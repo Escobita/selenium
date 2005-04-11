@@ -10,5 +10,8 @@ iframe {
 body {
   margin-top: 65px;
   margin-bottom: 1.5em;
+}
+
+html, body {
   overflow: auto;
 }
