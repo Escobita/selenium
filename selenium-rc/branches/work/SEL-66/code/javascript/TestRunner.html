@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+Copyright 2004 ThoughtWorks, Inc
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html>
+<head>
+<meta content="text/html; charset=ISO-8859-1"
+http-equiv="content-type">
+<link rel="stylesheet" type="text/css" href="skin/selenium.css">
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="skin/selenium-ie.css">
+<![endif]-->
+<title>Selenium Functional Test Runner</title>
+<script language="JavaScript" type="text/javascript" src="html-xpath/html-xpath-patched.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-browserbot.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-api.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-commandhandlers.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-executionloop.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-executioncontext.js"></script>
+<script language="JavaScript" type="text/javascript" src="selenium-fitrunner.js"></script>
+<script language="JavaScript" type="text/javascript" src="htmlutils.js"></script>
+<script language="JavaScript" type="text/javascript" src="domviewer.js"></script>
+</head>
+
+<body onLoad="javascript:start();">
+
+<div id="banner">
+<table width="100%" height="100%">
+  <tr valign="center">
+    <td rowspan="2">
+      <img src="skin/selenium-logo.png"/>
+    </td>
+    <td>
+      <button type="button" id="runTest" onClick="runSingleTest();">Run Selected</button>
+      <button type="button" id="runSuite" onClick="startTestSuite();">Run All</button>
+      <button type="button" id="continueTest" accesskey="n">Next</button>
+      
+    </td>
+    <td rowspan="2">
+      <button type="button" id="domViewer1" onClick="newRoot=getIframeDocument(getElementById('myiframe'));window.open('domviewer.html');return false;">View DOM</button>
+    </td>
+    <td align="right" rowspan="2">
+      <strong><a href="http://selenium.thoughtworks.com">Selenium</a> 
+      TestRunner</strong>
+      <br/>
+      &copy;<a href="http://www.thoughtworks.com">ThoughtWorks</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>
+    Mode:
+    <label><input id="modeRun" type="radio" name="runMode" value="0" checked="checked"/>Run</label>
+    <label><input id="modeWalk" type="radio" name="runMode" value="500" />Walk</label>
+    <label><input id="modeStep" type="radio" name="runMode" value="-1" />Step</label>
+    </strong>
+
+    </td>
+  </tr>
+</table>
+</div>
+
+<div id="main">
+
+<div id="suite">
+<iframe NAME="testSuiteFrame" ID="testSuiteFrame" SRC="./tests/TestSuite.html"></iframe>
+</div>
+
+<div id="test">
+<iframe NAME="testFrame" ID="testFrame" SRC="about:blank"></iframe>
+</div>
+
+<div id="aut">
+<iframe NAME="myiframe" ID="myiframe" SRC="about:blank"></iframe>
+</div>
+
+</div><!-- main -->
+
+<div id="footer">
+  <table id="resultsPanel">
+    <tr>
+      <th class="section">Elapsed Time:</th>
+      <td id="elapsedTime">00.00</td>
+      <th class="section">Tests -</th>
+      <th>run:</th><td id="testRuns">0</td>
+      <th>failed:</th><td id="testFailures">0</td>
+      <th class="section">Commands -</th>
+      <th>passed:</th><td id="commandPasses">0</td>
+      <th>failed:</th><td id="commandFailures">0</td>
+      <th>errors:</th><td id="commandErrors">0</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>
+
