@@ -42,19 +42,19 @@ var isSafari = (navigator.userAgent.indexOf('Safari') != -1);
 var geckoResult = /^Mozilla\/5\.0 .*Gecko\/(\d{8}).*$/.exec(navigator.userAgent);
 var geckoVersion = geckoResult == null ? null : geckoResult[1];
 
-function createBrowserBot(frame, executionContext) {
+function createBrowserBot(frame) {
     if (isIE) {
-        return new IEBrowserBot(frame, executionContext);
+        return new IEBrowserBot(frame);
     }
     else if (isKonqueror) {
-        return new KonquerorBrowserBot(frame, executionContext);
+        return new KonquerorBrowserBot(frame);
     }
     else if (isSafari) {
-        return new SafariBrowserBot(frame, executionContext);
+        return new SafariBrowserBot(frame);
     }
     else {
         // Use mozilla by default
-        return new MozillaBrowserBot(frame, executionContext);
+        return new MozillaBrowserBot(frame);
     }
 }
 
@@ -74,9 +74,8 @@ function createPageBot(windowObject) {
     }
 }
 
-BrowserBot = function(frame, executionContext) {
+BrowserBot = function(frame) {
     this.frame = frame;
-    this.executionContext = executionContext;
     this.currentPage = null;
     this.currentWindowName = null;
 
@@ -116,8 +115,7 @@ BrowserBot.prototype.getFrame = function() {
 };
 
 BrowserBot.prototype.getContentWindow = function() {
-    return this.executionContext.getContentWindow(this.getFrame());
-
+    return this.getFrame().contentWindow || frames[this.getFrame().id];
 };
 
 BrowserBot.prototype.selectWindow = function(target) {
@@ -135,15 +133,15 @@ BrowserBot.prototype.selectWindow = function(target) {
 BrowserBot.prototype.openLocation = function(target, onloadCallback) {
     // We're moving to a new page - clear the current one
     this.currentPage = null;
-    this.executionContext.open(target,this.getFrame());
+    // Window doesn't fire onload event when setting src to the current value,
+    // so we set it to blank first.
+    this.getFrame().src = "about:blank";
+    this.getFrame().src = target;
 };
 
 BrowserBot.prototype.getCurrentPage = function() {
     if (this.currentPage == null) {
-        var testWindow = this.getContentWindow().window;
-        if (this.currentWindowName != null) {
-            testWindow = this.getTargetWindow(this.currentWindowName);
-        }
+        var testWindow = this.getCurrentWindow();
         this.modifyWindowToRecordPopUpDialogs(testWindow, this);
         this.modifyWindowToClearPageCache(testWindow, this);
         this.currentPage = createPageBot(testWindow);
@@ -187,22 +185,30 @@ BrowserBot.prototype.getTargetWindow = function(windowName) {
     return targetWindow;
 };
 
-BrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
-    addLoadListener(this.frame, onloadCallback);
+BrowserBot.prototype.getCurrentWindow = function() {
+    var testWindow = this.getContentWindow().window;
+    if (this.currentWindowName != null) {
+        testWindow = this.getTargetWindow(this.currentWindowName);
+    }
+    return testWindow;
 };
 
-function MozillaBrowserBot(frame, executionContext) {
-    BrowserBot.call(this, frame, executionContext);
+BrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
+    addLoadListener(this.getFrame(), onloadCallback);
+};
+
+function MozillaBrowserBot(frame) {
+    BrowserBot.call(this, frame);
 }
 MozillaBrowserBot.prototype = new BrowserBot;
 
-function KonquerorBrowserBot(frame, executionContext) {
-    BrowserBot.call(this, frame, executionContext);
+function KonquerorBrowserBot(frame) {
+    BrowserBot.call(this, frame);
 }
 KonquerorBrowserBot.prototype = new BrowserBot;
 
-function SafariBrowserBot(frame, executionContext) {
-    BrowserBot.call(this, frame, executionContext);
+function SafariBrowserBot(frame) {
+    BrowserBot.call(this, frame);
 }
 SafariBrowserBot.prototype = new BrowserBot;
 
@@ -214,15 +220,15 @@ SafariBrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
     this.currentPage = null;
 
     try {
-        addLoadListener(this.frame, onloadCallback);
+        addLoadListener(this.getFrame(), onloadCallback);
     } catch (e) {
         LOG.debug("Got on error adding LoadListener in BrowserBot.prototype.callOnNextPageLoad." +
                   "This occurs on the second and all subsequent calls in Safari");
     }
 };
 
-function IEBrowserBot(frame, executionContext) {
-    BrowserBot.call(this, frame, executionContext);
+function IEBrowserBot(frame) {
+    BrowserBot.call(this, frame);
 }
 IEBrowserBot.prototype = new BrowserBot;
 
