@@ -203,7 +203,12 @@ BrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
 };
 
 BrowserBot.prototype.callOnFramePageLoad = function(loadFunction, frameObject) {
-    addLoadListener(frameObject, loadFunction);
+    try {
+        addLoadListener(frameObject, loadFunction);
+    } catch (e) {
+        LOG.debug("Got on error adding LoadListener in BrowserBot.prototype.callOnFramePageLoad." +
+                  "This occurs on the second and all subsequent calls in Safari");
+    }
 };
 
 BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowObject) {
@@ -271,19 +276,6 @@ SafariBrowserBot.prototype = new BrowserBot;
 SafariBrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
     this.currentPage = null;
     BrowserBot.prototype.callOnNextPageLoad.call(this, onloadCallback);
-};
-
-/**
- * Since Safari 1.3 doesn't trigger unload, we clear cached page as soon as
- * we know that we're expecting a new page.
- */
-SafariBrowserBot.prototype.callOnFramePageLoad = function(onloadCallback, frameObject) {
-    try {
-        addLoadListener(frameObject, onloadCallback);
-    } catch (e) {
-        LOG.debug("Got on error adding LoadListener in SafariBrowserBot.prototype.callOnFramePageLoad." +
-                  "This occurs on the second and all subsequent calls in Safari");
-    }
 };
 
 SafariBrowserBot.prototype.callOnWindowPageTransition = KonquerorBrowserBot.prototype.callOnWindowPageTransition;
