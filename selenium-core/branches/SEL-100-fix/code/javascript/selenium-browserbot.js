@@ -194,8 +194,37 @@ BrowserBot.prototype.getCurrentWindow = function() {
 };
 
 BrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
-    addLoadListener(this.getFrame(), onloadCallback);
+    if (this.currentWindowName == null) {
+        this.callOnFramePageLoad(onloadCallback, this.getFrame());
+    }
+    else {
+        this.callOnWindowPageTransition(onloadCallback, this.getCurrentWindow());
+    }
 };
+
+BrowserBot.prototype.callOnFramePageLoad = function(loadFunction, frameObject) {
+    addLoadListener(frameObject, loadFunction);
+};
+
+BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowObject) {
+    var unloadFunction = function() {
+        window.setTimeout(function() {addLoadListener(windowObject, loadFunction);}, 0);
+    };
+    addUnloadListener(windowObject, unloadFunction);
+};
+
+/**
+ * Handle the initial page load in a new popup window.
+ * TODO - something like this should allow us to wait for a new popup window - currently need to pause...
+ */
+//function callOnWindowInitialLoad(loadFunction, windowObject) {
+//    if (!(isSafari || isKonqueror)) {
+//        addLoadListener(windowObject, loadFunction);
+//    }
+//    else {
+//        this.pollForLoad(loadFunction, windowObject, windowObject.document);
+//    }
+//}
 
 function MozillaBrowserBot(frame) {
     BrowserBot.call(this, frame);
@@ -207,6 +236,23 @@ function KonquerorBrowserBot(frame) {
 }
 KonquerorBrowserBot.prototype = new BrowserBot;
 
+KonquerorBrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowObject) {
+    this.pollForLoad(loadFunction, windowObject, windowObject.document);
+};
+
+KonquerorBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument) {
+    var sameDoc = (originalDocument === windowObject.document);
+    var rs = windowObject.document.readyState;
+
+    if (!sameDoc && rs == 'complete') {
+        LOG.debug("poll: " + rs + " (" + sameDoc + ")");
+        loadFunction();
+        return;
+    }
+    var self = this;
+    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument);}, 200);
+};
+
 function SafariBrowserBot(frame) {
     BrowserBot.call(this, frame);
 }
@@ -216,13 +262,13 @@ SafariBrowserBot.prototype = new BrowserBot;
  * Since Safari 1.3 doesn't trigger unload, we clear cached page as soon as
  * we know that we're expecting a new page.
  */
-SafariBrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
+SafariBrowserBot.prototype.callOnFramePageLoad = function(onloadCallback, frameObject) {
     this.currentPage = null;
 
     try {
-        addLoadListener(this.getFrame(), onloadCallback);
+        addLoadListener(frameObject, onloadCallback);
     } catch (e) {
-        LOG.debug("Got on error adding LoadListener in BrowserBot.prototype.callOnNextPageLoad." +
+        LOG.debug("Got on error adding LoadListener in SafariBrowserBot.prototype.callOnFramePageLoad." +
                   "This occurs on the second and all subsequent calls in Safari");
     }
 };
