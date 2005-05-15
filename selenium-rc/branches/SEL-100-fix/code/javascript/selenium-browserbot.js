@@ -240,6 +240,12 @@ KonquerorBrowserBot.prototype.callOnWindowPageTransition = function(loadFunction
     this.pollForLoad(loadFunction, windowObject, windowObject.document);
 };
 
+/**
+ * For Konqueror (and Safari), we can't catch the onload event for a separate window (as opposed to an IFrame)
+ * So we set up a polling timer that will keep checking the readyState of the document until it's complete.
+ * Since we might call this before the original page is unloaded, we check to see that the completed document
+ * is different from the original one.
+ */
 KonquerorBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument) {
     var sameDoc = (originalDocument === windowObject.document);
     var rs = windowObject.document.readyState;
@@ -250,7 +256,7 @@ KonquerorBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject,
         return;
     }
     var self = this;
-    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument);}, 200);
+    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument);}, 100);
 };
 
 function SafariBrowserBot(frame) {
@@ -262,9 +268,16 @@ SafariBrowserBot.prototype = new BrowserBot;
  * Since Safari 1.3 doesn't trigger unload, we clear cached page as soon as
  * we know that we're expecting a new page.
  */
-SafariBrowserBot.prototype.callOnFramePageLoad = function(onloadCallback, frameObject) {
+SafariBrowserBot.prototype.callOnNextPageLoad = function(onloadCallback) {
     this.currentPage = null;
+    BrowserBot.prototype.callOnNextPageLoad.call(this, onloadCallback);
+};
 
+/**
+ * Since Safari 1.3 doesn't trigger unload, we clear cached page as soon as
+ * we know that we're expecting a new page.
+ */
+SafariBrowserBot.prototype.callOnFramePageLoad = function(onloadCallback, frameObject) {
     try {
         addLoadListener(frameObject, onloadCallback);
     } catch (e) {
@@ -272,6 +285,9 @@ SafariBrowserBot.prototype.callOnFramePageLoad = function(onloadCallback, frameO
                   "This occurs on the second and all subsequent calls in Safari");
     }
 };
+
+SafariBrowserBot.prototype.callOnWindowPageTransition = KonquerorBrowserBot.prototype.callOnWindowPageTransition;
+SafariBrowserBot.prototype.pollForLoad = KonquerorBrowserBot.prototype.pollForLoad;
 
 function IEBrowserBot(frame) {
     BrowserBot.call(this, frame);
