@@ -10,6 +10,10 @@ namespace Selenium
 		void ChooseCancelOnNextConfirmation();
 		void Click(String field);
 		void ClickAndWait(String field);
+        void KeyPress(String locator, int keycode);
+        void KeyDown(String locator, int keycode);
+        void MouseOver(String locator);
+        void MouseDown(String locator);
 		void Open(String path);
 		void Pause(int duration); // is this needed for driven ?
 		void SelectAndWait(String field, String value);
@@ -33,8 +37,11 @@ namespace Selenium
 		void VerifyTextPresent(String type, String text);
 		void VerifyTitle(String title);
 		void VerifyValue(String field, String value);
+        void SetContext(String context);
+        void SetContext(String context, String logLevel);
 		String[] GetAllButtons();
 		String[] GetAllLinks();
 		String[] GetAllFields();
+        String GetEval(String script);
 	}
 }

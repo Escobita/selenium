@@ -62,7 +62,7 @@ public class CommandBridgeClient implements CommandProcessor {
             is = getCommandResponse(command, is);
             return stringContentsOfInputStream(is);
         } catch (IOException e) {
-            throw new UnsupportedOperationException("Catch body broken");
+            throw new UnsupportedOperationException("Catch body broken: IOException from " + command + " -> " + e);
         } finally {
             if (is != null) {
                 try {

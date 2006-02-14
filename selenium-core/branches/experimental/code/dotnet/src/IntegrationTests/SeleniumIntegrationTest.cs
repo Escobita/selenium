@@ -36,6 +36,7 @@ namespace ThoughtWorks.Selenium.IntegrationTests
 		public void IISIntegrationTest()
 		{
 			selenium.Open("/testapp/test_click_page1.html");
+			selenium.SetContext("test", "debug");
 			selenium.VerifyText("link", "Click here for next page");
 			selenium.ClickAndWait("link");
 			selenium.ClickAndWait("previousPage");

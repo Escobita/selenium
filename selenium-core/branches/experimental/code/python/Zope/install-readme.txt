@@ -6,7 +6,15 @@ This has been tested with Plone 2.0.4.
    svn://selenium.codehaus.org/selenium/scm/trunk/code/javascript
    svn://selenium.codehaus.org/selenium/scm/trunk/code/python/Zope
 
+cp -r ../../javascript Selenium/skins/selenium_javascript
+rm -rf Selenium/skins/selenium_javascript/.svn
+rm -rf Selenium/skins/selenium_javascript/*/.svn 
+rm -rf Selenium/skins/selenium_javascript/*/*/.svn
+rm -rf Selenium/skins/selenium_javascript/*/*/*/.svn
+
 2) Copy the contents of the javascript folder (not the folder itself, just the contents, including all files and all sub-folders (selenium/trunk/code/javascript/*) to Zope/Selenium/skins/selenium_javascript.
+
+
 
 3) Append ".dtml" to all *.html, *.js, and *.css files inside the selenium_javascript folder and all sub-folders.
    Look at the end of this file for a sample script to do the renaming.
@@ -14,7 +22,30 @@ This has been tested with Plone 2.0.4.
         Before: selenium_javascript/TestRunner.html
         After: selenium_javascript/TestRunner.html.dtml
 
+        find Selenium/skins/selenium_javascript -type f |
+        while [ 1 ]; do
+                read fn
+                if [ -z "$fn" ]; then
+                        break
+                fi
+                case "$fn" in
+                        *.html|*.js|*.css)
+                                echo mv $fn $fn.dhtml
+                                mv $fn $fn.dhtml
+                        ;;
+                esac
+        done
+
+
 4) Copy Selenium folder (temp/Zope/Selenium) to <Plone_Instance_Home>/Products/Selenium
+
+(setenv "PLONE" "/cygdrive/c/Plone2.0.5")
+PLONE=/cygdrive/c/Plone2.0.6
+rm -rf  $PLONE/Zope/lib/python/Products/Selenium
+cp -r $P4ROOT/Tools/selenium/python/Zope/Selenium $PLONE/Zope/lib/python/Products
+rm -rf $PLONE/Zope/lib/python/Products/Selenium/.svn
+rm -rf $PLONE/Zope/lib/python/Products/Selenium/*/.svn
+rm -rf $PLONE/Zope/lib/python/Products/Selenium/*/*/.svn
 
 5) Use the Plone QuickInstaller to install the Plone product.
     a) Login to plone  as admin (not the Zope Management Interface (ZMI), but the Plone interface)
@@ -30,6 +61,7 @@ This has been tested with Plone 2.0.4.
 
     The TestRunner.html file is *really* stored here:
     <Plone_Instance_Home>/Products/Selenium/skins/selenium_javascript/TestRunner.html.dtml
+    ls $PLONE/Products/Selenium/skins/selenium_javascript/TestRunner.html.dtml
 
     and it makes a reference to the TestSuite.html file located here:
     <Plone_Instance_Home>/Products/Selenium/skins/selenium_javascript/tests/TestSuite.html.dtml

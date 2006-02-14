@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Win32;
 using Selenium;
+using System;
 
 namespace ThoughtWorks.Selenium.Core
 {
@@ -30,12 +31,30 @@ namespace ThoughtWorks.Selenium.Core
 			RegistryKey defaultBrowserKey = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command");
 
 			string browserPath = (string) defaultBrowserKey.GetValue("");
-			browserPath = browserPath.Replace("%1", url);
+			if (browserPath.IndexOf("%1") != -1)
+			{
+				browserPath = browserPath.Replace("%1", url);	
+			}
+			else
+			{
+				browserPath = browserPath + " " + url;
+			}
 
-			browser = browserPath.Substring(0, browserPath.IndexOf(' '));
-			arguments = browserPath.Substring(browserPath.IndexOf(' ') + 1);
-
-		}
+            string quotedExeSuffix = "exe\"";
+            int browserExeEnd = browserPath.IndexOf(quotedExeSuffix + " ");
+            
+            if (browserExeEnd==-1)
+            {
+                browserExeEnd = browserPath.IndexOf(' ');
+            }
+            else
+            {
+                browserExeEnd += quotedExeSuffix.Length;
+            }
+            
+            browser = browserPath.Substring(0, browserExeEnd);
+			arguments = browserPath.Substring(browserExeEnd + 1);
+        }
 
 		public virtual void Close()
 		{

@@ -1,0 +1,20 @@
+<project name="selenium" default="all">
+    
+    <!-- 
+    To derive this prop I was initially working with the TEMP variable, which I think is standard
+    on Windows boxes, but this variable contains a number of funny characters from 
+    being compressed to 8.3 mode, and this seems to confuse IIS.  If I keep the 
+    temporary directory name simple, then everything works:
+    --> 
+    <property name="tmp" value="c:/selenium_temp_dotnet"/>
+    
+    <target name="all">
+        <copy todir="${tmp}">
+            <fileset dir="."/>
+        </copy>
+        <!--  output="${tmp}/nant_out.txt" -->
+        <exec dir="${tmp}" executable="tools/nant/NAnt.exe" failonerror="true">
+            <arg line="-buildfile:selenium.build -nologo"/>
+        </exec>
+    </target>
+</project>

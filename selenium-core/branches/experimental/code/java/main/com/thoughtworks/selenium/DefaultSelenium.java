@@ -22,6 +22,7 @@ import com.thoughtworks.selenium.embedded.jetty.JettyCommandProcessor;
 import com.thoughtworks.selenium.launchers.DefaultBrowserLauncher;
 
 import java.io.File;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
@@ -32,9 +33,10 @@ import java.util.StringTokenizer;
  * @version $Revision$
  */
 public class DefaultSelenium implements Selenium {
-
+    
     private CommandProcessor commandProcessor;
     private BrowserLauncher launcher;
+    private String logLevel = null;
 
     public static final String DEFAULT_SELENIUM_CONTEXT = "selenium-driver";
 
@@ -87,7 +89,8 @@ public class DefaultSelenium implements Selenium {
 
     public void verifyText(String type, String text) {
         String result = commandProcessor.doCommand("verifyText", type, text);
-        if (!result.equals("PASSED")) {
+        if (!result.equals("PASSED")            // this is what IE returns
+                && !result.equals("OK")) {      // this is what firefox returns
             throw new SeleniumException(result);
         }
     }
@@ -108,7 +111,7 @@ public class DefaultSelenium implements Selenium {
     }
 
     protected String getTestRunnerPageName() {
-        return "SeleneseRunner.html";
+        return "SeleneseRunner.html?counterToMakeURsUniqueAndSoStopPageCachingInTheBrowser=" + (new Date()).getTime();
     }
 
     public void answerOnNextPrompt(String value) {
@@ -210,6 +213,34 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
+    public void keyPress(String locator, int keycode) {
+        String result = commandProcessor.doCommand("keypress", locator, Integer.toString(keycode));
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+    
+    public void keyDown(String locator, int keycode) {
+        String result = commandProcessor.doCommand("keydown", locator, Integer.toString(keycode));
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+    
+    public void mouseOver(String locator) {
+        String result = commandProcessor.doCommand("mouseover", locator, "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+    
+    public void mouseDown(String locator) {
+        String result = commandProcessor.doCommand("mousedown", locator, "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+    
     public void typeAndWait(String field, String value) {
         String result = commandProcessor.doCommand("typeAndWait", field, value);
         if (!result.equals("OK")) {
@@ -351,7 +382,11 @@ public class DefaultSelenium implements Selenium {
     }
     
     public void setContext(String context) {
-        String result = commandProcessor.doCommand("context", context, "");
+        setContext(context, "");   
+    }
+
+    public void setContext(String context, String logLevel) {
+        String result = commandProcessor.doCommand("context", context, logLevel);
     }
 
     public String[] getAllButtons() {
@@ -387,6 +422,11 @@ public class DefaultSelenium implements Selenium {
         return result;
     }
 
+    public String getEval(String script) {
+        String stringResult = commandProcessor.doCommand("getEval", script, "");
+        return stringResult;
+    }
+    
     public void start() {
         commandProcessor.start();
         launcher.launch("http://localhost:8080/" + getContextName() + "/" + getTestRunnerPageName());
@@ -397,5 +437,13 @@ public class DefaultSelenium implements Selenium {
         commandProcessor.stop();
     }
 
+    public String getLogLevel() {
+        return logLevel;
+    }
 
+    public boolean getEvalBool(String string) {
+        String eval = getEval(string);
+        boolean result = "true".equals(eval);
+        return result;
+    }
 }

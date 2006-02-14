@@ -94,12 +94,14 @@
             <zipfileset dir="../javascript/Embedded-WEB-INF" prefix="${java.release}/browser-bot/WEB-INF">
                 <include name="web.xml"/>
             </zipfileset>
+            <!-- I'm not sure where these things are really supposed to have come from...    Do we still need this at all?   -nas
             <zipfileset dir="../../website/webapps/ROOT" prefix="${java.release}/docs">
                 <include name="*.html"/>
                 <include name="*.png"/>
             </zipfileset>
-            <!-- a rename because copied docs are undecorated, index is not really an index -->
+            // a rename because copied docs are undecorated, index is not really an index
             <zipfileset dir="../../website/webapps/ROOT" includes="links.jsp" fullpath="${java.release}/docs/TABLE-OF-CONTENTS.html"/>
+            -->
         </zip>
 
         <property name="java.src.release" value="${ant.project.name}-${version}-java-src"/>
@@ -223,11 +225,17 @@
     </target>
 
     <target name="integration-test-windows" depends="compile" if="isWindows">
+        <antcall target="integration-test-windows-browser"><param name="browserToTest" value="ie"/></antcall>
+        <antcall target="integration-test-windows-browser"><param name="browserToTest" value="firefox"/></antcall>
+    </target>
 
-        <echo>Integration Tests for Embedded Web Container</echo>
+    <target name="integration-test-windows-browser">
+
+        <echo>Integration Tests for Embedded Web Container for ${browserToTest}</echo>
 
         <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed">
             <jvmarg value="-Dcode_root=${code_root}"/>
+            <jvmarg value="-DbrowserToTest=${browserToTest}"/>
             <jvmarg value="-DCATALINA_HOME=${env.CATALINA_HOME}"/>
             <classpath refid="instrumented.classpath"/>
             <formatter type="xml"/>

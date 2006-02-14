@@ -41,10 +41,11 @@ public class SingleEntryAsyncQueue {
         int retries = 0;
         while (available == false) {
             try {
-                wait(1000 * 5);
+                wait(1000);
             } catch (InterruptedException e) {
+                continue;
             }
-            if (available == false & retries > 5) {
+            if (available == false & retries > 25) {
                 throw new SeleniumCommandTimedOutException();
             }
             retries++;
@@ -53,12 +54,19 @@ public class SingleEntryAsyncQueue {
         return thing;
     }
 
+    public String toString() {
+        if (!available)
+            return "[empty queue]";
+    
+        return "[queue containing '" + thing + "']";
+    }
+
     /**
      * <p>Puts something in the queue.</p>
      * If there's already something available in the queue, wait
      * for that item to get picked up and removed from the queue. 
      * @param thing - the thing to put in the queue
-     */
+     */    
     public synchronized void put(Object thing) {
         while (available == true) {
             try {

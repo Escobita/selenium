@@ -16,12 +16,17 @@ namespace ThoughtWorks.Selenium.BridgeWebApp
 
 		public void ProcessRequest(HttpContext context)
 		{
+			string noOpToLoadIISProcess = context.Request.Params["noOpToLoadIISProcess"];
 			string commandRequest = context.Request.Params["commandRequest"];
 			string commandResult = context.Request.Params["commandResult"];
 			string seleniumStart = context.Request.Params["seleniumStart"];
 			string returnValue = null;
 
-			if (commandRequest != null)
+			if (noOpToLoadIISProcess != null)
+			{
+				returnValue = "ignoring request; w3wp should now be loaded";
+			}
+			else if (commandRequest != null)
 			{
 				returnValue = GetOrCreateQueue(context).ProcessCommandRequestFromClient(commandRequest);
 			}
@@ -36,19 +41,20 @@ namespace ThoughtWorks.Selenium.BridgeWebApp
 
 			byte[] output = Encoding.Default.GetBytes(returnValue);
 			context.Response.OutputStream.Write(output, 0, output.Length);
-
 		}
 
 		private SeleneseQueue GetOrCreateQueue(HttpContext context)
-		{
-			SeleneseQueue queue = (SeleneseQueue) context.Application.Get(SELENESE_QUEUE_KEY);
-			if (queue == null)
-			{
-				queue = new SeleneseQueue();
-				context.Application.Add(SELENESE_QUEUE_KEY, queue);
-			}
-		
-			return queue;
+        {
+            lock (context.Application)
+            {
+				SeleneseQueue queue = (SeleneseQueue) context.Application.Get(SELENESE_QUEUE_KEY);
+				if (queue == null)
+				{
+					queue = new SeleneseQueue();
+					context.Application.Add(SELENESE_QUEUE_KEY, queue);
+				}
+				return queue;
+            }
 		}
 	}
 }
