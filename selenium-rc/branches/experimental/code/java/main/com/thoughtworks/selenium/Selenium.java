@@ -29,6 +29,10 @@ public interface Selenium extends Startable {
     void chooseCancelOnNextConfirmation();
     void click(String field);
     void clickAndWait(String field);
+    void keyPress(String locator, int keycode);
+    void keyDown(String locator, int keycode);
+    void mouseOver(String locator);
+    void mouseDown(String locator);
     void fireEvent(String element, String event);
     void goBack();
     void open(String path);
@@ -71,9 +75,11 @@ public interface Selenium extends Startable {
      * @param context the message to be sent to the browser
      */
     void setContext(String context);
-	String[] getAllButtons();
+    void setContext(String context, String logLevel);
+    String[] getAllButtons();
 	String[] getAllLinks();
 	String[] getAllFields();
+    String getEval(String script);
     /** Starts the command processor and launches the browser */
     void start();
     /** Kills the browser and stops the command processor */

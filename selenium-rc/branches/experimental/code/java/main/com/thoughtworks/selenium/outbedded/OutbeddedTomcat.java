@@ -61,7 +61,9 @@ public class OutbeddedTomcat extends ServletContainer {
         List l = new ArrayList();
         for (StringTokenizer stringTokenizer = new StringTokenizer(classpath,File.pathSeparator); stringTokenizer.hasMoreTokens();) {
             String s = stringTokenizer.nextToken();
-            if (s.indexOf(File.separator+"jre"+File.separator)==-1) l.add(s);
+            if (s.indexOf(File.separator+"jre"+File.separator)!=-1) continue;
+            if (s.indexOf("xerces")!=-1) continue;
+            l.add(s);
         }
         String[] classpathpaths = new String[l.size()];
         classpathpaths = (String[]) l.toArray(classpathpaths);

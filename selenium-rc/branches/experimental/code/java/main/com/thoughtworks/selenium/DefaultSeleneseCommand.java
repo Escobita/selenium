@@ -46,6 +46,10 @@ public class DefaultSeleneseCommand implements SeleneseCommand {
     public String getCommandString() {
         return "|" + command + "|" + field + "|" + value + "|";
     }
+    
+    public String toString() {
+        return getCommandString();
+    }
 
     /** Factory method to create a SeleneseCommand from a wiki-style input string */
     public static SeleneseCommand parse(String inputLine) {

@@ -19,12 +19,8 @@ package com.thoughtworks.selenium.outbedded;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.outbedded.*;
 import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
 import junit.framework.TestCase;
-
-import java.io.File;
 
 /**
  * @author Ben Griffiths
@@ -32,51 +28,27 @@ import java.io.File;
 public class OutbeddedTomcatIntegrationTest extends TestCase {
 
     Selenium selenium;
-    ServletContainer container;
+    OutbeddedTomcatBridge bridge;
 
     protected void setUp() throws Exception {
         super.setUp();
 
-        String tomcatHome = checkForTomcatInstall();
+        bridge = new OutbeddedTomcatBridge();
+        String commandBridgeURL = bridge.launchBridge();
 
-        container = new OutbeddedTomcat(tomcatHome);
-        Deployer deployer = new IntegrationTestDeployer();
-
-        container.deployAppAndSelenium(deployer);
-
-        CommandProcessor processor = container.start();
-
+        bridge.start();
+        
         selenium = new DefaultSelenium(
-                processor,
+                new CommandBridgeClient(commandBridgeURL),
                 new SystemDefaultBrowserLauncher()
         );
 
         selenium.start();
-
     }
-
-    private String checkForTomcatInstall() {
-        String tomcatHome = getTomcatHome();
-        File f = new File(tomcatHome);
-        if (!f.exists()) throw new AssertionError("Tomcat not found");
-        return tomcatHome;
-    }
-
-    private String getTomcatHome() {
-        String defaultTomcat = "C:\\jakarta-tomcat-5.0.29";
-        if (System.getProperty("TOMCAT_HOME") != null) {
-            return System.getProperty("TOMCAT_HOME");
-        }
-        if (System.getProperty("CATALINA_HOME") != null) {
-            return System.getProperty("CATALINA_HOME");
-        }
-        return defaultTomcat;
-    }
-
 
     protected void tearDown() throws Exception {
         Thread.sleep(2 * 1000);
-        container.stop();
+        bridge.stop();
         selenium.stop();
     }
 

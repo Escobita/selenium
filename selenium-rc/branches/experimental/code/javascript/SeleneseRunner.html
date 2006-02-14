@@ -39,12 +39,19 @@ http-equiv="content-type">
         domViewer.rootDocument = autFrameDocument;
         return false;
     }
+    
+    function cleanUp() {
+    	if (LOG != null) {
+		LOG.close();
+	}
+    }
+    
 </script>
 <script>
 </script>
 </head>
 
-<body onLoad="runTest()">
+<body onLoad="runTest()" onUnload="cleanUp()">
 
 <table border="1" style="height: 100%;">
   <tr>

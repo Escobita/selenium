@@ -5,7 +5,7 @@ namespace ThoughtWorks.Selenium.BridgeWebApp
 {
 	public class SingleEntryBlockingQueue
 	{
-		private Queue queue = Queue.Synchronized(new Queue());
+		private Queue queue = new Queue();
 
 		public void Put(object o)
 		{

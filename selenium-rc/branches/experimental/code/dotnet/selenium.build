@@ -13,7 +13,7 @@
 	<target name="all-clean" depends="clean, all"
 		description="Clean up, then do everything you might want to do on a developer workstation" />
 		
-	<target name="test" depends="unit-tests, integration-tests" 
+	<target name="test" depends="unit-tests, iis-reset, integration-tests" 
 		description="Run all tests"/>
 	
 	<target name="unit-tests" depends="compile, run-unit-tests" 
@@ -64,7 +64,7 @@
 	</target>
 	
 	
-	<target name="run-integration-tests" depends="iis-reset">
+	<target name="run-integration-tests">
 		<property name="integration.tests.dll" value="ThoughtWorks.Selenium.IntegrationTests.dll" />
 		<exec 
 			program="tools\nunit\nunit-console.exe" 
@@ -76,9 +76,12 @@
 		<mkdir dir="deployed" />
 		<copy todir="deployed/BridgeWebApp">
 			<fileset basedir="src/BridgeWebApp">
-				<include name="SeleneseRunner.html" />
-				<include name="SeleneseRunner.hta" />
-				<include name="web.config" />
+				<include name="*.html" />
+				<include name="*.hta" />
+				<include name="*.config" />
+				<include name="*.css" />
+				<include name="*.js" />
+				<include name="*.png" />
 				<include name="global.asax*" />
 				
 			</fileset>
@@ -286,7 +289,7 @@
 				<![CDATA[
 					public static void ScriptMain(Project project)
 					{
-						CreateVDir(
+						System.Console.WriteLine(CreateVDir(
 							project.Properties["iis_vdir.WebSite"], 
 							project.Properties["iis_vdir.VDirName"], 
 							project.Properties["iis_vdir.Path"], 
@@ -297,7 +300,7 @@
 							bool.Parse(project.Properties["iis_vdir.chkScript"]), 
 							bool.Parse(project.Properties["iis_vdir.chkAuth"]), 
 							int.Parse(project.Properties["iis_vdir.webSiteNum"]), 
-							project.Properties["iis_vdir.serverName"]);
+							project.Properties["iis_vdir.serverName"]));
 					}
 
 					public static string CreateVDir(string  WebSite, string VDirName, string Path, bool  RootDir, 
@@ -305,6 +308,8 @@
 						int webSiteNum, string serverName)
 					{
 						string sRet=String.Empty;
+					    try
+					    {
 						System.DirectoryServices.DirectoryEntry IISSchema;
 						System.DirectoryServices.DirectoryEntry IISAdmin;
 						System.DirectoryServices.DirectoryEntry VDir;
@@ -405,7 +410,14 @@
 						}
 
 						sRet+= "VRoot " +VDirName + " created!";
-						return sRet;
+					    }
+ 					    catch(Exception ex)
+ 					    {
+ 						    string s = " operation aborted: " + ex.Message;
+ 						    System.Console.WriteLine(s);
+ 						    sRet+=s;
+ 					    }
+					    return sRet;
 					}
 					
 				]]>

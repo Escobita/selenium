@@ -49,9 +49,19 @@ public class SeleneseQueue {
         commandHolder.put(new DefaultSeleneseCommand(command, field, value));
         if (!command.equals("testComplete")) {
             return (String) commandResultHolder.get();
-        } else {
-            return "";
         }
+        return "";
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("{ commandHolder=");
+        sb.append(commandHolder.toString())
+        .append(", ")
+        .append(" commandResultHolder=")
+        .append(commandResultHolder.toString())
+        .append(" }");
+        
+        return sb.toString();
     }
 
     /**

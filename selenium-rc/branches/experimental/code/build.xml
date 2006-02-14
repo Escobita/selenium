@@ -132,11 +132,6 @@
         <copy todir="${website.root}" file="dist-image/doc/testrunner.html"/>
     </target>
 
-    <target name="publish-demos">
-        <update-demo demo-dir="demo1"/>
-        <update-demo demo-dir="demo2"/>
-    </target>
-
     <macrodef name="update-demo">
         <attribute name="demo-dir"/>
         <sequential>
@@ -154,4 +149,27 @@
             </copy>
         </sequential>
     </macrodef>
+    
+    <target name="test" depends="test_java, test_ruby, test_dotnet"/>
+    
+    <target name="test_java">
+        <ant dir="java" target="all">
+            <property name="code_root" value="."/>
+            <property name="version" value="${version}"/>
+        </ant>
+    </target>
+        
+    <target name="test_dotnet">
+        <ant dir="dotnet" target="all"/>
+    </target>
+        
+    <target name="test_dotnet">
+        <ant dir="ruby" target="all"/>
+    </target>
+        
+    <target name="publish-demos">
+        <update-demo demo-dir="demo1"/>
+        <update-demo demo-dir="demo2"/>
+    </target>
+
 </project>
