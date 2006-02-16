@@ -1,9 +1,12 @@
 <project name="selenium" default="dist">
 
     <property name="version" value="0.7-SNAPSHOT"/>
-    <property name="website.root" value="../website/webapps/ROOT"/>
+    <condition property="website.root" value="../website/webapps/ROOT">
+        <available file="../website/webapps/ROOT"/>
+    </condition>
 
     <target name="clean">
+        <fail message="wr=${website.root}"/>
         <delete dir="dist-image"/>
         <delete dir="dist"/>
     </target>
@@ -12,6 +15,7 @@
 
     <target name="dist-dirs">
         <mkdir dir="dist-image"/>
+        <mkdir dir="dist-image/doc"/>	<!-- needed when website.root is not set -->
         <mkdir dir="dist"/>
     </target>
 
@@ -33,7 +37,7 @@
         <echo file="dist-image/browserbot/version.txt">${version}</echo>
     </target>
 
-    <target name="dist-image-doc" depends="dist-dirs">
+    <target name="dist-image-doc" depends="dist-dirs" if="website.root">
         <copy todir="dist-image/doc">
             <fileset dir="doc">
                 <include name="*.html"/>
@@ -150,7 +154,7 @@
         </sequential>
     </macrodef>
     
-    <target name="test" depends="test_java, test_ruby, test_dotnet"/>
+    <target name="test" depends="test_ruby, test_dotnet, test_java"/>
     
     <target name="test_java">
         <ant dir="java" target="all">
@@ -163,7 +167,7 @@
         <ant dir="dotnet" target="all"/>
     </target>
         
-    <target name="test_dotnet">
+    <target name="test_ruby">
         <ant dir="ruby" target="all"/>
     </target>
         

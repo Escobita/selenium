@@ -115,8 +115,7 @@ public class RealDealIntegrationTest extends TestCase {
         selenium.testComplete();
     }
     
-   public void testAgain() throws InterruptedException {
-        Thread.sleep(2 * 1000);
+   public void testAgain() {
         testWithJavaScript();
     }
     

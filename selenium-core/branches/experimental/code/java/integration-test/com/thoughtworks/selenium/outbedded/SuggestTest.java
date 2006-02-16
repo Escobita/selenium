@@ -1,6 +1,6 @@
 package com.thoughtworks.selenium.outbedded;
 
-public class SuggestTest extends OutbeddedTomcatAJAXTest {
+public class SuggestTest extends OutbeddedTomcatAJAX {
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -16,10 +16,12 @@ public class SuggestTest extends OutbeddedTomcatAJAXTest {
         selenium.type("_id0:_id3", "foo");
         // DGF On Mozilla a keyPress is needed, and types a letter.
         // On IE6, a keyDown is needed, and no letter is typed. :-p
+        // NS On firefox, keyPress needed, no letter typed.
         
         boolean isIE = selenium.getEvalBool("isIE");
+        boolean isFirefox = selenium.getEvalBool("isFirefox");
         boolean isNetscape = selenium.getEvalBool("isNetscape");
-        String verificationText;
+        String verificationText = null;
         if (isIE) {
             selenium.keyDown("_id0:_id3", 120);
         } else {
@@ -27,8 +29,11 @@ public class SuggestTest extends OutbeddedTomcatAJAXTest {
         }
         if (isNetscape) {
             verificationText = "foox1";
-        } else {
+        } else if (isIE || isFirefox) {
             verificationText = "foo1";
+        }
+        else {
+            fail("which browser is this?");
         }
         Thread.sleep(2000);
         selenium.verifyTextPresent(verificationText);

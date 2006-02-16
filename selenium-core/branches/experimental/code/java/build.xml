@@ -225,22 +225,26 @@
     </target>
 
     <target name="integration-test-windows" depends="compile" if="isWindows">
-        <antcall target="integration-test-windows-browser"><param name="browserToTest" value="ie"/></antcall>
-        <antcall target="integration-test-windows-browser"><param name="browserToTest" value="firefox"/></antcall>
+        <integration-test-windows-browser browserToTest="ie"/>
+        <integration-test-windows-browser browserToTest="firefox"/>
     </target>
 
-    <target name="integration-test-windows-browser">
+    <macrodef name="integration-test-windows-browser">
+        <attribute name="browserToTest" default="NOT SET"/>
+        <sequential>
 
-        <echo>Integration Tests for Embedded Web Container for ${browserToTest}</echo>
+        <echo>Integration Tests for Embedded Web Container for @{browserToTest}</echo>
 
+        <mkdir dir="${integration.test.logs.dir}/@{browserToTest}"/>
+            
         <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed">
             <jvmarg value="-Dcode_root=${code_root}"/>
-            <jvmarg value="-DbrowserToTest=${browserToTest}"/>
+            <jvmarg value="-DbrowserToTest=@{browserToTest}"/>
             <jvmarg value="-DCATALINA_HOME=${env.CATALINA_HOME}"/>
             <classpath refid="instrumented.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
-            <batchtest todir="${integration.test.logs.dir}">
+            <batchtest todir="${integration.test.logs.dir}/@{browserToTest}">
                 <fileset dir="${integration.test.dir}">
                     <include name="**/embedded/**/Real*Test.java"/>
                     <exclude name="**/Mac*"/>
@@ -253,16 +257,17 @@
         Cannot run Outbedded Integration tests because environment variable CATALINA_HOME is not set.
         Please set CATALINA_HOME to your Tomcat installation directory.
         </fail>
-
-        <echo>Integration Tests for Outbedded Web Container, including those that require Tomcat installed and CATALINA_HOME set.</echo>
+        
+        <echo>Integration Tests for Outbedded Web Container for @{browserToTest}, including those that require Tomcat installed.</echo>
 
         <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed">
             <jvmarg value="-Dcode_root=${code_root}"/>
             <jvmarg value="-DCATALINA_HOME=${env.CATALINA_HOME}"/>
+            <jvmarg value="-DbrowserToTest=@{browserToTest}"/>
             <classpath refid="instrumented.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
-            <batchtest todir="${integration.test.logs.dir}">
+            <batchtest todir="${integration.test.logs.dir}/@{browserToTest}">
                 <fileset dir="${integration.test.dir}">
                     <include name="**/outbedded/**/*Test.java"/>
                     <exclude name="**/Mac*"/>
@@ -271,7 +276,8 @@
             </batchtest>
 
         </junit>
-    </target>
+        </sequential>
+    </macrodef>
 	
 	<target name="integration-test-unix" depends="compile" if="isUnix" unless="isMac">
 
