@@ -71,13 +71,20 @@ function getQueryVariable(variable) {
 }
 
 function buildDriverParams() {
+    var params = "";
+
     var host = getQueryVariable("driverhost");
     var port = getQueryVariable("driverport");
     if (host != undefined && port != undefined) {
-        return "&driverhost=" + host + "&driverport=" + port;
-    } else {
-        return ""
+        params = params + "&driverhost=" + host + "&driverport=" + port;
     }
+
+    var sessionId = getQueryVariable("sessionId");
+    if (sessionId != undefined) {
+        params = params + "&sessionId=" + sessionId;
+    }
+
+    return params;
 }
 
 function preventBrowserCaching() {
