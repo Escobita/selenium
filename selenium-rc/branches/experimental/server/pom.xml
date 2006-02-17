@@ -8,6 +8,12 @@
     <name>Selenium Server</name>
     <url>http://www.openqa.org/selenium</url>
     <build>
+        <resources>
+            <resource>
+                <directory>../code/javascript</directory>
+                <targetPath>/selenium</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
