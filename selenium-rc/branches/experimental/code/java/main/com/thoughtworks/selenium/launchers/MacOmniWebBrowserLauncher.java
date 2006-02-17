@@ -17,10 +17,6 @@
 
 package com.thoughtworks.selenium.launchers;
 
-import com.thoughtworks.selenium.BrowserLauncher;
-import com.thoughtworks.selenium.SeleniumException;
-
-import java.io.IOException;
 
 /**
  * "/Applications/OmniWeb.app/Contents/MacOS/OmniWeb -StartPage"

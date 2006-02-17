@@ -17,10 +17,6 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.SeleneseCommand;
-import com.thoughtworks.selenium.SeleneseHandler;
-
-import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -28,6 +24,11 @@ import java.rmi.ConnectIOException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+
+import javax.servlet.ServletContext;
+
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseHandler;
 
 /**
  * Handles command requests by sending Java Remote Method Invocation (RMI) requests to a RemoteSeleneseHandler

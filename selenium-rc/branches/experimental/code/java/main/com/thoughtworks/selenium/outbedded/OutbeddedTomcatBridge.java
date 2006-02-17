@@ -17,11 +17,11 @@
 
 package com.thoughtworks.selenium.outbedded;
 
+import java.io.File;
+
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
-
-import java.io.File;
 
 /**
  * @author Nelson Sproul

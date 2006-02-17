@@ -16,9 +16,9 @@
  */
 package com.thoughtworks.selenium.jwebunit;
 
-import com.thoughtworks.selenium.Selenium;
-
 import java.io.PrintStream;
+
+import com.thoughtworks.selenium.Selenium;
 
 /**
  * Provides a high-level API for basic web application navigation and validation
@@ -31,10 +31,7 @@ import java.io.PrintStream;
  */
 public class DefaultWebTester implements WebTester {
 
-    private Selenium selenium;
-
     public DefaultWebTester(Selenium selenium) {
-        this.selenium = selenium;
     }
 
     /**

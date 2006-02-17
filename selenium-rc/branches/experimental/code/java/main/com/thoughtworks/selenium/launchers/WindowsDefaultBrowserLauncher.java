@@ -19,8 +19,6 @@ package com.thoughtworks.selenium.launchers;
 
 import com.thoughtworks.selenium.BrowserLauncher;
 
-import java.io.IOException;
-
 /**
  * Launches the specified URL using "cmd /c start <i>url</i>".
  * 

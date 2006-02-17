@@ -17,17 +17,15 @@
 
 package com.thoughtworks.selenium.outbedded;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.codehaus.cargo.container.Container;
-import org.codehaus.cargo.container.orion.Orion2xContainer;
-import org.codehaus.cargo.container.resin.Resin3xContainer;
-import org.codehaus.cargo.container.jetty.Jetty4xEmbeddedContainer;
-import org.codehaus.cargo.container.jetty.JettyStandaloneConfiguration;
 import org.codehaus.cargo.container.deployable.DeployableFactory;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.tomcat.Tomcat5xContainer;
-
-import java.io.File;
-import java.util.*;
 
 import com.thoughtworks.selenium.CommandProcessor;
 

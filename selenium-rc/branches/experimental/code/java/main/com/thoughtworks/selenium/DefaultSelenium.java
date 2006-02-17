@@ -17,13 +17,13 @@
 
 package com.thoughtworks.selenium;
 
-import com.thoughtworks.selenium.embedded.jetty.DirectoryStaticContentHandler;
-import com.thoughtworks.selenium.embedded.jetty.JettyCommandProcessor;
-import com.thoughtworks.selenium.launchers.DefaultBrowserLauncher;
-
 import java.io.File;
 import java.util.Date;
 import java.util.StringTokenizer;
+
+import com.thoughtworks.selenium.embedded.jetty.DirectoryStaticContentHandler;
+import com.thoughtworks.selenium.embedded.jetty.JettyCommandProcessor;
+import com.thoughtworks.selenium.launchers.DefaultBrowserLauncher;
 
 /**
  * The default implementation of the Selenium interface.
@@ -59,6 +59,7 @@ public class DefaultSelenium implements Selenium {
     /** Launches commands using the default browser launcher and the 
      * JettyCommandProcessor serving the specified root directory. 
      * @param webAppRoot the root webapp that will be served by Jetty
+     * @deprecated
      */
     public DefaultSelenium(File webAppRoot) {
         commandProcessor = new JettyCommandProcessor(webAppRoot, getContextName(),
@@ -386,7 +387,7 @@ public class DefaultSelenium implements Selenium {
     }
 
     public void setContext(String context, String logLevel) {
-        String result = commandProcessor.doCommand("context", context, logLevel);
+        commandProcessor.doCommand("context", context, logLevel);
     }
 
     public String[] getAllButtons() {
@@ -417,7 +418,7 @@ public class DefaultSelenium implements Selenium {
         StringTokenizer tokenizer = new StringTokenizer(stringResult, ",");
         String[] result = new String[tokenizer.countTokens()];
         for (int i = 0; tokenizer.hasMoreElements(); i++) {
-            result[i] = (String) tokenizer.nextToken();
+            result[i] = tokenizer.nextToken();
         }
         return result;
     }

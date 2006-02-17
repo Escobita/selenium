@@ -17,15 +17,16 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
-import com.thoughtworks.selenium.CommandProcessor;
-import junit.framework.TestCase;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Vector;
+
+import junit.framework.TestCase;
+
+import com.thoughtworks.selenium.CommandProcessor;
 
 /**
  * @author Paul Hammant

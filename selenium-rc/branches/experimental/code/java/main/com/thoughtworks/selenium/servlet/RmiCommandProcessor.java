@@ -17,15 +17,15 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.SeleneseQueue;
-import com.thoughtworks.selenium.SeleneseCommand;
-
-import java.rmi.RemoteException;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+
+import com.thoughtworks.selenium.CommandProcessor;
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseQueue;
 
 /**
  * A Selenium command processor that handles requests over RMI.

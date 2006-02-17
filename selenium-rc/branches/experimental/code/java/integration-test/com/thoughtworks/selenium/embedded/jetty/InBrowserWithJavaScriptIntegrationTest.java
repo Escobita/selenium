@@ -17,13 +17,13 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
+import junit.framework.TestCase;
+
+import com.thoughtworks.selenium.BrowserLauncher;
+import com.thoughtworks.selenium.CommandProcessor;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.BrowserLauncher;
-import com.thoughtworks.selenium.launchers.WindowsDefaultBrowserLauncher;
 import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
-import junit.framework.TestCase;
 
 /**
  * @author Paul Hammant

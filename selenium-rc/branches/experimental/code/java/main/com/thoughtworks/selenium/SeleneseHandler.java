@@ -17,7 +17,6 @@
 
 package com.thoughtworks.selenium;
 
-import com.thoughtworks.selenium.SeleneseCommand;
 
 /**
  * Defines a <code>handleCommandResult</code> method that accepts a command reply,

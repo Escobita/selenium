@@ -1,9 +1,9 @@
 package com.thoughtworks.selenium.launchers;
 
+import java.io.IOException;
+
 import com.thoughtworks.selenium.BrowserLauncher;
 import com.thoughtworks.selenium.SeleniumException;
-
-import java.io.IOException;
 
 /**
  * An abstract class to launch the specified command path

@@ -19,6 +19,7 @@ package com.thoughtworks.selenium.jwebunit;
 import java.io.PrintStream;
 
 import junit.framework.TestCase;
+
 import com.thoughtworks.selenium.Selenium;
 
 /**

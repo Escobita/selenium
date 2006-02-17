@@ -17,14 +17,12 @@
 
 package com.thoughtworks.selenium.outbedded;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.outbedded.*;
-import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
 import junit.framework.TestCase;
 
-import java.io.File;
+import com.thoughtworks.selenium.CommandProcessor;
+import com.thoughtworks.selenium.DefaultSelenium;
+import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
 
 /**
  * @author Ben Griffiths
