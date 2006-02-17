@@ -65,16 +65,16 @@ public class SingleEntryAsyncQueue {
      * <p>Puts something in the queue.</p>
      * If there's already something available in the queue, wait
      * for that item to get picked up and removed from the queue. 
-     * @param thing - the thing to put in the queue
+     * @param obj - the thing to put in the queue
      */    
-    public synchronized void put(Object thing) {
+    public synchronized void put(Object obj) {
         while (available == true) {
             try {
                 wait();
             } catch (InterruptedException e) {
             }
         }
-        this.thing = thing;
+        this.thing = obj;
         available = true;
         notifyAll();
     }

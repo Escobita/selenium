@@ -17,16 +17,16 @@
 
 package com.thoughtworks.selenium.outbedded;
 
-import com.thoughtworks.selenium.SeleniumException;
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.DefaultSeleneseCommand;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import com.thoughtworks.selenium.CommandProcessor;
+import com.thoughtworks.selenium.DefaultSeleneseCommand;
+import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * Sends and retrieves results of commands sent over HTTP to CommandBridge servlet.
@@ -101,9 +101,9 @@ public class CommandBridgeClient implements CommandProcessor {
         return is;
     }
 
-    private URL buildCommandURL(String command, String pathToServlet) throws MalformedURLException {
+    private URL buildCommandURL(String command, String servletUrl) throws MalformedURLException {
         StringBuffer sb = new StringBuffer();
-        sb.append(pathToServlet);
+        sb.append(servletUrl);
         sb.append("?");
         sb.append("commandRequest=");
         sb.append(URLEncoder.encode(command));

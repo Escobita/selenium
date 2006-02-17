@@ -17,11 +17,12 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.SeleneseHandler;
-import com.thoughtworks.selenium.SeleneseCommand;
+import java.io.Writer;
 
 import javax.servlet.ServletContext;
-import java.io.Writer;
+
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseHandler;
 
 /**
  * Handles command requests by passing them off to a remote Selenium Server.

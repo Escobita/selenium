@@ -17,15 +17,15 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.SeleneseHandler;
-import com.thoughtworks.selenium.SeleneseCommand;
-import com.thoughtworks.selenium.DefaultSeleneseCommand;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
+
+import com.thoughtworks.selenium.DefaultSeleneseCommand;
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseHandler;
 
 /**
  * Provides the implementation of the <code>SeleneseProxyServlet</code>.

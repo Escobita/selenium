@@ -17,14 +17,14 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.ServletHttpContext;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Exposes a directory containing static content (eg HTML, images, JavaScript) in the Jetty server.

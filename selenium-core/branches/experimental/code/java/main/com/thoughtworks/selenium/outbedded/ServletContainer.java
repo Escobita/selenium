@@ -17,9 +17,9 @@
 
 package com.thoughtworks.selenium.outbedded;
 
-import com.thoughtworks.selenium.CommandProcessor;
-
 import java.io.File;
+
+import com.thoughtworks.selenium.CommandProcessor;
 
 /**
  * An abstract class representing a servlet container to which selenium and app under test can be deployed

@@ -24,7 +24,8 @@ import com.thoughtworks.selenium.BrowserLauncher;
  * @see com.thoughtworks.selenium.launchers.WindowsDefaultBrowserLauncher
  * @see com.thoughtworks.selenium.launchers.UnixDefaultBrowserLauncher
  * @see com.thoughtworks.selenium.launchers.MacDefaultBrowserLauncher
- * @see com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher 
+ * @see com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher
+ * @deprecated 
  * @author Paul Hammant
  * @version $Revision$
  */

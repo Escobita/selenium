@@ -1,7 +1,7 @@
 package com.thoughtworks.selenium.embedded.jetty;
 
-import com.thoughtworks.selenium.launchers.MacNetscapeBrowserLauncher;
 import com.thoughtworks.selenium.BrowserLauncher;
+import com.thoughtworks.selenium.launchers.MacNetscapeBrowserLauncher;
 
 /**
  * @author Paul Hammant

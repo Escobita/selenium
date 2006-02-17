@@ -17,11 +17,10 @@
 
 package com.thoughtworks.selenium;
 
-import com.thoughtworks.selenium.launchers.WindowsDefaultBrowserLauncher;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-import java.net.InetAddress;
+import com.thoughtworks.selenium.launchers.WindowsDefaultBrowserLauncher;
 
 /**
  * @author Paul Hammant
@@ -30,12 +29,10 @@ import java.net.InetAddress;
 public class DefaultSeleniumTestCase extends MockObjectTestCase {
 
     Mock commandProcessor;
-    private String machine;
-
+    
     protected void setUp() throws Exception {
         super.setUp();
         commandProcessor = new Mock(CommandProcessor.class);
-        machine = InetAddress.getLocalHost().getHostName();
     }
 
     public void testOpenWorking() {

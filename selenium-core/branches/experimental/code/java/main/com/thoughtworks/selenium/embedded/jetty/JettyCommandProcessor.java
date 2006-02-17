@@ -17,7 +17,10 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
-import com.thoughtworks.selenium.CommandProcessor;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.http.RequestLog;
@@ -26,9 +29,7 @@ import org.mortbay.jetty.servlet.ServletHttpContext;
 import org.mortbay.util.InetAddrPort;
 import org.mortbay.util.MultiException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import com.thoughtworks.selenium.CommandProcessor;
 
 /**
  * Constructs an embedded Jetty server to drive Selenium; <i>end users should primarily interact with this object</i>.

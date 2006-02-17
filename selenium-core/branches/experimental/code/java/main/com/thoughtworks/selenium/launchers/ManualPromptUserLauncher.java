@@ -4,7 +4,7 @@
  */
 package com.thoughtworks.selenium.launchers;
 
-import com.thoughtworks.selenium.*;
+import com.thoughtworks.selenium.BrowserLauncher;
 
 /**
  * Manually prompt the user to start a browser from the command line

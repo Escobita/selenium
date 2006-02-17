@@ -17,16 +17,17 @@
 
 package com.thoughtworks.selenium.outbedded;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.URLDecoder;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.net.URLDecoder;
 
 import com.thoughtworks.selenium.SeleneseCommand;
 import com.thoughtworks.selenium.SeleneseQueue;

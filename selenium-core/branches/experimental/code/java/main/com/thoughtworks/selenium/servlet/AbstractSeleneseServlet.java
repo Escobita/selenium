@@ -17,9 +17,8 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.SeleneseCommand;
-import com.thoughtworks.selenium.SeleneseHandler;
-import com.thoughtworks.selenium.SeleneseHandler;
+import java.io.IOException;
+import java.io.Writer;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -27,8 +26,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Writer;
+
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseHandler;
 
 /**
  * An abstract servlet that handles Selenese commands by handing them off to another

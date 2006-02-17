@@ -17,8 +17,13 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
-import com.thoughtworks.selenium.SeleneseCommand;
-import com.thoughtworks.selenium.SeleneseQueue;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.List;
+
 import org.mortbay.http.HttpException;
 import org.mortbay.http.HttpFields;
 import org.mortbay.http.HttpRequest;
@@ -26,12 +31,8 @@ import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.util.StringUtil;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.List;
+import com.thoughtworks.selenium.SeleneseCommand;
+import com.thoughtworks.selenium.SeleneseQueue;
 
 /**
  * The Jetty class that actually handles Selenese GET requests.

@@ -17,15 +17,18 @@
 
 package com.thoughtworks.selenium.embedded.jetty;
 
-import com.thoughtworks.selenium.*;
-import com.thoughtworks.selenium.launchers.DestroyableRuntimeExecutingBrowserLauncher;
-import com.thoughtworks.selenium.launchers.ManualPromptUserLauncher;
-import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
-import com.thoughtworks.selenium.launchers.WindowsIEBrowserLauncher;
+import java.io.File;
 
 import junit.framework.TestCase;
 
-import java.io.File;
+import com.thoughtworks.selenium.BrowserLauncher;
+import com.thoughtworks.selenium.DefaultSelenium;
+import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.SeleniumException;
+import com.thoughtworks.selenium.SeleniumLogLevels;
+import com.thoughtworks.selenium.launchers.DestroyableRuntimeExecutingBrowserLauncher;
+import com.thoughtworks.selenium.launchers.ManualPromptUserLauncher;
+import com.thoughtworks.selenium.launchers.WindowsIEBrowserLauncher;
 
 /**
  * @author Paul Hammant
@@ -77,11 +80,10 @@ public class RealDealIntegrationTest extends TestCase {
         String codeRootProperty = System.getProperty("code_root");
         if (codeRootProperty == null) {
             throw new Exception("'code_root' not specified");
-        } else {
-            codeRoot = new File(codeRootProperty);
-            if (!codeRoot.exists()) {
-                throw new Exception("'code_root' not a dir");
-            }
+        }
+        codeRoot = new File(codeRootProperty);
+        if (!codeRoot.exists()) {
+            throw new Exception("'code_root' not a dir");
         }
         return codeRoot;
     }

@@ -17,20 +17,17 @@
 
 package com.thoughtworks.selenium.outbedded;
 
-import com.thoughtworks.selenium.CommandProcessor;
-import com.thoughtworks.selenium.embedded.jetty.SeleneseJettyResourceHandler;
-import com.thoughtworks.selenium.embedded.jetty.NullStaticContentHandler;
-import com.thoughtworks.selenium.embedded.jetty.StaticContentHandler;
+import java.io.File;
+import java.io.IOException;
+
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.http.RequestLog;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHttpContext;
 import org.mortbay.util.InetAddrPort;
 import org.mortbay.util.MultiException;
 
-import java.io.File;
-import java.io.IOException;
+import com.thoughtworks.selenium.CommandProcessor;
 
 /**
  * Represents an instance of Jetty Servlet container running in-process

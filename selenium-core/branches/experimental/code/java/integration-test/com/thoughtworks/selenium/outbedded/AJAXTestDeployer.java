@@ -17,9 +17,6 @@
 
 package com.thoughtworks.selenium.outbedded;
 
-import com.thoughtworks.selenium.outbedded.ServletContainer;
-import com.thoughtworks.selenium.outbedded.Deployer;
-
 import java.io.File;
 
 /**

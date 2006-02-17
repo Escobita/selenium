@@ -17,11 +17,10 @@
 
 package com.thoughtworks.selenium.servlet;
 
-import com.thoughtworks.selenium.SeleneseHandler;
+import java.rmi.RemoteException;
+
 import com.thoughtworks.selenium.SeleneseCommand;
 import com.thoughtworks.selenium.SeleneseHandler;
-
-import java.rmi.RemoteException;
 
 /**
  * A simple wrapper around an RMI <code>RemoteSeleneseHandler</code> object.

@@ -17,10 +17,11 @@
 
 package com.thoughtworks.selenium.outbedded;
 
+import junit.framework.TestCase;
+
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.launchers.SystemDefaultBrowserLauncher;
-import junit.framework.TestCase;
 
 /**
  * @author Ben Griffiths
