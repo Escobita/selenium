@@ -34,7 +34,7 @@ namespace Selenium
 		void VerifySelected(String field, String value);
 		void VerifyTable(String table, String value);
 		void VerifyText(String type, String text);
-		void VerifyTextPresent(String type, String text);
+		void VerifyTextPresent(String text);
 		void VerifyTitle(String title);
 		void VerifyValue(String field, String value);
         void SetContext(String context);
@@ -43,5 +43,6 @@ namespace Selenium
 		String[] GetAllLinks();
 		String[] GetAllFields();
         String GetEval(String script);
+		bool GetEvalBool(String script);
 	}
 }
