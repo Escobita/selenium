@@ -149,9 +149,9 @@ public class DefaultSelenium : ISelenium
         DoCommandAndFailIfNotSuccess("verifyText", type, text, "PASSED");
 	}
 
-	public void VerifyTextPresent(String type, String text)
+	public void VerifyTextPresent(String text)
 	{
-        DoCommandAndFailIfNotSuccess("verifyTextPresent", type, text, "PASSED");
+        DoCommandAndFailIfNotSuccess("verifyTextPresent", text, "", "PASSED");
 	}
 
 	public void VerifyTitle(String title)
@@ -193,6 +193,12 @@ public class DefaultSelenium : ISelenium
     {
         return processor.DoCommand("getEval", script, "");
     }
+
+	public bool GetEvalBool(String script)
+	{
+		String eval = GetEval(script);
+		return "true".Equals(eval);
+	}
 
     public void SetContext(String context, String logLevel)
     {
