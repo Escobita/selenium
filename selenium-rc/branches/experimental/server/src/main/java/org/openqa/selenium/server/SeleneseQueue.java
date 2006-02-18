@@ -27,6 +27,9 @@ public class SeleneseQueue {
     private SingleEntryAsyncQueue commandResultHolder = new SingleEntryAsyncQueue();
 
     public String doCommand(String command, String field, String value) {
+        if ("testComplete".equals(command)) {
+            System.err.println("WARNING: testComplete command is deprecated; does nothing");
+        }
         commandHolder.put(new DefaultSeleneseCommand(command, field, value));
         if (!command.equals("testComplete")) {
             return (String) commandResultHolder.get();
