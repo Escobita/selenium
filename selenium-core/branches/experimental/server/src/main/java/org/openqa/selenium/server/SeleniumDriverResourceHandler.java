@@ -94,7 +94,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
             //System.out.println("commandRequest = " + commandRequest);
             SeleneseQueue queue = getQueue(sessionId);
             String results = queue.doCommand(commandS, field, value);
-            //System.out.println("Got result: " + results);
+            System.out.println("Got result: " + results);
             try {
                 res.getOutputStream().write(results.getBytes());
             } catch (IOException e) {
