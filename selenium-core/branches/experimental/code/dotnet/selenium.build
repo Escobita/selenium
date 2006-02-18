@@ -13,7 +13,7 @@
 	<target name="all-clean" depends="clean, all"
 		description="Clean up, then do everything you might want to do on a developer workstation" />
 		
-	<target name="test" depends="unit-tests, iis-reset, integration-tests" 
+	<target name="test" depends="unit-tests, run-integration-tests" 
 		description="Run all tests"/>
 	
 	<target name="unit-tests" depends="compile, run-unit-tests" 
