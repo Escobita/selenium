@@ -45,7 +45,7 @@ public class ClassPathResource extends Resource {
     }
 
     public long lastModified() {
-        return 0;
+        return -1;
     }
 
     public long length() {
