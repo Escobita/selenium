@@ -23,6 +23,7 @@ import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.util.StringUtil;
+import org.openqa.selenium.server.browserlaunchers.*;
 
 import java.io.*;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Map;
 public class SeleniumDriverResourceHandler extends ResourceHandler {
 
     private final Map<String, SeleneseQueue> queues = new HashMap<String, SeleneseQueue>();
+    private final Map<String, BrowserLauncher> launchers = new HashMap<String, BrowserLauncher>();
 
     private String getParam(HttpRequest req, String name) {
         List parameterValues = req.getParameterValues(name);
@@ -91,19 +93,37 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
                 value = values[3];
             }
 
-            //System.out.println("commandRequest = " + commandRequest);
-            SeleneseQueue queue = getQueue(sessionId);
-            String results = queue.doCommand(commandS, field, value);
+            String results;
+            if ("getNewBrowserSession".equals(commandS)) {
+                sessionId = Long.toString(System.currentTimeMillis());
+                BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
+                launcher.launch("http://" + value + "/selenium/SeleneseRunner.html?sessionId=" + sessionId);
+                launchers.put(sessionId, launcher);
+                SeleneseQueue queue = getQueue(sessionId);
+                queue.doCommand("context", sessionId, "");
+                results = sessionId;
+            } else if ("testComplete".equals(commandS)) {
+                BrowserLauncher launcher = getLauncher(sessionId);
+                if (launcher == null) {
+                    results = "ERROR: No launcher found for sessionId " + sessionId; 
+                } else {
+                    launcher.close();
+                    // finally, if the command was testComplete, remove the queue
+                    if ("testComplete".equals(commandS)) {
+                        clearQueue(sessionId);
+                    }
+                    results = "OK";
+                }
+            } else {
+//              System.out.println("commandRequest = " + commandRequest);
+                SeleneseQueue queue = getQueue(sessionId);
+                results = queue.doCommand(commandS, field, value);
+            }
             System.out.println("Got result: " + results);
             try {
                 res.getOutputStream().write(results.getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-
-            // finally, if the command was testComplete, remove the queue
-            if ("testComplete".equals(commandS)) {
-                clearQueue(sessionId);
             }
 
             req.setHandled(true);
@@ -113,6 +133,12 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         }
     }
 
+    private BrowserLauncher getLauncher(String sessionId) {
+        synchronized (launchers) {
+            return launchers.get(sessionId);
+        }
+    }
+    
     private SeleneseQueue getQueue(String sessionId) {
         synchronized (queues) {
             SeleneseQueue queue = queues.get(sessionId);
