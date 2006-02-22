@@ -1,6 +1,7 @@
 import seletest
 import unittest
 import time
+import sys
 
 class ExampleTest(seletest.seletest_class):
     def test_something(self):
@@ -12,5 +13,6 @@ class ExampleTest(seletest.seletest_class):
 	time.sleep(2)
 	self.verify_text_present("foo1")
 
+seletest.chooseSeleniumServer('localhost', 8080)
 suite = unittest.makeSuite(ExampleTest)
 unittest.TextTestRunner(verbosity=2).run(suite)

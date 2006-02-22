@@ -1,24 +1,20 @@
 import unittest
+import seletest
 import selenium
+
+seleniumHost = 'localhost'
+seleniumPort = str(8080)
+
+def chooseSeleniumServer(host, port):
+	seletest_class.seleniumHost = host
+	seletest_class.seleniumPort = str(port)
+
 
 class seletest_class(unittest.TestCase):
 
-#    def server_info
-#        ['localhost', 3000]
-#    def path_to_runner
-#    	'selenium/javascript'
-#    def driver_port
-#    	8080
-#    def driver_host
-#    	"localhost"
-#
     def setUp(self):
+	print "Using selenium server at " + seletest.seleniumHost + ":" + seletest.seleniumPort
 	self.seleniumField = selenium.selenium_class()
-
-#    def runTest():
-#        selenium = SeleneseInterpreter(10000);
-
-#    def tearDown():
 
     def open(self, url):
  	print "seletest:open called"
