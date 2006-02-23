@@ -36,8 +36,8 @@ import java.util.Map;
  */
 public class SeleniumDriverResourceHandler extends ResourceHandler {
 
-    private final Map<String, SeleneseQueue> queues = new HashMap<String, SeleneseQueue>();
-    private final Map<String, BrowserLauncher> launchers = new HashMap<String, BrowserLauncher>();
+    private final Map queues = new HashMap();
+    private final Map launchers = new HashMap();
 
     private String getParam(HttpRequest req, String name) {
         List parameterValues = req.getParameterValues(name);
@@ -135,13 +135,13 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
 
     private BrowserLauncher getLauncher(String sessionId) {
         synchronized (launchers) {
-            return launchers.get(sessionId);
+            return (BrowserLauncher) launchers.get(sessionId);
         }
     }
     
     private SeleneseQueue getQueue(String sessionId) {
         synchronized (queues) {
-            SeleneseQueue queue = queues.get(sessionId);
+            SeleneseQueue queue = (SeleneseQueue) queues.get(sessionId);
             if (queue == null) {
                 queue = new SeleneseQueue();
                 queues.put(sessionId, queue);

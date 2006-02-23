@@ -17,7 +17,7 @@ package org.openqa.selenium.server;
 
 import org.apache.commons.logging.Log;
 import org.mortbay.http.*;
-import static org.mortbay.http.HttpResponse.*;
+import org.mortbay.http.HttpResponse.*;
 import org.mortbay.http.handler.AbstractHttpHandler;
 import org.mortbay.log.LogFactory;
 import org.mortbay.util.*;
@@ -25,8 +25,7 @@ import org.mortbay.util.URI;
 
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.Integer.getInteger;
-import static java.lang.Integer.parseInt;
+import java.lang.Integer;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -47,8 +46,8 @@ import java.util.Set;
 public class ProxyHandler extends AbstractHttpHandler {
     private static Log log = LogFactory.getLog(ProxyHandler.class);
 
-    protected Set<String> _proxyHostsWhiteList;
-    protected Set<String> _proxyHostsBlackList;
+    protected Set _proxyHostsWhiteList;
+    protected Set _proxyHostsBlackList;
     protected int _tunnelTimeoutMs = 250;
     private boolean _anonymous = false;
     private transient boolean _chained = false;
@@ -104,15 +103,15 @@ public class ProxyHandler extends AbstractHttpHandler {
     /**
      * Set of allowed CONNECT ports.
      */
-    protected HashSet<Integer> _allowedConnectPorts = new HashSet<Integer>();
+    protected HashSet _allowedConnectPorts = new HashSet();
 
     {
-        _allowedConnectPorts.add(80);
-        _allowedConnectPorts.add(8000);
-        _allowedConnectPorts.add(8080);
-        _allowedConnectPorts.add(8888);
-        _allowedConnectPorts.add(443);
-        _allowedConnectPorts.add(8443);
+        _allowedConnectPorts.add(new Integer(80));
+        _allowedConnectPorts.add(new Integer(8000));
+        _allowedConnectPorts.add(new Integer(8080));
+        _allowedConnectPorts.add(new Integer(8888));
+        _allowedConnectPorts.add(new Integer(443));
+        _allowedConnectPorts.add(new Integer(8443));
     }
 
 
@@ -137,7 +136,7 @@ public class ProxyHandler extends AbstractHttpHandler {
             return new String[0];
 
         String[] hosts = new String[_proxyHostsWhiteList.size()];
-        hosts = _proxyHostsWhiteList.toArray(hosts);
+        hosts = (String[]) _proxyHostsWhiteList.toArray(hosts);
         return hosts;
     }
 
@@ -152,10 +151,12 @@ public class ProxyHandler extends AbstractHttpHandler {
         if (hosts == null || hosts.length == 0)
             _proxyHostsWhiteList = null;
         else {
-            _proxyHostsWhiteList = new HashSet<String>();
-            for (String host : hosts)
+            _proxyHostsWhiteList = new HashSet();
+            for (int i = 0; i < hosts.length; i++) {
+                String host = hosts[i];
                 if (host != null && host.trim().length() > 0)
                     _proxyHostsWhiteList.add(host);
+            }
         }
     }
 
@@ -171,7 +172,7 @@ public class ProxyHandler extends AbstractHttpHandler {
             return new String[0];
 
         String[] hosts = new String[_proxyHostsBlackList.size()];
-        hosts = _proxyHostsBlackList.toArray(hosts);
+        hosts = (String[]) _proxyHostsBlackList.toArray(hosts);
         return hosts;
     }
 
@@ -186,10 +187,12 @@ public class ProxyHandler extends AbstractHttpHandler {
         if (hosts == null || hosts.length == 0)
             _proxyHostsBlackList = null;
         else {
-            _proxyHostsBlackList = new HashSet<String>();
-            for (String host : hosts)
+            _proxyHostsBlackList = new HashSet();
+            for (int i = 0; i < hosts.length; i++) {
+                String host = hosts[i];
                 if (host != null && host.trim().length() > 0)
                     _proxyHostsBlackList.add(host);
+            }
         }
     }
 
@@ -275,7 +278,7 @@ public class ProxyHandler extends AbstractHttpHandler {
                     String val = (String) vals.nextElement();
                     if (val != null) {
                         // don't proxy Referer headers if the referer is Selenium!
-                        if ("Referer".equals(hdr) && val.contains("/selenium/SeleneseRunner.html")) {
+                        if ("Referer".equals(hdr) && (-1 != val.indexOf("/selenium/SeleneseRunner.html"))) {
                             continue;
                         }
 
@@ -366,7 +369,7 @@ public class ProxyHandler extends AbstractHttpHandler {
             log.warn(e.toString());
             LogSupport.ignore(log, e);
             if (!response.isCommitted())
-                response.sendError(__400_Bad_Request);
+                response.sendError(HttpResponse.__400_Bad_Request);
         }
     }
 
@@ -410,7 +413,7 @@ public class ProxyHandler extends AbstractHttpHandler {
 
                     customizeConnection(pathInContext, pathParams, request, tunnel.getSocket());
                     request.getHttpConnection().setHttpTunnel(tunnel);
-                    response.setStatus(__200_OK);
+                    response.setStatus(HttpResponse.__200_OK);
                     response.setContentLength(0);
                 }
                 request.setHandled(true);
@@ -418,7 +421,7 @@ public class ProxyHandler extends AbstractHttpHandler {
         }
         catch (Exception e) {
             LogSupport.ignore(log, e);
-            response.sendError(__500_Internal_Server_Error);
+            response.sendError(HttpResponse.__500_Internal_Server_Error);
         }
     }
 
@@ -434,7 +437,7 @@ public class ProxyHandler extends AbstractHttpHandler {
                 socket.setSoTimeout(timeoutMS);
                 socket.setTcpNoDelay(true);
             } else {
-                int chained_proxy_port = getInteger("http.proxyPort", 8888);
+                int chained_proxy_port = Integer.getInteger("http.proxyPort", 8888).intValue();
 
                 Socket chain_socket = new Socket(chained_proxy_host, chained_proxy_port);
                 chain_socket.setSoTimeout(timeoutMS);
@@ -455,7 +458,7 @@ public class ProxyHandler extends AbstractHttpHandler {
                     int space1 = chain_response_line.indexOf(' ', space0 + 1);
 
                     if (space1 > space0) {
-                        int code = parseInt(chain_response_line.substring(space0 + 1, space1));
+                        int code = Integer.parseInt(chain_response_line.substring(space0 + 1, space1));
 
                         if (code >= 200 && code < 300) {
                             socket = chain_socket;
@@ -486,7 +489,7 @@ public class ProxyHandler extends AbstractHttpHandler {
         }
         catch (IOException e) {
             log.debug(e);
-            response.sendError(__400_Bad_Request);
+            response.sendError(HttpResponse.__400_Bad_Request);
             return null;
         }
     }
@@ -554,7 +557,7 @@ public class ProxyHandler extends AbstractHttpHandler {
      */
     protected boolean isForbidden(String scheme, String host, int port, boolean openNonPrivPorts) {
         // Check port
-        if (port > 0 && !_allowedConnectPorts.contains(port)) {
+        if (port > 0 && !_allowedConnectPorts.contains(new Integer(port))) {
             if (!openNonPrivPorts || port <= 1024)
                 return true;
         }
@@ -579,7 +582,7 @@ public class ProxyHandler extends AbstractHttpHandler {
      * sendError(403)
      */
     protected void sendForbid(HttpRequest request, HttpResponse response, URI uri) throws IOException {
-        response.sendError(__403_Forbidden, "Forbidden for Proxy");
+        response.sendError(HttpResponse.__403_Forbidden, "Forbidden for Proxy");
     }
 
     /* ------------------------------------------------------------ */
