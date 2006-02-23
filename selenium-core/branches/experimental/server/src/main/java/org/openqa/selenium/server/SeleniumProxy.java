@@ -110,7 +110,7 @@ public class SeleniumProxy {
             }
 
             protected Resource getResource(final String s) throws IOException {
-                ClassPathResource r = new ClassPathResource("/selenium" + s);
+                ClassPathResource r = new ClassPathResource(/*DGF"/selenium" + */s);
                 context.getResourceMetaData(r);
                 return r;
             }
