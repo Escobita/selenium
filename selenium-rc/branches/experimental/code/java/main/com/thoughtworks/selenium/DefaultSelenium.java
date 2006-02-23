@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import com.thoughtworks.selenium.embedded.jetty.DirectoryStaticContentHandler;
 import com.thoughtworks.selenium.embedded.jetty.JettyCommandProcessor;
 import com.thoughtworks.selenium.launchers.DefaultBrowserLauncher;
+import com.thoughtworks.selenium.outbedded.*;
 
 /**
  * The default implementation of the Selenium interface.
@@ -36,10 +37,20 @@ public class DefaultSelenium implements Selenium {
     
     private CommandProcessor commandProcessor;
     private BrowserLauncher launcher;
+    private String browserStartCommand;
+    private String browserHostAndPort;
     private String logLevel = null;
 
-    public static final String DEFAULT_SELENIUM_CONTEXT = "selenium-driver";
+    public static final String DEFAULT_SELENIUM_CONTEXT = "selenium";
 
+    public DefaultSelenium(String host, int port, String browserStartCommand, String browserHostAndPort) {
+        this.commandProcessor = new CommandBridgeClient("http://" + host + 
+                ":"+ Integer.toString(port) + "/selenium/driver/");
+        this.browserStartCommand = browserStartCommand;
+        this.browserHostAndPort = browserHostAndPort;
+        this.launcher = null;
+    }
+    
     /** Launches commands using the specified command processor and browser launcher */
     public DefaultSelenium(CommandProcessor commandProcessor, BrowserLauncher launcher) {
         this.commandProcessor = commandProcessor;
@@ -430,7 +441,21 @@ public class DefaultSelenium implements Selenium {
     
     public void start() {
         commandProcessor.start();
-        launcher.launch("http://localhost:8080/" + getContextName() + "/" + getTestRunnerPageName());
+        if (launcher != null) {
+            launcher.launch("http://localhost:8080/" + getContextName() + "/" + getTestRunnerPageName());
+        } else {
+            long id = getNewBrowserSession(browserStartCommand, browserHostAndPort);
+            ((CommandBridgeClient)commandProcessor).setSessionId(id);
+        }
+    }
+    
+    public long getNewBrowserSession(String command, String hostAndPort) {
+        String result = commandProcessor.doCommand("getNewBrowserSession", command, hostAndPort);
+        try {
+            return Long.parseLong(result);
+        } catch (NumberFormatException e) {
+            throw new SeleniumException(result);
+        }
     }
 
     public void stop() {

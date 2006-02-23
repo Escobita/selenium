@@ -36,6 +36,7 @@ import com.thoughtworks.selenium.SeleniumException;
 public class CommandBridgeClient implements CommandProcessor {
 
     private String pathToServlet;
+    private String sessionId;
 
     /** Specifies the URL to the CommandBridge servlet */
     public CommandBridgeClient(String pathToServlet) {
@@ -107,7 +108,20 @@ public class CommandBridgeClient implements CommandProcessor {
         sb.append("?");
         sb.append("commandRequest=");
         sb.append(URLEncoder.encode(command));
+        if (sessionId != null) {
+            sb.append("&sessionId=");
+            sb.append(URLEncoder.encode(sessionId));
+        }
         URL result = new URL(sb.toString());
         return result;
+    }
+    
+    /** Specifies the session ID that this bridge client will use to communicate
+     * with the Selenium Server.  Multiple session IDs may be used to communicate
+     * with multiple Selenese command queues
+     * @param id - the session ID to use
+     */
+    public void setSessionId(long id) {
+        sessionId = Long.toString(id);
     }
 }
