@@ -10,9 +10,7 @@ public class ServerSuggestTest extends TestCase {
     DefaultSelenium selenium;
     
     protected void setUp() throws Exception {
-        CommandProcessor processor = new CommandBridgeClient("http://localhost:8180/selenium/driver/");
-        BrowserLauncher launcher = new ManualPromptUserLauncher();
-        selenium = new DefaultSelenium(processor, launcher);
+        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "www.irian.at");
         selenium.start();
     }
     
@@ -44,5 +42,9 @@ public class ServerSuggestTest extends TestCase {
         }
         Thread.sleep(2000);
         selenium.verifyTextPresent(verificationText);
+    }
+    
+    public void tearDown() {
+        selenium.testComplete();
     }
 }
