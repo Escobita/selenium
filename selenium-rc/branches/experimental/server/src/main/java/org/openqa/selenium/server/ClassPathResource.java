@@ -8,12 +8,14 @@ import java.net.MalformedURLException;
 import java.io.*;
 
 /**
+ * Represents resource file off of the classpath.
  * @author Patrick Lightbody (plightbo at gmail dot com)
  */
 public class ClassPathResource extends Resource {
     String path;
     ByteArrayOutputStream os;
 
+    /** Specifies the classpath path containing the resource */
     public ClassPathResource(String path) {
         this.path = path;
 
@@ -44,6 +46,8 @@ public class ClassPathResource extends Resource {
         return false;
     }
 
+    /** Returns the lastModified time, which 
+     * is always in the distant future to prevent caching. */
     public long lastModified() {
         return -1;
     }

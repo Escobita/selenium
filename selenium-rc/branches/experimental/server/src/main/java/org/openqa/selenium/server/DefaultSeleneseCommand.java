@@ -18,6 +18,7 @@
 package org.openqa.selenium.server;
 
 /**
+ * The default implementation of the SeleneseCommand interface
  * @author Paul Hammant
  * @version $Revision: 184 $
  */
@@ -46,6 +47,7 @@ public class DefaultSeleneseCommand implements SeleneseCommand {
         return getCommandString();
     }
 
+    /** Factory method to create a SeleneseCommand from a wiki-style input string */
     public static SeleneseCommand parse(String inputLine) {
         assert inputLine != null;
 
