@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A Jetty handler that takes care of Selenese Driven requests.
+ * 
+ * Selenese Driven requests are described in detail in the class description for
+ * <code>SeleniumProxy</code>
+ * @see org.openqa.selenium.server.SeleniumProxy
  * @author Paul Hammant
  * @version $Revision: 674 $
  */
@@ -39,6 +44,12 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
     private final Map queues = new HashMap();
     private final Map launchers = new HashMap();
 
+    /** Handy helper to retrieve the first parameter value matching the name
+     * 
+     * @param req - the Jetty HttpRequest
+     * @param name - the HTTP parameter whose value we'll return
+     * @return the value of the first HTTP parameter whose name matches <code>name</code>, or <code>null</code> if there is no such parameter
+     */
     private String getParam(HttpRequest req, String name) {
         List parameterValues = req.getParameterValues(name);
         if (parameterValues == null) {
@@ -47,7 +58,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         return (String) parameterValues.get(0);
     }
 
-    public void handle(String s, String s1, HttpRequest req, HttpResponse res) throws HttpException, IOException {
+    public void handle(String pathInContext, String pathParams, HttpRequest req, HttpResponse res) throws HttpException, IOException {
         res.setField(HttpFields.__ContentType, "text/plain");
         setNoCacheHeaders(res);
 
@@ -59,6 +70,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         String commandRequest = getParam(req, "commandRequest");
         String sessionId = getParam(req, "sessionId");
 
+        // If this is a browser requesting work for the first time...
         if (commandResult != null || (seleniumStart != null && seleniumStart.equals("true"))) {
             //System.out.println("commandResult = " + commandResult);
 
@@ -76,6 +88,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
 
             req.setHandled(true);
         } else if (commandRequest != null) {
+            // If this a Driver Client sending a new command...
             res.setContentType("text/plain");
             String[] values = commandRequest.split("\\|");
             String commandS = "";
@@ -94,6 +107,8 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
             }
 
             String results;
+            
+            // handle special commands
             if ("getNewBrowserSession".equals(commandS)) {
                 sessionId = Long.toString(System.currentTimeMillis());
                 BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
@@ -133,12 +148,14 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         }
     }
 
+    /** Retrieves a launcher for the specified sessionId, or <code>null</code> if there is no such launcher. */
     private BrowserLauncher getLauncher(String sessionId) {
         synchronized (launchers) {
             return (BrowserLauncher) launchers.get(sessionId);
         }
     }
     
+    /** Retrieves a SeleneseQueue for the specifed sessionId, creating a new one if there isn't one with that sessionId already */
     private SeleneseQueue getQueue(String sessionId) {
         synchronized (queues) {
             SeleneseQueue queue = (SeleneseQueue) queues.get(sessionId);
@@ -151,12 +168,14 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         }
     }
 
+    /** Deletes the specified SeleneseQueue */
     public void clearQueue(String sessionId) {
         synchronized(queues) {
             queues.remove(sessionId);
         }
     }
 
+    /** Sets all the don't-cache headers on the HttpResponse */
     private void setNoCacheHeaders(HttpResponse res) {
         res.setField(HttpFields.__CacheControl, "no-cache");
         res.setField(HttpFields.__Pragma, "no-cache");
