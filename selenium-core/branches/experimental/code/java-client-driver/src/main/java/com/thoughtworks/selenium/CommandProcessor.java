@@ -19,12 +19,8 @@ package com.thoughtworks.selenium;
 
 /**
  * <p>Provides a <code>doCommand</code> method, which sends the command to the browser
- * to be performed, normally by implementing some kind of server.</p>
+ * to be performed.</p>
  *  
- * <p>If you implement this class, you are strongly encouraged to use the standard
- * <code>SeleneseQueue</code> object to manage your command queue.</p>
- *
- * @see com.thoughtworks.selenium.SeleneseQueue
  *  
  * @author Paul Hammant
  * @version $Revision$
@@ -42,9 +38,9 @@ public interface CommandProcessor {
      */
     String doCommand(String command, String field, String value);
 
-    /** Starts the server */
-    void start();
-
-    /** Stops the server */
-    void stop();
+    /** Starts a new Selenium testing session */
+    public void start();
+    
+    /** Ends the current Selenium testing session (normally killing the browser) */
+    public void stop();
 }

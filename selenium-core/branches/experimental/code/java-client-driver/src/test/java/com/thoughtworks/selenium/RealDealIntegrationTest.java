@@ -49,7 +49,6 @@ public class RealDealIntegrationTest extends TestCase {
         selenium.verifyLocation("/selenium-server/tests/html/test_click_page2.html");
         selenium.clickAndWait("previousPage");
         selenium.verifyLocation("/selenium-server/tests/html/test_click_page1.html");
-        selenium.testComplete();
     }
     
    public void testAgain() {
@@ -67,13 +66,11 @@ public class RealDealIntegrationTest extends TestCase {
         } catch (SeleniumException se) {
            assertTrue("Exception message isn't as expected: " + se.getMessage(), se.getMessage().indexOf("XXX not found") != -1);
        }
-       selenium.testComplete();
    }
 
     public void testMinimal() {
          selenium.setContext("minimal 'test' -- to see how little I need to do to repro firefox hang",
                 SeleniumLogLevels.DEBUG);
-        selenium.testComplete();
     }
 }
 

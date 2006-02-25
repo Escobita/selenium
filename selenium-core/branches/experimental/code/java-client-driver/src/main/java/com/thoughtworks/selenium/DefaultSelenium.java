@@ -28,18 +28,26 @@ import java.util.*;
  */
 public class DefaultSelenium implements Selenium {
     
-    private CommandBridgeClient commandProcessor;
-    private String browserStartCommand;
-    private String browserHostAndPort;
+    private CommandProcessor commandProcessor;
     private String logLevel = null;
 
     public static final String DEFAULT_SELENIUM_CONTEXT = "selenium";
 
-    public DefaultSelenium(String host, int port, String browserStartCommand, String browserHostAndPort) {
-        this.commandProcessor = new CommandBridgeClient("http://" + host + 
-                ":"+ Integer.toString(port) + "/selenium-server/driver/");
-        this.browserStartCommand = browserStartCommand;
-        this.browserHostAndPort = browserHostAndPort;
+    /** Uses a CommandBridgeClient, specifying a server host/port, a command to launch the browser, and a starting URL for the browser.
+     * 
+     * @param serverHost - the host name on which the Selenium Server resides
+     * @param serverPort - the port on which the Selenium Server is listening
+     * @param browserStartCommand - the command string used to launch the browser, e.g. "c:\\program files\\internet explorer\\iexplore.exe"
+     * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
+     * e.g. "http://www.google.com" would send the browser to "http://www.google.com/selenium-server/SeleneseRunner.html"
+     */
+    public DefaultSelenium(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
+        this.commandProcessor = new CommandBridgeClient(serverHost, serverPort, browserStartCommand, browserURL);
+    }
+    
+    /** Uses an arbitrary CommandProcessor */
+    public DefaultSelenium(CommandProcessor processor) {
+        this.commandProcessor = processor;
     }
 
     public void open(String path) {
@@ -404,18 +412,8 @@ public class DefaultSelenium implements Selenium {
     }
     
     public void start() {
-        long id = getNewBrowserSession(browserStartCommand, browserHostAndPort);
-        commandProcessor.setSessionId(id);
+        commandProcessor.start();
 
-    }
-    
-    public long getNewBrowserSession(String command, String hostAndPort) {
-        String result = commandProcessor.doCommand("getNewBrowserSession", command, hostAndPort);
-        try {
-            return Long.parseLong(result);
-        } catch (NumberFormatException e) {
-            throw new SeleniumException(result);
-        }
     }
 
     public void stop() {

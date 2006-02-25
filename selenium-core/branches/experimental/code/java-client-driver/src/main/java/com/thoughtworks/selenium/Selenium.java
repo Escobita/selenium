@@ -18,7 +18,14 @@
 package com.thoughtworks.selenium;
 
 /**
- * Defines an object that runs Selenium commands; end users should primarily interact with this object.
+ * Defines an object that runs Selenium commands; <i>end users should primarily interact with this object</i>.
+ * 
+ * Normally you'll begin by creating a new Selenium object and then running the <code>start</code>
+ * methed to prepare a new test session.  When you are finished with the current browser session,
+ * call stop() to clean up the session and kill the browser. 
+ * 
+ * 
+ * @see com.thoughtworks.selenium.DefaultSelenium
  * @author Paul Hammant
  * @author Aslak Hellesoy
  * @version $Revision$
@@ -45,8 +52,6 @@ public interface Selenium  {
     void storeAttribute(String element, String value);
     void storeText(String element, String value);
     void storeValue(String field, String value);
-    /** Instructs the browser that the test is complete and that no more driven commands will arrive */
-    void testComplete();
     void type(String field, String value);
     void typeAndWait(String field, String value);
     void verifyAlert(String alert);
@@ -80,8 +85,8 @@ public interface Selenium  {
 	String[] getAllLinks();
 	String[] getAllFields();
     String getEval(String script);
-    /** Starts the command processor and launches the browser */
+    /** Launches the browser with a new Selenium session */
     void start();
-    /** Kills the browser and stops the command processor */
+    /** Ends the test session, killing the browser */
     void stop();
 }

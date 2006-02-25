@@ -2,6 +2,13 @@ package com.thoughtworks.selenium;
 
 import junit.framework.*;
 
+/**
+ * A test of the Apache MyFaces JSF AJAX auto-suggest sandbox application at www.irian.at.
+ *  
+ * 
+ *  @author danielf
+ *
+ */
 public class ApacheMyFacesSuggestTest extends TestCase {
 
     DefaultSelenium selenium;
