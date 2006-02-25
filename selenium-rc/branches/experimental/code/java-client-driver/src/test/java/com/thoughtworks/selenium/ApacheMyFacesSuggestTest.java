@@ -1,16 +1,13 @@
-package com.thoughtworks.selenium.outbedded;
+package com.thoughtworks.selenium;
 
 import junit.framework.*;
 
-import com.thoughtworks.selenium.*;
-import com.thoughtworks.selenium.launchers.*;
-
-public class ServerSuggestTest extends TestCase {
+public class ApacheMyFacesSuggestTest extends TestCase {
 
     DefaultSelenium selenium;
     
     protected void setUp() throws Exception {
-        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "www.irian.at");
+        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://www.irian.at");
         selenium.start();
     }
     

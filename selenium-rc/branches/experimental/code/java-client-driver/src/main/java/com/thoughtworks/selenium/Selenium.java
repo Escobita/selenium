@@ -23,7 +23,7 @@ package com.thoughtworks.selenium;
  * @author Aslak Hellesoy
  * @version $Revision$
  */
-public interface Selenium extends Startable {
+public interface Selenium  {
 
     void answerOnNextPrompt(String value);
     void chooseCancelOnNextConfirmation();
