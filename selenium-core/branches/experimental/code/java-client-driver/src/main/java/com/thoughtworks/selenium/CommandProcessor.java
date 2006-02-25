@@ -29,7 +29,7 @@ package com.thoughtworks.selenium;
  * @author Paul Hammant
  * @version $Revision$
  */
-public interface CommandProcessor extends Startable {
+public interface CommandProcessor {
 
     /** Send the specified Selenese command to the browser to be performed
      * 

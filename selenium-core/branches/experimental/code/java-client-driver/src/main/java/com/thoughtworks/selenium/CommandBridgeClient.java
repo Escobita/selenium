@@ -15,7 +15,7 @@
  *
  */
 
-package com.thoughtworks.selenium.outbedded;
+package com.thoughtworks.selenium;
 
 import java.io.IOException;
 import java.io.InputStream;

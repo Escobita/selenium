@@ -17,8 +17,6 @@
 
 package com.thoughtworks.selenium;
 
-import com.thoughtworks.selenium.utils.Assert;
-
 /**
  * The default implementation of the SeleneseCommand interface
  * 
@@ -53,7 +51,7 @@ public class DefaultSeleneseCommand implements SeleneseCommand {
 
     /** Factory method to create a SeleneseCommand from a wiki-style input string */
     public static SeleneseCommand parse(String inputLine) {
-        Assert.assertIsTrue(inputLine != null, "inputLine can't be null");
+        if (null == inputLine) throw new NullPointerException("inputLine can't be null");
         String[] values = inputLine.split("\\|");
         if (values.length != NUMARGSINCLUDINGBOUNDARIES) {
             throw new IllegalStateException("Cannot parse invalid line: " + inputLine + values.length);

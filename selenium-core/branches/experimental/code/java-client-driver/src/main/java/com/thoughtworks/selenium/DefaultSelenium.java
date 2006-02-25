@@ -21,9 +21,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import com.thoughtworks.selenium.embedded.jetty.DirectoryStaticContentHandler;
-import com.thoughtworks.selenium.embedded.jetty.JettyCommandProcessor;
-import com.thoughtworks.selenium.launchers.DefaultBrowserLauncher;
 import com.thoughtworks.selenium.outbedded.*;
 
 /**
@@ -35,8 +32,7 @@ import com.thoughtworks.selenium.outbedded.*;
  */
 public class DefaultSelenium implements Selenium {
     
-    private CommandProcessor commandProcessor;
-    private BrowserLauncher launcher;
+    private CommandBridgeClient commandProcessor;
     private String browserStartCommand;
     private String browserHostAndPort;
     private String logLevel = null;
@@ -45,37 +41,9 @@ public class DefaultSelenium implements Selenium {
 
     public DefaultSelenium(String host, int port, String browserStartCommand, String browserHostAndPort) {
         this.commandProcessor = new CommandBridgeClient("http://" + host + 
-                ":"+ Integer.toString(port) + "/selenium/driver/");
+                ":"+ Integer.toString(port) + "/selenium-server/driver/");
         this.browserStartCommand = browserStartCommand;
         this.browserHostAndPort = browserHostAndPort;
-        this.launcher = null;
-    }
-    
-    /** Launches commands using the specified command processor and browser launcher */
-    public DefaultSelenium(CommandProcessor commandProcessor, BrowserLauncher launcher) {
-        this.commandProcessor = commandProcessor;
-        this.launcher = launcher;
-    }
-
-    /** Launches commands using the specified browser launcher and the 
-     * JettyCommandProcessor serving the specified root directory. 
-     * @param webAppRoot the root webapp that will be served by Jetty
-     * @param launcher the browser launcher object to control the browser
-     */
-    public DefaultSelenium(File webAppRoot, BrowserLauncher launcher) {
-        commandProcessor = new JettyCommandProcessor(webAppRoot, getContextName());
-        this.launcher = launcher;
-    }
-
-    /** Launches commands using the default browser launcher and the 
-     * JettyCommandProcessor serving the specified root directory. 
-     * @param webAppRoot the root webapp that will be served by Jetty
-     * @deprecated
-     */
-    public DefaultSelenium(File webAppRoot) {
-        commandProcessor = new JettyCommandProcessor(webAppRoot, getContextName(),
-                new DirectoryStaticContentHandler(new File(DEFAULT_SELENIUM_CONTEXT)));
-        launcher = new DefaultBrowserLauncher();
     }
 
     public void open(String path) {
@@ -440,13 +408,9 @@ public class DefaultSelenium implements Selenium {
     }
     
     public void start() {
-        commandProcessor.start();
-        if (launcher != null) {
-            launcher.launch("http://localhost:8080/" + getContextName() + "/" + getTestRunnerPageName());
-        } else {
-            long id = getNewBrowserSession(browserStartCommand, browserHostAndPort);
-            ((CommandBridgeClient)commandProcessor).setSessionId(id);
-        }
+        long id = getNewBrowserSession(browserStartCommand, browserHostAndPort);
+        commandProcessor.setSessionId(id);
+
     }
     
     public long getNewBrowserSession(String command, String hostAndPort) {
@@ -459,7 +423,6 @@ public class DefaultSelenium implements Selenium {
     }
 
     public void stop() {
-        launcher.close();
         commandProcessor.stop();
     }
 
