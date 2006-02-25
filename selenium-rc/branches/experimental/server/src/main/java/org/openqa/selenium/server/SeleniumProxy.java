@@ -31,21 +31,21 @@ import java.net.URLConnection;
  * <ol>
  * <li><b>Client-Configured Proxy Requests</b>: By configuring your browser to use the
  * Selenium Server as an HTTP proxy, you can use the Selenium Server as a web proxy.  This allows
- * the server to create a virtual "/selenium" directory on every website that you visit using
+ * the server to create a virtual "/selenium-server" directory on every website that you visit using
  * the proxy.
- * <li><b>Browser Selenese</b>: If the browser goes to "/selenium/SeleneseRunner.html?sessionId=1234" on any website
+ * <li><b>Browser Selenese</b>: If the browser goes to "/selenium-server/SeleneseRunner.html?sessionId=1234" on any website
  * via the Client-Configured Proxy, it will ask the Selenium Server for work to do, like this:
- * <blockquote><code>http://www.yahoo.com/selenium/driver/?seleniumStart=true&sessionId=1234</code></blockquote>
+ * <blockquote><code>http://www.yahoo.com/selenium-server/driver/?seleniumStart=true&sessionId=1234</code></blockquote>
  * The driver will then reply with a command to run in the body of the HTTP response, e.g. "|open|http://www.yahoo.com||".  Once
  * the browser is done with this request, the browser will issue a new request for more work, this
- * time reporting the results of the previous command:<blockquote><code>http://www.yahoo.com/selenium/driver/?commandResult=OK&sessionId=1234</code></blockquote>
+ * time reporting the results of the previous command:<blockquote><code>http://www.yahoo.com/selenium-server/driver/?commandResult=OK&sessionId=1234</code></blockquote>
  * The action list is listed in selenium-api.js.  Normal actions like "doClick" will return "OK" if
  * clicking was successful, or some other error string if there was an error.  Assertions like
  * assertTextPresent or verifyTextPresent will return "PASSED" if the assertion was true, or
  * some other error string if the assertion was false.  Getters like "getEval" will return the
  * result of the get command.  "getAllLinks" will return a comma-delimited list of links.</li> 
  * <li><b>Driver Commands</b>: Clients may send commands to the Selenium Server over HTTP.
- * Command requests should look like this:<blockquote><code>http://localhost:8080/selenium/driver/?commandRequest=|open|http://www.yahoo.com||&sessionId=1234</code></blockquote>
+ * Command requests should look like this:<blockquote><code>http://localhost:8080/selenium-server/driver/?commandRequest=|open|http://www.yahoo.com||&sessionId=1234</code></blockquote>
  * The Selenium Server will not respond to the HTTP request until the browser has finished performing the requested
  * command; when it does, it will reply with the result of the command (e.g. "OK" or "PASSED") in the
  * body of the HTTP response.  (Note that <code>-interactive</code> mode also works by sending these
@@ -54,7 +54,7 @@ import java.net.URLConnection;
  * <p>There are some special commands that only work in the Selenium Server.  These commands are:
  * <ul><li><p><strong>getNewBrowserSession</strong>( <em>absoluteFilePathToBrowserExecutable</em>, <em>startURL</em> )</p>
  * <p>Creates a new "sessionId" number (based on the current time in milliseconds) and launches the browser specified in 
- * <i>absoluteFilePathToBrowserExecutable</i>, browsing directly to <i>startURL</i> + "/selenium/SeleneseRunner.html?sessionId=###" 
+ * <i>absoluteFilePathToBrowserExecutable</i>, browsing directly to <i>startURL</i> + "/selenium-server/SeleneseRunner.html?sessionId=###" 
  * where "###" is the sessionId number. Only commands that are associated with the specified sessionId will be run by this browser.</p>
  * 
  * </li>
@@ -151,7 +151,7 @@ public class SeleniumProxy {
                     break;
                 }
 
-                final URL url = new URL("http://localhost:" + port + "/selenium/driver?commandRequest=" + userInput);
+                final URL url = new URL("http://localhost:" + port + "/selenium-server/driver?commandRequest=" + userInput);
                 Thread t = new Thread(new Runnable() {
                     public void run() {
                         try {
@@ -188,9 +188,9 @@ public class SeleniumProxy {
         root.addHandler(rootProxy);
         server.addContext(null, root);
 
-        // Associate the ClassPathResource handler with the /selenium context
+        // Associate the ClassPathResource handler with the /selenium-server context
         final HttpContext context = new HttpContext();
-        context.setContextPath("/selenium");
+        context.setContextPath("/selenium-server");
         context.addHandler(new ResourceHandler() {
             public void handle(String string, String string1, HttpRequest httpRequest, HttpResponse httpResponse) throws HttpException, IOException {
                 httpResponse.setField("Expires", "-1"); // never cached.
@@ -199,16 +199,16 @@ public class SeleniumProxy {
 
             /** When resources are requested, fetch them from the classpath */
             protected Resource getResource(final String s) throws IOException {
-                ClassPathResource r = new ClassPathResource(/*DGF"/selenium" + */s);
+                ClassPathResource r = new ClassPathResource("/selenium" + s);
                 context.getResourceMetaData(r);
                 return r;
             }
         });
         server.addContext(null, context);
 
-        // Associate the SeleniumDriverResourceHandler with the /selenium/driver context
+        // Associate the SeleniumDriverResourceHandler with the /selenium-server/driver context
         HttpContext driver = new HttpContext();
-        driver.setContextPath("/selenium/driver");
+        driver.setContextPath("/selenium-server/driver");
         this.driver = new SeleniumDriverResourceHandler();
         context.addHandler(this.driver);
         server.addContext(null, driver);
