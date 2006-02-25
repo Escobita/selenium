@@ -112,7 +112,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
             if ("getNewBrowserSession".equals(commandS)) {
                 sessionId = Long.toString(System.currentTimeMillis());
                 BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
-                launcher.launch("http://" + value + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
+                launcher.launch(value + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
                 launchers.put(sessionId, launcher);
                 SeleneseQueue queue = getQueue(sessionId);
                 queue.doCommand("context", sessionId, "");
