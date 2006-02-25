@@ -17,11 +17,7 @@
 
 package com.thoughtworks.selenium;
 
-import java.io.File;
-import java.util.Date;
-import java.util.StringTokenizer;
-
-import com.thoughtworks.selenium.outbedded.*;
+import java.util.*;
 
 /**
  * The default implementation of the Selenium interface.
