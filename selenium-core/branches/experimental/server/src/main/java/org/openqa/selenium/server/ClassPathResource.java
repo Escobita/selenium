@@ -49,7 +49,7 @@ public class ClassPathResource extends Resource {
     /** Returns the lastModified time, which 
      * is always in the distant future to prevent caching. */
     public long lastModified() {
-        return -1;
+        return System.currentTimeMillis() + 1000 * 3600 * 24 * 365;
     }
 
     public long length() {
