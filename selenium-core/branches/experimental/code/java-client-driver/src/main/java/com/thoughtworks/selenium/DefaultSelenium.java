@@ -57,13 +57,6 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
-    public void clickAndWait(String field) {
-        String result = commandProcessor.doCommand("clickAndWait", field, "");
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
     public void verifyText(String type, String text) {
         String result = commandProcessor.doCommand("verifyText", type, text);
         if (!result.equals("PASSED")            // this is what IE returns
@@ -128,13 +121,6 @@ public class DefaultSelenium implements Selenium {
 
     public void select(String field, String value) {
         String result = commandProcessor.doCommand("select", field, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void selectAndWait(String field, String value) {
-        String result = commandProcessor.doCommand("selectAndWait", field, value);
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
@@ -210,13 +196,6 @@ public class DefaultSelenium implements Selenium {
         }
     }
     
-    public void typeAndWait(String field, String value) {
-        String result = commandProcessor.doCommand("typeAndWait", field, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
     public void verifyAlert(String alert) {
         String result = commandProcessor.doCommand("verifyAlert", alert, "");
         if (!result.equals("PASSED")) {
@@ -526,5 +505,12 @@ public class DefaultSelenium implements Selenium {
     public String getAlert() {
         String result = commandProcessor.doCommand("getAlert", "", "");
         return result;
+    }
+
+    public void waitForPageToLoad(long timeout) {
+        String result = commandProcessor.doCommand("waitForCondition", Long.toString(timeout), "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
     }
 }
