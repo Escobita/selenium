@@ -36,7 +36,6 @@ public interface Selenium  {
     void chooseCancelOnNextConfirmation();
     void check(String field);
     void click(String field);
-    void clickAndWait(String field);
     void close();
     void keyPress(String locator, int keycode);
     void keyDown(String locator, int keycode);
@@ -46,7 +45,6 @@ public interface Selenium  {
     void goBack();
     void open(String path);
     void select(String field, String value);
-    void selectAndWait(String field, String value);
     void selectWindow(String window);
     void store(String field, String value);
     void storeAttribute(String element, String value);
@@ -54,7 +52,6 @@ public interface Selenium  {
     void storeValue(String field, String value);
     void submit(String formLocator);
     void type(String field, String value);
-    void typeAndWait(String field, String value);
     void uncheck(String field);
     void verifyAlert(String alert);
     void verifyAttribute(String element, String value);
@@ -77,6 +74,7 @@ public interface Selenium  {
     void verifyVisible(String element);
     void waitForValue(String field, String value);
     void waitForCondition(String script, long timeout);
+    void waitForPageToLoad(long timeout);
     /** Writes a message to the status bar and adds a note to the 
      * browser-side log. Note that the browser-side logs will <i>not</i>
      * be sent back to the server, and are invisible to the driver.

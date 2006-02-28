@@ -45,9 +45,11 @@ public class RealDealIntegrationTest extends TestCase {
         String[] links = selenium.getAllLinks();
         assertTrue(links.length > 3);
         assertEquals("linkToAnchorOnThisPage", links[3]);
-        selenium.clickAndWait("link");
+        selenium.click("link");
+        selenium.waitForPageToLoad(5000);
         selenium.verifyLocation("/selenium-server/tests/html/test_click_page2.html");
-        selenium.clickAndWait("previousPage");
+        selenium.click("previousPage");
+        selenium.waitForPageToLoad(5000);
         selenium.verifyLocation("/selenium-server/tests/html/test_click_page1.html");
     }
     
