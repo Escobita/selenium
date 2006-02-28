@@ -92,6 +92,23 @@ public class SeleniumAPITest extends TestCase {
         assertFalse("missing methods: " + missingMethods.toString(), methodsAreMissing);
     }
     
+    public void testExtraMethods() {
+        Set allCommands = new HashSet(Arrays.asList(selenium.getAllActions()));
+        allCommands.addAll(Arrays.asList(selenium.getAllAccessors()));
+        allCommands.addAll(Arrays.asList(selenium.getAllAsserts()));
+        StringBuffer extraMethods = new StringBuffer();
+        boolean tooManyMethods = false;
+        for (Iterator i = driverMethodNames.iterator(); i.hasNext();) {
+            String methodName = (String) i.next();
+            if (methodName.equals("stop")) continue;
+            if (methodName.equals("start")) continue;
+            if (!allCommands.contains(methodName)) {
+                tooManyMethods = true;
+                extraMethods.append('\n').append(methodName);
+            }
+        }
+        assertFalse("extra methods: " + extraMethods.toString(), tooManyMethods);
+    }
 
     private void printMethodList(String[] methodNames) {
         for (int i = 0; i < methodNames.length; i++) {

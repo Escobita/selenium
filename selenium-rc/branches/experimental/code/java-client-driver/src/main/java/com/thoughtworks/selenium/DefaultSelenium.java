@@ -64,13 +64,6 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
-    public void setTextField(String field, String value) {
-        String result = commandProcessor.doCommand("setText", field, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
     public void verifyText(String type, String text) {
         String result = commandProcessor.doCommand("verifyText", type, text);
         if (!result.equals("PASSED")            // this is what IE returns
@@ -128,14 +121,6 @@ public class DefaultSelenium implements Selenium {
 
     public void goBack() {
         String result = commandProcessor.doCommand("goBack", "", "");
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void pause(int duration) // is this needed for driven ?
-    {
-        String result = commandProcessor.doCommand("pause", "" + duration, "");
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
