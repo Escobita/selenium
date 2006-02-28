@@ -616,3 +616,11 @@ Selenium.prototype.doBreak = function() {
     document.getElementById('modeStep').checked = true;
     runInterval = -1;
 };
+
+/*
+ * Click on the located element, and attach a callback to notify
+ * when the page is reloaded.
+ */
+Selenium.prototype.doModalDialogTest = function(returnValue) {
+    this.browserbot.doModalDialogTest(returnValue);
+};
