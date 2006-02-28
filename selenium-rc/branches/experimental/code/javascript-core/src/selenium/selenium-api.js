@@ -620,6 +620,12 @@ Selenium.prototype.doWaitForCondition = function(script, timeout) {
     testLoop.waitForConditionTimeout = timeout;
 };
 
+/*
+ * Wait for a new page to load.
+ */
+Selenium.prototype.doWaitForPageToLoad = function(timeout) {
+    this.doWaitForCondition("selenium.browserbot.isNewPageLoaded()", timeout);
+};
 
 /**
  * Evaluate a parameter, performing javascript evaluation and variable substitution.
