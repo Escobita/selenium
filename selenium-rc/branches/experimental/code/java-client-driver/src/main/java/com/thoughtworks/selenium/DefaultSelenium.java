@@ -198,28 +198,28 @@ public class DefaultSelenium implements Selenium {
     }
 
     public void keyPress(String locator, int keycode) {
-        String result = commandProcessor.doCommand("keypress", locator, Integer.toString(keycode));
+        String result = commandProcessor.doCommand("keyPress", locator, Integer.toString(keycode));
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
     }
     
     public void keyDown(String locator, int keycode) {
-        String result = commandProcessor.doCommand("keydown", locator, Integer.toString(keycode));
+        String result = commandProcessor.doCommand("keyDown", locator, Integer.toString(keycode));
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
     }
     
     public void mouseOver(String locator) {
-        String result = commandProcessor.doCommand("mouseover", locator, "");
+        String result = commandProcessor.doCommand("mouseOver", locator, "");
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
     }
     
     public void mouseDown(String locator) {
-        String result = commandProcessor.doCommand("mousedown", locator, "");
+        String result = commandProcessor.doCommand("mouseDown", locator, "");
         if (!result.equals("OK")) {
             throw new SeleniumException(result);
         }
@@ -350,7 +350,7 @@ public class DefaultSelenium implements Selenium {
             throw new SeleniumException(result);
         }
     }
-
+    
     public void verifyVisible(String element) {
         String result = commandProcessor.doCommand("verifyVisible", element, "");
         if (!result.equals("PASSED")) {
@@ -427,6 +427,119 @@ public class DefaultSelenium implements Selenium {
     public boolean getEvalBool(String string) {
         String eval = getEval(string);
         boolean result = "true".equals(eval);
+        return result;
+    }
+
+    public String[] getAllActions() {
+        String stringResult = commandProcessor.doCommand("getAllActions", "", "");
+        String[] result = extractDelimitedString(stringResult);
+        return result;
+    }
+
+    public String[] getAllAccessors() {
+        String stringResult = commandProcessor.doCommand("getAllAccessors", "", "");
+        String[] result = extractDelimitedString(stringResult);
+        return result;
+    }
+    
+    public String[] getAllAsserts() {
+        String stringResult = commandProcessor.doCommand("getAllAsserts", "", "");
+        String[] result = extractDelimitedString(stringResult);
+        return result;
+    }
+
+    public void check(String field) {
+        String result = commandProcessor.doCommand("check", field, "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+
+    public void close() {
+        String result = commandProcessor.doCommand("close", "", "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+
+    public void submit(String formLocator) {
+        String result = commandProcessor.doCommand("submit", formLocator, "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+
+    public void uncheck(String field) {
+        String result = commandProcessor.doCommand("uncheck", field, "");
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+
+    public void waitForCondition(String script, long timeout) {
+        String result = commandProcessor.doCommand("waitForCondition", script, Long.toString(timeout));
+        if (!result.equals("OK")) {
+            throw new SeleniumException(result);
+        }
+    }
+
+    public String getAttribute(String target) {
+        String result = commandProcessor.doCommand("getAttribute", target, "");
+        return result;
+    }
+
+    public String getChecked(String locator) {
+        String result = commandProcessor.doCommand("getChecked", locator, "");
+        return result;
+    }
+
+    public String getEffectiveStyle(String element) {
+        String result = commandProcessor.doCommand("getEffectiveStyle", element, "");
+        return result;
+    }
+
+    public String getEffectiveStyleProperty(String element, String property) {
+        String result = commandProcessor.doCommand("getEffectiveStyleProperty", element, property);
+        return result;
+    }
+
+    public String getTable(String tableLocator) {
+        String result = commandProcessor.doCommand("getTable", tableLocator, "");
+        return result;
+    }
+
+    public String getText(String type) {
+        String result = commandProcessor.doCommand("getText", type, "");
+        return result;
+    }
+
+    public String getValue(String field) {
+        String result = commandProcessor.doCommand("getValue", field, "");
+        return result;
+    }
+
+    public String getTitle() {
+        String result = commandProcessor.doCommand("getTitle", "", "");
+        return result;
+    }
+
+    public String getAbsoluteLocation() {
+        String result = commandProcessor.doCommand("getAbsoluteLocation", "", "");
+        return result;
+    }
+
+    public String getPrompt() {
+        String result = commandProcessor.doCommand("getPrompt", "", "");
+        return result;
+    }
+
+    public String getConfirmation() {
+        String result = commandProcessor.doCommand("getConfirmation", "", "");
+        return result;
+    }
+
+    public String getAlert() {
+        String result = commandProcessor.doCommand("getAlert", "", "");
         return result;
     }
 }

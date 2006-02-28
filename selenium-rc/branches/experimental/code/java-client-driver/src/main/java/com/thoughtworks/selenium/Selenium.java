@@ -34,8 +34,10 @@ public interface Selenium  {
 
     void answerOnNextPrompt(String value);
     void chooseCancelOnNextConfirmation();
+    void check(String field);
     void click(String field);
     void clickAndWait(String field);
+    void close();
     void keyPress(String locator, int keycode);
     void keyDown(String locator, int keycode);
     void mouseOver(String locator);
@@ -52,8 +54,10 @@ public interface Selenium  {
     void storeAttribute(String element, String value);
     void storeText(String element, String value);
     void storeValue(String field, String value);
+    void submit(String formLocator);
     void type(String field, String value);
     void typeAndWait(String field, String value);
+    void uncheck(String field);
     void verifyAlert(String alert);
     void verifyAttribute(String element, String value);
     void verifyConfirmation(String confirmation);
@@ -74,6 +78,7 @@ public interface Selenium  {
     void verifyValue(String field, String value);
     void verifyVisible(String element);
     void waitForValue(String field, String value);
+    void waitForCondition(String script, long timeout);
     /** Writes a message to the status bar and adds a note to the 
      * browser-side log. Note that the browser-side logs will <i>not</i>
      * be sent back to the server, and are invisible to the driver.
@@ -84,9 +89,27 @@ public interface Selenium  {
     String[] getAllButtons();
 	String[] getAllLinks();
 	String[] getAllFields();
+    String getAttribute(String target);
+    String getChecked(String locator);
     String getEval(String script);
+    String getEffectiveStyle(String element);
+    String getEffectiveStyleProperty(String element, String property);
+    String getTable(String tableLocator);
+    String getText(String type);
+    String getValue(String field);
+    String getTitle();
+    String getAbsoluteLocation();
+    String getPrompt();
+    String getConfirmation();
+    String getAlert();
     /** Launches the browser with a new Selenium session */
     void start();
     /** Ends the test session, killing the browser */
     void stop();
+    /** Returns a complete list of Selenium "doX" actions */
+    String[] getAllActions();
+    /** Returns a complete list of Selenium "getX" actions */
+    String[] getAllAccessors();
+    /** Returns a complete list of Selenium "assertX" actions */
+    String[] getAllAsserts();
 }
