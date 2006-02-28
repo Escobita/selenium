@@ -45,11 +45,9 @@ public interface Selenium  {
     void fireEvent(String element, String event);
     void goBack();
     void open(String path);
-    void pause(int duration); // is this needed for driven ?
     void select(String field, String value);
     void selectAndWait(String field, String value);
     void selectWindow(String window);
-    void setTextField(String field, String value);
     void store(String field, String value);
     void storeAttribute(String element, String value);
     void storeText(String element, String value);
