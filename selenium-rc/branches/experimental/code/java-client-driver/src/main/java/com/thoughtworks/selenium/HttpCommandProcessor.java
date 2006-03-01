@@ -32,7 +32,7 @@ import com.thoughtworks.selenium.SeleniumException;
  * Sends commands and retrieves results via HTTP.
  * @author Ben Griffiths, Jez Humble
  */
-public class CommandBridgeClient implements CommandProcessor {
+public class HttpCommandProcessor implements CommandProcessor {
 
     private String pathToServlet;
     private String browserStartCommand;
@@ -47,7 +47,7 @@ public class CommandBridgeClient implements CommandProcessor {
      * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
      * e.g. "http://www.google.com" would send the browser to "http://www.google.com/selenium-server/SeleneseRunner.html"
      */
-    public CommandBridgeClient(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
+    public HttpCommandProcessor(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
         this.pathToServlet = "http://" + serverHost + 
         ":"+ Integer.toString(serverPort) + "/selenium-server/driver/";
         this.browserStartCommand = browserStartCommand;
@@ -60,7 +60,7 @@ public class CommandBridgeClient implements CommandProcessor {
      * @param browserStartCommand - the command string used to launch the browser, e.g. "c:\\program files\\internet explorer\\iexplore.exe"
      * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
      */
-    public CommandBridgeClient(String pathToServlet, String browserStartCommand, String browserURL) {
+    public HttpCommandProcessor(String pathToServlet, String browserStartCommand, String browserURL) {
         this.pathToServlet = pathToServlet;
         this.browserStartCommand = browserStartCommand;
         this.browserURL = browserURL;
