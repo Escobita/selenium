@@ -320,28 +320,23 @@ Selenium.prototype.assertSelected = function(target, optionLocator) {
     locator.assertSelected(element);
 };
 
-String.prototype.parseCSV = function() {
-    var values = this.replace(/\\,/g, "\n").split(",");
-    // Restore escaped commas
-    for (var i = 0; i < values.length; i++) {
-        values[i] = values[i].replace(/\n/g, ",").trim();
-    }
-    return values;
-};
 
 /**
- * Verify the label of all of the options in the drop=down.
+ * Get the labels of all of the options in the drop-down (generates assert/verifySelectOptions)
  */
-Selenium.prototype.assertSelectOptions = function(target, options) {
+Selenium.prototype.getSelectOptions = function(target) {
     var element = this.page().findElement(target);
 
-    var expectedOptionLabels = options.parseCSV();
-    Assert.equals("Wrong number of options", expectedOptionLabels.length, element.options.length);
+	var selectOptions = "";
 
     for (var i = 0; i < element.options.length; i++) {
-        Assert.matches(expectedOptionLabels[i], element.options[i].text);
+    	var option = element.options[i].text.replace(/,/g, "\\,");
+    	selectOptions += option;
+    	if (i != element.options.length-1) selectOptions += ",";
     }
+    return selectOptions;
 };
+
 
 /**
  * Get the value of an element attribute. The syntax for returning an element attribute
@@ -432,22 +427,22 @@ Selenium.prototype.assertNotVisible = function(locator) {
 };
 
 Selenium.prototype.isVisible = function(element) {
-    var visibility = this.getEffectiveStyleProperty(element, "visibility");
+    var visibility = this.findEffectiveStyleProperty(element, "visibility");
     var isDisplayed = this.isDisplayed(element);
     return (visibility != "hidden" && isDisplayed);
 };
 
-Selenium.prototype.getEffectiveStyleProperty = function(element, property) {
-    var effectiveStyle = this.getEffectiveStyle(element);
+Selenium.prototype.findEffectiveStyleProperty = function(element, property) {
+    var effectiveStyle = this.findEffectiveStyle(element);
     var propertyValue = effectiveStyle[property];
     if (propertyValue == 'inherit' && element.parentNode.style) {
-        return this.getEffectiveStyleProperty(element.parentNode, property);
+        return this.findEffectiveStyleProperty(element.parentNode, property);
     }
     return propertyValue;
 };
 
 Selenium.prototype.isDisplayed = function(element) {
-    var display = this.getEffectiveStyleProperty(element, "display");
+    var display = this.findEffectiveStyleProperty(element, "display");
     if (display == "none") return false;
     if (element.parentNode.style) {
         return this.isDisplayed(element.parentNode);
@@ -455,7 +450,7 @@ Selenium.prototype.isDisplayed = function(element) {
     return true;
 };
 
-Selenium.prototype.getEffectiveStyle = function(element) {
+Selenium.prototype.findEffectiveStyle = function(element) {
     if (element.style == undefined) {
         return undefined; // not a styled element
     }
@@ -555,42 +550,6 @@ Selenium.prototype.doSetContext = function(context, logLevelThreshold) {
     return this.page().setContext(context, logLevelThreshold);
 };
 
-/*
- * Store the value of a form input in a variable
- */
-Selenium.prototype.doStoreValue = function(target, varName) {
-    if (!varName) {
-        // Backward compatibility mode: read the ENTIRE text of the page
-        // and stores it in a variable with the name of the target
-        value = this.page().bodyText();
-        storedVars[target] = value;
-        return;
-    }
-    var element = this.page().findElement(target);
-    storedVars[varName] = getInputValue(element);
-};
-
-/*
- * Store the text of an element in a variable
- */
-Selenium.prototype.doStoreText = function(target, varName) {
-    var element = this.page().findElement(target);
-    storedVars[varName] = getText(element);
-};
-
-/*
- * Store the value of an element attribute in a variable
- */
-Selenium.prototype.doStoreAttribute = function(target, varName) {
-    storedVars[varName] = this.page().findAttribute(target);
-};
-
-/*
- * Store the result of a literal value
- */
-Selenium.prototype.doStore = function(value, varName) {
-    storedVars[varName] = value;
-};
 
 
 /*
