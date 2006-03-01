@@ -1,6 +1,6 @@
 using System;
 
-namespace ThoughtWorks.Selenium.Core
+namespace Selenium
 {
 	/// <summary>
 	/// Summary description for DefaultSeleneseCommand.

@@ -145,6 +145,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "GoogleTest.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "SeleniumIntegrationTest.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

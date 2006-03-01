@@ -1,4 +1,4 @@
-namespace ThoughtWorks.Selenium.Core
+namespace Selenium
 {
 	/// <summary>
 	/// Summary description for SeleneseCommand.

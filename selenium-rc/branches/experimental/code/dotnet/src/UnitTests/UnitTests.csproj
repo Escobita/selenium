@@ -145,11 +145,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DefaultBrowserLauncherTest.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "DefaultSelenesCommandTest.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -160,26 +155,15 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "InternetExplorerBrowserLauncherTest.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "SingleEntryBlockingQueueTest.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
-                />
-				<File
-					RelPath = "HttpCommandProcessorTest.cs"
-					SubType = "Code"
-					BuildAction = "Compile"
                 />
                 <File
                     RelPath = "SkeletonTest.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
-
             </Include>
         </Files>
     </CSHARP>

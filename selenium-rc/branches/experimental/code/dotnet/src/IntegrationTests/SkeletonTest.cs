@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using ThoughtWorks.Selenium.Core;
+using Selenium;
 
 namespace ThoughtWorks.Selenium.IntegrationTests
 {

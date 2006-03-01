@@ -8,5 +8,7 @@ namespace Selenium
 	public interface ICommandProcessor
 	{
 		string DoCommand(string command, string  field, string value);
+		void Start();
+		void Stop();
 	}
 }

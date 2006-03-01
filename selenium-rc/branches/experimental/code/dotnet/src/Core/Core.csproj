@@ -115,11 +115,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "DefaultBrowserLauncher.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "DefaultSeleneseCommand.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -135,17 +130,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "IBrowserLauncher.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "ICommandProcessor.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "InternetExplorerBrowserLauncher.cs"
+                    RelPath = "IGeneratedSelenium.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -156,16 +146,6 @@
                 />
                 <File
                     RelPath = "ISelenium.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "IStartable.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "ManualPromptUserLauncher.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

@@ -1,4 +1,4 @@
-using ThoughtWorks.Selenium.Core;
+using Selenium;
 
 namespace ThoughtWorks.Selenium.BridgeWebApp
 {

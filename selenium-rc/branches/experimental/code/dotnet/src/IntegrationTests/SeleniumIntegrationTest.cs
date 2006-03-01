@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using NUnit.Framework;
 using Selenium;
-using ThoughtWorks.Selenium.Core;
 
 namespace ThoughtWorks.Selenium.IntegrationTests
 {
@@ -14,9 +13,7 @@ namespace ThoughtWorks.Selenium.IntegrationTests
 		[SetUp]
 		public void SetupTest()
 		{
-			HttpCommandProcessor processor = new HttpCommandProcessor("http://localhost:8180/selenium/driver/");
-			IBrowserLauncher launcher = new ManualPromptUserLauncher();
-			selenium = new DefaultSelenium(processor, launcher);
+			selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://www.irian.at");
 			selenium.Start();
 		}
 
@@ -44,9 +41,9 @@ namespace ThoughtWorks.Selenium.IntegrationTests
 			// On IE6, a keyDown is needed, and no letter is typed. :-p
 			// NS On firefox, keyPress needed, no letter typed.
         
-			bool isIE = selenium.GetEvalBool("isIE");
-			bool isFirefox = selenium.GetEvalBool("isFirefox");
-			bool isNetscape = selenium.GetEvalBool("isNetscape");
+			bool isIE = "true".Equals(selenium.GetEval("isIE"));
+			bool isFirefox = "true".Equals(selenium.GetEval("isFirefox"));
+			bool isNetscape = "true".Equals(selenium.GetEval("isNetscape"));
 			String verificationText = null;
 			if (isIE) 
 			{
