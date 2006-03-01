@@ -133,34 +133,6 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
-    public void store(String field, String value) {
-        String result = commandProcessor.doCommand("store", field, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void storeAttribute(String element, String value) {
-        String result = commandProcessor.doCommand("storeAttribute", element, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void storeText(String element, String value) {
-        String result = commandProcessor.doCommand("storeText", element, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void storeValue(String field, String value) {
-        String result = commandProcessor.doCommand("storeValue", field, value);
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
-    }
-
     public void type(String field, String value) {
         String result = commandProcessor.doCommand("type", field, value);
         if (!result.equals("OK")) {
@@ -203,8 +175,8 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
-    public void verifyAttribute(String element, String value) {
-        String result = commandProcessor.doCommand("verifyAttribute", element, value);
+    public void verifyAttribute(String element, String attribute, String value) {
+        String result = commandProcessor.doCommand("verifyAttribute", element + "@" + attribute, value);
         if (!result.equals("PASSED")) {
             throw new SeleniumException(result);
         }
@@ -247,20 +219,6 @@ public class DefaultSelenium implements Selenium {
 
     public void verifyPrompt(String text) {
         String result = commandProcessor.doCommand("verifyPrompt", text, "");
-        if (!result.equals("PASSED")) {
-            throw new SeleniumException(result);
-        }
-    }
-
-    public void verifySelectOptions(String field, String[] values) {
-        String vals = "";
-        for (int i = 0; i < values.length; i++) {
-            vals = vals + values[i];
-            if (i + 1 < values.length) {
-                vals = vals + ",";
-            }
-        }
-        String result = commandProcessor.doCommand("verifySelectOptions", field, vals);
         if (!result.equals("PASSED")) {
             throw new SeleniumException(result);
         }
@@ -447,23 +405,13 @@ public class DefaultSelenium implements Selenium {
         }
     }
 
-    public String getAttribute(String target) {
-        String result = commandProcessor.doCommand("getAttribute", target, "");
+    public String getAttribute(String locator, String attribute) {
+        String result = commandProcessor.doCommand("getAttribute", locator + "@" + attribute, "");
         return result;
     }
 
     public String getChecked(String locator) {
         String result = commandProcessor.doCommand("getChecked", locator, "");
-        return result;
-    }
-
-    public String getEffectiveStyle(String element) {
-        String result = commandProcessor.doCommand("getEffectiveStyle", element, "");
-        return result;
-    }
-
-    public String getEffectiveStyleProperty(String element, String property) {
-        String result = commandProcessor.doCommand("getEffectiveStyleProperty", element, property);
         return result;
     }
 
@@ -513,4 +461,11 @@ public class DefaultSelenium implements Selenium {
             throw new SeleniumException(result);
         }
     }
+    
+    public String[] getSelectOptions(String locator) {
+        String stringResult = commandProcessor.doCommand("getSelectOptions", locator, "");
+        String[] result = extractDelimitedString(stringResult);
+        return result;
+    }
+
 }
