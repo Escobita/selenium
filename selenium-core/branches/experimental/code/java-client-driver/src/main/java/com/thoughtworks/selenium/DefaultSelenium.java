@@ -42,7 +42,7 @@ public class DefaultSelenium implements Selenium {
      * e.g. "http://www.google.com" would send the browser to "http://www.google.com/selenium-server/SeleneseRunner.html"
      */
     public DefaultSelenium(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
-        this.commandProcessor = new CommandBridgeClient(serverHost, serverPort, browserStartCommand, browserURL);
+        this.commandProcessor = new HttpCommandProcessor(serverHost, serverPort, browserStartCommand, browserURL);
     }
     
     /** Uses an arbitrary CommandProcessor */
