@@ -16,7 +16,7 @@
         <resources>
             <resource>
                 <directory>src</directory>
-                <targetPath>/selenium</targetPath>
+                <!--<targetPath>/selenium</targetPath>-->
             </resource>
         </resources>
         <plugins/>
