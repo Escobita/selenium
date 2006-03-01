@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading;
 using Selenium;
 
-namespace ThoughtWorks.Selenium.Core
+namespace Selenium
 {
 	/// <summary>
 	/// Summary description for DefaultCommandProcessor.
@@ -12,23 +12,28 @@ namespace ThoughtWorks.Selenium.Core
 	public class HttpCommandProcessor : ICommandProcessor
 	{
 		private readonly string url;
+		private string sessionId;
+		private string browserStartCommand;
+		private string browserURL;
 
 		public string Url
 		{
 			get { return url; }
 		}
 
-		public HttpCommandProcessor(string url)
+		public HttpCommandProcessor(string serverHost, int serverPort, string browserStartCommand, string browserURL) 
 		{
-			if (url == null)
-			{
-				throw new ArgumentNullException("url", "please enter a valid url");
-			}
-			this.url = url;
+			this.url = "http://" + serverHost + 
+				":"+ serverPort + "/selenium-server/driver/";
+			this.browserStartCommand = browserStartCommand;
+			this.browserURL = browserURL;
 		}
 
-		public HttpCommandProcessor() : this("http://localhost/selenium-driver/driver.sel")
+		public HttpCommandProcessor(string serverURL, string browserStartCommand, string browserURL) 
 		{
+			this.url = serverURL;
+			this.browserStartCommand = browserStartCommand;
+			this.browserURL = browserURL;
 		}
 
 		public string DoCommand(string command, string argument1, string argument2)
@@ -62,8 +67,37 @@ namespace ThoughtWorks.Selenium.Core
 
 		private string BuildCommandString(string commandString)
 		{
-			return url + "?commandRequest=" + commandString;
+			string result = url + "?commandRequest=" + commandString;
+			if (sessionId != null)
+			{
+				result += "&sessionId=" + sessionId;
+			}
+			return result;
 		}
+
+		public void Start() 
+		{
+			string result = DoCommand("getNewBrowserSession", browserStartCommand, browserURL);
+			long id;
+			try 
+			{
+				// If the result isn't a long, it's probably an error message
+				id = System.Convert.ToInt64(result);
+			} 
+			catch (Exception) 
+			{
+				throw new SeleniumException(result);
+			}
+			sessionId = System.Convert.ToString(id);
+        
+		}
+
+		public void Stop() 
+		{
+			DoCommand("testComplete", "", "");
+			sessionId = null;
+		}
+
 
 	}
 }

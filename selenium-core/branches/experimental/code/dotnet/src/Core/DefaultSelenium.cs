@@ -7,10 +7,6 @@ namespace Selenium
 	/// </summary>
 public class DefaultSelenium : ISelenium
 {
-	public static readonly string SELENESE_RUNNER_URL = "http://localhost/selenium-driver/SeleneseRunner.html";
-
-	private readonly IBrowserLauncher launcher;
-	private readonly string seleneseRunnerUrl;
 	private readonly ICommandProcessor processor;
 
 	public ICommandProcessor Processor
@@ -18,21 +14,30 @@ public class DefaultSelenium : ISelenium
         get { return processor; }
 	}
 
-	public IBrowserLauncher Launcher
+	public DefaultSelenium(String serverHost, int serverPort, String browserStartCommand, String browserURL)
 	{
-        get { return launcher; }
+		this.processor = new HttpCommandProcessor(serverHost, serverPort, browserStartCommand, browserURL);
 	}
 
-	public DefaultSelenium(ICommandProcessor processor, IBrowserLauncher launcher)
-        : this (processor, launcher, SELENESE_RUNNER_URL)
-		{ }
-
-	public DefaultSelenium(ICommandProcessor processor, IBrowserLauncher launcher, string seleneseRunnerUrl)
+	public DefaultSelenium(ICommandProcessor processor)
 	{
         this.processor = processor;
-		this.launcher = launcher;
-		this.seleneseRunnerUrl = seleneseRunnerUrl;
     }
+
+	public void AnswerOnNextPrompt(String answerString)
+	{
+		DoCommandAndFailIfNotSuccess("answerOnNextPrompt", answerString);
+	}
+
+	public void Check(String locator)
+	{
+		DoCommandAndFailIfNotSuccess("check", locator);
+	}
+
+	public void Close()
+	{
+		DoCommandAndFailIfNotSuccess("close");
+	}
 
 	public void ChooseCancelOnNextConfirmation()
 	{
@@ -52,6 +57,146 @@ public class DefaultSelenium : ISelenium
 	public void Open(String path)
 	{
         DoCommandAndFailIfNotSuccess("open", path, "", "OK");
+	}
+
+	public void FireEvent(String locator, String eventName)
+	{
+		DoCommandAndFailIfNotSuccess("fireEvent", locator, eventName);
+	}
+
+	public String GetAbsoluteLocation()
+	{
+		return DoGet("getAbsoluteLocation");
+	}
+
+	public String GetAlert()
+	{
+		return DoGet("getAlert");
+	}
+
+	public String[] GetAllAccessors()
+	{
+		return DoGet("getAllAccessors").Split(',');
+	}
+
+	public String[] GetAllActions()
+	{
+		return DoGet("getAllAccessors").Split(',');
+	}
+
+	public String[] GetAllAsserts()
+	{
+		return DoGet("getAllAccessors").Split(',');
+	}
+
+	public String GetAttribute(String locator, String attribute)
+	{
+		return DoGet("getAttribute", locator + "@" + attribute);
+	}
+
+	public String GetChecked(String locator)
+	{
+		return DoGet("getChecked", locator);
+	}
+
+	public String GetConfirmation()
+	{
+		return DoGet("getConfirmation");
+	}
+
+	public String GetPrompt()
+	{
+		return DoGet("getPrompt");
+	}
+
+	public String[] GetSelectOptions(String locator)
+	{
+		return DoGet("getSelectOptions", locator).Split(',');
+	}
+
+	public String GetTable(String tableLocator)
+	{
+		return DoGet("getTable", tableLocator);
+	}
+
+	public String GetText(String locator)
+	{
+		return DoGet("getText", locator);
+	}
+
+	public String GetTitle()
+	{
+		return DoGet("getTitle");
+	}
+
+	public String GetValue(String locator)
+	{
+		return DoGet("getValue", locator);
+	}
+
+	public void GoBack()
+	{
+		DoCommandAndFailIfNotSuccess("goBack");
+	}
+
+	public void Select(String locator, String option)
+	{
+		DoCommandAndFailIfNotSuccess("select", locator, option);
+	}
+
+	public void Submit(String locator)
+	{
+		DoCommandAndFailIfNotSuccess("submit", locator);
+	}
+
+	public void Uncheck(String locator)
+	{
+		DoCommandAndFailIfNotSuccess("uncheck", locator);
+	}
+
+	public void VerifyAttribute(string locator, string attribute, string value)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyAttribute", locator + "@" + attribute, value);
+	}
+
+	public void VerifyEditable(string locator)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyEditable", locator);
+	}
+
+	public void VerifyNotEditable(string locator)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyNotEditable", locator);
+	}
+
+	public void VerifyVisible(string locator)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyVisible", locator);
+	}
+
+	public void VerifyNotVisible(string locator)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyNotVisible", locator);
+	}
+
+	public void VerifyPrompt(string pattern)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyPrompt", pattern);
+	}
+
+	public void VerifyTextNotPresent(string pattern)
+	{
+		DoVerifyAndFailIfNotSuccess("verifyTextNotPresent", pattern);
+	}
+
+	public void WaitForCondition(string script, long timeout)
+	{
+		DoVerifyAndFailIfNotSuccess("waitForCondition", script, System.Convert.ToString(timeout));
+	}
+
+	public void WaitForValue(string locator, string value)
+	{
+		DoVerifyAndFailIfNotSuccess("waitForValue", locator, value);
 	}
 
 	public void Pause(int duration)
@@ -181,12 +326,12 @@ public class DefaultSelenium : ISelenium
 
 	public void Start()
 	{
-        launcher.Launch(seleneseRunnerUrl);
+        processor.Start();
 	}
 
 	public void Stop()
 	{
-        launcher.Close();
+        processor.Stop();
 	}
 
 	public String GetEval(String script)
@@ -212,24 +357,74 @@ public class DefaultSelenium : ISelenium
     
     public void KeyPress(String locator, int keycode)
     {
-        DoCommandAndFailIfNotSuccess("keypress", locator, "" + keycode, "OK");
+        DoCommandAndFailIfNotSuccess("keyPress", locator, "" + keycode, "OK");
     }
     
     public void KeyDown(String locator, int keycode)
     {
-        DoCommandAndFailIfNotSuccess("keydown", locator, "" + keycode,"OK");
+        DoCommandAndFailIfNotSuccess("keyDown", locator, "" + keycode,"OK");
     }
     
     public void MouseOver(String locator)
     {
-        DoCommandAndFailIfNotSuccess("mouseover", locator, "","OK");
+        DoCommandAndFailIfNotSuccess("mouseOver", locator, "","OK");
     }
     
     public void MouseDown(String locator)
     {
-        DoCommandAndFailIfNotSuccess("mousedown", locator, "", "OK");
+        DoCommandAndFailIfNotSuccess("mouseDown", locator, "", "OK");
     }
-    
+
+	public void WaitForPageToLoad(long timeout)
+	{
+		DoCommandAndFailIfNotSuccess("waitForPageToLoad", System.Convert.ToString(timeout), "", "OK");
+	}
+
+	private string DoGet(string command, string argument1, string argument2)
+	{
+		return processor.DoCommand(command, argument1, argument2);
+	}
+
+	private string DoGet(string command, string argument1)
+	{
+		return processor.DoCommand(command, argument1, "");
+	}
+
+	private string DoGet(string command)
+	{
+		return processor.DoCommand(command, "", "");
+	}
+
+	private void DoVerifyAndFailIfNotSuccess(string command)
+	{
+		DoCommandAndFailIfNotSuccess(command, "", "", "PASSED");
+	}
+
+	private void DoVerifyAndFailIfNotSuccess(string command, string argument1)
+	{
+		DoCommandAndFailIfNotSuccess(command, argument1, "", "PASSED");
+	}
+
+	private void DoVerifyAndFailIfNotSuccess(string command, string argument1, string argument2)
+	{
+		DoCommandAndFailIfNotSuccess(command, argument1, argument2, "PASSED");
+	}
+
+	private void DoCommandAndFailIfNotSuccess(string command)
+	{
+		DoCommandAndFailIfNotSuccess(command, "", "", "OK");
+	}
+
+	private void DoCommandAndFailIfNotSuccess(string command, string argument1)
+	{
+		DoCommandAndFailIfNotSuccess(command, argument1, "", "OK");
+	}
+
+	private void DoCommandAndFailIfNotSuccess(string command, string argument1, string argument2)
+	{
+		DoCommandAndFailIfNotSuccess(command, argument1, argument2, "OK");
+	}
+
 	private void DoCommandAndFailIfNotSuccess(string command, string argument1, string argument2, string expectedResult)
     {
         string actualResult = processor.DoCommand(command, argument1, argument2);

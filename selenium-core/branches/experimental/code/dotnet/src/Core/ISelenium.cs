@@ -5,44 +5,37 @@ namespace Selenium
 	/// <summary>
 	/// Summary description for ISelenium.
 	/// </summary>
-	public interface ISelenium : IStartable
+	public interface ISelenium : IGeneratedSelenium
 	{
-		void ChooseCancelOnNextConfirmation();
-		void Click(String field);
-		void ClickAndWait(String field);
-        void KeyPress(String locator, int keycode);
-        void KeyDown(String locator, int keycode);
-        void MouseOver(String locator);
-        void MouseDown(String locator);
-		void Open(String path);
-		void Pause(int duration); // is this needed for driven ?
-		void SelectAndWait(String field, String value);
-		void SelectWindow(String window);
-		void SetTextField(String field, String value);
-		void StoreText(String element, String value);
-		void StoreValue(String field, String value);
-		void TestComplete();
-		void Type(String field, String value);
-		void TypeAndWait(String field, String value);
-		void VerifyAlert(String alert);
-		void VerifyAttribute(String element, String value);
-		void VerifyConfirmation(String confirmation);
-		void VerifyElementNotPresent(String type);
-		void VerifyElementPresent(String type);
-		void VerifyLocation(String location);
-		void VerifySelectOptions(String field, String[] values);
-		void VerifySelected(String field, String value);
-		void VerifyTable(String table, String value);
-		void VerifyText(String type, String text);
-		void VerifyTextPresent(String text);
-		void VerifyTitle(String title);
-		void VerifyValue(String field, String value);
-        void SetContext(String context);
-        void SetContext(String context, String logLevel);
-		String[] GetAllButtons();
-		String[] GetAllLinks();
-		String[] GetAllFields();
-        String GetEval(String script);
-		bool GetEvalBool(String script);
+		// DGF TODO replace *every* method with a non-generated definition
+		new void ChooseCancelOnNextConfirmation();
+		new void Click(String locator);
+        new void KeyPress(String locator, int keycode);
+        new void KeyDown(String locator, int keycode);
+        new void MouseOver(String locator);
+        new void MouseDown(String locator);
+		new void Open(String url);
+		new void SelectWindow(String window);
+		new void Type(String field, String value);
+		new void VerifyAlert(String alert);
+		new void VerifyConfirmation(String confirmation);
+		new void VerifyElementNotPresent(String locator);
+		new void VerifyElementPresent(String locator);
+		new void VerifyLocation(String location);
+		new void VerifySelected(String locator, String value);
+		new void VerifyTable(String tableLocator, String value);
+		new void VerifyText(String locator, String text);
+		new void VerifyTextPresent(String text);
+		new void VerifyTitle(String title);
+		new void VerifyValue(String locator, String value);
+        new void SetContext(String context);
+        new void SetContext(String context, String logLevel);
+		new void WaitForPageToLoad(long timeout);
+		new String[] GetAllButtons();
+		new String[] GetAllLinks();
+		new String[] GetAllFields();
+        new String GetEval(String script);
+		new void Start();
+		new void Stop();
 	}
 }

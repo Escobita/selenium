@@ -12,53 +12,32 @@ namespace ThoughtWorks.Selenium.UnitTests
 	{
 		private DefaultSelenium selenium;
 		private ICommandProcessor processor;
-		private IBrowserLauncher launcher;
 		private Mock mockProcessor;
-		private Mock mockLauncher;
 
 		[SetUp]
 		public void SetupTest()
 		{
 			mockProcessor = new DynamicMock(typeof (ICommandProcessor));
 			processor = (ICommandProcessor) mockProcessor.MockInstance;
-			mockLauncher = new DynamicMock(typeof(IBrowserLauncher));
-			launcher = (IBrowserLauncher) mockLauncher.MockInstance;
-			selenium = new DefaultSelenium(processor, launcher);
+			selenium = new DefaultSelenium(processor);
 		}
 
 		[TearDown]
 		public void TeardownTest()
 		{
 			mockProcessor.Verify();
-			mockLauncher.Verify();
 		}
 
 		[Test]
 		public void InstantiateSeleniumShouldWork()
 		{
 			Assert.AreEqual(processor, selenium.Processor);
-			Assert.AreEqual(launcher, selenium.Launcher);
-		}
-
-		[Test]
-		public void StartSeleniumShouldWorkWithDefaultURL()
-		{
-			mockLauncher.Expect("Launch", DefaultSelenium.SELENESE_RUNNER_URL);
-			selenium.Start();
-		}
-
-		[Test]
-		public void StartSeleniumShouldWorkWithSpecifiedURL()
-		{
-			selenium = new DefaultSelenium(processor, launcher, "myUrl");
-			mockLauncher.Expect("Launch", "myUrl");
-			selenium.Start();
 		}
 
 		[Test]
 		public void StopSeleniumShouldWork()
 		{
-			mockLauncher.Expect("Close");
+			mockProcessor.Expect("Stop");
 			selenium.Stop();
 		}
 
