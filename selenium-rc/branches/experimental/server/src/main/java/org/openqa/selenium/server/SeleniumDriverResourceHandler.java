@@ -22,8 +22,10 @@ import org.mortbay.http.HttpFields;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
 import org.mortbay.http.handler.ResourceHandler;
+import org.mortbay.jetty.*;
 import org.mortbay.util.StringUtil;
 import org.openqa.selenium.server.browserlaunchers.*;
+import org.openqa.selenium.server.htmlrunner.*;
 
 import java.io.*;
 import java.util.HashMap;
@@ -43,7 +45,12 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
 
     private final Map queues = new HashMap();
     private final Map launchers = new HashMap();
-
+    private SeleniumProxy server;
+    
+    public SeleniumDriverResourceHandler(SeleniumProxy server) {
+        this.server = server;
+    }
+    
     /** Handy helper to retrieve the first parameter value matching the name
      * 
      * @param req - the Jetty HttpRequest
@@ -88,64 +95,91 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
 
             req.setHandled(true);
         } else if (commandRequest != null) {
-            // If this a Driver Client sending a new command...
-            res.setContentType("text/plain");
-            String[] values = commandRequest.split("\\|");
-            String commandS = "";
-            String field = "";
-            String value = "";
-            if (values.length > 1) {
-                commandS = values[1];
-            }
-
-            if (values.length > 2) {
-                field = values[2];
-            }
-
-            if (values.length > 3) {
-                value = values[3];
-            }
-
-            String results;
-            
-            // handle special commands
-            if ("getNewBrowserSession".equals(commandS)) {
-                sessionId = Long.toString(System.currentTimeMillis());
-                BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
-                launcher.launch(value + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
-                launchers.put(sessionId, launcher);
-                SeleneseQueue queue = getQueue(sessionId);
-                queue.doCommand("context", sessionId, "");
-                results = sessionId;
-            } else if ("testComplete".equals(commandS)) {
-                BrowserLauncher launcher = getLauncher(sessionId);
-                if (launcher == null) {
-                    results = "ERROR: No launcher found for sessionId " + sessionId; 
-                } else {
-                    launcher.close();
-                    // finally, if the command was testComplete, remove the queue
-                    if ("testComplete".equals(commandS)) {
-                        clearQueue(sessionId);
-                    }
-                    results = "OK";
-                }
-            } else {
-//              System.out.println("commandRequest = " + commandRequest);
-                SeleneseQueue queue = getQueue(sessionId);
-                results = queue.doCommand(commandS, field, value);
-            }
-            System.out.println("Got result: " + results);
-            try {
-                res.getOutputStream().write(results.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            req.setHandled(true);
+            handleCommandRequest(req, res, commandRequest, sessionId);
         } else {
             //System.out.println("Unexpected: " + req.getRequestURL() + "?" + req.getQuery());
             req.setHandled(false);
         }
+    }
+
+    private void handleCommandRequest(HttpRequest req, HttpResponse res, String commandRequest, String sessionId) throws IOException {
+        // If this a Driver Client sending a new command...
+        res.setContentType("text/plain");
+        String[] values = commandRequest.split("\\|");
+        String commandS = "";
+        String field = "";
+        String value = "";
+        if (values.length > 1) {
+            commandS = values[1];
+        }
+
+        if (values.length > 2) {
+            field = values[2];
+        }
+
+        if (values.length > 3) {
+            value = values[3];
+        }
+
+        String results;
+        System.out.println("commandRequest = " + commandRequest);        
+        // handle special commands
+        if ("getNewBrowserSession".equals(commandS)) {
+            sessionId = Long.toString(System.currentTimeMillis());
+            BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
+            //BrowserLauncher launcher = new ManualPromptUserLauncher();
+            launcher.launch(value + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
+            launchers.put(sessionId, launcher);
+            SeleneseQueue queue = getQueue(sessionId);
+            queue.doCommand("setContext", sessionId, "");
+            results = sessionId;
+        } else if ("testComplete".equals(commandS)) {
+            BrowserLauncher launcher = getLauncher(sessionId);
+            if (launcher == null) {
+                results = "ERROR: No launcher found for sessionId " + sessionId; 
+            } else {
+                launcher.close();
+                // finally, if the command was testComplete, remove the queue
+                if ("testComplete".equals(commandS)) {
+                    clearQueue(sessionId);
+                }
+                results = "OK";
+            }
+        } else if ("addStaticContent".equals(commandS)) {
+            File dir = new File(field);
+            if (dir.exists()) {
+                server.addNewStaticContent(dir);
+                results = "OK";
+            } else {
+                results = "ERROR: dir does not exist - " + dir.getAbsolutePath();
+            }
+        } else if ("runHTMLSuite".equals(commandS)) {
+            HTMLLauncher launcher = new HTMLLauncher(server);
+            File output = null;
+            if (values.length <= 4) {
+                // 0|1runHTMLSuite|2browser|3browserURL|4suiteURL = 5 elements, counting 0
+                results = "ERROR: Not enough arguments (browser, browserURL, suiteURL, [outputFile])";
+            } else {
+                if (values.length > 5) {
+                    output = new File(values[5]);
+                }
+                // TODO User Configurable timeout 
+                long timeout = 1000 * 60 * 30;
+                results = launcher.runHTMLSuite(field, value, values[4], output, timeout);
+            }                
+        } else {
+
+            SeleneseQueue queue = getQueue(sessionId);
+            results = queue.doCommand(commandS, field, value);
+        }
+        System.out.println("Got result: " + results);
+        try {
+            res.getOutputStream().write(results.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        req.setHandled(true);
     }
 
     /** Retrieves a launcher for the specified sessionId, or <code>null</code> if there is no such launcher. */
