@@ -30,7 +30,7 @@ public class DestroyableRuntimeExecutingBrowserLauncher extends RuntimeExecuting
     }
 
     /** Kills the process */
-    public final void close() {
+    public void close() {
         process.destroy();
     }
 }

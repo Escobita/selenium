@@ -25,7 +25,7 @@ public class HTMLRunnerTest extends TestCase implements HTMLResultsListener {
     }
     
     public void testHTMLRunner() throws Exception {
-        String browser = "c:\\program files\\internet explorer\\iexplore.exe";
+        String browser = "*firefox";
         String browserURL = "http://localhost:8080";
         String testURL = "tests/ShortTestSuite.html";
         long timeout = 1000 * 60 * 10; // ten minutes
@@ -33,6 +33,11 @@ public class HTMLRunnerTest extends TestCase implements HTMLResultsListener {
         assertEquals("Tests didn't pass", "PASSED", result);
         assertTrue(output.exists());
         output.delete();
+    }
+    
+    public void testAgain() throws Exception {
+        // For safety's sake
+        testHTMLRunner();
     }
     
     public void tearDown() throws Exception {
