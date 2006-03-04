@@ -17,18 +17,15 @@
 
 package org.openqa.selenium.server;
 
-import org.mortbay.http.*;
-import org.mortbay.http.handler.ResourceHandler;
-import org.mortbay.jetty.*;
-import org.mortbay.util.StringUtil;
-import org.openqa.selenium.server.browserlaunchers.*;
-import org.openqa.selenium.server.htmlrunner.*;
-
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import org.mortbay.http.*;
+import org.mortbay.http.handler.*;
+import org.mortbay.util.*;
+import org.openqa.selenium.server.browserlaunchers.*;
+import org.openqa.selenium.server.htmlrunner.*;
 
 /**
  * A Jetty handler that takes care of Selenese Driven requests.
@@ -124,14 +121,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         System.out.println("commandRequest = " + commandRequest);        
         // handle special commands
         if ("getNewBrowserSession".equals(commandS)) {
-            sessionId = Long.toString(System.currentTimeMillis());
-            BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(field);
-            //BrowserLauncher launcher = new ManualPromptUserLauncher();
-            launcher.launch(value + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
-            launchers.put(sessionId, launcher);
-            SeleneseQueue queue = getQueue(sessionId);
-            queue.doCommand("setContext", sessionId, "");
-            results = sessionId;
+            results = getNewBrowserSession(field, value);
         } else if ("testComplete".equals(commandS)) {
             BrowserLauncher launcher = getLauncher(sessionId);
             if (launcher == null) {
@@ -179,6 +169,21 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         }
         
         req.setHandled(true);
+    }
+
+    private String getNewBrowserSession(String browser, String startURL) {
+        if (browser == null) throw new IllegalArgumentException("browser may not be null");
+        String sessionId;
+        String results;
+        BrowserLauncherFactory blf = new BrowserLauncherFactory(server);
+        BrowserLauncher launcher = blf.getBrowserLauncher(browser);
+        sessionId = Long.toString(System.currentTimeMillis());
+        launcher.launch(startURL + "/selenium-server/SeleneseRunner.html?sessionId=" + sessionId);
+        launchers.put(sessionId, launcher);
+        SeleneseQueue queue = getQueue(sessionId);
+        queue.doCommand("setContext", sessionId, "");
+        results = sessionId;
+        return results;
     }
 
     /** Perl and Ruby hang forever when they see "Connection: close" in the HTTP headers.

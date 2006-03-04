@@ -93,6 +93,7 @@ public class SeleniumProxy {
     private SeleniumHTMLRunnerResultsHandler postResultsHandler;
     private HttpContext context;
     private StaticContentHandler staticContentHandler;
+    private int port;
 
     /** Starts up the server on the specified port (or 8080 if no port was specified)
      * and then starts interactive mode if specified.
@@ -181,6 +182,7 @@ public class SeleniumProxy {
      * @throws Exception - you know, just in case
      */
     public SeleniumProxy(int port) throws Exception {
+        this.port = port;
         server = new Server();
         SocketListener socketListener = new SocketListener();
         socketListener.setPort(port);
@@ -259,6 +261,10 @@ public class SeleniumProxy {
         public void addStaticContent(File directory) {
             contentDirs.add(directory);
         }
+    }
+
+    public int getPort() {
+        return port;
     }
 
 }

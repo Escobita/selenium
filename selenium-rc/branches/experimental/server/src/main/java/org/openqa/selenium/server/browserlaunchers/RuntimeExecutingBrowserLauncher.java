@@ -10,7 +10,7 @@ import java.io.*;
 public abstract class RuntimeExecutingBrowserLauncher implements BrowserLauncher {
 
     protected Process process;
-    private String commandPath;
+    protected String commandPath;
 
     /** Specifies a command path to run */
     protected RuntimeExecutingBrowserLauncher(String commandPath) {

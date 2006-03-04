@@ -20,7 +20,8 @@ public class HTMLLauncher implements HTMLResultsListener {
     
     public String runHTMLSuite(String browser, String browserURL, String HTMLSuite, File outputFile, long timeout) throws IOException {
         server.handleHTMLRunnerResults(this);
-        BrowserLauncher launcher = new DestroyableRuntimeExecutingBrowserLauncher(browser);
+        BrowserLauncherFactory blf = new BrowserLauncherFactory(server);
+        BrowserLauncher launcher = blf.getBrowserLauncher(browser);
         launcher.launch(browserURL + "/selenium-server/TestRunner.html?auto=true&test=" + HTMLSuite);
         long now = System.currentTimeMillis();
         long end = now + timeout;
