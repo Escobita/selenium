@@ -3,13 +3,14 @@ package org.openqa.selenium.server;
 import org.mortbay.http.*;
 import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.jetty.Server;
-import org.mortbay.util.Resource;
+import org.mortbay.jetty.servlet.*;
+import org.mortbay.util.*;
+import org.openqa.selenium.server.htmlrunner.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.*;
 
 /**
  * Provides a server that can launch/terminate browsers and can receive Selenese commands
@@ -86,8 +87,12 @@ import java.net.URLConnection;
  *
  */
 public class SeleniumProxy {
+    
     private Server server;
     private SeleniumDriverResourceHandler driver;
+    private SeleniumHTMLRunnerResultsHandler postResultsHandler;
+    private HttpContext context;
+    private StaticContentHandler staticContentHandler;
 
     /** Starts up the server on the specified port (or 8080 if no port was specified)
      * and then starts interactive mode if specified.
@@ -188,32 +193,35 @@ public class SeleniumProxy {
         root.addHandler(rootProxy);
         server.addContext(null, root);
 
-        // Associate the ClassPathResource handler with the /selenium-server context
-        final HttpContext context = new HttpContext();
+        context = new HttpContext();
         context.setContextPath("/selenium-server");
-        context.addHandler(new ResourceHandler() {
-            public void handle(String string, String string1, HttpRequest httpRequest, HttpResponse httpResponse) throws HttpException, IOException {
-                httpResponse.setField("Expires", "-1"); // never cached.
-                super.handle(string, string1, httpRequest, httpResponse);
-            }
-
-            /** When resources are requested, fetch them from the classpath */
-            protected Resource getResource(final String s) throws IOException {
-                ClassPathResource r = new ClassPathResource("/selenium" + s);
-                context.getResourceMetaData(r);
-                return r;
-            }
-        });
+        staticContentHandler = new StaticContentHandler();
+        context.addHandler(staticContentHandler);
         server.addContext(null, context);
 
+        context.addHandler(new SingleTestSuiteResourceHandler());
+        server.addContext(null, context);
+        
+        this.postResultsHandler = new SeleniumHTMLRunnerResultsHandler();
+        context.addHandler(postResultsHandler);
+        server.addContext(null, context);
+        
         // Associate the SeleniumDriverResourceHandler with the /selenium-server/driver context
         HttpContext driver = new HttpContext();
         driver.setContextPath("/selenium-server/driver");
-        this.driver = new SeleniumDriverResourceHandler();
+        this.driver = new SeleniumDriverResourceHandler(this);
         context.addHandler(this.driver);
         server.addContext(null, driver);
     }
 
+    public void addNewStaticContent(File directory) {
+        staticContentHandler.addStaticContent(directory);
+    }
+    
+    public void handleHTMLRunnerResults(HTMLResultsListener listener) {
+        postResultsHandler.addListener(listener);
+    }
+    
     /** Starts the Jetty server */
     public void start() throws Exception {
         server.start();
@@ -223,4 +231,34 @@ public class SeleniumProxy {
     public void stop() throws InterruptedException {
         server.stop();
     }
+    
+    private class StaticContentHandler extends ResourceHandler {
+        List contentDirs = new Vector();
+        
+        public void handle(String string, String string1, HttpRequest httpRequest, HttpResponse httpResponse) throws HttpException, IOException {
+            httpResponse.setField("Expires", "-1"); // never cached.
+            super.handle(string, string1, httpRequest, httpResponse);
+        }
+
+        /** When resources are requested, fetch them from the classpath */
+        protected Resource getResource(final String s) throws IOException {
+            Resource r = new ClassPathResource("/selenium" + s);
+            context.getResourceMetaData(r);
+            if (!r.exists()) {
+                for (Iterator i = contentDirs.iterator(); i.hasNext();) {
+                    File dir = (File) i.next();
+                    File resFile = new File(dir, s);
+                    r = Resource.newResource(resFile.toURL());
+                    context.getResourceMetaData(r);
+                    if (r.exists()) break;
+                }
+            }
+            return r;
+        }
+        
+        public void addStaticContent(File directory) {
+            contentDirs.add(directory);
+        }
+    }
+
 }
