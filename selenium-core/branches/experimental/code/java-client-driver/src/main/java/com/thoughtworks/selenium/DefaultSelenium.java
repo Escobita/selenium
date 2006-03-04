@@ -51,18 +51,11 @@ public class DefaultSelenium implements Selenium {
     }
 
     public void open(String path) {
-        String result = commandProcessor.doCommand("open", path, "");
-        if (!result.equals("OK")) {
-            throw new SeleniumException(result);
-        }
+        doCommandAndFailIfNotSuccess("open", path);
     }
 
     public void verifyText(String type, String text) {
-        String result = commandProcessor.doCommand("verifyText", type, text);
-        if (!result.equals("PASSED")            // this is what IE returns
-                && !result.equals("OK")) {      // this is what firefox returns
-            throw new SeleniumException(result);
-        }
+        doVerify("verifyText", type, text);
     }
 
     public void verifyLocation(String location) {
@@ -292,7 +285,7 @@ public class DefaultSelenium implements Selenium {
     }
 
     public void setContext(String context, String logLevel) {
-        commandProcessor.doCommand("context", context, logLevel);
+        commandProcessor.doCommand("setContext", context, logLevel);
     }
 
     public String[] getAllButtons() {
@@ -468,4 +461,58 @@ public class DefaultSelenium implements Selenium {
         return result;
     }
 
+    private String doGet(String command, String argument1, String argument2)
+    {
+        return commandProcessor.doCommand(command, argument1, argument2);
+    }
+
+    private String doGet(String command, String argument1)
+    {
+        return commandProcessor.doCommand(command, argument1, "");
+    }
+
+    private String doGet(String command)
+    {
+        return commandProcessor.doCommand(command, "", "");
+    }
+
+    private void doVerify(String command)
+    {
+        doCommandAndFailIfNotSuccess(command, "", "", "PASSED");
+    }
+
+    private void doVerify(String command, String argument1)
+    {
+        doCommandAndFailIfNotSuccess(command, argument1, "", "PASSED");
+    }
+
+    private void doVerify(String command, String argument1, String argument2)
+    {
+        doCommandAndFailIfNotSuccess(command, argument1, argument2, "PASSED");
+    }
+
+    private void doCommandAndFailIfNotSuccess(String command)
+    {
+        doCommandAndFailIfNotSuccess(command, "", "", "OK");
+    }
+
+    private void doCommandAndFailIfNotSuccess(String command, String argument1)
+    {
+        doCommandAndFailIfNotSuccess(command, argument1, "", "OK");
+    }
+
+    private void doCommandAndFailIfNotSuccess(String command, String argument1, String argument2)
+    {
+        doCommandAndFailIfNotSuccess(command, argument1, argument2, "OK");
+    }
+    
+    private void doCommandAndFailIfNotSuccess(String command, String argument1, String argument2, String expectedResult)
+    {
+        String actualResult = commandProcessor.doCommand(command, argument1, argument2);
+        if (!actualResult.equals(expectedResult))
+        {
+            throw new SeleniumException(actualResult);
+        }
+    }
+    
 }
