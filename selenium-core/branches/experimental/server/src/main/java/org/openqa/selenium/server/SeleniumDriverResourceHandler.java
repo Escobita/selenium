@@ -17,10 +17,7 @@
 
 package org.openqa.selenium.server;
 
-import org.mortbay.http.HttpException;
-import org.mortbay.http.HttpFields;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
+import org.mortbay.http.*;
 import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.jetty.*;
 import org.mortbay.util.StringUtil;
@@ -28,6 +25,7 @@ import org.openqa.selenium.server.browserlaunchers.*;
 import org.openqa.selenium.server.htmlrunner.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +103,7 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
     private void handleCommandRequest(HttpRequest req, HttpResponse res, String commandRequest, String sessionId) throws IOException {
         // If this a Driver Client sending a new command...
         res.setContentType("text/plain");
+        hackRemoveConnectionCloseHeader(res);
         String[] values = commandRequest.split("\\|");
         String commandS = "";
         String field = "";
@@ -178,8 +177,50 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        
         req.setHandled(true);
+    }
+
+    /** Perl and Ruby hang forever when they see "Connection: close" in the HTTP headers.
+     * They see that and they think that Jetty will close the socket connection, but
+     * Jetty doesn't appear to do that reliably when we're creating a process while
+     * handling the HTTP response!  So, removing the "Connection: close" header so that
+     * Perl and Ruby think we're morons and hang up on us in disgust.
+     * @param res the HTTP response
+     */
+    private void hackRemoveConnectionCloseHeader(HttpResponse res) {
+        // First, if Connection has been added, remove it.
+        res.removeField(HttpFields.__Connection);
+        // Now, claim that this connection is *actually* persistent
+        Field[] fields = HttpConnection.class.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i].getName().equals("_close")) {
+                Field _close = fields[i];
+                _close.setAccessible(true);
+                try {
+                    _close.setBoolean(res.getHttpConnection(), false);
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (fields[i].getName().equals("_persistent")) {
+                Field _close = fields[i];
+                _close.setAccessible(true);
+                try {
+                    _close.setBoolean(res.getHttpConnection(), true);
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /** Retrieves a launcher for the specified sessionId, or <code>null</code> if there is no such launcher. */
