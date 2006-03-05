@@ -58,7 +58,7 @@ public class ClientDriverSuite extends TestSuite{
         }
         
         public void setUp() throws Exception {
-            server = new SeleniumProxy(8080);
+            server = new SeleniumProxy(SeleniumProxy.DEFAULT_PORT);
             server.start();
         }
         

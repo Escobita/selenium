@@ -43,7 +43,7 @@ public class HttpCommandProcessor implements CommandProcessor {
      * 
      * @param serverHost - the host name on which the Selenium Server resides
      * @param serverPort - the port on which the Selenium Server is listening
-     * @param browserStartCommand - the command string used to launch the browser, e.g. "c:\\program files\\internet explorer\\iexplore.exe"
+     * @param browserStartCommand - the command string used to launch the browser, e.g. "*firefox" or "c:\\program files\\internet explorer\\iexplore.exe"
      * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
      * e.g. "http://www.google.com" would send the browser to "http://www.google.com/selenium-server/SeleneseRunner.html"
      */
@@ -56,8 +56,8 @@ public class HttpCommandProcessor implements CommandProcessor {
     
     /** Specifies the URL to the CommandBridge servlet, a command to launch the browser, and a starting URL for the browser.
      * 
-     * @param pathToServlet - the URL of the Selenium Server Driver, e.g. "http://localhost:8080/selenium-server/driver/" (don't forget the final slash!)
-     * @param browserStartCommand - the command string used to launch the browser, e.g. "c:\\program files\\internet explorer\\iexplore.exe"
+     * @param pathToServlet - the URL of the Selenium Server Driver, e.g. "http://localhost:4444/selenium-server/driver/" (don't forget the final slash!)
+     * @param browserStartCommand - the command string used to launch the browser, e.g. "*firefox" or "c:\\program files\\internet explorer\\iexplore.exe"
      * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
      */
     public HttpCommandProcessor(String pathToServlet, String browserStartCommand, String browserURL) {

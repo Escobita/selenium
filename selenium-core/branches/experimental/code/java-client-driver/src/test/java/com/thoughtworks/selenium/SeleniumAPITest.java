@@ -19,10 +19,10 @@ public class SeleniumAPITest extends TestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
-        server = new SeleniumProxy(8080);
+        server = new SeleniumProxy(SeleniumProxy.DEFAULT_PORT);
         server.start();
         prepareDriverMethodNames();
-        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://localhost:8080");
+        selenium = new DefaultSelenium("localhost", SeleniumProxy.DEFAULT_PORT, "*firefox", "http://localhost:" + SeleniumProxy.DEFAULT_PORT);
         selenium.start();
     }
     
@@ -110,6 +110,30 @@ public class SeleniumAPITest extends TestCase {
         assertFalse("extra methods: " + extraMethods.toString(), tooManyMethods);
     }
 
+    public void XtestRedundantAssertions() {
+        Set accessors = new HashSet(Arrays.asList(selenium.getAllAccessors()));
+        String[] methodNames = selenium.getAllAsserts();
+        printMethodList(methodNames);
+        StringBuffer redundantMethods = new StringBuffer();
+        boolean methodsAreRedundant = false;
+        for (int i = 0; i < methodNames.length; i++) {
+            String method = methodNames[i];
+            if (method.startsWith("assert")) continue;
+            if (method.startsWith("verifyNot")) continue;
+            // Ignore Error/FailureOnNext; that's what try/catch are for
+            if (method.equals("verifyErrorOnNext")) continue;
+            if (method.equals("verifyFailureOnNext")) continue;
+            if (driverMethodNames.contains(method)) {
+                String correspondingAccessor = method.replaceFirst("^verify", "get");
+                if (accessors.contains(correspondingAccessor)) {
+                    methodsAreRedundant = true;
+                    redundantMethods.append('\n').append(methodNames[i]);
+                }
+            }
+        }
+        assertFalse("redundant methods: " + redundantMethods.toString(), methodsAreRedundant);
+    }
+    
     private void printMethodList(String[] methodNames) {
         for (int i = 0; i < methodNames.length; i++) {
             System.out.print(methodNames[i]);
