@@ -19,6 +19,8 @@ package com.thoughtworks.selenium;
 
 import junit.framework.*;
 
+import org.openqa.selenium.server.*;
+
 /**
  * @author Paul Hammant
  * @version $Revision: 131 $
@@ -29,7 +31,7 @@ public class RealDealIntegrationTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://localhost:8080");
+        selenium = new DefaultSelenium("localhost", SeleniumProxy.DEFAULT_PORT, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://localhost:" + SeleniumProxy.DEFAULT_PORT);
         selenium.start();
     }
 

@@ -2,6 +2,8 @@ package com.thoughtworks.selenium;
 
 import junit.framework.*;
 
+import org.openqa.selenium.server.*;
+
 /**
  * A test of the Apache MyFaces JSF AJAX auto-suggest sandbox application at www.irian.at.
  *  
@@ -14,7 +16,7 @@ public class ApacheMyFacesSuggestTest extends TestCase {
     DefaultSelenium selenium;
     
     protected void setUp() throws Exception {
-        selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://www.irian.at");
+        selenium = new DefaultSelenium("localhost", SeleniumProxy.DEFAULT_PORT, "*firefox", "http://www.irian.at");
         selenium.start();
     }
     
@@ -32,9 +34,9 @@ public class ApacheMyFacesSuggestTest extends TestCase {
         boolean isNetscape = selenium.getEvalBool("isNetscape");
         String verificationText = null;
         if (isIE) {
-            selenium.keyDown(elementID, 120);
+            selenium.keyDown(elementID, 'x');
         } else {
-            selenium.keyPress(elementID, 120);
+            selenium.keyPress(elementID, 'x');
         }
         if (isNetscape) {
             verificationText = "foox1";
