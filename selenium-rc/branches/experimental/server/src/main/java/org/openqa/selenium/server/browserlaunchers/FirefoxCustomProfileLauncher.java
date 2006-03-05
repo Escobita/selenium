@@ -8,6 +8,7 @@ import java.io.*;
 
 import org.apache.tools.ant.*;
 import org.apache.tools.ant.taskdefs.*;
+import org.openqa.selenium.server.*;
 
 public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBrowserLauncher {
 
@@ -124,7 +125,7 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
     }
     
     public static void main(String[] args) throws IOException, InterruptedException {
-        FirefoxCustomProfileLauncher l = new FirefoxCustomProfileLauncher(8080);
+        FirefoxCustomProfileLauncher l = new FirefoxCustomProfileLauncher(SeleniumProxy.DEFAULT_PORT);
         l.launch("http://www.google.com");
         System.out.println("Killing browser in 5 seconds");
         Thread.sleep(5000);

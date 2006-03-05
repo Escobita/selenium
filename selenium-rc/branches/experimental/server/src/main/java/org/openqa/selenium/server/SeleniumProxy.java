@@ -18,9 +18,9 @@ import java.util.*;
  * 
  * <p>To run Selenium Server, run:
  * 
- * <blockquote><code>java -jar selenium-server-1.0-SNAPSHOT.jar [-port 8080] [-interactive]</code></blockquote>
+ * <blockquote><code>java -jar selenium-server-1.0-SNAPSHOT.jar [-port 4444] [-interactive]</code></blockquote>
  * 
- * <p>Where <code>-port</code> specifies the port you wish to run the Server on (default is 8080).
+ * <p>Where <code>-port</code> specifies the port you wish to run the Server on (default is 4444).
  * 
  * <p>Using the <code>-interactive</code> flag will start the server in Interactive mode.
  * In this mode you can type wiki-style Selenese commands on the command line (e.g. |open|http://www.yahoo.com||).
@@ -46,7 +46,7 @@ import java.util.*;
  * some other error string if the assertion was false.  Getters like "getEval" will return the
  * result of the get command.  "getAllLinks" will return a comma-delimited list of links.</li> 
  * <li><b>Driver Commands</b>: Clients may send commands to the Selenium Server over HTTP.
- * Command requests should look like this:<blockquote><code>http://localhost:8080/selenium-server/driver/?commandRequest=|open|http://www.yahoo.com||&sessionId=1234</code></blockquote>
+ * Command requests should look like this:<blockquote><code>http://localhost:4444/selenium-server/driver/?commandRequest=|open|http://www.yahoo.com||&sessionId=1234</code></blockquote>
  * The Selenium Server will not respond to the HTTP request until the browser has finished performing the requested
  * command; when it does, it will reply with the result of the command (e.g. "OK" or "PASSED") in the
  * body of the HTTP response.  (Note that <code>-interactive</code> mode also works by sending these
@@ -94,15 +94,16 @@ public class SeleniumProxy {
     private HttpContext context;
     private StaticContentHandler staticContentHandler;
     private int port;
+    public static final int DEFAULT_PORT = 4444;
 
-    /** Starts up the server on the specified port (or 8080 if no port was specified)
+    /** Starts up the server on the specified port (or default if no port was specified)
      * and then starts interactive mode if specified.
      * 
      * @param args - either "-port" followed by a number, or "-interactive"
      * @throws Exception - you know, just in case.
      */ 
     public static void main(String[] args) throws Exception {
-        int port = 8080;
+        int port = DEFAULT_PORT;
         boolean interactive = false;
 
         for (int i = 0; i < args.length; i++) {
