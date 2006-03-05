@@ -37,7 +37,7 @@ public class DefaultSelenium implements Selenium {
      * 
      * @param serverHost - the host name on which the Selenium Server resides
      * @param serverPort - the port on which the Selenium Server is listening
-     * @param browserStartCommand - the command string used to launch the browser, e.g. "c:\\program files\\internet explorer\\iexplore.exe"
+     * @param browserStartCommand - the command string used to launch the browser, e.g. "*firefox" or "c:\\program files\\internet explorer\\iexplore.exe"
      * @param browserURL - the starting URL including just a domain name.  We'll start the browser pointing at the Selenium resources on this URL,
      * e.g. "http://www.google.com" would send the browser to "http://www.google.com/selenium-server/SeleneseRunner.html"
      */
