@@ -19,14 +19,14 @@ public class HTMLRunnerTest extends TestCase implements HTMLResultsListener {
     
     public void setUp() throws Exception {
         output = new File("results.html");
-        server = new SeleniumProxy(8080);
+        server = new SeleniumProxy(SeleniumProxy.DEFAULT_PORT);
         launcher = new HTMLLauncher(server);
         server.start();
     }
     
     public void testHTMLRunner() throws Exception {
         String browser = "*firefox";
-        String browserURL = "http://localhost:8080";
+        String browserURL = "http://localhost:" + server.getPort();
         String testURL = "tests/ShortTestSuite.html";
         long timeout = 1000 * 60 * 10; // ten minutes
         String result = launcher.runHTMLSuite(browser, browserURL, testURL, output, timeout);
