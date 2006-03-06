@@ -33,7 +33,8 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
     }
     
     private static String findBrowserLaunchLocation() {
-        File defaultLocation = new File(DEFAULT_LOCATION);
+        String defaultPath = System.getProperty("firefoxDefaultPath", DEFAULT_LOCATION);
+        File defaultLocation = new File(defaultPath);
         if (defaultLocation.exists()) {
             return defaultLocation.getAbsolutePath();
         } else {
@@ -71,6 +72,8 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
         out.println("}");
         out.close();
         
+        // TODO Do we want to make these preferences configurable somehow?
+        // TODO Disable pop-up blocking?
         File prefsJS = new File(customProfileDir, "prefs.js");
         out = new PrintStream(new FileOutputStream(prefsJS));
         // Don't ask if we want to switch default browsers
