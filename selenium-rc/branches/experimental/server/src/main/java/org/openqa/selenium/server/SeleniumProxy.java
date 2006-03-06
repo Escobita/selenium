@@ -114,6 +114,7 @@ public class SeleniumProxy {
             }
 
             if ("-interactive".equals(arg)) {
+                SingleEntryAsyncQueue.setTimeout(Integer.MAX_VALUE);
                 interactive = true;
             }
         }
@@ -211,11 +212,11 @@ public class SeleniumProxy {
         server.addContext(null, context);
         
         // Associate the SeleniumDriverResourceHandler with the /selenium-server/driver context
-        HttpContext driver = new HttpContext();
-        driver.setContextPath("/selenium-server/driver");
+        HttpContext driverContext = new HttpContext();
+        driverContext.setContextPath("/selenium-server/driver");
         this.driver = new SeleniumDriverResourceHandler(this);
         context.addHandler(this.driver);
-        server.addContext(null, driver);
+        server.addContext(null, driverContext);
     }
 
     public void addNewStaticContent(File directory) {
