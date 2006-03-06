@@ -63,8 +63,9 @@ import java.util.*;
  * <p>Kills the currently running browser and erases the old browser session.  If the current browser session was not
  * launched using <code>getNewBrowserSession</code>, or if that session number doesn't exist in the server, this
  * command will return an error.</p>
- * 
- * 
+ * </li>
+ * <li><p><strong>shutDown</strong>(  )</p>
+ * <p>Causes the server to shut itself down, killing itself and all running browsers along with it.</p>
  * </li>
  * </ul>
  * <p>Example:<blockquote><code>|getNewBrowserSession|c:\program files\internet explorer\iexplore.exe|http://www.google.com|
@@ -233,6 +234,7 @@ public class SeleniumProxy {
     /** Stops the Jetty server */
     public void stop() throws InterruptedException {
         server.stop();
+        driver.stopAllBrowsers();
     }
     
     private class StaticContentHandler extends ResourceHandler {
