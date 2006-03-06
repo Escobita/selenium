@@ -134,6 +134,18 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
                 }
                 results = "OK";
             }
+        } else if ("shutDown".equals(commandS)) {
+            try {
+                System.out.println("Shutdown command received");
+                res.getOutputStream().write("OK".getBytes());
+                res.commit();
+                Thread.sleep(3000);
+                System.exit(0);
+                results = null;
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            
         } else if ("addStaticContent".equals(commandS)) {
             File dir = new File(field);
             if (dir.exists()) {
@@ -252,6 +264,14 @@ public class SeleniumDriverResourceHandler extends ResourceHandler {
     public void clearQueue(String sessionId) {
         synchronized(queues) {
             queues.remove(sessionId);
+        }
+    }
+    
+    /** Kills all running browsers */
+    public void stopAllBrowsers() {
+        for (Iterator i = launchers.values().iterator(); i.hasNext();) {
+            BrowserLauncher launcher = (BrowserLauncher) i.next();
+            launcher.close();
         }
     }
 
