@@ -17,6 +17,8 @@
 
 package org.openqa.selenium.server;
 
+import java.util.LinkedList;
+
 /**
  * <p>Provides a synchronizing queue that holds a single entry
  * (eg a single Selenium Command).</p>
@@ -25,38 +27,87 @@ package org.openqa.selenium.server;
  */
 public class SingleEntryAsyncQueue {
 
-    private Object thing;
-    private boolean available;
-
+    private LinkedList q = new LinkedList();
+    private boolean waitingThreadsShouldThrow = false;
+    static private int timeout = 30;
+    
+    class OwnerAndDataPair extends Object {
+        private Object owner;
+        private Object data;
+            
+        public OwnerAndDataPair(Object ownerParm, Object dataParm) {
+            owner = ownerParm;
+            data = dataParm;
+        }
+        public Object getData() {
+            return data;
+        }
+        public Object getOwner() {
+            return owner;
+        }
+        public String toString() {
+            return "" + data + " (from " + owner + ")";
+        }
+    }
+    
+    public void clear() {
+        this.waitingThreadsShouldThrow = true;
+        if (q.isEmpty()) {
+            q.add("dummy_to_wake_up_getting_thread____(if_there_is_one)");
+        }
+        else {
+            q.clear();
+        }
+        synchronized(this) {
+            this.notifyAll();
+        }
+    }
+    
+    static public int getTimeout() {
+        return SingleEntryAsyncQueue.timeout;
+    }
+    static public void setTimeout(int timeout) {
+        SingleEntryAsyncQueue.timeout = timeout;
+    }
+    
     /**
-     * <p>Retrieves the item from the queue, emptying the queue.</p>
+     * <p>Retrieves the item from the queue.</p>
      * <p>If there's nothing in the queue right now, wait a period of time 
      * for something to show up.</p> 
      * @return the item in the queue
-     * @throws SeleniumCommandTimedOutException if the 
+     * @throws SeleniumCommandTimedOutException if the timeout is exceeded. 
      */
     public synchronized Object get() {
         int retries = 0;
-        while (available == false) {
+        while (q.isEmpty()) {
+            if (q.isEmpty() & retries >= timeout) {
+                throw new SeleniumCommandTimedOutException();
+            }
             try {
                 wait(1000);
             } catch (InterruptedException e) {
                 continue;
             }
-            if (available == false & retries > 25) {
-                throw new SeleniumCommandTimedOutException();
-            }
             retries++;
         }
-        available = false;
+        verifyThisThreadWasNotHungAndThenCleared();
+        Object thing = ((OwnerAndDataPair) q.removeFirst()).getData();
+        notifyAll();
         return thing;
     }
+        
+    private void verifyThisThreadWasNotHungAndThenCleared() {
+        if (waitingThreadsShouldThrow) {
+            throw new RuntimeException("called queue.get() when queue.clear() called");
+        }        
+    }
 
+    public int size() {
+        return q.size();
+    }
+    
     public String toString() {
-        if (!available)
-            return "[empty queue]";
-
-        return "[queue containing '" + thing + "']";
+        return q.toString();
     }
 
     /**
@@ -66,15 +117,17 @@ public class SingleEntryAsyncQueue {
      * @param obj - the thing to put in the queue
      */    
     public synchronized void put(Object thing) {
-        while (available == true) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
+        q.addLast(new OwnerAndDataPair("owner stub", thing));
+        notifyAll();
+        synchronized(this) {
+            while (((OwnerAndDataPair) q.getFirst()).getData() != thing) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                }
+                verifyThisThreadWasNotHungAndThenCleared();
             }
         }
-        this.thing = thing;
-        available = true;
-        notifyAll();
     }
 
 }
