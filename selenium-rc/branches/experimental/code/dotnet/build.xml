@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="Selenium" default="test">
+<project name="selenium-dotnet" default="test">
 
 	<property name="version" value="0.7-SNAPSHOT" />
 	<property name="iis_vdir.VDirName" value="Selenium-Driver" />
@@ -32,9 +32,6 @@
 
     <target name="all" depends="test, dist" 
 		description="Do everything you might want to do on a developer workstation" />
-		
-	<target name="all-clean" depends="clean, all"
-		description="Clean up, then do everything you might want to do on a developer workstation" />
 		
 	<target name="test" depends="unit-tests, run-integration-tests" 
 		description="Run all tests"/>
@@ -77,7 +74,7 @@
 	<target name="run-unit-tests">
 		<property name="unit.tests.dll" value="ThoughtWorks.Selenium.UnitTests.dll" />
 		<exec 
-			executable="tools\nunit\nunit-console.exe" 
+			executable="${ant.file.selenium-dotnet}\..\tools\nunit\nunit-console.exe" 
 			dir="build\UnitTests">
 			<arg line="${unit.tests.dll} /xml:../${unit.tests.dll}-results.xml /nologo"/>
 		</exec>
@@ -91,7 +88,7 @@
 	<target name="run-integration-tests">
 		<property name="integration.tests.dll" value="ThoughtWorks.Selenium.IntegrationTests.dll" />
 		<exec 
-			executable="tools\nunit\nunit-console.exe" 
+			executable="${ant.file.selenium-dotnet}\..\tools\nunit\nunit-console.exe" 
 			dir="build\IntegrationTests" >
 			<arg line="${integration.tests.dll} /xml:../${integration.tests.dll}-results.xml /nologo"/>
 		</exec>
@@ -156,6 +153,7 @@
 				<include name="**/*.config" />
 				<exclude name="BridgeWebApp/*" />
 				<exclude name="**/*.incr" />
+				<exclude name="dist/**" />
 			</fileset>
 		</copy>
 
