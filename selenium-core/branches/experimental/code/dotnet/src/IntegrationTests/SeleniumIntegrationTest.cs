@@ -13,7 +13,7 @@ namespace ThoughtWorks.Selenium.IntegrationTests
 		[SetUp]
 		public void SetupTest()
 		{
-			selenium = new DefaultSelenium("localhost", 8080, "c:\\Program Files\\Internet Explorer\\iexplore.exe", "http://www.irian.at");
+			selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.irian.at");
 			selenium.Start();
 		}
 
