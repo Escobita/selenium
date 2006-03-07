@@ -1,7 +1,8 @@
 <project name="selenium" default="all">
     <target name="all">
         <!--  output="${tmp}/ruby_out.txt" -->
-        <exec executable="python" failonerror="true">
+        <property name="python.executable" value="python" />
+        <exec executable="${python.executable}" failonerror="true">
             <arg line="selenium_example.py"/>
         </exec>
     </target>
