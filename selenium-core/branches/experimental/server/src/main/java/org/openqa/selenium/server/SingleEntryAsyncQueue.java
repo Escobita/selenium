@@ -61,6 +61,7 @@ public class SingleEntryAsyncQueue {
         synchronized(this) {
             this.notifyAll();
         }
+        
     }
     
     static public int getTimeout() {
@@ -90,15 +91,16 @@ public class SingleEntryAsyncQueue {
             }
             retries++;
         }
-        verifyThisThreadWasNotHungAndThenCleared();
+        verifyThisQueueWasNotHungAndThenCleared("get");
         Object thing = ((OwnerAndDataPair) q.removeFirst()).getData();
         notifyAll();
         return thing;
     }
         
-    private void verifyThisThreadWasNotHungAndThenCleared() {
+    private void verifyThisQueueWasNotHungAndThenCleared(String methodCalled) {
         if (waitingThreadsShouldThrow) {
-            throw new RuntimeException("called queue.get() when queue.clear() called");
+            throw new RuntimeException("called queue." +
+                    methodCalled + "() when queue.clear() called");
         }        
     }
 
@@ -117,6 +119,7 @@ public class SingleEntryAsyncQueue {
      * @param obj - the thing to put in the queue
      */    
     public synchronized void put(Object thing) {
+        verifyThisQueueWasNotHungAndThenCleared("put");
         q.addLast(new OwnerAndDataPair("owner stub", thing));
         notifyAll();
         synchronized(this) {
@@ -125,7 +128,7 @@ public class SingleEntryAsyncQueue {
                     wait();
                 } catch (InterruptedException e) {
                 }
-                verifyThisThreadWasNotHungAndThenCleared();
+                verifyThisQueueWasNotHungAndThenCleared("put");
             }
         }
     }
