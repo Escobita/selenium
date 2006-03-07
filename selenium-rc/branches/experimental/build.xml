@@ -10,7 +10,7 @@
 		<property name="maven.executable" value="${maven.home}/bin/mvn" />
 		<presetdef name="mvn">
 			<exec executable="${maven.executable}" failonerror="true">
-				<env key="MAVEN_HOME" value="${maven.home}" />
+				<env key="M2_HOME" value="${maven.home}" />
 				<env key="MAVEN_TERMINATE_CMD" value="on" />
 				<arg value="-DfirefoxDefaultPath=${firefox.location}" />
 				<arg line="${mvn.overrideable.settings}" />
