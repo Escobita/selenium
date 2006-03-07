@@ -14,9 +14,11 @@
 		</condition>
 		<fail if="build.failed" message="mvn is not appropriately failing on error...&#0010;You may be affected by maven bug 2127 http://jira.codehaus.org/browse/MNG-2127" />
 		<echo message="mvn appears to be able to fail on error" />
+		<property name="mvn.overrideable.settings" value="" />
 		<presetdef name="mvn">
 			<exec executable="${maven.executable}" failonerror="true">
 				<env key="MAVEN_HOME" value="${maven.home}" />
+				<arg line="${mvn.overrideable.settings}" />
 			</exec>
 		</presetdef>
 	</target>
