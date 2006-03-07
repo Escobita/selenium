@@ -96,18 +96,35 @@
         </zip>
     </target>
 
-    <target name="start-server">
+	<target name="maven-tasks">
 		<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
 			<classpath>
 				<pathelement location="maven-artifact-ant-2.0.2-dep.jar" />
 			</classpath>
 		</typedef>
-		<maven:dependencies pathId="selenium-server.classpath">
+	</target>
+	
+	<target name="custom-repo" depends="maven-tasks" if="custom.maven.repo">
+		<presetdef name="mavendeps">
+			<maven:dependencies>
+				<localRepository location="${custom.maven.repo}" />
+			</maven:dependencies>
+		</presetdef>
+	</target>
+	
+	<target name="default-repo" depends="maven-tasks" unless="custom.maven.repo">
+		<presetdef name="mavendeps">
+			<maven:dependencies/>
+		</presetdef>
+	</target>
+
+    <target name="start-server" depends="custom-repo,default-repo">
+		<mavendeps pathId="selenium-server.classpath">
 			<!-- DGF Server bundles all of its dependencies, 
 			which are marked with the scope "provided", so this should
 			only give us selenium-server.jar -->
 			<dependency groupId="org.openqa.selenium.server" artifactId="selenium-server" version="1.0-SNAPSHOT" scope="runtime"/>
-		</maven:dependencies>
+		</mavendeps>
 		<pathconvert targetos="windows" property="selenium-server.jar" refid="selenium-server.classpath" />
 		<condition property="build.failed">
 			<contains string="${selenium-server.jar}" substring=";" />
