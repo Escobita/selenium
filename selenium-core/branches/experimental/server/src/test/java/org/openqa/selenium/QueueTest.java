@@ -26,7 +26,7 @@ public class QueueTest extends TestCase {
         q = new SingleEntryAsyncQueue();
     }
     
-    public void testClearHungGetter() throws Exception {
+    public void xtestClearHungGetter() throws Exception {
         new Thread() {
             public void run() {
                 boolean exceptionSeen = false;
@@ -36,6 +36,9 @@ public class QueueTest extends TestCase {
                 catch (RuntimeException e) {
                     exceptionSeen = true;
                 }
+                catch (Throwable e) {
+                    fail("got an unexpected exception: " + e);
+                }
                 assertTrue(exceptionSeen);
             }
         }.start();
@@ -43,22 +46,27 @@ public class QueueTest extends TestCase {
         q.clear();
     }
     
-    public void testClearHungPutter() throws Exception {
-        new Thread() {
+    public void xtestClearHungPutter() throws Exception {
+        Thread t = new Thread() {
             public void run() {
                 boolean exceptionSeen = false;
                 try {
-                    q.put("sdf");   // this one executes and immediately returns
-                    q.put("sdf");   // this one will wait for q.size to be 1 before returning
+                    q.put("abc");   // this one executes and immediately returns
+                    q.put("xyz");   // this one will wait for q.size to be 1 before returning
                 }
                 catch (RuntimeException e) {
                     exceptionSeen = true;
                 }
+                catch (Throwable e) {
+                    fail("got an unexpected exception: " + e);
+                }
                 assertTrue(exceptionSeen);
             }
-        }.start();
-        sleepTight(300);    // give getter thread a chance to go wait on the queue
+        };
+        t.start();
+        sleepTight(1000);    // give getter thread a chance to go wait on the queue
         q.clear();
+        t.join();
     }
     
     public void testGetFromEmptyQueue() throws Exception {
