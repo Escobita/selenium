@@ -12,6 +12,8 @@
 			<exec executable="${maven.executable}" failonerror="true">
 				<env key="M2_HOME" value="${maven.home}" />
 				<env key="MAVEN_TERMINATE_CMD" value="on" />
+				<env key="ERROR_CODE" value="0" />
+				<!--<env key="MAVEN_BATCH_ECHO" value="on" />-->
 				<arg value="-DfirefoxDefaultPath=${firefox.location}" />
 				<arg line="${mvn.overrideable.settings}" />
 			</exec>
