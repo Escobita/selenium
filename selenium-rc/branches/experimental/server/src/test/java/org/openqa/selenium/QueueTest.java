@@ -26,7 +26,7 @@ public class QueueTest extends TestCase {
         q = new SingleEntryAsyncQueue();
     }
     
-    public void xtestClearHungGetter() throws Exception {
+    public void testClearHungGetter() throws Exception {
         new Thread() {
             public void run() {
                 boolean exceptionSeen = false;
@@ -46,27 +46,33 @@ public class QueueTest extends TestCase {
         q.clear();
     }
     
-    public void xtestClearHungPutter() throws Exception {
-        Thread t = new Thread() {
-            public void run() {
-                boolean exceptionSeen = false;
-                try {
-                    q.put("abc");   // this one executes and immediately returns
-                    q.put("xyz");   // this one will wait for q.size to be 1 before returning
-                }
-                catch (RuntimeException e) {
-                    exceptionSeen = true;
-                }
-                catch (Throwable e) {
-                    fail("got an unexpected exception: " + e);
-                }
-                assertTrue(exceptionSeen);
+    class PuttingThread extends Thread {
+        public String failureMessage = "not set yet";
+        public void run() {
+            try {
+                q.put("abc");   // this one executes and immediately returns
+                q.put("xyz");   // this one will wait for q.size to be 1 before returning
             }
-        };
+            catch (RuntimeException e) {
+                failureMessage = "ok";
+                System.out.println("Putting thread saw expected failure: " + e);
+                return;
+            }
+            catch (Throwable e) {
+                failureMessage = "got an unexpected exception: " + e;
+                return;
+            }
+            failureMessage = "no exception for a putting thread on a queue that got cleared";
+        }
+    };
+    
+    public void testClearHungPutter() throws Exception {
+        PuttingThread t = new PuttingThread(); 
         t.start();
         sleepTight(1000);    // give getter thread a chance to go wait on the queue
         q.clear();
         t.join();
+        assertEquals("ok", t.failureMessage);
     }
     
     public void testGetFromEmptyQueue() throws Exception {

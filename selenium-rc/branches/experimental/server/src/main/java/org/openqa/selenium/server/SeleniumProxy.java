@@ -18,9 +18,12 @@ import java.util.*;
  * 
  * <p>To run Selenium Server, run:
  * 
- * <blockquote><code>java -jar selenium-server-1.0-SNAPSHOT.jar [-port 4444] [-interactive]</code></blockquote>
+ * <blockquote><code>java -jar selenium-server-1.0-SNAPSHOT.jar [-port 4444] [-interactive] [-timeout 1800]</code></blockquote>
  * 
  * <p>Where <code>-port</code> specifies the port you wish to run the Server on (default is 4444).
+ * 
+ * <p>Where <code>-timeout</code> specifies the number of seconds that you allow data to wait all in the 
+ * communications queues before an exception is thrown.
  * 
  * <p>Using the <code>-interactive</code> flag will start the server in Interactive mode.
  * In this mode you can type wiki-style Selenese commands on the command line (e.g. |open|http://www.yahoo.com||).
@@ -96,6 +99,7 @@ public class SeleniumProxy {
     private StaticContentHandler staticContentHandler;
     private int port;
     public static final int DEFAULT_PORT = 4444;
+    public static final int DEFAULT_TIMEOUT= (30 * 60);
 
     /** Starts up the server on the specified port (or default if no port was specified)
      * and then starts interactive mode if specified.
@@ -105,6 +109,7 @@ public class SeleniumProxy {
      */ 
     public static void main(String[] args) throws Exception {
         int port = DEFAULT_PORT;
+        int timeout= DEFAULT_TIMEOUT;
         boolean interactive = false;
 
         for (int i = 0; i < args.length; i++) {
@@ -112,13 +117,16 @@ public class SeleniumProxy {
             if ("-port".equals(arg)) {
                 port = Integer.parseInt(args[i + 1]);
             }
-
-            if ("-interactive".equals(arg)) {
-                SingleEntryAsyncQueue.setTimeout(Integer.MAX_VALUE);
+            else if ("-timeout".equals(arg)) {
+                timeout = Integer.parseInt(args[i + 1]);
+            }
+            else if ("-interactive".equals(arg)) {
+                timeout = Integer.MAX_VALUE;
                 interactive = true;
             }
         }
 
+        SingleEntryAsyncQueue.setTimeout(timeout);
         final SeleniumProxy seleniumProxy = new SeleniumProxy(port);
         Thread jetty = new Thread(new Runnable() {
             public void run() {
