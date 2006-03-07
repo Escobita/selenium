@@ -8,7 +8,15 @@
 			<os family="windows" />
 		</condition>
 		<property name="maven.executable" value="${maven.home}/bin/mvn" />
-		<exec executable="${maven.executable}" outputproperty="ignore.output" resultproperty="mvn.noargs.should.be.1" />
+		<presetdef name="mvn">
+			<exec executable="${maven.executable}" failonerror="true">
+				<env key="MAVEN_HOME" value="${maven.home}" />
+				<env key="MAVEN_TERMINATE_CMD" value="on" />
+				<arg value="-DfirefoxDefaultPath=${firefox.location}" />
+				<arg line="${mvn.overrideable.settings}" />
+			</exec>
+		</presetdef>
+		<mvn outputproperty="ignore.output" failonerror="false" resultproperty="mvn.noargs.should.be.1" />
 		<condition property="build.failed">
 			<not><equals arg1="1" arg2="${mvn.noargs.should.be.1}" /></not>
 		</condition>
@@ -16,13 +24,6 @@
 		<echo message="mvn appears to be able to fail on error" />
 		<property name="mvn.overrideable.settings" value="" />
 		<property name="firefox.location" location="c:\program files\mozilla firefox\firefox.exe" />
-		<presetdef name="mvn">
-			<exec executable="${maven.executable}" failonerror="true">
-				<env key="MAVEN_HOME" value="${maven.home}" />
-				<arg value="-DfirefoxDefaultPath=${firefox.location}" />
-				<arg line="${mvn.overrideable.settings}" />
-			</exec>
-		</presetdef>
 	</target>
 
 	<target name="maven" depends="init">
