@@ -55,6 +55,7 @@ public class WindowsTaskKill {
             pattern.append(arg);
             pattern.append("\\E\"?");
         }
+        pattern.append("\\s*");
         Pattern cmd = Pattern.compile(pattern.toString(), Pattern.CASE_INSENSITIVE);
         Map procMap = procMap();
         for (Iterator i = procMap.keySet().iterator(); i.hasNext();) {
