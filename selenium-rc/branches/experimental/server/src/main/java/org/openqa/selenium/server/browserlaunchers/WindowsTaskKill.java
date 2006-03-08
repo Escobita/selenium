@@ -58,6 +58,7 @@ public class WindowsTaskKill {
         pattern.append("\\s*");
         Pattern cmd = Pattern.compile(pattern.toString(), Pattern.CASE_INSENSITIVE);
         Map procMap = procMap();
+        boolean killedOne = false;
         for (Iterator i = procMap.keySet().iterator(); i.hasNext();) {
             String commandLine = (String) i.next();
             if (commandLine == null) continue;
@@ -70,8 +71,16 @@ public class WindowsTaskKill {
                 System.out.println(commandLine);
                 Runtime.getRuntime().exec(new String[] {"taskkill", "/pid", processID});
                 System.out.println("Killed");
+                killedOne = true;
             }
         }
+        System.err.print("Didn't find any matches for");
+        for (int i = 0; i < cmdarray.length; i++) {
+            System.err.print(" '");
+            System.err.print(cmdarray[i]);
+            System.err.print('\'');
+        }
+        System.err.println("");
     }
     
     public static Map procMap() throws Exception {
@@ -85,7 +94,12 @@ public class WindowsTaskKill {
         exec.createArg().setValue("/format:rawxml.xsl");
         exec.setOutputproperty("proclist");
         System.out.println("Reading Windows Process List...");
-        exec.execute();
+        try {
+            exec.execute();
+        } catch (Throwable t) {
+            System.err.println("Error occurred while reading the process list!");
+            t.printStackTrace();
+        }
         System.out.println("Done, searching for processes to kill...");
         String output = p.getProperty("proclist");
         // TODO This would be faster if it used SAX instead of DOM
