@@ -21,8 +21,13 @@ public class WindowsTaskKillTest extends TestCase {
 //                System.out.print('=');
 //                System.out.println(value);
 //            }
-            assertNotNull("SystemRoot env var apparently not set on Windows!", WindowsTaskKill.findSystemRoot());
-            assertTrue("wmic should be found", "wmic" != WindowsTaskKill.findWMIC());
+            assertNotNull("SystemRoot env var apparently not set on Windows!", WindowsTaskKill.findSystemRoot());   
         }
+    }
+    public void testWMIC() {
+        assertTrue("wmic should be found", "wmic" != WindowsTaskKill.findWMIC());
+    }
+    public void testTaskKill() {
+        assertTrue("taskkill should be found", "taskkill" != WindowsTaskKill.findTaskKill());
     }
 }

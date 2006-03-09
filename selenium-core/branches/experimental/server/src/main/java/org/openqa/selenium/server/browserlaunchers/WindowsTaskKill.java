@@ -18,6 +18,7 @@ public class WindowsTaskKill {
 
     private static final boolean THIS_IS_WINDOWS = File.pathSeparator.equals(";");
     private static String wmic = null;
+    private static String taskkill = null;
     
     /**
      * @param args
@@ -91,6 +92,7 @@ public class WindowsTaskKill {
         ExecTask exec = new ExecTask();
         exec.setProject(p);
         exec.setExecutable("taskkill");
+        exec.setTaskType("taskkill");
         exec.setFailonerror(true);
         exec.createArg().setValue("/pid");
         exec.createArg().setValue(processID);
@@ -101,6 +103,7 @@ public class WindowsTaskKill {
         Project p = new Project();
         ExecTask exec = new ExecTask();
         exec.setProject(p);
+        exec.setTaskType("wmic");
         exec.setExecutable(findWMIC());
         exec.setFailonerror(true);
         exec.createArg().setValue("process");
@@ -178,6 +181,19 @@ public class WindowsTaskKill {
         System.err.println("Couldn't find wmic! Hope it's on the path...");
         wmic = "wmic";
         return wmic;
+    }
+    
+    public static String findTaskKill() {
+        if (taskkill != null) return taskkill;
+        File systemRoot = findSystemRoot();
+        File taskkillExe = new File(systemRoot, "system32/taskkill.exe");
+        if (taskkillExe.exists()) {
+            taskkill = taskkillExe.getAbsolutePath();
+            return taskkill;
+        }
+        System.err.println("Couldn't find taskkill! Hope it's on the path...");
+        taskkill = "taskkill";
+        return taskkill;
     }
     
     public static boolean thisIsWindows() {
