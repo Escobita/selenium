@@ -123,6 +123,9 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
             recursivelyDeleteDir(customProfileDir);
         } catch (RuntimeException e) {
             if (taskKillException != null) {
+                e.printStackTrace();
+                System.err.print("Perhaps caused by: ");
+                taskKillException.printStackTrace();
                 throw new RuntimeException("Couldn't delete custom Firefox " +
                         "profile directory, presumably because task kill failed; " +
                         "see stderr!", e);
