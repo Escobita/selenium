@@ -70,7 +70,7 @@ public class WindowsTaskKill {
                 System.out.print(processID);
                 System.out.print(": ");
                 System.out.println(commandLine);
-                Runtime.getRuntime().exec(new String[] {"taskkill", "/pid", processID});
+                killPID(processID);
                 System.out.println("Killed");
                 killedOne = true;
             }
@@ -85,12 +85,24 @@ public class WindowsTaskKill {
             System.err.println("");
         }
     }
+
+    private static void killPID(String processID) {
+        Project p = new Project();
+        ExecTask exec = new ExecTask();
+        exec.setProject(p);
+        exec.setExecutable("taskkill");
+        exec.setFailonerror(true);
+        exec.createArg().setValue("/pid");
+        exec.createArg().setValue(processID);
+        exec.execute();
+    }
     
     public static Map procMap() throws Exception {
         Project p = new Project();
         ExecTask exec = new ExecTask();
         exec.setProject(p);
         exec.setExecutable(findWMIC());
+        exec.setFailonerror(true);
         exec.createArg().setValue("process");
         exec.createArg().setValue("list");
         exec.createArg().setValue("full");
