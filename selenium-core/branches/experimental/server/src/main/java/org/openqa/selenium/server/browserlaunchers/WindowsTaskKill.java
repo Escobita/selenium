@@ -4,21 +4,36 @@
  */
 package org.openqa.selenium.server.browserlaunchers;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.tools.ant.*;
-import org.apache.tools.ant.taskdefs.*;
-import org.w3c.dom.*;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.types.Environment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 public class WindowsTaskKill {
 
     private static final boolean THIS_IS_WINDOWS = File.pathSeparator.equals(";");
     private static String wmic = null;
+    private static File wbem = null;
     private static String taskkill = null;
+    private static Properties env = null;
     
     /**
      * @param args
@@ -92,6 +107,10 @@ public class WindowsTaskKill {
         ExecTask exec = new ExecTask();
         exec.setProject(p);
         exec.setExecutable("taskkill");
+        Environment.Variable path = new Environment.Variable();
+        path.setKey(getExactPathEnvKey());
+        path.setFile(findWBEM());
+        exec.addEnv(path);
         exec.setTaskType("taskkill");
         exec.setFailonerror(false);
         exec.createArg().setValue("/pid");
@@ -151,8 +170,9 @@ public class WindowsTaskKill {
     }
     
     public static Properties loadEnvironment() {
-        // DGF lifted directly from Ant's Property task
-        Properties props = new Properties();
+        if (env != null) return env;
+    	// DGF lifted directly from Ant's Property task
+        env = new Properties();
         Vector osEnv = Execute.getProcEnvironment();
         for (Enumeration e = osEnv.elements(); e.hasMoreElements();) {
             String entry = (String) e.nextElement();
@@ -160,11 +180,21 @@ public class WindowsTaskKill {
             if (pos == -1) {
                 System.err.println("Ignoring: " + entry);
             } else {
-                props.put(entry.substring(0, pos),
+                env.put(entry.substring(0, pos),
                 entry.substring(pos + 1));
             }
         }
-        return props;
+        return env;
+    }
+    
+    public static String getExactPathEnvKey() {
+    	loadEnvironment();
+    	for (Iterator i = env.keySet().iterator(); i.hasNext();) {
+    		String key = (String) i.next();
+    		if (key.equalsIgnoreCase("PATH")) return key;
+    	}
+    	// They don't have a path???
+    	return "PATH";
     }
     
     public static File findSystemRoot() {
@@ -176,19 +206,32 @@ public class WindowsTaskKill {
         File systemRoot = new File(systemRootPath);
         if (!systemRoot.exists()) throw new RuntimeException("SystemRoot doesn't exist: " + systemRootPath);
         return systemRoot;
-    }
-    
+    }    
+        
     public static String findWMIC() {
         if (wmic != null) return wmic;
-        File systemRoot = findSystemRoot();
-        File wmicExe = new File(systemRoot, "system32/wbem/wmic.exe");
-        if (wmicExe.exists()) {
-            wmic = wmicExe.getAbsolutePath();
-            return wmic;
+        findWBEM();
+        if (null != wbem) {
+        	File wmicExe = new File(findWBEM(), "wmic.exe");
+            if (wmicExe.exists()) {
+                wmic = wmicExe.getAbsolutePath();
+                return wmic;
+            }
         }
         System.err.println("Couldn't find wmic! Hope it's on the path...");
         wmic = "wmic";
         return wmic;
+    }
+    
+    public static File findWBEM() {
+        if (wbem != null) return wbem;
+        File systemRoot = findSystemRoot();
+        wbem = new File(systemRoot, "system32/wbem");
+        if (!wbem.exists()) {
+        	System.err.println("Couldn't find wbem!");
+            return null;
+        }
+        return wbem;
     }
     
     public static String findTaskKill() {
