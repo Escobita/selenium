@@ -73,7 +73,7 @@
 
 	<target name="run-unit-tests">
 		<property name="unit.tests.dll" value="ThoughtWorks.Selenium.UnitTests.dll" />
-		<exec 
+		<exec failonerror="true"
 			executable="${ant.file.selenium-dotnet}\..\tools\nunit\nunit-console.exe" 
 			dir="build\UnitTests">
 			<arg line="${unit.tests.dll} /xml:../${unit.tests.dll}-results.xml /nologo"/>
@@ -87,11 +87,17 @@
 	
 	<target name="run-integration-tests">
 		<property name="integration.tests.dll" value="ThoughtWorks.Selenium.IntegrationTests.dll" />
-		<exec 
+		<ant dir=".." target="start-server" />
+		<exec resultproperty="integration.result"
 			executable="${ant.file.selenium-dotnet}\..\tools\nunit\nunit-console.exe" 
 			dir="build\IntegrationTests" >
 			<arg line="${integration.tests.dll} /xml:../${integration.tests.dll}-results.xml /nologo"/>
 		</exec>
+		<ant dir=".." target="stop-server" />
+		<condition property="build.failed">
+        	<not><equals arg1="0" arg2="${integration.result}" /></not>
+        </condition>
+        <fail if="build.failed" message=".net integration tests failed!" />
 	</target>
 
 	<target name="create-deployment-directory">
