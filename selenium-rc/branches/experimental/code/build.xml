@@ -144,7 +144,7 @@
     	<echo taskname="selenium-shutdown" message="DGF Errors during shutdown are expected" />
     </target>
     
-    <target name="test" depends="start-server, test-ruby, test-dotnet, test-python, stop-server"/>
+    <target name="test" depends="test-ruby, test-dotnet, test-python"/>
     
     <target name="test-python">
     	<echo message="python executable = ${python.executable}" />
