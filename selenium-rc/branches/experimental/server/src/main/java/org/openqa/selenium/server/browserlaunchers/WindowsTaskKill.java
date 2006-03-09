@@ -17,6 +17,7 @@ import org.w3c.dom.*;
 public class WindowsTaskKill {
 
     private static final boolean THIS_IS_WINDOWS = File.pathSeparator.equals(";");
+    private static String wmic = null;
     
     /**
      * @param args
@@ -74,24 +75,22 @@ public class WindowsTaskKill {
                 killedOne = true;
             }
         }
-        System.err.print("Didn't find any matches for");
-        for (int i = 0; i < cmdarray.length; i++) {
-            System.err.print(" '");
-            System.err.print(cmdarray[i]);
-            System.err.print('\'');
+        if (!killedOne) {
+            System.err.print("Didn't find any matches for");
+            for (int i = 0; i < cmdarray.length; i++) {
+                System.err.print(" '");
+                System.err.print(cmdarray[i]);
+                System.err.print('\'');
+            }
+            System.err.println("");
         }
-        System.err.println("");
     }
     
     public static Map procMap() throws Exception {
         Project p = new Project();
-        Property propTask = new Property();
-        propTask.setProject(p);
-        propTask.setEnvironment("env");
-        propTask.execute();
         ExecTask exec = new ExecTask();
         exec.setProject(p);
-        exec.setExecutable("wmic");
+        exec.setExecutable(findWMIC());
         exec.createArg().setValue("process");
         exec.createArg().setValue("list");
         exec.createArg().setValue("full");
@@ -126,6 +125,47 @@ public class WindowsTaskKill {
             processes.put(commandLine, processID);
         }
         return processes;
+    }
+    
+    public static Properties loadEnvironment() {
+        // DGF lifted directly from Ant's Property task
+        Properties props = new Properties();
+        Vector osEnv = Execute.getProcEnvironment();
+        for (Enumeration e = osEnv.elements(); e.hasMoreElements();) {
+            String entry = (String) e.nextElement();
+            int pos = entry.indexOf('=');
+            if (pos == -1) {
+                System.err.println("Ignoring: " + entry);
+            } else {
+                props.put(entry.substring(0, pos),
+                entry.substring(pos + 1));
+            }
+        }
+        return props;
+    }
+    
+    public static File findSystemRoot() {
+        Properties p = loadEnvironment();
+        String systemRootPath = (String) p.get("SystemRoot");
+        if (systemRootPath == null) systemRootPath = (String) p.get("SYSTEMROOT");
+        if (systemRootPath == null) systemRootPath = (String) p.get("systemroot");
+        if (systemRootPath == null) throw new RuntimeException("SystemRoot apparently not set!");
+        File systemRoot = new File(systemRootPath);
+        if (!systemRoot.exists()) throw new RuntimeException("SystemRoot doesn't exist: " + systemRootPath);
+        return systemRoot;
+    }
+    
+    public static String findWMIC() {
+        if (wmic != null) return wmic;
+        File systemRoot = findSystemRoot();
+        File wmicExe = new File(systemRoot, "system32/wbem/wmic.exe");
+        if (wmicExe.exists()) {
+            wmic = wmicExe.getAbsolutePath();
+            return wmic;
+        }
+        System.err.println("Couldn't find wmic! Hope it's on the path...");
+        wmic = "wmic";
+        return wmic;
     }
     
     public static boolean thisIsWindows() {
