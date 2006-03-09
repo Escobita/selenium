@@ -104,11 +104,14 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
     }
 
     public void close() {
+        Exception taskKillException = null;
         if (WindowsTaskKill.thisIsWindows()) {
             try {
                 // try to kill with windows taskkill
                 WindowsTaskKill.kill(cmdarray);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                taskKillException = e;
+            }
         }
         super.close();
         /* Sleeping two seconds to give Windows time to
@@ -116,7 +119,16 @@ public class FirefoxCustomProfileLauncher extends DestroyableRuntimeExecutingBro
          * are now unlocked
          */
         try {Thread.sleep(2000);} catch (InterruptedException e) {}
-        recursivelyDeleteDir(customProfileDir);
+        try {
+            recursivelyDeleteDir(customProfileDir);
+        } catch (RuntimeException e) {
+            if (taskKillException != null) {
+                throw new RuntimeException("Couldn't delete custom Firefox " +
+                        "profile directory, presumably because task kill failed; " +
+                        "see stderr!", e);
+            }
+            throw e;
+        }
     }
     
     private void recursivelyDeleteDir(File f) {

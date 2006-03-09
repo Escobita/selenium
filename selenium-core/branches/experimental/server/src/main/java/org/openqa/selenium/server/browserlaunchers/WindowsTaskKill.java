@@ -85,6 +85,10 @@ public class WindowsTaskKill {
     
     public static Map procMap() throws Exception {
         Project p = new Project();
+        Property propTask = new Property();
+        propTask.setProject(p);
+        propTask.setEnvironment("env");
+        propTask.execute();
         ExecTask exec = new ExecTask();
         exec.setProject(p);
         exec.setExecutable("wmic");
@@ -94,12 +98,7 @@ public class WindowsTaskKill {
         exec.createArg().setValue("/format:rawxml.xsl");
         exec.setOutputproperty("proclist");
         System.out.println("Reading Windows Process List...");
-        try {
-            exec.execute();
-        } catch (Throwable t) {
-            System.err.println("Error occurred while reading the process list!");
-            t.printStackTrace();
-        }
+        exec.execute();
         System.out.println("Done, searching for processes to kill...");
         String output = p.getProperty("proclist");
         // TODO This would be faster if it used SAX instead of DOM
