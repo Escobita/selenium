@@ -147,6 +147,7 @@
     <target name="test" depends="start-server, test-ruby, test-dotnet, test-python, stop-server"/>
     
     <target name="test-python">
+    	<echo message="python executable = ${python.executable}" />
         <ant dir="python/thin" target="all"/>
     </target>
     
