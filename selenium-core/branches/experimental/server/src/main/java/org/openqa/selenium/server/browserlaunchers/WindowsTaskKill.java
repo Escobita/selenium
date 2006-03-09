@@ -93,10 +93,18 @@ public class WindowsTaskKill {
         exec.setProject(p);
         exec.setExecutable("taskkill");
         exec.setTaskType("taskkill");
-        exec.setFailonerror(true);
+        exec.setFailonerror(false);
         exec.createArg().setValue("/pid");
         exec.createArg().setValue(processID);
+        exec.setResultProperty("result");
+        exec.setOutputproperty("output");
         exec.execute();
+        String result = p.getProperty("result");
+        String output = p.getProperty("output");
+        System.out.println(output);
+        if (!"0".equals(result)) {
+            throw new RuntimeException("exec return code " + result + ": " + output);
+        }
     }
     
     public static Map procMap() throws Exception {
