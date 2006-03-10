@@ -1,5 +1,5 @@
 <project name="selenium-top" default="all">
-
+<description>Builds Selenium from the top-level.  Start here!</description>
 	<target name="init">
 		<property environment="env" />
 		<property name="maven.home" value="${env.MAVEN_HOME}" /> <!-- override this if necessary -->
