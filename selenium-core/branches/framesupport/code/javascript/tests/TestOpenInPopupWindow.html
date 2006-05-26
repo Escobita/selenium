@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Test SelectWindow</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+  <tbody>
+    <tr>
+      <td rowspan="1" colspan="3">Test selectWindow<br>
+      </td>
+    </tr>
+    <tr>
+      <td>getEval</td>
+      <td>var myWin = window.open('../tests/html/test_page.slow.html', 'foo'); selenium.browserbot.openedWindows['foo'] = myWin; true;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>pause</td>
+      <td>1000</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td>waitForPopUp</td>
+      <td>foo</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>selectWindow</td>
+      <td>foo</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>open</td>
+      <td>../tests/html/test_page.slow.html</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>clickAndWait</td>
+      <td>link=Click to reload</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>close</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
