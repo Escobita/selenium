@@ -331,7 +331,7 @@ function startTest() {
     testLoop.start();
 
 	// PL: for the purpose of testing
-	testLoop.waitForConditionTimeout = 2000;
+	//testLoop.waitForConditionTimeout = 2000;
 }
 
 function HtmlTest(testDocument) {
