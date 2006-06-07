@@ -63,6 +63,7 @@ BrowserBot = function(frame) {
 
 BrowserBot.createForFrame = function(frame) {
     var browserbot;
+	LOG.info('createForFrame');
     LOG.debug("browserName: " + browserVersion.name);
     LOG.debug("userAgent: " + navigator.userAgent);
     if (browserVersion.isIE) {
@@ -150,6 +151,8 @@ BrowserBot.prototype.setIFrameLocation = function(iframe, location) {
 };
 
 BrowserBot.prototype.setOpenLocation = function(location) {
+	LOG.warn('Setting location on window w/ selId of ' + this.getCurrentWindow().selId);
+	LOG.warn('location.href = ' + this.getCurrentWindow().location.href);
     this.getCurrentWindow().location.href = location;
 };
 
@@ -203,9 +206,7 @@ BrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify,
  * for different browsers.
  */
 BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(windowToModify) {
-    if (this.currentWindowName != null) {
-        this.callOnWindowPageTransition(this.recordPageLoad, windowToModify);
-    }
+	this.callOnWindowPageTransition(this.recordPageLoad, windowToModify);
 };
 
 /**

@@ -49,8 +49,9 @@ Logger.prototype = {
     openLogWindow: function() {
         this.logWindow = window.open(
             getDocumentBase(document) + "SeleniumLog.html", "SeleniumLog",
-            "width=600,height=250,bottom=0,right=0,status,scrollbars,resizable"
+            "width=600,height=1000,bottom=0,right=0,status,scrollbars,resizable"
         );
+		this.logWindow.moveTo(window.screenX + 1210, window.screenY + window.outerHeight - 1400);
         return this.logWindow;
     },
     

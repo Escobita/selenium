@@ -243,6 +243,7 @@ function removeLoadListener(element, command) {
 }
 
 function addLoadListener(element, command) {
+	LOG.info('Adding loadLisenter for ' + element + ', ' + command);
     if (window.addEventListener && !browserVersion.isOpera)
         element.addEventListener("load",command, true);
     else if (window.attachEvent)

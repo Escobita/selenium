@@ -411,7 +411,7 @@ Selenium.prototype.doOpen = function(url) {
    * 
    * @param url the URL to open; may be relative or absolute
    */
-    this.browserbot.openLocation(url);
+    this.browserbot.	openLocation(url);
     return SELENIUM_PROCESS_WAIT;
 };
 

@@ -103,20 +103,28 @@ function loadAndRunIfAuto() {
 
 function start() {
 	// resize the window accordingly 
-	window.resizeTo(1200, 400);
+	window.resizeTo(1200, 500);
 	window.moveTo(window.screenX, 0);
 	
     appFrame = window.open('about:blank', 'main');
-	appFrame.resizeTo(1200, screen.availHeight - window.outerHeight + 140);
-	appFrame.moveTo(window.screenX, window.screenY + window.outerHeight - 170);
+	appFrame.resizeTo(1200, screen.availHeight - window.outerHeight - 60);
+	appFrame.moveTo(window.screenX, window.screenY + window.outerHeight + 25);
+
+	LOG.show();
 
 	queryString = null;
     setRunInterval();
-    loadSuiteFrame();
+	
+	// we use a timeout here to make sure the LOG has loaded first, so we can see _every_ error
+    setTimeout('loadSuiteFrame()', 500);
 }
 
 function loadSuiteFrame() {
     var testAppFrame = getApplicationFrame();
+	var ranNum= Math.floor(Math.random()*5);
+	LOG.warn('window ID: ' + ranNum);
+	testAppFrame.selId = ranNum;
+
     selenium = Selenium.createForFrame(testAppFrame);
     registerCommandHandlers();
 
@@ -324,6 +332,9 @@ function startTest() {
 
     testLoop = initialiseTestLoop();
     testLoop.start();
+
+	// PL: for the purpose of testing
+	testLoop.waitForConditionTimeout = 2000;
 }
 
 function HtmlTest(testDocument) {
