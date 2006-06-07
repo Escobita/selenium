@@ -83,10 +83,10 @@ function continueCurrentTest() {
     testLoop.resume();
 }
 
-var appFrame;
+var appWindow;
 
-function getApplicationFrame() {
-    return appFrame;
+function getApplicationWindow() {
+    return appWindow;
 }
 
 function getSuiteFrame() {
@@ -106,9 +106,9 @@ function start() {
 	window.resizeTo(1200, 500);
 	window.moveTo(window.screenX, 0);
 	
-    appFrame = window.open('about:blank', 'main');
-	appFrame.resizeTo(1200, screen.availHeight - window.outerHeight - 60);
-	appFrame.moveTo(window.screenX, window.screenY + window.outerHeight + 25);
+    appWindow = window.open('about:blank', 'main');
+	appWindow.resizeTo(1200, screen.availHeight - window.outerHeight - 60);
+	appWindow.moveTo(window.screenX, window.screenY + window.outerHeight + 25);
 
 	LOG.show();
 
@@ -120,12 +120,9 @@ function start() {
 }
 
 function loadSuiteFrame() {
-    var testAppFrame = getApplicationFrame();
-	var ranNum= Math.floor(Math.random()*5);
-	LOG.warn('window ID: ' + ranNum);
-	testAppFrame.selId = ranNum;
-
-    selenium = Selenium.createForFrame(testAppFrame);
+    var testAppWindow = getApplicationWindow();
+    testAppWindow.foo = '123';
+    selenium = Selenium.createForWindow(testAppWindow);
     registerCommandHandlers();
 
     //set the runInterval if there is a queryParameter for it
@@ -150,7 +147,7 @@ function loadSuiteFrame() {
 }
 
 function startSingleTest() {
-    removeLoadListener(getApplicationFrame(), startSingleTest);
+    removeLoadListener(getApplicationWindow(), startSingleTest);
     var singleTestName = getQueryParameter("singletest");
     addLoadListener(getTestFrame(), startTest);
     getTestFrame().src = singleTestName;
@@ -186,9 +183,9 @@ function onloadTestSuite() {
 	    startTestSuite();
         } else if (getQueryParameter("autoURL")) {
 
-            addLoadListener(getApplicationFrame(), startSingleTest);
+            addLoadListener(getApplicationWindow(), startSingleTest);
 
-	    getApplicationFrame().src = getQueryParameter("autoURL");
+	    getApplicationWindow().src = getQueryParameter("autoURL");
 
 	} else {
             testLink = suiteTable.rows[currentRowInSuite+1].cells[0].getElementsByTagName("a")[0];

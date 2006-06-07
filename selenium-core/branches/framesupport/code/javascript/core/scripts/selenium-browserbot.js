@@ -27,8 +27,8 @@
 // The window to which the commands will be sent.  For example, to click on a
 // popup window, first select that window, and then do a normal click command.
 
-BrowserBot = function(frame) {
-    this.frame = frame;
+BrowserBot = function(window) {
+    this.window = window;
     this.currentPage = null;
     this.currentWindowName = null;
 
@@ -61,28 +61,28 @@ BrowserBot = function(frame) {
     };
 };
 
-BrowserBot.createForFrame = function(frame) {
+BrowserBot.createForWindow = function(window) {
     var browserbot;
-	LOG.info('createForFrame');
+	LOG.info('createForWindow');
     LOG.debug("browserName: " + browserVersion.name);
     LOG.debug("userAgent: " + navigator.userAgent);
     if (browserVersion.isIE) {
-        browserbot = new IEBrowserBot(frame);
+        browserbot = new IEBrowserBot(window);
     }
     else if (browserVersion.isKonqueror) {
-        browserbot = new KonquerorBrowserBot(frame);
+        browserbot = new KonquerorBrowserBot(window);
     }
     else if (browserVersion.isSafari) {
-        browserbot = new SafariBrowserBot(frame);
+        browserbot = new SafariBrowserBot(window);
     }
     else {
         LOG.info("Using MozillaBrowserBot")
         // Use mozilla by default
-        browserbot = new MozillaBrowserBot(frame);
+        browserbot = new MozillaBrowserBot(window);
     }
 
     // Modify the test IFrame so that page loads are detected.
-    addLoadListener(browserbot.getFrame(), browserbot.recordPageLoad);
+    addLoadListener(browserbot.getWindow(), browserbot.recordPageLoad);
     return browserbot;
 };
 
@@ -122,8 +122,16 @@ BrowserBot.prototype.getNextPrompt = function() {
     return this.recordedPrompts.shift();
 };
 
-BrowserBot.prototype.getFrame = function() {
-    return this.frame;
+BrowserBot.prototype.getWindow = function() {
+    LOG.error('getWindow:' + this.window.foo);
+    if (!this.window.foo) {
+        this.modifyWindowToRecordPopUpDialogs(this.window, this);
+        this.modifySeparateTestWindowToDetectPageLoads(this.window);
+        this.currentPage = PageBot.createForWindow(this.window);
+        this.newPageLoaded = false;
+        this.window.foo = true;
+    }
+    return this.window;
 };
 
 BrowserBot.prototype.selectWindow = function(target) {
@@ -151,8 +159,7 @@ BrowserBot.prototype.setIFrameLocation = function(iframe, location) {
 };
 
 BrowserBot.prototype.setOpenLocation = function(location) {
-	LOG.warn('Setting location on window w/ selId of ' + this.getCurrentWindow().selId);
-	LOG.warn('location.href = ' + this.getCurrentWindow().location.href);
+    LOG.error('***** ' + this.getCurrentWindow().foo);
     this.getCurrentWindow().location.href = location;
 };
 
@@ -271,16 +278,12 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 };
 
 
-BrowserBot.prototype.getContentWindow = function() {
-    return this.getFrame().contentWindow || frames[this.getFrame().id] || this.getFrame();
-};
-
 BrowserBot.prototype.getTargetWindow = function(windowName) {
     LOG.debug("getTargetWindow(" + windowName + ")");
     // First look in the map of opened windows
     var targetWindow = this.openedWindows[windowName];
     if (!targetWindow) {
-        var evalString = "this.getContentWindow().window." + windowName;
+        var evalString = "this.getWindow()." + windowName;
         targetWindow = eval(evalString);
     }
     if (!targetWindow) {
@@ -290,7 +293,7 @@ BrowserBot.prototype.getTargetWindow = function(windowName) {
 };
 
 BrowserBot.prototype.getCurrentWindow = function() {
-    var testWindow = this.getContentWindow().window;
+    var testWindow = this.getWindow();
     if (this.currentWindowName != null) {
         testWindow = this.getTargetWindow(this.currentWindowName);
     }

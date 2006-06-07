@@ -147,8 +147,8 @@ function Selenium(browserbot) {
     };
 }
 
-Selenium.createForFrame = function(frame) {
-    return new Selenium(BrowserBot.createForFrame(frame));
+Selenium.createForWindow = function(window) {
+    return new Selenium(BrowserBot.createForWindow(window));
 };
 
 Selenium.prototype.reset = function() {
@@ -388,7 +388,7 @@ Selenium.prototype.doSubmit = function(formLocator) {
     var actuallySubmit = true;
     if (form.onsubmit) {
     	// apply this to the correct window so alerts are properly handled, even in IE HTA mode
-    	actuallySubmit = form.onsubmit.apply(this.browserbot.getContentWindow());
+    	actuallySubmit = form.onsubmit.apply(this.browserbot.getWindow());
     }
     if (actuallySubmit) {
         form.submit();
@@ -411,7 +411,7 @@ Selenium.prototype.doOpen = function(url) {
    * 
    * @param url the URL to open; may be relative or absolute
    */
-    this.browserbot.	openLocation(url);
+    this.browserbot.openLocation(url);
     return SELENIUM_PROCESS_WAIT;
 };
 
@@ -908,7 +908,7 @@ Selenium.prototype.findEffectiveStyle = function(element) {
     if (element.style == undefined) {
         return undefined; // not a styled element
     }
-    var window = this.browserbot.getContentWindow();
+    var window = this.browserbot.getWindow();
     if (window.getComputedStyle) { 
         // DOM-Level-2-CSS
         return window.getComputedStyle(element, null);
