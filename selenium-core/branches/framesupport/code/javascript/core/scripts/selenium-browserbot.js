@@ -41,6 +41,7 @@ BrowserBot = function(window) {
     this.nextPromptResult = '';
     this.newPageLoaded = false;
     this.pageLoadError = null;
+    this.uniqueId = new Date().getTime();
 
     var self = this;
     this.recordPageLoad = function() {
@@ -81,8 +82,7 @@ BrowserBot.createForWindow = function(window) {
         browserbot = new MozillaBrowserBot(window);
     }
 
-    // Modify the test IFrame so that page loads are detected.
-    addLoadListener(browserbot.getWindow(), browserbot.recordPageLoad);
+    browserbot.getWindow();
     return browserbot;
 };
 

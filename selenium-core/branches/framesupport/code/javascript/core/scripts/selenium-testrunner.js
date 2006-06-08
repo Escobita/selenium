@@ -106,9 +106,24 @@ function start() {
 	window.resizeTo(1200, 500);
 	window.moveTo(window.screenX, 0);
 	
-    appWindow = window.open('about:blank', 'main');
-	appWindow.resizeTo(1200, screen.availHeight - window.outerHeight - 60);
-	appWindow.moveTo(window.screenX, window.screenY + window.outerHeight + 25);
+    appWindow = window.open('TestRunner-splash.html', 'main');
+	try {
+		var windowHeight = 500;
+		if (window.outerHeight) {
+			windowHeight = window.outerHeight;
+		} else if (document.documentElement && document.documentElement.offsetHeight) {
+			windowHeight = document.documentElement.offsetHeight;
+		}
+		
+		if (window.screenLeft && !window.screenX) window.screenX = window.screenLeft;
+		if (window.screenTop && !window.screenY) window.screenY = window.screenTop;
+		
+		appWindow.resizeTo(1200, screen.availHeight - windowHeight - 60);
+		appWindow.moveTo(window.screenX, window.screenY + windowHeight + 25);
+	} catch (e) {
+		LOG.error("Couldn't resize app window");
+		LOG.exception(e);
+	}
 
 	LOG.show();
 
@@ -121,7 +136,7 @@ function start() {
 
 function loadSuiteFrame() {
     var testAppWindow = getApplicationWindow();
-    testAppWindow.foo = '123';
+    //testAppWindow.foo = '123';
     selenium = Selenium.createForWindow(testAppWindow);
     registerCommandHandlers();
 
