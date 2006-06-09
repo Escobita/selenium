@@ -64,6 +64,7 @@ FAILURE = 1;
 
 runInterval = 0;
 
+selenium = null;
 queryString = null;
 
 function setRunInterval() {
@@ -125,7 +126,7 @@ function start() {
 		LOG.exception(e);
 	}
 
-	LOG.show();
+	//LOG.show();
 
 	queryString = null;
     setRunInterval();
@@ -137,8 +138,10 @@ function start() {
 function loadSuiteFrame() {
     var testAppWindow = getApplicationWindow();
     //testAppWindow.foo = '123';
-    selenium = Selenium.createForWindow(testAppWindow);
-    registerCommandHandlers();
+    if (selenium == null)  {
+    	selenium = Selenium.createForWindow(testAppWindow);
+    	registerCommandHandlers();
+    }
 
     //set the runInterval if there is a queryParameter for it
     var tempRunInterval = getQueryParameter("runInterval");
