@@ -398,6 +398,11 @@ Selenium.prototype.doSubmit = function(formLocator) {
 	    	testLoop.waitForCondition = function () {
 	    		return new Date().getTime() > (now + 20);
 	    	}
+	    } else {
+	    	actuallySubmit = form.onsubmit();
+	    	if (actuallySubmit) {
+	    		form.submit();
+	    	}
 	    }
     } else {
     	form.submit();
