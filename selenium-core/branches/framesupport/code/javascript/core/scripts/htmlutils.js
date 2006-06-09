@@ -194,7 +194,7 @@ function triggerEvent(element, eventType, canBubble) {
 function triggerKeyEvent(element, eventType, keycode, canBubble) {
     canBubble = (typeof(canBubble) == undefined) ? true : canBubble;
     if (element.fireEvent) {
-		keyEvent = parent.frames['myiframe'].document.createEventObject();
+		keyEvent = element.ownerDocument.createEventObject();
 		keyEvent.keyCode=keycode;
 		element.fireEvent('on' + eventType, keyEvent);
     }
