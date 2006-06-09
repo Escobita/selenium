@@ -224,8 +224,10 @@ BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowO
     // Since the unload event doesn't fire in Safari 1.3, we start polling immediately
     if (windowObject && !windowObject.closed) {
         LOG.debug("Starting pollForLoad: " + windowObject.document.location);
+        var marker = 'selenium' + new Date().getTime();
+        windowObject.document.location[marker] = true;
         this.pollingForLoad = true;
-        this.pollForLoad(loadFunction, windowObject, windowObject.document.location, windowObject.document.location.href);
+        this.pollForLoad(loadFunction, windowObject, windowObject.document.location, windowObject.document.location.href, marker);
     }
 };
 
@@ -234,7 +236,7 @@ BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowO
  * Since we might call this before the original page is unloaded, we first check to see that the current location
  * or href is different from the original one.
  */
-BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref) {
+BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref, marker) {
     var windowClosed = true;
     try {
     	windowClosed = windowObject.closed;
@@ -261,7 +263,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 
 		if (rs == null) rs = 'complete';
 
-	    if (!(sameLoc && sameHref) && rs == 'complete') {
+	    if (!(sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
 	        LOG.debug("pollForLoad complete: " + rs + " (" + currentHref + ")");
 	        loadFunction();
 	        this.pollingForLoad = false;
@@ -269,7 +271,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	    }
 	    var self = this;
 	    LOG.debug("pollForLoad continue: " + currentHref);
-	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref);}, 500);
+	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
 	} catch (e) {
 		LOG.error("Exception during pollForLoad; this should get noticed soon!");
 		LOG.exception(e);
@@ -732,7 +734,6 @@ PageBot.prototype.selectOption = function(element, optionToSelect) {
     if (changed) {
         triggerEvent(element, 'change', true);
     }
-    triggerEvent(element, 'blur', false);
 };
 
 /*
@@ -745,7 +746,6 @@ PageBot.prototype.addSelection = function(element, option) {
         option.selected = true;
         triggerEvent(element, 'change', true);
     }
-    triggerEvent(element, 'blur', false);
 };
 
 /*
@@ -758,7 +758,6 @@ PageBot.prototype.removeSelection = function(element, option) {
         option.selected = false;
         triggerEvent(element, 'change', true);
     }
-    triggerEvent(element, 'blur', false);
 };
 
 PageBot.prototype.checkMultiselect = function(element) {
@@ -777,7 +776,6 @@ PageBot.prototype.replaceText = function(element, stringValue) {
         // In chrome URL, The change event is already fired by setting the value.
         triggerEvent(element, 'change', true);
     }
-    triggerEvent(element, 'blur', false);
 };
 
 MozillaPageBot.prototype.clickElement = function(element) {
@@ -809,7 +807,6 @@ MozillaPageBot.prototype.clickElement = function(element) {
         return;
     }
 
-    triggerEvent(element, 'blur', false);
 };
 
 OperaPageBot.prototype.clickElement = function(element) {
@@ -832,7 +829,6 @@ OperaPageBot.prototype.clickElement = function(element) {
         return;
     }
 
-    triggerEvent(element, 'blur', false);
 };
 
 
@@ -851,7 +847,6 @@ KonquerorPageBot.prototype.clickElement = function(element) {
         return;
     }
 
-    triggerEvent(element, 'blur', false);
 };
 
 SafariPageBot.prototype.clickElement = function(element) {
@@ -903,7 +898,6 @@ SafariPageBot.prototype.clickElement = function(element) {
         return;
     }
 
-    triggerEvent(element, 'blur', false);
 };
 
 IEPageBot.prototype.clickElement = function(element) {
@@ -934,7 +928,6 @@ IEPageBot.prototype.clickElement = function(element) {
             triggerEvent(element, 'change', true);
         }
 
-        triggerEvent(element, 'blur', false);
     }
     catch (e) {
         // If the page is unloading, we may get a "Permission denied" or "Unspecified error".
