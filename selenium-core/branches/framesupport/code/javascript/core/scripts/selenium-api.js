@@ -387,11 +387,20 @@ Selenium.prototype.doSubmit = function(formLocator) {
     var form = this.page().findElement(formLocator);
     var actuallySubmit = true;
     if (form.onsubmit) {
-    	// apply this to the correct window so alerts are properly handled, even in IE HTA mode
-    	actuallySubmit = form.onsubmit.apply(this.browserbot.getWindow());
-    }
-    if (actuallySubmit) {
-        form.submit();
+    	if (browserVersion.isHTA) {
+	    	// run the code in the correct window so alerts are handled correctly even in HTA mode
+	    	var win = this.browserbot.getWindow();
+	    	var now = new Date().getTime();
+	    	var marker = 'marker' + now;
+	    	win[marker] = form;
+	    	win.setTimeout("var actuallySubmit = "+marker+".onsubmit(); if (actuallySubmit) { "+marker+".submit(); };", 0);    		    	
+	    	// pause for at least 20ms for this command to run
+	    	testLoop.waitForCondition = function () {
+	    		return new Date().getTime() > (now + 20);
+	    	}
+	    }
+    } else {
+    	form.submit();
     }
     
 };
