@@ -229,7 +229,7 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
         var marker = 'selenium' + new Date().getTime();
         windowObject.document.location[marker] = true;
         this.pollingForLoad[windowObject] = true;
-        this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document.location, windowObject.document.location.href, marker);
+        this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.document.location, windowObject.document.location.href, marker);
     }
 };
 
@@ -238,7 +238,7 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
  * Since we might call this before the original page is unloaded, we first check to see that the current location
  * or href is different from the original one.
  */
-BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref, marker) {
+BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
     if (this.windowClosed(windowObject)) {
     	this.pollingForLoad[windowObject] = false;
         return;
@@ -247,16 +247,18 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
     LOG.info("pollForLoad original ("+marker+"): " + originalHref);
     try {
 
+		var currentDocument = windowObject.document;
 	    var currentLocation = windowObject.document.location;
 	    var currentHref = currentLocation.href
 
+		var sameDoc = (originalDocument === currentDocument);
 	    var sameLoc = (originalLocation === currentLocation);
 	    var sameHref = (originalHref === currentHref);
 	    var rs = windowObject.document.readyState;
 
 		if (rs == null) rs = 'complete';
 
-	    if (!(sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
+	    if (!(sameDoc && sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
 	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
 	        this.pollingForLoad[windowObject] = false;
 	        this.modifyWindow(windowObject);
@@ -268,7 +270,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	    }
 	    var self = this;
 	    LOG.info("pollForLoad continue ("+marker+"): " + currentHref);
-	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
+	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
 	} catch (e) {
 		LOG.error("Exception during pollForLoad; this should get noticed soon!");
 		LOG.exception(e);
@@ -321,11 +323,12 @@ KonquerorBrowserBot.prototype.setIFrameLocation = function(iframe, location) {
     iframe.src = location;
 };
 
-KonquerorBrowserBot.prototype.setOpenLocation = function(location) {
+KonquerorBrowserBot.prototype.setOpenLocation = function(loc) {
     // Window doesn't fire onload event when setting src to the current value,
     // so we set it to blank first.
-    this.getCurrentWindow().location.href = "about:blank";
-    this.getCurrentWindow().location.href = location;
+    var win = this.getCurrentWindow();
+    win.location.href = "about:blank";
+    win.location.href = loc;
 };
 
 function SafariBrowserBot(frame) {
@@ -334,6 +337,7 @@ function SafariBrowserBot(frame) {
 SafariBrowserBot.prototype = new BrowserBot;
 
 SafariBrowserBot.prototype.setIFrameLocation = KonquerorBrowserBot.prototype.setIFrameLocation;
+SafariBrowserBot.prototype.setOpenLocation = KonquerorBrowserBot.prototype.setOpenLocation;
 
 function IEBrowserBot(frame) {
     BrowserBot.call(this, frame);
@@ -370,19 +374,19 @@ IEBrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(wind
     BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads.call(this, windowObject);
 };
 
-IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref, marker) {
-	BrowserBot.prototype.pollForLoad.call(this, loadFunction, windowObject, originalLocation, originalHref, marker);
+IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
+	BrowserBot.prototype.pollForLoad.call(this, loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
 	if (this.pageLoadError) {
 		if (this.pageUnloading) {
 			var self = this;
 		    LOG.warn("pollForLoad UNLOADING ("+marker+"): caught exception while firing events on unloading page: " + this.pageLoadError.message);
-		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
+		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
 		    this.pageLoadError = null;
             return;
         } else if (this.pageLoadError.message == "Permission denied" && this.permDeniedCount++ < 4) {
         	var self = this;
 		    LOG.warn("pollForLoad ("+marker+"): PERMISSION DENIED ("+this.permDeniedCount+"), waiting to see if it goes away");
-		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
+		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
 		    this.pageLoadError = null;
 		    return;
 		}
