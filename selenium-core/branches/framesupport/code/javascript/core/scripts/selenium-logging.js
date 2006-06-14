@@ -19,6 +19,8 @@ var Logger = function() {
 }
 Logger.prototype = {
 
+	pendingMessages: new Array(),
+
     setLogLevelThreshold: function(logLevel) {
     	this.pendingLogLevelThreshold = logLevel;
         this.show();
@@ -38,7 +40,8 @@ Logger.prototype = {
             this.logWindow.setThresholdLevel(this.pendingLogLevelThreshold);
             
             // can't just directly log because that action would loop back to this code infinitely
-            this.pendingInfoMessage = "Log level programmatically set to " + this.pendingLogLevelThreshold + " (presumably by driven-mode test code)";
+            var pendingMessage = new LogMessage("info", "Log level programmatically set to " + this.pendingLogLevelThreshold + " (presumably by driven-mode test code)");
+            this.pendingMessages.push(pendingMessage);
             
             this.pendingLogLevelThreshold = null;	// let's only go this way one time
         }
@@ -65,12 +68,22 @@ Logger.prototype = {
         var logWindow = this.getLogWindow();
         if (logWindow) {
             if (logWindow.append) {
-            	if (this.pendingInfoMessage) {
- 		    logWindow.append("info: " + this.pendingInfoMessage, "info");
-                    this.pendingInfoMessage = null;
-                }
+            	if (this.pendingMessages.length > 0) {
+            		logWindow.append("info: Appending missed logging messages", "info");
+	            	while (this.pendingMessages.length > 0) {
+	            		var msg = this.pendingMessages.shift();
+	            		logWindow.append(msg.type + ": " + msg.msg, msg.type);
+	            	}
+	            	logWindow.append("info: Done appending missed logging messages", "info");
+	            }
                 logWindow.append(className + ": " + message, className);
             }
+        } else {
+        	// uncomment this to turn on background logging
+        	/* these logging messages are never flushed, which creates 
+        	an enormous array of strings that never stops growing.  Only
+        	turn this on if you need it for debugging! */
+        	//this.pendingMessages.push(new LogMessage(message, className));
         }
     },
 
@@ -111,3 +124,7 @@ Logger.prototype = {
 
 var LOG = new Logger();
 
+var LogMessage = function(msg, type) {
+	this.type = type;
+	this.msg = msg;
+}
