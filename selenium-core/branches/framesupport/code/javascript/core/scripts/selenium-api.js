@@ -389,7 +389,7 @@ Selenium.prototype.doSubmit = function(formLocator) {
     if (form.onsubmit) {
     	if (browserVersion.isHTA) {
 	    	// run the code in the correct window so alerts are handled correctly even in HTA mode
-	    	var win = this.browserbot.getWindow();
+	    	var win = this.browserbot.getCurrentWindow();
 	    	var now = new Date().getTime();
 	    	var marker = 'marker' + now;
 	    	win[marker] = form;
@@ -452,7 +452,7 @@ Selenium.prototype.doWaitForPopUp = function(windowID, timeout) {
     }
     
     testLoop.waitForCondition = function () {
-        var targetWindow = selenium.browserbot.getTargetWindow(windowID);
+        var targetWindow = selenium.browserbot.getWindowByName(windowID);
         if (!targetWindow) return false;
         if (!targetWindow.location) return false;
         if ("about:blank" == targetWindow.location) return false;
@@ -922,7 +922,7 @@ Selenium.prototype.findEffectiveStyle = function(element) {
     if (element.style == undefined) {
         return undefined; // not a styled element
     }
-    var window = this.browserbot.getWindow();
+    var window = this.browserbot.getCurrentWindow();
     if (window.getComputedStyle) { 
         // DOM-Level-2-CSS
         return window.getComputedStyle(element, null);

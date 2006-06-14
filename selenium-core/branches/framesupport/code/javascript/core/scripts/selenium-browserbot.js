@@ -42,12 +42,13 @@ BrowserBot = function(window) {
     this.newPageLoaded = false;
     this.pageLoadError = null;
     this.uniqueId = new Date().getTime();
+    this.pollingForLoad = new Object();
 
     var self = this;
     this.recordPageLoad = function() {
     	LOG.info("Page load detected");
         try {
-        	LOG.info("Page load location=" + self.getCurrentWindow().location);
+        	LOG.info("Page load location=" + self.getCurrentWindow(true).location);
         } catch (e) {
         	self.pageLoadError = e;
         	return;
@@ -57,7 +58,9 @@ BrowserBot = function(window) {
     };
 
     this.isNewPageLoaded = function() {
-    	if (this.pageLoadError) throw this.pageLoadError;
+    	if (this.pageLoadError) {
+    		throw this.pageLoadError;
+    	}
         return self.newPageLoaded;
     };
 };
@@ -82,7 +85,7 @@ BrowserBot.createForWindow = function(window) {
         browserbot = new MozillaBrowserBot(window);
     }
 
-    browserbot.getWindow();
+    browserbot.getCurrentWindow();
     return browserbot;
 };
 
@@ -122,16 +125,26 @@ BrowserBot.prototype.getNextPrompt = function() {
     return this.recordedPrompts.shift();
 };
 
-BrowserBot.prototype.getWindow = function() {
-    LOG.error('getWindow:' + this.window.foo);
-    if (!this.window.foo) {
-        this.modifyWindowToRecordPopUpDialogs(this.window, this);
-        this.modifySeparateTestWindowToDetectPageLoads(this.window);
-        this.currentPage = PageBot.createForWindow(this.window);
-        this.newPageLoaded = false;
-        this.window.foo = true;
+BrowserBot.prototype.windowClosed = function(win) {
+    var c = win.closed;
+    if (c == null) return true;
+    return c;
+};
+
+BrowserBot.prototype.modifyWindow = function(win) {
+    if (this.windowClosed(win)) {
+    	LOG.error("modifyWindow: Window was closed!");
+    	return null;
     }
-    return this.window;
+    LOG.info('modifyWindow ' + this.uniqueId + ":"+ win[this.uniqueId]);
+    if (!win[this.uniqueId]) {
+        this.modifyWindowToRecordPopUpDialogs(win, this);
+        this.modifySeparateTestWindowToDetectPageLoads(win);
+        this.currentPage = PageBot.createForWindow(win);
+        this.newPageLoaded = false;
+        win[this.uniqueId] = true;
+    }
+    return win;
 };
 
 BrowserBot.prototype.selectWindow = function(target) {
@@ -140,7 +153,7 @@ BrowserBot.prototype.selectWindow = function(target) {
     this.currentWindowName = null;
     if (target && target != "null") {
         // If window exists
-        if (this.getTargetWindow(target)) {
+        if (this.getWindowByName(target)) {
             this.currentWindowName = target;
         }
     }
@@ -158,16 +171,16 @@ BrowserBot.prototype.setIFrameLocation = function(iframe, location) {
     iframe.src = location;
 };
 
-BrowserBot.prototype.setOpenLocation = function(location) {
-    LOG.error('***** ' + this.getCurrentWindow().foo);
-    this.getCurrentWindow().location.href = location;
+BrowserBot.prototype.setOpenLocation = function(loc) {
+    var win = this.getCurrentWindow();
+    // is there a Permission Denied risk here? setting a timeout breaks Firefox
+    //win.setTimeout(function() { win.location.href = loc; }, 0);
+    win.location.href = loc;
 };
 
 BrowserBot.prototype.getCurrentPage = function() {
     if (this.currentPage == null) {
         var testWindow = this.getCurrentWindow();
-        this.modifyWindowToRecordPopUpDialogs(testWindow, this);
-        this.modifySeparateTestWindowToDetectPageLoads(testWindow);
         this.currentPage = PageBot.createForWindow(testWindow);
         this.newPageLoaded = false;
     }
@@ -206,28 +219,17 @@ BrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify,
 };
 
 /**
- * The main IFrame has a single, long-lived onload handler that clears
- * Browserbot.currentPage and sets the "newPageLoaded" flag. For separate
- * windows, we need to attach a handler each time. This uses the
- * "callOnWindowPageTransition" mechanism, which is implemented differently
- * for different browsers.
- */
-BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(windowToModify) {
-	this.callOnWindowPageTransition(this.recordPageLoad, windowToModify);
-};
-
-/**
  * Call the supplied function when a the current page unloads and a new one loads.
  * This is done by polling continuously until the document changes and is fully loaded.
  */
-BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowObject) {
+BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(windowObject) {
     // Since the unload event doesn't fire in Safari 1.3, we start polling immediately
-    if (windowObject && !windowObject.closed) {
-        LOG.debug("Starting pollForLoad: " + windowObject.document.location);
+    if (windowObject && !this.windowClosed(windowObject)) {
+        LOG.info("Starting pollForLoad: " + windowObject.document.location);
         var marker = 'selenium' + new Date().getTime();
         windowObject.document.location[marker] = true;
-        this.pollingForLoad = true;
-        this.pollForLoad(loadFunction, windowObject, windowObject.document.location, windowObject.document.location.href, marker);
+        this.pollingForLoad[windowObject] = true;
+        this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document.location, windowObject.document.location.href, marker);
     }
 };
 
@@ -237,21 +239,12 @@ BrowserBot.prototype.callOnWindowPageTransition = function(loadFunction, windowO
  * or href is different from the original one.
  */
 BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref, marker) {
-    var windowClosed = true;
-    try {
-    	windowClosed = windowObject.closed;
-    } catch (e) {
-    	LOG.debug("exception detecting closed window (I guess it must be closed)");
-    	LOG.exception(e);
-    	// swallow exceptions which may occur in HTA mode when the window is closed
-    }
-    if (null == windowClosed) windowClosed = true;
-    if (windowClosed) {
-    	this.pollingForLoad = false;
+    if (this.windowClosed(windowObject)) {
+    	this.pollingForLoad[windowObject] = false;
         return;
     }
 
-    LOG.debug("pollForLoad original: " + originalHref);
+    LOG.info("pollForLoad original ("+marker+"): " + originalHref);
     try {
 
 	    var currentLocation = windowObject.document.location;
@@ -264,13 +257,17 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 		if (rs == null) rs = 'complete';
 
 	    if (!(sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
-	        LOG.debug("pollForLoad complete: " + rs + " (" + currentHref + ")");
+	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
+	        this.pollingForLoad[windowObject] = false;
+	        this.modifyWindow(windowObject);
+	        if (!this.pollingForLoad[windowObject]) {
+	        	this.modifySeparateTestWindowToDetectPageLoads(windowObject);
+	        }
 	        loadFunction();
-	        this.pollingForLoad = false;
 	        return;
 	    }
 	    var self = this;
-	    LOG.debug("pollForLoad continue: " + currentHref);
+	    LOG.info("pollForLoad continue ("+marker+"): " + currentHref);
 	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
 	} catch (e) {
 		LOG.error("Exception during pollForLoad; this should get noticed soon!");
@@ -280,24 +277,29 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 };
 
 
-BrowserBot.prototype.getTargetWindow = function(windowName) {
-    LOG.debug("getTargetWindow(" + windowName + ")");
+BrowserBot.prototype.getWindowByName = function(windowName, doNotModify) {
+    LOG.debug("getWindowByName(" + windowName + ")");
     // First look in the map of opened windows
     var targetWindow = this.openedWindows[windowName];
     if (!targetWindow) {
-        var evalString = "this.getWindow()." + windowName;
-        targetWindow = eval(evalString);
+    	targetWindow = this.window[windowName];
     }
     if (!targetWindow) {
         throw new SeleniumError("Window does not exist");
     }
+    if (!doNotModify) {
+    	this.modifyWindow(targetWindow);
+    }
     return targetWindow;
 };
 
-BrowserBot.prototype.getCurrentWindow = function() {
-    var testWindow = this.getWindow();
+BrowserBot.prototype.getCurrentWindow = function(doNotModify) {
+    var testWindow = this.window;
     if (this.currentWindowName != null) {
-        testWindow = this.getTargetWindow(this.currentWindowName);
+        testWindow = this.getWindowByName(this.currentWindowName, doNotModify);
+    }
+    if (!doNotModify) {
+    	this.modifyWindow(testWindow);
     }
     return testWindow;
 };
@@ -357,6 +359,55 @@ IEBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModif
         var returnValue = oldShowModalDialog(fullURL, args, features);
         return returnValue;
     };
+};
+
+IEBrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(windowObject) {
+    this.pageUnloading = false;
+    this.permDeniedCount = 0;
+    var self = this;
+    var pageUnloadDetector = function() {self.pageUnloading = true;};
+    windowObject.attachEvent("onbeforeunload", pageUnloadDetector);
+    BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads.call(this, windowObject);
+};
+
+IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalLocation, originalHref, marker) {
+	BrowserBot.prototype.pollForLoad.call(this, loadFunction, windowObject, originalLocation, originalHref, marker);
+	if (this.pageLoadError) {
+		if (this.pageUnloading) {
+			var self = this;
+		    LOG.warn("pollForLoad UNLOADING ("+marker+"): caught exception while firing events on unloading page: " + this.pageLoadError.message);
+		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
+		    this.pageLoadError = null;
+            return;
+        } else if (this.pageLoadError.message == "Permission denied" && this.permDeniedCount++ < 4) {
+        	var self = this;
+		    LOG.warn("pollForLoad ("+marker+"): PERMISSION DENIED ("+this.permDeniedCount+"), waiting to see if it goes away");
+		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalLocation, originalHref, marker);}, 500);
+		    this.pageLoadError = null;
+		    return;
+		}
+        throw this.pageLoadError;
+    }
+};
+
+IEBrowserBot.prototype.windowClosed = function(win) {
+    try {
+		return win.closed;
+	} catch (e) {
+		// Got an exception trying to read that property; we'll have to take a guess!
+		if (browserVersion.isHTA) {
+			if (e.message == "Permission denied") {
+				// the window is probably unloading, which means it's probably not closed yet
+				return false;
+			} else {
+				// there's a good chance that we've lost contact with the window object if it is closed
+				return true;
+			}
+		} else {
+			// the window is probably unloading, which means it's probably not closed yet
+			return false;
+		}
+	}
 };
 
 SafariBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify, browserBot) {
@@ -941,7 +992,7 @@ IEPageBot.prototype.clickElement = function(element) {
 };
 
 PageBot.prototype.windowClosed = function(element) {
-    return this.currentWindow.closed;
+    return selenium.browserbot.windowClosed(this.currentWindow);
 };
 
 PageBot.prototype.bodyText = function() {
@@ -1006,10 +1057,6 @@ function isDefined(value) {
 
 PageBot.prototype.goBack = function() {
     this.currentWindow.history.back();
-    if (browserVersion.isOpera && !selenium.browserbot.pollingForLoad) {
-    	// DGF On Opera, goBack doesn't re-trigger a load event, so we have to poll for it
-        selenium.browserbot.callOnWindowPageTransition(selenium.browserbot.recordPageLoad, this.currentWindow);
-    }
 };
 
 PageBot.prototype.goForward = function() {
