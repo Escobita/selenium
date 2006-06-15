@@ -138,11 +138,11 @@ BrowserBot.prototype.modifyWindow = function(win) {
     }
     LOG.info('modifyWindow ' + this.uniqueId + ":"+ win[this.uniqueId]);
     if (!win[this.uniqueId]) {
+        win[this.uniqueId] = true;
         this.modifyWindowToRecordPopUpDialogs(win, this);
         this.modifySeparateTestWindowToDetectPageLoads(win);
         this.currentPage = PageBot.createForWindow(win);
         this.newPageLoaded = false;
-        win[this.uniqueId] = true;
     }
     return win;
 };
@@ -224,13 +224,26 @@ BrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify,
  */
 BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(windowObject) {
     // Since the unload event doesn't fire in Safari 1.3, we start polling immediately
-    if (windowObject && !this.windowClosed(windowObject)) {
-        LOG.info("Starting pollForLoad: " + windowObject.document.location);
-        var marker = 'selenium' + new Date().getTime();
-        windowObject.document.location[marker] = true;
-        this.pollingForLoad[windowObject] = true;
-        this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.document.location, windowObject.document.location.href, marker);
+    if (!windowObject) {
+    	LOG.warn("modifySeparateTestWindowToDetectPageLoads: no windowObject!");
+    	return;
     }
+    if (this.windowClosed(windowObject)) {
+    	LOG.info("modifySeparateTestWindowToDetectPageLoads: windowObject was closed");
+    	return;
+    }
+    var oldMarker = this.isPollingForLoad(windowObject);
+    if (oldMarker) {
+    	LOG.info("modifySeparateTestWindowToDetectPageLoads: already polling this window: " + oldMarker);
+    	return;
+    }
+    
+    var marker = 'selenium' + new Date().getTime();
+    LOG.info("Starting pollForLoad ("+marker+"): " + windowObject.document.location);
+    windowObject.document.location[marker] = true;
+    windowObject[this.uniqueId] = marker;
+    this.pollingForLoad[marker] = true;
+    this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.document.location, windowObject.document.location.href, marker);
 };
 
 /**
@@ -240,7 +253,7 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
  */
 BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
     if (this.windowClosed(windowObject)) {
-    	this.pollingForLoad[windowObject] = false;
+    	delete this.pollingForLoad[marker];
         return;
     }
 
@@ -260,11 +273,15 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 
 	    if (!(sameDoc && sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
 	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
-	        this.pollingForLoad[windowObject] = false;
+	        delete this.pollingForLoad[marker];
 	        this.modifyWindow(windowObject);
-	        if (!this.pollingForLoad[windowObject]) {
+	        var newMarker = this.isPollingForLoad(windowObject);
+	        if (!newMarker) {
+	        	LOG.debug("modifyWindow didn't start new poller: " + newMarker);
 	        	this.modifySeparateTestWindowToDetectPageLoads(windowObject);
 	        }
+	        newMarker = this.isPollingForLoad(windowObject);
+	        LOG.info("pollForLoad ("+marker+") restarting " + newMarker);
 	        loadFunction();
 	        return;
 	    }
@@ -278,6 +295,19 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	}
 };
 
+BrowserBot.prototype.isPollingForLoad = function(win) {
+	var marker = win[this.uniqueId];
+	if (!marker) {
+		LOG.debug("isPollingForLoad false, missing uniqueId " + this.uniqueId + ": " + win[this.uniqueId]);
+		return false;
+	}
+	if (!this.pollingForLoad[win[this.uniqueId]]) {
+		LOG.debug("isPollingForLoad false, this.pollingForLoad["+win[this.uniqueId]+"]: " + this.pollingForLoad[win[this.uniqueId]]);
+		return false;
+	}
+	return win[this.uniqueId];
+	return false;
+};
 
 BrowserBot.prototype.getWindowByName = function(windowName, doNotModify) {
     LOG.debug("getWindowByName(" + windowName + ")");
