@@ -429,6 +429,11 @@ Selenium.prototype.doOpen = function(url) {
     return SELENIUM_PROCESS_WAIT;
 };
 
+Selenium.prototype.doMakeThisTheDefaultWindow = function() {
+	this.browserbot.makeThisTheDefaultWindow();
+};
+	
+
 Selenium.prototype.doSelectWindow = function(windowID) {
 	/**
    * Selects a popup window; once a popup window has been selected, all
@@ -438,6 +443,20 @@ Selenium.prototype.doSelectWindow = function(windowID) {
    * @param windowID the JavaScript window ID of the window to select
    */
     this.browserbot.selectWindow(windowID);
+};
+
+Selenium.prototype.doSelectFrame = function(locator) {
+	/**
+	* Selects a frame within the current window.  (You may invoke this command
+	* multiple times to select nested frames.)  To select the parent frame, use
+	* "relative=parent" as a locator; to select the top frame, use "relative=top".
+	*
+	* <p>You may also use a DOM expression to identify the frame you want directly,
+	* like this: <code>dom=frames["main"].frames["subframe"]</code></p>
+	*
+	* @param locator an <a href="#locators">element locator</a> identifying a frame or iframe
+	*/
+	this.browserbot.selectFrame(locator);
 };
 
 Selenium.prototype.doWaitForPopUp = function(windowID, timeout) {
@@ -857,15 +876,11 @@ Selenium.prototype.isTextPresent = function(pattern) {
    */
     var allText = this.page().bodyText();
 
-    if(allText == "") {
-        Assert.fail("Page text not found");
-    } else {
-    	var patternMatcher = new PatternMatcher(pattern);
-        if (patternMatcher.strategy == PatternMatcher.strategies.glob) {
-    		patternMatcher.matcher = new PatternMatcher.strategies.globContains(pattern);
-    	}
-    	return patternMatcher.matches(allText);
-    }
+    var patternMatcher = new PatternMatcher(pattern);
+    if (patternMatcher.strategy == PatternMatcher.strategies.glob) {
+		patternMatcher.matcher = new PatternMatcher.strategies.globContains(pattern);
+	}
+	return patternMatcher.matches(allText);
 };
 
 Selenium.prototype.isElementPresent = function(locator) {

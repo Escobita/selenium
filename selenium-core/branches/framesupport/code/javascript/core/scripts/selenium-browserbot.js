@@ -161,9 +161,34 @@ BrowserBot.prototype.selectWindow = function(target) {
     }
 };
 
+BrowserBot.prototype.makeThisTheDefaultWindow = function() {
+	this.window = this.getCurrentWindow();
+	this.selectWindow();
+};
+
 BrowserBot.prototype.selectFrame = function(target) {
-	var frameElement = this.getCurrentPage().findElement(target);
-	this.currentWindow = frameElement.contentWindow;
+	if (target == "relative=up") {
+		this.currentWindow = this.getCurrentWindow().parent;
+	} else if (target == "relative=top") {
+		this.currentWindow = this.getCurrentWindow().top;
+	} else {
+		var frame = this.getCurrentPage().findElement(target);
+		if (frame == null) {
+			throw new SeleniumError("Not found: " + target);
+		}
+		// now, did they give us a frame or a frame ELEMENT?
+		if (frame.contentWindow) {
+			// this must be a frame element
+			this.currentWindow = frame.contentWindow;
+		} else if (frame.document) {
+			// must be an actual window frame
+			this.currentWindow = frame;
+		} else {
+			// neither
+			throw new SeleniumError("Not a frame: " + target);
+		}
+	}
+	this.currentPage = null;
 };
 
 BrowserBot.prototype.openLocation = function(target) {
@@ -362,6 +387,11 @@ KonquerorBrowserBot.prototype.setOpenLocation = function(loc) {
     var win = this.getCurrentWindow();
     win.location.href = "about:blank";
     win.location.href = loc;
+    // force the current polling thread to detect a page load
+    var marker = this.isPollingForLoad(win);
+    if (marker) {
+    	delete win.location[marker];
+    }
 };
 
 function SafariBrowserBot(frame) {
@@ -430,9 +460,20 @@ IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, origin
 
 IEBrowserBot.prototype.windowClosed = function(win) {
     try {
-		return win.closed;
+		var c = win.closed;
+		// frame windows claim to be non-closed when their parents are closed
+		// but you can't access their document objects in that case
+		if (!c) {
+			try {
+				win.document;
+			} catch (de) {
+				return true;
+			}
+		}
+		if (c == null) return true;
+		return c;
 	} catch (e) {
-		// Got an exception trying to read that property; we'll have to take a guess!
+		// Got an exception trying to read win.closed; we'll have to take a guess!
 		if (browserVersion.isHTA) {
 			if (e.message == "Permission denied") {
 				// the window is probably unloading, which means it's probably not closed yet
@@ -504,25 +545,25 @@ PageBot = function(pageWindow) {
     /**
      * Find a locator based on a prefix.
      */
-    this.findElementBy = function(locatorType, locator, inDocument) {
+    this.findElementBy = function(locatorType, locator, inDocument, inWindow) {
         var locatorFunction = this.locationStrategies[locatorType];
         if (! locatorFunction) {
             throw new SeleniumError("Unrecognised locator type: '" + locatorType + "'");
         }
-        return locatorFunction.call(this, locator, inDocument);
+        return locatorFunction.call(this, locator, inDocument, inWindow);
     };
 
     /**
      * The implicit locator, that is used when no prefix is supplied.
      */
-    this.locationStrategies['implicit'] = function(locator, inDocument) {
+    this.locationStrategies['implicit'] = function(locator, inDocument, inWindow) {
         if (locator.startsWith('//')) {
-            return this.locateElementByXPath(locator, inDocument);
+            return this.locateElementByXPath(locator, inDocument, inWindow);
         }
         if (locator.startsWith('document.')) {
-            return this.locateElementByDomTraversal(locator, inDocument);
+            return this.locateElementByDomTraversal(locator, inDocument, inWindow);
         }
-        return this.locateElementByIdentifier(locator, inDocument);
+        return this.locateElementByIdentifier(locator, inDocument, inWindow);
     };
 
 };
@@ -586,12 +627,12 @@ PageBot.prototype.findElement = function(locator) {
         locatorString = result[2];
     }
 
-    var element = this.findElementBy(locatorType, locatorString, this.currentDocument);
+    var element = this.findElementBy(locatorType, locatorString, this.currentDocument, this.currentWindow);
     if (element != null) {
         return element;
     }
     for (var i = 0; i < this.currentWindow.frames.length; i++) {
-        element = this.findElementBy(locatorType, locatorString, this.currentWindow.frames[i].document);
+        element = this.findElementBy(locatorType, locatorString, this.currentWindow.frames[i].document, this.currentWindow.frames[i]);
         if (element != null) {
             return element;
         }
@@ -605,23 +646,23 @@ PageBot.prototype.findElement = function(locator) {
  * In non-IE browsers, getElementById() does not search by name.  Instead, we
  * we search separately by id and name.
  */
-PageBot.prototype.locateElementByIdentifier = function(identifier, inDocument) {
-    return PageBot.prototype.locateElementById(identifier, inDocument)
-            || PageBot.prototype.locateElementByName(identifier, inDocument)
+PageBot.prototype.locateElementByIdentifier = function(identifier, inDocument, inWindow) {
+    return PageBot.prototype.locateElementById(identifier, inDocument, inWindow)
+            || PageBot.prototype.locateElementByName(identifier, inDocument, inWindow)
             || null;
 };
 
 /**
  * In IE, getElementById() also searches by name - this is an optimisation for IE.
  */
-IEPageBot.prototype.locateElementByIdentifer = function(identifier, inDocument) {
+IEPageBot.prototype.locateElementByIdentifer = function(identifier, inDocument, inWindow) {
     return inDocument.getElementById(identifier);
 };
 
 /**
  * Find the element with id - can't rely on getElementById, coz it returns by name as well in IE..
  */
-PageBot.prototype.locateElementById = function(identifier, inDocument) {
+PageBot.prototype.locateElementById = function(identifier, inDocument, inWindow) {
     var element = inDocument.getElementById(identifier);
     if (element && element.id === identifier) {
         return element;
@@ -635,7 +676,7 @@ PageBot.prototype.locateElementById = function(identifier, inDocument) {
  * Find an element by name, refined by (optional) element-filter
  * expressions.
  */
-PageBot.prototype.locateElementByName = function(locator, document) {
+PageBot.prototype.locateElementByName = function(locator, document, inWindow) {
     var elements = document.getElementsByTagName("*");
 
     var filters = locator.split(' ');
@@ -653,18 +694,23 @@ PageBot.prototype.locateElementByName = function(locator, document) {
 };
 
 /**
-* Finds an element using by evaluating the "document.*" string against the
-* current document object. Dom expressions must begin with "document."
+* Finds an element using by evaluating the specfied string.
 */
-PageBot.prototype.locateElementByDomTraversal = function(domTraversal, inDocument) {
-    if (domTraversal.indexOf("document.") != 0) {
-        return null;
-    }
+PageBot.prototype.locateElementByDomTraversal = function(domTraversal, inDocument, inWindow) {
 
-    // Trim the leading 'document'
-    domTraversal = domTraversal.substr(9);
-    var locatorScript = "inDocument." + domTraversal;
-    var element = eval(locatorScript);
+	var element = null;
+    try {
+    	if (browserVersion.isOpera) {
+    		element = inWindow.eval(domTraversal);
+    	} else {
+	    	with (inWindow) {
+	    		element = eval(domTraversal);
+	    	}
+	    }
+    } catch (e) {
+    	e.isSeleniumError = true;
+    	throw e;
+    }
 
     if (!element) {
         return null;
@@ -678,7 +724,7 @@ PageBot.prototype.locateElementByDomTraversal.prefix = "dom";
 * Finds an element identified by the xpath expression. Expressions _must_
 * begin with "//".
 */
-PageBot.prototype.locateElementByXPath = function(xpath, inDocument) {
+PageBot.prototype.locateElementByXPath = function(xpath, inDocument, inWindow) {
 
     // Trim any trailing "/": not valid xpath, and remains from attribute
     // locator.
@@ -746,7 +792,7 @@ PageBot.prototype.findElementByTagNameAndText = function(
     return null;
 };
 
-PageBot.prototype.findElementUsingFullXPath = function(xpath, inDocument) {
+PageBot.prototype.findElementUsingFullXPath = function(xpath, inDocument, inWindow) {
     // Use document.evaluate() if it's available
     if (inDocument.evaluate) {
         return inDocument.evaluate(xpath, inDocument, null, 0, null).iterateNext();
@@ -766,7 +812,7 @@ PageBot.prototype.findElementUsingFullXPath = function(xpath, inDocument) {
 * Finds a link element with text matching the expression supplied. Expressions must
 * begin with "link:".
 */
-PageBot.prototype.locateElementByLinkText = function(linkText, inDocument) {
+PageBot.prototype.locateElementByLinkText = function(linkText, inDocument, inWindow) {
     var links = inDocument.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {
         var element = links[i];
