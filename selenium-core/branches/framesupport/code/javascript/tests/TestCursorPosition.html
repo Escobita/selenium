@@ -18,46 +18,59 @@ Copyright 2004 ThoughtWorks, Inc
 <head>
   <meta content="text/html; charset=ISO-8859-1"
  http-equiv="content-type">
-  <title>Test Refresh</title>
+  <title>TestCursorPosition</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
   <tbody>
     <tr>
-      <td rowspan="1" colspan="3">Test Refresh<br>
+      <td rowspan="1" colspan="3">TestCursorPosition<br>
       </td>
     </tr>
     <tr>
       <td>open</td>
-      <td>../tests/html/test_page.slow.html</td>
+      <td>../tests/html/test_type_page1.html</td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <td>verifyLocation</td>
-      <td>*/tests/html/test_page.slow.html</td>
+      <td>verifyFailureOnNext</td>
+      <td>There is no cursor on this page!</td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <td>verifyTitle</td>
-      <td>Slow Loading Page<br>
-      </td>
-      <td>&nbsp;</td>
+      <td>verifyCursorPosition</td>
+      <td>username</td>
+      <td>8</td>
     </tr>
-</table>
-
-Change the text dynamically, then refresh to make sure the text reverts
-
-<table cellpadding="1" cellspacing="1" border="1">
-  <tbody>
     <tr>
-      <td>click</td>
-      <td>changeSpan</td>
+      <td>verifyValue</td>
+      <td>username</td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <td>assertTextPresent</td>
-      <td>Changed the text</td>
-      <td>&nbsp;</td>
+      <td>type</td>
+      <td>username</td>
+      <td>TestUser</td>
+    </tr>
+    <tr>
+      <td>setCursorPosition</td>
+      <td>username</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>verifyCursorPosition</td>
+      <td>username</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>setCursorPosition</td>
+      <td>username</td>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <td>verifyCursorPosition</td>
+      <td>username</td>
+      <td>8</td>
     </tr>
     <tr>
       <td>refreshAndWait</td>
@@ -65,38 +78,17 @@ Change the text dynamically, then refresh to make sure the text reverts
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <td>assertTextNotPresent</td>
-      <td>Changed the text</td>
-      <td>&nbsp;</td>
-    </tr>
-</table>
-
-Change the text dynamically again, then click on a button to do a slow refresh
-
-<table cellpadding="1" cellspacing="1" border="1">
-  <tbody>
-    <tr>
-      <td>click</td>
-      <td>changeSpan</td>
+      <td>verifyFailureOnNext</td>
+      <td>There is no cursor on this page!</td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <td>assertTextPresent</td>
-      <td>Changed the text</td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td>clickAndWait</td>
-      <td>slowRefresh</td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td>assertTextNotPresent</td>
-      <td>Changed the text</td>
-      <td>&nbsp;</td>
+      <td>verifyCursorPosition</td>
+      <td>username</td>
+      <td>8</td>
     </tr>
   </tbody>
 </table>
-
+Cursor location seems to be non-deterministic across browsers when there is no cursor.  This is filed as <a href="http://jira.openqa.org/browse/SEL-243">SEL-243</a>.
 </body>
 </html>

@@ -20,7 +20,7 @@
 // work around seem to make it necessary. Maybe as we learn more about what we need,
 // we can do this in a more "feature-centric" rather than "browser-centric" way.
 
-BrowserVersion = function() {
+var BrowserVersion = function() {
     this.name = navigator.appName;
 
     if (window.opera != null)
@@ -28,6 +28,24 @@ BrowserVersion = function() {
         this.browser = BrowserVersion.OPERA;
         this.isOpera = true;
         return;
+    }
+    
+    var self = this;
+    
+    var checkChrome = function() {
+    	var loc = window.document.location.href;
+    	try {
+    		loc = window.top.document.location.href;
+    	} catch (e) {
+    		// can't see the top (that means we might be chrome, but it's impossible to be sure)
+    		self.isChromeDetectable = "no, top location couldn't be read in this window";
+    	}
+    	
+    	if (/^chrome:\/\//.test(loc)) {
+    		self.isChrome = true;
+    	} else {
+    		self.isChrome = false;
+    	}
     }
 
     if (this.name == "Microsoft Internet Explorer")
@@ -69,6 +87,7 @@ BrowserVersion = function() {
         {
             this.firefoxVersion = result[1];
         }
+        checkChrome();
         return;
     }
 
@@ -77,6 +96,7 @@ BrowserVersion = function() {
         this.browser = BrowserVersion.MOZILLA;
         this.isMozilla = true;
         this.isGecko = true;
+        checkChrome();
         return;
     }
 
@@ -91,5 +111,5 @@ BrowserVersion.FIREFOX = "Firefox";
 BrowserVersion.MOZILLA = "Mozilla";
 BrowserVersion.UNKNOWN = "Unknown";
 
-browserVersion = new BrowserVersion();
+var browserVersion = new BrowserVersion();
 

@@ -91,11 +91,19 @@ function getApplicationWindow() {
 }
 
 function getSuiteFrame() {
-    return document.getElementById('testSuiteFrame');
+    var f = document.getElementById('testSuiteFrame');
+    if (f==null) {
+    	f = top;	// proxyInjection mode does not set myiframe
+    }
+    return f;
 }
 
 function getTestFrame(){
-    return document.getElementById('testFrame');
+    var f = document.getElementById('testFrame');
+    if (f==null) {
+    	f = top;	// proxyInjection mode does not set myiframe
+    }
+    return f;
 }
 
 function loadAndRunIfAuto() {
@@ -258,7 +266,10 @@ function addOnclick(suiteTable, rowNum) {
 
 function isQueryParameterTrue(name) {
     parameterValue = getQueryParameter(name);
-    return (parameterValue != null && parameterValue.toLowerCase() == "true");
+    if (parameterValue == null) return false;
+    if (parameterValue.toLowerCase() == "true") return true;
+    if (parameterValue.toLowerCase() == "on") return true;
+    return false;
 }
 
 function getQueryString() {
@@ -724,59 +735,62 @@ function testComplete() {
 }
 
 Selenium.prototype.doPause = function(waitTime) {
+    /** Wait for the specified amount of time (in milliseconds)
+    * @param waitTime the amount of time to sleep (in milliseconds)
+    */
     testLoop.pauseInterval = waitTime;
 };
 
+Selenium.prototype.doPause.dontCheckAlertsAndConfirms = true;
+
 Selenium.prototype.doBreak = function() {
+    /** Halt the currently running test, and wait for the user to press the Continue button.
+    * This command is useful for debugging, but be careful when using it, because it will
+    * force automated tests to hang until a user intervenes manually.
+    */
     document.getElementById('modeStep').checked = true;
     runInterval = -1;
 };
+
+Selenium.prototype.doStore = function(expression, variableName) {
+    /** This command is a synonym for storeExpression.
+    * @param expression the value to store
+    * @param variableName the name of a <a href="#storedVars">variable</a> in which the result is to be stored.
+    */
+    storedVars[variableName] = expression; 
+}
 
 /*
  * Click on the located element, and attach a callback to notify
  * when the page is reloaded.
  */
-Selenium.prototype.doModalDialogTest = function(returnValue) {
+// DGF TODO this code has been broken for some time... what is it trying to accomplish?
+Selenium.prototype.XXXdoModalDialogTest = function(returnValue) {
     this.browserbot.doModalDialogTest(returnValue);
 };
 
-/*
- * Store the value of a form input in a variable
- */
-Selenium.prototype.doStoreValue = function(target, varName) {
-    if (!varName) {
-        // Backward compatibility mode: read the ENTIRE text of the page
-        // and stores it in a variable with the name of the target
-        value = this.page().bodyText();
-        storedVars[target] = value;
-        return;
-    }
-    var element = this.page().findElement(target);
-    storedVars[varName] = getInputValue(element);
-};
-
-/*
- * Store the text of an element in a variable
- */
-Selenium.prototype.doStoreText = function(target, varName) {
-    var element = this.page().findElement(target);
-    storedVars[varName] = getText(element);
-};
-
-/*
- * Store the value of an element attribute in a variable
- */
-Selenium.prototype.doStoreAttribute = function(target, varName) {
-    storedVars[varName] = this.page().findAttribute(target);
-};
-
-/*
- * Store the result of a literal value
- */
-Selenium.prototype.doStore = function(value, varName) {
-    storedVars[varName] = value;
-};
-
-Selenium.prototype.doEcho = function(msg) {
-	currentTest.currentRow.cells[2].innerHTML = msg;
+Selenium.prototype.doEcho = function(message) {
+    /** Prints the specified message into the third table cell in your Selenese tables.
+    * Useful for debugging.
+    * @param message the message to print
+    */
+	currentTest.currentRow.cells[2].innerHTML = message;
 }
+
+Selenium.prototype.assertSelected = function(selectLocator, optionLocator) {
+	/**
+   * Verifies that the selected option of a drop-down satisfies the optionSpecifier.  <i>Note that this command is deprecated; you should use assertSelectedLabel, assertSelectedValue, assertSelectedIndex, or assertSelectedId instead.</i>
+   * 
+   * <p>See the select command for more information about option locators.</p>
+   * 
+   * @param selectLocator an <a href="#locators">element locator</a> identifying a drop-down menu
+   * @param optionLocator an option locator, typically just an option label (e.g. "John Smith")
+   */
+    var element = this.page().findElement(selectLocator);
+    var locator = this.optionLocatorFactory.fromLocatorString(optionLocator);
+    if (element.selectedIndex == -1)
+    {
+        Assert.fail("No option selected");
+    }
+    locator.assertSelected(element);
+};

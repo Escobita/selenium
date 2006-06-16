@@ -23,18 +23,40 @@ doneColor = "#FFFFCC";
 
 slowMode = false;
 
+var injectedSessionId;
 var cmd1 = document.createElement("div");
 var cmd2 = document.createElement("div");
 var cmd3 = document.createElement("div");
 var cmd4 = document.createElement("div");
 
 var postResult = "START";
-
-queryString = null;
+var pendingMessagesToRC = "";
+var debugMode = null;
+var relayToRC = null;	// override in injection.html
+var relayBotToRC = null;	// override in injection.html
+var queryString = null;
+var xmlHttpForCommandsAndResults = null;
+var restoreSeleniumState = function(){}; // override in injection.html
 
 function runTest() {
+    debugMode = getQueryVariable("debugMode");
+    if (debugMode=="false") {
+    	debugMode = false;
+    }
     var testAppFrame = document.getElementById('myiframe');
+    if (testAppFrame==null) {
+    	// proxy injection mode
+    	testAppFrame = window;
+        LOG.log = logToRc;
+    }
+    else
+    {
+        LOG.logHook = logToRc;
+    }
+
     selenium = Selenium.createForFrame(testAppFrame);
+    restoreSeleniumState();
+    window.selenium = selenium;
 
     commandFactory = new CommandHandlerFactory();
     commandFactory.registerAll(selenium);
@@ -53,10 +75,12 @@ function runTest() {
     	postResult = "START";
     };
 
-    document.getElementById("commandList").appendChild(cmd4);
-    document.getElementById("commandList").appendChild(cmd3);
-    document.getElementById("commandList").appendChild(cmd2);
-    document.getElementById("commandList").appendChild(cmd1);
+    if (document.getElementById("commandList") != null) {
+    	document.getElementById("commandList").appendChild(cmd4);
+        document.getElementById("commandList").appendChild(cmd3);
+        document.getElementById("commandList").appendChild(cmd2);
+        document.getElementById("commandList").appendChild(cmd1);
+    }
     
     var doContinue = getQueryVariable("continue");
 	if (doContinue != null) postResult = "OK";
@@ -109,10 +133,13 @@ function getQueryVariable(variable) {
 
 function buildBaseUrl() {
 	var baseUrl = getQueryVariable("baseUrl");
-	if (baseUrl != null) return baseUrl;
-	var lastSlash = window.location.href.lastIndexOf('/');
-	baseUrl = window.location.href.substring(0, lastSlash+1);
-	return baseUrl;
+        if (baseUrl != null) {
+        	return baseUrl;
+        }
+        var s=window.location.href
+        var slashPairOffset=s.indexOf("//") + "//".length
+        var pathSlashOffset=s.substring(slashPairOffset).indexOf("/")
+        return s.substring(0, slashPairOffset + pathSlashOffset) + "/selenium-server/core/";
 }
 
 function buildDriverParams() {
@@ -125,6 +152,9 @@ function buildDriverParams() {
     }
 
     var sessionId = getQueryVariable("sessionId");
+    if (sessionId == undefined) {
+    	sessionId = injectedSessionId;
+    }
     if (sessionId != undefined) {
         params = params + "&sessionId=" + sessionId;
     }
@@ -138,38 +168,80 @@ function preventBrowserCaching() {
 }   
 
 function nextCommand() {
-    xmlHttp = XmlHttp.create();
-    try {
-    	
-    	var url = buildBaseUrl();
-        if (postResult == "START") {
-        	url = url + "driver/?seleniumStart=true" + buildDriverParams() + preventBrowserCaching();
-        } else {
-        	url = url + "driver/?" + buildDriverParams() + preventBrowserCaching();
-        }
-        LOG.debug("XMLHTTPRequesting " + url);
-        xmlHttp.open("POST", url, true);
-        xmlHttp.onreadystatechange=handleHttpResponse;
-        xmlHttp.send(postResult);
-    } catch(e) {
-       	var s = 'xmlHttp returned:\n'
-        for (key in e) {
-            s += "\t" + key + " -> " + e[key] + "\n"
-        }
-        LOG.error(s);
-        return null;
+    var urlParms = (postResult == "START" ? "seleniumStart=true" : "");
+    xmlHttpForCommandsAndResults = XmlHttp.create();
+    sendToRC(postResult, urlParms, handleHttpResponse, xmlHttpForCommandsAndResults);
+}
+
+function sendMessageToRClater(message) {
+    pendingMessagesToRC = pendingMessagesToRC + message.replace(/[\n\r]/g, " ") + "\n";
+}
+
+function logToRc(message, logLevel) {
+    if (debugMode) {
+        sendToRC("logLevel=" + logLevel + ":" + message + "\n");
     }
+}
+
+function isArray(x) {
+    return ((typeof x)=="object") && (x["length"]!=null);
+}
+
+function serializeString(name, s) {
+    return name + "=unescape(\"" + escape(s) + "\");";
+}
+
+function serializeObject(name, x)
+{
+    var s = '';
+
+    if (isArray(x))
+    {
+        s = name + "=new Array(); ";
+        var len = x["length"];
+        for (var j = 0; j<len; j++)
+        {
+            s += serializeString(name + "[" + j + "]", x[j]);
+        }
+    }
+    else if (typeof x == "string")
+    {
+        return serializeString(name, x);
+    }
+    else
+    {
+        throw "unrecognized object not encoded: " + name + "(" + x + ")";
+    }
+    return s;
+}
+
+function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject) {
+    if (xmlHttpObject==null) {
+ 	xmlHttpObject = XmlHttp.create();
+    }
+    var url = buildBaseUrl() + "driver/?"
+    if (urlParms) {
+    	url += urlParms;
+    }
+    if (callback==null) {
+    	callback = function(){};
+    }
+    url += buildDriverParams() + preventBrowserCaching();
+    xmlHttpObject.open("POST", url, true);
+    xmlHttpObject.onreadystatechange = callback;
+    xmlHttpObject.send(pendingMessagesToRC + dataToBePosted);
+        
     return null;
 }
 
  function handleHttpResponse() {
- 	if (xmlHttp.readyState == 4) {
- 		if (xmlHttp.status == 200) {
- 			var command = extractCommand(xmlHttp);
+ 	if (xmlHttpForCommandsAndResults.readyState == 4) {
+ 		if (xmlHttpForCommandsAndResults.status == 200) {
+                	var command = extractCommand(xmlHttpForCommandsAndResults);
  			testLoop.currentCommand = command;
  			testLoop.beginNextTest();
  		} else {
- 			var s = 'xmlHttp returned: ' + xmlHttp.status + ": " + xmlHttp.statusText;
+ 			var s = 'xmlHttp returned: ' + xmlHttpForCommandsAndResults.status + ": " + xmlHttpForCommandsAndResults.statusText;
  			LOG.error(s);
  			testLoop.currentCommand = null;
  			setTimeout("testLoop.beginNextTest();", 2000);
@@ -209,18 +281,20 @@ function commandStarted(command) {
     innerHTML += ")";
     commandNode.innerHTML = innerHTML;
     commandNode.style.backgroundColor = workingColor;
-    document.getElementById("commandList").removeChild(cmd1);
-    document.getElementById("commandList").removeChild(cmd2);
-    document.getElementById("commandList").removeChild(cmd3);
-    document.getElementById("commandList").removeChild(cmd4);
-    cmd4 = cmd3;
-    cmd3 = cmd2;
-    cmd2 = cmd1;
-    cmd1 = commandNode;
-    document.getElementById("commandList").appendChild(cmd4);
-    document.getElementById("commandList").appendChild(cmd3);
-    document.getElementById("commandList").appendChild(cmd2);
-    document.getElementById("commandList").appendChild(cmd1);
+    if (document.getElementById("commandList") != null) {
+    	document.getElementById("commandList").removeChild(cmd1);
+        document.getElementById("commandList").removeChild(cmd2);
+        document.getElementById("commandList").removeChild(cmd3);
+        document.getElementById("commandList").removeChild(cmd4);
+        cmd4 = cmd3;
+        cmd3 = cmd2;
+        cmd2 = cmd1;
+        cmd1 = commandNode;
+        document.getElementById("commandList").appendChild(cmd4);
+        document.getElementById("commandList").appendChild(cmd3);
+        document.getElementById("commandList").appendChild(cmd2);
+        document.getElementById("commandList").appendChild(cmd1);
+    }
 }
 
 function commandComplete(result) {

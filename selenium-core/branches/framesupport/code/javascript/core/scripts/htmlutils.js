@@ -285,7 +285,7 @@ function describe(object, delimiter) {
     return props.join(delimiter || '\n');
 }
 
-PatternMatcher = function(pattern) {
+var PatternMatcher = function(pattern) {
     this.selectStrategy(pattern);
 };
 PatternMatcher.prototype = {

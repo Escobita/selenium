@@ -27,7 +27,7 @@
 // The window to which the commands will be sent.  For example, to click on a
 // popup window, first select that window, and then do a normal click command.
 
-BrowserBot = function(window) {
+var BrowserBot = function(window) {
     this.window = window;
     this.currentPage = null;
     this.currentWindow = window;
@@ -108,8 +108,12 @@ BrowserBot.prototype.hasAlerts = function() {
     return (this.recordedAlerts.length > 0) ;
 };
 
+BrowserBot.prototype.relayBotToRC = function() {}; // override in injection.html
+
 BrowserBot.prototype.getNextAlert = function() {
-    return this.recordedAlerts.shift();
+    var t = this.recordedAlerts.shift();
+    this.relayBotToRC("browserbot.recordedAlerts");
+    return t;
 };
 
 BrowserBot.prototype.hasConfirmations = function() {
@@ -117,7 +121,9 @@ BrowserBot.prototype.hasConfirmations = function() {
 };
 
 BrowserBot.prototype.getNextConfirmation = function() {
-    return this.recordedConfirmations.shift();
+    var t = this.recordedConfirmations.shift();
+    this.relayBotToRC("browserbot.recordedConfirmations");
+    return t;
 };
 
 BrowserBot.prototype.hasPrompts = function() {
@@ -125,7 +131,9 @@ BrowserBot.prototype.hasPrompts = function() {
 };
 
 BrowserBot.prototype.getNextPrompt = function() {
-    return this.recordedPrompts.shift();
+    var t = this.recordedPrompts.shift();
+    this.relayBotToRC("browserbot.recordedPrompts");
+    return t;
 };
 
 BrowserBot.prototype.windowClosed = function(win) {
@@ -221,14 +229,17 @@ BrowserBot.prototype.getCurrentPage = function() {
 };
 
 BrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify, browserBot) {
+    var self = this;
     windowToModify.alert = function(alert) {
         browserBot.recordedAlerts.push(alert);
+        self.relayBotToRC("browserbot.recordedAlerts");
     };
 
     windowToModify.confirm = function(message) {
         browserBot.recordedConfirmations.push(message);
         var result = browserBot.nextConfirmResult;
         browserBot.nextConfirmResult = true;
+        self.relayBotToRC("browserbot.recordedConfirmations");
         return result;
     };
 
@@ -237,6 +248,7 @@ BrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify,
         var result = !browserBot.nextConfirmResult ? null : browserBot.nextPromptResult;
         browserBot.nextConfirmResult = true;
         browserBot.nextPromptResult = '';
+        self.relayBotToRC("browserbot.recordedPrompts");
         return result;
     };
 
@@ -292,7 +304,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
     LOG.info("pollForLoad original ("+marker+"): " + originalHref);
     try {
 		var currentDocument = windowObject.document;
-	    var currentLocation = windowObject.document.location;
+	    var currentLocation = windowObject.location;
 	    var currentHref = currentLocation.href
 
 		var sameDoc = (originalDocument === currentDocument);
@@ -517,12 +529,18 @@ SafariBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToM
     };
 };
 
-PageBot = function(pageWindow) {
+var PageBot = function(pageWindow) {
     if (pageWindow) {
         this.currentWindow = pageWindow;
         this.currentDocument = pageWindow.document;
         this.location = pageWindow.location;
-        this.title = function() {return this.currentDocument.title;};
+        this.title = function() {
+        	var t = this.currentDocument.title;
+        	if (typeof(t) == "string") {
+        		t = t.trim();
+        	}
+        	return t;
+        };
     }
 
     // Register all locateElementBy* functions
@@ -546,7 +564,7 @@ PageBot = function(pageWindow) {
      * Find a locator based on a prefix.
      */
     this.findElementBy = function(locatorType, locator, inDocument, inWindow) {
-        var locatorFunction = this.locationStrategies[locatorType];
+        var locatorFunction = this.locationStrategies[locatorType];        
         if (! locatorFunction) {
             throw new SeleniumError("Unrecognised locator type: '" + locatorType + "'");
         }
@@ -588,27 +606,27 @@ PageBot.createForWindow = function(windowObject) {
     }
 };
 
-MozillaPageBot = function(pageWindow) {
+var MozillaPageBot = function(pageWindow) {
     PageBot.call(this, pageWindow);
 };
 MozillaPageBot.prototype = new PageBot();
 
-KonquerorPageBot = function(pageWindow) {
+var KonquerorPageBot = function(pageWindow) {
     PageBot.call(this, pageWindow);
 };
 KonquerorPageBot.prototype = new PageBot();
 
-SafariPageBot = function(pageWindow) {
+var SafariPageBot = function(pageWindow) {
     PageBot.call(this, pageWindow);
 };
 SafariPageBot.prototype = new PageBot();
 
-IEPageBot = function(pageWindow) {
+var IEPageBot = function(pageWindow) {
     PageBot.call(this, pageWindow);
 };
 IEPageBot.prototype = new PageBot();
 
-OperaPageBot = function(pageWindow) {
+var OperaPageBot = function(pageWindow) {
     PageBot.call(this, pageWindow);
 };
 OperaPageBot.prototype = new PageBot();
@@ -907,7 +925,7 @@ PageBot.prototype.replaceText = function(element, stringValue) {
     triggerEvent(element, 'focus', false);
     triggerEvent(element, 'select', true);
     element.value=stringValue;
-    if (!this.isChrome()) {
+    if (!browserVersion.isChrome) {
         // In chrome URL, The change event is already fired by setting the value.
         triggerEvent(element, 'change', true);
     }
@@ -928,7 +946,7 @@ MozillaPageBot.prototype.clickElement = function(element) {
 
     // Perform the link action if preventDefault was set.
     // In chrome URL, the link action is already executed by triggerMouseEvent.
-    if (!this.isChrome() && !preventDefault) {
+    if (!browserVersion.isChrome && !preventDefault) {
         // Try the element itself, as well as it's parent - this handles clicking images inside links.
         if (element.href) {
             this.currentWindow.location.href = element.href;
@@ -1129,7 +1147,10 @@ PageBot.prototype.getAllLinks = function() {
 
 PageBot.prototype.setContext = function(strContext, logLevel) {
      //set the current test title
-    document.getElementById("context").innerHTML=strContext;
+    var ctx = document.getElementById("context");
+    if (ctx != null) { 
+    	ctx.innerHTML=strContext;
+    }
     if (logLevel!=null) {
     	LOG.setLogLevelThreshold(logLevel);
     }
@@ -1148,7 +1169,11 @@ PageBot.prototype.goForward = function() {
 };
 
 PageBot.prototype.close = function() {
-    this.currentWindow.eval("window.close();");
+	if (browserVersion.isChrome) {
+		this.currentWindow.close();
+	} else {
+	    this.currentWindow.eval("window.close();");
+	}
 };
 
 PageBot.prototype.refresh = function() {
@@ -1214,10 +1239,25 @@ PageBot.prototype.selectElements = function(filterExpr, elements, defaultFilterT
     return this.selectElementsBy(filterType, filterExpr, elements);
 };
 
-PageBot.prototype.isChrome = function() {
-    return false;
-};
+/**
+ * Find an element by class
+ */
+PageBot.prototype.locateElementByClass = function(locator, document) {
+    return Element.findFirstMatchingChild(document, 
+	    function(element) { 
+		    return element.className == locator
+		}
+    );
+}
 
-MozillaPageBot.prototype.isChrome = function() {
-    return this.location.href.startsWith("chrome://");
-};
+/**
+ * Find an element by alt
+ */
+PageBot.prototype.locateElementByAlt = function(locator, document) {
+    return Element.findFirstMatchingChild(document,
+	    function(element) {
+		    return element.alt == locator
+		}
+    );
+}
+
