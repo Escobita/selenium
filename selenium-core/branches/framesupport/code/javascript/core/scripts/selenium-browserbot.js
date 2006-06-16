@@ -30,6 +30,7 @@
 BrowserBot = function(window) {
     this.window = window;
     this.currentPage = null;
+    this.currentWindow = window;
     this.currentWindowName = null;
 
     this.modalDialogTest = null;
@@ -59,7 +60,9 @@ BrowserBot = function(window) {
 
     this.isNewPageLoaded = function() {
     	if (this.pageLoadError) {
-    		throw this.pageLoadError;
+    		var e = this.pageLoadError;
+    		this.pageLoadError = null;
+    		throw e;
     	}
         return self.newPageLoaded;
     };
@@ -151,12 +154,16 @@ BrowserBot.prototype.selectWindow = function(target) {
     // we've moved to a new page - clear the current one
     this.currentPage = null;
     this.currentWindowName = null;
+    this.currentWindow = this.window;
     if (target && target != "null") {
-        // If window exists
-        if (this.getWindowByName(target)) {
-            this.currentWindowName = target;
-        }
+    	this.currentWindow = this.getWindowByName(target);
+        this.currentWindowName = target;
     }
+};
+
+BrowserBot.prototype.selectFrame = function(target) {
+	var frameElement = this.getCurrentPage().findElement(target);
+	this.currentWindow = frameElement.contentWindow;
 };
 
 BrowserBot.prototype.openLocation = function(target) {
@@ -259,7 +266,6 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 
     LOG.info("pollForLoad original ("+marker+"): " + originalHref);
     try {
-
 		var currentDocument = windowObject.document;
 	    var currentLocation = windowObject.document.location;
 	    var currentHref = currentLocation.href
@@ -326,10 +332,7 @@ BrowserBot.prototype.getWindowByName = function(windowName, doNotModify) {
 };
 
 BrowserBot.prototype.getCurrentWindow = function(doNotModify) {
-    var testWindow = this.window;
-    if (this.currentWindowName != null) {
-        testWindow = this.getWindowByName(this.currentWindowName, doNotModify);
-    }
+    var testWindow = this.currentWindow;
     if (!doNotModify) {
     	this.modifyWindow(testWindow);
     }
@@ -420,7 +423,8 @@ IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, origin
 		    this.pageLoadError = null;
 		    return;
 		}
-        throw this.pageLoadError;
+		//handy for debugging!
+        //throw this.pageLoadError;
     }
 };
 
