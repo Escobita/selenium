@@ -43,7 +43,7 @@ function runTest() {
     if (debugMode=="false") {
     	debugMode = false;
     }
-    var testAppWindow = window.open('Blank.html', 'main');
+    var testAppWindow = window.open('Blank.html?start=true', 'main');
 	try {
 		var windowHeight = 500;
 		if (window.outerHeight) {

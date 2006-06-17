@@ -115,7 +115,7 @@ function start() {
 	window.resizeTo(1200, 500);
 	window.moveTo(window.screenX, 0);
 	
-    appWindow = window.open('TestRunner-splash.html', 'main');
+    appWindow = window.open('TestRunner-splash.html?start=true', 'main');
 	try {
 		var windowHeight = 500;
 		if (window.outerHeight) {

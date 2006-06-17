@@ -201,18 +201,20 @@ BrowserBot.prototype.selectFrame = function(target) {
 
 BrowserBot.prototype.openLocation = function(target) {
     // We're moving to a new page - clear the current one
+    var win = this.getCurrentWindow(true);
+    LOG.info("openLocation newPageLoaded = false");
     this.currentPage = null;
     this.newPageLoaded = false;
 
-    this.setOpenLocation(target);
+    this.setOpenLocation(win, target);
 };
 
 BrowserBot.prototype.setIFrameLocation = function(iframe, location) {
     iframe.src = location;
 };
 
-BrowserBot.prototype.setOpenLocation = function(loc) {
-    var win = this.getCurrentWindow();
+BrowserBot.prototype.setOpenLocation = function(win, loc) {
+    
     // is there a Permission Denied risk here? setting a timeout breaks Firefox
     //win.setTimeout(function() { win.location.href = loc; }, 0);
     win.location.href = loc;
@@ -312,7 +314,17 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	    var sameHref = (originalHref === currentHref);
 	    var rs = windowObject.document.readyState;
 
-		if (rs == null) rs = 'complete';
+		if (rs == null) {
+			if (    typeof currentDocument.getElementsByTagName != 'undefined'
+		         && typeof currentDocument.getElementById != 'undefined' 
+		         && ( currentDocument.getElementsByTagName('body')[0] != null
+		              || currentDocument.body != null ) ) {
+		
+		        rs = 'complete';
+		    } else {
+		    	LOG.info("pollForLoad readyState was null and DOM appeared to not be ready yet");
+		    }
+		}
 
 	    if (!(sameDoc && sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
 	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
@@ -325,7 +337,11 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	        }
 	        newMarker = this.isPollingForLoad(windowObject);
 	        LOG.info("pollForLoad ("+marker+") restarting " + newMarker);
-	        loadFunction();
+	        if (/(TestRunner-splash|Blank)\.html\?start=true$/.test(currentHref)) {
+	        	LOG.info("pollForLoad Oh, it's just the starting page.  Never mind!");
+	        } else {
+	        	loadFunction();
+	        }
 	        return;
 	    }
 	    var self = this;
@@ -393,10 +409,9 @@ KonquerorBrowserBot.prototype.setIFrameLocation = function(iframe, location) {
     iframe.src = location;
 };
 
-KonquerorBrowserBot.prototype.setOpenLocation = function(loc) {
+KonquerorBrowserBot.prototype.setOpenLocation = function(win, loc) {
     // Window doesn't fire onload event when setting src to the current value,
     // so we set it to blank first.
-    var win = this.getCurrentWindow();
     win.location.href = "about:blank";
     win.location.href = loc;
     // force the current polling thread to detect a page load
