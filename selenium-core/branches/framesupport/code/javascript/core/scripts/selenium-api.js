@@ -429,7 +429,7 @@ Selenium.prototype.doOpen = function(url) {
     return SELENIUM_PROCESS_WAIT;
 };
 
-Selenium.prototype.doMakeThisTheDefaultWindow = function() {
+Selenium.prototype.makeThisTheDefaultWindow = function() {
 	this.browserbot.makeThisTheDefaultWindow();
 };
 	
