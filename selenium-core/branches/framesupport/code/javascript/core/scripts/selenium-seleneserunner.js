@@ -43,10 +43,27 @@ function runTest() {
     if (debugMode=="false") {
     	debugMode = false;
     }
-    var testAppFrame = document.getElementById('myiframe');
-    if (testAppFrame==null) {
+    var testAppWindow = window.open('Blank.html', 'main');
+	try {
+		var windowHeight = 500;
+		if (window.outerHeight) {
+			windowHeight = window.outerHeight;
+		} else if (document.documentElement && document.documentElement.offsetHeight) {
+			windowHeight = document.documentElement.offsetHeight;
+		}
+		
+		if (window.screenLeft && !window.screenX) window.screenX = window.screenLeft;
+		if (window.screenTop && !window.screenY) window.screenY = window.screenTop;
+		
+		appWindow.resizeTo(1200, screen.availHeight - windowHeight - 60);
+		appWindow.moveTo(window.screenX, window.screenY + windowHeight + 25);
+	} catch (e) {
+		LOG.error("Couldn't resize app window");
+		LOG.exception(e);
+	}
+    if (testAppWindow==null) {
     	// proxy injection mode
-    	testAppFrame = window;
+    	testAppWindow = window;
         LOG.log = logToRc;
     }
     else
@@ -54,7 +71,7 @@ function runTest() {
         LOG.logHook = logToRc;
     }
 
-    selenium = Selenium.createForFrame(testAppFrame);
+    selenium = Selenium.createForWindow(testAppWindow);
     restoreSeleniumState();
     window.selenium = selenium;
 
@@ -338,14 +355,6 @@ function delay(millis) {
     }
 }
 
-function getIframeDocument(iframe) {
-    if (iframe.contentDocument) {
-        return iframe.contentDocument;
-    }
-    else {
-        return iframe.contentWindow.document;
-    }
-}
 
 // Parses a URI query string into a SeleniumCommand object
 function createCommandFromRequest(commandRequest) {
