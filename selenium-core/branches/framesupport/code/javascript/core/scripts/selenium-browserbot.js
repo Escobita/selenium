@@ -315,19 +315,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 		var sameDoc = (originalDocument === currentDocument);
 	    var sameLoc = (originalLocation === currentLocation);
 	    var sameHref = (originalHref === currentHref);
-	    var rs = windowObject.document.readyState;
-
-		if (rs == null) {
-			if (    typeof currentDocument.getElementsByTagName != 'undefined'
-		         && typeof currentDocument.getElementById != 'undefined' 
-		         && ( currentDocument.getElementsByTagName('body')[0] != null
-		              || currentDocument.body != null ) ) {
-		
-		        rs = 'complete';
-		    } else {
-		    	LOG.info("pollForLoad readyState was null and DOM appeared to not be ready yet");
-		    }
-		}
+	    var rs = this.getReadyState(windowObject, currentDocument);
 
 	    if (!(sameDoc && sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
 	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
@@ -356,6 +344,37 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 		LOG.exception(e);
 		this.pageLoadError = e;
 	}
+};
+
+BrowserBot.prototype.getReadyState = function(windowObject, currentDocument) {
+	var rs = currentDocument.readyState;
+	LOG.info("getReadyState name = " + windowObject.name);
+	LOG.info("getReadyState href = " + windowObject.location.href);
+	if (rs == null) {
+		if (    typeof currentDocument.getElementsByTagName != 'undefined'
+	         && typeof currentDocument.getElementById != 'undefined' 
+	         && ( currentDocument.getElementsByTagName('body')[0] != null
+	              || currentDocument.body != null ) ) {
+	              	if (windowObject.frameElement && windowObject.location.href == "about:blank" && windowObject.frameElement.src != "about:blank") {
+						LOG.info("getReadyState not loaded, frame location was about:blank, but frame src = " + windowObject.frameElement.src);
+						return null;
+					}
+	              	LOG.info("getReadyState = windowObject.frames.length = " + windowObject.frames.length);
+	              	for (var i = 0; i < windowObject.frames.length; i++) {
+	              		LOG.info("i = " + i);
+	              		if (this.getReadyState(windowObject.frames[i], windowObject.frames[i].document) != 'complete') {
+	              			LOG.info("getReadyState aha! the nested frame " + windowObject.frames[i].name + " wasn't ready!");
+	              			return null;
+	              		}
+	              	}
+	
+	        rs = 'complete';
+	    } else {
+	    	LOG.info("pollForLoad readyState was null and DOM appeared to not be ready yet");
+	    }
+	}
+	LOG.info("getReadyState returning " + rs);
+	return rs;
 };
 
 BrowserBot.prototype.reschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
