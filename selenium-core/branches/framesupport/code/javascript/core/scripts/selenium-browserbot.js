@@ -27,10 +27,11 @@
 // The window to which the commands will be sent.  For example, to click on a
 // popup window, first select that window, and then do a normal click command.
 
-var BrowserBot = function(window) {
-    this.window = window;
+var BrowserBot = function(win) {
+    this.window = win;
+    this.buttonWindow = window;
     this.currentPage = null;
-    this.currentWindow = window;
+    this.currentWindow = win;
     this.currentWindowName = null;
 
     this.modalDialogTest = null;
@@ -151,10 +152,10 @@ BrowserBot.prototype.modifyWindow = function(win) {
     if (!win[this.uniqueId]) {
         win[this.uniqueId] = true;
         this.modifyWindowToRecordPopUpDialogs(win, this);
-        this.modifySeparateTestWindowToDetectPageLoads(win);
         this.currentPage = PageBot.createForWindow(win);
         this.newPageLoaded = false;
     }
+    this.modifySeparateTestWindowToDetectPageLoads(win);
     return win;
 };
 
@@ -201,7 +202,7 @@ BrowserBot.prototype.selectFrame = function(target) {
 
 BrowserBot.prototype.openLocation = function(target) {
     // We're moving to a new page - clear the current one
-    var win = this.getCurrentWindow(true);
+    var win = this.getCurrentWindow();
     LOG.info("openLocation newPageLoaded = false");
     this.currentPage = null;
     this.newPageLoaded = false;
@@ -289,8 +290,9 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
     windowObject.document.location[marker] = true;
     windowObject[this.uniqueId] = marker;
     this.pollingForLoad[marker] = true;
-    this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.document.location, windowObject.document.location.href, marker);
+    this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.location, windowObject.location.href, marker);
 };
+
 
 /**
  * Set up a polling timer that will keep checking the readyState of the document until it's complete.
@@ -298,13 +300,14 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
  * or href is different from the original one.
  */
 BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
-    if (this.windowClosed(windowObject)) {
-    	delete this.pollingForLoad[marker];
-        return;
-    }
-
     LOG.info("pollForLoad original ("+marker+"): " + originalHref);
     try {
+	    if (this.windowClosed(windowObject)) {
+	    	LOG.info("pollForLoad WINDOW CLOSED ("+marker+")");
+	    	delete this.pollingForLoad[marker];
+	        return;
+	    }
+	    
 		var currentDocument = windowObject.document;
 	    var currentLocation = windowObject.location;
 	    var currentHref = currentLocation.href
@@ -339,19 +342,44 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	        LOG.info("pollForLoad ("+marker+") restarting " + newMarker);
 	        if (/(TestRunner-splash|Blank)\.html\?start=true$/.test(currentHref)) {
 	        	LOG.info("pollForLoad Oh, it's just the starting page.  Never mind!");
-	        } else {
+	        } else if (this.currentWindow[this.uniqueId] == newMarker) {
 	        	loadFunction();
+	        } else {
+	        	LOG.info("pollForLoad page load detected in non-current window; ignoring");
 	        }
 	        return;
 	    }
-	    var self = this;
 	    LOG.info("pollForLoad continue ("+marker+"): " + currentHref);
-	    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
+	    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
 	} catch (e) {
 		LOG.error("Exception during pollForLoad; this should get noticed soon!");
 		LOG.exception(e);
 		this.pageLoadError = e;
 	}
+};
+
+BrowserBot.prototype.reschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
+	var self = this;
+	window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
+};
+
+/** This function isn't used normally, but is useful for debugging pollers 
+* To enable it, rename it to "reschedulePoller", so it will override the 
+* existing reschedulePoller function
+*/
+BrowserBot.prototype.XXXreschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
+	var doc = this.buttonWindow.document;
+	var button = doc.createElement("button");
+	var buttonName = doc.createTextNode(marker + " - " + windowObject.name);
+	button.appendChild(buttonName);
+	var tools = doc.getElementById("tools");
+	var self = this;
+	button.onclick = function() {
+		tools.removeChild(button);
+		self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
+	};
+	tools.appendChild(button);
+	window.setTimeout(button.onclick, 500);
 };
 
 BrowserBot.prototype.isPollingForLoad = function(win) {
@@ -470,13 +498,13 @@ IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, origin
 		if (this.pageUnloading) {
 			var self = this;
 		    LOG.warn("pollForLoad UNLOADING ("+marker+"): caught exception while firing events on unloading page: " + this.pageLoadError.message);
-		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
+		    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
 		    this.pageLoadError = null;
             return;
         } else if (this.pageLoadError.message == "Permission denied" && this.permDeniedCount++ < 4) {
         	var self = this;
 		    LOG.warn("pollForLoad ("+marker+"): PERMISSION DENIED ("+this.permDeniedCount+"), waiting to see if it goes away");
-		    window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
+		    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
 		    this.pageLoadError = null;
 		    return;
 		}
