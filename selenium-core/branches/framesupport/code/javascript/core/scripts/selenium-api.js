@@ -1114,7 +1114,6 @@ Selenium.prototype.getCursorPosition = function(locator) {
    var doc = this.page().currentDocument;
    var win = this.browserbot.getCurrentWindow();
 	if( doc.selection && !browserVersion.isOpera){
-		
 		var selectRange = doc.selection.createRange().duplicate();
 		var elementRange = element.createTextRange();
 		selectRange.move("character",0);
@@ -1129,7 +1128,7 @@ Selenium.prototype.getCursorPosition = function(locator) {
 		var answer = String(elementRange.text).replace(/\r/g,"").length;
 		return answer;
 	} else {
-		if (typeof(element.selectionStart) != undefined) {
+		if (typeof(element.selectionStart) != "undefined") {
 			if (win.getSelection && typeof(win.getSelection().rangeCount) != undefined && win.getSelection().rangeCount == 0) {
 				Assert.fail("There is no cursor on this page!");
 			}
