@@ -75,6 +75,7 @@ function TestLoop(commandFactory) {
     this.resume = function() {
     	LOG.debug("testLoop.resume() - actually execute");
         try {
+        	selenium.browserbot.runScheduledPollers();
             this.executeCurrentCommand();
             this.waitForConditionStart = new Date().getTime();
             this.continueTestWhenConditionIsTrue();
@@ -136,6 +137,7 @@ function TestLoop(commandFactory) {
      */
     this.continueTestWhenConditionIsTrue = function () {
     	LOG.debug("testLoop.continueTestWhenConditionIsTrue()");
+    	selenium.browserbot.runScheduledPollers();
         try {
             if (this.waitForCondition == null || this.waitForCondition()) {
             	LOG.debug("condition satisfied; let's continueTest()");

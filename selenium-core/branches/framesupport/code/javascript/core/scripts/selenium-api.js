@@ -471,12 +471,15 @@ Selenium.prototype.doWaitForPopUp = function(windowID, timeout) {
     }
     
     testLoop.waitForCondition = function () {
-        var targetWindow = selenium.browserbot.getWindowByName(windowID);
+        var targetWindow = selenium.browserbot.getWindowByName(windowID, true);
         if (!targetWindow) return false;
         if (!targetWindow.location) return false;
         if ("about:blank" == targetWindow.location) return false;
         if (!targetWindow.document) return false;
-        if (!targetWindow.document.readyState) return true;
+        if (!selenium.browserbot.window.document.readyState) {
+    		// This is Firefox, with no readyState extension
+    		return true;
+    	}
         if ('complete' != targetWindow.document.readyState) return false;
         return true;
     };

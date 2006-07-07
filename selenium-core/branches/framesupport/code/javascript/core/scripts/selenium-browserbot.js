@@ -34,6 +34,7 @@ var BrowserBot = function(win) {
     this.currentWindow = win;
     this.currentWindowName = null;
 
+	this.windowPollers = new Array();
     this.modalDialogTest = null;
     this.recordedAlerts = new Array();
     this.recordedConfirmations = new Array();
@@ -348,41 +349,48 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 
 BrowserBot.prototype.getReadyState = function(windowObject, currentDocument) {
 	var rs = currentDocument.readyState;
-	LOG.info("getReadyState name = " + windowObject.name);
-	LOG.info("getReadyState href = " + windowObject.location.href);
 	if (rs == null) {
-		if (    typeof currentDocument.getElementsByTagName != 'undefined'
-	         && typeof currentDocument.getElementById != 'undefined' 
-	         && ( currentDocument.getElementsByTagName('body')[0] != null
-	              || currentDocument.body != null ) ) {
-	              	if (windowObject.frameElement && windowObject.location.href == "about:blank" && windowObject.frameElement.src != "about:blank") {
-						LOG.info("getReadyState not loaded, frame location was about:blank, but frame src = " + windowObject.frameElement.src);
-						return null;
-					}
-	              	LOG.info("getReadyState = windowObject.frames.length = " + windowObject.frames.length);
-	              	for (var i = 0; i < windowObject.frames.length; i++) {
-	              		LOG.info("i = " + i);
-	              		if (this.getReadyState(windowObject.frames[i], windowObject.frames[i].document) != 'complete') {
-	              			LOG.info("getReadyState aha! the nested frame " + windowObject.frames[i].name + " wasn't ready!");
-	              			return null;
-	              		}
-	              	}
-	
-	        rs = 'complete';
-	    } else {
-	    	LOG.info("pollForLoad readyState was null and DOM appeared to not be ready yet");
-	    }
+		if (this.buttonWindow.document.readyState == null) {
+			// uh oh!  we're probably on Firefox with no readyState extension installed!
+			// We'll have to just take a guess as to when the document is loaded; this guess
+			// will never be perfect. :-(
+			if (    typeof currentDocument.getElementsByTagName != 'undefined'
+		         && typeof currentDocument.getElementById != 'undefined' 
+		         && ( currentDocument.getElementsByTagName('body')[0] != null
+		              || currentDocument.body != null ) ) {
+		              	if (windowObject.frameElement && windowObject.location.href == "about:blank" && windowObject.frameElement.src != "about:blank") {
+							LOG.info("getReadyState not loaded, frame location was about:blank, but frame src = " + windowObject.frameElement.src);
+							return null;
+						}
+		              	LOG.info("getReadyState = windowObject.frames.length = " + windowObject.frames.length);
+		              	for (var i = 0; i < windowObject.frames.length; i++) {
+		              		LOG.info("i = " + i);
+		              		if (this.getReadyState(windowObject.frames[i], windowObject.frames[i].document) != 'complete') {
+		              			LOG.info("getReadyState aha! the nested frame " + windowObject.frames[i].name + " wasn't ready!");
+		              			return null;
+		              		}
+		              	}
+		
+		        rs = 'complete';
+		    } else {
+		    	LOG.info("pollForLoad readyState was null and DOM appeared to not be ready yet");
+		    }
+		}
 	}
 	LOG.info("getReadyState returning " + rs);
 	return rs;
 };
 
-BrowserBot.prototype.reschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
+/** This function isn't used normally, but was the way we used to schedule pollers:
+  asynchronously executed autonomous units.  This is deprecated, but remains here
+  for future reference.
+*/
+BrowserBot.prototype.XXXreschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
 	var self = this;
 	window.setTimeout(function() {self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);}, 500);
 };
 
-/** This function isn't used normally, but is useful for debugging pollers 
+/** This function isn't used normally, but is useful for debugging asynchronous pollers 
 * To enable it, rename it to "reschedulePoller", so it will override the 
 * existing reschedulePoller function
 */
@@ -399,6 +407,22 @@ BrowserBot.prototype.XXXreschedulePoller = function(loadFunction, windowObject, 
 	};
 	tools.appendChild(button);
 	window.setTimeout(button.onclick, 500);
+};
+
+BrowserBot.prototype.reschedulePoller = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
+	var self = this;
+	var pollerFunction = function() {
+		self.pollForLoad(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
+	};
+	this.windowPollers.push(pollerFunction);
+};
+
+BrowserBot.prototype.runScheduledPollers = function() {
+	var oldPollers = this.windowPollers;
+	this.windowPollers = new Array();
+	for (var i = 0; i < oldPollers.length; i++) {
+		oldPollers[i].call();
+	}
 };
 
 BrowserBot.prototype.isPollingForLoad = function(win) {
@@ -540,11 +564,19 @@ IEBrowserBot.prototype.windowClosed = function(win) {
 		if (!c) {
 			try {
 				win.document;
-			} catch (de) {
-				return true;
+			} catch (de) {	
+				if (de.message == "Permission denied") {
+					// the window is probably unloading, which means it's probably not closed yet
+					return false;
+				} else {
+					// this is probably one of those frame window situations
+					return true;
+				}
 			}
 		}
-		if (c == null) return true;
+		if (c == null) {
+			return true;
+		}
 		return c;
 	} catch (e) {
 		// Got an exception trying to read win.closed; we'll have to take a guess!
