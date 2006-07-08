@@ -67,6 +67,8 @@ runInterval = 0;
 selenium = null;
 queryString = null;
 
+warned = null;
+
 function setRunInterval() {
     // Get the value of the checked runMode option.
     // There should be a way of getting the value of the "group", but I don't know how.
@@ -133,7 +135,7 @@ function start() {
 		LOG.error("Couldn't resize app window");
 		LOG.exception(e);
 	}
-
+	
 	//LOG.show();
 
 	queryString = null;
@@ -156,6 +158,11 @@ function loadSuiteFrame() {
     if (tempRunInterval) {
         runInterval = tempRunInterval;
     }
+    
+    if (window.document.readyState == null && !isAutomatedRun() && !warned) {
+		alert("Beware!  Mozilla bug 300992 means that we can't always reliably detect when a new page has loaded.  Install the Selenium IDE extension or the readyState extension available from selenium.openqa.org to make page load detection more reliable.");
+		warned = true;
+	}
 
     document.getElementById("modeRun").onclick = setRunInterval;
     document.getElementById('modeWalk').onclick = setRunInterval;
