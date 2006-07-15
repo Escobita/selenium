@@ -317,8 +317,13 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	    var sameLoc = (originalLocation === currentLocation);
 	    var sameHref = (originalHref === currentHref);
 	    var rs = this.getReadyState(windowObject, currentDocument);
+	    var markedLoc = currentLocation[marker];
+	    if (browserVersion.isKonqueror || browserVersion.isSafari) {
+	    	// the mark disappears too early on these browsers
+	    	markedLoc = true;
+	    }
 
-	    if (!(sameDoc && sameLoc && sameHref && currentLocation[marker]) && rs == 'complete') {
+	    if (!(sameDoc && sameLoc && sameHref && markedLoc) && rs == 'complete') {
 	        LOG.info("pollForLoad FINISHED ("+marker+"): " + rs + " (" + currentHref + ")");
 	        delete this.pollingForLoad[marker];
 	        this.modifyWindow(windowObject);
