@@ -575,11 +575,13 @@ IEBrowserBot.prototype.windowClosed = function(win) {
 					return false;
 				} else {
 					// this is probably one of those frame window situations
+					LOG.debug("IEBrowserBot.windowClosed: couldn't read win.document, assuming closed: " + de.message);
 					return true;
 				}
 			}
 		}
 		if (c == null) {
+			LOG.debug("IEBrowserBot.windowClosed: win.closed was null, assuming closed");
 			return true;
 		}
 		return c;

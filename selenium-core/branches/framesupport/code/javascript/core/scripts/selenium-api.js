@@ -475,6 +475,20 @@ Selenium.prototype.doWaitForPopUp = function(windowID, timeout) {
         if (!targetWindow) return false;
         if (!targetWindow.location) return false;
         if ("about:blank" == targetWindow.location) return false;
+        if (browserVersion.isKonqueror) {
+        	if ("/" == targetWindow.location.href) {
+        		// apparently Konqueror uses this as the temporary location, instead of about:blank
+        		return false;
+        	}
+        }
+        if (browserVersion.isSafari) {
+        	if(targetWindow.location.href == selenium.browserbot.buttonWindow.location.href) {
+        		// Apparently Safari uses this as the temporary location, instead of about:blank
+        		// what a world!
+        		LOG.debug("DGF what a world!");
+        		return false;
+        	}
+        }
         if (!targetWindow.document) return false;
         if (!selenium.browserbot.window.document.readyState) {
     		// This is Firefox, with no readyState extension
