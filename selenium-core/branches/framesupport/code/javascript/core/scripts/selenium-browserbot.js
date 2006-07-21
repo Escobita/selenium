@@ -302,6 +302,14 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
  */
 BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
     LOG.info("pollForLoad original ("+marker+"): " + originalHref);
+    var currentDocument;
+    var currentLocation;
+    var currentHref;
+    var sameDoc;
+    var sameLoc;
+    var sameHref;
+    var rs;
+    var markedLoc;
     try {
 	    if (this.windowClosed(windowObject)) {
 	    	LOG.info("pollForLoad WINDOW CLOSED ("+marker+")");
@@ -309,15 +317,16 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	        return;
 	    }
 	    
-		var currentDocument = windowObject.document;
-	    var currentLocation = windowObject.location;
-	    var currentHref = currentLocation.href
+            currentDocument = windowObject.document;
+            currentLocation = windowObject.location;
+            currentHref = currentLocation.href
 
-		var sameDoc = (originalDocument === currentDocument);
-	    var sameLoc = (originalLocation === currentLocation);
-	    var sameHref = (originalHref === currentHref);
-	    var rs = this.getReadyState(windowObject, currentDocument);
-	    var markedLoc = currentLocation[marker];
+            sameDoc = (originalDocument === currentDocument);
+            sameLoc = (originalLocation === currentLocation);
+            sameHref = (originalHref === currentHref);
+            rs = this.getReadyState(windowObject, currentDocument);
+            markedLoc = currentLocation[marker];
+            
 	    if (browserVersion.isKonqueror || browserVersion.isSafari) {
 	    	// the mark disappears too early on these browsers
 	    	markedLoc = true;
@@ -346,7 +355,7 @@ BrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, original
 	    LOG.info("pollForLoad continue ("+marker+"): " + currentHref);
 	    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
 	} catch (e) {
-		LOG.error("Exception during pollForLoad; this should get noticed soon!");
+        LOG.error("Exception during pollForLoad; this should get noticed soon (" + e.message + ")!");
 		LOG.exception(e);
 		this.pageLoadError = e;
 	}
@@ -382,6 +391,10 @@ BrowserBot.prototype.getReadyState = function(windowObject, currentDocument) {
 		    }
 		}
 	}
+        else if (rs == "loading" && browserVersion.isIE) {
+        	LOG.info("pageUnloading = true!!!!");
+        	this.pageUnloading = true;
+        }
 	LOG.info("getReadyState returning " + rs);
 	return rs;
 };
@@ -541,22 +554,23 @@ IEBrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(wind
 };
 
 IEBrowserBot.prototype.pollForLoad = function(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker) {
-	BrowserBot.prototype.pollForLoad.call(this, loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
-	if (this.pageLoadError) {
-		if (this.pageUnloading) {
-			var self = this;
-		    LOG.warn("pollForLoad UNLOADING ("+marker+"): caught exception while firing events on unloading page: " + this.pageLoadError.message);
-		    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
-		    this.pageLoadError = null;
+    BrowserBot.prototype.pollForLoad.call(this, loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
+    if (this.pageLoadError) {
+	if (this.pageUnloading) {
+	    var self = this;
+	    LOG.warn("pollForLoad UNLOADING ("+marker+"): caught exception while firing events on unloading page: " + this.pageLoadError.message);
+	    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
+	    this.pageLoadError = null;
             return;
-        } else if (this.pageLoadError.message == "Permission denied" && this.permDeniedCount++ < 4) {
-        	var self = this;
-		    LOG.warn("pollForLoad ("+marker+"): PERMISSION DENIED ("+this.permDeniedCount+"), waiting to see if it goes away");
-		    this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
-		    this.pageLoadError = null;
-		    return;
-		}
-		//handy for debugging!
+        } else if (((this.pageLoadError.message == "Permission denied") || (/^Access is denied/.test(this.pageLoadError.message)))
+        	    && this.permDeniedCount++ < 4) {
+            var self = this;
+            LOG.warn("pollForLoad ("+marker+"): " + this.pageLoadError.message + " ("+this.permDeniedCount+"), waiting to see if it goes away");
+            this.reschedulePoller(loadFunction, windowObject, originalDocument, originalLocation, originalHref, marker);
+            this.pageLoadError = null;
+            return;
+        }
+        //handy for debugging!
         //throw this.pageLoadError;
     }
 };
@@ -573,9 +587,14 @@ IEBrowserBot.prototype.windowClosed = function(win) {
 				if (de.message == "Permission denied") {
 					// the window is probably unloading, which means it's probably not closed yet
 					return false;
+                                }
+                                else if (/^Access is denied/.test(de.message)) {
+                                	// rare variation on "Permission denied"?
+                                        LOG.debug("IEBrowserBot.windowClosed: got " + de.message + " (this.pageUnloading=" + this.pageUnloading + "); assuming window is unloading, probably not closed yet");
+					return false;
 				} else {
 					// this is probably one of those frame window situations
-					LOG.debug("IEBrowserBot.windowClosed: couldn't read win.document, assuming closed: " + de.message);
+                                        LOG.debug("IEBrowserBot.windowClosed: couldn't read win.document, assume closed: " + de.message + " (this.pageUnloading=" + this.pageUnloading + ")");
 					return true;
 				}
 			}

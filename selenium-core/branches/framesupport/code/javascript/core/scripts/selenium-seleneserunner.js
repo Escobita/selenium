@@ -190,13 +190,9 @@ function nextCommand() {
     sendToRC(postResult, urlParms, handleHttpResponse, xmlHttpForCommandsAndResults);
 }
 
-function sendMessageToRClater(message) {
-    pendingMessagesToRC = pendingMessagesToRC + message.replace(/[\n\r]/g, " ") + "\n";
-}
-
 function logToRc(message, logLevel) {
     if (debugMode) {
-        sendToRC("logLevel=" + logLevel + ":" + message + "\n");
+    	sendToRC("logLevel=" + logLevel + ":" + message.replace(/[\n\r\015]/, " ") + "\n");
     }
 }
 

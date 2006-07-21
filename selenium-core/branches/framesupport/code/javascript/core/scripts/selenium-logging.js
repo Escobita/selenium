@@ -87,7 +87,7 @@ Logger.prototype = {
         	/* these logging messages are never flushed, which creates 
         	an enormous array of strings that never stops growing.  Only
         	turn this on if you need it for debugging! */
-        	this.pendingMessages.push(new LogMessage(message, className));
+        	//this.pendingMessages.push(new LogMessage(message, className));
         }
     },
 
