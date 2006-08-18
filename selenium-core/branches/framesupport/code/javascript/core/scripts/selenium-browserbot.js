@@ -28,10 +28,11 @@
 // popup window, first select that window, and then do a normal click command.
 
 var BrowserBot = function(win) {
-    this.window = win;
-    this.buttonWindow = window;
+    this.topWindow = win;
+    this.window = this.topWindow;
+    this.buttonWindow = this.topWindow; // not sure what this is used for
     this.currentPage = null;
-    this.currentWindow = win;
+    this.currentWindow = this.topWindow;
     this.currentWindowName = null;
 
 	this.windowPollers = new Array();
@@ -183,32 +184,7 @@ BrowserBot.prototype.selectFrame = function(target) {
 	if (target == "relative=up") {
 		this.currentWindow = this.getCurrentWindow().parent;
 	} else if (target == "relative=top") {
-		this.currentWindow = this.getCurrentWindow().top;
-	} else {
-		var frame = this.getCurrentPage().findElement(target);
-		if (frame == null) {
-			throw new SeleniumError("Not found: " + target);
-    }
-		// now, did they give us a frame or a frame ELEMENT?
-		if (frame.contentWindow) {
-			// this must be a frame element
-			this.currentWindow = frame.contentWindow;
-		} else if (frame.document) {
-			// must be an actual window frame
-			this.currentWindow = frame;
-		} else {
-			// neither
-			throw new SeleniumError("Not a frame: " + target);
-		}
-	}
-	this.currentPage = null;
-};
-
-BrowserBot.prototype.selectFrame = function(target) {
-    if (target == "relative=up") {
-        this.currentWindow = this.getCurrentWindow().parent;
-    } else if (target == "relative=top") {
-        this.currentWindow = this.getCurrentWindow().top;
+        this.currentWindow = this.topWindow;
     } else {
         var frame = this.getCurrentPage().findElement(target);
         if (frame == null) {
