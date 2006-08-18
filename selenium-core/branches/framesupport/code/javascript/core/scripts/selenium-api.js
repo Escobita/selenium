@@ -157,6 +157,9 @@ function Selenium(browserbot) {
 }
 
 Selenium.createForWindow = function(window) {
+    if (!window.location) {
+        throw "error: not a window!";
+    }
     return new Selenium(BrowserBot.createForWindow(window));
 };
 

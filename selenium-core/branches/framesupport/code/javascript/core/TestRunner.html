@@ -59,7 +59,7 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
         </script>
 </head>
 
-<body onLoad="start();">
+<body onLoad="onSeleniumLoad();">
 <table class="layout">
 <form action="" name="controlPanel">
 
@@ -115,8 +115,8 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
 
                         <div class="executionOptions">
                             <input id="runAllRestTests" type="checkbox" name="runAllRestTests"/>
-                            <label for="runAllRestTests">Run the rest of tests from here</label><br>
-
+                            <label for="runAllRestTests">Run the rest of tests from here</label>
+                            <br/>
                             <input id="highlightOption" type="checkbox" name="highlightOption" value="0"/>
                             <label for="highlightOption">Highlight elements</label>
                         </div>
@@ -166,6 +166,14 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
                 </td>
             </tr>
         </table>
+    </td>
+</tr>
+
+<!-- AUT -->
+
+<tr>
+    <td colspan="3" height="70%">
+        <iframe name="myiframe" id="myiframe" src="TestRunner-splash.html"></iframe>
     </td>
 </tr>
 

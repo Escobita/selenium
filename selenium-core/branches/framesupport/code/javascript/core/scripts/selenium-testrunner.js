@@ -81,10 +81,29 @@ function setRunInterval() {
     }
 }
 
-
 var appWindow;
 
+/**
+ * Get the window that will hold the AUT.  
+ * 
+ * If the query-pamemeter "multiWindow" is set, this returns a separate
+ * top-level window, suitable for testing "frame-busting" applications.
+ * Otherwise, it returns an embedded iframe window.
+ */
 function getApplicationWindow() {
+    if (isQueryParameterTrue('multiWindow')) {
+        return getSeparateApplicationWindow();
+    }
+    return $('myiframe').contentWindow;
+}
+
+/**
+ * Get (or create) the separate top-level AUT window.
+ */
+function getSeparateApplicationWindow() {
+    if (appWindow == null) {
+        openSeparateAppWindow();
+    }
     return appWindow;
 }
 
@@ -110,45 +129,56 @@ function loadAndRunIfAuto() {
     loadSuiteFrame();
 }
 
-function start() {
-	// resize the window accordingly 
-	window.resizeTo(1200, 500);
-	window.moveTo(window.screenX, 0);
-	
-    appWindow = window.open('TestRunner-splash.html?start=true', 'main');
-	try {
-		var windowHeight = 500;
-		if (window.outerHeight) {
-			windowHeight = window.outerHeight;
-		} else if (document.documentElement && document.documentElement.offsetHeight) {
-			windowHeight = document.documentElement.offsetHeight;
-		}
-		
-		if (window.screenLeft && !window.screenX) window.screenX = window.screenLeft;
-		if (window.screenTop && !window.screenY) window.screenY = window.screenTop;
-		
-		appWindow.resizeTo(1200, screen.availHeight - windowHeight - 60);
-		appWindow.moveTo(window.screenX, window.screenY + windowHeight + 25);
-	} catch (e) {
-		LOG.error("Couldn't resize app window");
-		LOG.exception(e);
-	}
-	
-	//LOG.show();
+function onSeleniumLoad() {
+    //openSeparateAppWindow();
+    
+    //LOG.show();
 
     queryString = null;
     setRunInterval();
-	
-	// we use a timeout here to make sure the LOG has loaded first, so we can see _every_ error
+    
+    // we use a timeout here to make sure the LOG has loaded first, so we can see _every_ error
     setTimeout('loadSuiteFrame()', 500);
+}
+
+function openSeparateAppWindow() {
+    // resize the Selenium window itself
+    window.resizeTo(1200, 500);
+    window.moveTo(window.screenX, 0);
+    
+    appWindow = window.open('TestRunner-splash.html?start=true', 'main');
+    try {
+        var windowHeight = 500;
+        if (window.outerHeight) {
+            windowHeight = window.outerHeight;
+        } else if (document.documentElement && document.documentElement.offsetHeight) {
+            windowHeight = document.documentElement.offsetHeight;
+        }
+        
+        if (window.screenLeft && !window.screenX) window.screenX = window.screenLeft;
+        if (window.screenTop && !window.screenY) window.screenY = window.screenTop;
+        
+        appWindow.resizeTo(1200, screen.availHeight - windowHeight - 60);
+        appWindow.moveTo(window.screenX, window.screenY + windowHeight + 25);
+    } catch (e) {
+        LOG.error("Couldn't resize app window");
+        LOG.exception(e);
+    }
+
+
+    if (window.document.readyState == null && !isAutomatedRun() && !warned) {
+        alert("Beware!  Mozilla bug 300992 means that we can't always reliably detect when a new page has loaded.  Install the Selenium IDE extension or the readyState extension available from selenium.openqa.org to make page load detection more reliable.");
+        warned = true;
+    }
+
 }
 
 function loadSuiteFrame() {
     var testAppWindow = getApplicationWindow();
     //testAppWindow.foo = '123';
     if (selenium == null)  {
-    	selenium = Selenium.createForWindow(testAppWindow);
-    	registerCommandHandlers();
+        selenium = Selenium.createForWindow(testAppWindow);
+        registerCommandHandlers();
     }
 
     //set the runInterval if there is a queryParameter for it
@@ -157,11 +187,6 @@ function loadSuiteFrame() {
         runInterval = tempRunInterval;
     }
     
-    if (window.document.readyState == null && !isAutomatedRun() && !warned) {
-		alert("Beware!  Mozilla bug 300992 means that we can't always reliably detect when a new page has loaded.  Install the Selenium IDE extension or the readyState extension available from selenium.openqa.org to make page load detection more reliable.");
-		warned = true;
-	}
-
     document.getElementById("modeRun").onclick = setRunInterval;
     document.getElementById('modeWalk').onclick = setRunInterval;
 
@@ -217,7 +242,7 @@ function onloadTestSuite() {
 
             addLoadListener(getApplicationWindow(), startSingleTest);
 
-	    getApplicationWindow().src = getQueryParameter("autoURL");
+        getApplicationWindow().src = getQueryParameter("autoURL");
 
         } else {
             testLink = suiteTable.rows[currentRowInSuite + 1].cells[0].getElementsByTagName("a")[0];
@@ -417,8 +442,8 @@ function startTest() {
 
     currentTest.start();
 
-	// PL: for the purpose of testing
-	//testLoop.waitForConditionTimeout = 2000;
+    // PL: for the purpose of testing
+    //testLoop.waitForConditionTimeout = 2000;
 }
 
 get_new_rows = function() {
