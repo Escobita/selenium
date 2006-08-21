@@ -84,8 +84,8 @@ function setRunInterval() {
 var appWindow;
 
 /**
- * Get the window that will hold the AUT.  
- * 
+ * Get the window that will hold the AUT.
+ *
  * If the query-pamemeter "multiWindow" is set, this returns a separate
  * top-level window, suitable for testing "frame-busting" applications.
  * Otherwise, it returns an embedded iframe window.
@@ -102,7 +102,7 @@ function getApplicationWindow() {
  */
 function getSeparateApplicationWindow() {
     if (appWindow == null) {
-        openSeparateAppWindow();
+        openSeparateAppWindow('TestRunner-splash.html');
     }
     return appWindow;
 }
@@ -139,38 +139,6 @@ function onSeleniumLoad() {
     
     // we use a timeout here to make sure the LOG has loaded first, so we can see _every_ error
     setTimeout('loadSuiteFrame()', 500);
-}
-
-function openSeparateAppWindow() {
-    // resize the Selenium window itself
-    window.resizeTo(1200, 500);
-    window.moveTo(window.screenX, 0);
-    
-    appWindow = window.open('TestRunner-splash.html?start=true', 'main');
-    try {
-        var windowHeight = 500;
-        if (window.outerHeight) {
-            windowHeight = window.outerHeight;
-        } else if (document.documentElement && document.documentElement.offsetHeight) {
-            windowHeight = document.documentElement.offsetHeight;
-        }
-        
-        if (window.screenLeft && !window.screenX) window.screenX = window.screenLeft;
-        if (window.screenTop && !window.screenY) window.screenY = window.screenTop;
-        
-        appWindow.resizeTo(1200, screen.availHeight - windowHeight - 60);
-        appWindow.moveTo(window.screenX, window.screenY + windowHeight + 25);
-    } catch (e) {
-        LOG.error("Couldn't resize app window");
-        LOG.exception(e);
-    }
-
-
-    if (window.document.readyState == null && !isAutomatedRun() && !warned) {
-        alert("Beware!  Mozilla bug 300992 means that we can't always reliably detect when a new page has loaded.  Install the Selenium IDE extension or the readyState extension available from selenium.openqa.org to make page load detection more reliable.");
-        warned = true;
-    }
-
 }
 
 function loadSuiteFrame() {
@@ -325,15 +293,6 @@ function getBreakpointEventHandler(commandRow) {
     }
 }
 
-
-function isQueryParameterTrue(name) {
-    parameterValue = getQueryParameter(name);
-    if (parameterValue == null) return false;
-    if (parameterValue.toLowerCase() == "true") return true;
-    if (parameterValue.toLowerCase() == "on") return true;
-    return false;
-}
-
 function getQueryString() {
     if (queryString != null) return queryString;
     if (browserVersion.isHTA) {
@@ -363,20 +322,6 @@ function extractArgs() {
         args[i] = args[i].replace(/^"(.*)"$/, "$1");
     }
     return args;
-}
-
-function getQueryParameter(searchKey) {
-    var str = getQueryString();
-    if (str == null) return null;
-    var clauses = str.split('&');
-    for (var i = 0; i < clauses.length; i++) {
-        var keyValuePair = clauses[i].split('=', 2);
-        var key = unescape(keyValuePair[0]);
-        if (key == searchKey) {
-            return unescape(keyValuePair[1]);
-        }
-    }
-    return null;
 }
 
 function isNewWindow() {

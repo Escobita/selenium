@@ -78,6 +78,7 @@
     <target name="generate-xml" depends="copy-sources">
         <java jar="${docs.generation.dir}/js.jar" output="${image.dir}/doc.xml" failonerror="true" fork="true">
             <arg file="${docs.generation.dir}/doc.js"/>
+            <arg file="javascript/core/scripts/selenium-api.js" />
         </java>
         <xmlvalidate file="${image.dir}/doc.xml" lenient="true"/>
         <copy file="${image.dir}/doc.xml" tofile="${image.dir}/core/iedoc.xml" overwrite="true"/>
