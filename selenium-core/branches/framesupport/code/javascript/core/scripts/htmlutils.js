@@ -564,7 +564,7 @@ function objToString(obj) {
 }
 
 
-function getSeparateApplicationWindow(url) {
+function openSeparateApplicationWindow(url) {
     // resize the Selenium window itself
     window.resizeTo(1200, 500);
     window.moveTo(window.screenX, 0);

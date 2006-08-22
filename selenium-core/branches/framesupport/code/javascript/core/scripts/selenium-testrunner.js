@@ -102,7 +102,7 @@ function getApplicationWindow() {
  */
 function getSeparateApplicationWindow() {
     if (appWindow == null) {
-        openSeparateAppWindow('TestRunner-splash.html');
+        appWindow = openSeparateApplicationWindow('TestRunner-splash.html');
     }
     return appWindow;
 }

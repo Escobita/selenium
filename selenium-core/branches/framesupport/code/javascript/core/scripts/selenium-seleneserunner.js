@@ -42,7 +42,7 @@ function runSeleniumTest() {
     var testAppWindow;
 
     if (isQueryParameterTrue('multiWindow')) {
-        testAppWindow = getSeparateApplicationWindow('Blank.html');
+        testAppWindow = openSeparateApplicationWindow('Blank.html');
     } else {
         testAppWindow = $('myiframe').contentWindow;
     }
