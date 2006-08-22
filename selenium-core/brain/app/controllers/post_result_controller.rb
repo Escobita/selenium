@@ -1,6 +1,8 @@
+
 class PostResultController < ApplicationController
   def index
-    puts request.raw_post
-    render :text => request.raw_post
+	run = Run.parse(params)
+    render :text => CGI::unescape(request.raw_post)
   end
+  
 end
