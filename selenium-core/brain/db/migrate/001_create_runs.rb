@@ -4,6 +4,7 @@ class CreateRuns < ActiveRecord::Migration
       t.column :time, :timestamp
       t.column :version, :string
       t.column :revision, :string
+      t.column :agent, :string
       t.column :total_time, :float
       t.column :note, :text
     end

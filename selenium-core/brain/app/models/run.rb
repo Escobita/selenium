@@ -12,15 +12,15 @@ class Run < ActiveRecord::Base
     @@clock = clock
   end
   
-  def self.parse_and_save(params)
-    run = Run.create(
+  def self.parse(params)
+    run = Run.new(
                      :version => params["selenium.version"],
                      :revision => params["selenium.revision"],
                      :total_time => params["totalTime"].to_f,
                      :time => @@clock.now )		
     names = parse_test_case_names(params["suite"])
-    names.each do |name|
-        run.test_cases.create :name => name
+    (0...names.size).each do |i|
+      run.test_cases << TestCase.create_by_name_and_table(names[i], params["testTable.#{i+1}"])
     end
     return run
   end

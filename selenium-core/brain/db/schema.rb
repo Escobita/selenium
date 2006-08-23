@@ -8,6 +8,7 @@ ActiveRecord::Schema.define(:version => 2) do
     t.column "time", :datetime
     t.column "version", :string
     t.column "revision", :string
+    t.column "agent", :string
     t.column "total_time", :float
     t.column "note", :text
   end
