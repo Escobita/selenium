@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class RunTest < Test::Unit::TestCase
-  fixtures :runs
+  fixtures :runs, :test_cases
   
   def test_should_get_run_object_after_parsing_post_results
     version = "TEST_VERSION"
@@ -57,6 +57,11 @@ EOF
     })
     assert_equal(1, run.test_cases.size)
     assert_equal("TestOpen", run.test_cases.first.name)
+  end
+  
+  def test_should_able_to_return_run_status
+    assert_equal("passed", runs(:passed_test_run).status)
+    assert_equal("failed", runs(:failed_test_run).status)
   end
   
 end

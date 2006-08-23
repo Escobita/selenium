@@ -25,6 +25,13 @@ class Run < ActiveRecord::Base
     return run
   end
   
+  def status
+    test_cases.each do |test_case|
+      return test_case.status if test_case.status != :passed
+    end
+    :passed
+  end
+  
   private 
   
   def self.parse_test_case_names(suite)

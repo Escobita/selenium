@@ -5,11 +5,11 @@ class TestCase < ActiveRecord::Base
 	 status = ''
 	 pass = HTML::Document.new(table).find_all(:tag => 'tr', :attributes => {:bgcolor => '#ffcccc'}).size == 0
 	 if(pass)
-	   status = :passed
+	   status = "passed"
 	 else
-	   status = :failed
+	   status = "failed"
 	 end
-	 TestCase.new(:status => status)
+	 TestCase.new(:status => status, :note => table)
 	end
 	
 	def self.create_by_name_and_table(name, table)

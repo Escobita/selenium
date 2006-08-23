@@ -1,5 +1,11 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-first:
+passed_test_run:
   id: 1
-another:
+  version: 0.7.2
+  agent: Firefox
+  time: 2006-08-23 15:23:34
+failed_test_run:
   id: 2
+  version: 0.7.2
+  agent: Internet Explorer
+  time: 2006-08-23 15:23:34

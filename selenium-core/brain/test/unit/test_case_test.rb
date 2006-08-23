@@ -19,7 +19,7 @@ class TestCaseTest < Test::Unit::TestCase
 EOF
 
     test_case = TestCase.parse(test_table)
-    assert_equal(:passed, test_case.status)
+    assert_equal("passed", test_case.status)
   end
 
   def test_should_parse_failed_test_table
@@ -38,7 +38,7 @@ EOF
 EOF
 
     test_case = TestCase.parse(test_table)
-    assert_equal(:failed, test_case.status)
+    assert_equal("failed", test_case.status)
   end
   
   def test_should_able_to_create_test_case_with_table_and_name
@@ -46,6 +46,13 @@ EOF
     name = "TEST_CASE"
     test_case = TestCase.create_by_name_and_table(name, test_table)
     assert_equal(name, test_case.name)
+  end
+  
+  def test_should_create_test_case_with_whole_test_table
+    test_table = "<html>TEST_TABLE</html>"
+    name = "TEST_CASE"
+    test_case = TestCase.create_by_name_and_table(name, test_table)
+    assert_equal(test_table, test_case.note)    
   end
 
 end

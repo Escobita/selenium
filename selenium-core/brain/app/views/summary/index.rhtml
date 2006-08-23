@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title>Summary</title>
+	<%= stylesheet_link_tag "main" %>
+</head>
+
+<body>
+<table id="runs">
+	<caption>Selenium Core Testing Results</caption>
+	<thead>
+		<th>#</th>
+		<th>Status</th>
+		<th>Version</th>
+		<th>User agent</th>
+		<th>Time</th>
+	</thead>
+	<% @runs.each do |run| %>
+	<tr class="<%= cycle('odd', 'even') %>">
+		<td><%= run.id %></td>
+		<td><%=h run.status %></td>
+		<td><%=h run.version %></td>
+		<td><%=h run.agent %></td>
+		<td><%=h run.time.gmtime %></td>
+	</tr>
+	<% end %>
+</table>
+</body>
+</html>

@@ -1,0 +1,61 @@
+* {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+table { 
+    font-size£º 80%;	
+	color: #000;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #666666;
+}
+table a {
+	text-decoration: underline;
+}
+table a:visited {
+	text-decoration: none;
+}
+tr.odd {
+	background-color: #ebf3ff;
+}
+tr a {
+	color: #000000;
+}
+tr:hover a {
+	color: #ffffff;
+}
+tr:hover, tr.odd:hover {
+	background-color: #cccccc;
+	color: #ffffff;
+}
+caption {
+	height: 45px;
+	line-height: 44px;
+	color: #60634E;
+	font-weight: bold;
+	text-align: center;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+thead th {
+	font-size: 105%;
+	color: #000;
+	height: 33px;
+}
+
+tr {
+	vertical-align: top;
+}
+tr,th,td {
+	padding: .75em;
+}
+td {
+	border-left: 1px solid #dadada;
+}
+tfoot tr {
+}
+tfoot td, tfoot th{
+	color: #000;
+	border: 0px;
+}
