@@ -29,11 +29,12 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
         <script type="text/javascript" src="scripts/narcissus-defs.js"></script>
         <script type="text/javascript" src="scripts/narcissus-parse.js"></script>
         <script type="text/javascript" src="scripts/narcissus-exec.js"></script>
-        <script language="JavaScript" type="text/javascript" src="scripts/prototype-1.4.0.js"></script>
-        <script language="JavaScript" type="text/javascript" src="lib/cssQuery.js"></script>
-        <script language="JavaScript" type="text/javascript" src="lib/cssQuery-standard.js"></script>
-        <script language="JavaScript" type="text/javascript" src="lib/cssQuery-level2.js"></script>
-        <script language="JavaScript" type="text/javascript" src="lib/cssQuery-level3.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/prototype.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/scriptaculous/scriptaculous.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/cssQuery/cssQuery.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/cssQuery/cssQuery-standard.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/cssQuery/cssQuery-level2.js"></script>
+        <script language="JavaScript" type="text/javascript" src="lib/cssQuery/cssQuery-level3.js"></script>
         <script language="JavaScript" type="text/javascript" src="scripts/selenium-browserdetect.js"></script>
         <script language="JavaScript" type="text/javascript" src="scripts/selenium-browserbot.js"></script>
         <script language="JavaScript" type="text/javascript" src="scripts/find_matching_child.js"></script>
@@ -66,107 +67,104 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
 <!-- Suite, Test, Control Panel -->
 
 <tr class="selenium">
-    <td width="25%" height="30%">
-        <iframe name="testSuiteFrame" id="testSuiteFrame" src="./TestPrompt.html" application="yes"></iframe>
-    </td>
-    <td width="50%" height="30%">
-        <iframe name="testFrame" id="testFrame" application="yes"></iframe>
-    </td>
+<td width="25%" height="30%">
+    <iframe name="testSuiteFrame" id="testSuiteFrame" src="./TestPrompt.html" application="yes"></iframe>
+</td>
+<td width="50%" height="30%">
+    <iframe name="testFrame" id="testFrame" application="yes"></iframe>
+</td>
 
-    <td width="25%">
-        <table class="layout">
-            <tr class="selenium">
-                <th width="25%" height="1" class="header">
-                    <h1><a href="http://selenium.thoughtworks.com" title="The Selenium Project">Selenium</a> TestRunner
-                    </h1>
-                </th>
-            </tr>
-            <tr>
-                <td width="25%" height="30%" id="controlPanel">
+<td width="25%">
+    <table class="layout">
+        <tr class="selenium">
+            <th width="25%" height="1" class="header">
+                <h1><a href="http://selenium.thoughtworks.com" title="The Selenium Project">Selenium</a> TestRunner
+                </h1>
+            </th>
+        </tr>
+        <tr>
+            <td width="25%" height="30%" id="controlPanel">
+                <fieldset>
+                    <legend>Execute Tests</legend>
 
-                    <fieldset>
-                        <legend>Execute Tests</legend>
+                    <div style="float:left">Fast</div>
+                    <div style="float:right">Slow</div>
+	      <br>
+	      <div id="speedSlider">
+	      <div id="speedTrack">&nbsp;</div>
+	      <div id="speedHandle">&nbsp;</div>
+	      </div>
 
-                        <div>
-                            <input id="modeRun" type="radio" name="runMode" value="0" checked="checked"/><label
-                                for="modeRun">Run</label>
-                            <input id="modeWalk" type="radio" name="runMode" value="500"/><label
-                                for="modeWalk">Walk</label>
-                        </div>
-
-                        <div>
-                            <button type="button" id="runSuite" onClick="startTestSuite();"
-                                    title="Run the entire Test-Suite">
-                                <strong>All</strong>
-                            </button>
-                            <button type="button" id="runSeleniumTest" onClick="runSingleTest();"
-                                    title="Run the current Test">
-                                <em>Selected</em>
-                            </button>
-                            <button type="button" id="pauseTest" onClick="pauseCurrentTest();" disabled="disabled"
-                                    title="Pause the current Test">
-                                Pause
-                            </button>
-                            <button type="button" id="stepTest" onClick="stepCurrentTest()" disabled="disabled"
-                                    title="Step the Test">
-                                Step
-                            </button>
-                        </div>
-
-                        <div class="executionOptions">
-                            <input id="runAllRestTests" type="checkbox" name="runAllRestTests"/>
-                            <label for="runAllRestTests">Run the rest of tests from here</label>
-                            <br/>
-                            <input id="highlightOption" type="checkbox" name="highlightOption" value="0"/>
-                            <label for="highlightOption">Highlight elements</label>
-                        </div>
-
-                    </fieldset>
-
-                    <table id="stats" align="center">
-                        <tr>
-                            <td colspan="2" align="right">Elapsed:</td>
-                            <td id="elapsedTime" colspan="2">00.00</td>
-                        </tr>
-                        <tr>
-                            <th colspan="2">Tests</th>
-                            <th colspan="2">Commands</th>
-                        </tr>
-                        <tr>
-                            <td class="count" id="testRuns">0</td>
-                            <td>run</td>
-                            <td class="count" id="commandPasses">0</td>
-                            <td>passed</td>
-                        </tr>
-                        <tr>
-                            <td class="count" id="testFailures">0</td>
-                            <td>failed</td>
-                            <td class="count" id="commandFailures">0</td>
-                            <td>failed</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"></td>
-                            <td class="count" id="commandErrors">0</td>
-                            <td>incomplete</td>
-                        </tr>
-                    </table>
-
-                    <fieldset>
-                        <legend>Tools</legend>
-
-                        <button type="button" id="domViewer1" onClick="openDomViewer();">
-                            View DOM
+                    <div>
+                        <button type="button" id="runSuite" onClick="startTestSuite();"
+                                title="Run the entire Test-Suite">
+                            <strong>All</strong>
                         </button>
-                        <button type="button" onClick="LOG.show();">
-                            Show Log
+                        <button type="button" id="runSeleniumTest" onClick="runSingleTest();"
+                                title="Run the current Test">
+                            <em>Selected</em>
                         </button>
+                        <button type="button" id="pauseTest" onClick="pauseCurrentTest();" disabled="disabled"
+                                title="Pause the current Test">
+                            Pause
+                        </button>
+                        <button type="button" id="stepTest" onClick="stepCurrentTest()" disabled="disabled"
+                                title="Step the Test">
+                            Step
+                        </button>
+                    </div>
 
-                    </fieldset>
+                    <div class="executionOptions">
+                        <input id="highlightOption" type="checkbox" name="highlightOption" value="0"/>
+                        <label for="highlightOption">Highlight elements</label>
+                    </div>
 
-                </td>
-            </tr>
-        </table>
-    </td>
+                </fieldset>
+
+                <table id="stats" align="center">
+                    <tr>
+                        <td colspan="2" align="right">Elapsed:</td>
+                        <td id="elapsedTime" colspan="2">00.00</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Tests</th>
+                        <th colspan="2">Commands</th>
+                    </tr>
+                    <tr>
+                        <td class="count" id="testRuns">0</td>
+                        <td>run</td>
+                        <td class="count" id="commandPasses">0</td>
+                        <td>passed</td>
+                    </tr>
+                    <tr>
+                        <td class="count" id="testFailures">0</td>
+                        <td>failed</td>
+                        <td class="count" id="commandFailures">0</td>
+                        <td>failed</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td class="count" id="commandErrors">0</td>
+                        <td>incomplete</td>
+                    </tr>
+                </table>
+
+                <fieldset>
+                    <legend>Tools</legend>
+
+                    <button type="button" id="domViewer1" onClick="openDomViewer();">
+                        View DOM
+                    </button>
+                    <button type="button" onClick="LOG.show();">
+                        Show Log
+                    </button>
+
+                </fieldset>
+
+            </td>
+        </tr>
+    </table>
+</td>
 </tr>
 
 <!-- AUT -->

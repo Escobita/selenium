@@ -1,89 +1,26 @@
 require 'rake/tasklib'
 require 'thread'
 require 'webrick'
-require 'rbconfig'
+require 'browser'
+require 'test_case_result'
+require 'jsunit_result'
+require 'selenium_result'
 
-include_file 'browser'
-include_file 'jsunit_result_parser'
-include_file 'selenium_result_parser'
-
+include Browser
 
 class JavaScriptTestTask < ::Rake::TaskLib
-  def initialize(name=:test)
+
+  def initialize(name)
     @name = name
     @tests = []
+    @mounts = {}
     @browsers = []
-    @port = 8889
+    @port = 4444
     
     @queue = Queue.new
     
-    @server = WEBrick::HTTPServer.new(:Port => @port) # TODO: make port configurable
-    @server.mount_proc("/results") do |req, res|
-      @queue.push(req.query['time'].to_s)
-      res.body += parse_result(req, JsUnitResultParser.new, "logs/JsUnitResults.xml")
-    end
-    
-    @server.mount_proc("/seleniumResults") do |req, res|
-      result = parse_result(req, SeleniumResultParser.new, "logs/SeleniumResults.xml")
-      File.open("logs/SeleniumResults.html", File::CREAT|File::RDWR) do |f|
-        f << result
-      end
-      res.body += result
-      @queue.push(req.query['result'].to_s)
-    end
-    
     yield self if block_given?
     define
-  end
-  
-  def parse_result(req, parser, log_file)
-    xml = parser.to_xml(req)
-    File.open(log_file, File::CREAT|File::RDWR) do |f|
-      f << xml
-    end
-    parser.to_html(req)
-  end
-  
-  def define
-    task @name do
-      trap("INT") { 
-        @server.shutdown
-      }
-      t = Thread.new { 
-        @server.start
-      }
-      
-      # run all combinations of browsers and tests
-      threads = Array.new
-      @browsers.each do |browser|
-        if browser.supported?
-          threads <<  Thread.new do            
-            @tests.each do |test|
-              browser.setup
-              browser.visit("http://localhost:#{@port}#{test}")              
-              result = @queue.pop
-              browser.teardown
-            end            
-          end
-          
-          
-        else
-          puts "Skipping #{browser}, not supported on this OS"
-        end
-      end
-      
-      threads.each do |thread|
-        thread.join
-      end
-      @server.shutdown
-      t.join
-    end
-  end
-  
-  def mount(path, dir=nil)
-    dir = Dir.pwd + path unless dir
-    
-    @server.mount(path, WEBrick::HTTPServlet::FileHandler, dir)
   end
   
   # test should be specified as a url
@@ -91,7 +28,82 @@ class JavaScriptTestTask < ::Rake::TaskLib
     @tests << test
   end
   
+  def mount(path, dir=nil)
+    dir = Dir.pwd + path unless dir
+    @mounts[path] = dir
+  end
+  
   def browser(browser)
     @browsers << browser.new
   end
+
+  def handle_test_results(res, parser, log_file)
+    html_report = parse_result(parser, log_file)
+    res.body += html_report
+    @queue.push(parser.success?)
+    return html_report
+  end
+  
+  def parse_result(parser, log_file)
+    xml = parser.to_xml()
+    mkdir_p 'logs'
+    File.open(log_file, "w") do |f|
+      f << xml
+    end
+    parser.to_html()
+  end
+  
+  def create_server
+    @server = WEBrick::HTTPServer.new(:Port => @port)
+    @server.mount_proc("/jsunitResults") do |req, res|
+      parser, log_file = [JsUnitResult.new(req), "logs/JsUnitResults.xml"]
+      html_report = handle_test_results(res, parser, log_file)    
+    end
+    @server.mount_proc("/seleniumResults") do |req, res|
+      parser, log_file = [SeleniumResult.new(req), "logs/SeleniumResults.xml"]
+      html_report = handle_test_results(res, parser, log_file)      
+      File.open("logs/SeleniumResults.html", "w") do |f|
+        f << html_report
+      end
+    end
+    @mounts.each do |path,dir|
+      @server.mount(path, WEBrick::HTTPServlet::FileHandler, dir)
+    end
+  end
+
+  def define
+    task @name do
+      create_server
+      t = Thread.new { 
+        puts "Starting test-server"
+        trap(:INT) {
+          @server.shutdown
+        }
+        @server.start
+      }
+      
+      @browsers.each do |browser|
+        if browser.supported?
+          puts "Running tests with #{browser}"
+          @tests.each do |test|
+            test_url = "ROOT" + test
+            test_url.gsub!(/ROOT/, "http://localhost:#{@port}")
+            browser.setup
+            browser.visit(test_url)              
+            passed = @queue.pop
+            browser.teardown
+            raise "TEST FAILED" unless passed
+          end            
+          puts "Done tests with #{browser}"
+        else
+          puts "Skipping #{browser}, not supported on this OS"
+        end
+      end
+      
+      puts "Shutting down test-server"
+      @server.shutdown
+      t.join
+    end
+  end
+  
 end

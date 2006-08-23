@@ -69,20 +69,7 @@ queryString = null;
 
 warned = null;
 
-function setRunInterval() {
-    // Get the value of the checked runMode option.
-    // There should be a way of getting the value of the "group", but I don't know how.
-    var runModeOptions = document.forms['controlPanel'].runMode;
-    for (var i = 0; i < runModeOptions.length; i++) {
-        if (runModeOptions[i].checked) {
-            runInterval = runModeOptions[i].value;
-            break;
-        }
-    }
-}
-
 var appWindow;
-
 /**
  * Get the window that will hold the AUT.
  *
@@ -135,7 +122,7 @@ function onSeleniumLoad() {
     //LOG.show();
 
     queryString = null;
-    setRunInterval();
+    runInterval = 0;
     
     // we use a timeout here to make sure the LOG has loaded first, so we can see _every_ error
     setTimeout('loadSuiteFrame()', 500);
@@ -155,9 +142,14 @@ function loadSuiteFrame() {
         runInterval = tempRunInterval;
     }
     
-    document.getElementById("modeRun").onclick = setRunInterval;
-    document.getElementById('modeWalk').onclick = setRunInterval;
-
+    speedController = new Control.Slider('speedHandle', 'speedTrack', {
+        range:$R(0, 1000),
+        onSlide:function(v) {
+            runInterval = v;
+        } ,
+        onChange:function(v) {
+            runInterval = v;
+        }});
     document.getElementById("highlightOption").checked = getQueryParameter("highlight")
 
     var testSuiteName = getQueryParameter("test");
@@ -352,7 +344,7 @@ function pauseCurrentTest() {
 }
 
 function continueCurrentTest() {
-    setRunInterval();
+    runInterval = speedController.value;
     currentTest.resume();
 
     document.getElementById('pauseTest').innerHTML = "Pause";
@@ -360,6 +352,7 @@ function continueCurrentTest() {
 }
 
 function stepCurrentTest() {
+    runInterval = -1;
     currentTest.resume();
 }
 
@@ -419,7 +412,7 @@ function startTestSuite() {
 }
 
 function runNextTest() {
-    if (!runAllTests && !document.getElementById("runAllRestTests").checked)
+    if (!runAllTests)
         return;
 
     suiteTable = getIframeDocument(getSuiteFrame()).getElementsByTagName("table")[0];
