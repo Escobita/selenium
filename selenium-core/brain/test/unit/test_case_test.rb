@@ -18,8 +18,8 @@ class TestCaseTest < Test::Unit::TestCase
 </TBODY></TABLE></DIV>
 EOF
 
-    test_case = TestCase.parse(test_table)
-    assert_equal("passed", test_case.status)
+    status = TestCase.parse_status(test_table)
+    assert_equal("passed", status)
   end
 
   def test_should_parse_failed_test_table
@@ -37,8 +37,12 @@ EOF
 </TBODY></TABLE></DIV>
 EOF
 
-    test_case = TestCase.parse(test_table)
-    assert_equal("failed", test_case.status)
+    status = TestCase.parse_status(test_table)
+    assert_equal("failed", status)
+  end
+  
+  def test_should_get_skipped_status_when_test_table_is_nil
+    assert_equal("skipped", TestCase.parse_status(nil))
   end
   
   def test_should_able_to_create_test_case_with_table_and_name

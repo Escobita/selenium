@@ -1,20 +1,22 @@
 class TestCase < ActiveRecord::Base
 	belongs_to :run
+    FAILED_COLOR = "#ffcccc"
 	
-	def self.parse(table)
+	def self.parse_status(table)
+	 return "skipped" unless table
 	 status = ''
-	 pass = HTML::Document.new(table).find_all(:tag => 'tr', :attributes => {:bgcolor => '#ffcccc'}).size == 0
+	 # dirty way: check whether result table include the pink color or not
+	 pass = !(table.include?(FAILED_COLOR))
 	 if(pass)
 	   status = "passed"
 	 else
 	   status = "failed"
 	 end
-	 TestCase.new(:status => status, :note => table)
+	 return status
 	end
 	
 	def self.create_by_name_and_table(name, table)
-	 test_case = self.parse(table)
-	 test_case.name = name
-	 return test_case
+	 status = parse_status(table)
+	 return TestCase.new(:name => name, :status => status, :note => table)
 	end
 end
