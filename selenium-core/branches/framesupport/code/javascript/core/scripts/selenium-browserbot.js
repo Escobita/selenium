@@ -292,12 +292,27 @@ BrowserBot.prototype.modifySeparateTestWindowToDetectPageLoads = function(window
     
     var marker = 'selenium' + new Date().getTime();
     LOG.info("Starting pollForLoad ("+marker+"): " + windowObject.document.location);
-    windowObject.document.location[marker] = true;
-    windowObject[this.uniqueId] = marker;
     this.pollingForLoad[marker] = true;
-    this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.location, windowObject.location.href, marker);
+    // if this is a frame, add a load listener, otherwise, attach a poller
+    if (this.getFrameElement(windowObject)) {
+    	LOG.info("modifySeparateTestWindowToDetectPageLoads: this window is a frame; attaching a load listener");
+    	addLoadListener(windowObject.frameElement, this.recordPageLoad);
+    	windowObject.frameElement[marker] = true;
+    	windowObject.frameElement[this.uniqueId] = marker;
+    } else {
+    	windowObject.document.location[marker] = true;
+    	windowObject[this.uniqueId] = marker;
+    	this.pollForLoad(this.recordPageLoad, windowObject, windowObject.document, windowObject.location, windowObject.location.href, marker);
+    }
 };
 
+BrowserBot.prototype.getFrameElement = function(win) {
+	var frameElement = null;
+	try {
+		frameElement = win.frameElement;
+	} catch (e) {} // on IE, checking frameElement on a pop-up results in a "No such interface supported" exception
+	return frameElement;
+}
 
 /**
  * Set up a polling timer that will keep checking the readyState of the document until it's complete.
@@ -448,17 +463,21 @@ BrowserBot.prototype.runScheduledPollers = function() {
 };
 
 BrowserBot.prototype.isPollingForLoad = function(win) {
-	var marker = win[this.uniqueId];
+	var marker;
+	if (this.getFrameElement(win)) {
+		marker = win.frameElement[this.uniqueId];
+	} else {
+		marker = win[this.uniqueId];
+	}
 	if (!marker) {
-		LOG.debug("isPollingForLoad false, missing uniqueId " + this.uniqueId + ": " + win[this.uniqueId]);
+		LOG.debug("isPollingForLoad false, missing uniqueId " + this.uniqueId + ": " + marker);
 		return false;
 	}
-	if (!this.pollingForLoad[win[this.uniqueId]]) {
-		LOG.debug("isPollingForLoad false, this.pollingForLoad["+win[this.uniqueId]+"]: " + this.pollingForLoad[win[this.uniqueId]]);
+	if (!this.pollingForLoad[marker]) {
+		LOG.debug("isPollingForLoad false, this.pollingForLoad["+marker+"]: " + this.pollingForLoad[marker]);
 		return false;
 	}
-	return win[this.uniqueId];
-	return false;
+	return marker;
 };
 
 BrowserBot.prototype.getWindowByName = function(windowName, doNotModify) {
