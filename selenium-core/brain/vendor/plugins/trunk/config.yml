@@ -16,7 +16,7 @@ environments:
 
 browsers:
   firefox: 'c:\Program Files\Mozilla Firefox\firefox.exe'
-  ie: 'c:\Program Files\Internet Explorer\iexplore.exe'
+#  ie: 'c:\Program Files\Internet Explorer\iexplore.exe'
 
 port_start: 3000
 port_end: 3005

@@ -7,15 +7,15 @@
 <body>
 <table id="runs">
 	<caption>Selenium Core Testing Results</caption>
-	<thead>
-		<th>#</th>
-		<th>Status</th>
-		<th>Version</th>
-		<th>User agent</th>
-		<th>Time</th>
-	</thead>
+	<tr>
+		<td>#</td>
+		<td>Status</td>
+		<td>Version</td>
+		<td>User agent</td>
+		<td>Time</td>
+	</tr>
 	<% @runs.each do |run| %>
-	<tr class="<%= cycle('odd', 'even') %>">
+	<tr id='<%= run.id %>' onclick='window.location="<%= url_for :action => :detail, :id => run.id %>"' class="<%= run.status %>">
 		<td><%= run.id %></td>
 		<td><%=h run.status %></td>
 		<td><%=h run.version %></td>

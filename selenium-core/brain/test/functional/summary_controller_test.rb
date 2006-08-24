@@ -17,4 +17,5 @@ class SummaryControllerTest < Test::Unit::TestCase
     get :index
     assert_equal(2, assigns(:runs).size)
   end
+  
 end

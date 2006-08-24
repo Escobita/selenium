@@ -3,37 +3,18 @@
 }
 
 table { 
-    font-size£º 80%;	
+    font-size: 80%;	
 	color: #000;
 	text-align: left;
 	border-collapse: collapse;
 	border: 1px solid #666666;
-}
-table a {
-	text-decoration: underline;
-}
-table a:visited {
-	text-decoration: none;
-}
-tr.odd {
-	background-color: #ebf3ff;
-}
-tr a {
-	color: #000000;
-}
-tr:hover a {
-	color: #ffffff;
-}
-tr:hover, tr.odd:hover {
-	background-color: #cccccc;
-	color: #ffffff;
 }
 caption {
 	height: 45px;
 	line-height: 44px;
 	color: #60634E;
 	font-weight: bold;
-	text-align: center;
+	text-align: left;
 	width: 100%;
 	margin: 0;
 	padding: 0;
@@ -58,4 +39,30 @@ tfoot tr {
 tfoot td, tfoot th{
 	color: #000;
 	border: 0px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+li{
+    margin: 0.2em 0em;
+}
+
+ul#testcases {
+    list-style-type: disc;
+}
+
+ul#testcases li{
+    width: 500px;
+}
+
+.passed {
+    background-color: #ccffcc;
+    cursor: pointer;
+}
+
+.failed {
+    background-color: #ffcccc;
+    cursor: pointer;
 }
