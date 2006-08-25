@@ -103,7 +103,7 @@
 		xslfile="${result.xsl}"
 		spamwhilebroken="false"
 		skipusers="true" >
-		<!--	<always address="selenium-dev@openqa.org" /> -->
+		<always address="selenium-dev@openqa.org" /> 
 		<always address="alex.hal9000@gmail.com" />
 	    </htmlemail>
 	    <!-- maybe publish browser test results -->
