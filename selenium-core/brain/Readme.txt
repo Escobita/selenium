@@ -6,4 +6,5 @@ we gonna make your brain very sick, kaka :-))
 
 Note:
 
-before you enjoy coding in this project, please make sure you copyed selenium-core javascript directory to project's publish/selenium directory.
+before you enjoy coding in this project, please make sure you copyed
+selenium-core javascript directory to project's publish/selenium_core directory.
