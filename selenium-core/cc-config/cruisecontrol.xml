@@ -1,121 +1,113 @@
 <?xml version="1.0"?>
 
 <cruisecontrol>
-    <property name="cc.dir" value="c:/cruisecontrol"/>
-    <property name="score.dir" value="${cc.dir}/checkout/score" />
-    <property name="src.dir" value="${cc.dir}/checkout/src" />
-    <property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
-    <property name="ant.script" value="${cc.dir}/apache-ant-1.6.5/bin/ant.bat" />
+	<property file="platform.specific.properties">
 
-    <project name="selenium_core.build.win32" buildafterfailed="true">
+	<property name="score.dir" value="${cc.dir}/checkout/score" />
+	<property name="src.dir" value="${cc.dir}/checkout/src" />
 	<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
-	<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
+	<project name="selenium_core.build.${platform.name}" buildafterfailed="true">
+		<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
-	<listeners>
-	    <currentbuildstatuslistener file="${cc.dir}/logs/${project.name}/currentbuildstatus.txt" />
-	</listeners>
+		<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
 
-	<bootstrappers>
-	    <svnbootstrapper localWorkingCopy="${score.dir}"/>
-	</bootstrappers>	
+		<listeners>
+			<currentbuildstatuslistener file="${cc.dir}/logs/${project.name}/currentbuildstatus.txt" />
+		</listeners>
 
-	<modificationset quietperiod="30">
-	    <svn LocalWorkingCopy="${score.dir}" />
-	</modificationset>
+		<bootstrappers>
+			<svnbootstrapper localWorkingCopy="${score.dir}"/>
+		</bootstrappers>	
 
-	<schedule>
-	    <ant antWorkingDir="${score.dir}" 
-		antscript="${ant.script}"
-		buildfile="ccbuild.xml" 
-		target="all" 
-		uselogger="true"
-		tempfile="${project.name}-log.xml"
-		timeout= "1200" />
-	</schedule>
+		<modificationset quietperiod="30">
+			<svn LocalWorkingCopy="${score.dir}" />
+		</modificationset>
 
-	<log>
-	    <merge file="${score.dir}/code/logs/SeleniumResults.xml"/>
-	    <merge file="${score.dir}/code/logs/JsUnitResults.xml"/>
-	</log>
-	<publishers>
-	    <onsuccess>
-		<artifactspublisher
-		    file="${score.dir}/code/build/dist/Selenium-Core-0.7.2-SNAPSHOT.zip"
-		    dest="artifacts/${project.name}" />
-	    </onsuccess>
-	</publishers>
-    </project>
+		<schedule>
+			<ant antWorkingDir="${score.dir}" 
+				antscript="${ant.script}"
+				buildfile="ccbuild.xml" 
+				target="all" 
+				uselogger="true"
+				tempfile="${project.name}-log.xml"
+				timeout= "1200" />
+		</schedule>
 
-    <project name="selenium.build.win32" buildafterfailed="true">
-	<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
+		<log>
+			<merge file="${score.dir}/code/logs/SeleniumResults.xml"/>
+			<merge file="${score.dir}/code/logs/JsUnitResults.xml"/>
+		</log>
+	</project>
 
-	<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
+	<project name="selenium.build.${platform.name}" buildafterfailed="true">
+		<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
-	<listeners>
-	    <currentbuildstatuslistener file="${cc.dir}/logs/${project.name}/currentbuildstatus.txt" />
-	</listeners>
+		<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
 
-	<bootstrappers>
-	    <svnbootstrapper localWorkingCopy="${src.dir}"/>
-	</bootstrappers>	
+		<listeners>
+			<currentbuildstatuslistener file="${cc.dir}/logs/${project.name}/currentbuildstatus.txt" />
+		</listeners>
 
-	<modificationset quietperiod="30">
-	    <svn LocalWorkingCopy="${src.dir}"/>
-	    <svn LocalWorkingCopy="${score.dir}" />
-	</modificationset>
+		<bootstrappers>
+			<svnbootstrapper localWorkingCopy="${src.dir}"/>
+		</bootstrappers>	
 
-	<schedule>
-	    <ant antWorkingDir="${src.dir}" 
-		antscript="${ant.script}"
-		buildfile="ccbuild.xml" 
-		target="cruise" 
-		uselogger="true"
-		tempfile="${project.name}-log.xml"
-		timeout="2700" />
-	</schedule>
+		<modificationset quietperiod="30">
+			<svn LocalWorkingCopy="${src.dir}"/>
+			<svn LocalWorkingCopy="${score.dir}" />
+		</modificationset>
 
-	<log>
-	    <!-- how to merge more test results? (e.g. NUnit test results) -->
-	    <merge file="${src.dir}/server/target/surefire-reports/TEST-org.openqa.selenium.ServerTestSuite.xml"/>
-	    <merge file="${src.dir}/clients/java/target/surefire-reports/TEST-org.openqa.selenium.ClientDriverSuite.xml"/>
-	    <merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTaskTest.xml"/>
-	    <merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTest.xml"/>
-	</log>
+		<schedule>
+			<ant antWorkingDir="${src.dir}" 
+				antscript="${ant.script}"
+				buildfile="ccbuild.xml" 
+				target="cruise" 
+				uselogger="true"
+				tempfile="${project.name}-log.xml"
+				timeout="3600" />
+		</schedule>
 
-	<publishers>
-	    <artifactspublisher
-		file="${score.dir}/code/score-build.log"
-		dest="artifacts/${project.name}" />
-	    <artifactspublisher
-		file="${src.dir}/src-build.log"
-		dest="artifacts/${project.name}" />
-	    <onsuccess>	
-		<artifactspublisher
-		    file="${score.dir}/code/build/dist/selenium-core.jar"
-		    dest="artifacts/${project.name}" />
-		<artifactspublisher
-		    dir="${src.dir}/clients/dist"
-		    dest="artifacts/${project.name}"
-		    subdirectory="dist" />
-		<artifactspublisher
-		    dir="${src.dir}/clients/dist-doc"
-		    dest="artifacts/${project.name}"
-		    subdirectory="dist-doc" />
-	    </onsuccess>
-	    <htmlemail
-		buildresultsurl="http://selenium-win32/buildresults/selenium?tab=buildResults"
-		mailhost="localhost"
-		returnaddress="selenium.build.win32@gmail.com"
-		xslfile="${cc.dir}/webapps/cruisecontrol/xsl/buildresults.xsl"
-		spamwhilebroken="false"
-		skipusers="true" >
-		<always address="selenium-dev@openqa.org" /> 
-		<always address="alex.hal9000@gmail.com" />
-	    </htmlemail>
-	    <!-- maybe publish browser test results -->
-	</publishers>
+		<log>
+			<!-- how to merge more test results? (e.g. NUnit test results) -->
+			<merge file="${src.dir}/server/target/surefire-reports/TEST-org.openqa.selenium.ServerTestSuite.xml"/>
+			<merge file="${src.dir}/clients/java/target/surefire-reports/TEST-org.openqa.selenium.ClientDriverSuite.xml"/>
+			<merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTaskTest.xml"/>
+			<merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTest.xml"/>
+		</log>
 
-    </project>
+		<publishers>
+			<artifactspublisher
+				file="${score.dir}/code/score-build.log"
+				dest="artifacts/${project.name}" />
+			<artifactspublisher
+				file="${src.dir}/src-build.log"
+				dest="artifacts/${project.name}" />
+			<onsuccess>	
+				<artifactspublisher
+					file="${score.dir}/code/build/dist/selenium-core.jar"
+					dest="artifacts/${project.name}" />
+				<artifactspublisher
+					dir="${src.dir}/clients/dist"
+					dest="artifacts/${project.name}"
+					subdirectory="dist" />
+				<artifactspublisher
+					dir="${src.dir}/clients/dist-doc"
+					dest="artifacts/${project.name}"
+					subdirectory="dist-doc" />
+			</onsuccess>
+			<htmlemail
+				buildresultsurl="http://localhost/buildresults/${project.name}?tab=buildResults"
+				mailhost="localhost"
+				returnaddress="${return.mail.address}"
+				xslfile="${result.xsl}"
+				spamwhilebroken="false"
+				skipusers="true" >
+				<!--	<always address="selenium-dev@openqa.org" /> -->
+				<always address="alex.hal9000@gmail.com" />
+			</htmlemail>
+			<!-- maybe publish browser test results -->
+		</publishers>
+	</project>
 
 </cruisecontrol>
