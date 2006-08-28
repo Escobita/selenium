@@ -99,7 +99,7 @@
 	    <htmlemail
 		buildresultsurl="http://localhost/buildresults/${project.name}?tab=buildResults"
 		mailhost="localhost"
-		returnaddress="${return.mail.address}"
+		returnaddress="${reply.address}"
 		xslfile="${result.xsl}"
 		spamwhilebroken="false"
 		skipusers="true" >
