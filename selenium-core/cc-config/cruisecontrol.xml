@@ -8,7 +8,6 @@
     <property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
     <project name="selenium_core.build.${platform.name}" buildafterfailed="true">
-	<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
 	<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
 
@@ -17,7 +16,7 @@
 	</listeners>
 
 	<bootstrappers>
-	    <svnbootstrapper localWorkingCopy="${score.dir}"/>
+		<svnbootstrapper file="${score.dir}/ccbuild.xml"/>
 	</bootstrappers>	
 
 	<modificationset quietperiod="30">
@@ -41,7 +40,6 @@
     </project>
 
     <project name="selenium.build.${platform.name}" buildafterfailed="true">
-	<property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
 
 	<labelincrementer defaultLabel="${project.name}-1" separator="-"/>
 
@@ -50,7 +48,7 @@
 	</listeners>
 
 	<bootstrappers>
-	    <svnbootstrapper localWorkingCopy="${src.dir}"/>
+		<svnbootstrapper file="${src.dir}/ccbuild.xml"/>
 	</bootstrappers>	
 
 	<modificationset quietperiod="30">
