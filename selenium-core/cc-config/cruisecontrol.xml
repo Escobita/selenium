@@ -69,9 +69,8 @@
 	<log>
 	    <!-- how to merge more test results? (e.g. NUnit test results) -->
 	    <merge file="${src.dir}/server/target/surefire-reports/TEST-org.openqa.selenium.ServerTestSuite.xml"/>
-	    <merge file="${src.dir}/clients/java/target/surefire-reports/TEST-org.openqa.selenium.ClientDriverSuite.xml"/>
-	    <merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTaskTest.xml"/>
-	    <merge file="${src.dir}/xlator/target/surefire-reports/TEST-org.openqa.selenium.XlatorTest.xml"/>
+	    <merge dir="${src.dir}/clients/java/target/surefire-reports"/>
+	    <merge dir="${src.dir}/xlator/target/surefire-reports"/>
 	</log>
 
 	<publishers>
