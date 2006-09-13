@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 
 <cruisecontrol>
+
     <property file="cc-config/platform.specific.properties"/>
 
     <property name="score.dir" value="${cc.dir}/checkout/score" />
     <property name="src.dir" value="${cc.dir}/checkout/src" />
     <property name="cruise.build.artifacts.dir" value="${cc.dir}/artifacts" />
+
+    <property name="selenium.build.target" value="cruise" />
 
     <project name="selenium_core.build.${platform.name}" buildafterfailed="true">
 
@@ -60,7 +63,7 @@
 	    <ant antWorkingDir="${src.dir}" 
 		antscript="${ant.script}"
 		buildfile="ccbuild.xml" 
-		target="cruise" 
+		target="${selenium.build.target}" 
 		uselogger="true"
 		tempfile="${project.name}-log.xml"
 		timeout="3600" />
