@@ -66,7 +66,7 @@
 		target="${selenium.build.target}" 
 		uselogger="true"
 		tempfile="${project.name}-log.xml"
-		timeout="3600" />
+		timeout="5400" />
 	</schedule>
 
 	<log>
