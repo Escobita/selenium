@@ -77,12 +77,6 @@
 	</log>
 
 	<publishers>
-	    <artifactspublisher
-		file="${score.dir}/code/score-build.log"
-		dest="artifacts/${project.name}" />
-	    <artifactspublisher
-		file="${src.dir}/src-build.log"
-		dest="artifacts/${project.name}" />
 	    <onsuccess>	
 		<artifactspublisher
 		    file="${score.dir}/code/build/dist/selenium-core.jar"
