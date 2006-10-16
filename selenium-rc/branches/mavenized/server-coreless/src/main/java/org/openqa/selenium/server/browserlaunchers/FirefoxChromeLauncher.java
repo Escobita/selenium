@@ -174,6 +174,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
 
     public void close() {
         if (closed) return;
+        if (process == null) return;
         System.out.println("Killing Firefox...");
         Exception taskKillException = null;
         Exception fileLockException = null;
