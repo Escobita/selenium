@@ -18,6 +18,7 @@ import org.mortbay.util.*;
  * @author Ajit George
  *
  */
+@SuppressWarnings("serial")
 public class SeleniumHTMLRunnerResultsHandler implements HttpHandler {
 
     HttpContext context;
@@ -39,6 +40,8 @@ public class SeleniumHTMLRunnerResultsHandler implements HttpHandler {
         if (result == null) {
             res.getOutputStream().write("No result was specified!".getBytes());
         }
+        String seleniumVersion = request.getParameter("selenium.version");
+        String seleniumRevision = request.getParameter("selenium.revision");
         String totalTime = request.getParameter("totalTime");
         String numTestPasses = request.getParameter("numTestPasses");
         String numTestFailures = request.getParameter("numTestFailures");
@@ -49,12 +52,12 @@ public class SeleniumHTMLRunnerResultsHandler implements HttpHandler {
         
         int numTotalTests = Integer.parseInt(numTestPasses) + Integer.parseInt(numTestFailures);
         
-        List testTables = createTestTables(request, numTotalTests);
+        List<String> testTables = createTestTables(request, numTotalTests);
 
         
-        HTMLTestResults results = new HTMLTestResults(result, totalTime,
-                numTestPasses, numTestFailures, numCommandPasses,
-                numCommandFailures, numCommandErrors, suite, testTables);
+        HTMLTestResults results = new HTMLTestResults(seleniumVersion, seleniumRevision,
+                result, totalTime, numTestPasses,
+                numTestFailures, numCommandPasses, numCommandFailures, numCommandErrors, suite, testTables);
         
         for (Iterator i = listeners.iterator(); i.hasNext();) {
             HTMLResultsListener listener = (HTMLResultsListener) i.next();
@@ -73,7 +76,7 @@ public class SeleniumHTMLRunnerResultsHandler implements HttpHandler {
         writer.flush();
     }
     
-    private List createTestTables(HttpRequest request, int numTotalTests) {
+    private List<String> createTestTables(HttpRequest request, int numTotalTests) {
         List<String> testTables = new LinkedList<String>();
         for (int i = 1; i <= numTotalTests; i++) {
             String testTable = request.getParameter("testTable." + i);
