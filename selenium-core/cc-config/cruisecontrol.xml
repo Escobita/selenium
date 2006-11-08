@@ -78,13 +78,12 @@
         <publishers>
             <htmlemail
                 buildresultsurl="http://localhost/buildresults/${project.name}?tab=buildResults"
-                mailhost="localhost"
+                mailhost="mail.openqa.org"
                 returnaddress="${reply.address}"
                 xslfile="${result.xsl}"
                 spamwhilebroken="false"
                 skipusers="true" >
                 <always address="selenium-dev@openqa.org" /> 
-                <always address="alex.hal9000@gmail.com" />
             </htmlemail>
             <!-- maybe publish browser test results -->
         </publishers>
