@@ -733,6 +733,10 @@ public class SeleniumServer {
         }
         SeleniumServer.proxyInjectionMode = proxyInjectionMode;
     }
+	
+	public void setAlwaysProxy(boolean alwaysProxy) {
+        SeleniumServer.alwaysProxy = alwaysProxy;
+    }
 
 	public static String getForcedBrowserMode() {
         return forcedBrowserMode;
