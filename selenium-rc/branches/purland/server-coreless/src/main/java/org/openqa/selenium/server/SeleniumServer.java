@@ -523,6 +523,7 @@ public class SeleniumServer {
         }  
         SocketListener socketListener = new SocketListener();
         socketListener.setMaxIdleTimeMs(60000);
+        socketListener.setMaxThreads(512);
         socketListener.setPort(port);
         server.addListener(socketListener);
         configServer();
