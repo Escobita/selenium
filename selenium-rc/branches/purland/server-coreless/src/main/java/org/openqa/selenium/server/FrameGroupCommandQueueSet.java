@@ -221,8 +221,8 @@ public class FrameGroupCommandQueueSet {
                 }
                 if (command.equals("waitForPopUp")) {
                     String waitingForThisWindowName = arg;
-                    int timeoutInSeconds = Integer.parseInt(value);
-                    String result = waitForLoad(waitingForThisWindowName, "top", timeoutInSeconds);
+                    long timeoutInMilliseconds = Long.parseLong(value);
+                    String result = waitForLoad(waitingForThisWindowName, "top", (int)(timeoutInMilliseconds / 1000l));
                     if (!result.equals("OK")) {
                         return result;
                     }
