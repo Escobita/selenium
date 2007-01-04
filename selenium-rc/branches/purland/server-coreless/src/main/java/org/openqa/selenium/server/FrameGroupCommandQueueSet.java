@@ -89,26 +89,30 @@ public class FrameGroupCommandQueueSet {
         FrameAddress match = findMatchingFrameAddress(frameAddressToCommandQueue.keySet(),
                     seleniumWindowName, DEFAULT_LOCAL_FRAME_ADDRESS);
         
-        // If we didn't find a match, try finding the frame address by window title^M
+        // If we didn't find a match, try finding the frame address by window title
         if (match == null) {
-	        boolean windowFound = false;
-	        for (FrameAddress frameAddress : frameAddressToCommandQueue.keySet()) {
-		        CommandQueue commandQueue = frameAddressToCommandQueue.get(frameAddress);
-		        String cmdResult = commandQueue.doCommand("getTitle", "", "");
-		        cmdResult = cmdResult.substring(3);
-		        if (cmdResult.equals(seleniumWindowName)) {
-			        windowFound = true;
-			        match = frameAddress;
-			        break;
-		        }
-	        }
-        
-	        // Return with an error if we didn't find the window^M
-	        if (!windowFound) {
-	        	return "ERROR: could not find window " + seleniumWindowName;
-	        }
+        	boolean windowFound = false;
+        	for (FrameAddress frameAddress : frameAddressToCommandQueue.keySet()) {
+        		CommandQueue commandQueue = frameAddressToCommandQueue.get(frameAddress);
+        		// Following logic is when it would freeze when it would hit WindowName::top frame
+        		// if (frameAddress.getWindowName().equals("WindowName") && !seleniumWindowName.equals("WindowName")) {
+        		//	continue;
+        		// }
+        	
+        		String windowName = getWindowTitle(commandQueue);
+        		
+        		if (windowName.equals(seleniumWindowName)) {
+        			windowFound = true;
+        			match = frameAddress;
+        			break;
+        		}
+        	}
+        	
+        	// Return with an error if we didn't find the window
+        	if (!windowFound) {
+        		return "ERROR: could not find window " + seleniumWindowName;
+        	}
         }
-        
         setCurrentFrameAddress(match);
         return "OK";
     }
@@ -256,15 +260,38 @@ public class FrameGroupCommandQueueSet {
                 if (command.equals("waitForPopUp")) {
                     String waitingForThisWindowName = arg;
                     long timeoutInMilliseconds = Long.parseLong(value);
-                    String result = waitForLoad(waitingForThisWindowName, "top", (int)(timeoutInMilliseconds / 1000l));
-                    if (!result.equals("OK")) {
-                        return result;
+                    FrameAddress frameAddress;
+                    try {
+                    	 // Wait for the popup window to load, if it throws
+                    	 // an exception then we should simply return the
+                    	 // command result
+                    	 frameAddress = waitForLoad(waitingForThisWindowName, "top", (int)(timeoutInMilliseconds / 1000l));
+                    	 
+                    	 // if (!result.equals("OK")) {
+                    	 // 	return result;
+                     	 // }
                     }
-                    return selectWindow(waitingForThisWindowName);
+                    catch (RemoteCommandException ex) {
+                    	return ex.getResult();
+                    }
+                    
+                    // Return the result of selecting the frame address, not the window name
+                    return selectWindow(frameAddress);
                 }
                 if (command.equals("waitForPageToLoad")) {
                     return waitForLoad(arg);
                 }
+                if (command.equals("waitForFrameToLoad")) {
+                	String waitingForThisFrameName = arg;
+                	long timeoutInMilliseconds = Long.parseLong(value);
+                	String result = waitForFrameLoad(waitingForThisFrameName, (int)(timeoutInMilliseconds / 1000l));
+                	
+                	if (!result.equals("OK"))
+                		return result;
+                	
+                	selectFrame(waitingForThisFrameName);
+                	return "OK";
+                }                
                 if (command.equals("open")) {
                     String t = getCommandQueue().doCommand(command, arg, value);
                     if (!"OK".equals(t)) {
@@ -272,7 +299,7 @@ public class FrameGroupCommandQueueSet {
                     }
                     return waitForLoad(SeleniumServer.getTimeoutInSeconds() * 1000l);
                 }
-                
+
                 if (command.equals("getAllWindowNames")) {
                 	return getAllWindowNames();
                 }
@@ -294,7 +321,7 @@ public class FrameGroupCommandQueueSet {
             dataLock.unlock();
         }
     }
-    
+
     /**
      * Generates a CSV string from the given string array.
      * 
@@ -346,7 +373,7 @@ public class FrameGroupCommandQueueSet {
         String frameAddressCSV = getStringArrayAccessorCSV(windowNames.toArray(new String[0]));
         
         return "OK," + frameAddressCSV;        
-    }    
+    }   
 
     /**
      * Get a window title in the given CommandQueue.
@@ -356,8 +383,12 @@ public class FrameGroupCommandQueueSet {
     private String getWindowTitle(CommandQueue queue) {
         String cmdResult = queue.doCommand("getTitle", "", "");
     
-        // Parse out and remove the OK, from the command result
-    	cmdResult = cmdResult.substring(3);
+        if (cmdResult.length() >= 3) {  
+        	// Parse out and remove the OK, from the command result
+        	cmdResult = cmdResult.substring(3);
+        }
+    	
+    	
     	return cmdResult;
     }    
     
@@ -387,44 +418,45 @@ public class FrameGroupCommandQueueSet {
         return waitForFrameLoad(Long.parseLong(timeoutInMilliseconds));
     }
     
-    /**
-     * Waits for a frame to load.
-     * 
+	/**
+	 * Waits for a frame to load.
+	 * 
      * @param waitingForThisLocalFrame
      *            Frame address to wait for.
      * @param timeoutInSeconds
      *            Time to wait in seconds.
-     * @return Returns "OK" if waiting was successful.
-     */
-    private String waitForFrameLoad(String waitingForThisLocalFrame, int timeoutInSeconds) {
-        
-        dataLock.lock();
-    
-        try {
-            for (FrameAddress matchingFrameAddress = null; timeoutInSeconds >= 0; timeoutInSeconds--) {
-    			matchingFrameAddress = findMatchingFrameAddressFrame(
-    				frameAddressToJustLoaded.keySet(), waitingForThisLocalFrame);
-    			if (matchingFrameAddress != null) {
-    				SeleniumServer.log("wait is over: frame \""
-    				        + waitingForThisLocalFrame
-    				        + "\" was seen at last (" + matchingFrameAddress
-    				        + ")");
-    				frameAddressToJustLoaded.remove(matchingFrameAddress);
-    				return "OK";
-    			}
-    			SeleniumServer.log("waiting for frame \""
-    			        + waitingForThisLocalFrame + "\"");
-    			try {
-    			    resultArrivedOnAnyQueue.await(1, TimeUnit.SECONDS);
-    			} catch (InterruptedException e) {
-    			}
-    		}
-    		return "ERROR: timed out waiting for frame \""
-    				+ waitingForThisLocalFrame + "\" to appear";
-    	} finally {
-    		dataLock.unlock();
-    	}
-    }
+	 * @return Returns "OK" if waiting was successful.
+	 */
+	private String waitForFrameLoad(String waitingForThisLocalFrame, int timeoutInSeconds) {
+		dataLock.lock();
+		try {
+			for (FrameAddress matchingFrameAddress = null; timeoutInSeconds >= 0; timeoutInSeconds--) {
+				matchingFrameAddress = findMatchingFrameAddressFrame(
+						frameAddressToJustLoaded.keySet(), waitingForThisLocalFrame);
+				if (matchingFrameAddress != null) {
+					SeleniumServer.log("wait is over: frame \""
+							+ waitingForThisLocalFrame
+							+ "\" was seen at last (" + matchingFrameAddress
+							+ ")");
+					// Remove it from the list of matching frame addresses
+					// since it just loaded.  Mark whether just loaded
+					// to aid debugging.
+					markWhetherJustLoaded(matchingFrameAddress, false);
+					return "OK";
+				}
+				SeleniumServer.log("waiting for frame \""
+						+ waitingForThisLocalFrame + "\"");
+				try {
+					resultArrivedOnAnyQueue.await(1, TimeUnit.SECONDS);
+				} catch (InterruptedException e) {
+				}
+			}
+			return "ERROR: timed out waiting for frame \""
+					+ waitingForThisLocalFrame + "\" to appear";
+		} finally {
+			dataLock.unlock();
+		}
+	}
 
     /**
      * Find matching frame address for the given local frame.
@@ -487,21 +519,33 @@ public class FrameGroupCommandQueueSet {
     		return true;
     	}
     	return false;
-    }        
-    
+    }
+     
     private String waitForLoad(long timeoutInMilliseconds) {
         int timeoutInSeconds = (int)(timeoutInMilliseconds / 1000l);
         if (timeoutInSeconds == 0) {
             timeoutInSeconds = 1;
-        };
-        return waitForLoad(currentSeleniumWindowName, currentLocalFrameAddress, timeoutInSeconds);
+        }
+        try {
+        	FrameAddress frameAddress = waitForLoad(currentSeleniumWindowName, currentLocalFrameAddress, timeoutInSeconds);
+        	
+        	if (frameAddress == null) {
+        		throw new RuntimeException("frame address is null in waitForLoad...this should not happen.");
+        	}
+        	else {
+        		return "OK";
+        	}
+        }
+        catch (RemoteCommandException se) {
+        	return se.getMessage();
+        }
     }
     
     private String waitForLoad(String timeoutInMilliseconds) {
         return waitForLoad(Long.parseLong(timeoutInMilliseconds));
     }
 
-    private String waitForLoad(String waitingForThisWindowName, String waitingForThisLocalFrame, int timeoutInSeconds) {
+    private FrameAddress waitForLoad(String waitingForThisWindowName, String waitingForThisLocalFrame, int timeoutInSeconds) throws RemoteCommandException {
         dataLock.lock();
         try {
             for (FrameAddress matchingFrameAddress = null; timeoutInSeconds >= 0; timeoutInSeconds--) {
@@ -509,8 +553,11 @@ public class FrameGroupCommandQueueSet {
                         waitingForThisWindowName, waitingForThisLocalFrame);
                 if (matchingFrameAddress!=null) {
                     SeleniumServer.log("wait is over: window \"" + waitingForThisWindowName + "\" was seen at last (" + matchingFrameAddress + ")");
-                    frameAddressToJustLoaded.remove(matchingFrameAddress);
-                    return "OK";
+					// Remove it from the list of matching frame addresses
+					// since it just loaded.  Mark whether just loaded
+					// to aid debugging.
+					markWhetherJustLoaded(matchingFrameAddress, false);
+                    return matchingFrameAddress;
                 }
                 SeleniumServer.log("waiting for window \"" + waitingForThisWindowName + "\"" + " local frame \"" + waitingForThisLocalFrame + "\"");
                 try {
@@ -518,7 +565,11 @@ public class FrameGroupCommandQueueSet {
                 } catch (InterruptedException e) {
                 }
             }
-            return "ERROR: timed out waiting for window \"" + waitingForThisWindowName + "\" to appear";
+            String result = "timed out waiting for window \"" + waitingForThisWindowName + "\" to appear";
+            throw new RemoteCommandException(result, result);
+        }
+        catch (RemoteCommandException se) {
+        	throw new RemoteCommandException(se.getMessage(), se.getResult(), se);
         }
         finally {
             dataLock.unlock();
@@ -547,6 +598,25 @@ public class FrameGroupCommandQueueSet {
         if (windowName==null || windowName.equals("null")) {
             windowName = DEFAULT_SELENIUM_WINDOW_NAME;
         }
+        
+        CommandQueue queue = frameAddressToCommandQueue.get(f);
+        boolean windowJustLoaded = justLoaded(f);
+//        if (windowName != null && f.getLocalFrameAddress().equals("top")) {
+        if (windowJustLoaded) {
+        	boolean windowDoesMatch = queue.matchesFrameAddress(f.getLocalFrameAddress(), localFrame);
+
+			// Mark the frame as still loaded because we just sent a command
+			markWhetherJustLoaded(f, true);        	
+        	
+        	//if (windowDoesMatch) {
+        		String title = getWindowTitle(queue);
+        		markWhetherJustLoaded(f, true);  
+        		if (title.equals(windowName) ) {
+        			return true;
+        		}
+        	//}
+        }
+        
         if (!f.getLocalFrameAddress().equals(localFrame)) {
             return false;
         }
@@ -584,6 +654,11 @@ public class FrameGroupCommandQueueSet {
                     queue.addJsWindowNameVar((String)jsWindowNameVar);                    
                 }
             }
+            
+            if (justLoaded/* && !queue.isResultExpected()*/) {
+            	commandResult = "OK";
+            }
+            
             return queue.handleCommandResult(commandResult);
         }
         finally {
@@ -713,5 +788,3 @@ public class FrameGroupCommandQueueSet {
         }
     }
 }
-
-
