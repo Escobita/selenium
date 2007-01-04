@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.openqa.selenium.core</groupId>
             <artifactId>selenium-core</artifactId>
-            <version>0.8.2-SNAPSHOT</version>
+            <version>0.8.3-SNAPSHOT</version>
             <scope>provided</scope>
     	</dependency>
 
