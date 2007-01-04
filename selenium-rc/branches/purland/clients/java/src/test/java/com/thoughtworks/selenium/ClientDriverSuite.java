@@ -62,6 +62,8 @@ public class ClientDriverSuite extends TestCase {
             
             
             if (isProxyInjectionMode) {
+            	// Run test for selecting windows by titles through PI mode
+            	suite.addTestSuite(TestSelectWindowTitle.class);
                 suite.addTestSuite(TestClick.class);    // ok, run just a single test in PI mode
             }
             else {

@@ -88,9 +88,27 @@ public class FrameGroupCommandQueueSet {
         }
         FrameAddress match = findMatchingFrameAddress(frameAddressToCommandQueue.keySet(),
                     seleniumWindowName, DEFAULT_LOCAL_FRAME_ADDRESS);
-        if (match==null) {
-            return "ERROR: could not find window " + seleniumWindowName;
+        
+        // If we didn't find a match, try finding the frame address by window title^M
+        if (match == null) {
+	        boolean windowFound = false;
+	        for (FrameAddress frameAddress : frameAddressToCommandQueue.keySet()) {
+		        CommandQueue commandQueue = frameAddressToCommandQueue.get(frameAddress);
+		        String cmdResult = commandQueue.doCommand("getTitle", "", "");
+		        cmdResult = cmdResult.substring(3);
+		        if (cmdResult.equals(seleniumWindowName)) {
+			        windowFound = true;
+			        match = frameAddress;
+			        break;
+		        }
+	        }
+        
+	        // Return with an error if we didn't find the window^M
+	        if (!windowFound) {
+	        	return "ERROR: could not find window " + seleniumWindowName;
+	        }
         }
+        
         setCurrentFrameAddress(match);
         return "OK";
     }
@@ -238,6 +256,10 @@ public class FrameGroupCommandQueueSet {
                     }
                     return waitForLoad(SeleniumServer.getTimeoutInSeconds() * 1000l);
                 }
+                
+                if (command.equals("getAllWindowNames")) {
+                	return getAllWindowNames();
+                }
 
                 // strip off AndWait - in PI mode we handle this in the server rather than in core...
                 if (command.endsWith("AndWait")) {
@@ -256,7 +278,60 @@ public class FrameGroupCommandQueueSet {
             dataLock.unlock();
         }
     }
+    
+    /**
+     * Generates a CSV string from the given string array.
+     * 
+     * @param stringArray Array of strings to generate a CSV.
+     */
+    public String getStringArrayAccessorCSV(String[] stringArray) {
+    	StringBuffer sb = new StringBuffer();
+    	
+    	for (int i = 0; i < stringArray.length; i++) {
+    		// Obey specs for String Array accessor responses
+    		String str = stringArray[i];
+    		
+    		// If the string contains a slash make it appear as \\ in the protocol
+    		// 1 slash in Java/regex is \\\\
+    		str = str.replaceAll("\\\\", "\\\\\\\\");
+    		str = str.replaceAll(",", "\\\\,");
+    		sb.append(str);
+    		if ((i+1) < stringArray.length) {
+    			sb.append('\\');
+    			sb.append(',');
+    			sb.append(" ");
+    		}
+    	}
+    	
+    	return sb.toString();
+    }    
 
+    /**
+     * Get all window names from the server.  Since the JS in the browser
+     * cannot possibly know about all windows.
+     */
+    private String getAllWindowNames() {
+    	// If we're not in PI mode, send the command back to the browser.
+        if (!SeleniumServer.isProxyInjectionMode()) {  
+        	return doCommand("getAllWindowNames", "", "");
+        }
+        
+        Set<FrameAddress> frameAddressSet = frameAddressToCommandQueue.keySet();
+        List<String> windowNames = new ArrayList<String>();
+        
+        // Find all window names in the set of frame addresses
+        for (FrameAddress frameAddress : frameAddressSet) {
+        	String windowName = frameAddress.getWindowName();
+        	if (!windowNames.contains(windowName)) {
+        		windowNames.add(windowName);
+        	}
+        }
+        
+        String frameAddressCSV = getStringArrayAccessorCSV(windowNames.toArray(new String[0]));
+        
+        return "OK," + frameAddressCSV;        
+    }    
+    
     private String waitForLoad(long timeoutInMilliseconds) {
         int timeoutInSeconds = (int)(timeoutInMilliseconds / 1000l);
         if (timeoutInSeconds == 0) {
