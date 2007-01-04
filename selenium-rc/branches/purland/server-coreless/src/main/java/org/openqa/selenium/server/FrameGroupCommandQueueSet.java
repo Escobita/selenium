@@ -47,9 +47,9 @@ public class FrameGroupCommandQueueSet {
     private FrameAddress currentFrameAddress = null;
     
     private Map<FrameAddress, CommandQueue> frameAddressToCommandQueue = new ConcurrentHashMap<FrameAddress, CommandQueue>();
-    static public final Map<String, FrameGroupCommandQueueSet> queueSets = new HashMap<String, FrameGroupCommandQueueSet>();
+    static public final Map<String, FrameGroupCommandQueueSet> queueSets = new ConcurrentHashMap<String, FrameGroupCommandQueueSet>();
     
-    private Map<FrameAddress, Boolean> frameAddressToJustLoaded = new HashMap<FrameAddress, Boolean>();
+    private Map<FrameAddress, Boolean> frameAddressToJustLoaded = new ConcurrentHashMap<FrameAddress, Boolean>();
     static private Lock dataLock = new ReentrantLock(); // 
     static private Condition resultArrivedOnAnyQueue = dataLock.newCondition();
     
@@ -112,6 +112,22 @@ public class FrameGroupCommandQueueSet {
         setCurrentFrameAddress(match);
         return "OK";
     }
+    
+    /**
+	 * Select a window by the given frame address.
+	 * 
+	 * @param frameAddress
+	 *            Frame address to select.
+	 * @return Returns "OK" if the command was successful.
+	 */
+	private String selectWindow(FrameAddress frameAddress) {
+		if (!SeleniumServer.isProxyInjectionMode()) {
+			return doCommand("selectWindow", frameAddress.getWindowName(), "");
+		}
+
+		setCurrentFrameAddress(frameAddress);
+		return "OK";
+	}    
 
     public CommandQueue getCommandQueue() {
         dataLock.lock();
@@ -331,6 +347,147 @@ public class FrameGroupCommandQueueSet {
         
         return "OK," + frameAddressCSV;        
     }    
+
+    /**
+     * Get a window title in the given CommandQueue.
+     * @param queue CommandQueue to get the title from.
+     * @return Returns the title if it is found.
+     */
+    private String getWindowTitle(CommandQueue queue) {
+        String cmdResult = queue.doCommand("getTitle", "", "");
+    
+        // Parse out and remove the OK, from the command result
+    	cmdResult = cmdResult.substring(3);
+    	return cmdResult;
+    }    
+    
+    /**
+     * Waits for a frame to load.
+     * 
+     * @param timeoutInMilliseconds Time to wait in milliseconds
+     * @return Returns "OK" if waiting was successful.
+     */
+    private String waitForFrameLoad(long timeoutInMilliseconds) {
+        int timeoutInSeconds = (int) (timeoutInMilliseconds / 1000l);
+    
+        if (timeoutInSeconds == 0) {
+            timeoutInSeconds = 1;
+        }
+    
+    	return waitForFrameLoad(currentLocalFrameAddress, timeoutInSeconds);
+    }
+    
+    /**
+     * Waits for a frame to load.
+     * 
+     * @param timeoutInMilliseconds Time to wait in milliseconds
+     * @return Returns "OK" if waiting was successful.
+     */
+    private String waitForFrameLoad(String timeoutInMilliseconds) {
+        return waitForFrameLoad(Long.parseLong(timeoutInMilliseconds));
+    }
+    
+    /**
+     * Waits for a frame to load.
+     * 
+     * @param waitingForThisLocalFrame
+     *            Frame address to wait for.
+     * @param timeoutInSeconds
+     *            Time to wait in seconds.
+     * @return Returns "OK" if waiting was successful.
+     */
+    private String waitForFrameLoad(String waitingForThisLocalFrame, int timeoutInSeconds) {
+        
+        dataLock.lock();
+    
+        try {
+            for (FrameAddress matchingFrameAddress = null; timeoutInSeconds >= 0; timeoutInSeconds--) {
+    			matchingFrameAddress = findMatchingFrameAddressFrame(
+    				frameAddressToJustLoaded.keySet(), waitingForThisLocalFrame);
+    			if (matchingFrameAddress != null) {
+    				SeleniumServer.log("wait is over: frame \""
+    				        + waitingForThisLocalFrame
+    				        + "\" was seen at last (" + matchingFrameAddress
+    				        + ")");
+    				frameAddressToJustLoaded.remove(matchingFrameAddress);
+    				return "OK";
+    			}
+    			SeleniumServer.log("waiting for frame \""
+    			        + waitingForThisLocalFrame + "\"");
+    			try {
+    			    resultArrivedOnAnyQueue.await(1, TimeUnit.SECONDS);
+    			} catch (InterruptedException e) {
+    			}
+    		}
+    		return "ERROR: timed out waiting for frame \""
+    				+ waitingForThisLocalFrame + "\" to appear";
+    	} finally {
+    		dataLock.unlock();
+    	}
+    }
+
+    /**
+     * Find matching frame address for the given local frame.
+     * 
+     * @param frameAddresses Set of frame addresses to search within.
+     * @param localFrame Local frame address as a string to search for.
+     * @return Returns the frame address, null if it cannot find a match.
+     */
+    private FrameAddress findMatchingFrameAddressFrame(
+    		Set<FrameAddress> frameAddresses, String localFrame) {
+        
+    	for (FrameAddress frameAddress : frameAddresses) {
+    		if (matchesFrameAddressFrame(frameAddress, localFrame)) {
+    			return frameAddress;
+    		}
+    	}
+    	return null;
+    }
+    
+    /**
+     * Determine if a given frame matches the given local frame address string.
+     * 
+     * @param frame Frame address to search.
+     * @param localFrame Frame address string to search for.
+     * @return Returns true if found, otherwise false.
+     */
+    private boolean matchesFrameAddressFrame(FrameAddress frame, String localFrame) {
+    	CommandQueue queue = frameAddressToCommandQueue.get(frame);
+    	String frameLocalFrame = frame.getLocalFrameAddress();
+    	boolean justLoaded = justLoaded(frame);
+        
+        // I tried the following but it wasn't complete and am leaving here as
+        // a reference of what was tried.
+             
+        /* boolean result = queue.matchesFrameAddress(frameLocalFrame, localFrame);
+    
+    	// If we are looking for the "top" frame and the frame that we are
+    	// currently
+    	// looking at is a subframe of "top" and it has just loaded...then
+        if (frameLocalFrame.startsWith(localFrame)
+                && frameLocalFrame.startsWith(localFrame + "." + "frames")
+                && justLoaded && result) {
+            return true;
+        } else if (localFrame.equals("top")
+                && frameLocalFrame.startsWith("top.frames") && justLoaded
+                && result) {
+            return true;
+        }
+        */
+    		
+    		
+    	// If the frame has just loaded...and
+    	// 1) if the local frame is equal to the given frame address
+    	//    OR:
+    	// 2) if the browser returns yes if the local frame does in fact
+    	//    match the given frame address to the frame
+    	if (justLoaded
+    			&& (localFrame.equals(frameLocalFrame) || queue
+    					.matchesFrameAddress(frameLocalFrame, localFrame))) {
+    		return true;
+    	}
+    	return false;
+    }        
     
     private String waitForLoad(long timeoutInMilliseconds) {
         int timeoutInSeconds = (int)(timeoutInMilliseconds / 1000l);
