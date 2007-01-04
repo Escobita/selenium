@@ -237,11 +237,6 @@ public class SeleniumServer {
             } else if ("-jettyThreads".equalsIgnoreCase(arg)) {
             	int jettyThreads = Integer.parseInt(getArg(args, ++i));
             	
-            	if (jettyThreads > MAX_JETTY_THREADS) {
-            		System.err.println("You must specify a number of jetty threads lower than the maximum number (" + MAX_JETTY_THREADS + ").");
-            		System.exit(1);
-            	}
-            	
             	// Set the number of jetty threads before we construct the instance
             	SeleniumServer.setJettyThreads(jettyThreads);
             } else if ("-userJsInjection".equalsIgnoreCase(arg)) {
@@ -729,8 +724,15 @@ public class SeleniumServer {
      * Set the number of threads that the server will use for Jetty.
      * 
      * In order to use this, you must call this method before you call the SeleniumServer constructor.
+     * 
+     * @param jettyThreads Number of jetty threads for the server to use 
+     * @throws IllegalArgumentException when jettyThreads <= 0 or > MAX_JETTY_THREADS
      */
     public static void setJettyThreads(int jettyThreads) {
+    	if (jettyThreads <= 0 || jettyThreads > MAX_JETTY_THREADS) {
+    		throw new IllegalArgumentException("Number of jetty threads specified as an argument must be greater than zero and less than " + MAX_JETTY_THREADS);
+    	}
+    	
     	SeleniumServer.jettyThreads = jettyThreads;
     }
 
