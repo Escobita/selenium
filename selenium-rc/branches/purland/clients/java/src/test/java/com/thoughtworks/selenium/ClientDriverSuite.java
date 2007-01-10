@@ -65,6 +65,9 @@ public class ClientDriverSuite extends TestCase {
             	// Run test for selecting windows by titles through PI mode
             	suite.addTestSuite(TestSelectWindowTitle.class);
                 suite.addTestSuite(TestClick.class);    // ok, run just a single test in PI mode
+                
+                // Will need to run for IE tests
+                //suite.addTestSuite(TestModalDialog.class);
             }
             else {
                 
