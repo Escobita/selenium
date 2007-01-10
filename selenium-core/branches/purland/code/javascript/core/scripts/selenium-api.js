@@ -2095,7 +2095,7 @@ Selenium.prototype.doWaitForFrameToLoad = function(frameAddress, timeout) {
      * Waits for a new frame to load.
      *
      * <p>Selenium constantly keeps track of new pages and frames loading, 
-     * and sets a "newPageLoaded" flag when it first notices a page load.
+     * and sets a "newPageLoaded" flag when it first notices a page load.</p>
      * 
      * See waitForPageToLoad for more information.
      * 
