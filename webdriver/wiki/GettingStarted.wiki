@@ -1,0 +1,5 @@
+#summary Getting started with WebDriver
+
+= Getting Started =
+
+Placeholder for "getting started with WebDriver" content.
