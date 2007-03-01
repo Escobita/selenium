@@ -1,5 +1,50 @@
 #summary Getting started with WebDriver
 
-= Getting Started =
+= The 5 Minute Getting Started Guide =
 
-Placeholder for "getting started with WebDriver" content.
+Before you start:
+
+ * CheckOut the latest version of the code, because there aren't any pre-packed binaries yet.
+ * Follow the instructions in BuildingWebDriver.
+
+Assuming that you've built everything and the source is located at {{{$WEBDRIVER_HOME}}}, and we're only going to use the HtmlUnitDriver to start with:
+
+ * Start a new Java project in your favourite IDE
+ * Add {{{$WEBDRIVER_HOME/common/build/webdriver-common.jar}}} to the {{{CLASSPATH}}}
+ * Add {{{$WEBDRIVER_HOME/htmlunit/build/webdriver-htmlunit.jar}}} to the {{{CLASSPATH}}}
+ * Add all the Jar files under {{{$WEBDRIVER_HOME/htmlunit/lib/runtime}}} to the {{{CLASSPATH}}}
+
+We're now ready to write some code. Perhaps something that looks like:
+
+{{{
+package com.thoughtworks.webdriver.example;
+
+import com.thoughtworks.webdriver.WebDriver;
+import com.thoughtworks.webdriver.WebElement;
+import com.thoughtworks.webdriver.htmlunit.HtmlUnitDriver;
+
+public class Example  {
+    public static void main(String[] args) {
+        // Create a new instance of the html unit driver
+        WebDriver driver = new HtmlUnitDriver();
+
+        // And now use this to visit Google
+        driver.get("http://www.google.com");
+
+        // Find the text input element using a little XPath
+        WebElement element = driver.selectElement("//input[@name='q']");
+
+        // Enter something to search for
+        element.setValue("Cheese!");
+
+        // Now submit the form. WebDriver will find the form for us from the element
+        element.submit();
+
+        // Check the title of the page
+        System.out.println("Page title is: " + driver.getTitle());
+    }
+}
+
+}}}
+
+Compile and run it. Congratulations, you've managed to get started with WebDriver!

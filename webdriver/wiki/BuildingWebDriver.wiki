@@ -1,0 +1,29 @@
+#summary Instructions on how to build WebDriver
+
+= Building WebDriver =
+
+== Prerequisites ==
+
+For all versions of WebDriver:
+
+ * The Java JDK 1.4 or above
+ * Ruby
+ * Rake, which is a ruby build tool (http://rake.rubyforge.org/)
+ * The source code (you may need to CheckOut the source from source control)
+
+In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
+
+ * Visual Studio 2005
+ * .Net 2
+ * "regasm" and "csc" should both be on the PATH. This is most easily done by starting the "Visual Studio 2005 Command Prompt" from that Start menu.
+
+== Building ==
+
+The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. Now:
+
+{{{
+cd $WEBDRIVER_HOME   # Where the top level Rakefile is kept
+rake
+}}}
+
+This will not only compile the source, but will also run any tests which need to be run. If these all pass, then you have successfully built WebDriver!

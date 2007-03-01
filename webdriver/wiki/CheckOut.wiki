@@ -1,0 +1,9 @@
+#summary Getting hold of the source in order to build WebDriver
+
+= Getting the Latest WebDriver code =
+
+In order to get the latest version of the code, please follow the instructions on the project's source page on Google Code located at http://code.google.com/p/webdriver/source
+
+= Downloading Binaries =
+
+Currently there are no binaries or pre-packaged versions of WebDriver available for download. We plan on releasing these once the FirefoxDriver has been added to the project, which should happen at some point in March 2007. If you would like to be kept up to date with developments, want to know when binary packages are released or need any help, please consider joining the mailing list.
