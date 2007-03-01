@@ -1,0 +1,5 @@
+#summary What is HtmlUnit
+
+= HtmlUnit =
+
+This is a Java framework for testing webapps. It's a wrapper around the Jakarta [http://jakarta.apache.org/commons/httpclient/ HttpClient] and provides a more friendly API. The project is hosted at http://htmlunit.sourceforge.net/ 

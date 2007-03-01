@@ -1,0 +1,18 @@
+#summary Information about the HtmlUnit Driver
+
+= HtmlUnit Driver =
+
+This is currently the fastest and most lightweight implementation of WebDriver. As the name suggests, this is based on HtmlUnit.
+
+== Pros ==
+
+ * Fastest implementation of WebDriver
+ * A pure Java solution and so it is platform independent.
+
+== Cons ==
+
+ * Does not support Javascript.
+
+= HtmlUnit Supports Javascript So Why Doesn't the HtmlUnitDriver? =
+
+Every browser has its own implementation of Javascript and each of these have their own quirks and oddities and HtmlUnit is no different. Because of this, it was felt that Javascript should be disabled except in the implementations of WebDriver which drive a real browser (such as the FirefoxDriver and the InternetExplorerDriver) so that if any issues are found, we can be certain that they will effect end-users of the application under test.

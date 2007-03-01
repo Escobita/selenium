@@ -8,7 +8,7 @@ For all versions of WebDriver:
 
  * The Java JDK 1.4 or above
  * Ruby
- * Rake, which is a ruby build tool (http://rake.rubyforge.org/)
+ * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
  * The source code (you may need to CheckOut the source from source control)
 
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
