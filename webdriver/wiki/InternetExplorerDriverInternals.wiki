@@ -1,0 +1,18 @@
+#summary How the InternetExplorerDriver works
+
+= How the InternetExplorerDriver Works =
+
+The InternetExplorerDriver is composed of both a Java part and a custom COM component. The two are connected using [JACOB http://sourceforge.net/projects/jacob-project/], a Java/COM bridge. The COM component is written in C# and wraps the Internet Explorer ActiveX control.
+
+== Time for some ASCII art ==
+
+{{{
+
+ +-----------+    +----------+    +-----------+    +---------+
+ |   Java    |    | Java/COM |    |  Custom   |    |   IE    |
+ | component |--->|  bridge  |--->|    COM    |--->| ActiveX |
+ |           |    |          |    | component |    | control |
+ +-----------+    +----------+    +-----------+    +---------+
+
+}}}
+
