@@ -305,6 +305,7 @@ Format.prototype.loadFile = function(file, isURL) {
 		this.getFormatter().parse(testCase, text);
 		
 		sis.close();
+        testCase.recordModifiedInCommands();
 		testCase.file = file;
         if (!isURL) {
             testCase.lastModifiedTime = file.lastModifiedTime;
