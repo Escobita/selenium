@@ -178,6 +178,7 @@ function start(baseURL) {
 		if (result.failed) {
             testCase.debugContext.failed = true;
 			testCase.debugContext.currentCommand().result = 'failed';
+            LOG.error(result.failureMessage);
 		} else if (result.passed) {
 			testCase.debugContext.currentCommand().result = 'passed';
 		} else {
