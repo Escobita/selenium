@@ -49,3 +49,48 @@ public class Example  {
 }}}
 
 Compile and run it. Congratulations, you've managed to get started with WebDriver!
+
+Now let's try something that needs Javascript. Follow the instructions on the FirefoxDriver page in order to create a profile called "WebDriver" and install the WebDriver extension. Once that's done, create a new class called GoogleSuggest, which looks like:
+
+{{{
+package com.thoughtworks.webdriver.example;
+
+import java.util.List;
+
+import com.thoughtworks.webdriver.WebDriver;
+import com.thoughtworks.webdriver.WebElement;
+import com.thoughtworks.webdriver.firefox.FirefoxDriver;
+
+public class GoogleSuggest {
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) throws Exception {
+        // The Firefox driver supports javascript 
+        WebDriver driver = new FirefoxDriver();
+        
+        // Go to the Google Suggest home page
+        driver.get("http://www.google.com/webhp?complete=1&hl=en");
+        
+        // Enter the query string "I like cheese"
+        WebElement query = driver.selectElement("//input[@name='q']");
+        query.setValue("Cheese");
+
+        // This should go at some point, but allows Google to return some suggestions for now
+        Thread.sleep(2000);
+        
+        // And now list the suggestions
+        WebElement allSuggestions = driver.selectElement("//div[@id='completeDiv']");
+        
+        // Each of the results is presented as a div with a span within a span, so this looks quite complex
+        // The important point is that finding the suggestions is simple because we can grab the top
+        // level element and just get hold of the immediate children with the appropriate tag name.
+        List<WebElement> suggestions = allSuggestions.getChildrenOfType("div");
+        for (WebElement suggestion : suggestions) {
+            WebElement containingSpan = (WebElement) suggestion.getChildrenOfType("span").get(0);
+            WebElement text = (WebElement) containingSpan.getChildrenOfType("span").get(0);
+            System.out.println("Suggestion was: " + text.getText());
+        };
+    }
+}
+}}}
+
+You'll see the list of suggestions being printed to the console. That's all there is to using WebDriver!
