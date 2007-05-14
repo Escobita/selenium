@@ -15,7 +15,7 @@ In addition, the InternetExplorerDriver needs some additional components and can
 
  * Visual Studio 2005
  * .Net 2
- * "regasm" and "csc" should both be on the PATH. This is most easily done by starting the "Visual Studio 2005 Command Prompt" from that Start menu.
+ * "regasm" and "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2005 Command Prompt" from that Start menu.
 
 == Building ==
 
