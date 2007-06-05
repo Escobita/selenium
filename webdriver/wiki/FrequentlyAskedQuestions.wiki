@@ -1,0 +1,31 @@
+#summary WebDriver FAQs
+#labels Featured
+
+= FAQ =
+
+*Q: What is WebDriver?*
+
+A: WebDriver is a tool for writing automated tests of websites. It aims to mimic the behaviour of a real user, and as such interacts with the HTML of the application.
+
+*Q: So, is it like [http://www.openqa.org/selenium-core/ Selenium]? Or [http://sahi.co.in/ Sahi]?*
+
+A: The aim is the same (to allow you to test your webapp), but the implementation is different. Rather than running as a Javascript application within the browser (with the limitations this brings, such as the "[http://www.openqa.org/selenium-rc/tutorial.html same origin]" problem), WebDriver controls the browser itself. This means that it can take advantage of any facilities offered by the native platform.
+
+*Q: What does it mean to be "developer focused"?
+
+A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
+
+*Q: Why can't I execute Javascript directly? Other web testing tools allow this*
+
+A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers
+working out which Javascript method to call.
+
+We also realise that there will be times when this is a limitation, and if you find this is a case please ask for help on the [http://groups.google.com/group/webdriver mailing list]. We'll do our best to help develop a simple, workable solution.
+
+*Q: Which browsers does WebDriver support?*
+
+A: The existing drivers are the InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
+
+*Q: I'd like it WebDriver did....*
+
+A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
