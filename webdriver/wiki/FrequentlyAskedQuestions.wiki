@@ -26,6 +26,6 @@ We also realise that there will be times when this is a limitation, and if you f
 
 A: The existing drivers are the InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
 
-*Q: I'd like it WebDriver did....*
+*Q: I'd like it if WebDriver did....*
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
