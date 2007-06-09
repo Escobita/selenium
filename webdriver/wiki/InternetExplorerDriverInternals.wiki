@@ -2,17 +2,8 @@
 
 = How the InternetExplorerDriver Works =
 
-The InternetExplorerDriver is composed of both a Java part and a custom COM component. The two are connected using [JACOB http://sourceforge.net/projects/jacob-project/], a Java/COM bridge. The COM component is written in C# and wraps the Internet Explorer ActiveX control.
+The InternetExplorerDriver is composed of a Java part and a native component that uses the IE Automation APIs. The C++ source is organised into separate layers. Each Java class that uses native methods has a matching header and source file (with a very long name). These are responsible for handling all the conversion to and from JNI types, and call down to other classes which handle driving IE and marshalling from COM types to simpler types.
 
-== Time for some ASCII art ==
+XPath evaluation is done using Jaxen, an Open Source XPath engine. The key Java class is the IeNavigator. This ultimately makes use of the ElementNode and DocumentNode C++ classes.
 
-{{{
-
- +-----------+    +----------+    +-----------+    +---------+
- |   Java    |    | Java/COM |    |  Custom   |    |   IE    |
- | component |--->|  bridge  |--->|    COM    |--->| ActiveX |
- |           |    |          |    | component |    | control |
- +-----------+    +----------+    +-----------+    +---------+
-
-}}}
-
+As an aside, the pointers to the native objects are stored as long fields in the Java classes.
