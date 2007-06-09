@@ -6,7 +6,7 @@ This driver has been tested with IE 6 and 7 on XP, but should also work with IE 
 
 == Installing ==
 
-Before using this driver, it is necessary to register the COM component that forms the native part of the driver (see InternetExplorerDriverInternals for more information) This is done by running the {{{webdriver.reg}}} file found in the root of the "jobbie" directory. If you are compiling the C# code within Visual Studio, your IDE will do this for you.
+Simply copy the jars from the "jobbie/lib/runtime" directory on to the classpath and ensure that the internetexplorerdriver.dll is somewhere on the PATH.
 
 == Pros ==
 
