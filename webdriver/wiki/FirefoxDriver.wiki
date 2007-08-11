@@ -10,7 +10,7 @@ There is a plan to make the FirefoxDriver installable as a simple XPI. Until the
 
  # Find out where your profile directory ($PROFILE_DIR) is. The best guide for that is here: http://www.mozilla.org/support/firefox/profile
  # Create a new "WebDriver" profile. The camel case matters!
-   * This is done using {{{firefox -profileManager}}}
+   * This is done using {{{firefox -ProfileManager}}}
    * Or by following the instructions from the page mentioned above
  # Create a file called {{{fxdriver@thoughtworks.com}}} in {{{$PROFILE_DIR/xxxxxxxx.WebDriver/extensions/}}} The contents of this file should be a single line, containing the absolute path to the FirefoxDriver's extension directory ({{{firefox/src/extension}}})
 
