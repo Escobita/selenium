@@ -4,9 +4,19 @@
 
 Everything you ever wanted to know about the Firefox driver but were afraid to ask.
 
-== Installing ==
+== Installing the Quick Way ==
 
-There is a plan to make the FirefoxDriver installable as a simple XPI. Until then, you'll need to install the extension by hand. This isn't as terrifying as you might think:
+There is a plan to make the FirefoxDriver installable as a simple XPI. Until then, you'll need Ruby and rake installed on your machine, then (after quitting any open instances of Firefox) simply run:
+
+{{{rake install_firefox}}}
+
+This assumes that your installation of Firefox 2 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH.
+
+After the installation is completed, Firefox should start using the new WebDriver profile. Go to "{{{Tools->Add-ons}}}" and check that there's an extension called "Firefox WebDriver" installed. Carry on reading below if it's not!
+
+== Installing the Long Way ==
+
+If the quick way doesn't work for you, or you'd like to understand more about what to do, you'll need to install the extension by hand. This isn't as terrifying as you might think:
 
  # Find out where your profile directory ($PROFILE_DIR) is. The best guide for that is here: http://www.mozilla.org/support/firefox/profile
  # Create a new "WebDriver" profile. The camel case matters!
@@ -22,3 +32,4 @@ There is a plan to make the FirefoxDriver installable as a simple XPI. Until the
 == Cons ==
  
  * Not complete
+
