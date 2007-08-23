@@ -10,7 +10,9 @@ There is a plan to make the FirefoxDriver installable as a simple XPI. Until the
 
 {{{rake install_firefox}}}
 
-This assumes that your installation of Firefox 2 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH.
+This assumes that your installation of Firefox 2 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then set the "firefox" variable to be the firefox binary to use:
+
+{{{rake install_firefox firefox="d:\apps\mozilla firefox\firefox"}}}
 
 After the installation is completed, Firefox should start using the new WebDriver profile. Go to "{{{Tools->Add-ons}}}" and check that there's an extension called "Firefox WebDriver" installed. Carry on reading below if it's not!
 
@@ -32,4 +34,3 @@ If the quick way doesn't work for you, or you'd like to understand more about wh
 == Cons ==
  
  * Not complete
-
