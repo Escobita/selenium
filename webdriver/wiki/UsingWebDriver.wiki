@@ -1,4 +1,4 @@
-#summary Using WebDriver in your project
+#summary Using WebDriver in your project and finding the jars and required libraries
 
 = Using WebDriver =
 
@@ -23,7 +23,7 @@ Each of these top level directories is arranged in the same way. After a build, 
 
 Fortunately, all the libraries required for a particular driver are located under {{{$DRIVER/lib/runtime}}} You'll need to copy those on to your CLASSPATH too.
 
-|| *Driver* || *Location of driver jar under trunk* || *Location of required libraries* || Notes ||
+|| *Driver* || *Location of driver jar under trunk* || *Location of required libraries* || *Notes* ||
 || common || common/build/webdriver-common.jar || none needed || Required by every driver ||
 || htmlunit || htmlunit/build/webdriver-htmlunit.jar || htmlunit/lib/runtime || none ||
 || firefox || firefox/build/webdriver-firefox.jar || none needed || none ||
