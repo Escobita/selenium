@@ -2,7 +2,24 @@
 
 = Firefox Driver =
 
-Everything you ever wanted to know about the Firefox driver but were afraid to ask.
+Everything you ever wanted to know about the Firefox driver but were afraid to ask. See below for instructions on how to install the FirefoxDriver.
+
+== Important System Properties ==
+
+The following system properties (read using {{{System.getProperty()}}}) are used by the FirefoxDriver:
+
+|| *Property* || *What it means* ||
+|| webdriver.firefox.bin || The location of the binary used to control firefox. ||
+|| webdriver.firefox.development || When using the {{{FirefoxLauncher}}} class to create the profile, this indicates that you are using the development version of WebDriver (that is, one that is checked out from source) ||
+
+Normally the Firefox binary is assumed to be in the default location for your particular operating system:
+
+|| *OS* || *Expected Location of Firefox* ||
+|| Linux || firefox (found using "which") ||
+|| Mac || /Applications/Firefox.app/Contents/MacOS/firefox ||
+|| Windows || %PROGRAMFILES%\Mozilla Firefox\firefox.exe ||
+
+The default profile name is *WebDriver* (the casing matters!)
 
 == Installing the Quick Way ==
 
