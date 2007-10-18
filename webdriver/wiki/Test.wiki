@@ -1,5 +1,0 @@
-#summary Testing
-
-= This is a Test =
-
-This is a link [http://code.google.com/p/webdriver/w/test to something] Will it work?
