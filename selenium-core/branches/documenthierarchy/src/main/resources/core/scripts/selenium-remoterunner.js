@@ -531,14 +531,21 @@ function getSeleniumWindowNameURLparameters() {
     var w = (proxyInjectionMode ? selenium.browserbot.getCurrentWindow() : window).top;
     var s = "&seleniumWindowName=";
     if (w.opener == null) {
+    	var seleniumWindowNameUniqueId = "";
+    
         // This is top, use this unique id
     	if (this == w) {
-    		s += uniqueId;
+    		seleniumWindowNameUniqueId = uniqueId;
     	}
     	// Get unique id from top window
     	else {
-    		s += w.uniqueId;
-    	}    
+    		seleniumWindowNameUniqueId = w.uniqueId;
+    	}
+    	
+    	// To avoid appending undefined
+    	if (seleniumWindowNameUniqueId) {
+    		s += seleniumWindowNameUniqueId;
+    	}
     
         return s;
     }

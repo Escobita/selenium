@@ -80,9 +80,9 @@ objectExtend(CommandHandlerFactory.prototype, {
                 this.registerAccessor(functionName, accessBlock);
                 this._registerStoreCommandForAccessor(baseName, accessBlock, requiresTarget);
 
-                // var predicateBlock = this._predicateForAccessor(accessBlock, requiresTarget, isBoolean);
-                // this._registerAssertionsForPredicate(baseName, predicateBlock);
-                // this._registerWaitForCommandsForPredicate(seleniumApi, baseName, predicateBlock);
+                var predicateBlock = this._predicateForAccessor(accessBlock, requiresTarget, isBoolean);
+                this._registerAssertionsForPredicate(baseName, predicateBlock);
+                this._registerWaitForCommandsForPredicate(seleniumApi, baseName, predicateBlock);
             }
         }
     },
