@@ -46,7 +46,7 @@ public class TestModalDialog extends SeleneseTestCase
             selenium.click("close");
             
             // Select top window
-            selenium.selectWindow("Modal Dialog Host Window");
+			selenium.selectWindow("null");
             
             // Verify text of changing field after modal dialog
             verifyEquals("after modal dialog", selenium.getText("changeText"));
