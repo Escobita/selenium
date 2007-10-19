@@ -42,6 +42,10 @@ objectExtend(CommandHandlerFactory.prototype, {
 
     initialize: function() {
         this.handlers = {};
+		this.REGEX_ACCESSORS = /^(get|is)([A-Z].+)$/;
+		this.REGEX_ALL_ACTIONS = /^do([A-Z].+)$/;
+		this.REGEX_ALL_ASSERTS = /^assert([A-Z].+)$/;
+		this.REGEX_PREDICATE_NAME = /^(.*)Present$/;
     },
 
     registerAction: function(name, actionBlock, wait, dontCheckAlertsAndConfirms) {
@@ -65,7 +69,7 @@ objectExtend(CommandHandlerFactory.prototype, {
         // getFoo, assertFoo, verifyFoo, assertNotFoo, verifyNotFoo
         // storeFoo, waitForFoo, and waitForNotFoo.
         for (var functionName in seleniumApi) {
-            var match = /^(get|is)([A-Z].+)$/.exec(functionName);
+            var match = this.REGEX_ACCESSORS.exec(functionName);
             if (match) {
                 var accessMethod = seleniumApi[functionName];
                 var accessBlock = fnBind(accessMethod, seleniumApi);
@@ -76,16 +80,16 @@ objectExtend(CommandHandlerFactory.prototype, {
                 this.registerAccessor(functionName, accessBlock);
                 this._registerStoreCommandForAccessor(baseName, accessBlock, requiresTarget);
 
-                var predicateBlock = this._predicateForAccessor(accessBlock, requiresTarget, isBoolean);
-                this._registerAssertionsForPredicate(baseName, predicateBlock);
-                this._registerWaitForCommandsForPredicate(seleniumApi, baseName, predicateBlock);
+                // var predicateBlock = this._predicateForAccessor(accessBlock, requiresTarget, isBoolean);
+                // this._registerAssertionsForPredicate(baseName, predicateBlock);
+                // this._registerWaitForCommandsForPredicate(seleniumApi, baseName, predicateBlock);
             }
         }
     },
 
     _registerAllActions: function(seleniumApi) {
         for (var functionName in seleniumApi) {
-            var match = /^do([A-Z].+)$/.exec(functionName);
+            var match = this.REGEX_ALL_ACTIONS.exec(functionName);
             if (match) {
                 var actionName = match[1].lcfirst();
                 var actionMethod = seleniumApi[functionName];
@@ -99,7 +103,7 @@ objectExtend(CommandHandlerFactory.prototype, {
 
     _registerAllAsserts: function(seleniumApi) {
         for (var functionName in seleniumApi) {
-            var match = /^assert([A-Z].+)$/.exec(functionName);
+            var match = this.REGEX_ALL_ASSERTS.exec(functionName);
             if (match) {
                 var assertBlock = fnBind(seleniumApi[functionName], seleniumApi);
 
@@ -204,7 +208,7 @@ objectExtend(CommandHandlerFactory.prototype, {
     },
 
     _invertPredicateName: function(baseName) {
-        var matchResult = /^(.*)Present$/.exec(baseName);
+        var matchResult = this.REGEX_PREDICATE_NAME.exec(baseName);
         if (matchResult != null) {
             return matchResult[1] + "NotPresent";
         }
@@ -299,10 +303,11 @@ function ActionHandler(actionBlock, wait, dontCheckAlerts) {
     }
     // note that dontCheckAlerts could be undefined!!!
     this.checkAlerts = (dontCheckAlerts) ? false : true;
+    this.REGEX_POPUPS = /(Alert|Confirmation)(Not)?Present/;
 }
 ActionHandler.prototype = new CommandHandler;
 ActionHandler.prototype.execute = function(seleniumApi, command) {
-    if (this.checkAlerts && (null == /(Alert|Confirmation)(Not)?Present/.exec(command.command))) {
+    if (this.checkAlerts && (!this.REGEX_POPUPS.test(command.command))) {
         // todo: this conditional logic is ugly
         seleniumApi.ensureNoUnhandledPopups();
     }
@@ -368,10 +373,11 @@ AssertResult.prototype.setFailed = function(message) {
     this.failureMessage = message;
 }
 
-function SeleniumCommand(command, target, value, isBreakpoint) {
+function SeleniumCommand(command, target, value, isBreakpoint, commandId) {
     this.command = command;
     this.target = target;
     this.value = value;
     this.isBreakpoint = isBreakpoint;
+	this.commandId = commandId;
 }
 

@@ -178,6 +178,10 @@ function normalizeNewlines(text)
     return text.replace(/\r\n|\r/g, "\n");
 }
 
+// Replace &nbsp; with a space
+var NBSP_PATTERN = new RegExp(String.fromCharCode(160), "g");
+var SPACES_PATTERN = /\ +/g;
+
 /**
  * Replace multiple sequential spaces with a single space, and then convert &nbsp; to space.
  */
@@ -191,14 +195,12 @@ function normalizeSpaces(text)
 
     // Replace multiple spaces with a single space
     // TODO - this shouldn't occur inside PRE elements
-    text = text.replace(/\ +/g, " ");
+    text = text.replace(SPACES_PATTERN, " ");
 
-    // Replace &nbsp; with a space
-    var nbspPattern = new RegExp(String.fromCharCode(160), "g");
     if (browserVersion.isSafari) {
-	return replaceAll(text, String.fromCharCode(160), " ");
+		return replaceAll(text, String.fromCharCode(160), " ");
     } else {
-	return text.replace(nbspPattern, " ");
+		return text.replace(NBSP_PATTERN, " ");
     }
 }
 

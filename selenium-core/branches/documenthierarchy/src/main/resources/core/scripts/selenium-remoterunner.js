@@ -189,12 +189,31 @@ objectExtend(RemoteRunner.prototype, {
         this.requiresCallBack = true;
         this.commandNode = null;
         this.xmlHttpForCommandsAndResults = null;
+        this.COMMAND_MATCHER = /^(.*?)\n((.|[\r\n])*)/;
     },
 
     nextCommand : function() {
         var urlParms = "";
         if (postResult == "START") {
             urlParms += "seleniumStart=true";
+                        
+            var w = (proxyInjectionMode ? selenium.browserbot.getCurrentWindow() : window);
+            var frameName = "";
+            var frameId = "";
+            if (typeof w != 'undefined') {
+            	if (typeof w.name != 'undefined') {
+            		frameName = w.name;
+            	}
+            	// May only work in Firefox/IE ???
+            	if (window.frameElement) {
+            		frameId = w.frameElement.id;
+            	}
+            }
+            
+            urlParms += "&seleniumTitle=" + encodeURIComponent(w.document.title);
+            
+            urlParms += "&seleniumFrameName=" + encodeURIComponent(frameName); 
+            urlParms += "&seleniumFrameId=" + encodeURIComponent(frameId);            
         }
         this.xmlHttpForCommandsAndResults = XmlHttp.create();
         sendToRC(postResult, urlParms, fnBind(this._HandleHttpResponse, this), this.xmlHttpForCommandsAndResults);
@@ -279,8 +298,10 @@ objectExtend(RemoteRunner.prototype, {
                     return;
                 }
                 var command = this._extractCommand(this.xmlHttpForCommandsAndResults);
-                this.currentCommand = command;
-                this.continueTestAtCurrentCommand();
+                if (command) {
+	                this.currentCommand = command;
+	                this.continueTestAtCurrentCommand();
+	           	}
             }
             // Not OK 
             else {
@@ -296,10 +317,10 @@ objectExtend(RemoteRunner.prototype, {
     _extractCommand : function(xmlHttp) {
         var command;
         try {
-            var re = new RegExp("^(.*?)\n((.|[\r\n])*)");
-            if (re.exec(xmlHttp.responseText)) {
-                command = RegExp.$1;
-                var rest = RegExp.$2;
+            var matches = this.COMMAND_MATCHER.exec(xmlHttp.responseText);
+            if (matches) {
+                command = matches[1];
+                var rest = matches[2];
                 rest = rest.trim();
                 if (rest) {
                     eval(rest);
@@ -342,6 +363,9 @@ objectExtend(RemoteRunner.prototype, {
             cmdArgs[pair[0]] = pair[1];
         }
         var cmd = cmdArgs['cmd'];
+        
+        var commandId = cmdArgs['commandId'];
+        
         var arg1 = cmdArgs['1'];
         if (null == arg1) arg1 = "";
         arg1 = decodeURIComponent(arg1);
@@ -351,7 +375,7 @@ objectExtend(RemoteRunner.prototype, {
         if (cmd == null) {
             throw new Error("Bad command request: " + commandRequest);
         }
-        return new SeleniumCommand(cmd, arg1, arg2);
+        return new SeleniumCommand(cmd, arg1, arg2, false, commandId);
     }
 
 })
@@ -382,9 +406,12 @@ function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async) {
                     var retry = false;
                     if (typeof currentTest != 'undefined') {
                         var command = currentTest._extractCommand(xmlHttpObject);
-                            //console.log("*********** " + command.command + " | " + command.target + " | " + command.value);
-                        if (command.command == 'retryLast') {
-                            retry = true;
+                           
+                        if (command) {
+                        	//console.log("*********** " + command.command + " | " + command.target + " | " + command.value);
+	                        if (command.command == 'retryLast') {
+	                            retry = true;
+	                        }
                         }
                     }
                     if (retry) {
@@ -409,10 +436,18 @@ function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async) {
 }
 
 function addUrlParams(url) {
+	var commandId = "";
+	
+	// Add command ID to a command that was run and we're posting information about
+	if (typeof currentTest != 'undefined' && typeof currentTest.currentCommand != 'undefined') {
+		commandId = "&commandId=" + currentTest.currentCommand.commandId;
+	}
+
     return url + "&localFrameAddress=" + (proxyInjectionMode ? makeAddressToAUTFrame() : "top")
     + getSeleniumWindowNameURLparameters()
     + "&uniqueId=" + uniqueId
     + buildDriverParams() + preventBrowserCaching()
+    + commandId;
 }
 
 function sendToRCAndForget(dataToBePosted, urlParams) {
@@ -496,10 +531,19 @@ function getSeleniumWindowNameURLparameters() {
     var w = (proxyInjectionMode ? selenium.browserbot.getCurrentWindow() : window).top;
     var s = "&seleniumWindowName=";
     if (w.opener == null) {
+        // This is top, use this unique id
+    	if (this == w) {
+    		s += uniqueId;
+    	}
+    	// Get unique id from top window
+    	else {
+    		s += w.uniqueId;
+    	}    
+    
         return s;
     }
     if (w["seleniumWindowName"] == null) {
-        if (w.name) {
+		if (w.name && w.name != "") {
             w["seleniumWindowName"] = w.name;
         } else {
     	    w["seleniumWindowName"] = 'generatedSeleniumWindowName_' + Math.round(100000 * Math.random());
