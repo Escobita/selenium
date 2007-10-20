@@ -99,8 +99,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<includes>
+					<!--
 						<include>**/UnitTestSuite.java</include>
 						<include>**/ServerTestSuite.java</include>
+					-->
+						<include>**/*Test.java</include>
 					</includes>
 					<forkMode>never</forkMode>
 					<useFile>false</useFile>
@@ -153,7 +156,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
