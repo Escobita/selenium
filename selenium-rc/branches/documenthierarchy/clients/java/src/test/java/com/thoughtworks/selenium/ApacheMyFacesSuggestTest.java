@@ -1,9 +1,9 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import org.openqa.selenium.server.*;
-import org.openqa.selenium.server.browserlaunchers.*;
+import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.browser.launchers.WindowsUtils;
 
 /**
  * A test of the Apache MyFaces JSF AJAX auto-suggest sandbox application at www.irian.at.

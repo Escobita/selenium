@@ -9,10 +9,10 @@ public class YahooHttpsTest extends SeleneseTestCase {
 
     public void setUp() throws Exception {
         boolean pi = true;
-        SeleniumServer.setAvoidProxy(!pi);
-        ss = new SeleniumServer(4444, false, !pi);
-        ss.setProxyInjectionMode(pi);
-        ss.start();
+//        SeleniumServer.setAvoidProxy(!pi);
+//        ss = new SeleniumServer(4444, false, !pi);
+//        ss.setProxyInjectionMode(pi);
+//        ss.start();
         super.setUp("http://login11.marketingsolutions.yahoo.com");
     }
 

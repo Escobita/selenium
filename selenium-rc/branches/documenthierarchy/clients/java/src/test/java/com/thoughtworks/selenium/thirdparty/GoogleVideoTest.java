@@ -14,8 +14,8 @@ public class GoogleVideoTest extends TestCase {
     public void setUp() {
         try {
             selServer = new SeleniumServer();
-            selServer.setProxyInjectionMode(true);
-            SeleniumServer.setBrowserSideLogEnabled(true);
+//            selServer.setProxyInjectionMode(true);
+//            SeleniumServer.setBrowserSideLogEnabled(true);
             selServer.start();
         } catch (Exception e) {
             // TODO Auto-generated catch block

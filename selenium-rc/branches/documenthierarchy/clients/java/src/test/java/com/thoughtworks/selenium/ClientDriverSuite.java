@@ -77,7 +77,7 @@ public class ClientDriverSuite extends TestCase {
             
             
             if (isProxyInjectionMode) {
-            	 suite.addTestSuite(TestModalDialog.class);            	 
+            //	 suite.addTestSuite(TestModalDialog.class);            	 
             }
 
 //          suite.addTestSuite(RealDealIntegrationTest.class);
@@ -85,8 +85,8 @@ public class ClientDriverSuite extends TestCase {
 
             // Working tests
          
-            suite.addTestSuite(TestFramesNested.class);
-            suite.addTestSuite(TestFramesSpecialTargets.class);
+//            suite.addTestSuite(TestFramesNested.class);
+//            suite.addTestSuite(TestFramesSpecialTargets.class);
             suite.addTestSuite(TestFramesClickJavascriptHref.class);
             suite.addTestSuite(TestFramesClick.class);            
             suite.addTestSuite(TestFramesOpen.class);   
@@ -138,34 +138,6 @@ public class ClientDriverSuite extends TestCase {
 
 //			  // only works in IE right now
 //			  suite.addTest(I18nTest.suite());
-            
-            // Test all browsers
-//            for (Browser browser : testableBrowserList) {
-//            	System.out.println("Running all tests in suite for browser " + browser);
-//            	
-//            	for (Class<? extends SeleniumClientTestBase> testClass : seleniumClientTestList) {
-////            		suite.addTestSuite(testClass);
-//            		try {
-//						Constructor<? extends SeleniumClientTestBase> constructor = testClass.getConstructor(BrowserType.class);
-//						SeleniumClientTestBase testBase = constructor.newInstance(new Object[] { BrowserType.getBrowserType(browser.toString()) });
-//						
-//						//testBase.setName(testBase.getClass().getName());
-//						suite.addTest(testBase);
-//					} catch (NoSuchMethodException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} catch (InstantiationException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} catch (IllegalAccessException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} catch (InvocationTargetException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//            	}
-//            }
             
             ClientDriverTestSetup setup = new ClientDriverTestSetup(suite);
             supersuite.addTest(setup);
