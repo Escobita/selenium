@@ -90,7 +90,7 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
             if (WindowsUtils.thisIsWindows()) {
                 defaultPath = WindowsUtils.getProgramFilesPath() + "\\Mozilla Firefox\\firefox.exe";
             } else {
-                defaultPath = "/opt/swiftfox/swiftfox-bin";
+                defaultPath = "/usr/firefox/firefox-bin";
             }
         }
         File defaultLocation = new File(defaultPath);
@@ -106,7 +106,7 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
                     "*firefox c:\\blah\\firefox.exe");
         }
         // On unix, prefer firefoxBin if it's on the path
-        File firefoxBin = AsyncExecute.whichExec("swiftfox-bin");
+        File firefoxBin = AsyncExecute.whichExec("firefox-bin");
         if (firefoxBin != null) {
             return firefoxBin.getAbsolutePath();
         }
@@ -279,8 +279,12 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
         File testFile = new File(customProfileDir(), "extensions.ini");
         long start = System.currentTimeMillis();
         for (; System.currentTimeMillis() < start + timeout;) {
-
-            AsyncExecute.sleepTight(500);
+        	try {
+        		AsyncExecute.sleepTight(500);
+        	}
+        	catch (RuntimeException ex) {
+        		// Do nothing...sleep again if necessary
+        	}
             if (testFile.exists()) break;
         }
         if (!testFile.exists()) throw new RuntimeException("Timed out waiting for profile to be created!");
