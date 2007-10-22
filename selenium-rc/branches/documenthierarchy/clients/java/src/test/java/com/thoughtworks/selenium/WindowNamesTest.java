@@ -39,7 +39,6 @@ public class WindowNamesTest extends TestCase
             System.out.println("Window Title: " + windowTitle);
         }
         //selenium.setSpeed("500");
-        selenium.selectWindow("");
         selenium.selectWindow("Google");
         
 		selenium.type("q", "Selenium OpenQA");
