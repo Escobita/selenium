@@ -287,7 +287,11 @@ public class LauncherUtils {
 			out.println("user_pref('network.proxy.autoconfig_url', '"
 					+ pathToBrowserURL(proxyPAC.getAbsolutePath()) + "');");
 		}
-
+		
+		// turn off safebrowsing and remote lookups
+		out.println("user_pref('browser.safebrowsing.enabled', false);");
+		out.println("user_pref('browser.safebrowsing.remoteLookups', false);");
+		
 		// suppress authentication confirmations
 		out.println("user_pref('network.http.phishy-userpass-length', 255);");
 
