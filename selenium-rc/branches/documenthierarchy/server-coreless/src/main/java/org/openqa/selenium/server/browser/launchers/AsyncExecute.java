@@ -66,7 +66,12 @@ public class AsyncExecute extends Execute {
 		final Process process = launch(project, getCommandline(),
 				getEnvironment(), workingDirectory, useVMLauncher);
 		if (Os.isFamily("windows")) {
-			AsyncExecute.sleepTight(1000);
+			try {
+				AsyncExecute.sleepTight(1000);
+			}
+			catch (RuntimeException ex) {
+				// Do nothing...
+			}
 		}
 
 		OutputStream dummyOut = new OutputStream() {
