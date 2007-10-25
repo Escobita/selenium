@@ -808,7 +808,7 @@ public class WindowManager implements WindowListener {
 				windowName = Window.DEFAULT_WINDOW_NAME;
 			}
 			
-			window = new DefaultWindow(windowName, null);
+			window = new Window(windowName, null);
 			window.addListener(this);
 			addWindow(window);
 			addStartedWindow(window);
