@@ -76,20 +76,14 @@ public class GoogleSuggest {
 
         // This should go at some point, but allows Google to return some suggestions for now
         Thread.sleep(2000);
-        
+
         // And now list the suggestions
-        WebElement allSuggestions = driver.selectElement("//div[@id='completeDiv']");
+        List<WebElement> allSuggestions = driver.selectElements("//td[@class='google-ac-c']");
         
-        // Each of the results is presented as a div with a span within a span, so this looks quite complex
-        // The important point is that finding the suggestions is simple because we can grab the top
-        // level element and just get hold of the immediate children with the appropriate tag name.
-        List<WebElement> suggestions = allSuggestions.getChildrenOfType("div");
-        for (WebElement suggestion : suggestions) {
-            WebElement containingSpan = (WebElement) suggestion.getChildrenOfType("span").get(0);
-            WebElement text = (WebElement) containingSpan.getChildrenOfType("span").get(0);
-            System.out.println("Suggestion was: " + text.getText());
-        };
-    }
+        for (WebElement suggestion : allSuggestions) {
+            System.out.println(suggestion.getText());
+        }
+     }
 }
 }}}
 
