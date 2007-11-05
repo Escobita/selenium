@@ -21,8 +21,8 @@ Additional changes that are required for a beta release
 || [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation ||
 || [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour ||
 || none  || Example tests ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings || Not Started || Not Started || Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings || Not Started || Not Started || Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings || Not Started || Not Started || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings ||
 
 A final release will be done once the beta has been out and successfully used on a number of projects. Other drivers have been left off because none have been started.
