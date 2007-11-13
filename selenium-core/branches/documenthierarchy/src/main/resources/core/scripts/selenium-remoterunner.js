@@ -298,7 +298,11 @@ objectExtend(RemoteRunner.prototype, {
                     return;
                 }
                 var command = this._extractCommand(this.xmlHttpForCommandsAndResults);
-                if (command) {
+                if (command.command == 'retryLast') {
+                    setTimeout(fnBind(function() {
+                        sendToRC("RETRY", "retry=true", fnBind(this._HandleHttpResponse, this), this.xmlHttpForCommandsAndResults, true);
+                    }, this), 1000);
+                } else {
 	                this.currentCommand = command;
 	                this.continueTestAtCurrentCommand();
 	           	}
@@ -315,7 +319,15 @@ objectExtend(RemoteRunner.prototype, {
     },
 
     _extractCommand : function(xmlHttp) {
-        var command;
+        var command, text, json;
+        text = command = xmlHttp.responseText;
+        if (/^json=/.test(text)) {
+            eval(text);
+            if (json.rest) {
+                eval(json.rest);
+            }
+            return json;
+        }
         try {
             var matches = this.COMMAND_MATCHER.exec(xmlHttp.responseText);
             if (matches) {
@@ -395,42 +407,11 @@ function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async) {
     url = addUrlParams(url);
     url += "&sequenceNumber=" + seleniumSequenceNumber++;
     
-    var wrappingCallback;
-    if (callback == null) {
-        callback = function() {};
-        wrappingCallback = callback;
-    } else {
-        wrappingCallback = function() {
-            if (xmlHttpObject.readyState == 4) {
-                if (xmlHttpObject.status == 200) {
-                    var retry = false;
-                    if (typeof currentTest != 'undefined') {
-                        var command = currentTest._extractCommand(xmlHttpObject);
-                           
-                        if (command) {
-                        	//console.log("*********** " + command.command + " | " + command.target + " | " + command.value);
-	                        if (command.command == 'retryLast') {
-	                            retry = true;
-	                        }
-                        }
-                    }
-                    if (retry) {
-                        setTimeout(fnBind(function() {
-                            sendToRC("RETRY", "retry=true", callback, xmlHttpObject, async);
-                        }, this), 1000);
-                    } else {
-                        callback();
-                    }
-                }
-            }
-        }
-    }
-    
     var postedData = "postedData=" + encodeURIComponent(dataToBePosted);
 
     //xmlHttpObject.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xmlHttpObject.open("POST", url, async);
-    xmlHttpObject.onreadystatechange = wrappingCallback;
+    if (callback) xmlHttpObject.onreadystatechange = callback;
     xmlHttpObject.send(postedData);
     return null;
 }
@@ -612,11 +593,78 @@ Selenium.prototype.doSetContext = function(context) {
     }
 };
 
+Selenium.prototype.doAttachFile = function(fieldLocator,fileLocator) {
+   /**
+   * Sets a file input (upload) field to the file listed in fileLocator
+   *
+   *  @param fieldLocator an <a href="#locators">element locator</a>
+   *  @param fileLocator a URL pointing to the specified file. Before the file
+   *  can be set in the input field (fieldLocator), Selenium RC may need to transfer the file  
+   *  to the local machine before attaching the file in a web page form. This is common in selenium
+   *  grid configurations where the RC server driving the browser is not the same
+   *  machine that started the test.
+   *
+   *  Supported Browsers: Firefox ("*chrome") only.
+   *   
+   */
+   // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us! 
+};
+
 Selenium.prototype.doCaptureScreenshot = function(filename) {
     /**
     * Captures a PNG screenshot to the specified file.
     *
     * @param filename the absolute path to the file to be written, e.g. "c:\blah\screenshot.png"
+    */
+    // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us!
+};
+
+Selenium.prototype.doShutDownSeleniumServer = function(keycode) {
+    /**
+    * Kills the running Selenium Server and all browser sessions.  After you run this command, you will no longer be able to send
+    * commands to the server; you can't remotely start the server once it has been stopped.  Normally
+    * you should prefer to run the "stop" command, which terminates the current browser session, rather than 
+    * shutting down the entire server.
+    *
+    */
+    // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us!
+};
+
+Selenium.prototype.doKeyDownNative = function(keycode) {
+    /**
+    * Simulates a user pressing a key (without releasing it yet) by sending a native operating system keystroke.
+    * This function uses the java.awt.Robot class to send a keystroke; this more accurately simulates typing
+    * a key on the keyboard.  It does not honor settings from the shiftKeyDown, controlKeyDown, altKeyDown and
+    * metaKeyDown commands, and does not target any particular HTML element.  To send a keystroke to a particular
+    * element, focus on the element first before running this command.
+    *
+    * @param keycode an integer keycode number corresponding to a java.awt.event.KeyEvent; note that Java keycodes are NOT the same thing as JavaScript keycodes!
+    */
+    // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us!
+};
+
+Selenium.prototype.doKeyUpNative = function(keycode) {
+    /**
+    * Simulates a user releasing a key by sending a native operating system keystroke.
+    * This function uses the java.awt.Robot class to send a keystroke; this more accurately simulates typing
+    * a key on the keyboard.  It does not honor settings from the shiftKeyDown, controlKeyDown, altKeyDown and
+    * metaKeyDown commands, and does not target any particular HTML element.  To send a keystroke to a particular
+    * element, focus on the element first before running this command.
+    *
+    * @param keycode an integer keycode number corresponding to a java.awt.event.KeyEvent; note that Java keycodes are NOT the same thing as JavaScript keycodes!
+    */
+    // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us!
+};
+
+Selenium.prototype.doKeyPressNative = function(keycode) {
+    /**
+    * Simulates a user pressing and releasing a key by sending a native operating system keystroke.
+    * This function uses the java.awt.Robot class to send a keystroke; this more accurately simulates typing
+    * a key on the keyboard.  It does not honor settings from the shiftKeyDown, controlKeyDown, altKeyDown and
+    * metaKeyDown commands, and does not target any particular HTML element.  To send a keystroke to a particular
+    * element, focus on the element first before running this command.
+    *
+    * @param keycode an integer keycode number corresponding to a java.awt.event.KeyEvent; note that Java keycodes are NOT the same thing as JavaScript keycodes!
     */
     // This doesn't really do anything on the JS side; we let the Selenium Server take care of this for us!
 };

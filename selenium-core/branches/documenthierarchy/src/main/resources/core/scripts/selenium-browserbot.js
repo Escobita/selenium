@@ -350,7 +350,7 @@ BrowserBot.prototype.selectFrame = function(target) {
         this.currentWindow = frame;
         this.isSubFrameSelected = true;
     }
-    else if (target == "relative=up") {
+    else if (target == "relative=up" || target == "relative=parent") {
         this.currentWindow = this.getCurrentWindow().parent;
         this.isSubFrameSelected = (this._getFrameElement(this.currentWindow) != null);
     } else if (target == "relative=top") {
@@ -1079,6 +1079,21 @@ BrowserBot.prototype.getTitle = function() {
     return t;
 }
 
+BrowserBot.prototype.getCookieByName = function(cookieName) {
+    var ck = this.getDocument().cookie;
+    if (!ck) return null;
+    var ckPairs = ck.split(/;/);
+    for (var i = 0; i < ckPairs.length; i++) {
+        var ckPair = ckPairs[i];
+        var ckNameValue = ckPair.split(/=/);
+        var ckName = decodeURIComponent(ckNameValue[0]);
+        if (ckName === cookieName) {
+            return decodeURIComponent(ckNameValue[1]);
+        }
+    }
+    return null;
+}
+
 /*
  * Finds an element recursively in frames and nested frames
  * in the specified document, using various lookup protocols
@@ -1295,14 +1310,25 @@ BrowserBot.prototype._findElementUsingFullXPath = function(xpath, inDocument, in
 
     // Use document.evaluate() if it's available
     if (this.allowNativeXpath && inDocument.evaluate) {
-        return inDocument.evaluate(xpath, inDocument, this._namespaceResolver, 0, null).iterateNext();
+        var result;
+        try {
+            result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, 0, null);
+        } catch (e) {
+            throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+    }
+        return result.iterateNext();
     }
 
     // If not, fall back to slower JavaScript implementation
     // DGF set xpathdebug = true (using getEval, if you like) to turn on JS XPath debugging
     //xpathdebug = true;
     var context = new ExprContext(inDocument);
-    var xpathObj = xpathParse(xpath);
+    var xpathObj;
+    try {
+        xpathObj = xpathParse(xpath);
+    } catch (e) {
+        throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+    }
     var xpathResult = xpathObj.evaluate(context);
     if (xpathResult && xpathResult.value) {
         return xpathResult.value[0];
@@ -1332,7 +1358,12 @@ BrowserBot.prototype.evaluateXPathCount = function(xpath, inDocument) {
 
     // Use document.evaluate() if it's available
     if (this.allowNativeXpath && inDocument.evaluate) {
-        var result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, XPathResult.NUMBER_TYPE, null);
+        var result;
+        try {
+            result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, XPathResult.NUMBER_TYPE, null);
+        } catch (e) {
+            throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+        }
         return result.numberValue;
     }
 
@@ -1340,7 +1371,12 @@ BrowserBot.prototype.evaluateXPathCount = function(xpath, inDocument) {
     // DGF set xpathdebug = true (using getEval, if you like) to turn on JS XPath debugging
     //xpathdebug = true;
     var context = new ExprContext(inDocument);
-    var xpathObj = xpathParse(xpath);
+    var xpathObj;
+    try {
+        xpathObj = xpathParse(xpath);
+    } catch (e) {
+        throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+    }
     var xpathResult = xpathObj.evaluate(context);
     if (xpathResult && xpathResult.value) {
         return xpathResult.value;
@@ -1517,6 +1553,11 @@ BrowserBot.prototype.doubleClickElement = function(element, clientX, clientY) {
        this._fireEventOnElement("dblclick", element, clientX, clientY);
 };
 
+// The contextmenu event is fired when the user right-clicks to open the context menu
+BrowserBot.prototype.contextMenuOnElement = function(element, clientX, clientY) {
+       this._fireEventOnElement("contextmenu", element, clientX, clientY);
+};
+
 BrowserBot.prototype._modifyElementTarget = function(element) {
     if (element.target) {
         if (element.target == "_blank" || /^selenium_blank/.test(element.target) ) {
@@ -1553,6 +1594,9 @@ BrowserBot.prototype._getTargetWindow = function(element) {
 
 BrowserBot.prototype._getFrameFromGlobal = function(target) {
 
+    if (target == "_self") {
+        return this.getCurrentWindow();
+    }
     if (target == "_top") {
         return this.topFrame;
     } else if (target == "_parent") {

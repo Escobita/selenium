@@ -91,6 +91,7 @@ objectExtend(HtmlTestRunner.prototype, {
     },
 
     _onloadTestSuite:function () {
+        suiteFrame = new HtmlTestSuiteFrame(getSuiteFrame());
         if (! this.getTestSuite().isAvailable()) {
             return;
         }
@@ -139,6 +140,8 @@ objectExtend(HtmlTestRunner.prototype, {
         //todo: move testFailed and storedVars to TestCase
         this.testFailed = false;
         storedVars = new Object();
+        storedVars.nbsp = String.fromCharCode(160);
+        storedVars.space = ' ';
         this.currentTest = new HtmlRunnerTestLoop(testFrame.getCurrentTestCase(), this.metrics, this.commandFactory);
         currentTest = this.currentTest;
         this.currentTest.start();
@@ -171,7 +174,6 @@ objectExtend(SeleniumFrame.prototype, {
         this._onLoad();
         if (this.loadCallback) {
             this.loadCallback();
-            this.loadCallback = null;
         }
     },
 

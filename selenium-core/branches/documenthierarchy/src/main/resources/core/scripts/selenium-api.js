@@ -142,6 +142,8 @@ function Selenium(browserbot) {
      * <li><strong>regexp:</strong><em>regexp</em>:
      * Match a string using a regular-expression. The full power of JavaScript
      * regular-expressions is available.</li>
+     * <li><strong>regexpi:</strong><em>regexpi</em>:
+     * Match a string using a case-insensitive regular-expression.</li>
      * <li><strong>exact:</strong><em>string</em>:
      *
      * Match a string exactly, verbatim, without any of that fancy wildcard
@@ -223,6 +225,17 @@ Selenium.prototype.doDoubleClick = function(locator) {
    this.browserbot.doubleClickElement(element);
 };
 
+Selenium.prototype.doContextMenu = function(locator) {
+    /**
+   * Simulates opening the context menu for the specified element (as might happen if the user "right-clicked" on the element).
+   *
+   * @param locator an element locator
+   *
+   */
+   var element = this.browserbot.findElement(locator);
+   this.browserbot.contextMenuOnElement(element);
+};
+
 Selenium.prototype.doClickAt = function(locator, coordString) {
     /**
    * Clicks on a link, button, checkbox or radio button. If the click action
@@ -255,6 +268,20 @@ Selenium.prototype.doDoubleClickAt = function(locator, coordString) {
     this.browserbot.doubleClickElement(element, clientXY[0], clientXY[1]);
 };
 
+Selenium.prototype.doContextMenuAt = function(locator, coordString) {
+    /**
+   * Simulates opening the context menu for the specified element (as might happen if the user "right-clicked" on the element).
+   *
+   * @param locator an element locator
+   * @param coordString specifies the x,y position (i.e. - 10,20) of the mouse
+   *      event relative to the element returned by the locator.
+   *
+   */
+    var element = this.browserbot.findElement(locator);
+    var clientXY = getClientXY(element, coordString)
+    this.browserbot.contextMenuOnElement(element, clientXY[0], clientXY[1]);
+};
+
 Selenium.prototype.doFireEvent = function(locator, eventName) {
     /**
    * Explicitly simulate an event, to trigger the corresponding &quot;on<em>event</em>&quot;
@@ -266,6 +293,19 @@ Selenium.prototype.doFireEvent = function(locator, eventName) {
     var element = this.browserbot.findElement(locator);
     triggerEvent(element, eventName, false);
 };
+
+Selenium.prototype.doFocus = function(locator) {
+    /** Move the focus to the specified element; for example, if the element is an input field, move the cursor to that field.
+    *
+    * @param locator an <a href="#locators">element locator</a>
+    */
+    var element = this.browserbot.findElement(locator);
+    if (element.focus) {
+        element.focus();
+    } else {
+         triggerEvent(element, "focus", false);
+    }
+}
 
 Selenium.prototype.doKeyPress = function(locator, keySequence) {
     /**
@@ -1417,6 +1457,18 @@ Selenium.prototype.isVisible = function(locator) {
    */
     var element;
     element = this.browserbot.findElement(locator);
+    // DGF if it's an input tag of type "hidden" then it's not visible
+    if (element.tagName) {
+        var tagName = new String(element.tagName).toLowerCase();
+        if (tagName == "input") {
+            if (element.type) {
+                var elementType = new String(element.type).toLowerCase();
+                if (elementType == "hidden") {
+                    return false;
+                }
+            }
+        }
+    }
     var visibility = this.findEffectiveStyleProperty(element, "visibility");
     var _isDisplayed = this._isDisplayed(element);
     return (visibility != "hidden" && _isDisplayed);
@@ -1470,7 +1522,24 @@ Selenium.prototype.isEditable = function(locator) {
     if (element.value == undefined) {
         Assert.fail("Element " + locator + " is not an input.");
     }
-    return !element.disabled;
+    if (element.disabled) {
+        return false;
+    }
+    // DGF "readonly" is a bit goofy... it doesn't necessarily have a value
+    // You can write <input readonly value="black">
+    var readOnlyNode = element.getAttributeNode('readonly');
+    if (readOnlyNode) {
+        // DGF on IE, every input element has a readOnly node, but it may be false
+        if (typeof(readOnlyNode.nodeValue) == "boolean") {
+            var readOnly = readOnlyNode.nodeValue;
+            if (readOnly) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    return true;
 };
 
 Selenium.prototype.getAllButtons = function() {
@@ -2139,15 +2208,40 @@ Selenium.prototype.getCookie = function() {
     return doc.cookie;
 };
 
+Selenium.prototype.getCookieByName = function(name) {
+    /**
+     * Returns the value of the cookie with the specified name, or throws an error if the cookie is not present.
+     * @param name the name of the cookie
+     * @return string the value of the cookie
+     */
+    var v = this.browserbot.getCookieByName(name);
+    if (v === null) {
+        throw new SeleniumError("Cookie '"+name+"' was not found");
+    }
+    return v;
+};
+
+Selenium.prototype.isCookiePresent = function(name) {
+    /**
+     * Returns true if a cookie with the specified name is present, or false otherwise.
+     * @param name the name of the cookie
+     * @return boolean true if a cookie with the specified name is present, or false otherwise.
+     */
+    var v = this.browserbot.getCookieByName(name);
+    var absent = (v === null);
+    return !absent;
+}   
+
 Selenium.prototype.doCreateCookie = function(nameValuePair, optionsString) {
     /**
      * Create a new cookie whose path and domain are same with those of current page
      * under test, unless you specified a path for this cookie explicitly.
      *
      * @param nameValuePair name and value of the cookie in a format "name=value"
-     * @param optionsString options for the cookie. Currently supported options include 'path' and 'max_age'.
-     *      the optionsString's format is "path=/path/, max_age=60". The order of options are irrelevant, the unit
-     *      of the value of 'max_age' is second.
+     * @param optionsString options for the cookie. Currently supported options include 'path', 'max_age' and 'domain'.
+     *      the optionsString's format is "path=/path/, max_age=60, domain=.foo.com". The order of options are irrelevant, the unit
+     *      of the value of 'max_age' is second.  Note that specifying a domain that isn't a subset of the current domain will
+     *      usually fail.
      */
     var results = /[^\s=\[\]\(\),"\/\?@:;]+=[^\s=\[\]\(\),"\/\?@:;]*/.test(nameValuePair);
     if (!results) {
@@ -2170,19 +2264,47 @@ Selenium.prototype.doCreateCookie = function(nameValuePair, optionsString) {
         }
         cookie += "; path=" + path;
     }
+    results = /domain=([^\s,]+)[,]?/.exec(optionsString);
+    if (results) {
+        var domain = results[1];
+        cookie += "; domain=" + domain;
+    }
     LOG.debug("Setting cookie to: " + cookie);
     this.browserbot.getDocument().cookie = cookie;
 }
 
-Selenium.prototype.doDeleteCookie = function(name,path) {
+Selenium.prototype.doDeleteCookie = function(name,optionsString) {
     /**
-     * Delete a named cookie with specified path.
+     * Delete a named cookie with specified path and domain.  Be careful; to delete a cookie, you
+     * need to delete it using the exact same path and domain that were used to create the cookie.
+     * If the path is wrong, or the domain is wrong, the cookie simply won't be deleted.  Also
+     * note that specifying a domain that isn't a subset of the current domain will usually fail.
      *
      * @param name the name of the cookie to be deleted
-     * @param path the path property of the cookie to be deleted
+     * @param optionsString options for the cookie. Currently supported options include 'path' and 'domain'.
+     *      the optionsString's format is "path=/path/, domain=.foo.com". The order of options are irrelevant.
+     *      Note that specifying a domain that isn't a subset of the current domain will
+     *      usually fail.
      */
     // set the expire time of the cookie to be deleted to one minute before now.
-    path = path.trim();
+    var path = "";
+    var domain = "";
+    var matched = false;
+    results = /path=([^\s,]+)[,]?/.exec(optionsString);
+    if (results) {
+        matched = true;
+        path = results[1];
+    }
+    results = /domain=([^\s,]+)[,]?/.exec(optionsString);
+    if (results) {
+        matched = true;
+        domain = results[1];
+    }
+    // Treat the entire optionsString as a path (for backwards compatibility)
+    if (optionsString && !matched) {
+        LOG.warn("Using entire optionsString as a path; please change the argument to deleteCookie to use path="+optionsString);
+        path = optionsString;
+    }
     if (browserVersion.khtml) {
         // Safari and conquerer don't like paths with / at the end
         if ("/" != path) {
@@ -2190,7 +2312,16 @@ Selenium.prototype.doDeleteCookie = function(name,path) {
         }
     }
     var expireDateInMilliseconds = (new Date()).getTime() + (-1 * 1000);
-    var cookie = name.trim() + "=deleted; path=" + path + "; expires=" + new Date(expireDateInMilliseconds).toGMTString();
+    var cookie = name.trim() + "=deleted; ";
+    path = path.trim();
+    domain = domain.trim();
+    if (path) {
+        cookie += "path=" + path + "; ";
+    }
+    if (domain) {
+        cookie += "domain=" + domain + "; ";
+    }
+    cookie += "expires=" + new Date(expireDateInMilliseconds).toGMTString();
     LOG.debug("Setting cookie to: " + cookie);
     this.browserbot.getDocument().cookie = cookie;
 }

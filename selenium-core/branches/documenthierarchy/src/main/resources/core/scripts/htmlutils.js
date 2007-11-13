@@ -629,6 +629,20 @@ PatternMatcher.strategies = {
         };
     },
 
+    regexpi: function(regexpString) {
+        this.regexp = new RegExp(regexpString, "i");
+        this.matches = function(actual) {
+            return this.regexp.test(actual);
+        };
+    },
+
+    regexi: function(regexpString) {
+        this.regexp = new RegExp(regexpString, "i");
+        this.matches = function(actual) {
+            return this.regexp.test(actual);
+        };
+    },
+
 /**
  * "globContains" (aka "wildmat") patterns, e.g. "glob:one,two,*",
  * but don't require a perfect match; instead succeed if actual
