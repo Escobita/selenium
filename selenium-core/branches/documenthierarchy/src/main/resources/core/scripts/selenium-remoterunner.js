@@ -34,6 +34,9 @@ var proxyInjectionMode = false;
 var uniqueId = 'sel_' + Math.round(100000 * Math.random());
 var seleniumSequenceNumber = 0;
 
+// If the remote runner has received a response from the server
+var hasResponse = false;
+
 var RemoteRunnerOptions = classCreate();
 objectExtend(RemoteRunnerOptions.prototype, URLConfiguration.prototype);
 objectExtend(RemoteRunnerOptions.prototype, {
@@ -88,7 +91,17 @@ function runSeleniumTest() {
         proxyInjectionMode = true;
         testAppWindow = window;
     }
+    
+    if (document.getElementById("commandList") != null) {
+        document.getElementById("commandList").appendChild(cmd4);
+        document.getElementById("commandList").appendChild(cmd3);
+        document.getElementById("commandList").appendChild(cmd2);
+        document.getElementById("commandList").appendChild(cmd1);
+    }
+
     selenium = Selenium.createForWindow(testAppWindow, proxyInjectionMode);
+    window.selenium = selenium;
+        
     if (runOptions.getBaseUrl()) {
         selenium.browserbot.baseUrl = runOptions.getBaseUrl();
     }
@@ -102,20 +115,13 @@ function runSeleniumTest() {
     else if (debugMode) {
         LOG.logHook = logToRc;
     }
-    window.selenium = selenium;
 
     commandFactory = new CommandHandlerFactory();
-    commandFactory.registerAll(selenium);
+	//commandFactory.registerAll(selenium);
 
     currentTest = new RemoteRunner(commandFactory);
 
-    if (document.getElementById("commandList") != null) {
-        document.getElementById("commandList").appendChild(cmd4);
-        document.getElementById("commandList").appendChild(cmd3);
-        document.getElementById("commandList").appendChild(cmd2);
-        document.getElementById("commandList").appendChild(cmd1);
-    }
-
+//    currentTest.sendSeleniumStart();
     var doContinue = runOptions.getContinue();
     if (doContinue != null) postResult = "OK";
 
@@ -297,8 +303,19 @@ objectExtend(RemoteRunner.prototype, {
                     LOG.error("saw blank string xmlHttpForCommandsAndResults.responseText");
                     return;
                 }
+                
+                // If this is the first response from the server
+                // then register this selenium with the command factory
+     			if (!hasResponse) {
+     				// Use the windows selenium
+                	commandFactory.registerAll(selenium);
+                    hasResponse = true;
+                }
+                
                 var command = this._extractCommand(this.xmlHttpForCommandsAndResults);
-                if (command.command == 'retryLast') {
+                if (command == null) {
+                	return;
+                } else if (command.command == 'retryLast') {
                     setTimeout(fnBind(function() {
                         sendToRC("RETRY", "retry=true", fnBind(this._HandleHttpResponse, this), this.xmlHttpForCommandsAndResults, true);
                     }, this), 1000);
@@ -420,7 +437,9 @@ function addUrlParams(url) {
 	var commandId = "";
 	
 	// Add command ID to a command that was run and we're posting information about
-	if (typeof currentTest != 'undefined' && typeof currentTest.currentCommand != 'undefined') {
+	if (typeof currentTest != 'undefined' 
+		&& typeof currentTest.currentCommand != 'undefined'
+		&& typeof currentTest.currentCommand.commandId != 'undefined') {
 		commandId = "&commandId=" + currentTest.currentCommand.commandId;
 	}
 
