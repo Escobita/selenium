@@ -3,6 +3,7 @@ package org.openqa.selenium.server.jetty5;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.mortbay.http.HttpFields;
 import org.mortbay.http.HttpRequest;
 import org.openqa.selenium.server.jetty.WebRequest;
 
@@ -92,4 +93,8 @@ public class Jetty5WebRequest implements WebRequest {
 	public void setField(String field, String value) {
 		httpRequest.setField(field, value);
 	}
+
+	public String getField(String name) {
+		return httpRequest.getField(name);
+}
 }

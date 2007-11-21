@@ -72,7 +72,7 @@ public class InjectionManager {
     
 	private static void appendFileContent(StringBuffer sb, String url) throws IOException {
 //        InputStream in = new ClassPathResource(url).getInputStream();
-		InputStream in = new ClasspathResourceLocator().getResource(url);
+		InputStream in = new ClasspathResourceLocator().getResourceStream(url);
         if (in==null) {
             if (!url.endsWith("user-extensions.js")) {
                 throw new RuntimeException("couldn't find " + url);

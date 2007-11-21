@@ -1,16 +1,23 @@
 package org.openqa.selenium.server.jetty;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mortbay.http.HttpFields;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
-import org.openqa.selenium.server.jetty.Handler.Method;
 import org.openqa.selenium.server.proxy.InjectionManager;
 
 /**
@@ -20,6 +27,8 @@ import org.openqa.selenium.server.proxy.InjectionManager;
  */
 public class StaticContentHandler extends AbstractHandler {
 	private static Logger logger = Logger.getLogger(StaticContentHandler.class);
+
+	SimpleDateFormat LAST_MODIFIED_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 
 	private List<ResourceLocator> resourceLocatorList = new ArrayList<ResourceLocator>();
 
@@ -57,17 +66,6 @@ public class StaticContentHandler extends AbstractHandler {
                     "/core/InjectedRemoteRunner.html");
         }
        
-        // Tell browser to cache Selenium JS for up to 30 minutes
-        if (contextPath.endsWith(".js")) {
-        	// @todo verify this assumption
-        	// we know this was working, but anders thinks it may be better to use the file
-        	// modified date rather then a fixed timeline from the proxy server 
-//			webResponse.setField(HttpFields.__CacheControl, "max-age=1800");
-        	//FIXME, we could get this to grab the last modified date off the files
-        	webResponse.setField("Last-Modified", "Mon, 10 Sep 2007 00:00:00 GMT");
-        }
-
-		
 		//logger.info("Attempting to handle static content for context path before modification: "
 		//		+ contextPath);
 		//logger.info("Attempting to handle static content for requestURL: " + requestURL);
@@ -79,8 +77,45 @@ public class StaticContentHandler extends AbstractHandler {
 
 		// Find the file resource for the URL and then put it to the output stream
 		for (ResourceLocator resourceLocator : resourceLocatorList) {
-			InputStream inputStream = resourceLocator.getResource(contextPath);
 
+			// grab the resource and set the Last-Modified date
+			URL url = resourceLocator.getResource(contextPath);
+			if (url == null) {
+				logger.warn("Could not find resource for context path: "
+						+ contextPath);
+				continue;
+			}
+			
+			File f = new File(url.getFile());
+			
+			// grab the last modified time from the file system and zero out the ms since what we'll get in 
+			// the header doesn't have ms
+			Calendar lastModified = Calendar.getInstance();
+			lastModified.setTimeInMillis(f.lastModified());
+			lastModified.set(Calendar.MILLISECOND, 0);
+			
+			// for some reason IE was ignoring this unless it was in GMT format?
+			LAST_MODIFIED_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+			webResponse.setField(HttpFields.__LastModified, LAST_MODIFIED_FORMAT.format(lastModified.getTime()));
+			
+			try {
+				Calendar ifModifiedSince = Calendar.getInstance();
+				String requestIfModifiedSince = webRequest.getField(HttpFields.__IfModifiedSince);
+				
+				if (requestIfModifiedSince != null) {
+					ifModifiedSince.setTime(LAST_MODIFIED_FORMAT.parse(requestIfModifiedSince));
+					
+					if (lastModified.before(ifModifiedSince) || lastModified.equals(ifModifiedSince)) {
+						webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+						return true;
+					} 
+				}
+			} catch (ParseException e) {
+				logger.warn("Can not properly handle cache.  Unable to parse " + HttpFields.__IfModifiedSince);
+			}
+			
+			InputStream inputStream = url.openStream();
+			
 			if (inputStream != null) {
 				try {
 					// Inject static content on the classpath that may need to be injected

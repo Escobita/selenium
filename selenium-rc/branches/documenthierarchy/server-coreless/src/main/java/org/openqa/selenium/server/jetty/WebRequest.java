@@ -3,7 +3,7 @@ package org.openqa.selenium.server.jetty;
 import java.io.InputStream;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import org.mortbay.http.HttpFields;
 
 public interface WebRequest {
 	String getPath();
@@ -17,4 +17,5 @@ public interface WebRequest {
 	void setHandled(boolean handled);
 	Map getParameterStringArrayMap();
 	void setField(String field, String value);
+	public String getField(String name);
 }

@@ -1,6 +1,7 @@
 package org.openqa.selenium.server.jetty;
 
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Locator to locate a resource within a specified path.
@@ -8,5 +9,6 @@ import java.io.InputStream;
  * @author Matthew Purland
  */
 public interface ResourceLocator {
-	InputStream getResource(String pathInContext);
+	InputStream getResourceStream(String pathInContext);
+	URL getResource(String pathInContext);
 }

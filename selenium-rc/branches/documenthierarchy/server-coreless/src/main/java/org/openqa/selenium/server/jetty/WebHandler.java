@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mortbay.http.HttpFields;
 import org.openqa.selenium.server.jetty.Handler.Method;
 import org.openqa.selenium.server.jetty5.Jetty5StaticContentHandler;
 
@@ -98,7 +99,9 @@ public class WebHandler {
 		webRequest.setHandled(requestWasHandled);
 		
 		if (requestWasHandled) {
+			if (webResponse.getStatus() != HttpServletResponse.SC_NOT_MODIFIED) {
 			webResponse.setStatus(HttpServletResponse.SC_OK);
+			}
 		} else if (method == null) {
 			webResponse.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 		} else {

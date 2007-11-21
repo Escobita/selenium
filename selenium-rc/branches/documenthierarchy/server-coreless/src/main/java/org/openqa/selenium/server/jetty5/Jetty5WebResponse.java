@@ -54,4 +54,8 @@ public class Jetty5WebResponse implements WebResponse {
 		httpResponse.setField(field, value);
 	}
 
+	public int getStatus() {
+		return httpResponse.getStatus();
+}
+
 }

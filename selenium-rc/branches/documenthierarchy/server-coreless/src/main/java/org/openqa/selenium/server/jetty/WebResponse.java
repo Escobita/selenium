@@ -14,4 +14,5 @@ public interface WebResponse {
 	String getContentType();
 	OutputStream getOutputStream();
 	void setStatus(int status);
+	int getStatus();
 }
