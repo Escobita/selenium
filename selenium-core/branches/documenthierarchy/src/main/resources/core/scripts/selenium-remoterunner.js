@@ -437,9 +437,9 @@ function addUrlParams(url) {
 	var commandId = "";
 	
 	// Add command ID to a command that was run and we're posting information about
-	if (typeof currentTest != 'undefined' 
-		&& typeof currentTest.currentCommand != 'undefined'
-		&& typeof currentTest.currentCommand.commandId != 'undefined') {
+	if (currentTest
+		&& currentTest.currentCommand
+		&& (typeof currentTest.currentCommand.commandId != 'undefined' && currentTest.currentCommand.commandId != null)) {
 		commandId = "&commandId=" + currentTest.currentCommand.commandId;
 	}
 
