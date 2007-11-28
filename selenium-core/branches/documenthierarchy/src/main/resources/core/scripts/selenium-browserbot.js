@@ -289,13 +289,14 @@ BrowserBot.prototype._modifyWindow = function(win) {
     // In proxyInjection mode, we have our own mechanism for detecting page loads
     if (!this.proxyInjectionMode) {
         this.modifySeparateTestWindowToDetectPageLoads(win);
-    }
+        
     if (win.frames && win.frames.length && win.frames.length > 0) {
         for (var i = 0; i < win.frames.length; i++) {
             try {
                 this._modifyWindow(win.frames[i]);
             } catch (e) {} // we're just trying to be opportunistic; don't worry if this doesn't work out
         }
+    }
     }
     return win;
 };
@@ -1842,6 +1843,18 @@ IEBrowserBot.prototype._handleClosedSubFrame = function(testWindow, doNotModify)
     return testWindow;
 };
 
+function getCurrentCommands(w, commands) {
+	var c = (typeof commands != 'undefined' && commands != null) ?  commands : new Array();
+	var cmd = w.currentTest.currentCommand;
+	if(typeof cmd != 'undefined' && cmd != null) {
+		c.push(cmd);
+	}
+	if (w != w.top) {
+		c = getCurrentCommands(w.parent, c);
+	}
+	return c;
+}
+
 IEBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify, browserBot) {
     BrowserBot.prototype.modifyWindowToRecordPopUpDialogs(windowToModify, browserBot);
 
@@ -1861,7 +1874,13 @@ IEBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModif
             runInterval = "&runInterval=" + runOptions.runInterval;
         }
         
-        sendToRC("OK,BEFORE MODAL", "modalDialog=true");
+        var commands = getCurrentCommands(window);
+        var commandId = "";
+        for (i in commands) {
+        	commandId = "&commandId=" + commands[i].commandId;
+        	break;
+        }
+        sendToRC("OK,BEFORE MODAL", "modalDialog=true" + commandId, null, null, null, false);
             
         var testRunnerURL = "TestRunner.html?auto=true&singletest=" 
             + escape(browserBot.modalDialogTest)

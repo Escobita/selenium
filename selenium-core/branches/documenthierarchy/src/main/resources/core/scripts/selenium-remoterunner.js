@@ -410,7 +410,10 @@ objectExtend(RemoteRunner.prototype, {
 })
 
 
-function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async) {
+function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async, sequenced) {
+    if (sequenced == null) {
+        sequenced = true;
+    }
     if (async == null) {
         async = true;
     }
@@ -422,7 +425,11 @@ function sendToRC(dataToBePosted, urlParms, callback, xmlHttpObject, async) {
         url += urlParms;
     }
     url = addUrlParams(url);
+    if (sequenced) {
     url += "&sequenceNumber=" + seleniumSequenceNumber++;
+    } else {
+        url += "&sequenceNumber=-1";
+    }
     
     var postedData = "postedData=" + encodeURIComponent(dataToBePosted);
 
