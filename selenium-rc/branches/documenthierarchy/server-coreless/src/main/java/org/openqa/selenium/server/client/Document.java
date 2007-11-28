@@ -1,8 +1,6 @@
 package org.openqa.selenium.server.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.server.command.CommandResult;
 import org.openqa.selenium.server.command.RemoteCommand;
 import org.openqa.selenium.server.command.runner.RemoteCommandRunner;
-import org.openqa.selenium.server.locator.RelativeFrameLocator;
 
 /**
  * A document that represents a document under the DOM which may contain
@@ -62,6 +59,10 @@ public class Document {
 	private Document parent;
 	
 	private Window parentWindow;
+	
+	public RemoteCommand<CommandResult> getRunningCommand() {
+		return remoteCommandRunner.getRunningCommand();
+	}
 	
 	public Document(Window parentWindow, String uniqueId,
 			String frameAddress, String frameName, String frameId, RemoteCommandRunner remoteCommandRunner, boolean hasStarted) {
@@ -375,15 +376,21 @@ public class Document {
 			else if (frameAddress.equals(getFrameId())) {
 				documentMatches = true;
 			}
+			else if (frameAddress.startsWith("id=")
+					&& frameAddress.substring("id=".length()).equals(getFrameId())) {
+				documentMatches = true;
+			}
+			else if (frameAddress.startsWith("name=")
+					&& frameAddress.substring("name=".length()).equals(getFrameName())) {
+				documentMatches = true;
+			}
 			// @todo Add isLocatorSyntax function for checking if locator
 			else if (frameAddress.startsWith("relative=")
 					|| frameAddress.startsWith("dom=")
 					|| frameAddress.startsWith("xpath=")
 					|| frameAddress.startsWith("link=")
 					|| frameAddress.startsWith("css=")
-					|| frameAddress.startsWith("identifier=")
-					|| frameAddress.startsWith("id=")
-					|| frameAddress.startsWith("name=")) {
+					|| frameAddress.startsWith("identifier=")) {
 				Document foundDocument = findDocumentByFrameMatchExpression(frameAddress);
 
 				if (foundDocument != null) {
@@ -543,6 +550,7 @@ public class Document {
 //		// Get the unique ID passed from the browser
 //		String uniqueId = parametersMap.get("uniqueId");
 		String commandId = parametersMap.get("commandId");
+
 		Integer sequenceId = Integer.valueOf(parametersMap.get("sequenceNumber"));
 //		boolean isModal = Boolean.valueOf(parametersMap.get("modalDialog"));
 //		

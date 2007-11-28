@@ -27,6 +27,8 @@ import org.openqa.selenium.server.command.StringRemoteCommandResult;
 public class RemoteCommandRunner extends
 		AbstractCommandRunner<RemoteCommand<CommandResult>> {
 
+	private static final int NOT_SEQUENCED = -1;
+
 	private static Logger logger = Logger.getLogger(RemoteCommandRunner.class);
 
 	private BlockingQueue<RemoteCommand<CommandResult>> commandQueue = new SynchronousQueue<RemoteCommand<CommandResult>>();
@@ -44,7 +46,7 @@ public class RemoteCommandRunner extends
 	
 	private Queue<Thread> waitingBrowserQueue = new ConcurrentLinkedQueue<Thread>();
 
-	Integer lastSequenceId = new Integer(-1);
+	Integer lastSequenceId = new Integer(NOT_SEQUENCED);
 	final Lock resultLock = new ReentrantLock();
 	final Condition sequenceProcessed = resultLock.newCondition();
 
@@ -177,7 +179,7 @@ public class RemoteCommandRunner extends
 		resultLock.lock();
 		try {
 			logger.debug("Acquired lock for commandId=" + commandId + ", sequenceId=" + sequenceId + ", lastSequenceId=" + lastSequenceId);
-			while (sequenceId > (lastSequenceId + 1)) {
+			while ((sequenceId != NOT_SEQUENCED) && (sequenceId > (lastSequenceId + 1))) {
 				sequenceProcessed.await();
 			}
 			boolean hasCommandId = commandId != null && !"".equals(commandId);
@@ -215,7 +217,9 @@ public class RemoteCommandRunner extends
 		} finally {
 			logger.debug("Releasing lock for result for commandId=" + commandId + ", sequenceId=" + sequenceId + ", lastSequenceId=" + lastSequenceId);
 			// notify any waiting threads that a sequence has been handled so they can wake up and check if it's their turn
+			if (sequenceId != NOT_SEQUENCED) {
 			lastSequenceId = sequenceId;
+			}
 			sequenceProcessed.signalAll();			
 			
 			resultLock.unlock();

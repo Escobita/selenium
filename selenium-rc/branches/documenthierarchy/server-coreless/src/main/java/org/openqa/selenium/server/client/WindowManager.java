@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.server.command.AbstractCommand;
 import org.openqa.selenium.server.command.CommandResult;
 import org.openqa.selenium.server.command.OKCommandResult;
 import org.openqa.selenium.server.command.RemoteCommand;
@@ -833,7 +834,25 @@ public class WindowManager implements WindowListener {
 				else if (document != null) {			
 					logger.debug("handling command result on document unique id: " + uniqueId);
 					
-					//Window window = findWindowContainingDocument(document);
+					// Use the found document as a starting point, but if this is a modal result
+					// search up the document hierarchy until we find a running command.  The
+					// assumption is that this will be the trigger that is launching the modal.
+					// and what triggered the modal is who needs to handle this modal result.
+					if (modalDialog && document.getRunningCommand() == null) {
+						logger.debug("searching for trigger to modal dialog result");
+						Document parent = document.getParentDocument();
+						while (parent != null) {
+							RemoteCommand<CommandResult> command = parent.getRunningCommand();
+							String commandId = commandParametersMap.get("commandId");
+							logger.debug("parent command: " + command + " result commandId: " + commandId);
+							if ((command != null) && (commandId.equals(command.getCommandId()))) {
+								document = parent;
+								break;
+							}
+							parent = parent.getParentDocument();
+						}
+					}
+					
 					
 					if (window != null) {
 						logger.debug("Handling command result in window");
