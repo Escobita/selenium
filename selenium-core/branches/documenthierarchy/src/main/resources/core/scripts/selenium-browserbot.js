@@ -351,7 +351,7 @@ BrowserBot.prototype.selectFrame = function(target) {
         this.currentWindow = frame;
         this.isSubFrameSelected = true;
     }
-    else if (target == "relative=up") {
+    else if (target == "relative=up" || target == "relative=parent") {
         this.currentWindow = this.getCurrentWindow().parent;
         this.isSubFrameSelected = (this._getFrameElement(this.currentWindow) != null);
     } else if (target == "relative=top") {
@@ -1080,6 +1080,98 @@ BrowserBot.prototype.getTitle = function() {
     return t;
 }
 
+BrowserBot.prototype.getCookieByName = function(cookieName, doc) {
+    if (!doc) doc = this.getDocument();
+    var ck = doc.cookie;
+    if (!ck) return null;
+    var ckPairs = ck.split(/;/);
+    for (var i = 0; i < ckPairs.length; i++) {
+        var ckPair = ckPairs[i].trim();
+        var ckNameValue = ckPair.split(/=/);
+        var ckName = decodeURIComponent(ckNameValue[0]);
+        if (ckName === cookieName) {
+            return decodeURIComponent(ckNameValue[1]);
+        }
+    }
+    return null;
+}
+
+BrowserBot.prototype.getAllCookieNames = function() {
+    var ck = this.getDocument().cookie;
+    if (!ck) return [];
+    var cookieNames = [];
+    var ckPairs = ck.split(/;/);
+    for (var i = 0; i < ckPairs.length; i++) {
+        var ckPair = ckPairs[i].trim();
+        var ckNameValue = ckPair.split(/=/);
+        var ckName = decodeURIComponent(ckNameValue[0]);
+        cookieNames.push(ckName);
+    }
+    return cookieNames;
+}
+
+BrowserBot.prototype.deleteCookie = function(cookieName, domain, path, doc) {
+    if (!doc) doc = this.getDocument();
+    var expireDateInMilliseconds = (new Date()).getTime() + (-1 * 1000);
+    var cookie = cookieName + "=deleted; ";
+    if (path) {
+        cookie += "path=" + path + "; ";
+    }
+    if (domain) {
+        cookie += "domain=" + domain + "; ";
+    }
+    cookie += "expires=" + new Date(expireDateInMilliseconds).toGMTString();
+    LOG.debug("Setting cookie to: " + cookie);
+    doc.cookie = cookie;
+}
+
+/** Try to delete cookie, return false if it didn't work */
+BrowserBot.prototype._maybeDeleteCookie = function(cookieName, domain, path, doc) {
+    this.deleteCookie(cookieName, domain, path, doc);
+    return (!this.getCookieByName(cookieName));
+}
+    
+
+BrowserBot.prototype._recursivelyDeleteCookieDomains = function(cookieName, domain, path, doc) {
+    var deleted = this._maybeDeleteCookie(cookieName, domain, path, doc);
+    if (deleted) return true;
+    var dotIndex = domain.indexOf(".");
+    if (dotIndex == 0) {
+        return this._recursivelyDeleteCookieDomains(cookieName, domain.substring(1), path, doc);
+    } else if (dotIndex != -1) {
+        return this._recursivelyDeleteCookieDomains(cookieName, domain.substring(dotIndex), path, doc);
+    }
+}
+
+BrowserBot.prototype._recursivelyDeleteCookie = function(cookieName, domain, path, doc) {
+    var deleted = this._maybeDeleteCookie(cookieName, null, path, doc);
+    if (deleted) return true;
+    deleted = this._recursivelyDeleteCookieDomains(cookieName, domain, path, doc);
+    if (deleted) return true;
+    if (deleted) return true;
+    var slashIndex = path.lastIndexOf("/");
+    var finalIndex = path.length-1;
+    if (slashIndex == finalIndex) {
+        slashIndex--;
+    }
+    if (slashIndex == -1) return false;
+    return this._recursivelyDeleteCookie(cookieName, domain, path.substring(0, slashIndex+1), doc);
+}
+
+BrowserBot.prototype.recursivelyDeleteCookie = function(cookieName, domain, path) {
+    var win = this.getCurrentWindow();
+    var doc = win.document;
+    if (this._maybeDeleteCookie(cookieName, domain, path, doc)) return;
+    if (!domain) {
+        domain = doc.domain;
+    }
+    if (!path) {
+        path = win.location.pathname;
+    }
+    var deleted = this._recursivelyDeleteCookie(cookieName, "." + domain, path, doc);
+    if (!deleted) throw new SeleniumError("Couldn't delete cookie " + cookieName);
+}
+
 /*
  * Finds an element recursively in frames and nested frames
  * in the specified document, using various lookup protocols
@@ -1208,74 +1300,39 @@ BrowserBot.prototype.locateElementByXPath = function(xpath, inDocument, inWindow
     if (xpath.charAt(xpath.length - 1) == '/') {
         xpath = xpath.slice(0, -1);
     }
-
-    // Handle //tag
-    var match = xpath.match(/^\/\/(\w+|\*)$/);
-    if (match) {
-        var elements = inDocument.getElementsByTagName(match[1].toUpperCase());
-        if (elements == null) return null;
-        return elements[0];
+    // HUGE hack - remove namespace from xpath for IE
+    if (browserVersion.isIE) {
+        xpath = xpath.replace(/x:/g, '')
     }
 
-    // Handle //tag[@attr='value']
-    var match = xpath.match(/^\/\/(\w+|\*)\[@(\w+)=('([^\']+)'|"([^\"]+)")\]$/);
-    if (match) {
-        // We don't return the value without checking if it is null first.
-        // This is beacuse in some rare cases, this shortcut actually WONT work
-        // but that the full XPath WILL. A known case, for example, is in IE
-        // when the attribute is onclick/onblur/onsubmit/etc. Due to a bug in IE
-        // this shortcut won't work because the actual function is returned
-        // by getAttribute() rather than the text of the attribute.
-        var val = this._findElementByTagNameAndAttributeValue(
-                inDocument,
-                match[1].toUpperCase(),
-                match[2].toLowerCase(),
-                match[3].slice(1, -1)
-                );
-        if (val) {
-            return val;
-        }
+    // Use document.evaluate() if it's available
+    if (this.allowNativeXpath && inDocument.evaluate) {
+        var result;
+        try {
+            result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, 0, null);
+        } catch (e) {
+            throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+    }
+        return result.iterateNext();
     }
 
-    // Handle //tag[text()='value']
-    var match = xpath.match(/^\/\/(\w+|\*)\[text\(\)=('([^\']+)'|"([^\"]+)")\]$/);
-    if (match) {
-        return this._findElementByTagNameAndText(
-                inDocument,
-                match[1].toUpperCase(),
-                match[2].slice(1, -1)
-                );
+    // If not, fall back to slower JavaScript implementation
+    // DGF set xpathdebug = true (using getEval, if you like) to turn on JS XPath debugging
+    //xpathdebug = true;
+    var context = new ExprContext(inDocument);
+    context.setCaseInsensitive(true);
+    var xpathObj;
+    try {
+        xpathObj = xpathParse(xpath);
+    } catch (e) {
+        throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
     }
-
-    return this._findElementUsingFullXPath(xpath, inDocument);
-};
-
-BrowserBot.prototype._findElementByTagNameAndAttributeValue = function(
-        inDocument, tagName, attributeName, attributeValue
-        ) {
-    if (browserVersion.isIE && attributeName == "class") {
-        attributeName = "className";
-    }
-    var elements = inDocument.getElementsByTagName(tagName);
-    for (var i = 0; i < elements.length; i++) {
-        var elementAttr = elements[i].getAttribute(attributeName);
-        if (elementAttr == attributeValue) {
-            return elements[i];
-        }
+    var xpathResult = xpathObj.evaluate(context);
+    if (xpathResult && xpathResult.value) {
+        return xpathResult.value[0];
     }
     return null;
-};
 
-BrowserBot.prototype._findElementByTagNameAndText = function(
-        inDocument, tagName, text
-        ) {
-    var elements = inDocument.getElementsByTagName(tagName);
-    for (var i = 0; i < elements.length; i++) {
-        if (getText(elements[i]) == text) {
-            return elements[i];
-        }
-    }
-    return null;
 };
 
 BrowserBot.prototype._namespaceResolver = function(prefix) {
@@ -1287,30 +1344,6 @@ BrowserBot.prototype._namespaceResolver = function(prefix) {
         throw new Error("Unknown namespace: " + prefix + ".");
     }
 }
-
-BrowserBot.prototype._findElementUsingFullXPath = function(xpath, inDocument, inWindow) {
-    // HUGE hack - remove namespace from xpath for IE
-    if (browserVersion.isIE) {
-        xpath = xpath.replace(/x:/g, '')
-    }
-
-    // Use document.evaluate() if it's available
-    if (this.allowNativeXpath && inDocument.evaluate) {
-        return inDocument.evaluate(xpath, inDocument, this._namespaceResolver, 0, null).iterateNext();
-    }
-
-    // If not, fall back to slower JavaScript implementation
-    // DGF set xpathdebug = true (using getEval, if you like) to turn on JS XPath debugging
-    //xpathdebug = true;
-    var context = new ExprContext(inDocument);
-    var xpathObj = xpathParse(xpath);
-    var xpathResult = xpathObj.evaluate(context);
-    if (xpathResult && xpathResult.value) {
-        return xpathResult.value[0];
-    }
-    return null;
-
-};
 
 // DGF this may LOOK identical to _findElementUsingFullXPath, but 
 // fEUFX pops the first element off the resulting nodelist; this function
@@ -1333,7 +1366,12 @@ BrowserBot.prototype.evaluateXPathCount = function(xpath, inDocument) {
 
     // Use document.evaluate() if it's available
     if (this.allowNativeXpath && inDocument.evaluate) {
-        var result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, XPathResult.NUMBER_TYPE, null);
+        var result;
+        try {
+            result = inDocument.evaluate(xpath, inDocument, this._namespaceResolver, XPathResult.NUMBER_TYPE, null);
+        } catch (e) {
+            throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+        }
         return result.numberValue;
     }
 
@@ -1341,7 +1379,13 @@ BrowserBot.prototype.evaluateXPathCount = function(xpath, inDocument) {
     // DGF set xpathdebug = true (using getEval, if you like) to turn on JS XPath debugging
     //xpathdebug = true;
     var context = new ExprContext(inDocument);
-    var xpathObj = xpathParse(xpath);
+    context.setCaseInsensitive(true);
+    var xpathObj;
+    try {
+        xpathObj = xpathParse(xpath);
+    } catch (e) {
+        throw new SeleniumError("Invalid xpath: " + extractExceptionMessage(e));
+    }
     var xpathResult = xpathObj.evaluate(context);
     if (xpathResult && xpathResult.value) {
         return xpathResult.value;
@@ -1518,6 +1562,11 @@ BrowserBot.prototype.doubleClickElement = function(element, clientX, clientY) {
        this._fireEventOnElement("dblclick", element, clientX, clientY);
 };
 
+// The contextmenu event is fired when the user right-clicks to open the context menu
+BrowserBot.prototype.contextMenuOnElement = function(element, clientX, clientY) {
+       this._fireEventOnElement("contextmenu", element, clientX, clientY);
+};
+
 BrowserBot.prototype._modifyElementTarget = function(element) {
     if (element.target) {
         if (element.target == "_blank" || /^selenium_blank/.test(element.target) ) {
@@ -1554,6 +1603,9 @@ BrowserBot.prototype._getTargetWindow = function(element) {
 
 BrowserBot.prototype._getFrameFromGlobal = function(target) {
 
+    if (target == "_self") {
+        return this.getCurrentWindow();
+    }
     if (target == "_top") {
         return this.topFrame;
     } else if (target == "_parent") {
@@ -2011,28 +2063,6 @@ IEBrowserBot.prototype._windowClosed = function(win) {
  */
 IEBrowserBot.prototype.locateElementByIdentifer = function(identifier, inDocument, inWindow) {
     return inDocument.getElementById(identifier);
-};
-
-IEBrowserBot.prototype._findElementByTagNameAndAttributeValue = function(
-        inDocument, tagName, attributeName, attributeValue
-        ) {
-    if (attributeName == "class") {
-        attributeName = "className";
-    }
-    var elements = inDocument.getElementsByTagName(tagName);
-    for (var i = 0; i < elements.length; i++) {
-        var elementAttr = elements[i].getAttribute(attributeName);
-        if (elementAttr == attributeValue) {
-            return elements[i];
-        }
-        // DGF SEL-347, IE6 URL-escapes javascript href attribute
-        if (!elementAttr) continue;
-        elementAttr = unescape(new String(elementAttr));
-        if (elementAttr == attributeValue) {
-            return elements[i];
-        }
-    }
-    return null;
 };
 
 SafariBrowserBot.prototype.modifyWindowToRecordPopUpDialogs = function(windowToModify, browserBot) {
