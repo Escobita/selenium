@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project name="deploy">
+    <target name="deploy">
+		<copy file="target/selenium-rc-website-1.0-SNAPSHOT.war" tofile="/opt/project_websites/selenium-rc.war"/>
+    </target>
+</project>
