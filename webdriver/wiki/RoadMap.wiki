@@ -7,7 +7,7 @@ At least the following issues need to be completed before the first set of binar
 || *Issue* || *Summary* || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* ||
 || [http://code.google.com/p/webdriver/issues/detail?id=21 21] || Fix the InternetExplorerDriver || n/a || n/a || Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements || Started || Started || Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements || Done || Done || Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide || Not Started || Not Started || Not Started || 
 || [http://code.google.com/p/webdriver/issues/detail?id=14 14]  || Block on AJAX calls || n/a || Not Started || Not Started ||
 
