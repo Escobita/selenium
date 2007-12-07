@@ -81,9 +81,9 @@ public class LoginPage {
     // the application using a user name and password. 
     public HomePage loginAs(String username, String password) {
         // This is the only place in the test code that "knows" how to enter these details
-        driver.selectElement("id=username").setValue(username);
-        driver.selectElement("id=passwd").setValue(password);
-        driver.selectElement("id=login").submit();
+        driver.findElement(By.id("username")).setValue(username);
+        driver.findElement(By.id("passwd")).setValue(password);
+        driver.findElement(By.id("login")).submit();
          
         // Return a new page object representing the destination. Should the login page ever
         // go somewhere else (for example, a legal disclaimer) then changing the method signature

@@ -20,6 +20,7 @@ We're now ready to write some code. Perhaps something that looks like:
 {{{
 package com.thoughtworks.webdriver.example;
 
+import com.thoughtworks.webdriver.By;
 import com.thoughtworks.webdriver.WebDriver;
 import com.thoughtworks.webdriver.WebElement;
 import com.thoughtworks.webdriver.htmlunit.HtmlUnitDriver;
@@ -33,7 +34,7 @@ public class Example  {
         driver.get("http://www.google.com");
 
         // Find the text input element using a little XPath
-        WebElement element = driver.selectElement("//input[@name='q']");
+        WebElement element = driver.findElement(By.xpath("//input[@name='q']"));
 
         // Enter something to search for
         element.setValue("Cheese!");
@@ -57,6 +58,7 @@ package com.thoughtworks.webdriver.example;
 
 import java.util.List;
 
+import com.thoughtworks.webdriver.By;
 import com.thoughtworks.webdriver.WebDriver;
 import com.thoughtworks.webdriver.WebElement;
 import com.thoughtworks.webdriver.firefox.FirefoxDriver;
@@ -71,14 +73,14 @@ public class GoogleSuggest {
         driver.get("http://www.google.com/webhp?complete=1&hl=en");
         
         // Enter the query string "I like cheese"
-        WebElement query = driver.selectElement("//input[@name='q']");
+        WebElement query = driver.findElement(By.xpath("//input[@name='q']"));
         query.setValue("Cheese");
 
         // This should go at some point, but allows Google to return some suggestions for now
         Thread.sleep(2000);
 
         // And now list the suggestions
-        List<WebElement> allSuggestions = driver.selectElements("//td[@class='google-ac-c']");
+        List<WebElement> allSuggestions = driver.findElements(By.xpath("//td[@class='google-ac-c']"));
         
         for (WebElement suggestion : allSuggestions) {
             System.out.println(suggestion.getText());
