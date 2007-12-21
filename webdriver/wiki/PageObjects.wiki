@@ -97,4 +97,4 @@ public class LoginPage {
 
 == Support in WebDriver ==
 
-There is a PageObjectFactory in the support package that provides support for this pattern, and helps to remove some boiler-plate code from your Page Objects at the same time.
+There is a PageFactory in the support package that provides support for this pattern, and helps to remove some boiler-plate code from your Page Objects at the same time.
