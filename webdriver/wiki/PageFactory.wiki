@@ -1,6 +1,6 @@
 #summary Description of the PageFactory in the WebDriver support library.
 
-= The PageObjectFactory =
+= The PageFactory =
 
 In order to support the PageObject pattern, WebDriver's support library contains a factory class.
 
