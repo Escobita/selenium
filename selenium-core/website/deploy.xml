@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<project name="deploy">
+    <target name="deploy">
+		<delete dir="/opt/j2ee/domains/openqa.org/projectwebsites/webapps/selenium-core"/>
+		<mkdir dir="/opt/j2ee/domains/openqa.org/projectwebsites/webapps/selenium-core"/>
+		<unwar src="target/selenium-core-website-1.0-SNAPSHOT.war" dest="/opt/j2ee/domains/openqa.org/projectwebsites/webapps/selenium-core"/>
+    </target>
+</project>
