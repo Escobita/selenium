@@ -21,5 +21,10 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
-    
+    <jsp-config>
+        <taglib>
+            <taglib-location>/WEB-INF/sitemesh-decorator.tld</taglib-location>
+            <taglib-uri>http://www.opensymphony.com/sitemesh/decorator</taglib-uri>
+        </taglib>
+    </jsp-config>
 </web-app>
