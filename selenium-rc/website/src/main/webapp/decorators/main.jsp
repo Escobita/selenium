@@ -1,4 +1,3 @@
-<%@taglib prefix="ww" uri="/webwork" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <html>
 <head>
