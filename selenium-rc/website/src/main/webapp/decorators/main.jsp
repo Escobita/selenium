@@ -24,21 +24,21 @@
 
 <body onload="onLoadFunc()">
 
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp"></script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium-rc"></script>
 <script type="text/javascript"
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp"></script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium-rc"></script>
 
 <h1 class="first">Selenium RC: <decorator:title/></h1>
 
 <decorator:body/>
 
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/leftnav.jsp"></script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/leftnav.jsp?name=selenium-rc"></script>
 <script type="text/javascript"
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp"></script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium-rc"></script>
 
 </body>
 </html>

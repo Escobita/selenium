@@ -4,7 +4,7 @@
 </head>
 <body>
 
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/reporting.jsp"></script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/reporting.jsp?name=selenium-rc"></script>
 
 </body>
 </html>

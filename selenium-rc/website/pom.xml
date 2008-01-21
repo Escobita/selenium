@@ -43,8 +43,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <ant antfile="deploy.xml" target="deploy" inheritRefs="true">
-                                        </ant>
+                                        <copy file="target/selenium-rc-website-1.0-SNAPSHOT.war" tofile="/opt/j2ee/domains/openqa.org/projectwebsites/tomcat/webapps/selenium-rc/ROOT.war"/>
                                     </tasks>
                                 </configuration>
                             </execution>
