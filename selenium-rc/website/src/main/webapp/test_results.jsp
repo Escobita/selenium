@@ -2,7 +2,20 @@
     private String renderResult(Browser browser, OS os, String name) {
         Map<String, Map<TestConfig, Boolean>> map = TestResults.getResults();
         Map<TestConfig, Boolean> results = map.get(name);
-        Boolean pass = results.get(new TestConfig(browser, os));
+
+        Boolean pass = null;
+        if (os == null) {
+            // OS not provided, so just grab the first non-null result (if one can be found)
+            for (OS selection : OS.values()) {
+                pass = results.get(new TestConfig(browser, selection));
+                if (pass != null) {
+                    break;
+                }
+            }
+        } else {
+            pass = results.get(new TestConfig(browser, os));
+        }
+
         if (pass == null) {
             return "<td class='not_run'></td>";
         } else if (pass) {
@@ -53,25 +66,14 @@
         </tr>
         <tr>
             <th></th>
-            <th>IE6</th>
+            <th>XP<br/>IE6</th>
+            <th>Vista<br/>IE7</th>
+            <th>OSX10.5<br/>SAF3</th>
             <th>FF2</th>
             <th>FF2C</th>
             <th>FF3</th>
             <th>FF3C</th>
             <th>OP92</th>
-
-            <th>IE7</th>
-            <th>FF2</th>
-            <th>FF2C</th>
-            <th>FF3</th>
-            <th>FF3C</th>
-            <th>OP92</th>
-
-            <th>SAF3</th>
-            <th>FF2</th>
-            <th>FF2C</th>
-            <th>FF3</th>
-            <th>FF3C</th>
         </tr>
     </thead>
     <tbody>
@@ -82,24 +84,13 @@
             <td><%= name %></td>
 
             <%= renderResult(Browser.IE6, OS.XP, name)%>
-            <%= renderResult(Browser.FIREFOX2, OS.XP, name)%>
-            <%= renderResult(Browser.FIREFOX2CHROME, OS.XP, name)%>
-            <%= renderResult(Browser.FIREFOX3, OS.XP, name)%>
-            <%= renderResult(Browser.FIREFOX3CHROME, OS.XP, name)%>
-            <%= renderResult(Browser.OPERA92, OS.XP, name)%>
-
             <%= renderResult(Browser.IE7, OS.VISTA, name)%>
-            <%= renderResult(Browser.FIREFOX2, OS.VISTA, name)%>
-            <%= renderResult(Browser.FIREFOX2CHROME, OS.VISTA, name)%>
-            <%= renderResult(Browser.FIREFOX3, OS.VISTA, name)%>
-            <%= renderResult(Browser.FIREFOX3CHROME, OS.VISTA, name)%>
-            <%= renderResult(Browser.OPERA92, OS.VISTA, name)%>
-
             <%= renderResult(Browser.SAFARI3, OS.LEOPARD, name)%>
-            <%= renderResult(Browser.FIREFOX2, OS.LEOPARD, name)%>
-            <%= renderResult(Browser.FIREFOX2CHROME, OS.LEOPARD, name)%>
-            <%= renderResult(Browser.FIREFOX3, OS.LEOPARD, name)%>
-            <%= renderResult(Browser.FIREFOX3CHROME, OS.LEOPARD, name)%>
+            <%= renderResult(Browser.FIREFOX2, null, name)%>
+            <%= renderResult(Browser.FIREFOX2CHROME, null, name)%>
+            <%= renderResult(Browser.FIREFOX3, null, name)%>
+            <%= renderResult(Browser.FIREFOX3CHROME, null, name)%>
+            <%= renderResult(Browser.OPERA92, OS.XP, name)%>
         </tr>
         <%
             }
