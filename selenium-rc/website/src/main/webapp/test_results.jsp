@@ -65,8 +65,6 @@
             <th>OSX10.5<br/>SAF3</th>
             <th>FF2</th>
             <th>FF2C</th>
-            <th>FF3</th>
-            <th>FF3C</th>
             <th>OP92</th>
         </tr>
     </thead>
@@ -82,8 +80,6 @@
             <%= renderResult(Browser.SAFARI3, OS.LEOPARD, name)%>
             <%= renderResult(Browser.FIREFOX2, null, name)%>
             <%= renderResult(Browser.FIREFOX2CHROME, null, name)%>
-            <%= renderResult(Browser.FIREFOX3, null, name)%>
-            <%= renderResult(Browser.FIREFOX3CHROME, null, name)%>
             <%= renderResult(Browser.OPERA92, OS.XP, name)%>
         </tr>
         <%
