@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -28,7 +29,7 @@ import org.openqa.selenium.server.proxy.InjectionManager;
 public class StaticContentHandler extends AbstractHandler {
 	private static Logger logger = Logger.getLogger(StaticContentHandler.class);
 
-	SimpleDateFormat LAST_MODIFIED_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
+	public static final SimpleDateFormat LAST_MODIFIED_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 
 	private List<ResourceLocator> resourceLocatorList = new ArrayList<ResourceLocator>();
 
@@ -103,8 +104,14 @@ public class StaticContentHandler extends AbstractHandler {
 				String requestIfModifiedSince = webRequest.getField(HttpFields.__IfModifiedSince);
 				
 				if (requestIfModifiedSince != null) {
-					ifModifiedSince.setTime(LAST_MODIFIED_FORMAT.parse(requestIfModifiedSince));
-					
+					try {
+						//requestIfModifiedSince = new String(requestIfModifiedSince);
+						Date ifModifiedSinceDate = LAST_MODIFIED_FORMAT.parse(requestIfModifiedSince);
+						ifModifiedSince.setTime(ifModifiedSinceDate);
+					}
+					catch (NumberFormatException ex) {
+						// squelch exception.  workaround IE number format exception from request
+					}
 					if (lastModified.before(ifModifiedSince) || lastModified.equals(ifModifiedSince)) {
 						webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 						return true;
