@@ -47,8 +47,8 @@
     <thead>
         <tr>
             <th></th>
-            <th colspan="1">Win XP</th>
-            <th colspan="5">Vista</th>
+            <th colspan="6">Win XP</th>
+            <th colspan="6">Vista</th>
             <th colspan="5">Leopard</th>
         </tr>
         <tr>
