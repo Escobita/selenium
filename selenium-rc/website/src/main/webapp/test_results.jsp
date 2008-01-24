@@ -47,20 +47,23 @@
     <thead>
         <tr>
             <th></th>
-            <th colspan="3">WinXP</th>
-            <th colspan="3">Vista</th>
-            <th colspan="2">Leopard</th>
+            <th colspan="1">Win XP</th>
+            <th colspan="5">Vista</th>
+            <th colspan="5">Leopard</th>
         </tr>
         <tr>
             <th></th>
             <th>IE6</th>
-            <th>Safari 3</th>
-            <th>Firefox 2</th>
             <th>IE7</th>
-            <th>Safari 3</th>
-            <th>Firefox 2</th>
-            <th>Safari 3</th>
-            <th>Firefox 2</th>
+            <th>FF2</th>
+            <th>FF2C</th>
+            <th>FF3</th>
+            <th>FF3C</th>
+            <th>SAF3</th>
+            <th>FF2</th>
+            <th>FF2C</th>
+            <th>FF3</th>
+            <th>FF3C</th>
         </tr>
     </thead>
     <tbody>
@@ -70,13 +73,16 @@
         <tr>
             <td><%= name %></td>
             <%= renderResult(Browser.IE6, OS.XP, name)%>
-            <%= renderResult(Browser.SAFARI3, OS.XP, name)%>
-            <%= renderResult(Browser.FIREFOX2, OS.XP, name)%>
             <%= renderResult(Browser.IE7, OS.VISTA, name)%>
             <%= renderResult(Browser.FIREFOX2, OS.VISTA, name)%>
-            <%= renderResult(Browser.SAFARI3, OS.VISTA, name)%>
+            <%= renderResult(Browser.FIREFOX2CHROME, OS.VISTA, name)%>
+            <%= renderResult(Browser.FIREFOX3, OS.VISTA, name)%>
+            <%= renderResult(Browser.FIREFOX3CHROME, OS.VISTA, name)%>
             <%= renderResult(Browser.SAFARI3, OS.LEOPARD, name)%>
             <%= renderResult(Browser.FIREFOX2, OS.LEOPARD, name)%>
+            <%= renderResult(Browser.FIREFOX2CHROME, OS.LEOPARD, name)%>
+            <%= renderResult(Browser.FIREFOX3, OS.LEOPARD, name)%>
+            <%= renderResult(Browser.FIREFOX3CHROME, OS.LEOPARD, name)%>
         </tr>
         <%
             }
