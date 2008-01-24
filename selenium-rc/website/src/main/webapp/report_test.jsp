@@ -5,8 +5,8 @@
     String name = request.getParameter("name");
     OS os = OS.valueOf(request.getParameter("os"));
     Browser browser = Browser.valueOf(request.getParameter("browser"));
-    boolean pass = Boolean.parseBoolean(request.getParameter("pass"));
+    String result = request.getParameter("result");
 
-    TestResults.putResult(name, pass, new TestConfig(browser, os));;
+    TestResults.putResult(name, result, new TestConfig(browser, os));;
 %>
 OK
