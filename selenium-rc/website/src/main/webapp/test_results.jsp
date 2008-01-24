@@ -88,7 +88,7 @@
             <%= renderResult(Browser.SAFARI3, OS.LEOPARD, name)%>
             <%= renderResult(Browser.FIREFOX2, null, name)%>
             <%= renderResult(Browser.FIREFOX2CHROME, null, name)%>
-            <%= renderResult(Browser.OPERA92, OS.XP, name)%>
+            <%= renderResult(Browser.OPERA92, null, name)%>
         </tr>
         <%
             }
