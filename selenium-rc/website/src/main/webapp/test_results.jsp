@@ -58,13 +58,7 @@
 
 <table>
     <thead>
-        <tr>
-            <th></th>
-            <th colspan="6">Win XP</th>
-            <th colspan="6">Vista</th>
-            <th colspan="5">Leopard</th>
-        </tr>
-        <tr>
+        <tr valign="bottom">
             <th></th>
             <th>XP<br/>IE6</th>
             <th>Vista<br/>IE7</th>
