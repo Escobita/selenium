@@ -59,12 +59,14 @@
             <th>FF3</th>
             <th>FF3C</th>
             <th>OP92</th>
+
             <th>IE7</th>
             <th>FF2</th>
             <th>FF2C</th>
             <th>FF3</th>
             <th>FF3C</th>
             <th>OP92</th>
+
             <th>SAF3</th>
             <th>FF2</th>
             <th>FF2C</th>
@@ -78,12 +80,21 @@
         %>
         <tr>
             <td><%= name %></td>
+
             <%= renderResult(Browser.IE6, OS.XP, name)%>
+            <%= renderResult(Browser.FIREFOX2, OS.XP, name)%>
+            <%= renderResult(Browser.FIREFOX2CHROME, OS.XP, name)%>
+            <%= renderResult(Browser.FIREFOX3, OS.XP, name)%>
+            <%= renderResult(Browser.FIREFOX3CHROME, OS.XP, name)%>
+            <%= renderResult(Browser.OPERA92, OS.XP, name)%>
+
             <%= renderResult(Browser.IE7, OS.VISTA, name)%>
             <%= renderResult(Browser.FIREFOX2, OS.VISTA, name)%>
             <%= renderResult(Browser.FIREFOX2CHROME, OS.VISTA, name)%>
             <%= renderResult(Browser.FIREFOX3, OS.VISTA, name)%>
             <%= renderResult(Browser.FIREFOX3CHROME, OS.VISTA, name)%>
+            <%= renderResult(Browser.OPERA92, OS.VISTA, name)%>
+
             <%= renderResult(Browser.SAFARI3, OS.LEOPARD, name)%>
             <%= renderResult(Browser.FIREFOX2, OS.LEOPARD, name)%>
             <%= renderResult(Browser.FIREFOX2CHROME, OS.LEOPARD, name)%>
