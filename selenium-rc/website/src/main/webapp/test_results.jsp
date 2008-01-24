@@ -54,11 +54,17 @@
         <tr>
             <th></th>
             <th>IE6</th>
+            <th>FF2</th>
+            <th>FF2C</th>
+            <th>FF3</th>
+            <th>FF3C</th>
+            <th>OP92</th>
             <th>IE7</th>
             <th>FF2</th>
             <th>FF2C</th>
             <th>FF3</th>
             <th>FF3C</th>
+            <th>OP92</th>
             <th>SAF3</th>
             <th>FF2</th>
             <th>FF2C</th>
