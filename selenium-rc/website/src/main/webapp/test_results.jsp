@@ -1,28 +1,32 @@
 <%!
     private String renderResult(Browser browser, OS os, String name) {
-        Map<String, Map<TestConfig, Boolean>> map = TestResults.getResults();
-        Map<TestConfig, Boolean> results = map.get(name);
+        Map<String, Map<TestConfig, String>> map = TestResults.getResults();
+        Map<TestConfig, String> results = map.get(name);
 
-        Boolean pass = null;
+        String result = null;
         if (os == null) {
             // OS not provided, so just grab the first non-null result (if one can be found)
             for (OS selection : OS.values()) {
-                pass = results.get(new TestConfig(browser, selection));
-                if (pass != null) {
+                result = results.get(new TestConfig(browser, selection));
+                if (result != null) {
                     break;
                 }
             }
         } else {
-            pass = results.get(new TestConfig(browser, os));
+            result = results.get(new TestConfig(browser, os));
         }
 
-        if (pass == null) {
+        if (result == null) {
             return "<td class='not_run'></td>";
-        } else if (pass) {
+        } else if (result.equals("pass")) {
             return "<td class='pass'>PASS</td>";
-        } else {
+        } else if (result.equals("fail")) {
             return "<td class='fail'>FAIL</td>";
+        } else if (result.equals("skip")) {
+            return "<td class='skip'>SKIP</td>";
         }
+
+        return "<td>?</td>";
     }
 %>
 <%@ page import="org.openqa.selenium.Browser" %>
@@ -46,6 +50,10 @@
         .fail {
             background-color: red;
         }
+
+        .skip {
+            background-color: yellow;
+        }
     </style>
 </head>
 
@@ -53,7 +61,7 @@
 
 
 <%
-    Map<String, Map<TestConfig, Boolean>> map = TestResults.getResults();
+    Map<String, Map<TestConfig, String>> map = TestResults.getResults();
 %>
 
 <table>
