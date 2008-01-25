@@ -111,6 +111,7 @@ public class StaticContentHandler extends AbstractHandler {
 					}
 					catch (NumberFormatException ex) {
 						// squelch exception.  workaround IE number format exception from request
+						logger.warn("Squelching bad number format exception in parse.", ex);
 					}
 					if (lastModified.before(ifModifiedSince) || lastModified.equals(ifModifiedSince)) {
 						webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
