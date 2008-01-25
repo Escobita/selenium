@@ -4,6 +4,10 @@
  */
 package com.thoughtworks.selenium;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -37,18 +41,6 @@ import com.thoughtworks.selenium.corebased.*;
  */
 public class ClientDriverSuite extends TestCase {
 
-//	protected static List<Class<? extends SeleniumClientTestBase>> seleniumClientTestList = new ArrayList<Class<? extends SeleniumClientTestBase>>();
-//	protected static List<Browser> testableBrowserList = new ArrayList<Browser>();
-	
-//	static {		
-//		seleniumClientTestList.add(GoogleTest.class);
-//	}
-//	
-//	static {
-//		testableBrowserList.add(BrowserType.Browser.FIREFOX);
-//		testableBrowserList.add(BrowserType.Browser.IEXPLORE);
-//	}
-	
     /**
      * Construct a test suite containing the other integration tests, wrapping
      * them up in a TestSetup object that will launch the Selenium Server
@@ -76,27 +68,21 @@ public class ClientDriverSuite extends TestCase {
             TestSuite suite = new TestSuite(ClientDriverSuite.class.getName());
             
             
-            if (isProxyInjectionMode) {
-            //	 suite.addTestSuite(TestModalDialog.class);            	 
-            }
-
-//          suite.addTestSuite(RealDealIntegrationTest.class);
-
-
-            // Working tests
-         
-//            suite.addTestSuite(TestFramesNested.class);
-//            suite.addTestSuite(TestFramesSpecialTargets.class);
-            suite.addTestSuite(TestFramesClickJavascriptHref.class);
-            suite.addTestSuite(TestFramesClick.class);            
-            suite.addTestSuite(TestFramesOpen.class);   
-            suite.addTestSuite(WindowNamesTest.class);
-            suite.addTestSuite(ApacheMyFacesSuggestTest.class);
-            suite.addTestSuite(TestJavascriptParameters.class);
-            suite.addTestSuite(TestErrorChecking.class);
-            suite.addTestSuite(GoogleTestSearch.class);
-            suite.addTestSuite(GoogleTest.class);
-            suite.addTestSuite(TestCheckUncheck.class);
+            
+            
+               
+//            suite.addTestSuite(ApacheMyFacesSuggestTest.class);
+//            suite.addTest(I18nIntegrationTest.suite());
+//            suite.addTestSuite(TestBasicAuth.class);
+//            suite.addTestSuite(RealDealIntegrationTest.class);
+//            suite.addTestSuite(TestErrorChecking.class);
+//            suite.addTestSuite(TestJavascriptParameters.class);
+//            suite.addTestSuite(TestClick.class);
+//            suite.addTestSuite(GoogleTestSearch.class);
+//            suite.addTestSuite(GoogleTest.class);
+//            suite.addTestSuite(WindowNamesTest.class);
+//            suite.addTestSuite(TestCookie.class);
+//            suite.addTestSuite(TestCheckUncheck.class);
             suite.addTestSuite(TestXPathLocators.class);
             suite.addTestSuite(TestClickJavascriptHref.class);
             suite.addTestSuite(TestCommandError.class);
@@ -104,40 +90,81 @@ public class ClientDriverSuite extends TestCase {
             suite.addTestSuite(TestFailingAssert.class);
             suite.addTestSuite(TestFailingVerifications.class);
             suite.addTestSuite(TestFocusOnBlur.class);
-            suite.addTestSuite(TestGoBack.class);            
+            suite.addTestSuite(TestGoBack.class);
             suite.addTestSuite(TestImplicitLocators.class);
             suite.addTestSuite(TestLocators.class);
             suite.addTestSuite(TestOpen.class);
             suite.addTestSuite(TestPatternMatching.class);
+            suite.addTestSuite(TestPause.class);
+            suite.addTestSuite(TestSelectWindow.class);
             suite.addTestSuite(TestStore.class);
             suite.addTestSuite(TestSubmit.class);
             suite.addTestSuite(TestType.class);
             suite.addTestSuite(TestVerifications.class);
+            suite.addTestSuite(TestWait.class);
             suite.addTestSuite(TestSelect.class);
             suite.addTestSuite(TestEditable.class);
-            suite.addTestSuite(TestRefresh.class);
-            suite.addTestSuite(TestVisibility.class);
-            suite.addTestSuite(TestMultiSelect.class);
-            suite.addTestSuite(TestWaitFor.class);
-            suite.addTestSuite(TestWaitForNot.class);
-            suite.addTestSuite(TestClick.class);
-            suite.addTestSuite(TestSelectWindow.class); 
-            suite.addTestSuite(TestWaitInPopupWindow.class);
             suite.addTestSuite(TestPrompt.class);
             suite.addTestSuite(TestConfirmations.class);
             suite.addTestSuite(TestAlerts.class);
-            suite.addTestSuite(TestPause.class);
-            suite.addTestSuite(TestWait.class);
+            suite.addTestSuite(TestRefresh.class);
+            suite.addTestSuite(TestVisibility.class);
+            suite.addTestSuite(TestMultiSelect.class);
+            suite.addTestSuite(TestWaitInPopupWindow.class);
+            suite.addTestSuite(TestWaitFor.class);
+            suite.addTestSuite(TestWaitForNot.class);
+            suite.addTestSuite(TestCssLocators.class);
+            suite.addTestSuite(TestFramesClick.class);
+            suite.addTestSuite(TestFramesOpen.class);
+            suite.addTestSuite(TestFramesNested.class);
+            suite.addTestSuite(TestClickBlankTarget.class);
             
-            // new
-            suite.addTestSuite(TestEvilClosingWindow.class);
-            suite.addTestSuite(TestSelectWindowTitle.class);
-            suite.addTestSuite(TestSelectMultiLevelFrame.class);
+            suite.addTestSuite(TestDojoDragAndDrop.class);
+            suite.addTestSuite(TestDragAndDrop.class);
+            suite.addTestSuite(TestElementIndex.class);
+            suite.addTestSuite(TestElementOrder.class);
+            suite.addTestSuite(TestElementPresent.class);
+            
+            
+            suite.addTestSuite(TestFunkEventHandling.class);
+            suite.addTestSuite(TestHighlight.class);
+            suite.addTestSuite(TestHtmlSource.class);
+            suite.addTestSuite(TestJavaScriptAttributes.class);
             suite.addTestSuite(TestOpenInTargetFrame.class);
-            // not working
-
-//			  // only works in IE right now
-//			  suite.addTest(I18nTest.suite());
+            suite.addTestSuite(TestSelectMultiLevelFrame.class);
+            suite.addTestSuite(TestSelectWindowTitle.class);
+            suite.addTestSuite(TestTextWhitespace.class);
+            
+            suite.addTestSuite(TestEvilClosingWindow.class);
+            
+            if (isProxyInjectionMode) {
+                suite.addTestSuite(MultiDomainTest.class);
+                
+                // Will need to run for IE tests
+                //suite.addTestSuite(TestModalDialog.class);
+            }
+            
+            if (!isProxyInjectionMode) {
+                // SRC-386, This only works with *chrome mode
+            	suite.addTestSuite(AttachFileTest.class);
+                // SRC-324, TFCJH relies on out-of-frame effects, which are synchronous in JS mode but
+                // asynchronous in PI mode, making this test unreliable
+                suite.addTestSuite(TestFramesClickJavascriptHref.class);
+                // In PI mode we force the browser to be *pi___, so we can't use *mock there
+                suite.addTestSuite(MockBrowserTest.class);
+                // SRC-312 TFST requires slide-up logic when the subframe is closed
+                suite.addTestSuite(TestFramesSpecialTargets.class);
+                // SRC-311 TTRT can't inject PI into iframe with no src
+                suite.addTestSuite(TestTypeRichText.class);
+                // SRC-330 TALS requires server-side persistence of locator strategies
+                suite.addTestSuite(TestAddLocationStrategy.class);
+            }
+            
+            if (false) {
+                suite.addTestSuite(SSLOpenTest.class); // DGF until we can auto-install the cert, no point in running this
+                suite.addTestSuite(TestXPathLocatorInXHtml.class); // DGF firefox only
+                suite.addTestSuite(TestCursorPosition.class); // DGF frequently fails on firefox
+            }
             
             ClientDriverTestSetup setup = new ClientDriverTestSetup(suite);
             supersuite.addTest(setup);
@@ -147,7 +174,6 @@ public class ClientDriverSuite extends TestCase {
             throw e;
         }
     }
-
     /**
      * A TestSetup decorator that runs a super setUp and tearDown at the
      * beginning and end of the entire run: in this case, we use it to startup
