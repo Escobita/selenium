@@ -5,7 +5,7 @@
 It is planned that all implementations of WebDriver will understand a
 common wire protocol. The plan is to base this on
 [http://www.json.org/ JSON] because this is a widely understood, easy
-to parse and has implementations already available in many different
+to parse format that has implementations already available in many different
 languages. 
 
 == Basic Concepts and Terms ==
