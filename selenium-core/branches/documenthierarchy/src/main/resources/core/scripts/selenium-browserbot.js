@@ -1096,8 +1096,9 @@ BrowserBot.prototype.getCookieByName = function(cookieName, doc) {
     return null;
 }
 
-BrowserBot.prototype.getAllCookieNames = function() {
-    var ck = this.getDocument().cookie;
+BrowserBot.prototype.getAllCookieNames = function(doc) {
+    if (!doc) doc = this.getDocument();
+    var ck = doc.cookie;
     if (!ck) return [];
     var cookieNames = [];
     var ckPairs = ck.split(/;/);
@@ -1128,7 +1129,7 @@ BrowserBot.prototype.deleteCookie = function(cookieName, domain, path, doc) {
 /** Try to delete cookie, return false if it didn't work */
 BrowserBot.prototype._maybeDeleteCookie = function(cookieName, domain, path, doc) {
     this.deleteCookie(cookieName, domain, path, doc);
-    return (!this.getCookieByName(cookieName));
+    return (!this.getCookieByName(cookieName, doc));
 }
     
 
@@ -1140,28 +1141,28 @@ BrowserBot.prototype._recursivelyDeleteCookieDomains = function(cookieName, doma
         return this._recursivelyDeleteCookieDomains(cookieName, domain.substring(1), path, doc);
     } else if (dotIndex != -1) {
         return this._recursivelyDeleteCookieDomains(cookieName, domain.substring(dotIndex), path, doc);
+    } else {
+        // No more dots; try just not passing in a domain at all
+        return this._maybeDeleteCookie(cookieName, null, path, doc);
     }
 }
 
 BrowserBot.prototype._recursivelyDeleteCookie = function(cookieName, domain, path, doc) {
-    var deleted = this._maybeDeleteCookie(cookieName, null, path, doc);
-    if (deleted) return true;
-    deleted = this._recursivelyDeleteCookieDomains(cookieName, domain, path, doc);
-    if (deleted) return true;
-    if (deleted) return true;
     var slashIndex = path.lastIndexOf("/");
     var finalIndex = path.length-1;
     if (slashIndex == finalIndex) {
         slashIndex--;
     }
-    if (slashIndex == -1) return false;
-    return this._recursivelyDeleteCookie(cookieName, domain, path.substring(0, slashIndex+1), doc);
+    if (slashIndex != -1) {
+        deleted = this._recursivelyDeleteCookie(cookieName, domain, path.substring(0, slashIndex+1), doc);
+        if (deleted) return true;
+    }
+    return this._recursivelyDeleteCookieDomains(cookieName, domain, path, doc);
 }
 
-BrowserBot.prototype.recursivelyDeleteCookie = function(cookieName, domain, path) {
-    var win = this.getCurrentWindow();
+BrowserBot.prototype.recursivelyDeleteCookie = function(cookieName, domain, path, win) {
+    if (!win) win = this.getCurrentWindow();
     var doc = win.document;
-    if (this._maybeDeleteCookie(cookieName, domain, path, doc)) return;
     if (!domain) {
         domain = doc.domain;
     }
@@ -1169,7 +1170,11 @@ BrowserBot.prototype.recursivelyDeleteCookie = function(cookieName, domain, path
         path = win.location.pathname;
     }
     var deleted = this._recursivelyDeleteCookie(cookieName, "." + domain, path, doc);
-    if (!deleted) throw new SeleniumError("Couldn't delete cookie " + cookieName);
+    if (deleted) return;
+    // Finally try a null path (Try it last because it's uncommon)
+    deleted = this._recursivelyDeleteCookieDomains(cookieName, "." + domain, null, doc);
+    if (deleted) return;
+    throw new SeleniumError("Couldn't delete cookie " + cookieName);
 }
 
 /*
@@ -1321,6 +1326,7 @@ BrowserBot.prototype.locateElementByXPath = function(xpath, inDocument, inWindow
     //xpathdebug = true;
     var context = new ExprContext(inDocument);
     context.setCaseInsensitive(true);
+    context.setIgnoreAttributesWithoutValue(true);
     var xpathObj;
     try {
         xpathObj = xpathParse(xpath);
