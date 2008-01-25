@@ -14,10 +14,7 @@ In order to make sure that there is as little confusion as possible,
 the following terms are going to be used:
 
   * *Client* means the local machine, on which the WebDriver API is being used.
-  * *Server* means the remote machine, which is running the
-             RemoteWebDriver. This also refers to drivers that
-             implement the wire protocol directly, such as the Firefox
-             extension used in the FirefoxDriver
+  * *Server* means the remote machine, which is running the RemoteWebDriver. This also refers to drivers that implement the wire protocol directly, such as the Firefox   extension used in the FirefoxDriver
 
 The protocol will assume that the WebDriver API has been "flattened",
 but there is an expectation that client implementations will take a
@@ -44,7 +41,7 @@ be treated as an opaque handle by the client.
 || response || Depends on commandName || If `isError` is true, then this represents the error message, otherwise the response is to be interpreted depending on the `commandName` ||
 
 Occasionally methods will return or require an
-``elementIdentifier``. This should be treated as an opaque string by
+``elementId``. This should be treated as an opaque string by
 clients, and its meaning depends on the server implementation.
 
 == List of Commands ==
