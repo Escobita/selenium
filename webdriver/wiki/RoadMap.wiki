@@ -26,3 +26,12 @@ Additional changes that are required for a beta release
 || [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings |||||||| Not Started ||
 
 A final release will be done once the beta has been out and successfully used on a number of projects. Other drivers have been left off because none have been started.
+
+== The Future ==
+
+The following are also planned:
+
+  * *JsonWireProtocol* --- The formalisation of the current FirefoxDriver wire protocol in [http://www.json.org/ JSON].
+  * *SocketServer* --- Providing a socket server that understands the JsonWireProtocol for the existing InternetExplorerDriver and SafariDriver.
+  * *RemoteWebDriver* --- The ability to control a single instance of WebDriver on one machine from another.
+  * *FarmedWebDriver* --- Built on top of RemoteWebDriver, this will allow the use of WebDriver on a grid.

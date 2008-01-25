@@ -1,0 +1,79 @@
+#summary A description of the protocol used by WebDriver to communite with remote instances
+
+= The Wire Protocol =
+
+It is planned that all implementations of WebDriver will understand a
+common wire protocol. The plan is to base this on
+[http://www.json.org/ JSON] because this is a widely understood, easy
+to parse and has implementations already available in many different
+languages. 
+
+== Basic Concepts and Terms ==
+
+In order to make sure that there is as little confusion as possible,
+the following terms are going to be used:
+
+  * *Client* means the local machine, on which the WebDriver API is being used.
+  * *Server* means the remote machine, which is running the
+             RemoteWebDriver. This also refers to drivers that
+             implement the wire protocol directly, such as the Firefox
+             extension used in the FirefoxDriver
+
+The protocol will assume that the WebDriver API has been "flattened",
+but there is an expectation that client implementations will take a
+more Object-based approach, as demonstrated in the existing Java
+API. It can be thought of request/response pairs of "commands" and
+"command responses" that look like:
+
+=== Command ===
+
+|| *Key* || *Type* || *Represents* ||
+|| context || String || An opaque handle, used by the driver to determine where to route the command to ||
+|| commandName || String || The name of the method to invoke ||
+|| parameters || Array || The parameters required for the command. The type of the parameters depends on the command ||
+
+In order for commands to be understood directly, the `context` should
+be treated as an opaque handle by the client.
+
+=== Command Response ===
+
+|| *Key* || *Type* || *Represents* ||
+|| context || String || Returned to the client. This should be used to ensure that commands are sent to the correct driver ||
+|| commandName || String || The command that this is in response to. ||
+|| isError || Boolean || Should the response be interpreted as being an error or did the command complete successfully ||
+|| response || Depends on commandName || If `isError` is true, then this represents the error message, otherwise the response is to be interpreted depending on the `commandName` ||
+
+Occasionally methods will return or require an
+``elementIdentifier``. This should be treated as an opaque string by
+clients, and its meaning depends on the server implementation.
+
+== List of Commands ==
+
+The server should understand the following commands. This list is
+currently incomplete. For example, it does not currently explain _how_
+to set up the initial connection, and it lacks "house keeping" methods
+which are probably necessary.
+
+=== WebDriver Methods ===
+
+|| *commandName* || *Paramter Name:Type* || *Return Types* || *Meaning* ||
+|| get || url:String || none || Go to the specified URL and wait until the page has completely loaded ||
+|| currentTitle || none || String || Get the title of the page, as it would be displayed by the browser ||
+|| findElement || findMechanism:String, locator:String || elementId || Find the first element on the current page that matches ``locator`` using the specified mechanism ||
+
+=== Element Specific Methods ===
+
+|| *commandName* || *Paramter Name:Type* || *Return Types* || *Meaning* ||
+|| clickElement || id:elementId || none || Clicks the specified element and waits for a page to finish loading before returning ||
+|| clearElement || id:elementId || none || Clears the contents of elements that a user would normally type into, such as INPUT or TEXTAREA ||
+|| typeIntoElement || id:elementId, value:String || none || Simulates sending keyboard input to the specified element. Can be used to set an element's value ||
+
+
+== Element Finding Mechanisms ==
+
+The list of mechanisms that can be used to locate an element or elements.
+
+|| *Mechanism Name* || *Interpreted as* ||
+|| id || The value of the `id` attribute ||
+|| linkText || An exact match of the text value of a link ||
+|| xpath || Surprisingly, this an xpath expression ||
