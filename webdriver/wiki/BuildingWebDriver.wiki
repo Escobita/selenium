@@ -39,7 +39,7 @@ The main reason why all the FirefoxDriver tests fail is because the required pro
  # Start Firefox using the new WebDriver profile ({{{firefox -P WebDriver}}})
  # Check that the extension has been installed correctly:
    * First by checking the "Tools->Add-Ons" popup
-   * Looking at the content of {{{${PROFILE_DIR}/.*WebDriver/extensions/fxdriver@thoughtworks.com}}} This should contain the path to wherever it is that you've checked WebDriver out to and end with {{{firefox/src/extension}}}. {{{${PROFILE_DIR}}}} is the location where Firefox stores its profiles.
+   * Looking at the content of {{{${PROFILE_DIR}/.*WebDriver/extensions/fxdriver@googlecode.com}}} This should contain the path to wherever it is that you've checked WebDriver out to and end with {{{firefox/src/extension}}}. {{{${PROFILE_DIR}}}} is the location where Firefox stores its profiles.
 
 == I've Followed the Steps Above and All the Firefox Tests Still Fail ==
 

@@ -14,15 +14,15 @@ This is very much work in progress at the moment, and the set of HTML tags that 
   * Use _Matcher_s to test conditions of elements (mix webdriver and hamcrest at will)
 
 {{{
-package com.thoughtworks.webdriver.lift;
+package com.googlecode.webdriver.lift;
 
-import static com.thoughtworks.webdriver.lift.Finders.*;
-import static com.thoughtworks.webdriver.lift.Matchers.*;
+import static com.googlecode.webdriver.lift.Finders.*;
+import static com.googlecode.webdriver.lift.Matchers.*;
 
 import static org.hamcrest.Matchers.*;
 
-import com.thoughtworks.webdriver.WebDriver;
-import com.thoughtworks.webdriver.htmlunit.HtmlUnitDriver;
+import com.googlecode.webdriver.WebDriver;
+import com.googlecode.webdriver.htmlunit.HtmlUnitDriver;
 
 public class GoogleTest extends HamcrestWebDriverTestCase {
 
