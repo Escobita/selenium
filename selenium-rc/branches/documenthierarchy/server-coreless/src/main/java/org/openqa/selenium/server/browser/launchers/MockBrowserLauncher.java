@@ -1,7 +1,3 @@
-/*
- * Created on Oct 25, 2006
- *
- */
 package org.openqa.selenium.server.browser.launchers;
 
 import java.io.IOException;
@@ -12,42 +8,56 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.commons.logging.Log;
-import org.apache.log4j.Logger;
 import org.mortbay.log.LogFactory;
+import org.openqa.selenium.server.DefaultRemoteCommand;
+import org.openqa.selenium.server.RemoteCommand;
 import org.openqa.selenium.server.SeleniumServer;
-import org.openqa.selenium.server.client.Session;
-import org.openqa.selenium.server.command.RemoteCommand;
-import org.openqa.selenium.server.command.runner.RemoteCommandRunner;
-import org.openqa.selenium.server.configuration.SeleniumConfiguration;
 
-public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runnable {
+public class MockBrowserLauncher implements BrowserLauncher, Runnable {
 
-	private static Logger logger = Logger.getLogger(MockBrowserLauncher.class);
-
+    private static final String DANGEROUS_TEXT = "&%?\\+|,%*";
+    private static final String JAPANESE_TEXT = "\u307E\u3077";
+    private static final String CHINESE_TEXT = "\u4E2D\u6587";
+    private static final String KOREAN_TEXT = "\uC5F4\uC5D0";
+    private static final String ROMANCE_TEXT = "\u00FC\u00F6\u00E4\u00DC\u00D6\u00C4 \u00E7\u00E8\u00E9 \u00BF\u00F1 \u00E8\u00E0\u00F9\u00F2";
+    static Log log = LogFactory.getLog(MockBrowserLauncher.class);
+    private final int port;
+    private final String sessionId;
     private Thread browser;
     private boolean interrupted = false;
     private String uniqueId;
     private int sequenceNumber = 0;
     
-    public MockBrowserLauncher(SeleniumConfiguration seleniumConfiguration) {
-        super(seleniumConfiguration);
+    public MockBrowserLauncher(int port, String sessionId) {
+        this.port = port;
+        this.sessionId = sessionId;
         this.uniqueId = "mock";
-    }       
+    }
     
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	protected void launch(String url) {
-        browser = new Thread(this);
-        browser.setName("mockbrowser");
+    public MockBrowserLauncher(int port, String sessionId, String command) {
+        this.port = port;
+        this.sessionId = sessionId;
+    }
+    
+    public void launchRemoteSession(String url, boolean multiWindow) {
+      browser = new Thread(this);
+      browser.setName("mockbrowser");
+      if (null != url) {
         browser.start();
-	}
+      } else {
+        log.info("launching a mock unresponsive browser");
+      }
+    }
 
-    public boolean close() {
+    public void launchHTMLSuite(String startURL, String suiteUrl,
+            boolean multiWindow, String defaultLogLevel) {
+
+    }
+
+    public void close() {
         interrupted = true;
         browser.interrupt();
-        return true;
+        
     }
 
     public Process getProcess() {
@@ -56,22 +66,22 @@ public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runn
 
     public void run() {
         try {
-            String startURL = "http://localhost:" + getSeleniumConfiguration().getPort()+"/selenium-server/driver/?sessionId=" + getSession().getSessionId() + "&uniqueId=" + uniqueId;
+            String startURL = "http://localhost:" + port+"/selenium-server/driver/?sessionId=" + sessionId + "&uniqueId=" + uniqueId;
             String commandLine = doBrowserRequest(startURL+"&seleniumStart=true&sequenceNumber="+sequenceNumber++, "START");
             while (!interrupted) {
-            	logger.info("MOCK: " + commandLine);
-                RemoteCommand sc = new RemoteCommand(commandLine, null);
+                log.info("MOCK: " + commandLine);
+                RemoteCommand sc = DefaultRemoteCommand.parse(commandLine);
                 String result = doCommand(sc);
-//                if (SeleniumServer.isBrowserSideLogEnabled() && !interrupted) {
-//                    for (int i = 0; i < 3; i++) {
-//                        doBrowserRequest(startURL + "&logging=true&sequenceNumber="+sequenceNumber++, "logLevel=debug:dummy log message " + i + "\n");
-//                    }
-//                }
+                if (SeleniumServer.isBrowserSideLogEnabled() && !interrupted) {
+                    for (int i = 0; i < 3; i++) {
+                        doBrowserRequest(startURL + "&logging=true&sequenceNumber="+sequenceNumber++, "logLevel=debug:dummy log message " + i + "\n");
+                    }
+                }
                 if (!interrupted) {
                     commandLine = doBrowserRequest(startURL+"&sequenceNumber="+sequenceNumber++, result);
                 }
             }
-            logger.info("MOCK: interrupted, exiting");
+            log.info("MOCK: interrupted, exiting");
         } catch (Exception e) {
             RuntimeException re = new RuntimeException("Exception in mock browser", e);
             re.printStackTrace();
@@ -81,22 +91,50 @@ public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runn
 
     private String doCommand(RemoteCommand sc) {
         String command = sc.getCommand();
-        String result = "OK";
         if (command.equals("getAllButtons")) {
-            result = "OK,";
+            return "OK,";
         } else if (command.equals("getAllLinks")) {
-            result = "OK,1";
+            return "OK,1";
         } else if (command.equals("getAllFields")) {
-            result = "OK,1,2,3";
+            return "OK,1,2,3";
         } else if (command.equals("getWhetherThisFrameMatchFrameExpression")) {
-            result = "OK,true";
+            return "OK,true";
+        } else if ("dangerous-labels".equals(sc.getField()) && command.equals("getSelectOptions")) {
+            return "OK,veni\\, vidi\\, vici,c:\\\\foo\\\\bar,c:\\\\I came\\, I \\\\saw\\\\\\, I conquered";
+
+        } else if (command.startsWith("getText")) {
+            if ("romance".equals(sc.getField())) {
+                return "OK,"+ROMANCE_TEXT;
+            } else if ("korean".equals(sc.getField())) {
+                return "OK,"+KOREAN_TEXT;
+            } else if ("chinese".equals(sc.getField())) {
+                return "OK,"+CHINESE_TEXT;
+            } else if ("japanese".equals(sc.getField())) {
+                return "OK,"+JAPANESE_TEXT;
+            } else if ("dangerous".equals(sc.getField())) {
+                return "OK,"+DANGEROUS_TEXT;
+            }
         }
-        else if (command.startsWith("get")) {
-            result = "OK,x";
-        } else if (command.startsWith("is")) {
-            result = "OK,true";
+        else if (command.startsWith("get")) {   
+            return "OK,x";
+        } else if (command.startsWith("isTextPresent")) {
+            if (ROMANCE_TEXT.equals(sc.getField())) {
+                return "OK,true";
+            } else if (KOREAN_TEXT.equals(sc.getField())) {
+                return "OK,true";
+            } else if (CHINESE_TEXT.equals(sc.getField())) {
+                return "OK,true";
+            } else if (JAPANESE_TEXT.equals(sc.getField())) {
+                return "OK,true";
+            } else if (DANGEROUS_TEXT.equals(sc.getField())) {
+                return "OK,true";
+            }
+            return "OK,false";
         }
-        return result;
+        else if (command.startsWith("is")) {   
+            return "OK,true";
+        }
+        return "OK";
     }
     
     private String stringContentsOfInputStream(InputStream is) throws IOException {
@@ -117,7 +155,7 @@ public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runn
         conn.setRequestProperty("Content-Type", "application/xml");
         // Send POST output.
         conn.setDoOutput(true);
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
         wr.write(body);
         wr.flush();
         wr.close();
@@ -133,4 +171,5 @@ public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runn
             return stringContentsOfInputStream(is);
         }
     }
+
 }
