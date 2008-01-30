@@ -5,6 +5,8 @@
 package org.openqa.selenium.server.testgenerator;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.xml.parsers.*;
@@ -272,11 +274,16 @@ public class XlateHtmlSeleneseToJava {
     private static String XlateString(String base, String htmlSeleneseFileName, String htmlSelenese) {
         declaredVariables.clear();
         domain = null;
+        
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("CST"));
+        
         String preamble = "package " + packageName  + ";\n" + 
         "import com.thoughtworks.selenium.*;\n" +
         "/**\n" + 
         " * @author XlateHtmlSeleneseToJava\n" +
-        " * Generated from " + htmlSeleneseFileName + ".\n" +
+        " * Generated on " + dateFormat.format(calendar.getTime()) + " from " + htmlSeleneseFileName + ".\n" +
         " */\n" + 
         "public class " + base + " extends SeleneseTestCase\n" + 
         "{\n" + 
