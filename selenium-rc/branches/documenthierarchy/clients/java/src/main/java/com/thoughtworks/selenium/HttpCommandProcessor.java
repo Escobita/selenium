@@ -110,13 +110,13 @@ public class HttpCommandProcessor implements CommandProcessor {
             URL result = new URL(pathToServlet); 
             String body = buildCommandBody(command);
             HttpURLConnection uc = (HttpURLConnection) result.openConnection();
-            uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             uc.setInstanceFollowRedirects(false);
             uc.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(uc.getOutputStream());
-            wr.write(body);
-            wr.flush();
-            wr.close();
+            Writer out = new OutputStreamWriter(uc.getOutputStream(), "UTF-8");
+            out.write(body);
+            out.flush();
+            out.close();
             responsecode = uc.getResponseCode();
             if (responsecode == HttpURLConnection.HTTP_MOVED_PERM) {
                 pathToServlet = uc.getRequestProperty("Location");
