@@ -34,7 +34,7 @@ public class Jetty5DriverHandler extends AbstractJetty5Handler {
 	public void handle(String pathInContext, String pathParams, HttpRequest request, HttpResponse response) throws HttpException, IOException {
 		// Set the content type
 		// The driver handler will return plain text
-		response.setContentType(TEXT_PLAIN);
+		response.setContentType(TEXT_PLAIN + "; charset=UTF-8");
 		
 		// Set the headers to not cache
 		setNoCacheHeaders(response);

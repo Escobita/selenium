@@ -763,7 +763,7 @@ public class WindowManager implements WindowListener {
 
 		try {
 			// @todo Change to use UTF8 constant
-			Writer writer = new OutputStreamWriter(buf, "UTF-8");
+			Writer writer = new OutputStreamWriter(buf);
 			if (remoteCommand != null) {
 				writer.write(remoteCommand.getBrowserCommandResponse());
 			}

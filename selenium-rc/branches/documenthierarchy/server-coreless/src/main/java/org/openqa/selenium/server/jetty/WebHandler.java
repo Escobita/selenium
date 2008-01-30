@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -80,12 +81,21 @@ public class WebHandler {
 				// Flush the finished output stream from the handler
 				//byteArrayOutputStream.flush();
 				bufferedOutputStream.flush();
-				
+				Writer out = new OutputStreamWriter(responseOutputStream, "UTF-8");
 				try {
-					String byteArrayString = byteArrayOutputStream.toString("UTF-8");
+					String byteArrayString = byteArrayOutputStream.toString();
+					
+					String byteArrayStringUTF8 = byteArrayOutputStream.toString("UTF-8");
 					// Write the output stream from the handler to the response output stream
-					responseOutputStream.write(byteArrayString.getBytes());
+		            
+					//responseOutputStream.write(byteArrayStringUTF8.getBytes());
 					//responseByteWriter.write(byteBuffer);
+//					if (!"UTF-8".equals(webRequest.getCharacterEncoding())) {
+//						out.write(byteArrayStringUTF8);
+//					}
+//					else {
+						out.write(byteArrayString);
+//					}
 				}
 				catch (SocketException e) {
 //					handlingEnabled = false;
@@ -93,13 +103,14 @@ public class WebHandler {
 //					throw e;
 				}
 				// Flush the response output stream
-				responseOutputStream.flush();
+				//responseOutputStream.flush();
+				out.flush();
 			}
 		}
 
 		webRequest.setHandled(requestWasHandled);
 		webResponse.setCharacterEncoding("UTF-8");
-		//webResponse.setContentType("application/x-www-form-urlencoded; charset=utf-8");
+		//webResponse.setContentType("application/x-www-form-urlencoded; charset=UTF-8");
 		
 		if (requestWasHandled) {
 			if (webResponse.getStatus() != HttpServletResponse.SC_NOT_MODIFIED) {
