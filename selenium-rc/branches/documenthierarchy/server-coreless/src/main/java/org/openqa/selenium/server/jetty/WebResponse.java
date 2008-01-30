@@ -15,4 +15,6 @@ public interface WebResponse {
 	OutputStream getOutputStream();
 	void setStatus(int status);
 	int getStatus();
+	void setCharacterEncoding(String encoding);
+	void setContentType(String encoding);
 }

@@ -477,4 +477,22 @@ public class DefaultSeleniumConfiguration extends AbstractConfigurationSource
 				.getPrimaryOptionName(), debugURL);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isBrowserSideLogEnabled() {
+		boolean isBrowserSideLogEnabled = getBoolean(SeleniumConfigurationOption.BROWSER_SIDE_LOG
+				.getPrimaryOptionName());
+
+		return isBrowserSideLogEnabled;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setBrowserSideLogEnabled(boolean browserSideLog) {
+		setProperty(SeleniumConfigurationOption.BROWSER_SIDE_LOG
+				.getPrimaryOptionName(), Boolean.valueOf(browserSideLog));
+	}
+
 }

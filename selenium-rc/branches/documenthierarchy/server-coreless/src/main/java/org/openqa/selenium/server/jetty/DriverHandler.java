@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -132,7 +136,8 @@ public class DriverHandler extends AbstractHandler {
 		Thread.currentThread().setName("Thread-" +  Thread.currentThread().getId());
 		
 		// Create print writer out of output stream so we can write to it...
-		PrintWriter out = new PrintWriter(outputStream);
+		// @todo Abstract away into WebHandler to pass correct UTF PrintWriter
+		Writer out = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
 		InputStream requestInputStream = webRequest.getInputStream();
 		String requestURL = webRequest.getRequestURL();
 
@@ -240,6 +245,8 @@ public class DriverHandler extends AbstractHandler {
 				String frameName = getParameter("seleniumFrameName",
 						parameterMap);
 				String frameId = getParameter("seleniumFrameId", parameterMap);
+				
+				// @todo Validate input data.  Don't process result unless params are correct.
 				
 				commandResult = session.handleResult(postedData, commandParametersMap, uniqueId, sequenceId, windowName, windowTitle, frameAddress, frameName, frameId, browserStart, browserUnload, modalDialog, hasJavaScriptState);
 			}

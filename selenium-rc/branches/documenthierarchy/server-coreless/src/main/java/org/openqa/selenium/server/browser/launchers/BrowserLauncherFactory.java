@@ -44,6 +44,7 @@ public class BrowserLauncherFactory {
 		//supportedBrowsers.put(Browser.IEHTA, HTABrowserLauncher.class);
 		supportedBrowsers.put(Browser.PI_IEXPLORE, ProxyInjectionInternetExplorerCustomProxyLauncher.class);
 		supportedBrowsers.put(Browser.MOCK, MockBrowserLauncher.class);
+		supportedBrowsers.put(Browser.CHROME, FirefoxChromeLauncher.class);
 		// @todo add support for rest of browsers
 		// supportedBrowsers.put("iexplore", InternetExplorerCustomProxyLauncher.class);
 		// supportedBrowsers.put("safari", SafariCustomProfileLauncher.class);

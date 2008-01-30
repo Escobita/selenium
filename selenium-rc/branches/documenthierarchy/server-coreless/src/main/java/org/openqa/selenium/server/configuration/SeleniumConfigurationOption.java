@@ -83,8 +83,12 @@ public enum SeleniumConfigurationOption {
 			new NoSeleniumConfigurationOptionValidator()),
 	// Force proxy chain mode
 	FORCE_PROXY_CHAIN_MODE(new String[] { "forceProxyChainMode" }, Boolean
+			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
+	// Browser side log toggle
+	BROWSER_SIDE_LOG(new String[] { "browserSideLog" }, Boolean
 			.valueOf(false), new NoSeleniumConfigurationOptionValidator());
-
+	
+	
 	// The option name
 	private final String[] optionNames;
 

@@ -58,4 +58,10 @@ public class Jetty5WebResponse implements WebResponse {
 		return httpResponse.getStatus();
 }
 
+	public void setCharacterEncoding(String encoding) {
+		httpResponse.setCharacterEncoding(encoding, true);
+	}
+	public void setContentType(String encoding) {
+		httpResponse.setContentType(encoding);
+	}
 }

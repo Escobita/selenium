@@ -316,6 +316,16 @@ public interface SeleniumConfiguration extends ConfigurationSource {
 	 * @return Returns the debug URL.
 	 */
 	String getDebugURL();
+	
+	/**
+	 * Set browser side log toggle.
+	 */
+	void setBrowserSideLogEnabled(boolean browserSideLog);
+
+	/**
+	 * Is browser side log enabled?
+	 */
+	boolean isBrowserSideLogEnabled();
 
 	// @todo Check configuration to ensure all options are accessible through selenium.option
 

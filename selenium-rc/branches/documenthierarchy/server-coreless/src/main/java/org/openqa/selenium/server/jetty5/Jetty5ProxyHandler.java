@@ -272,15 +272,12 @@ public class Jetty5ProxyHandler extends AbstractJetty5Handler {
                 request.setHandled(false);
                 return;
             }
-        	
 
             if (url == null) {
                 if (isForbidden(uri))
                     sendForbid(request, response, uri);
                 return;
             }
-
-
 
             proxyPlainTextRequest(url, pathInContext, pathParams, request, response);
         }
@@ -549,13 +546,9 @@ public class Jetty5ProxyHandler extends AbstractJetty5Handler {
 	        if (proxy_in != null) {
 	            boolean injectableResponse = http.getResponseCode() == HttpURLConnection.HTTP_OK ||
 	                    (http.getResponseCode() >= 400 && http.getResponseCode() < 600);
-	            if (seleniumConfiguration.isProxyInjectionMode() && injectableResponse) {
+	            if (seleniumConfiguration.isProxyInjectionMode() && injectableResponse && shouldInject(request.getPath())) {
 	                // check if we should proxy this path based on the dontProxyRegex that can be user-specified
-	                if (shouldInject(request.getPath())) {
-	                    bytesCopied = injectJavaScript(request, response, proxy_in, response.getOutputStream());
-	                } else {
-	                    bytesCopied = modifiedIO.copy(proxy_in, response.getOutputStream());
-	                }
+                    bytesCopied = injectJavaScript(request, response, proxy_in, response.getOutputStream());
 	            }
 	            else {
 	                bytesCopied = modifiedIO.copy(proxy_in, response.getOutputStream());

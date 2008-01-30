@@ -132,7 +132,7 @@ public class Jetty5SeleniumWebServer extends AbstractSeleniumWebServer {
 		Jetty5DriverHandler jettyDriverHandler = new Jetty5DriverHandler(
 				webHandler, driverHandler);
 		driverContext.addHandler(jettyDriverHandler);
-
+		
 		server.addContext(context);
 		server.addContext(driverContext);
 	}

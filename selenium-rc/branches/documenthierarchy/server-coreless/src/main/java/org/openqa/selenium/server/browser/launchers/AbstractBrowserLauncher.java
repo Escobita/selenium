@@ -49,12 +49,12 @@ public abstract class AbstractBrowserLauncher implements BrowserLauncher {
 	public void launchHTMLSuite(String suiteUrl, String browserURL,
 			boolean multiWindow) {
 		launch(LauncherUtils.getDefaultHTMLSuiteUrl(browserURL, suiteUrl,
-				multiWindow, 0));
+				multiWindow, getSeleniumConfiguration().getPort()));
 	}
 
 	public void launchRemoteSession(String browserURL, boolean multiWindow, boolean debugMode) {
 		launch(LauncherUtils.getDefaultRemoteSessionUrl(browserURL, session,
-				multiWindow, debugMode, 0));
+				multiWindow, debugMode, getSeleniumConfiguration().getPort()));
 	}
 
 

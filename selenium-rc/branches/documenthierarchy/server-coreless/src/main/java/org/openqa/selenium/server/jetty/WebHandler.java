@@ -82,8 +82,9 @@ public class WebHandler {
 				bufferedOutputStream.flush();
 				
 				try {
+					String byteArrayString = byteArrayOutputStream.toString("UTF-8");
 					// Write the output stream from the handler to the response output stream
-					responseOutputStream.write(byteArrayOutputStream.toByteArray());
+					responseOutputStream.write(byteArrayString.getBytes());
 					//responseByteWriter.write(byteBuffer);
 				}
 				catch (SocketException e) {
@@ -97,6 +98,8 @@ public class WebHandler {
 		}
 
 		webRequest.setHandled(requestWasHandled);
+		webResponse.setCharacterEncoding("UTF-8");
+		//webResponse.setContentType("application/x-www-form-urlencoded; charset=utf-8");
 		
 		if (requestWasHandled) {
 			if (webResponse.getStatus() != HttpServletResponse.SC_NOT_MODIFIED) {

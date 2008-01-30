@@ -59,7 +59,10 @@ public class CommandFactory {
 		TEST_COMPLETE("testComplete", TestCompleteCommand.class),
 
 		// isPostSupported
-		IS_POST_SUPPORTED("isPostSupported", IsPostSupportedCommand.class);
+		IS_POST_SUPPORTED("isPostSupported", IsPostSupportedCommand.class),
+		
+		// attachFile
+		ATTACH_FILE("attachFile", AttachFileLocalCommand.class);
 
 		private final String commandName;
 
@@ -148,7 +151,9 @@ public class CommandFactory {
 				.getCommandName(), SupportedLocalCommand.TEST_COMPLETE);
 		supportedLocalCommands.put(SupportedLocalCommand.IS_POST_SUPPORTED
 				.getCommandName(), SupportedLocalCommand.IS_POST_SUPPORTED);
-
+		supportedLocalCommands.put(SupportedLocalCommand.ATTACH_FILE
+				.getCommandName(), SupportedLocalCommand.ATTACH_FILE);
+		
 		// Proxy commands
 //		supportedProxyCommands.put(
 //				SupportedProxyCommand.CLOSE.getCommandName(),

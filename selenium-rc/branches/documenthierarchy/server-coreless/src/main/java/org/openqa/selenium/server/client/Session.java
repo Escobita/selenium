@@ -1,25 +1,22 @@
 package org.openqa.selenium.server.client;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Get;
+import org.apache.tools.ant.util.FileUtils;
 import org.openqa.selenium.server.browser.BrowserType;
 import org.openqa.selenium.server.browser.launchers.BrowserLauncher;
 import org.openqa.selenium.server.command.CommandResult;
-import org.openqa.selenium.server.command.OKCommandResult;
-import org.openqa.selenium.server.command.RemoteCommand;
-import org.openqa.selenium.server.command.StringRemoteCommandResult;
-import org.openqa.selenium.server.command.commands.CommandFactory.SupportedProxyCommand;
-import org.openqa.selenium.server.command.runner.RemoteCommandRunner;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
 
 /**
@@ -60,6 +57,8 @@ public class Session {
 	private SeleniumConfiguration seleniumConfiguration;
 
 	private WindowManager windowManager;
+	
+	private List<File> tempFilesList;
 	
 	/**
 	 * Construct a session from the driver client. A session must contain at
@@ -163,6 +162,8 @@ public class Session {
 	
 			windowManager.close();
 		}
+		
+		// @todo Remove and clear all temp files
 	}
 	
 	private String extractVarName(String jsInitializer) {
@@ -331,4 +332,33 @@ public class Session {
  			
 		return commandResult;
 	}
+	
+    /**
+     * Retrieves the temp files for the specified sessionId, or <code>null</code> if there are no such files. 
+     **/
+    public List<File> getTempFiles() {
+    	if (tempFilesList == null) { // first time we call it
+    		tempFilesList = new ArrayList<File>();
+    	}
+        return tempFilesList;
+    }
+    
+    public File downloadFile(String urlString) {
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed URL <" + urlString + ">, " + e.getMessage());
+        }
+        File outputFile = FileUtils.getFileUtils().createTempFile("se-",".file",null);
+        Project p = new Project();
+        // @todo Add log listener
+        //p.addBuildListener(new AntJettyLoggerBuildListener(log));
+        Get g = new Get();
+        g.setProject(p);
+        g.setSrc(url);
+        g.setDest(outputFile);
+        g.execute();
+        return outputFile;
+    }
 }

@@ -7,13 +7,14 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.mortbay.log.LogFactory;
-import org.openqa.selenium.server.DefaultRemoteCommand;
-import org.openqa.selenium.server.RemoteCommand;
-import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.command.RemoteCommand;
+import org.openqa.selenium.server.command.RemoteCommandResult;
+import org.openqa.selenium.server.configuration.SeleniumConfiguration;
 
-public class MockBrowserLauncher implements BrowserLauncher, Runnable {
+public class MockBrowserLauncher extends AbstractBrowserLauncher implements Runnable {
 
     private static final String DANGEROUS_TEXT = "&%?\\+|,%*";
     private static final String JAPANESE_TEXT = "\u307E\u3077";
@@ -21,64 +22,71 @@ public class MockBrowserLauncher implements BrowserLauncher, Runnable {
     private static final String KOREAN_TEXT = "\uC5F4\uC5D0";
     private static final String ROMANCE_TEXT = "\u00FC\u00F6\u00E4\u00DC\u00D6\u00C4 \u00E7\u00E8\u00E9 \u00BF\u00F1 \u00E8\u00E0\u00F9\u00F2";
     static Log log = LogFactory.getLog(MockBrowserLauncher.class);
-    private final int port;
-    private final String sessionId;
-    private Thread browser;
+    //private final int port;
+    //private final String sessionId;
+    private Thread browserThread;
     private boolean interrupted = false;
     private String uniqueId;
     private int sequenceNumber = 0;
     
-    public MockBrowserLauncher(int port, String sessionId) {
-        this.port = port;
-        this.sessionId = sessionId;
-        this.uniqueId = "mock";
+    public MockBrowserLauncher(SeleniumConfiguration seleniumConfiguration) {
+//        this.port = port;
+//        this.sessionId = sessionId;
+//        this.uniqueId = "mock";
+    	super(seleniumConfiguration);
     }
     
-    public MockBrowserLauncher(int port, String sessionId, String command) {
-        this.port = port;
-        this.sessionId = sessionId;
-    }
+//    public MockBrowserLauncher(int port, String sessionId, String command) {
+//        this.port = port;
+//        this.sessionId = sessionId;
+//    }
     
-    public void launchRemoteSession(String url, boolean multiWindow) {
-      browser = new Thread(this);
-      browser.setName("mockbrowser");
+	@Override
+	protected void launch(String url) {
+		browserThread = new Thread(this);
+		browserThread.setName("mockbrowser");
       if (null != url) {
-        browser.start();
+    	  browserThread.start();
       } else {
         log.info("launching a mock unresponsive browser");
       }
     }
 
-    public void launchHTMLSuite(String startURL, String suiteUrl,
-            boolean multiWindow, String defaultLogLevel) {
-
-    }
-
-    public void close() {
+    public boolean close() {
         interrupted = true;
-        browser.interrupt();
+        browserThread.interrupt();
         
+        return true;
     }
 
     public Process getProcess() {
         return null;
     }
+    
+    public String parseJSON(String jsonText) {
+    	final String jsonPrefix = "json=";
+    	return jsonText.substring(jsonPrefix.length());
+    }
 
     public void run() {
         try {
-            String startURL = "http://localhost:" + port+"/selenium-server/driver/?sessionId=" + sessionId + "&uniqueId=" + uniqueId;
-            String commandLine = doBrowserRequest(startURL+"&seleniumStart=true&sequenceNumber="+sequenceNumber++, "START");
+            String startURL = "http://localhost:" + getSeleniumConfiguration().getPort()+"/selenium-server/driver/?sessionId=" + getSession().getSessionId() + "&uniqueId=" + uniqueId;
+            String commandLine = doBrowserRequest(startURL+"&localFrameAddress=top&seleniumStart=true&sequenceNumber="+sequenceNumber++, "START");
             while (!interrupted) {
                 log.info("MOCK: " + commandLine);
-                RemoteCommand sc = DefaultRemoteCommand.parse(commandLine);
+                RemoteCommand sc = RemoteCommand.parse(commandLine);
                 String result = doCommand(sc);
-                if (SeleniumServer.isBrowserSideLogEnabled() && !interrupted) {
+                
+                // Create JSON object to get commandId and other parameters from result
+                JSONObject commandObject = new JSONObject(parseJSON(commandLine));
+            	String commandId = commandObject.getString("commandId");
+                if (getSeleniumConfiguration().isBrowserSideLogEnabled() && !interrupted) {
                     for (int i = 0; i < 3; i++) {
-                        doBrowserRequest(startURL + "&logging=true&sequenceNumber="+sequenceNumber++, "logLevel=debug:dummy log message " + i + "\n");
+                        doBrowserRequest(startURL + "&commandId=" + commandId + "&localFrameAddress=top&logging=true&sequenceNumber="+sequenceNumber++, "logLevel=debug:dummy log message " + i + "\n");
                     }
                 }
                 if (!interrupted) {
-                    commandLine = doBrowserRequest(startURL+"&sequenceNumber="+sequenceNumber++, result);
+                    commandLine = doBrowserRequest(startURL+"&commandId=" + commandId + "&localFrameAddress=top&sequenceNumber="+sequenceNumber++, result);
                 }
             }
             log.info("MOCK: interrupted, exiting");
@@ -89,7 +97,7 @@ public class MockBrowserLauncher implements BrowserLauncher, Runnable {
         }
     }
 
-    private String doCommand(RemoteCommand sc) {
+    private String doCommand(RemoteCommand<RemoteCommandResult> sc) {
         String command = sc.getCommand();
         if (command.equals("getAllButtons")) {
             return "OK,";
@@ -171,5 +179,4 @@ public class MockBrowserLauncher implements BrowserLauncher, Runnable {
             return stringContentsOfInputStream(is);
         }
     }
-
 }

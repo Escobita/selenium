@@ -110,9 +110,9 @@ public class RemoteCommand<T extends CommandResult> extends AbstractCommand<T> {
         if (jsonInputString == null) throw new NullPointerException("jsonInputString must not be null");
         jsonInputString = jsonInputString.trim();
         // TODO use a real JSON library (but it should be Apache licensed and less than 1.4 megs including deps!)
-        final String jsonPrefix = "json";
-        final String jsonCommandPrefix = jsonPrefix + "={command:\"";
-        if (!jsonInputString.startsWith(jsonCommandPrefix)) throw new IllegalArgumentException("invalid command string, missing '" + jsonCommandPrefix + "'=" + jsonInputString);
+        final String jsonPrefix = "json=";
+        //final String jsonCommandPrefix = jsonPrefix + "={command:\"";
+        if (!jsonInputString.startsWith(jsonPrefix)) throw new IllegalArgumentException("invalid command string, missing '" + jsonPrefix + "'=" + jsonInputString);
         
         JSONObject jsonCommandObject = new JSONObject(jsonInputString.substring(jsonPrefix.length()));
         Map<String, String> jsonCommandParameterMap = new HashMap<String, String>();
@@ -329,5 +329,12 @@ public class RemoteCommand<T extends CommandResult> extends AbstractCommand<T> {
 	 */
 	public WaitingType getWaitingType() {
 		return waitingType;
+	}
+	
+	/**
+	 * Get the field.
+	 */
+	public String getField() {
+		return getCommandParameterMap().get("1");
 	}
 }

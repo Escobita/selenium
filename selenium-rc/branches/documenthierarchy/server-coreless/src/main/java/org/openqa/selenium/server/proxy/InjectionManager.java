@@ -258,7 +258,8 @@ public class InjectionManager {
 
     private byte[] setSomeJsVars(String sessionId) {
         StringBuffer moreJs = new StringBuffer();
-        if (seleniumConfiguration.isDebugMode()) {
+        if (seleniumConfiguration.isBrowserSideLogEnabled()) {
+        //if (seleniumConfiguration.isDebugMode()) {
             moreJs.append("debugMode = true;\n");
         }
         moreJs.append("injectedSessionId = ")
