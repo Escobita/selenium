@@ -30,14 +30,6 @@ public class WebHandler {
 	public void handleHandler(Handler handler, String pathInContext, WebRequest webRequest, WebResponse webResponse) throws IOException {
 		String queryString = webRequest.getQuery();
 		
-//		String requestURL = webRequest.getRequestURL();
-//		String requestPath = webRequest.getPath();
-//		// Get URI to pass to handler
-//		//URI uri = request.getURI();
-//		String requestScheme = webRequest.getScheme();
-//		String requestHost = webRequest.getHost();
-//		int requestPort = webRequest.getPort();
-		
 		String contextPath = pathInContext;
 		
 		// Must be parameter string array map
@@ -55,60 +47,34 @@ public class WebHandler {
 			// separate output stream is passed to it
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-//			InputStream requestInputStream = webRequest.getInputStream();
-
-//			WebRequest webRequest = new Jetty5WebRequest(request);
-//			WebResponse webResponse = new Jetty5WebResponse(response);;
-			
-//			if (!handlingEnabled) {
-//				logger.debug("Handling disabled...sleeping for 60s");
-//				try {
-//					Thread.sleep(60000);
-//				}
-//				catch (InterruptedException ex) {
-//					
-//				}
-//			}
 			
 			requestWasHandled = handler.handle(contextPath,
 					queryString, parameterMap, method, webRequest, webResponse, /*requestInputStream,*/
 					bufferedOutputStream);
 
-			//ByteBuffer byteBuffer = null;
-			//WritableByteChannel responseByteWriter = Channels.newChannel(responseOutputStream);
-			
 			if (requestWasHandled) {
 				// Flush the finished output stream from the handler
-				//byteArrayOutputStream.flush();
 				bufferedOutputStream.flush();
+				
 				Writer out = new OutputStreamWriter(responseOutputStream, "UTF-8");
 				try {
 					String byteArrayStringUTF8 = byteArrayOutputStream.toString("UTF-8");
+					
 					// Write the output stream from the handler to the response output stream
-		            
-					//responseOutputStream.write(byteArrayStringUTF8.getBytes());
-					//responseByteWriter.write(byteBuffer);
-//					if (!"UTF-8".equals(webRequest.getCharacterEncoding())) {
-//						out.write(byteArrayStringUTF8);
-//					}
-//					else {
-						out.write(byteArrayStringUTF8);
-//					}
+					out.write(byteArrayStringUTF8);
 				}
 				catch (SocketException e) {
 //					handlingEnabled = false;
 //					logger.debug("Socket Exception Thread " + Thread.currentThread().getName());
 //					throw e;
 				}
-				// Flush the response output stream
-				//responseOutputStream.flush();
+				// Flush the response output writer to flush to the underlying stream
 				out.flush();
 			}
 		}
 
 		webRequest.setHandled(requestWasHandled);
 		webResponse.setCharacterEncoding("UTF-8");
-		//webResponse.setContentType("application/x-www-form-urlencoded; charset=UTF-8");
 		
 		if (requestWasHandled) {
 			if (webResponse.getStatus() != HttpServletResponse.SC_NOT_MODIFIED) {
