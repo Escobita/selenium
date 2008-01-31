@@ -137,7 +137,7 @@ public class DriverHandler extends AbstractHandler {
 		
 		// Create print writer out of output stream so we can write to it...
 		// @todo Abstract away into WebHandler to pass correct UTF PrintWriter
-		Writer out = new OutputStreamWriter(outputStream);
+		Writer out = new OutputStreamWriter(outputStream, "UTF-8");
 		InputStream requestInputStream = webRequest.getInputStream();
 		String requestURL = webRequest.getRequestURL();
 

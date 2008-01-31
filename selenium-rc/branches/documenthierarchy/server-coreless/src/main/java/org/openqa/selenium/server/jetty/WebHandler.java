@@ -83,8 +83,6 @@ public class WebHandler {
 				bufferedOutputStream.flush();
 				Writer out = new OutputStreamWriter(responseOutputStream, "UTF-8");
 				try {
-					String byteArrayString = byteArrayOutputStream.toString();
-					
 					String byteArrayStringUTF8 = byteArrayOutputStream.toString("UTF-8");
 					// Write the output stream from the handler to the response output stream
 		            
@@ -94,7 +92,7 @@ public class WebHandler {
 //						out.write(byteArrayStringUTF8);
 //					}
 //					else {
-						out.write(byteArrayString);
+						out.write(byteArrayStringUTF8);
 //					}
 				}
 				catch (SocketException e) {
