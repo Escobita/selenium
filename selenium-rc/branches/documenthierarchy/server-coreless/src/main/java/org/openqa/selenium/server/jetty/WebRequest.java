@@ -17,5 +17,5 @@ public interface WebRequest {
 	void setHandled(boolean handled);
 	Map getParameterStringArrayMap();
 	void setField(String field, String value);
-	public String getField(String name);
+	String getField(String name);
 }

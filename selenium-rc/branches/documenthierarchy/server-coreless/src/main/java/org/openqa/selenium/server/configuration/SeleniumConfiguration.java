@@ -326,6 +326,26 @@ public interface SeleniumConfiguration extends ConfigurationSource {
 	 * Is browser side log enabled?
 	 */
 	boolean isBrowserSideLogEnabled();
+	
+	/**
+	 * Set to ensure clean session.
+	 */
+	void setEnsureCleanSession(boolean ensureCleanSession);
+	
+	/**
+	 * Is ensure clean session enabled?
+	 */
+	boolean isEnsureCleanSession();
+	
+	/**
+	 * Set to avoid proxy.
+	 */
+	void setAvoidProxy(boolean avoidProxy);
+	
+	/**
+	 * Is avoiding proxy?
+	 */
+	boolean isAvoidProxy();
 
 	// @todo Check configuration to ensure all options are accessible through selenium.option
 

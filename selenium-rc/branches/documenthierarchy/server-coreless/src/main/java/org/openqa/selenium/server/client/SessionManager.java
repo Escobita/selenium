@@ -3,7 +3,6 @@ package org.openqa.selenium.server.client;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.server.browser.BrowserType;
@@ -11,16 +10,12 @@ import org.openqa.selenium.server.browser.BrowserType.Browser;
 import org.openqa.selenium.server.browser.launchers.BrowserLauncher;
 import org.openqa.selenium.server.browser.launchers.BrowserLauncherFactory;
 import org.openqa.selenium.server.browser.launchers.LauncherUtils;
-import org.openqa.selenium.server.command.CommandResult;
-import org.openqa.selenium.server.command.RemoteCommand;
 import org.openqa.selenium.server.command.RemoteCommand;
 import org.openqa.selenium.server.command.commands.CommandFactory;
 import org.openqa.selenium.server.command.handler.DriverCommandHandler;
 import org.openqa.selenium.server.command.runner.LocalCommandRunner;
 import org.openqa.selenium.server.command.runner.ProxyCommandRunner;
-import org.openqa.selenium.server.command.runner.RemoteCommandRunner;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
-import org.openqa.selenium.server.configuration.SeleniumConfigurationOption;
 
 /**
  * Manages sessions for clients.
@@ -184,8 +179,8 @@ public class SessionManager {
 		
 		windowManager.setSession(session);
 
-		// Set the session on the browser launcher
-		browserLauncher.setSession(session);
+		// Initialize the browser launcher with the given session
+		browserLauncher.init(session);
 
 		addSession(session);
 

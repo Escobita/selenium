@@ -51,10 +51,6 @@ public class CommandFactory {
 	public enum SupportedLocalCommand implements SupportedCommand {
 		// Local commands
 
-		// getNewBrowserSession
-		GET_NEW_BROWSER_SESSION("getNewBrowserSession",
-				GetNewBrowserSessionCommand.class),
-
 		// testComplete
 		TEST_COMPLETE("testComplete", TestCompleteCommand.class),
 
@@ -144,9 +140,6 @@ public class CommandFactory {
 
 	static {
 		// Local commands
-		supportedLocalCommands.put(
-				SupportedLocalCommand.GET_NEW_BROWSER_SESSION.getCommandName(),
-				SupportedLocalCommand.GET_NEW_BROWSER_SESSION);
 		supportedLocalCommands.put(SupportedLocalCommand.TEST_COMPLETE
 				.getCommandName(), SupportedLocalCommand.TEST_COMPLETE);
 		supportedLocalCommands.put(SupportedLocalCommand.IS_POST_SUPPORTED

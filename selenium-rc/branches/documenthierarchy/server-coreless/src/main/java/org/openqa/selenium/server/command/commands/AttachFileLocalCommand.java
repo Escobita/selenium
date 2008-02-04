@@ -29,8 +29,8 @@ public class AttachFileLocalCommand extends AbstractLocalCommand {
 		tempFilesForSession.add(downloadedFile);
 
 		Map<String, String> commandParameterMap = new HashMap<String, String>();
-		commandParameterMap.put("locator", parametersMap.get("1"));
-		commandParameterMap.put("value", downloadedFile.getAbsolutePath());
+		commandParameterMap.put("1", parametersMap.get("1"));
+		commandParameterMap.put("2", downloadedFile.getAbsolutePath());
 		RemoteCommand setContextRemoteCommand = new RemoteCommand("type",
 				commandParameterMap);
 

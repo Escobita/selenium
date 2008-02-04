@@ -86,8 +86,16 @@ public enum SeleniumConfigurationOption {
 			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
 	// Browser side log toggle
 	BROWSER_SIDE_LOG(new String[] { "browserSideLog" }, Boolean
-			.valueOf(false), new NoSeleniumConfigurationOptionValidator());
-	
+			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
+	// Ensure clean session
+	ENSURE_CLEAN_SESSION(new String[] { "ensureCleanSession" }, Boolean
+			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
+	// Avoid proxy
+	AVOID_PROXY(new String[] { "avoidProxy" }, Boolean
+			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
+	// Log level
+	LOG_LEVEL(new String[] { "logLevel" }, null, new NoSeleniumConfigurationOptionValidator());	
+		
 	
 	// The option name
 	private final String[] optionNames;

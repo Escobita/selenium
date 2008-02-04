@@ -56,25 +56,26 @@ public class WebHandler {
 				// Flush the finished output stream from the handler
 				bufferedOutputStream.flush();
 				
-				Writer out = new OutputStreamWriter(responseOutputStream, "UTF-8");
+				//Writer out = new OutputStreamWriter(responseOutputStream, "UTF-8");
 				try {
-					String byteArrayStringUTF8 = byteArrayOutputStream.toString("UTF-8");
-					
 					// Write the output stream from the handler to the response output stream
-					out.write(byteArrayStringUTF8);
+					responseOutputStream.write(byteArrayOutputStream.toByteArray());
 				}
 				catch (SocketException e) {
 //					handlingEnabled = false;
 //					logger.debug("Socket Exception Thread " + Thread.currentThread().getName());
 //					throw e;
 				}
-				// Flush the response output writer to flush to the underlying stream
-				out.flush();
+
 			}
 		}
 
 		webRequest.setHandled(requestWasHandled);
+		
 		webResponse.setCharacterEncoding("UTF-8");
+		
+		// Flush the response output stream
+		responseOutputStream.flush();
 		
 		if (requestWasHandled) {
 			if (webResponse.getStatus() != HttpServletResponse.SC_NOT_MODIFIED) {

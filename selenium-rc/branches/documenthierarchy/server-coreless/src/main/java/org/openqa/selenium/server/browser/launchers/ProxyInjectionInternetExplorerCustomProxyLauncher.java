@@ -2,7 +2,7 @@ package org.openqa.selenium.server.browser.launchers;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.openqa.selenium.server.SeleniumServer;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
 
 
@@ -19,40 +19,23 @@ import org.openqa.selenium.server.configuration.SeleniumConfiguration;
  *
  */
 public class ProxyInjectionInternetExplorerCustomProxyLauncher extends InternetExplorerCustomProxyLauncher {
-    private static boolean changeMaxConnections = true;
-    
-    private static final int MAX_CONNECTIONS = 512;
-    
-	private static Logger logger = Logger
-	.getLogger(InternetExplorerCustomProxyLauncher.class);
-    
-    public ProxyInjectionInternetExplorerCustomProxyLauncher(SeleniumConfiguration seleniumConfiguration) {
+    private static boolean alwaysChangeMaxConnections = true;
+
+	public ProxyInjectionInternetExplorerCustomProxyLauncher(SeleniumConfiguration seleniumConfiguration) {
         super(seleniumConfiguration);
     }
     
     public ProxyInjectionInternetExplorerCustomProxyLauncher(SeleniumConfiguration seleniumConfiguration, String browserLaunchLocation) {
         super(seleniumConfiguration, browserLaunchLocation);
-    }    
+    }
     
     @Override
     protected void changeRegistrySettings() throws IOException {
-    	final int port = getSeleniumConfiguration().getPort();
-    	
-    	logger.info("Changing registry settings for Proxy Injection Internet Explorer...");
-    	
-        customPACappropriate = false;
+        wpm.setChangeMaxConnections(alwaysChangeMaxConnections);
         super.changeRegistrySettings();
-        WindowsUtils.writeBooleanRegistryValue(REG_KEY_BASE + REG_KEY_PROXY_ENABLE, true);
-        WindowsUtils.writeStringRegistryValue(REG_KEY_BASE + REG_KEY_PROXY_SERVER, "127.0.0.1:" + port);
-
-        if (changeMaxConnections) {
-            // need at least 1 xmlHttp connection per frame/window
-            WindowsUtils.writeIntRegistryValue(REG_KEY_BASE + REG_KEY_MAX_CONNECTIONS_PER_1_0_SVR, MAX_CONNECTIONS);
-            WindowsUtils.writeIntRegistryValue(REG_KEY_BASE + REG_KEY_MAX_CONNECTIONS_PER_1_1_SVR, MAX_CONNECTIONS);
-        }
     }
-
+    
     public static void setChangeMaxConnections(boolean changeMaxConnections) {
-        ProxyInjectionInternetExplorerCustomProxyLauncher.changeMaxConnections = changeMaxConnections;
+    	ProxyInjectionInternetExplorerCustomProxyLauncher.alwaysChangeMaxConnections = changeMaxConnections;
     }
 }

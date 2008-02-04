@@ -73,22 +73,16 @@ public class RemoteCommand<T extends CommandResult> extends AbstractCommand<T> {
 		commandObject.put("command", getCommand());
 		// @todo Should be able to have multiple commands and parameters in JSON
 		// @todo Only supports 2 parameters right now! 
-		Object target = "";
-		Object value = "";
+		// Reorder parameters correctly for 1-param and 2-param
+		String target = getCommandParameterMap().get("1");
+		String value = getCommandParameterMap().get("2");
+
+		if (target == null) {
+			target = "";
+		}
 		
-		if (!getCommandParameterMap().isEmpty()) {
-			String[] parameterMap = getCommandParameterMap().values().toArray(new String[0]);
-			
-			// Reorder parameters correctly for 1-param and 2-param
-			if (parameterMap.length > 0) {
-				if (parameterMap.length == 1) {
-					target = parameterMap[0];
-				}
-				if (parameterMap.length == 2) {
-					target = parameterMap[1];
-					value = parameterMap[0];
-				}
-			}
+		if (value == null) {
+			value = "";
 		}
 		commandObject.put("target", target);
 		commandObject.put("value", value);

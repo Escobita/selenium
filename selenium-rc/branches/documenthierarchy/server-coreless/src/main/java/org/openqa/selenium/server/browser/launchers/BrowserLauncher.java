@@ -57,9 +57,9 @@ public interface BrowserLauncher {
     Process getProcess();
     
 	/**
-	 * Set the session for the browser launcher.
+	 * Initialize the browser launcher with the given session.
 	 * 
 	 * @param session The session
 	 */
-	void setSession(Session session);
+	void init(Session session);
 }

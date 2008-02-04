@@ -129,12 +129,12 @@ public class StaticContentHandler extends AbstractHandler {
 					// Inject static content on the classpath that may need to be injected
 					if (seleniumConfiguration.isProxyInjectionMode()) {
 						injectionManager.injectJavaScript(webRequest.getRequestURL(), webRequest.getPath(), webResponse, inputStream, outputStream);
-						outputStream.flush();
 					}
 					else {
 						modifiedIO.copy(inputStream, outputStream);
-						outputStream.flush();
 					}
+					//webResponse.setContentType(url.openConnection().getContentType());
+					outputStream.flush();
 					requestWasHandled = true;
 				} catch (IOException ex) {
 					logger.error(ex);

@@ -166,7 +166,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
 
         copyRunnerHtmlFiles();
 
-        LauncherUtils.generatePacAndPrefJs(customProfileDir, getSeleniumConfiguration().getPort(), LauncherUtils.ProxySetting.NO_PROXY, homePage, changeMaxConnections);
+        LauncherUtils.generatePacAndPrefJs(customProfileDir, getSeleniumConfiguration(), LauncherUtils.ProxySetting.NO_PROXY, homePage, changeMaxConnections);
 
         return customProfileDir.getAbsolutePath();
     }

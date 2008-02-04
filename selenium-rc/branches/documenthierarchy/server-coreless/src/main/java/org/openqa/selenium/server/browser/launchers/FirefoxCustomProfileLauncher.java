@@ -171,7 +171,7 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
         }
         ResourceExtractor.extractResourcePath(getClass(), "/customProfileDirCUSTFF", customProfileDir());
 
-        LauncherUtils.generatePacAndPrefJs(customProfileDirectory, port, proxySetting, null, isAlwaysProxy);
+        LauncherUtils.generatePacAndPrefJs(customProfileDirectory, getSeleniumConfiguration(), proxySetting, null, isAlwaysProxy);
     }
 
     /**

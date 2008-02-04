@@ -43,7 +43,6 @@ public class Jetty5StaticContentHandler extends AbstractJetty5Handler {
 	public void handle(String pathInContext, String pathParams,
 			HttpRequest request, HttpResponse response) throws HttpException,
 			IOException {
-		// response.setContentType("text/plain");
 		handleHandler(staticContentHandler, pathInContext, pathParams, request,
 				response);
 	}

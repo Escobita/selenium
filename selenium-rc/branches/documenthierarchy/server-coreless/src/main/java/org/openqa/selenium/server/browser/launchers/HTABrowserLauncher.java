@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.FileUtils;
 import org.openqa.selenium.server.client.Session;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
+import org.openqa.selenium.server.configuration.SeleniumConfigurationOption;
 
 public class HTABrowserLauncher extends AbstractBrowserLauncher {
 	private static Logger logger = Logger.getLogger(HTABrowserLauncher.class);
@@ -106,7 +107,7 @@ public class HTABrowserLauncher extends AbstractBrowserLauncher {
     }
 
     public void launchHTMLSuite(String suiteUrl, String browserURL, boolean multiWindow) {
-        launch(LauncherUtils.getDefaultHTMLSuiteUrl(browserURL, suiteUrl, multiWindow, getSeleniumConfiguration().getPort()), "TestRunner.hta");
+        launch(LauncherUtils.getDefaultHTMLSuiteUrl(browserURL, suiteUrl, multiWindow, getSeleniumConfiguration().getPort(), (String) SeleniumConfigurationOption.LOG_LEVEL.getDefaultValue()), "TestRunner.hta");
     }
 
     public void launchRemoteSession(String browserURL, boolean multiWindow, boolean debugMode) {

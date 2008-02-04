@@ -495,4 +495,41 @@ public class DefaultSeleniumConfiguration extends AbstractConfigurationSource
 				.getPrimaryOptionName(), Boolean.valueOf(browserSideLog));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isEnsureCleanSession() {
+		boolean isEnsureCleanSession = getBoolean(SeleniumConfigurationOption.ENSURE_CLEAN_SESSION
+				.getPrimaryOptionName());
+
+		return isEnsureCleanSession;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setEnsureCleanSession(boolean ensureCleanSession) {
+		setProperty(SeleniumConfigurationOption.ENSURE_CLEAN_SESSION
+				.getPrimaryOptionName(), Boolean.valueOf(ensureCleanSession));
+		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isAvoidProxy() {
+		boolean isAvoidProxy = getBoolean(SeleniumConfigurationOption.AVOID_PROXY
+				.getPrimaryOptionName());
+
+		return isAvoidProxy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setAvoidProxy(boolean avoidProxy) {
+		setProperty(SeleniumConfigurationOption.AVOID_PROXY
+				.getPrimaryOptionName(), Boolean.valueOf(avoidProxy));
+	}
+
 }
