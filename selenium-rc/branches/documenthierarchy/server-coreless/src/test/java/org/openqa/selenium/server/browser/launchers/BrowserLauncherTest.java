@@ -65,7 +65,7 @@ public class BrowserLauncherTest extends SeleniumTestBase {
 			
 			Session session = new Session(seleniumConfiguration, browserType, browserLauncher, driverClient, windowManager);
 //			session.addBrowserClient(browserClient);
-			browserLauncher.setSession(session);
+//			browserLauncher.setSession(session);
 			browserLauncher.launchRemoteSession(BROWSER_LAUNCHER_URL, false,
 					false);
 			boolean hasClosedSuccessfully = browserLauncher.close();
