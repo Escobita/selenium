@@ -70,19 +70,18 @@ public class ClientDriverSuite extends TestCase {
             
             
             
-               
-//            suite.addTestSuite(ApacheMyFacesSuggestTest.class);
-//            suite.addTest(I18nIntegrationTest.suite());
-//            suite.addTestSuite(TestBasicAuth.class);
-//            suite.addTestSuite(RealDealIntegrationTest.class);
-//            suite.addTestSuite(TestErrorChecking.class);
-//            suite.addTestSuite(TestJavascriptParameters.class);
-//            suite.addTestSuite(TestClick.class);
-//            suite.addTestSuite(GoogleTestSearch.class);
 //            suite.addTestSuite(GoogleTest.class);
-//            suite.addTestSuite(WindowNamesTest.class);
-//            suite.addTestSuite(TestCookie.class);
-//            suite.addTestSuite(TestCheckUncheck.class);
+//          suite.addTestSuite(ApacheMyFacesSuggestTest.class);
+//          suite.addTestSuite(GoogleTestSearch.class);
+//          suite.addTestSuite(WindowNamesTest.class);
+            suite.addTest(I18nIntegrationTest.suite());
+            suite.addTestSuite(TestBasicAuth.class);
+            suite.addTestSuite(RealDealIntegrationTest.class);
+            suite.addTestSuite(TestErrorChecking.class);
+            suite.addTestSuite(TestJavascriptParameters.class);
+            suite.addTestSuite(TestClick.class);
+            suite.addTestSuite(TestCookie.class);
+            suite.addTestSuite(TestCheckUncheck.class);
             suite.addTestSuite(TestXPathLocators.class);
             suite.addTestSuite(TestClickJavascriptHref.class);
             suite.addTestSuite(TestCommandError.class);
@@ -141,7 +140,7 @@ public class ClientDriverSuite extends TestCase {
                 suite.addTestSuite(MultiDomainTest.class);
                 
                 // Will need to run for IE tests
-                //suite.addTestSuite(TestModalDialog.class);
+                suite.addTestSuite(TestModalDialog.class);
             }
             
             if (!isProxyInjectionMode) {
