@@ -89,39 +89,6 @@ public class StaticContentHandler extends AbstractHandler {
 			
 			File f = new File(url.getFile());
 			
-			// grab the last modified time from the file system and zero out the ms since what we'll get in 
-			// the header doesn't have ms
-			Calendar lastModified = Calendar.getInstance();
-			lastModified.setTimeInMillis(f.lastModified());
-			lastModified.set(Calendar.MILLISECOND, 0);
-			
-			// for some reason IE was ignoring this unless it was in GMT format?
-			LAST_MODIFIED_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-			webResponse.setField(HttpFields.__LastModified, LAST_MODIFIED_FORMAT.format(lastModified.getTime()));
-			
-			try {
-				Calendar ifModifiedSince = Calendar.getInstance();
-				String requestIfModifiedSince = webRequest.getField(HttpFields.__IfModifiedSince);
-				
-				if (requestIfModifiedSince != null) {
-					try {
-						//requestIfModifiedSince = new String(requestIfModifiedSince);
-						Date ifModifiedSinceDate = LAST_MODIFIED_FORMAT.parse(requestIfModifiedSince);
-						ifModifiedSince.setTime(ifModifiedSinceDate);
-					}
-					catch (NumberFormatException ex) {
-						// squelch exception.  workaround IE number format exception from request
-						logger.warn("Squelching bad number format exception in parse.", ex);
-					}
-					if (lastModified.before(ifModifiedSince) || lastModified.equals(ifModifiedSince)) {
-						webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-						return true;
-					} 
-				}
-			} catch (ParseException e) {
-				logger.warn("Can not properly handle cache.  Unable to parse " + HttpFields.__IfModifiedSince);
-			}
-			
 			InputStream inputStream = url.openStream();
 			
 			if (inputStream != null) {
@@ -131,6 +98,39 @@ public class StaticContentHandler extends AbstractHandler {
 						injectionManager.injectJavaScript(webRequest.getRequestURL(), webRequest.getPath(), webResponse, inputStream, outputStream);
 					}
 					else {
+						// grab the last modified time from the file system and zero out the ms since what we'll get in 
+						// the header doesn't have ms
+						Calendar lastModified = Calendar.getInstance();
+						lastModified.setTimeInMillis(f.lastModified());
+						lastModified.set(Calendar.MILLISECOND, 0);
+						
+						// for some reason IE was ignoring this unless it was in GMT format?
+						LAST_MODIFIED_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+						webResponse.setField(HttpFields.__LastModified, LAST_MODIFIED_FORMAT.format(lastModified.getTime()));
+						
+						try {
+							Calendar ifModifiedSince = Calendar.getInstance();
+							String requestIfModifiedSince = webRequest.getField(HttpFields.__IfModifiedSince);
+							
+							if (requestIfModifiedSince != null) {
+								try {
+									//requestIfModifiedSince = new String(requestIfModifiedSince);
+									Date ifModifiedSinceDate = LAST_MODIFIED_FORMAT.parse(requestIfModifiedSince);
+									ifModifiedSince.setTime(ifModifiedSinceDate);
+								}
+								catch (NumberFormatException ex) {
+									// squelch exception.  workaround IE number format exception from request
+									logger.warn("Squelching bad number format exception in parse.", ex);
+								}
+								if (lastModified.before(ifModifiedSince) || lastModified.equals(ifModifiedSince)) {
+									webResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+									return true;
+								} 
+							}
+						} catch (ParseException e) {
+							logger.warn("Can not properly handle cache.  Unable to parse " + HttpFields.__IfModifiedSince);
+						}
+						
 						modifiedIO.copy(inputStream, outputStream);
 					}
 					//webResponse.setContentType(url.openConnection().getContentType());
