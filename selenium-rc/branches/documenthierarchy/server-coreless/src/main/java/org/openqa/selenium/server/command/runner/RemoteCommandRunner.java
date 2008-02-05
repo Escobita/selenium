@@ -146,7 +146,12 @@ public class RemoteCommandRunner extends
 					+ System.identityHashCode(commandQueue) + ") : ");
 			
 			while (!shutdown && command == null) {
-				command = commandQueue.poll(100, TimeUnit.MILLISECONDS);
+				try {
+					command = commandQueue.poll(100, TimeUnit.MILLISECONDS);
+				}
+				catch (InterruptedException ex) {
+					logger.warn("Interrupted exception while polling for command from command runner.", ex);
+				}
 			}
 			
 			if (shutdown) {
@@ -159,10 +164,6 @@ public class RemoteCommandRunner extends
 			logger.debug("took commandQueue ("
 					+ System.identityHashCode(commandQueue) + ") : "
 					+ commandDebug);
-		} catch (InterruptedException ex) {
-			logger.warn(
-					"Interrupted exception while trying waiting to pop from command runner: "
-							+ this, ex);
 		}
 		finally {
 			waitingBrowserQueue.remove(Thread.currentThread());
@@ -180,7 +181,12 @@ public class RemoteCommandRunner extends
 		try {
 			logger.debug("Acquired lock for commandId=" + commandId + ", sequenceId=" + sequenceId + ", lastSequenceId=" + lastSequenceId);
 			while ((sequenceId != NOT_SEQUENCED) && (sequenceId > (lastSequenceId + 1))) {
-				sequenceProcessed.await();
+				try {
+					sequenceProcessed.await();
+				}
+				catch (InterruptedException ex) {
+					logger.warn("Await interrupted", ex);
+				}
 			}
 			boolean hasCommandId = commandId != null && !"".equals(commandId);
 			CommandResult commandResult = null;
