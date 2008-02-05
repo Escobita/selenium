@@ -134,8 +134,13 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
             logger.info("Preparing Firefox profile...");
 
             exe.setCommandline(cmdarray);
-            process = exe.asyncSpawn();
-
+            
+            try {
+            	process = exe.asyncSpawn();
+            }
+            catch (RuntimeException ex) {
+            	logger.error("Error while spawning asynchronously.", ex);
+            }
 //            try {
             	waitForFullProfileToBeCreated(5 * 1000);
 //            }
