@@ -329,6 +329,6 @@ public class RemoteCommand<T extends CommandResult> extends AbstractCommand<T> {
 	 * Get the field.
 	 */
 	public String getField() {
-		return getCommandParameterMap().get("1");
+		return getCommandParameterMap().get("target");
 	}
 }

@@ -3,6 +3,7 @@ package org.openqa.selenium.server.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -763,7 +764,7 @@ public class WindowManager implements WindowListener {
 
 		try {
 			// @todo Change to use UTF8 constant
-			Writer writer = new OutputStreamWriter(buf);
+			Writer writer = new OutputStreamWriter(buf, "UTF-8");
 			if (remoteCommand != null) {
 				writer.write(remoteCommand.getBrowserCommandResponse());
 			}
@@ -776,7 +777,17 @@ public class WindowManager implements WindowListener {
 			logger.error(ex);
 		}
 
-		return buf.toString();
+		String bufString;
+		
+		try {
+			bufString = buf.toString("UTF-8");
+		}
+		catch (UnsupportedEncodingException ex) {
+			logger.error("Encoding browser command response to UTF8 not supported.", ex);
+			bufString = buf.toString();
+		}
+		
+		return bufString;
 	}
 	
 	public CommandResult handleResult(String result, Map<String, String> commandParametersMap, String uniqueId, String windowName, String windowTitle, String frameAddress, String frameName, String frameId, boolean browserStart, boolean browserUnload, boolean modalDialog, boolean hasJavaScriptState) {		
