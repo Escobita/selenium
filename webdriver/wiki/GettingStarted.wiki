@@ -37,7 +37,7 @@ public class Example  {
         WebElement element = driver.findElement(By.xpath("//input[@name='q']"));
 
         // Enter something to search for
-        element.setValue("Cheese!");
+        element.sendKeys("Cheese!");
 
         // Now submit the form. WebDriver will find the form for us from the element
         element.submit();
@@ -74,7 +74,7 @@ public class GoogleSuggest {
         
         // Enter the query string "I like cheese"
         WebElement query = driver.findElement(By.xpath("//input[@name='q']"));
-        query.setValue("Cheese");
+        query.sendKeys("Cheese");
 
         // This should go at some point, but allows Google to return some suggestions for now
         Thread.sleep(2000);
