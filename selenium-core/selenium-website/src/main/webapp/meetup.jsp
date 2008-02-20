@@ -4,7 +4,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%!
-    private static final String file = "/home/oqa-j2ee/meetup.txt";
+    private static final String file = "/home/selenium-j2ee/meetup.txt";
     //private static final String file = "/tmp/meetup.txt";
 
     private List<Map<String, String>> readConference() throws IOException {
