@@ -16,6 +16,7 @@ import org.openqa.selenium.server.command.handler.DriverCommandHandler;
 import org.openqa.selenium.server.command.runner.LocalCommandRunner;
 import org.openqa.selenium.server.command.runner.ProxyCommandRunner;
 import org.openqa.selenium.server.configuration.SeleniumConfiguration;
+import org.openqa.selenium.server.configuration.SeleniumConfigurationOption;
 
 /**
  * Manages sessions for clients.
@@ -213,6 +214,12 @@ public class SessionManager {
 						.getPathToBrowser());
 			}
 		}
+		
+		if (seleniumConfiguration.isOptionSpecified(SeleniumConfigurationOption.FORCED_BROWSER_MODE)) {
+			String browserString = seleniumConfiguration.getForcedBrowserMode();
+			logger.info("Browser type forced to " + browserString);
+			browserType = new BrowserType(new Browser(browserString));
+		}
 
 		BrowserLauncher browserLauncher = browserLauncherFactory
 				.getBrowserLauncher(browserType);
@@ -241,9 +248,10 @@ public class SessionManager {
 				
 				boolean multiWindowMode = seleniumConfiguration.isMultiWindowMode();
 				boolean debugMode = seleniumConfiguration.isDebugMode();
+				boolean proxyInjectionMode = seleniumConfiguration.isProxyInjectionMode();
 				
 				Map<String, String> commandParameterMap = new HashMap<String, String>();
-				commandParameterMap.put("url", LauncherUtils.getDefaultRemoteSessionUrl(startURL, session, multiWindowMode, debugMode, 0));
+				commandParameterMap.put("url", LauncherUtils.getDefaultRemoteSessionUrl(startURL, session, multiWindowMode, debugMode, proxyInjectionMode, 0, "localhost"));
 				RemoteCommand openCommand = new RemoteCommand(
 						"open", commandParameterMap);
 				session.getWindowManager().run(openCommand);

@@ -59,7 +59,7 @@ public class CommandFactory {
 		
 		// attachFile
 		ATTACH_FILE("attachFile", AttachFileLocalCommand.class);
-
+		
 		private final String commandName;
 
 		private final Class<? extends LocalCommand> commandClass;
@@ -111,7 +111,11 @@ public class CommandFactory {
 		GET_ALL_WINDOW_NAMES("getAllWindowNames", GetAllWindowNamesProxyCommand.class),
 		
 		// getTitle
-		GET_TITLE("getTitle", GetTitleProxyCommand.class);
+		GET_TITLE("getTitle", GetTitleProxyCommand.class),
+		
+		// addLocationStrategy
+		ADD_LOCATION_STRATEGY("addLocationStrategy", AddLocationStrategyProxyCommand.class);
+		
 		
 		private final String commandName;
 
@@ -172,6 +176,10 @@ public class CommandFactory {
 		supportedProxyCommands.put(
 				SupportedProxyCommand.GET_ALL_WINDOW_NAMES.getCommandName(),
 				SupportedProxyCommand.GET_ALL_WINDOW_NAMES);
+		
+//		supportedProxyCommands.put(
+//				SupportedProxyCommand.ADD_LOCATION_STRATEGY.getCommandName(),
+//				SupportedProxyCommand.ADD_LOCATION_STRATEGY);
 //		supportedProxyCommands.put(
 //				SupportedProxyCommand.GET_TITLE.getCommandName(),
 //				SupportedProxyCommand.GET_TITLE);

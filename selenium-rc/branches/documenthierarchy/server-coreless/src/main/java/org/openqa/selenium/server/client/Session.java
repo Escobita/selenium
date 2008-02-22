@@ -361,4 +361,8 @@ public class Session {
         g.execute();
         return outputFile;
     }
+    
+    public void addLocatorStrategy(String locator, String locatorCode) {
+    	
+    }
 }

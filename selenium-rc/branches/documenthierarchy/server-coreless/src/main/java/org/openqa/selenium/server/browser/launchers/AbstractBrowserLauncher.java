@@ -57,7 +57,7 @@ public abstract class AbstractBrowserLauncher implements BrowserLauncher {
 
 	public void launchRemoteSession(String browserURL, boolean multiWindow, boolean debugMode) {
 		launch(LauncherUtils.getDefaultRemoteSessionUrl(browserURL, session,
-				multiWindow, debugMode, getSeleniumConfiguration().getPort()));
+				multiWindow, debugMode, getSeleniumConfiguration().isProxyInjectionMode(), getSeleniumConfiguration().getPort(), getSeleniumConfiguration().getHostname()));
 	}
 
 

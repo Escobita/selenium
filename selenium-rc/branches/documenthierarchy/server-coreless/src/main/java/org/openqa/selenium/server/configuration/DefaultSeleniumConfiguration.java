@@ -260,8 +260,8 @@ public class DefaultSeleniumConfiguration extends AbstractConfigurationSource
 	/**
 	 * {@inheritDoc}
 	 */
-	public Browser getForcedBrowserMode() {
-		Browser browser = (Browser) getProperty(SeleniumConfigurationOption.FORCED_BROWSER_MODE
+	public String getForcedBrowserMode() {
+		String browser = (String) getProperty(SeleniumConfigurationOption.FORCED_BROWSER_MODE
 				.getPrimaryOptionName());
 		return browser;
 	}
@@ -530,6 +530,42 @@ public class DefaultSeleniumConfiguration extends AbstractConfigurationSource
 	public void setAvoidProxy(boolean avoidProxy) {
 		setProperty(SeleniumConfigurationOption.AVOID_PROXY
 				.getPrimaryOptionName(), Boolean.valueOf(avoidProxy));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isKillableProcessEnabled() {
+		boolean isKillableProcessEnabled = getBoolean(SeleniumConfigurationOption.KILLABLE_PROCESS_ENABLED
+				.getPrimaryOptionName());
+
+		return isKillableProcessEnabled;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setKillableProcessEnabled(boolean killableProcessEnabled) {
+		setProperty(SeleniumConfigurationOption.KILLABLE_PROCESS_ENABLED
+				.getPrimaryOptionName(), Boolean.valueOf(killableProcessEnabled));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getHostname() {
+		String hostname = getString(SeleniumConfigurationOption.HOSTNAME
+				.getPrimaryOptionName());
+
+		return hostname;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setHostname(String hostname) {
+		setProperty(SeleniumConfigurationOption.HOSTNAME
+				.getPrimaryOptionName(), hostname);
 	}
 
 }

@@ -81,22 +81,27 @@ public class HtmlIdentifierManager {
 
     public boolean shouldBeInjected(String path, String contentType, String contentPreview) {
         int score = 0;
-
+        boolean shouldInject = false;
         if (seleniumConfiguration.isDebugMode()) {
         	logger.debug("HtmlIdentifier.shouldBeInjected(\"" + path + "\", \"" + contentType + "\", \"...\")");
         }        
         
-        for (Rule rule : rules) {
-            int scoreDelta = rule.score(path, contentType, contentPreview);
-            if (seleniumConfiguration.isDebugMode()) {
-                logger.debug("    applied rule " + rule + ": " + scoreDelta);
-            }
-            score += scoreDelta;
+        // Only try injecting paths that aren't a part of the selenium server
+        if (!path.startsWith("/selenium-server/core/scripts/") 
+        		&& !path.startsWith("/selenium-server/core/xpath/")
+        		&& !path.startsWith("/selenium-server/core/lib/")) {
+	        for (Rule rule : rules) {
+	            int scoreDelta = rule.score(path, contentType, contentPreview);
+	            if (seleniumConfiguration.isDebugMode()) {
+	                logger.debug("    applied rule " + rule + ": " + scoreDelta);
+	            }
+	            score += scoreDelta;
+	        }
+	        shouldInject = (score > INJECTION_THRESHOLD);
         }
-        boolean shouldInject = (score > INJECTION_THRESHOLD);
         if (seleniumConfiguration.isDebugMode()) {
             logger.debug("    total : " + score + ">" + INJECTION_THRESHOLD + "?  (should " + (shouldInject ? "" : "not ") + "inject)");
-        }        
+        }
         return shouldInject;
     }
 

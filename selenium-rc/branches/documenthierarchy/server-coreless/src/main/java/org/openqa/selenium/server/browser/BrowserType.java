@@ -11,18 +11,19 @@ import java.util.StringTokenizer;
  */
 public class BrowserType {
 
-	public enum Browser {
-		FIREFOX("*firefox"), // Firefox
-		IEXPLORE("*iexplore"), // Internet Explorer
-		CUSTOM("*custom"), // Custom browser
-		CHROME("*chrome"), // Launches Firefox using a chrome URL
-		IEHTA("*iehta"), // Launches IE as an HTML Application (HTA)
-		PI_FIREFOX("*pifirefox"), // Launches Firefox in PI mode
-		PI_IEXPLORE("*piiexplore"),// Launches IE in PI mode
-		MOCK("*mock");// Mock browser
+	public static class Browser {
+		public static final Browser FIREFOX = new Browser("*firefox"); // Firefox
+		public static final Browser IEXPLORE = new Browser("*iexplore"); // Internet Explorer
+		public static final Browser CUSTOM = new Browser("*custom"); // Custom browser
+		public static final Browser CHROME = new Browser("*chrome"); // Launches Firefox using a chrome URL
+		public static final Browser IEHTA = new Browser("*iehta"); // Launches IE as an HTML Application (HTA)
+		public static final Browser PI_FIREFOX = new Browser("*pifirefox"); // Launches Firefox in PI mode
+		public static final Browser PI_IEXPLORE = new Browser("*piiexplore");// Launches IE in PI mode
+		public static final Browser MOCK = new Browser("*mock");// Mock browser
+		
 		private String browserType;
 
-		Browser(String browserType) {
+		public Browser(String browserType) {
 			this.browserType = browserType;
 		}
 
@@ -31,6 +32,24 @@ public class BrowserType {
 		 */
 		public String toString() {
 			return browserType;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			boolean isEqual = false;
+			
+			if (obj instanceof Browser) {
+				Browser browser = (Browser) obj;
+				
+				isEqual = browserType.equals(browser.browserType);
+			}
+			
+			return isEqual;
+		}
+		
+		@Override
+		public int hashCode() {
+			return browserType.hashCode();
 		}
 	}
 

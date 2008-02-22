@@ -184,15 +184,22 @@ public class LauncherUtils {
                 + "&test=" + urlEncode(suiteUrl);
 	}
 
-	public static String getDefaultRemoteSessionUrl(String startURL, Session session, boolean multiWindow, boolean debugMode, int serverPort) {
+	public static String getDefaultRemoteSessionUrl(String startURL, Session session, boolean multiWindow, boolean debugMode, boolean proxyInjectionMode, int serverPort, String serverHost) {
 		String url = LauncherUtils.stripStartURL(startURL);
 		url += "/selenium-server/core/RemoteRunner.html?" 
                 + "sessionId=" + session.getSessionId() 
                 + "&multiWindow=" + multiWindow 
                 + "&baseUrl=" + urlEncode(startURL)
                 + "&debugMode=" + debugMode;
+		
+		final String SELENIUM_SERVER_DRIVER_URL = "/selenium-server/driver/";
         if (serverPort != 0) {
-            url += "&driverUrl=http://localhost:" + serverPort + "/selenium-server/driver/";
+        	if (proxyInjectionMode) {
+         		url += "&" + startURL + SELENIUM_SERVER_DRIVER_URL;
+        	}
+        	else {
+        		url += "&driverUrl=http://" + serverHost + ":" + serverPort + SELENIUM_SERVER_DRIVER_URL;
+        	}
         }
         return url;
 	}

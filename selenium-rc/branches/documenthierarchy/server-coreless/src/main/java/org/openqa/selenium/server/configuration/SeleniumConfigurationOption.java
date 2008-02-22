@@ -26,7 +26,11 @@ public enum SeleniumConfigurationOption {
 			new NoSeleniumConfigurationOptionValidator()),
 	// Port
 	PORT(new String[] { "port" }, Integer.valueOf(4444),
-			new PortSeleniumConfigurationOptionValidator()),
+			new PortSeleniumConfigurationOptionValidator()),	
+	// Hostname
+	HOSTNAME(new String[] { "host", "hostname" }, "localhost",
+			new NoSeleniumConfigurationOptionValidator()),			
+			
 	// Timeout in seconds
 	TIMEOUT(new String[] { "timeout" }, Integer.valueOf(30 * 60 * 1000),
 			new NoSeleniumConfigurationOptionValidator()),
@@ -94,7 +98,11 @@ public enum SeleniumConfigurationOption {
 	AVOID_PROXY(new String[] { "avoidProxy" }, Boolean
 			.valueOf(false), new NoSeleniumConfigurationOptionValidator()),
 	// Log level
-	LOG_LEVEL(new String[] { "logLevel" }, null, new NoSeleniumConfigurationOptionValidator());	
+	LOG_LEVEL(new String[] { "logLevel" }, null, new NoSeleniumConfigurationOptionValidator()),
+	
+	// Killable process enabled?
+	KILLABLE_PROCESS_ENABLED(new String[] { "killableProcessEnabled" }, Boolean.valueOf(true), new NoSeleniumConfigurationOptionValidator());	
+		
 		
 	
 	// The option name

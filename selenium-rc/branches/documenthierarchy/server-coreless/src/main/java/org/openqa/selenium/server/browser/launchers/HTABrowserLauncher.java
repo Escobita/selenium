@@ -111,7 +111,7 @@ public class HTABrowserLauncher extends AbstractBrowserLauncher {
     }
 
     public void launchRemoteSession(String browserURL, boolean multiWindow, boolean debugMode) {
-        launch(LauncherUtils.getDefaultRemoteSessionUrl(browserURL, getSession(), multiWindow, debugMode, getSeleniumConfiguration().getPort()), "RemoteRunner.hta");
+        launch(LauncherUtils.getDefaultRemoteSessionUrl(browserURL, getSession(), multiWindow, debugMode, getSeleniumConfiguration().isProxyInjectionMode(), getSeleniumConfiguration().getPort(), getSeleniumConfiguration().getHostname()), "RemoteRunner.hta");
     }
 
 	@Override

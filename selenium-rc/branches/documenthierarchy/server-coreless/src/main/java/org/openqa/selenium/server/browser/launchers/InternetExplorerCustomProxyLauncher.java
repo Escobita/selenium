@@ -79,7 +79,17 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
     @Override
     public void launch(String url) {
         try {
-            if (WindowsUtils.thisIsWindows()) {
+        	log.info("launch(" + url + ")...");
+        	log.info("Windows? " + (WindowsUtils.thisIsWindows() ? "Yes" : "No") );
+        	log.info("OS Name: '" + System.getProperty("os.name") + "'" );
+        	log.info("Windows 2000?: " + (System.getProperty("os.name").equals("Windows 2000") ? "Yes" : "No"));
+        	boolean useKillableProcess = WindowsUtils.thisIsWindows() &&
+        	System.getProperty("os.name").equals("Windows 2000") == false &&
+        	getSeleniumConfiguration().isKillableProcessEnabled() == true;
+        	log.info("Using killable process?: "+ (useKillableProcess ? "Yes" : "No") );
+        	
+        	// Use killable process if windows
+            if (useKillableProcess) {
                 wpm.backupRegistrySettings();
                 changeRegistrySettings();
                 customProxyPACDir = wpm.getCustomProxyPACDir();

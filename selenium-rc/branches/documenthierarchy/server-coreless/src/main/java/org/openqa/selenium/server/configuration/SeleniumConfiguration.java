@@ -154,8 +154,8 @@ public interface SeleniumConfiguration extends ConfigurationSource {
 	/**
 	 * Get forced browser mode string.
 	 */
-	BrowserType.Browser getForcedBrowserMode();
-
+	String getForcedBrowserMode();	
+	
 	/**
 	 * Set file for javascript user extensions.
 	 */
@@ -346,6 +346,26 @@ public interface SeleniumConfiguration extends ConfigurationSource {
 	 * Is avoiding proxy?
 	 */
 	boolean isAvoidProxy();
+	
+	/**
+	 * Set killable process enabled.
+	 */
+	void setKillableProcessEnabled(boolean killableProcessEnabled);
+	
+	/**
+	 * Is killable process enabled?
+	 */
+	boolean isKillableProcessEnabled();
+	
+	/**
+	 * Set the hostname for the server.
+	 */
+	void setHostname(String hostname);
+	
+	/**
+	 * Get the hostname for the server.
+	 */
+	String getHostname();
 
 	// @todo Check configuration to ensure all options are accessible through selenium.option
 
