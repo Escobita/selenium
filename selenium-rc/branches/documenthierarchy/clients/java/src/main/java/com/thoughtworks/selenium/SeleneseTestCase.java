@@ -22,6 +22,9 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.configuration.SeleniumConfiguration;
+
 import junit.framework.*;
 
 /**
@@ -44,6 +47,7 @@ public class SeleneseTestCase extends TestCase {
     protected Selenium selenium;
     
     private StringBuffer verificationErrors = new StringBuffer();
+
     
     public SeleneseTestCase() {
         super();
@@ -116,22 +120,22 @@ public class SeleneseTestCase extends TestCase {
      */
     public void setUp(String url, String browserString) throws Exception {
         super.setUp();
+        
         int port = getDefaultPort();
         if (url==null) {
             url = "http://localhost:" + port;
-;
         }
         selenium = new DefaultSelenium("localhost", port, browserString, url);
         selenium.start();
         selenium.setContext(this.getClass().getSimpleName() + "." + getName());
     }
 
-    private int getDefaultPort() {
+    protected int getDefaultPort() {
         try {
             Class c = Class.forName("org.openqa.selenium.server.SeleniumServer");
-            Method getDefaultPort = c.getMethod("getDefaultPort", new Class[0]);
-            Integer portNumber = (Integer)getDefaultPort.invoke(null, new Object[0]);
-            return portNumber.intValue();
+            Method getInstance = c.getMethod("getInstance", new Class[0]);
+            SeleniumServer server = (SeleniumServer)getInstance.invoke(null, new Object[0]);
+            return server.getSeleniumConfiguration().getPort();
         } catch (Exception e) {
             return 4444;
         }

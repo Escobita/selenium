@@ -1,26 +1,21 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.*;
+import org.openqa.selenium.server.browser.BrowserType;
 
-public class MockBrowserTest extends TestCase {
-    Selenium sel;
-    public void setUp() {
-        sel = new DefaultSelenium("localhost", 4444, "*mock", "http://x");
-        sel.start();
+public class MockBrowserTest extends SeleneseTestCase {
+
+    public void setUp() throws Exception {
+        setUp("http://x", BrowserType.Browser.MOCK.toString());
     }
-    
-    public void tearDown() {
-        sel.stop();
-    }
-    
+
     public void testMock() {
-        sel.open("/");
-        sel.click("foo");
-        assertEquals("Incorrect title", "x", sel.getTitle());
-        assertTrue("alert wasn't present", sel.isAlertPresent());
-        assertArrayEquals("getAllButtons should return one empty string", new String[]{""}, sel.getAllButtons());
-        assertArrayEquals("getAllLinks was incorrect", new String[]{"1"}, sel.getAllLinks());
-        assertArrayEquals("getAllFields was incorrect", new String[]{"1", "2", "3"}, sel.getAllFields());
+        selenium.open("/");
+        selenium.click("foo");
+        assertEquals("Incorrect title", "x", selenium.getTitle());
+        assertTrue("alert wasn't present", selenium.isAlertPresent());
+        assertArrayEquals("getAllButtons should return one empty string", new String[]{""}, selenium.getAllButtons());
+        assertArrayEquals("getAllLinks was incorrect", new String[]{"1"}, selenium.getAllLinks());
+        assertArrayEquals("getAllFields was incorrect", new String[]{"1", "2", "3"}, selenium.getAllFields());
         
     }
     

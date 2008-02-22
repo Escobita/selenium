@@ -4,56 +4,62 @@
  */
 package com.thoughtworks.selenium;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 
-import junit.extensions.*;
-import junit.framework.*;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import org.openqa.selenium.server.*;
+import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.browser.BrowserType;
 
-public class I18nTest extends TestCase {
+public class I18nTest extends SeleneseTestCase {
     
-    private static String startUrl = "http://localhost:" + SeleniumServer.getDefaultPort();
-    private static Selenium sel;
-    
+    private static String browser = null;
+
+    public String getBrowser() {
+		return browser;
+	}
+
+	public void setBrowser(String browser) {
+		this.browser = browser;
+	}
+	
     public static Test suite() {
-        return new I18nTestSetup(new TestSuite(I18nTest.class), "*mock", true);
+        return new I18nTestSetup(new TestSuite(I18nTest.class),
+				BrowserType.Browser.MOCK.toString(), true);
     }
     
-    protected static class I18nTestSetup extends TestSetup {
+    public void setUp() throws Exception {
+    	setUp(null, getBrowser());
+        selenium.open("/selenium-server/tests/html/test_i18n.html");
+	}
 
-        String browser;
+	protected static class I18nTestSetup extends TestSetup {
+
         boolean launchServer;
         SeleniumServer server;
         
         public I18nTestSetup(Test test, String browser, boolean launchServer) {
             super(test);
-            this.browser = browser;
+            
+            // this is pretty ugly to call back like this, but wanted to get the 
+            // browser back to the test so it could leverage the super setUp method
+            TestSuite suite = (TestSuite)test;
+            I18nTest t = (I18nTest)suite.testAt(0);
+            t.setBrowser(browser);
+            
             this.launchServer = launchServer;
         }
         
         public void setUp() throws Exception {
             if (launchServer) {
-                server = new SeleniumServer();
+                server = SeleniumServer.getInstance();
                 server.start();
-            }
-            try {
-                sel = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), browser,
-                        startUrl);
-                sel.start();
-                sel.open(startUrl + "/selenium-server/tests/html/test_i18n.html");
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
             }
         }
         
         public void tearDown() throws Exception {
-            try {
-                sel.stop();
-            } catch (Exception e) {
-                throw e;
-            }
             if (launchServer) server.stop();
         }
         
@@ -91,7 +97,7 @@ public class I18nTest extends TestCase {
     }
     
     public void testDangerousLabels() throws UnsupportedEncodingException {
-        String[] labels = sel.getSelectOptions("dangerous-labels");
+        String[] labels = selenium.getSelectOptions("dangerous-labels");
         assertEquals("Wrong number of labels", 3, labels.length);
         assertEquals("mangled label", "veni, vidi, vici", labels[0]);
         assertEquals("mangled label", "c:\\foo\\bar", labels[1]);
@@ -101,8 +107,8 @@ public class I18nTest extends TestCase {
     private void verifyText(String expected, String id) throws UnsupportedEncodingException {
         System.out.println(getName());
         System.out.println(expected);
-        assertTrue(sel.isTextPresent(expected));
-        String actual = sel.getText(id);
+        assertTrue(selenium.isTextPresent(expected));
+        String actual = selenium.getText(id);
         byte[] result = actual.getBytes("UTF-8");
         for (int i = 0; i < result.length; i++) {
             Byte b = new Byte(result[i]);

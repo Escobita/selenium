@@ -383,8 +383,4 @@ public class SeleniumServer {
 			server.stop();
 		}
 	}
-	
-	public static int getDefaultPort() {
-		return (Integer) SeleniumConfigurationOption.PORT.getDefaultValue();
-	}
 }

@@ -17,26 +17,18 @@
 
 package com.thoughtworks.selenium;
 
-import junit.framework.*;
+import junit.framework.AssertionFailedError;
 
-import org.openqa.selenium.server.*;
+import org.openqa.selenium.server.browser.BrowserType;
 
 /**
  * @author Paul Hammant
  * @version $Revision: 131 $
  */
-public class RealDealIntegrationTest extends TestCase {
+public class RealDealIntegrationTest extends SeleneseTestCase {
 
-    Selenium selenium;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*firefox", "http://localhost:" + SeleniumServer.getDefaultPort());
-        selenium.start();
-    }
-
-    protected void tearDown() throws Exception {
-        selenium.stop();
+    public void setUp() throws Exception {
+        setUp(null, BrowserType.Browser.FIREFOX.toString());
     }
 
     public void testWithJavaScript() {

@@ -1,24 +1,14 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import junit.framework.TestCase;
+import org.openqa.selenium.server.browser.BrowserType;
 
-import org.openqa.selenium.server.SeleniumServer;
+import com.thoughtworks.selenium.SeleneseTestCase;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.Selenium;
-
-public class DomainTourTest extends TestCase
+public class DomainTourTest extends SeleneseTestCase
 {
-    private Selenium selenium;
-    
     public void setUp() throws Exception {
         String url = "http://www.google.com";
-        selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*iexplore", url);
-        selenium.start();
-    }
-    
-    protected void tearDown() throws Exception {
-        selenium.stop();
+        setUp(url, BrowserType.Browser.IEXPLORE.toString());
     }
     
     public void testAll() throws Throwable {     

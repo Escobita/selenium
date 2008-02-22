@@ -1,21 +1,13 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.*;
+import org.openqa.selenium.server.browser.BrowserType;
 
-import org.openqa.selenium.server.*;
-
-public class WindowNamesTest extends TestCase
+public class WindowNamesTest extends SeleneseTestCase
 {
-   private Selenium selenium;
 
    public void setUp() throws Exception {
-        String url = "http://www.google.com";
-       selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*firefox", url);
-       selenium.start();
-    }
-   
-   protected void tearDown() throws Exception {
-       selenium.stop();
+		String url = "http://www.google.com";
+		setUp(url, BrowserType.Browser.FIREFOX.toString());
    }
    
    public void testWindowNames() throws Throwable {

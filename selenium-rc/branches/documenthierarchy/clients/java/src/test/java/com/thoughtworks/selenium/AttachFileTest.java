@@ -1,20 +1,12 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.*;
+import org.openqa.selenium.server.browser.BrowserType;
 
-import org.openqa.selenium.server.*;
-
-public class AttachFileTest extends TestCase {
-    private Selenium selenium;
+public class AttachFileTest extends SeleneseTestCase {
 
     public void setUp() throws Exception {
         String url = "http://www.snipshot.com";
-        selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*chrome", url);
-        selenium.start();
-    }
-
-    protected void tearDown() throws Exception {
-        selenium.stop();
+        setUp(url, BrowserType.Browser.CHROME.toString());
     }
 
     public void testAttachfile() throws Throwable {

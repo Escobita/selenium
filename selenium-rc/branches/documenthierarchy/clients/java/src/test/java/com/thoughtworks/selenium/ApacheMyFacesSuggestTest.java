@@ -1,8 +1,6 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
-
-import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.browser.BrowserType;
 import org.openqa.selenium.server.browser.launchers.WindowsUtils;
 
 /**
@@ -12,14 +10,13 @@ import org.openqa.selenium.server.browser.launchers.WindowsUtils;
  *  @author danielf
  *
  */
-public class ApacheMyFacesSuggestTest extends TestCase {
+public class ApacheMyFacesSuggestTest extends SeleneseTestCase {
 
-    DefaultSelenium selenium;
     boolean isProxyInjectionMode;
     private static final String updateId = "ac4update";
     private static final String inputId = "ac4";
     
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         isProxyInjectionMode = System.getProperty("selenium.proxyInjectionMode")!=null
             && System.getProperty("selenium.proxyInjectionMode").equals("true");
     }
@@ -52,9 +49,9 @@ public class ApacheMyFacesSuggestTest extends TestCase {
     
     public void testAJAXFirefox() throws Throwable {
         if (shouldSkip()) return;
-        selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*firefox", "http://www.irian.at");
-        selenium.start();
 
+        setUp("http://www.irian.at", "*firefox");
+        
         selenium.open("http://www.irian.at/selenium-server/tests/html/ajax/ajax_autocompleter2_test.html");
         selenium.keyPress(inputId, "\\74");
         Thread.sleep(500);
@@ -77,8 +74,8 @@ public class ApacheMyFacesSuggestTest extends TestCase {
     public void testAJAXIExplore() throws Throwable {
         if (!WindowsUtils.thisIsWindows()) return;
         if (shouldSkip()) return;
-        selenium = new DefaultSelenium("localhost", SeleniumServer.getDefaultPort(), "*iexplore", "http://www.irian.at");
-        selenium.start();
+        
+        setUp("http://www.irian.at", BrowserType.Browser.IEXPLORE.toString());
 
         selenium.open("http://www.irian.at/selenium-server/tests/html/ajax/ajax_autocompleter2_test.html");
         selenium.type(inputId, "J");
@@ -100,8 +97,4 @@ public class ApacheMyFacesSuggestTest extends TestCase {
         }.wait("Didn't find 'Jane Agnews' in inputId");
     }
     
-    public void tearDown() {
-        if (selenium == null) return;
-        selenium.stop();
-    }
 }
