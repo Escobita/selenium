@@ -178,9 +178,9 @@
 <h2>Attendees</h2>
 
 <div class="blah">
-    Interested in attending? Please fill out the following form. This will help us make sure the experience optimized
+    Interested in attending? Please fill out the following form with your <b>first name and family name</b>. This will help us make sure the experience optimized
     for you and the other attendees. Please tell us what interests you have or why you're attending. You can also
-    optionally provide your email address in case we need to get in contact with you after the meetup.
+    optionally provide your email address in case we need to get in contact with you after the meetup.  Please also note we are limited to 100, and will be closing the list when that number is reached. You'll have badges waiting for you at Google - so bring some proof of ID.
 
     <p/>
 
