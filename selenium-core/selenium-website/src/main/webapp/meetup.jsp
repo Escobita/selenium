@@ -188,7 +188,7 @@
 <h2>What to Bring</h2>
 
 <div class="blah">
-    <u>Small bites of food and drinks will be provided</u>, so all that we ask is that you please bring your curiousity
+    <u>Small bites of food and drinks will be provided</u>, so all that we ask is that you please bring your curiosity
     and passion about Selenium, open source, automated QA, or agile development!
 </div>
 
@@ -200,6 +200,8 @@
     optionally provide your email address in case we need to get in contact with you after the meetup.  Please also note we are limited to 100, and will be closing the list when that number is reached. You'll have badges waiting for you at Google - so bring some proof of ID.
 
     <p/>
+	This list will close to new attendees at 10am local time, whether 100 attendees or less, so that badges can be printed.	
+	<p/>
 
     <form method="POST" action="meetup.jsp">
         <table id="signup">
