@@ -13,12 +13,25 @@
         FileInputStream fis = new FileInputStream(file);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         String line;
-        while ((line = br.readLine() + "\t\t\t") != null) {
+        while ((line = br.readLine()) != null) {
             String[] parts = line.split("\t");
             Map<String, String> map = new HashMap<String, String>();
-            map.put("name", parts[0]);
-            map.put("email", parts[1]);
-            map.put("interests", parts[2]);
+            if (parts.length > 0) {
+                map.put("name", parts[0]);
+                if (parts.length > 1) {
+                    map.put("email", parts[1]);
+                    if (parts.length > 2) {
+                        map.put("interests", parts[2]);
+                    } else {
+                        map.put("interests", "");
+                    }
+                } else {
+                    map.put("email", "");
+                    map.put("interests", "");
+                }
+            } else {
+                continue;
+            }
             list.add(map);
         }
         br.close();
