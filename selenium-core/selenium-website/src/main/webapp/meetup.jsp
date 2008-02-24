@@ -13,7 +13,7 @@
         FileInputStream fis = new FileInputStream(file);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         String line;
-        while ((line = br.readLine()) != null) {
+        while ((line = br.readLine() + "\t\t\t") != null) {
             String[] parts = line.split("\t");
             Map<String, String> map = new HashMap<String, String>();
             map.put("name", parts[0]);
