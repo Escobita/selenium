@@ -57,12 +57,16 @@
 
     if (name != null) {
         if (email == null) {
-            email = "";
+            email = "N/A";
         }
 
         if (interests == null) {
-            interests = "";
+            interests = "N/A";
         }
+
+        name = name.replaceAll("\\s+", " ");
+        email = email.replaceAll("\\s+", " ");
+        interests = interests.replaceAll("\\s+", " ");
 
         addEntry(name, email, interests);
     }
