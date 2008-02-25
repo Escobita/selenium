@@ -20,7 +20,7 @@ public class GoogleSearchPage {
     public void searchFor(String text) {
         // And here we use it. Note that it looks like we've
         // not properly instantiated it yet....
-        q.setValue(text);
+        q.sendKeys(text);
         q.submit();
     }
 } 
@@ -59,13 +59,13 @@ public class UsingGoogleSearchPage {
 The PageFactory relies on using sensible defaults: the name of the field in the Java class is assumed to be the "id" of the element on the HTML page. That is, in the example above, the line:
 
 {{{ 
-    q.setValue(text);
+    q.sendKeys(text);
 }}}
 
 is equivalent to:
 
 {{{
-    driver.findElement(By.id("q")).setValue(text);
+    driver.findElement(By.id("q")).sendKeys(text);
 }}}
 
 The driver instance that's used is the one that's passed to the PageFactory's initElements method.
@@ -100,7 +100,7 @@ public class GoogleSearchPage {
 
     public void searchFor(String text) {
         // We continue using the element just as before
-        q.setValue(text);
+        q.sendKeys(text);
         q.submit();
     }
 } 
@@ -127,7 +127,7 @@ public class GoogleSearchPage {
 
     public void searchFor(String text) {
         // We continue using the element just as before
-        q.setValue(text);
+        q.sendKeys(text);
         q.submit();
     }
 } 
