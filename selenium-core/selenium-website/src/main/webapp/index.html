@@ -1,67 +1,85 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
-<html><head>
-  
-    <title>Selenium</title><style type="text/css">
-        @import "http://www.openqa.org/shared/css/main.css";
-        @import "http://www.openqa.org/shared/css/wiki.css";
-    </style>
-    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-    </script>
-    <script type="text/javascript">
-        if (urchinTracker) {
-            _uacct = "UA-131794-2";
-            urchinTracker();
-        }
-    </script>
-    <script type="text/javascript">
-        function onLoadFunc() {
-            document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
-        }
-    </script></head>
+<html><head><title>Selenium</title><style type="text/css">
+@import url(main.css);
+@import url(wiki.css);
 
+</style><script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script><script type="text/javascript">
+if (urchinTracker) {
+_uacct = "UA-131794-2";
+urchinTracker();
+}
+</script><script type="text/javascript">
+function onLoadFunc() {
+document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
+}
+</script>
+
+
+
+
+</head>
 <body onload="onLoadFunc()">
-
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium"></script>
 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium"></script>
-
 <h1 class="first">Selenium Overview</h1>
-
 <p>
-<b>Selenium</b> is a test tool for web applications. Selenium tests run
-<b>directly in a browser</b>, just as real users do. And they run in
+<b>Selenium</b> is a test tool for web applications.
+Selenium tests run
+<b>directly in a browser</b>, just as real users do. And
+they run in
 Internet Explorer, Mozilla and Firefox on Windows, Linux, and
-Macintosh. &nbsp;We have plans to target the Safari on the iPhone and
+Macintosh. &nbsp;We have plans to target the Safari on the iPhone
+and
 others later.&nbsp;
-</p>There are two modes of operation for <span style="font-style: italic;">Selenium Core</span> and <span style="font-style: italic;">Selenium Remote Control (RC)</span><br><h2>Selenium Core</h2>Core mode - the JavaScript core library and the tests in question are loaded <span style="font-weight: bold;">into</span>
+</p>
+There are two modes of operation for <span style="font-style: italic;">Selenium Core</span> and <span style="font-style: italic;">Selenium Remote Control (RC)</span><br>
+<h2>Selenium Core</h2>
+Core mode - the JavaScript core library and the tests in question are
+loaded <span style="font-weight: bold;">into</span>
 your webapp. Its a simpler form of Selenium, and suitable for
-non-developers, but it has some inherant limitations. &nbsp;Below is a
-simplified representation of the architecture. <br><img style="width: 538px; height: 227px;" alt="core" src="selenium-core.png"><br><h2>Selenium Remote Control</h2>The
+non-developers, but it has some inherant limitations. &nbsp;Below
+is a
+simplified representation of the architecture. <br>
+<img style="width: 538px; height: 227px;" alt="core" src="selenium-core.png"><br>
+<h2>Selenium Remote Control</h2>
+The
 Remote Control mode is more advanced. It is able to test a wider range
 of web-applications than Selenium-Core and is more scalable, but
 requires some technical knowledge to set up. &nbsp;Below is a
-simplified architectural representation of it .. <br><img style="width: 538px; height: 499px;" alt="rc" src="selenium-rc.png"><br><br><span style="font-style: italic;">User Quote:</span><div style="text-align: left; margin-right: 120px; margin-left: 80px;"><span style="font-style: italic;">"Considering the simplicity of it, it is
+simplified architectural representation of it .. <br>
+<img style="width: 538px; height: 499px;" alt="rc" src="selenium-rc.png"><br>
+<br>
+<span style="font-style: italic;">User Quote:</span>
+<div style="text-align: left; margin-right: 120px; margin-left: 80px;"><span style="font-style: italic;">"Considering the simplicity of
+it, it is
 almost surprising that no one has thought of doing this previously. The
 framework is simple and the code is neat and very maintainable.
 Sometimes it takes a work of genius to find the uncomplicated solution
-to a potentially complicated problem.</span><span style="font-style: italic;">" - </span><a href="http://www.testingreflections.com/blog/2">Antony Marcano</a><span style="font-style: italic;"></span><span style="font-style: italic;"></span><br>
+to a potentially complicated problem.</span><span style="font-style: italic;">" - </span><a href="http://www.testingreflections.com/blog/2">Antony
+Marcano</a><span style="font-style: italic;"></span><span style="font-style: italic;"></span><br>
 <span style="font-style: italic;"></span></div>
 <div style="text-align: left; margin-right: 120px; margin-left: 120px;"><span style="font-style: italic;"><br>
 </span></div>
-<div style="text-align: left; margin-right: 120px;">Selenium was
+<div style="text-align: left; margin-right: 120px;">Selenium
+was
 developed by team
 of developers and testers at
-<a href="http://www.thoughtworks.com/">ThoughtWorks</a>. It is
+<a href="http://www.thoughtworks.com/">ThoughtWorks</a>.
+It is
 open-source software and can
 be downloaded and used without charge. It is currently under active
-development developers from multiple companies. Stay tuned for updates and further
-announcements. <a href="http://www.thoughtworks.com/">ThoughtWorks</a> is a leader in Agile development methods for enterprise
+development developers from multiple companies. Stay tuned for updates
+and further
+announcements. <a href="http://www.thoughtworks.com/">ThoughtWorks</a>
+is a leader in Agile development methods for enterprise
 software development. Selenium is designed specifically for the
 acceptance testing requirements of Agile teams. However, teams
 using more traditional development will also find it useful.
 </div>
 <br>
-<br><script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium"></script>
-
+<br>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium"></script>
 </body></html>
