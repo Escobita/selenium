@@ -88,10 +88,14 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
         	getSeleniumConfiguration().isKillableProcessEnabled() == true;
         	log.info("Using killable process?: "+ (useKillableProcess ? "Yes" : "No") );
         	
+        	// Backup/set registry settings if windows
+        	if (WindowsUtils.thisIsWindows()) {
+        		wpm.backupRegistrySettings();
+                changeRegistrySettings();
+        	}
+        	
         	// Use killable process if windows
             if (useKillableProcess) {
-                wpm.backupRegistrySettings();
-                changeRegistrySettings();
                 customProxyPACDir = wpm.getCustomProxyPACDir();
                 File killableProcessWrapper = new File(customProxyPACDir, "killableprocess.exe");
                 ResourceExtractor.extractResourcePath(InternetExplorerCustomProxyLauncher.class, "/killableprocess/killableprocess.exe", killableProcessWrapper);
