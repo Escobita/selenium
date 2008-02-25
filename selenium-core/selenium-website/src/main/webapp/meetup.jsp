@@ -200,32 +200,8 @@
     optionally provide your email address in case we need to get in contact with you after the meetup.  Please also note we are limited to 100, and will be closing the list when that number is reached. You'll have badges waiting for you at Google - so bring some proof of ID.
 
     <p/>
-	This list will close to new attendees at 10am local time, whether 100 attendees or less, so that badges can be printed.	
+	This list is now closed. The room in question at Google is at full capacity now.  People not on the list will be turned away at the front desk - sorry!	
 	<p/>
-
-    <form method="POST" action="meetup.jsp">
-        <table id="signup">
-            <tbody>
-                <tr>
-                    <td class="formLabel" valign="top">Name:</td>
-                    <td class="formInput" valign="top"><input class="textinput" name="name" maxlength="100"/></td>
-                </tr>
-                <tr>
-                    <td class="formLabel" valign="top">Email:</td>
-                    <td class="formInput" valign="top"><input class="textinput" name="email" maxlength="64"/></td>
-                </tr>
-                <tr>
-                    <td class="formLabel" valign="top">Interests:</td>
-                    <td class="formInput" valign="top"><textarea name="interests"></textarea></td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="right">
-                        <input type="submit" value="Submit"/>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </form>
 
     <p/>
 
