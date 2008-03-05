@@ -51,6 +51,18 @@
 
     <releases>
         <release>
+            <version>1.0-beta-1</version>
+            <description>Includes Selenium Core 1.0 beta-1</description>
+            <date>03/05/2008</date>
+            <jiraId>10241</jiraId>
+            <downloads>
+              <download>
+                <url>http://release.openqa.org/selenium-ide/1.0-beta-1/selenium-ide-1.0-beta-1.xpi</url>
+                <name>Firefox extension (requires Firefox 1.5.0.* or 2.0.0.*)</name>
+              </download>
+            </downloads>
+        </release>
+        <release>
             <version>0.8.7</version>
             <description>Includes Selenium Core 0.8.2</description>
             <date>03/21/2007</date>
