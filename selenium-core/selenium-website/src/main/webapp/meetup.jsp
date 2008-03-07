@@ -1,14 +1,7 @@
-
-
-
-
-
-
-
-<html>
-<head>
-    <title>Selenium Users Open Evening: February 25, 2008</title>
-    <style type="text/css">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+    
+    <title>Selenium Users Open Evening: February 25, 2008</title><style type="text/css">
         @import "http://www.openqa.org/shared/css/main.css";
         @import "http://www.openqa.org/shared/css/wiki.css";
     </style>
@@ -76,13 +69,18 @@
             width: 200px;
             height: 50px;
         }
-    </style>
-</head>
+    </style></head>
+
+
+
+
+
+
+
 <body onload="onLoadFunc()">
 
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium"></script>
-<script type="text/javascript"
-        src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium"></script>
 
@@ -98,26 +96,27 @@
     brightest minds in web testing and Agile development!
 </div>
 
-<p/>
+<p>
 
-<h2>Time &amp; Location</h2>
+</p><h2>News Update</h2><div class="blah">
+    <u>The event is history now</u>, see the videos of the l<a href="http://www.youtube.com/watch?v=EDb8yOM3Vpw">ightening talks</a> and the <a href="http://www.youtube.com/watch?v=4y-3bllkkPc">panel question and answer</a></div><h2>Time &amp; Location</h2>
 
 <div class="blah">
-    <b>Monday, February 25, 2008<br/>
+    <b>Monday, February 25, 2008<br>
         6:30PM PST to 9:00PM PST</b>
 
-    <p/>
+    <p>
 
-    <a href="http://maps.google.com/maps?f=q&hl=en&geocode=&q=1600+Amphitheatre+Pky,+Mountain+View,+CA&sll=37.38948,-122.08171&sspn=0.085789,0.108147&ie=UTF8&z=16&iwloc=addr">Google
-        Campus</a><br/>
-    1600 Amphitheatre Pky<br/>
-    Mountain View, CA<br/>
+    <a href="http://maps.google.com/maps?f=q&amp;hl=en&amp;geocode=&amp;q=1600+Amphitheatre+Pky,+Mountain+View,+CA&amp;sll=37.38948,-122.08171&amp;sspn=0.085789,0.108147&amp;ie=UTF8&amp;z=16&amp;iwloc=addr">Google
+        Campus</a><br>
+    1600 Amphitheatre Pky<br>
+    Mountain View, CA<br>
 
-    <p/>
+    </p><p>
 
     Upon arriving, please proceed to reception in building 41 and ask for directions to the <u>Selenium Users Open
     Evening</u>.
-</div>
+</p></div>
 
 <h2>What to Bring</h2>
 
@@ -129,15 +128,18 @@
 <h2>Attendees</h2>
 
 <div class="blah">
-    Interested in attending? Please fill out the following form with your <b>first name and family name</b>. This will help us make sure the experience optimized
-    for you and the other attendees. Please tell us what interests you have or why you're attending. You can also
-    optionally provide your email address in case we need to get in contact with you after the meetup.  Please also note we are limited to 100, and will be closing the list when that number is reached. You'll have badges waiting for you at Google - so bring some proof of ID.
+    Interested in attending? Please fill out the following form with your <b>first name and family name</b>.
+This will help us make sure the experience optimized for you and the
+other attendees. Please tell us what interests you have or why you're
+attending. You can also optionally provide your email address in case
+we need to get in contact with you after the meetup. Please also note
+we are limited to 100, and will be closing the list when that number is
+reached. You'll have badges waiting for you at Google - so bring some
+proof of ID. <p> This list is now closed. The room in question at Google is at
+full capacity now. People not on the list will be turned away at the
+front desk - sorry! </p><p>
 
-    <p/>
-	This list is now closed. The room in question at Google is at full capacity now.  People not on the list will be turned away at the front desk - sorry!	
-	<p/>
-
-    <p/>
+    </p><p>
 
     <table id="attendees">
         <thead>
@@ -307,7 +309,7 @@
                 </td>
                 <td class="nameCol">Jason Huggins
                 </td>
-                <td class="interestsCol">Future trends in web app & browser testing.
+                <td class="interestsCol">Future trends in web app &amp; browser testing.
                 </td>
             </tr>
             
@@ -352,8 +354,10 @@
                 </td>
                 <td class="nameCol">Heather Rarden
                 </td>
-                <td class="interestsCol">Selenium vs Ruby; QA work in an Agile environment; maintaining sustainable and healthy architecture amidst Agile programming, testing, quality assurance work.
-                </td>
+                <td class="interestsCol">Selenium
+vs Ruby; QA work in an Agile environment; maintaining sustainable and
+healthy architecture amidst Agile programming, testing, quality
+assurance work. </td>
             </tr>
             
             <tr>
@@ -1060,10 +1064,9 @@
             
         </tbody>
     </table>
-</div>
+</p></div>
 
 
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium"></script>
 
-</body>
-</html>
+</body></html>
