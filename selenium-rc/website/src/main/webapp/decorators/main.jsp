@@ -33,7 +33,7 @@
 <h1 class="first">Selenium RC: <decorator:title/></h1>
 
 <decorator:body/>
-
+</div>
 <div id="menu">
 	<div class="menuGroup">
         <h1>Selenium Remote Control</h1>
