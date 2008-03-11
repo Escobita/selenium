@@ -19,7 +19,7 @@ In order to be useful, WebDriver must not make the user learn all the different 
 
 One obvious benefit to this design is that writing a language binding for WebDriver becomes a matter of bridging to the "best fit" language. Another benefit is that it becomes very easy to work on a single driver, given you understand the "best fit" language. For example, it's possible to work on the FirefoxDriver completely independently of the InternetExplorerDriver. Better, once a feature in a driver is working in one binding language (for example, Java), it should be easy to add that support to other binding languages. 
 
-[http://webdriver.googlecode.com/wiki/ArchitecturalOverview http://webdriver.googlecode.com/wiki/language_bindings.png]
+[http://webdriver.googlecode.com/wiki/ArchitecturalOverview http://webdriver.googlecode.com/svn/wiki/language_bindings.png]
 
 More detailed information about each driver, how to write language bindings and its implementation can be found on their pages:
 
