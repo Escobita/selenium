@@ -13,7 +13,7 @@ This is currently the fastest and most lightweight implementation of WebDriver. 
 
  * Does not support Javascript.
 
-= HtmlUnit Supports Javascript So Why Doesn't the HtmlUnitDriver? =
+== HtmlUnit Supports Javascript So Why Doesn't the HtmlUnitDriver? ==
 
 The short answer is that it's disabled because no browser that's in widespread use has the javascript engine used by HtmlUnit ([http://www.mozilla.org/rhino/ Rhino]). By disabling javascript in the HtmlUnitDriver we can be sure that any issues which are found will effect end-users of the application under test.
 
