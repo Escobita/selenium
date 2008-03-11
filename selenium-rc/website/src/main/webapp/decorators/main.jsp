@@ -3,8 +3,8 @@
 <head>
     <title>Selenium RC: <decorator:title/></title>
     <style type="text/css">
-        @import "http://www.openqa.org/shared/css/main.css";
-        @import "http://www.openqa.org/shared/css/wiki.css";
+		@import url(main.css);
+		@import url(wiki.css);
     </style>
     <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
     </script>
