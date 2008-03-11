@@ -8,13 +8,15 @@ common wire protocol. The plan is to base this on
 to parse format that has implementations already available in many different
 languages. 
 
+The expected protocol that will be used for transferring the JSON objects will be HTTP.
+
 == Basic Concepts and Terms ==
 
 In order to make sure that there is as little confusion as possible,
 the following terms are going to be used:
 
   * *Client* means the local machine, on which the WebDriver API is being used.
-  * *Server* means the remote machine, which is running the RemoteWebDriver. This also refers to drivers that implement the wire protocol directly, such as the Firefox   extension used in the FirefoxDriver
+  * *Server* means the remote machine, which is running the RemoteWebDriver. This also refers to drivers that implement the wire protocol directly, such as the Firefox extension used in the FirefoxDriver
 
 The protocol will assume that the WebDriver API has been "flattened",
 but there is an expectation that client implementations will take a
@@ -56,7 +58,7 @@ which are probably necessary.
 || *commandName* || *Paramter Name:Type* || *Return Types* || *Meaning* ||
 || get || url:String || none || Go to the specified URL and wait until the page has completely loaded ||
 || currentTitle || none || String || Get the title of the page, as it would be displayed by the browser ||
-|| findElement || findMechanism:String, locator:String || elementId || Find the first element on the current page that matches ``locator`` using the specified mechanism ||
+|| findElement || findMechanism:String, locator:String || elementId || Find the first element on the current page that matches "locator" using the specified mechanism ||
 
 === Element Specific Methods ===
 

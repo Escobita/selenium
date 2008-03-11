@@ -4,7 +4,7 @@
 
 == From a New Download ==
 
-Currently, the only way to introduce WebDriver to your project is to CheckOut the source code and build from that. This is far easier than it sounds :)
+Unpack the ZIP and copy all the jar files on to your project's classpath. The FirefoxDriver and InternetExplorerDriver have more detailed instructions about installing the native parts of these drivers. The "webdriver-support" package contains useful helper classes, such as the LiftStyleApi and the PageFactory.
 
 == From a Fresh CheckOut ==
 
@@ -17,7 +17,7 @@ Perhaps that last point needs a little more explanation...
 
 === Where Jars Are Located ===
 
-If you take a look at the top level of WebDriver's trunk, you'll see a number of directories which contain the drivers you may want to use (*common* contains code needed by every driver, *firefox* and *htmlunit* should be obvious, and *jobbie* contains the InternetExplorerDriver)
+If you take a look at the top level of WebDriver's trunk, you'll see a number of directories which contain the drivers you may want to use (*common* contains code needed by every driver, *firefox*, *safari* and *htmlunit* should be obvious, and *jobbie* contains the InternetExplorerDriver)
 
 Each of these top level directories is arranged in the same way. After a build, they each contain a sub-directory containing the required jar (named {{{webdriver-$DRIVER.jar}}}) called *build*. That is, the FirefoxDriver jar is located at {{{firefox/build/webdriver-firefox.jar}}} and the common jar is located at {{{common/build/webdriver-common.jar}}} and so on. These jars only contain the driver code, and not any required supporting libraries. For example, the HtmlUnitDriver requires the HtmlUnit jars, plus any libraries that _it_ needs.
 
@@ -26,7 +26,8 @@ Fortunately, all the libraries required for a particular driver are located unde
 || *Driver* || *Location of driver jar under trunk* || *Location of required libraries* || *Notes* ||
 || common || common/build/webdriver-common.jar || none needed || Required by every driver ||
 || htmlunit || htmlunit/build/webdriver-htmlunit.jar || htmlunit/lib/runtime || none ||
-|| firefox || firefox/build/webdriver-firefox.jar || none needed || none ||
+|| firefox || firefox/build/webdriver-firefox.jar || firefox/lib/runtime || You must install the webdriver-firefox.xpi into a Firefox profile called "WebDriver" ||
 || internet explorer || jobbie/build/webdriver-jobbie.jar || jobbie/lib/runtime || Copy the DLL from jobbie/build on to your PATH ||
+|| safari || safari/build/webdriver-safari.jar || None needed || Universal access must be enabled on the OS X machine ||
 
 Once you've done that, you should be ready to start using WebDriver in your project.

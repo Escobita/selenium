@@ -8,7 +8,7 @@ Getting involved with an Open Source project can seem like a daunting task. Some
 
 If you can write code you can get involved by picking up one of the [http://code.google.com/p/webdriver/issues/list?q=label%3AGettingInvolved "Getting Involved" issues]. These are issues that should provide an easier way to get familiar with the code and its structure. If you run into problems or want some help, then please join the [http://groups.google.com/group/webdriver Google Group] and send us an email. Once you think an issue is complete, just create a patch and associate it with the issue.
 
-If there's something that you need to make sense of the code (perhaps an architectural overview? Maybe something to do with why code is the way it is?) just let us know, and we'll add it to the wiki.
+If there's something that you need to make sense of the code (perhaps an ArchitecturalOverview? Maybe something to do with why code is the way it is?) just let us know, and we'll add it to the wiki.
 
 == If You're Not a Developer ==
 

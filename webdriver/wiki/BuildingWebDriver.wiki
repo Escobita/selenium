@@ -18,7 +18,7 @@ In addition, the InternetExplorerDriver needs some additional components and can
 
 == Building ==
 
-The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. Now:
+The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows and the SafariDriver only on Mac OS X. Now:
 
 {{{
 cd $WEBDRIVER_HOME   # Where the top level Rakefile is kept

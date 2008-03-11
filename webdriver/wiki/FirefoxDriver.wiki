@@ -22,7 +22,24 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 
 The default profile name is *WebDriver* (the casing matters!)
 
-== Installing the Quick Way (with Ruby) ==
+== Installing a Downloaded Binary ==
+
+The "wedriver-firefox.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
+
+ # Copy all the "jar" files on to your classpath.
+ # Create a "WebDriver" profile. The case of the profile name matters! 
+   # {{{firefox -ProfileManager}}} 
+     * "firefox" here is the full path to the Firefox 2 binary installed on your system.
+   # Click the "Create Profile" button.
+   # Follow the wizard, accepting the defaults offered, except for the profile name, which is "WebDriver" (without the quotes, but with the same StudlyCaps!)
+   # Start the new profile. This can be done one of two ways:
+     * {{{firefox -ProfileManager}}} and double-clicking on the WebDriver profile in the list shown
+     * {{{firefox -P WebDriver}}}
+# Install the FirefoxDriver XPI by dragging the XPI on to the instance of Firefox using the WebDriver profile and following the on-screen prompts.
+
+Once this has been done, you should be able to quit Firefox and the FirefoxDriver should work as expected.
+
+== Installing the Quick Way From Source (with Ruby) ==
 
 There is a plan to make the FirefoxDriver installable as a simple XPI. Until then, you'll need Ruby and rake installed on your machine, then (after quitting any open instances of Firefox) simply run:
 
@@ -34,7 +51,7 @@ This assumes that your installation of Firefox 2 is pretty standard. On Windows,
 
 After the installation is completed, Firefox should start using the new WebDriver profile. Go to "{{{Tools->Add-ons}}}" and check that there's an extension called "Firefox WebDriver" installed. Carry on reading below if it's not!
 
-== Installing the Quick Way (with Java) ==
+== Installing the Quick Way From Source (with Java) ==
 
 There is a {{{FirefoxLauncher}}} class that can be run. It takes a single argument, which is the name of the profile to create. If no argument is given, then the profile will be called *WebDriver*. The FirefoxLauncher will make use of the "{{{webdriver.firefox.development}}}" system property to determine whether or not we should use a pre-built XPI of WebDriver or whether we are using a development build (that is, the extension used will be the version obtained using from a CheckOut) Example usage looks like:
 
@@ -72,4 +89,4 @@ If the quick way doesn't work for you, or you'd like to understand more about wh
 
 == Cons ==
  
- * Not complete
+ * Currently requires the "WebDriver" profile to be set up in Firefox

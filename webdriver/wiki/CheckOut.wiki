@@ -6,4 +6,6 @@ In order to get the latest version of the code, please follow the instructions o
 
 = Downloading Binaries =
 
-Currently there are no binaries or pre-packaged versions of WebDriver available for download. We plan on releasing these once the FirefoxDriver has been added to the project, which should happen at some point in March 2007. If you would like to be kept up to date with developments, want to know when binary packages are released or need any help, please consider joining the mailing list.
+There are binaries available to download. Note that these are currently somewhat rough: you will need to install items such as the Firefox extension (the ".xpi") into a WebDriver profile yourself, and the InternetExplorerDriver.dll will need to be placed on the native path somehow. Please see the FirefoxDriver and InternetExplorerDriver pages for more information specific to each implementation.
+
+If you would like to be kept up to date with developments, want to know when binary packages are released or need any help, please consider joining the mailing list.
