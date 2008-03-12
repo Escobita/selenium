@@ -77,6 +77,7 @@
     <div class="menuGroup">
         <h1>Developing Selenium Remote Control</h1>
         <ul>
+            <li><a href="/how-it-works.jsp">How it Works</a></li>
             <li><a href="/contribute.jsp">How to Contribute</a></li>
             <li><a href="/devForums.jsp">Developer Forums</a></li>
             <li><a href="/members.jsp">Development Team</a></li>
