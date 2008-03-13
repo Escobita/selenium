@@ -48,7 +48,7 @@
         <ul>
             <li><a href="/license.jsp">License</a></li>
             <li><a href="/download.jsp">Download</a></li>
-            <li><a href="/release-notes.jsp">Release Notes</a></li>
+            <li><a href="/release-notes.html">Release Notes</a></li>
         </ul>
     </div>
     <div class="menuGroup">
@@ -77,7 +77,7 @@
     <div class="menuGroup">
         <h1>Developing Selenium Remote Control</h1>
         <ul>
-            <li><a href="/how-it-works.jsp">How it Works</a></li>
+            <li><a href="/how-it-works.html">How it Works</a></li>
             <li><a href="/contribute.jsp">How to Contribute</a></li>
             <li><a href="/devForums.jsp">Developer Forums</a></li>
             <li><a href="/members.jsp">Development Team</a></li>
