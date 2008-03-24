@@ -59,7 +59,7 @@ Finally, a PageObject need not represent an entire page. It may represent a sect
   * Generally don't make assertions
   * Methods return other PageObjects
   * Need not represent an entire page
-  * Different results for the same action are modeled as different methods
+  * Different results for the same action are modelled as different methods
 
 == Example ==
 
@@ -81,8 +81,8 @@ public class LoginPage {
     // the application using a user name and password. 
     public HomePage loginAs(String username, String password) {
         // This is the only place in the test code that "knows" how to enter these details
-        driver.findElement(By.id("username")).setValue(username);
-        driver.findElement(By.id("passwd")).setValue(password);
+        driver.findElement(By.id("username")).sendKeys(username);
+        driver.findElement(By.id("passwd")).sendKeys(password);
         driver.findElement(By.id("login")).submit();
          
         // Return a new page object representing the destination. Should the login page ever
