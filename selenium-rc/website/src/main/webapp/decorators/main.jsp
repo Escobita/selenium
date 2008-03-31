@@ -70,6 +70,7 @@
             <li><a href="http://wiki.openqa.org/display/SRC/Developer%27s+Guide">Developers Guide</a></li>
 			<li><a href="http://wiki.openqa.org/display/SRC/Home">Wiki</a></li>
             <li><a href="/user-forums.html">User Forums</a></li>
+            <li><a href="/xpath-help.jsp">Help with XPath</a></li>
             <li><a href="/self-help.jsp">Self Help</a></li>
             <li><a href="/reporting.jsp">Reporting Issues</a></li>
             <li><a href="/rss.jsp">RSS Feeds</a></li>
