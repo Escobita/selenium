@@ -18,7 +18,11 @@ function onLoadFunc() {
 document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
 }
 </script></head>
-<body>
+<body onload="onLoadFunc()">
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium"></script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium"></script>
 <div class="document" id="selenium-reference">
 <div class="section" id="test-tables">
 <h2>What is XPath&nbsp;</h2>
@@ -36,4 +40,5 @@ to illustrate the point, load it up and go into firebug. &nbsp;Clicking
 'Inspect'' (1) in firebugs toolbar and clicking on a node in the page
 (2) takes you to the relevant html that represents it (3). &nbsp;There
 are some breadcrumbs that show where you are in the page (4)...... <br /><br /><img style="width: 818px; height: 582px;" alt="firebug" src="images/firebug-1.png" /><br /><br />If you right-click on that breadcrumbs place, you can get to a menu that will give you xpath for it...<br /><br /><br /><img style="width: 659px; height: 315px;" alt="firebug" src="images/firebug-2.jpg" /><br /><br />Using that menu, gives the following as the xpath for that node ...<br /><br />&nbsp;&nbsp;&nbsp; /html/body/table/tbody/tr[2]/td[2]/table/tbody/tr/td/table/tbody/tr[5]/td[2]<br /><br />Bug that is too unweildy for use in a Selenium script. &nbsp;Use Xpath to make it more concise....<br /><br />TODO<br />&nbsp;<br /></div></div>
+<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium"></script>
 </body></html>
