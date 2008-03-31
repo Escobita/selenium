@@ -69,7 +69,7 @@
             <li><a href="/options.html">Server Command Line Options</a></li>
             <li><a href="http://wiki.openqa.org/display/SRC/Developer%27s+Guide">Developers Guide</a></li>
 			<li><a href="http://wiki.openqa.org/display/SRC/Home">Wiki</a></li>
-            <li><a href="/userForums.jsp">User Forums</a></li>
+            <li><a href="/user-forums.html">User Forums</a></li>
             <li><a href="/self-help.jsp">Self Help</a></li>
             <li><a href="/reporting.jsp">Reporting Issues</a></li>
             <li><a href="/rss.jsp">RSS Feeds</a></li>

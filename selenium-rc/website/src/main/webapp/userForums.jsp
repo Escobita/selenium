@@ -1,10 +1,9 @@
 <html>
 <head>
-    <title>User Forums</title>
+	<META HTTP-EQUIV=REFRESH CONTENT="1; URL=http://selenium-rc.openqa.org/user-forums.html">.
+    <title>Download</title>
 </head>
 <body>
-
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/userForums.jsp?name=selenium-rc"></script>
-
+	<a href="http://selenium-rc.openqa.org/user-forums.html">Page moved to here</a>
 </body>
 </html>
