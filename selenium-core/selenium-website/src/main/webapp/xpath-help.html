@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>XPath help</title>
+
+<style type="text/css">@import url(main.css);
+@import url(wiki.css);
+</style>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+if (urchinTracker) {
+_uacct = "UA-131794-2";
+urchinTracker();
+}
+</script>
+<script type="text/javascript">
+function onLoadFunc() {
+document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
+}
+</script></head>
+<body>
+<div class="document" id="selenium-reference">
+<div class="section" id="test-tables">
+<h2>What is XPath&nbsp;</h2>
+This page explains how Selenium Core can be deployed to test or
+script
+web
+applications.<br />
+</div>
+<div class="section" id="command-reference">
+<h2>XPath trial and error</h2>Brian Slesinsky has a great tool called <a href="http://slesinsky.org/brian/code/xpath_checker.html">XPath Checker</a> for Firefox. &nbsp;Its a plugin, that is well worth installing into Firefox. <br /><br />There is another, more well known plugin called <a href="https://addons.mozilla.org/en-US/firefox/addon/1843">Firebug</a>
+for Firefox. It allows you to inspect a page at run time. &nbsp;With
+the advent of AJAX web apps, there where a page structure is only
+apparent at run time, then it is invaluable. <br /><br /><br />Using the 'email' example of the <a href="http://code.google.com/webtoolkit/examples/">GWT sample applications</a>,
+to illustrate the point, load it up and go into firebug. &nbsp;Clicking
+'Inspect'' (1) in firebugs toolbar and clicking on a node in the page
+(2) takes you to the relevant html that represents it (3). &nbsp;There
+are some breadcrumbs that show where you are in the page (4)...... <br /><br /><img style="width: 818px; height: 582px;" alt="firebug" src="images/firebug-1.png" /><br /><br />If you right-click on that breadcrumbs place, you can get to a menu that will give you xpath for it...<br /><br /><br /><img style="width: 659px; height: 315px;" alt="firebug" src="images/firebug-2.jpg" /><br /><br />Using that menu, gives the following as the xpath for that node ...<br /><br />&nbsp;&nbsp;&nbsp; /html/body/table/tbody/tr[2]/td[2]/table/tbody/tr/td/table/tbody/tr[5]/td[2]<br /><br />Bug that is too unweildy for use in a Selenium script. &nbsp;Use Xpath to make it more concise....<br /><br />TODO<br />&nbsp;<br /></div></div>
+</body></html>
