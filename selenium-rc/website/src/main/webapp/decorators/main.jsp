@@ -81,7 +81,7 @@
         <ul>
             <li><a href="/how-it-works.html">How it Works</a></li>
             <li><a href="/contribute.jsp">How to Contribute</a></li>
-            <li><a href="/devForums.jsp">Developer Forums</a></li>
+            <li><a href="/dev-forums.html">Developer Forums</a></li>
             <li><a href="/members.jsp">Development Team</a></li>
             <li><a href="/source.jsp">Source Repository</a></li>
         </ul>
