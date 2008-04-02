@@ -9,10 +9,9 @@ launches its own Firefox browser, without the plugins you may have
 installed for your Firefox. &nbsp;You can hack Selenium-RC to put in
 Firebug and XPath Checker. You may be in the habit of pausing tests in
 the middle of a
-run, and kicking off fFrebug so you can confirm XPATH for certain
+run, and kicking off&nbsp;Firebug so you can confirm XPATH for certain
 widgets, fields, etc.</p><h3>Firebug</h3><p>Instructions here are for a Mac, with Firebug already installed into Firefox.<br><br>Start&nbsp;in
 the dir that you have the Selenium-RC server jar in.&nbsp; And run
 these commands in order to add Firebug to that jar in the right way
-(change STUPID-PROFILE-ID to be whatever Firefox has set your random
-profile ID):</p><pre style="margin-left: 40px;">mkdir foo<br>mkdir foo/customProfileDirCUSTFFCHROME<br>mkdir foo/customProfileDirCUSTFFCHROME/extensions<br>cp -R ~/Library/Application\ Support/Firefox/Profiles/STUPID-PROFILE-ID/extensions/firebug\@software.joehewitt.com foo/customProfileDirCUSTFFCHROME/extensions/<br>cd foo/<br>jar -uf ../selenium-server-x.y-standalone.jar&nbsp; .</pre><p>If you're not on a mac, then modify the above to make sense for your operating system.</p><h3>XPath Checker</h3>Brian has a small bug in the naming of his plugin, so that its a little harder to copy into Selenium-RC<br><br>(TODO)<pre></pre><br><br><br>
+(change <span style="font-weight: bold;">STUPID-PROFILE-ID</span> to be whatever Firefox has set your random profile ID):</p><pre style="margin-left: 40px;">mkdir foo<br>mkdir foo/customProfileDirCUSTFFCHROME<br>mkdir foo/customProfileDirCUSTFFCHROME/extensions<br>cp -R ~/Library/Application\ Support/Firefox/Profiles/<span style="font-weight: bold;">STUPID-PROFILE-ID</span>/extensions/firebug\@software.joehewitt.com foo/customProfileDirCUSTFFCHROME/extensions/<br>cd foo/<br>cp -R foo/customProfileDirCUSTFFCHROME foo/customProfileDirCUSTFF<br>jar -uf ../selenium-server-<span style="font-weight: bold;">x.y</span>-standalone.jar&nbsp; .</pre><p>If you're not on a mac, then modify the above to make sense for your operating system.</p><h3>XPath Checker</h3>Brian has a small bug in the naming of his plugin, so that its a little harder to copy into Selenium-RC<br><br>(TODO)<pre></pre><br><br><br>
 </body></html>
