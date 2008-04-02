@@ -104,6 +104,5 @@ google_color_text = "000
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium-rc"></script>
-
 </body>
 </html>
