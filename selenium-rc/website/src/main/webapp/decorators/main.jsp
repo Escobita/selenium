@@ -30,21 +30,23 @@
 </script>
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium-rc"></script>
 
-<h1 class="first">Selenium RC: <decorator:title/></h1>
+<h1 class="first">Selenium-RC: <decorator:title/></h1>
 
 <decorator:body/>
 </div>
 <div id="menu">
 	<div class="menuGroup">
-        <h1>Selenium Remote Control</h1>
+        <h1>Essential</h1>
         <ul>
             <li><a href="/">About</a></li>
             <li><a href="/news.jsp">News</a></li>
             <li><a href="/changelog.jsp">Changelog</a></li>
+            <li><a href="/tutorial.html">Tutorial</a></li>
+            <li><a href="http://wiki.openqa.org/display/SRC/Selenium+RC+FAQ">FAQ</a></li>
         </ul>
     </div>
     <div class="menuGroup">
-        <h1>Evaluating Selenium Remote Control</h1>
+        <h1>Evaluating</h1>
         <ul>
             <li><a href="/license.jsp">License</a></li>
             <li><a href="/download.jsp">Download</a></li>
@@ -52,11 +54,8 @@
         </ul>
     </div>
     <div class="menuGroup">
-        <h1>Using Selenium Remote Control</h1>
+        <h1>Using It</h1>
         <ul>
-            <li><a href="/documentation.jsp">Documentation</a></li>
-            <li><a href="/tutorial.html">Tutorial</a></li>
-            <li><a href="http://wiki.openqa.org/display/SRC/Selenium+RC+FAQ">FAQ</a></li>
             <li><a href="/experimental.html">Experimental</a></li>
             <li><a href="/java.html">- Java</a></li>
             <li><a href="/dotnet.html">- .NET</a></li>
@@ -77,7 +76,7 @@
         </ul>
     </div>
     <div class="menuGroup">
-        <h1>Developing Selenium Remote Control</h1>
+        <h1>Improving It</h1>
         <ul>
             <li><a href="/how-it-works.html">How it Works</a></li>
             <li><a href="/contribute.jsp">How to Contribute</a></li>
