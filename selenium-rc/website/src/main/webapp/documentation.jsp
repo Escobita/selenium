@@ -1,10 +1,9 @@
 <html>
 <head>
-    <title>Documentation</title>
+	<META HTTP-EQUIV=REFRESH CONTENT="1; URL=http://selenium-rc.openqa.org/">.
+    <title>Documentation (dead page)</title>
 </head>
 <body>
-
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/documentation.jsp?name=selenium-rc"></script>
-
+	The old documentation.jsp page did not contain much data, the left nav from the <a href="http://selenium-rc.openqa.org/">main page</a> should give you what you want
 </body>
 </html>
