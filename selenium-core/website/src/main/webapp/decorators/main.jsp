@@ -60,7 +60,7 @@
             <li><a href="/installing.html">Installing</a></li>
             <li><a href="/documentation.jsp">Documentation</a></li>
             <li><a href="/usage.html">Usage</a></li>
-            <li><a href="/reference.jsp">Reference</a></li>
+            <li><a href="/reference.html">Reference</a></li>
             <li><a href="/demos.html">Demos</a></li>
 			<li><a href="http://wiki.openqa.org/display/SEL/Home">Wiki</a></li>
             <li><a href="http://clearspace.openqa.org/community/selenium/selenium_users">User Forums</a></li>
