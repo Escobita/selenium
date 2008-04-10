@@ -51,11 +51,13 @@
             <li><a href="/license.jsp">License</a></li>
             <li><a href="/download.jsp">Download</a></li>
             <li><a href="/release-notes.html">Release Notes</a></li>
+            <li><a href="/compatibility.html">Compatibility</a></li>
         </ul>
     </div>
     <div class="menuGroup">
         <h1>Using It</h1>
         <ul>
+            <li><a href="/installing.html">Installing</a></li>
             <li><a href="/documentation.jsp">Documentation</a></li>
             <li><a href="/usage.jsp">Usage</a></li>
             <li><a href="/reference.jsp">Reference</a></li>
