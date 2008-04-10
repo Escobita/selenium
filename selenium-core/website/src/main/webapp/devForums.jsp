@@ -1,10 +1,9 @@
 <html>
 <head>
+	<META HTTP-EQUIV=REFRESH CONTENT="1; URL=http://clearspace.openqa.org/community/selenium/selenium_developers">.
     <title>Developer Forums</title>
 </head>
 <body>
-
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/devForums.jsp?name=selenium-core"></script>
-
+	<a href="http://clearspace.openqa.org/community/selenium/selenium_developers">Page moved to here</a>
 </body>
 </html>
