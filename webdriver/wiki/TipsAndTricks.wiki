@@ -1,0 +1,33 @@
+#summary Tips and tricks for using WebDriver
+
+= Tips and Tricks =
+
+== Changing the user agent ==
+
+This is easy with the FirefoxDriver:
+
+{{{
+FirefoxProfile profile = new FirefoxProfile();
+profile.addAdditionalPreference("general.useragent.override", "some UA string");
+WebDriver driver = new FirefoxDriver(profile);
+}}}
+
+== Tweaking an existing Firefox profile ==
+
+Suppose that you wanted to modify the user agent string (as above), but you've got a tricked out Firefox profile that contains dozens of useful extensions. There are two ways to obtain this profile. Assuming that the profile has been created using Firefox's profile manager ("firefox -ProfileManager"):
+
+{{{
+ProfileIni allProfiles = new ProfilesIni();
+FirefoxProfile profile = allProfiles.getProfile("WebDriver");
+profile.addAdditionalPreferences(extraPrefs);
+WebDriver driver = new FirefoxDriver(profile);
+}}}
+
+Alternatively, if the profile isn't already registered with Firefox:
+
+{{{
+File profileDir = new File("path/to/top/level/of/profile");
+FirefoxProfile profile = new FirefoxProfile(profileDir);
+profile.addAdditionalPreferences(extraPrefs);
+WebDriver driver = new FirefoxDriver(profile);
+}}}

@@ -12,6 +12,7 @@ The following system properties (read using {{{System.getProperty()}}}) are used
 || webdriver.firefox.bin || The location of the binary used to control firefox. ||
 || webdriver.firefox.development || When using the {{{FirefoxLauncher}}} class to create the profile, this indicates that you are using the development version of WebDriver (that is, one that is checked out from source) ||
 || webdriver.firefox.profile || The name of the profile to use when starting firefox. This defaults to *WebDriver* ||
+|| webdriver.firefox.useExisting || Use a running instance of firefox if one is present ||
 
 Normally the Firefox binary is assumed to be in the default location for your particular operating system:
 

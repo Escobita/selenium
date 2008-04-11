@@ -34,7 +34,7 @@ public class Example  {
         driver.get("http://www.google.com");
 
         // Find the text input element using a little XPath
-        WebElement element = driver.findElement(By.xpath("//input[@name='q']"));
+        WebElement element = driver.findElement(By.name("q"));
 
         // Enter something to search for
         element.sendKeys("Cheese!");
@@ -73,7 +73,7 @@ public class GoogleSuggest {
         driver.get("http://www.google.com/webhp?complete=1&hl=en");
         
         // Enter the query string "I like cheese"
-        WebElement query = driver.findElement(By.xpath("//input[@name='q']"));
+        WebElement query = driver.findElement(By.name("q"));
         query.sendKeys("Cheese");
 
         // This should go at some point, but allows Google to return some suggestions for now

@@ -1,0 +1,24 @@
+#summary How to commit code to WebDriver
+
+= Committing Code =
+
+== If You Don't Have Commit Rights ==
+
+We'd still welcome your patch! If you're fixing an issue, please attach your patch to that issue. If it's something that you'd like to see or an enhancement, please create a new issue: this way if it takes us a while to check the code in, it doesn't get lost in someone's inbox!
+
+The easiest way to create a patch is to either use TortoiseSvn's "Create patch" function, or to capture the output of "{{{svn diff}}}".
+
+== If You Have Commit Rights ==
+
+If you have commit rights and want to check code in, please follow the following steps:
+
+  * Run "{{{svn up}}}" to make sure that no-one else beat you to checkin (it's deeply unlikely, but you never know)
+  * Run "{{{rake clean test}}}" before checking in. If any tests fail don't check in!
+  * Run "{{{svn st}}}" to ensure that you've included all the files that you should have (I only mention this because I seem to forget files on a regular basis)
+  * Check in. In your commit message:
+    * Include as the first part of the commit message your name in wiki format (eg. JoeBloggs)
+    * If you're fixing an issue, please refer to it by number (preceding it with a hash, eg: #23) and give a quick summary of what the problem is
+    * Use your commit message to describe _why_ you've done what you've done. We can read code to figure out _what_ you've done.
+    * Don't worry if it's an epic commit message: too much information is better than too little.
+
+A good commit message is something like: "JoeBloggs: Fixing issue #123 (greedy cheese munching). Adding locking to the CheeseAdapter so that only one cheese is consumed at a time." A bad commit message looks like: "Edited CheeseAdapter.java"

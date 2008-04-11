@@ -1,4 +1,4 @@
-#summary How the InternetExplorerDriver works
+#summary How the InternetExplorerDriver works, and how to work on it
 
 = How the InternetExplorerDriver Works =
 
@@ -14,3 +14,18 @@ Most languages support calling or linking to exported functions from a C library
 Currently, the Java binding uses JNI, and in this case the C++ source is organised into separate layers. Each Java class that uses native methods has a matching header and source file (with a very long name). These are responsible for handling all the conversion to and from JNI types, and call down to other classes which handle driving IE and marshalling from COM types to simpler types. At some point, we plan on moving to [http://jna.java.dev.net JNA] to help simplify development and unify the model used for writing the driver with other language bindings.
 
 For the Java binding, XPath evaluation is done using Jaxen, an Open Source XPath engine. The key Java class is the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/java/com/googlecode/webdriver/ie/IeNavigator.java IeNavigator]. This ultimately makes use of the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/ElementNode.cpp ElementNode] and [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/DocumentNode.cpp DocumentNode] C++ classes. In order to allow XPath support for other languages, we plan on migrating to a native XPath solution, accessed in the same way as other native functionality.
+
+= Working On the InternetExplorerDriver = 
+
+Currently, all the tests for the InternetExplorerDriver are written in Java, and so you'll need both Visual Studio 2005 and a Java IDE installed on your machine. If you're using Eclipse, the process for making and testing modifications is:
+
+  # Edit the C++ code in VS.
+  # Build the code to ensure that it compiles
+  # Do a complete rebuild when you are ready to run a test. This will cause the created DLL to be copied to the right place to allow its use in Eclipse
+  # Load Eclipse (or some other IDE, such as Idea)
+  # Edit the {{{SingleTestSuite}}} so that it is {{{usingDriver(IE)}}}
+  # Create a JUnit run configuration that uses the "webdriver-internet-explorer" project. If you don't do this, the test won't work at all, and there will be a somewhat cryptic error message on the console.
+
+Once the basic setup is done, you can start working on the code pretty quickly. As an alternative, there will soon be .Net bindings added (using C#) Once these have been added, it should be possible to make changes to the IE driver entirely in Visual Studio.
+
+When working with Java, any unhandled exception in the C++ code may cause the JVM to die. If this happens, take a look at the log files that Java generates. This will give you a hint at where to start when tracking down the problem.
