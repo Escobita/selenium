@@ -2,6 +2,20 @@
 
 = Tips and Tricks =
 
+== Using Drag and Drop ==
+
+It may not be immediately obvious, but if you're using a browser that supports it you can cast a {{{WebElement}}} to {{{RenderedWebElement}}} and then it's easy to do drag and drop:
+
+{{{
+// Note the casts
+RenderedWebElement from = (RenderedWebElement) driver.findElement(By.id("one"));
+RenderedWebElement to = (RenderedWebElement) driver.findElement(By.id("two"));
+
+from.dragAndDropOn(to);
+}}}
+
+Currently, only the FirefoxDriver supports this, but you should also expect support for the InternetExplorerDriver and SafariDriver too.
+
 == Changing the user agent ==
 
 This is easy with the FirefoxDriver:
