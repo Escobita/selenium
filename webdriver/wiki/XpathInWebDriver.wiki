@@ -20,10 +20,10 @@ This is a little abstract, so for the following piece of HTML:
 The following will happen:
 
 || *XPath expression* |||||||||| *Number of Matches In* ||
-|||| *HtmlUnitDriver* || *FirefoxDriver* || *InternetExplorerDriver* || *SafariDriver* ||
+|| || *HtmlUnitDriver* || *FirefoxDriver* || *InternetExplorerDriver* || *SafariDriver* ||
 || //input || 1 ("example")  || 2 || 2 || 1 ("example") ||
 || //INPUT || 0 || 2 || 0 || 1 ("other") ||
 
 == Matching Implicit Attributes ==
 
-Sometimes HTML do not need attributes to be explicitly declared because they will default to known values. For example, the "input" tag does not require the "type" attribute because it defaults to "text". The rule of thumb when using XPath in WebDriver is that you *should not* expect to be able to match against these implicit attributes.
+Sometimes HTML do not need attributes to be explicitly declared because they will default to known values. For example, the "input" tag does not require the "type" attribute because it defaults to "text". The rule of thumb when using xpath in WebDriver is that you *should not* expect to be able to match against these implicit attributes.
