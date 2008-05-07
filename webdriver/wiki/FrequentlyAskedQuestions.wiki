@@ -33,6 +33,10 @@ A: The existing drivers are the InternetExplorerDriver, FirefoxDriver, SafariDri
 
 A: Please see the HtmlUnitDriver page for more details, but the short answer is because no browser uses the JS engine used by HtmlUnit.
 
+*Q: My XPath finds elements in one browser, but not in others. Why is this?*
+
+A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XPathInWebDriver page.
+
 *Q: What about support for languages other than Java?*
 
 A: Support for other languages is planned, and we will be announcing these on the mailing list as they are checked in.
