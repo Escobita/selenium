@@ -35,7 +35,7 @@ A: Please see the HtmlUnitDriver page for more details, but the short answer is 
 
 *Q: My XPath finds elements in one browser, but not in others. Why is this?*
 
-A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XPathInWebDriver page.
+A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XpathInWebDriver page.
 
 *Q: What about support for languages other than Java?*
 

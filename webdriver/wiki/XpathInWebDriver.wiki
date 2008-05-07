@@ -19,7 +19,7 @@ This is a little abstract, so for the following piece of HTML:
 
 The following will happen:
 
-|| *XPath expression* |||||||| *Number of Matches In* ||
+|| *XPath expression* |||||||||| *Number of Matches In* ||
 |||| *HtmlUnitDriver* || *FirefoxDriver* || *InternetExplorerDriver* || *SafariDriver* ||
 || //input || 1 ("example")  || 2 || 2 || 1 ("example") ||
 || //INPUT || 0 || 2 || 0 || 1 ("other") ||
