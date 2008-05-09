@@ -124,6 +124,34 @@ RenderedWebElement target = (RenderedWebElement) driver.findElement(By.name("tar
 element.dragAndDropOn(target);
 }}}
 
+== Moving Between Windows and Frames ==
+
+It's rare for a modern web application not to have any frames or to be constrained to a single window. WebDriver supports moving between named windows using the "switchTo" method:
+
+{{{
+driver.switchTo().window("windowName");
+}}}
+
+All calls to driver will now be interpreted as being directed to the particular window. But how do you know the window's name? Take a look at the javascript or link that opened it:
+
+{{{
+<a href="somewhere.html" target="windowName">Click here to open a new window</a>
+}}}
+
+You can also swing from frame to frame (or into iframes):
+
+{{{
+driver.switchTo().frame("frameName");
+}}}
+
+It's possible to access subframes by separating the path with a dot, and you can specify the frame by its index too. That is:
+
+{{{
+driver.switchTo().frame("frameName.0.child");
+}}}
+
+would go to the frame named "child" of the first subframe of the frame called "frameName". *All frames are evaluated as if from _top*.
+
 == Cookies ==
 
 Before we leave these next steps, you may be interested in understanding how to use cookies. First of all, you need to be on the domain that the cookie will be valid for:
@@ -142,3 +170,7 @@ for (Cookie loadedCookie : allCookies) {
     System.out.println(String.format("%s -> %s", loadedCookie.getName(), loadedCookie.getValue()));
 }
 }}}
+
+== Next, Next Steps! ==
+
+This has been a high level walkthrough of WebDriver and some of its key capabilities. You may want to look at the DesignPatterns to see get some ideas about how you can reduce the pain of maintaining your tests and how to make your code more modular.
