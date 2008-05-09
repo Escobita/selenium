@@ -1,0 +1,144 @@
+#summary Provides a quick overview of using WebDriver
+
+= Next Steps For Using WebDriver =
+
+Once you've begun GettingStarted, you may want to know more. This is the right place to look!
+
+WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that's easy to explore and understand, which will help make your tests easier to read and maintain. It's not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old "main" method. 
+
+== Which Implementation of WebDriver Should I Use? ==
+
+WebDriver is the name of the key interface against which tests should be written, but there are several implementations. These are:
+
+|| *Name of driver* || *Available on which OS?* || *Class to instantiate* ||
+|| HtmlUnitDriver || All || com.googlecode.webdriver.htmlunit.HtmlUnitDriver ||
+|| FirefoxDriver || All || com.googlecode.webdriver.firefox.FirefoxDriver ||
+|| InternetExplorerDriver || Windows || com.googlecode.webdriver.ie.InternetExplorerDriver ||
+|| SafariDriver || Mac OS X || com.googlecode.webdriver.safari.SafariDriver ||
+
+You can find out more information about each of these by following the links in the table. Which you use depends on what you want to do. For sheer speed, the HtmlUnitDriver is great, but it's not graphical, which means that you can't watch what's happening. As a developer, you may be comfortable with this, but sometimes it's good to be able to test using a real browser. Of the remaining drivers, most work has been completed on the FirefoxDriver, but it's perfectly reasonable to expect the others to work equally well, and we're working hard on making that happen, so please use whichever makes the most sense for your project.
+
+To keep things simple, let's start with the HtmlUnitDriver:
+
+{{{
+WebDriver driver = new HtmlUnitDriver();
+}}}
+
+== Navigating ==
+
+There are two ways to navigate to a webpage, and they both have the same result:
+
+{{{
+driver.get("http://www.google.com");
+driver.navigate().to("http://www.google.com");
+}}}
+
+WebDriver will wait until the page has fully loaded before returning control to your test or script. You can always move backwards and forwards in your browser's history:
+
+{{{
+driver.navigate().forward();
+driver.navigate().back();
+}}}
+
+== Interacting With the Page ==
+
+Just being able to go to places and move around in history isn't terribly useful. What we'd really like to do is to interact with the pages, or, more specifically, the HTML elements within a page. First of all, we need to find one. WebDriver offers a number of ways of finding elements. For example, given an element defined as:
+
+{{{
+<input type="text" name="passwd" id="passwd-id" />
+}}}
+
+we could use any of:
+
+{{{
+WebElement element;
+element = driver.findElement(By.id("passwd-id"));
+element = driver.findElement(By.name("passwd"));
+element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
+}}}
+
+You can also look for an link by its text, but be careful! The text must be an _exact_ match! You should also be careful when using XpathInWebDriver. If there's more than one element that matches the query, then only the first will be returned. If nothing can be found, the {{{NoSuchElementException}}} will be thrown.
+
+WebDriver has an "Object-based" API; we represent all types of elements using the same interface: WebElement. This means that although you may see a lot of possible methods you could invoke when you hit your IDE's auto-complete key combination, not all of them will make sense or be valid. Don't worry! WebDriver will attempt to do the Right Thing, so if you call a method that makes no sense ("setSelected()" on a "meta" tag, for example) an exception will be thrown.
+
+So, we've got an element. What can we do with it? First of all, you may want to enter some text into a text field:
+
+{{{
+element.sendKeys("some text");
+}}}
+
+You can simulate pressing the arrow keys by using the "Keys" class:
+
+{{{
+element.sendKeys(" and some", Keys.ARROW_DOWN);
+}}}
+
+One of the interesting things is that typing something into a text field won't automatically clear it. Instead, what you type will be appended to what's already there. You can easily clear the contents of a text field or textarea:
+
+{{{
+element.clear();
+}}}
+
+== Filling In Forms ==
+
+We've already seen how to enter text into a textarea or text field, but what about the other elements? You can "toggle" the state of checkboxes, and you can use "setSelected" to set something like an OPTION tag selected. Dealing with SELECT tags isn't too bad:
+
+{{{
+WebElement select = driver.findElement("//select");
+List<WebElement> allOptions = select.getChildrenOfType("option");
+for (WebElement option : allOptions) {
+    System.out.println(String.format("Value is: %s", option.getValue()));
+    option.setSelected();
+}
+}}}
+
+This will find the first "SELECT" element on the page, and cycle through each of it's OPTIONs in turn, printing out their values, and selecting each in turn. 
+
+Once you've finished filling out the form, you probably want to submit it. One way to do this would be to find the "submit" button and click it:
+
+{{{
+driver.findElement(By.id("submit")).click();  // Assume the button has the ID "submit" :)
+}}}
+
+Alternatively, WebDriver has the convenience method "submit" on every element. If you call this on an element within a form, WebDriver will walk up the DOM until it finds the enclosing form and then calls submit on that. If the element isn't in a form, then the "NoSuchElementException" will be thrown:
+
+{{{
+element.submit();
+}}}
+
+== Getting Visual Information And Drag And Drop ==
+
+Sometimes you want to extract some visual information out of an element, perhaps to see if it's visible or where it is on screen. You can find out this information by casting the element:
+
+{{{
+WebElement plain = driver.findElement(By.name("q"));
+RenderedWebElement element = (RenderedWebElement) element;
+}}}
+
+Not all drivers render their content to the screen (such as the HtmlUnitDriver), so it's not safe to assume that the cast will work, but if it does you can gather additional information such as the size and location of the element. In addition, you can use drag and drop, either moving an element by a certain amount, or on to another element:
+
+{{{
+RenderedWebElement element = (RenderedWebElement) driver.findElement(By.name("source"));
+RenderedWebElement target = (RenderedWebElement) driver.findElement(By.name("target"));
+
+element.dragAndDropOn(target);
+}}}
+
+== Cookies ==
+
+Before we leave these next steps, you may be interested in understanding how to use cookies. First of all, you need to be on the domain that the cookie will be valid for:
+
+{{{
+// Go to the correct domain
+driver.get("http://www.example.com");
+
+// Now set the cookie. This one's valid for the entire domain
+Cookie cookie = new Cookie("key", "value");
+driver.manage().addCookie(cookie);
+
+// And now output all the available cookies for the current URL
+Set<Cookie> allCookies = driver.manage().getCookies();
+for (Cookie loadedCookie : allCookies) {
+    System.out.println(String.format("%s -> %s", loadedCookie.getName(), loadedCookie.getValue()));
+}
+}}}

@@ -89,4 +89,4 @@ public class GoogleSuggest {
 }
 }}}
 
-When you run this program, you'll see the list of suggestions being printed to the console. That's all there is to using WebDriver!
+When you run this program, you'll see the list of suggestions being printed to the console. That's all there is to using WebDriver! You're ready to take the NextSteps, now.
