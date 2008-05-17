@@ -73,7 +73,7 @@ You can simulate pressing the arrow keys by using the "Keys" class:
 element.sendKeys(" and some", Keys.ARROW_DOWN);
 }}}
 
-One of the interesting things is that typing something into a text field won't automatically clear it. Instead, what you type will be appended to what's already there. You can easily clear the contents of a text field or textarea:
+It is possible to call {{{sendKeys}}} on any element, which makes it possible to test keyboard shortcuts such as those used on GMail. A side-effect of this is that typing something into a text field won't automatically clear it. Instead, what you type will be appended to what's already there. You can easily clear the contents of a text field or textarea:
 
 {{{
 element.clear();

@@ -2,7 +2,7 @@
 
 = Getting the Latest WebDriver code =
 
-In order to get the latest version of the code, please follow the instructions on the project's source page on Google Code located at http://code.google.com/p/webdriver/source Once you've downloaded the source, please take a look at BuildingWebDriver for instructions on how to compile everything.
+In order to get the latest version of the code, please follow the instructions on the project's source page on Google Code located at http://code.google.com/p/webdriver/source Once you've downloaded the source, please take a look at BuildingWebDriver for instructions on how to compile everything and at the DeveloperTips for information on how to work on the code.
 
 = Downloading Binaries =
 
