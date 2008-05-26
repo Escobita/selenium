@@ -6,8 +6,8 @@
 
 For all versions of WebDriver:
 
- * The Java JDK 5 or above
- * Ruby
+ * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Sun's site] if it's not already on your computer)
+ * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also includes Rake. If you're using OS X 10.5 the default versions of ruby and rake are fine)
  * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
  * The source code (you may need to CheckOut the source from source control)
 
@@ -28,6 +28,10 @@ rake
 This will not only compile the source, but will also run any tests which need to be run. If these all pass, then you have successfully built WebDriver!
 
 = Common Problems =
+
+== Nothing Compiles ==
+
+Make sure that you've got the JAVA_HOME environment setting properly set up. In addition, make sure that you can execute "rake" "java", "jar" and "javac" from the command line. If you're on Windows, you'll also need to be able to execute "devenv". You may need to install a JDK.
 
 == All Firefox Tests Fail ==
 
