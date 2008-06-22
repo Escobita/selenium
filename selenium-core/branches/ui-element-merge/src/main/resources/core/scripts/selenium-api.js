@@ -2723,11 +2723,11 @@ Selenium.prototype.doCaptureEntirePageScreenshot = function(filename, kwargs) {
     LOG.debug('computed dimensions');
     
     var originalBackground = doc.style.background;
+    
     if (kwargs) {
-        // TODO - replace with parse_kwargs() when it makes it into Core
-        var matches = /background\s*=([^,]+)/.exec(kwargs);
-        if (matches) {
-            doc.style.background = matches[1].trim();
+        var args = parse_kwargs(kwargs);
+        if (args.background) {
+            doc.style.background = args.background;
         }
     }
     

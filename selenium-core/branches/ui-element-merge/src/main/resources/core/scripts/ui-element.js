@@ -284,10 +284,10 @@ function UIElement(uiElementShorthand)
         this.name = uiElementShorthand.name;
         this.description = uiElementShorthand.description;
         
-        // construct a new one getLocator() method based on the locator
-        // property, or use the provided function. We're deprecating the xpath
-        // property and getXPath() function, but still allow for them for
-        // backwards compatability.
+        // construct a new getLocator() method based on the locator property,
+        // or use the provided function. We're deprecating the xpath property
+        // and getXPath() function, but still allow for them for backwards
+        // compatability.
         if (uiElementShorthand.locator) {
             this.getLocator = function(args) {
                 return uiElementShorthand.locator;
@@ -744,8 +744,8 @@ function UIMap()
         }
         catch (e) {
             try {
-            safe_alert("Could not create pageset from shorthand:\n"
-                + print_r(pagesetShorthand) + "\n" + e.message);
+                safe_alert("Could not create pageset from shorthand:\n"
+                    + print_r(pagesetShorthand) + "\n" + e.message);
             }
             catch (e) {
                 alert('wtf? caught: ' + e + ', ' (e.message ? e.message : ""));
