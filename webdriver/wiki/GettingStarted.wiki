@@ -18,12 +18,12 @@ Assuming that you've built everything and the source is located at {{{$WEBDRIVER
 We're now ready to write some code. Perhaps something that looks like:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
-import com.googlecode.webdriver.By;
-import com.googlecode.webdriver.WebDriver;
-import com.googlecode.webdriver.WebElement;
-import com.googlecode.webdriver.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 public class Example  {
     public static void main(String[] args) {
@@ -33,7 +33,7 @@ public class Example  {
         // And now use this to visit Google
         driver.get("http://www.google.com");
 
-        // Find the text input element using a little XPath
+        // Find the text input element by its name
         WebElement element = driver.findElement(By.name("q"));
 
         // Enter something to search for
@@ -54,14 +54,14 @@ Compile and run it. Congratulations, you've managed to get started with WebDrive
 Now let's try something that needs Javascript. Follow the instructions on the FirefoxDriver page in order to create a profile called "WebDriver" and install the WebDriver extension. Once that's done, create a new class called GoogleSuggest, which looks like:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
 import java.util.List;
 
-import com.googlecode.webdriver.By;
-import com.googlecode.webdriver.WebDriver;
-import com.googlecode.webdriver.WebElement;
-import com.googlecode.webdriver.firefox.FirefoxDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class GoogleSuggest {
     @SuppressWarnings("unchecked")

@@ -11,10 +11,10 @@ WebDriver is a tool for automating testing web applications, and in particular t
 WebDriver is the name of the key interface against which tests should be written, but there are several implementations. These are:
 
 || *Name of driver* || *Available on which OS?* || *Class to instantiate* ||
-|| HtmlUnitDriver || All || com.googlecode.webdriver.htmlunit.HtmlUnitDriver ||
-|| FirefoxDriver || All || com.googlecode.webdriver.firefox.FirefoxDriver ||
-|| InternetExplorerDriver || Windows || com.googlecode.webdriver.ie.InternetExplorerDriver ||
-|| SafariDriver || Mac OS X || com.googlecode.webdriver.safari.SafariDriver ||
+|| HtmlUnitDriver || All || org.openqa.selenium.htmlunit.HtmlUnitDriver ||
+|| FirefoxDriver || All || org.openqa.selenium.firefox.FirefoxDriver ||
+|| InternetExplorerDriver || Windows || org.openqa.selenium.ie.InternetExplorerDriver ||
+|| SafariDriver || Mac OS X || org.openqa.selenium.safari.SafariDriver ||
 
 You can find out more information about each of these by following the links in the table. Which you use depends on what you want to do. For sheer speed, the HtmlUnitDriver is great, but it's not graphical, which means that you can't watch what's happening. As a developer, you may be comfortable with this, but sometimes it's good to be able to test using a real browser. Of the remaining drivers, most work has been completed on the FirefoxDriver, but it's perfectly reasonable to expect the others to work equally well, and we're working hard on making that happen, so please use whichever makes the most sense for your project.
 

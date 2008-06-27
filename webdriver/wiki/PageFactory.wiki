@@ -9,9 +9,9 @@ In order to support the PageObject pattern, WebDriver's support library contains
 In order to use the PageFactory, first declare some fields on a PageObject that are WebElements or RenderedWebElements, for example:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
-import com.googlecode.webdriver.WebElement;
+import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
     // Here's the element
@@ -29,12 +29,12 @@ public class GoogleSearchPage {
 In order for this code to work and not through a NullPointerException because the "q" field isn't instantiated, we need to initialise the PageObject:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
-import com.googlecode.webdriver.WebDriver;
-import com.googlecode.webdriver.WebElement;
-import com.googlecode.webdriver.htmlunit.HtmlUnitDriver;
-import com.googlecode.webdriver.support.PageFactory;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.support.PageFactory;
 
 public class UsingGoogleSearchPage {
     public static void main(String[] args) {
@@ -88,12 +88,12 @@ When we run the example, the PageFactory will search for an element on the page 
 Although the code works, someone who's not familiar with the source of the Google home page may not know that the name of the field is "q". Fortunately, we can pick a meaningful name and change the strategy used to look the element up using an annotation:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
-import com.googlecode.webdriver.By;
-import com.googlecode.webdriver.How;
-import com.googlecode.webdriver.support.FindBy;
-import com.googlecode.webdriver.WebElement;
+import org.openqa.selenium.By;
+import org.openqa.selenium.How;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
     // The element is now looked up using an XPath expression
@@ -111,13 +111,13 @@ public class GoogleSearchPage {
 One wrinkle that remains is that every time we call a method on the WebElement, the driver will go and find it on the current page again. In an AJAX-heavy application this is what you would like to happen, but in the case of the Google search page we know that the element is always going to be there and won't change. We also know that we won't be navigating away from the page and returning (which would mean that a different element with the same name would be present) It would be handy if we could "cache" the element once we'd looked it up:
 
 {{{
-package com.googlecode.webdriver.example;
+package org.openqa.selenium.example;
 
-import com.googlecode.webdriver.By;
-import com.googlecode.webdriver.How;
-import com.googlecode.webdriver.support.CacheLookup;
-import com.googlecode.webdriver.support.FindBy;
-import com.googlecode.webdriver.WebElement;
+import org.openqa.selenium.By;
+import org.openqa.selenium.How;
+import org.openqa.selenium.support.CacheLookup;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
     // The element is now looked up using an XPath expression,

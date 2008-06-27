@@ -19,3 +19,74 @@ Secondly, take a look at the [http://developer.mozilla.org/en/docs/Extensions Mo
 You should also ensure that the Java System property "webdriver.firefox.useExisting" is set to "true", which will cause the FirefoxDriver to reuse the instance of Firefox that's running and which has bound itself to port 7055 (the default port). Finally, to actually log information to the console, use the "[http://developer.mozilla.org/en/docs/DOM:window.dump dump]" method in your javascript code. Note that you'll need to include newlines manually when using the dump method.
 
 If you find that you'd like to examine an object in detail, use the "{{{Utils.dump()}}}" method, which will report which interfaces an object implements, as well as outputting as much information as it can to the console..
+
+== Flow of Control: Starting Firefox ==
+
+The following steps are performed when instantiating an instance of the FirefoxDriver:
+
+  # Repeatedly attempt to open a server socket on a well-known port number (normally 7055).
+  # Locate the Firefox profile to use. This is normally the one called "WebDriver" but need not be.
+  # Copy the existing profile to a temporary directory, ignoring any lock files that indicate that Firefox is actually running.
+  # Delete the current "extensions.cache" to force Firefox to look for newly installed extensions on start up.
+  # Identify the next free port above the locked one by attempting to bind to each of them in turn. Release the newly found port
+  # Update "user.js" with the preferences required to make WebDriver work as expected. Set the "webdriver_firefox_port" value to the one that we found in the step above this.
+  # Start Firefox with the "-silent" flag and telling it to use the freshly minted directory as the profile. This causes Firefox to start up, look at the profile and fix it up if necessary.
+  # Wait until that Firefox instance has finished and the process has died.
+  # Start firefox again and repeatedly attempt to connect until we're successful or too much time has passed.
+  # Release the port we grabbed in the first step.
+
+We are using the port at the well-known address as a simple locking mechanism. The approach was chosen because it allows the same algorithm to be used by different JVMs or even languages at the same time without fear of starting multiple instances of Firefox all listening on the same port (which looks terrible, I can assure you :) The mechanism is simple enough so that most languages can be used to implement it without requiring any special libraries.
+
+== Sending Commands to Firefox ==
+
+The basic mechanism for sending commands from the client language (such as Java) to the Firefox extension is:
+
+  # Create a new map/dictionary (whatever your favourite programming language calls it) The keys are case-sensitive and are:
+    * *context* Treated as string and an opaque key by the client language. 
+    * *commandName* The name of the command to execute. This is a string.
+    * *parameters* A list of parameters. The type of these depends on the command name. This list can be empty.
+    * *elementId* A string and an opaque key that represents the identifier for a particular element.
+  # Serialize the map using JSON.
+  # Connect to the socket opened by the extension (on the same port identified in the "Flow of Control" section)
+  # Send the JSON across the wire to Firefox. The mechanism used to this changes occasionally, but the implementation in the AbstractExtensionConnection is the one that should be used.
+  # Block until a response is sent. Again, this mechanism is liable to change, but the reference implementation is in the AbstractExtensionConnection
+  # The response is another map serialized in JSON. The keys are case-sensitive and are:
+    * *methodName* The name of the method that this is response is for as a string. Should match "commandName" from the original command sent
+	* *context* As for the original command
+	* *isError* Indicates that some error or another occurred. In the Java code, this will cause an exception to be thrown.
+	* *responseText* A string who's meaning differs depending on the command. If "isError" is true, this will be a description of the error that actually occurred.
+
+== How Commands Are Interpreted by the Extension ==
+
+Once the command has reached the firefox extension, it is deserialized from JSON into a Javascript object (take a look at "socketListener.js" for the implementation) The first thing that happens is the command name is interpreted. Some commands don't need to pay attention to the context (or set it) For those that do care about the context, it is interpreted as a pointer to the window and the frame being used. In order to be executed, the command name is looked up on the FirefoxDriver prototype. For example, the command "get" is defined as:
+
+{{{
+FirefoxDriver.prototype.get = function(respond, url)
+}}}
+
+Each function takes at least one parameter: the object that represents the response. It is used like this:
+
+{{{
+FirefoxDriver.prototype.getCurrentUrl = function(respond) {
+respond.context = this.context;
+respond.response = Utils.getBrowser(this.context).contentWindow.location;
+respond.send();
+}
+}}}
+
+If an error occurs, the "isProperty" field should be set to "true". Calling the "send" method causes the response to be sent via the socket connection back to the client (the AbstractExtensionConnection in the Java code) You should make sure that this is only ever called once per command.
+
+== Useful Javascript Functions ==
+
+There are some useful Javascript functions in the "utils.js" file. These are:
+
+|| *Method Name* || *Parameters* || *Does What* ||
+|| Utils.getBrowser || The context from the command (generally "this.context") || Gets back the instance of Browser associated with the current context ||
+|| Utils.getDocument || The context from the command (generally "this.context") || Get the HTML document associated with the current context. This is what is accessed by Javascript on the page as "document" ||
+|| Utils.addToKnownElements || The element and the context || Stores the element in the context. Returns an identifier which can be used later to obtain the element in subsequent commands ||
+|| Utils.getElementAt || The identifier from "addToKnownElements" and the context || Retrieves a previously stored element ||
+|| Utils.dump || Any Javascript object || Dumps a representation of the given object to stdout (using "dump"). Handy for debugging ||
+
+= Future Direction =
+
+The RemoteWebDriver and the FirefoxDriver are both implementations of an RPC mechanism. It would be desirable for these two drivers to share as much code as possible. In order to do this, we would have to take advantage of one of the httpd implementations which are based on XPCOM.
