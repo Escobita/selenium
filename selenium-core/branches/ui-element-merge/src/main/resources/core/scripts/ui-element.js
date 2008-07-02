@@ -24,6 +24,18 @@ function UIArgumentException(message)
     this.name = 'UIArgumentException';
 }
 
+function PagesetException(message)
+{
+    this.message = message;
+    this.name = 'PagesetException';
+}
+
+function UISpecifierException(message)
+{
+    this.message = message;
+    this.name = 'UISpecifierException';
+}
+
 //*****************************************************************************
 // UI-Element core
 
@@ -165,7 +177,7 @@ function UIElement(uiElementShorthand)
                 // issues. The xpath does have to be lowercase however, it
                 // seems. 
                 results = eval_xpath(locator.string, doc,
-                    { allowNativeXpath: false });
+                    { allowNativeXpath: false, returnOnFirstMatch: true });
             }
             else {
                 // piece the locator back together
@@ -242,19 +254,17 @@ function UIElement(uiElementShorthand)
             }
         }
         return defaultLocators;
-    }
+    };
     
     
     
     /**
      * Validate the structure of the shorthand notation this object is being
-     * initialized with. Throws an exception otherwise if there's a validation
-     * error.
+     * initialized with. Throws an exception if there's a validation error.
      *
      * @param uiElementShorthand
      *
-     * @returns  true if validation passed
-     * @throws   UIElementException
+     * @throws  UIElementException
      */
     this.validate = function(uiElementShorthand)
     {
@@ -271,9 +281,7 @@ function UIElement(uiElementShorthand)
             && !uiElementShorthand.getXPath) {
             throw new UIElementException(msg + 'no locator specified!');
         }
-        
-        return true;
-    }
+    };
     
     
     
@@ -326,7 +334,7 @@ function UIElement(uiElementShorthand)
                 var testcase = uiElementShorthand[attr];
                 if (uiElementShorthand.args &&
                     uiElementShorthand.args.length && !testcase.args) {
-                    alert('No args defined in ' + attr + ' for UI element '
+                    safe_alert('No args defined in ' + attr + ' for UI element '
                         + this.name + '! Skipping testcase.');
                     continue;
                 } 
@@ -365,7 +373,7 @@ function UIElement(uiElementShorthand)
         if (!this.isDefaultLocatorConstructionDeferred) {
             this.defaultLocators = this.getDefaultLocators();
         }
-    }
+    };
     
     
     
@@ -403,15 +411,16 @@ UIElement.defaultOffsetLocatorStrategy = function(locatedElement, pageElement) {
  * valid.
  *
  * @param uiArgumentShorthand
- * @param parent
+ * @param localVars
  *
- * @throws               UIArgumentException
+ * @throws  UIArgumentException
  */
 function UIArgument(uiArgumentShorthand, localVars)
 {
     /**
      * @param uiArgumentShorthand
-     * @returns  true if validation passed
+     *
+     * @throws  UIArgumentException
      */
     this.validate = function(uiArgumentShorthand)
     {
@@ -429,8 +438,6 @@ function UIArgument(uiArgumentShorthand, localVars)
             !uiArgumentShorthand.getDefaultValues) {
             throw new UIArgumentException(msg + 'no default values specified!');
         }
-        
-        return true;
     };
     
     
@@ -442,8 +449,10 @@ function UIArgument(uiArgumentShorthand, localVars)
     this.init = function(uiArgumentShorthand, localVars)
     {
         this.validate(uiArgumentShorthand);
+        
         this.name = uiArgumentShorthand.name;
         this.description = uiArgumentShorthand.description;
+        
         if (uiArgumentShorthand.defaultValues) {
             var defaultValues = uiArgumentShorthand.defaultValues;
             this.getDefaultValues =
@@ -461,14 +470,6 @@ function UIArgument(uiArgumentShorthand, localVars)
     
     
     this.init(uiArgumentShorthand, localVars);
-}
-
-
-
-function UISpecifierException(message)
-{
-    this.message = message;
-    this.name = 'UISpecifierException';
 }
 
 
@@ -563,14 +564,6 @@ function UISpecifier(uiSpecifierStringOrPagesetName, elementName, args)
 
 
 
-function PagesetException(message)
-{
-    this.message = message;
-    this.name = 'PagesetException';
-}
-
-
-
 function Pageset(pagesetShorthand)
 {
     /**
@@ -643,7 +636,7 @@ function Pageset(pagesetShorthand)
     
     
     /**
-     * Throws an exception on validation failure. Returns true otherwise.
+     * Throws an exception on validation failure.
      */
     this._validate = function(pagesetShorthand)
     {
@@ -661,8 +654,6 @@ function Pageset(pagesetShorthand)
             throw new PagesetException(msg
                 + 'no path, pathRegexp, or pageContent specified!');
         }
-        
-        return true;
     };
     
     
@@ -670,8 +661,10 @@ function Pageset(pagesetShorthand)
     this.init = function(pagesetShorthand)
     {
         this._validate(pagesetShorthand);
+        
         this.name = pagesetShorthand.name;
         this.description = pagesetShorthand.description;
+        
         var pathPrefixRegexp = pagesetShorthand.pathPrefix
             ? RegExp.escape(pagesetShorthand.pathPrefix) : "";
         var pathRegexp = '^' + pathPrefixRegexp;
@@ -743,13 +736,8 @@ function UIMap()
             var pageset = new Pageset(pagesetShorthand);
         }
         catch (e) {
-            try {
-                safe_alert("Could not create pageset from shorthand:\n"
-                    + print_r(pagesetShorthand) + "\n" + e.message);
-            }
-            catch (e) {
-                alert('wtf? caught: ' + e + ', ' (e.message ? e.message : ""));
-            }
+            safe_alert("Could not create pageset from shorthand:\n"
+                + print_r(pagesetShorthand) + "\n" + e.message);
             return false;
         }
         
@@ -789,7 +777,15 @@ function UIMap()
             return false;
         }
         
-        this.pagesets[pagesetName].uiElements[uiElement.name] = uiElement;
+        try {
+            this.pagesets[pagesetName].uiElements[uiElement.name] = uiElement;
+        }
+        catch (e) {
+            safe_alert("Could not add UI element '" + uiElement.name
+                + "' to pageset '" + pagesetName + "':\n" + e.message);
+            return false;
+        }
+        
         return true;
     };
     
@@ -885,26 +881,28 @@ function UIMap()
     
     
     /**
-     * Finds and returns an element on a page given a UI specifier string
+     * Returns a list of elements on a page that a given UI specifier string,
+     * maps to. If no elements are mapped to, returns an empty list..
      *
      * @param   uiSpecifierString  a String that specifies a UI element with
      *                             attendant argument values
      * @param   inDocument         the document object the specified UI element
      *                             appears in
-     * @return                     a list of elements specified by
-     *                             uiSpecifierString
+     * @return                     a potentially-empty list of elements
+     *                             specified by uiSpecifierString
      */
     this.getPageElements = function(uiSpecifierString, inDocument)
     {
         var locator = this.getLocator(uiSpecifierString);
-        var results = eval_locator(locator, inDocument);
+        var results = locator ? eval_locator(locator, inDocument) : [];
         return results;
     };
     
     
     
     /**
-     * Split this out to support use by the Editor.
+     * Returns the locator string that a given UI specifier string maps to, or
+     * null if it cannot be mapped.
      *
      * @param uiSpecifierString
      */

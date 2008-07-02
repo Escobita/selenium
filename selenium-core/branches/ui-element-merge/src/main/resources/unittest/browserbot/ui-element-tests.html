@@ -29,17 +29,16 @@ function test_UIElement_validate()
     });
     
     // happy path 1
-    assertTrue(uiElement.validate({ name: 'name', description: 'desc',
-        xpath: '//a' }));
+    uiElement.validate({ name: 'name', description: 'desc', xpath: '//a' }));
     
     // happy path 2
-    assertTrue(uiElement.validate({ name: 'name', description: 'desc',
+    uiElement.validate({ name: 'name', description: 'desc',
         getLocator: function(args) { return '//a'; } }));
     
     // destructive: no name
     try {
         uiElement.validate({ description: 'desc', xpath: '//a' });
-        assertTrue(false);
+        fail('Expected UIElementException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIElementException', e.name);
@@ -48,7 +47,7 @@ function test_UIElement_validate()
     // destructive: no description
     try {
         uiElement.validate({ name: 'name', xpath: '//a' });
-        assertTrue(false);
+        fail('Expected UIElementException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIElementException', e.name);
@@ -57,7 +56,7 @@ function test_UIElement_validate()
     // destructive: no xpath
     try {
         uiElement.validate({ name: 'name', description: 'desc' });
-        assertTrue(false);
+        fail('Expected UIElementException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIElementException', e.name);
@@ -313,13 +312,13 @@ function test_UIArgument_validate()
     });
     
     // happy path 1
-    assertTrue(uiArgument.validate({ name: 'name'
+    uiArgument.validate({ name: 'name'
         , description: 'desc'
         , defaultValues: [1, 2]
     }));
     
     // happy path 2
-    assertTrue(uiArgument.validate({ name: 'name'
+    uiArgument.validate({ name: 'name'
         , description: 'desc'
         , getDefaultValues: function() { return [1, 2]; }
     }));
@@ -327,7 +326,7 @@ function test_UIArgument_validate()
     // destructive: no name
     try {
         uiArgument.validate({ description: 'desc', defaultValues: [1, 2] });
-        assertTrue(false);
+        fail('Expected UIArgumentException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIArgumentException', e.name);
@@ -336,7 +335,7 @@ function test_UIArgument_validate()
     // destructive: no description
     try {
         uiArgument.validate({ name: 'name', defaultValues: [1, 2] });
-        assertTrue(false);
+        fail('Expected UIArgumentException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIArgumentException', e.name);
@@ -345,7 +344,7 @@ function test_UIArgument_validate()
     // destructive: no default values
     try {
         uiArgument.validate({ name: 'name', description: 'desc' });
-        assertTrue(false);
+        fail('Expected UIArgumentException, but none was thrown');
     }
     catch (e) {
         assertEquals('UIArgumentException', e.name);
@@ -422,28 +421,28 @@ function test_UISpecifier__initFromUISpecifierString()
     // destructive
     try {
         testUISpecifier._initFromUISpecifierString('pagesetName::()');
-        fail('Expected exception but none was thrown: missing element name');
+        fail('Expected UISpecifierException, but none was thrown: missing element name');
     }
     catch (e) {
         assertEquals('UISpecifierException', e.name);
     }
     try {
         testUISpecifier._initFromUISpecifierString('elementName()');
-        fail('Expected exception but none was thrown: missing pageset name');
+        fail('Expected UISpecifierException, but none was thrown: missing pageset name');
     }
     catch (e) {
         assertEquals('UISpecifierException', e.name);
     }
     try {
         testUISpecifier._initFromUISpecifierString('pagesetName::elementName');
-        fail('Expected exception but none was thrown: missing arguments');
+        fail('Expected UISpecifierException, but none was thrown: missing arguments');
     }
     catch (e) {
         assertEquals('UISpecifierException', e.name);
     }
     try {
         testUISpecifier._initFromUISpecifierString('pagesetName::elementName(k1=v1, k2=v2');
-        fail('Expected exception but none was thrown: missing close parenthesis for arguments');
+        fail('Expected UISpecifierException, but none was thrown: missing close parenthesis for arguments');
     }
     catch (e) {
         assertEquals('UISpecifierException', e.name);
@@ -649,7 +648,7 @@ function test_Pageset_validate()
     // no name
     try {
         new Pageset({ description: 'desc', paths: [ 'foo' ] });
-        fail('PagesetException expected but not thrown');
+        fail('Expected PagesetException, but none was thrown');
     }
     catch (e) {
         assertEquals('PagesetException', e.name);
@@ -658,7 +657,7 @@ function test_Pageset_validate()
     // no description
     try {
         new Pageset({ name: 'name', paths: [ 'foo' ] });
-        fail('PagesetException expected but not thrown');
+        fail('Expected PagesetException, but none was thrown');
     }
     catch (e) {
         assertEquals('PagesetException', e.name);
@@ -667,21 +666,16 @@ function test_Pageset_validate()
     // no paths, pathRegexp, or pageContent
     try {
         new Pageset({ name: 'name', description: 'desc' });
-        fail('PagesetException expected but not thrown');
+        fail('Expected PagesetException, but none was thrown');
     }
     catch (e) {
         assertEquals('PagesetException', e.name);
     }
     
     // happy paths
-    try {
-        new Pageset({ name: 'name', description: 'desc', paths: [ 'foo' ] });
-        new Pageset({ name: 'name', description: 'desc', pathRegexp: 'bar' });
-        new Pageset({ name: 'name', description: 'desc', pageContent: function() { return true; } });
-    }
-    catch (e) {
-        fail('Unexpected exception thrown: ' + e.message);
-    }
+    new Pageset({ name: 'name', description: 'desc', paths: [ 'foo' ] });
+    new Pageset({ name: 'name', description: 'desc', pathRegexp: 'bar' });
+    new Pageset({ name: 'name', description: 'desc', pageContent: function() { return true; } });
 }
 
 
