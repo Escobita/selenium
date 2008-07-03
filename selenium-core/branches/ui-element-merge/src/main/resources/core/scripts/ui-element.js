@@ -36,6 +36,12 @@ function UISpecifierException(message)
     this.name = 'UISpecifierException';
 }
 
+function CommandMatcherException(message)
+{
+    this.message = message;
+    this.name = 'CommandMatcherException';
+}
+
 //*****************************************************************************
 // UI-Element core
 
@@ -941,7 +947,7 @@ function UIMap()
     this.getUISpecifierString = function(pageElement, inDocument)
     {
         var is_fuzzy_match =
-            PageBot.prototype.locateElementByUIElement.is_fuzzy_match;
+            BrowserBot.prototype.locateElementByUIElement.is_fuzzy_match;
         var pagesets = this.getPagesetsForPage(inDocument);
         for (var i = 0; i < pagesets.length; ++i) {
             var pageset = pagesets[i];
@@ -1051,22 +1057,481 @@ UIMap.getInstance = function() {
     return (UIMap.self == null) ? new UIMap() : UIMap.self;
 }
 
+//******************************************************************************
+// Rollups
 
-
-// add a locator builder for UI elements. This is used to create a
-// locator string (in this case a UI specifier) identifying a page
-// element when it is clicked (or otherwise interacted with) in the
-// IDE. The locator string is later used to find the element when
-// passed to the "locateElementBy..." PageBot method.
-// add the UI element locator, and promote it to top priority
-if (is_IDE()) {
-    if (LocatorBuilders.order.indexOf(UI_GLOBAL.UI_PREFIX) == -1) {
-        LocatorBuilders.add(UI_GLOBAL.UI_PREFIX, function(pageElement) {
-            return UIMap.getInstance().getUISpecifierString(pageElement,
-                this.window.document);
-        });
-        LocatorBuilders.order.unshift(UI_GLOBAL.UI_PREFIX);
-        LocatorBuilders.order.pop();
+/**
+ * The Command object isn't available in the Selenium RC. We introduce an
+ * object with the identical constructor. In the IDE, this will be redefined,
+ * which is just fine.
+ *
+ * @param command
+ * @param target
+ * @param value
+ */
+if (typeof(Command) == 'undefined') {
+    function Command(command, target, value) {
+        this.command = command != null ? command : '';
+        this.target = target != null ? target : '';
+        this.value = value != null ? value : '';
     }
+}
+
+
+
+/**
+ * A CommandMatcher object matches commands during the application of a
+ * RollupRule. It's specified with a shorthand format, for example:
+ *
+ *  new CommandMatcher({
+ *      command: 'click'
+ *      , target: 'ui=allPages::.+'
+ *  })
+ *
+ * which is intended to match click commands whose target is an element in the
+ * allPages PageSet. The matching expressions are given as regular expressions;
+ * in the example above, the command must be "click"; "clickAndWait" would be
+ * acceptable if 'click.*' were used. Here's a more complete example:
+ *
+ *  new CommandMatcher({
+ *      command: 'type'
+ *      , target: 'ui=loginPages::username()'
+ *      , value: '.+_test'
+ *      , updateArgs: function(command, args) {
+ *          args.username = command.value;
+ *      }
+ *  })
+ *
+ * Here, the command and target are fixed, but there is variability in the 
+ * value of the command. When a command matches, the username is saved to the
+ * arguments object.
+ */
+function CommandMatcher(commandMatcherShorthand)
+{
+    /**
+     * Ensure the shorthand notation used to initialize the CommandMatcher has
+     * all required values.
+     *
+     * @param commandMatcherShorthand  an object containing information about
+     *                                 the CommandMatcher
+     */
+    this.validate = function(commandMatcherShorthand) {
+        var msg = "CommandMatcher validation error:\n"
+            + print_r(commandMatcherShorthand);
+        if (!commandMatcherShorthand.command) {
+            throw new CommandMatcherException(msg + 'no command specified!');
+        }
+        if (!commandMatcherShorthand.target) {
+            throw new CommandMatcherException(msg + 'no target specified!');
+        }
+        if (commandMatcherShorthand.minMatches &&
+            commandMatcherShorthand.maxMatches &&
+            commandMatcherShorthand.minMatches >
+            commandMatcherShorthand.maxMatches) {
+            throw new CommandMatcherException(msg + 'minMatches > maxMatches!');
+        }
+    };
+
+    /**
+     * Initialize this object.
+     *
+     * @param commandMatcherShorthand  an object containing information used to
+     *                                 initialize the CommandMatcher
+     */
+    this.init = function(commandMatcherShorthand) {
+        this.validate(commandMatcherShorthand);
+        
+        this.command = commandMatcherShorthand.command;
+        this.target = commandMatcherShorthand.target;
+        this.value = commandMatcherShorthand.value || null;
+        this.minMatches = commandMatcherShorthand.minMatches || 1;
+        this.maxMatches = commandMatcherShorthand.maxMatches || 1;
+        this.updateArgs = commandMatcherShorthand.updateArgs ||
+            function(command, args) { return args; };
+    };
+    
+    /**
+     * Determines whether a given command matches. Updates args by "reference"
+     * and returns true if it does; return false otherwise.
+     *
+     * @param command  the command to attempt to match
+     */
+    this.isMatch = function(command) {
+        var re = new RegExp('^' + this.command + '$');
+        if (! re.test(command.command)) {
+            return false;
+        }
+        re = new RegExp('^' + this.target + '$');
+        if (! re.test(command.target)) {
+            return false;
+        }
+        if (this.value != null) {
+            re = new RegExp('^' + this.value + '$');
+            if (! re.test(command.value)) {
+                return false;
+            }
+        }
+        
+        // okay, the command matches
+        return true;
+    };
+    
+    // initialization
+    this.init(commandMatcherShorthand);
+}
+
+
+
+function RollupRuleException(message)
+{
+    this.message = message;
+    this.name = 'RollupRuleException';
+}
+
+function RollupRule(rollupRuleShorthand)
+{
+    /**
+     * Ensure the shorthand notation used to initialize the RollupRule has all
+     * required values.
+     *
+     * @param rollupRuleShorthand  an object containing information about the
+     *                             RollupRule
+     */
+    this.validate = function(rollupRuleShorthand) {
+        var msg = "RollupRule validation error:\n"
+            + print_r(rollupRuleShorthand);
+        if (!rollupRuleShorthand.name) {
+            throw new RollupRuleException(msg + 'no name specified!');
+        }
+        if (!rollupRuleShorthand.description) {
+            throw new RollupRuleException(msg + 'no description specified!');
+        }
+        // rollupRuleShorthand.args is optional
+        if (!rollupRuleShorthand.commandMatchers &&
+            !rollupRuleShorthand.getRollup) {
+            throw new RollupRuleException(msg
+                + 'no command matchers specified!');
+        }
+        if (!rollupRuleShorthand.expandedCommands &&
+            !rollupRuleShorthand.getExpandedCommands) {
+            throw new RollupRuleException(msg
+                + 'no expanded commands specified!');
+        }
+        
+        return true;
+    };
+
+    /**
+     * Initialize this object.
+     *
+     * @param rollupRuleShorthand  an object containing information used to
+     *                             initialize the RollupRule
+     */
+    this.init = function(rollupRuleShorthand) {
+        this.validate(rollupRuleShorthand);
+        
+        this.name = rollupRuleShorthand.name;
+        this.description = rollupRuleShorthand.description;
+        this.pre = rollupRuleShorthand.pre || '';
+        this.post = rollupRuleShorthand.post || '';
+        this.alternateCommand = rollupRuleShorthand.alternateCommand;
+        this.args = rollupRuleShorthand.args || [];
+        
+        if (rollupRuleShorthand.commandMatchers) {
+            // construct the rule from the list of CommandMatchers
+            this.commandMatchers = [];
+            var matchers = rollupRuleShorthand.commandMatchers;
+            for (var i = 0; i < matchers.length; ++i) {
+                if (matchers[i].updateArgs && this.args.length == 0) {
+                    // enforce metadata for arguments
+                    var msg = "RollupRule validation error:\n"
+                        + print_r(rollupRuleShorthand)
+                        + 'no argument metadata provided!';
+                    throw new RollupRuleException(msg);
+                }
+                this.commandMatchers.push(new CommandMatcher(matchers[i]));
+            }
+            
+            // returns false if the rollup doesn't match, or a rollup command
+            // if it does. If returned, the command contains the
+            // replacementIndexes property, which indicates which commands it
+            // substitutes for.
+            this.getRollup = function(commands) {
+                // this is a greedy matching algorithm
+                var replacementIndexes = [];
+                var commandMatcherQueue = this.commandMatchers;
+                var matchCount = 0;
+                var args = {};
+                for (var i = 0, j = 0; i < commandMatcherQueue.length;) {
+                    var matcher = commandMatcherQueue[i];
+                    if (j >= commands.length) {
+                        // we've run out of commands! If the remaining matchers
+                        // do not have minMatches requirements, this is a
+                        // match. Otherwise, it's not.
+                        if (matcher.minMatches > 0) {
+                            return false;
+                        }
+                        ++i;
+                        matchCount = 0; // unnecessary, but let's be consistent
+                    }
+                    else {
+                        if (matcher.isMatch(commands[j])) {
+                            ++matchCount;
+                            if (matchCount == matcher.maxMatches) {
+                                // exhausted this matcher's matches ... move on
+                                // to next matcher
+                                ++i;
+                                matchCount = 0;
+                            }
+                            args = matcher.updateArgs(commands[j], args);
+                            replacementIndexes.push(j);
+                            ++j; // move on to next command
+                        }
+                        else {
+                            //alert(matchCount + ', ' + matcher.minMatches);
+                            if (matchCount < matcher.minMatches) {
+                                return false;
+                            }
+                            // didn't match this time, but we've satisfied the
+                            // requirements already ... move on to next matcher
+                            ++i;
+                            matchCount = 0;
+                            // still gonna look at same command
+                        }
+                    }
+                }
+                
+                var rollup;
+                if (this.alternateCommand) {
+                    rollup = new Command(this.alternateCommand,
+                        commands[0].target, commands[0].value);
+                }
+                else {
+                    rollup = new Command('rollup', this.name);
+                    rollup.value = to_kwargs(args);
+                }
+                rollup.replacementIndexes = replacementIndexes;
+                return rollup;
+            };
+        }
+        else {
+            this.getRollup = function(commands) {
+                var result = rollupRuleShorthand.getRollup(commands);
+                if (result) {
+                    var rollup = new Command(
+                        result.command
+                        , result.target
+                        , result.value
+                    );
+                    rollup.replacementIndexes = result.replacementIndexes;
+                    return rollup;
+                }
+                return false;
+            };
+        }
+        
+        this.getExpandedCommands = function(kwargs) {
+            var commands = [];
+            var expandedCommands = (rollupRuleShorthand.expandedCommands
+                ? rollupRuleShorthand.expandedCommands
+                : rollupRuleShorthand.getExpandedCommands(
+                    parse_kwargs(kwargs)));
+            for (var i = 0; i < expandedCommands.length; ++i) {
+                var command = expandedCommands[i];
+                commands.push(new Command(
+                    command.command
+                    , command.target
+                    , command.value
+                ));
+            }
+            return commands;
+        };
+    };
+    
+    this.init(rollupRuleShorthand);
+}
+
+
+
+/**
+ *
+ */
+function RollupManager()
+{
+    // singleton pattern
+    RollupManager.self = this;
+    
+    this.init = function()
+    {
+        this.rollupRules = {};
+        if (is_IDE()) {
+            Editor.rollupManager = this;
+        }
+    };
+
+    /**
+     * Adds a new RollupRule to the repository. Returns true on success, or
+     * false if the rule couldn't be added.
+     *
+     * @param rollupRuleShorthand  shorthand JSON specification of the new
+     *                             RollupRule, possibly including CommandMatcher
+     *                             shorthand too.
+     * @return                     true if the rule was added successfully,
+     *                             false otherwise.
+     */
+    this.addRollupRule = function(rollupRuleShorthand)
+    {
+        try {
+            var rule = new RollupRule(rollupRuleShorthand);
+            this.rollupRules[rule.name] = rule;
+        }
+        catch(e) {
+            smart_alert("Could not create RollupRule from shorthand:\n\n"
+                + e.message);
+            return false;
+        }
+        return true;
+    };
+    
+    /**
+     * Returns a RollupRule by name.
+     *
+     * @param rollupName  the name of the rule to fetch
+     * @return            the RollupRule, or null if it isn't found.
+     */
+    this.getRollupRule = function(rollupName)
+    {
+        return (this.rollupRules[rollupName] || null);
+    };
+    
+    /**
+     * Returns a list of name-description pairs for use in populating the
+     * auto-populated target dropdown in the IDE. Rules that have an alternate
+     * command defined are not included in the list, as they are not bona-fide
+     * rollups.
+     *
+     * @return  a list of name-description pairs
+     */
+    this.getRollupRulesForDropdown = function()
+    {
+        var targets = [];
+        var names = keys(this.rollupRules).sort();
+        for (var i = 0; i < names.length; ++i) {
+            var name = names[i];
+            if (this.rollupRules[name].alternateCommand) {
+                continue;
+            }
+            targets.push([ name, this.rollupRules[name].description ]);
+        }
+        return targets;
+    };
+    
+    /**
+     * Applies all rules to the current editor commands, asking the user in
+     * each case if it's okay to perform the replacement. The rules are applied
+     * repeatedly until there are no more matches. The algorithm should
+     * remember when the user has declined a replacement, and not ask to do it
+     * again.
+     *
+     * @return  the list of commands with rollup replacements performed
+     */
+    this.applyRollupRules = function()
+    {
+        var commands = editor.getTestCase().commands;
+        var blacklistedRollups = {};
+    
+        // so long as rollups were performed, we need to keep iterating through
+        // the commands starting at the beginning, because further rollups may
+        // potentially be applied on the newly created ones.
+        while (true) {
+            var performedRollup = false;
+            for (var i = 0; i < commands.length; ++i) {
+                // iterate through commands
+                for (var rollupName in this.rollupRules) {
+                    var rule = this.rollupRules[rollupName];
+                    var rollup = rule.getRollup(commands.slice(i));
+                    if (rollup) {
+                        // since we passed in a sliced version of the commands
+                        // array to the getRollup() method, we need to re-add 
+                        // the offset to the replacementIndexes
+                        var k = 0;
+                        for (; k < rollup.replacementIndexes.length; ++k) {
+                            rollup.replacementIndexes[k] += i;
+                        }
+                        
+                        // build the confirmation message
+                        var msg = "Perform the following command rollup?\n\n";
+                        for (k = 0; k < rollup.replacementIndexes.length; ++k) {
+                            var replacementIndex = rollup.replacementIndexes[k];
+                            var command = commands[replacementIndex];
+                            msg += '[' + replacementIndex + ']: ';
+                            msg += command + "\n";
+                        }
+                        msg += "\n";
+                        msg += rollup;
+                        
+                        // check against blacklisted rollups
+                        if (blacklistedRollups[msg]) {
+                            continue;
+                        }
+                        
+                        // highlight the potentially replaced rows
+                        for (k = 0; k < commands.length; ++k) {
+                            var command = commands[k];
+                            command.result = '';
+                            if (rollup.replacementIndexes.indexOf(k) != -1) {
+                                command.selectedForReplacement = true;
+                            }
+                            editor.view.rowUpdated(replacementIndex);
+                        }
+                        
+                        // get confirmation from user
+                        if (confirm(msg)) {
+                            // perform rollup
+                            var deleteRanges = [];
+                            var replacementIndexes = rollup.replacementIndexes;
+                            for (k = 0; k < replacementIndexes.length; ++k) {
+                                // this is expected to be list of ranges. A
+                                // range has a start, and a list of commands.
+                                // The deletion only checks the length of the
+                                // command list.
+                                deleteRanges.push({
+                                    start: replacementIndexes[k]
+                                    , commands: [ 1 ]
+                                });
+                            }
+                            editor.view.executeAction(new TreeView
+                                .DeleteCommandAction(editor.view,deleteRanges));
+                            editor.view.insertAt(i, rollup);
+                            
+                            performedRollup = true;
+                        }
+                        else {
+                            // cleverly remember not to try this rollup again
+                            blacklistedRollups[msg] = true;
+                        }
+                        
+                        // unhighlight
+                        for (k = 0; k < commands.length; ++k) {
+                            commands[k].selectedForReplacement = false;
+                            editor.view.rowUpdated(k);
+                        }
+                    }
+                }
+            }
+            if (!performedRollup) {
+                break;
+            }
+        }
+        return commands;
+    };
+    
+    this.init();
+}
+
+RollupManager.getInstance = function() {
+    return (RollupManager.self == null)
+        ? new RollupManager()
+        : RollupManager.self;
 }
 

@@ -29,11 +29,11 @@ function test_UIElement_validate()
     });
     
     // happy path 1
-    uiElement.validate({ name: 'name', description: 'desc', xpath: '//a' }));
+    uiElement.validate({ name: 'name', description: 'desc', xpath: '//a' });
     
     // happy path 2
     uiElement.validate({ name: 'name', description: 'desc',
-        getLocator: function(args) { return '//a'; } }));
+        getLocator: function(args) { return '//a'; } });
     
     // destructive: no name
     try {
@@ -315,13 +315,13 @@ function test_UIArgument_validate()
     uiArgument.validate({ name: 'name'
         , description: 'desc'
         , defaultValues: [1, 2]
-    }));
+    });
     
     // happy path 2
     uiArgument.validate({ name: 'name'
         , description: 'desc'
         , getDefaultValues: function() { return [1, 2]; }
-    }));
+    });
     
     // destructive: no name
     try {
@@ -730,6 +730,205 @@ function test_UIMap_getUIElementsByUrl()
 }
 
 
+
+function test_CommandMatcher_validate()
+{
+    // no target
+    try {
+        new CommandMatcher({ command: 'command' });
+        fail('Expected CommandMatcherException, but none was thrown');
+    }
+    catch (e) {
+        assertEquals('CommandMatcherException', e.name);
+    }
+
+    // no command
+    try {
+        new CommandMatcher({ target: 'target' });
+        fail('Expected CommandMatcherException, but none was thrown');
+    }
+    catch (e) {
+        assertEquals('CommandMatcherException', e.name);
+    }
+    
+    // minMatches > maxMatches
+    try {
+        new CommandMatcher({
+            command: 'command'
+            , target: 'target'
+            , minMatches: 5
+            , maxMatches: 1
+        });
+        fail('Expected CommandMatcherException, but none was thrown');
+    }
+    catch (e) {
+        assertEquals('CommandMatcherException', e.name);
+    }
+    
+    // happy path
+    new CommandMatcher({ command: 'command', target: 'target' });
+}
+
+function test_CommandMatcher_init()
+{
+    var f = function() { };
+
+    // happy path, all elements
+    var cm = new CommandMatcher({
+        command: 'command'
+        , target: 'target'
+        , value: 'value'
+        , minMatches: 1
+        , maxMatches: 5
+        , updateArgs: f
+    });
+    assertEquals('command', cm.command);
+    assertEquals('target', cm.target);
+    assertEquals('value', cm.value);
+    assertEquals(1, cm.minMatches);
+    assertEquals(5, cm.maxMatches);
+    assertEquals(f, cm.updateArgs);
+    
+    // leave out all non-required fields
+    cm = new CommandMatcher({ command: 'command', target: 'target' });
+    assertEquals('command', cm.command);
+    assertEquals('target', cm.target);
+    assertNull(cm.value);
+    assertEquals(1, cm.minMatches);
+    assertEquals(1, cm.maxMatches);
+    assertNotUndefined(cm.updateArgs);
+}
+
+function test_CommandMatcher_match()
+{
+    // test matching on command, target, and value using regular expressions.
+    // Assert on the arguments object being updated correctly.
+    var cm = new CommandMatcher({
+        command: 'click.*'
+        , target: 'ui=allPages::.+'
+        , value: '\\d{4}'
+    });
+    
+    // happy path
+    var command = {
+        command: 'clickAndWait'
+        , target: 'ui=allPages::help()'
+        , value: '2085'
+    };
+    assertTrue(cm.isMatch(command));
+    
+    // sad path 1: failed command
+    command.command = 'type';
+    assertFalse(cm.isMatch(command));
+    
+    // sad path 2: failed target
+    command.command = 'click';
+    command.target = 'password';
+    assertFalse(cm.isMatch(command));
+    
+    // sad path 3: failed value
+    command.target = 'ui=allPages::faq()';
+    command.value = 'asdf';
+    assertFalse(cm.isMatch(command));
+}
+
+
+
+function test_RollupRule_getRollup()
+{
+    var rule = new RollupRule({
+        name: 'name'
+        , description: 'desc'
+        , commandMatchers: [
+            {
+                command: 'cmd1'
+                , target: 'tar\\d'
+            }
+            , {
+                command: 'cmd2'
+                , target: '[Tt]ar2'
+                , value: '\\$.*'
+            }
+        ]
+        , expandedCommands: []
+    });
+    
+    // exact match
+    var commands = [
+        new Command('cmd1', 'tar1', '')
+        , new Command('cmd2', 'Tar2', '$5')
+    ];
+    var result = rule.getRollup(commands);
+    assertEquals('rollup', result.command);
+    assertEquals('name', result.target);
+    assertEquals('', result.value);
+    assertTrue(are_equal([ 0, 1 ], result.replacementIndexes));
+    
+    // now we set maxMatches, and have multiple matches for the first
+    // CommandMatcher
+    rule.commandMatchers[0].maxMatches = 5;
+    rule.commandMatchers[0].updateArgs = function(command, args) {
+        if (args.count) {
+            ++args.count;
+        }
+        else {
+            args.count = 1;
+        }
+        return args;
+    };
+    commands.unshift(new Command('cmd1', 'tar0'));
+    commands.unshift(new Command('cmd1', 'tar9'));
+    result = rule.getRollup(commands);
+    assertTrue(are_equal({ count: '3' }, parse_kwargs(result.value)));
+    assertTrue(are_equal([ 0, 1, 2, 3 ], result.replacementIndexes));
+    
+    // now we add non-matching commands after
+    commands.push(new Command('cmd1', 'target'));
+    commands.push(new Command('cmd2', 'tar2', 'dro$$'));
+    result = rule.getRollup(commands);
+    assertTrue(are_equal({ count: '3' }, parse_kwargs(result.value)));
+    assertTrue(are_equal([ 0, 1, 2, 3 ], result.replacementIndexes));
+    
+    // now we set minMatches. The first test should fail to match.
+    rule.commandMatchers[1].minMatches = 2;    
+    rule.commandMatchers[1].maxMatches = 5;
+    rule.commandMatchers[1].updateArgs = function(command, args) {
+        if (args.count2) {
+            ++args.count2;
+        }
+        else {
+            args.count2 = 1;
+        }
+        return args;
+    };
+    result = rule.getRollup(commands);
+    assertFalse(result);
+    
+    // this test uses commands that satisfy the minMatches.
+    commands.splice(4, 0, new Command('cmd2', 'tar2', '$_'));
+    result = rule.getRollup(commands);
+    assertTrue(are_equal({ count: '3', count2: '2' },
+        parse_kwargs(result.value)));
+    assertTrue(are_equal([ 0, 1, 2, 3, 4 ], result.replacementIndexes));
+    
+    // test the alternate command replacement
+    rule = new RollupRule({
+        name: 'btnG'
+        , description: 'desc'
+        , alternateCommand: 'clickAndWait'
+        , commandMatchers: [
+            {
+                command: 'click'
+                , target: 'btnG'
+            }
+        ]
+        , expandedCommands: []
+    });
+    commands = [ new Command('click', 'btnG') ];
+    result = rule.getRollup(commands);
+    assertEquals('clickAndWait', result.command);
+    assertEquals('btnG', result.target);
+}
 
     </script>
 </head>
