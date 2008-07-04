@@ -19,11 +19,19 @@ A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium].
 
 A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
 
-*Q: Why can't I execute Javascript directly? Other web testing tools allow this*
+*Q: How do I execute Javascript directly?*
 
 A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
 
-We also realise that there will be times when this is a limitation, and if you find this is a case please ask for help on the [http://groups.google.com/group/webdriver mailing list]. We'll do our best to help develop a simple, workable solution.
+We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a JavascriptExecutor. In Java, this looks like:
+
+{{{
+WebDriver driver; // Assigned elsewhere
+JavascriptExecutor js = (JavascriptExecutor) driver;
+js.executeScript("return document.title");
+}}}
+
+Other language bindings will follow a similar approach.
 
 *Q: Which browsers does WebDriver support?*
 
@@ -36,6 +44,12 @@ A: Please see the HtmlUnitDriver page for more details, but the short answer is 
 *Q: My XPath finds elements in one browser, but not in others. Why is this?*
 
 A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XpathInWebDriver page.
+
+*Q: The InternetExplorerDriver does not work well on Vista. How do I get it to work as expected?*
+
+A: There are a number of solutions:
+   * Add any domains the browser visits to IE's "trustworthy sites". If you use a large number of sites, this might be problematic.
+   * Run Java with Administrator rights. Note, that this is potentially a large security hole: only visit sites you trust when running in this mode.
 
 *Q: What about support for languages other than Java?*
 
