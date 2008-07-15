@@ -1,5 +1,6 @@
 <decorators defaultdir="/decorators">
     <excludes>
+        <pattern>/selenium/*</pattern>
         <pattern>/shared/*</pattern>
         <pattern>/javadoc/*</pattern>
         <pattern>/ndoc/*</pattern>
