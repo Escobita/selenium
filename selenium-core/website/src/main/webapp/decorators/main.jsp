@@ -41,7 +41,6 @@
             <li><a href="/">About</a></li>
             <li><a href="/news.jsp">News</a></li>
             <li><a href="/changelog.jsp">Changelog</a></li>
-            <li><a href="/tutorial.html">Tutorial</a></li>
             <li><a href="http://wiki.openqa.org/display/SEL/Selenium+core+FAQ">FAQ</a></li>
         </ul>
     </div>
