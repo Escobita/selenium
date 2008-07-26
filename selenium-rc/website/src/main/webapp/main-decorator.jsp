@@ -3,8 +3,8 @@
 <head>
     <title>Selenium RC: <decorator:title/></title>
     <style type="text/css">
-		@import url(main.css);
-		@import url(wiki.css);
+		@import url(/main.css);
+		@import url(/wiki.css);
     </style>
     <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
     </script>
@@ -22,7 +22,7 @@
     <decorator:head/>
 </head>
 
-<body onload="onLoadFunc()">
+<body onLoad="onLoadFunc()">
 
 <script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium-rc"></script>
 <script type="text/javascript"
