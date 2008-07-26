@@ -1,107 +1,94 @@
-<%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
-<html>
+﻿<%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-    <title>Selenium RC: <decorator:title/></title>
-    <style type="text/css">
-		@import url(/main.css);
-		@import url(/wiki.css);
-    </style>
-    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-    </script>
-    <script type="text/javascript">
-        if (urchinTracker) {
-            _uacct = "UA-131794-2";
-            urchinTracker();
-        }
-    </script>
-    <script type="text/javascript">
-        function onLoadFunc() {
-            document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
-        }
-    </script>
+    <title><decorator:title/></title>
+    <link href="openqa.css" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" href="openqa-favicon.ico" type="image/vnd.microsoft.icon" />
+    <link rel="icon" href="openqa-favicon.ico" type="image/vnd.microsoft.icon" /> 
+    <script src="page-tools.js" type="text/javascript"></script>
     <decorator:head/>
 </head>
+<body class="homepage">
+<div id="container">
+    <div id="header">
+        <h1><a href="../selenium.openqa.org/index.html" title="Return to Selenium home page">Selenium</a></h1>
+        <ul>
+            <li><a href="index.html#">About</a></li>
+            <li><a href="index.html#">Support</a></li>
+            <li><a href="index.html#">Documentation</a></li>
+            <li><a href="index.html#">Download</a></li>
+            <li><a href="index.html#">Projects</a></li>
+        </ul>
+        <form id="searchbox_016909259827549404702:hzru01fldsm" action="http://www.google.com/cse" title="openqa.org Selenium Search">
+            <div>
+                <label for="q" title="Search openqa.org's sites for selenium content">search selenium:</label>
+                <input type="hidden" name="cx" value="016909259827549404702:hzru01fldsm">
+                <input type="hidden" name="cof" value="FORID:">
+                <input type="text" id="q" name="q" accesskey="s" size="30">
+                <input type="submit" id="submit" value="Go">
+            </div>
+        </form>
 
-<body onLoad="onLoadFunc()">
-
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium-rc"></script>
-<script type="text/javascript"
-  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium-rc"></script>
-
-<h1 class="first">Selenium-RC: <decorator:title/></h1>
-
-<decorator:body/>
+    </div>
+    <div id="userStatus">Welcome, <span id="username">Guest</span>. <a id="login" href="../www.openqa.org/sass/index.action">Login</a> or <a id="create_account" href="../www.openqa.org/sass/index.action">Create an account</a>.</div>
+    <div id="mBody">
+        <div id="sidebar">
+            <img alt="Selenium Logo" src="images/big-logo.png" />
+            <p>
+                <strong>Selenium is a suite of tools</strong> to automate web app testing across many platforms.
+            </p>
+            <p>Selenium...</p>
+            <ul>
+                <li>runs in <a href="index.html#">many browsers</a> and <a href="index.html#">operating systems</a></li>
+                <li>can be controlled by many <a href="index.html#">programming languages</a> and <a href="index.html#">testing frameworks</a>.</li>
+            </ul>
+            <div class="downloadBox"><a href="index.html#">Download Selenium</a>1.0 beta - 2MB Zip file</div>
+            <div class="ads">Ads go here</div>
+        </div>
+        <div id="mainContent">
+	      <decorator:body/>
+        </div>
+    </div>
+    <div id="footer">
+        <ul id="sitemap">
+            <li><a href="index.html#">Selenium Projects</a>
+                <ul><li><a href="index.html#">Selenium Core</a></li>
+                    <li><a href="index.html#">Selenium IDE</a></li>
+                    <li><a href="index.html#">Selenium Remote Control</a></li>
+                    <li><a href="index.html#">Selenium Grid</a></li>
+                    <li><a href="index.html#">Selenium on Rails</a></li>
+                    <li><a href="index.html#">CubicTest (for Eclipse)</a></li>
+                    <li class="different"><a href="index.html#">Other related projects</a></li>
+                </ul></li>
+            <li><a href="index.html#">Documentation</a>
+                <ul><li><a href="index.html#">Examples</a></li>
+                    <li><a href="index.html#">Screencasts</a></li>
+                    <li><a href="index.html#">Tutorials/Labs</a></li>
+                    <li><a href="index.html#">Wiki</a></li>
+                    <li><a href="index.html#">Selenium API</a></li>
+                </ul></li>
+            <li><a href="index.html#">Support</a>
+                <ul><li><a href="index.html#">Forums</a></li>
+                    <li><a href="index.html#">Bug Tracker</a></li>
+                    <li><a href="index.html#">Jobs Board</a></li>
+                    <li><a href="index.html#">Commercial Support</a></li>
+                </ul></li>
+            <li><a href="index.html#">About Selenium</a>
+                <ul><li><a href="index.html#">How it Works</a></li>
+                    <li><a href="index.html#">News/Blogs</a></li>
+                    <li><a href="index.html#">Supported Platforms</a></li>
+                    <li><a href="index.html#">Roadmap</a></li>
+                    <li><a href="index.html#">Getting Involved</a></li>
+                </ul></li>
+            <li><a href="../www.openqa.org/index.html">OpenQA.org</a>
+                <ul><li><a href="index.html#">Create an account</a></li>
+                    <li><a href="index.html#">Account management</a></li>
+                    <li><a href="index.html#">Sponsors</a></li>
+                </ul></li>
+        </ul>
+        <a href="../www.openqa.org/index.html"><img alt="openqa.org logo" id="footerLogo" src="openqa-logo.png" /></a>
+    </div>
 </div>
-<div id="menu">
-	<div class="menuGroup">
-        <h1>Essential</h1>
-        <ul>
-            <li><a href="/">About</a></li>
-            <li><a href="/news.jsp">News</a></li>
-            <li><a href="/changelog.jsp">Changelog</a></li>
-            <li><a href="/tutorial.html">Tutorial</a></li>
-            <li><a href="http://wiki.openqa.org/display/SRC/Selenium+RC+FAQ">FAQ</a></li>
-        </ul>
-    </div>
-    <div class="menuGroup">
-        <h1>Evaluating</h1>
-        <ul>
-            <li><a href="/license.jsp">License</a></li>
-            <li><a href="/download.jsp">Download</a></li>
-            <li><a href="/release-notes.html">Release Notes</a></li>
-        </ul>
-    </div>
-    <div class="menuGroup">
-        <h1>Using It</h1>
-        <ul>
-            <li><a href="/experimental.html">Experimental</a></li>
-            <li><a href="/java.html">- Java</a></li>
-            <li><a href="/dotnet.html">- .NET</a></li>
-            <li><a href="/perl.html">- Perl</a></li>
-            <li><a href="/php.html">- PHP</a></li>
-            <li><a href="/python.html">- Python</a></li>
-            <li><a href="/ruby.html">- ruby</a></li>
-            <li><a href="/selenese.html">- Selenese</a></li>
-            <li><a href="/js.html">- JavaScript</a></li>
-            <li><a href="/options.html">Server Command Line Options</a></li>
-            <li><a href="http://wiki.openqa.org/display/SRC/Developer%27s+Guide">Developers Guide</a></li>
-			<li><a href="http://wiki.openqa.org/display/SRC/Home">Wiki</a></li>
-            <li><a href="/user-forums.html">User Forums</a></li>
-            <li><a href="/xpath-help.html">Help with XPath</a></li>
-            <li><a href="/self-help.html">Self Help</a></li>
-            <li><a href="/reporting.jsp">Reporting Issues</a></li>
-            <li><a href="/rss.jsp">RSS Feeds</a></li>
-        </ul>
-    </div>
-    <div class="menuGroup">
-        <h1>Improving It</h1>
-        <ul>
-            <li><a href="/how-it-works.html">How it Works</a></li>
-            <li><a href="/contribute.jsp">How to Contribute</a></li>
-            <li><a href="/dev-forums.html">Developer Forums</a></li>
-            <li><a href="/members.jsp">Development Team</a></li>
-            <li><a href="/source.jsp">Source Repository</a></li>
-        </ul>
-    </div>
-</div>
-<script type="text/javascript">
-google_ad_client = "pub-6291771388053870";
-google_ad_width = 120;
-google_ad_height = 240;
-google_ad_format = "120x240_as";
-google_ad_type = "text_image";
-google_ad_channel ="2417238009";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_url = "008000";
-google_color_text = "000000";
-</script>
-<script type="text/javascript"
-  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium-rc"></script>
 </body>
 </html>
