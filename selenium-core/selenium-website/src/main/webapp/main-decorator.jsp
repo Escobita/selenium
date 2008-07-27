@@ -31,7 +31,7 @@
         </form>
 
     </div>
-    <div id="userStatus">Welcome, <span id="username">Guest</span>. <a id="login" href="../www.openqa.org/sass/index.action">Login</a> or <a id="create_account" href="../www.openqa.org/sass/index.action">Create an account</a>.</div>
+    <div id="userStatus">Welcome, <span id="username">Guest</span>. <a id="login" href="http://www.openqa.org/sass/index.action">Login</a> or <a id="create_account" href="http://www.openqa.org/sass/index.action">Create an account</a>.</div>
     <div id="mBody">
         <div id="sidebar">
             <img alt="Selenium Logo" src="images/big-logo.png" />
@@ -83,7 +83,7 @@
                     <li><a href="getting-involved.html">Getting Involved</a></li>
                 </ul></li>
             <li><a href="../www.openqa.org/index.html">OpenQA.org</a>
-                <ul><li><a href="index.html#">Create an account</a></li>
+                <ul><li><a href="http://www.openqa.org/sass/index.action">Create an account</a></li>
                     <li><a href="index.html#">Account management</a></li>
                     <li><a href="index.html#">Sponsors</a></li>
                 </ul></li>
