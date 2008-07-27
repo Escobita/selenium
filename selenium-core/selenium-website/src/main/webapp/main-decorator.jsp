@@ -82,7 +82,7 @@
                 <ul><li><a href="index.html#">Examples</a></li>
                     <li><a href="index.html#">Screencasts</a></li>
                     <li><a href="index.html#">Tutorials/Labs</a></li>
-                    <li><a href="index.html#">Wiki</a></li>
+                    <li><a href="http://wiki.openqa.org/display/SEL/Home">Wiki</a></li>
                     <li><a href="index.html#">Selenium API</a></li>
                 </ul></li>
             <li><a href="index.html#">Support</a>
