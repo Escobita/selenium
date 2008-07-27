@@ -58,7 +58,7 @@
                     <li><a href="http://selenium-rc.openqa.org">Selenium Remote Control</a></li>
                     <li><a href="http://selenium-grid.openqa.org">Selenium Grid</a></li>
                     <li><a href="http://selenium-on-rails.openqa.org">Selenium on Rails</a></li>
-                    <li><a href="http://cubic.openqa.org">CubicTest (for Eclipse)</a></li>
+                    <li><a href="http://cubictest.openqa.org">CubicTest (for Eclipse)</a></li>
                     <li class="different"><a href="more-related-projects.html#">Other related projects</a></li>
                 </ul></li>
             <li><a href="index.html#">Documentation</a>
