@@ -44,7 +44,24 @@
                 <li>can be controlled by many <a href="programming-languages.html#">programming languages</a> and <a href="testing-frameworks.html">testing frameworks</a>.</li>
             </ul>
             <div class="downloadBox"><a href="index.html#">Download Selenium</a>1.0 beta - 2MB Zip file</div>
-            <div class="ads">Ads go here</div>
+            <div class="ads">
+				<script type="text/javascript"><!--
+				google_ad_client = "pub-6291771388053870";
+				google_ad_width = 190;
+				google_ad_height = 370;
+				google_ad_format = "190x370_as";
+				google_ad_type = "text_image";
+				google_ad_channel ="";
+				google_color_border = "E9E9E9";
+				google_color_bg = "E9E9E9";
+				google_color_link = "000000";
+				google_color_url = "333333";
+				google_color_text = "000000";
+				//--></script>
+				<script type="text/javascript"
+				  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+				</script>
+	        </div>
         </div>
         <div id="mainContent">
 	      <decorator:body/>
