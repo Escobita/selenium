@@ -1,124 +1,134 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
-<html><head><title>Selenium</title>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Mac OS X (vers 1 September 2005), see www.w3.org" />
 
-<style type="text/css">
-@import url(main.css);
-@import url(wiki.css);
-</style>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-if (urchinTracker) {
-_uacct = "UA-131794-2";
-urchinTracker();
-}
-</script>
-<script type="text/javascript">
-function onLoadFunc() {
-document.getElementById("content").style.minHeight = document.getElementById("menu").clientHeight + 'px';
-}
-</script></head>
-<body onload="onLoadFunc()">
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-start.jsp?name=selenium"></script>
-<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/header-end.jsp?name=selenium"></script>
-<h1 class="first">Selenium Overview</h1>
+  <title>Selenium web application testing system</title>
+</head>
 
-<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
-<tbody>
-<tr>
-<td style="vertical-align: top;">
-<p><b>Selenium</b> is a test tool for web
-applications.
-Selenium tests run
-<b>directly in a browser</b>, just like real users
-do. It runs in
-Internet Explorer, Mozilla and Firefox on Windows, Linux, and
-Macintosh, Safari on the Mac. &nbsp;We have plans to target Safari
-on the iPhone in some months.&nbsp;</p><p>The quickest way to learn Selenium is via a Firefox plugin called <a href="index.html#Selenium_IDE"><span style="font-style: italic;">Selenium IDE</span></a>. It is quite compelling for developing tests in and quickly trying out
-Selenium before choosing Selenium&nbsp;for
-your project.
-</p>
-There are two modes of operation for Selenium<span style="font-style: italic;"> - <a href="index.html#Selenium_Core">Core</a></span><a href="index.html#core"> </a>and <span style="font-style: italic;"><a href="index.html#Selenium_Remote_Control">Remote Control (RC)</a>.
-&nbsp;</span>Remote Control mode also has a related
-capability called<span style="font-style: italic;"> <a href="index.html#Selenium_Grid">Selenium Grid</a></span> that allows you to throw hardware at tests to make it all faster.
-<br>
-</td>
-<td style="width: 180px; background-color: rgb(102, 255, 255); vertical-align: top;"><span style="font-weight: bold;">News!</span><br>
-Selenium 1.0 beta-1 released (March 5, 2008)<br>
-<span style="font-weight: bold;">Downloads..</span><br>
-<a href="http://archiva.openqa.org/repository/releases/org/openqa/selenium/core/selenium-core/1.0-beta-1/">Selenium
-Core</a><br>
-<a href="http://archiva.openqa.org/repository/releases/org/openqa/selenium/selenium-remote-control/1.0-beta-1/selenium-remote-control-1.0-beta-1-dist.zip">Selenium
-RC</a><br><a href="release-notes.html">Release Notes</a><br>
-</td>
-</tr>
-</tbody>
-</table>
-<br>
-<h2><a name="Selenium_IDE"></a>Selenium IDE</h2>
-This Firefox plugin allows you to record and playback tests in the
-browser. &nbsp;Here is a screen shot of it in use (in the side-bar
-of
-Firefox):<br>
-<img style="width: 862px; height: 687px;" alt="ide" src="selenium-ide.png"><br>
-To install Selenium-IDE into firefox, <a href="http://selenium-ide.openqa.org/download.jsp">go here</a>
-<br>
-<br>
-For more on Selenium IDE, see <a href="http://selenium-ide.openqa.org/">its website</a><span style="font-style: italic;"></span>.&nbsp;Be sure
-to check it out if you do not know what Selenium is, as the learning
-curve is very small.<br>
-<h2><a name="Selenium_Remote_Control"></a>Selenium
-Remote Control</h2>
-<p>The
-Remote Control mode is more advanced. It is able to test a wider range
-of web-applications than Selenium-Core and is more scalable, but
-requires some technical knowledge to set up. &nbsp;Below is a
-simplified architectural representation of it .. </p>
-<img style="width: 538px; height: 525px;" alt="rc" src="selenium-rc.png"><br>
-For more on Selenium-RC and downloads, see <a href="http://selenium-rc.openqa.org/">its website</a> <br>
-<h2><a name="Selenium_Grid"></a>Selenium Grid</h2>
-<p>This additional server piece allows the several
-Remote Control servers to accessed in parallel by one or more driving
-processes. &nbsp;You may want to do this if you want to use scale
-to
-speed everything up, or because you need to test on Mac and/or Linux,
-as well as Windows from one driving test-suite.</p>
-<img style="width: 581px; height: 532px;" alt="grid" src="selenium-grid.png"><br>
-For more on Selenium Grid and downloads, see <a href="http://selenium-grid.openqa.org/">its website</a><span style="font-style: italic;"><br>
-</span>
-<h2><a name="Selenium_Core"></a>Selenium Core</h2>
-<p>
-Core mode: The JavaScript core library and the tests in question are
-loaded <span style="font-weight: bold;">into</span>
-your webapp. It is a simpler form of Selenium, and suitable for
-non-developers, but it has some inherent limitations. Below
-is a
-simplified representation of the architecture.</p><table style="text-align: left;" border="0" cellpadding="2" cellspacing="2"><tbody><tr><td><img style="width: 538px; height: 227px;" alt="core" src="selenium-core.png"></td><td>Your
-tests scripts (written in HTML) and the Selenium Test Runner itself are
-uploaded to the same web server that hosts the application you are
-trying to test. &nbsp;That suggests that you know how to deploy to that
-web server (or know someone who does).<br><br>You open a browser at a URL that will kick off the tests, and watch them run by.<br><br>Selenium Core works on muliple browsers - more than the three shown on the left.</td></tr></tbody></table><br>
+<body>
+  <h2>Get started with Selenium</h2>
 
-For more on Selenium Core and downloads, see <a href="http://selenium-core.openqa.org/">its website</a>
+  <div class="bigMenu">
+    <h3 id="step0">0. Watch: see the magic.</h3>
 
-<br><br>
-<div style="text-align: left; margin-right: 120px;">Selenium
-was
-developed by team
-of developers and testers at
-<a href="http://www.thoughtworks.com/">ThoughtWorks</a>.
-It is
-open-source software and can
-be downloaded and used without charge. It is currently under active
-development developers from multiple companies. See <a href="who-made-selenium.html">who made Selenium</a>
-for more details.<br><br>
-<a href="http://www.thoughtworks.com/">ThoughtWorks</a>
-is a leader in Agile development methods for enterprise
-software development. Selenium is designed specifically for the
-acceptance testing requirements of Agile teams. However, teams
-using more traditional development will also find it useful.
-</div>
-<script type="text/javascript" src="http://www.openqa.org/shared/projects/footer.jsp?name=selenium"></script>
-</body></html>
+    <div>
+      <a class="video" href="index.html#step0" onclick=
+      "showVideo()" title="Watch the video"><img alt="video icon"
+      src="images/intro-video-icon.png" /> 5 Minute Intro</a>
+      <a class="video" href="index.html#step0" onclick=
+      "showVideo()" title="Watch the video"><img alt="video icon"
+      src="images/intro-video-icon.png" /> Example Setup</a>
+      <a class="video" href="index.html#step0" onclick=
+      "showVideo()" title="Watch the video"><img alt="video icon"
+      src="images/intro-video-icon.png" /> Tips and Tricks</a>
+
+      <div style="display:none;" id="introVideo">
+        <object width="425" height="355">
+          <param name="movie" value=
+          "http://www.youtube.com/v/EDb8yOM3Vpw&amp;color1=0x3a3a3a&amp;color2=0x999999&amp;hl=en" />
+          <param name="wmode" value="transparent" />
+          <embed src=
+          "../www.youtube.com/swf/l.swf?video_id=EDb8yOM3Vpw&amp;rel=1&amp;eurl=http:%252F%252Fseleniumdesign.googlepages.com%252Findex.html&amp;iurl=http:%252F%252Fi.ytimg.com%252Fvi%252FEDb8yOM3Vpw%252Fdefault.jpg&amp;t=OEgsToPDskKN-LpcTtnPY-b0psxw_mf1&amp;color1=0x3a3a3a&amp;color2=0x999999&amp;hl=en"
+          type="application/x-shockwave-flash" wmode="transparent"
+          width="425" height="355" />
+        </object>
+      </div>
+    </div>
+
+    <h3>1. Begin: write and run tests in Firefox.</h3>
+
+    <div>
+      <a href="../selenium-ide.openqa.org/index.html"><img alt=
+      "Selenium IDE Logo" class="icon" src=
+      "images/selenium-ide-logo.png" /></a>
+
+      <p><strong><a href=
+      "../selenium-ide.openqa.org/index.html">Selenium
+      IDE</a></strong> is a Firefox addon that records clicks,
+      typing, and other actions to make a test, which you can play
+      back in the browser.</p>
+
+      <ul>
+        <li><a href="index.html#">Download Selenium IDE</a></li>
+
+        <li><a href="selenium-ide.html">Learn more</a></li>
+
+        <li><a href="index.html#">Screenshots</a></li>
+      </ul>
+    </div>
+
+    <h3>2. Customize: your language, your browser.</h3>
+
+    <div>
+      <a href="../selenium-rc.openqa.org/index.html"><img alt=
+      "Selenium RC Logo" class="icon" src=
+      "images/selenium-rc-logo.png" /></a>
+
+      <p><strong><a href=
+      "../selenium-rc.openqa.org/index.html">Selenium Remote
+      Control (RC)</a></strong> runs your tests in <a href=
+      "index.html#">multiple browsers and platforms</a>. Tweak your
+      tests in your <a href="index.html#">preferred
+      language</a>.</p>
+
+      <ul>
+        <li><a href="index.html#">Download Selenium RC</a></li>
+
+        <li><a href="selenium-rc.html">Learn
+        more</a></li>
+
+        <li><a href="index.html#">Screenshots</a></li>
+      </ul>
+    </div>
+
+    <h3>3. Deploy: scale out, speed up.</h3>
+
+    <div>
+      <a href="../selenium-grid.openqa.org/index.html"><img alt=
+      "Selenium Grid Logo" class="icon" src=
+      "images/selenium-grid-logo.png" /></a>
+
+      <p><strong><a href=
+      "../selenium-grid.openqa.org/index.html">Selenium
+      Grid</a></strong> extends Selenium RC to distribute your
+      tests across multiple servers, saving you time by running
+      tests in parallel.</p>
+
+      <ul>
+        <li><a href="index.html#">Download Selenium Grid</a></li>
+
+        <li><a href="selenium-grid.html">Learn
+        more</a></li>
+
+        <li><a href="index.html#">Screenshots</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Learn Selenium</h2>
+
+  <ul>
+    <li><a href="index.html#">The Magic of Selenium: How it
+    works</a></li>
+
+    <li><a href="index.html#">Support Matrix: Operating Systems,
+    Browsers, Programming Languages</a></li>
+
+    <li><a href="screencasts.html">Screencasts</a></li>
+
+    <li><a href="index.html#">Tutorials / Labs</a></li>
+
+    <li><a href="index.html#">Selenium API</a></li>
+  </ul>
+
+  <h2>Selenium News<a href="index.html#"><img alt="Feed icon" src=
+  "images/feed.png" /></a></h2>
+
+  <ul>
+    <li><a href="index.html#">Selenium 1.0 beta released</a></li>
+
+    <li><a href="feb-08-meetup.html#">Selenium Meetup @ the Googleplex - February 2008</a></li>
+  </ul>
+</body>
+</html>

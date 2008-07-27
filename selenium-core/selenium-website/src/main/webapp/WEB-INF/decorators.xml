@@ -1,6 +1,5 @@
 <decorators defaultdir="/">
     <excludes>
-        <pattern>/index.html</pattern>
         <pattern>/undecorated_new_for_reference.html</pattern>
         <pattern>/shared/*</pattern>
         <pattern>/javadoc/*</pattern>
