@@ -75,7 +75,8 @@
                     <li><a href="index.html#">Commercial Support</a></li>
                 </ul></li>
             <li><a href="index.html#">About Selenium</a>
-                <ul><li><a href="index.html#">How it Works</a></li>
+                <ul><li><a href="who-made-selenium.html">Who made Selenium</a>
+	                <li><a href="index.html#">How it Works</a></li>
                     <li><a href="index.html#">News/Blogs</a></li>
                     <li><a href="index.html#">Supported Platforms</a></li>
                     <li><a href="index.html#">Roadmap</a></li>
