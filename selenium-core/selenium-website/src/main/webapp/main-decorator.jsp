@@ -83,7 +83,7 @@
                     <li><a href="index.html#">Screencasts</a></li>
                     <li><a href="index.html#">Tutorials/Labs</a></li>
                     <li><a href="http://wiki.openqa.org/display/SEL/Home">Wiki</a></li>
-                    <li><a href="index.html#">Selenium API</a></li>
+                    <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
                 </ul></li>
             <li><a href="index.html#">Support</a>
                 <ul><li><a href="http://clearspace.openqa.org/index.jspa">Forums</a></li>
