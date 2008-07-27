@@ -69,10 +69,10 @@
                     <li><a href="index.html#">Selenium API</a></li>
                 </ul></li>
             <li><a href="index.html#">Support</a>
-                <ul><li><a href="index.html#">Forums</a></li>
-                    <li><a href="index.html#">Bug Tracker</a></li>
+                <ul><li><a href="http://clearspace.openqa.org/index.jspa">Forums</a></li>
+                    <li><a href="http://jira.openqa.org/">Bug Tracker</a></li>
                     <li><a href="index.html#">Jobs Board</a></li>
-                    <li><a href="index.html#">Commercial Support</a></li>
+                    <li><a href="commercial-suppprt.html">Commercial Support</a></li>
                 </ul></li>
             <li><a href="index.html#">About Selenium</a>
                 <ul><li><a href="who-made-selenium.html">Who made Selenium</a>
