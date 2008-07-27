@@ -41,7 +41,7 @@
             <p>Selenium...</p>
             <ul>
                 <li>runs in <a href="many-browsers.html">many browsers</a> and <a href="operating-systems.html">operating systems</a></li>
-                <li>can be controlled by many <a href="programming-languages.html#">programming languages</a> and <a href="index.html#">testing frameworks</a>.</li>
+                <li>can be controlled by many <a href="programming-languages.html#">programming languages</a> and <a href="testing-frameworks.html">testing frameworks</a>.</li>
             </ul>
             <div class="downloadBox"><a href="index.html#">Download Selenium</a>1.0 beta - 2MB Zip file</div>
             <div class="ads">Ads go here</div>
