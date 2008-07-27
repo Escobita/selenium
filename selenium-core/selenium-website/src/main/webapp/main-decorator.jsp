@@ -79,7 +79,7 @@
 	                <li><a href="index.html#">How it Works</a></li>
                     <li><a href="index.html#">News/Blogs</a></li>
                     <li><a href="index.html#">Supported Platforms</a></li>
-                    <li><a href="index.html#">Roadmap</a></li>
+                    <li><a href="roadmap.html">Roadmap</a></li>
                     <li><a href="getting-involved.html">Getting Involved</a></li>
                 </ul></li>
             <li><a href="../www.openqa.org/index.html">OpenQA.org</a>
