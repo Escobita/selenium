@@ -53,13 +53,13 @@
     <div id="footer">
         <ul id="sitemap">
             <li><a href="index.html#">Selenium Projects</a>
-                <ul><li><a href="index.html#">Selenium Core</a></li>
-                    <li><a href="index.html#">Selenium IDE</a></li>
-                    <li><a href="index.html#">Selenium Remote Control</a></li>
-                    <li><a href="index.html#">Selenium Grid</a></li>
-                    <li><a href="index.html#">Selenium on Rails</a></li>
-                    <li><a href="index.html#">CubicTest (for Eclipse)</a></li>
-                    <li class="different"><a href="index.html#">Other related projects</a></li>
+                <ul><li><a href="http://selenium-core.openqa.org">Selenium Core</a></li>
+                    <li><a href="http://selenium-ide.openqa.org">Selenium IDE</a></li>
+                    <li><a href="http://selenium-rc.openqa.org">Selenium Remote Control</a></li>
+                    <li><a href="http://selenium-grid.openqa.org">Selenium Grid</a></li>
+                    <li><a href="http://selenium-on-rails.openqa.org">Selenium on Rails</a></li>
+                    <li><a href="http://cubic.openqa.org">CubicTest (for Eclipse)</a></li>
+                    <li class="different"><a href="more-related-projects.html#">Other related projects</a></li>
                 </ul></li>
             <li><a href="index.html#">Documentation</a>
                 <ul><li><a href="index.html#">Examples</a></li>
