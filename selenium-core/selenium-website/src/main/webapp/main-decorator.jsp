@@ -80,7 +80,7 @@
                     <li><a href="index.html#">News/Blogs</a></li>
                     <li><a href="index.html#">Supported Platforms</a></li>
                     <li><a href="index.html#">Roadmap</a></li>
-                    <li><a href="index.html#">Getting Involved</a></li>
+                    <li><a href="getting-involved.html">Getting Involved</a></li>
                 </ul></li>
             <li><a href="../www.openqa.org/index.html">OpenQA.org</a>
                 <ul><li><a href="index.html#">Create an account</a></li>
