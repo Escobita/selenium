@@ -15,9 +15,9 @@
         <h1><a href="../selenium.openqa.org/index.html" title="Return to Selenium home page">Selenium</a></h1>
         <ul>
             <li><a href="index.html#">About</a></li>
-            <li><a href="index.html#">Support</a></li>
+            <li><a href="support.html#">Support</a></li>
             <li><a href="index.html#">Documentation</a></li>
-            <li><a href="index.html#">Download</a></li>
+            <li><a href="downloads.html#">Download</a></li>
             <li><a href="projects.html">Projects</a></li>
         </ul>
         <form id="searchbox_016909259827549404702:hzru01fldsm" action="http://www.google.com/cse" title="openqa.org Selenium Search">
