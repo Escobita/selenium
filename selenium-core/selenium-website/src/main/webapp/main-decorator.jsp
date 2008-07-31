@@ -3,22 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
     <title><decorator:title/></title>
-    <link href="openqa.css" rel="stylesheet" type="text/css" />
-    <link rel="shortcut icon" href="openqa-favicon.ico" type="image/vnd.microsoft.icon" />
-    <link rel="icon" href="openqa-favicon.ico" type="image/vnd.microsoft.icon" /> 
-    <script src="page-tools.js" type="text/javascript"></script>
+    <link href="/openqa.css" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon" />
+    <link rel="icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon" /> 
+    <script src="/page-tools.js" type="text/javascript"></script>
     <decorator:head/>
 </head>
 <body class="homepage">
 <div id="container">
     <div id="header">
-        <h1><a href="../selenium.openqa.org/index.html" title="Return to Selenium home page">Selenium</a></h1>
+        <h1><a href="/" title="Return to Selenium home page">Selenium</a></h1>
         <ul>
-            <li><a href="index.html#">About</a></li>
-            <li><a href="support.html#">Support</a></li>
-            <li><a href="index.html#">Documentation</a></li>
-            <li><a href="downloads.html#">Download</a></li>
-            <li><a href="projects.html">Projects</a></li>
+            <li id="menu_about"><a href="/about/" title="Overview of Selenium">About</a></li>
+            <li id="menu_support"><a href="/support/" title="Get help with Selenium">Support</a></li>
+            <li id="menu_documentation"><a href="/documentation/" title="Technical references and guides">Documentation</a></li>
+            <li id="menu_download"><a href="/download/" title="Get Selenium">Download</a></li>
+            <li id="menu_projects"><a href="/projects/" title="Selenium Projects">Projects</a></li>
         </ul>
         <form id="searchbox_016909259827549404702:hzru01fldsm" action="http://www.google.com/cse" title="openqa.org Selenium Search">
             <div>
@@ -34,16 +34,16 @@
     <div id="userStatus">Welcome, <span id="username">Guest</span>. <a id="login" href="http://www.openqa.org/sass/index.action">Login</a> or <a id="create_account" href="http://www.openqa.org/sass/index.action">Create an account</a>.</div>
     <div id="mBody">
         <div id="sidebar">
-            <img alt="Selenium Logo" src="images/big-logo.png" />
+            <img alt="Selenium Logo" src="/images/big-logo.png" />
             <p>
                 <strong>Selenium is a suite of tools</strong> to automate web app testing across many platforms.
             </p>
             <p>Selenium...</p>
             <ul>
-                <li>runs in <a href="many-browsers.html">many browsers</a> and <a href="operating-systems.html">operating systems</a></li>
-                <li>can be controlled by many <a href="programming-languages.html#">programming languages</a> and <a href="testing-frameworks.html">testing frameworks</a>.</li>
+                <li>runs in <a href="/about/platforms.html#browsers">many browsers</a> and <a href="/about/platforms.html#operating-systems">operating systems</a></li>
+                <li>can be controlled by many <a href="/about/platforms.html#programming-languages">programming languages</a> and <a href="/about/platforms.html#testing-frameworks">testing frameworks</a>.</li>
             </ul>
-            <div class="downloadBox"><a href="downloads.html">Download Selenium</a>1.0 beta</div>
+            <div class="downloadBox"><a href="/download/">Download Selenium</a>1.0 beta</div>
             <div class="ads">
 				<script type="text/javascript"><!--
 				google_ad_client = "pub-6291771388053870";
@@ -69,43 +69,48 @@
     </div>
     <div id="footer">
         <ul id="sitemap">
-            <li><a href="index.html#">Selenium Projects</a>
-                <ul><li><a href="http://selenium-core.openqa.org">Selenium Core</a></li>
+            <li><a href="/projects/">Selenium Projects</a>
+                <ul>
+					<li><a href="http://selenium-core.openqa.org">Selenium Core</a></li>
                     <li><a href="http://selenium-ide.openqa.org">Selenium IDE</a></li>
                     <li><a href="http://selenium-rc.openqa.org">Selenium Remote Control</a></li>
                     <li><a href="http://selenium-grid.openqa.org">Selenium Grid</a></li>
                     <li><a href="http://selenium-on-rails.openqa.org">Selenium on Rails</a></li>
                     <li><a href="http://cubictest.openqa.org">CubicTest (for Eclipse)</a></li>
-                    <li class="different"><a href="more-related-projects.html#">Other related projects</a></li>
+                    <li class="different"><a href="/projects/related.html">Other related projects</a></li>
                 </ul></li>
-            <li><a href="index.html#">Documentation</a>
-                <ul><li><a href="examples.html">Examples</a></li>
-                    <li><a href="screencasts.html">Screencasts</a></li>
-                    <li><a href="index.html#">Tutorials/Labs</a></li>
+            <li><a href="/documentation/">Documentation</a>
+                <ul>
+					<li><a href="/documentation/examples/">Examples</a></li>
+                    <li><a href="/documentation/screencasts/">Screencasts</a></li>
+                    <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                     <li><a href="http://wiki.openqa.org/display/SEL/Home">Wiki</a></li>
                     <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
                 </ul></li>
-            <li><a href="index.html#">Support</a>
-                <ul><li><a href="http://clearspace.openqa.org/index.jspa">Forums</a></li>
+            <li><a href="/support/">Support</a>
+                <ul>
+					<li><a href="http://clearspace.openqa.org/index.jspa">Forums</a></li>
                     <li><a href="http://jira.openqa.org/">Bug Tracker</a></li>
-                    <li><a href="jobs-board.html">Jobs Board</a></li>
-                    <li><a href="commercial-suppprt.html">Commercial Support</a></li>
+                    <li><a href="/support/jobs-board.html">Jobs Board</a></li>
+                    <li><a href="/support/commercial.html">Commercial Support</a></li>
                 </ul></li>
             <li><a href="index.html#">About Selenium</a>
-                <ul><li><a href="who-made-selenium.html">Who made Selenium</a>
-	                <li><a href="index.html#">How it Works</a></li>
-                    <li><a href="news.html">News/Blogs</a></li>
-                    <li><a href="supported-platforms.html">Supported Platforms</a></li>
-                    <li><a href="roadmap.html">Roadmap</a></li>
-                    <li><a href="getting-involved.html">Getting Involved</a></li>
+                <ul>
+					<li><a href="/about/how.html">How it Works</a></li>
+					<li><a href="/about/platforms.html">Supported Platforms</a></li>
+					<li><a href="/about/contributors.html">Who made Selenium</a>
+                    <li><a href="/about/news.html">News/Blogs</a></li>
+                    <li><a href="/about/roadmap.html">Roadmap</a></li>
+                    <li><a href="/about/getting-involved.html">Getting Involved</a></li>
                 </ul></li>
-            <li><a href="../www.openqa.org/index.html">OpenQA.org</a>
-                <ul><li><a href="http://www.openqa.org/sass/index.action">Create an account</a></li>
-                    <li><a href="index.html#">Account management</a></li>
-                    <li><a href="index.html#">Sponsors</a></li>
+            <li><a href="http://www.openqa.org/">OpenQA.org</a>
+                <ul>
+					<li><a href="http://www.openqa.org/sass/index.action">Create an account</a></li>
+                    <li><a href="http://www.openqa.org/sass/index.action">Account management</a></li>
+                    <li><a href="http://www.openqa.org/sponsors.html">Sponsors</a></li>
                 </ul></li>
         </ul>
-        <a href="../www.openqa.org/index.html"><img alt="openqa.org logo" id="footerLogo" src="images/openqa-logo.png" /></a>
+        <a href="http://www.openqa.org/index.html"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png" /></a>
     </div>
 </div>
 </body>

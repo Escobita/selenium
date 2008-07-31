@@ -110,7 +110,7 @@ div.downloadBox a
 	margin-left: 0;
 }
 
-#mainContent .bigMenu div p
+#mainContent .bigMenu p
 {
 	padding-top: 0.3em;
 	margin-bottom: 0;
@@ -205,6 +205,10 @@ div.downloadBox a
 	padding-right: 3px;
 }
 
+th
+{
+	text-align: left;
+}
 
 /* The rest of this file is almost directly from mozilla.org. */
 
@@ -732,41 +736,6 @@ div.downloadBox a
 	}
 	
 
-/* Specific to Products Pages */
-
-.productlist {
-	margin: 0;
-	padding: 0 0 0 5px;
-}
-
-.productlist li {
-	clear: left;
-	list-style: none;
-	padding: 0 0 1em 0;
-	margin-left: 0;
-}
-
-.productlist h3 {
-	margin: 0 0 0.2em 0;
-}
-
-.productlist img {
-	float: left;
-	margin: 0 0.5em 1em 0;
-}
-
-/* Random Stuff That Needs To Be Cleaned Up / Deprecated */
-
-.flLeft {
-	float: left;
-	margin: 5px 10px 5px 0;
-}
-.flRight {
-	float: right;
-	margin: 5px 0 5px 10px;
-}
-
-
 
 /* content.css */
 /* mozilla.org Cavendish Content Styles
@@ -1183,20 +1152,6 @@ ol.faq li a:hover {
 		background: transparent url("images/shop_br.gif") scroll no-repeat bottom right ;
 	}
 
-/* Firefox Central styles  */
-        #ffcentral-desc {
-                background: url("../../products/firefox/t-welcomefirefox.gif") no-repeat;
-                width: 60%;
-                float: left;
-                line-height: 140%;
-        }
-        #ffcentral-desc div {
-                padding: 40px 0 0 100px;
-        }
-        #ffcentral h3, #ffcentral h2, #ffcentral p, #ffcentral ul {
-                margin-top: 0;
-                color: #4C5C5C;
-        }
 
 
 /* base/template.css */
@@ -1379,37 +1334,37 @@ ol.faq li a:hover {
 	#header ul li:hover a { background-position: 0% -400px; }
 	#header ul li:hover { background-position: 100% -400px; }
 	
-	body.sectionAbout li#menu_aboutus a,
-	body.sectionProducts li#menu_products a,
+	body.sectionAbout li#menu_about a,
+	body.sectionProjects li#menu_projects a,
 	body.sectionSupport li#menu_support a,
-	body.sectionDevelopers li#menu_developers a,
-	body.sectionStore li#menu_store a {
+	body.sectionDocumentation li#menu_documentation a,
+	body.sectionDownload li#menu_download a {
 		background-position: 0% -200px;
 		color: #039;
 	}
 	
-	body.sectionAbout li#menu_aboutus,
-	body.sectionProducts li#menu_products,
+	body.sectionAbout li#menu_about,
+	body.sectionProjects li#menu_projects,
 	body.sectionSupport li#menu_support,
-	body.sectionDevelopers li#menu_developers,
-	body.sectionStore li#menu_store {
+	body.sectionDocumentation li#menu_documentation,
+	body.sectionDownload li#menu_download {
 		background-position: 100% -200px;
 		border-bottom: 1px solid #fff;
 	}
 	
-	body.sectionAbout li#menu_aboutus:hover,
-	body.sectionProducts li#menu_products:hover,
+	body.sectionAbout li#menu_about:hover,
+	body.sectionProjects li#menu_projects:hover,
 	body.sectionSupport li#menu_support:hover,
-	body.sectionDevelopers li#menu_developers:hover,
-	body.sectionStore li#menu_store:hover {
+	body.sectionDocumentation li#menu_documentation:hover,
+	body.sectionDownloads li#menu_downloads:hover {
 		background-position: 100% 0%;
 	}
 	
-	body.sectionAbout li#menu_aboutus:hover a,
-	body.sectionProducts li#menu_products:hover a,
+	body.sectionAbout li#menu_about:hover a,
+	body.sectionProjects li#menu_projects:hover a,
 	body.sectionSupport li#menu_support:hover a,
-	body.sectionDevelopers li#menu_developers:hover a,
-	body.sectionStore li#menu_store:hover a {
+	body.sectionDocumentation li#menu_documentation:hover a,
+	body.sectionDownloads li#menu_downloads:hover a {
 		background-position: 0% 0%;
 		color: #333;
 	}
