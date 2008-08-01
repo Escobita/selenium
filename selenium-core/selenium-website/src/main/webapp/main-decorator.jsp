@@ -45,22 +45,13 @@
             </ul>
             <div class="downloadBox"><a href="/download/">Download Selenium</a>1.0 beta</div>
             <div class="ads">
-				<script type="text/javascript"><!--
-				google_ad_client = "pub-6291771388053870";
-				google_ad_width = 190;
-				google_ad_height = 370;
-				google_ad_format = "190x370_as";
-				google_ad_type = "text_image";
-				google_ad_channel ="";
-				google_color_border = "E9E9E9";
-				google_color_bg = "E9E9E9";
-				google_color_link = "000000";
-				google_color_url = "333333";
-				google_color_text = "000000";
-				//--></script>
-				<script type="text/javascript"
-				  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-				</script>
+				<script type="text/javascript"><!-- 
+				google_ad_client = "pub-6291771388053870"; 
+				/* 160x600, created 7/31/08 */ 
+				google_ad_slot = "9920140235"; 
+				google_ad_width = 160; 
+				google_ad_height = 600; //--> </script> 
+				<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"> </script>
 	        </div>
         </div>
         <div id="mainContent">
