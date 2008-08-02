@@ -98,20 +98,27 @@
         automate your tests.</p>
 	   <table>
 	        <tr><th>Framework</th><th>Selenium IDE</th><th>Selenium Remote Control</th><th>Selenium Core</th></tr>
-	        <tr><th>JUnit</th><td>Generate code</td><td>Manipulate browser, check assertions</td><td>
+	        <tr><th>Bromine</th><td>Custom code generation template*</td><td>Manipulate browser, check assertions 
+                via custom driver</td><td>
                 n/a</td></tr>
-	        <tr><th>NUnit</th><td>Generate code</td><td>Manipulate browser, check assertions</td><td>
+			<tr><th>JUnit</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check assertions 
+                via Java driver</td><td>
+                n/a</td></tr>
+	        <tr><th>NUnit</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check assertions 
+                    via .NET driver</td><td>
                     n/a</td></tr>
-	        <tr><th>Test::Unit&nbsp; (Ruby)</th><td>Generate code</td><td>Manipulate browser, check 
-                    assertions</td><td>n/a</td></tr>
-	        <tr><th>unittest (Python)</th><td>Generate code</td><td>Manipulate browser, check 
-                    assertions</td><td>n/a</td></tr>
-	        <tr><th>Others</th><td>Generate custom code*</td><td>Manipulate browser, check 
-                    assertions**</td><td>n/a</td></tr>
+	        <tr><th>RSpec (Ruby)</th><td>Custom code generation template*</td><td>Manipulate browser, check 
+                    assertions via Ruby driver</td><td>n/a</td></tr>
+			<tr><th>Test::Unit (Ruby)</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check 
+                    assertions via Ruby driver</td><td>n/a</td></tr>
+	        <tr><th>unittest (Python)</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check 
+                    assertions via Python driver</td><td>n/a</td></tr>
+	        <tr><th>Others</th><td>Custom code generation template*</td><td>Manipulate browser, check 
+                    assertions via HTTP requests**</td><td>n/a</td></tr>
 	        </table>
 	
             <p class="remark">
-                * Built-in code generation creates code specifically for the given frameworks, 
+                * Built-in code generation creates code specifically for the &quot;out-of-the-box&quot; frameworks, 
                 but you can modify the Javascript-based templates to output any kind of code you 
                 want.</p>
             <p class="remark">
