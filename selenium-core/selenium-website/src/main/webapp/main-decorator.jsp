@@ -101,7 +101,7 @@
                     <li><a href="http://www.openqa.org/sponsors.html">Sponsors</a></li>
                 </ul></li>
         </ul>
-        <a href="http://www.openqa.org/index.html"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png" /></a>
+        <a href="http://www.openqa.org/"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png" /></a>
     </div>
 </div>
 </body>
