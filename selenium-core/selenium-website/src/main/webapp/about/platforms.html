@@ -98,9 +98,9 @@
         automate your tests.</p>
 	   <table>
 	        <tr><th>Framework</th><th>Selenium IDE</th><th>Selenium Remote Control</th><th>Selenium Core</th></tr>
-	        <tr><th>Bromine</th><td>Custom code generation template*</td><td>Manipulate browser, check assertions 
+	        <tr><th>Bromine</th><td>Comes with template to add to IDE</td><td>Manipulate browser, check assertions 
                 via custom driver</td><td>
-                n/a</td></tr>
+                        Special support**</td></tr>
 			<tr><th>JUnit</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check assertions 
                 via Java driver</td><td>
                 n/a</td></tr>
@@ -117,7 +117,7 @@
 	        <tr><th>unittest (Python)</th><td>Out-of-the-box code generation</td><td>Manipulate browser, check 
                     assertions via Python driver</td><td>n/a</td></tr>
 	        <tr><th>Others</th><td>Custom code generation template*</td><td>Manipulate browser, check 
-                    assertions via HTTP requests**</td><td>n/a</td></tr>
+                    assertions via HTTP requests***</td><td>n/a</td></tr>
 	        </table>
 	
             <p class="remark">
@@ -125,7 +125,10 @@
                 but you can modify the Javascript-based templates to output any kind of code you 
                 want.</p>
             <p class="remark">
-                ** Using the appropriate driver (or HTTP commands), you can manipulate and test 
+                ** Bromine is built specifically for Selenium and it directly supports both Selenium Core and Selenium 
+                Remote Control. The other testing frameworks use Selenium Remote Control drivers for testing.</p>
+            <p class="remark">
+                *** Using the appropriate driver (or HTTP commands), you can manipulate and test 
                 the browser using any testing framework by calling commands like &quot;click&quot; or 
                 &quot;isElementPresent.&quot; Selenium Remote Control just deals with the commands and 
                 doesn&#39;t care about what actually calls those commands.</p>
