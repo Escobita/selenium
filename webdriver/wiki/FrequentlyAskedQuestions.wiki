@@ -39,7 +39,7 @@ A: The existing drivers are the InternetExplorerDriver, FirefoxDriver, SafariDri
 
 *Q: HtmlUnit Supports Javascript So Why Doesn't the HtmlUnitDriver?*
 
-A: Please see the HtmlUnitDriver page for more details, but the short answer is because no browser uses the JS engine used by HtmlUnit.
+A: In early releases of WebDriver, the Javascript support provided by HtmlUnit was explicitly turned off. In current release, it is possible to enable this javascript support. Please see the HtmlUnitDriver page for more details.
 
 *Q: My XPath finds elements in one browser, but not in others. Why is this?*
 
@@ -58,3 +58,7 @@ A: Support for other languages is planned, and we will be announcing these on th
 *Q: I'd like it if WebDriver did....*
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
+
+*Q: Why Is The InternetExplorerDriver Called Jobbie?*
+
+A: It started out as a play on "[http://jacobie.sourceforge.net jacobie]". It's not terribly funny, I know, but it made sense at the time and the name has stayed.

@@ -32,7 +32,3 @@ The default target that's used will compile the code and run all the tests. More
 | safari | Compile the SafariDriver |
 | support | Guess what this does :) |
 | test_htmlunit | Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. |
-
-== Why Is The InternetExplorerDriver Called Jobbie? ==
-
-It started out as a play on "jacobie". It's not terribly funny, I know, but it made sense at the time.

@@ -6,6 +6,6 @@ In order to get the latest version of the code, please follow the instructions o
 
 = Downloading Binaries =
 
-There are binaries available to download. Note that these are currently somewhat rough: you will need to install items such as the Firefox extension (the ".xpi") into a WebDriver profile yourself, and the InternetExplorerDriver.dll will need to be placed on the native path somehow. Please see the FirefoxDriver and InternetExplorerDriver pages for more information specific to each implementation.
+There are binaries available to download. These are require no other installation than being placed (along with their dependencies) on your classpath.
 
 If you would like to be kept up to date with developments, want to know when binary packages are released or need any help, please consider joining the mailing list.
