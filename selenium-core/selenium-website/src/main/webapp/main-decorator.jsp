@@ -82,7 +82,7 @@
                 <ul>
 					<li><a href="http://clearspace.openqa.org/index.jspa">Forums</a></li>
                     <li><a href="http://jira.openqa.org/">Bug Tracker</a></li>
-                    <li><a href="/support/jobs-board.html">Jobs Board</a></li>
+                    <li><a href="http://clearspace.openqa.org/community/jobs_board">Jobs Board</a></li>
                     <li><a href="/support/commercial.html">Commercial Support</a></li>
                 </ul></li>
             <li><a href="index.html#">About Selenium</a>
