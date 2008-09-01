@@ -1,27 +1,101 @@
 <html>
-    <head>
-	    <title>Getting Involved</title>
-	</head>
-	<body>
-	<p>Getting involved with Selenium is easy: just email us on the mailing lists or forums and we'll work with you on how to best capture your willingness to help out.  OpenQA is a loose collection of QA-related projects, many focussing on Selenium, and you could get involved with any individually project that interests you. Start with the forums, and work out what is best for you.</p>
-	<p><br>
-	  Ultimately, the best way to get involved is to contributing code. Providing patches with your bug reports will definitely get them resolved sooner and will ultimately lead to getting you invited to be a developer for the project. We also greatly appreciate:</p>
+<head>
+	<title>
+		Getting Involved with Selenium
+	</title>
+</head>
+<body class="sectionAbout">
+	<h2>Getting Involved with Selenium</h2>
+	<p>Selenium is certainly a team effort! There are several ways you can help out,
+	whether you're a programmer, designer, QA engineer, writer, project manager, or 
+	just willing to help. If you're interested in helping, the best way to connect 
+	with us is in the forums, in the 
+	<a href="http://clearspace.openqa.org/community/selenium/selenium_developers">Selenium 
+	Developers</a> section. We'll work with you to get you set up to contribute.</p>
+	
+	<p>You can help by...</p>
+	
+	<h3>Answering questions in the <a href="http://clearspace.openqa.org/">forums</a></h3>
+	<p><em>For anyone interested in helping</em></p>
+	<p>We get a lot of questions and we have a great community to help answer them. If you
+	could <a href="http://www.openqa.org/sass/index.action">register</a> and log into the 
+	<a href="http://clearspace.openqa.org/">forums</a> to answer a question or two, that would
+	be great! There are often some very basic questions that are easy to answer.</p>
+	    
+	<h3>Updating our website</h3>
+	<p><em>For writers, designers, and programmers with Selenium experience</em></p>
+	<p>We have a lot of out-of-date information that needs to be tidied up on the site!
+	Help by writing documentation, producing helpful diagrams, re-skinning the website, or
+	organizing content.</p> 
+	<p>You can get started by using Subversion to check out our content at 
+	<a href="https://svn.openqa.org/svn/selenium-core/selenium-website">
+	https://svn.openqa.org/svn/selenium-core/selenium-website</a>. To get it running, you'll 
+	want to install a recent version of Java (if you don't have it already) and 
+	<a href="http://maven.apache.org/">Apache Maven</a>, which is used to build the website
+	and run it in a web server called "Jetty." (Maven will download Jetty when it's needed.)
+	Once you have it installed, run "mvn jetty:run" to start up Maven and Jetty and you'll
+	have a website live on your computer at 
+	<a href="http://localhost:8080/">http://localhost:8080/</a>. If you're on Windows, you may
+	want to make a batch script like this:
+	<pre>
+	SET JAVA_HOME=C:\Program Files\Java\jdk1.6.0_02
+	SET PATH=%PATH%;C:\Program Files\apache-maven-2.0.9\bin
+	mvn jetty:run
+	</pre>
+	and then save it to the selenium-website folder. (Maven uses the pom.xml configuration file
+	there to set everything up.)
+	</p>
+	<p>Get involved by posting to the 
+	<a href="http://clearspace.openqa.org/community/selenium/selenium_developers">Selenium Developers</a>
+	section of the forums.</p>
+		
+	<h3>Writing documentation</h3>
+	<p><em>For writers with Selenium experience</em></p>
+    <p>For the most part our documentation is held in source control, on the wiki, or generated 
+	as part of the build(s). The main documentation is in plain HTML so use your favorite 
+	editor offline to edit the pages. The source for this main site is 
+	<a href="https://svn.openqa.org/svn/selenium-core/selenium-website/src/main/webapp">here</a> 
+	and if you are familiar with Subversion you should be able to bring it down to your 
+	local system for offline editing.</p>  You can also help with the documentation of 
+	<a href="http://svn.openqa.org/svn/selenium-core/website/src/main/webapp/">Selenium Core</a>, 
+	<a href="http://svn.openqa.org/svn/selenium-rc/website/src/main/webapp">Selenium RemoteControl</a>,
+	<a href="https://svn.openqa.org/svn/selenium-ide/website/src/main/webapp/">Selenium IDE</a>,
+	and <a href="https://svn.openqa.org/svn/selenium-grid/website/src/main/webapp/">Selenium Grid</a>.
+	(See above for how to set up Maven and Jetty locally to try it out on your own computer.)
+	</p>  
+	
+    <h3>Bug reports and feature requests</h3>
+	<p><em>For any Selenium user</em></p>
+    <p>If you ran into a problem with Selenium, feel free to file a bug report about it. See our
+	<a href="http://selenium.openqa.org/support/">support</a> site. Similarly, if you have an idea
+	for a feature you'd like to see in a future version, report that as well.</p>
+	<p>You may also want to check the <a href="http://clearspace.openqa.org/">forums</a> to see 
+	if a similar question has been asked. In many cases the bug reports are the result of not 
+	being familiar with the way Selenium works, is installed or its limitations.  We would 
+	love help going through the bug reports and adding comments (which automatically get sent
+	to the reporter) for cases where advice is all they need.</p>
+	<p>If you're a programmer and are skilled in the language in question, then dive in 
+	and see if you can fix the bug. (See below.)</p>
+	
+	<h3>Contributing code to Selenium</h3>
+	<p><em>For programmers with Selenium experience</em></p>
+	<p>Much of the magic behind Selenium is the hard work of programmers with backgrounds in
+	Javascript, Java, Ruby,	PHP, Python, perl, C#, HTML, and other languages. If you haven't
+	already, you can download the source code from our Subversion repositories:</p>
 	<ul>
-	  <li>Help in the forums</li>
-      <li>Writing documentation</li>
-	  <li>Bug reports</li>
-	  <li>Patches</li>
-	  <li>Feature requests</li>
+		<li><a href="https://svn.openqa.org/svn/selenium-ide/">Selenium IDE</a></li>
+		<li><a href="https://svn.openqa.org/svn/selenium-grid/">Selenium Grid</a></li>
+		<li><a href="https://svn.openqa.org/svn/selenium-rc/">Selenium Remote Control</a></li>
+		<li><a href="https://svn.openqa.org/svn/selenium-core/">Selenium Core</a></li>
 	</ul>
-    <h2>Help in the forums</h2>
-    <p>The Selenium  <a href="http://clearspace.openqa.org/">forums</a> constantly have a lot of newbie questions. We're pretty open to help in those forums answering questions, so please dive in as you like.</p>
-    <h2>Writing documentation</h2>
-    <p>For the most part our documentation is held in source control, on the wiki, or generated as part of the build(s). The main documentation is in plain HTML so use your favorite editor offline to edit the pages. The source for this main site is <a href="https://svn.openqa.org/svn/selenium-core/selenium-website/src/main/webapp">here</a> and if your are familiar with Subversion you should be able to bring it down to your local system for offline editing.</p>  The subversion source for documentation for the others is like so: <a href="http://svn.openqa.org/svn/selenium-core/website/src/main/webapp/">here</a> for Selenium Core, <a href="http://svn.openqa.org/svn/selenium-rc/website/src/main/webapp">here</a> for Selenium Remote-Control, <a href="https://svn.openqa.org/svn/selenium-ide/website/src/main/webapp/">here</a> for Selenium IDE, and <a href="https://svn.openqa.org/svn/selenium-grid/website/src/main/webapp/">here</a> for Selenium Grid.</p>  
-    <h2>Bug reports</h2>
-    <p>We encourage people to file bug reports for Selenium for things that go wrong for them. See <a href="http://selenium.openqa.org/support/">for more details</a>. In many cases the bug reports are the result of not being familiar with the way Selenium works, is installed or its limitations.  We would love additional help going through the bug reports and adding comments (which automatically get sent to the reporter) for cases where advice is all they need.  Alternatively, if you're coder and are skilled in the language in question, then dive in and see if you can fix the bug.</p>
-    <h2>Patches</h2>
-    <p>Patches are the life blood of vibrant open source project.  The Selenium developers on the project today have donated patches initially to get there.  Many have stuck around, but as many only donated one or two patches which is fine by us too.  The subversion source-code roots for projects are like so: <a href="http://svn.openqa.org/svn/selenium-core/trunk">here</a> for Selenium Core, <a href="http://svn.openqa.org/svn/selenium-rc/trunk">here</a> for Selenium Remote-Control, <a href="https://svn.openqa.org/svn/selenium-ide/trunk">here</a> for Selenium IDE, and <a href="https://svn.openqa.org/svn/selenium-grid/trunk">here</a> for Selenium Grid.  Some of these will require Maven to be installed to kick off the build, and some will require Ant.</p>
-    <h2>Feature requests</h2>
-    <p>As for bugs, feature requests are filed through <a href="http://selenium.openqa.org/support/">the support page</a>.  Please be detailed for feature requests and also look to see whether they have been filed before.
+	<p>We encourage code patches and other contributions - get involved by posting to the 
+	<a href="http://clearspace.openqa.org/community/selenium/selenium_developers">Selenium Developers</a>
+	section of the forums.</p>	
+	
+	<h3>Shaping the <a href="roadmap.html">vision for Selenium</a></h3>
+	<p><em>For project managers, QA Engineers, designers, and programmers</em></p>
+	<p>How could we make Selenium better? What would increase its value to end users and help it
+	be more accessible and practical? <a href="http://clearspace.openqa.org/thread/14975?tstart=0">Contribute 
+	to the discussion</a> on the forums.</p>
 </body>
 </html>
