@@ -75,7 +75,7 @@
 					<li><a href="/documentation/examples/">Examples</a></li>
                     <li><a href="/documentation/screencasts/">Screencasts</a></li>
                     <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
-                    <li><a href="http://wiki.openqa.org/display/SEL/Home">Wiki</a></li>
+                    <li><a href="http://wiki.openqa.org/">Wiki</a></li>
                     <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
                 </ul></li>
             <li><a href="/support/">Support</a>
@@ -98,7 +98,7 @@
                 <ul>
 					<li><a href="http://www.openqa.org/sass/index.action">Create an account</a></li>
                     <li><a href="http://www.openqa.org/sass/index.action">Account management</a></li>
-                    <li><a href="http://www.openqa.org/sponsors.html">Sponsors</a></li>
+                    <li><a href="http://www.openqa.org/sponsors.action">Sponsors</a></li>
                 </ul></li>
         </ul>
         <a href="http://www.openqa.org/"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png" /></a>
