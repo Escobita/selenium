@@ -6,12 +6,12 @@
 
 When developing WebDriver, it is common to want to run a single test rather than the entire test suite for a particular driver. In order to do this, open the {{{SingleTestSuite}}} class. There are some key fields that you may comment out (or include!):
 
-| *Method Name* | *What It Means* |
-| addSourceDir | Adds a source directory relative to the root of trunk (that is, the directory containing the Rakefile) |
-| usingDriver | Takes the fully qualified name of the driver class. This class must have a no-arg constructor and must implement the WebDriver interface |
-| keepDriverInstance | Without this method, a new instance of the chosen driver will be instantiated per-test |
-| onlyRun | The class name (not fully qualified) of the TestCase to run |
-| method | The name of a particular method within the TestCase given by "onlyRun" |
+|| *Method Name* || *What It Means* ||
+|| addSourceDir || Adds a source directory relative to the root of trunk (that is, the directory containing the Rakefile) ||
+|| usingDriver || Takes the fully qualified name of the driver class. This class must have a no-arg constructor and must implement the WebDriver interface ||
+|| keepDriverInstance || Without this method, a new instance of the chosen driver will be instantiated per-test ||
+|| onlyRun || The class name (not fully qualified) of the TestCase to run ||
+|| method || The name of a particular method within the TestCase given by "onlyRun" ||
 
 == Using Rake ==
 
@@ -23,12 +23,12 @@ rake clean test_htmlunit
 
 The default target that's used will compile the code and run all the tests. More interesting targets are:
 
-| *Target* | *Description* |
-| clean | Delete the contents of the build directory, removing all compiled artifacts |
-| test | Compile the dependencies of and run all the tests for the HtmlUnitDriver, FirefoxDriver, InternetExplorerDriver and SafariDriver as well as the support library's tests |
-| firefox | Compile the FirefoxDriver |
-| htmlunit | Compile the HtmlUnitDriver |
-| jobbie | Compile the InternetExplorerDriver. This won't compile the C++ on a non-Windows system, but will always compile the Java, no matter which OS you happen to be using |
-| safari | Compile the SafariDriver |
-| support | Guess what this does :) |
-| test_htmlunit | Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. |
+|| *Target* || *Description* ||
+|| clean || Delete the contents of the build directory, removing all compiled artifacts ||
+|| test || Compile the dependencies of and run all the tests for the HtmlUnitDriver, FirefoxDriver, InternetExplorerDriver and SafariDriver as well as the support library's tests ||
+|| firefox || Compile the FirefoxDriver ||
+|| htmlunit || Compile the HtmlUnitDriver ||
+|| jobbie || Compile the InternetExplorerDriver. This won't compile the C++ on a non-Windows system, but will always compile the Java, no matter which OS you happen to be using ||
+|| safari || Compile the SafariDriver ||
+|| support || Guess what this does :) ||
+|| test_htmlunit || Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. ||
