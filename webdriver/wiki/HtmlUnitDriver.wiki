@@ -19,19 +19,15 @@ The short answer is that it's disabled because no browser that's in widespread u
 
 The long answer is that when we say "javascript" we actually mean "javascript and the DOM". Although the DOM is [http://www.w3.org/DOM/ defined by the W3C] each browser out there has its own quirks and differences in their implementation of the DOM and in how javascript interacts with it. HtmlUnit has an impressively complete implementation of the DOM and has good support for using javascript, but it is no different from any other browser: it has its own quirks and differences from both the W3C standard and the DOM implementations of the major browsers, despite its ability to [http://htmlunit.sourceforge.net/javascript.html mimic other browsers].
 
-With WebDriver, we had to make a choice; do we enable HtmlUnit's javascript capabilities and run the risk of teams running into problems that only manifest themselves there, or do we leave javascript disabled, knowing that there are more and more sites that rely on javascript? We took the conservative approach, and have disabled support when we use HtmlUnit.
+With WebDriver, we had to make a choice; do we enable HtmlUnit's javascript capabilities and run the risk of teams running into problems that only manifest themselves there, or do we leave javascript disabled, knowing that there are more and more sites that rely on javascript? We took the conservative approach, and by default have disabled support when we use HtmlUnit.
 
 == Enabling Javascript ==
 
-Enabling Javascript support is fairly easy, though a little messy:
+Having said that, enabling Javascript support is very easy:
 
 {{{
-WebDriver driver = new HtmlUnitDriver() {
-    protected void newWebClient() {
-        super.newWebClient();
-        getWebClient().setJavaScriptEnabled(true);
-    }
-};
+HtmlUnitDriver driver = new HtmlUnitDriver();
+driver.setJavascriptEnabled(true);
 }}}
 
-If there is enough demand, we might expose this functionality through a slightly nicer API in the future.
+This will cause the HtmlUnitDriver to emulate IE's Javascript handling by default. 
