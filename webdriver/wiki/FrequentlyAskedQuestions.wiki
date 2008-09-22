@@ -15,6 +15,10 @@ A: The aim is the same (to allow you to test your webapp), but the implementatio
 
 A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver will make is its API and the native drivers. The process of rolling WebDriver into Selenium will probably take some time, so until it's complete if you'd like to use the WebDriver API then the best bet will be to use WebDriver directly.
 
+*Q: What's the plan for migrating WebDriver into Selenium?*
+
+A: The process is being discussed on the [http://clearspace.openqa.org/message/48227#48227 OpenQA forum], but the current plan is that parts of WebDriver will be rolled into Selenium 1.5. For the user, the key change will be that the WebDriver interfaces will become available within the Selenium (RC) libraries. There will also be a series of changes internally, for example picking the WebDriver implementation of the Selenium interfaces where this is appropriate, and these changes will be discussed and tracked on the OpenQA site and/or the [http://groups.google.com/group/webdriver?pli=1 WebDriver mailing list].
+
 *Q: What does it mean to be "developer focused"?
 
 A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
@@ -54,6 +58,23 @@ A: There are a number of solutions:
 *Q: What about support for languages other than Java?*
 
 A: Support for other languages is planned, and we will be announcing these on the mailing list as they are checked in.
+
+*Q: How do I handle pop up windows?*
+
+A: WebDriver offers the ability to cope with multiple windows. This is done by using the "WebDriver.switchTo().window()" method to switch to a window with a known name. If the name is not known, you can use "WebDriver.switchTo().windowIterable()" to obtain a (Java) Iterable which can be used to iterate over every open window.
+
+*Q: Does WebDriver support Javascript alerts and prompts?*
+
+A: Not yet, but we plan on adding an API for this, that will look something like:
+
+{{{
+// Get a handle to the open alert, prompt or confirmation
+Alert alert = driver.switchTo().alert();
+// Get the text of the alert or prompt
+alert.getText();  
+// And acknowledge the alert (equivalent to clicking "OK")
+alert.accept();
+}}}
 
 *Q: I'd like it if WebDriver did....*
 
