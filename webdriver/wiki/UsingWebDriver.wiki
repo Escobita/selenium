@@ -6,6 +6,73 @@
 
 Unpack the ZIP and copy all the jar files on to your project's classpath. The FirefoxDriver and InternetExplorerDriver have more detailed instructions about installing the native parts of these drivers. The "webdriver-support" package contains useful helper classes, such as the LiftStyleApi and the PageFactory.
 
+== With Maven ==
+
+1.) Add the configuration for the OpenQA repository to your pom.xml:
+{{{
+    <project ...>
+        ...
+        <repositories>
+            ...
+            <repository>
+                <id>openqa-releases</id>
+                <name>OpenQA Releases</name>
+                <url>http://archiva.openqa.org/repository/releases/</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>false</enabled>
+                </snapshots>
+            </repository>
+            ...
+        </repositories>
+        ...
+    </project> 
+}}}
+
+2.) If you want to use the HtmlUnitDriver, add the following dependency to your pom.xml:
+{{{
+    <dependency>
+        <groupId>org.openqa.selenium.webdriver</groupId>
+        <artifactId>webdriver-htmlunit</artifactId>
+        <version>0.5.524</version>
+    </dependency>
+}}}
+If you want to use the FirefoxDriver, you need to add the following dependency to your pom.xml:
+{{{
+    <dependency>
+        <groupId>org.openqa.selenium.webdriver</groupId>
+        <artifactId>webdriver-firefox</artifactId>
+        <version>0.5.524</version>
+    </dependency>
+}}}
+If you want to use the InternetExplorerDriver, you need to add the following dependency to your pom.xml:
+{{{
+    <dependency>
+        <groupId>org.openqa.selenium.webdriver</groupId>
+        <artifactId>webdriver-ie</artifactId>
+        <version>0.5.524</version>
+    </dependency>
+}}}
+If you want to use the SafariDriver, just add the following dependency to your pom.xml:
+{{{
+    <dependency>
+        <groupId>org.openqa.selenium.webdriver</groupId>
+        <artifactId>webdriver-safari</artifactId>
+        <version>0.5.524</version>
+    </dependency>
+}}}
+And finally if you like to use any of our support classes you should add the following dependency to your pom.xml:
+{{{
+    <dependency>
+        <groupId>org.openqa.selenium.webdriver</groupId>
+        <artifactId>webdriver-support</artifactId>
+        <version>0.5.524</version>
+    </dependency>
+}}}
+That's it. 
+
 == From a Fresh CheckOut ==
 
  * Follow the instructions in CheckOut in order to get the latest version of WebDriver.
