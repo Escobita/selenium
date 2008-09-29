@@ -34,50 +34,18 @@ The default profile name is *WebDriver* (the casing matters!)
 The "wedriver-firefox.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
 
  # Copy all the "jar" files on to your classpath.
- # Create a "WebDriver" profile. The case of the profile name matters! 
-   # {{{firefox -ProfileManager}}} 
-     * "firefox" here is the full path to the Firefox 2 binary installed on your system.
-   # Click the "Create Profile" button.
-   # Follow the wizard, accepting the defaults offered, except for the profile name, which is "WebDriver" (without the quotes, but with the same StudlyCaps!)
-   # Start the new profile. This can be done one of two ways:
-     * {{{firefox -ProfileManager}}} and double-clicking on the WebDriver profile in the list shown
-     * {{{firefox -P WebDriver}}}
-# Install the FirefoxDriver XPI by dragging the XPI on to the instance of Firefox using the WebDriver profile and following the on-screen prompts.
-
-Once this has been done, you should be able to quit Firefox and the FirefoxDriver should work as expected.
 
 == Installing the Quick Way From Source (with Ruby) ==
 
-There is a plan to make the FirefoxDriver installable as a simple XPI. Until then, you'll need Ruby and rake installed on your machine, then (after quitting any open instances of Firefox) simply run:
+If you're doing development work, you may will need to install the FirefoxDriver into a profile called {{{WebDriver}}} (the case matters!) If you have the source, you can set everything up correctly by running:
 
 {{{rake install_firefox}}}
 
-This assumes that your installation of Firefox 2 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then set the "firefox" variable to be the firefox binary to use:
+This assumes that your installation of Firefox 2 or 3 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then set the "firefox" variable to be the firefox binary to use:
 
 {{{rake install_firefox firefox="d:\apps\mozilla firefox\firefox"}}}
 
 After the installation is completed, Firefox should start using the new WebDriver profile. Go to "{{{Tools->Add-ons}}}" and check that there's an extension called "Firefox WebDriver" installed. Carry on reading below if it's not!
-
-== Installing the Quick Way From Source (with Java) ==
-
-There is a {{{FirefoxLauncher}}} class that can be run. It takes a single argument, which is the name of the profile to create. If no argument is given, then the profile will be called *WebDriver*. The FirefoxLauncher will make use of the "{{{webdriver.firefox.development}}}" system property to determine whether or not we should use a pre-built XPI of WebDriver or whether we are using a development build (that is, the extension used will be the version obtained using from a CheckOut) Example usage looks like:
-
-{{{java -cp common/build/webdriver-common.jar:firefox/build/webdriver-firefox.jar -Dwebdriver.firefox.development="/home/foo/webdriver/trunk/firefox/src/extension" org.openqa.selenium.firefox.FirefoxLauncher}}}
-
-The equivalent in an Ant build file would be:
-
-{{{
-<target name="install_firefox_driver">
-  <java classname="org.openqa.selenium.firefox.FirefoxLauncher" fork="yes">
-    <sysproperty key="webdriver.firefox.development" value="/home/foo/webdriver/trunk/firefox/src/extension"/>
-    <arg value="WebDriver"/>
-    <classpath>
-      <pathelement location="common/build/webdriver-common.jar"/>
-      <pathelement location="firefox/build/webdriver-firefox.jar"/>
-    </classpath>
-  </java>
-</target>
-}}}
 
 == Installing the Long Way ==
 
