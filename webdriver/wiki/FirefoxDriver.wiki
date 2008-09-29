@@ -60,8 +60,8 @@ If the quick way doesn't work for you, or you'd like to understand more about wh
 == Pros ==
 
  * Runs in a real browser and supports Javascript
- * Not as fast as the HtmlUnitDriver, but faster than the InternetExplorerDriver
+ * Faster than the InternetExplorerDriver
 
 == Cons ==
  
- * Currently requires the "WebDriver" profile to be set up in Firefox
+ * Slower than the HtmlUnitDriver
