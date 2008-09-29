@@ -4,6 +4,12 @@
 
 Everything you ever wanted to know about the Firefox driver but were afraid to ask. See below for instructions on how to install the FirefoxDriver.
 
+== Before Going Any Further ==
+
+The FirefoxDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-firefox.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
+
+If you want to dig deeper, though, carry on reading!
+
 == Important System Properties ==
 
 The following system properties (read using {{{System.getProperty()}}}) are used by the FirefoxDriver:
