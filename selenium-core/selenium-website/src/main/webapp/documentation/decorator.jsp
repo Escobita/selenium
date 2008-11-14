@@ -41,7 +41,7 @@
                     <li><a href="/documentation/screencasts/">Screencasts</a></li>
                     <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                     <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                    <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
+                    <li><a href="/projects/core/reference.html">Selenium API</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -65,7 +65,7 @@
                 <ul>
 					<li><a href="http://selenium-core.openqa.org">Selenium Core</a></li>
                     <li><a href="http://selenium-ide.openqa.org">Selenium IDE</a></li>
-                    <li><a href="http://selenium-rc.openqa.org">Selenium Remote Control</a></li>
+                    <li><a href="/projects/remote-control/">Selenium Remote Control</a></li>
                     <li><a href="http://selenium-grid.openqa.org">Selenium Grid</a></li>
                     <li><a href="http://selenium-on-rails.openqa.org">Selenium on Rails</a></li>
                     <li><a href="http://cubictest.openqa.org">CubicTest (for Eclipse)</a></li>
@@ -77,7 +77,7 @@
                     <li><a href="/documentation/screencasts/">Screencasts</a></li>
                     <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                     <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                    <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
+                    <li><a href="/projects/core/reference.html">Selenium API</a></li>
                 </ul></li>
             <li><a href="/support/">Support</a>
                 <ul>

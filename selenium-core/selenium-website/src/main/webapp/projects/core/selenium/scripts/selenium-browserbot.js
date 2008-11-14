@@ -942,7 +942,7 @@ BrowserBot.prototype.getWindowByName = function(windowName, doNotModify) {
         }
     }
     if (!targetWindow) {
-        throw new SeleniumError("Window does not exist. If this looks like a Selenium bug, make sure to read http://selenium-core.openqa.org/reference.html#openWindow for potential workarounds.");
+        throw new SeleniumError("Window does not exist. If this looks like a Selenium bug, make sure to read /projects/core/reference.html#openWindow for potential workarounds.");
     }
     if (browserVersion.isHTA) {
         try {

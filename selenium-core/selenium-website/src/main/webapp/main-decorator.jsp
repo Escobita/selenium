@@ -76,7 +76,7 @@
                     <li><a href="/documentation/screencasts/">Screencasts</a></li>
                     <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                     <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                    <li><a href="http://selenium-core.openqa.org/reference.html">Selenium API</a></li>
+                    <li><a href="/projects/core/reference.html">Selenium API</a></li>
                 </ul></li>
             <li><a href="/support/">Support</a>
                 <ul>
