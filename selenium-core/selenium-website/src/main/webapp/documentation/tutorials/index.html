@@ -277,7 +277,7 @@ end
 <p>Despite the soundness of the policy, it creates a problem for Selenium automated tests. If you write a .js file designed to test google.com, the same origin policy denies you the right to just run that .js file with google.com; instead, you'd have to somehow install that .js file <em>on google.com</em> in order to write automated tests against it. In the case of google.com we don't have the right to do this; but even if we did, it would be a hassle to do so. </p>
 <p>That's where the Selenium Server comes in. The Selenium Server is acting as a <em>client-configured proxy</em> for the browser that you automatically started with &quot;getNewBrowserSession&quot;. Specifically, it configures your browser to use the Selenium Server as a proxy in its browser preferences. </p>
 <p>A proxy normally <em>fetches </em>HTML pages on your behalf; if a page can't be found, it honestly reports that the page wasn't there. But the Selenium Server is a very different kind of proxy; when the browser requests a page through the proxy that contains &quot;/selenium-server/&quot; in its URL, the Selenium Server doesn't simply fetch the page from the remote server, but instead automatically returns its own page instead. That makes the browser think that the remote server served up our JS, which allows us to &quot;inject&quot; arbitrary JavaScript into google.com without modifying google.com directly.</p>
-<p><img src="images/selenium-rc.png" /></p>
+<p><img src="images/selenium-rc-logo.png" /></p>
 <p>However, the solution isn't perfect. Try running your tests like this:</p>
 <blockquote>
   <p><code>cmd=<strong>getNewBrowserSession</strong>&amp;1=<strong>*iexplore</strong>&amp;2=<strong>http://www.yahoo.com<br />
