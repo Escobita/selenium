@@ -160,7 +160,7 @@
         <li><a href="/projects/">Selenium Projects</a>
             <ul>
                 <li><a href="http://selenium-core.openqa.org">Selenium Core</a></li>
-                <li><a href="http://selenium-ide.openqa.org">Selenium IDE</a></li>
+                <li><a href="/projects/ide">Selenium IDE</a></li>
                 <li><a href="http://selenium-rc.openqa.org">Selenium Remote Control</a></li>
                 <li><a href="http://selenium-grid.openqa.org">Selenium Grid</a></li>
                 <li><a href="http://selenium-on-rails.openqa.org">Selenium on Rails</a></li>
