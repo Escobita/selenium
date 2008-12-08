@@ -77,6 +77,7 @@
                 <ul>
                     <li><a href="/download/previous.html">Previous Releases</a></li>
                     <li><a href="/download/nightly.html">Nightly Releases</a></li>
+                    <li><a href="/download/source.html">Source Code</a></li>
                     <li><a href="/download/maven.html">Maven Repository Info</a></li>
                 </ul>
             </li>
