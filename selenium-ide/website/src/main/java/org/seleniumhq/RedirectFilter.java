@@ -13,7 +13,7 @@ public class RedirectFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         String request = req.getRequestURI();
-        String url = "http://selenium.seleniumhq.org/projects/ide";
+        String url = "http://seleniumhq.org/projects/ide";
 
         if (request.equals("/changelog.jsp")) {
             url = "http://seleniumhq.org/download/previous.html";
