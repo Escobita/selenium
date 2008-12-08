@@ -1,25 +1,4 @@
 <decorators defaultdir="/">
-    <excludes>
-        <pattern>/undecorated_new_for_reference.html</pattern>
-        <pattern>/shared/*</pattern>
-        <pattern>/javadoc/*</pattern>
-        <pattern>/ndoc/*</pattern>
-        <pattern>/rdoc/*</pattern>
-        <pattern>/epydoc/*</pattern>
-    </excludes>
-
-	<decorator name="about" page="about/decorator.jsp">
-       <pattern>/about/*</pattern>
-    </decorator>
-
-	<decorator name="documentation" page="documentation/decorator.jsp">
-       <pattern>/documentation/*</pattern>
-    </decorator>
-	
-	<decorator name="download" page="download/decorator.jsp">
-       <pattern>/download/*</pattern>
-    </decorator>
-	
     <decorator name="main" page="main-decorator.jsp">
        <pattern>/*</pattern>
     </decorator>
