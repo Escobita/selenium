@@ -1,12 +1,181 @@
 <html>
 <head>
-	<title>
-		Selenium on Rails
-	</title>
+	<title>Selenium on Rails</title>
 </head>
-<body>
+<body class="sectionProjects">
 	<h2>Selenium on Rails</h2>
-	<p>...is currently <a href="http://selenium-on-rails.openqa.org">here</a>.</p>
-	<script>document.location = "http://selenium-on-rails.openqa.org";</script>
+
+
+    <h2>Overview</h2>
+    <p>Selenium on Rails provides an easy way to test Rails application with Selenium.</p>
+
+    <p>This plugin does four things: </p>
+    <ol>
+        <li>The Selenium Core files don&#8216;t have to pollute <tt>/public</tt>.</li>
+        <li>No need to create suite files, they are generated on the fly &#8212; one suite per directory in <tt>/test/selenium</tt> (suites can be nested).</li>
+        <li>Instead of writing the test cases in HTML you can use a number of better formats (see <tt>Formats</tt>).</li>
+        <li>Loading of fixtures and wiping of session (<tt>/selenium/setup</tt>).</li>
+    </ol>
+
+    <h2>Installation for Rails 2.1</h2>
+    <ol>
+        <li>Install Selenium on Rails: <tt>script/plugin install
+            <a href="http://svn.openqa.org/svn/selenium-on-rails/current/selenium-on-rails">http://svn.openqa.org/svn/selenium-on-rails/current/selenium-on-rails</a></tt>
+        </li>
+
+        <li>If you&#8216;re on Windows, <tt>gem install win32-open3</tt></li>
+        <li><em>If the RedCloth gem is available the Selenese test cases can use it for better markup.</em></li>
+
+        <li>Run the Rakefile in the plugin&#8216;s directory to run the tests in order to see that everything works. (If RedCloth isn&#8216;t installed a few tests will fail since they assume RedCloth is installed.)</li>
+        <li>Create a test case: <tt>script/generate selenium login</tt></li>
+        <li>Start the server: <tt>script/server -e test</tt></li>
+        <li>Point your browser to <tt><a href="http://localhost:3000/selenium">localhost:3000/selenium</a></tt></li>
+
+        <li>If everything works as expected you should see the Selenium test runner. The north east frame contains all your test cases (just one for now), and the north frame contains your test case.</li>
+    </ol>
+
+    <h2>Installation for rails versions before Rails 2.1</h2>
+    <p>Rails has been changed in ways that break the original versions of Selenium on Rails.  If you're using versions before Rails 2.1 you need to use this release.  There are no plans to update this release with new changes or bug fixes unless there is sufficient demand, so if you can update then do so.
+    <ol>
+        <li>Install Selenium on Rails: <tt>script/plugin install
+            <a href="http://svn.openqa.org/svn/selenium-on-rails/tags/pre-rails-2-1/selenium-on-rails">http://svn.openqa.org/svn/selenium-on-rails/tags/pre-rails-2-1/selenium-on-rails</a></tt>
+        </li>
+
+        <li>If you&#8216;re on Windows, <tt>gem install win32-open3</tt></li>
+        <li><em>If the RedCloth gem is available the Selenese test cases can use it for better markup.</em></li>
+
+        <li>Run the Rakefile in the plugin&#8216;s directory to run the tests in order to see that everything works. (If RedCloth isn&#8216;t installed a few tests will fail since they assume RedCloth is installed.)</li>
+        <li>Create a test case: <tt>script/generate selenium login</tt></li>
+        <li>Start the server: <tt>script/server -e test</tt></li>
+        <li>Point your browser to <tt><a href="http://localhost:3000/selenium">localhost:3000/selenium</a></tt></li>
+
+        <li>If everything works as expected you should see the Selenium test runner. The north east frame contains all your test cases (just one for now), and the north frame contains your test case.</li>
+    </ol>
+
+    <h2>Formats</h2>
+    <p> The test cases can be written in a number of formats. Which one you choose is a matter of taste. You can generate your test files by running <tt>script/generate selenium</tt> or by creating them manually in your <tt>/test/selenium</tt> directory.</p>
+
+    <h3>RSelenese, .rsel</h3>
+
+    <p>RSelenese enable you to write your tests in Ruby. This is my favorite format.</p>
+    <pre>
+     setup :fixtures =&gt; :all
+     open '/'
+     assert_title 'Home'
+     ('a'..'z').each {|c| open :controller =&gt; 'user', :action =&gt; 'create', :name =&gt; c }
+    </pre>
+
+    <p> See
+    <a href="http://svn.openqa.org/fisheye/browse/~raw,r=1000/selenium-on-rails/selenium-on-rails/doc/classes/SeleniumOnRails/TestBuilder.html">SeleniumOnRails::TestBuilder		</a>
+    for available commands.  This is also available in the <a href="http://www.openqa.org/selenium-ide/">SeleniumIDE</a>, using the format <a href="http://wiki.openqa.org/download/attachments/408/rselenese.js?version=1">here</a>.  IMPORTANT NOTE: RSelenese generates the HTML tables for Selenium behind the scenes when the page is loaded - ONCE.  That means code like this:
+
+    <pre>
+        (1..10).each do |index|
+            do something
+        end
+    </pre>
+
+    Will only be executed when the test is loaded, not when the test is run.  This is a common error and leads to tests that work the first time and fail the second time.
+
+    <h3>Selenese, .sel</h3>
+    <p> Selenese is the dumbest format (in a good way). You just write your commands delimited by | characters.</p>
+    <pre>
+     |open|/selenium/setup|
+     |open|/|
+     |goBack|
+    </pre>
+
+    <p>If you don&#8216;t want to write Selenese tests by hand you can use <a href="http://www.openqa.org/selenium-ide/">SeleniumIDE</a> which has <ahref="http://wiki.openqa.org/display/SIDE/SeleniumOnRails">support</a> for Selenese.</p>
+
+    <p> SeleniumIDE makes it super easy to record test and edit them. </p>
+
+    <h3>HTML/RHTML</h3>
+    <p>
+    You can write your tests in HTML/RHTML but that&#8216;s mostly useful if you have existing tests you want to reuse.
+    </p>
+
+    <h3>Partial test cases</h3>
+    <p>If you have some common actions you want to do in several test cases you can put them in a separate partial test case and include them in your other test cases. This is highly recommended, just as small functions would be recommended in structured programming.</p>
+
+    <p> A partial test case is just like a normal test case besides that its filename has to start with _: </p>
+    <pre>
+     #_login.rsel
+     open '/login'
+     type 'name', name
+     type 'password', password
+     click 'submit', :wait=&gt;true
+    </pre>
+
+    <p>To include a partial test case in a RSelenese test case: </p>
+    <pre>
+     include_partial 'login', :name =&gt; 'Jane Doe', :password =&gt; 'Jane Doe'.reverse
+    </pre>
+
+    <p>in a Selenese test case: </p>
+    <pre>
+     |includePartial|login|name=John Doe|password=eoD nhoJ|
+    </pre>
+    <p>and in a RHTML test case:</p>
+    <pre>
+     &lt;%= render :partial =&gt; 'login', :locals =&gt; {:name = 'Joe Schmo', :password =&gt; 'Joe Schmo'.reverse} %&gt;
+    </pre>
+
+    <h2>Configuration</h2>
+    <p>There are a number of settings available. You make them by copying <tt>config.yml.example</tt> to <tt>config/selenium.yml</tt> in your application and make your changes in that file.</p>
+
+    <h3>Environments</h3>
+    <p>Per default this plugin is only available in test environment. You can change this by setting <tt>environments</tt>, such as:</p>
+    <pre>
+     #config.yml
+     environments:
+       - test
+       - development
+    </pre>
+
+    <h3>Selenium Core path</h3>
+    <p> If you don&#8216;t want to use the bundled Selenium Core version you can set <tt>selenium_path</tt> to the directory where Selenium Core is stored.</p>
+
+    <pre>
+     #config.yml
+     selenium_path: 'c:\selenium'
+    </pre>
+
+    <h2><tt>test:acceptance</tt></h2>
+    <p>You can run all your Selenium tests as a Rake task.  If you're using a continuous builder this is a great way to integrate selenium into your build process.</p>
+
+    <p>First, if you&#8216;re on Windows, you have to make sure win32-open3 is installed. Then you have to configure which browsers you want to run, like this:</p>
+
+    <pre>
+     #config.yml
+     browsers:
+       firefox: 'c:\Program Files\Mozilla Firefox\firefox.exe'
+       ie: 'c:\Program Files\Internet Explorer\iexplore.exe'
+    </pre>
+
+    <p>Now you&#8216;re all set. First start a server:</p>
+
+    <pre>
+     script/server -e test
+    </pre>
+
+    <p>Then run the tests:</p>
+
+    <pre>
+        rake test:acceptance
+    </pre>
+
+    <p>Now it should work, otherwise let me know!</p>
+
+    <h3>Store results</h3>
+    <p>If you want to store the results from a <tt>test:acceptance</tt> you just need to set in which directory they should be stored:</p>
+
+    <pre>
+     #config.yml
+     result_dir: 'c:\result'
+    </pre>
+
+    <p>So when you run <tt>rake test:acceptance</tt> the tables with the results will be stored as <tt>.html</tt> files in that directory.</p>
+    <p>This can be useful especially for continous integration.</p>
+
 </body>
 </html>
