@@ -1,4 +1,4 @@
-﻿<%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
+﻿l<%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <decorator:useHtmlPage id="p"/>
@@ -35,9 +35,8 @@
     </form>
 
 </div>
-<div id="userStatus">Welcome, <span id="username">Guest</span>. <a id="login"
-                                                                   href="http://www.openqa.org/sass/index.action">Login</a>
-    or <a id="create_account" href="http://www.openqa.org/sass/index.action">Create an account</a>.
+<div id="userStatus">
+    Note: To use the OpenQA <a href="http://clearspace.openqa.org">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://www.openqa.org/sass/index.action">OpenQA account</a>.
 </div>
 <div id="mBody">
     <%
