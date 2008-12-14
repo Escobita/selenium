@@ -1528,7 +1528,7 @@ h2 a:link { color: #000; }
 h2 a:visited { color: #000; }
 h2 a:hover { color: #039; }
 
-#mBody h2 { margin-top: 0; }
+#mBody h2 { margin-top: 10px; }
 #mBody p { margin-top: 0; }
 
 #front-feature div {

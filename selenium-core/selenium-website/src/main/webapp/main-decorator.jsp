@@ -36,7 +36,7 @@
 
 </div>
 <div id="userStatus">
-    Note: To use the OpenQA <a href="http://clearspace.openqa.org">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://www.openqa.org/sass/index.action">OpenQA account</a>.
+    Note: To use the OpenQA <a href="http://clearspace.openqa.org/community/selenium">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://www.openqa.org/sass/index.action">OpenQA account</a>.
 </div>
 <div id="mBody">
     <%
