@@ -67,7 +67,7 @@ When this command finishes, your browser window should reveal google.com in the 
 <blockquote>
   <p><code>cmd=<strong>click</strong>&amp;1=<strong>btnG</strong>&amp;sessionId=<em>260113</em></code> </p>
 </blockquote>
-<p>You should now see the results of your Google Search in your browser window. You can run dozens of Selenium commands to automate all manner of browsing tasks. For more information on particular commands, you can go look at the <a href="http://www.openqa.org/selenium/">Selenium Core</a> section at the Open QA website, or check out the reference materials available for any of our Client Drivers (<a href="java.html">Java</a>, <a href="dotnet.html">.NET</a>, <a href="perl.html">Perl</a>, <a href="php.html">PHP</a>, <a href="python.html">Python</a> or <a href="ruby.html">Ruby</a>). </p>
+<p>You should now see the results of your Google Search in your browser window. You can run dozens of Selenium commands to automate all manner of browsing tasks. For more information on particular commands the best source is the <a href="/projects/core/reference.html">Selenium reference</a>. </p>
 <p>The next thing we might want to do is read some information back out of the page... for example, let's retrieve the HTML title of the current page, like this:
 <blockquote>
   <p><code> cmd=<strong>getTitle</strong>&amp;sessionId=<em>260113</em></code></p>
@@ -290,7 +290,7 @@ end
 </blockquote>
 <p>and then we tried to open up google.com (which did work...) and type &quot;Hello World&quot; into the search box. But yahoo.com doesn't have the right to modify google.com, so that operation fails.</p>
 <p>All this means is that you have to choose your browser's start URL wisely: if you open up the browser to yahoo.com, you can't use it to test google.com, and vice versa.</p>
-<p>However, in some cases, you may be <i>required</i> to test more than one domain at once.  The most common case is when you need to test both http://blah.com <i>and</i> https://blah.com.  "http:" and "https:" are considered different "origins" from JavaScript perspective, so tests running on one can't run on the other.  In that case, for now, you'll have to use one of our <a href="experimental.html">experimental browser launchers</a> which support running in multiple domains.  (Also be sure to read the <a href="#https">HTTPS</a> section of this documentation for more details about HTTPS support.)
+<p>However, in some cases, you may be <i>required</i> to test more than one domain at once.  The most common case is when you need to test both http://blah.com <i>and</i> https://blah.com.  "http:" and "https:" are considered different "origins" from JavaScript perspective, so tests running on one can't run on the other.  In that case, for now, you'll have to use either the <b>*chrome</b>, or the <b>*iehta</b> browser launchers which support running in multiple domains.  (Also be sure to read the <a href="#https">HTTPS</a> section of this documentation for more details about HTTPS support.)
 
 
 <h2><a name="otherbrowsers"/>Automatically Launching Other Browsers</h2>
@@ -342,7 +342,7 @@ end
 
 <p>Another thing that makes HTTPS challenging is that many sites that require HTTPS use it only for certain pages (e.g. only for the login page), which means that testing such sites requires switching between different domains, in violation of the same-origin policy.</p>
 
-<p>If your test needs to use multiple domains (HTTP and HTTPS in the same test), you'll need to use one of our <a href="experimental.html">experimental</a> *chrome or *iehta browser launchers, or use proxy injection mode.  If you use *chrome or *iehta, you don't need to use the Selenium proxy at all, in which case you don't have to trust the CyberVillains CA.  If you use proxy injection mode, you'll still have to trust CyberVillains, following the directions below.</p>
+<p>If your test needs to use multiple domains (HTTP and HTTPS in the same test), your best choices are the <b>*chrome</b> or <b>*iehta</b> browser launchers, alternatively you can use proxy injection mode.  If you use *chrome or *iehta, you don't need to use the Selenium proxy at all, in which case you don't have to trust the CyberVillains CA.  If you use proxy injection mode, you'll still have to trust CyberVillains, following the directions below.</p>
 
 <h3>Using the CyberVillains CA manually</h3>
 
