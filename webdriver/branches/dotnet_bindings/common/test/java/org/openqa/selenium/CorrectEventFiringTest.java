@@ -6,6 +6,13 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.List;
 
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		
+		Thread.sleep(1000);
+	}
+	
 	@JavascriptEnabled
 	@Ignore("safari")
 	public void testShouldFireFocusEventWhenClicking() {

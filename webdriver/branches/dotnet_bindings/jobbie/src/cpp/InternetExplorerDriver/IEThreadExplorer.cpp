@@ -30,12 +30,10 @@ void IeThread::OnSetVisible(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
+
 	const long& isVisible = data.input_long_;
 
-	if (isVisible)
-		pBody->ieThreaded->put_Visible(VARIANT_TRUE);
-	else 
-		pBody->ieThreaded->put_Visible(VARIANT_FALSE);
+	pBody->ieThreaded->put_Visible(isVisible ? VARIANT_TRUE : VARIANT_FALSE);
 }
 
 void IeThread::OnGetCurrentUrl(WPARAM w, LPARAM lp)

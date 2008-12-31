@@ -79,9 +79,9 @@ protected:
 	void getElementName(IHTMLElement *pElement, std::wstring& res);
 	void getAttribute(IHTMLElement *pElement, LPCWSTR name, std::wstring& res);
 	bool isSelected(IHTMLElement *pElement);
-	bool isDisplayed(IHTMLElement *element);
+	int isDisplayed(IHTMLElement *element, bool* displayed);
 	bool isEnabled(IHTMLElement *pElement);
-	void getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, long *y);
+	int getLocationOnceScrolledIntoView(IHTMLElement *pElement, HWND* hwnd, long *x, long *y);
 	void click(IHTMLElement *pElement, CScopeCaller *pSC=NULL);
 	void getValue(IHTMLElement *pElement, std::wstring& res);
 	void getValueOfCssProperty(IHTMLElement *pElement, LPCWSTR propertyName, std::wstring& res);

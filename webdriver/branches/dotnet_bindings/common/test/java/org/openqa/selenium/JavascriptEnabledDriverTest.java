@@ -23,6 +23,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.matchers.JUnitMatchers.either;
+
+import org.openqa.selenium.internal.InteractionData;
 import org.openqa.selenium.internal.Locatable;
 
 import java.awt.*;
@@ -338,7 +340,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
       if (!(element instanceof Locatable))
     	  return;
       
-      Point point = ((Locatable) element).getLocationOnScreenOnceScrolledIntoView();
+      InteractionData point = ((Locatable) element).getLocationOnScreenOnceScrolledIntoView();
 
       assertTrue(point.getX() > 1);
       assertTrue(point.getY() > 1);

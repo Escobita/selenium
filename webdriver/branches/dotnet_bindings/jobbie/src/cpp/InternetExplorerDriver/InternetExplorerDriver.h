@@ -40,7 +40,7 @@ public:
 
 	ElementWrapper* selectElementByXPath(IHTMLElement *p, const wchar_t *xpath);
 	std::vector<ElementWrapper*>* selectElementsByXPath(IHTMLElement *p, const wchar_t *xpath);
-	ElementWrapper* selectElementById(IHTMLElement *p, const wchar_t *elementId);
+	int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** result);
 	std::vector<ElementWrapper*>* selectElementsById(IHTMLElement *p, const wchar_t *elementId);
 	ElementWrapper* selectElementByLink(IHTMLElement *p, const wchar_t *elementLink);
 	std::vector<ElementWrapper*>* selectElementsByLink(IHTMLElement *p, const wchar_t *elementLink);

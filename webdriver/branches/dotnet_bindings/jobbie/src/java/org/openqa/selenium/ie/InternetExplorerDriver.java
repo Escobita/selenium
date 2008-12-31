@@ -17,49 +17,69 @@
 
 package org.openqa.selenium.ie;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.ReturnedCookie;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Collections;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
-public class InternetExplorerDriver implements WebDriver, SearchContext, JavascriptExecutor {
-    private long iePointer; // Used by the native code to keep track of the IE instance
-    private static boolean comStarted;
+import static org.openqa.selenium.ie.ErrorCode.SUCCESS;
 
-    public InternetExplorerDriver() {
-        startCom();
-        openIe();
+public class InternetExplorerDriver implements WebDriver, SearchContext,
+    JavascriptExecutor {
+  private final static WebDriverLibrary lib = JobbieLibraryInstance
+      .getLibraryInstance();
+  private final Helpers helpers;
+  private Pointer driver;
+
+  public InternetExplorerDriver() {
+    PointerByReference ptr = new PointerByReference();
+    ErrorCode result = ErrorCode.fromCode(lib.wdNewDriverInstance(ptr));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Cannot create new browser instance: " + result);
     }
+    helpers = new Helpers(lib);
+    driver = ptr.getValue();
+  }
 
-    @SuppressWarnings("unused")
-    private InternetExplorerDriver(long iePointer) {
-        this.iePointer = iePointer;
+  public String getPageSource() {
+    PointerByReference ptr = new PointerByReference();
+    ErrorCode result = ErrorCode.fromCode(lib.wdGetPageSource(driver, ptr));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Unable to get page source: " + result);
     }
+    return helpers.convertToString(ptr);
+  }
 
-    public native String getPageSource();
-
-    public native void close();
-    
-    public void quit() {
-    	close();  // Not a good implementation, but better than nothing
+  public void close() {
+    ErrorCode result = ErrorCode.fromCode(lib.wdClose(driver));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Unable to close driver: " + result);
     }
+  }
+
+  public void quit() {
+    close(); // Not a good implementation, but better than nothing
+  }
 
   public Set<String> getWindowHandles() {
     return Collections.singleton("1");
@@ -69,245 +89,246 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
     return "1";
   }
 
-  private native Object doExecuteScript(String script, Object[] args);
-    public Object executeScript(String script, Object... args) {
-    	for (Object arg : args) {
-    		if (!(arg instanceof String || 
-    			  arg instanceof Boolean || 
-    			  arg instanceof Number || 
-    			  arg instanceof InternetExplorerElement))
-    			throw new IllegalArgumentException("Parameter is not of recognized type: " + arg);
-    	}
-    	
-    	script = "(function() { return function(){" + script + "};})();";
-    	return doExecuteScript(script, args);
+  public Object executeScript(String script, Object... args) {
+    for (Object arg : args) {
+      if (!(arg instanceof String || arg instanceof Boolean
+          || arg instanceof Number || arg instanceof InternetExplorerElement))
+        throw new IllegalArgumentException(
+            "Parameter is not of recognized type: " + arg);
+    }
+
+    script = "(function() { return function(){" + script + "};})();";
+
+    throw new UnsupportedOperationException("executeScript");
+  }
+
+  public void get(String url) {
+    ErrorCode result = ErrorCode.fromCode(lib.wdGet(driver, new WString(url)));
+    if (result != SUCCESS) {
+      throw new IllegalStateException(String.format("Cannot get \"%s\": %s", url, result));
+    }
+  }
+
+  public String getCurrentUrl() {
+    PointerByReference ptr = new PointerByReference();
+    ErrorCode result = ErrorCode.fromCode(lib.wdGetCurrentUrl(driver, ptr));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Unable to get current URL: " + result);
     }
     
-    
-    public native void get(String url);
+    return helpers.convertToString(ptr);
+  }
 
-    public native String getCurrentUrl();
+  public String getTitle() {
+    PointerByReference ptr = new PointerByReference();
+    ErrorCode result = ErrorCode.fromCode(lib.wdGetTitle(driver, ptr));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Unable to get the title of the current page: " + result);
+    }
+    return helpers.convertToString(ptr);
+  }
 
-    public native String getTitle();
+  public boolean getVisible() {
+    IntByReference result = new IntByReference();
+    ErrorCode res = ErrorCode.fromCode(lib.wdGetVisible(driver, result));
+    if (res != SUCCESS) {
+      throw new IllegalStateException("Cannot determine visibility of browser: " + res);
+    }
+    return result.getValue() == 1;
+  }
 
-    public native boolean getVisible();
+  public void setVisible(boolean visible) {
+    ErrorCode result = ErrorCode.fromCode(lib.wdSetVisible(driver, visible ? 1 : 0));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Cannot set the visibility of the browser: " + result);
+    }
+  }
 
-    public native void setVisible(boolean visible);
+  public List<WebElement> findElements(By by) {
+    return new Finder(lib, driver, null).findElements(by);
+  }
 
-    public List<WebElement> findElements(By by) {
-    	return new Finder(iePointer, 0).findElements(by);
+  public WebElement findElement(By by) {
+    return new Finder(lib, driver, null).findElement(by);
+  }
+
+  @Override
+  public String toString() {
+     return getClass().getName() + ":" + driver;
+  }
+
+  public TargetLocator switchTo() {
+    return new InternetExplorerTargetLocator();
+  }
+
+  public Navigation navigate() {
+    return new InternetExplorerNavigation();
+  }
+
+  public Options manage() {
+    return new InternetExplorerOptions();
+  }
+
+  protected void waitForLoadToComplete() {
+    ErrorCode result = ErrorCode.fromCode(lib.wdWaitForLoadToComplete(driver));
+    if (result != SUCCESS) {
+      throw new IllegalStateException("Unable to wait for load to complete: " + result);
+    }
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    lib.wdFreeDriver(driver);  // We should check the error code, but there's nothing sane to do.
+  }
+
+  private class InternetExplorerTargetLocator implements TargetLocator {
+    public WebDriver frame(int frameIndex) {
+      return frame(String.valueOf(frameIndex));
     }
 
-    public WebElement findElement(By by) {
-        return new Finder(iePointer, 0).findElement(by);
+    public WebDriver frame(String frameName) {
+      ErrorCode result = ErrorCode.fromCode(lib.wdSwitchToFrame(driver, new WString(frameName)));
+
+      if (result == ErrorCode.NO_SUCH_FRAME) {
+        throw new NoSuchFrameException("Unable to find frame with name or id: "
+            + frameName);
+      }
+      if (result != SUCCESS) {
+        throw new IllegalStateException(
+            String.format("Cannot switch to frame \"%s\": %s", frameName, result));
+      }
+      return InternetExplorerDriver.this;
     }
 
-    @Override
-    public String toString() {
-        return getClass().getName() + ":" + iePointer;
+    public WebDriver window(String windowName) {
+      return null; // For the sake of getting us off the ground
     }
 
-    public TargetLocator switchTo() {
-        return new InternetExplorerTargetLocator();
+    public Iterable<WebDriver> windowIterable() {
+      throw new UnsupportedOperationException("windowIterable");
     }
 
-
-    public Navigation navigate() {
-        return new InternetExplorerNavigation();
+    public WebDriver defaultContent() {
+      return frame("");
     }
 
-    public Options manage() {
-        return new InternetExplorerOptions();
+    public WebElement activeElement() {
+      PointerByReference element = new PointerByReference();
+
+      ErrorCode result = ErrorCode.fromCode(lib.wdSwitchToActiveElement(driver, element));
+      if (result == SUCCESS)
+        return new InternetExplorerElement(lib, driver, element.getValue());
+      
+      if (result == ErrorCode.NO_SUCH_ELEMENT) {
+        throw new NoSuchElementException("Cannot find active element");
+      }
+      
+      throw new IllegalStateException("Cannot find active element: " + result);
     }
 
-    protected native void waitForLoadToComplete();
+    public Alert alert() {
+      throw new UnsupportedOperationException("alert");
+    }
+  }
 
-    private void startCom() {
-        if (!comStarted) {
-        	try {
-            loadLibrary();
-        	} catch (RuntimeException e) {
-        		e.printStackTrace();
-        		throw e;
-        	}
-            startComNatively();
-            comStarted = true;
-        }
+  private class InternetExplorerNavigation implements Navigation {
+    public void back() {
+      ErrorCode result = ErrorCode.fromCode(lib.wdGoBack(driver));
+      if (result != SUCCESS) {
+        throw new IllegalStateException("Cannot navigate backwards: " + result);
+      }
+      
+      result = ErrorCode.fromCode(lib.wdWaitForLoadToComplete(driver));
+      if (result != SUCCESS) {
+        throw new IllegalStateException("Cannot wait for back navigation to end: " + result);
+      }
     }
 
-	private void loadLibrary() {
-		try {
-			System.loadLibrary("InternetExplorerDriver");
-		} catch (UnsatisfiedLinkError e) {
-            File dll = writeResourceToDisk("InternetExplorerDriver.dll");
-            System.load(dll.getAbsolutePath());
-        }
-	}
-
-	private File writeResourceToDisk(String resourceName) throws UnsatisfiedLinkError {
-		InputStream is = InternetExplorerDriver.class.getResourceAsStream(resourceName);
-		if (is == null) 
-			is = InternetExplorerDriver.class.getResourceAsStream("/" + resourceName);
-		
-        FileOutputStream fos = null;
-        
-		try {
-		    File dll = File.createTempFile("webdriver", null);
-		    dll.deleteOnExit();
-		    fos = new FileOutputStream(dll);
-		    
-		    int count;
-		    byte[] buf = new byte[4096];
-		    while ((count = is.read(buf, 0, buf.length)) > 0) {
-		        fos.write(buf, 0, count);
-		    }
-		    
-		    return dll;
-		} catch(IOException e2) {
-		    throw new UnsatisfiedLinkError("Cannot create temporary DLL: " + e2.getMessage());
-		}
-		finally {
-		    try { is.close(); } catch(IOException e2) { }
-		    if (fos != null) {
-		        try { fos.close(); } catch(IOException e2) { }
-		    }
-		}
-	}
-
-    private native void startComNatively();
-
-    private native void openIe();
-
-    @Override
-    protected void finalize() throws Throwable {
-    	if (iePointer != 0)
-    		deleteStoredObject();
+    public void forward() {
+      ErrorCode result = ErrorCode.fromCode(lib.wdGoForward(driver));
+      if (result != SUCCESS) {
+        throw new IllegalStateException("Cannot navigate forward: " + result);
+      }
+      
+      result = ErrorCode.fromCode(lib.wdWaitForLoadToComplete(driver));
+      if (result != SUCCESS) {
+        throw new IllegalStateException("Cannot wait for forward navigation to end: " + result);
+      }
     }
 
-    private native void deleteStoredObject();
-
-    private native void setFrameIndex(String pathToFrame);
-    
-    private native void goBack();
-	private native void goForward();
-
-	private native void doAddCookie(String cookieString);
-    private native String doGetCookies();
-    
-    private native void doSetMouseSpeed(int timeOut);
-	
-    private native WebElement doSwitchToActiveElement();
-    
-    private class InternetExplorerTargetLocator implements TargetLocator {
-        public WebDriver frame(int frameIndex) {
-            return frame(String.valueOf(frameIndex));
-        }
-
-        public WebDriver frame(String frameName) {
-        	setFrameIndex(frameName);
-        	return InternetExplorerDriver.this;
-        }
-
-        public WebDriver window(String windowName) {
-            return null; // For the sake of getting us off the ground
-        }
-
-        public Iterable<WebDriver> windowIterable() {
-            throw new UnsupportedOperationException("windowIterable");
-        }
-
-        public WebDriver defaultContent() {
-            return frame("");
-        }
-
-
-        public WebElement activeElement() {
-            return doSwitchToActiveElement();
-        }
-
-        public Alert alert() {
-            throw new UnsupportedOperationException("alert");
-        }
+    public void to(String url) {
+      get(url);
     }
-    
-    private class InternetExplorerNavigation implements Navigation {
-		public void back() {
-			goBack();
-		}
-		
-		public void forward() {
-			goForward();
-		}
+  }
 
-		public void to(String url) {
-			get(url);
-		}
+  private class InternetExplorerOptions implements Options {
+    public void addCookie(Cookie cookie) {
+      ErrorCode result = ErrorCode.fromCode(lib.wdAddCookie(driver, new WString(cookie.toString())));
+      if (result != SUCCESS) {
+        throw new IllegalStateException(
+            String.format("Unable to add cookie: %s (%s)", cookie, result));
+      }
     }
-    
-    private class InternetExplorerOptions implements Options {
-		public void addCookie(Cookie cookie) {
-			doAddCookie(cookie.toString());
-		}
 
-		public void deleteAllCookies() {
-			Set<Cookie> cookies = getCookies();
-			for (Cookie cookie : cookies) {
-				deleteCookie(cookie);
-			}
-		}
+    public void deleteAllCookies() {
+      Set<Cookie> cookies = getCookies();
+      for (Cookie cookie : cookies) {
+        deleteCookie(cookie);
+      }
+    }
 
-		public void deleteCookie(Cookie cookie) {
-			Date dateInPast = new Date(0);
-			Cookie toDelete = new ReturnedCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), dateInPast, false);
-			addCookie(toDelete);
-		}
+    public void deleteCookie(Cookie cookie) {
+      Date dateInPast = new Date(0);
+      Cookie toDelete = new ReturnedCookie(cookie.getName(), cookie.getValue(),
+          cookie.getDomain(), cookie.getPath(), dateInPast, false);
+      addCookie(toDelete);
+    }
 
-		public void deleteCookieNamed(String name) {
-			deleteCookie(new ReturnedCookie(name, "", getCurrentHost(), "", null, false));
-		}
+    public void deleteCookieNamed(String name) {
+      deleteCookie(new ReturnedCookie(name, "", getCurrentHost(), "", null,
+          false));
+    }
 
-		public Set<Cookie> getCookies() {
-			String currentUrl = getCurrentHost();
-			
-			Set<Cookie> toReturn = new HashSet<Cookie>();
-			String allDomainCookies = doGetCookies();
+    public Set<Cookie> getCookies() {
+      String currentUrl = getCurrentHost();
 
-			String[] cookies = allDomainCookies.split("; ");
-			for (String cookie : cookies) {
-				String[] parts = cookie.split("=");
-				if (parts.length != 2) {
-					continue;
-				}
-				
-				toReturn.add(new ReturnedCookie(parts[0], parts[1], currentUrl, "", null, false));
-			}
-			
-	        return toReturn;
-		}
+      Set<Cookie> toReturn = new HashSet<Cookie>();
+      PointerByReference rawCookie = new PointerByReference();
+      ErrorCode result = ErrorCode.fromCode(lib.wdGetCookies(driver, rawCookie));
+      if (result != SUCCESS) {
+        throw new IllegalStateException("Unable to get all available cookies: " + result);
+      }
+      String allDomainCookies = helpers.convertToString(rawCookie);
 
-		private String getCurrentHost() {
-			try {
-				URL url = new URL(getCurrentUrl());
-				return url.getHost();
-			} catch (MalformedURLException e) {
-				return "";
-			}
-		}
-
-        public Speed getSpeed() {
-            throw new UnsupportedOperationException();
+      String[] cookies = allDomainCookies.split("; ");
+      for (String cookie : cookies) {
+        String[] parts = cookie.split("=");
+        if (parts.length != 2) {
+          continue;
         }
 
-        public void setSpeed(Speed speed) {
-            doSetMouseSpeed(speed.getTimeOut());
-        }
+        toReturn.add(new ReturnedCookie(parts[0], parts[1], currentUrl, "",
+            null, false));
+      }
+
+      return toReturn;
     }
 
-    public WebElement findElementByPartialLinkText(String using) {
-        throw new UnsupportedOperationException();
+    private String getCurrentHost() {
+      try {
+        URL url = new URL(getCurrentUrl());
+        return url.getHost();
+      } catch (MalformedURLException e) {
+        return "";
+      }
     }
 
-    public List<WebElement> findElementsByPartialLinkText(String using) {
-        throw new UnsupportedOperationException();
+    public Speed getSpeed() {
+      throw new UnsupportedOperationException();
     }
+
+    public void setSpeed(Speed speed) {
+      new UnsupportedOperationException("setSpeed");
+    }
+  }
 }

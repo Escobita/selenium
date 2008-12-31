@@ -33,7 +33,7 @@ public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-        driver.setVisible(true);
+//        driver.setVisible(true);
 
         TestEnvironment environment = GlobalTestEnvironment.get();
 

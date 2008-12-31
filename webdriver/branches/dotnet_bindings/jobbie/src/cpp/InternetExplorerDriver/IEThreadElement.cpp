@@ -5,6 +5,7 @@
 #include <cctype>
 #include <algorithm>
 
+#include "errorcodes.h"
 #include "IEThread.h"
 #include "interactions.h"
 #include "utils.h"
@@ -83,7 +84,8 @@ void IeThread::OnElementSendKeys(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_ELEMENT(data, pElement)
 
-	if (!isDisplayed(pElement)) {
+	bool displayed;
+	if (isDisplayed(pElement, &displayed) != 0 || !displayed) {
 		throw std::wstring(L"Element is not displayed");
 	}
 
@@ -151,12 +153,17 @@ void IeThread::OnElementIsDisplayed(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_ELEMENT(data, pElement)
 
-	data.output_bool_ = isDisplayed(pElement);
+	bool displayed;
+	if (isDisplayed(pElement, &displayed) != SUCCESS) {
+		data.output_string_ = L"Cannot determine if element is displayed or not. Possibly it's obsolete";
+	} else {
+		data.output_bool_ = displayed;
+	}
 }
 
-bool IeThread::isDisplayed(IHTMLElement *element)
+int IeThread::isDisplayed(IHTMLElement *element, bool* toReturn)
 {
-	bool toReturn = true;
+	*toReturn = true;
 
 	CComPtr<IHTMLElement> e(element);
 	do {
@@ -168,7 +175,7 @@ bool IeThread::isDisplayed(IHTMLElement *element)
 
 		e2->get_currentStyle(&style);
 		if(!style) {
-			throw std::wstring(L"appears to manipulate obsolete DOM element.");
+			return -EOBSOLETEELEMENT;
 		}
 		style->get_display(&display);
 		style->get_visibility(&visible);
@@ -179,14 +186,15 @@ bool IeThread::isDisplayed(IHTMLElement *element)
 		int isDisplayed = _wcsicmp(L"none", displayValue.c_str());
 		int isVisible = _wcsicmp(L"hidden", visibleValue.c_str());
 
-		toReturn &= isDisplayed != 0 && isVisible != 0;
+		*toReturn &= isDisplayed != 0 && isVisible != 0;
 
 		CComPtr<IHTMLElement> parent;
 		e->get_parentElement(&parent);
+		
 		e = parent;
-	} while (e && toReturn);
+	} while (e && *toReturn);
 
-	return toReturn;
+	return SUCCESS;
 }
 
 void IeThread::OnElementIsEnabled(WPARAM w, LPARAM lp)
@@ -202,21 +210,28 @@ void IeThread::OnElementGetLocationOnceScrolledIntoView(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_ELEMENT(data, pElement)
 
+	HWND hwnd;
 	long x = 0, y = 0;
 
-	getLocationOnceScrolledIntoView(pElement, &x, &y);
+	getLocationOnceScrolledIntoView(pElement, &hwnd, &x, &y);
 
-	SAFEARRAY* args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
+	SAFEARRAY* args = SafeArrayCreateVector(VT_VARIANT, 0, 3);
 	
 	long index = 0;
+	VARIANT hwndRes;
+	hwndRes.vt = VT_I8;
+	hwndRes.llVal = (LONGLONG) hwnd;
+	SafeArrayPutElement(args, &index, &hwndRes);
+
+	index = 1;
 	VARIANT xRes;
-	xRes.vt = VT_I8;
+	xRes.vt = VT_I4;
 	xRes.lVal = x;
 	SafeArrayPutElement(args, &index, &xRes);
 
-	index = 1;
+	index = 2;
 	VARIANT yRes;
-	yRes.vt = VT_I8;
+	yRes.vt = VT_I4;
 	yRes.lVal = y;
 	SafeArrayPutElement(args, &index, &yRes);
 
@@ -260,13 +275,13 @@ void IeThread::OnElementGetLocation(WPARAM w, LPARAM lp)
 	
 	long index = 0;
 	VARIANT xRes;
-	xRes.vt = VT_I8;
+	xRes.vt = VT_I4;
 	xRes.lVal = x;
 	SafeArrayPutElement(args, &index, &xRes);
 
 	index = 1;
 	VARIANT yRes;
-	yRes.vt = VT_I8;
+	yRes.vt = VT_I4;
 	yRes.lVal = y;
 	SafeArrayPutElement(args, &index, &yRes);
 
@@ -372,7 +387,8 @@ void IeThread::OnElementSetSelected(WPARAM w, LPARAM lp)
 		throw std::wstring(L"Unable to select a disabled element");
 	}
 
-	if (!this->isDisplayed(pElement)) 
+	bool displayed;
+	if (this->isDisplayed(pElement, &displayed) != 0 || !displayed) 
 	{
 		throw std::wstring(L"Unable to select an element that is not displayed");
 	}
@@ -586,21 +602,22 @@ bool IeThread::isSelected(IHTMLElement *pElement)
 	return false;
 }
 
-void IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, long *y)
+int IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, HWND* hwnd, long *x, long *y)
 {
 	CComQIPtr<IHTMLDOMNode2> node(pElement);
 
 	if (!node) {
 		cerr << "No node to get location of" << endl;
-		return;
+		return -ENOSUCHELEMENT;
 	}
 
-	if (!isDisplayed(pElement)) {
-		throw std::wstring(L"Element is not displayed");
+	bool displayed;
+	if (isDisplayed(pElement, &displayed) != 0 || !displayed) {
+		return -EELEMENTNOTDISPLAYED;
 	}
 
 	if (!isEnabled(pElement)) {
-		throw std::wstring(L"Element is not enabled");
+		return -EELEMENTNOTENABLED;
 	}
 
 	const HWND hWnd = getHwnd();
@@ -618,7 +635,7 @@ void IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, 
 	CComQIPtr<IHTMLElement2> element2(pElement);
 	CComPtr<IHTMLRect> rect;
 	if (FAILED(element2->getBoundingClientRect(&rect))) {
-		return;
+		return -EUNHANDLEDERROR;
 	}
 
 	long clickX, clickY, width, height;
@@ -632,7 +649,8 @@ void IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, 
 	width -= clickX;
 
 	if (height == 0 || width == 0) {
-		throw std::wstring(L"Element would not be visible because it lacks height and/or width.");
+		cerr << "Element would not be visible because it lacks height and/or width." << endl;
+		return -EELEMENTNOTDISPLAYED;
 	}
 
 	CComPtr<IDispatch> ownerDocDispatch;
@@ -642,6 +660,10 @@ void IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, 
 	ownerDoc->get_documentElement(&docElement);
 
 	CComQIPtr<IHTMLElement2> e2(docElement);
+	if (!e2) {
+		cerr << "Unable to get underlying html element from the document" << endl;
+		return -EUNHANDLEDERROR;
+	}
 
 	CComQIPtr<IHTMLDocument2> doc2(ownerDoc);
 
@@ -673,8 +695,10 @@ void IeThread::getLocationOnceScrolledIntoView(IHTMLElement *pElement, long *x, 
 	clickX += screenLeft;
 	clickY += screenTop;
 
+	*hwnd = ieWindow;
 	*x = clickX;
 	*y = clickY;
+	return SUCCESS;
 }
 
 void IeThread::click(IHTMLElement *pElement, CScopeCaller *pSC)
@@ -682,10 +706,8 @@ void IeThread::click(IHTMLElement *pElement, CScopeCaller *pSC)
 	SCOPETRACER
 
 	long clickX = 0, clickY = 0;
-	getLocationOnceScrolledIntoView(pElement, &clickX, &clickY);
-
-	const HWND hWnd = getHwnd();
-	const HWND ieWindow = getIeServerWindow(hWnd);
+	HWND ieWindow;
+	getLocationOnceScrolledIntoView(pElement, &ieWindow, &clickX, &clickY);
 
 	// Create a mouse move, mouse down, mouse up OS event
 	clickAt(ieWindow, clickX, clickY);

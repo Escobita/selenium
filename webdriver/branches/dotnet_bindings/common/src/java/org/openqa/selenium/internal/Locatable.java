@@ -1,6 +1,5 @@
 package org.openqa.selenium.internal;
 
-import java.awt.Point;
 
 public interface Locatable {
   /**
@@ -9,5 +8,5 @@ public interface Locatable {
    *
    * @return The top lefthand corner location on the screen, or null if the element is not visible
    */
-  Point getLocationOnScreenOnceScrolledIntoView();
+  InteractionData getLocationOnScreenOnceScrolledIntoView();
 }

@@ -28,7 +28,6 @@
 	DataMarshaller& data = prepareCmData(pElem, input_string); \
 	sendThreadMsg(message, data);
 
-
 void throwRunTimeException(JNIEnv *, LPCWSTR msg);
 void throwNoSuchFrameException(JNIEnv *, LPCWSTR message);
 void throwNoSuchElementException(JNIEnv *, LPCWSTR msg);

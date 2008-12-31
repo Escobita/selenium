@@ -91,7 +91,7 @@ bool ElementWrapper::toggle()
 	return isSelected();
 }
 
-void ElementWrapper::getLocationOnceScrolledIntoView(long* x, long* y) 
+void ElementWrapper::getLocationOnceScrolledIntoView(HWND* hwnd, long* x, long* y) 
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_GETLOCATIONONCESCROLLEDINTOVIEW,)
@@ -99,6 +99,7 @@ void ElementWrapper::getLocationOnceScrolledIntoView(long* x, long* y)
 	VARIANT result = data.output_variant_;
 	
 	if (result.vt != VT_ARRAY) {
+		*hwnd = NULL;
 		*x = 0;
 		*y = 0;
 		return;
@@ -106,12 +107,17 @@ void ElementWrapper::getLocationOnceScrolledIntoView(long* x, long* y)
 
 	SAFEARRAY* ary = result.parray;
 	long index = 0;
+	CComVariant hwndVariant;
+	SafeArrayGetElement(ary, &index, (void*) &hwndVariant);
+	*hwnd = (HWND) hwndVariant.llVal;
+
+	index = 1;
 	CComVariant xVariant;
 	SafeArrayGetElement(ary, &index, (void*) &xVariant);
 	*x = xVariant.lVal;
 
+	index = 2;
 	CComVariant yVariant;
-	index = 1;
 	SafeArrayGetElement(ary, &index, (void*) &yVariant);
 	*y = yVariant.lVal;
 

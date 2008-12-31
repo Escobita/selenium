@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "utils.h"
 #include "InternalCustomMessage.h"
+#include "errorcodes.h"
 #include "jsxpath.h"
 
 using namespace std;
@@ -152,15 +153,16 @@ std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByXPath(IHTM
 	return toReturn;
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string) 
+int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** result) 
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYID)
 
-	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Id"); throw Err;}
-	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Id"); throw Err;}
+	if(1 == data.output_long_ || !data.output_html_element_) { return -ENOSUCHELEMENT; }
 
-	return new ElementWrapper(this, data.output_html_element_);	
+	*result = new ElementWrapper(this, data.output_html_element_);
+
+	return SUCCESS;
 }
 
 std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsById(IHTMLElement *pElem, const wchar_t *input_string)

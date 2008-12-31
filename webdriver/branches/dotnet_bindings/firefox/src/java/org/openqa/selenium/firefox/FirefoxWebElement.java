@@ -13,6 +13,7 @@ import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.internal.InteractionData;
 import org.openqa.selenium.internal.Locatable;
 
 import java.awt.*;
@@ -244,7 +245,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
         return elementId;
     }
 
-    public Point getLocationOnScreenOnceScrolledIntoView() {
+    public InteractionData getLocationOnScreenOnceScrolledIntoView() {
         String json = sendMessage(RuntimeException.class, "getLocationOnceScrolledIntoView");
         if (json == null) {
             return null;
@@ -252,8 +253,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
         try {
             JSONObject mapped = new JSONObject(json);
-
-            return new Point(mapped.getInt("x"), mapped.getInt("y"));
+            return new FirefoxInteractionData(mapped.getLong("windowHandle"), mapped.getInt("x"), mapped.getInt("y"));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
