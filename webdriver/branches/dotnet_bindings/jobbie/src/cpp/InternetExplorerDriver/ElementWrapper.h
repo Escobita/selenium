@@ -1,57 +1,54 @@
-#pragma once
+#ifndef JOBBIE_ELEMENTWRAPPER_H_
+#define JOBBIE_ELEMENTWRAPPER_H_
 
 #include <string>
 #include <vector>
 
-#include <Exdisp.h>
-#include <mshtml.h>
-
-#include "InternetExplorerDriver.h"
-#include "com_googlecode_webdriver_ie_InternetExplorerElement.h"
-
+class DataMarshaller;
 class InternetExplorerDriver;
 
 class ElementWrapper
 {
 public:
-	ElementWrapper(InternetExplorerDriver* ie, IHTMLDOMNode *node);
+	ElementWrapper(InternetExplorerDriver* ie, IHTMLElement *pElem);
 	~ElementWrapper();
 
-	std::wstring getAttribute(const wchar_t* name);
-	std::wstring getValue();
-	void sendKeys(const wchar_t* newValue);
+    LPCWSTR getElementName();
+	LPCWSTR getAttribute(LPCWSTR name);
+	LPCWSTR getValue();
+	void sendKeys(LPCWSTR newValue);
 	void clear();
 	bool isSelected();
 	void setSelected();
 	bool isEnabled();
 	bool isDisplayed();
 	bool toggle();
-	std::wstring getText();
+	LPCWSTR getText();
+	LPCWSTR getValueOfCssProperty(LPCWSTR propertyName);
+	void releaseInterface();
 
-	long getX();
-	long getY();
+	void getLocationOnceScrolledIntoView(long *x, long *y);
+	void getLocation(long *x, long *y);
 	long getWidth();
 	long getHeight();
 
 	void click();
 	void submit();
 
-	std::vector<ElementWrapper*>* getChildrenWithTagName(const std::wstring& tagName);
+	std::vector<ElementWrapper*>* getChildrenWithTagName(LPCWSTR tagName);
+
+	IHTMLElement* getWrappedElement() {return pElement;}
+	InternetExplorerDriver* getParent() {return ie;}
+
 
 private:
-	std::wstring getTextAreaValue();
-	bool isCheckbox();
-	void findParentForm(IHTMLFormElement **pform);
-	IHTMLEventObj* newEventObject();
-	void fireEvent(IHTMLEventObj*, const OLECHAR*);
-	void fireEvent(IHTMLDOMNode* fireFrom, IHTMLEventObj*, const OLECHAR*);
-
-	static void getText(std::wstring& toReturn, IHTMLDOMNode* node, bool isPreformatted);
-	static void collapsingAppend(std::wstring& s, const std::wstring& s2);
-	static std::wstring collapseWhitespace(const wchar_t *text);
-	static bool isBlockLevel(IHTMLDOMNode *node);
-
 	InternetExplorerDriver* ie;
-	CComQIPtr<IHTMLElement> element;
+	IHTMLElement *pElement;
+
+	DataMarshaller& commandData();
+	DataMarshaller& prepareCmData();
+	DataMarshaller& prepareCmData(LPCWSTR str);
+	bool sendThreadMsg(UINT msg, DataMarshaller& data);
 };
 
+#endif // JOBBIE_ELEMENTWRAPPER_H_

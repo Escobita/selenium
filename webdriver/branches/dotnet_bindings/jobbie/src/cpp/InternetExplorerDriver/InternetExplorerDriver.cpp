@@ -1,554 +1,377 @@
 #include "StdAfx.h"
-#include "InternetExplorerDriver.h"
 #include "utils.h"
-#include <exdispid.h>
-#include <iostream>
-#include <jni.h>
-#include <comutil.h>
-#include <comdef.h>
-#include <stdlib.h>
-#include <string>
-
-#include "atlbase.h"
-#include "atlstr.h"
+#include "InternalCustomMessage.h"
+#include "jsxpath.h"
 
 using namespace std;
 
-long invokeCount = 0;
-long queryCount = 0;
-
-InternetExplorerDriver::InternetExplorerDriver()
+InternetExplorerDriver::InternetExplorerDriver() : p_IEthread(NULL)
 {
-	if (!SUCCEEDED(CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER, IID_IWebBrowser2, (void**)&ie))) 
-	{
-		throw "Cannot create InternetExplorer instance";
-	}
+	SCOPETRACER
+	speed = 0;
+	
+	p_IEthread = ThreadFactory();
+	p_IEthread->pIED = this;
+
+	ResetEvent(p_IEthread->sync_LaunchIE);
+	p_IEthread->PostThreadMessageW(_WD_START, 0, 0);
+	WaitForSingleObject(p_IEthread->sync_LaunchIE, 60000);
 
 	closeCalled = false;
-	currentFrame = -1;
-
-	bringToFront();
-//	sink = new IeEventSink(ie);
 }
 
 InternetExplorerDriver::InternetExplorerDriver(InternetExplorerDriver *other)
 {
-	this->ie = other->ie;
+	ScopeTracer D(("Constructor_from_other"));
+	this->p_IEthread = other->p_IEthread;
 }
 
 InternetExplorerDriver::~InternetExplorerDriver()
 {
-//	delete sink;
+	SCOPETRACER
+	close();
+}
+
+IeThread* InternetExplorerDriver::ThreadFactory()
+{
+	SCOPETRACER
+	static IeThread* gThread = NULL;
+	if(!gThread) 
+	{
+		// Spawning the GUI worker thread, which will instantiate the ActiveX component
+		gThread = p_IEthread = new IeThread();
+		p_IEthread->hThread = CreateThread (NULL, 0, (DWORD (__stdcall *)(LPVOID)) (IeThread::runProcessStatic), 
+					(void *)p_IEthread, 0, NULL);
+
+		p_IEthread->pIED = this;
+		ResetEvent(p_IEthread->sync_LaunchThread);
+		ResumeThread(p_IEthread->hThread); 
+		WaitForSingleObject(p_IEthread->sync_LaunchThread, 60000);
+	}
+
+	return gThread;
 }
 
 void InternetExplorerDriver::close()
 {
+	SCOPETRACER
 	if (closeCalled)
 		return;
 
-	ie->Quit();
 	closeCalled = true;
+
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_QUIT_IE,)
 }
 
 bool InternetExplorerDriver::getVisible()
 {
-	VARIANT_BOOL visible;
-	ie->get_Visible(&visible);
-	return visible == VARIANT_TRUE;
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETVISIBLE,)
+	return data.output_bool_;
 }
 
 void InternetExplorerDriver::setVisible(bool isVisible) 
 {
-	if (isVisible)
-		ie->put_Visible(VARIANT_TRUE);
-	else 
-		ie->put_Visible(VARIANT_FALSE);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_SETVISIBLE, (int)isVisible)
 }
 
-std::wstring InternetExplorerDriver::getCurrentUrl()
+LPCWSTR InternetExplorerDriver::getCurrentUrl()
 {
-	CComPtr<IHTMLDocument2> doc;
-	getDocument(&doc);
-
-	if (!doc) {
-		return L"";
-	}
-
-	CComBSTR url;
-	doc->get_URL(&url);
-	return bstr2wstring(url);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETCURRENTURL,)
+	return data.output_string_.c_str();
 }
 
-std::wstring InternetExplorerDriver::getTitle()
+LPCWSTR InternetExplorerDriver::getPageSource()
 {
-	CComPtr<IHTMLDocument2> doc;
-	getDocument(&doc);
-	CComBSTR title;
-	doc->get_title(&title);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETPAGESOURCE,)
+	return data.output_string_.c_str();
+}
 
-	return bstr2wstring(title);
+LPCWSTR InternetExplorerDriver::getTitle()
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETTITLE,)
+	return data.output_string_.c_str();
 }
 
 void InternetExplorerDriver::get(const wchar_t *url)
 {
-	CComVariant spec(url);
-	CComVariant dummy;
-
-	ie->Navigate2(&spec, &dummy, &dummy, &dummy, &dummy);
-	currentFrame = -1;
-	waitForNavigateToFinish();
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETURL, url)
 }
 
 void InternetExplorerDriver::goForward() 
 {
-	ie->GoForward();
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GOFORWARD,)
 }
 
 void InternetExplorerDriver::goBack()
 {
-	ie->GoBack();
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GOBACK,)
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementById(const wchar_t *elementId) 
+ElementWrapper* InternetExplorerDriver::getActiveElement()
 {
-	CComPtr<IHTMLDocument3> doc;
-	getDocument3(&doc);
-
-	IHTMLElement* element = NULL;
-	BSTR id = SysAllocString(elementId);
-	doc->getElementById(id, &element);
-	SysFreeString(id);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETACTIVEELEMENT,)
 	
-	if (element != NULL) {
-		CComVariant value;
-		element->getAttribute(CComBSTR(L"id"), 0, &value);
-		std::wstring converted = variant2wchar(value);
-		if (converted == elementId)
-		{
-			IHTMLDOMNode* node = NULL;
-			element->QueryInterface(__uuidof(IHTMLDOMNode), (void **)&node);
-			element->Release();
-			ElementWrapper* toReturn = new ElementWrapper(this, node);
-			node->Release();
-
-			return toReturn;
-		}
-
-		CComPtr<IHTMLDocument2> doc2;
-		getDocument(&doc2);
-
-		CComPtr<IHTMLElementCollection> allNodes;
-		doc2->get_all(&allNodes);
-		long length = 0;
-		CComPtr<IUnknown> unknown;
-		allNodes->get__newEnum(&unknown);
-		CComQIPtr<IEnumVARIANT> enumerator(unknown);
-
-		VARIANT var;
-		VariantInit(&var);
-		enumerator->Next(1, &var, NULL);
-		IDispatch *disp;
-		disp = V_DISPATCH(&var);
-
-		while (disp) 
-		{
-			CComQIPtr<IHTMLElement> curr(disp);
-			disp->Release();
-			if (curr) 
-			{
-				CComVariant value;
-				curr->getAttribute(CComBSTR(L"id"), 0, &value);
-				std::wstring converted = variant2wchar(value);
-				if (elementId == converted) 
-				{
-					CComQIPtr<IHTMLDOMNode> node(curr);
-					return new ElementWrapper(this, node);
-				}
-			}
-
-			VariantInit(&var);
-			enumerator->Next(1, &var, NULL);
-			disp = V_DISPATCH(&var);
-		}
-	}
-
-	throw "Cannot find element";
+	return new ElementWrapper(this, data.output_html_element_);
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByLink(const wchar_t *elementLink)
+ElementWrapper* InternetExplorerDriver::selectElementByXPath(IHTMLElement *pElem, const wchar_t *input_string)
 {
-	CComPtr<IHTMLDocument2> doc;
-	getDocument(&doc);
-	CComPtr<IHTMLElementCollection> linkCollection;
-	doc->get_links(&linkCollection);
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYXPATH)
+
+	if(data.output_long_ || !data.output_html_element_) {std::wstring Err(L"Cannot find element by Xpath"); throw Err;}
 	
-	long linksLength;
-	linkCollection->get_length(&linksLength);
-
-	for (int i = 0; i < linksLength; i++) {
-		VARIANT idx;
-		idx.vt = VT_I4;
-		idx.lVal = i;
-		VARIANT zero;
-		zero.vt = VT_I4;
-		zero.lVal = 0;
-		CComPtr<IDispatch> dispatch;
-		linkCollection->item(idx, zero, &dispatch);
-
-		CComQIPtr<IHTMLElement> element(dispatch);
-
-		CComBSTR linkText;
-		element->get_innerText(&linkText);
-
-		std::wstring converted = bstr2wstring(linkText);
-		if (converted == elementLink) {
-			CComQIPtr<IHTMLDOMNode> linkNode(element);
-			return new ElementWrapper(this, linkNode);
-		}
-	}
-
-	throw "Cannot find element";
+	return new ElementWrapper(this, data.output_html_element_);
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByName(const wchar_t *elementName) 
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByXPath(IHTMLElement *pElem, const wchar_t *input_string)
 {
-	CComPtr<IHTMLDocument3> doc;
-	getDocument3(&doc);
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYXPATH)
 
-	CComPtr<IHTMLElementCollection> elementCollection;
-	CComBSTR name = SysAllocString(elementName);
-	doc->getElementsByName(name, &elementCollection);
-	
-	long elementsLength;
-	elementCollection->get_length(&elementsLength);
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
 
-	for (int i = 0; i < elementsLength; i++) {
-		VARIANT idx;
-		idx.vt = VT_I4;
-		idx.lVal = i;
-		VARIANT zero;
-		zero.vt = VT_I4;
-		zero.lVal = 0;
-		CComPtr<IDispatch> dispatch;
-		elementCollection->item(idx, zero, &dispatch);
+	if(data.output_long_) {std::wstring Err(L"Cannot find elements by Xpath"); throw Err;}
 
-		CComQIPtr<IHTMLElement> element(dispatch);
-
-		CComBSTR nameText;
-		CComVariant value;
-		element->getAttribute(CComBSTR(L"name"), 0, &value);
-		std::wstring converted = variant2wchar(value);
-		if (converted == elementName) {
-			CComQIPtr<IHTMLDOMNode> elementNode(element);
-			return new ElementWrapper(this, elementNode);
-		}
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
 	}
+	return toReturn;
+}
 
-	throw "Cannot find element";
+ElementWrapper* InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string) 
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYID)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Id"); throw Err;}
+	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Id"); throw Err;}
+
+	return new ElementWrapper(this, data.output_html_element_);	
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsById(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYID)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by Id"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
+}
+
+ElementWrapper* InternetExplorerDriver::selectElementByLink(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYLINK)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Link"); throw Err;}
+	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Link"); throw Err;}
+
+	return new ElementWrapper(this, data.output_html_element_);	
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByLink(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYLINK)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by Link"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
+}
+
+ElementWrapper* InternetExplorerDriver::selectElementByName(IHTMLElement *pElem, const wchar_t *input_string) 
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYNAME)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Name"); throw Err;}
+	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Name"); throw Err;}
+	
+	return new ElementWrapper(this, data.output_html_element_);
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByName(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYNAME)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by Name"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
+}
+
+ElementWrapper* InternetExplorerDriver::selectElementByClassName(IHTMLElement *pElem, const wchar_t *input_string) 
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYCLASSNAME)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by ClassName"); throw Err;}
+	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by ClassName"); throw Err;}
+	
+	return new ElementWrapper(this, data.output_html_element_);
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByClassName(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYCLASSNAME)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by ClassName"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
 }
 
 void InternetExplorerDriver::waitForNavigateToFinish() 
 {
-	VARIANT_BOOL busy;
-	ie->get_Busy(&busy);
-	while (busy == VARIANT_TRUE) {
-		Sleep(100);
-		ie->get_Busy(&busy);
-	}
-
-	READYSTATE readyState;
-	ie->get_ReadyState(&readyState);
-	while (readyState != READYSTATE_COMPLETE) {
-		Sleep(50);
-		ie->get_ReadyState(&readyState);
-	}
-
-	CComPtr<IDispatch> dispatch = NULL;
-	ie->get_Document(&dispatch);
-	IHTMLDocument2* doc = NULL;
-	dispatch->QueryInterface(__uuidof(IHTMLDocument2), (void**)&doc);
-	
-	waitForDocumentToComplete(doc);
-
-	IHTMLFramesCollection2* frames = NULL;
-	doc->get_frames(&frames);
-
-	if (frames != NULL) {
-		long framesLength = 0;
-		frames->get_length(&framesLength);
-
-		VARIANT index;
-		VariantInit(&index);
-		index.vt = VT_I4;
-
-		for (long i = 0; i < framesLength; i++) {
-			index.lVal = i;
-			VARIANT result;
-			frames->item(&index, &result);
-
-			IHTMLWindow2* window;
-			result.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**)&window);
-
-			IHTMLDocument2* frameDoc;
-			window->get_document(&frameDoc);
-
-			waitForDocumentToComplete(frameDoc);
-
-			frameDoc->Release();
-			window->Release();
-			VariantClear(&result);
-		}
-
-		VariantClear(&index);
-		frames->Release();
-	}
-
-	doc->Release();
+	SCOPETRACER
+	DataMarshaller& data = prepareCmData();
+	p_IEthread->m_EventToNotifyWhenNavigationCompleted = data.synchronization_flag_;
+	sendThreadMsg(_WD_WAITFORNAVIGATIONTOFINISH, data);
 }
 
-void InternetExplorerDriver::waitForDocumentToComplete(IHTMLDocument2* doc)
+bool InternetExplorerDriver::switchToFrame(LPCWSTR pathToFrame) 
 {
-	CComBSTR state;
-	doc->get_readyState(&state);
-	std::wstring currentState = bstr2wstring(state);
-
-	while (currentState != L"complete") {
-		Sleep(50);
-		state.Empty();
-		doc->get_readyState(&state);
-		currentState = bstr2wstring(state);
-	}
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_SWITCHTOFRAME, pathToFrame)
+	return data.output_bool_;
 }
 
-void InternetExplorerDriver::switchToFrame(int frameIndex) 
+LPCWSTR InternetExplorerDriver::getCookies()
 {
-	currentFrame = frameIndex;
-}
-
-std::wstring InternetExplorerDriver::getCookies()
-{
-	CComPtr<IHTMLDocument2> doc;
-	getDocument(&doc);
-	if (!doc) {
-		return L"";
-	}
-
-	CComBSTR cookie;
-	doc->get_cookie(&cookie);
-
-	return bstr2wstring(cookie);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETCOOKIES,)
+	return data.output_string_.c_str();
 }
 
 void InternetExplorerDriver::addCookie(const wchar_t *cookieString)
 {
-	CComPtr<IHTMLDocument2> doc;
-	getDocument(&doc);
-	CComBSTR cookie(cookieString);
-
-	doc->put_cookie(cookie);
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ADDCOOKIE, cookieString)
 }
 
-HWND InternetExplorerDriver::bringToFront() 
+
+
+CComVariant& InternetExplorerDriver::executeScript(const wchar_t *script, SAFEARRAY* args, bool tryAgain)
 {
-	setVisible(true);
-	HWND hWnd;
-	ie->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hWnd));
-
-	DWORD ieWinThreadId = GetWindowThreadProcessId(hWnd, NULL);
-    DWORD currThreadId = GetCurrentThreadId();
-    if( ieWinThreadId != currThreadId )
-    {
-		AttachThreadInput(currThreadId, ieWinThreadId, true);
-    }
-
-	SetActiveWindow(hWnd);
-	SetFocus(hWnd);
-
-	if( ieWinThreadId != currThreadId )
-    {
-		AttachThreadInput(currThreadId, ieWinThreadId, false);
-    }
-
-	return hWnd;
+	SCOPETRACER
+	DataMarshaller& data = prepareCmData(script);
+	data.input_safe_array_ = args;
+	sendThreadMsg(_WD_EXECUTESCRIPT, data);
+	return data.output_variant_;
 }
 
-void InternetExplorerDriver::getDocument(IHTMLDocument2 **pdoc)
+void InternetExplorerDriver::setSpeed(int speed)
 {
-	CComPtr<IDispatch> dispatch;
-	ie->get_Document(&dispatch);
-	
-	if (!dispatch) {
-		return;
+	this->speed = speed;
+}
+
+int InternetExplorerDriver::getSpeed()
+{
+	return speed;
+}
+
+
+/////////////////////////////////////////////////////////////
+
+bool InternetExplorerDriver::sendThreadMsg(UINT msg, DataMarshaller& data)
+{
+	ResetEvent(data.synchronization_flag_);
+	// NOTE(alexis.j.vuillemin): do not do here data.resetOutputs()
+	//   it has to be performed FROM the worker thread (see ON_THREAD_COMMON).
+	p_IEthread->PostThreadMessageW(msg, 0, 0);
+	DWORD res = WaitForSingleObject(data.synchronization_flag_, 60000);
+	data.resetInputs();
+	if(WAIT_TIMEOUT == res)
+	{
+		safeIO::CoutA("Unexpected TIME OUT.");
+		p_IEthread->m_EventToNotifyWhenNavigationCompleted = NULL;
+		std::wstring Err(L"Error: had to TIME OUT as a request to the worker thread did not complete after 1 min.");
+		throw Err;
 	}
-
-	CComQIPtr<IHTMLDocument2> doc(dispatch);
-	CComQIPtr<IHTMLFramesCollection2> frames;
-	doc->get_frames(&frames);
-
-	if (frames == NULL) {
-		*pdoc = doc.Detach();
-		return;
+	if(data.exception_caught_)
+	{
+		safeIO::CoutA("Caught exception from worker thread.");
+		p_IEthread->m_EventToNotifyWhenNavigationCompleted = NULL;
+		std::wstring Err(data.output_string_);
+		throw Err;
 	}
-
-	long length = 0;
-	frames->get_length(&length);
-
-	if (!length) {
-		currentFrame = -1;
-		*pdoc = doc.Detach();
-		return;
-	}
-
-	if (currentFrame == -1) {
-		CComPtr<IHTMLDocument3> doc3;
-		getDocument3(&doc3);
-
-		CComPtr<IHTMLElementCollection> bodyTags;
-		CComBSTR bodyTagName(L"BODY");
-		doc3->getElementsByTagName(bodyTagName, &bodyTags);
-
-		long numberOfBodyTags = 0;
-		bodyTags->get_length(&numberOfBodyTags);
-	
-		if (numberOfBodyTags) {
-			*pdoc = doc.Detach();
-			return;
-		}
-
-		currentFrame = 0;
-	}
-
-	VARIANT index;
-	index.vt = VT_I4;
-	index.lVal = currentFrame;
-	CComVariant result;
-	frames->item(&index, &result);
-
-	CComQIPtr<IHTMLWindow2> win(result.pdispVal);
-	// Clear the reference to the top frame's doc reference and return the frame's
-	doc.Release();
-	win->get_document(&doc);
-	*pdoc = doc.Detach();
+	return true;
 }
 
-void InternetExplorerDriver::getDocument3(IHTMLDocument3 **pdoc)
+inline DataMarshaller& InternetExplorerDriver::prepareCmData()
 {
-	CComPtr<IDispatch> dispatch;
-	ie->get_Document(&dispatch);
-
-	CComQIPtr<IHTMLDocument3> doc(dispatch);
-	*pdoc = doc.Detach();
+	return commandData();
 }
 
-IeEventSink::IeEventSink(IWebBrowser2* ie) 
+DataMarshaller& InternetExplorerDriver::prepareCmData(LPCWSTR str)
 {
-	this->ie = ie;
-	this->ie->AddRef();
-
-//	HRESULT hr = AtlAdvise(this->ie, (IUnknown*) this, DIID_DWebBrowserEvents2, &eventSinkCookie);
+	DataMarshaller& data = prepareCmData();
+	data.input_string_ = str;
+	return data;
 }
 
-IeEventSink::~IeEventSink() 
+DataMarshaller& InternetExplorerDriver::prepareCmData(IHTMLElement *pElem, LPCWSTR str)
 {
-//	AtlUnadvise(ie, DIID_DWebBrowserEvents2, eventSinkCookie);
+	DataMarshaller& data = prepareCmData(str);
+	data.input_html_element_ = pElem;
+	return data;
 }
 
-// IUnknown methods
-STDMETHODIMP IeEventSink::QueryInterface(REFIID interfaceId, void **pointerToObj)
+DataMarshaller& InternetExplorerDriver::prepareCmData(int v)
 {
-	queryCount++;
-//	cout << "Querying interface: " << queryCount << endl;
-    if (interfaceId == IID_IUnknown)
-    {
-        *pointerToObj = (IUnknown *)this;
-        return S_OK;
-    }
-    else if (interfaceId == IID_IDispatch)
-    {
-        *pointerToObj = (IDispatch *)this;
-        return S_OK;
-    }
-
-	*pointerToObj = NULL;
-    return E_NOINTERFACE;
-    
+	DataMarshaller& data = prepareCmData();
+	data.input_long_ = (long) v;
+	return data;
 }
 
-STDMETHODIMP_(ULONG) IeEventSink::AddRef()
-{
-    return 1;
-}
-
-STDMETHODIMP_(ULONG) IeEventSink::Release()
-{
-    return 1;
-}
-
-
-// IDispatch methods
-STDMETHODIMP IeEventSink::Invoke(DISPID dispidMember,
-                                     REFIID riid,
-                                     LCID lcid, WORD wFlags,
-                                     DISPPARAMS* pDispParams,
-                                     VARIANT* pvarResult,
-                                     EXCEPINFO*  pExcepInfo,
-                                     UINT* puArgErr)
-{
-	invokeCount++;
-//	cout << "Invoking: " << invokeCount << endl;
-
-	if (!pDispParams)
-		return E_INVALIDARG;
-
-	switch (dispidMember) {
-		case DISPID_PROGRESSCHANGE:
-			break;
-
-		case DISPID_BEFORENAVIGATE2:
-//			cout << "Before navigate" << endl;
-			break;
-
-		case DISPID_NAVIGATECOMPLETE2:
-//			cout << "Navigation complete" << endl;
-			break;
-
-		case DISPID_NEWWINDOW2:
-//			cout << "New window event detected" << endl;
-			// Check the argument's type
-			/*
-			if (pDispParams->rgvarg[0].vt == (VT_BYREF|VT_VARIANT)) {
-				CComVariant varURL(*pDispParams->rgvarg[0].pvarVal);
-				varURL.ChangeType(VT_BSTR);
-
-			char str[100];   // Not the best way to do this.
-			}
-			*/
-			break;    
-
-		default:
-			break;
-	}
-
-	return S_OK;
-}
-
-STDMETHODIMP IeEventSink::GetIDsOfNames(REFIID    riid,
-                                                 LPOLESTR *names,
-                                                 UINT      numNames,
-                                                 LCID      localeContextId,
-                                                 DISPID *  dispatchIds)
-{
-    return E_NOTIMPL;
-}
-
-STDMETHODIMP IeEventSink::GetTypeInfoCount(UINT* pctinfo)
-{
-    return E_NOTIMPL;
-}
-
-STDMETHODIMP IeEventSink::GetTypeInfo(UINT        typeInfoId,
-                                               LCID        localeContextId,
-                                               ITypeInfo** pointerToTypeInfo)
-{
-    return E_NOTIMPL;
-}

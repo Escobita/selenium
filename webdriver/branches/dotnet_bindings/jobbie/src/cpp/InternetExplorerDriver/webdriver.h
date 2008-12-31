@@ -14,31 +14,62 @@ typedef struct WebDriver WebDriver;
 struct WebElement;
 typedef struct WebElement WebElement;
 
-EXPORT WebDriver* webdriver_newDriverInstance();
-EXPORT void webdriver_deleteDriverInstance(WebDriver* handle);
-EXPORT void webdriver_deleteElementInstance(WebElement* handle);
+struct StringWrapper;
+typedef struct StringWrapper StringWrapper;
 
-EXPORT void webdriver_get(WebDriver* driver, wchar_t* url);
-EXPORT void webdriver_close(WebDriver* driver);
+struct ElementCollection;
+typedef struct ElementCollection ElementCollection;
 
-EXPORT const wchar_t* webdriver_getCurrentUrl(WebDriver* driver);
+// String manipulation functions
+EXPORT int wdStringLength(StringWrapper* string, int* length);
+EXPORT int wdFreeString(StringWrapper* string);
+EXPORT int wdCopyString(StringWrapper* source, int length, wchar_t* dest);
 
-EXPORT WebElement* webdriver_findElementById(WebDriver* handle, const wchar_t* id);
-EXPORT WebElement* webdriver_findElementByLinkText(WebDriver* handle, const wchar_t* linkText);
-EXPORT WebElement* webdriver_findElementByName(WebDriver* handle, const wchar_t* name);
+// Element collection functions
+EXPORT int wdcGetCollectionLength(ElementCollection* collection, int* length);
+EXPORT int wdcGetElementAtIndex(ElementCollection* collection, int index, WebElement** result);
 
-EXPORT void webdriver_elementClear(WebElement* handle);
-EXPORT void webdriver_elementSendKeys(WebElement* handle, const wchar_t* text);
-EXPORT void webdriver_elementSubmit(WebElement* handle);
+// Element manipulation functions
+EXPORT int wdeFreeElement(WebElement* element);
 
-EXPORT void webdriver_elementClick(WebElement* handle);
+// Driver manipulation functions
 
-EXPORT bool webdriver_isElementVisible(WebElement* handle);
-EXPORT size_t webdriver_elementGetAttributeLength(WebElement* handle, const wchar_t* attributeName);
-EXPORT void webdriver_elementGetAttribute(WebElement* handle, const wchar_t* attributeName, wchar_t* result, size_t resultLength);
 
-EXPORT size_t webdriver_elementGetTextLength(WebElement* handle);
-EXPORT void webdriver_elementGetText(WebElement* handle, wchar_t* result, size_t resultLength);
+// WebDriver functions
+EXPORT int wdNewDriverInstance(WebDriver** result);
+EXPORT int wdFreeDriver(WebDriver* driver);
+
+EXPORT int wdGet(WebDriver* driver, wchar_t* url);
+EXPORT int wdClose(WebDriver* driver);
+EXPORT int wdSetVisible(WebDriver* driver, int value);
+
+EXPORT int wdGetCurrentUrl(WebDriver* driver, StringWrapper** result);
+EXPORT int wdGetTitle(WebDriver* driver, StringWrapper** result);
+
+// Element functions
+EXPORT int wdeClick(WebElement* element);
+EXPORT int wdeGetAttribute(WebElement* element, const wchar_t* string, StringWrapper** result);
+EXPORT int wdeGetText(WebElement* element, StringWrapper** result);
+EXPORT int wdeIsDisplayed(WebElement* element, int* result);
+EXPORT int wdeSendKeys(WebElement* element, const wchar_t* text);
+EXPORT int wdeSubmit(WebElement* element);
+
+// Element locating functions
+EXPORT int wdFindElementById(WebDriver* driver, WebElement* element, const wchar_t* id, WebElement** result);
+EXPORT int wdFindElementsById(WebDriver* driver, WebElement* element, const wchar_t* id, ElementCollection** result);
+
+EXPORT int wdFindElementByName(WebDriver* driver, WebElement* element, const wchar_t* name, WebElement** result);
+EXPORT int wdFindElementsByName(WebDriver* driver, WebElement* element, const wchar_t* name, ElementCollection** result);
+
+EXPORT int wdFindElementByClassName(WebDriver* driver, WebElement* element, const wchar_t* className, WebElement** result);
+EXPORT int wdFindElementsByClassName(WebDriver* driver, WebElement* element, const wchar_t* className, ElementCollection** result);
+
+EXPORT int wdFindElementByLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, WebElement** result);
+EXPORT int wdFindElementsByLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, ElementCollection** result);
+
+EXPORT int wdFindElementByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, WebElement** result);
+EXPORT int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, ElementCollection** result);
+
 
 #ifdef __cplusplus
 }

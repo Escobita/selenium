@@ -1,16 +1,13 @@
 #include "stdafx.h"
 
-#include <iostream>
-#include <sstream>
-#include <string>
+#include <ctime>
 
-#include <jni.h>
-
-#include "CommentNode.h"
-#include "ElementNode.h"
-#include "Node.h"
-#include "TextNode.h"
 #include "utils.h"
+#include "logging.h"
+
+using namespace std;
+
+safeIO gSafe;
 
 void throwException(JNIEnv *env, const char* className, const char *message)
 {
@@ -24,108 +21,229 @@ void throwException(JNIEnv *env, const char* className, const char *message)
 	env->ThrowNew(newExcCls, message);
 }
 
-void throwNoSuchElementException(JNIEnv *env, const char *message)
+void throwException(JNIEnv *env, const char* className, LPCWSTR msg)
 {
-	throwException(env, "com/googlecode/webdriver/NoSuchElementException", message);
+	std::string str;
+	cw2string(msg, str);
+	throwException(env, className, str.c_str());
 }
 
-void throwRunTimeException(JNIEnv *env, const char *message)
+void throwNoSuchElementException(JNIEnv *env, LPCWSTR msg)
 {
-	throwException(env, "java/lang/RuntimeException", message);
+	throwException(env, "org/openqa/selenium/NoSuchElementException", msg);
 }
 
-void throwUnsupportedOperationException(JNIEnv *env, const char *message)
+void throwNoSuchFrameException(JNIEnv *env, LPCWSTR msg)
 {
-	throwException(env, "java/lang/UnsupportedOperationException", message);
+	throwException(env, "org/openqa/selenium/NoSuchFrameException", msg);
 }
 
-void startCom() 
+void throwRunTimeException(JNIEnv *env, LPCWSTR msg)
 {
-	CoInitialize(NULL);
+	throwException(env, "java/lang/RuntimeException", msg);
+}
+
+void throwUnsupportedOperationException(JNIEnv *env, LPCWSTR msg)
+{
+	throwException(env, "java/lang/UnsupportedOperationException", msg);
 }
 
 jobject newJavaInternetExplorerDriver(JNIEnv* env, InternetExplorerDriver* driver) 
 {
-	jclass clazz = env->FindClass("com/googlecode/webdriver/ie/InternetExplorerDriver");
+	jclass clazz = env->FindClass("org/openqa/selenium/ie/InternetExplorerDriver");
 	jmethodID cId = env->GetMethodID(clazz, "<init>", "(J)V");
 
 	return env->NewObject(clazz, cId, (jlong) driver);
 }
 
-jobject initJavaXPathNode(JNIEnv* env, Node* node) 
-{
-	if (node == NULL)
-		return NULL;
 
-	jclass clazz;
-	if (dynamic_cast<TextNode*>(node)) 
-	{
-		clazz = env->FindClass("com/googlecode/webdriver/ie/TextNode");
-	} else if (dynamic_cast<CommentNode*>(node))
-	{
-		clazz = env->FindClass("com/googlecode/webdriver/ie/CommentNode");
-	} else
-	{
-		clazz = env->FindClass("com/googlecode/webdriver/ie/ElementNode");
+void wait(long millis)
+{
+	clock_t end = clock() + millis;
+	do {
+        MSG msg;
+		if (PeekMessage( &msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg); 
+			DispatchMessage(&msg); 
+		}
+		Sleep(0);
+	} while (clock() < end);
+}
+
+void waitWithoutMsgPump(long millis)
+{
+	Sleep(millis);
+}
+
+// "Internet Explorer_Server" + 1
+#define LONGEST_NAME 25
+
+HWND getChildWindow(HWND hwnd, LPCTSTR name)
+{
+	TCHAR pszClassName[LONGEST_NAME];
+	HWND hwndtmp = GetWindow(hwnd, GW_CHILD);
+	while (hwndtmp != NULL) {
+		::GetClassName(hwndtmp, pszClassName, LONGEST_NAME);
+		if (lstrcmp(pszClassName, name) == 0) {
+			return hwndtmp;
+		}
+		hwndtmp = GetWindow(hwndtmp, GW_HWNDNEXT);
 	}
-	jmethodID cId = env->GetMethodID(clazz, "<init>", "(J)V");
-	return env->NewObject(clazz, cId, (jlong) node);
+	return NULL;
 }
 
-static std::wstring stringify(int number)
-{
-	std::wostringstream o;
-	o << number;
-	return o.str();
-}
-
-std::wstring variant2wchar(const VARIANT toConvert) 
+LPCWSTR comvariant2cw(CComVariant& toConvert) 
 {
 	VARTYPE type = toConvert.vt;
 
-	switch (type) {
+	switch(type) {
 		case VT_BOOL:
-			return (toConvert.boolVal) ? L"true" : L"false";
+			return toConvert.boolVal == VARIANT_TRUE ? 	L"true":L"false";
 
-		case VT_BSTR: 
-			return bstr2wstring(toConvert.bstrVal);
+		case VT_BSTR:
+			return bstr2cw(toConvert.bstrVal);
 
 		case VT_EMPTY:
-		case VT_NULL:
 			return L"";
-/*
-		case VT_I4:
-			long value = toConvert.lVal;
-			int length = value / 10;
-			toReturn = new wchar_t[length + 1];
-			swprintf(toReturn, length, L"%l", value);
-			return toReturn;
-*/
 
-		default:
-			std::wstring msg(L"Unknown variant type: ");
-			msg += stringify(type);
-			OutputDebugString(msg.c_str());
+		case VT_NULL:
+			// TODO(shs96c): This should really return NULL.
+			return L"";
+
+		// This is lame
+		case VT_DISPATCH:
 			return L"";
 	}
+	return L"";
 }
 
-std::wstring bstr2wstring(BSTR from) 
+
+LPCWSTR combstr2cw(CComBSTR& from) 
+{
+	if (!from.operator BSTR()) {
+		return L"";
+	}
+
+	return (LPCWSTR) from.operator BSTR();
+}
+
+LPCWSTR bstr2cw(BSTR& from) 
 {
 	if (!from) {
 		return L"";
 	}
 
-	size_t length = SysStringLen(from) + 1;
-	wchar_t *buf = new wchar_t[length];
-	wcsncpy_s(buf, length, from, length - 1);
-	std::wstring toReturn(buf);
-	delete[] buf;
-
-	return toReturn;
+	return (LPCWSTR) from;
 }
 
-jstring wstring2jstring(JNIEnv *env, const std::wstring& text)
+jstring lpcw2jstring(JNIEnv *env, LPCWSTR text, int size)
 {
-	return env->NewString((const jchar*) text.c_str(), (jsize) text.length());
+	SCOPETRACER
+	if (!text)
+		return NULL;
+
+	return env->NewString((const jchar*) text, 
+		(jsize) ((size==-1) ? wcslen(text):size) );
 }
+
+
+long getLengthOf(SAFEARRAY* ary)
+{
+	if (!ary)
+		return 0;
+
+	long lower = 0;
+	SafeArrayGetLBound(ary, 1, &lower);
+	long upper = 0;
+	SafeArrayGetUBound(ary, 1, &upper);
+	return 1 + upper - lower;
+}
+
+/*
+bool on_catchAllExceptions()
+{
+	safeIO::CoutA("Exception caught in dll", true);
+	// Do nothing for the moment.
+	return true;
+}
+*/
+
+safeIO::safeIO()
+{
+	m_cs_out.Init();
+	// LOG::File("C:/tmp/test.log");
+	LOG::Level("INFO");
+}
+
+void safeIO::CoutL(LPCWSTR str, bool showThread, int cc)
+{
+	std::string output_str;
+	cw2string(str, output_str);
+
+	safeIO::CoutA(output_str.c_str(), showThread, cc);
+}
+
+void safeIO::CoutA(LPCSTR str, bool showThread, int cc)
+{
+#ifdef __VERBOSING_DLL__
+	gSafe.m_cs_out.Lock();
+	if(showThread)
+	{
+		DWORD thrID = GetCurrentThreadId();
+		if(cc>0)
+		{
+			LOG(INFO) << "[0x" << hex << thrID << "] "  << " (" << cc << ") " << str;
+		}
+		else if(cc<0)
+		{
+			LOG(INFO) << "[0x" << hex << thrID << "] "  << " (" << (-cc) << ") " << str;
+		}
+		else
+		{
+			LOG(INFO) << "[0x" << hex << thrID << "] "  << str;
+		}
+	}
+	else
+	{
+		LOG(INFO) << str;
+	}
+	gSafe.m_cs_out.Unlock();
+#endif
+}
+
+char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn)
+{
+  LPSTR pszOut = NULL;
+  if (lpwszStrIn != NULL)
+  {
+	int nInputStrLen = (int) wcslen (lpwszStrIn);
+
+	// Double NULL Termination
+	int nOutputStrLen = WideCharToMultiByte (CP_ACP, 0, lpwszStrIn, nInputStrLen, NULL, 0, 0, 0) + 2;
+	pszOut = new char [nOutputStrLen];
+
+	if (pszOut)
+	{
+	  memset (pszOut, 0x00, nOutputStrLen);
+	  WideCharToMultiByte(CP_ACP, 0, lpwszStrIn, nInputStrLen, pszOut, nOutputStrLen, 0, 0);
+	}
+  }
+  return pszOut;
+}
+
+inline void wstring2string(const std::wstring& inp, std::string &out)
+{
+	cw2string(inp.c_str(), out);
+} 
+
+void cw2string(LPCWSTR inp, std::string &out)
+{
+	LPSTR pszOut = ConvertLPCWSTRToLPSTR (inp);
+	if(!pszOut)
+	{
+		out = "";
+		return;
+	}
+	out = pszOut;
+	delete [] pszOut;
+} 

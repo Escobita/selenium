@@ -1,19 +1,18 @@
 function WebDriverServer() {
     this.wrappedJSObject = this;
     this.serverSocket = Components.classes["@mozilla.org/network/server-socket;1"].createInstance(Components.interfaces.nsIServerSocket);
-    this.nextId = 0;
+    this.generator = Utils.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");
 }
 
 WebDriverServer.prototype.newDriver = function(window) {
-    window.fxdriver = new FirefoxDriver(this, this.getNextId());
+    window.fxdriver = new FirefoxDriver(this);
     // Yuck. But it allows us to refer to it later.
     window.fxdriver.window = window;
     return window.fxdriver;
 };
 
 WebDriverServer.prototype.getNextId = function() {
-    this.nextId++;
-    return this.nextId;
+    return this.generator.generateUUID().toString(); 
 }
 
 WebDriverServer.prototype.onSocketAccepted = function(socket, transport) {

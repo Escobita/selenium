@@ -1,0 +1,134 @@
+package org.openqa.selenium.firefox.internal;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ProfilesIni {
+  private Map<String, FirefoxProfile> profiles = new HashMap<String, FirefoxProfile>();
+  
+  public ProfilesIni() {
+    File appData = locateAppDataDirectory(Platform.getCurrent());
+    profiles = readProfiles(appData);
+  }
+  
+  protected Map<String, FirefoxProfile> readProfiles(File appData) {
+    Map<String, FirefoxProfile> toReturn = new HashMap<String, FirefoxProfile>();
+
+    File profilesIni = new File(appData, "profiles.ini");
+    if (!profilesIni.exists()) {
+        // Fine. No profiles.ini file
+        return toReturn;
+    }
+    
+    boolean isRelative = true;
+    String name = null;
+    String path = null;
+    
+    BufferedReader reader = null;
+    try {
+        reader = new BufferedReader(new FileReader(profilesIni));
+
+        String line = reader.readLine();
+
+        while (line != null) {
+          if (line.startsWith("[Profile")) {
+            FirefoxProfile profile = newProfile(name, appData, path, isRelative);
+            if (profile != null) 
+              toReturn.put(name, profile);
+            
+            name = null;
+            path = null;
+          } else if (line.startsWith("Name=")) {
+              name = line.substring("Name=".length());
+          } else if (line.startsWith("IsRelative=")) {
+            isRelative = line.endsWith("1");
+          } else if (line.startsWith("Path=")) {
+            path = line.substring("Path=".length()); 
+          }
+          
+          line = reader.readLine();
+        }
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    } finally {
+        try {
+            if (reader != null) {
+              FirefoxProfile profile = newProfile(name, appData, path, isRelative);
+              if (profile != null) 
+                toReturn.put(name, profile);
+              
+              reader.close();
+            }
+        } catch (IOException e) {
+            // Nothing that can be done sensibly. Swallowing.
+        }
+     }
+    
+    return toReturn;
+  }
+  
+  protected FirefoxProfile newProfile(String name, File appData, String path, boolean isRelative) {
+    if (name != null && path != null) {
+      File profileDir = isRelative ? new File(appData, path) : new File(path);
+      return new FirefoxProfile(profileDir);
+    }
+    return null;
+  }
+
+  public FirefoxProfile getProfile(String profileName) {
+    FirefoxProfile profile = profiles.get(profileName);
+    if (profile == null)
+      return null;
+
+    if (profile.getPort() == 0)
+      profile.setPort(FirefoxDriver.DEFAULT_PORT);
+    return profile;
+  }
+  
+  public Collection<FirefoxProfile> getExistingProfiles() {
+    return profiles.values();
+  }
+  
+  protected File locateAppDataDirectory(Platform os) {
+    File appData;
+    switch (os) {
+        case WINDOWS:
+        case VISTA:
+        case XP:
+            appData = new File(MessageFormat.format("{0}\\Mozilla\\Firefox", System.getenv("APPDATA")));
+            break;
+
+        case MAC:
+            appData = new File(MessageFormat.format("{0}/Library/Application Support/Firefox", System.getenv("HOME")));
+            break;
+
+        default:
+            appData = new File(MessageFormat.format("{0}/.mozilla/firefox", System.getenv("HOME")));
+            break;
+    }
+
+    if (!appData.exists()) {
+        // It's possible we're being run as part of an automated build.
+        // Assume the user knows what they're doing
+        return null;
+    }
+
+    if (!appData.isDirectory()) {
+        throw new RuntimeException("The discovered user firefox data directory " +
+                "(which normally contains the profiles) isn't a directory: " + appData.getAbsolutePath());
+    }
+
+    return appData;
+  }
+}
+
