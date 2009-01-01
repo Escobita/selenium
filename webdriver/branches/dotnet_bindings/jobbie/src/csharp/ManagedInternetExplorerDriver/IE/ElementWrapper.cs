@@ -4,23 +4,19 @@ using System;
 
 namespace OpenQa.Selenium.IE
 {
-    internal class SafeInternetExplorerDriverHandle : SafeHandleZeroOrMinusOneIsInvalid
+    internal class ElementWrapper : SafeHandleZeroOrMinusOneIsInvalid
     {
-        internal SafeInternetExplorerDriverHandle()
+        internal ElementWrapper()
             : base(true)
         {
         }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern void wdFreeDriver(IntPtr driver);
-
-        [DllImport("InternetExplorerDriver")]
-        private static extern void wdClose(IntPtr driver);
+        private static extern void wdeFreeElement(IntPtr handle);
 
         protected override bool ReleaseHandle()
         {
-            wdClose(handle);
-            wdFreeDriver(handle);
+            wdeFreeElement(handle);
             // TODO(simonstewart): Are we really always successful?
             return true;
         }

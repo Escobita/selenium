@@ -19,6 +19,7 @@ namespace OpenQa.Selenium.IE
                 IWebElement query = driver.FindOneElement(By.Name, "q");
                 query.Clear();
                 query.SendKeys("cheese");
+                Console.WriteLine("Element name: " + query.ElementName);
                 query.Submit();
 
                 IWebElement link = driver.FindOneElement(By.LinkText, "Cheese - Wikipedia, the free encyclopedia");

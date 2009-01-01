@@ -8,10 +8,15 @@ namespace OpenQa.Selenium.IE
     public class InternetExplorerDriver : IWebDriver
     {
         [DllImport("InternetExplorerDriver")]
-        private static extern SafeInternetExplorerDriverHandle webdriver_newDriverInstance();
+        private static extern int wdNewDriverInstance(ref SafeInternetExplorerDriverHandle handle);
         public InternetExplorerDriver()
         {
-            handle = webdriver_newDriverInstance();
+            handle = new SafeInternetExplorerDriverHandle();
+            int result = wdNewDriverInstance(ref handle);
+            if (result != 0)
+            {
+                throw new Exception("Doh!");
+            }
         }
 
         public void Dispose()
@@ -24,63 +29,84 @@ namespace OpenQa.Selenium.IE
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern void webdriver_get(SafeHandle handle, string url);
+        private static extern void wdGet(SafeHandle handle, string url);
         public void Get(string url)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException("handle");
             }
-            webdriver_get(handle, url);
+            wdGet(handle, url);
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern string webdriver_getCurrentUrl(SafeHandle handle);
+        private static extern int wdGetCurrentUrl(SafeHandle handle, ref StringWrapperHandle result);
         public string CurrentUrl
         {
             get
             {
-                return webdriver_getCurrentUrl(handle);
+                StringWrapperHandle result = new StringWrapperHandle();
+                
+
+                    if (wdGetCurrentUrl(handle, ref result) != 0)
+                    {
+                        throw new Exception("Doomed");
+                    }
+                    return result.Value;
+                
             }
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern IntPtr webdriver_findElementById(SafeHandle handle, [MarshalAs(UnmanagedType.LPWStr)] String id);
+        private static extern int wdFindElementById(SafeHandle driver, ElementWrapper element, [MarshalAs(UnmanagedType.LPWStr)] String id, ref ElementWrapper result);
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern IntPtr webdriver_findElementByLinkText(SafeHandle handle, [MarshalAs(UnmanagedType.LPWStr)] String linkText);
+        private static extern int wdFindElementByLinkText(SafeHandle driver, ElementWrapper element, [MarshalAs(UnmanagedType.LPWStr)] String id, ref ElementWrapper result);
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern IntPtr webdriver_findElementByName(SafeHandle handle, [MarshalAs(UnmanagedType.LPWStr)] String name);
+        private static extern int wdFindElementByName(SafeHandle driver, ElementWrapper element, [MarshalAs(UnmanagedType.LPWStr)] String id, ref ElementWrapper result);
         public IWebElement FindOneElement(By mechanism, string locator)
         {
-            IntPtr rawElement;
+            ElementWrapper rawElement = new ElementWrapper();
+            int result;
+            ElementWrapper parent = new ElementWrapper();
 
             try
             {
                 switch (mechanism)
                 {
                     case By.Id:
-                        rawElement = webdriver_findElementById(handle, locator);
+                        result = wdFindElementById(handle, parent, locator, ref rawElement);
                         break;
 
                     case By.LinkText:
-                        rawElement = webdriver_findElementByLinkText(handle, locator);
+                        result = wdFindElementByLinkText(handle, parent, locator, ref rawElement);
                         break;
 
                     case By.Name:
-                        rawElement = webdriver_findElementByName(handle, locator);
+                        result = wdFindElementByName(handle, parent, locator, ref rawElement);
                         break;
 
                     default:
                         throw new ArgumentException("Unrecognised element location mechanism: " + mechanism);
                 }
 
-                return new InternetExplorerWebElement(rawElement);
+                if (result != 0)
+                {
+                    throw new Exception("Cannot locate element");
+                }
+                return new InternetExplorerWebElement(this, rawElement);
             }
             catch (SEHException)
             {
                 // Unable to find the element
                 return null;
             }
+        }
+
+        [DllImport("InternetExplorerDriver")]
+        private static extern int wdWaitForLoadToComplete(SafeInternetExplorerDriverHandle driver);
+        internal void WaitForLoadToComplete() 
+        {
+            wdWaitForLoadToComplete(handle);
         }
 
         private bool disposed = false;

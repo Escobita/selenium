@@ -34,6 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="By.cs" />
+    <Compile Include="IE\ElementWrapper.cs" />
+    <Compile Include="IE\StringWrapperHandle.cs" />
     <Compile Include="IE\InternetExplorerDriver.cs" />
     <Compile Include="IE\InternetExplorerWebElement.cs" />
     <Compile Include="IE\SafeInternetExplorerDriverHandle.cs" />

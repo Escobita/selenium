@@ -7,83 +7,97 @@ namespace OpenQa.Selenium.IE
 {
     class InternetExplorerWebElement : IWebElement
     {
-        public InternetExplorerWebElement(IntPtr handle)
+        public InternetExplorerWebElement(InternetExplorerDriver driver, ElementWrapper wrapper)
         {
-            this.handle = handle;
+            this.driver = driver;
+            this.wrapper = wrapper;
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern uint webdriver_elementGetTextLength(IntPtr handle);
-        [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern void webdriver_elementGetText(
-            IntPtr handle, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder res, uint resLength);
+        private static extern int wdeGetText(ElementWrapper wrapper, ref StringWrapperHandle result);
         public string Text
         {
             get 
             {
-                uint length = webdriver_elementGetTextLength(handle);
-                StringBuilder result = new StringBuilder((int) length);
-                webdriver_elementGetText(handle, result, length);
-                return result.ToString();
+                StringWrapperHandle result = new StringWrapperHandle();
+                wdeGetText(wrapper, ref result);
+                return result.Value;
             }
         }
 
+        [DllImport("InternetExplorerDriver")]
+        private static extern int wdeGetElementName(ElementWrapper wrapper, ref StringWrapperHandle result);
+        public string ElementName
+        {
+            get
+            {
+                StringWrapperHandle result = new StringWrapperHandle();
+                wdeGetElementName(wrapper, ref result);
+                return result.Value;
+            }
+        }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern bool webdriver_isElementVisible(IntPtr handle);
+        private static extern int wdeIsDisplayed(ElementWrapper handle, ref int displayed);
         public bool Visible
         {
-            get { return webdriver_isElementVisible(handle); }
+            get 
+            {
+                int displayed = 0;
+                wdeIsDisplayed(wrapper, ref displayed);
+                return displayed == 1;
+            }
         }
 	
         [DllImport("InternetExplorerDriver")]
-        private static extern void webdriver_deleteElementInstance(IntPtr handle);
-        ~InternetExplorerWebElement()
-        {
-            webdriver_deleteElementInstance(handle);
-        }
-
-        [DllImport("InternetExplorerDriver")]
-        private static extern void webdriver_elementClear(IntPtr handle);
+        private static extern int wdeClear(ElementWrapper handle);
         public void Clear()
         {
-            webdriver_elementClear(handle);
+            wdeClear(wrapper);
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern void webdriver_elementSendKeys(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string text);
+        private static extern int wdeSendKeys(ElementWrapper wrapper, [MarshalAs(UnmanagedType.LPWStr)] string text);
         public void SendKeys(string text)
         {
-            webdriver_elementSendKeys(handle, text);
+            wdeSendKeys(wrapper, text);            
         }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern void webdriver_elementSubmit(IntPtr handle);
+        private static extern int wdeSubmit(ElementWrapper wrapper);
         public void Submit()
         {
-            webdriver_elementSubmit(handle);
+            wdeSubmit(wrapper);
         }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern void webdriver_elementClick(IntPtr handle);
+        private static extern int wdeGetDetailsOnceScrolledOnToScreen(ElementWrapper wrapper, ref IntPtr hwnd, ref int x, ref int y, ref int width, ref int height);
+        [DllImport("InternetExplorerDriver")]
+        private static extern void clickAt(IntPtr directInputTo, int x, int y);
         public void Click()
         {
-            webdriver_elementClick(handle);
+            int x = 0;
+            int y = 0;
+            int width = 0;
+            int height = 0;
+            IntPtr hwnd = new IntPtr();
+
+            wdeGetDetailsOnceScrolledOnToScreen(wrapper, ref hwnd, ref x, ref y, ref width, ref height);
+            clickAt(hwnd, x, y);
+            driver.WaitForLoadToComplete();
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern uint webdriver_elementGetAttributeLength(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string attributeName);
-        [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        private static extern void webdriver_elementGetAttribute(
-            IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string attributeName, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder res, uint resLength);
+        private static extern int wdeGetAttribute(ElementWrapper wrapper, [MarshalAs(UnmanagedType.LPWStr)] string attributeName, ref StringWrapperHandle result);
         public string GetAttribute(string attributeName)
         {
-            uint length = webdriver_elementGetAttributeLength(handle, attributeName);
-            StringBuilder result = new StringBuilder((int) length);
-            webdriver_elementGetAttribute(handle, attributeName, result, length);
-            return result.ToString();
+            StringWrapperHandle result = new StringWrapperHandle();
+            wdeGetAttribute(wrapper, attributeName, ref result);
+            return result.Value;
         }
 
-        private IntPtr handle;
+
+        private ElementWrapper wrapper;
+        private InternetExplorerDriver driver;
     }
 }

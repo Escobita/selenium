@@ -6,6 +6,11 @@ namespace OpenQa.Selenium
 {
     public interface IWebElement
     {
+        string ElementName
+        {
+            get;
+        }
+
         string Text
         {
             get;
