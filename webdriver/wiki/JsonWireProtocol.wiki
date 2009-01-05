@@ -69,7 +69,7 @@ which are probably necessary.
 Methods used to create and manage webdriver sessions. A session can be thought of a new instance of a particular driver.
 
 || *URL* || *HTTP Method* || *Argument* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session || POST || An object with the fields: "browserName", "platform", "javascriptEnabled", "version" || A redirect to a URL desribing the newly created driver || Create a new session. Equivalent to "new Driver()" || 
+|| /session || POST || An object with the fields: "browserName", "platform", "javascriptEnabled", "version" || A redirect to a URL desribing the newly created driver || Create a new session. Equivalent to "new Driver()" || N/A || 
 || /session/:sessionId/:context || GET || none || An object with the same fields as for "/session" || This desribes the driver created by the call to "/session" || N/A ||
 || /session/:sessionId || DELETE || none || Ignored || Delete an existing session. This will allow the server to release any resources held for the driver, and consequently there is an expectation that users will call this method to allow this clean up || N/A ||
 
@@ -93,8 +93,8 @@ Given this information, the following methods can be used to locate an element
 === WebDriver Methods ===
 
 || *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| get || url:String || none || Go to the specified URL and wait until the page has completely loaded || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver.get] || 
-|| currentTitle || none || String || Get the title of the page, as it would be displayed by the browser || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getTitle() WebDriver.getTitle] ||
+|| get || POST || A single argument: a string || none || Go to the specified URL and wait until the page has completely loaded || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver.get] || 
+|| currentTitle || GET || none || String || Get the title of the page, as it would be displayed by the browser || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getTitle() WebDriver.getTitle] ||
 
 === Element Specific Methods ===
 
