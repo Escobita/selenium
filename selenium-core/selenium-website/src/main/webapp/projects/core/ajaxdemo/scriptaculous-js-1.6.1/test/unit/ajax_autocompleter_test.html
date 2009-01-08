@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <meta name="generator" content=
-  "HTML Tidy (vers 31 October 2006 - Apple Inc. build 13), see www.w3.org" />
+  "HTML Tidy (version num removed), see www.w3.org" />
 
   <title>script.aculo.us Unit test file</title>
   <meta http-equiv="content-type" content=
@@ -57,7 +57,7 @@
   <form>
     <input id="dummy_element" type="text" autocomplete="off" /> 
     <!-- Tests follow -->
-    <script type="text/javascript" language="javascript" charset=
+     <script type="text/javascript" language="javascript" charset=
     "utf-8">
 // <![CDATA[
 
@@ -87,7 +87,7 @@
         assertEqual('test2', $('ac_update').firstChild.firstChild.nextSibling.innerHTML);
         
         // intl. characters return (UTF-8)
-        assertEqual('Here we have some international Â©âÆÃÂ®ÃÃ§â¬ âÆrÃx', $('ac_update').firstChild.lastChild.innerHTML);
+        assertEqual('Here we have some international Â©âÆÃÂ®ÃÃ§â¬ âÆrÃx', $('ac_update').firstChild.lastChild.innerHTML);
                 
         // first entry should be selected
         assert(Element.hasClassName($('ac_update').firstChild.firstChild, 'selected'),'Selected item should have a className of: selected');
