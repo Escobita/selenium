@@ -1,68 +1,76 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 FirefoxDriver.prototype.click = function(respond) {
     respond.context = this.context;
 
-    var currentlyActive = Utils.getActiveElement(this.context);
-
     var element = Utils.getElementAt(respond.elementId, this.context);
+
     if (!element) {
         respond.send();
         return;
     }
 
-    // Attach a listener so that we can wait until any page load this causes to complete
-    var driver = this;
-    var alreadyReplied = false;
-    var browser = Utils.getBrowser(driver.context);
-    var contentWindow = Utils.getBrowser(driver.context).contentWindow;
-    var fireMouseEventOn = Utils.fireMouseEventOn;
+    if (!Utils.isDisplayed(element)) {
+        respond.isError = true;
+        respond.response = "Element is not currently visible and so may not be clicked";
+        respond.send();
+        return;
+    }
 
-    var clickListener = new WebLoadingListener(driver, function(event) {
+    var currentlyActive = Utils.getActiveElement(this.context);
+
+    Utils.fireMouseEventOn(this.context, element, "mousedown");
+    if (element != currentlyActive) {
+      currentlyActive.blur();
+      element.focus();
+    }
+//    Utils.fireMouseEventOn(this.context, element, "mouseup");
+    Utils.fireMouseEventOn(this.context, element, "mouseup");
+    Utils.fireMouseEventOn(this.context, element, "click");
+
+    var browser = Utils.getBrowser(this.context);
+    var alreadyReplied = false;
+
+    var clickListener = new WebLoadingListener(this, function(event) {
         if (!alreadyReplied) {
             alreadyReplied = true;
             respond.send();
         }
     });
 
-    var clickEvents = function() {
-        fireMouseEventOn(driver.context, element, "mousedown");
-        if (element != currentlyActive) {
-          currentlyActive.blur();
-          element.focus();
-        }
-        
-        fireMouseEventOn(driver.context, element, "mouseup");
-
-        var checkForLoad = function() {
-            // Returning should be handled by the click listener, unless we're not actually loading something. Do a check and return if we are.
-            // There's a race condition here, in that the click event and load may have finished before we get here. For now, let's pretend that
-            // doesn't happen. The other race condition is that we make this check before the load has begun. With all the javascript out there,
-            // this might actually be a bit of a problem.
-            var docLoaderService = browser.webProgress
-            if (!docLoaderService.isLoadingDocument) {
-                WebLoadingListener.removeListener(browser, clickListener);
-                if (!alreadyReplied) {
-                    alreadyReplied = true;
-                    respond.send();
-                }
+    var checkForLoad = function() {
+        // Returning should be handled by the click listener, unless we're not actually loading something. Do a check and return if we are.
+        // There's a race condition here, in that the click event and load may have finished before we get here. For now, let's pretend that
+        // doesn't happen. The other race condition is that we make this check before the load has begun. With all the javascript out there,
+        // this might actually be a bit of a problem.
+        var docLoaderService = browser.webProgress;
+        if (!docLoaderService.isLoadingDocument) {
+            WebLoadingListener.removeListener(browser, clickListener);
+            if (!alreadyReplied) {
+                alreadyReplied = true;
+                respond.send();
             }
-        };
-        
-        var doClick = function() {
-	        // Now do the click. I'm a little surprised that this works as often as it does:
-	        // http://developer.mozilla.org/en/docs/DOM:element.click#Notes
-//	        if (element["click"]) {
-//	            element.click();
-//	        }
-	            // Or just send the click event.
-	            fireMouseEventOn(driver.context, element, "click");
-	        
-	        contentWindow.setTimeout(checkForLoad, 50);
-        };
-        
-        contentWindow.setTimeout(doClick, 50);
-    }
+        }
+    };
 
-    contentWindow.setTimeout(clickEvents, 50);
+    var contentWindow = browser.contentWindow;
+    contentWindow.setTimeout(checkForLoad, 50);
 };
 
 FirefoxDriver.prototype.getElementText = function(respond) {
@@ -105,6 +113,13 @@ FirefoxDriver.prototype.sendKeys = function(respond, value) {
 
     var element = Utils.getElementAt(respond.elementId, this.context);
 
+    if (!Utils.isDisplayed(element)) {
+	    respond.isError = true;
+		respond.response = "Element is not currently visible and so may not be clicked";
+		respond.send();
+		return;
+	}
+
   var currentlyActive = Utils.getActiveElement(this.context);
   if (currentlyActive != element) {
       currentlyActive.blur();
@@ -120,15 +135,46 @@ FirefoxDriver.prototype.clear = function(respond) {
    respond.context = this.context;
 
    var element = Utils.getElementAt(respond.elementId, this.context);
+
+   if (!Utils.isDisplayed(element)) {
+	    respond.isError = true;
+		respond.response = "Element is not currently visible and so may not be clicked";
+		respond.send();
+		return;
+   }
+
    var isTextField = element["value"] !== undefined;
+
+   var currentlyActive = Utils.getActiveElement(this.context);
+    if (currentlyActive != element) {
+      currentlyActive.blur();
+      element.focus();
+  }
+
+  var currentValue = undefined;
+  if (element["value"] !== undefined) {
+      currentValue = element.value;
+  } else if (element.hasAttribute("value")) {
+      currentValue = element.getAttribute("value");
+  }
 
    if (isTextField) {
      element.value = "";
    } else {
      element.setAttribute("value", "");
    }
-   
+
+   if (currentValue !== undefined && currentValue != "") {
+     Utils.fireHtmlEvent(this.context, element, "change");
+   }
+
    respond.send();
+}
+
+FirefoxDriver.prototype.getElementName = function(respond) {
+    var element = Utils.getElementAt(respond.elementId, this.context);
+    respond.response = element.tagName.toLowerCase();
+    respond.send();
 }
 
 FirefoxDriver.prototype.getElementAttribute = function(respond, value) {
@@ -198,10 +244,15 @@ FirefoxDriver.prototype.getElementChildren = function(respond, name) {
     var element = Utils.getElementAt(respond.elementId, this.context);
 
     var children = element.getElementsByTagName(name[0]);
+
     var response = "";
     for (var i = 0; i < children.length; i++) {
-        response += Utils.addToKnownElements(children[i], this.context) + " ";
+      var e = children[i];
+      var index = Utils.addToKnownElements(e, this.context);
+      response += index + ",";
     }
+    // Strip the trailing comma
+    response = response.substring(0, response.length - 1);
 
     respond.context = this.context;
     respond.response = response;
@@ -233,6 +284,14 @@ FirefoxDriver.prototype.getElementSelected = function(respond) {
 
 FirefoxDriver.prototype.setElementSelected = function(respond) {
     var element = Utils.getElementAt(respond.elementId, this.context);
+
+    if (!Utils.isDisplayed(element)) {
+	    respond.isError = true;
+		respond.response = "Element is not currently visible and so may not be clicked";
+		respond.send();
+		return;
+	}
+
 
     var wasSet = "You may not select an unselectable element";
     respond.context = this.context;
@@ -281,6 +340,13 @@ FirefoxDriver.prototype.toggleElement = function(respond) {
 
     var element = Utils.getElementAt(respond.elementId, this.context);
 
+    if (!Utils.isDisplayed(element)) {
+	    respond.isError = true;
+		respond.response = "Element is not currently visible and so may not be clicked";
+		respond.send();
+		return;
+	}
+
     try {
         var checkbox = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
         if (checkbox.type == "checkbox") {
@@ -318,17 +384,8 @@ FirefoxDriver.prototype.toggleElement = function(respond) {
 FirefoxDriver.prototype.isElementDisplayed = function(respond) {
     var element = Utils.getElementAt(respond.elementId, this.context);
 
-    var isDisplayed = true;
-    do {
-        var display = Utils.getStyleProperty(element, "display");
-        var visible = Utils.getStyleProperty(element, "visibility");
-        isDisplayed &= display != "none" && visible != "hidden";
-
-        element = element.parentNode;
-    } while (element.tagName.toLowerCase() != "body" && isDisplayed);
-
     respond.context = this.context;
-    respond.response = isDisplayed ? "true" : "false";
+    respond.response = Utils.isDisplayed(element) ? "true" : "false";
     respond.send();
 };
 
@@ -344,8 +401,8 @@ FirefoxDriver.prototype.getElementLocation = function(respond) {
 FirefoxDriver.prototype.getElementSize = function(respond) {
     var element = Utils.getElementAt(respond.elementId, this.context);
 
-    var width = element.offsetWidth;
-    var height = element.offsetHeight;
+    var width = element.scrollWidth;
+    var height = element.scrollHeight;
 
     respond.context = this.context;
     respond.response = width + ", " + height;
@@ -353,55 +410,70 @@ FirefoxDriver.prototype.getElementSize = function(respond) {
 };
 
 FirefoxDriver.prototype.dragAndDrop = function(respond, movementString) {
-    var element = Utils.getElementAt(respond.elementId, this.context);
-    
-    var clientStartXY = Utils.getElementLocation(element, this.context);
-    
-    var clientStartX = clientStartXY.x;
-    var clientStartY = clientStartXY.y;
-    
-    var movementX = movementString[0];
-    var movementY = movementString[1];
+  var element = Utils.getElementAt(respond.elementId, this.context);
 
-    var clientFinishX = ((clientStartX + movementX) < 0) ? 0 : (clientStartX + movementX);
-    var clientFinishY = ((clientStartY + movementY) < 0) ? 0 : (clientStartY + movementY);
-    // Restrict the desitnation into the sensible dimension
-    var window = Utils.getBrowser(this.context).contentWindow;
-    if (clientFinishX > window.innerWidth)
-        clientFinishX = window.innerWidth;
-    if (clientFinishY > window.innerHeight)
-        clientFinishY = window.innerHeight;
-
-    var mouseSpeed = this.mouseSpeed;
-    var move = function(current, dest) {
-        if (current == dest) return current;
-        if (Math.abs(current - dest) < mouseSpeed) return dest;
-        return (current < dest) ? current + mouseSpeed : current - mouseSpeed;
-    }
-
-    Utils.triggerMouseEvent(element, 'mousedown', clientStartX, clientStartY);
-    Utils.triggerMouseEvent(element, 'mousemove', clientStartX, clientStartY);
-    var clientX = clientStartX;
-    var clientY = clientStartY;
-
-    while ((clientX != clientFinishX) || (clientY != clientFinishY)) {
-        clientX = move(clientX, clientFinishX);
-        clientY = move(clientY, clientFinishY);
-        
-        Utils.triggerMouseEvent(element, 'mousemove', clientX, clientY);
-    }
-
-    Utils.triggerMouseEvent(element, 'mousemove', clientFinishX, clientFinishY);
-    Utils.triggerMouseEvent(element, 'mouseup',  clientFinishX, clientFinishY);
-
-    var finalLoc = Utils.getElementLocation(element, this.context)
-
-    respond.context = this.context;
-    respond.response = finalLoc.x + "," + finalLoc.y;
+  if (!Utils.isDisplayed(element)) {
+    respond.isError = true;
+    respond.response = "Element is not currently visible and so may not be clicked";
     respond.send();
+    return;
+  }
+
+  // Scroll the first element into view
+//  element.scrollIntoView(true);
+
+  var clientStartXY = Utils.getElementLocation(element, this.context);
+
+  var clientStartX = clientStartXY.x;
+  var clientStartY = clientStartXY.y;
+
+  var movementX = movementString[0];
+  var movementY = movementString[1];
+
+  var clientFinishX = ((clientStartX + movementX) < 0) ? 0 : (clientStartX + movementX);
+  var clientFinishY = ((clientStartY + movementY) < 0) ? 0 : (clientStartY + movementY);
+
+  // Restrict the desitnation into the sensible dimension
+  var body = element.ownerDocument.body;
+
+  if (clientFinishX > body.scrollWidth)
+    clientFinishX = body.scrollWidth;
+  if (clientFinishY > body.scrollHeight)
+    clientFinishY = body.scrollHeight;
+
+  var mouseSpeed = this.mouseSpeed;
+  var move = function(current, dest) {
+    if (current == dest) return current;
+    if (Math.abs(current - dest) < mouseSpeed) return dest;
+    return (current < dest) ? current + mouseSpeed : current - mouseSpeed;
+  }
+
+  Utils.triggerMouseEvent(element, 'mousedown', clientStartX, clientStartY);
+  Utils.triggerMouseEvent(element, 'mousemove', clientStartX, clientStartY);
+  var clientX = clientStartX;
+  var clientY = clientStartY;
+
+  while ((clientX != clientFinishX) || (clientY != clientFinishY)) {
+    clientX = move(clientX, clientFinishX);
+    clientY = move(clientY, clientFinishY);
+
+    Utils.triggerMouseEvent(element, 'mousemove', clientX, clientY);
+  }
+
+  Utils.triggerMouseEvent(element, 'mousemove', clientFinishX, clientFinishY);
+
+  // TODO(simon.m.stewart) If we can tell which element is under the cursor, send the mouseup to that
+  Utils.triggerMouseEvent(element, 'mouseup', clientFinishX, clientFinishY);
+
+  var finalLoc = Utils.getElementLocation(element, this.context)
+
+  respond.context = this.context;
+  respond.response = finalLoc.x + "," + finalLoc.y;
+  respond.send();
 };
 
 FirefoxDriver.prototype.findElementsByXPath = function (respond, xpath) {
+    Utils.dumpn("findElementsByXPath: " + respond.elementId);
     var element = Utils.getElementAt(respond.elementId, this.context);
     var indices = Utils.findElementsByXPath(xpath, element, this.context)
     var response = ""
@@ -417,18 +489,82 @@ FirefoxDriver.prototype.findElementsByXPath = function (respond, xpath) {
 
 FirefoxDriver.prototype.findElementsByLinkText = function (respond, linkText) {
     var element = Utils.getElementAt(respond.elementId, this.context);
-    var children = element.getElementsByTagName("a");
+    var children = element.getElementsByTagName("A");
     var response = "";
     for (var i = 0; i < children.length; i++) {
+
       if (linkText == Utils.getText(children[i])) {
         response += Utils.addToKnownElements(children[i], this.context) + ",";
       }
     }
     response = response.substring(0, response.length - 1);
-    
+
     respond.context = this.context;
     respond.response = response;
     respond.send();
+};
+
+FirefoxDriver.prototype.findElementByPartialLinkText = function(respond, linkText) {
+    var element = Utils.getElementAt(respond.elementId, this.context);
+    var allLinks = element.getElementsByTagName("A");
+    var index;
+    for (var i = 0; i < allLinks.length && !index; i++) {
+        var text = Utils.getText(allLinks[i], true);
+        if (text.indexOf(linkText) != -1) {
+            index = Utils.addToKnownElements(allLinks[i], this.context);
+            break;
+        }
+    }
+
+    respond.context = this.context;
+
+    if (index !== undefined) {
+        respond.response = index;
+    } else {
+        respond.isError = true;
+        respond.response = "Unable to find element with link text contains '" + linkText + "'";
+    }
+
+    respond.send();
+};
+
+FirefoxDriver.prototype.findElementsByPartialLinkText = function (respond, linkText) {
+    var element = Utils.getElementAt(respond.elementId, this.context);
+    var children = element.getElementsByTagName("A");
+    var response = "";
+    for (var i = 0; i < children.length; i++) {
+      if (Utils.getText(children[i]).indexOf(linkText) != -1) {
+        response += Utils.addToKnownElements(children[i], this.context) + ",";
+      }
+    }
+    response = response.substring(0, response.length - 1);
+
+    respond.context = this.context;
+    respond.response = response;
+    respond.send();
+};
+
+FirefoxDriver.prototype.findChildElementsByClassName = function(respond, className) {
+    var element = Utils.getElementAt(respond.elementId, this.context);
+
+    if (element["getElementsByClassName"]) {
+      var result = element.getElementsByClassName(className);
+
+      var response = "";
+      for (var i = 0; i < result.length; i++) {
+          var e = result[i];
+          var index = Utils.addToKnownElements(e, this.context);
+          response += index + ",";
+      }
+      // Strip the trailing comma
+      response = response.substring(0, response.length - 1);
+
+      respond.context = this.context;
+      respond.response = response;
+      respond.send();
+    } else {
+      this.findElementsByXPath(respond, ".//*[contains(concat(' ',normalize-space(@class),' '),' " + className + " ')]");
+    }
 };
 
 FirefoxDriver.prototype.findElementById = function(respond, id) {
@@ -436,7 +572,7 @@ FirefoxDriver.prototype.findElementById = function(respond, id) {
 	var parentElement = Utils.getElementAt(respond.elementId, this.context);
     var element = doc.getElementById(id);
     var isChild = false;
-    
+
     if (element) {
     	var tmp = element;
     	while (tmp != null) {
@@ -444,10 +580,10 @@ FirefoxDriver.prototype.findElementById = function(respond, id) {
     			isChild = true;
 	    		break;
 	    	}
-	    	tmp = tmp.parentNode	
+	    	tmp = tmp.parentNode
 	    }
 		if (isChild) {
-	        respond.response = Utils.addToKnownElements(element, this.context);
+	    respond.response = Utils.addToKnownElements(element, this.context);
 		} else {
 			//The first match is not a child of the current node, fall back
 			//to xpath to see if there are any children nodes with that id
@@ -468,4 +604,46 @@ FirefoxDriver.prototype.getElementCssProperty = function(respond, propertyName) 
     var element = Utils.getElementAt(respond.elementId, this.context);
     respond.response = Utils.getStyleProperty(element, propertyName); // Coeerce to a string
     respond.send();
+};
+
+FirefoxDriver.prototype.getLocationOnceScrolledIntoView = function(respond) {
+  var element = Utils.getElementAt(respond.elementId, this.context);
+
+  if (!Utils.isDisplayed(element)) {
+    respond.response = undefined;
+    respond.send();
+    return;
+  }
+
+  element.ownerDocument.body.focus();
+  element.scrollIntoView(true);
+
+  var retrieval = Utils.newInstance("@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
+
+  try {
+    var accessible = retrieval.getAccessibleFor(element);
+    var x = {}, y = {}, width = {}, height = {};
+    accessible.getBounds(x, y, width, height);
+
+    respond.response = {
+      x : x.value,
+      y : y.value
+    };
+    respond.send();
+    return;
+  } catch(e) {
+    // Element doesn't have an accessibility node
+  }
+
+  // Fallback. Use the (deprecated) method to find out where the element is in
+  // the viewport. This should be fine to use because we only fall down this
+  // code path on older versions of Firefox (I think!)
+  var theDoc = Utils.getDocument(this.context);
+  var box = theDoc.getBoxObjectFor(element);
+
+  respond.response = {
+    x : box.screenX,
+    y : box.screenY
+  };
+  respond.send();
 };

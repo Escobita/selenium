@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 const charset = "UTF-8";
 const CI = Components.interfaces;
 
@@ -35,7 +53,7 @@ SocketListener.prototype.onStopRequest = function(request, context, status)
 SocketListener.prototype.onDataAvailable = function(request, context, inputStream, offset, count)
 {
     var incoming = {}
-    this.inputStream.readString(count, incoming);
+    var read = this.inputStream.readString(count, incoming);
 
     var lines = incoming.value.split('\n');
     for (var j = 0; j < lines.length; j++) {
@@ -48,17 +66,17 @@ SocketListener.prototype.onDataAvailable = function(request, context, inputStrea
                 this.step++;
             }
         } else {
-            this.data += lines[j] + "\n";
-            this.linesLeft--;
+            this.data += lines[j];
+            this.linesLeft -= read;
 
-            if (this.linesLeft == 0) {
+            if (this.linesLeft <= 0) {
                 this.executeCommand();
                 j++;  // Consume the empty line
             }
         }
     }
 
-    if (this.linesLeft == 0 && this.data) {
+    if (this.linesLeft <= 0 && this.data) {
         this.executeCommand();
     }
 }
@@ -70,7 +88,7 @@ SocketListener.prototype.executeCommand = function() {
     var command = JSON.parse(this.data);
 
     var sendBack = {
-        commandName : command.commandName,
+        commandName : command ? command.commandName : "Unknown command",
         isError : false,
         response : "",
         elementId : command.elementId
@@ -146,10 +164,18 @@ SocketListener.prototype.executeCommand = function() {
         }
 
         if (!fxbrowser) {
-            dump("Unable to find browser with id " + context.windowId + "\n");
+            Utils.dumpn("Unable to find browser with id " + context.windowId + "\n");
+            respond.isError = true;
+            respond.response = "Unable to find browser with id " + context.windowId;
+            respond.send();
+            return;
         }
         if (!driver) {
-            dump("Unable to find the driver\n");
+            Utils.dumpn("Unable to find the driver\n");
+            respond.isError = true;
+            respond.response = "Unable to find the driver";
+            respond.send();
+            return;
         }
 
         driver.context = context;
@@ -206,17 +232,26 @@ SocketListener.prototype.executeCommand = function() {
                     respond.commandName = info.command.commandName;
                     info.driver[info.command.commandName](respond, info.command.parameters);
                 } catch (e) {
-                    info.driver.window.dump("Exception caught: " + info.command.commandName + "(" + info.command.parameters + ")\n");
-                    info.driver.window.dump(e + "\n");
+                    var obj = {
+                      fileName : e.fileName,
+                      lineNumber : e.lineNumber,
+                      message : e.message,
+                      name : e.name,
+                      stack : e.stack  
+                    };
+                    var message = "Exception caught by driver: " + info.command.commandName + "(" + info.command.parameters + ")\n" + e;
+                    Utils.dumpn(message);
+                    Utils.dump(e);
                     respond.isError = true;
                     respond.context = info.driver.context;
+                    respond.response = obj;
                     respond.send();
                 }
             }
         }
         driver.window.setTimeout(wait, 0, info);
     } else {
-        dump("Unrecognised command: " + this.command + "\n");
+        Utils.dumpn("Unrecognised command: " + this.command + "\n");
         this.linesLeft = 0;
         this.step = 0;
         this.readLength = false;
@@ -236,16 +271,23 @@ SocketListener.prototype.isReadingLineCount = function() {
 };
 
 SocketListener.prototype.switchToWindow = function(respond, windowId) {
-    var lookFor = windowId;
-    if (typeof windowId != "string")
-        lookFor = windowId[0];
+    var lookFor = windowId[0];
     var wm = Utils.getService("@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator");
     var allWindows = wm.getEnumerator(null);
 
+    var matches = function(win, lookFor) {
+      if (win.content.name == lookFor)
+        return true;
+
+      if (win.top.fxdriver && win.top.fxdriver.id == lookFor)
+        return true;
+
+      return false;
+    }
+
     while (allWindows.hasMoreElements()) {
         var win = allWindows.getNext();
-        var winname = win.content.name;
-        if (winname == lookFor) {
+        if (matches(win, lookFor)) {
             win.focus();
             var driver = win.top.fxdriver;
             if (!driver) {
@@ -257,14 +299,12 @@ SocketListener.prototype.switchToWindow = function(respond, windowId) {
             respond.response = new Context(win.fxdriver.id).toString();
             respond.send();
             return;
-        } else {
-            respond.response += winname + "!=" + lookFor + ","
         }
     }
 
     respond.context = this.context;
     respond.isError = true;
-    respond.response += "No window found";
+    respond.response = "No window found";
     respond.send();
 };
 
@@ -276,9 +316,9 @@ SocketListener.prototype.getAllWindowHandles = function(respond) {
   var index = -1;
   while (allWindows.hasMoreElements()) {
     var win = allWindows.getNext();
-    index++;
-    if (win.top.fxdriver) {
-      res += index + ","
+
+    if (win.top.fxdriver && !win.top.closed) {
+      res += win.top.fxdriver.id + ","
     }
   }
 

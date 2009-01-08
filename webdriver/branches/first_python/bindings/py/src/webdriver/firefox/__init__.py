@@ -30,13 +30,11 @@ class WebDriver(webdriver.WebDriver):
 
   def FindElementByXPath(self, xpath):
     elemId = self.conn.command("selectElementUsingXPath", [xpath])
-    assert type(elemId) == int, "Bad response format: %s" % str(elemId)
     elem = WebElement(self, elemId)
     return elem
   
   def FindElementByLinkText(self, link):
     elemId = self.conn.command("selectElementUsingLink", [link])
-    assert type(elemId) == int, "Bad response format"
     elem = WebElement(self, elemId)
     return elem
 
@@ -51,7 +49,7 @@ class WebDriver(webdriver.WebDriver):
     elems = []
     if len(elemIds):
       for elemId in elemIds.split(","):
-        elem = WebElement(self, int(elemId))
+        elem = WebElement(self, elemId)
         elems.append(elem)
     return elems
 
@@ -72,4 +70,3 @@ class WebDriver(webdriver.WebDriver):
 
   def Manage(self):
     return Options()
-

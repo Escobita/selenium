@@ -1,8 +1,37 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 function Utils() {
 }
 
+Utils.getUniqueId = function() {
+  if (!Utils._generator) {
+    Utils._generator = Utils.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");
+  }
+  return Utils._generator.generateUUID().toString();
+};
+
 Utils.newInstance = function(className, interfaceName) {
     var clazz = Components.classes[className];
+
+    if (!clazz)
+      return undefined;
+
     var iface = Components.interfaces[interfaceName];
     return clazz.createInstance(iface);
 };
@@ -54,6 +83,9 @@ Utils.getActiveElement = function(context) {
 }
 
 function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
+    if (node['tagName'] && node.tagName == "SCRIPT") {
+        return [toReturn, textSoFar];
+    }
     var children = node.childNodes;
 
     for (var i = 0; i < children.length; i++) {
@@ -104,7 +136,20 @@ function isBlockLevel(node) {
     } catch (e) {
         return false;
     }
-}
+};
+
+Utils.isDisplayed = function(element) {
+    var isDisplayed = true;
+    do {
+        var display = Utils.getStyleProperty(element, "display");
+        var visible = Utils.getStyleProperty(element, "visibility");
+        isDisplayed &= display != "none" && visible != "hidden";
+
+        element = element.parentNode;
+    } while (element && element.tagName && element.tagName.toLowerCase() != "body" && isDisplayed);
+
+	return isDisplayed;
+};
 
 Utils.getStyleProperty = function(node, propertyName) {
     var value = node.ownerDocument.defaultView.getComputedStyle(node, null).getPropertyValue(propertyName);
@@ -145,30 +190,31 @@ function isWhiteSpace(character) {
 
 Utils.getText = function(element) {
     var bits = getTextFromNode(element, "", "", element.tagName == "PRE");
-
     var text = bits[0] + collapseWhitespace(bits[1]);
-    var index = text.length - 1;
-    while (isWhiteSpace(text[index])) {
-        index--;
+    var start = 0;
+    while (start < text.length && isWhiteSpace(text[start])) {
+        ++start;
     }
-
-    return text.slice(0, index + 1);
+    var end = text.length;
+    while (end > start && isWhiteSpace(text[end - 1])) {
+        --end;
+    }
+    return text.slice(start, end);
 };
 
 Utils.addToKnownElements = function(element, context) {
     var doc = Utils.getDocument(context);
     if (!doc.fxdriver_elements) {
-        doc.fxdriver_elements = new Array();
+        doc.fxdriver_elements = {};
     }
-    var start = doc.fxdriver_elements.length;
-    doc.fxdriver_elements.push(element);
-    return start;
+
+    var id = Utils.getUniqueId();
+    doc.fxdriver_elements[id] = element;
+
+    return id;
 };
 
 Utils.getElementAt = function(index, context) {
-    // Convert to a number if we're dealing with a string...
-    index = index - 0;
-
     var doc = Utils.getDocument(context);
     if (doc.fxdriver_elements)
         return doc.fxdriver_elements[index];
@@ -546,11 +592,7 @@ Utils.findForm = function(element) {
 }
 
 Utils.fireMouseEventOn = function(context, element, eventName) {
-    var event = Utils.getDocument(context).createEvent("MouseEvents");
-    var view = Utils.getDocument(context).defaultView;
-
-    event.initMouseEvent(eventName, true, true, view, 1, 0, 0, 0, 0, false, false, false, false, 0, element);
-    element.dispatchEvent(event);
+    Utils.triggerMouseEvent(element, eventName, 0, 0);
 }
 
 Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
@@ -722,9 +764,3 @@ Utils.findElementsByXPath = function (xpath, contextNode, context) {
     }
     return indices;
 };
-
-Utils.log = function myDump(aMessage) {
-  var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
-      .getService(Components.interfaces.nsIConsoleService);
-  consoleService.logStringMessage(aMessage);
-}
