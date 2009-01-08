@@ -140,8 +140,6 @@ if __name__ == "__main__":
 
   try:
     unittest.main()
-  except:
-    pass
   finally:
     driver = WebDriver()
     driver.Quit()
