@@ -36,7 +36,7 @@
 
 </div>
 <div id="userStatus">
-    Note: To use the OpenQA <a href="http://clearspace.openqa.org/community/selenium">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://www.openqa.org/sass/index.action">OpenQA account</a>.
+    Note: To use the OpenQA <a href="http://clearspace.openqa.org/community/selenium">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://openqa.org/sass/index.action">OpenQA account</a>.
 </div>
 <div id="mBody">
     <%
@@ -158,12 +158,12 @@
     <ul id="sitemap">
         <li><a href="/projects/">Selenium Projects</a>
             <ul>
-                <li><a href="/projects/ide">Selenium IDE</a></li>
-                <li><a href="/projects/remote-control">Selenium Remote Control</a></li>
-                <li><a href="/projects/grid">Selenium Grid</a></li>
-                <li><a href="/projects/core">Selenium Core</a></li>
-                <li><a href="/projects/on-rails">Selenium on Rails</a></li>
-                <li><a href="/projects/ruby">Selenium on Ruby</a></li>
+                <li><a href="/projects/ide/">Selenium IDE</a></li>
+                <li><a href="/projects/remote-control/">Selenium Remote Control</a></li>
+                <li><a href="http://selenium-grid.openqa.org/">Selenium Grid</a></li>
+                <li><a href="/projects/core/">Selenium Core</a></li>
+                <li><a href="/projects/on-rails/">Selenium on Rails</a></li>
+                <li><a href="/projects/ruby/">Selenium on Ruby</a></li>
                 <li><a href="http://cubictest.seleniumhq.org">CubicTest (for Eclipse)</a></li>
             </ul>
         </li>
@@ -195,15 +195,15 @@
                 <li><a href="http://clearspace.openqa.org/community/jobs_board">Jobs Board</a></li>
             </ul>
         </li>
-        <li><a href="http://www.openqa.org/">OpenQA.org</a>
+        <li><a href="http://openqa.org/">OpenQA.org</a>
             <ul>
-                <li><a href="http://www.openqa.org/sass/index.action">Create an account</a></li>
-                <li><a href="http://www.openqa.org/sass/index.action">Account management</a></li>
-                <li><a href="http://www.openqa.org/sponsors.action">Sponsors</a></li>
+                <li><a href="http://openqa.org/sass/index.action">Create an account</a></li>
+                <li><a href="http://openqa.org/sass/index.action">Account management</a></li>
+                <li><a href="http://openqa.org/sponsors.action">Sponsors</a></li>
             </ul>
         </li>
     </ul>
-    <a href="http://www.openqa.org/"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png"/></a>
+    <a href="http://openqa.org/"><img alt="openqa.org logo" id="footerLogo" src="/images/openqa-logo.png"/></a>
 </div>
 </div>
 </body>
