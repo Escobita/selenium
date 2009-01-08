@@ -1,28 +1,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy (vers 31 October 2006 - Apple Inc. build 13), see www.w3.org" />
+
   <title>script.aculo.us Unit test file</title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <script src="../../lib/prototype.js" type="text/javascript"></script>
-  <script src="../../src/scriptaculous.js" type="text/javascript"></script>
-  <script src="../../src/unittest.js" type="text/javascript"></script>
+  <meta http-equiv="content-type" content=
+  "text/html; charset=us-ascii" />
+  <script src="../../lib/prototype.js" type="text/javascript">
+</script>
+  <script src="../../src/scriptaculous.js" type="text/javascript">
+</script>
+  <script src="../../src/unittest.js" type="text/javascript">
+</script>
   <link rel="stylesheet" href="../test.css" type="text/css" />
 </head>
+
 <body>
-<h1>script.aculo.us Unit test file</h1>
-<p>
-  Tests the effects
-</p>
+  <h1>script.aculo.us Unit test file</h1>
 
-<!-- generated elements go in here -->
-<div id="sandbox"></div>
+  <p>Tests the effects</p><!-- generated elements go in here -->
 
-<!-- Log output -->
-<div id="testlog"> </div>
+  <div id="sandbox"></div><!-- Log output -->
 
-<!-- Tests follow -->
-<script type="text/javascript" language="javascript" charset="utf-8">
+  <div id="testlog"></div><!-- Tests follow -->
+  <script type="text/javascript" language="javascript" charset=
+  "utf-8">
 // <![CDATA[
 
   var TAGS =
@@ -200,7 +205,7 @@
     }},
     
     testEffectTagifyText: function() { with(this) {
-      $('sandbox').innerHTML = "Blah<strong>bleb</strong> Blub";
+      $('sandbox').innerHTML = "Blah<strong>bleb<\/strong> Blub";
       assertEqual(3, $('sandbox').childNodes.length);
       Effect.tagifyText('sandbox');
       assertEqual(10, $('sandbox').childNodes.length);
@@ -257,7 +262,7 @@
 
   });
 
-// ]]>
-</script>
+  // ]]>
+  </script>
 </body>
 </html>

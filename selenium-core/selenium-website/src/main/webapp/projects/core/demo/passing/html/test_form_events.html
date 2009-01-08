@@ -1,55 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
 <html>
 <head>
-<script language="javascript">
-<!--
-/*  flag to determine if event should be recorded. */
-var recording = true;
+  <meta name="generator" content=
+  "HTML Tidy (vers 31 October 2006 - Apple Inc. build 13), see www.w3.org">
 
-/* Records an event in the events textarea */
-function recordEvent(e) {
+  <script language="javascript" type="text/javascript">
+<!--
+  /*  flag to determine if event should be recorded. */
+  var recording = true;
+
+  /* Records an event in the events textarea */
+  function recordEvent(e) {
     if (!recording) return;
     // Handle IE
-	if (!e) var e = window.event;
-	var targetString = this.id;
-	var eventMessage = '{' + e.type + '(' + targetString + ')} ';
+        if (!e) var e = window.event;
+        var targetString = this.id;
+        var eventMessage = '{' + e.type + '(' + targetString + ')} ';
     document.getElementById('eventlog').value += eventMessage;
     return true;
-}
+  }
 
-/** Attach recording event handlers to the element */
-function attachEventRecorders(elementId) {
+  /** Attach recording event handlers to the element */
+  function attachEventRecorders(elementId) {
     var element = document.getElementById(elementId);
     element.onfocus=recordEvent;
     element.onchange=recordEvent;
     element.onselect=recordEvent;
     element.onblur=recordEvent;
-}
+  }
 
-function setupEventRecorders() {
+  function setupEventRecorders() {
     attachEventRecorders('theTextbox');
     attachEventRecorders('theCheckbox');
     attachEventRecorders('theForm');
     attachEventRecorders('theRadio1');
     attachEventRecorders('theRadio2');
     attachEventRecorders('theSelect');
-}
+  }
 
--->
-</script>
+  -->
+  </script>
+
+  <title></title>
 </head>
+
 <body id="theBody" onload="setupEventRecorders()">
-<form id="theForm" name="theForm">
-<input name="theTextbox" id="theTextbox" type="text" value=""/>
-<input name="theCheckbox" id="theCheckbox" type="checkbox"/>
-<input name="theRadio" id="theRadio1" type="radio" value="radio1"/><input name="theRadio" id="theRadio2" type="radio" value="theRadio"/>
-<select name="theSelect" id="theSelect"><option value="">Empty Option</option><option value="option1">First Option</option><option value="option2">Second Option</option></select>
-</form>
+  <form id="theForm" name="theForm">
+    <input name="theTextbox" id="theTextbox" type="text" value="">
+    <input name="theCheckbox" id="theCheckbox" type="checkbox">
+    <input name="theRadio" id="theRadio1" type="radio" value=
+    "radio1"><input name="theRadio" id="theRadio2" type="radio"
+    value="theRadio"> <select name="theSelect" id="theSelect">
+      <option value="">
+        Empty Option
+      </option>
 
-<hr/>
+      <option value="option1">
+        First Option
+      </option>
 
-<div>EventLog<br/>
-<textarea id="eventlog" rows="15" cols="80"></textarea><br/>
-Record events:<input type="checkbox" checked="checked" onclick="recording=this.checked;"/><br/>
-</div>
+      <option value="option2">
+        Second Option
+      </option>
+    </select>
+  </form>
+  <hr>
+
+  <div>
+    EventLog<br>
+    <textarea id="eventlog" rows="15" cols="80">
+</textarea><br>
+    Record events:<input type="checkbox" checked="checked" onclick=
+    "recording=this.checked;"><br>
+  </div>
 </body>
 </html>

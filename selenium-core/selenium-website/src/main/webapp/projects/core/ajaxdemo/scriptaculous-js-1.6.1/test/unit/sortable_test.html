@@ -1,54 +1,81 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy (vers 31 October 2006 - Apple Inc. build 13), see www.w3.org" />
+
   <title>script.aculo.us Unit test file</title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <script src="../../lib/prototype.js" type="text/javascript"></script>
-  <script src="../../src/scriptaculous.js" type="text/javascript"></script>
-  <script src="../../src/unittest.js" type="text/javascript"></script>
+  <meta http-equiv="content-type" content=
+  "text/html; charset=us-ascii" />
+  <script src="../../lib/prototype.js" type="text/javascript">
+</script>
+  <script src="../../src/scriptaculous.js" type="text/javascript">
+</script>
+  <script src="../../src/unittest.js" type="text/javascript">
+</script>
   <link rel="stylesheet" href="../test.css" type="text/css" />
 </head>
+
 <body>
-<h1>script.aculo.us Unit test file</h1>
-<p>
-  Test of sortable functions in dragdrop.js
-</p>
+  <h1>script.aculo.us Unit test file</h1>
 
-<!-- Log output -->
-<div id="testlog"> </div>
+  <p>Test of sortable functions in dragdrop.js</p>
+  <!-- Log output -->
 
+  <div id="testlog"></div>
 
-<ul id="sortable1">
-  <li id="item_1" class="a">item 1</li>
-  <li id="item_2" class="c b">item 1<ul><li id="item_99">!!!</li></ul></li>
-  <li id="item_3" class="b">item 1</li>
-  <li id="item_xy" class="x y">item 1</li>
-  <!-- a comment -->
-</ul>
+  <ul id="sortable1">
+    <li id="item_1" class="a">item 1</li>
 
-<div id="sortable2">
-  <div id="item_4">item 4</div>  <div id="item_5">item 5</div>
-  <img src="icon.png" alt="img"/>
-  <!-- a comment -->
-</div>
+    <li id="item_2" class="c b">item 1
 
-<div id="sortable3">
-  
-</div>
+      <ul>
+        <li id="item_99">!!!</li>
+      </ul>
+    </li>
 
-<ul id="sortable_specialcreate">
-  <li id="y1item">item 1</li>
-  <li id="y2item">item 1<ul><li id="yyyy9928282hjhd">!!!</li></ul></li>
-</ul>
+    <li id="item_3" class="b">item 1</li>
 
-<ul id="sortable_specialformat">
-  <li id="x1item">item 1</li>
-  <li id="x2item">item 1<ul><li id="xxxxx88888item">!!!</li></ul></li>
-</ul>
+    <li id="item_xy" class="x y">item 1</li><!-- a comment -->
+  </ul>
 
-<!-- Tests follow -->
-<script type="text/javascript" language="javascript" charset="utf-8">
+  <div id="sortable2">
+    <div id="item_4">
+      item 4
+    </div>
+
+    <div id="item_5">
+      item 5
+    </div><img src="icon.png" alt="img" /> <!-- a comment -->
+  </div>
+
+  <div id="sortable3"></div>
+
+  <ul id="sortable_specialcreate">
+    <li id="y1item">item 1</li>
+
+    <li id="y2item">item 1
+
+      <ul>
+        <li id="yyyy9928282hjhd">!!!</li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul id="sortable_specialformat">
+    <li id="x1item">item 1</li>
+
+    <li id="x2item">item 1
+
+      <ul>
+        <li id="xxxxx88888item">!!!</li>
+      </ul>
+    </li>
+  </ul><!-- Tests follow -->
+  <script type="text/javascript" language="javascript" charset=
+  "utf-8">
 // <![CDATA[
 
   new Test.Unit.Runner({
@@ -92,7 +119,7 @@
       // test special format given explicitly
       assertEqual('sortable_specialformat[]=1&sortable_specialformat[]=2', 
         Sortable.serialize('sortable_specialformat', {format:/(\d+)/}));
- 
+
       // return full id
       assertEqual('sortable_specialformat[]=x1item&sortable_specialformat[]=x2item', 
         Sortable.serialize('sortable_specialformat', {format:/(.*)/}));
@@ -115,7 +142,7 @@
       // test special format given explicitly
       assertEnumEqual(['1','2'], 
         Sortable.sequence('sortable_specialformat', {format:/(\d+)/}));
- 
+
       // return full id
       assertEnumEqual(['x1item','x2item'], 
         Sortable.sequence('sortable_specialformat', {format:/(.*)/}));
@@ -161,7 +188,7 @@
     }}
 
   }, "testlog");
-// ]]>
-</script>
+  // ]]>
+  </script>
 </body>
 </html>
