@@ -43,12 +43,6 @@ class WebElement(webdriver.WebElement):
       # The "disabled" attribute may not exist
       return True
 
-  def FindElements(self, by):
-    pass
-
-  def FindElement(self, by):
-    pass
-
   def FindElementsByXPath(self, xpath):
     resp = self._command("findElementsByXPath", xpath)
     elems = []
@@ -61,4 +55,4 @@ class WebElement(webdriver.WebElement):
     self._command("sendKeys", keys_characters)
 
   def _command(self, _cmd, *args):
-    return self.conn.command(_cmd, params = args, elementId=self.id)
+    return self.conn.ElementCommand(_cmd, self.id, *args)

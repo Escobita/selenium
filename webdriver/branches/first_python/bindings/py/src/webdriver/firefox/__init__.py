@@ -14,13 +14,13 @@ class WebDriver(webdriver.WebDriver):
     self.conn = ExtensionConnection()
 
   def Get(self, url):
-    self.conn.command("get", [url])
+    self.conn.DriverCommand("get", url)
 
   def GetCurrentUrl(self):
-    return self.conn.command("getCurrentUrl")
+    return self.conn.DriverCommand("getCurrentUrl")
 
   def GetTitle(self):
-    return self.conn.command("title")
+    return self.conn.DriverCommand("title")
 
   def GetVisible(self):
     return True
@@ -29,12 +29,12 @@ class WebDriver(webdriver.WebDriver):
     pass
 
   def FindElementByXPath(self, xpath):
-    elemId = self.conn.command("selectElementUsingXPath", [xpath])
+    elemId = self.conn.DriverCommand("selectElementUsingXPath", xpath)
     elem = WebElement(self, elemId)
     return elem
   
   def FindElementByLinkText(self, link):
-    elemId = self.conn.command("selectElementUsingLink", [link])
+    elemId = self.conn.DriverCommand("selectElementUsingLink", link)
     elem = WebElement(self, elemId)
     return elem
 
@@ -43,9 +43,9 @@ class WebDriver(webdriver.WebDriver):
 
   def FindElementByName(self, name):
     return self.FindElementByXPath("//*[@name=\"%s\"]" % name)
-        
+
   def FindElementsByXPath(self, xpath):
-    elemIds = self.conn.command("selectElementsUsingXPath", [xpath])
+    elemIds = self.conn.DriverCommand("selectElementsUsingXPath", xpath)
     elems = []
     if len(elemIds):
       for elemId in elemIds.split(","):
@@ -54,13 +54,13 @@ class WebDriver(webdriver.WebDriver):
     return elems
 
   def GetPageSource(self):
-    return self.conn.command("getPageSource")
+    return self.conn.DriverCommand("getPageSource")
   
   def Close(self):
-    self.conn.command("close")
+    self.conn.DriverCommand("close")
 
   def Quit(self):
-    self.conn.command("quit")
+    self.conn.DriverCommand("quit")
 
   def SwitchTo(self):
     return TargetLocator()

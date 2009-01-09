@@ -5,16 +5,16 @@ import exceptions
 class TargetLocator(webdriver.TargetLocator):
   
   def __init__(self):
-    self.conn = ExtensionConnection()
+    self._conn = ExtensionConnection()
  
   def Window(self, windowName):
-    resp = self.conn.command("switchToWindow", windowName)
+    resp = self._conn.DriverCommand("switchToWindow", windowName)
     if not resp or "No window found" in resp:
       raise exceptions.InvalidSwitchToTargetException("Window %s not found" % windowName)
-    self.conn.context = resp
+    self._conn.context = resp
 
   def FrameByIndex(self, index):
-    resp = self.conn.command("switchToFrame", str(index))
+    resp = self._conn.DriverCommand("switchToFrame", str(index))
 
   def FrameByName(self, frameName):
-    resp = self.conn.command("switchToFrame", frameName)
+    resp = self._conn.DriverCommand("switchToFrame", frameName)

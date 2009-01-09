@@ -3,13 +3,13 @@ import webdriver
 
 class Navigation(webdriver.Navigation):
   def __init__(self):
-    self.conn = ExtensionConnection()
+    self._conn = ExtensionConnection()
 
   def Back(self):
-    self.conn.command("goBack")
+    self._conn.DriverCommand("goBack")
 
   def Forward(self):
-    self.conn.command("goForward")
+    self._conn.DriverCommand("goForward")
 
   def To(self, url):
-    self.conn.command("get", url)
+    self._conn.DriverCommand("get", url)

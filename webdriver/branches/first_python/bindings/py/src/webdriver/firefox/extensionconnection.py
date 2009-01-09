@@ -19,10 +19,13 @@ class ExtensionConnection(object):
 
       self.socket.settimeout(20)
       self.context = "null"
-      resp = self.command("findActiveDriver",[])
+      resp = self.DriverCommand("findActiveDriver")
       self.context = resp
 
-  def command(self, cmd, params=[], elementId="null"):
+  def DriverCommand(self, cmd, *params):
+    return self.ElementCommand(cmd, "null", *params)
+  
+  def ElementCommand(self, cmd, elementId, *params):
     json_dump = simplejson.dumps({"parameters": params,
                                 "context": self.context,
                                 "elementId": elementId,
@@ -39,7 +42,6 @@ class ExtensionConnection(object):
       return
 
     resp = ""
-    
     while not resp.endswith("\n\n"):
       resp += self.socket.recv(1)
     resp_length = int(re.match("Length: (\d+)", resp).group(1))
