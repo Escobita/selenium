@@ -1,32 +1,88 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Using the Java Client Driver</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+  <meta name="generator" content=
+  "HTML Tidy (version num removed), see www.w3.org" />
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=us-ascii" />
+
+  <title>Using the Java Client Driver</title>
+  <link rel="stylesheet" href="default.css" type="text/css" />
 </head>
+
 <body>
+  <h2><a href=
+  "http://release.openqa.org/selenium-remote-control/0.9.2/doc/java/">
+  JavaDoc reference</a> is available</h2>
 
-<h2><a href="http://release.openqa.org/selenium-remote-control/0.9.2/doc/java/">JavaDoc reference</a> is available</h2>
+  <p>First, make sure you've already started the Selenium Server
+  separately in another process. The Selenium Server should remain
+  up and running throughout this process; you shouldn't need to
+  start/stop it each time you use the Client Driver. (Though, of
+  course, if you need to start and stop the server, you certainly
+  can, just by automatically starting it from the command
+  line.)</p>
 
-<p>First, make sure you've already started the Selenium Server separately in another process.  The Selenium Server should remain up and running throughout this process; you shouldn't need to start/stop it each time you use the Client Driver.  (Though, of course, if you need to start and stop the server, you certainly can, just by automatically starting it from the command line.)</p>
+  <p>Just add selenium-java-client-driver.jar to your classpath,
+  and create a new DefaultSelenium object. You'll need to give it
+  the hostname and port of the Selenium Server, the browser string
+  to use with "getNewBrowserSession", and the base URL at which
+  we'll start testing. When you're ready to begin, run the .start()
+  method on your DefaultSelenium object; when it's time to close
+  the browser, use the .stop() method.</p>
 
-<p>Just add selenium-java-client-driver.jar to your classpath, and create a new DefaultSelenium object.  You'll need to give it the hostname and port of the Selenium Server, the browser string to use with "getNewBrowserSession", and the base URL at which we'll start testing.  When you're ready to begin, run the .start() method on your DefaultSelenium object; when it's time to close the browser, use the .stop() method.</p>
+  <p>If the Selenium Remote-Control Server is already running
+  <b>you do not need selenium-server.jar in your classpath</b> .
+  The Java client driver just needs to <i>connect</i> to the
+  Selenium Server over TCP/IP; The Remote-Control server doesn't
+  need to run in the same Java Virtual Machine (JVM), or even on
+  the same physical machine. For Advanced testing, we recommend the
+  running the Selenium Server on many different machines, ideally
+  with many different operating systems and browsers; your client
+  driver can connect directly to those machines by specifying a
+  different hostname in the DefaultSelenium constructor.</p>
 
-<p>If the Selenium Remote-Control Server is already running <b>you do not need selenium-server.jar in your classpath</b> .  The Java client driver just needs to <i>connect</i> to the Selenium Server over TCP/IP; The Remote-Control server doesn't need to run in the same Java Virtual Machine (JVM), or even on the same physical machine.  For Advanced testing, we recommend the running the Selenium Server on many different machines, ideally with many different operating systems and browsers; your client driver can connect directly to those machines by specifying a different hostname in the DefaultSelenium constructor.</p>
+  <p>The DefaultSelenium object has methods for each operation you
+  would like the browser to perform. If an operation fails,
+  exceptions will be thrown. It is OK to wrap up in a try/catch
+  block if you like, though many developers use isElementPresent()
+  or the new waitFor conditions, if the application is more
+  asynchronous in terms of loading.</p>
 
-<p>The DefaultSelenium object has methods for each operation you would like the browser to perform.  If an operation fails, exceptions will be thrown.  It is OK to wrap up in a try/catch block if you like, though many developers use isElementPresent() or the new waitFor conditions, if the application is more asynchronous in terms of loading.</p>
+  <p>While we recommend that you use the Java Client Driver
+  together with a testing framework like <a href=
+  "http://www.junit.org/">JUnit</a> or <a href=
+  "http://testng.org/">TestNG</a>, a testing framework is not
+  required; you can use the Java Client Driver with any program
+  whatsoever to automate tasks in your browser.</p>
 
-<p>While we recommend that you use the Java Client Driver together with a testing framework like <a href="http://www.junit.org/">JUnit</a> or <a href="http://testng.org/">TestNG</a>, a testing framework is not required; you can use the Java Client Driver with any program whatsoever to automate tasks in your browser.</p>
+  <p>If you <i>do</i> run your tests in JUnit you may run into a
+  common issue with organizing the tests: if you start your browser
+  during setUp and then stop your browser during tearDown, you'll
+  very likely be stopping and starting your browser dozens or even
+  hundreds of times throughout the test run. Furthermore, there's
+  no easy way to configure JUnit to run the same test multiple
+  times with different configurations (aka "data-driven" testing).
+  TestNG makes these tasks very easy, so you may prefer to use
+  TestNG for that purpose.</p>
 
-<p>If you <i>do</i> run your tests in JUnit you may run into a common issue with organizing the tests: if you start your browser during setUp and then stop your browser during tearDown, you'll very likely be stopping and starting your browser dozens or even hundreds of times throughout the test run.  Furthermore, there's no easy way to configure JUnit to run the same test multiple times with different configurations (aka "data-driven" testing).  TestNG makes these tasks very easy, so you may prefer to use TestNG for that purpose.</p>
+  <p>With that said, JUnit is the the de facto standard for Java
+  automated tests. If you want to use JUnit anyway, you'll probably
+  want to look into using a <a href=
+  "http://www.cs.wm.edu/~noonan/junit/doc/faq/faq.htm#organize_3">global
+  setUp and tearDown</a>. Note that the JUnit team recommends that
+  you not use TestSetup, because JUnit is a <i>unit</i> testing
+  tool (for verifying your code in isolation) rather than an
+  integration or functional testing tool (for verifying your code's
+  compatibility with particular browsers). Think about using TestNG
+  instead.</p>
 
-<p>With that said, JUnit is the the de facto standard for Java automated tests.  If you want to use JUnit anyway, you'll probably want to look into using a <a href="http://www.cs.wm.edu/~noonan/junit/doc/faq/faq.htm#organize_3">global setUp and tearDown</a>.  Note that the JUnit team recommends that you not use TestSetup, because JUnit is a <i>unit</i> testing tool (for verifying your code in isolation) rather than an integration or functional testing tool (for verifying your code's compatibility with particular browsers).  Think about using TestNG instead.</p>
-
-<p>Example: <a href="selenium-java-example-for-newbies.zip">Self-contained Java Client example testing Google etc</a>. This also serves as a platform to report bugs from.</p>
-
+  <p>Example: <a href=
+  "selenium-java-example-for-newbies.zip">Self-contained Java
+  Client example testing Google etc</a>. This also serves as a
+  platform to report bugs from.</p>
 </body>
 </html>
-
-
