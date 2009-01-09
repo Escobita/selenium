@@ -4,7 +4,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from common import logger
 import urllib
 
-HTML_ROOT = "../../../common/src/web/"
+HTML_ROOT = os.getenv("webdriver_test_htmlroot")
 
 class MyHandler(BaseHTTPRequestHandler):
   def do_GET(self):

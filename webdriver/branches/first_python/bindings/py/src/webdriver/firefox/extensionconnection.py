@@ -5,8 +5,14 @@ import simplejson
 from common import logger
 import exceptions
 
+_SOCKET_TIMEOUT = 20
+
 class ExtensionConnection(object):
-  #Borg pattern hive mind state
+  """This class maintains a connection to the firefox extension.
+
+  It follows the Borg design patthern:
+  http://code.activestate.com/recipes/66531/
+  """
   __shared_state = {}
 
   def __init__(self):
@@ -17,7 +23,7 @@ class ExtensionConnection(object):
       self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.socket.connect(("localhost",7055))
 
-      self.socket.settimeout(20)
+      self.socket.settimeout(_SOCKET_TIMEOUT)
       self.context = "null"
       resp = self.DriverCommand("findActiveDriver")
       self.context = resp

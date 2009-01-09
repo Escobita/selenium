@@ -1,6 +1,6 @@
 import webdriver
 
-class Options(webdriver.Options):
+class Options(object):
   def addCookie(self, cookie):
     raise NotImplementedError()
 
@@ -21,4 +21,3 @@ class Options(webdriver.Options):
 
   def setMouseSpeed(self, speed):
     raise NotImplementedError()
-

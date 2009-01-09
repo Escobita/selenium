@@ -2,7 +2,7 @@ from extensionconnection import ExtensionConnection
 from common import logger
 import webdriver
 
-class WebElement(webdriver.WebElement):
+class WebElement(object):
 
   def __init__(self, parent, id):
     self.parent = parent

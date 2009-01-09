@@ -1,6 +1,3 @@
-cd bindings\py\src
-
-set PYTHONPATH=%PYTHONPATH%;.;..\lib 
-
-python webdriver/unittests/basic_tests.py
-cd ..\..\..
+set PYTHONPATH=%PYTHONPATH%;bindings\py\src;bindings\py\lib 
+set webdriver_test_htmlroot="common/src/web/"
+python bindings\py\tests\basic_tests.py

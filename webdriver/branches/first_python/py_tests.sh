@@ -1,3 +1,3 @@
-cd bindings/py/src
-export PYTHONPATH=$PYTHONPATH:.:../lib
-python webdriver/unittests/basic_tests.py
+export PYTHONPATH=$PYTHONPATH:bindings/py/src:bindings/py/lib
+export webdriver_test_htmlroot="common/src/web/"
+python bindings/py/tests/basic_tests.py

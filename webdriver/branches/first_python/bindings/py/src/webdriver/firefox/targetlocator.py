@@ -2,7 +2,7 @@ from extensionconnection import ExtensionConnection
 import webdriver
 import exceptions
 
-class TargetLocator(webdriver.TargetLocator):
+class TargetLocator(object):
   
   def __init__(self):
     self._conn = ExtensionConnection()

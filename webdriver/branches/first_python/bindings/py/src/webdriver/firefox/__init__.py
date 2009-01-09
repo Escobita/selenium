@@ -9,7 +9,7 @@ from webelement import *
 # import the base webdriver package
 import webdriver
 
-class WebDriver(webdriver.WebDriver):
+class WebDriver(object):
   def __init__(self):
     self.conn = ExtensionConnection()
 

@@ -139,7 +139,9 @@ if __name__ == "__main__":
   firefox.LaunchBrowser()
 
   try:
-    unittest.main()
+    testLoader = unittest.TestLoader()
+    testRunner = unittest.TextTestRunner()
+    testRunner.run(testLoader.loadTestsFromTestCase(BasicTest))
     driver = WebDriver()
     driver.Quit()
   finally:

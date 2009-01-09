@@ -1,7 +1,7 @@
 from extensionconnection import ExtensionConnection
 import webdriver
 
-class Navigation(webdriver.Navigation):
+class Navigation(object):
   def __init__(self):
     self._conn = ExtensionConnection()
 
