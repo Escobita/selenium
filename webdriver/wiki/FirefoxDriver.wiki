@@ -12,7 +12,7 @@ If you want to dig deeper, though, carry on reading!
 
 == Important System Properties ==
 
-The following system properties (read using {{{System.getProperty()}}}) are used by the FirefoxDriver:
+The following system properties (read using {{{System.getProperty()}}} and set using {{{System.setProperty()}}} in Java code or the "{{{-DpropertyName=value}}}" command line flag) are used by the FirefoxDriver:
 
 || *Property* || *What it means* ||
 || webdriver.firefox.bin || The location of the binary used to control firefox. ||
