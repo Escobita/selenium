@@ -1,3 +1,16 @@
+<%!private String text(Element e, String name) {
+    return e.getElementsByTagName(name).item(0).getFirstChild().getNodeValue();
+}%>
+<%@ page import="org.w3c.dom.Element" %>
+<%@ page import="org.w3c.dom.NodeList" %>
+<%@ page import="org.w3c.dom.Document" %>
+<%@ page import="javax.xml.parsers.DocumentBuilderFactory" %>
+<%@ page import="javax.xml.parsers.DocumentBuilder" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.TimeZone" %>
+<%@ page import="java.util.Date" %>
+<%@ taglib uri="http://www.opensymphony.com/oscache" prefix="oscache" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,6 +20,7 @@
   "HTML Tidy (version num removed), see www.w3.org" />
 
   <title>Selenium web application testing system</title>
+  <link rel="alternate" type="application/rss+xml" title="Selenium Blog Posts Feed" href="http://feeds.feedburner.com/Selenium" />
 </head>
 
 <body class="homepage">
@@ -116,17 +130,31 @@
 
   <h2>Selenium News</h2>
 
+  The following is the latest Selenium news posted in the <a href="http://clearspace.openqa.org/community/selenium/blog">Selenium blog</a>. Please subscribe to the <a href="http://feeds.feedburner.com/Selenium">RSS feed</a> to to keep up-to-date with all Selenium development and community activity!
+
   <ul>
-    <li>2008-09-02: We're still overhauling the Selenium website.
-    <a href="about/getting-involved.html">You can help</a>!</li>
+  <oscache:cache>
+      <%
+          // date format: Mon, 12 Jan 2009 22:06:48 GMT
+          SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+          sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+          URL url = new URL("http://feeds.feedburner.com/Selenium");
+          DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+          Document doc = db.parse(url.openStream());
+          NodeList items = doc.getElementsByTagName("item");
+          for (int i = 0; i < items.getLength(); i++) {
+              Element e = (Element) items.item(i);
+              String link = text(e, "link");
+              String title = text(e, "title");
+              String desc = text(e, "description");
+              String date = text(e, "clearspace:dateToText");
 
-    <li>2008-08-30: Selenium 1.0 is coming soon! (Yes, really!)
-    We're just finishing up a new automated build system on our new
-    build server that will help us test and ensure high-quality 1.0
-    and future releases.</li>
-
-    <li><a href="feb-08-meetup.html#">Selenium Meetup @ the
-    Googleplex - February 2008</a></li>
+      %>
+      <li>
+          <a href="<%= link %>"><%= title %></a> - <i><%= date%></i>
+      </li>
+      <%}%>
+  </oscache:cache>
   </ul>
 </body>
 </html>
