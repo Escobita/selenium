@@ -12,6 +12,7 @@ public class UrlAliasFilter implements Filter {
 
     static {
         aliasMap.put("/index.html", "/");
+        aliasMap.put("/about/news.html", "/about/news.jsp");
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {

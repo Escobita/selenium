@@ -130,31 +130,6 @@
 
   <h2>Selenium News</h2>
 
-  The following is the latest Selenium news posted in the <a href="http://clearspace.openqa.org/community/selenium/blog">Selenium blog</a>. Please subscribe to the <a href="http://feeds.feedburner.com/Selenium">RSS feed</a> to to keep up-to-date with all Selenium development and community activity!
-
-  <ul>
-  <oscache:cache>
-      <%
-          // date format: Mon, 12 Jan 2009 22:06:48 GMT
-          SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-          sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-          URL url = new URL("http://feeds.feedburner.com/Selenium");
-          DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-          Document doc = db.parse(url.openStream());
-          NodeList items = doc.getElementsByTagName("item");
-          for (int i = 0; i < items.getLength(); i++) {
-              Element e = (Element) items.item(i);
-              String link = text(e, "link");
-              String title = text(e, "title");
-              String desc = text(e, "description");
-              String date = text(e, "clearspace:dateToText");
-
-      %>
-      <li>
-          <a href="<%= link %>"><%= title %></a> - <i><%= date%></i>
-      </li>
-      <%}%>
-  </oscache:cache>
-  </ul>
+  <%@include file="/news.jspf"%>
 </body>
 </html>
