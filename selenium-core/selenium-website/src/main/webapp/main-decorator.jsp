@@ -134,7 +134,7 @@
                 languages</a> and <a href="/about/platforms.html#testing-frameworks">testing frameworks</a>.
             </li>
         </ul>
-        <div class="downloadBox"><a href="/download/">Download Selenium</a>1.0 beta</div>
+        <div class="downloadBox"><a href="/download/">Download Selenium</a>1.0 beta-2</div>
         <div class="ads">
             <script type="text/javascript"><!--
             google_ad_client = "pub-6291771388053870";
