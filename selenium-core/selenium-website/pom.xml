@@ -32,6 +32,24 @@
                     </connectors>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codelutin</groupId>
+                <artifactId>maven-jrst-plugin</artifactId>
+                <version>0.8.3</version>
+                <executions>
+                    <execution>
+                        <id>build-docs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>jrst</goal>
+                        </goals>
+                        <configuration>
+                            <directoryIn>src/main/rst</directoryIn>
+                            <directoryOut>target/selenium-website-1.0-SNAPSHOT/gendocs</directoryOut>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -73,7 +91,7 @@
             <artifactId>oscache</artifactId>
             <version>2.1.1</version>
         </dependency>
-        
+
         <dependency>
             <groupId>opensymphony</groupId>
             <artifactId>sitemesh</artifactId>
@@ -95,4 +113,12 @@
         </dependency>
 
     </dependencies>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Repo-for-jrst</id>
+            <url>http://lutinbuilder.labs.libre-entreprise.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+
 </project>
