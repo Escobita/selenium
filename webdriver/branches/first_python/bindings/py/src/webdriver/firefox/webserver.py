@@ -1,10 +1,11 @@
+import logging
 import os
 import threading
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from common import logger
 import urllib
 
 HTML_ROOT = os.getenv("webdriver_test_htmlroot")
+logger = logging.getLogger("webdriver.SimpleWebServer")
 
 class MyHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -18,7 +19,7 @@ class MyHandler(BaseHTTPRequestHandler):
       f.close()
       return
     except IOError:
-      self.send_error(404,'File Not Found: %s' % self.path)
+      self.send_response(404,'File Not Found: %s' % self.path)
 
 class SimpleWebServer(object):
   def __init__(self):

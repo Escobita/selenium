@@ -1,5 +1,4 @@
 from extensionconnection import ExtensionConnection
-from common import logger
 import webdriver
 
 class WebElement(object):

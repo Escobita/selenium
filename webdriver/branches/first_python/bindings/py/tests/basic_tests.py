@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import logging
 import re
 import time
 import sys
@@ -8,7 +9,6 @@ from webdriver.firefox import WebDriver
 from webdriver.firefox import navigation
 from webdriver.firefox.webserver import SimpleWebServer
 from webdriver.firefox.firefoxlauncher import FirefoxLauncher
-
 
 class BasicTest (unittest.TestCase):
   def setUp(self):
@@ -133,6 +133,7 @@ class BasicTest (unittest.TestCase):
     self.driver.Get("http://localhost:8000/%s.html" % name)
 
 if __name__ == "__main__":
+  logging.basicConfig(level=logging.INFO)
   webserver = SimpleWebServer()
   webserver.start()
   firefox = FirefoxLauncher()

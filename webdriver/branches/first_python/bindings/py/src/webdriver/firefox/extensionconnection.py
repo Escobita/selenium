@@ -1,11 +1,12 @@
+import logging
 import socket
 import re
 import threading
 import simplejson
-from common import logger
 import exceptions
 
 _SOCKET_TIMEOUT = 20
+logger = logging.getLogger("webdriver.ExtensionConnection")
 
 class ExtensionConnection(object):
   """This class maintains a connection to the firefox extension.
