@@ -10,7 +10,7 @@ from webelement import *
 import webdriver
 
 class WebDriver(object):
-  
+   """The main interface to use for testing, which represents an idealised web browser."""
   def __init__(self):
     self._conn = ExtensionConnection()
 
