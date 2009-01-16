@@ -57,7 +57,7 @@ class BasicTest (unittest.TestCase):
     self.driver.FindElementByLinkText("Open new window").Click()
     self.assertEquals(title_1, self.driver.GetTitle())
     try:
-      self.driver.SwitchTo().Window("result")
+      self.driver.SwitchToWindow("result")
     except:
       # This may fail because the window is not loading fast enough, so try again
       time.sleep(1)
@@ -66,16 +66,16 @@ class BasicTest (unittest.TestCase):
 
   def testSwitchToFrameByIndex(self):
     self._loadPage("frameset")
-    self.driver.SwitchTo().FrameByIndex(2)
-    self.driver.SwitchTo().FrameByIndex(0)
-    self.driver.SwitchTo().FrameByIndex(2)
+    self.driver.SwitchToFrameByIndex(2)
+    self.driver.SwitchToFrameByIndex(0)
+    self.driver.SwitchToFrameByIndex(2)
     checkbox = self.driver.FindElementById("checky")
     checkbox.Toggle()
     checkbox.Submit()
 
   def testSwitchFrameByName(self):
     self._loadPage("frameset")
-    self.driver.SwitchTo().FrameByName("third");
+    self.driver.SwitchToFrameByName("third");
     checkbox = self.driver.FindElementById("checky")
     checkbox.Toggle()
     checkbox.Submit()
@@ -103,16 +103,13 @@ class BasicTest (unittest.TestCase):
     self.assertTrue(option_elems[0].IsSelected())
     self.assertTrue(option_elems[2].IsSelected())
 
-  def testManage(self):
-    self.assertTrue(self.driver.Manage())
-
   def testNavigate(self):
     self._loadPage("formPage")
     self.driver.FindElementById("imageButton").Submit()
     self.assertEquals("We Arrive Here", self.driver.GetTitle())
-    self.driver.Navigate().Back()
+    self.driver.Back()
     self.assertEquals("We Leave From Here", self.driver.GetTitle())
-    self.driver.Navigate().Forward()
+    self.driver.Forward()
     self.assertEquals("We Arrive Here", self.driver.GetTitle())
 
   def testGetAttribute(self):
