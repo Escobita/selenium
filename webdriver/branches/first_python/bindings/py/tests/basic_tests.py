@@ -5,8 +5,7 @@ import re
 import time
 import sys
 import unittest
-from webdriver.firefox import WebDriver
-from webdriver.firefox import navigation
+from webdriver.firefox.webdriver import WebDriver
 from webdriver.firefox.webserver import SimpleWebServer
 from webdriver.firefox.firefoxlauncher import FirefoxLauncher
 
@@ -64,7 +63,7 @@ class BasicTest (unittest.TestCase):
       time.sleep(1)
       self.driver.SwitchTo().Window("result")
     self.assertEquals(title_2, self.driver.GetTitle())
-    
+
   def testSwitchToFrameByIndex(self):
     self._loadPage("frameset")
     self.driver.SwitchTo().FrameByIndex(2)
