@@ -66,16 +66,16 @@ class BasicTest (unittest.TestCase):
 
   def testSwitchToFrameByIndex(self):
     self._loadPage("frameset")
-    self.driver.SwitchToFrameByIndex(2)
-    self.driver.SwitchToFrameByIndex(0)
-    self.driver.SwitchToFrameByIndex(2)
+    self.driver.SwitchToFrame(2)
+    self.driver.SwitchToFrame(0)
+    self.driver.SwitchToFrame(2)
     checkbox = self.driver.FindElementById("checky")
     checkbox.Toggle()
     checkbox.Submit()
 
   def testSwitchFrameByName(self):
     self._loadPage("frameset")
-    self.driver.SwitchToFrameByName("third");
+    self.driver.SwitchToFrame("third");
     checkbox = self.driver.FindElementById("checky")
     checkbox.Toggle()
     checkbox.Submit()
