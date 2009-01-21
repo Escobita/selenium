@@ -90,7 +90,7 @@ public class GoogleSuggest {
         long end = System.currentTimeMillis() + 5000;
         while (System.currentTimeMillis() < end) {
             // Browsers which render content (such as Firefox and IE) return "RenderedWebElements"
-            RenderedWebElement resultsDiv = (RenderedWebElement) driver.findElement(By.className("google-ac-c"));
+            RenderedWebElement resultsDiv = (RenderedWebElement) driver.findElement(By.className("gac_m"));
 
             // If results have been returned, the results are displayed in a drop down.
             if (resultsDiv.isDisplayed()) {
@@ -99,7 +99,7 @@ public class GoogleSuggest {
         }
 
         // And now list the suggestions
-        List<WebElement> allSuggestions = driver.findElements(By.xpath("//td[@class='google-ac-c']"));
+        List<WebElement> allSuggestions = driver.findElements(By.xpath("//td[@class='gac_c']"));
         
         for (WebElement suggestion : allSuggestions) {
             System.out.println(suggestion.getText());
