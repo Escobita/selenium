@@ -30,23 +30,7 @@
 		831963FC0F295273005D1D21 /* HTTPVirtualDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 831963F30F295273005D1D21 /* HTTPVirtualDirectory.m */; };
 		831964290F295636005D1D21 /* HTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 831964270F295636005D1D21 /* HTTPConnection.m */; };
 		8319642A0F295636005D1D21 /* HTTPResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 831964280F295636005D1D21 /* HTTPResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8319643B0F2963C8005D1D21 /* HTTPResponse.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 831963B20F292DE1005D1D21 /* HTTPResponse.h */; };
-		8319643D0F2963E6005D1D21 /* HTTPConnection.m in CopyFiles */ = {isa = PBXBuildFile; fileRef = 831963B10F292DE1005D1D21 /* HTTPConnection.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		831963D70F2950A7005D1D21 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(PATCHED_CODE)";
-			dstSubfolderSpec = 0;
-			files = (
-				8319643D0F2963E6005D1D21 /* HTTPConnection.m in CopyFiles */,
-				8319643B0F2963C8005D1D21 /* HTTPResponse.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -231,7 +215,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8319631E0F284654005D1D21 /* Build configuration list for PBXNativeTarget "CocoaHTTPServer" */;
 			buildPhases = (
-				831963D70F2950A7005D1D21 /* CopyFiles */,
 				831963910F28477C005D1D21 /* ShellScript */,
 				831963170F28464E005D1D21 /* Headers */,
 				831963180F28464E005D1D21 /* Sources */,
@@ -280,7 +263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "patch -N -d ${PATCHED_CODE} -p1 <${PROJECT_DIR}/extensions/redirect_and_error.patch || true";
+			shellScript = "cp ${SRCROOT}/project/HTTPResponse.h ${SRCROOT}/project/HTTPConnection.m ${PATCHED_CODE}/\npatch -N -d ${PATCHED_CODE} -p1 <${PROJECT_DIR}/extensions/redirect_and_error.patch || true";
 		};
 /* End PBXShellScriptBuildPhase section */
 
