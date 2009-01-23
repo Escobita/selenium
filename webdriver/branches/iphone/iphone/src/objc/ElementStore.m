@@ -24,7 +24,6 @@
 #import "WebDriverResource.h"
 #import "ElementStore+FindElement.h"
 #import "Element.h"
-#import "DDNumber.h"
 
 static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
 
@@ -106,9 +105,7 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   NSString *lenStr = [[self viewController]
                       jsEval:[NSString stringWithFormat:@"%@.length",
                               container]];
-  SInt64 length = 0;
-  // Using the DDNumber extension provided by HTTPServer
-  [NSNumber parseString:lenStr intoSInt64:&length];
+  int length = [lenStr intValue];
   
   NSMutableArray *result = [NSMutableArray arrayWithCapacity:length];
   for (int i = 0; i < length; i++) {
