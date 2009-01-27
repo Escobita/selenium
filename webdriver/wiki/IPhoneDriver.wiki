@@ -1,0 +1,43 @@
+#summary Information about the iPhone Driver
+#labels Phase-Deploy
+
+= iPhone Driver =
+
+_This driver is currently experimental and not yet in the main repository. Please be patient_
+
+The iphone driver allows testing on mobile safari on the iphone. It works through the use of an iphone application running on your iphone, ipod touch or iphone simulator.
+
+== Drawbacks ==
+
+* The iphone driver does not currently support forms, input elements or cookie management.
+* You must start the iphone application manually
+* To test on a device you need the iphone SDK and a provisioning profile
+* There is a known memory leak
+
+= Installing =
+
+The iphone driver application is not currently on the Apple store. To run it, you will need the iphone development tools on your local machine. These tools must be downloaded from [http://developer.apple.com/iphone apple]. To run it on your device, you will also need a provisioning profile.
+
+The iphone driver connects through HTTP to the iphone, ipod or iphone simulator. You can run the simulator on another machine on your network and configure webdriver to connect to it remotely.
+
+== In the simulator ==
+
+First, install the iphone SDK from here: http://developer.apple.com/iphone
+
+Download the source from [http://code.google.com/p/webdriver/source/checkout here] and open webdriver/iphone/iWebDriver.xcodeproj in xcode.
+
+Set your build configuration to Simulator / iPhone OS 2.2 / iWebDriver. This is done in a drop-down box in the top left of the project window.
+
+Click Build & Go. After compiling, the iphone simulator should appear and the iWebDriver app will be installed in it.
+
+== On the device == 
+
+For now, you will need the full set of development tools from apple to install on your device.
+
+Install the iphone SDK and configure your build environment as described above. You will also need a provisioning profile from Apple to be installed and configured for your device.
+
+Download and open the iWebdriver project as above. Open Info.plist and edit the Bundle Identifier to `com.NAME.${PRODUCT_NAME:identifier}` where NAME is the name you registered your provisioning profile to be an authority on.
+
+Make sure your device is connected to your computer. Your device must also be routable from your computer. The easiest way to do this is to configure a wifi network and connect your device to it.
+
+Set your build configuration to Device / iPhone OS 2.2 / iWebDriver and click Build & Go.
