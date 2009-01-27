@@ -13,7 +13,7 @@
 		831963B70F292DE1005D1D21 /* DDRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 831963A50F292DE1005D1D21 /* DDRange.m */; };
 		831963B80F292DE1005D1D21 /* DDData.h in Headers */ = {isa = PBXBuildFile; fileRef = 831963A60F292DE1005D1D21 /* DDData.h */; };
 		831963B90F292DE1005D1D21 /* DDData.m in Sources */ = {isa = PBXBuildFile; fileRef = 831963A70F292DE1005D1D21 /* DDData.m */; };
-		831963BA0F292DE1005D1D21 /* AsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 831963A90F292DE1005D1D21 /* AsyncSocket.h */; };
+		831963BA0F292DE1005D1D21 /* AsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 831963A90F292DE1005D1D21 /* AsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		831963BB0F292DE1005D1D21 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 831963AA0F292DE1005D1D21 /* AsyncSocket.m */; };
 		831963BC0F292DE1005D1D21 /* HTTPAuthenticationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 831963AC0F292DE1005D1D21 /* HTTPAuthenticationRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		831963BD0F292DE1005D1D21 /* HTTPAuthenticationRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 831963AD0F292DE1005D1D21 /* HTTPAuthenticationRequest.m */; };

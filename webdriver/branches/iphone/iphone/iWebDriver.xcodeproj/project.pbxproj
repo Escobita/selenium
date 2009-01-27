@@ -64,6 +64,16 @@
 		83998A880EE77F370074D106 /* WebDriverHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 839986BD0EE3AB990074D106 /* WebDriverHTTPConnection.m */; };
 		83998A890EE77F380074D106 /* HTTPServerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 839986A20EE3AA5E0074D106 /* HTTPServerController.m */; };
 		83998A8B0EE77F440074D106 /* RESTServiceMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 839988680EE535750074D106 /* RESTServiceMapping.m */; };
+		839D642A0F2EB3FC009645BF /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 831964970F296888005D1D21 /* libjson.a */; };
+		839D642B0F2EB400009645BF /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8319647B0F29686E005D1D21 /* libCocoaHTTPServer.a */; };
+		839D64580F2EB4A7009645BF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765580DF743DE002DB57D /* CoreGraphics.framework */; };
+		839D645A0F2EB4BB009645BF /* HTTPJSONResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E5B30F0EFF6749004AA772 /* HTTPJSONResponse.m */; };
+		839D645B0F2EB4BC009645BF /* JSONRESTResource.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E5B3110EFF6749004AA772 /* JSONRESTResource.m */; };
+		839D645C0F2EB4C0009645BF /* Attribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 839049340F1ACEFD001A79B6 /* Attribute.m */; };
+		839D645D0F2EB4C3009645BF /* NSException+WebDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 8331047F0F1EB2F7000A38DB /* NSException+WebDriver.m */; };
+		839D645E0F2EB4CB009645BF /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8399865C0EE3A5000074D106 /* WebViewController.m */; };
+		839D645F0F2EB4CC009645BF /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 289233A90DB2D0DB0083E9F9 /* MainViewController.m */; };
+		839D64600F2EB4D0009645BF /* UIResponder+SimulateTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 831962710F27E79F005D1D21 /* UIResponder+SimulateTouch.m */; };
 		83B927D30EE354060011DCC4 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B927D20EE354060011DCC4 /* CFNetwork.framework */; };
 		83E5B3830EFF6DB7004AA772 /* HTTPJSONResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E5B30F0EFF6749004AA772 /* HTTPJSONResponse.m */; };
 		83E5B3840EFF6DB7004AA772 /* JSONRESTResource.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E5B3110EFF6749004AA772 /* JSONRESTResource.m */; };
@@ -233,6 +243,9 @@
 			files = (
 				83998A1C0EE763490074D106 /* CFNetwork.framework in Frameworks */,
 				83998A1D0EE763490074D106 /* Foundation.framework in Frameworks */,
+				839D642A0F2EB3FC009645BF /* libjson.a in Frameworks */,
+				839D642B0F2EB400009645BF /* libCocoaHTTPServer.a in Frameworks */,
+				839D64580F2EB4A7009645BF /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,6 +692,13 @@
 				838B33790F142CE800F72BC4 /* Element.m in Sources */,
 				838B33A10F14391A00F72BC4 /* WebViewController+FindElement.m in Sources */,
 				838B349E0F14630E00F72BC4 /* Element+FindElement.m in Sources */,
+				839D645A0F2EB4BB009645BF /* HTTPJSONResponse.m in Sources */,
+				839D645B0F2EB4BC009645BF /* JSONRESTResource.m in Sources */,
+				839D645C0F2EB4C0009645BF /* Attribute.m in Sources */,
+				839D645D0F2EB4C3009645BF /* NSException+WebDriver.m in Sources */,
+				839D645E0F2EB4CB009645BF /* WebViewController.m in Sources */,
+				839D645F0F2EB4CC009645BF /* MainViewController.m in Sources */,
+				839D64600F2EB4D0009645BF /* UIResponder+SimulateTouch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -773,6 +793,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				HEADER_SEARCH_PATHS = (
+					"$(COCOAHTTPSERVER_HEADERS)/**",
+					"$(JSON_HEADERS)/**",
+				);
 				INFOPLIST_FILE = "Tests-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -801,6 +825,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				HEADER_SEARCH_PATHS = (
+					"$(COCOAHTTPSERVER_HEADERS)/**",
+					"$(JSON_HEADERS)/**",
+				);
 				INFOPLIST_FILE = "Tests-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -829,7 +857,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/usr/local/include";
+				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)/usr/local/include";
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = iphoneos2.2;
@@ -845,7 +873,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/usr/local/include";
+				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)/usr/local/include";
 				PREBINDING = NO;
 				SDKROOT = iphoneos2.2;
 			};

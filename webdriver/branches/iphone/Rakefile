@@ -45,7 +45,7 @@ task :prebuild do
   end
 end
 
-task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :support, :remote, :selenium]
+task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :iphone, :support, :remote, :selenium]
 
 task :clean do
   rm_rf 'common/build'
@@ -59,7 +59,7 @@ task :clean do
   rm_rf 'build/'
 end
 
-task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_support, :test_remote] do
+task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_iphone, :test_support, :test_remote] do
 end
 
 task :install_firefox => [:firefox] do
@@ -197,6 +197,22 @@ simple_jars = {
     'jar'       => "safari/build/webdriver-safari-test.jar",
     'resources' => nil,
     'classpath' => ["safari/lib/**/*.jar", "safari/build/webdriver-safari.jar"] + common_test_libs,
+    'test_on'   => mac?,
+  },
+  "iphone" =>   {
+    'src'       => "iphone/src/java/**/*.java",
+    'deps'      => [:common, :remote],
+    'jar'       => "iphone/build/webdriver-iphone.jar",
+    'resources' => nil,
+    'classpath' => ["remote/build/webdriver-remote-client.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'test_on'   => false,
+  },
+  "test_iphone" => {
+    'src'       => "iphone/test/java/**/*.java",
+    'deps'      => [:iphone, :test_common],
+    'jar'       => "iphone/build/webdriver-iphone-test.jar",
+    'resources' => nil,
+    'classpath' => ["iphone/build/webdriver-iphone.jar"] + common_test_libs,
     'test_on'   => mac?,
   },
   "support" =>   {
