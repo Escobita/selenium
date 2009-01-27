@@ -9,10 +9,10 @@ The iphone driver allows testing on mobile safari on the iphone. It works throug
 
 == Drawbacks ==
 
-* The iphone driver does not currently support forms, input elements or cookie management.
-* You must start the iphone application manually
-* To test on a device you need the iphone SDK and a provisioning profile
-* There is a known memory leak
+ * The iphone driver does not currently support forms, input elements or cookie management.
+ * You must start the iphone application manually
+ * To test on a device you need the iphone SDK and a provisioning profile
+ * There is a known memory leak
 
 = Installing =
 
