@@ -858,7 +858,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)/usr/local/include";
+				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/usr/local/include";
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = iphoneos2.2;
@@ -874,7 +874,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)/usr/local/include";
+				JSON_HEADERS = "$(PROJECT_DIR)/lib/buildtime-src/json-framework/project/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/usr/local/include";
 				PREBINDING = NO;
 				SDKROOT = iphoneos2.2;
 			};
