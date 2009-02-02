@@ -19,7 +19,7 @@
 #import "WebViewController.h"
 #import "HTTPServerController.h"
 #import "UIResponder+SimulateTouch.h"
-
+#import <objc/runtime.h>
 @implementation WebViewController
 
 @dynamic webView;
@@ -33,6 +33,7 @@
 //	[[self webView] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
   NSLog(@"WebViewController viewDidLoad");
   [[HTTPServerController sharedInstance] setViewController:self];
+  [self describeLastAction:[[HTTPServerController sharedInstance] status]];
   loadLock_ = [[NSCondition alloc] init];
   lastJSResult_ = nil;
 }

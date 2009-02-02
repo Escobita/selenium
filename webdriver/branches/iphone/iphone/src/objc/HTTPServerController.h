@@ -28,15 +28,16 @@
   HTTPServer *server_;
 	
   WebViewController *viewController_;
-	
-  IBOutlet UILabel *statusLabel_;
+
+  // The current status of the server for users.
+  NSString *status_;
 	
   RESTServiceMapping *serviceMapping_;
 }
 
-@property (retain, nonatomic) UILabel *statusLabel;
 @property (retain, nonatomic) WebViewController *viewController;
 @property (readonly, nonatomic) RESTServiceMapping *serviceMapping;
+@property (readonly, nonatomic, copy) NSString *status;
 
 +(HTTPServerController *)sharedInstance;
 

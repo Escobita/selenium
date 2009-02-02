@@ -32,31 +32,20 @@ static MainViewController *singleton_;
     }
     return self;
 }
-/*
--(UIWebView*) webView
-{
-	return (UIWebView*)[self view];
-}*/
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
   [super viewDidLoad];
-  [statusLabel_ setText:@"Reticulating Splines"];
-  [[HTTPServerController sharedInstance] setStatusLabel:statusLabel_];
+  
   singleton_ = self;
-//	textField.clearsOnBeginEditing = NO;
-//	textField.delegate = self;
-//	textField.autocorrectionType = UITextAutocorrectionTypeNo;
 }
 
-
-/*
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+  return YES;
 }
-*/
+
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview

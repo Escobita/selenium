@@ -728,7 +728,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Joseph Gentle";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -751,7 +750,6 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = iWebDriver;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "E4A988D9-000C-45B7-BC04-E3E84C9E3B9A";
 			};
 			name = Debug;
 		};
@@ -759,7 +757,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Joseph Gentle";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -780,7 +777,6 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = iWebDriver;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "E4A988D9-000C-45B7-BC04-E3E84C9E3B9A";
 			};
 			name = Release;
 		};

@@ -20,43 +20,53 @@
 #import "WebDriverHTTPServer.h"
 #import "WebDriverHTTPConnection.h"
 #import "RESTServiceMapping.h"
+
+#import <sys/types.h>
 #import <sys/socket.h>
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 
 @implementation HTTPServerController
 
-@synthesize statusLabel=statusLabel_;
-@synthesize viewController=viewController_;
-@synthesize serviceMapping=serviceMapping_;
+@synthesize status = status_;
+@synthesize viewController = viewController_;
+@synthesize serviceMapping = serviceMapping_;
 
 -(NSString *)getAddress {
   
-  CFHostRef host = CFHostCreateWithName(NULL, CFSTR("localhost"));
+  struct ifaddrs *head;
+  if (getifaddrs(&head))
+    return @"unknown";
   
-  CFStreamError error;
-  if (!CFHostStartInfoResolution(host, kCFHostAddresses, &error)) {
-    NSLog(@"error: %d", error.error);
-    CFRelease(host);
-    return nil;
-  }
+  // Default to return localhost.
+  NSString *address = @"127.0.0.1";
   
-  Boolean hasBeenResolved;
-  NSArray *addresses = (NSArray *)CFHostGetAddressing(host, &hasBeenResolved);
-  NSLog(@"%d addresses", [addresses count]);
-  for (NSData *data in addresses) {
-    struct sockaddr sock;
-//    struct in_addr asdf;
-    [data getBytes:&sock];
-    for (int i = 0; i < 14; i++) {
-      NSLog(@"%d", sock.sa_data[i]);
-    }
-//    NSLog(@"%d %d %d %d  %d %d %d %d", sock.sa_data[0], sock.sa_data[1], sock.sa_data[2], sock.sa_data[3]);
-  }
-  
-//  if (hasBeenResolved
+  // |head| contains the first element in a linked list of interface addresses.
+  // Iterate through the list.
+  for (struct ifaddrs *ifaddr = head;
+       ifaddr != NULL;
+       ifaddr = ifaddr->ifa_next) {
+    
+    struct sockaddr *sock = ifaddr->ifa_addr;
 
-//  CFRelease(host);
+    NSString *interfaceName = [NSString stringWithCString:ifaddr->ifa_name];
+
+    // Ignore localhost.
+    if ([interfaceName isEqualToString:@"lo0"])
+      continue;
   
-  return @"unknown";
+    // Ignore IPv6 for now.
+    if (sock->sa_family == AF_INET) {
+      struct in_addr inaddr = ((struct sockaddr_in *)sock)->sin_addr;
+      char *name = inet_ntoa(inaddr);
+      address = [NSString stringWithCString:name];
+      break;
+    }
+  }
+  
+  freeifaddrs(head);
+  
+  return address;
 }
 
 -(id) init {
@@ -78,14 +88,12 @@
   }
 
   NSLog(@"HTTP server started on addr %@ port %d",
-        @"unknown",
-//        [self getAddress],
+        [self getAddress],
         [server_ port]);
   
-  if (statusLabel_) {
-    [statusLabel_ setText:[NSString stringWithFormat:@"Started on port %d",
-                           [server_ port]]];
-  }
+  status_ = [[NSString alloc] initWithFormat:@"Started at http://%@:%d/hub/",
+             [self getAddress],
+             [server_ port]];
 
   serviceMapping_ = [[RESTServiceMapping alloc] init];
 
