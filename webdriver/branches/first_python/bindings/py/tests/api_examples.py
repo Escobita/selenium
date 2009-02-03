@@ -9,7 +9,7 @@ from webdriver.firefox.webdriver import WebDriver
 from webdriver.firefox.webserver import SimpleWebServer
 from webdriver.firefox.firefoxlauncher import FirefoxLauncher
 
-class BasicTest (unittest.TestCase):
+class ApiExampleTest (unittest.TestCase):
   def setUp(self):
     self.driver = WebDriver()
 
@@ -61,7 +61,7 @@ class BasicTest (unittest.TestCase):
     except:
       # This may fail because the window is not loading fast enough, so try again
       time.sleep(1)
-      self.driver.SwitchTo().Window("result")
+      self.driver.SwitchToWindow("result")
     self.assertEquals(title_2, self.driver.GetTitle())
 
   def testSwitchToFrameByIndex(self):
@@ -138,7 +138,7 @@ if __name__ == "__main__":
   try:
     testLoader = unittest.TestLoader()
     testRunner = unittest.TextTestRunner()
-    testRunner.run(testLoader.loadTestsFromTestCase(BasicTest))
+    testRunner.run(testLoader.loadTestsFromTestCase(ApiExampleTest))
     driver = WebDriver()
     driver.Quit()
   finally:

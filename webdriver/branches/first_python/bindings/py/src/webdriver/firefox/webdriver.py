@@ -1,16 +1,10 @@
 import re
 import sys
 
-from navigation import *
-from options import *
-from targetlocator import *
 from webelement import *
 
-# import the base webdriver package
-import webdriver
-
 class WebDriver(object):
-   """The main interface to use for testing, which represents an idealised web browser."""
+  """The main interface to use for testing, which represents an idealised web browser."""
   def __init__(self):
     self._conn = ExtensionConnection()
 
