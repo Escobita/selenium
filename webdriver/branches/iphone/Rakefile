@@ -45,8 +45,10 @@ task :prebuild do
   end
 end
 
-def macWithXCode?
-  mac? && present?('xcodebuild')
+def iPhoneSDKPresent?
+  return false unless mac? && present?('xcodebuild')
+  sdks = `xcodebuild -showsdks`
+  !!(sdks =~ /simulator2.2/)
 end
 
 task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :iphone, :support, :remote, :selenium]
@@ -316,8 +318,8 @@ task :test_iphone => [:test_iphone_server, :test_iphone_client]
 
 #### iPhone ####
 task :iphone_server => FileList['iphone/src/objc/**'] do
-  if macWithXCode? then
-    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target iWebDriver"
+  if iPhoneSDKPresent? then
+    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target iWebDriver", :verbose => false
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -325,7 +327,7 @@ end
 
 # This does not depend on :iphone_server because the dependancy is specified in xcode
 task :test_iphone_server do
-  if macWithXCode? then
+  if iPhoneSDKPresent? then
     sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target Tests"
   else
     puts "XCode not found. Not testing the iphone driver."
