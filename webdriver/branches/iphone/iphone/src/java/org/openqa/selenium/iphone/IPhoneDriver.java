@@ -26,8 +26,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 /**
  * IPhoneDriver is a driver for running tests on Mobile Safari on the iPhone / iPod Touch.
  * 
- * The driver uses WebDriver's remote REST interface to communicate to the iphone. The iphone
- * (or iphone simulator) must run the iWebDriver app.
+ * The driver uses WebDriver's remote REST interface to communicate with the
+ * iphone. The iphone (or iphone simulator) must run the iWebDriver app.
  */
 public class IPhoneDriver extends RemoteWebDriver {
 
@@ -40,8 +40,8 @@ public class IPhoneDriver extends RemoteWebDriver {
   }
 
   public IPhoneDriver(URL remoteAddress, Capabilities desiredCapabilities)
-  	throws Exception {
-	super(remoteAddress, desiredCapabilities);
+  	    throws Exception {
+    super(remoteAddress, desiredCapabilities);
   }
 
 }
