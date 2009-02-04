@@ -10,136 +10,136 @@ from webdriver.firefox.webserver import SimpleWebServer
 from webdriver.firefox.firefoxlauncher import FirefoxLauncher
 
 class ApiExampleTest (unittest.TestCase):
-  def setUp(self):
-    self.driver = WebDriver()
+    def setUp(self):
+	self.driver = WebDriver()
 
-  def tearDown(self):
-    pass
+    def tearDown(self):
+	pass
 
-  def testGetTitle(self):
-    self._loadSimplePage()
-    title = self.driver.GetTitle()
-    self.assertEquals("Hello WebDriver", title)
+    def testGetTitle(self):
+	self._loadSimplePage()
+	title = self.driver.get_title()
+	self.assertEquals("Hello WebDriver", title)
 
-  def testGetCurrentUrl(self):
-    self._loadSimplePage()
-    url = self.driver.GetCurrentUrl()
-    self.assertEquals("http://localhost:8000/simpleTest.html", url)
+    def testGetCurrentUrl(self):
+	self._loadSimplePage()
+	url = self.driver.get_current_url()
+	self.assertEquals("http://localhost:8000/simpleTest.html", url)
 
-  def testFindElementsByXPath(self):
-    self._loadSimplePage()
-    elem = self.driver.FindElementByXPath("//h1")
-    self.assertEquals("Heading", elem.GetText())
+    def testFindElementsByXPath(self):
+	self._loadSimplePage()
+	elem = self.driver.find_element_by_xpath("//h1")
+	self.assertEquals("Heading", elem.get_text())
 
-  def testFindElementsByXpath(self):
-    self._loadPage("xhtmlTest")
-    elems = self.driver.FindElementsByXPath("//option")
-    self.assertEquals(4, len(elems))
-    self.assertEquals("saab", elems[1].GetAttribute("value"))
+    def testFindElementsByXpath(self):
+	self._loadPage("xhtmlTest")
+	elems = self.driver.find_elements_by_xpath("//option")
+	self.assertEquals(4, len(elems))
+	self.assertEquals("saab", elems[1].get_attribute("value"))
 
-  def testFindElementsByName(self):
-    self._loadPage("xhtmlTest")
-    elem = self.driver.FindElementByName("x")
-    self.assertEquals("Named element", elem.GetText())
+    def testFindElementsByName(self):
+	self._loadPage("xhtmlTest")
+	elem = self.driver.find_element_by_name("x")
+	self.assertEquals("Named element", elem.get_text())
 
-  def testShouldBeAbleToEnterDataIntoFormFields(self):
-    self._loadPage("xhtmlTest")
-    elem = self.driver.FindElementByXPath("//form[@name='someForm']/input[@id='username']")
-    elem.Clear()
-    elem.SendKeys("some text")
-    elem = self.driver.FindElementByXPath("//form[@name='someForm']/input[@id='username']")
-    self.assertEquals("some text", elem.GetValue())
+    def testShouldBeAbleToEnterDataIntoFormFields(self):
+	self._loadPage("xhtmlTest")
+	elem = self.driver.find_element_by_xpath("//form[@name='someForm']/input[@id='username']")
+	elem.clear()
+	elem.send_keys("some text")
+	elem = self.driver.find_element_by_xpath("//form[@name='someForm']/input[@id='username']")
+	self.assertEquals("some text", elem.get_value())
 
-  def testSwitchToWindow(self):
-    title_1 = "XHTML Test Page"
-    title_2 = "We Arrive Here"
-    self._loadPage("xhtmlTest")
-    self.driver.FindElementByLinkText("Open new window").Click()
-    self.assertEquals(title_1, self.driver.GetTitle())
-    try:
-      self.driver.SwitchToWindow("result")
-    except:
-      # This may fail because the window is not loading fast enough, so try again
-      time.sleep(1)
-      self.driver.SwitchToWindow("result")
-    self.assertEquals(title_2, self.driver.GetTitle())
+    def testSwitchToWindow(self):
+	title_1 = "XHTML Test Page"
+	title_2 = "We Arrive Here"
+	self._loadPage("xhtmlTest")
+	self.driver.find_element_by_link_text("Open new window").click()
+	self.assertEquals(title_1, self.driver.get_title())
+	try:
+	    self.driver.SwitchToWindow("result")
+	except:
+	  # This may fail because the window is not loading fast enough, so try again
+	  time.sleep(1)
+	  self.driver.switch_to_window("result")
+	self.assertEquals(title_2, self.driver.get_title())
 
-  def testSwitchToFrameByIndex(self):
-    self._loadPage("frameset")
-    self.driver.SwitchToFrame(2)
-    self.driver.SwitchToFrame(0)
-    self.driver.SwitchToFrame(2)
-    checkbox = self.driver.FindElementById("checky")
-    checkbox.Toggle()
-    checkbox.Submit()
+    def testSwitchToFrameByIndex(self):
+	self._loadPage("frameset")
+	self.driver.switch_to_frame(2)
+	self.driver.switch_to_frame(0)
+	self.driver.switch_to_frame(2)
+	checkbox = self.driver.find_element_by_id("checky")
+	checkbox.toggle()
+	checkbox.submit()
+  
+    def testSwitchFrameByName(self):
+        self._loadPage("frameset")
+        self.driver.switch_to_frame("third");
+        checkbox = self.driver.find_element_by_id("checky")
+        checkbox.toggle()
+        checkbox.submit()
 
-  def testSwitchFrameByName(self):
-    self._loadPage("frameset")
-    self.driver.SwitchToFrame("third");
-    checkbox = self.driver.FindElementById("checky")
-    checkbox.Toggle()
-    checkbox.Submit()
+    def testGetPageSource(self):
+        self._loadSimplePage()
+        source = self.driver.get_page_source()
+        self.assertTrue(len(re.findall(r'<html>.*</html>', source, re.DOTALL)) > 0)
 
-  def testGetPageSource(self):
-    self._loadSimplePage()
-    source = self.driver.GetPageSource()
-    self.assertTrue(len(re.findall(r'<html>.*</html>', source, re.DOTALL)) > 0)
+    def testIsEnabled(self):
+        self._loadPage("formPage")
+        elem = self.driver.find_element_by_xpath("//input[@id='working']")
+        self.assertTrue(elem.is_enabled())
+        elem = self.driver.find_element_by_xpath("//input[@id='notWorking']")
+        self.assertFalse(elem.is_enabled())
 
-  def testIsEnabled(self):
-    self._loadPage("formPage")
-    elem = self.driver.FindElementByXPath("//input[@id='working']")
-    self.assertTrue(elem.IsEnabled())
-    elem = self.driver.FindElementByXPath("//input[@id='notWorking']")
-    self.assertFalse(elem.IsEnabled())
+    def testIsSelectedAndToggle(self):
+        self._loadPage("formPage")
+        elem = self.driver.find_element_by_id("multi")
+        option_elems = elem.find_elements_by_xpath("option")
+        self.assertTrue(option_elems[0].is_selected())
+        option_elems[0].toggle()
+        self.assertFalse(option_elems[0].is_selected())
+        option_elems[0].toggle()
+        self.assertTrue(option_elems[0].is_selected())
+        self.assertTrue(option_elems[2].is_selected())
 
-  def testIsSelectedAndToggle(self):
-    self._loadPage("formPage")
-    elem = self.driver.FindElementById("multi")
-    option_elems = elem.FindElementsByXPath("option")
-    self.assertTrue(option_elems[0].IsSelected())
-    option_elems[0].Toggle()
-    self.assertFalse(option_elems[0].IsSelected())
-    option_elems[0].Toggle()
-    self.assertTrue(option_elems[0].IsSelected())
-    self.assertTrue(option_elems[2].IsSelected())
+    def testNavigate(self):
+        self._loadPage("formPage")
+        self.driver.find_element_by_id("imageButton").submit()
+        self.assertEquals("We Arrive Here", self.driver.get_title())
+        self.driver.back()
+        self.assertEquals("We Leave From Here", self.driver.get_title())
+        self.driver.forward()
+        self.assertEquals("We Arrive Here", self.driver.get_title())
 
-  def testNavigate(self):
-    self._loadPage("formPage")
-    self.driver.FindElementById("imageButton").Submit()
-    self.assertEquals("We Arrive Here", self.driver.GetTitle())
-    self.driver.Back()
-    self.assertEquals("We Leave From Here", self.driver.GetTitle())
-    self.driver.Forward()
-    self.assertEquals("We Arrive Here", self.driver.GetTitle())
+    def testGetAttribute(self):
+        self._loadPage("xhtmlTest")
+        elem = self.driver.find_element_by_id("select_volvo")
+        self.assertEquals("xx", elem.get_attribute("tag"))
 
-  def testGetAttribute(self):
-    self._loadPage("xhtmlTest")
-    elem = self.driver.FindElementById("select_volvo")
-    self.assertEquals("xx", elem.GetAttribute("tag"))
+    def testGetImplicitAttribute(self):
+        self._loadPage("xhtmlTest")
+        elem = self.driver.find_element_by_id("select_saab")
+        self.assertEquals(1, elem.get_attribute("index"))
 
-  def testGetImplicitAttribute(self):
-    self._loadPage("xhtmlTest")
-    elem = self.driver.FindElementById("select_saab")
-    self.assertEquals(1, elem.GetAttribute("index"))
+    def _loadSimplePage(self):
+        self.driver.get("http://localhost:8000/simpleTest.html")
 
-  def _loadSimplePage(self):
-    self.driver.Get("http://localhost:8000/simpleTest.html")
-
-  def _loadPage(self, name):
-    self.driver.Get("http://localhost:8000/%s.html" % name)
+    def _loadPage(self, name):
+        self.driver.get("http://localhost:8000/%s.html" % name)
 
 if __name__ == "__main__":
-  logging.basicConfig(level=logging.INFO)
-  webserver = SimpleWebServer()
-  webserver.start()
-  firefox = FirefoxLauncher()
-  firefox.LaunchBrowser()
-
-  try:
-    testLoader = unittest.TestLoader()
-    testRunner = unittest.TextTestRunner()
-    testRunner.run(testLoader.loadTestsFromTestCase(ApiExampleTest))
-    driver = WebDriver()
-    driver.Quit()
-  finally:
-    webserver.stop()
+    logging.basicConfig(level=logging.INFO)
+    webserver = SimpleWebServer()
+    webserver.start()
+    firefox = FirefoxLauncher()
+    firefox.LaunchBrowser()
+  
+    try:
+        testLoader = unittest.TestLoader()
+        testRunner = unittest.TextTestRunner()
+        testRunner.run(testLoader.loadTestsFromTestCase(ApiExampleTest))
+        driver = WebDriver()
+        driver.quit()
+    finally:
+        webserver.stop()
