@@ -28,24 +28,25 @@
 
 @implementation RESTServiceMapping
 
-//static NSString *urlBase = @"/hub";
-
 - (id)init {
   if (![super init])
     return nil;
-  
+
   serverRoot_ = [[HTTPVirtualDirectory alloc] init];
 
-  // This is to make up for a bug in the java http client
+  // This makes up for a bug in the java http client (r733). We forward
+  // requests for /session to /hub/session.
   [serverRoot_ setResource:[HTTPStaticResource redirectWithURL:@"/hub/session/"]
                   withName:@"session"];
-  
+
+  // The root of our REST service.
   HTTPVirtualDirectory *restRoot = [[[HTTPVirtualDirectory alloc] init] autorelease];
   [serverRoot_ setResource:restRoot withName:@"hub"];
   
   HTTPDataResponse *response =
     [[HTTPDataResponse alloc]
-                 initWithData:[@"<html><body><h1>hi</h1></body></html>"
+                 initWithData:[@"<html><body><h1>iWebDriver ready.</h1></body>"
+                               "</html>"
             dataUsingEncoding:NSASCIIStringEncoding]];
   
   [restRoot setIndex:[HTTPStaticResource resourceWithResponse:response]];
@@ -54,49 +55,67 @@
   [restRoot setResource:[[[Session alloc] init] autorelease]
                withName:@"session"];
   
-//  [session setIndex:[HTTPResourceResponseWrapper redirectWithURL:@"123/foo"]];
-  
-//  [restRoot setResource:[JSONRESTServiceHandler JSONResourceWithTarget:self action:@selector(createSession:method:)] withName:@"session"];
-
   return self;
 }
 
-- (NSObject<HTTPResponse> *)httpResponseForRequest:(CFHTTPMessageRef)request {
-
-//  NSLog(@"RESTServiceMapping responseForRequest");
-
-  NSString *method = [(NSString *)CFHTTPMessageCopyRequestMethod(request)
-                      autorelease];
+// Extract message properties from an http request and return them.
+// Pass nil in the |query|, |method| or |data| arguments to ignore.
++ (void)propertiesOfHTTPMessage:(CFHTTPMessageRef)request
+                        toQuery:(NSString **)query
+                         method:(NSString **)method
+                           data:(NSData **)data {
+  // Extract method
+  if (method != nil) {
+    *method = [(NSString *)CFHTTPMessageCopyRequestMethod(request)
+                        autorelease];
+  }
   
   // Extract requested URI
-  NSURL *uri = [(NSURL *)CFHTTPMessageCopyRequestURL(request) autorelease];
-  NSString *path = [uri relativeString]; // TODO: Do I want absoluteString here?
+  if (query != nil) {
+    NSURL *uri = [(NSURL *)CFHTTPMessageCopyRequestURL(request) autorelease];
+    *query = [uri relativeString];
+  }
   
-  NSData *data = [(NSData*)CFHTTPMessageCopyBody(request) autorelease];
+  // Extract POST data
+  if (data != nil) {
+    *data = [(NSData*)CFHTTPMessageCopyBody(request) autorelease];
+  }
+}
+
+// Send the request to the right HTTPResource and return its response.
+- (NSObject<HTTPResponse> *)httpResponseForRequest:(CFHTTPMessageRef)request {
+
+  NSString *query;
+  NSString *method;
+  NSData *data;
   
-  NSLog(@"Responding to request: %@ %@", method, uri);
+  [RESTServiceMapping propertiesOfHTTPMessage:request
+                                      toQuery:&query
+                                       method:&method
+                                         data:&data];
   
-  if (data)
-  {
+  NSLog(@"Responding to request: %@ %@", method, query);
+  if (data) {
     NSLog(@"data: '%@'", [[[NSString alloc] initWithData:data
                                                 encoding:NSUTF8StringEncoding]
                             autorelease]);
   }
   
+  // Do the actual work.
   id<HTTPResponse,NSObject> response =
-    [serverRoot_ httpResponseForQuery:path
+    [serverRoot_ httpResponseForQuery:query
                                method:method
                              withData:data];
 
-  // Unfortunately, webdriver only supports absolute redirects. Hack hack hack.
+  // Unfortunately, WebDriver only supports absolute redirects (r733). We need
+  // to expand all relative redirects to absolute redirects.
   if ([response isKindOfClass:[HTTPRedirectResponse class]]) {
+    NSURL *uri = [(NSURL *)CFHTTPMessageCopyRequestURL(request) autorelease];
     [(HTTPRedirectResponse *)response expandRelativeUrlWithBase:uri];
   }
   
   if (response == nil) {
-    NSLog(@"404 - could not create response for request at %@", uri);
-  } else {
-//    NSLog(@"Responding with '%@'", [response description]);
+    NSLog(@"404 - could not create response for request at %@", query);
   }
   
   return response;

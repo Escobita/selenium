@@ -50,9 +50,16 @@
 - (void)setURL:(NSString *)urlString;
 - (void)back;
 - (void)forward;
-- (NSString *)jsEval:(NSString *)script, ...;
+
+// Evaluate a javascript string and return the result.
+// Arguments can be passed in in NSFormatter (printf) style.
+//
+// Variables declared with var are kept between script calls. However, they are
+// lost when the page reloads. Check before using any variables which were
+// defined during previous events.
+- (NSString *)jsEval:(NSString *)format, ...;
 - (NSString *)jsEvalAndBlock:(NSString *)script, ...;
-- (BOOL)jsElementIsNull:(NSString *)expression;
+- (BOOL)jsElementIsNullOrUndefined:(NSString *)expression;
 - (NSString *)source;
 
 - (void)clickOnPageElementAt:(CGPoint)point;

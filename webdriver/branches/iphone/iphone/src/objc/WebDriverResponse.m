@@ -26,10 +26,9 @@
 @dynamic isError, value, sessionId, context;
 
 - (id)initWithValue:(id)theValue {
-	// Its an NSProxy. There is no init.
-//	if (![super init])
-//		return nil;
-
+  if (![super init])
+    return nil;
+  
   [self setValue:theValue];
 
   // The sessionId and context are automatically set by |Context|.
@@ -56,7 +55,7 @@
 }
 
 - (void)dealloc {
-  // I need to call the release methods instead of calling setValue:nil because
+  // Calls the release methods instead of calling setValue:nil because
   // setValue tries to change the response_ object (which it can't) and throws
   // an exception.
   [value_ release];
@@ -66,7 +65,7 @@
   [super dealloc];
 }
 
-- (NSDictionary *)convertToJSON {
+- (NSDictionary *)convertToDictionary {
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   [dict setValue:value_ forKey:@"value"];
   [dict setValue:sessionId_ forKey:@"sessionId"];
@@ -75,14 +74,24 @@
   return dict;
 }
 
+// Create the response_ object from the current property set.
 - (void)createResponse {
-  if (response_ == nil) {
-    NSDictionary *dict = [self convertToJSON];
-    response_ = [[HTTPJSONResponse alloc] initWithObject:(id)dict];
-  }
+  [response_ release];
+  NSDictionary *dict = [self convertToDictionary];
+  response_ = [[HTTPJSONResponse alloc] initWithObject:(id)dict];
 }
 
-// If we change any of the properties, we can no longer use our cached response
+// Return the response_ object (create it if necessary).
+- (HTTPJSONResponse *)response {
+  if (response_ == nil)
+    [self createResponse];
+  
+  return response_;
+}
+
+// Invalidate the stored response. This usually happens when any of the
+// properties change. This will throw an exception if called after its sent
+// over the network.
 - (void)setResponseDirty {
   if (response_ != nil && [response_ offset] != 0) {
     @throw [NSException exceptionWithName:@"kResponseInUse"
@@ -95,8 +104,7 @@
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
-  [self createResponse];
-  [anInvocation setTarget:response_];
+  [anInvocation setTarget:[self response]];
   [anInvocation invoke];
 }
 
@@ -105,8 +113,7 @@
   if (sig != nil) {
     return sig;
   } else {
-    [self createResponse];
-    return [response_ methodSignatureForSelector:aSelector];
+    return [[self response] methodSignatureForSelector:aSelector];
   }
 }
 
@@ -114,8 +121,7 @@
   if ([super respondsToSelector:aSelector])
     return YES;
   
-  [self createResponse];
-  return [response_ respondsToSelector:aSelector];
+  return [[self response] respondsToSelector:aSelector];
 }
 
 - (NSString *)description {
@@ -150,7 +156,6 @@
 }
 
 - (void)setSessionId:(NSString *)newSessionId {
-//  NSLog(@"session id set to %@", newSessionId);
   [sessionId_ release];
   sessionId_ = [newSessionId copy];
   [self setResponseDirty];
@@ -161,7 +166,6 @@
 }
 
 - (void)setContext:(NSString *)newContext {
-//  NSLog(@"context id set to %@", newContext);
   [context_ release];
   context_ = [newContext copy];
   [self setResponseDirty];

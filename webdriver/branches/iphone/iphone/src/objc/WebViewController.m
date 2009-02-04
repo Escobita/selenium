@@ -24,14 +24,12 @@
 
 @dynamic webView;
 
-// Implement viewDidLoad to do additional setup after loading the view,
-// typically from a nib.
+// Executed after the nib loads the interface.
+// Configure the webview to match the mobile safari app.
 - (void)viewDidLoad {
   [super viewDidLoad];
   [[self webView] setScalesPageToFit:YES];
   [[self webView] setDelegate:self];
-//	[[self webView] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
-  NSLog(@"WebViewController viewDidLoad");
   [[HTTPServerController sharedInstance] setViewController:self];
   [self describeLastAction:[[HTTPServerController sharedInstance] status]];
   loadLock_ = [[NSCondition alloc] init];
@@ -39,8 +37,10 @@
 }
 
 - (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-  // Release anything that's not essential, such as cached data
+  NSLog(@"Memory warning recieved.");
+  // TODO(josephg): How can we send this warning to the user? Maybe set the
+  // displayed text; though that could be overwritten basically straight away.
+  [super didReceiveMemoryWarning];
 }
 
 - (void)dealloc {
@@ -51,7 +51,10 @@
 }
 
 - (UIWebView *)webView {
-  // TODO: make this check the view is a UIWebView
+  if (![[self view] isKindOfClass:[UIWebView class]]) {
+    NSLog(@"NIB error: WebViewController's view is not a UIWebView.");
+    return nil;
+  }
   return (UIWebView *)[self view];
 }
 
@@ -70,7 +73,11 @@
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-  // I'm ignoring the error since thats what webdriver expects.
+  // This is a very troubled method. It can be called multiple times (for each
+  // frame of webpage). It is sometimes called even when the page seems to have
+  // loaded correctly.
+  
+  // Page loading errors are ignored because that's what WebDriver expects.
   NSLog(@"*** WebView failed to load URL with error %@", error);
   [loadLock_ signal];
 }
@@ -82,26 +89,35 @@
 }
 
 - (void)waitForLoad {
-  // Experiment with me on the phone once debugging is working nicely.
+  // TODO(josephg): Test sleep intervals on the device.
   // This delay should be long enough that the webview has isLoading
-  // set correctly (but as short as possible - these delays really add up.) 
+  // set correctly (but as short as possible - these delays slow down testing.)
+  
+  // - The problem with [view isLoading] is that it gets set in a separate
+  // worker thread. So, right after asking the webpage to load a URL we need to
+  // wait an unspecified amount of time before isLoading will correctly tell us
+  // whether the page is loading content.
+  
   [NSThread sleepForTimeInterval:0.2f];
   
   while ([[self webView] isLoading]) {
     // Yield.
     [NSThread sleepForTimeInterval:0.01f];
-    
-    // Wait 100ms or until the page has loaded.
-    //      [loadLock_ waitUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
   }  
 }
 
+// All method calls on the view need to be done from the main thread to avoid
+// synchronization errors. This method calls a given selector in this class
+// optionally with an argument.
+//
+// If called with waitUntilLoad:YES, we wait for a web page to be loaded in the
+// view before returning.
 - (void)performSelectorOnView:(SEL)selector
                    withObject:(id)value
                 waitUntilLoad:(BOOL)wait {
 
-  /* The problem with this method is that the webview never gives us any clear
-   * indication of whether or not its loading and if so, when its done. Asking
+  /* The problem with this method is that the UIWebView never gives us any clear
+   * indication of whether or not it's loading and if so, when its done. Asking
    * it to load causes it to begin loading sometime later (isLoading returns NO
    * for awhile.) Even the |webViewDidFinishLoad:| method isn't a sure sign of
    * anything - it will be called multiple times, once for each frame of the
@@ -123,15 +139,13 @@
     [self waitForLoad];
 }
 
-// Get the specified URL and block until its finished loading
+// Get the specified URL and block until it's finished loading.
 - (void)setURL:(NSString *)urlString {
   NSURLRequest *url = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
   
   [self performSelectorOnView:@selector(loadRequest:)
                    withObject:url
                 waitUntilLoad:YES];
-  
-  //  NSLog(@"Waiting for '%@' to load...", urlString);
 }
 
 - (void)back {
@@ -149,16 +163,18 @@
 }
 
 - (id)visible {
-  // It is always visible.
+  // The WebView is always visible.
   return [NSNumber numberWithBool:YES];  
 }
 
-// Ignored for now. We could make sure the app is on the main flipside; though
-// I don't consider this necessary.
+// Ignored.
 - (void)setVisible:(NSNumber *)target {
 }
 
 // Execute js in the main thread and set lastJSResult_ appropriately.
+// This function must be executed on the main thread. Its designed to be called
+// using performSelectorOnMainThread:... which doesn't return a value - so
+// the return value is passed back through a class parameter.
 - (void)jsEvalInternal:(NSString *)script {
   [lastJSResult_ release];
   lastJSResult_ = [[[self webView]
@@ -167,6 +183,8 @@
   NSLog(@"jsEval: %@ -> %@", script, lastJSResult_);
 }
 
+// Evaluate the given JS format string & arguments. Argument list is the same
+// as [NSString stringWithFormat:...].
 - (NSString *)jsEval:(NSString *)format, ... {
   if (format == nil) {
     [NSException raise:@"invalidArguments" format:@"Invalid arguments for jsEval"];
@@ -178,10 +196,7 @@
                                              arguments:argList]
                       autorelease];
   va_end(argList);
-  
-  while ([[self webView] isLoading])
-    [NSThread sleepForTimeInterval:0.01f];
-  
+
   [self performSelectorOnMainThread:@selector(jsEvalInternal:)
                          withObject:script
                       waitUntilDone:YES];
@@ -201,26 +216,19 @@
                       autorelease];
   va_end(argList);
   
-  NSString *url = [self URL];
-  NSString *result = [self jsEval:script];
-  if (![url isEqualToString:[self URL]]) {
-    [NSThread sleepForTimeInterval:0.01f];
-    while ([[self webView] isLoading])
-      [NSThread sleepForTimeInterval:0.01f];
-  }
+  NSString *result = [self jsEval:@"%@", script];
   
-//  [NSThread sleepForTimeInterval:0.1f];
+  [self waitForLoad];
   
   return result;
 }
 
-- (BOOL)jsElementIsNull:(NSString *)expression {
-  NSString *isNull = [self jsEval:[NSString stringWithFormat:@"%@ === null",
-                                   expression]];
+- (BOOL)jsElementIsNullOrUndefined:(NSString *)expression {
+  NSString *isNull = [self jsEval:@"%@ === null || %@ === undefined",
+                                   expression, expression];
   return [isNull isEqualToString:@"true"];
 }
 
-// The current title of the web browser
 - (NSString *)currentTitle {
   return [self jsEval:@"document.title"];
 }
@@ -287,15 +295,21 @@
   [[self webView] simulateTapAt:pointInViewSpace];
 }
 
-// I don't know why, but this doesn't seem to work in the current version of
-// mobile safari.
+// I don't know why, but this doesn't work in the current version of
+// mobile safari. (2.2 firmware)
 - (void)addFirebug {
   // This is the http://getfirebug.com/lite.html bookmarklet
   [self jsEval:
-  @"var firebug=document.createElement('script');firebug.setAttribute('src',"
-   "'http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');"
-   "document.body.appendChild(firebug);(function(){if(window.firebug.version)"
-   "{firebug.init();}else{setTimeout(arguments.callee);}})();"];
+  @"var firebug=document.createElement('script');\r"
+   "firebug.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');\r"
+   "document.body.appendChild(firebug);\r"
+   "(function() {\r"
+   "  if(window.firebug.version) {\r"
+   "    firebug.init();\r"
+   "  } else {\r"
+   "  setTimeout(arguments.callee);\r"
+   "  }\r"
+   "})();"];
 }
 
 @end

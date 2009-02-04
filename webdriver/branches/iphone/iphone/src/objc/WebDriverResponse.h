@@ -21,18 +21,28 @@
 
 @class HTTPJSONResponse;
 
-/* This class mirrors the 'Response' class in webdriver. When webdriver expects
- * a 'response' object, data is wrapped into one of these.
- *
- * Don't confuse HTTPResponse (A response to an HTTP message) and a
- * WebDriverResponse (an HTTPResponse containing a JSON object with fields
- * mirroring webdriver's
- */
-@interface WebDriverResponse : NSObject<HTTPResponse> {
-  // These fields mirror their equivalents in WebDriver
+// |WebDriverResponse| mirrors the |Response| class in webdriver. It is the
+// return type for all of WebDriver's RPC methods.
+//
+// This is implemented as a proxy around an HTTPResponse. When the standard
+// HTTPResponse methods are called, the data in WebDriverResponse's fields are
+// baked into an HTTPJSONResponse and the data fields (isError, value, etc)
+// become immutable.
+// 
+// Don't confuse HTTPResponse (a response to an HTTP message) and a
+// WebDriver |Response| (an HTTPResponse containing the return value of a
+// method).
+@interface WebDriverResponse : NSObject {
+  // These fields mirror their equivalents in WebDriver.
+  
+  // Did the method call generate an error?
   BOOL isError_;
+  // The value the method returned or the exception generated
   id value_;
+  
+  // The active session
   NSString *sessionId_;
+  // The active context
   NSString *context_;
 
   // We're a proxy around this response.
@@ -49,5 +59,12 @@
 
 + (WebDriverResponse *)responseWithValue:(id)value;
 + (WebDriverResponse *)responseWithError:(id)error;
+
+@end
+
+// This is needed so the world knows that WebDriverResponse indirectly
+// implements the |HTTPResponse| protocol. WebDriverResponse implements this
+// through forwarding. Doing it this way supresses compiler warnings. 
+@interface WebDriverResponse (ForwardedHTTPResponse) <HTTPResponse>
 
 @end

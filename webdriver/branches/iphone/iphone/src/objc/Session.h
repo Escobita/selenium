@@ -1,5 +1,5 @@
 //
-//  SessionManager.h
+//  Session.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import "HTTPVirtualDirectory.h"
 
-// This virtualdirectory matches the /:session directory which webdriver
+// This |HTTPVirtualDirectory| matches the /:session directory which WebDriver
 // expects. All the interesting stuff is in the :session/:context subdirectory
 // (Matched by the |Context| class).
 @interface Session : HTTPVirtualDirectory {

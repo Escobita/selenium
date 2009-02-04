@@ -37,9 +37,8 @@
 
 @property (nonatomic, readonly, copy) NSString *elementId;
 
-// Designated initialiser. You probably shouldn't use this directly - instead
-// use elementFromJSObject. That allows the ElementStore to specify the
-// element's id.
+// Designated initializer. Don't call this directly - instead
+// use |elementFromJSObject:inStore:| which will generate an id for the element.
 - (id)initWithId:(NSString *)elementId inStore:(ElementStore *)store;
 
 // Create a new element from a JSON expression and put the element into the
@@ -49,6 +48,8 @@
 
 // Same as |elementFromJSObject:inStore:| above, but using the element's store.
 - (Element *)elementFromJSObject:(NSString *)object;
+
+// Get the relative URL for this element (relative to the context).
 - (NSString *)url;
 
 // Is this element the document?
@@ -58,8 +59,8 @@
 // in JS.
 - (NSString *)jsLocator;
 
-// Simulate a click on the element. A dict is passed in through REST, but it is
-// ignored.
+// Simulate a click on the element. An |NSDictionary| is passed in through REST,
+// but it is ignored.
 - (void)click:(NSDictionary *)dict;
 
 // Clear the contents of this input field.
@@ -68,26 +69,28 @@
 // Submit this form, or the form containing this element.
 - (void)submit;
 
-// The text contained in the element
+// The text contained in the element.
 - (NSString *)text;
 
-// Type these keys into the element
+// Type these keys into the element.
 - (void)sendKeys:(NSString *)keys;
 
-// This method is only valid on checkboxes and radio buttons. That should be
-// checked.
-- (NSNumber *)checked;
+// Is the element checked?
+// This method is only valid on checkboxes and radio buttons.
+- (NSNumber *)isChecked;
 
+// Set the element's checked property.
 // This method is only valid on checkboxes and radio buttons.
 - (void)setChecked:(NSNumber *)numValue;
 
-// Like |checked| above, we should check that the element is valid.
+// Toggle the element's checked property.
+// This method is only valid on checkboxes and radio buttons.
 - (void)toggleSelected;
 
 // Is the element enabled?
-- (NSNumber *)enabled;
+- (NSNumber *)isEnabled;
 
 // Is the element displayed on the screen?
-- (NSNumber *)displayed;
+- (NSNumber *)isDisplayed;
 
 @end

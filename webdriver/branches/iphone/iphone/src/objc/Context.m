@@ -29,8 +29,9 @@
 #import "WebDriverResource.h"
 #import "Context+ExecuteScript.h"
 
-// There is only one context. The whole notion of context (seperate from
-// session) may be removed some day.
+// There is only one context. The whole notion of context (separate from
+// session) may be removed some day. When that happens, the functionality
+// |Context| provides will be migrated into |Session|.
 static NSString * const CONTEXT_NAME = @"foo";
 
 @implementation Context
@@ -72,8 +73,9 @@ static NSString * const CONTEXT_NAME = @"foo";
                               POST:@selector(setURL:)
                           withName:@"url"];
   
-  // Evaluate the given javascript string. Block until loading complete (if
-  // any). Note that this is 'raw' jsEval - as opposed to /execute below.
+  // Evaluate the given javascript string. If the request causes a new page to
+  // load, block until that loading is complete.
+  // Note that this is 'raw' jsEval - as opposed to /execute below.
   [self setResourceToViewMethodGET:NULL
                               POST:@selector(jsEvalAndBlock:)
                           withName:@"eval"];
@@ -98,13 +100,13 @@ static NSString * const CONTEXT_NAME = @"foo";
                               POST:NULL
                           withName:@"source"];
   
-  // Load firebug into the webview. This doesn't currently work
-  // TODO: find out why firebug doesn't load and fix it.
+  // Load firebug into the webview. This doesn't currently work.
+  // TODO(josephg): find out why firebug doesn't load and fix it.
   [self setResourceToViewMethodGET:NULL
                               POST:@selector(addFirebug)
                           withName:@"firebug"];
   
-  // Execute JS function with given body. This takes an optional second
+  // Execute JS function with the given body. This takes an optional second
   // argument which is a list of arguments to the function.
   // Executes (function() { $1 }).apply(null, $2);
   WebDriverResource *executeScript
@@ -137,6 +139,10 @@ static NSString * const CONTEXT_NAME = @"foo";
   [super dealloc];
 }
 
++ (NSString *)contextName {
+  return CONTEXT_NAME;
+}
+
 - (id)capabilities {
   NSMutableDictionary *capabilities = [NSMutableDictionary dictionary];
   [capabilities setObject:@"mobile safari" forKey:@"browserName"];
@@ -148,7 +154,7 @@ static NSString * const CONTEXT_NAME = @"foo";
 }
 
 // This is called when the client sends DELETE to session/context.
-// TODO: Make this actually clear resources.
+// TODO(josephg): Make this actually clear resources.
 - (void)deleteContext {
   
 }

@@ -21,11 +21,12 @@
 
 @class ElementStore;
 
-// This class matches the /:session/:context/ virtual directory which webdriver
+// This class matches the /:session/:context/ virtual directory which WebDriver
 // expects. The context manages the global behaviour of the page - getUrl,
 // forward, back, execute javascript, etc. Most of the actual functionality
-// resides in |WebViewController| since its cleaner that way. This vdir is
-// responsible for mapping the REST calls to code execution.
+// resides in |WebViewController| since it's cleaner that way. This
+// |VirtualDirectory| is responsible for mapping the REST calls to code
+// execution.
 @interface Context : HTTPVirtualDirectory {
   int sessionId_;
   
@@ -35,5 +36,9 @@
 @property (nonatomic, readonly) ElementStore *elementStore;
 
 - (id)initWithSessionId:(int)sessionId;
+
+// Returns the constant context name. There is only one context in each
+// session.
++ (NSString *)contextName;
 
 @end

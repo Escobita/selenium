@@ -1,5 +1,5 @@
 //
-//  SessionManager.m
+//  Session.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -27,18 +27,28 @@
   if (![super init])
     return nil;
 
+  // Sessions are created by POSTing to /hub/session with
+  // a set of |DesiredCapabilities|.
   [self setIndex:[JSONRESTResource
                   JSONResourceWithTarget:self 
                                   action:@selector(createSessionWithData:method:)]];
+
+  // Session IDs start at 1001.
   nextId_ = 1001;
 
   return self;
 }
 
+// TODO (josephg): We really only support one session. Error (or ignore the
+// request) if the session is already created. When the session exists, change
+// the service we advertise using zeroconf.
+
+// Create a session. This method is bound to the index of /hub/session/
 - (NSObject<HTTPResponse> *)createSessionWithData:(id)desiredCapabilities
                                            method:(NSString *)method {
-//	if (![method isEqualToString:@"POST"])
-//		return nil;
+  // TODO (josephg): Implement DELETE on this method.
+  if (![method isEqualToString:@"POST"] && ![method isEqualToString:@"GET"])
+    return nil;
   
   int sessionId = nextId_++;
   
@@ -55,10 +65,13 @@
                                     initWithSessionId:sessionId]
                                     autorelease];
  
-  [session setResource:context withName:@"foo"];
+  // The context has a static name.
+  [session setResource:context withName:[Context contextName]];
 
   return [HTTPRedirectResponse redirectToURL:
-          [NSString stringWithFormat:@"session/%d/foo/", sessionId]];
+          [NSString stringWithFormat:@"session/%d/%@/",
+           sessionId,
+           [Context contextName]]];
 }
 
 @end

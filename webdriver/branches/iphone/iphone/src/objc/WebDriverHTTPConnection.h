@@ -1,5 +1,5 @@
 //
-//  WebServerConnection.h
+//  WebDriverHTTPConnection.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -19,8 +19,11 @@
 #import <Foundation/Foundation.h>
 #import "HTTPConnection.h"
 
-// This class overrides some of the HTTPConnection methods to change the default
-// behaviour in a number of cases.
+// |WebDriverHTTPConnection| overrides some of the HTTPConnection methods to
+// change the default behaviour.
+// We allow all HTTP methods. We forward requests to the |RESTServiceMapping|
+// instead of looking for files on the file system and we implement a custom
+// 404 response.
 @interface WebDriverHTTPConnection : HTTPConnection {
 
 }

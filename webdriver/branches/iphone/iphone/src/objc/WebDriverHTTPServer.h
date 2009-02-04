@@ -1,5 +1,5 @@
 //
-//  MyHTTPServer.h
+//  WebDriverHTTPServer.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.

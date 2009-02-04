@@ -29,6 +29,7 @@
 #import "MainViewController.h"
 #import "WebViewController.h"
 #import "NSString+SBJSON.h"
+#import "NSException+WebDriver.h"
 
 @implementation Element
 
@@ -66,28 +67,20 @@
                                 POSTAction:@selector(sendKeys:)
                                   withName:@"value"];
   
-  [self setMyWebDriverHandlerWithGETAction:@selector(checked)
+  [self setMyWebDriverHandlerWithGETAction:@selector(isChecked)
                                 POSTAction:@selector(setChecked:)
                                   withName:@"selected"];
   
-  [self setMyWebDriverHandlerWithGETAction:@selector(enabled)
+  [self setMyWebDriverHandlerWithGETAction:@selector(isEnabled)
                                 POSTAction:NULL
                                   withName:@"enabled"];
   
-  [self setMyWebDriverHandlerWithGETAction:@selector(displayed)
+  [self setMyWebDriverHandlerWithGETAction:@selector(isDisplayed)
                                 POSTAction:NULL
                                   withName:@"displayed"];
   
   [self addSearchSubdirs];
   
-  // Its actually attribute/blah but resources ignore subdirectories
-  // and the attribute name is passed as an argument anyway. This is a bit of
-  // a hack on the default functionality of resources, but its a lot nicer
-  // than using a whole class just for attributes.
-//  [self setMyWebDriverHandlerWithGETAction:@selector(attribute:)
-//                                POSTAction:NULL
-//                                  withName:@"attribute"];
-
   [self setResource:[Attribute attributeDirectoryForElement:self]
            withName:@"attribute"];
   
@@ -109,7 +102,7 @@
   return [Element elementFromJSObject:object inStore:elementStore_];
 }
 
-// This method returns the javascript object
+// This method returns the string representation of a javascript object.
 - (NSString *)jsLocator {
   return [elementStore_ jsLocatorForElement:self];
 }
@@ -126,6 +119,7 @@
                         [self jsLocator]]] isEqualToString:@"true"];
 }
 
+// Get the element's URL relative to the context.
 - (NSString *)url {
   return [NSString stringWithFormat:@"element/%@", [self elementId]];
 }
@@ -137,30 +131,30 @@
   // load before continuing.
   NSString *locator = [self jsLocator];
   [[self viewController] jsEvalAndBlock:
-   @"if (%@[\"click\"])\r"
+   @"if (%@['click'])\r"
     "%@.click();\r"
-    "var event = document.createEvent(\"MouseEvents\");\r"
-    "event.initMouseEvent(\"click\", true, true, null, 1, 0, 0, 0, 0, false,"
+    "var event = document.createEvent('MouseEvents');\r"
+    "event.initMouseEvent('click', true, true, null, 1, 0, 0, 0, 0, false,"
          "false, false, false, 0, null);\r"
     "%@.dispatchEvent(event);\r",
                        locator, locator, locator];
 }
 
-// This returns the pixel position of the element on the page assuming zoom is
-// 1:1 and scrolled to the top-left.
+// This returns the pixel position of the element on the page in page
+// coordinates.
 - (CGRect)positionOnPage {
   NSString *container = @"_WEBDRIVER_pos";
   [[self viewController] jsEval:
   @"var locate = function(elem) {\r"
   "  var x = 0, y = 0;\r"
-  "  if (elem.offsetParent) {\r"
-  "    do {\r"
-  "      x += elem.offsetLeft;\r"
-  "      y += elem.offsetTop;\r"
-  "    } while (elem = elem.offsetParent);\r"
+  "  while (elem && elem.offsetParent) {\r"
+  "    x += elem.offsetLeft;\r"
+  "    y += elem.offsetTop;\r"
+  "    elem = elem.offsetParent;\r"
   "  }\r"
   "  return {x: x, y: y};\r"
-  "}; var %@ = locate(%@)", container, [self jsLocator]];
+  "};\r"
+  "var %@ = locate(%@);", container, [self jsLocator]];
 
   float x = [[[self viewController] jsEval:@"%@.x", container] floatValue];
   float y = [[[self viewController] jsEval:@"%@.y", container] floatValue];
@@ -222,9 +216,9 @@
           jsEval:[NSString stringWithFormat:@"%@.value", [self jsLocator]]];
 }
 
-// This method is only valid on checkboxes and radio buttons. That should be
-// checked.
-- (NSNumber *)checked {
+// This method is only valid on checkboxes and radio buttons.
+// TODO(josephg): Check that the element is a checkbox or radio button
+- (NSNumber *)isChecked {
   BOOL checked = [[[self viewController]
                    jsEval:[NSString stringWithFormat:@"%@.checked",
                            [self jsLocator]]] isEqualToString:@"true"];
@@ -249,7 +243,7 @@
                                  jsLocator, jsLocator, jsLocator]];
 }
 
-- (NSNumber *)enabled {
+- (NSNumber *)isEnabled {
   BOOL enabled = [[[self viewController]
                   jsEval:[NSString stringWithFormat:@"%@.disabled",
                           [self jsLocator]]] isEqualToString:@"false"];
@@ -257,28 +251,19 @@
   return [NSNumber numberWithBool:enabled];
 }
 
-- (NSNumber *)displayed {
-//  @throw [NSException exceptionWithName:@" reason:<#(NSString *)reason#> userInfo:<#(NSDictionary *)userInfo#>
-  return nil;
+- (NSNumber *)isDisplayed {
+  @throw [NSException webDriverExceptionWithMessage:@"Not Implemented"
+                                     webDriverClass:nil];
 }
 
-// No idea about the signature here
 - (void)location {
-  
+  @throw [NSException webDriverExceptionWithMessage:@"Not Implemented"
+                                     webDriverClass:nil];
 }
 
-// or here
 - (void)size {
-  
-}
-
-// Implement me - I should be a sub-element in the tree.
-- (NSString *)attribute:(NSDictionary *)arguments {
-  NSString *name = [arguments objectForKey:@"name"];
-  return [[self viewController]
-          jsEval:[NSString stringWithFormat:@"%@.getAttribute(\"%@\")",
-                  [self jsLocator],
-                  name]];
+  @throw [NSException webDriverExceptionWithMessage:@"Not Implemented"
+                                     webDriverClass:nil];
 }
 
 @end

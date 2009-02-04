@@ -1,5 +1,5 @@
 //
-//  WebServerConnection.m
+//  WebDriverHTTPConnection.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -23,6 +23,7 @@
 @implementation WebDriverHTTPConnection
 
 - (NSObject<HTTPResponse> *)httpResponseForRequest:(CFHTTPMessageRef)theRequest {
+  // Forward the message to our |RESTServiceMapping| instance.
   return [[server delegate] httpResponseForRequest:theRequest];
 }
 
@@ -32,16 +33,23 @@
 }
 
 - (BOOL)supportsMethod:(NSString *)method atPath:(NSString *)path {
-//  NSLog(@"recieved %d bytes of post", postContentLength);
+  // It is up to the |HTTPResource| to determine if it supports a given method.
+  // If it doesn't, we'll throw a custom exception.
   return YES;
 }
 
+// Overridden to read the data chunk straight into the request object.
+// iWebDriver doesn't support range requests. 
 - (void)prepareForBodyWithSize:(UInt64)contentLength {
+  // Since none of the webdriver RPC methods send much data, for simplicity
+  // we'll buffer the whole POST data segment in memory.
   NSMutableData *data = [[NSMutableData alloc] initWithCapacity:contentLength];
   CFHTTPMessageSetBody(request, (CFDataRef)data);
   [data release];
 }
 
+// Overridden to read the data chunk straight into the request object.
+// See |prepareForBodyWithSize:| above.
 - (void)processDataChunk:(NSData *)postDataChunk {
   CFHTTPMessageAppendBytes(request,
                            [postDataChunk bytes],
@@ -50,20 +58,19 @@
 
 - (NSData *)preprocessErrorResponse:(CFHTTPMessageRef)response {
   // Return a token 404 message.
-  if(CFHTTPMessageGetResponseStatusCode(response) == 404)
-  {
-      NSString *msg = @"<html><body>Error 404 - Not Found</body></html>";
-      NSData *msgData = [msg dataUsingEncoding:NSUTF8StringEncoding];
+  if(CFHTTPMessageGetResponseStatusCode(response) == 404) {
+    NSString *msg = @"<html><body>Error 404 - Not Found</body></html>";
+    NSData *msgData = [msg dataUsingEncoding:NSUTF8StringEncoding];
 
-      CFHTTPMessageSetBody(response, (CFDataRef)msgData);
+    CFHTTPMessageSetBody(response, (CFDataRef)msgData);
 
-      NSString *contentLengthStr =
-        [NSString stringWithFormat:@"%u",
-                                   (unsigned)[msgData length]];
-    
-      CFHTTPMessageSetHeaderFieldValue(response,
-                                       CFSTR("Content-Length"),
-                                       (CFStringRef)contentLengthStr);
+    NSString *contentLengthStr =
+      [NSString stringWithFormat:@"%u",
+                                 (unsigned)[msgData length]];
+  
+    CFHTTPMessageSetHeaderFieldValue(response,
+                                     CFSTR("Content-Length"),
+                                     (CFStringRef)contentLengthStr);
   }
   
   return [super preprocessErrorResponse:response];

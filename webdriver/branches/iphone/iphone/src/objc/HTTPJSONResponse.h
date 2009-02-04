@@ -1,5 +1,5 @@
 //
-//  JSONResponse.h
+//  HTTPJSONResponse.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -19,7 +19,11 @@
 #import <Foundation/Foundation.h>
 #import "HTTPResponse.h"
 
-// A wrapper around HTTPDataResponse to return JSON data.
+// |HTTPJSONResponse| wraps |HTTPDataResponse| for JSON data. It is used to
+// return JSON from an HTTP method.
+// 
+// Memory use is proportional to the size of the JSON of the object returned.
+// Be careful returning very large objects!
 @interface HTTPJSONResponse : HTTPDataResponse {
 
 }

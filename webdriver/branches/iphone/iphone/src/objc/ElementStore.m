@@ -33,7 +33,7 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
 
 - (void)configureJSStore {
   [[self viewController] jsEval:[NSString stringWithFormat:
-                                 @"if (typeof %@ !== \"object\") var %@ = [];",
+                                 @"if (typeof %@ !== 'object') var %@ = [];",
                                  JSARRAY,
                                  JSARRAY]];
 }
@@ -79,8 +79,11 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   return [self jsLocatorForElementWithId:[element elementId]];
 }
 
+// Construct an Element from a javascript object. This stores a reference to the
+// object in a local array, uses the array index as a new element's key and
+// returns the element created.
 - (Element *)elementFromJSObject:(NSString *)jsObject {
-  if ([[self viewController] jsElementIsNull:jsObject])
+  if ([[self viewController] jsElementIsNullOrUndefined:jsObject])
     return nil;
   
   NSString *elementId = [self generateElementId];
@@ -90,9 +93,9 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   [self configureJSStore];
   
   // Set the javascript cache to contain the object
-  [[self viewController] jsEval:[NSString stringWithFormat:@"%@ = %@;",
-                                 [self jsLocatorForElementWithId:elementId],
-                                 jsObject]];
+  [[self viewController] jsEval:@"%@ = %@;",
+                           [self jsLocatorForElementWithId:elementId],
+                           jsObject];
 
   // Add the element to the REST interface
   [self setResource:element withName:elementId];
@@ -100,11 +103,12 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   return element;
 }
 
+// Constructs an array of |Element| objects from a javascript array of
+// elements contained in |container|.
+// This method maps the elements in the JS array |container| through
+// |elementFromJSObject:| (above)
 - (NSArray *)elementsFromJSArray:(NSString *)container {
-  // all I really want to do is map elementFromJSObject on the array. Sigh.
-  NSString *lenStr = [[self viewController]
-                      jsEval:[NSString stringWithFormat:@"%@.length",
-                              container]];
+  NSString *lenStr = [[self viewController] jsEval:@"%@.length", container];
   int length = [lenStr intValue];
   
   NSMutableArray *result = [NSMutableArray arrayWithCapacity:length];

@@ -40,7 +40,8 @@
     id value = [arg objectForKey:@"value"];
     NSString *type = [arg objectForKey:@"type"];
     if ([type isEqualToString:@"ELEMENT"]) {
-      // TODO: Get the element and put a javascript expression for it in the argument
+      // TODO(josephg): Get the element and put a javascript expression for it
+      // in the argument.
       value = @"{}";
     }
     //    NSLog(@"argument: %@ of type %@", value, type);
@@ -63,61 +64,42 @@
   if (argsAsString == nil)
     argsAsString = @"null";
   
-  NSString *script = [NSString stringWithFormat:
-                      @"var f = function(){%@}; "
-                      "var result = f.apply(null, %@); result",
-                      code, argsAsString];
+  // Execute the script and store the result in 'result'.
+  [[self viewController] jsEval:@"var f = function(){%@};\r"
+                                "var result = f.apply(null, %@);",
+                                code, argsAsString];
   
-  NSString *result = [[self viewController] jsEval:script];  
-  NSString *isNull = [[self viewController] jsEval:@"result === null"];
-  NSString *jsType = [[self viewController] jsEval:@"typeof result"];
-  NSString *isElement = [[self viewController] jsEval:@"result instanceof HTMLElement"];
-  /*
-   if (arg instanceof String) {
-   converted.put("type", "STRING");
-   converted.put("value", arg);
-   } else if (arg instanceof Number) {
-   converted.put("type", "NUMBER");
-   converted.put("value", ((Number) arg).longValue());
-   } else if (isPrimitiveNumberType(arg)) {
-   converted.put("type", "NUMBER");
-   converted.put("value", getPrimitiveTypeAsLong(arg));
-   } else if (arg instanceof Boolean) {
-   converted.put("type", "BOOLEAN");
-   converted.put("value", ((Boolean) arg).booleanValue());
-   } else if (arg.getClass() == boolean.class) {
-   converted.put("type", "BOOLEAN");
-   converted.put("value", arg);
-   } else if (arg instanceof FirefoxWebElement) {
-   converted.put("type", "ELEMENT");
-   converted.put("value", ((FirefoxWebElement) arg).getElementId());
-   } else {
-   throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
-   }*/
+  NSString *result = [[self viewController] jsEval:@"result"];
+  BOOL isNull = [[self viewController] jsElementIsNullOrUndefined:@"result"];
+  NSString *isElement = [[self viewController]
+                         jsEval:@"result instanceof HTMLElement"];
   
-  NSString *value = result;
-  NSString *type = [jsType uppercaseString];
+  // Now that we have the result, we need to return it like:
+  //   {type: 'VALUE', value: 'true'}.
+  // If the method returned null or undefined, we should return
+  //   {type: 'NULL'}
+  // ... And if the method returns an element we should return it like this:
+  //   {type: 'ELEMENT', value: 'element/123'}
   
-  if ([value isEqualToString:@""])
-    value = nil;
-  
-  if ([isNull isEqualToString:@"true"]) {
-    type = @"NULL";
-    value = nil;
-  }
-  else if ([isElement isEqualToString:@"true"]) {
-    // create element then...
-    Element *elem = [[self elementStore] elementFromJSObject:@"result"];
-    value = [elem url];
-    type = @"ELEMENT";
-  }
-  
-  if (value == nil)
-    return [NSDictionary dictionaryWithObjectsAndKeys:type, @"type", nil];
-  else
+  if (isNull) {
+    // Return {type: 'NULL'}
     return [NSDictionary dictionaryWithObjectsAndKeys:
-            value, @"value",
-            type, @"type", nil];
+            @"NULL", @"type", nil];
+  } else if ([isElement isEqualToString:@"true"]) {
+    // The function returned an element. Cache the element in the local
+    // |ElementStore| (in the virtual directory).
+    Element *elem = [[self elementStore] elementFromJSObject:@"result"];
+    
+    // Return {type: 'ELEMENT', value: 'element/123'}
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+            [elem url], @"value",
+            @"ELEMENT", @"type", nil];
+  } else {
+    // Return {type: 'VALUE', value: 'cheese'}
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+            result, @"value",
+            @"VALUE", @"type", nil];
+  }
 }
 
 @end

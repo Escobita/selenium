@@ -22,7 +22,12 @@
 
 @class VirtualDirectory;
 
+// |RESTServiceMapping| stores the tree of virtual directories. When the HTTP
+// server recieves an http request, the request is forwarded through
+// |HTTPServerController| to |RESTServiceMapping| which in turn delegates it to
+// the appropriate |HTTPResource|.
 @interface RESTServiceMapping : NSObject {
+  // Stores the root directory of the HTTP server
   VirtualDirectory *serverRoot_;
 }
 

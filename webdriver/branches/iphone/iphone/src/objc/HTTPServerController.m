@@ -1,5 +1,5 @@
 //
-//  WebServerController.m
+//  HTTPServerController.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.

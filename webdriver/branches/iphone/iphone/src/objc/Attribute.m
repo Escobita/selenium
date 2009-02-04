@@ -34,7 +34,7 @@
 - (NSString *)attribute:(NSString *)name {
   NSLog(@"attribute query: %@", name);
   NSString *query = [NSString stringWithFormat:
-                     @"%@.getAttribute(\"%@\")",
+                     @"%@.getAttribute('%@')",
                      [element_ jsLocator],
                      name];
   return [[self viewController] jsEval:query];
@@ -46,10 +46,6 @@
   NSString *attribute = [self attribute:queriedAttribute];
   return [HTTPStaticResource
           resourceWithResponse:[WebDriverResponse responseWithValue:attribute]];
-}
-
-- (void)dealloc {
-  [super dealloc];
 }
 
 @end

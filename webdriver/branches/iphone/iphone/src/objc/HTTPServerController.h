@@ -1,5 +1,5 @@
 //
-//  WebServerController.h
+//  HTTPServerController.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -23,7 +23,7 @@
 @class WebViewController;
 @class RESTServiceMapping;
 
-// A shared object of this class creates, configures and controls the web server
+// |HTTPServerController| creates, configures and controls the web server.
 @interface HTTPServerController : NSObject {
   HTTPServer *server_;
 	

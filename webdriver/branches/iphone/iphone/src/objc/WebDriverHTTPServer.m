@@ -1,5 +1,5 @@
 //
-//  MyHTTPServer.m
+//  WebDriverHTTPServer.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -25,7 +25,7 @@
   if (![super init])
     return nil;
   
-  // Fork connection pool thread
+  // Forks connection pool thread.
   [NSThread detachNewThreadSelector:@selector(connectionThread)
                            toTarget:self
                          withObject:self];
