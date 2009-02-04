@@ -79,6 +79,14 @@
                                 POSTAction:NULL
                                   withName:@"displayed"];
   
+  [self setMyWebDriverHandlerWithGETAction:@selector(locationAsDictionary)
+                                POSTAction:NULL
+                                  withName:@"location"];
+
+  [self setMyWebDriverHandlerWithGETAction:@selector(sizeAsDictionary)
+                                POSTAction:NULL
+                                  withName:@"size"];
+    
   [self addSearchSubdirs];
   
   [self setResource:[Attribute attributeDirectoryForElement:self]
@@ -142,7 +150,7 @@
 
 // This returns the pixel position of the element on the page in page
 // coordinates.
-- (CGRect)positionOnPage {
+- (CGPoint)location {
   NSString *container = @"_WEBDRIVER_pos";
   [[self viewController] jsEval:
   @"var locate = function(elem) {\r"
@@ -159,18 +167,32 @@
   float x = [[[self viewController] jsEval:@"%@.x", container] floatValue];
   float y = [[[self viewController] jsEval:@"%@.y", container] floatValue];
 
+  return CGPointMake(x, y);
+}
+
+// Fetches the size of the element in page coordinates.
+- (CGSize)size {
   float width = [[[self viewController] jsEval:@"%@.offsetWidth",
                   [self jsLocator]] 
                  floatValue];
   float height = [[[self viewController] jsEval:@"%@.offsetHeight",
-                  [self jsLocator]] 
-                 floatValue];
-  
-  return CGRectMake(x, y, width, height);
+                   [self jsLocator]] 
+                  floatValue];
+ 
+  return CGSizeMake(width, height);
+}
+
+// Fetches the bounds of the element in page coordinates. This is built from
+// |size| and |location|.
+- (CGRect)bounds {
+  CGRect bounds;
+  bounds.origin = [self location];
+  bounds.size = [self size];
+  return bounds;
 }
 
 - (void)clickSimulate:(NSDictionary *)dict {
-  CGRect currentPosition = [self positionOnPage];
+  CGRect currentPosition = [self bounds];
   CGPoint midpoint = CGPointMake(CGRectGetMidX(currentPosition),
                                  CGRectGetMidY(currentPosition));
   [[[MainViewController sharedInstance] webViewController]
@@ -256,14 +278,20 @@
                                      webDriverClass:nil];
 }
 
-- (void)location {
-  @throw [NSException webDriverExceptionWithMessage:@"Not Implemented"
-                                     webDriverClass:nil];
+- (NSDictionary *)locationAsDictionary {
+  CGPoint location = [self location];
+  return [NSDictionary dictionaryWithObjectsAndKeys:
+          [NSNumber numberWithFloat:location.x], @"x",
+          [NSNumber numberWithFloat:location.y], @"y",
+          nil];
 }
 
-- (void)size {
-  @throw [NSException webDriverExceptionWithMessage:@"Not Implemented"
-                                     webDriverClass:nil];
+- (NSDictionary *)sizeAsDictionary {
+  CGSize size = [self size];
+  return [NSDictionary dictionaryWithObjectsAndKeys:
+          [NSNumber numberWithFloat:size.width], @"width",
+          [NSNumber numberWithFloat:size.height], @"height",
+          nil];  
 }
 
 @end
