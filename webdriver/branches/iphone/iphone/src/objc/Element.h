@@ -31,7 +31,7 @@
   NSString *elementId_;
   
   // A link back to the element store. Needed for creating new elements.
-  // Not retained to avoid a circular dependancy.
+  // Not retained to avoid a circular dependency.
   ElementStore *elementStore_;
 }
 

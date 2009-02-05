@@ -223,6 +223,26 @@
   return result;
 }
 
+
+- (BOOL)testJsExpression:(NSString *)format, ... {
+  if (format == nil) {
+    [NSException raise:@"invalidArguments" format:@"Invalid arguments for jsEval"];
+  }
+  
+  va_list argList;
+  va_start(argList, format);
+  NSString *script = [[[NSString alloc] initWithFormat:format
+                                             arguments:argList]
+                      autorelease];
+  va_end(argList);
+  
+  return [[self jsEval:@"!!(%@)", script] isEqualToString:@"true"];
+}
+
+- (float)floatProperty:(NSString *)property ofObject:(NSString *)jsObject {
+  return [[self jsEval:@"%@.%@", jsObject, property] floatValue];
+}
+
 - (BOOL)jsElementIsNullOrUndefined:(NSString *)expression {
   NSString *isNull = [self jsEval:@"%@ === null || %@ === undefined",
                                    expression, expression];

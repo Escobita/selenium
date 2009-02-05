@@ -1,6 +1,6 @@
 package org.openqa.selenium;
 
-public class MultitouchTest {
+public class MultitouchTest extends AbstractDriverTestCase {
   public void testFoo() {
 
   }

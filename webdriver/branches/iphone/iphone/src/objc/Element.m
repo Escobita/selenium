@@ -117,14 +117,14 @@
 
 // Is this element a (/the) document?
 - (BOOL)isDocumentElement {
-  if ([elementId_ isEqualToString:@"0"])
+  if ([elementId_ isEqualToString:@"0"]) {
     return YES;
-  else
+  } else {
   // I have no idea how to clean this indenting - It looks like lisp.
     return [[[self viewController]
-             jsEval:[NSString 
-                   stringWithFormat:@"%@ instanceof HTMLDocument",
-                        [self jsLocator]]] isEqualToString:@"true"];
+             jsEval:@"%@ instanceof HTMLDocument", [self jsLocator]]
+            isEqualToString:@"true"];
+  }
 }
 
 // Get the element's URL relative to the context.
@@ -164,9 +164,9 @@
   "};\r"
   "var %@ = locate(%@);", container, [self jsLocator]];
 
-  float x = [[[self viewController] jsEval:@"%@.x", container] floatValue];
-  float y = [[[self viewController] jsEval:@"%@.y", container] floatValue];
-
+  float x = [[self viewController] floatProperty:@"x" ofObject:container];
+  float y = [[self viewController] floatProperty:@"y" ofObject:container];
+  
   return CGPointMake(x, y);
 }
 
