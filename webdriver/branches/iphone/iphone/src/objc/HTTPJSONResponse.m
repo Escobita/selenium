@@ -21,8 +21,7 @@
 
 @implementation HTTPJSONResponse
 
-- (id)initWithData:(NSData *)data
-{
+- (id)initWithData:(NSData *)data {
   NSLog(@"Use initWithObject for HTTPJSONResponse");
   return nil;
 }

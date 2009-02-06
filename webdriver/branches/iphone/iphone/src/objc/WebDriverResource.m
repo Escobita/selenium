@@ -48,10 +48,14 @@
 {
   NSMutableDictionary *actions = [NSMutableDictionary dictionary];
  
-  if (getAction != NULL) [actions setValue:[NSValue valueWithPointer:getAction] forKey:@"GET"];
-  if (postAction != NULL) [actions setValue:[NSValue valueWithPointer:postAction] forKey:@"POST"];
-  if (putAction != NULL) [actions setValue:[NSValue valueWithPointer:putAction] forKey:@"PUT"];
-  if (deleteAction != NULL) [actions setValue:[NSValue valueWithPointer:deleteAction] forKey:@"DELETE"];
+  if (getAction != NULL)
+    [actions setValue:[NSValue valueWithPointer:getAction] forKey:@"GET"];
+  if (postAction != NULL)
+    [actions setValue:[NSValue valueWithPointer:postAction] forKey:@"POST"];
+  if (putAction != NULL)
+    [actions setValue:[NSValue valueWithPointer:putAction] forKey:@"PUT"];
+  if (deleteAction != NULL)
+    [actions setValue:[NSValue valueWithPointer:deleteAction] forKey:@"DELETE"];
   
   return [self initWithTarget:target actions:actions];
 }
@@ -78,7 +82,7 @@
                         PUTAction:NULL
                      DELETEAction:NULL];
 }
-  
+
 - (void)dealloc
 {
   [target_ release];
@@ -98,7 +102,8 @@
   [response setContext:context_];
 }
 
-// Make an array of objects containing the method arguments
+// Make an array of objects containing the method arguments. Return nil on
+// error.
 - (NSArray *)getArgumentListFromData:(NSData *)data {
   id requestData = nil;
   
@@ -111,7 +116,7 @@
     [dataString release];
   }
   
-  // The request data should be a list of arguments.
+  // The request data should contain an array of arguments.
   if (requestData != nil
       && ![requestData isKindOfClass:[NSArray class]]) {
     NSLog(@"Invalid argument list - Expecting an array but given %@",
@@ -122,7 +127,8 @@
   return (NSArray *)requestData;
 }
 
-// Create the invocator for the method
+// Create and return an invocator for the specified method. Returns nil on
+// error.
 - (NSInvocation *)createInvocationWithSelector:(SEL)selector
                                      signature:(NSMethodSignature *)method
                                      arguments:(NSArray *)arguments {
@@ -132,9 +138,11 @@
   [invocation setTarget:target_];
   
   if (arguments != nil) {
+    // The first two arguments in the method are the target and selector.
+    // NSInvocation will fill them in for us. We start with the 3rd argument.
     for (int i = 2; i < [method numberOfArguments]; i++) {
       id arg;
-      if (i-2 < [arguments count]) {
+      if (i - 2 < [arguments count]) {
         arg = [arguments objectAtIndex:i - 2];
       }
       else if (allowOptionalArguments_) {
@@ -177,12 +185,12 @@
                  signature, [signature numberOfArguments] - 2]];
   }
     
-  // TODO: check argument type as well as number.
+  // TODO(josephg): check argument type as well as number.
   
-  // On no error, return nil.
   return nil;
 }
 
+// Invoke the given invocation and create a WebDriver response from it.
 - (WebDriverResponse *)createResponseFromInvocation:(NSInvocation *)invocation {
   WebDriverResponse *response;
   
@@ -200,13 +208,14 @@
     NSLog(@"Method invocation error: %@", e);
     response = [WebDriverResponse responseWithError:e];
     
-//    @throw e;
+    // For easy debugging with Xcode, rethrow the exception here.
   }
   
   return response;
 }
 
-// Get the HTTP response to this request.
+// Get the HTTP response to this request. This method is part of the
+// |HTTPResource| protocol. It is the local entrypoint for creating a response.
 - (id<HTTPResponse,NSObject>)httpResponseForQuery:(NSString *)query
                                            method:(NSString *)method
                                          withData:(NSData *)theData {
@@ -214,7 +223,7 @@
   NSMethodSignature *methodSignature = [target_ methodSignatureForSelector:selector];
   WebDriverResponse *response = nil;
   
-  if (methodSignature == NULL) {
+  if (methodSignature == nil) {
     response = [WebDriverResponse responseWithError:
                 [NSString stringWithFormat:@"Invalid method for resource: %@",
                  method]];
@@ -227,7 +236,8 @@
   response = [self validateArgumentList:arguments
                           forHTTPMethod:method
                               signature:methodSignature];
-  // Validation failed if response != nil.
+  
+  // response != nil if validation failed.
   if (response != nil) {
     [self configureWebDriverResponse:response];
     return response;
@@ -240,12 +250,14 @@
   [[MainViewController sharedInstance]
    describeLastAction:NSStringFromSelector(selector)];
   
+  // Finally call the invocation and create a response from it.
   response = [self createResponseFromInvocation:invocation];
   [self configureWebDriverResponse:response];
   return response;
 }
 
-- (id<HTTPResource>)elementWithQuery:(NSString *)query {
+// This is part of the |HTTPResource| protocol.
+- (id<HTTPResource>)elementWithQuery:(NSString *)query { 
   return self;
 }
 
@@ -254,7 +266,7 @@
 
 @implementation HTTPVirtualDirectory (WebDriverResource)
 
-// Helper method to set JSON resources
+// Helper method to set JSON resources.
 - (void)setMyWebDriverHandlerWithGETAction:(SEL)getAction
                                 POSTAction:(SEL)postAction
                                  PUTAction:(SEL)putAction
@@ -278,6 +290,5 @@
                               DELETEAction:NULL
                                   withName:name];
 }
-
 
 @end

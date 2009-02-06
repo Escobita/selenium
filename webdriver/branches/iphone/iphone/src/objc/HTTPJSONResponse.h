@@ -28,8 +28,14 @@
 
 }
 
+// Create an |HTTPJSONResponse| from the object. The object is serialised to
+// JSON immediately.
+// Object must be one of NSNumber, NSString, NSDictionary, NSArray.
 - (id)initWithObject:(id)object;
 
+// A helper method for |initWithObject:| above. As with |initWithObject:|,
+// object must be one of NSNumber, NSString, NSDictionary, NSArray.
+// Follows standard autorelease pattern.
 + (HTTPJSONResponse *)responseWithObject:(id)object;
 
 @end

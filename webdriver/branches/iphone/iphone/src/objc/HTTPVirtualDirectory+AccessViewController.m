@@ -22,7 +22,9 @@
 @implementation HTTPVirtualDirectory (AccessViewController)
 
 - (WebViewController *)viewController {
-  // This is ugly.
+  // This is a somewhat ugly implementation. It is implemented like this so
+  // if we have multiple view controllers (eg, tabs), all VirtualDirectory
+  // access of the viewController can be easily changed.
   return [[HTTPServerController sharedInstance] viewController];
 }
 

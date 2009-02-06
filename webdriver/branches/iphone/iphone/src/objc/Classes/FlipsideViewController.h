@@ -18,6 +18,8 @@
 
 #import <UIKit/UIKit.h>
 
+// The view controller for the flipside view. Though not implemented yet, this
+// view will eventually show bonjour settings and configuration.
 @interface FlipsideViewController : UIViewController {
 
 }

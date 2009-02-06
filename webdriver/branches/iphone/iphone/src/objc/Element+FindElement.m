@@ -18,14 +18,13 @@
 
 #import "Element+FindElement.h"
 #import "HTTPVirtualDirectory+AccessViewController.h"
-#import "WebViewController+FindElement.h"
 #import "ElementStore.h"
 #import "WebDriverResource.h"
 #import "NSException+WebDriver.h"
+#import "WebViewController.h"
 
 @implementation Element (FindElement)
 
-// add the strange element and elements subdirs to the vdir.
 - (void)addSearchSubdirs {
   // This represents the element/ subdirectory of the element.
   HTTPVirtualDirectory *findElement = [HTTPVirtualDirectory virtualDirectory];
@@ -40,13 +39,16 @@
                             nil];
   
   for (NSString *method in searchMethods) {
-    [findElement setResource:[WebDriverResource resourceWithTarget:self
-                                                         GETAction:NULL
-                                                        POSTAction:@selector(findElementUsing:)]
+    [findElement setResource:
+     [WebDriverResource resourceWithTarget:self
+                                 GETAction:NULL
+                                POSTAction:@selector(findElementUsing:)]
                     withName:method];
-    [findElements setResource:[WebDriverResource resourceWithTarget:self
-                                                          GETAction:NULL
-                                                         POSTAction:@selector(findElementsUsing:)]
+    
+    [findElements setResource:
+     [WebDriverResource resourceWithTarget:self
+                                 GETAction:NULL
+                                POSTAction:@selector(findElementsUsing:)]
                      withName:method];    
   }
   
@@ -72,7 +74,8 @@
 - (NSArray *)elementsByXPath:(NSString *)xpath to:(NSString *)container {
   NSString *query = [NSString stringWithFormat:
    @"var elemsByXpath = function(xpath, context) {\r"
-    "var result = document.evaluate(xpath, context, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);\r"
+    "var result = document.evaluate(\r"
+    "  xpath, context, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);\r"
     "var arr = new Array();\r"
     "var element = result.iterateNext();\r"
     "while (element) {\r"
@@ -89,53 +92,45 @@
 // Search for elements by their name= attribute.
 - (NSArray *)elementsByName:(NSString *)name to:(NSString *)container {
   if ([self isDocumentElement]) {
-    NSString *query = [NSString stringWithFormat:
-                       @"var %@ = %@.getElementsByName(\"%@\");",
-                       container,
-                       [self jsLocator],
-                       name];
-    [[self viewController] jsEval:query];
+    // Searching in the whole DOM we can use document.getElementsByName.
+    [[self viewController] jsEval:
+                 @"var %@ = document.getElementsByName('%@');",
+                 container,
+                 name];
     return [elementStore_ elementsFromJSArray:container];
   } else {
-    // I'm just going to use xpath to do this.
-    return [self elementsByXPath:[NSString stringWithFormat:@".//*[@name = '%@']", name]
+    // We only want to search the subtree of this element in the DOM. Since
+    // there's no builtin element.getElementsByName, we use xpath.
+    return [self elementsByXPath:
+            [NSString stringWithFormat:@".//*[@name = '%@']", name]
                               to:container];
   }
 }
 
-// Is this element a direct or indirect decendant of the given element?
-- (BOOL)elementIsDecendantOfElement:(Element *)element {
+// Is this element a direct or indirect descendant of the given element?
+- (BOOL)elementIsDescendantOfElement:(Element *)element {
   NSString *result = [[self viewController] jsEval:
-  @"var elementIsDecendant = function(element, parent) {\r"
-   "var tmp = element;\r"
-   "while (tmp != null) {\r"
-   "  if (tmp == parentElement)\r"
-   "    return true;\r"
-   "  tmp = tmp.parentNode;\r"
-   "}\r"
-   "return false;\r"
-   "}; elementIsDecendant(%@, %@)", [self jsLocator], [element jsLocator]];
+    @"var elementIsDecendant = function(element, parent) {\r"
+     "  var tmp = element;\r"
+     "  while (tmp != null) {\r"
+     "    if (tmp == parentElement)\r"
+     "      return true;\r"
+     "    tmp = tmp.parentNode;\r"
+     "  }\r"
+     "  return false;\r"
+     "}; elementIsDecendant(%@, %@)", [self jsLocator], [element jsLocator]];
   return [result isEqualToString:@"true"];
 }
 
 - (NSArray *)elementsById:(NSString *)anId to:(NSString *)container {
-  [[self viewController] getElementById:anId
-                                   toJS:[NSString stringWithFormat:@"var %@",
-                                         container]];
-  Element *element = [self elementFromJSObject:container];
-  if (element) {
-    if ([self isDocumentElement] || [element elementIsDecendantOfElement:self])
-      return [NSArray arrayWithObject:element];
-    else
-      return [self elementsByXPath:[NSString stringWithFormat:@".//*[@id = '%@']",
-                                    anId]
-                                to:container];
-  }
-  else
-    return [NSArray array];
+  // We can't use getElementById() because there might be multiple elements with
+  // the same id. xpath should find them all correctly.
+  return [self elementsByXPath:[NSString stringWithFormat:@".//*[@id = '%@']",
+                                anId]
+                            to:container];
 }
 
-// Returns an array of the links in the child tree from this element.
+// Returns an array of the links in the DOM subtree from this element.
 - (NSArray *)links {
   NSString *container = @"_WEBDRIVER_links";
   [[self viewController] jsEval:@"var %@ = %@.getElementsByTagName('A');",
@@ -149,8 +144,10 @@
   
   NSMutableArray *result = [NSMutableArray array];
   for (Element *elem in links) {
-    // I'm going to do a straight comparison. If this search should be case-
-    // insensitive or something, use |NSString|'s compare:options:range:
+    // I'm going to do a straight comparison. The documentation isn't clear if
+    // this search should be case sensitive. I'll assume it is. If it shouldn't
+    // be case sensitive, this should be changed to use |NSString|'s
+    // compare:options:range:
     if ([[elem text] isEqualToString:text]) {
       [result addObject:elem];
     }
@@ -186,6 +183,8 @@
   
   NSArray *result = nil;
   
+  // This could be rewritten to use a dictionary of selectors keyed by the
+  // method, but I think it's more obvious what this is doing.
   if ([method isEqualToString:@"id"]) {
     result = [self elementsById:query to:tempStore];
   }
@@ -212,7 +211,6 @@
 
 - (NSArray *)findElementsUsing:(NSDictionary *)dict {
   // This maps the /element/id/element/method to findElementsByMethod.
-  // They shouldn't be different, but they are.
   NSString *query = [dict objectForKey:@"value"];
   NSString *method = [dict objectForKey:@"using"];
   return [self findElementsByMethod:method query:query];
@@ -223,7 +221,8 @@
   if (results && [results count] > 0)
     return [NSArray arrayWithObject:[results objectAtIndex:0]];
   else
-    @throw([NSException webDriverExceptionWithMessage:@"Unable to locate element"
-                                       webDriverClass:@"org.openqa.selenium.NoSuchElementException"]);
+    @throw([NSException
+            webDriverExceptionWithMessage:@"Unable to locate element"
+                           webDriverClass:@"org.openqa.selenium.NoSuchElementException"]);
 }
 @end

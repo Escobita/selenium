@@ -43,8 +43,6 @@
 		838B33760F14286600F72BC4 /* ElementStore+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33740F14286600F72BC4 /* ElementStore+FindElement.m */; };
 		838B33790F142CE800F72BC4 /* Element.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33780F142CE800F72BC4 /* Element.m */; };
 		838B337A0F142CE800F72BC4 /* Element.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33780F142CE800F72BC4 /* Element.m */; };
-		838B33A10F14391A00F72BC4 /* WebViewController+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33A00F14391A00F72BC4 /* WebViewController+FindElement.m */; };
-		838B33A20F14391A00F72BC4 /* WebViewController+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33A00F14391A00F72BC4 /* WebViewController+FindElement.m */; };
 		838B349E0F14630E00F72BC4 /* Element+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B349D0F14630E00F72BC4 /* Element+FindElement.m */; };
 		838B349F0F14630E00F72BC4 /* Element+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B349D0F14630E00F72BC4 /* Element+FindElement.m */; };
 		839049350F1ACEFD001A79B6 /* Attribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 839049340F1ACEFD001A79B6 /* Attribute.m */; };
@@ -191,8 +189,6 @@
 		838B33740F14286600F72BC4 /* ElementStore+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ElementStore+FindElement.m"; sourceTree = "<group>"; };
 		838B33770F142CE800F72BC4 /* Element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Element.h; sourceTree = "<group>"; };
 		838B33780F142CE800F72BC4 /* Element.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Element.m; sourceTree = "<group>"; };
-		838B339F0F14391A00F72BC4 /* WebViewController+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WebViewController+FindElement.h"; sourceTree = "<group>"; };
-		838B33A00F14391A00F72BC4 /* WebViewController+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WebViewController+FindElement.m"; sourceTree = "<group>"; };
 		838B349C0F14630E00F72BC4 /* Element+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Element+FindElement.h"; sourceTree = "<group>"; };
 		838B349D0F14630E00F72BC4 /* Element+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Element+FindElement.m"; sourceTree = "<group>"; };
 		839049330F1ACEFD001A79B6 /* Attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Attribute.h; sourceTree = "<group>"; };
@@ -292,8 +288,6 @@
 				289233A90DB2D0DB0083E9F9 /* MainViewController.m */,
 				8399865B0EE3A5000074D106 /* WebViewController.h */,
 				8399865C0EE3A5000074D106 /* WebViewController.m */,
-				838B339F0F14391A00F72BC4 /* WebViewController+FindElement.h */,
-				838B33A00F14391A00F72BC4 /* WebViewController+FindElement.m */,
 				831962700F27E79F005D1D21 /* UIResponder+SimulateTouch.h */,
 				831962710F27E79F005D1D21 /* UIResponder+SimulateTouch.m */,
 			);
@@ -661,7 +655,6 @@
 				838B334D0F14254C00F72BC4 /* Context+ExecuteScript.m in Sources */,
 				838B33760F14286600F72BC4 /* ElementStore+FindElement.m in Sources */,
 				838B337A0F142CE800F72BC4 /* Element.m in Sources */,
-				838B33A20F14391A00F72BC4 /* WebViewController+FindElement.m in Sources */,
 				838B349F0F14630E00F72BC4 /* Element+FindElement.m in Sources */,
 				839049350F1ACEFD001A79B6 /* Attribute.m in Sources */,
 				833104800F1EB2F7000A38DB /* NSException+WebDriver.m in Sources */,
@@ -691,7 +684,6 @@
 				838B334C0F14254C00F72BC4 /* Context+ExecuteScript.m in Sources */,
 				838B33750F14286600F72BC4 /* ElementStore+FindElement.m in Sources */,
 				838B33790F142CE800F72BC4 /* Element.m in Sources */,
-				838B33A10F14391A00F72BC4 /* WebViewController+FindElement.m in Sources */,
 				838B349E0F14630E00F72BC4 /* Element+FindElement.m in Sources */,
 				839D645A0F2EB4BB009645BF /* HTTPJSONResponse.m in Sources */,
 				839D645B0F2EB4BC009645BF /* JSONRESTResource.m in Sources */,

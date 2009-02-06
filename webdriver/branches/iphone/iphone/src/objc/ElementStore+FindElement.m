@@ -23,14 +23,13 @@
 @implementation ElementStore (FindElement)
 
 - (NSArray *)findElementsByMethod:(NSString *)method query:(NSString *)query {
+  // Just forward the request to the document element.
   return [[self document] findElementsByMethod:method query:query];
 }
 
 // This method is the same as above, but it only returns one value.
 // I'm not sure why it returns that single value in an array, but thats the
 // spec.
-// TODO: Consider implementing this by just calling |findElementByMethod:query:|
-// like above.
 - (NSArray *)findElementByMethod:(NSString *)method query:(NSString *)query {
   NSArray *allElements = [self findElementsByMethod:method query:query];
   if (allElements != nil && [allElements count] >= 1)

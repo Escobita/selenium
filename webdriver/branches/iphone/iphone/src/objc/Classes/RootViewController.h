@@ -21,9 +21,10 @@
 @class MainViewController;
 @class FlipsideViewController;
 
-// This class manages the two views & controllers. Its the standard apple
-// template code.
+// |RootViewController| manages the two views and controllers. It is mostly
+// standard apple template code.
 @interface RootViewController : UIViewController {
+  // The button which switches views
   UIButton *infoButton;
   MainViewController *mainViewController;
   FlipsideViewController *flipsideViewController;

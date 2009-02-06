@@ -18,7 +18,7 @@
 
 #import "FlipsideViewController.h"
 
-
+// Currently unmodified apple boilerplate
 @implementation FlipsideViewController
 
 - (void)viewDidLoad {
@@ -27,8 +27,7 @@
 }
 
 - (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-  // Release anything that's not essential, such as cached data
+  [super didReceiveMemoryWarning];
 }
 
 - (void)dealloc {

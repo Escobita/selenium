@@ -24,18 +24,24 @@
 #import "HTTPResponse.h"
 #import "HTTPRedirectResponse.h"
 
+// These tests test that the HTTP Server can correctly send redirect methods,
+// handle get, put, post and deletes and respond with custom-generated errors.
+// This is all the functionality the web server extensions patch adds to
+// CocoaHTTPServer.
+
+// These tests do not simulate actual network traffic but instead inject
+// HTTP data into CocoaHTTPServer through AsyncSocket.
+
+
+// This category lets us access an otherwise internal method of HTTPConnection.
 @interface WebDriverHTTPConnection (Internal)
 
 -(void)replyToHTTPRequest;
+-(void)setRequest:(CFHTTPMessageRef)newRequest;
 
 @end
 
-@interface WebDriverHTTPConnection (TestingAdditions)
-
-- (void)setRequest:(CFHTTPMessageRef)newRequest;
-
-@end
-
+// This category lets us dig into the HTTPConnection.
 @implementation WebDriverHTTPConnection (TestingAdditions)
 
 - (void)setRequest:(CFHTTPMessageRef)newRequest {
@@ -51,13 +57,13 @@
 
 
 @interface HTTPServerTests: SenTestCase {
-  HTTPServer *server;
+  HTTPServer *server_;
 	
-  NSString *lastUrl;
-  NSString *lastMethod;
-  NSData *lastDataBody;
+  NSString *lastUrl_;
+  NSString *lastMethod_;
+  NSData *lastDataBody_;
 	
-  NSObject<HTTPResponse> *response;
+  NSObject<HTTPResponse> *response_;
 }
 
 @end
@@ -65,22 +71,24 @@
 
 @implementation HTTPServerTests
 
+// Create a simple web server.
 -(void) setUp {
-  server = [[HTTPServer alloc] init];
-  [server setDelegate:self];
-  [server setConnectionClass:[WebDriverHTTPConnection class]];
-  [server setDocumentRoot:[NSURL fileURLWithPath:[@"/" stringByExpandingTildeInPath]]];
+  server_ = [[HTTPServer alloc] init];
+  [server_ setDelegate:self];
+  [server_ setConnectionClass:[WebDriverHTTPConnection class]];
+  [server_ setDocumentRoot:[NSURL fileURLWithPath:
+                            [@"/" stringByExpandingTildeInPath]]];
   NSError *error = nil;
 
-  BOOL success = [server start:&error];
+  BOOL success = [server_ start:&error];
 
   STAssertEquals(YES, success,
-				   @"Could not start server: %@",
-				   error);
+                 @"Could not start server: %@",
+                 error);
 }
 
 -(void) tearDown {
-  [server release];
+  [server_ release];
 }
 
 - (NSObject<HTTPResponse> *)dummyHTTPResponse {
@@ -89,35 +97,42 @@
   return [[[HTTPDataResponse alloc] initWithData:data] autorelease];
 }
 
+// This overridden method makes a copy of any HTTP message recieved into our
+// HTTPServerTests instance for examination.
 - (NSObject<HTTPResponse> *)httpResponseForRequest:(CFHTTPMessageRef)request {
-  [lastUrl release];
-  [lastMethod release];
-  [lastDataBody release];
+  [lastUrl_ release];
+  [lastMethod_ release];
+  [lastDataBody_ release];
 	
-  lastUrl = (NSString*)CFURLCopyPath(CFHTTPMessageCopyRequestURL(request));
-  lastMethod = (NSString*)CFHTTPMessageCopyRequestMethod(request);
-  lastDataBody = (NSData*)CFHTTPMessageCopyBody(request);
+  lastUrl_ = (NSString*)CFURLCopyPath(CFHTTPMessageCopyRequestURL(request));
+  lastMethod_ = (NSString*)CFHTTPMessageCopyRequestMethod(request);
+  lastDataBody_ = (NSData*)CFHTTPMessageCopyBody(request);
 	
-  if (response == nil)
+  if (response_ == nil)
     return [self dummyHTTPResponse];
   else
-    return [[response retain] autorelease];
+    return [[response_ retain] autorelease];
 }
 
 // Test if the server has started.
 -(void)testStarted {
-  // We don't need to do anything here.
+  // We don't need to do anything here - setUp is called automatically and it
+  // will throw an exception if the server didn't start.
 }
 
 - (NSURL *)baseURL {
-  return [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/", [server port]]];
+  return [NSURL URLWithString:
+          [NSString stringWithFormat:@"http://localhost:%d/", [server_ port]]];
 }
 
+// Inject a given HTTP request into the web server.
 - (void)injectRequest:(CFHTTPMessageRef)request {
+  // Make a fake AsyncSocket with the data we want to inject.
   AsyncSocket *sock = [[AsyncSocket alloc] init];
-  WebDriverHTTPConnection *connection = [[WebDriverHTTPConnection alloc] initWithAsyncSocket:sock forServer:server];
+  WebDriverHTTPConnection *connection = [[WebDriverHTTPConnection alloc] 
+                                         initWithAsyncSocket:sock 
+                                                   forServer:server_];
   [connection onSocketWillConnect:sock];
-  //	[connection onSocket:sock didReadData:(NSData*)data withTag:0];
   [connection setRequest:request];
   [connection replyToHTTPRequest];
 	
@@ -125,12 +140,17 @@
   [sock release];
 }
 
+// Test that we correctly recieved and handled an HTTP request with the
+// designated message and data.
 - (void)sendTestRequestWithMethod:(NSString *)method data:(NSString *)dataStr {
-  STAssertNotNULL(server, @"server is null");
+  STAssertNotNULL(server_, @"server is null");
   NSString *testURL = @"/a/b/c";
 	
   NSURL *url = [NSURL URLWithString:testURL relativeToURL:[self baseURL]];
-  CFHTTPMessageRef request = CFHTTPMessageCreateRequest(NULL, (CFStringRef)method, (CFURLRef)url, kCFHTTPVersion1_1);
+  CFHTTPMessageRef request = CFHTTPMessageCreateRequest(NULL,
+                                                        (CFStringRef)method,
+                                                        (CFURLRef)url,
+                                                        kCFHTTPVersion1_1);
 	
   NSData *data = nil;
   if (dataStr != nil) {
@@ -141,16 +161,16 @@
   [self injectRequest:request];
   CFRelease(request);
 	
-  STAssertNotNULL(lastMethod, @"Did not recieve HTTP request");
-  STAssertEqualStrings(method, lastMethod,
+  STAssertNotNULL(lastMethod_, @"Did not recieve HTTP request");
+  STAssertEqualStrings(method, lastMethod_,
                        @"Recieved method incorrect - expected %@ recieved %@",
-                       method, lastMethod);
-  STAssertEqualStrings(testURL, lastUrl,
+                       method, lastMethod_);
+  STAssertEqualStrings(testURL, lastUrl_,
                        @"Recieved URL incorrect - expected %@ recieved %@",
-                       testURL, lastUrl);
+                       testURL, lastUrl_);
 
   if (dataStr != nil) {
-    BOOL dataMathches = [lastDataBody isEqualToData:data];
+    BOOL dataMathches = [lastDataBody_ isEqualToData:data];
     STAssertTrue(dataMathches, @"Body data does not match!");
   }
 }
@@ -171,19 +191,25 @@
   [self sendTestRequestWithMethod:@"POST" data:@"hello there"];
 }
 
-// TODO: This should be broken out into |HTTPRedirectResponse.m|.
+// Test that the server correctly respects redirect responses. 
 - (void)testRedirect {
   NSString *destinationURL = @"/foo/bar/bat";
-  response = [HTTPRedirectResponse redirectToURL:destinationURL];
+  response_ = [HTTPRedirectResponse redirectToURL:destinationURL];
 	
-  STAssertNotNULL(server, @"server is null");
+  STAssertNotNULL(server_, @"server is null");
   NSString *testURL = @"/a/b/c";
 	
   NSURL *url = [NSURL URLWithString:testURL relativeToURL:[self baseURL]];
-  CFHTTPMessageRef request = CFHTTPMessageCreateRequest(NULL, CFSTR("GET"), (CFURLRef)url, kCFHTTPVersion1_1);
+  CFHTTPMessageRef request = CFHTTPMessageCreateRequest(NULL,
+                                                        CFSTR("GET"),
+                                                        (CFURLRef)url,
+                                                        kCFHTTPVersion1_1);
   [self injectRequest:request];
   CFRelease(request);
 	
-  // TODO: This test is incomplete.
+  // TODO(josephg): This test is incomplete.
 }
+
+// TODO(josephg): Add a test for error responses (502, etc).
+
 @end

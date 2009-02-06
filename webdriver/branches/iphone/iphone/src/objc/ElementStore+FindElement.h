@@ -21,13 +21,19 @@
 
 // This category implements the findElement[s] methods accessable on
 // :context/element and :context/elements.
-// The methods simply forward the requests to the document element.
+// The methods simply forward the requests to the document |Element|'s
+// findElement methods.
 @interface ElementStore (FindElement)
 
-// This throws an exception if it can't find the given element.
+// Find and return a single element found after searching with the given search
+// method and query. The search method can be 'class', 'name', 'id',
+// 'link text' and 'class name'.
+// Throws an exception if no element can be found.
 - (NSArray *)findElementByMethod:(NSString *)method query:(NSString *)query;
 
-// This returns an array of all elements found.
+// Find and return all matching elements for the search method and query.
+// Valid search methods are the same as for |findElementByMethod:query:| above.
+// Throws an exception if no element can be found.
 - (NSArray *)findElementsByMethod:(NSString *)method query:(NSString *)query;
 
 @end

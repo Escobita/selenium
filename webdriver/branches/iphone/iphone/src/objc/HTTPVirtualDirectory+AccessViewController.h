@@ -21,6 +21,8 @@
 
 @class WebViewController;
 
+// This category gives |HTTPVirtualDirectory| objects access to the
+// |WebViewController|.
 @interface HTTPVirtualDirectory (AccessViewController)
 
 - (WebViewController *)viewController;

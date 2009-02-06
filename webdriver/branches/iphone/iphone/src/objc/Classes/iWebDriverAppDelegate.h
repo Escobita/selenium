@@ -20,6 +20,7 @@
 
 @class RootViewController;
 
+// |iWebDriverAppDelegate| is boilerplate.
 @interface iWebDriverAppDelegate : NSObject <UIApplicationDelegate> {
   UIWindow *window_;
   RootViewController *rootViewController_;
