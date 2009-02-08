@@ -74,16 +74,17 @@
 - (NSArray *)elementsByXPath:(NSString *)xpath to:(NSString *)container {
   NSString *query = [NSString stringWithFormat:
    @"var elemsByXpath = function(xpath, context) {\r"
-    "var result = document.evaluate(\r"
-    "  xpath, context, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);\r"
-    "var arr = new Array();\r"
-    "var element = result.iterateNext();\r"
-    "while (element) {\r"
-    "  arr.push(element);\r"
-    "  element = result.iterateNext();\r"
-    "}\r"
-    "return arr;\r"
-    "}; var %@ = elemsByXpath(\"%@\",%@);", container, xpath, [self jsLocator]];
+    "  var result = document.evaluate(\r"
+    "    xpath, context, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);\r"
+    "  var arr = new Array();\r"
+    "  var element = result.iterateNext();\r"
+    "  while (element) {\r"
+    "    arr.push(element);\r"
+    "    element = result.iterateNext();\r"
+    "  }\r"
+    "  return arr;\r"
+    "};\r"
+    "var %@ = elemsByXpath('%@', %@);", container, xpath, [self jsLocator]];
   [[self viewController] jsEval:@"%@.length", container];
   [[self viewController] jsEval:query];
   return [elementStore_ elementsFromJSArray:container];
