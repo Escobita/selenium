@@ -18,7 +18,7 @@
 
 #import "WebDriverResource.h"
 #import "WebDriverResponse.h"
-#import "JSON.h"
+#import "NSString+SBJSON.h"
 #import "MainViewController.h"
 
 @implementation WebDriverResource

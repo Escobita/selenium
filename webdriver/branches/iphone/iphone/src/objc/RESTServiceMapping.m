@@ -17,7 +17,6 @@
 //  limitations under the License.
 
 #import "RESTServiceMapping.h"
-#import "JSON.h"
 #import "HTTPJSONResponse.h"
 #import "HTTPVirtualDirectory.h"
 #import "HTTPStaticResource.h"

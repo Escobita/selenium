@@ -17,7 +17,7 @@
 //  limitations under the License.
 
 #import "HTTPJSONResponse.h"
-#import "JSON.h"
+#import "NSObject+SBJSON.h"
 
 @implementation HTTPJSONResponse
 

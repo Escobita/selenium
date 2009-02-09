@@ -17,27 +17,16 @@
 //  limitations under the License.
 
 #import "HTTPResponse+Utility.h"
-#import "JSON.h"
 
 @implementation HTTPDataResponse (Utility)
 
 - (id)initWithString:(NSString *)str {
   return [self initWithData:[str dataUsingEncoding:NSUTF8StringEncoding]];
 }
-/*
-- (id)initWithJSONObject:(id)obj
-{
-	return [self initWithString:[obj JSONFragment]];
-}*/
 
-+ (id)responseWithString:(NSString *)str {
++ (HTTPDataResponse *)responseWithString:(NSString *)str {
   return [[[self alloc] initWithString:str] autorelease];
 }
-/*
-+ (id)responseWithJSONObject:(id)obj
-{
-	return [[[self alloc] initWithJSONObject:obj] autorelease];	
-}*/
 
 - (NSString *)description {
   return [[[NSString alloc] initWithData:data

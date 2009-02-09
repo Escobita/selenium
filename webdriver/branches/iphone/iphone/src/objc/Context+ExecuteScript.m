@@ -18,7 +18,7 @@
 
 #import "Context+ExecuteScript.h"
 #import "HTTPVirtualDirectory+AccessViewController.h"
-#import "JSON.h"
+#import "NSObject+SBJSON.h"
 #import "WebViewController.h"
 #import "NSException+WebDriver.h"
 #import "Element.h"

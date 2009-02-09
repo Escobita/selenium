@@ -19,13 +19,16 @@
 #import <Foundation/Foundation.h>
 #import "HTTPResponse.h"
 
+// The |Utility| category adds some convenience methods to HTTPDataResponse
+// allowing |HTTPDataResponse|s to be created from strings.
 @interface HTTPDataResponse (Utility)
 
+// Init an |HTTPDataResponse| containing the given string encoded in UTF8. 
 - (id)initWithString:(NSString *)str;
-//- (id)initWithJSONObject:(id)obj;
 
-+ (id)responseWithString:(NSString *)str;
-//+ (id)responseWithJSONObject:(id)obj;
+// Create and return an |HTTPDataResponse| containing the given string encoded
+// in UTF8. Returned object is autoreleased.
++ (HTTPDataResponse *)responseWithString:(NSString *)str;
 
 - (NSString *)description;
 

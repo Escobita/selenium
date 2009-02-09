@@ -17,7 +17,7 @@
 //  limitations under the License.
 
 #import "JSONRESTResource.h"
-#import "JSON.h"
+#import "NSString+SBJSON.h"
 #import "HTTPJSONResponse.h"
 
 @implementation JSONRESTResource
