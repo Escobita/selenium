@@ -19,6 +19,7 @@
 		289233AF0DB2D0DB0083E9F9 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 289233AB0DB2D0DB0083E9F9 /* RootViewController.m */; };
 		289233B00DB2D0DB0083E9F9 /* FlipsideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 289233AD0DB2D0DB0083E9F9 /* FlipsideViewController.m */; };
 		8301250C0EFF044900BA9BE6 /* Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 839988650EE515C90074D106 /* Session.m */; };
+		8311AB7A0F44EF0500921B78 /* selenium-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8311AB790F44EF0500921B78 /* selenium-icon.png */; };
 		8316A1BF0EECCCA300FE869C /* Context.m in Sources */ = {isa = PBXBuildFile; fileRef = 8316A1BE0EECCCA300FE869C /* Context.m */; };
 		8316A1C00EECCCA300FE869C /* Context.m in Sources */ = {isa = PBXBuildFile; fileRef = 8316A1BE0EECCCA300FE869C /* Context.m */; };
 		8316A2120EECE0F700FE869C /* HTTPResponse+Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = 8316A2110EECE0F700FE869C /* HTTPResponse+Utility.m */; };
@@ -162,6 +163,7 @@
 		289233AD0DB2D0DB0083E9F9 /* FlipsideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FlipsideViewController.m; path = Classes/FlipsideViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* iWebDriver_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iWebDriver_Prefix.pch; sourceTree = "<group>"; };
+		8311AB790F44EF0500921B78 /* selenium-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selenium-icon.png"; sourceTree = "<group>"; };
 		8316A1BD0EECCCA300FE869C /* Context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Context.h; sourceTree = "<group>"; };
 		8316A1BE0EECCCA300FE869C /* Context.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Context.m; sourceTree = "<group>"; };
 		8316A2100EECE0F700FE869C /* HTTPResponse+Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPResponse+Utility.h"; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8311AB790F44EF0500921B78 /* selenium-icon.png */,
 				280E754A0DD40C5E005A515E /* FlipsideView.xib */,
 				8399863B0EE3A2E70074D106 /* MainView.xib */,
 				280E754C0DD40C5E005A515E /* MainWindow.xib */,
@@ -597,6 +600,7 @@
 				280E754D0DD40C5E005A515E /* FlipsideView.xib in Resources */,
 				280E754F0DD40C5E005A515E /* MainWindow.xib in Resources */,
 				8399863C0EE3A2E70074D106 /* MainView.xib in Resources */,
+				8311AB7A0F44EF0500921B78 /* selenium-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
