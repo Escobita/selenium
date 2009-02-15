@@ -102,7 +102,7 @@
                 <li><a href="/documentation/screencasts/">Screencasts</a></li>
                 <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                 <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                <li><a href="/projects/core/reference.html">Selenium API</a></li>
+                <li><a href="/documentation/core/reference.html">Selenium API</a></li>
                 </ul>
             </li>
         </ul>
@@ -160,7 +160,7 @@
             <ul>
                 <li><a href="/projects/ide/">Selenium IDE</a></li>
                 <li><a href="/projects/remote-control/">Selenium Remote Control</a></li>
-                <li><a href="http://selenium-grid.openqa.org/">Selenium Grid</a></li>
+                <li><a href="http://selenium-grid.seleniumhq.org/">Selenium Grid</a></li>
                 <li><a href="/projects/core/">Selenium Core</a></li>
                 <li><a href="/projects/on-rails/">Selenium on Rails</a></li>
                 <li><a href="/projects/ruby/">Selenium on Ruby</a></li>
@@ -173,7 +173,7 @@
                 <li><a href="/documentation/screencasts/">Screencasts</a></li>
                 <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                 <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                <li><a href="/projects/core/reference.html">Selenium API</a></li>
+                <li><a href="/documentation/core/reference.html">Selenium API</a></li>
             </ul>
         </li>
         <li><a href="/support/">Support</a>
