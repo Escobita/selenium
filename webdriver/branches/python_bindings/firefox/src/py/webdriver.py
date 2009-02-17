@@ -6,10 +6,12 @@ import time
 from webelement import *
 from exceptions import *
 from firefoxlauncher import FirefoxLauncher
+from webdriver_common.exceptions import *
 
 class WebDriver(object):
     """The main interface to use for testing, which represents an idealised web browser."""
     def __init__(self):
+        FirefoxLauncher().LaunchBrowser()
         self._conn = ExtensionConnection()
         self._conn.connect()
 
