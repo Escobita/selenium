@@ -84,14 +84,12 @@ class WebElement(object):
                              "value":[char for char in value]})
 
     def _get(self, path, *params):
-        resp = self._conn.get(("element/%s/" % self.id) + path, *params)
-        if resp:
-            return resp["value"]
+        return utils.return_value_if_exists(
+            self._conn.get(("element/%s/" % self.id) + path, *params))
 
     def _post(self, path, *params):
-        resp = self._conn.post(("element/%s/" % self.id) + path, *params)
-        if resp:
-            return resp["value"]
+        return utils.return_value_if_exists(
+            self._conn.post(("element/%s/" % self.id) + path, *params))
 
     def _get_elem(self, resp_value):
         return WebElement(self, resp_value.split("/")[1])

@@ -109,14 +109,12 @@ class WebDriver(object):
         return WebElement(self, resp_value.split("/")[1])
 
     def _get(self, path, *params):
-        resp = self._conn.get(path, *params)
-        if resp:
-            return resp["value"]
+        return utils.return_value_if_exists(
+            self._conn.get(path, *params))
 
     def _post(self, path, *params):
-        resp = self._conn.post(path, *params)
-        if resp:
-            return resp["value"]
+        return utils.return_value_if_exists(
+            self._conn.post(path, *params))
 
     def _delete(self, path):
         self._conn.request("DELETE", path)

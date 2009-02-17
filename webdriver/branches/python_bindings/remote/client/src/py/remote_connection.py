@@ -16,7 +16,7 @@ class RemoteConnection(object):
             self._context = "foo_conext"
             self._session_id = ""
             #TODO: parameterize the capabilities
-            resp = self.post("/hub/session/",
+            resp = self.post("/hub/session",
                              {"browserName":"firefox",
                               "platform":"ANY",
                               "class":"org.openqa.selenium.remote.DesiredCapabilities",
