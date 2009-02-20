@@ -7,8 +7,8 @@ from webdriver_common.exceptions import *
 
 
 class WebDriver(object):
-    def __init__(self):
-        self._conn = RemoteConnection()
+    def __init__(self, remote_server_addr, browser_name, platform):
+        self._conn = RemoteConnection(remote_server_addr, browser_name, platform)
 
     def get(self, url):
         """Loads a web page in the current browser."""

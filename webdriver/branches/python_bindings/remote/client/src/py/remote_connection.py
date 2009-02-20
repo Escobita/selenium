@@ -4,21 +4,19 @@ import logging
 import utils
 from webdriver_common.exceptions import ErrorInResponseException
 
-SERVER_ADDR = "localhost:6001"
-
 class RemoteConnection(object):
     __shared_state = {}
 
-    def __init__(self):
+    def __init__(self, remote_server_addr, browser_name, platform):
         self.__dict__ = self.__shared_state
         if "_conn" not in self.__dict__:
-            self._conn = httplib.HTTPConnection(SERVER_ADDR)
-            self._context = "foo_conext"
+            self._conn = httplib.HTTPConnection(remote_server_addr)
+            self._context = "foo"
             self._session_id = ""
             #TODO: parameterize the capabilities
             resp = self.post("/hub/session",
-                             {"browserName":"firefox",
-                              "platform":"ANY",
+                             {"browserName": browser_name,
+                              "platform": platform,
                               "class":"org.openqa.selenium.remote.DesiredCapabilities",
                               "javascriptEnabled":False,
                               "version":""},

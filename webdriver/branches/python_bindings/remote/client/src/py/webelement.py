@@ -9,7 +9,6 @@ class WebElement(object):
     def __init__(self, parent, id):
         self.parent = parent
         self.id = id
-        self._conn = RemoteConnection()
 
     def get_text(self):
         return self._get("text")
@@ -85,12 +84,18 @@ class WebElement(object):
 
     def _get(self, path, *params):
         return utils.return_value_if_exists(
-            self._conn.get(("element/%s/" % self.id) + path, *params))
+            self._get_root_parent()._conn.get(("element/%s/" % self.id) + path, *params))
 
     def _post(self, path, *params):
         return utils.return_value_if_exists(
-            self._conn.post(("element/%s/" % self.id) + path, *params))
+            self._get_root_parent()._conn.post(("element/%s/" % self.id) + path, *params))
 
     def _get_elem(self, resp_value):
         return WebElement(self, resp_value.split("/")[1])
+
+    def _get_root_parent(self):
+        parent = self.parent
+        while "parent" in parent.__dict__:
+            parent = parent.parent
+        return parent
 

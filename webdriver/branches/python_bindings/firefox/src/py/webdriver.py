@@ -4,7 +4,6 @@ import sys
 import time
 
 from webelement import *
-from exceptions import *
 from firefoxlauncher import FirefoxLauncher
 from webdriver_common.exceptions import *
 

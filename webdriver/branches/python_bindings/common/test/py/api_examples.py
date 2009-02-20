@@ -8,13 +8,12 @@ import unittest
 from webdriver_common.exceptions import *
 from webdriver_common.webserver import SimpleWebServer
 
-# The following classes are to be swapped in at run time
-WebDriver = None
-WebElement = None
+driver = None
 
 class ApiExampleTest (unittest.TestCase):
+
     def setUp(self):
-        self.driver = WebDriver()
+        self.driver = driver
 
     def tearDown(self):
         pass
@@ -183,7 +182,7 @@ class ApiExampleTest (unittest.TestCase):
     def testExecuteScriptAndReturnElement(self):
         self._loadPage("xhtmlTest")
         elem = self.driver.execute_script("return document.getElementById('id1');")
-        self.assertEquals(WebElement, type(elem))
+        self.assertTrue("WebElement" in str(type(elem)))
 
     def testExecuteScriptWithArgs(self):
         self._loadPage("xhtmlTest")
@@ -203,11 +202,9 @@ class ApiExampleTest (unittest.TestCase):
     def _loadPage(self, name):
         self.driver.get("http://localhost:8000/%s.html" % name)
 
-def run_tests(package):
-    global WebDriver, WebElement
-    WebDriver = package.webdriver.WebDriver
-    WebElement =  package.webelement.WebElement
-
+def run_tests(_driver):
+    global driver
+    driver = _driver
     logging.basicConfig(level=logging.INFO)
     webserver = SimpleWebServer()
     webserver.start()
@@ -215,7 +212,6 @@ def run_tests(package):
         testLoader = unittest.TestLoader()
         testRunner = unittest.TextTestRunner()
         testRunner.run(testLoader.loadTestsFromTestCase(ApiExampleTest))
-        driver = WebDriver()
         driver.quit()
     finally:
         webserver.stop()
