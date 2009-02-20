@@ -129,7 +129,7 @@ class WebDriver(object):
 
     def _handle_find_element_exception(self, e):
         if "Unable to locate element" in e.response:
-            raise NoSuchElementException("Unable to locate element:")
+            raise NoSuchElementException(e.response)
         else:
             raise e
 

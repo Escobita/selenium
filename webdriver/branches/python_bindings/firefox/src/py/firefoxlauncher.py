@@ -21,13 +21,21 @@ class FirefoxLauncher(object):
                     program_files = "\\Program Files"
                 self._start_cmd = os.path.join(program_files, "Mozilla Firefox\\firefox.exe") 
             else:
-                self._start_cmd = Popen(["which", "firefox2"], stdout=PIPE).communicate()[0].strip()
+                # Maybe iceweasel (Debian) is another candidate...
+                for ffname in ["firefox2", "firefox", "firefox-3.0"]:
+                    logging.debug("Searching for '%s'...", ffname)
+                    p = Popen(["which", ffname], stdout=PIPE)
+                    cmd = p.communicate()[0].strip()
+                    if cmd != "":
+                        logging.debug("Using %s", cmd)
+                        self._start_cmd = cmd
+                        break
 
     def LaunchBrowser(self):
         if self.extension_connection.is_connectable():
             logging.debug("Browser already running, ignore")
         else:
-            Popen([self._start_cmd, "-P", "WebDriver"])
+            Popen([self._start_cmd, "-no-remote", "-P", "WebDriver"])
             self._WaitUntilConnectable()
 
     def _WaitUntilConnectable(self):
