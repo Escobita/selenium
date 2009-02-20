@@ -1,6 +1,6 @@
 from webdriver_common.exceptions import *
 from results_page import ResultsPage
-from utils import require_loaded
+from page_loader import require_loaded
 class GoogleOneBox(object):
     """This class models a page that has a google search bar."""
     

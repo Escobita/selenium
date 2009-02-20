@@ -20,8 +20,11 @@ class WebDriver(object):
         return resp
 
     def find_element_by_id(self, id):
-        resp = self._post("element", "id", id)
-        return self._get_elem(resp[0])
+        try:
+            resp = self._post("element", "id", id)
+            return self._get_elem(resp[0])
+        except ErrorInResponseException, e:
+            utils.handle_find_element_exception(e)
 
     def find_elements_by_xpath(self, xpath):
         resp = self._post("elements", "xpath", xpath)
@@ -56,7 +59,6 @@ class WebDriver(object):
             return self._get_elem(self._post("element", "xpath", xpath)[0])
         except ErrorInResponseException, e:
             utils.handle_find_element_exception(e)
-        return elem
 
     def find_element_by_link_text(self, link):
         """Finds an element by its link text.
