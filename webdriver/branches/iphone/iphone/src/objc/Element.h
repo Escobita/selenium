@@ -73,7 +73,7 @@
 - (NSString *)text;
 
 // Type these keys into the element.
-- (void)sendKeys:(NSString *)keys;
+- (void)sendKeys:(NSDictionary *)dict;
 
 // Is the element checked?
 // This method is only valid on checkboxes and radio buttons.

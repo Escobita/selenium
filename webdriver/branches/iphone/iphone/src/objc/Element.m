@@ -227,9 +227,9 @@
             [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
-- (void)sendKeys:(NSString *)keys {
-  // double check my signature
-  // TODO: implement me.
+- (void)sendKeys:(NSDictionary *)dict {
+  [[self viewController]
+    jsEval:[NSString stringWithFormat:@"%@.value=%@", [self jsLocator], [dict objectForKey:@"value"]]];
 }
 
 - (NSString *)value {
