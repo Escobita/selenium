@@ -5,17 +5,13 @@ from webdriver_firefox.webdriver import WebDriver
 
 
 class FirefoxLauncherTests (unittest.TestCase):
-    def setUp(self):
-        self.firefox = FirefoxLauncher()
 
     def testLaunchAndCloseBrowser(self):
-         self.firefox.LaunchBrowser()
-         self.webdriver = WebDriver()
+         self.webdriver = WebDriver("WebDriver")
          self.webdriver.quit()
 
     def testDoubleClose(self):
-        self.firefox.LaunchBrowser()
-        self.webdriver = WebDriver()
+        self.webdriver = WebDriver("WebDriver")
         self.webdriver.close()
         self.webdriver.close()
         self.webdriver.quit()

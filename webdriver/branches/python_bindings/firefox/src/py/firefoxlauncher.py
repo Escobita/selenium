@@ -5,6 +5,7 @@ import time
 import platform
 import os
 from extensionconnection import ExtensionConnection
+from firefox_profile import ProfileIni
 
 class FirefoxLauncher(object):
     __shared_state = {}
@@ -30,12 +31,17 @@ class FirefoxLauncher(object):
                         logging.debug("Using %s", cmd)
                         self._start_cmd = cmd
                         break
+            self.profile_ini = ProfileIni()
 
-    def LaunchBrowser(self):
+    def LaunchBrowser(self, profile_name):
         if self.extension_connection.is_connectable():
             logging.debug("Browser already running, ignore")
         else:
-            Popen([self._start_cmd, "-no-remote", "-P", "WebDriver"])
+            if profile_name not in self.profile_ini.profiles:
+                Popen([self._start_cmd, "-createProfile", profile_name]).wait()
+                self.profile_ini.refresh()
+            self.profile_ini.profiles[profile_name].add_extension()
+            Popen([self._start_cmd, "-no-remote", "--verbose", "-P", profile_name])
             self._WaitUntilConnectable()
 
     def _WaitUntilConnectable(self):

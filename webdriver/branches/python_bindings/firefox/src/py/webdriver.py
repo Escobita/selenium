@@ -5,12 +5,13 @@ import time
 
 from webelement import *
 from firefoxlauncher import FirefoxLauncher
+from firefox_profile import FirefoxProfile
 from webdriver_common.exceptions import *
 
 class WebDriver(object):
     """The main interface to use for testing, which represents an idealised web browser."""
-    def __init__(self):
-        FirefoxLauncher().LaunchBrowser()
+    def __init__(self, profile_name=None):
+        FirefoxLauncher().LaunchBrowser(profile_name)
         self._conn = ExtensionConnection()
         self._conn.connect()
 
