@@ -15,11 +15,11 @@ class WebElement(object):
 
     def click(self):
         """Clicks the element."""
-        self._post("click")
+        self._post("click", {"id": self.id})
 
     def submit(self):
         """Submits a form."""
-        self._post("submit")
+        self._post("submit", {"id": self.id})
 
     def get_value(self):
         """Gets the value of the element's value attribute."""
@@ -27,7 +27,7 @@ class WebElement(object):
 
     def clear(self):
         """Clears the text if it's a text entry element."""
-        self._post("clear")
+        self._post("clear", {"id": self.id})
 
     def get_attribute(self, name):
         """Gets the attribute value."""
@@ -35,7 +35,7 @@ class WebElement(object):
 
     def toggle(self):
         """Toggles the element state."""
-        self._post("toggle")
+        self._post("toggle", {"id": self.id})
 
     def is_selected(self):
         """Whether the element is selected."""
@@ -43,7 +43,7 @@ class WebElement(object):
 
     def set_selected(self):
         """Selects an elmeent."""
-        self._post("selected")
+        self._post("selected", {"id": self.id})
 
     def is_enabled(self):
         """Whether the element is enabled."""
@@ -79,8 +79,7 @@ class WebElement(object):
     def send_keys(self, value):
         """Simulates typing into the element."""
         #TODO: This should be as simple as self._post("value", value). Fix it in the remote driver.
-        self._post("value", {"id": self.id,
-                             "value":[char for char in value]})
+        self._post("value", {"id": self.id, "value":[value]})
 
     def _get(self, path, *params):
         return utils.return_value_if_exists(
