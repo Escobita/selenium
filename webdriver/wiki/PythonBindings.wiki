@@ -5,12 +5,8 @@
 The python bindings for WebDriver are now available in the trunk of WebDriver and are ready for use. The work is still in progress, your feedback would be welcome.
 
 =Installation of the python bindings=
-It should take no longer than 10 minutes to get everything setup and the tests running for the first time. 
-
 Checkout the source code from http://code.google.com/p/webdriver/source/checkout. In the root directory of the downloaded code, run the following command from a command prompt:
 {{{python setup.py install}}}
-
-You will need to run "rake install_firefox" to install the firefox extension. This means you need Rake and Java installed. (This step is to be removed once profile management is implemented)
 
 And you need to have simplejson installed. Or add (webdriver_directory)/firefox/lib-src to your PYTHONPATH(the py_test script described below does this automatically).
 
