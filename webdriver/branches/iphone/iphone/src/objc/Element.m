@@ -228,8 +228,8 @@
 }
 
 - (void)sendKeys:(NSDictionary *)dict {
-  [[self viewController]
-    jsEval:[NSString stringWithFormat:@"%@.value=%@", [self jsLocator], [dict objectForKey:@"value"]]];
+  [[self viewController] 
+	jsEval:[NSString stringWithFormat:@"%@.value=\"%@\"", [self jsLocator], [[dict objectForKey:@"value"] componentsJoinedByString:@""]]];	
 }
 
 - (NSString *)value {
