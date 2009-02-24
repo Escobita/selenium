@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
+<title>Developing Scripts With Selenium IDE</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5631 2008-08-24 13:01:23Z goodger $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="developing-scripts-with-selenium-ide">
+<h1 class="title">Developing Scripts With Selenium IDE</h1>
+
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#installing-the-ide" id="id2">Installing the IDE</a></li>
+<li><a class="reference internal" href="#opening-the-ide" id="id3">Opening the IDE</a></li>
+<li><a class="reference internal" href="#ide-features" id="id4">IDE Features</a></li>
+<li><a class="reference internal" href="#building-scripts" id="id5">Building Scripts</a><ul>
+<li><a class="reference internal" href="#recording" id="id6">Recording</a></li>
+<li><a class="reference internal" href="#adding-verifications-and-asserts-with-the-context-menu" id="id7">Adding Verifications and Asserts With the Context Menu</a></li>
+<li><a class="reference internal" href="#editing" id="id8">Editing</a><ul>
+<li><a class="reference internal" href="#insert-command" id="id9">Insert Command</a></li>
+<li><a class="reference internal" href="#insert-comment" id="id10">Insert Comment</a></li>
+<li><a class="reference internal" href="#edit-a-command-or-comment" id="id11">Edit a Command or Comment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#opening-and-saving-a-script" id="id12">Opening and Saving a Script</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-scripts" id="id13">Running Scripts</a></li>
+<li><a class="reference internal" href="#debugging" id="id14">Debugging</a><ul>
+<li><a class="reference internal" href="#breakpoints-and-startpoints" id="id15">Breakpoints and Startpoints</a></li>
+<li><a class="reference internal" href="#stepping-through-a-script" id="id16">Stepping Through a Script</a></li>
+<li><a class="reference internal" href="#find-button" id="id17">Find Button</a></li>
+<li><a class="reference internal" href="#page-source-for-debugging" id="id18">Page Source for Debugging</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-a-test-suite" id="id19">Writing a Test Suite</a></li>
+<li><a class="reference internal" href="#user-extensions" id="id20">User Extensions</a></li>
+<li><a class="reference internal" href="#format" id="id21">Format</a></li>
+<li><a class="reference internal" href="#summary" id="id22">Summary</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="#id1">Introduction</a></h1>
+<p>The Selenium IDE (Integrated Development Environment) is the tool you use to
+develop your Selenium scripts.  Its an easy to use Firefox plug-in and is the
+generally the most efficient way to develop test scripts.  It also contains a
+context menu that allows you to first select a UI element from the browser’s
+currently displayed page and then select from a list of Selenium commands
+with parameters pre-defined according to the context of the selected UI
+element.  This is not only a time-saver, but also an excellent way of
+learning Selenium script syntax.</p>
+<p>This chapter is all about the Selenuim IDE and how to use it effectively.</p>
+</div>
+<div class="section" id="installing-the-ide">
+<h1><a class="toc-backref" href="#id2">Installing the IDE</a></h1>
+<p>Using Firefox, first, download the IDE from the SeleniumHQ website.</p>
+<p><a class="reference external" href="http://seleniumhq.org/projects/ide/">http://seleniumhq.org/projects/ide/</a></p>
+<p>When downloading from Firefox, you’ll be presented with the following window.</p>
+<!-- TODO: add image here -->
+<p>Select Install Now.  The Firefox Add-ons window pops up, first showing a
+progress bar, and when the download is complete, displays the following.</p>
+<!-- TODO: add image here -->
+<p>Restart Firefox.  After Firefox reboots you will find the Selnium IDE listed under the Firefox Tools menu.</p>
+<!-- TODO: add image here -->
+</div>
+<div class="section" id="opening-the-ide">
+<h1><a class="toc-backref" href="#id3">Opening the IDE</a></h1>
+<p>To run the Sel-IDE, simply select it from the Firefox Tools menu.  It opens
+as follows with an empty script-editing window and a menu for loading, or
+creating new, your scripts.</p>
+<!-- Darn!  I need to redo this.  No time now, gotta go!!!! -->
+<!-- TODO: add image here -->
+</div>
+<div class="section" id="ide-features">
+<h1><a class="toc-backref" href="#id4">IDE Features</a></h1>
+<p>The File menu allows you to create, open and save test script and test suite
+files.  The Edit menu allows copy, paste, delete, undo and select all
+operations for editing the commands in your script.  The Options menu allows
+the changing of settings.  Specifically you can set the timeout value for
+certain commands, add user-defined user extensions to base set of Selenium
+commands, and you can specify the format (language) used when saving your
+scripts.  The Help menu is the standard Firefox Help menu.  The Sel-IDE runs
+within a Firefox browser window and therefore displays the standard Firefox
+Help menu.  There is nothing specific to Selenium IDE in the Help menu.</p>
+<p>The toolbar contains buttons for controlling the execution of your test
+scripts, including a step feature for debugging your scripts.  The right-most
+button, the one with the red-dot, is the record button.</p>
+<!-- TODO: add image here -->
+<!-- TODO: add image here
+Speed Control:  controls how fast your script runs.
+Run All: Runs the entire test suite when a test suite with multiple test
+scripts is loaded. -->
+<!-- TODO: add image here
+Run:  Runs the currently selected test.  When only a single test is
+loaded this button and the Run All button have the same effect. -->
+<!-- TODO: add image here
+Pause/Resume:  Allows stopping and starting of a running script. -->
+<!-- TODO: add image here
+Step:  Allows one to “step” through a script by running it one command at a
+time.  Use for debugging scripts. -->
+<!-- TODO: add image here
+TestRunner Mode:  Allows you to run the script in a browser loaded with
+the Selenium-Core TestRunner.  The TestRunner is not commonly used now
+and is likely to be deprecated.  This button is for evaluating scripts
+for backwards compatibility with the TestRunner.  Most users will
+probably not need this button. -->
+<!-- TODO: add image here
+Apply Rollup Rules: -->
+<!-- What is this?  Is this still used? Anyone know? -->
+<!-- TODO: add image here
+Record:  Records the user’s browser actions. -->
+<p>Your script is displayed in the following window.  It has two tabs, one for
+displaying the command and their parameters in a readable “table” format.</p>
+<!-- TODO: add image here -->
+<p>The Source tab displays the script in the native format in which the file
+will be stored.  By default this is HTML although it can be changed to a
+programming language such as Java or C#, or a scripting language like Python.
+See the Options menu for details.  The Source view also allows one to edit
+the script in it’s raw form, including copy, cut and paste operations.</p>
+<p>The Command, Target, and Value entry fields display the currently selected
+command along with its parameters (if any).  These are entry fields where you
+can modify the currently selected command.</p>
+<!-- TODO: add image here -->
+<p>If you start typing in the Command field, a drop-down list will be populated
+based on the first characters you type; you can then select your desired
+command from the drop-down.</p>
+<p>The bottom box displays the Log.  When you run your script, error messages,
+and information messages showing the progress of your script, are displayed
+here.  This is sometimes useful for script debugging.   Notice the Clear
+button for clearing the Log.  Also notice the Info button is a drop-down
+allowing selection of different levels of information to display.</p>
+<!-- TODO: add image here -->
+<!-- What is UI-Element and Rollup?  I tried these but they seem non-functional.
+Are these new features not yet implemented or are they old features being
+deprecated?  Anyone know?  If not, I’ll post the question on the forums. -->
+</div>
+<div class="section" id="building-scripts">
+<h1><a class="toc-backref" href="#id5">Building Scripts</a></h1>
+<p>There are three primary methods for developing scripts.  Frequently, a script
+developer will require all three techniques.</p>
+<div class="section" id="recording">
+<h2><a class="toc-backref" href="#id6">Recording</a></h2>
+<p>Many first-time users begin by recording a script from their interactions
+with a website.  When Sel-IDE is first opened the record button is ON by
+default.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This can be set to OFF as a default with an available user extension.</p>
+</div>
+<p>The Recorder will automatically insert commands into your script based on
+your mouse clicks.  Typically, this will include:</p>
+<ul class="simple">
+<li>clicking a link – <em>click</em> or <em>clickAndWait</em> commands</li>
+<li>entering values – <em>type</em> command</li>
+<li>selecting options from a drop-down listbox – <em>select</em> command</li>
+<li>click checkboxes or radio buttons – <em>click</em> command</li>
+</ul>
+<p>Here's some “gotchas” to be aware of:</p>
+<ul class="simple">
+<li>The <em>type</em> command may require clicking on some other area of the web page
+for it to record.</li>
+<li>Following a link usually records a <em>click</em> commands. You will often need to
+change this to <em>clickAndWait</em> to ensure your script pauses until the new page
+is completely loaded.  Otherwise, your script will continue running commands
+before the page has loaded all its UI elements. This will cause unexpected
+script failures.</li>
+</ul>
+</div>
+<div class="section" id="adding-verifications-and-asserts-with-the-context-menu">
+<h2><a class="toc-backref" href="#id7">Adding Verifications and Asserts With the Context Menu</a></h2>
+<p>Your scripts will also need to check the properties of a web-page.  This
+requires <em>assert</em> and <em>verify</em> commands.  We won't describe the specifics of
+these commands here; that is in the chapter on Selenium commands.  Here we’ll
+simply describe how to add them to your script.</p>
+<p>With the Sel-IDE open, go to the browser displaying your test application and
+right click anywhere on the page.  You will see a context menu showing <em>verify</em>
+and/or <em>assert</em> commands.</p>
+<!-- TODO: add image here -->
+<p>The first time you use Selenium, there may only be one Selenium command listed.
+As you use the IDE however, you will find additional commands will quickly be
+added to this menu.  Selenium IDE will attempt to predict what command, along
+with the parameters, you will need for a selected UI element on the current
+web-page.</p>
+<p>Let's see how this works. Open a web-page of your choosing and select a block
+of text on the page. A paragraph or a heading will work fine.  Now, right-click
+the selected text.  The context menu should give you a <em>verifyTextPresent</em>
+command and the suggested parameter should be the text itself.</p>
+<p>Also, notice the Show All Available Commands menu option.  This shows many,
+many more commands, again, along with suggested parameters, for testing your
+currently selected UI element.</p>
+<p>Try a few more UI elements. Try right-clicking an image, or a user control
+like a button or a checkbox.  You may need to use Show All Available Commands
+to see options other than <em>verifyTextPresent</em>. Once you select these other
+options, the more commonly used ones will show up on the primary context menu.
+For example, selecting <em>verifyElementPresent</em> for an image should later cause
+that command to be available on the primary context menu the next time you
+select an image and right-click.</p>
+<p>Again, these commands will be explained in detail in the chapter on Selenium
+commands.  For now though, feel free to use the IDE to record and select
+commands into a script and then run the script.  You can learn a lot about
+the Selenium commands simply by experimenting though the IDE.</p>
+</div>
+<div class="section" id="editing">
+<h2><a class="toc-backref" href="#id8">Editing</a></h2>
+<div class="section" id="insert-command">
+<h3><a class="toc-backref" href="#id9">Insert Command</a></h3>
+<p>Select the point in your script where you want to insert the command.  Right-
+click and select Insert Command.  Now use the command edit text fields to
+enter your new command and its parameters.</p>
+</div>
+<div class="section" id="insert-comment">
+<h3><a class="toc-backref" href="#id10">Insert Comment</a></h3>
+<p>Comments may be added to make your script more readable.  These comments are
+ignored when the script is run.  Select the point in your script where you
+want to insert the comment.  Right-click and select Insert Comment.  Now use
+the first command edit text fields to enter the comment.</p>
+</div>
+<div class="section" id="edit-a-command-or-comment">
+<h3><a class="toc-backref" href="#id11">Edit a Command or Comment</a></h3>
+<p>Simply select the line to be changed and edit it using the command editing text
+fields.</p>
+</div>
+</div>
+<div class="section" id="opening-and-saving-a-script">
+<h2><a class="toc-backref" href="#id12">Opening and Saving a Script</a></h2>
+<p>The File-»Open, Save and Save As menu commands behave similar to opening and
+saving files in most other programs.  When you open an existing script, it
+loads that script file into the IDE and displays its Selenium commands in the
+main script editing window.</p>
+<p>Notice also that you can open and save test suite files.  Test suites will be
+discussed later in this section.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">At the time of writing there's a bug, where at times, when the IDE is
+first opened and then you select File-&gt;Open, nothing happens.  If you see
+this, close down the IDE and restart it (you don't need to close the
+browser itself).  This will fix the problem.</p>
+</div>
+</div>
+</div>
+<div class="section" id="running-scripts">
+<h1><a class="toc-backref" href="#id13">Running Scripts</a></h1>
+<p>The IDE allows many options for running your script. You can run a script all
+at once, stop and start it, run it one line at a time, run a single command
+you are current developing, and you can do a batch run of an entire test suite.
+Execution of scripts is very flexible in the IDE.</p>
+<dl class="docutils">
+<dt>Run a Script</dt>
+<dd>Click the Run button to run the currently displayed script.</dd>
+<dt>Run a Test Suite</dt>
+<dd>Click the Run All button to run all the scripts in the currently loaded
+test suite.</dd>
+<dt>Stop and Start</dt>
+<dd>The Pause button can be used to stop the script while it is running.  The
+icon of this button then changes to indicate the Resume button.  To continue
+click Resume.</dd>
+<dt>Stop in the Middle</dt>
+<dd>You can set a breakpoint in the script to cause the script to stop on a
+particular command.  This is useful for debugging your script. To set a
+breakpoint, select a command, right-click, and from the context menu
+select Toggle Breakpoint.</dd>
+<dt>Start from the Middle</dt>
+<dd>You can tell the IDE to begin running from a specific command in the
+middle of the script.  This also is used for debugging.  To set a
+startpoint, select a command, right-click, and from the context menu
+select Set/Clear Start Point.</dd>
+<dt>Run Any Single Command</dt>
+<dd>Double-click any single command to run it by itself.  This is useful when
+writing a single command.  It lets you immediately test a command you are
+constructing, but not sure if it is correct.  You can double-click it to
+see if it runs correctly.  This is also available from the context menu.</dd>
+</dl>
+</div>
+<div class="section" id="debugging">
+<h1><a class="toc-backref" href="#id14">Debugging</a></h1>
+<p>Debugging means finding and fixing errors in your script.  This is a normal
+part of script development.</p>
+<p>We won’t teach debugging here as most new users to Selenium will already have
+some basic experience with debugging.  If this is new to you, we recommend
+you ask one of the developers in your organization.</p>
+<div class="section" id="breakpoints-and-startpoints">
+<h2><a class="toc-backref" href="#id15">Breakpoints and Startpoints</a></h2>
+<p>The Sel-IDE supports the setting of breakpoints and the ability to start and
+stop the running of a script, from any point within the script.  That is, one
+can run up to a specific command in the middle of the script and inspect how
+the script behaves at that point.  To do this, set a breakpoint on the
+command just before the one to be examined.</p>
+<p>To set a breakpoint, select a command, right-click, and from the context menu
+select <em>Toggle Breakpoint</em>.  Then click the Run button to run your script from
+the beginning up to the breakpoint.</p>
+<p>It is also sometimes useful to run a script from somewhere in the middle to
+the end of the script or up to a breakpoint that follows the starting point.
+For example, suppose your script first logs into the website and then
+performs a series of tests and you are trying to debug one of those tests.
+However, you only need to login once, but you need to keep rerunning your
+tests as you are developing them.  You can login once, then run your script
+from a startpoint placed after the login portion of your script.  That will
+prevent you from having to manually logout each time you rerun your script.</p>
+<p>To set a startpoint, select a command, right-click, and from the context
+menu select <em>Set/Clear Start Point</em>.  Then click the Run button to execute the
+script beginning at that startpoint.</p>
+</div>
+<div class="section" id="stepping-through-a-script">
+<h2><a class="toc-backref" href="#id16">Stepping Through a Script</a></h2>
+<!-- TODO: Fill this in- -it should be real quick. -->
+</div>
+<div class="section" id="find-button">
+<h2><a class="toc-backref" href="#id17">Find Button</a></h2>
+<p>The Find button is used to see which UI element on the currently displayed
+webpage (in the browser) is used in the currently selected Selenium command.
+This is useful when building a locator for a command's first parameter (see the
+section on locators in the Selenium Commands chapter). It can be used with any
+command that must identify a UI element on a webpage, i.e. <em>click</em>,
+<em>clickAndWait</em>, <em>type</em>, and the <em>assert</em> and <em>verify</em> commands among others.</p>
+<p>Select any command that must identify a UI element. Click the Find button.
+Now look on the webpage displayed in the Firefox browser.</p>
+</div>
+<div class="section" id="page-source-for-debugging">
+<h2><a class="toc-backref" href="#id18">Page Source for Debugging</a></h2>
+<p>Often, when debugging a script, you simply must look at the page source (the
+HTML for the webpage you’re trying to test) to determine a problem.  Firefox
+makes this easy.  Simply, right-click the webpage and select Page Source.
+The HTML opens in a separate window.  Use its Search feature (F3 function key)
+to search for a keyword to find the HTML for the UI element you’re trying
+to test.</p>
+</div>
+</div>
+<div class="section" id="writing-a-test-suite">
+<h1><a class="toc-backref" href="#id19">Writing a Test Suite</a></h1>
+<p>A test suite is a collection of test scripts and is displayed in the left-most
+pane in the IDE. Test scripts may be added to the list and deleted from it.
+Test suites may be opened and saved.  When a test suite is saved any changes
+to tests scripts within that suite are also saved.</p>
+<!-- do some testing here of test suites—do they save correctly?
+I’ve seen errors in the past. -->
+</div>
+<div class="section" id="user-extensions">
+<h1><a class="toc-backref" href="#id20">User Extensions</a></h1>
+<p>User extensions are javascript files that allow one to create their own
+customized and features to add additional functionality.  Often this is in
+the form of customized commands although this extensibility is not limited to
+additional commands.  User extensions are loaded by setting the path to user
+extension files through the Options menu.</p>
+<p>There are a number of useful extensions created by users available at the
+SeleniumHQ website. Also you’ll find information on writing your own extensions.</p>
+<!-- is this true or is the OpenQA still? -->
+</div>
+<div class="section" id="format">
+<h1><a class="toc-backref" href="#id21">Format</a></h1>
+<p>Format, under the Options menu, allows you to select a language for saving
+and displaying the script.  This is for supporting Selenium RC.  The default
+is HTML and if you will only be running your Selenium scripts from the IDE
+you can ignore this feature.</p>
+<p>If, however, you will be using Selenium RC to run your scripts, this is how
+you translate your test script into a programming language.  Select the
+language, i.e. Java, PHP, you will be using with Selenium RC for developing
+your test programs.  This simply save the scripts using File-»Save.  Your
+script will be translated into a series of functions in the language you
+choose.  Essentially, program code supporting your test is generated for you
+by Selenium-IDE.</p>
+<p>Also, note that if the generated code does not suit your needs, you can alter
+it by editing a configuration file which defines the generation process.
+Each supported language has configuration settings which are editable.  This
+is under Options-&gt;Options-&gt;Format tab.</p>
+<!-- TODO: Add the steps here to change the format. -->
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">At the time of writing, this feature is not yet supported by the Selenium
+developers.  However the author has altered the C# format in a limited
+manner and it has worked well.</p>
+</div>
+</div>
+<div class="section" id="summary">
+<h1><a class="toc-backref" href="#id22">Summary</a></h1>
+</div>
+</div>
+</body>
+</html>
