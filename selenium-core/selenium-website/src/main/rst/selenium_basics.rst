@@ -147,19 +147,23 @@ Script Syntax
    decide where this goes. 
  
 Selenium commands are simple, they consist of the command and two parameters.  
-For example::
+For example:
 
-    verifyText    //div//a[2]   Login 
+==========  ===========  =====
+verifyText  //div//a[2]  Login 
+==========  ===========  =====
 
 The parameters are not always required.  It depends on the command.  In some 
 cases both are required, in others one parameter is required, and still in 
 others the command may take no parameters at all.  Here are a couple more 
-examples::
+examples:
   
-    goBackAndWait 
-    verifyTextPresent  Welcome to My Home Page 
-    type id=phone       (555) 666-7066 
-    type id=address1   ${myVariableAddress} 
+=================  ===========   =======================
+goBackAndWait 
+verifyTextPresent                Welcome to My Home Page 
+type               id=phone      \(555\) 666-7066 
+type               id=address1   ${myVariableAddress} 
+=================  ===========   =======================
  
 The command reference describes the parameter requirements for each command. 
   
@@ -182,9 +186,9 @@ An empty column entry indicates that parameter is not used by the command.
 For instance::
   
     <tr> 
-    <td>verifyText</td> 
-    <td>//div//a[2]</td> 
-    <td>Login</td> 
+        <td>verifyText</td> 
+        <td>//div//a[2]</td> 
+        <td>Login</td> 
     </tr> 
 
 .. Dave added this section below. We'll need to reconcile these two. Hadn't 
@@ -209,14 +213,14 @@ the page::
        <tr><td>verifyText</td><td>//h2</td><td>Downloads</td></tr>
    </table>
 
-Rendered as a table in a browser this would look like the following::
+Rendered as a table in a browser this would look like the following:
 
-   open      /download/
-   assertTitle      Downloads
-   verifyText   //h2   Downloads
+===========  ====  ==========
+open               /download/
+assertTitle        Downloads
+verifyText   //h2  Downloads
+===========  ====  ==========
 
-.. TODO: make this a table ^
-        
 .. Santiago: Shouldn't both attributes of the first 2 rows be in the 2nd 
    column, not the 3rd???
 .. Dave: The second column is the target, and as the open and assertTitle don't

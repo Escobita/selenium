@@ -75,14 +75,14 @@ The best use of this feature is to logically group your test commands, and
 start each group with an **assert** followed by one or more **verify** test 
 commands. An example follows:
 
-open            /download/      
+============    =====   ============
+open                    /download/      
 assertTitle             Downloads       
 verifyText      //h2    Downloads       
 assertTable     1.2.1   Selenium IDE    
 verifyTable     1.2.2   June 3, 2008    
 verifyTable     1.2.3   1.0 beta 2      
-
-.. TODO: Make this a table
+============    =====   ============
 
 The above example first opens a page and then **asserts** that the correct page 
 is loaded by comparing the title with the expected value, only if this passes 
@@ -122,9 +122,9 @@ attribute matching the location will be found.
 
 .. Dave:    I agree that this section needs context.
 
-identifier=loginForm
-identifier=username
-identifier=continue
+- identifier=loginForm
+- identifier=username
+- identifier=continue
 
 .. TODO: Colors here!
 
@@ -148,7 +148,7 @@ Locating by id
 More limited than the identifier locator type but also more explicit. Use 
 this when you know an element's @id attribute.
 
-id=loginForm
+- id=loginForm
 
 .. TODO: Colors here!
 
@@ -191,11 +191,11 @@ filter type is value (matching the @value attribute).
 .. Dave: These are just quick examples and I expected them to be refined. 
    Style is fine as you have it.
 
-name=username
-name=continue
-name=continue Continue
-name=continue value=Continue
-name=continue type=button
+- name=username
+- name=continue
+- name=continue Continue
+- name=continue value=Continue
+- name=continue type=button
 
 .. TODO: Colors here!
 
@@ -237,15 +237,20 @@ application. By finding a nearby element with an @id or @name attribute (ideally
 a parent element) you can locate your target element based on the relationship.
 This is much less likely to change and can make your tests more robust.
 
-xpath=/html/body/form[1] - *Absolute path (would break if the HTML was 
-changed only slightly)*
-xpath=//form[1] - *First form element in the HTML.*
-xpath=//form[@id='loginForm'] - *The form element with @id of 'loginForm'*
-xpath=//form[input/@name='username'] - *First form element with an input child element with @name of 'username'*
-xpath=//input[@name='username'] - *First input element with @name of 'username'*
-xpath=//form[@id='loginForm']/input[1] - *First input child element of the form element with @id of 'loginForm'*
-xpath=//input[@name='continue'][@type='button'] - *Input with @name 'continue' and @type of button'*
-xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the form element with @id of 'loginForm'*
+- xpath=/html/body/form[1] - *Absolute path (would break if the HTML was 
+  changed only slightly)*
+- xpath=//form[1] - *First form element in the HTML.*
+- xpath=//form[@id='loginForm'] - *The form element with @id of 'loginForm'*
+- xpath=//form[input/@name='username'] - *First form element with an input child
+  element with @name of 'username'*
+- xpath=//input[@name='username'] - *First input element with @name of 
+  'username'*
+- xpath=//form[@id='loginForm']/input[1] - *First input child element of the 
+  form element with @id of 'loginForm'*
+- xpath=//input[@name='continue'][@type='button'] - *Input with @name 'continue'
+  and @type of button'*
+- xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the 
+  form element with @id of 'loginForm'*
 
 
 .. TODO: Colors here!
@@ -294,8 +299,8 @@ This is a simple method of locating a hyperlink in your web page by using the
 text of the link. If two links with the same text are present then the first 
 match will be used.
 
-link=Continue
-link=Cancel
+- link=Continue
+- link=Cancel
 
 .. TODO: Colors here!
 
@@ -317,13 +322,13 @@ using JavaScript. This location strategy takes JavaScript that evaluates to
 an element on the page, which can be simply the element's location using the 
 hierarchical dotted notation.
 
-dom=document.getElementById('loginForm')
-dom=document.forms['loginForm']
-dom=document.forms[0]
-dom=document.forms[0].username
-dom=document.forms[0].elements['username']
-dom=document.forms[0].elements[0]
-dom=document.forms[0].elements[3]
+- dom=document.getElementById('loginForm')
+- dom=document.forms['loginForm']
+- dom=document.forms[0]
+- dom=document.forms[0].username
+- dom=document.forms[0].elements['username']
+- dom=document.forms[0].elements[0]
+- dom=document.forms[0].elements[3]
 
 .. TODO: Colors here!
 
