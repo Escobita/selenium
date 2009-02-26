@@ -10,7 +10,7 @@ Checkout the source code from http://code.google.com/p/webdriver/source/checkout
 
 And you need to have simplejson installed. Or add (webdriver_directory)/firefox/lib-src to your PYTHONPATH(the py_test script described below does this automatically).
 
-That's it :) However you may want to run some sanity tests... If so you can run {{{py_tests}}} from the same root directory. On Windows platforms {{{py_tests.bat}}} is executed, on Linux {{{py_tests.sh}}} is executed. All the tests should pass. 
+That's it :) However you may want to run some sanity tests... If so you can run {{{py_test.py}}} from the same root directory. All the tests should pass. 
 
 =Comparison with Java Bindings=
 Here is a summary of the major differences between the python and Java bindings.
