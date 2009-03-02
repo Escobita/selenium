@@ -1,7 +1,7 @@
+.. _chapter08-reference:
+
 Advanced Selenium 
 =================
-
-.. contents::
 
 Writing User Extensions 
 -----------------------

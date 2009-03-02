@@ -1,6 +1,9 @@
-Selenium Grid 
-=============
+.. _chapter07-reference:
 
-.. contents::
+|logo| Selenium-Grid
+====================
 
-.. Contents To be determined
+.. |logo| image:: images/selenium-grid-logo.png
+   :alt:
+
+Contents to be determined

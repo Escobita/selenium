@@ -1,15 +1,18 @@
-Developing Scripts With Selenium IDE 
-====================================
+.. _chapter03-reference:
 
-.. contents::
+|logo| Developing Scripts With Selenium-IDE 
+===========================================
+
+.. |logo| image:: images/selenium-ide-logo.png
+   :alt:
 
 Introduction 
 ------------
 
-The Selenium IDE (Integrated Development Environment) is the tool you use to 
+The Selenium-IDE (Integrated Development Environment) is the tool you use to 
 develop your Selenium scripts.  Its an easy to use Firefox plug-in and is the 
 generally the most efficient way to develop test scripts.  It also contains a 
-context menu that allows you to first select a UI element from the browser’s 
+context menu that allows you to first select a UI element from the browser's 
 currently displayed page and then select from a list of Selenium commands 
 with parameters pre-defined according to the context of the selected UI 
 element.  This is not only a time-saver, but also an excellent way of 
@@ -20,22 +23,25 @@ This chapter is all about the Selenuim IDE and how to use it effectively.
 Installing the IDE 
 ------------------
 
-Using Firefox, first, download the IDE from the SeleniumHQ website.  
+Using Firefox, first, download the IDE from the SeleniumHQ `downloads page`_
   
-http://seleniumhq.org/projects/ide/ 
+.. _`downloads page`: http://seleniumhq.org/download/
   
-When downloading from Firefox, you’ll be presented with the following window. 
+When downloading from Firefox, you'll be presented with the following window. 
  
-.. TODO: add image here
+.. image:: images/chapt3_img01_IDE_Installation.png
+   :align: center
 
 Select Install Now.  The Firefox Add-ons window pops up, first showing a 
 progress bar, and when the download is complete, displays the following. 
   
-.. TODO: add image here
+.. image:: images/chapt3_img02_IDE_Installation.png
+   :align: center
   
 Restart Firefox.  After Firefox reboots you will find the Selnium IDE listed under the Firefox Tools menu. 
-  
-.. TODO: add image here
+
+.. image:: images/chapt3_img03_IDE_Installation.png
+   :align: center
 
 Opening the IDE 
 ---------------
@@ -46,8 +52,9 @@ creating new, your scripts.
   
 .. Darn!  I need to redo this.  No time now, gotta go!!!!
 
-.. TODO: add image here
- 
+.. image:: images/chapt3_img04_IDE_open.png
+   :align: center
+  
 IDE Features  
 ------------
 
@@ -59,54 +66,69 @@ certain commands, add user-defined user extensions to base set of Selenium
 commands, and you can specify the format (language) used when saving your 
 scripts.  The Help menu is the standard Firefox Help menu.  The Sel-IDE runs 
 within a Firefox browser window and therefore displays the standard Firefox 
-Help menu.  There is nothing specific to Selenium IDE in the Help menu. 
+Help menu.  There is nothing specific to Selenium-IDE in the Help menu. 
   
 The toolbar contains buttons for controlling the execution of your test 
 scripts, including a step feature for debugging your scripts.  The right-most 
 button, the one with the red-dot, is the record button.  
   
-.. TODO: add image here
+.. image:: images/chapt3_img05_IDE_features.png
+   :align: center
   
-.. TODO: add image here
+|speed control|
     Speed Control:  controls how fast your script runs. 
+|run all|
     Run All: Runs the entire test suite when a test suite with multiple test 
     scripts is loaded. 
-.. TODO: add image here
+|run|
     Run:  Runs the currently selected test.  When only a single test is 
     loaded this button and the Run All button have the same effect.  
-.. TODO: add image here
+|pause resume|
     Pause/Resume:  Allows stopping and starting of a running script.
-.. TODO: add image here
-    Step:  Allows one to “step” through a script by running it one command at a 
+|step|
+    Step:  Allows one to "step" through a script by running it one command at a 
     time.  Use for debugging scripts. 
-.. TODO: add image here
+|testrunner|
     TestRunner Mode:  Allows you to run the script in a browser loaded with 
     the Selenium-Core TestRunner.  The TestRunner is not commonly used now 
     and is likely to be deprecated.  This button is for evaluating scripts 
     for backwards compatibility with the TestRunner.  Most users will 
     probably not need this button.   
-.. TODO: add image here
-    Apply Rollup Rules:  
+|rollup|
+    Apply Rollup Rules: 
+
 .. What is this?  Is this still used? Anyone know?
-.. TODO: add image here
-    Record:  Records the user’s browser actions.  
 
+|record|
+    Record:  Records the user's browser actions.  
+
+.. |speed control| image:: images/chapt3_img06_Speed_Control.png
+.. |run all| image:: images/chapt3_img07_Run_All.png
+.. |run| image:: images/chapt3_img08_Run.png
+.. |pause resume| image:: images/chapt3_img09_Pause.png
+.. |step| image:: images/chapt3_img11_Step.png
+.. |testrunner| image:: images/chapt3_img12_TestRunner_Mode.png
+.. |rollup| image:: images/chapt3_img13_Apply_Rollup_Rules.png
+.. |record| image:: images/chapt3_img14_Record.png
+    
 Your script is displayed in the following window.  It has two tabs, one for 
-displaying the command and their parameters in a readable “table” format.  
+displaying the command and their parameters in a readable "table" format.  
 
-.. TODO: add image here
+.. image:: images/chapt3_img15_Table_Format.png
+   :align: center
   
 The Source tab displays the script in the native format in which the file 
 will be stored.  By default this is HTML although it can be changed to a 
 programming language such as Java or C#, or a scripting language like Python.
 See the Options menu for details.  The Source view also allows one to edit 
-the script in it’s raw form, including copy, cut and paste operations. 
+the script in it's raw form, including copy, cut and paste operations. 
   
 The Command, Target, and Value entry fields display the currently selected 
 command along with its parameters (if any).  These are entry fields where you 
 can modify the currently selected command.  
   
-.. TODO: add image here
+.. image:: images/chapt3_img16_Entry_Fields.png
+   :align: center
   
 If you start typing in the Command field, a drop-down list will be populated 
 based on the first characters you type; you can then select your desired 
@@ -118,11 +140,12 @@ here.  This is sometimes useful for script debugging.   Notice the Clear
 button for clearing the Log.  Also notice the Info button is a drop-down 
 allowing selection of different levels of information to display.  
   
-.. TODO: add image here
+.. image:: images/chapt3_img17_Bottom_Box.png
+   :align: center
   
 .. What is UI-Element and Rollup?  I tried these but they seem non-functional.  
    Are these new features not yet implemented or are they old features being 
-   deprecated?  Anyone know?  If not, I’ll post the question on the forums. 
+   deprecated?  Anyone know?  If not, I'll post the question on the forums. 
      
 Building Scripts  
 ----------------
@@ -137,18 +160,18 @@ Many first-time users begin by recording a script from their interactions
 with a website.  When Sel-IDE is first opened the record button is ON by 
 default. 
 
-.. Note::
+.. note::
     This can be set to OFF as a default with an available user extension. 
   
 The Recorder will automatically insert commands into your script based on 
 your mouse clicks.  Typically, this will include:
   
-* clicking a link – *click* or *clickAndWait* commands 
-* entering values – *type* command 
-* selecting options from a drop-down listbox – *select* command 
-* click checkboxes or radio buttons – *click* command 
+* clicking a link - *click* or *clickAndWait* commands 
+* entering values - *type* command 
+* selecting options from a drop-down listbox - *select* command 
+* click checkboxes or radio buttons - *click* command 
   
-Here's some “gotchas” to be aware of:
+Here's some "gotchas" to be aware of:
   
 * The *type* command may require clicking on some other area of the web page 
   for it to record. 
@@ -163,18 +186,18 @@ Adding Verifications and Asserts With the Context Menu
   
 Your scripts will also need to check the properties of a web-page.  This 
 requires *assert* and *verify* commands.  We won't describe the specifics of 
-these commands here; that is in the chapter on Selenium commands.  Here we’ll 
+these commands here; that is in the chapter on Selenium commands.  Here we'll 
 simply describe how to add them to your script. 
   
-With the Sel-IDE open, go to the browser displaying your test application and 
+With Sel-IDE recording, go to the browser displaying your test application and 
 right click anywhere on the page.  You will see a context menu showing *verify* 
 and/or *assert* commands.  
 
-.. TODO: add image here
+.. TODO: add image here (it wasn't correctly uploaded in the GDocs version
 
 The first time you use Selenium, there may only be one Selenium command listed.
 As you use the IDE however, you will find additional commands will quickly be
-added to this menu.  Selenium IDE will attempt to predict what command, along 
+added to this menu.  Selenium-IDE will attempt to predict what command, along 
 with the parameters, you will need for a selected UI element on the current 
 web-page. 
   
@@ -235,7 +258,7 @@ main script editing window.
 Notice also that you can open and save test suite files.  Test suites will be 
 discussed later in this section.  
   
-.. Note:: 
+.. note:: 
     At the time of writing there's a bug, where at times, when the IDE is 
     first opened and then you select File->Open, nothing happens.  If you see 
     this, close down the IDE and restart it (you don't need to close the 
@@ -285,7 +308,7 @@ Debugging
 Debugging means finding and fixing errors in your script.  This is a normal 
 part of script development. 
   
-We won’t teach debugging here as most new users to Selenium will already have 
+We won't teach debugging here as most new users to Selenium will already have 
 some basic experience with debugging.  If this is new to you, we recommend 
 you ask one of the developers in your organization. 
   
@@ -336,10 +359,10 @@ Page Source for Debugging
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Often, when debugging a script, you simply must look at the page source (the 
-HTML for the webpage you’re trying to test) to determine a problem.  Firefox 
+HTML for the webpage you're trying to test) to determine a problem.  Firefox 
 makes this easy.  Simply, right-click the webpage and select Page Source.  
 The HTML opens in a separate window.  Use its Search feature (F3 function key)
-to search for a keyword to find the HTML for the UI element you’re trying 
+to search for a keyword to find the HTML for the UI element you're trying 
 to test. 
   
 Writing a Test Suite 
@@ -351,7 +374,7 @@ Test suites may be opened and saved.  When a test suite is saved any changes
 to tests scripts within that suite are also saved. 
   
 .. do some testing here of test suites—do they save correctly?
-   I’ve seen errors in the past. 
+   I've seen errors in the past. 
   
 User Extensions 
 ---------------
@@ -363,7 +386,7 @@ additional commands.  User extensions are loaded by setting the path to user
 extension files through the Options menu. 
   
 There are a number of useful extensions created by users available at the 
-SeleniumHQ website. Also you’ll find information on writing your own extensions.   
+SeleniumHQ website. Also you'll find information on writing your own extensions.   
 
 .. is this true or is the OpenQA still?
 
@@ -371,13 +394,13 @@ Format
 ------
 
 Format, under the Options menu, allows you to select a language for saving 
-and displaying the script.  This is for supporting Selenium RC.  The default 
+and displaying the script.  This is for supporting Selenium-RC.  The default 
 is HTML and if you will only be running your Selenium scripts from the IDE 
 you can ignore this feature. 
   
-If, however, you will be using Selenium RC to run your scripts, this is how 
+If, however, you will be using Selenium-RC to run your scripts, this is how 
 you translate your test script into a programming language.  Select the 
-language, i.e. Java, PHP, you will be using with Selenium RC for developing 
+language, i.e. Java, PHP, you will be using with Selenium-RC for developing 
 your test programs.  This simply save the scripts using File-»Save.  Your 
 script will be translated into a series of functions in the language you 
 choose.  Essentially, program code supporting your test is generated for you 
@@ -390,7 +413,7 @@ is under Options->Options->Format tab.
   
 .. TODO: Add the steps here to change the format. 
   
-.. Note::
+.. note::
    At the time of writing, this feature is not yet supported by the Selenium 
    developers.  However the author has altered the C# format in a limited 
    manner and it has worked well. 

@@ -1,7 +1,7 @@
+.. _chapter06-reference:
+
 Test Design Considerations
 ==========================
-
-.. contents::
 
 Introducing Test Design Options
 -------------------------------
@@ -21,40 +21,53 @@ Web Page Content -- Static vs. Dynamic Pages
 Object Identification for Static HTML Objects       
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Static HTML Objects might look as::
+Static HTML Objects might look as:
            
+.. code-block:: html
+
     <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm','adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
 
 This is HTML snippet for a button and its id is "adminHomeForm". This id 
 remains constant with the all occurrences of page. Hence to click this button 
-use following selenium command::
+use following selenium command:
+
+.. code-block:: java
+   :linenos:
 
     selenium.click("adminHomeForm");
 
 Object identification with Dynamic HTML Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Dynamic HTML of an object might look as::
+Dynamic HTML of an object might look as:
+           
+.. code-block:: html
 
 <input type="checkbox" class="checkbox" style="margin-right: 10px;" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
 This is HTML snippet for a check box. Its id and name 
 (addForm:_id74:_id75:0:_id79:0:checkBox) both are same and dynamic. Now in 
-this case normal object identification like::
+this case normal object identification like:
+
+.. code-block:: java
+   :linenos:
 
     selenium.click("addForm:_id74:_id75:0:_id79:0:checkBox);
 
 would not work. Best way to capture this id dynamically from website it self. 
-This can be as following::
+This can be as following:
 
-    String[] checkboxIds  = selenium.getAllFields(); // Collect all input ids on page.
-    if(GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
-           {
-                    // If id is of desired check box.
-                    if(checkboxIds[i].indexOf("addForm") > -1) {                       
-                        selenium.check(checkboxIds[i]);                    
-                    }
-            }
+.. code-block:: java
+   :linenos:
+
+   String[] checkboxIds  = selenium.getAllFields(); // Collect all input ids on page.
+   if(GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
+          {
+                   // If id is of desired check box.
+                   if(checkboxIds[i].indexOf("addForm") > -1) {                       
+                       selenium.check(checkboxIds[i]);                    
+                   }
+           }
 
 This approach will work only if there is one field whose id has got text 
 'addForm' appended to it.
@@ -62,7 +75,10 @@ This approach will work only if there is one field whose id has got text
 Consider one more examples of Dynamic object. A page with two links having the
 same name (one which appears on page) and same html name. Now if href is used 
 to click link it would always be clicking on first element. Click on second 
-element link can be achieved as following::
+element link can be achieved as following:
+
+.. code-block:: java
+   :linenos:
 
     // Stores reference for second appearance of link.
     boolean isSecondInstanceLink = false;
@@ -136,8 +152,8 @@ Types of Tests
 
 * Page Rendering Tests 
 * Forms Tests 
-* Specific Function Tests – For example, if a .jsp is called from used to retrieve data based on parameter input. 
-* User Scenario Test – A Multiple Page Functional Test 
+* Specific Function Tests - For example, if a .jsp is called from used to retrieve data based on parameter input. 
+* User Scenario Test - A Multiple Page Functional Test 
 
 Solving Common Web-App Problems 
 -------------------------------

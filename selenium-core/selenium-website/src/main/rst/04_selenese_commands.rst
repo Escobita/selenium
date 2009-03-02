@@ -1,7 +1,7 @@
-“Selenese” Selenium Commands 
-=============================
+.. _chapter04-reference:
 
-.. contents::
+"Selenese" Selenium Commands 
+=============================
 
 .. Dave: Is this basically a reworking and extension of the existing 'Selenium 
    Reference'? -Dave 1/6/09 3:49 PM
@@ -129,18 +129,20 @@ attribute matching the location will be found.
 .. TODO: Colors here!
 
 For instance, your page source could have identifier (ID) and name attributes 
-as follows::
+as follows:
+           
+.. code-block:: html
 
-        <html>
-         <body>
-          <form id="loginForm">
-           <input name="username" type="text" />
-           <input name="password" type="password" />
-           <input name="continue" type="submit" value="Login" />
-           <input name="continue" type="button" value="Continue" />
-          </form>
-         </body>
-        <html>
+  <html>
+   <body>
+    <form id="loginForm">
+     <input name="username" type="text" />
+     <input name="password" type="password" />
+     <input name="continue" type="submit" value="Login" />
+     <input name="continue" type="button" value="Continue" />
+    </form>
+   </body>
+  <html>
 
 Locating by id 
 ~~~~~~~~~~~~~~
@@ -152,18 +154,18 @@ this when you know an element's @id attribute.
 
 .. TODO: Colors here!
 
-::
+.. code-block:: html
 
-        <html>
-         <body>
-          <form id="loginForm">
-           <input name="username" type="text" />
-           <input name="password" type="password" />
-           <input name="continue" type="submit" value="Login" />
-           <input name="continue" type="button" value="Continue" />
-          </form>
-         </body>
-        <html>
+   <html>
+    <body>
+     <form id="loginForm">
+      <input name="username" type="text" />
+      <input name="password" type="password" />
+      <input name="continue" type="submit" value="Login" />
+      <input name="continue" type="button" value="Continue" />
+     </form>
+    </body>
+   <html>
 
 
 .. Paul: There's an important use of this, and similar locators.  These vs. 
@@ -199,18 +201,18 @@ filter type is value (matching the @value attribute).
 
 .. TODO: Colors here!
 
-::
+.. code-block:: html
 
-        <html>
-         <body>
-          <form id="loginForm">
-           <input name="username" type="text" />
-           <input name="password" type="password" />
-           <input name="continue" type="submit" value="Login" />
-           <input name="continue" type="button" value="Continue" />
-          </form>
-        </body>
-        <html>
+   <html>
+    <body>
+     <form id="loginForm">
+      <input name="username" type="text" />
+      <input name="password" type="password" />
+      <input name="continue" type="submit" value="Login" />
+      <input name="continue" type="button" value="Continue" />
+     </form>
+   </body>
+   <html>
 
 Locating by XPath 
 ~~~~~~~~~~~~~~~~~
@@ -255,18 +257,18 @@ This is much less likely to change and can make your tests more robust.
 
 .. TODO: Colors here!
 
-::
+.. code-block:: html
 
-        <html>
-         <body>
-          <form id="loginForm">
-           <input name="username" type="text" />
-           <input name="password" type="password" />
-           <input name="continue" type="submit" value="Login" />
-           <input name="continue" type="button" value="Continue" />
-          </form>
-        </body>
-        <html>
+   <html>
+    <body>
+     <form id="loginForm">
+      <input name="username" type="text" />
+      <input name="password" type="password" />
+      <input name="continue" type="submit" value="Login" />
+      <input name="continue" type="button" value="Continue" />
+     </form>
+   </body>
+   <html>
 
 
 These examples cover some basics, but in order to really take advantage the 
@@ -304,15 +306,15 @@ match will be used.
 
 .. TODO: Colors here!
 
-::
+.. code-block:: html
 
-        <html>
-         <body>
-          <p>Are you sure you want to do this?</p>
-          <a href="continue.html">Continue</a> 
-          <a href="cancel.html">Cancel</a>
-        </body>
-        <html>
+  <html>
+   <body>
+    <p>Are you sure you want to do this?</p>
+    <a href="continue.html">Continue</a> 
+    <a href="cancel.html">Cancel</a>
+  </body>
+  <html>
 
 Locating by DOM  
 ~~~~~~~~~~~~~~~
@@ -331,19 +333,19 @@ hierarchical dotted notation.
 - dom=document.forms[0].elements[3]
 
 .. TODO: Colors here!
+           
+.. code-block:: html
 
-::
-
-        <html>
-         <body>
-          <form id="loginForm">
-           <input name="username" type="text" />
-           <input name="password" type="password" />
-           <input name="continue" type="submit" value="Login" />
-           <input name="continue" type="button" value="Continue" />
-          </form>
-        </body>
-        <html>
+   <html>
+    <body>
+     <form id="loginForm">
+      <input name="username" type="text" />
+      <input name="password" type="password" />
+      <input name="continue" type="submit" value="Login" />
+      <input name="continue" type="button" value="Continue" />
+     </form>
+   </body>
+   <html>
 
 
 You can use Selenium itself as well as other sites and extensions to explore 

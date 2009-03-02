@@ -1,7 +1,7 @@
+.. _chapter09-reference:
+
 Getting Help 
 ============
-
-.. contents::
 
 OpenQA 
 ------

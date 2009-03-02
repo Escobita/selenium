@@ -1,7 +1,7 @@
+.. _chapter02-reference:
+
 Selenium Basics 
 ================
-
-.. contents::
 
 .. This is a rough draft. I have not proofread this yet, although you're 
    still welcome to add your comments. 
@@ -11,12 +11,11 @@ Selenium Basics
 Getting Started -- Choosing Your Selenium Tool 
 -----------------------------------------------
 
-Most people get started with the Selenium IDE. This is what we recommend. It 
-is an easy way to get familiar with Selenium commands quickly. You can 
-develop your first example script in just a few minutes.  The Selenium-IDE is 
-also very easy to install.  See the section on Selenium-IDE for more:
-
-.. TODO: Link the final selenium IDE section here ^
+Most people get started with the Selenium-IDE. This is what we recommend. It 
+is an easy way to get familiar with Selenium commands quickly. You can develop
+your first example script in just a few minutes. Selenium-IDE is also very easy
+to install. See the :ref:`section on Selenium-IDE <chapter03-reference>` for 
+more:
   
 You may also run your scripts from the Selenium-IDE. The Selenium-IDE is very 
 simple to use and is recommended for less-technical users. It can server as a 
@@ -33,33 +32,33 @@ length list or table will require running the script from a programming
 language. Selenium-IDE does not support iteration. In addition, data-driven 
 testing, allowing multiple tests by varying the data but using a single 
 script which varies the input, is often performed via a test program 
-developed with Selenium-RC.  
+developed with Selenium-RC. 
 
 Finally, Selenium Core is another way of running tests. One can run test 
-scripts from a web-browser using the html interface TestRunner.html.  This is 
-the original method for running Selenium commands.  It has limitations though.
+scripts from a web-browser using the html interface TestRunner.html. This is 
+the original method for running Selenium commands. It has limitations though.
 Similar to Selenium-IDE, it does not support iteration and data-driven 
-testing.  
+testing. 
 
 .. note: the Selenium-IDE may now support data-driven testing through a 
    user-extension need to try out the new extension recently made available).
 
-It also cannot switch between http and https protocols.  Since the 
+It also cannot switch between http and https protocols. Since the 
 development of Selenium-IDE and Selenium-RC, more and more are using these 
-tools with few still using Selenium-Core.  At the time of writing (Feb 09) it 
+tools with few still using Selenium-Core. At the time of writing (Feb 09) it 
 is still available and may be convenient for some. However, the Selenium 
 community is encouraging the use Selenium-IDE and RC and discouraging the use 
-of Selenium-Core.  Support for Selenium-Core is becoming less h available and 
+of Selenium-Core. Support for Selenium-Core is becoming less h available and 
 it may be deprecated in a future 
-release.  
+release. 
 
 .. Santiago: should this part about Selenium-Core be in the docs?? As I read 
    before, Selenium Core was in a deprecation rute. 
 
 .. Paul: Not sure yet, if we should just give a quick mention to Core or 
-   ignore it entirely.  I included just for now but may delete it later.  This 
+   ignore it entirely. I included just for now but may delete it later. This 
    is something we should all agree on, perhaps with the Dev's 
-   input.  
+   input. 
 
 Introducing Selenium Commands 
 ------------------------------
@@ -71,15 +70,15 @@ Selenium Commands -- Selenese
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Selenium provides a rich set of commands for fully testing your web-app 
-in virtually any way you may imagine.  This command set is often called 
+in virtually any way you may imagine. This command set is often called 
 selenese. These commands essentially create a testing language. 
 
 In selenese, certainly, one can test the existence of UI elements, based 
 on their HTML tags, can test for specific content, can test for broken links, 
-input fields, selection list, submitting forms, and table data.  In addition 
+input fields, selection list, submitting forms, and table data. In addition 
 Selenium commands support testing of window size (is true? must check the 
 reference), mouse position, alerts, Ajax functionality, pop up windows, event 
-handling, and many other features.  The Command Reference (available at 
+handling, and many other features. The Command Reference (available at 
 SeleniumHQ.org) lists all the available commands. 
   
 .. Dave: My understanding was that 'Selenese' was the HTML language for 
@@ -92,10 +91,10 @@ SeleniumHQ.org) lists all the available commands.
    Selenese'? I can see this topic being a simple introduction to the 
    Selenium Reference, with the HTML method of writing tests covered elsewhere.
 
-.. Paul: Yes, we can present the Selenese separately from the HTML Syntax.  
-   As the person that coined 'Selenese' I meant the wire language.  Commands 
+.. Paul: Yes, we can present the Selenese separately from the HTML Syntax. 
+   As the person that coined 'Selenese' I meant the wire language. Commands 
    and replies over a plain text connection in the style that the RC drivers 
-   have been working with for years.  Since then, it is true that 'Selenese' 
+   have been working with for years. Since then, it is true that 'Selenese' 
    has been re-appropriated to mean something else (by Dan and Nelson)
 
 .. Dave: This is taken from the command reference - I can try to reword if we 
@@ -141,21 +140,21 @@ Script Syntax
 .. Paul developed this section, following is a very similar section developed 
    by Dave. 
 
-.. This may belong in the Selenese section.  I was thinking an introduction to 
+.. This may belong in the Selenese section. I was thinking an introduction to 
    script syntax would belong under Basics, however this content is directly 
-   related to Selenese.  Let's see how these two sections come together and then 
+   related to Selenese. Let's see how these two sections come together and then 
    decide where this goes. 
  
-Selenium commands are simple, they consist of the command and two parameters.  
+Selenium commands are simple, they consist of the command and two parameters. 
 For example:
 
 ==========  ===========  =====
 verifyText  //div//a[2]  Login 
 ==========  ===========  =====
 
-The parameters are not always required.  It depends on the command.  In some 
+The parameters are not always required. It depends on the command. In some 
 cases both are required, in others one parameter is required, and still in 
-others the command may take no parameters at all.  Here are a couple more 
+others the command may take no parameters at all. Here are a couple more 
 examples:
   
 =================  ===========   =======================
@@ -172,31 +171,33 @@ The parameters vary, however they are typically
 * a *locator* for identifying a UI element within a page. 
 * a *text pattern* for verifying or asserting expected page content 
 * a *text pattern* or a selenium variable for entering text in an input field 
-  or for selecting an option from an option list.  
+  or for selecting an option from an option list. 
 
 Here, we are simply providing an introduction to Selenium Basics including 
-the basic features of Selenium scripts.  Locators, text patterns, and 
+the basic features of Selenium scripts. Locators, text patterns, and 
 selenium variables are described in considerable detail in the section on 
 Selenium Commands. 
   
 Selenium scripts developed in the Selenium-IDE may be stored in an HTML text 
-file.  The format uses an HTML table where a row represents a complete 
+file. The format uses an HTML table where a row represents a complete 
 command and the three column entries represent the command and it's parameters.
 An empty column entry indicates that parameter is not used by the command.
-For instance::
+For instance:
+           
+.. code-block:: html
   
-    <tr> 
-        <td>verifyText</td> 
-        <td>//div//a[2]</td> 
-        <td>Login</td> 
-    </tr> 
+   <tr> 
+       <td>verifyText</td> 
+       <td>//div//a[2]</td> 
+       <td>Login</td> 
+   </tr> 
 
 .. Dave added this section below. We'll need to reconcile these two. Hadn't 
    planned on two of us delving into chap 2 at the same time.
 
 The simple Selenese HTML syntax can be used to write tests without knowledge 
-of a programming language, and can also be produced by Selenium IDE. With a 
-knowledge of the syntax and Selenium IDE you can quickly produce and 
+of a programming language, and can also be produced by Selenium-IDE. With a 
+knowledge of the syntax and Selenium-IDE you can quickly produce and 
 customize your testcases.
 
 The format consists of an HTML table with three columns. The first column is 
@@ -205,7 +206,9 @@ column contains a value. The second and third columns may not require values
 depending on the chosen Selenium command, but they should be present. Each 
 table row represents a new Selenium command. Here is an example of a test 
 that opens a page, asserts the page title and then verifies some content on 
-the page::
+the page:
+           
+.. code-block:: html
 
    <table>
        <tr><td>open</td><td></td><td>/download/</td></tr>
@@ -230,8 +233,8 @@ verifyText   //h2  Downloads
 Test Suites 
 ------------
 
-.. Paul: let's show the HTML of a test suite here.  then show how it looks in 
-   the IDE section.  
+.. Paul: let's show the HTML of a test suite here. then show how it looks in 
+   the IDE section. 
 
 Commonly Used Selenium Commands 
 --------------------------------
