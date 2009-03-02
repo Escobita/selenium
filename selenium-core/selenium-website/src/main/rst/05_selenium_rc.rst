@@ -9,38 +9,45 @@
 When to Use Selenium-RC?
 ------------------------
 
-Selenium-RC is the response for tests that need a little more that just simple 
-browser actions and a linear excecution. Selenium-RC allows the users to use 
-the full power of programming languages, allowing the users to create tests 
-that can read and write external files, make queries to a Data Base, send 
-emails with the tests report, practically anything that a user can do with 
-a common application.
+Selenium-RC is the response for tests that need a little more that just simple
+browser actions and a linear excecution. Selenium-RC allows the users to use
+the full power of programming languages, allowing the users to create tests
+that can read and write external files, make queries to a Data Base, send emails
+with the tests report, practically anything that a user can do with a common 
+application.
 
-You can see some examples of this in the `Sample Test Scripts`_ section,
-where we will explain how to develop complex tests and leverage the power of 
-a real programming language in them.
+You can see some examples of this in the `Sample Test Scripts`_ section, where
+we will explain how to develop complex tests and leverage the power of a real
+programming language in them.
+
+.. TODO: The content of Sameple test scripts section is not what is described
+   here. For now I'm just explaining simple code on them.
+   I'll try to add a last subsection like "Adding spice to your tests".
 
 Basically, you will need to use Selenium-RC whenever your test requires logic
-not supported by running a script from the Selenium-IDE. What sort of logic could 
-this be?  For example, the Selenium-IDE does not directly support
+not supported by running a script from Selenium-IDE. What sort of logic could 
+this be?  For example, Selenium-IDE does not directly support:
 
 * condition statements 
 * iteration 
-* logging and reporting of test results. 
-* error handling, particularly of unexpected errors. 
-* database testing 
-* test case grouping 
-* rerun the failed tests 
-* test case dependency 
-* capture screen shot on test failure 
+* logging and reporting of test results
+* error handling, particularly of unexpected errors
+* database testing
+* test case grouping
+* rerun the failed tests
+* test case dependency
+* capture screen shots on test failures
 
 Though few of these are not supported by selenium inherently but can be achieved
-by using language specific library. These would be explained in details in 
-the `Sample Test Scripts`_ section. 
+by using language specific libraries. These would be explained in details in the
+`Sample Test Scripts`_ section. 
 
-It may be possible to add this functionality by adding a custom built user 
-extension to Selenium-IDE but most prefer to use Selenium-RC to gain the full flexibility
-of a programming language.
+.. Santi: I'm not sure if we'll be able to explain EVERY pont of these on that 
+   section, some of them even have a separate section.
+
+It may be possible to add this functionality by adding a custom built user
+extension to Selenium-IDE but most prefer to use Selenium-RC to gain the full
+flexibility of a programming language.
 
 Architecture Diagram
 --------------------
@@ -67,6 +74,8 @@ browser withing the Application Under Test.
    AUT?  It can't because the AUT is on a server somewhere. So the Sel-Core is
    injected straight into the browser and then the Sel-Core-Injected-Browser 
    communicates with the AUT. Is this correct?
+
+.. Santi: Yes, from what I know that's right Paul.
 
 
 Here is a simplified architectural representation.... 
@@ -170,21 +179,31 @@ As a test suite starts in your favorite language, the following happens:
 Installation
 ------------
 
-.. Here we will put the process for installing selenium RC and the different 
-   client libraries, maybe we should also cover some IDEs. We should talk a 
-   little more about this part...
+Once you dowload the whole Selenium-RC zip file from the `downloads page`_ you
+will notice that it has lots of subfolders inside. As you already know from
+the `Architecture Diagram`_, this folders have all the subparts that integrates
+the RC.
 
-.. Paul: Could one of you guys please put in a brief description of what is 
-   IntelliJ?  I'm not familiar with it and I'm sure some other readers will be 
-   in the same boat. Please include a short sentence that mentions who uses it 
-   and/or why it is used--just to add some context. 
-   Tarun: I would do this.
-   Santi: We should create a short generic description that describes what is 
-   and IDE that will be enough to understand what IntelliJ, Eclipse or any of
-   them mean.
+Once you've chosen a language to work with, you'll only need to install the 
+server and the client driver you need.
 
-Java installation
-~~~~~~~~~~~~~~~~~~
+Selenium server installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Selenium-RC server is just a jar file, which doesn't need installation at
+all. Just be downloading the zip file and extracting the server in the desired
+directory should be enough. You just go to that directory and execute it using
+java:: 
+
+    java -jar selenium-server.jar
+
+Most people like to have a more simplified setup, which can be made by creating
+an executable batch file (.bat on windows and .sh on linux) with just the line
+write above. This way, you can make a shortcut to that executable file in your
+desktop and just double-click on it anytime you want to wake up the server.
+
+Java client installation
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 In General configuration of Selenium-RC with any java IDE would have following 
 steps:
@@ -208,7 +227,7 @@ steps:
 
 These points have been delineated below with reference to Eclipse and IntelliJ: 
 
-Configuring Selenium-RC with Eclipse
+Configuring Selenium-RC With Eclipse
 ++++++++++++++++++++++++++++++++++++
 
 **Eclipse** is a multi-language software development platform comprising an IDE 
@@ -321,7 +340,7 @@ Added libraries would appear in Package Explorer as following:
 .. image:: images/chapt5_img18_Configure_Build_Path.png
    :align: center
 
-Configuring Selenium-RC with Intellij
+Configuring Selenium-RC With Intellij
 +++++++++++++++++++++++++++++++++++++
 
 **IntelliJ IDEA** is a commercial Java IDE by the company JetBrains. Intellij 
@@ -332,17 +351,16 @@ JUnit.
 
 .. <Documentation is in progress> 
 
-Python installation 
-~~~~~~~~~~~~~~~~~~~~
+Python Client Installation 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following steps describe the basic installation procedure. After following 
 this, the user can start using the desired IDE, (even write tests in a text 
 processor and run them from command line!) without any extra work (at least 
 from the selenium's part).
 
-
 * Installing Python.
-  This will cover python installation on Windows only, as in most of linux 
+  This will cover python installation on Windows only, as in most linux 
   distributions and OSX, python is already pre-installed by default. 
 
         1. Download Active python's installer from ActiveState's official site: 
@@ -382,8 +400,8 @@ from the selenium's part).
 .. image:: images/chapt5_img25_Python_Driver_Install.png
    :align: center
 
-Congratulations, you're done! Now any python script that you create can import 
-selenium and start interacting with the browsers. 
+Congratulations, you're done! Now any python script that you create can import
+selenium and start interacting with the browsers.
 
 .. _`downloads page`: http://seleniumhq.org/download/
 
@@ -398,6 +416,11 @@ type               q             selenium rc
 clickAndWait       submit
 assertTextPresent  Selenium-RC
 =================  ============  ===========
+
+.. note:: The table doesn't include that the script is written to test 
+   `Selenium's website`_
+
+.. _Selenium's website: http://seleniumhq.org
 
 Here is the test script exported to all the programming languages:
 
@@ -587,12 +610,12 @@ Here is the test script exported to all the programming languages:
 Now we will analyze the different parts of the tests for you to understand
 each statement.
 
-Basic tests structure
+Basic Tests Structure
 ~~~~~~~~~~~~~~~~~~~~~
 
-Here we'll explain the basic test structure on each programming language. This
-tends to differ from one to another, so you'll find separate explanations for 
-each of them:
+Here you will find an explanation of the basic test structure on each 
+programming language. This tends to differ from one to another, so you'll find
+separate explanations for each of them:
 
 * Python_
 * Java_
@@ -711,8 +734,8 @@ The basic test structure is:
 Ruby
 ++++
 
-Starting the Browser 
-~~~~~~~~~~~~~~~~~~~~
+Starting The Browser 
+~~~~~~~~~~~~~~~~~~~~~
 
 .. container:: toggled
 
@@ -766,6 +789,25 @@ an object for your code) and assigning the "browser" instance to a variable
 (which will later be used to call methods from the browser, like *open* or 
 *type*)
 
+The initial parameters that you should give when you create the browser instance
+are: 
+
+host
+    This is the ip location where the server is located. Most of the times is
+    the same machine than the one where the client is running, so you'll see
+    that it's an optional parameter on some clients.
+port
+    As the host, it determines on which socket is the server listening waiting
+    for the client to communicate with him. Again, it can be optional in some
+    client drivers.
+browser
+    The browser in which you want to run the tests. This is a required 
+    parameter (I hope you understand why :))
+url
+    The base url of the application under test. This is also required on all the
+    client libs and Selenium-RC needs it before starting the browser due to the
+    way the same server is implemented.
+
 Finally, some languages require the browser to be started explicitly by calling
 it's *start* method.
 
@@ -774,6 +816,30 @@ Running Commands
 
 Retrieving and Reporting Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Adding Some Spice to Your Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now you'll understand why you needed Selenium-RC and you just couldn't stay
+only with the IDE. We will try to give you some guidance on things that can 
+only be done using a programming language. The different examples are just 
+written on only one of the languages, but we think that you'll understand the
+idea and will be able to translate it to your favorite language.
+
+Iteration
++++++++++
+
+Data Driven Testing
++++++++++++++++++++
+
+Error Handling
+++++++++++++++
+
+Conditionals
+++++++++++++
+
+Data Base Validations
++++++++++++++++++++++
 
 Server Command Line options
 ---------------------------
