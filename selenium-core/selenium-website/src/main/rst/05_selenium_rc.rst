@@ -410,6 +410,8 @@ Sample Test Scripts
 
 If we use the following test recorded with Selenium-IDE as a base:
 
+.. _search example:
+
 =================  ============  ===========
 open               /
 type               q             selenium rc
@@ -814,6 +816,18 @@ it's *start* method.
 Running Commands 
 ~~~~~~~~~~~~~~~~
 
+Once you have the browser initialized and assigned to a variable (generally
+named selenium) you can make it run commands by calling the respective 
+methods from the selenium browser. For example, when you call the *type* method
+of the selenium object::
+
+    selenium.type("field-id","sting to type")
+
+In backend (by the magic of Selenium-RC), the browser will actually **type** 
+using the locator and the string you specified during the method call. So, 
+summarizing, what for your code is just a regular object (with methods and 
+properties), in backend it's making the real browser do things.
+
 Retrieving and Reporting Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -824,13 +838,53 @@ Now you'll understand why you needed Selenium-RC and you just couldn't stay
 only with the IDE. We will try to give you some guidance on things that can 
 only be done using a programming language. The different examples are just 
 written on only one of the languages, but we think that you'll understand the
-idea and will be able to translate it to your favorite language.
+idea and will be able to translate it to the language of your choice.
 
 Iteration
 +++++++++
 
+Iteration is one of the most common things people needs to do in their tests.
+Generally, to repeat a simple search, or saving you from duplicating the same
+code several times.
+
+If we take the `search example`_ we've been looking at, it's not so crazy to 
+think that we want to check that all the Selenium tools appear on the search
+we make. This kind of test could be made doing the following using Selenese:
+
+=================  =============  =============
+open               /
+type               q              selenium rc
+clickAndWait       submit
+assertTextPresent  Selenium-RC
+type               q              selenium ide
+clickAndWait       submit 
+assertTextPresent  Selenium-IDE 
+type               q              selenium grid
+clickAndWait       submit 
+assertTextPresent  Selenium-Grid 
+=================  =============  =============
+
+As you can see, the code has been triplicated to run the same steps 3 times.
+This doesn't look to efficient.
+
+By using a programming language, we can just iterate over a list and do the 
+search in the following way (the example has been written in python):
+
+.. code-block:: python
+
+   list = ("IDE", "RC", "GRID")
+   for tool in list:
+       sel.type("q", "selenium " + tool)
+       sel.click("submit")
+       sel.wait_for_page_to_load("30000")
+       self.failUnless(sel.is_text_present("Selenium-" + tool))
+
 Data Driven Testing
 +++++++++++++++++++
+
+So, the iteration_ idea seems cool. Let's improve this by allowing the users to
+write an external text file from which the script should read the input data,
+search and assert it's existence.
 
 Error Handling
 ++++++++++++++
@@ -989,7 +1043,6 @@ Howto correctly use your Verify commands in Selenium-RC
 .. Santi: I'll put some info from 
    http://clearspace.openqa.org/message/56908#56908 (we should write an example
    for all the languages...)
-
 
 Paul's part
 -----------
@@ -1163,11 +1216,11 @@ tell it to use this new Firefox profile with the server command-line option
 Specifying the Path to a Specific Browser 
 -----------------------------------------
 
-You can specify to Selenium-RC a specific path to a specific browser. This is 
-useful if you have different versions of the same browser, and you wish to 
-use a specific one. Also, this is used to allow your tests to run against 
-a browser not directly supported by Selenium-RC. When specifying the run mode,
-use the \*custom specifier followed by the full path to the browser's .exe::
+You can specify to Selenium-RC a path to a specific browser. This is useful if 
+you have different versions of the same browser, and you wish to use a specific
+one. Also, this is used to allow your tests to run against a browser not 
+directly supported by Selenium-RC. When specifying the run mode, use the 
+\*custom specifier followed by the full path to the browser's executable::
 
    *custom <path to browser> 
  
@@ -1191,6 +1244,10 @@ Troubleshooting
 .. Paul: Here's 3 other issues we had on our orig list of topics for this 
    chapter. Shall we still develop these?
 
+.. Santi: must recheck if all the topics here: 
+   http://seleniumhq.org/documentation/remote-control/troubleshooting.html
+   are covered.
+
 Empty verify strings
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1201,12 +1258,31 @@ This issue has it's own section. Please go here_ for more information.
 Firefox and Linux 
 ~~~~~~~~~~~~~~~~~
 
-.. Paul: what's this section about?  Does Selenium-RC behave differently with 
-   Firefox on Linux?
+On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin" 
+directly, so if you are using a previous version, make sure that the real 
+executable is on the path. 
 
-.. Santi: It did, before version 1.0beta 2, you had to make some changes to 
-   the path for FF to work with selenium. This is no longer an issue now, 
-   anyway, let's leave it until we make sure.
+On most linux distributions, the real firefox-bin is located on::
+
+   /usr/lib/firefox-x.x.x/ 
+
+Where the x.x.x is the version number you currently have. So, to add that path 
+to the user's path. you will have to add the following to your .bashrc file:
+
+.. code-block:: bash
+
+   export PATH="$PATH:/usr/lib/firefox-x.x.x/"
+
+
+.. This problem is caused because in linux, firefox is executed through a shell
+   script (the one located on /usr/bin/firefox), when it comes the time to kill
+   the browser Selenium-RC will kill the shell script, leaving the browser 
+   running.  Santi: not sure if we should put this here...
+
+If necessary, you can specify the path to firefox-bin directly in your test,
+like this::
+
+   "*firefox /usr/lib/firefox-x.x.x/firefox-bin"
 
 IE and the style attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1216,9 +1292,6 @@ IE and the style attributes
 
 .. Paul: Hey Santi, what is this section?  Does this belong inthe Selenese 
    chapter?  That's where we're putting stuff on locators like XPATH.
-
-.. Santi: The last 2 topics here where inside the "Troubleshooting" section. 
-   It seems like someone erased that part (not sure who or why)
 
 .. Santi: I put this under the SelRC part, because it's only caused working 
    with IE (and this can only be done using Sel RC)
