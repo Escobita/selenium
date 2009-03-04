@@ -1,22 +1,24 @@
 /*
- * Copyright 2007 ThoughtWorks, Inc
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package org.openqa.selenium;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -80,21 +82,6 @@ public interface WebDriver {
      */
     String getTitle();
 
-    /**
-     * Is the browser visible or not?
-     *
-     * @return True if the browser can be seen, or false otherwise
-     */
-    boolean getVisible();
-
-    /**
-     * Make the browser visible or not. Note that for some implementations, this
-     * is a no-op.
-     *
-     * @param visible Set whether or not the browser is visible
-     */
-    void setVisible(boolean visible);
-
   /**
      * Find all elements within the current page using the given mechanism.
      *
@@ -121,7 +108,9 @@ public interface WebDriver {
      * returned text is that of the modified page. Please consult the
      * documentation of the particular driver being used to determine whether
      * the returned text reflects the current state of the page or the text last
-     * sent by the web server.
+     * sent by the web server. The page source returned is a representation of
+     * the underlying DOM: do not expect it to be formatted or escaped in the same
+     * way as the response sent from the web server.
      *
      * @return The source of the current page
      */
@@ -132,11 +121,25 @@ public interface WebDriver {
      * currently open.
      */
     void close();
-    
+
     /**
      * Quits this driver, closing every associated window.
      */
     void quit();
+
+    /**
+     * Return a set of window handles which can be used to iterate over all open windows of
+     * this webdriver instance by passing them to {@link #switchTo().window(String)}
+     *
+     * @return A set of window handles which can be used to iterate over all open windows.
+     */
+    Set<String> getWindowHandles();
+
+    /**
+     * Return an opaque handle to this window that uniquely identifies it within this driver
+     * instance. This can be used to switch to this window at a later date
+     */
+    String getWindowHandle();
 
     /**
      * Send future commands to a different frame or window.
@@ -162,9 +165,9 @@ public interface WebDriver {
      * @see org.openqa.selenium.WebDriver.Options
      */
     public Options manage();
-    
+
     /**
-     * An interface for managing stuff you would do in a browser menu 
+     * An interface for managing stuff you would do in a browser menu
      */
     public interface Options {
 
@@ -172,7 +175,7 @@ public interface WebDriver {
          * Add a specific cookie. If the cookie's domain name is left blank, it
          * is assumed that the cookie is meant for the domain of the current
          * document.
-         * 
+         *
          * @param cookie
          *                The cookie to add.
          */
@@ -181,7 +184,7 @@ public interface WebDriver {
         /**
          * Delete the named cookie from the current domain. This is equivalent
          * to setting the named cookie's expiry date to some time in the past.
-         * 
+         *
          * @param name
          *                The name of the cookie to delete
          */
@@ -190,7 +193,7 @@ public interface WebDriver {
         /**
          * Delete a cookie from the browser's "cookie jar". The domain of the
          * cookie will be ignored.
-         * 
+         *
          * @param cookie
          */
         void deleteCookie(Cookie cookie);
@@ -203,25 +206,25 @@ public interface WebDriver {
         /**
          * Get all the cookies for the current domain. This is the equivalent of
          * calling "document.cookies"
-         * 
+         *
          * @return A Set of cookies for the current domain.
          */
         Set<Cookie> getCookies();
 
         /**
          * Gets the mouse speed for drag and drop
-         * 
+         *
          */
         Speed getSpeed();
 
         /**
          * Sets the speed for user input
-         * 
+         *
          * @param speed
          */
         void setSpeed(Speed speed);
     }
-    
+
     /**
 	 * Used to locate a given frame or window.
 	 */
@@ -255,20 +258,14 @@ public interface WebDriver {
          *
          * @param windowName
          * @return A driver focused on the given window
+         * @throws NoSuchWindowException If the window cannot be found
          */
         WebDriver window(String windowName);
 
       /**
-       * Provides a mechanism to iterate over every open browser window.  
-       *
-       * @return An iterable of current open windows.
-       */
-        Iterable<WebDriver> windowIterable();
-
-        /**
          * Selects either the first frame on the page, or the main document when a page contains iframes.
          */
-          WebDriver defaultContent();
+        WebDriver defaultContent();
 
         /**
          * Switches to the element that currently has focus, or the body element if this cannot be detected.
@@ -281,30 +278,42 @@ public interface WebDriver {
     }
 
     public interface Navigation {
-      /**
-       * Move back a single "item" in the browser's history.
-       */
-      void back();
+        /**
+         * Move back a single "item" in the browser's history.
+         */
+        void back();
+
+        /**
+         * Move a single "item" forward in the browser's history. Does nothing if
+         * we are on the latest page viewed.
+         */
+        void forward();
+
+
+        /**
+         * Load a new web page in the current browser window. This is done using an
+         * HTTP GET operation, and the method will block until the load is complete.
+         * This will follow redirects issued either by the server or as a
+         * meta-redirect from within the returned HTML. Should a meta-redirect
+         * "rest" for any duration of time, it is best to wait until this timeout is
+         * over, since should the underlying page change whilst your test is
+         * executing the results of future calls against this interface will be
+         * against the freshly loaded page.
+         *
+         * @param url The URL to load. It is best to use a fully qualified URL
+         */
+        void to(String url);
+
+        /**
+         * Overloaded version of {@link #to(String)} that makes it easy to pass in a URL.
+         *
+         * @param url
+         */
+          void to(URL url);
 
       /**
-       * Move a single "item" forward in the browser's history. Does nothing if
-       * we are on the latest page viewed.
+       * Refresh the current page 
        */
-      void forward();
-
-
-      /**
-       * Load a new web page in the current browser window. This is done using an
-       * HTTP GET operation, and the method will block until the load is complete.
-       * This will follow redirects issued either by the server or as a
-       * meta-redirect from within the returned HTML. Should a meta-redirect
-       * "rest" for any duration of time, it is best to wait until this timeout is
-       * over, since should the underlying page change whilst your test is
-       * executing the results of future calls against this interface will be
-       * against the freshly loaded page.
-       *
-       * @param url The URL to load. It is best to use a fully qualified URL
-       */
-      void to(String url);
+         void refresh();
     }
 }

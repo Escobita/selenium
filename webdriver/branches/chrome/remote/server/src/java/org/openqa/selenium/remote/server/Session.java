@@ -1,33 +1,54 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote.server;
+
+import junit.framework.TestCase;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.remote.Capabilities;
+import org.openqa.selenium.remote.Context;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.internal.OperatingSystem;
-import org.openqa.selenium.remote.Capabilities;
-import org.openqa.selenium.remote.Context;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
 public class Session {
   private final WebDriver driver;
   private KnownElements knownElements = new KnownElements();
   private Capabilities capabilities;
   private Executor executor;
+  private volatile String base64EncodedImage;
 
-  public Session(DriverSessions parent, final Capabilities capabilities) throws Exception {
-    if (isDriverRequiringGlobalThread(capabilities)) {
-      this.executor = parent.getExecutor();
-    } else {
-      this.executor = Executors.newSingleThreadExecutor();
-    }
+  public Session(final Capabilities capabilities) throws Exception {
+    executor = Executors.newSingleThreadExecutor();
 
     // Ensure that the browser is created on the single thread.
     FutureTask<WebDriver> createBrowser = new FutureTask<WebDriver>(new Callable<WebDriver>() {
       public WebDriver call() throws Exception {
-        return createNewDriverMatching(capabilities);
+        EventFiringWebDriver driver =
+            new EventFiringWebDriver(createNewDriverMatching(capabilities));
+        driver.register(new SnapshotScreenListener(Session.this));
+        return driver;
       }
     });
     execute(createBrowser);
@@ -36,14 +57,10 @@ public class Session {
     boolean isRendered = isRenderingDriver(capabilities);
     DesiredCapabilities desiredCapabilities =
         new DesiredCapabilities(capabilities.getBrowserName(), capabilities.getVersion(),
-                                capabilities.getOperatingSystem());
+                                capabilities.getPlatform());
     desiredCapabilities.setJavascriptEnabled(isRendered);
 
     this.capabilities = desiredCapabilities;
-  }
-
-  private boolean isDriverRequiringGlobalThread(Capabilities capabilities) {
-    return "internet explorer".equals(capabilities.getBrowserName());
   }
 
   public <X> X execute(FutureTask<X> future) throws Exception {
@@ -70,10 +87,9 @@ public class Session {
   }
 
   private WebDriver createNewDriverMatching(Capabilities capabilities) throws Exception {
-    OperatingSystem os = capabilities.getOperatingSystem();
-    if (os != null && !OperatingSystem.ANY.equals(os) && !OperatingSystem.getCurrentPlatform()
-        .equals(os)) {
-      throw new RuntimeException("Desired operating system does not match current OS");
+    Platform platform = capabilities.getPlatform();
+    if (platform != null && !Platform.ANY.equals(platform) && !Platform.getCurrent().is(platform)) {
+      throw new WebDriverException("Desired operating system does not match current OS");
     }
 
     String browser = capabilities.getBrowserName();
@@ -105,6 +121,16 @@ public class Session {
           .newInstance();
     }
 
-    throw new RuntimeException("Unable to match browser: " + browser);
+    throw new WebDriverException("Unable to match browser: " + browser);
+  }
+
+  public void attachScreenshot(String base64EncodedImage) {
+    this.base64EncodedImage = base64EncodedImage;
+  }
+
+  public String getAndClearScreenshot() {
+    String temp = this.base64EncodedImage;
+    base64EncodedImage = null;
+    return temp;
   }
 }

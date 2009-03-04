@@ -1,12 +1,12 @@
 package org.openqa.selenium.chrome.internal;
 
+import org.openqa.selenium.Platform;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.openqa.selenium.internal.OperatingSystem;
 
 public class ChromeBinary {
     private final File actualBinary;
@@ -32,8 +32,8 @@ public class ChromeBinary {
         if (binary != null)
             return binary;
 
-        OperatingSystem os = OperatingSystem.getCurrentPlatform();
-        switch (os) {
+        Platform platform = Platform.getCurrent();
+        switch (platform) {
             case WINDOWS:
                 String userProfile = System.getenv("USERPROFILE");
                 if (userProfile == null) {
@@ -89,8 +89,8 @@ public class ChromeBinary {
     protected void modifyLibraryPath(ProcessBuilder builder) {
         String propertyName;
 
-        OperatingSystem os = OperatingSystem.getCurrentPlatform();
-        switch (os) {
+        Platform platform = Platform.getCurrent();
+        switch (platform) {
             case MAC:
                 propertyName = "DYLD_LIBRARY_PATH";
                 break;

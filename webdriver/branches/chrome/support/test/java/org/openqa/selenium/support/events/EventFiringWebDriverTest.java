@@ -1,13 +1,34 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.support.events;
 
+import org.jmock.Expectations;
+import org.jmock.integration.junit3.MockObjectTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.jmock.Expectations;
-import org.jmock.integration.junit3.MockObjectTestCase;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.JavascriptExecutor;
+
+import java.lang.reflect.Proxy;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 /**
  * @author Michael Tamm
@@ -144,4 +165,55 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
             log.toString()
         );
     }
+
+  public void testShouldCallListenersWhenAnExceptionIsThrown() {
+    final WebDriver mockedDriver = mock(WebDriver.class);
+    final StringBuilder log = new StringBuilder();
+
+    final NoSuchElementException exception = new NoSuchElementException("argh");
+
+    checking(new Expectations() {{
+        one(mockedDriver).findElement(By.id("foo")); will(throwException(exception));
+      }});
+
+    EventFiringWebDriver testedDriver =
+        new EventFiringWebDriver(mockedDriver).register(new AbstractWebDriverEventListener() {
+          public void onException(Throwable throwable, WebDriver driver) {
+            log.append(throwable.getMessage());
+          }
+        });
+
+    try {
+      testedDriver.findElement(By.id("foo"));
+      fail("Expected exception to be propogated");
+    } catch (NoSuchElementException e) {
+      // Fine
+    }
+
+    assertEquals(exception.getMessage(), log.toString());
+  }
+
+  public void testShouldUnpackElementArgsWhenCallingScripts() {
+    final ExececutingDriver mockedDriver = mock(ExececutingDriver.class);
+    final WebElement stubbedElement = mock(WebElement.class);
+
+    checking(new Expectations() {{
+        one(mockedDriver).findElement(By.id("foo")); will(returnValue(stubbedElement));
+        allowing(stubbedElement);
+        one(mockedDriver).executeScript("foo", stubbedElement); will(returnValue("foo"));
+      }});
+
+    EventFiringWebDriver testedDriver = new EventFiringWebDriver(mockedDriver);
+    testedDriver.register(new AbstractWebDriverEventListener() {} );
+
+    WebElement element = testedDriver.findElement(By.id("foo"));
+    try {
+      testedDriver.executeScript("foo", element);
+    } catch (RuntimeException e) {
+      // This is the error we're trying to fix
+      throw e;
+    }
+  }
+
+  private static interface ExececutingDriver extends WebDriver, JavascriptExecutor {}
 }

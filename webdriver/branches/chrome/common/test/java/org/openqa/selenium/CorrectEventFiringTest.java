@@ -1,13 +1,31 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 import java.util.List;
 
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	@JavascriptEnabled
-	@Ignore("safari")
+        @Ignore(SAFARI)
 	public void testShouldFireFocusEventWhenClicking() {
 		driver.get(javascriptPage);
 
@@ -17,7 +35,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldFireClickEventWhenClicking() {
 		driver.get(javascriptPage);
 
@@ -27,7 +45,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldFireMouseDownEventWhenClicking() {
 		driver.get(javascriptPage);
 
@@ -37,7 +55,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldFireMouseUpEventWhenClicking() {
 		driver.get(javascriptPage);
 
@@ -47,7 +65,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldFireEventsInTheRightOrder() {
 		driver.get(javascriptPage);
 
@@ -65,7 +83,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testsShouldIssueMouseDownEvents() {
 		driver.get(javascriptPage);
 		driver.findElement(By.id("mousedown")).click();
@@ -75,7 +93,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldIssueClickEvents() {
 		driver.get(javascriptPage);
 		driver.findElement(By.id("mouseclick")).click();
@@ -85,7 +103,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldIssueMouseUpEvents() {
 		driver.get(javascriptPage);
 		driver.findElement(By.id("mouseup")).click();
@@ -95,7 +113,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testMouseEventsShouldBubbleUpToContainingElements() {
 		driver.get(javascriptPage);
 		driver.findElement(By.id("child")).click();
@@ -105,11 +123,11 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldEmitOnChangeEventsWhenSelectingElements() {
 		driver.get(javascriptPage);
 		WebElement select = driver.findElement(By.id("selector"));
-		List<WebElement> allOptions = select.getChildrenOfType("option");
+		List<WebElement> allOptions = select.findElements(By.tagName("option"));
 
 		String initialTextValue = driver.findElement(By.id("result")).getText();
 
@@ -125,7 +143,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 	}
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
 	public void testShouldEmitOnChangeEventsWhenChnagingTheStateOfACheckbox() {
 		driver.get(javascriptPage);
 		WebElement checkbox = driver.findElement(By.id("checkbox"));
@@ -135,7 +153,30 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 				equalTo("checkbox thing"));
 	}
 
-	private void clickOnElementWhichRecordsEvents() {
+  @JavascriptEnabled
+  @Ignore(SAFARI)
+  public void testShouldEmitClickEventWhenClickingOnATextInputElement() {
+    driver.get(javascriptPage);
+
+    WebElement clicker = driver.findElement(By.id("clickField"));
+    clicker.click();
+
+    assertThat(clicker.getValue(), equalTo("Clicked"));
+  }
+
+  @JavascriptEnabled
+  @Ignore(SAFARI)
+  public void testClearingAnElementShouldCauseTheOnChangeHandlerToFire() {
+    driver.get(javascriptPage);
+
+    WebElement element = driver.findElement(By.id("clearMe"));
+    element.clear();
+
+    WebElement result = driver.findElement(By.id("result"));
+    assertThat(result.getText(), equalTo("Cleared"));
+  }
+
+        private void clickOnElementWhichRecordsEvents() {
 		driver.findElement(By.id("plainButton")).click();
 	}
 

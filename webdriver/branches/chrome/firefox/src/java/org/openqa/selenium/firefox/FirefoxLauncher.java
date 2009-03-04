@@ -1,112 +1,125 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox;
 
-import java.io.File;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.NotConnectedException;
+import org.openqa.selenium.firefox.internal.RunningInstanceConnection;
+
 import java.io.IOException;
 import java.net.ConnectException;
 
-import org.openqa.selenium.firefox.internal.FirefoxBinary;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.firefox.internal.RunningInstanceConnection;
-
 public class FirefoxLauncher {
-    public static void main(String[] args) throws IOException {
-        FirefoxLauncher launcher = new FirefoxLauncher();
+  private final FirefoxBinary binary;
 
-        if (args.length == 0)
-            launcher.createBaseWebDriverProfile();
-        else if (args.length == 1)
-            launcher.createBaseWebDriverProfile(args[0]);
-        else
-            launcher.createBaseWebDriverProfile(args[0], Integer.parseInt(args[1]));
+  public FirefoxLauncher(FirefoxBinary binary) {
+      this.binary = binary;
+  }
+
+  public static void main(String[] args) {
+    FirefoxBinary binary = new FirefoxBinary();
+    FirefoxLauncher launcher = new FirefoxLauncher(new FirefoxBinary());
+    ProfileManager profileManager = ProfileManager.getInstance();
+
+    String profileName = "WebDriver";
+    int port = FirefoxDriver.DEFAULT_PORT;
+    if (args.length >= 2) {
+      port = Integer.parseInt(args[1]);
+    }
+    
+    if (args.length >= 1) {
+      profileName = args[0];
+    }
+    
+    // If there's a browser already running, connect and kill it.
+    launcher.connectAndKill(port);
+    
+    // Ensure the profile is created, and initialize it.
+    launcher.createBaseWebDriverProfile(binary, profileName, port);
+
+    // Connect until it works.
+    launcher.repeatedlyConnectUntilFirefoxAppearsStable(port);
+  }
+    
+  public FirefoxBinary startProfile(FirefoxProfile profile, int port) throws IOException {
+    FirefoxBinary binaryToUse = binary;
+    if (binary == null) {
+      binaryToUse = new FirefoxBinary();
     }
 
-    public void createBaseWebDriverProfile() throws IOException {
-        createBaseWebDriverProfile(FirefoxDriver.DEFAULT_PROFILE);
+    FirefoxProfile profileToUse = profile.createCopy(port);
+    binaryToUse.clean(profileToUse);
+    binaryToUse.startProfile(profileToUse);
+    return binaryToUse;
+  }
+  
+  @Deprecated
+  public void createBaseWebDriverProfile(FirefoxBinary binary, String profileName, int port) {
+    // If there's a browser already running
+    connectAndKill(port);
+
+    System.out.println(String.format("Creating %s", profileName));
+    try {
+        binary.createProfile(profileName);
+        System.out.println("Profile created");
+        binary.waitFor();
+    } catch (IOException e) {
+        throw new WebDriverException("Unable to create base webdriver profile", e);
+    } catch (InterruptedException e) {
+        throw new WebDriverException(e);
     }
+    
+    ProfileManager.getInstance().createProfile(binary, profileName, port);
+  }
 
-    public void createBaseWebDriverProfile(String profileName) throws IOException {
-        createBaseWebDriverProfile(profileName, FirefoxDriver.DEFAULT_PORT);
+  @Deprecated
+  protected void connectAndKill(int port) {
+    try {
+        ExtensionConnection connection = new RunningInstanceConnection("localhost", port, 5000);
+        connection.quit();
+    } catch (ConnectException e) {
+        // This is fine. It just means that Firefox isn't running with the webdriver extension installed already
+    } catch (NotConnectedException e) {
+        // This is fine. It just means that Firefox isn't running with the webdriver extension installed already
+    } catch (IOException e) {
+        throw new WebDriverException(e);
     }
+  }
 
-    public void createBaseWebDriverProfile(String profileName, int port) throws IOException {
-        // If there's a browser already running
-        connectAndKill(port);
-
-        FirefoxBinary binary = new FirefoxBinary();
-
-        System.out.println(String.format("Creating %s", profileName));
-        try {
-            binary.createProfile(profileName);
-            System.out.println("Profile created");
-            binary.waitFor();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        ProfilesIni allProfiles = new ProfilesIni();
-        FirefoxProfile profile = allProfiles.getProfile(profileName);
-
-        System.out.println("Attempting to install the WebDriver extension");
-        profile.addWebDriverExtensionIfNeeded(true);
-
-        System.out.println("Updating user preferences with common, useful settings");
-        profile.setPort(port);
-        profile.updateUserPrefs();
-
-        System.out.println("Deleting existing extensions cache (if it already exists)");
-        profile.deleteExtensionsCacheIfItExists();
-
-        System.out.println("Firefox should now start and quit");
-        binary.startProfile(profile);
-        
-        repeatedlyConnectUntilFirefoxAppearsStable(port);
-    }
-
-    private void repeatedlyConnectUntilFirefoxAppearsStable(int port) {
-      ExtensionConnection connection;
-      // maximum wait time is a minute
-      long maxWaitTime = System.currentTimeMillis() + 60000;
+  private void repeatedlyConnectUntilFirefoxAppearsStable(int port) {
+    ExtensionConnection connection;
+    
+    // maximum wait time is a minute
+    long maxWaitTime = System.currentTimeMillis() + 60000;
       
-        while (System.currentTimeMillis() < maxWaitTime) {
-            try {
-                connection = new RunningInstanceConnection("localhost", port, 1000);
-                Thread.sleep(2000);
-                connection.quit();
-                return;
-            } catch (ConnectException e) {
-                // Fine. Nothing listening. Perhaps in a restart?
-            } catch (IOException e) {
-                // Expected. It'll do that
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-
-    protected void connectAndKill(int port) {
-        try {
-            ExtensionConnection connection = new RunningInstanceConnection("localhost", port, 5000);
-            connection.quit();
-        } catch (ConnectException e) {
-            // This is fine. It just means that Firefox isn't running with the webdriver extension installed already
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public FirefoxBinary startProfile(FirefoxProfile profile, int port) throws IOException {
-        return startProfile(profile, null, port);
-    }
-
-    public FirefoxBinary startProfile(FirefoxProfile originalProfile, File firefoxBinary, int port) throws IOException {
-        FirefoxBinary binary = new FirefoxBinary(firefoxBinary);
-
-        FirefoxProfile profile = originalProfile.createCopy(port);
-        binary.clean(profile);
-        binary.startProfile(profile);
-        return binary;
-    }
+    do {
+      try {
+          connection = new RunningInstanceConnection("localhost", port, 1000);
+          Thread.sleep(2000);
+          connection.quit();
+          return;
+      } catch (ConnectException e) {
+          // Fine. Nothing listening. Perhaps in a restart?
+      } catch (IOException e) {
+          // Expected. It'll do that
+      } catch (InterruptedException e) {
+          throw new WebDriverException(e);
+      }
+    } while (System.currentTimeMillis() < maxWaitTime);
+  }
 }

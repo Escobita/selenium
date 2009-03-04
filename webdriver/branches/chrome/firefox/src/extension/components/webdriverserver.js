@@ -1,19 +1,36 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 function WebDriverServer() {
     this.wrappedJSObject = this;
     this.serverSocket = Components.classes["@mozilla.org/network/server-socket;1"].createInstance(Components.interfaces.nsIServerSocket);
-    this.nextId = 0;
+    this.generator = Utils.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");
 }
 
 WebDriverServer.prototype.newDriver = function(window) {
-    window.fxdriver = new FirefoxDriver(this, this.getNextId());
+    window.fxdriver = new FirefoxDriver(this);
     // Yuck. But it allows us to refer to it later.
     window.fxdriver.window = window;
     return window.fxdriver;
 };
 
 WebDriverServer.prototype.getNextId = function() {
-    this.nextId++;
-    return this.nextId;
+    return this.generator.generateUUID().toString(); 
 }
 
 WebDriverServer.prototype.onSocketAccepted = function(socket, transport) {

@@ -5,11 +5,11 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 def windows?
-  RUBY_PLATFORM =~ /win32/i
+  RUBY_PLATFORM.downcase.include?("win32")
 end
 
 def mac?
-  RUBY_PLATFORM =~ /darwin/i
+  RUBY_PLATFORM.downcase.include?("darwin")
 end
 
 def all?
@@ -24,7 +24,7 @@ def present?(arg)
   matches = prefixes.select do |prefix|
     File.exists?(prefix + File::SEPARATOR + arg)
   end
-  
+
   matches.length > 0
 end
 
@@ -39,46 +39,58 @@ task :prebuild do
 
   if windows? then
     if (!present?("msbuild.exe")) then
-      puts "Cannot locate '#{exe}' which is required for the build"
+      puts "Cannot locate 'msbuild.exe' which is required for the build"
       exit -1
     end
   end
 end
 
-task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :support, :remote, :selenium, :chrome]
+def iPhoneSDKPresent?
+  return false unless mac? && present?('xcodebuild')
+  begin
+    sdks = sh "xcodebuild -showsdks 2>/dev/null", :verbose => false
+    !!(sdks =~ /simulator2.2/)
+  rescue
+    false
+  end
+end
+
+task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :chrome, :safari, :iphone, :support, :remote, :selenium]
 
 task :clean do
   rm_rf 'common/build'
   rm_rf 'htmlunit/build'
   rm_rf 'jobbie/build'
+  rm_rf 'jobbie/src/cpp/InternetExplorerDriver/Release'
   rm_rf 'firefox/build'
   rm_rf 'safari/build'
+  rm_rf 'iphone/build'
   rm_rf 'support/build'
   rm_rf 'selenium/build'
   rm_rf 'chrome/build'
   rm_rf 'build/'
 end
 
-task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_support, :test_remote, :test_chrome] do 
+task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_chrome, :test_iphone, :test_support, :test_remote] do
 end
 
-task :install_firefox => [:firefox] do  
+task :install_firefox => [:firefox] do
   libs = %w(common/build/webdriver-common.jar firefox/build/webdriver-firefox.jar firefox/lib/runtime/json-20080701.jar)
 
   firefox = "firefox"
   if ENV['firefox'] then
       firefox = ENV['firefox']
   end
-  
+
   extension_loc = File.dirname(__FILE__) + "/firefox/src/extension"
   extension_loc.tr!("/", "\\") if windows?
-  
+
   cmd = 'java'
   cmd += ' -cp ' + libs.join(File::PATH_SEPARATOR)
   cmd += ' -Dwebdriver.firefox.development="' + extension_loc + '"'
   cmd += " -Dwebdriver.firefox.bin=\"#{ENV['firefox']}\" " unless ENV['firefox'].nil?
   cmd += ' org.openqa.selenium.firefox.FirefoxLauncher '
-    
+
   sh cmd, :verbose => true
 end
 
@@ -163,7 +175,7 @@ simple_jars = {
     'deps'      => [:remote_common],
     'jar'       => "remote/build/webdriver-remote-client.jar",
     'resources' => nil,
-    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/client/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/client/lib/runtime/**/*.jar", "remote/server/lib/runtime/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
     'test_on'   => false,
   },
   "test_remote_client" => {
@@ -171,16 +183,16 @@ simple_jars = {
     'deps'      => [:test_common, :firefox, :remote_client, :remote_server],
     'jar'       => "remote/build/webdriver-remote-common-test.jar",
     'resources' => nil,
-    'classpath' => ["remote/build/*.jar", "remote/client/lib/**/*.jar", "remote/common/lib/**/*.jar", "firefox/lib/**/*.jar", "firefox/build/webdriver-firefox.jar"] + common_test_libs,
+    'classpath' => ["remote/build/*.jar", "remote/client/lib/**/*.jar", "remote/common/lib/**/*.jar", "firefox/lib/**/*.jar", "firefox/build/webdriver-firefox.jar", "support/build/webdriver-support.jar", "support/lib/runtime/*.jar"] + common_test_libs,
     'test_on'   => all?,
     'test_in'   => 'remote/client',
   },
   "remote_server" => {
     'src'       => "remote/server/src/java/**/*.java",
-    'deps'      => [:remote_common],
+    'deps'      => [:remote_common, :support],
     'jar'       => "remote/build/webdriver-remote-server.jar",
     'resources' => nil,
-    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/server/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'classpath' => ["remote/common/lib/runtime/**/*.jar", "support/lib/runtime/*.jar", "support/build/webdriver-support.jar", "remote/server/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
     'test_on'   => false,
   },
   "safari" =>   {
@@ -198,7 +210,23 @@ simple_jars = {
     'resources' => nil,
     'classpath' => ["safari/lib/**/*.jar", "safari/build/webdriver-safari.jar"] + common_test_libs,
     'test_on'   => mac?,
-  },                              
+  },
+  "iphone_client" =>   {
+    'src'       => "iphone/src/java/**/*.java",
+    'deps'      => [:common, :remote],
+    'jar'       => "iphone/build/webdriver-iphone.jar",
+    'resources' => nil,
+    'classpath' => ["remote/build/webdriver-remote-client.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'test_on'   => false,
+  },
+  "test_iphone_client" => {
+    'src'       => "iphone/test/java/**/*.java",
+    'deps'      => [:iphone_client, :test_common, :remote_client],
+    'jar'       => "iphone/build/webdriver-iphone-test.jar",
+    'resources' => nil,
+    'classpath' => ["iphone/build/webdriver-iphone.jar", "remote/build/webdriver-remote-client.jar", "remote/build/webdriver-remote-common.jar"] + common_test_libs,
+    'test_on'   => iPhoneSDKPresent?,
+  },
   "support" =>   {
     'src'       => "support/src/java/**/*.java",
     'deps'      => [:common],
@@ -214,7 +242,7 @@ simple_jars = {
     'resources' => nil,
     'classpath' => ["support/lib/**/*.jar", "support/build/webdriver-support.jar"] + common_test_libs,
     'test_on'   => all?,
-  },    
+  },
   "selenium" => {
     'src'       => "selenium/src/java/**/*.java",
     'deps'      => [:common],
@@ -222,7 +250,21 @@ simple_jars = {
     'resources' => nil,
     'classpath' => ["selenium/lib/runtime/**/*.jar"] + common_libs,
     'test_on'   => false,
-  },                         
+  },
+  "test_selenium" => {
+    'src'       => "selenium/test/java/**/*.java",
+    'deps'      => [:test_common, :firefox, :jobbie, :htmlunit, :selenium],
+    'jar'       => "selenium/build/webdriver-selenium-test.jar",
+    'resources' => nil,
+    'classpath' => [
+                    "selenium/lib/**/*.jar", "selenium/build/webdriver-selenium.jar",
+                    "firefox/build/webdriver-firefox.jar", "firefox/lib/**/*.jar",
+                    "jobbie/build/webdriver-jobbie.jar", "jobbie/lib/**/*.jar",
+                    "htmlunit/build/webdriver-htmlunit.jar", "htmlunit/lib/**/*.jar",
+                    "selenium/build/*.jar"
+                   ] + common_test_libs,
+    'test_on'   => false,
+  },
   "chrome" =>   {
     'src'       => "chrome/src/java/**/*.java",
     'deps'      => [:common],
@@ -265,11 +307,40 @@ end
 task :remote => [:remote_client, :remote_server]
 task :test_remote => [:test_remote_client]
 
+file "selenium/build/webdriver-selenium.jar" => "selenium/src/java/org/openqa/selenium/internal/injectableSelenium.js" do
+  sh "jar uf selenium/build/webdriver-selenium.jar -C selenium/src/java org/openqa/selenium/internal/injectableSelenium.js", :verbose => false
+end
+
+task :test_selenium do
+  temp_classpath = simple_jars['test_selenium']['classpath']
+  classpath = FileList.new
+  temp_classpath.each do |item|
+      classpath.add item
+  end
+
+  test_string = 'java '
+  test_string += '-cp ' + classpath.join(File::PATH_SEPARATOR) + ' '
+  test_string += "-Dwebdriver.firefox.bin=\"#{ENV['firefox']}\" " unless ENV['firefox'].nil?
+  test_string += 'org.testng.TestNG selenium/test/java/webdriver-selenium-suite.xml'
+
+  result = sh test_string, :verbose => false
+end
+
+task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :safari, :support] do
+  mkdir_p "build/javadoc"
+   sourcepath = ""
+   classpath = "support/lib/runtime/hamcrest-all-1.1.jar"
+   %w(common firefox jobbie htmlunit safari support remote/common remote/client).each do |m|
+     sourcepath += ":#{m}/src/java"
+   end
+   cmd = "javadoc -d build/javadoc -sourcepath #{sourcepath} -classpath #{classpath} -subpackages org.openqa.selenium"
+  sh cmd
+end
 
 #### Internet Explorer ####
 file 'jobbie/build/InternetExplorerDriver.dll' => FileList['jobbie/src/csharp/**/*.cs'] do
   if windows? then
-    sh "MSBuild.exe WebDriver.sln /verbosity:q /target:Rebuild /property:Configuration=Debug", :verbose => false
+    sh "MSBuild.exe WebDriver.sln /verbosity:q /target:Rebuild /property:Configuration=Release", :verbose => false
   else
     puts "Not compiling DLL. Do not try and run the IE tests!"
     begin
@@ -295,17 +366,26 @@ file 'firefox/build/webdriver-extension.zip' => FileList['firefox/src/extension/
   end
 end
 
-task :generate_headers => [:jobbie] do
-  cmd = "javah -jni -classpath common\\build\\webdriver-common.jar;jobbie\\build\\webdriver-jobbie.jar -d jobbie\\src\\cpp\\InternetExplorerDriver "
-  tests = FileList.new("jobbie/src/java/**/*.java")
-  tests.each {|f|
-    f = f.to_s
-    f =~ /jobbie\/src\/java\/(.*)\.java/
-    f = $1
-    f.tr! '/', '.'
-    cmd += f + " "
-  }
-  sh cmd, :verbose => true
+task :iphone => [:iphone_server, :iphone_client]
+task :test_iphone => [:test_iphone_server, :test_iphone_client, :remote_client]
+
+#### iPhone ####
+task :iphone_server => FileList['iphone/src/objc/**'] do
+  if iPhoneSDKPresent? then
+    puts "Building iWebDriver iphone app"
+    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target iWebDriver >/dev/null", :verbose => false
+  else
+    puts "XCode not found. Not building the iphone driver."
+  end
+end
+
+# This does not depend on :iphone_server because the dependancy is specified in xcode
+task :test_iphone_server do
+  if iPhoneSDKPresent? then
+    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target Tests"
+  else
+    puts "XCode not found. Not testing the iphone driver."
+  end
 end
 
 def version
@@ -317,7 +397,7 @@ task :remote_release => [:remote] do
 
   cp 'remote/build/webdriver-remote-common.jar', 'build/dist/remote_client'
   cp 'common/build/webdriver-common.jar', 'build/dist/remote_client'
- 
+
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_client'
   cp Dir.glob('remote/client/lib/runtime/*.jar'), 'build/dist/remote_client'
 
@@ -338,8 +418,8 @@ task :remote_release => [:remote] do
   rm_rf "build/dist/remote_server"
 end
 
-task :release => [:common, :firefox, :htmlunit, :jobbie, :remote_release, :support] do
-  %w(common firefox jobbie htmlunit support).each do |driver|
+task :release => [:common, :firefox, :htmlunit, :jobbie, :safari, :remote_release, :support] do
+  %w(common firefox jobbie htmlunit safari support).each do |driver|
     mkdir_p "build/dist/#{driver}"
     cp 'common/build/webdriver-common.jar', "build/dist/#{driver}"
     cp "#{driver}/build/webdriver-#{driver}.jar", "build/dist/#{driver}"
@@ -352,77 +432,77 @@ end
 
 
 def javac(args)
-  # mandatory args  
+  # mandatory args
   out = (args[:jar] or raise 'javac: please specify the :jar parameter')
   source_patterns = (args[:sources] or raise 'javac: please specify the :sources parameter')
   sources = FileList.new(source_patterns)
   raise("No source files found at #{sources.join(', ')}") if sources.empty?
-  
+
   # We'll start with just one thing now
   extra_resources = args[:resources]
-  
+
   puts "Building: #{out}"
-  
+
   # optional args
   unless args[:exclude].nil?
     args[:exclude].each { |pattern| sources.exclude(pattern) }
   end
   debug = (args[:debug] or true)
   temp_classpath = (args[:classpath]) || []
-  
+
   classpath = FileList.new
   temp_classpath.each do |item|
     classpath.add item
   end
-  
+
   target_dir = "#{out}.classes"
   mkdir_p target_dir, :verbose => false
-  
+
   compile_string = "javac "
   compile_string += "-source 5 -target 5 "
-  compile_string += "-g " if debug 
+  compile_string += "-g " if debug
   compile_string += "-d #{target_dir} "
 
   compile_string += "-cp " + classpath.join(File::PATH_SEPARATOR) + " " if classpath.length > 0
-  
-  sources.each do |source| 
+
+  sources.each do |source|
     compile_string += " #{source}"
   end
-  
+
   sh compile_string, :verbose => false
-  
+
   # Copy the resource to the target_dir
   if extra_resources then
     cp_r extra_resources, target_dir, :verbose => false
   end
-  
+
   jar_string = "jar cf #{out} -C #{target_dir} ."
   sh jar_string, :verbose => false
-  
+
   rm_rf target_dir, :verbose => false
 end
 
 def junit(args)
   using = args[:in]
-  
+
   source_dir = "#{using}/test/java"
   source_glob = source_dir + File::SEPARATOR + '**' + File::SEPARATOR + '*.java'
-  
-  temp_classpath = (args[:classpath]) || []    
+
+  temp_classpath = (args[:classpath]) || []
   classpath = FileList.new
   temp_classpath.each do |item|
       classpath.add item
   end
-  
+
   tests = FileList.new(source_dir + File::SEPARATOR + '**' + File::SEPARATOR + '*Suite.java')
   tests.exclude '**/Abstract*'
-  
+
   test_string = 'java '
   test_string += '-cp ' + classpath.join(File::PATH_SEPARATOR) + ' ' if classpath.length > 1
   test_string += '-Djava.library.path=' + args[:native_path].join(File::PATH_SEPARATOR) + ' ' unless args[:native_path].nil?
   test_string += "-Dwebdriver.firefox.bin=\"#{ENV['firefox']}\" " unless ENV['firefox'].nil?
   test_string += 'junit.textui.TestRunner'
-  
+
   tests.each do |test|
     puts "Looking at #{test}\n"
     name = test.sub("#{source_dir}/", '').gsub('/', '.')

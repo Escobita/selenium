@@ -1,61 +1,72 @@
-#pragma once
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+#ifndef JOBBIE_ELEMENTWRAPPER_H_
+#define JOBBIE_ELEMENTWRAPPER_H_
 
 #include <string>
 #include <vector>
 
-#include <Exdisp.h>
-#include <mshtml.h>
-
-#include "InternetExplorerDriver.h"
-#include "org_openqa_selenium_ie_InternetExplorerElement.h"
-
+class DataMarshaller;
 class InternetExplorerDriver;
 
 class ElementWrapper
 {
 public:
-	ElementWrapper(InternetExplorerDriver* ie, IHTMLDOMNode *node);
+	ElementWrapper(InternetExplorerDriver* ie, IHTMLElement *pElem);
 	~ElementWrapper();
 
-	std::wstring getAttribute(const std::wstring& name);
-	std::wstring getValue();
-	void sendKeys(const std::wstring& newValue);
+    LPCWSTR getElementName();
+	LPCWSTR getAttribute(LPCWSTR name);
+	LPCWSTR getValue();
+	int sendKeys(LPCWSTR newValue);
 	void clear();
 	bool isSelected();
-	void setSelected();
+	int setSelected();
 	bool isEnabled();
 	bool isDisplayed();
-	bool toggle();
-	std::wstring getText();
-	std::wstring getValueOfCssProperty(const std::wstring& propertyName);
+	int toggle(bool*);
+	LPCWSTR getText();
+	LPCWSTR getValueOfCssProperty(LPCWSTR propertyName);
+	void releaseInterface();
 
-	long getX();
-	long getY();
+	int getLocationWhenScrolledIntoView(HWND* hwnd, long *x, long *y);
+	void getLocation(long *x, long *y);
 	long getWidth();
 	long getHeight();
 
-	void click();
+	int click();
 	void submit();
 
-	std::vector<ElementWrapper*>* getChildrenWithTagName(const std::wstring& tagName);
-	IHTMLElement* getWrappedElement();
-	InternetExplorerDriver* getParent();
+	std::vector<ElementWrapper*>* getChildrenWithTagName(LPCWSTR tagName);
+
+	IHTMLElement* getWrappedElement() {return pElement;}
+	InternetExplorerDriver* getParent() {return ie;}
+
 
 private:
-	std::wstring getTextAreaValue();
-	bool isCheckbox();
-	bool isRadio();
-	void findParentForm(IHTMLFormElement **pform);
-	IHTMLEventObj* newEventObject();
-	void fireEvent(IHTMLEventObj*, const OLECHAR*);
-	void fireEvent(IHTMLDOMNode* fireFrom, IHTMLEventObj*, const OLECHAR*);
-
-	static void getText(std::wstring& toReturn, IHTMLDOMNode* node, bool isPreformatted);
-	static void collapsingAppend(std::wstring& s, const std::wstring& s2);
-	static std::wstring collapseWhitespace(const wchar_t *text);
-	static bool isBlockLevel(IHTMLDOMNode *node);
-
 	InternetExplorerDriver* ie;
-	CComQIPtr<IHTMLElement> element;
+	IHTMLElement *pElement;
+
+	DataMarshaller& commandData();
+	DataMarshaller& prepareCmData();
+	DataMarshaller& prepareCmData(LPCWSTR str);
+	bool sendThreadMsg(UINT msg, DataMarshaller& data);
 };
 
+#endif // JOBBIE_ELEMENTWRAPPER_H_

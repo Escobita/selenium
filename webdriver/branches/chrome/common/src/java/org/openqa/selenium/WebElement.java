@@ -1,19 +1,20 @@
 /*
- * Copyright 2007 ThoughtWorks, Inc
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package org.openqa.selenium;
 
@@ -67,8 +68,14 @@ public interface WebElement {
      */
     void clear();
 
-    
-    
+    /**
+     * Get the tag name of this element, <b>not</b> the value of the name attribute:
+     * will return <code>"input"</code> for the element <code>&lt;input name="foo" /&gt;</code>.
+     *
+     * @return The element name of this element.
+     */
+    String getElementName();
+
     /**
      * Get the value of a the given attribute of the element. Will return the
      * current value, even if this has been modified after the page has been
@@ -122,15 +129,7 @@ public interface WebElement {
      */
     String getText();
 
-    /**
-     * Get the list of child elements that match the given tag name.
-     *
-     * @param tagName The tag name of the child elements.
-     * @return A list of {@link WebElement}s of the given type.
-     */
-    List<WebElement> getChildrenOfType(String tagName);
-    
-    /**
+  /**
      * Find all elements within the current context using the given mechanism.
      *
      * @param by The locating mechanism to use
@@ -147,5 +146,5 @@ public interface WebElement {
      * @throws NoSuchElementException If no matching elements are found
      */
     WebElement findElement(By by);
-    
+
 }

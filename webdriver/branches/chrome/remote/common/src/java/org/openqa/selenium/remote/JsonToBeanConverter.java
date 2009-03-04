@@ -1,19 +1,34 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.JSONException;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 public class JsonToBeanConverter {
 
@@ -31,6 +46,11 @@ public class JsonToBeanConverter {
       return (T) text;
     }
 
+    if (text instanceof Number) {
+      // Thank you type erasure. 
+      return (T) Long.valueOf(String.valueOf(text));
+    }
+
     if (isPrimitive(text.getClass())) {
       return (T) text;
     }
@@ -41,6 +61,36 @@ public class JsonToBeanConverter {
 
     if ("".equals(String.valueOf(text))) {
       return (T) text;
+    }
+
+    if (Command.class.equals(clazz)) {
+      JSONObject rawCommand = new JSONObject((String) text);
+
+      SessionId sessionId = null;
+      if (rawCommand.has("sessionId"))
+        sessionId = convert(SessionId.class, rawCommand.getString("sessionId"));
+      Context context = null;
+      if (rawCommand.has("context"))
+        context = convert(Context.class, rawCommand.getString("context"));
+
+      if (rawCommand.has("parameters")) {
+        List args = convert(ArrayList.class, rawCommand.getJSONArray("parameters"));
+        return (T) new Command(sessionId, context, rawCommand.getString("methodName"), args.toArray());
+      }
+
+      return (T) new Command(sessionId, context, rawCommand.getString("methodName"));
+    }
+
+    if (Context.class.equals(clazz)) {
+      JSONObject object = new JSONObject((String) text);
+      String value = object.getString("value");
+      return (T) new Context(value);
+    }
+
+    if (SessionId.class.equals(clazz)) {
+      JSONObject object = new JSONObject((String) text);
+      String value = object.getString("value");
+      return (T) new SessionId(value);
     }
 
     if (text != null && text instanceof String && !((String) text).startsWith("{") && Object.class
@@ -69,10 +119,6 @@ public class JsonToBeanConverter {
     if (Map.class.isAssignableFrom(clazz)) {
       return (T) convertMap(o);
     }
-
-//    if (List.class.isAssignableFrom(o.getClass())) {
-//      return (T) convertList(o);
-//    }
 
     if (isPrimitive(o.getClass())) {
       return (T) o;
@@ -141,7 +187,7 @@ public class JsonToBeanConverter {
   private Map convertMap(JSONObject toConvert) throws Exception {
     Map map = new HashMap();
 
-    Iterator allEntries = toConvert.sortedKeys();
+    Iterator allEntries = toConvert.keys();
     while (allEntries.hasNext()) {
       String key = (String) allEntries.next();
       map.put(key, convert(Object.class, toConvert.get(key)));

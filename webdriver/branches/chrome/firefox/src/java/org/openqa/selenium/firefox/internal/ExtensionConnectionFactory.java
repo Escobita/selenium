@@ -1,28 +1,49 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox.internal;
+
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.ExtensionConnection;
+import org.openqa.selenium.firefox.FirefoxBinary;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.NotConnectedException;
 
 import java.io.IOException;
 
-import org.openqa.selenium.firefox.ExtensionConnection;
-import org.openqa.selenium.firefox.FirefoxProfile;
-
 public class ExtensionConnectionFactory {
-    public static ExtensionConnection connectTo(FirefoxProfile profile, String host, int port) {
+    public static ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile, String host) {
+      final int profilePort = profile.getPort();
         boolean isDev = Boolean.getBoolean("webdriver.firefox.useExisting");
         if (isDev) {
             try {
-                return new RunningInstanceConnection(host, port);
-            } catch (IOException e) {
+                return new RunningInstanceConnection(host, profilePort);
+            } catch (NotConnectedException e) {
                 // Fine. No running instance
+            } catch (IOException e) {
+              // Fine. No running instance.
             }
         }
 
         try {
-          return new NewProfileExtensionConnection(profile, host, port);
+          Lock lock = new SocketLock(profilePort - 1);
+          return new NewProfileExtensionConnection(lock, binary, profile, host);
         } catch (Exception e) {
-          // Tell the world what went wrong
-          e.printStackTrace();
+          throw new WebDriverException(e);
         }
-
-        return new DisconnectedExtension();
     }
 }

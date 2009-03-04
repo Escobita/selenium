@@ -1,15 +1,35 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.support;
+
+import org.openqa.selenium.RenderedWebElement;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.DefaultElementLocatorFactory;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
-
-import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.internal.LocatingElementHandler;
 
 /**
  * Factory class to make using Page Objects simpler and easier.
@@ -64,26 +84,45 @@ public class PageFactory {
    * @param page The object with WebElement fields that should be proxied.
    */
     public static void initElements(WebDriver driver, Object page) {
-        Class<?> proxyIn = page.getClass();
-        while (proxyIn != Object.class) {
-            proxyFields(driver, page, proxyIn);
-            proxyIn = proxyIn.getSuperclass();
-        }
+      final WebDriver driverRef = driver;
+      initElements(new DefaultElementLocatorFactory(driverRef), page);
+    }
+    
+    /**
+     * Similar to the other "initElements" methods, but takes an 
+     * {@link ElementLocatorFactory} which is used for providing the 
+     * mechanism for finding elements. If the ElementLocatorFactory returns
+     * null then the field won't be decorated.
+     * 
+     * @param factory The factory to use
+     * @param page The object to decorate the fields of
+     */
+    public static void initElements(ElementLocatorFactory factory, Object page) {
+      Class<?> proxyIn = page.getClass();
+      while (proxyIn != Object.class) {
+          proxyFields(factory, page, proxyIn);
+          proxyIn = proxyIn.getSuperclass();
+      }
     }
 
-    private static void proxyFields(WebDriver driver, Object page, Class<?> proxyIn) {
+    private static void proxyFields(ElementLocatorFactory factory, Object page, Class<?> proxyIn) {
         Field[] fields = proxyIn.getDeclaredFields();
         for (Field field : fields) {
             if (!WebElement.class.isAssignableFrom(field.getType()))
               continue;
 
             field.setAccessible(true);
-            proxyElement(driver, page, field);
+            proxyElement(factory, page, field);
         }
     }
 
-    private static void proxyElement(WebDriver driver, Object page, Field field) {
-        InvocationHandler handler = new LocatingElementHandler(driver, field);
+    private static void proxyElement(ElementLocatorFactory factory, Object page, Field field) {
+      ElementLocator locator = factory.createLocator(field);
+      if (locator == null) {
+        return;
+      }
+      
+      InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy;
         if (field.getType().equals(RenderedWebElement.class)){
           proxy = (RenderedWebElement) Proxy.newProxyInstance(

@@ -62,7 +62,11 @@ public class ChromeWebElement implements WebElement, SearchContext {
         );
     }
 
-    public String getAttribute(String name) {
+  public String getElementName() {
+    throw new UnsupportedOperationException("getElementName");
+  }
+
+  public String getAttribute(String name) {
         throw new UnsupportedOperationException("getAttribute");
     }
 

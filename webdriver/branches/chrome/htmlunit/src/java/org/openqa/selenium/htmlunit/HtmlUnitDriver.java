@@ -1,4 +1,22 @@
 /*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*
  * Copyright 2007 ThoughtWorks, Inc
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +35,25 @@
 
 package org.openqa.selenium.htmlunit;
 
+import com.gargoylesoftware.htmlunit.CookieManager;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.WebWindowEvent;
 import com.gargoylesoftware.htmlunit.WebWindowListener;
-import com.gargoylesoftware.htmlunit.ProxyConfig;
+import com.gargoylesoftware.htmlunit.WebWindowNotFoundException;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.html.FrameWindow;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlInlineFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.host.HTMLElement;
-import org.apache.commons.httpclient.HttpState;
+
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ScriptableObject;
 import org.openqa.selenium.Alert;
@@ -41,42 +62,49 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.io.IOException;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
-        FindsById, FindsByLinkText, FindsByXPath, FindsByName {
+        FindsById, FindsByLinkText, FindsByXPath, FindsByName, FindsByTagName {
     private WebClient webClient;
     private WebWindow currentWindow;
     /** window name => history. */
-    private Map<String, History> histories = new HashMap<String, History>();
+    private Map<WebWindow, History> histories = new HashMap<WebWindow, History>();
     private boolean enableJavascript;
     private ProxyConfig proxyConfig;
+    private AtomicLong windowNamer = new AtomicLong(System.currentTimeMillis());
+    private final BrowserVersion version;
 
-    public HtmlUnitDriver(boolean enableJavascript) {
-    this.enableJavascript = enableJavascript;
-
-    webClient = newWebClient();
+  public HtmlUnitDriver(BrowserVersion version) {
+        this.version = version;
+        webClient = createWebClient(version);
         webClient.addWebWindowListener(new WebWindowListener() {
             private boolean waitingToLoad;
 
@@ -90,26 +118,35 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
                     waitingToLoad = false;
                     webClient.setCurrentWindow(window);
                 }
-                String windowName = window.getName();
-                History history = histories.get(windowName);
+                History history = histories.get(window);
                 if (history == null) {
                     history = new History(window);
-                    histories.put(windowName, history);
+                    histories.put(window, history);
                 }
                 history.addNewPage(webWindowEvent.getNewPage());
             }
 
             public void webWindowClosed(WebWindowEvent webWindowEvent) {
                 WebWindow window = webWindowEvent.getWebWindow();
-                String windowName = window.getName();
-                histories.remove(windowName);
+                histories.remove(window);
                 pickWindow();
             }
         });
+        if (currentWindow == null) {
+          get(WebClient.URL_ABOUT_BLANK);
+        }
+
+        // Clear the history.
+        histories.clear();
     }
 
     public HtmlUnitDriver() {
       this(false);
+    }
+
+    public HtmlUnitDriver(boolean enableJavascript) {
+      this(BrowserVersion.getDefault());
+      setJavascriptEnabled(enableJavascript);
     }
 
     private HtmlUnitDriver(boolean enableJavascript, WebWindow currentWindow) {
@@ -117,22 +154,17 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         this.currentWindow = currentWindow;
     }
 
-    /**
-     * @return WebClient to use
-     * @deprecated Please override modifyWebClient. This method will become private
-     */
-    @Deprecated
-    protected WebClient newWebClient() {
-        WebClient client = new WebClient();
+    private WebClient createWebClient(BrowserVersion version) {
+        WebClient client = newWebClient(version);
         client.setThrowExceptionOnFailingStatusCode(false);
         client.setPrintContentOnFailingStatusCode(false);
         client.setJavaScriptEnabled(enableJavascript);
         client.setRedirectEnabled(true);
         try {
-			client.setUseInsecureSSL(true);
-		} catch (GeneralSecurityException e) {
-			throw new RuntimeException(e);
-		}
+            client.setUseInsecureSSL(true);
+        } catch (GeneralSecurityException e) {
+            throw new WebDriverException(e);
+        }
 
         // Ensure that we've set the proxy if necessary
         if (proxyConfig != null)
@@ -140,6 +172,16 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
         return modifyWebClient(client);
     }
+
+  /**
+   * Create the underlying webclient, but don't set any fields on it.
+   *
+   * @param version Which browser to emulate
+   * @return a new instance of WebClient.
+   */
+  protected WebClient newWebClient(BrowserVersion version) {
+    return new WebClient(version);
+  }
 
     /**
      * Child classes can override this method to customise the webclient that
@@ -159,25 +201,44 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public void get(String url) {
-        try {
-            URL fullUrl = new URL(url);
-            webClient.getPage(fullUrl);
-        } catch (UnknownHostException e) {
-          // This should be fine
-        } catch (ConnectException e) {
-          // This might be expected
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+      URL fullUrl;
+      try {
+        fullUrl = new URL(url);
+      } catch (Exception e) {
+        throw new WebDriverException(e);
+      }
 
-        pickWindow();
+      get(fullUrl);
     }
 
-    protected void pickWindow() {
+    /**
+     * Allows HtmlUnit's about:blank to be loaded in the constructor, and may
+     * be useful for other tests?
+     *  
+     * @param fullUrl
+     */
+    protected void get(URL fullUrl) {
+      try {
+        webClient.getPage(fullUrl);
+      } catch (UnknownHostException e) {
+        // This should be fine
+      } catch (ConnectException e) {
+        // This might be expected
+      } catch (Exception e) {
+        throw new WebDriverException(e);
+      }
+
+      pickWindow();
+    }
+
+  protected void pickWindow() {
         currentWindow = webClient.getCurrentWindow();
         Page page = webClient.getCurrentWindow().getEnclosedPage();
 
         if (page == null)
+          return;
+
+        if (!(page instanceof HtmlPage))
           return;
 
         if (((HtmlPage) page).getFrames().size() > 0) {
@@ -188,23 +249,15 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public String getCurrentUrl() {
-        return lastPage().getWebResponse().getUrl().toString();
+        return lastPage().getWebResponse().getRequestUrl().toString();
     }
 
     public String getTitle() {
-        HtmlPage htmlPage = lastPage();
-        if (htmlPage == null) {
+        Page page = lastPage();
+        if (page == null || !(page instanceof HtmlPage)) {
             return null; // no page so there is no title
         }
-        return htmlPage.getTitleText();
-    }
-
-    public boolean getVisible() {
-        return false;
-    }
-
-    public void setVisible(boolean visible) {
-        // no-op
+        return ((HtmlPage) page).getTitleText();
     }
 
     public WebElement findElement(By by) {
@@ -221,15 +274,50 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public void close() {
-        webClient = newWebClient();
+        webClient = createWebClient(version);
     }
 
     public void quit() {
     	webClient = null;
     	currentWindow = null;
+        histories.clear();
     }
 
-    public Object executeScript(String script, Object... args) {
+  public Set<String> getWindowHandles() {
+    Set<String> allHandles = new HashSet<String>();
+    List<WebWindow> allWindows = webClient.getWebWindows();
+    for (WebWindow window : allWindows) {
+      WebWindow top = window.getTopWindow();
+      if (top.getName() == null || "".equals(top.getName())) {
+        nameWindow(top);
+      }
+      allHandles.add(top.getName());
+    }
+
+    return allHandles;
+  }
+
+  public String getWindowHandle() {
+    WebWindow window = webClient.getCurrentWindow();
+    if (window.getName() == null) {
+      nameWindow(window);
+    }
+    return window.getName();
+  }
+
+  private String nameWindow(WebWindow window) {
+    String windowName = "webdriver" + windowNamer.incrementAndGet();
+    window.setName(windowName);
+    return windowName;
+  }
+
+  public Object executeScript(String script, Object... args) {
+        if (!(lastPage() instanceof HtmlPage)) {
+          throw new UnsupportedOperationException("Cannot execute JS against a plain text page");
+        }
+
+        HtmlPage page = (HtmlPage) lastPage();
+
         if (!isJavascriptEnabled())
             throw new UnsupportedOperationException("Javascript is not enabled for this HtmlUnitDriver instance");
 
@@ -237,32 +325,35 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
         for (int i = 0; i < args.length; i++) {
             if (!(args[i] instanceof HtmlUnitWebElement ||
+                  args[i] instanceof HtmlElement || // special case the underlying type
                   args[i] instanceof Number ||
                   args[i] instanceof String ||
                   args[i] instanceof Boolean)) {
               throw new IllegalArgumentException(
                   "Argument must be a string, number, boolean or WebElement: " +
-                      args[i] + " (" + args[i].getClass() + ")");                                  
+                      args[i] + " (" + args[i].getClass() + ")");
             }
 
             if (args[i] instanceof HtmlUnitWebElement) {
                 HtmlElement element = ((HtmlUnitWebElement) args[i]).getElement();
                 parameters[i] = element.getScriptObject();
+            } else if (args[i] instanceof HtmlElement) {
+                parameters[i] = ((HtmlElement) args[i]).getScriptObject();
             } else {
                 parameters[i] = args[i];
             }
         }
 
         script = "function() {" + script + "};";
-        ScriptResult result = lastPage().executeJavaScript(script);
+        ScriptResult result = page.executeJavaScript(script);
         Function func = (Function) result.getJavaScriptResult();
-        
-        result = lastPage().executeJavaScriptFunctionIfPossible(
-        		func, 
-        		(ScriptableObject) currentWindow.getScriptObject(), 
-        		parameters, 
-        		lastPage().getDocumentElement());
-        
+
+        result = page.executeJavaScriptFunctionIfPossible(
+        		func,
+        		(ScriptableObject) currentWindow.getScriptObject(),
+        		parameters,
+        		page.getDocumentElement());
+
         Object value = result.getJavaScriptResult();
 
         if (value instanceof HTMLElement) {
@@ -285,15 +376,19 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     return new HtmlUnitNavigation();
   }
 
-  private synchronized HtmlPage lastPage() {
-        return (HtmlPage) currentWindow.getEnclosedPage();
+  private synchronized Page lastPage() {
+        return currentWindow.getEnclosedPage();
     }
 
   public WebElement findElementByLinkText(String selector) {
     int equalsIndex = selector.indexOf('=') + 1;
     String expectedText = selector.substring(equalsIndex).trim();
 
-    List<HtmlAnchor> anchors = lastPage().getAnchors();
+    if (!(lastPage() instanceof HtmlPage)) {
+      throw new IllegalStateException("Cannot find links for " + lastPage());
+    }
+
+    List<HtmlAnchor> anchors = ((HtmlPage) lastPage()).getAnchors();
     for (HtmlAnchor anchor : anchors) {
       if (expectedText.equals(anchor.asText())) {
         return newHtmlUnitWebElement(anchor);
@@ -310,14 +405,16 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public List<WebElement> findElementsByLinkText(String selector) {
+    List<WebElement> elements = new ArrayList<WebElement>();
+
+    if (!(lastPage() instanceof HtmlPage))
+      return elements;
+
     int equalsIndex = selector.indexOf('=') + 1;
     String expectedText = selector.substring(equalsIndex).trim();
 
-    List<HtmlAnchor> anchors = lastPage().getAnchors();
-    Iterator<HtmlAnchor> allAnchors = anchors.iterator();
-    List<WebElement> elements = new ArrayList<WebElement>();
-    while (allAnchors.hasNext()) {
-      HtmlAnchor anchor = allAnchors.next();
+    List<HtmlAnchor> anchors = ((HtmlPage) lastPage()).getAnchors();
+    for (HtmlAnchor anchor : anchors) {
       if (expectedText.equals(anchor.asText())) {
         elements.add(newHtmlUnitWebElement(anchor));
       }
@@ -326,8 +423,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
     public WebElement findElementById(String id) {
+        if (!(lastPage() instanceof HtmlPage))
+            throw new IllegalStateException("Cannot find element by id for " + lastPage());
+
         try {
-            HtmlElement element = lastPage().getHtmlElementById(id);
+            HtmlElement element = ((HtmlPage) lastPage()).getHtmlElementById(id);
             return newHtmlUnitWebElement(element);
         } catch (ElementNotFoundException e) {
             throw new NoSuchElementException("Cannot find element with ID: " + id);
@@ -339,7 +439,10 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
   public WebElement findElementByName(String name) {
-    List<HtmlElement> allElements = lastPage().getHtmlElementsByName(name);
+    if (!(lastPage() instanceof HtmlPage))
+      throw new IllegalStateException("Cannot find element by name for " + lastPage());
+
+    List<HtmlElement> allElements = ((HtmlPage) lastPage()).getElementsByName(name);
     if (allElements.size() > 0) {
         return newHtmlUnitWebElement(allElements.get(0));
     }
@@ -347,14 +450,46 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     throw new NoSuchElementException("Cannot find element with name: " + name);
   }
 
-  @SuppressWarnings("unchecked")
   public List<WebElement> findElementsByName(String using) {
-    List allElements = lastPage().getHtmlElementsByName(using);
+    if (!(lastPage() instanceof HtmlPage))
+      return new ArrayList<WebElement>();
+
+    List<HtmlElement> allElements = ((HtmlPage) lastPage()).getElementsByName(using);
     return convertRawHtmlElementsToWebElements(allElements);
   }
 
+  public WebElement findElementByTagName(String name) {
+    if (!(lastPage() instanceof HtmlPage))
+      throw new IllegalStateException("Cannot find element by name for " + lastPage());
+
+    NodeList allElements = ((HtmlPage) lastPage()).getElementsByTagName(name);
+    if (allElements.getLength() > 0) {
+        return newHtmlUnitWebElement((HtmlElement) allElements.item(0));
+    }
+
+    throw new NoSuchElementException("Cannot find element with name: " + name);
+  }
+
+  public List<WebElement> findElementsByTagName(String using) {
+    if (!(lastPage() instanceof HtmlPage))
+      return new ArrayList<WebElement>();
+
+    NodeList allElements = ((HtmlPage) lastPage()).getElementsByTagName(using);
+    List<WebElement> toReturn = new ArrayList<WebElement>(allElements.getLength());
+    for (int i = 0; i < allElements.getLength(); i++) {
+      Node item = allElements.item(i);
+      if (item instanceof HtmlElement) {
+        toReturn.add(newHtmlUnitWebElement((HtmlElement) item));
+      }
+    }
+    return toReturn;
+  }
+  
   public WebElement findElementByXPath(String selector) {
-    	Object node = lastPage().getFirstByXPath(selector);
+    if (!(lastPage() instanceof HtmlPage))
+      throw new IllegalStateException("Cannot find element by xpath for " + lastPage());
+
+        Object node = ((HtmlPage) lastPage()).getFirstByXPath(selector);
         if (node == null)
             throw new NoSuchElementException("Cannot locate a node using " + selector);
         if (node instanceof HtmlElement)
@@ -363,8 +498,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public List<WebElement> findElementsByXPath(String selector) {
-    	List<?> nodes = lastPage().getByXPath(selector);
-        return convertRawHtmlElementsToWebElements(nodes);
+      if (!(lastPage() instanceof HtmlPage))
+        return new ArrayList<WebElement>();
+
+      List<?> nodes = ((HtmlPage) lastPage()).getByXPath(selector);
+      return convertRawHtmlElementsToWebElements(nodes);
     }
 
     private List<WebElement> convertRawHtmlElementsToWebElements(List<?> nodes) {
@@ -375,7 +513,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     		elements.add(newHtmlUnitWebElement((HtmlElement) node));
       }
 
-        return elements;
+      return elements;
     }
 
   public boolean isJavascriptEnabled() {
@@ -434,21 +572,18 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         }
 
         public WebDriver window(String windowId) {
-            WebWindow window = webClient.getWebWindowByName(windowId);
+            WebWindow window;
+            try {
+                 window = webClient.getWebWindowByName(windowId);
+            } catch (WebWindowNotFoundException e) {
+                throw new NoSuchWindowException("Cannot find window: " + windowId);
+            }
             webClient.setCurrentWindow(window);
             pickWindow();
             return HtmlUnitDriver.this;
         }
 
-        public Iterable<WebDriver> windowIterable() {
-            return new Iterable<WebDriver>() {
-              public Iterator<WebDriver> iterator() {
-                return new HtmlUnitDriverIterator();
-              }
-            };
-        }
-
-        public WebDriver defaultContent() {
+    public WebDriver defaultContent() {
             pickWindow();
             return HtmlUnitDriver.this;
         }
@@ -532,21 +667,33 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
     private class HtmlUnitNavigation implements Navigation {
       public void back() {
-        String windowName = currentWindow.getName();
-        History history = histories.get(windowName);
+        History history = histories.get(currentWindow);
         history.goBack();
       }
 
 
       public void forward() {
-          String windowName = currentWindow.getName();
-          History history = histories.get(windowName);
+          History history = histories.get(currentWindow);
           history.goForward();
       }
 
 
       public void to(String url) {
         get(url);
+      }
+
+      public void to(URL url) {
+        get(url);
+      }
+
+      public void refresh() {
+        if (lastPage() instanceof HtmlPage) {
+          try {
+            ((HtmlPage) lastPage()).refresh();
+          } catch (IOException e) {
+            throw new WebDriverException(e);
+          }
+        }
       }
     }
 
@@ -555,63 +702,73 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     private class HtmlUnitOptions implements Options {
-        private HttpState state;
-
-        HtmlUnitOptions() {
-            state = webClient.getWebConnection().getState();
-        }
-
         public void addCookie(Cookie cookie) {
           String domain = getDomainForCookie(cookie);
+          verifyDomain(cookie, domain);
 
-            state.addCookie(new org.apache.commons.httpclient.Cookie(domain,
-                    cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getExpiry(),
-                    cookie.isSecure()));
+          webClient.getCookieManager().addCookie(new org.apache.commons.httpclient.Cookie(domain,
+              cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getExpiry(),
+              cookie.isSecure()));
         }
 
-        public void deleteCookieNamed(String name) {
-            //Assume the cookie either doesn't have a domain or has the same domain as the current
-            //page. Delete the cookie for both cases.
-            state.addCookie(new org.apache.commons.httpclient.Cookie(getHostName(), name, "", "/",
-                    new Date(0), false));
-            state.addCookie(new org.apache.commons.httpclient.Cookie("", name, "", "/", new Date(0),
-                    false));
+      private void verifyDomain(Cookie cookie, String expectedDomain) {
+        String domain = cookie.getDomain();
+        if (domain == null)
+          return;
+
+        if ("".equals(domain)) {
+          throw new WebDriverException(
+              "Domain must not be an empty string. Consider using null instead");
+        }
+
+        expectedDomain = expectedDomain.startsWith(".") ? expectedDomain : "." + expectedDomain;
+        domain = domain.startsWith(".") ? domain : "." + domain;
+
+        if (!expectedDomain.endsWith(domain)) {
+          throw new WebDriverException(
+              String.format("You may only add cookies that would be visible to the current domain: %s => %s",
+                  domain, expectedDomain));
+        }
+      }
+
+      public void deleteCookieNamed(String name) {
+            CookieManager cookieManager = webClient.getCookieManager();
+
+            Set<org.apache.commons.httpclient.Cookie> rawCookies = webClient.getCookieManager().getCookies(getHostName());
+            for (org.apache.commons.httpclient.Cookie cookie : rawCookies) {
+                if (name.equals(cookie.getName())) {
+                    cookieManager.removeCookie(cookie);
+                }
+            }
         }
 
         public void deleteCookie(Cookie cookie) {
-            String domain = getDomainForCookie(cookie);
-
-            state.addCookie(new org.apache.commons.httpclient.Cookie(domain,
-                    cookie.getName(), cookie.getValue(), cookie.getPath(), new Date(0),
-                    cookie.isSecure()));
+            deleteCookieNamed(cookie.getName());
         }
 
         public void deleteAllCookies() {
-            state.clearCookies();
+            webClient.getCookieManager().clearCookies();
         }
 
         public Set<Cookie> getCookies() {
-            HttpState state = webClient.getWebConnection().getState();
-            org.apache.commons.httpclient.Cookie[] rawCookies = state.getCookies();
-            
+            Set<org.apache.commons.httpclient.Cookie> rawCookies = webClient.getCookieManager().getCookies(getHostName());
+
             Set<Cookie> retCookies = new HashSet<Cookie>();
             for(org.apache.commons.httpclient.Cookie c : rawCookies) {
-                if("".equals(c.getDomain()) || getHostName().indexOf(c.getDomain()) != -1) {
-                	if (c.getPath() != null && getPath().startsWith(c.getPath())) {
-                		retCookies.add(new ReturnedCookie(c.getName(), c.getValue(), c.getDomain(), c.getPath(),
-                            c.getExpiryDate(), c.getSecure()));
-                	}
+                if (c.getPath() != null && getPath().startsWith(c.getPath())) {
+                    retCookies.add(new ReturnedCookie(c.getName(), c.getValue(), c.getDomain(), c.getPath(),
+                        c.getExpiryDate(), c.getSecure()));
                 }
             }
-            return retCookies;  
+            return retCookies;
         }
 
         private String getHostName() {
-            return lastPage().getWebResponse().getUrl().getHost().toLowerCase();
+            return lastPage().getWebResponse().getRequestUrl().getHost().toLowerCase();
         }
-        
+
         private String getPath() {
-        	return lastPage().getWebResponse().getUrl().getPath();
+        	return lastPage().getWebResponse().getRequestUrl().getPath();
         }
 
         public Speed getSpeed() {
@@ -622,14 +779,14 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
             throw new UnsupportedOperationException();
         }
 
-        private String getDomainForCookie(Cookie cookie) {
-            URL current = lastPage().getWebResponse().getUrl();
-            String hostName = cookie.getDomain();
-            if (hostName == null || "".equals(hostName)) {
-                hostName = String.format("%s:%s", current.getHost(), current.getPort());
-            }
-            return hostName;
+      private String getDomainForCookie(Cookie cookie) {
+        URL current = lastPage().getWebResponse().getRequestUrl();
+        if (current.getPort() == 80) {
+          return current.getHost();
         }
+
+        return String.format("%s:%s", current.getHost(), current.getPort());
+      }
     }
 
     private class HtmlUnitDriverIterator implements Iterator<WebDriver> {
@@ -658,5 +815,33 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
       public void remove() {
         throw new UnsupportedOperationException("remove");
       }
+    }
+
+    public WebElement findElementByPartialLinkText(String using) {
+        if (!(lastPage() instanceof HtmlPage)) {
+          throw new IllegalStateException("Cannot find links for " + lastPage());
+        }
+
+        List<HtmlAnchor> anchors = ((HtmlPage) lastPage()).getAnchors();
+        for (HtmlAnchor anchor : anchors) {
+          if (anchor.asText().contains(using)) {
+            return newHtmlUnitWebElement(anchor);
+          }
+        }
+        throw new NoSuchElementException("No link found with text: " + using);
+    }
+
+    public List<WebElement> findElementsByPartialLinkText(String using) {
+
+        List<HtmlAnchor> anchors = ((HtmlPage) lastPage()).getAnchors();
+        Iterator<HtmlAnchor> allAnchors = anchors.iterator();
+        List<WebElement> elements = new ArrayList<WebElement>();
+        while (allAnchors.hasNext()) {
+          HtmlAnchor anchor = allAnchors.next();
+          if (anchor.asText().contains(using)) {
+            elements.add(newHtmlUnitWebElement(anchor));
+          }
+        }
+        return elements;
     }
 }

@@ -1,4 +1,22 @@
 /*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*
  * Copyright 2007 ThoughtWorks, Inc
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,38 +41,29 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
-import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.OperatingSystem;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Attr;
 
-import com.gargoylesoftware.htmlunit.html.ClickableElement;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomText;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlImageInput;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
-import com.gargoylesoftware.htmlunit.html.HtmlOption;
-import com.gargoylesoftware.htmlunit.html.HtmlPreformattedText;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
-import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
+import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.html.*;
 
 public class HtmlUnitWebElement implements WebElement,
-    FindsById, FindsByLinkText, FindsByXPath, FindsByName, SearchContext {
-    private final HtmlUnitDriver parent;
-    private final HtmlElement element;
+    FindsById, FindsByLinkText, FindsByXPath, FindsByTagName, SearchContext {
+    protected final HtmlUnitDriver parent;
+    protected final HtmlElement element;
     private final static char nbspChar = (char) 160;
     private final static String[] blockLevelsTagNames =
             {"p", "h1", "h2", "h3", "h4", "h5", "h6", "dl", "div", "noscript",
                     "blockquote", "form", "hr", "table", "fieldset", "address", "ul", "ol", "pre", "br"};
+    private String toString;
 
     public HtmlUnitWebElement(HtmlUnitDriver parent, HtmlElement element) {
         this.parent = parent;
@@ -67,14 +76,16 @@ public class HtmlUnitWebElement implements WebElement,
 
         ClickableElement clickableElement = ((ClickableElement) element);
         try {
-            if (parent.isJavascriptEnabled()) {
-              clickableElement.focus();
-              clickableElement.mouseDown();
-              clickableElement.mouseUp();
+            if (parent.isJavascriptEnabled() && !(element instanceof HtmlInput)) {
+                element.focus();
             }
+
             clickableElement.click();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
+        } catch (ScriptException e) {
+          System.out.println(e.getMessage());
+          // Press on regardless
         }
     }
 
@@ -99,7 +110,7 @@ public class HtmlUnitWebElement implements WebElement,
                 throw new NoSuchElementException("Unable to find the containing form");
             form.submit();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
     }
 
@@ -108,38 +119,38 @@ public class HtmlUnitWebElement implements WebElement,
     	names.add("input");
     	names.add("button");
     	List<? extends HtmlElement> allElements = form.getHtmlElementsByTagNames(names);
-    	
+
     	HtmlElement submit = null;
     	for (HtmlElement element : allElements) {
     		if (!isSubmitElement(element))
     			continue;
-    		
+
     		if (isBefore(submit, element))
     			submit = element;
     	}
-    	
+
     	if (submit == null)
-    		throw new RuntimeException("Cannot locate element used to submit form");
+    		throw new WebDriverException("Cannot locate element used to submit form");
     	try {
 			((ClickableElement) submit).click();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new WebDriverException(e);
 		}
 	}
 
 	private boolean isSubmitElement(HtmlElement element) {
 		HtmlElement candidate = null;
-		
+
 		if (element instanceof HtmlSubmitInput && !((HtmlSubmitInput)element).isDisabled())
 			candidate = element;
 		else if (element instanceof HtmlImageInput && !((HtmlImageInput)element).isDisabled())
 			candidate = element;
 		else if (element instanceof HtmlButton) {
 			HtmlButton button = (HtmlButton) element;
-			if ("submit".equalsIgnoreCase(button.getTypeAttribute()) && !button.isDisabled()) 
+			if ("submit".equalsIgnoreCase(button.getTypeAttribute()) && !button.isDisabled())
 				candidate = element;
 		}
-		
+
 		return candidate != null;
 	}
 
@@ -154,13 +165,13 @@ public class HtmlUnitWebElement implements WebElement,
     }
 
     public void clear() {
-    	if (element instanceof HtmlInput) {
-            element.setAttributeValue("value", "");
+        if (element instanceof HtmlInput) {
+            ((HtmlInput)element).setValueAttribute("");
         } else if (element instanceof HtmlTextArea) {
             ((HtmlTextArea) element).setText("");
         }
     }
-    
+
     public void sendKeys(CharSequence... value) {
         StringBuilder builder = new StringBuilder();
         for (CharSequence seq : value) {
@@ -172,13 +183,13 @@ public class HtmlUnitWebElement implements WebElement,
             element.type(builder.toString());
             return;
           } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
           }
         }
 
         if (element instanceof HtmlInput) {
             String currentValue = getValue();
-            element.setAttributeValue("value", (currentValue == null ? "" : currentValue) + builder.toString());
+            element.setAttribute("value", (currentValue == null ? "" : currentValue) + builder.toString());
         } else if (element instanceof HtmlTextArea) {
             String currentValue = getValue();
             ((HtmlTextArea) element).setText((currentValue == null ? "" : currentValue) + builder.toString());
@@ -187,10 +198,14 @@ public class HtmlUnitWebElement implements WebElement,
         }
     }
 
-  public String getAttribute(String name) {
+    public String getElementName() {
+        return element.getNodeName();
+    }
+
+    public String getAttribute(String name) {
         final String lowerName = name.toLowerCase();
 
-        String value = element.getAttributeValue(name);
+        String value = element.getAttribute(name);
 
         if ("disabled".equals(lowerName)) {
             return isEnabled() ? "false" : "true";
@@ -201,11 +216,23 @@ public class HtmlUnitWebElement implements WebElement,
         if ("checked".equals(lowerName)) {
             return (value.equalsIgnoreCase("checked") ? "true" : "false");
         }
+        if ("index".equals(lowerName) && element instanceof HtmlOption) {
+          HtmlSelect select = ((HtmlOption) element).getEnclosingSelect();
+          List<HtmlOption> allOptions = select.getOptions();
+          for (int i = 0; i < allOptions.size(); i++) {
+            HtmlOption option = select.getOption(i);
+            if (element.equals(option)) {
+              return String.valueOf(i);
+            }
+          }
+
+          return null;
+        }
 
         if (!"".equals(value))
             return value;
 
-        if (element.isAttributeDefined(name))
+        if (element.hasAttribute(name))
             return "";
 
 
@@ -228,9 +255,9 @@ public class HtmlUnitWebElement implements WebElement,
                 }
             }
 
-            throw new UnsupportedOperationException("You may only toggle checkboxes or options in a select which allows multiple selections");
+            throw new UnsupportedOperationException("You may only toggle checkboxes or options in a select which allows multiple selections: " + getElementName());
         } catch (IOException e) {
-            throw new RuntimeException("Unexpected exception: " + e);
+            throw new WebDriverException("Unexpected exception: " + e);
         }
     }
 
@@ -244,7 +271,7 @@ public class HtmlUnitWebElement implements WebElement,
     }
 
     public void setSelected() {
-        String disabledValue = element.getAttributeValue("disabled");
+        String disabledValue = element.getAttribute("disabled");
         if (disabledValue.length() > 0) {
             throw new UnsupportedOperationException("You may not select a disabled element");
         }
@@ -258,13 +285,7 @@ public class HtmlUnitWebElement implements WebElement,
     }
 
     public boolean isEnabled() {
-        if (element instanceof HtmlInput)
-            return !((HtmlInput) element).isDisabled();
-
-        if (element instanceof HtmlTextArea)
-            return !((HtmlTextArea) element).isDisabled();
-
-        return true;
+      return !element.hasAttribute("disabled");
     }
 
     // This isn't very pretty. Sorry.
@@ -276,16 +297,10 @@ public class HtmlUnitWebElement implements WebElement,
 
         String text = toReturn.toString() + collapseWhitespace(textSoFar);
 
-        int index = text.length();
-        while (index > 0 && isWhiteSpace(text.charAt(index - 1))) {
-            index--;
-        }
-
-        return text.substring(0, index);
+        return text.trim();
     }
 
-
-    protected HtmlUnitDriver getParent() {
+  protected HtmlUnitDriver getParent() {
         return parent;
     }
 
@@ -293,11 +308,10 @@ public class HtmlUnitWebElement implements WebElement,
         return element;
     }
 
-    private boolean isWhiteSpace(int lastChar) {
-        return lastChar == '\n' || lastChar == ' ' || lastChar == '\t' || lastChar == '\r';
-    }
-
     private void getTextFromNode(DomNode node, StringBuffer toReturn, StringBuffer textSoFar, boolean isPreformatted) {
+        if (node instanceof HtmlScript) {
+            return;
+        }
         if (isPreformatted) {
             getPreformattedText(node, toReturn);
         }
@@ -324,17 +338,17 @@ public class HtmlUnitWebElement implements WebElement,
         }
 
         if (isBlockLevel(node)) {
-            toReturn.append(collapseWhitespace(textSoFar)).append(OperatingSystem.getCurrentPlatform().getLineEnding());
+            toReturn.append(collapseWhitespace(textSoFar)).append(Platform.getCurrent().getLineEnding());
             textSoFar.delete(0, textSoFar.length());
         }
     }
 
     private boolean isBlockLevel(DomNode node) {
         // From the HTML spec (http://www.w3.org/TR/html401/sgml/dtd.html#block)
-//		 <!ENTITY % block "P | %heading; | %list; | %preformatted; | DL | DIV | NOSCRIPT | BLOCKQUOTE | FORM | HR | TABLE | FIELDSET | ADDRESS">
-//	     <!ENTITY % heading "H1|H2|H3|H4|H5|H6">
-//	     <!ENTITY % list "UL | OL">
-//	     <!ENTITY % preformatted "PRE">
+        //     <!ENTITY % block "P | %heading; | %list; | %preformatted; | DL | DIV | NOSCRIPT | BLOCKQUOTE | FORM | HR | TABLE | FIELDSET | ADDRESS">
+        //     <!ENTITY % heading "H1|H2|H3|H4|H5|H6">
+        //     <!ENTITY % list "UL | OL">
+        //     <!ENTITY % preformatted "PRE">
 
         if (!(node instanceof HtmlElement))
             return false;
@@ -358,33 +372,35 @@ public class HtmlUnitWebElement implements WebElement,
         toReturn.append(xmlText.replaceAll("^<pre.*?>", "").replaceAll("</pre.*>$", ""));
     }
 
-    public List<WebElement> getChildrenOfType(String tagName) {
-        Iterable<HtmlElement> allChildren = element.getAllHtmlChildElements();
-        List<WebElement> elements = new ArrayList<WebElement>();
-        for (HtmlElement child : allChildren) {
-            if (tagName.equals(child.getTagName())) {
-                elements.add(getParent().newHtmlUnitWebElement(child));
-            }
-        }
-        return elements;
-    }
+  public List<WebElement> getElementsByTagName(String tagName) {
+    List<?> allChildren =  element.getByXPath(".//" + tagName);
+    List<WebElement> elements = new ArrayList<WebElement>();
+    for (Object o : allChildren) {
+      if (!(o instanceof HtmlElement))
+        continue;
 
-    public WebElement findElement(By by) {
+      HtmlElement child = (HtmlElement) o;
+      elements.add(getParent().newHtmlUnitWebElement(child));
+    }
+    return elements;
+  }
+
+  public WebElement findElement(By by) {
         return by.findElement(this);
     }
-    
+
     public List<WebElement> findElements(By by) {
         return by.findElements(this);
     }
-    
+
     public WebElement findElementById(String id) {
         return findElementByXPath(".//*[@id = '" + id + "']");
     }
-    
+
     public List<WebElement> findElementsById(String id) {
         return findElementsByXPath(".//*[@id = '" + id + "']");
     }
-    
+
     public WebElement findElementByXPath(String xpathExpr) {
         HtmlElement match = (HtmlElement) element.getFirstByXPath(xpathExpr);
         if (match == null) {
@@ -393,7 +409,7 @@ public class HtmlUnitWebElement implements WebElement,
         }
         return getParent().newHtmlUnitWebElement(match);
     }
-    
+
     public List<WebElement> findElementsByXPath(String xpathExpr) {
         List<WebElement> webElements = new ArrayList<WebElement>();
         List<?> htmlElements = element.getByXPath(xpathExpr);
@@ -402,7 +418,7 @@ public class HtmlUnitWebElement implements WebElement,
         }
         return webElements;
     }
-    
+
     public WebElement findElementByLinkText(String linkText) {
         List<WebElement> elements = findElementsByLinkText(linkText);
         if (elements.size() == 0) {
@@ -411,27 +427,62 @@ public class HtmlUnitWebElement implements WebElement,
         }
         return elements.size() > 0 ? elements.get(0) : null;
     }
-    
-    @SuppressWarnings("unchecked")
+
     public List<WebElement> findElementsByLinkText(String linkText) {
-        List<HtmlElement> htmlElements = 
+        List<HtmlElement> htmlElements =
             (List<HtmlElement>) element.getHtmlElementsByTagName("a");
         List<WebElement> webElements = new ArrayList<WebElement>();
         for (HtmlElement e : htmlElements) {
-            if (e.getTextContent().equals(linkText) 
+            if (e.getTextContent().equals(linkText)
                     && e.getAttribute("href") != null) {
                 webElements.add(getParent().newHtmlUnitWebElement(e));
             }
         }
         return webElements;
     }
-    
-    public WebElement findElementByName(String name) {
-        return findElementByXPath(".//*[@name = '" + name + "']");
+
+    public WebElement findElementByPartialLinkText(String linkText) {
+        List<WebElement> elements = findElementsByPartialLinkText(linkText);
+        if (elements.size() == 0) {
+            throw new NoSuchElementException(
+                    "Unable to find element with linkText " + linkText);
+        }
+        return elements.size() > 0 ? elements.get(0) : null;
     }
 
-    public List<WebElement> findElementsByName(String name) {
-        return findElementsByXPath(".//*[@name = '" + name + "']");
+    public List<WebElement> findElementsByPartialLinkText(String linkText) {
+        List<HtmlElement> htmlElements =
+            (List<HtmlElement>) element.getHtmlElementsByTagName("a");
+        List<WebElement> webElements = new ArrayList<WebElement>();
+        for (HtmlElement e : htmlElements) {
+            if (e.getTextContent().contains(linkText)
+                    && e.getAttribute("href") != null) {
+                webElements.add(getParent().newHtmlUnitWebElement(e));
+            }
+        }
+        return webElements;
+    }
+
+    public WebElement findElementByTagName(String name) {
+      List<WebElement> elements = findElementsByTagName(name);
+      if (elements.size() == 0) {
+        throw new NoSuchElementException("Cannot find element with tag name: " + name);
+      }
+      return elements.get(0);
+    }
+
+    public List<WebElement> findElementsByTagName(String name) {
+      return findElementsByXPath(".//*[local-name()='" + name + "']");
+
+      /* TODO(simon.m.stewart): Update this once the next version of HtmlUnit is released
+      NodeList elements = element.getElementsByTagName(name);
+      ArrayList<WebElement> toReturn = new ArrayList<WebElement>(elements.getLength());
+      for (int i = 0; i < elements.getLength(); i++) {
+        toReturn.add(parent.newHtmlUnitWebElement((HtmlElement) elements.item(i)));
+      }
+
+      return toReturn;
+      */
     }
 
     private WebElement findParentForm() {
@@ -440,5 +491,26 @@ public class HtmlUnitWebElement implements WebElement,
             current = current.getParentNode();
         }
         return getParent().newHtmlUnitWebElement((HtmlForm) current);
+    }
+
+    @Override
+    public String toString() {
+        if (toString == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append('<').append(element.getTagName());
+            NamedNodeMap attributes = element.getAttributes();
+            int n = attributes.getLength();
+            for (int i = 0; i < n; ++i) {
+                Attr a = (Attr) attributes.item(i);
+                sb.append(' ').append(a.getName()).append("=\"").append(a.getValue().replace("\"", "&quot;")).append("\"");
+            }
+            if (element.hasChildNodes()) {
+                sb.append('>');
+            } else {
+                sb.append(" />");
+            }
+            toString = sb.toString();
+        }
+        return toString;
     }
 }

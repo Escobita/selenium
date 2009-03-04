@@ -1,7 +1,26 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox.internal;
 
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.internal.OperatingSystem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,17 +35,18 @@ public class ProfilesIni {
   private Map<String, FirefoxProfile> profiles = new HashMap<String, FirefoxProfile>();
   
   public ProfilesIni() {
-    File appData = locateAppDataDirectory(OperatingSystem.getCurrentPlatform());
+    File appData = locateAppDataDirectory(Platform.getCurrent());
     profiles = readProfiles(appData);
   }
   
   protected Map<String, FirefoxProfile> readProfiles(File appData) {
+    Map<String, FirefoxProfile> toReturn = new HashMap<String, FirefoxProfile>();
+
     File profilesIni = new File(appData, "profiles.ini");
     if (!profilesIni.exists()) {
-        throw new RuntimeException("Unable to locate the profiles.ini file, which contains information about where to locate the profiles");
+        // Fine. No profiles.ini file
+        return toReturn;
     }
-
-    Map<String, FirefoxProfile> toReturn = new HashMap<String, FirefoxProfile>();
     
     boolean isRelative = true;
     String name = null;
@@ -57,7 +77,7 @@ public class ProfilesIni {
           line = reader.readLine();
         }
     } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new WebDriverException(e);
     } finally {
         try {
             if (reader != null) {
@@ -84,17 +104,25 @@ public class ProfilesIni {
   }
 
   public FirefoxProfile getProfile(String profileName) {
-    return profiles.get(profileName);
+    FirefoxProfile profile = profiles.get(profileName);
+    if (profile == null)
+      return null;
+
+    if (profile.getPort() == 0)
+      profile.setPort(FirefoxDriver.DEFAULT_PORT);
+    return profile;
   }
   
   public Collection<FirefoxProfile> getExistingProfiles() {
     return profiles.values();
   }
   
-  protected File locateAppDataDirectory(OperatingSystem os) {
+  protected File locateAppDataDirectory(Platform os) {
     File appData;
     switch (os) {
         case WINDOWS:
+        case VISTA:
+        case XP:
             appData = new File(MessageFormat.format("{0}\\Mozilla\\Firefox", System.getenv("APPDATA")));
             break;
 
@@ -108,12 +136,13 @@ public class ProfilesIni {
     }
 
     if (!appData.exists()) {
-        throw new RuntimeException("Unable to locate directory which should contain the information about Firefox profiles.\n" +
-                "Tried looking in: " + appData.getAbsolutePath());
+        // It's possible we're being run as part of an automated build.
+        // Assume the user knows what they're doing
+        return null;
     }
 
     if (!appData.isDirectory()) {
-        throw new RuntimeException("The discovered user firefox data directory " +
+        throw new WebDriverException("The discovered user firefox data directory " +
                 "(which normally contains the profiles) isn't a directory: " + appData.getAbsolutePath());
     }
 

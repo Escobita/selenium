@@ -1,7 +1,26 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+import static org.openqa.selenium.Ignore.Driver.*;
 
 public class PageLoadingTest extends AbstractDriverTestCase {
     public void testShouldWaitForDocumentToBeLoaded() {
@@ -9,7 +28,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
 
         assertThat(driver.getTitle(), equalTo("Hello WebDriver"));
     }
-    
+
     public void testShouldFollowRedirectsSentInTheHttpResponseHeaders() {
         driver.get(redirectPage);
 
@@ -20,7 +39,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
         driver.get(metaRedirectPage);
         assertThat(driver.getTitle(), equalTo("We Arrive Here"));
     }
-    
+
     public void testShouldBeAbleToGetAFragmentOnTheCurrentPage() {
         driver.get(xhtmlTestPage);
         driver.get(xhtmlTestPage + "#text");
@@ -36,7 +55,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
         driver.get("http://localhost:3001");
     }
 
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded() {
         driver.get(framesetPage);
 
@@ -49,7 +68,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
         assertThat(pageNumber.getText().trim(), equalTo("2"));
     }
 
-    @Ignore("safari")
+    @Ignore(SAFARI)
     @NeedsFreshDriver
     public void testSouldDoNothingIfThereIsNothingToGoBackTo() {
         driver.get(formPage);
@@ -58,28 +77,57 @@ public class PageLoadingTest extends AbstractDriverTestCase {
         assertThat(driver.getTitle(), equalTo("We Leave From Here"));
       }
 
-    @Ignore("safari")
-      public void testShouldBeAbleToNavigateBackInTheBrowserHistory() {
-          driver.get(formPage);
+    @Ignore(SAFARI)
+    public void testShouldBeAbleToNavigateBackInTheBrowserHistory() {
+        driver.get(formPage);
 
-          driver.findElement(By.id("imageButton")).submit();
-          assertThat(driver.getTitle(), equalTo("We Arrive Here"));
+        driver.findElement(By.id("imageButton")).submit();
+        assertThat(driver.getTitle(), equalTo("We Arrive Here"));
 
-          driver.navigate().back();
-          assertThat(driver.getTitle(), equalTo("We Leave From Here"));
-      }
+        driver.navigate().back();
+        assertThat(driver.getTitle(), equalTo("We Leave From Here"));
+    }
 
-    @Ignore("safari")
-      public void testShouldBeAbleToNavigateForwardsInTheBrowserHistory() {
-          driver.get(formPage);
+    @Ignore(SAFARI)
+    public void testShouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes() {
+        driver.get(xhtmlTestPage);
 
-          driver.findElement(By.id("imageButton")).submit();
-          assertThat(driver.getTitle(), equalTo("We Arrive Here"));
+        driver.findElement(By.name("sameWindow")).click();
+        assertThat(driver.getTitle(), equalTo("This page has iframes"));
 
-          driver.navigate().back();
-          assertThat(driver.getTitle(), equalTo("We Leave From Here"));
+        driver.navigate().back();
+        assertThat(driver.getTitle(), equalTo("XHTML Test Page"));
+    }
 
-          driver.navigate().forward();
-          assertThat(driver.getTitle(), equalTo("We Arrive Here"));
-      }
+    @Ignore(SAFARI)
+    public void testShouldBeAbleToNavigateForwardsInTheBrowserHistory() {
+        driver.get(formPage);
+
+        driver.findElement(By.id("imageButton")).submit();
+        assertThat(driver.getTitle(), equalTo("We Arrive Here"));
+
+        driver.navigate().back();
+        assertThat(driver.getTitle(), equalTo("We Leave From Here"));
+
+        driver.navigate().forward();
+        assertThat(driver.getTitle(), equalTo("We Arrive Here"));
+    }
+
+    @Ignore({FIREFOX, IE, SAFARI})
+    public void testShouldBeAbleToAccessPagesWithAnInsecureSslCertificate() {
+        String url = GlobalTestEnvironment.get().getAppServer().whereIsSecure("simpleTest.html");
+        driver.get(url);
+
+        // This should work
+        assertThat(driver.getTitle(), equalTo("Hello WebDriver"));
+    }
+
+    @Ignore({SAFARI, IE})
+    public void testShouldBeAbleToRefreshAPage() {
+      driver.get(xhtmlTestPage);
+
+      driver.navigate().refresh();
+
+      assertThat(driver.getTitle(), equalTo("XHTML Test Page"));
+    }
 }

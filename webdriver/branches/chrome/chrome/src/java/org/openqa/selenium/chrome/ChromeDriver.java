@@ -6,6 +6,7 @@ import org.openqa.selenium.internal.*;
 
 import java.util.List;
 import java.util.Set;
+import java.net.URL;
 
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor,
         FindsById, FindsByClassName, FindsByLinkText, FindsByXPath {
@@ -76,7 +77,15 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
         connection.quit();
     }
 
-    public TargetLocator switchTo() {
+  public String getWindowHandle() {
+    throw new UnsupportedOperationException("getWindowHandle");
+  }
+
+  public Set<String> getWindowHandles() {
+    throw new UnsupportedOperationException("getWindowHandles");
+  }
+
+  public TargetLocator switchTo() {
     	throw new UnsupportedOperationException("switchTo");
     }
 
@@ -99,7 +108,15 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
         }
     }
 
-    public WebElement findElementByLinkText(String using) {
+  public WebElement findElementByPartialLinkText(String using) {
+    throw new UnsupportedOperationException("findElementByPartialLinkText");
+  }
+
+  public List<WebElement> findElementsByPartialLinkText(String using) {
+    throw new UnsupportedOperationException("findElementsByPartialLinkText");
+  }
+
+  public WebElement findElementByLinkText(String using) {
         String res = connection.executeJavascript(RuntimeException.class,
                 "var foundElement = false;" +
                 "for (var i = 0; i < document.links.length; i++) {" +
@@ -216,6 +233,14 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
 
       public void to(String url) {
         get(url);
+      }
+
+      public void to(URL url) {
+        get(url.toString());
+      }
+
+      public void refresh() {
+          throw new UnsupportedOperationException("refresh");
       }
     }
 

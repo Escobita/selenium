@@ -1,36 +1,45 @@
 /*
- * Copyright 2007 ThoughtWorks, Inc
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.matchers.JUnitMatchers.either;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IE;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Point;
+
+import org.hamcrest.Matchers;
+import org.openqa.selenium.internal.Locatable;
 
 /**
  * Test case for browsers that support using Javascript
  */
 public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 	@JavascriptEnabled
-	@Ignore(value = "safari", reason = "safari: not implemented, ie: fails for some reason.")
+	@Ignore(value = SAFARI, reason = "safari: not implemented, ie: fails for some reason.")
     public void testDocumentShouldReflectLatestTitle() throws Exception {
         driver.get(javascriptPage);
 
@@ -43,7 +52,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     }
 
 	@JavascriptEnabled
-	@Ignore("safari")
+	@Ignore(SAFARI)
     public void testDocumentShouldReflectLatestDom() throws Exception {
         driver.get(javascriptPage);
         String currentText = driver.findElement(By.xpath("//div[@id='dynamo']")).getText();
@@ -91,30 +100,8 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 //		}
 //	}
 
-	@JavascriptEnabled
-	@Ignore("safari, htmlunit")
-    public void testShouldAllowTheUserToTellIfAnElementIsDisplayedOrNot() {
-        driver.get(javascriptPage);
-
-        assertThat(((RenderedWebElement) driver.findElement(By.id("displayed"))).isDisplayed(), is(true));
-        assertThat(((RenderedWebElement) driver.findElement(By.id("none"))).isDisplayed(), is(false));
-        assertThat(((RenderedWebElement) driver.findElement(By.id("hidden"))).isDisplayed(), is(false));
-    }
-
     @JavascriptEnabled
-    @Ignore("safari")
-    public void testVisibilityShouldTakeIntoAccountParentVisibility() {
-        driver.get(javascriptPage);
-
-        RenderedWebElement childDiv =  (RenderedWebElement) driver.findElement(By.id("hiddenchild"));
-        RenderedWebElement hiddenLink = (RenderedWebElement) driver.findElement(By.id("hiddenlink"));
-
-        assertFalse(childDiv.isDisplayed());
-        assertFalse(hiddenLink.isDisplayed());
-    }
-
-    @JavascriptEnabled
-	@Ignore(value = "ie, safari", reason="safari: not implemented, ie: Fails")
+	@Ignore(value = {IE, SAFARI}, reason="safari: not implemented, ie: Fails")
     public void testShouldWaitForLoadsToCompleteAfterJavascriptCausesANewPageToLoad() {
         driver.get(formPage);
 
@@ -124,7 +111,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     }
 
 	@JavascriptEnabled
-	@Ignore("safari, htmlunit")
+	@Ignore({HTMLUNIT, SAFARI})
     public void testShouldBeAbleToDetermineTheLocationOfAnElement() {
         driver.get(xhtmlTestPage);
 
@@ -136,7 +123,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     }
 
 	@JavascriptEnabled
-	@Ignore("safari, htmlunit")
+	@Ignore({HTMLUNIT, SAFARI})
     public void testShouldBeAbleToDetermineTheSizeOfAnElement() {
         driver.get(xhtmlTestPage);
 
@@ -157,7 +144,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     }
 
   @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
   public void testShouldBeAbleToSubmitFormsByCausingTheOnClickEventToFire() {
     driver.get(javascriptPage);
     WebElement element = driver.findElement(By.id("jsSubmitButton"));
@@ -167,7 +154,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
   public void testShouldBeAbleToClickOnSubmitButtons() {
     driver.get(javascriptPage);
     WebElement element = driver.findElement(By.id("submittingButton"));
@@ -177,7 +164,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
   public void testIssue80ClickShouldGenerateClickEvent() {
     driver.get(javascriptPage);
     WebElement element = driver.findElement(By.id("clickField"));
@@ -189,7 +176,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore("safari, htmlunit")
+  @Ignore({HTMLUNIT, SAFARI})
   public void testShouldBeAbleToSwitchToFocusedElement() {
     driver.get(javascriptPage);
 
@@ -200,7 +187,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
   public void testIfNoElementHasFocusTheActiveElementIsTheBody() {
     driver.get(simpleTestPage);
 
@@ -210,7 +197,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore("safari, htmlunit, ie")
+  @Ignore(value = {FIREFOX, HTMLUNIT, REMOTE, SAFARI}, reason = "Firefox: Window demands focus to work. Other platforms: not properly tested")
   public void testChangeEventIsFiredAppropriatelyWhenFocusIsLost() {
     driver.get(javascriptPage);
 
@@ -222,6 +209,44 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     input.sendKeys(Keys.BACK_SPACE, "t");
     driver.findElement(By.xpath("//body")).click();  // move focus
 
-    assertThat(driver.findElement(By.id("result")).getText().trim(), either(is("focus change blur focus blur")).or(is("focus blur change focus blur")));
+    assertThat(driver.findElement(By.id("result")).getText().trim(), 
+    		either(is("focus change blur focus blur"))
+    		.or(is("focus blur change focus blur"))
+    		.or(is("focus blur change focus blur change")));
+  }
+
+  /**
+  * If the click handler throws an exception, the firefox driver freezes. This is suboptimal.   
+  */
+  @JavascriptEnabled
+  @Ignore(SAFARI)
+  public void testShouldBeAbleToClickIfEvenSomethingHorribleHappens() {
+    driver.get(javascriptPage);
+
+    driver.findElement(By.id("error")).click();
+
+    // If we get this far then the test has passed, but let's do something basic to prove the point
+    String text = driver.findElement(By.id("error")).getText();
+
+    assertNotNull(text);
+  }
+    
+  @JavascriptEnabled
+  public void testShouldBeAbleToGetTheLocationOfAnElement() {
+      driver.get(javascriptPage);
+
+      if (!(driver instanceof JavascriptExecutor))
+        return;
+
+      ((JavascriptExecutor) driver).executeScript("window.focus();");
+      WebElement element = driver.findElement(By.id("keyUp"));
+      
+      if (!(element instanceof Locatable))
+    	  return;
+      
+      Point point = ((Locatable) element).getLocationOnScreenOnceScrolledIntoView();
+
+      assertTrue(point.getX() > 1);
+      assertTrue(point.getY() > 1);
   }
 }

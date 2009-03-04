@@ -1,15 +1,35 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox.internal;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.ExtensionConnection;
+import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.firefox.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -37,7 +57,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
             try {
                 addr = InetAddress.getByName(host);
             } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
+                throw new WebDriverException(e);
             }
         }
 
@@ -64,7 +84,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
                 }
             }
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
         // Firefox binds to the IP4 address by preference
@@ -75,11 +95,11 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
             return localIp6;
 
         // Nothing found. Grab the first address we can find
-        NetworkInterface firstInterface = null;
+        NetworkInterface firstInterface;
         try {
             firstInterface = NetworkInterface.getNetworkInterfaces().nextElement();
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
         InetAddress firstAddress = null;
         if (firstInterface != null) {
@@ -89,24 +109,26 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         if (firstAddress != null)
             return firstAddress;
 
-        throw new RuntimeException("Unable to find loopback address for localhost");
+        throw new WebDriverException("Unable to find loopback address for localhost");
     }
 
-    protected boolean connectToBrowser(long timeToWaitInMilliSeconds) throws IOException {
+    protected void connectToBrowser(long timeToWaitInMilliSeconds) throws IOException {
         long waitUntil = System.currentTimeMillis() + timeToWaitInMilliSeconds;
         while (!isConnected() && waitUntil > System.currentTimeMillis()) {
             try {
-//                System.out.println("Attempting to connect");
                 connect();
             } catch (ConnectException e) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    throw new WebDriverException(ie);
                 }
             }
         }
-        return isConnected();
+
+        if (!isConnected()) {
+          throw new NotConnectedException(socket, timeToWaitInMilliSeconds);
+        }
     }
 
     private void connect() throws IOException {
@@ -125,18 +147,15 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
                                                   Command command) {
         String converted = convert(command);
 
-        int lines = countLines(converted);
-
-        StringBuffer message = new StringBuffer("Length: ");
-        message.append(lines).append("\n\n");
-
+        StringBuilder message = new StringBuilder("Length: ");
+        message.append(converted.length()).append("\n\n");
         message.append(converted).append("\n");
 
         try {
             out.write(message.toString());
             out.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
         return waitForResponseFor(command.getCommandName());
@@ -156,21 +175,24 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
 
             json.put("parameters", params);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
-        return json.toString();
-    }
-
-    private int countLines(String response) {
-        return response.split("\n").length;
+      try {
+        // Force encoding as UTF-8.
+        byte[] bytes = json.toString().getBytes("UTF-8");
+        return new String(bytes, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        // If UTF-8 is missing from Java, we've got problems
+        throw new IllegalStateException("Cannot convert string to UTF-8");
+      }
     }
 
     private Response waitForResponseFor(String command) {
         try {
             return readLoop(command);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
     }
 
@@ -179,7 +201,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
 
         if (command.equals(response.getCommand()))
             return response;
-        throw new RuntimeException("Expected response to " + command + " but actually got: " + response.getCommand() + " (" + response.getCommand() + ")");
+        throw new WebDriverException("Expected response to " + command + " but actually got: " + response.getCommand() + " (" + response.getCommand() + ")");
     }
 
     private Response nextResponse() throws IOException {

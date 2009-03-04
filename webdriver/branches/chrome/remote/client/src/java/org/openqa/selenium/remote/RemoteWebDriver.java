@@ -1,29 +1,47 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.OperatingSystem;
 import org.openqa.selenium.internal.ReturnedCookie;
 import static org.openqa.selenium.remote.MapMaker.map;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
 
 public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByXPath {
@@ -32,31 +50,38 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
   private Capabilities capabilities;
   private SessionId sessionId;
 
-  @SuppressWarnings({"unchecked"})
+  public RemoteWebDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
+    this.executor = executor;
+    startSession(desiredCapabilities);
+  }
+
+  public RemoteWebDriver(Capabilities desiredCapabilities) throws Exception {
+    this((URL) null, desiredCapabilities);
+  }
+
   public RemoteWebDriver(URL remoteAddress, Capabilities desiredCapabilities) throws Exception {
-    URL toUse = remoteAddress;
-    if (remoteAddress == null) {
-      String remoteServer = System.getProperty("webdriver.remote.server");
-      toUse = remoteServer == null ? null : new URL(remoteServer);
-    }
+    this(new HttpCommandExecutor(remoteAddress), desiredCapabilities);
+  }
 
-    executor = new HttpCommandExecutor(toUse);
-
+  @SuppressWarnings({"unchecked"})
+  protected void startSession(Capabilities desiredCapabilities) {
     Response response = execute("newSession", desiredCapabilities);
 
     Map<String, Object> rawCapabilities = (Map<String, Object>) response.getValue();
     String browser = (String) rawCapabilities.get("browserName");
     String version = (String) rawCapabilities.get("version");
-    OperatingSystem os = OperatingSystem.valueOf((String) rawCapabilities.get("operatingSystem"));
+    Platform platform;
+    if (rawCapabilities.containsKey("operatingSystem")) {
+      platform = Platform.valueOf((String) rawCapabilities.get("operatingSystem"));
+    } else {
+      platform = Platform.valueOf((String) rawCapabilities.get("platform"));
+    }
 
-    DesiredCapabilities returnedCapabilities = new DesiredCapabilities(browser, version, os);
+
+    DesiredCapabilities returnedCapabilities = new DesiredCapabilities(browser, version, platform);
     returnedCapabilities.setJavascriptEnabled((Boolean) rawCapabilities.get("javascriptEnabled"));
     capabilities = returnedCapabilities;
     sessionId = new SessionId(response.getSessionId());
-  }
-
-  public RemoteWebDriver(Capabilities desiredCapabilities) throws Exception {
-    this(null, desiredCapabilities);
   }
 
   public Capabilities getCapabilities() {
@@ -74,16 +99,6 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
 
   public String getCurrentUrl() {
     return execute("currentUrl").getValue().toString();
-  }
-
-
-  public boolean getVisible() {
-    Response response = execute("getVisible");
-    return (Boolean) response.getValue();
-  }
-
-  public void setVisible(boolean visible) {
-    execute("setVisible", visible);
   }
 
   public List<WebElement> findElements(By by) {
@@ -160,6 +175,16 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     execute("quit");
   }
 
+  @SuppressWarnings({"unchecked"})
+  public Set<String> getWindowHandles() {
+    Response response = execute("getWindowHandles");
+    return (Set<String>) response.getValue();
+  }
+
+  public String getWindowHandle() {
+    return (String) execute("getCurrentWindowHandle").getValue();
+  }
+
   public Object executeScript(String script, Object... args) {
     if (!capabilities.isJavascriptEnabled()) {
       throw new UnsupportedOperationException("You must be using an underlying instance of WebDriver that supports executing javascript");
@@ -175,11 +200,11 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       command = new Command(sessionId, new Context("foo"), "executeScript", script, convertedArgs);
     else
       command = new Command(sessionId, new Context("foo"), "executeScript", script);
-    Response response = null;
+    Response response;
     try {
       response = executor.execute(command);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new WebDriverException(e);
     }
     if (response.isError())
       throwIfResponseFailed(response);
@@ -289,6 +314,7 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
 
     try {
       response = executor.execute(command);
+      amendElementValueIfNecessary(response);
     } catch (Exception e) {
       response.setError(true);
       response.setValue(e.getStackTrace());
@@ -301,36 +327,71 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     return response;
   }
 
+  private void amendElementValueIfNecessary(Response response) {
+    if (!(response.getValue() instanceof RemoteWebElement))
+      return;
+
+    // Ensure that the parent is set properly
+    RemoteWebElement existingElement = (RemoteWebElement) response.getValue();
+    existingElement.setParent(this);
+
+    if (!getCapabilities().isJavascriptEnabled())
+      return;
+
+    if (response.getValue() instanceof RenderedRemoteWebElement)
+      return;  // Good, nothing to do
+
+    RenderedRemoteWebElement replacement = new RenderedRemoteWebElement();
+    replacement.setId(existingElement.getId());
+    replacement.setParent(this);
+
+    response.setValue(replacement);
+  }
+
   private Response throwIfResponseFailed(Response response) {
     if (response.getValue() instanceof StackTraceElement[]) {
-      RuntimeException runtimeException = new RuntimeException();
+      WebDriverException runtimeException = new WebDriverException();
       runtimeException.setStackTrace((StackTraceElement[]) response.getValue());
       throw runtimeException;
     }
 
     Map rawException = (Map) response.getValue();
 
+    String screenGrab = (String) rawException.get("screen");
     String message = (String) rawException.get("message");
     String className = (String) rawException.get("class");
 
-    RuntimeException toThrow;
+    RuntimeException toThrow = null;
     try {
       Class<?> aClass;
       try {
         aClass = Class.forName(className);
         if (!RuntimeException.class.isAssignableFrom(aClass)) {
-          aClass = RuntimeException.class;
+          aClass = WebDriverException.class;
         }
       } catch (ClassNotFoundException e) {
-        aClass = RuntimeException.class;
+        aClass = WebDriverException.class;
       }
 
+      if (screenGrab != null) {
+        try {
+          Constructor<? extends RuntimeException> constructor =
+              (Constructor<? extends RuntimeException>) aClass
+                  .getConstructor(String.class, Throwable.class);
+          toThrow = constructor.newInstance(message, new ScreenshotException(screenGrab));
+        } catch (NoSuchMethodException e) {
+          // Fine. Fall through
+        }
+      }
+
+      if (toThrow == null) {
       try {
         Constructor<? extends RuntimeException> constructor =
             (Constructor<? extends RuntimeException>) aClass.getConstructor(String.class);
         toThrow = constructor.newInstance(message);
       } catch (NoSuchMethodException e) {
-        toThrow = (RuntimeException) aClass.newInstance();
+        toThrow = (WebDriverException) aClass.newInstance();
+      }
       }
 
       List<Map> elements = (List<Map>) rawException.get("stackTrace");
@@ -354,8 +415,9 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
         toThrow.setStackTrace(trace);
       }
     } catch (Exception e) {
-      toThrow = new RuntimeException(e);
+      toThrow = new WebDriverException(e);
     }
+
     throw toThrow;
   }
 
@@ -396,7 +458,7 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
 
         return toReturn;
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw new WebDriverException(e);
       }
 
     }
@@ -425,6 +487,14 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     public void to(String url) {
       get(url);
     }
+
+    public void to(URL url) {
+      get(String.valueOf(url));
+    }
+
+    public void refresh() {
+      execute("refresh");
+    }
   }
 
   private class RemoteTargetLocator implements TargetLocator {
@@ -444,10 +514,6 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       return RemoteWebDriver.this;
     }
 
-    public Iterable<WebDriver> windowIterable() {
-      throw new UnsupportedOperationException("windowIterable");
-    }
-
     public WebDriver defaultContent() {
       execute("switchToFrame", map("id", null));
       return RemoteWebDriver.this;
@@ -457,5 +523,13 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       Response response = execute("getActiveElement");
       return getElementFrom(response);
     }
+  }
+
+  public WebElement findElementByPartialLinkText(String using) {
+	  throw new UnsupportedOperationException();
+  }
+	
+  public List<WebElement> findElementsByPartialLinkText(String using) {
+	  throw new UnsupportedOperationException();
   }
 }

@@ -1,16 +1,35 @@
-package org.openqa.selenium.support;
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
 
-import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package org.openqa.selenium.support;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.openqa.selenium.RenderedWebElement;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+
+import java.lang.reflect.Field;
 
 public class PageFactoryTest extends MockObjectTestCase {
     private WebDriver driver = null;
@@ -60,6 +79,21 @@ public class PageFactoryTest extends MockObjectTestCase {
         ConstructedPage page = PageFactory.initElements(driver, ConstructedPage.class);
 
         assertThat(driver, equalTo(page.driver));
+    }
+
+    public void testShouldNotDecorateFieldsWhenTheElementLocatorFactoryReturnsNull() {
+      PublicPage page = new PublicPage();
+      // Assign not-null values
+      WebElement q = mock(WebElement.class);
+      page.q = q;
+
+      PageFactory.initElements(new ElementLocatorFactory() {
+        public ElementLocator createLocator(Field field) {
+          return null;
+        }
+      }, page);
+
+      assertThat(page.q, equalTo(q));
     }
 
     public static class PublicPage {

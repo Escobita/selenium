@@ -1,9 +1,39 @@
-function FirefoxDriver(server, id) {
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+function FirefoxDriver(server) {
     this.server = server;
     this.context = new Context();
-    this.id = id;
     this.mouseSpeed = 1;
 }
+
+FirefoxDriver.prototype.__defineGetter__("id", function() {
+  if (!this.id_) {
+    this.id_ = this.server.getNextId();
+  }
+
+  return this.id_;
+});
+
+FirefoxDriver.prototype.getCurrentWindowHandle = function(respond) {
+  respond.response = this.id;
+  respond.send();
+};
 
 FirefoxDriver.prototype.get = function(respond, url) {
     var self = this;
@@ -142,7 +172,11 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
 
 FirefoxDriver.prototype.getCurrentUrl = function(respond) {
     respond.context = this.context;
-    respond.response = "" + Utils.getBrowser(this.context).contentWindow.location;
+    var url = Utils.getDocument(this.context).location;
+    if (!url) {
+      url = Utils.getBrowser(this.context).contentWindow.location;
+    }
+    respond.response = "" + url;
     respond.send();
 }
 
@@ -178,6 +212,70 @@ FirefoxDriver.prototype.selectElementUsingXPath = function(respond, xpath) {
     respond.send();
 };
 
+FirefoxDriver.prototype.selectElementByName = function(respond, name) {
+  var doc = Utils.getDocument(this.context);
+
+  var elements = doc.getElementsByName(name);
+  if (elements.length) {
+    respond.response = Utils.addToKnownElements(elements[0], this.context);
+  } else {
+    respond.isError = true;
+    respond.response = "Unable to locate element with name '" + name + "'";
+  }
+
+  respond.send();
+};
+
+FirefoxDriver.prototype.selectElementsUsingName = function(respond, name) {
+  var doc = Utils.getDocument(this.context);
+
+  var elements = doc.getElementsByName(name);
+  var response = "";
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
+    var index = Utils.addToKnownElements(element, this.context);
+    response += index + ",";
+  }
+      // Strip the trailing comma
+  response = response.substring(0, response.length - 1);
+
+  respond.context = this.context;
+  respond.response = response;
+  respond.send();
+};
+
+FirefoxDriver.prototype.selectElementUsingTagName = function(respond, name) {
+	var doc = Utils.getDocument(this.context);
+
+	var elements = doc.getElementsByTagName(name);
+	if (elements.length) {
+		respond.response = Utils.addToKnownElements(elements[0], this.context);
+	} else {
+		respond.isError = true;
+		respond.response = "Unable to locate element with name '" + name + "'";
+	}
+
+	respond.send();
+};
+
+FirefoxDriver.prototype.selectElementsUsingTagName = function(respond, name) {
+	var doc = Utils.getDocument(this.context);
+
+	var elements = doc.getElementsByTagName(name);
+	var response = "";
+	for ( var i = 0; i < elements.length; i++) {
+		var element = elements[i];
+		var index = Utils.addToKnownElements(element, this.context);
+		response += index + ",";
+	}
+	// Strip the trailing comma
+	response = response.substring(0, response.length - 1);
+
+	respond.context = this.context;
+	respond.response = response;
+	respond.send();
+};
+
 FirefoxDriver.prototype.selectElementUsingClassName = function(respond, name) {
     var doc = Utils.getDocument(this.context);
 
@@ -189,7 +287,7 @@ FirefoxDriver.prototype.selectElementUsingClassName = function(respond, name) {
         respond.response = Utils.addToKnownElements(elements[0], this.context);
       } else {
         respond.isError = true;
-        respond.response = "Unable to find element with class name '" + name + "'";
+        respond.response = "Unable to locate element with class name '" + name + "'";
       }
 
       respond.send();
@@ -237,7 +335,64 @@ FirefoxDriver.prototype.selectElementUsingLink = function(respond, linkText) {
         respond.response = index;
     } else {
         respond.isError = true;
-        respond.response = "Unable to find element with link text '" + linkText + "'";
+        respond.response = "Unable to locate element with link text '" + linkText + "'";
+    }
+
+    respond.send();
+};
+
+FirefoxDriver.prototype.selectElementsUsingLink = function(respond, linkText) {
+  var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+  var indices = "";
+  for (var i = 0; i < allLinks.length; i++) {
+    var text = Utils.getText(allLinks[i], true);
+    if (linkText == text) {
+      indices += Utils.addToKnownElements(allLinks[i], this.context) + ",";
+    }
+
+  }
+
+  // Strip the trailing comma
+  indices = indices.substring(0, indices.length - 1);
+
+  respond.context = this.context;
+  respond.response = indices;
+  respond.send();
+};
+
+FirefoxDriver.prototype.selectElementsUsingPartialLinkText = function(respond, linkText) {
+    var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+    var indices = "";
+    for (var i = 0; i < allLinks.length; i++) {
+        var text = Utils.getText(allLinks[i], true);
+        if (text.indexOf(linkText) != -1) {
+            indices += Utils.addToKnownElements(allLinks[i], this.context) + ",";
+        }
+    }
+
+    respond.context = this.context;
+    respond.response = indices;
+    respond.send();
+};
+
+FirefoxDriver.prototype.selectElementUsingPartialLinkText = function(respond, linkText) {
+    var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+    var index;
+    for (var i = 0; i < allLinks.length && !index; i++) {
+        var text = Utils.getText(allLinks[i], true);
+        if (text.indexOf(linkText) != -1) {
+            index = Utils.addToKnownElements(allLinks[i], this.context);
+            break;
+        }
+    }
+
+    respond.context = this.context;
+
+    if (index !== undefined) {
+        respond.response = index;
+    } else {
+        respond.isError = true;
+        respond.response = "Unable to locate element with link text contains '" + linkText + "'";
     }
 
     respond.send();
@@ -253,11 +408,30 @@ FirefoxDriver.prototype.selectElementById = function(respond, id) {
         respond.response = Utils.addToKnownElements(element, this.context);
     } else {
         respond.isError = true;
-        respond.response = "Unable to find element with id '" + id + "'";
+        respond.response = "Unable to locate element with id '" + id + "'";
     }
 
     respond.send();
-}
+};
+
+FirefoxDriver.prototype.selectElementsUsingId = function(respond, id) {
+    var doc = Utils.getDocument(this.context);
+	var allElements = doc.evaluate("//*", doc, null, Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+    var indices = "";
+	var element = allElements.iterateNext();
+    while (element) {
+        var index = Utils.addToKnownElements(element, this.context);
+        indices += index + ",";
+        element = allElements.iterateNext();
+    }
+    // Strip the trailing comma
+    indices = indices.substring(0, indices.length - 1);
+
+    respond.context = this.context;
+    respond.response = indices;
+    respond.send();
+};
+
 
 FirefoxDriver.prototype.selectElementsUsingXPath = function(respond, xpath) {
     var doc = Utils.getDocument(this.context)
@@ -300,7 +474,7 @@ FirefoxDriver.prototype.switchToDefaultContent = function(respond) {
 
 FirefoxDriver.prototype.switchToActiveElement = function(respond) {
   var element = Utils.getActiveElement(this.context);
-  
+
   respond.response = Utils.addToKnownElements(element, this.context);
   respond.send();
 };
@@ -328,6 +502,13 @@ FirefoxDriver.prototype.goForward = function(respond) {
     respond.send();
 }
 
+FirefoxDriver.prototype.refresh = function(respond) {
+    var browser = Utils.getBrowser(this.context);
+    browser.contentWindow.location.reload(true);
+
+    respond.send();
+}
+
 FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     var cookie;
     cookie = eval('(' + cookieString[0] + ')');
@@ -343,9 +524,24 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     cookie.expiry = cookie.expiry.getTime() / 1000; // Stored in seconds
 
     if (!cookie.domain) {
-        var location = Utils.getBrowser(this.context).contentWindow.location
-        cookie.domain = location.hostname; // + ":" + location.port;
+      var location = Utils.getBrowser(this.context).contentWindow.location
+      cookie.domain = location.hostname; // + ":" + location.port;
+      if (location.port != 80) {
+        cookie.domain += ":" + location.port;
+      }
+    } else {
+      var currLocation = Utils.getBrowser(this.context).contentWindow.location;
+      var currDomain = currLocation.host;
+      if (currLocation.port != 80) { currDomain += ":" + currLocation.port; }
+      if (currDomain.indexOf(cookie.domain) == -1) {  // Not quite right, but close enough
+        respond.isError = true;
+        respond.response = "You may only set cookies for the current domain";
+        respond.send();
+        return;
+      }
     }
+
+    Utils.dump(cookie);
 
     var cookieManager = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager2");
 
@@ -361,63 +557,72 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     respond.send();
 }
 
-FirefoxDriver.prototype.getCookie = function(respond) {
-    var cookieManager = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager2");
-    var toReturn = "";
+function handleCookies(context, toCall) {
+  var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
 
-    var location = Utils.getBrowser(this.context).contentWindow.location;
-    var isForCurrentHost = function(c) {
-        try {
-            return location.hostname.indexOf(c.host) != -1;
-        } catch(e) {
-            return false;
-        }
-    }
+  var makeStrippedHost = function (aHost) {
+    var formattedHost = aHost.charAt(0) == "." ? aHost.substring(1, aHost.length) : aHost;
+    formattedHost = formattedHost.substring(0, 4) == "www." ? formattedHost.substring(4, formattedHost.length) : formattedHost;
 
-    var isForCurrentPath = function(c) {
-        try {
-        	return location.pathname.indexOf(c.path) != -1;
-        } catch(e) {
-        	return false;
-        }
-    }
+    return formattedHost;
+  };
 
-    var cookieToString = function(c) {
-      return c.name + "=" + c.value + ";" + "domain=" + c.host + ";"
-          + "path=" + c.path + ";" + "expires=" + c.expires + ";"
-          +(c.isSecure ? "secure ;" : "");
-    }
+  var location = Utils.getBrowser(context).contentWindow.location;
+  var currentDomain = makeStrippedHost(location.host);
+  if (location.port != 80) {
+    currentDomain += ":" + location.port;
+  }
+  var isForCurrentHost = function(aHost) {
+    return currentDomain.indexOf(aHost) != -1;
+  }
 
-    var allCookies = cookieManager.enumerator;
+  var currentPath = Utils.getBrowser(context).contentWindow.location.pathname;
+  if (!currentPath) currentPath = "/";
+  var isForCurrentPath = function(aPath) {
+    return currentPath.indexOf(aPath) != -1;
+  }
 
-    while (allCookies.hasMoreElements()) {
-      var cookie = allCookies.getNext();
+  var e = cm.enumerator;
+  while (e.hasMoreElements()) {
+    var cookie = e.getNext();
+     if (cookie && cookie instanceof Components.interfaces.nsICookie) {
+       var strippedHost = makeStrippedHost(cookie.host);
 
-      cookie = cookie.QueryInterface(Components.interfaces.nsICookie)
-      if (isForCurrentHost(cookie) && isForCurrentPath(cookie)) {
-        toReturn += cookieToString(cookie) + "\n";
+       if (isForCurrentHost(strippedHost) && isForCurrentPath(cookie.path)) {
+         toCall(cookie);
       }
     }
-
-    respond.context = this.context;
-    respond.response = toReturn;
-    respond.send();
+  }
 }
 
+FirefoxDriver.prototype.getCookie = function(respond) {
+  var cookieToString = function(c) {
+    return c.name + "=" + c.value + ";" + "domain=" + c.host + ";"
+        + "path=" + c.path + ";" + "expires=" + c.expires + ";"
+        + (c.isSecure ? "secure ;" : "");
+  }
+
+  var toReturn = "";
+  handleCookies(this.context, function(cookie) {
+    var toAdd = cookieToString(cookie);
+    toReturn += toAdd + "\n";
+  });
+
+  respond.response = toReturn;
+  respond.send();
+}
+
+// This is damn ugly, but it turns out that just deleting a cookie from the document
+// doesn't always do The Right Thing
 FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
-    var cookie = eval('(' + cookieString + ')');
+    var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
+    var toDelete = eval('(' + cookieString + ')');
 
-    if (!cookie.domain) {
-        var location = Utils.getBrowser(this.context).contentWindow.location
-        cookie.domain = location.hostname; // + ":" + location.port;
-    }
-
-    if (!cookie.path) {
-        cookie.path = "/";
-    }
-
-    var cookieManager = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
-    cookieManager.remove(cookie.domain, cookie.name, cookie.path, false);
+    handleCookies(this.context,  function(cookie) {
+      if (toDelete.name == cookie.name) {
+        cm.remove(cookie.host, cookie.name, cookie.path, false);
+      }
+    });
 
     respond.context = this.context;
     respond.send();
@@ -430,8 +635,26 @@ FirefoxDriver.prototype.setMouseSpeed = function(respond, speed) {
     respond.send();
 };
 
-FirefoxDriver.prototype.getMouseSpeed = function(respond, speed) {
+FirefoxDriver.prototype.getMouseSpeed = function(respond) {
     respond.context = this.context;
     respond.response = "" + this.mouseSpeed;
+    respond.send();
+};
+
+FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
+    var window = Utils.getBrowser(this.context).contentWindow
+    try {
+        var canvas = Screenshooter.grab(window);
+        try {
+            Screenshooter.save(canvas, pngFile);
+        } catch(e) {
+            respond.isError = true;
+            respond.response = 'Could not save screenshot to ' + pngFile + ' - ' + e;
+        }
+    } catch(e) {
+        respond.isError = true;
+        respond.response = 'Could not take screenshot of current page - ' + e;
+    }
+    respond.context = this.context;
     respond.send();
 };

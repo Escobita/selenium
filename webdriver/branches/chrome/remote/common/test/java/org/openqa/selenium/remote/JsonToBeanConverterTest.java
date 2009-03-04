@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
 import junit.framework.TestCase;
@@ -6,13 +23,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openqa.selenium.internal.OperatingSystem;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Platform;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
-import java.util.Collections;
 
 public class JsonToBeanConverterTest extends TestCase {
 
@@ -80,7 +97,7 @@ public class JsonToBeanConverterTest extends TestCase {
 
   public void testShouldProperlyFillInACapabilitiesObject() throws Exception {
     DesiredCapabilities capabilities =
-        new DesiredCapabilities("browser", "version", OperatingSystem.ANY);
+        new DesiredCapabilities("browser", "version", Platform.ANY);
     capabilities.setJavascriptEnabled(true);
     String text = new BeanToJsonConverter().convert(capabilities);
 
@@ -186,6 +203,35 @@ public class JsonToBeanConverterTest extends TestCase {
     List trace = (List) reconstructed.get("stackTrace");
 
     assertTrue(trace.get(0) instanceof Map);
+  }
+
+  public void testShouldBeAbleToReconsituteASessionId() throws Exception {
+    String json = new BeanToJsonConverter().convert(new SessionId("id"));
+    SessionId sessionId = new JsonToBeanConverter().convert(SessionId.class, json);
+
+    assertEquals("id", sessionId.toString());
+  }
+
+  public void testShouldBeAbleToReconsituteAContext() throws Exception {
+    String json = new BeanToJsonConverter().convert(new Context("ctxt"));
+    Context context = new JsonToBeanConverter().convert(Context.class, json);
+
+    assertEquals("ctxt", context.toString());
+  }
+
+  public void testShouldBeAbleToConvertACommand() throws Exception {
+    SessionId sessionId = new SessionId("session id");
+    Context context = new Context("context");
+    Command original = new Command(sessionId, context, "methodName", "cheese");
+    String raw = new BeanToJsonConverter().convert(original);
+    Command converted = new JsonToBeanConverter().convert(Command.class, raw);
+
+    assertEquals(sessionId.toString(), converted.getSessionId().toString());
+    assertEquals(context.toString(), converted.getContext().toString());
+    assertEquals(original.getMethodName(), converted.getMethodName());
+
+    assertTrue(converted.getParameters().length == 1);
+    assertEquals("cheese", converted.getParameters()[0]);
   }
 
   public static class SimpleBean {

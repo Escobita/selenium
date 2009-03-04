@@ -1,13 +1,30 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.Header;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -47,7 +64,11 @@ public class HttpCommandExecutor implements CommandExecutor {
 
   public HttpCommandExecutor(URL addressOfRemoteServer) throws Exception {
     if (addressOfRemoteServer == null) {
-      throw new IllegalArgumentException("You must specify a remote address to connect to");
+      String remoteServer = System.getProperty("webdriver.remote.server");
+      addressOfRemoteServer = remoteServer == null ? null : new URL(remoteServer);
+
+      if (addressOfRemoteServer == null)
+        throw new IllegalArgumentException("You must specify a remote address to connect to");
     }
 
     this.remotePath = addressOfRemoteServer.getPath();
@@ -58,10 +79,13 @@ public class HttpCommandExecutor implements CommandExecutor {
 
     nameToUrl.put("newSession", new CommandInfo("/session", HttpVerb.POST));
     nameToUrl.put("quit", new CommandInfo("/session/:sessionId", HttpVerb.DELETE));
+    nameToUrl.put("getCurrentWindowHandle", new CommandInfo("/session/:sessioId/:context/window_handle", HttpVerb.GET));
+    nameToUrl.put("getWindowHandles", new CommandInfo("/session/:sessioId/:context/window_handles", HttpVerb.GET));
     nameToUrl.put("get", new CommandInfo("/session/:sessionId/:context/url", HttpVerb.POST));
     nameToUrl
         .put("forward", new CommandInfo("/session/:sessionId/:context/forward", HttpVerb.POST));
     nameToUrl.put("back", new CommandInfo("/session/:sessionId/:context/back", HttpVerb.POST));
+    nameToUrl.put("refresh", new CommandInfo("/session/:sessionId/:context/refresh", HttpVerb.POST));
 
     nameToUrl.put("executeScript", new CommandInfo("/session/:sessionId/:context/execute", HttpVerb.POST));
 
@@ -97,6 +121,8 @@ public class HttpCommandExecutor implements CommandExecutor {
                   new CommandInfo("/session/:sessionId/:context/element/:id/value", HttpVerb.POST));
     nameToUrl.put("getElementValue",
                   new CommandInfo("/session/:sessionId/:context/element/:id/value", HttpVerb.GET));
+    nameToUrl.put("getElementName",
+                  new CommandInfo("/session/:sessionId/:context/element/:id/name", HttpVerb.GET));
     nameToUrl.put("isElementSelected", new CommandInfo(
         "/session/:sessionId/:context/element/:id/selected", HttpVerb.GET));
     nameToUrl.put("setElementSelected", new CommandInfo(
@@ -113,7 +139,7 @@ public class HttpCommandExecutor implements CommandExecutor {
                   new CommandInfo("/session/:sessionId/:context/element/:id/size", HttpVerb.GET));
 
     nameToUrl.put("getElementAttribute",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/:name", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/:context/element/:id/attribute/:name", HttpVerb.GET));
 
     nameToUrl
         .put("getAllCookies", new CommandInfo("/session/:sessionId/:context/cookie", HttpVerb.GET));

@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
 import junit.framework.TestCase;
@@ -5,14 +22,15 @@ import junit.framework.TestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.awt.Point;
 
 
 public class BeanToJsonConverterTest extends TestCase {
@@ -57,6 +75,18 @@ public class BeanToJsonConverterTest extends TestCase {
     assertThat(allNames.length(), is(2));
   }
 
+  public void testShouldConvertNumbersAsLongs() throws Exception {
+    
+    String json = new BeanToJsonConverter().convert(new Exception());
+    Map map = new JsonToBeanConverter().convert(Map.class, json);
+
+    List stack = (List) map.get("stackTrace");
+    Map line = (Map) stack.get(0);
+
+    Object o = line.get("lineNumber");
+    assertTrue("line number is of type: " + o.getClass(), o instanceof Long);
+  }
+
   public void testShouldNotChokeWhenCollectionIsNull() throws Exception {
     try {
       new BeanToJsonConverter().convert(new BeanWithNullCollection());
@@ -93,6 +123,38 @@ public class BeanToJsonConverterTest extends TestCase {
     } catch (StackOverflowError e) {
       fail("This should never happen");
     }
+  }
+
+  public void testShouldEncodeClassNameAsClassProperty() throws Exception {
+    String json = new BeanToJsonConverter().convert(new SimpleBean());
+    JSONObject converted = new JSONObject(json);
+
+    assertEquals(SimpleBean.class.getName(), converted.get("class"));
+  }
+
+  public void testShouldBeAbleToConvertASessionId() throws JSONException {
+    SessionId sessionId = new SessionId("some id");
+    String json = new BeanToJsonConverter().convert(sessionId);
+    JSONObject converted = new JSONObject(json);
+
+    assertEquals("some id", converted.getString("value"));
+  }
+
+  public void testShouldBeAbleToConvertAContext() throws JSONException {
+    Context context = new Context("some context");
+    String json = new BeanToJsonConverter().convert(context);
+    JSONObject converted = new JSONObject(json);
+
+    assertEquals("some context", converted.getString("value"));
+  }
+
+  public void testShouldBeAbleToConvertAJsonObject() throws JSONException {
+    JSONObject obj = new JSONObject();
+    obj.put("key", "value");
+    String json = new BeanToJsonConverter().convert(obj);
+    JSONObject converted = new JSONObject(json);
+
+    assertEquals("value", converted.getString("key"));
   }
 
   private static class SimpleBean {
