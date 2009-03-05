@@ -15,7 +15,8 @@ Web Page Content -- Static vs. Dynamic Pages
 .. Note: 
     This topic is covered as - Object identification for Static content and 
     Object identification for Dynamic contents. The examples described here 
-    are specific to Java and should not be very different to implement.
+    are specific to Java but should not be very hard to implement on the 
+    scripting language of your choice.
 
 
 Object Identification for Static HTML Objects       
@@ -27,12 +28,11 @@ Static HTML Objects might look as:
 
     <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm','adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
 
-This is HTML snippet for a button and its id is "adminHomeForm". This id 
-remains constant with the all occurrences of page. Hence to click this button 
-use following selenium command:
+This is HTML snippet for a button and its id is "adminHomeForm". This id remains
+constant within the all occurrences of page. Hence to click this button you just
+have to use the following selenium command:
 
 .. code-block:: java
-   :linenos:
 
     selenium.click("adminHomeForm");
 
@@ -43,42 +43,43 @@ Dynamic HTML of an object might look as:
            
 .. code-block:: html
 
-<input type="checkbox" class="checkbox" style="margin-right: 10px;" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
+    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
 This is HTML snippet for a check box. Its id and name 
-(addForm:_id74:_id75:0:_id79:0:checkBox) both are same and dynamic. Now in 
-this case normal object identification like:
+(addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
+(they will change the next time you open the application). Now in this case,
+normal object identification like:
 
 .. code-block:: java
-   :linenos:
 
     selenium.click("addForm:_id74:_id75:0:_id79:0:checkBox);
 
-would not work. Best way to capture this id dynamically from website it self. 
-This can be as following:
+Would not work. The best way is to capture this id dynamically from the website
+itself. This can be done as follows:
 
 .. code-block:: java
-   :linenos:
 
    String[] checkboxIds  = selenium.getAllFields(); // Collect all input ids on page.
    if(GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
           {
-                   // If id is of desired check box.
+                   // If the id starts with addForm
                    if(checkboxIds[i].indexOf("addForm") > -1) {                       
                        selenium.check(checkboxIds[i]);                    
                    }
            }
 
-This approach will work only if there is one field whose id has got text 
+.. Santi: I'm not sure if this is a good example... We can just do this by
+   using a simple CSS or XPATH locator.
+
+This approach will work only if there is one field whose id has got the text 
 'addForm' appended to it.
 
-Consider one more examples of Dynamic object. A page with two links having the
+Consider one more example of a Dynamic object. A page with two links having the
 same name (one which appears on page) and same html name. Now if href is used 
-to click link it would always be clicking on first element. Click on second 
+to click the link, it would always be clicking on first element. Click on second
 element link can be achieved as following:
 
 .. code-block:: java
-   :linenos:
 
     // Stores reference for second appearance of link.
     boolean isSecondInstanceLink = false;
@@ -109,7 +110,7 @@ element link can be achieved as following:
         }
     }
 
-    selenium.click(editInfo );
+    selenium.click(editInfo);
                    
 
 
@@ -138,6 +139,18 @@ Bitmap Comparison
 .. Tarun: Bitmap comparison is about comparison of two images. This feature 
    is available in commercial web automation tools and helps in UI testing (or
    I guess so)
+   Santi: I'm not really sure how this can be achieved using Selenium. The only
+   idea that I have right now is calculating the checksum of the image and 
+   comparing that with the one of the image that should be present there, like:
+
+   <pseudocode>
+     img_url = sel.get_attribute("//img[@src]")
+     image = wget(img_url)
+     assertEqual(get_md5(image), "MD5SUMEXPECTED12341234KJL234")
+   </pseudocode>
+
+   But I've never implemented this before...
+
 
 Recovery From Failure
 ---------------------

@@ -74,32 +74,32 @@ get done within that time frame, then manual testing is the best solution.
 
 Test automation has it's place though, and has specific advantages for 
 improving the long-term efficiency of a software team's testing processes. 
-Test automation supports 
+Test automation supports:
   
-* frequent and rapid regression testing 
-* rapid feedback to developers during, and parallel to, the development process 
-* unlimited test-pass iteration 
-* customized reporting of application defects 
-* support for Agile, eXtreme development methodologies 
-* disciplined documentation of testcases. 
-* uncovering the defects. 
+* Frequent and rapid regression testing 
+* Rapid feedback to developers during, and parallel to, the development process 
+* Unlimited test-pass iteration 
+* Customized reporting of application defects 
+* Support for Agile, eXtreme development methodologies 
+* Disciplined documentation of testcases
+* Uncovering the defects
   
 .. TODO: expand on the points a bit more. 
 
 Selenium Components
 -------------------
 
-Selenium is composed of three major components. Each has a specific role in 
-aiding the development of web apps test automation. 
+Selenium is composed of three major tools. Each one has a specific role in 
+aiding the development of webapps test automation. 
 
 Selenium-IDE
 ~~~~~~~~~~~~
 
-The Selenium-IDE is the integrated development environment for building 
+The Selenium-IDE is the Integrated Development Environment for building 
 Selenium test scripts. It operates as a Firefox plug-in. The Selenium-IDE 
 provides an easy to use interface for both developing and running testcases. 
-It also can run an entire test suite. The Selenium-IDE has a recording 
-feature for recording user actions into a script as the user performs them. 
+It also can run an entire test suite. The Selenium-IDE has a recording feature
+for recording user actions into a script as the user performs them. 
 It also has an options menu (right-click) integrated with the Firefox browser 
 which allows the user to pick from a list of assertions and verifications 
 based on a currently selected UI component and then add the selected test to 
@@ -116,10 +116,13 @@ flexibility and extensibility in developing test logic. For instance, if the
 application under test returns a result set, and if the automated test program
 needs to run tests on each element in the result set, the programming languages
 iteration support can be used to iterate through the result set, calling 
-Selenium commands to run tests on each result set item. 
+Selenium commands to run tests on each item. 
 
 .. Dave: I think an example would be a good idea here so that the reader can 
    immediately see the advantage of using Selenium-RC. Maybe some pseudo code.
+
+.. Santi: I think that the previous paragraf is really the example...
+   maybe we can make that example more simple.
 
 Selenium-RC supports the use of programming languages for test logic by 
 providing a programming API and library for each of it's 8 supported languages.
@@ -127,7 +130,6 @@ This ability to use Selenium-RC to develop a test program also allows the automa
 testing to be integrated with a project's automated build environment.
 
 .. TODO: double-check this 
-
 
 Selenium-Grid 
 ~~~~~~~~~~~~~~
@@ -144,7 +146,7 @@ Supported Browsers
 At the time of writing, the soon-to-be-released Selenium 1.0 supports Internet 
 Explorer, Mozilla Firefox, Opera And Safari 
 
-.. TODO: look this up and get the specific versions off SeleniumHQ.org 
+.. TODO: Look this up and get the specific versions off SeleniumHQ.org 
   
 Flexibility and Extensibility
 ------------------------------
@@ -178,6 +180,10 @@ Example Web-Site Test
    I developed in PHP for college, it has a CRUD and a contact form. I'll take 
    a look at it and post it for you to see it.
   
+.. I'm not sure about this section. We already have some sample test scripts in
+   both the IDE and RC sections. In addition, I'm not sure if the selenium
+   introduction is the right place to start putting some code.
+
 About this Book
 ---------------
 

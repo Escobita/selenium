@@ -421,9 +421,7 @@ assertTextPresent  Selenium-RC
 =================  ============  ===========
 
 .. note:: The table doesn't include that the script is written to test 
-   `Selenium's website`_
-
-.. _Selenium's website: http://seleniumhq.org
+   a search at http://www.google.com
 
 Here is the test script exported to all the programming languages:
 
@@ -449,7 +447,7 @@ Here is the test script exported to all the programming languages:
         		[SetUp]
         		public void SetupTest()
         		{
-        			selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://seleniumhq.org/");
+        			selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com/");
         			selenium.Start();
         			verificationErrors = new StringBuilder();
         		}
@@ -491,7 +489,7 @@ Here is the test script exported to all the programming languages:
 
       public class NewTest extends SeleneseTestCase {
       	public void setUp() throws Exception {
-      		setUp("http://seleniumhq.org/", "*firefox");
+      		setUp("http://www.google.com/", "*firefox");
       	}
             public void testNew() throws Exception {
       	      selenium.open("/");
@@ -516,7 +514,7 @@ Here is the test script exported to all the programming languages:
       my $sel = Test::WWW::Selenium->new( host => "localhost", 
                                           port => 4444, 
                                           browser => "*firefox", 
-                                          browser_url => "http://seleniumhq.org/" );
+                                          browser_url => "http://www.google.com/" );
 
       $sel->open_ok("/");
       $sel->type_ok("q", "selenium rc");
@@ -537,7 +535,7 @@ Here is the test script exported to all the programming languages:
         function setUp()
         {
           $this->setBrowser("*firefox");
-          $this->setBrowserUrl("http://seleniumhq.org/");
+          $this->setBrowserUrl("http://www.google.com/");
         }
 
         function testMyTestCase()
@@ -562,7 +560,7 @@ Here is the test script exported to all the programming languages:
           def setUp(self):
               self.verificationErrors = []
               self.selenium = selenium("localhost", 4444, "*firefox",
-                      "http://seleniumhq.org/")
+                      "http://www.google.com/")
               self.selenium.start()
          
           def test_new(self):
@@ -590,7 +588,7 @@ Here is the test script exported to all the programming languages:
           if $selenium
             @selenium = $selenium
           else
-            @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://seleniumhq.org/", 10000);
+            @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
             @selenium.start
           end
           @selenium.set_context("test_new")
@@ -657,7 +655,7 @@ all the rest.
    // We create our selenium test case
 
          public void setUp() throws Exception {
-   		setUp("http://seleniumhq.org/", "*firefox");
+   		setUp("http://www.google.com/", "*firefox");
                 // We instantiate and start the browser
          }
 
@@ -706,7 +704,7 @@ The basic test structure is:
            # we find in our tests
 
            self.selenium = selenium("localhost", 4444, "*firefox",
-                   "http://seleniumhq.org/")
+                   "http://www.google.com/")
            self.selenium.start()
            # We instantiate and start the browser
 
@@ -744,14 +742,14 @@ Starting The Browser
 
    .. code-block:: c#
 
-      selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://seleniumhq.org/");
+      selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com/");
       selenium.Start();
 
 .. container:: toggled
 
    .. code-block:: java
 
-      setUp("http://seleniumhq.org/", "*firefox");
+      setUp("http://www.google.com/", "*firefox");
 
 .. container:: toggled
 
@@ -760,21 +758,21 @@ Starting The Browser
       my $sel = Test::WWW::Selenium->new( host => "localhost", 
                                           port => 4444, 
                                           browser => "*firefox", 
-                                          browser_url => "http://seleniumhq.org/" );
+                                          browser_url => "http://www.google.com/" );
 
 .. container:: toggled
 
    .. code-block:: php
 
       $this->setBrowser("*firefox");
-      $this->setBrowserUrl("http://seleniumhq.org/");
+      $this->setBrowserUrl("http://www.google.com/");
 
 .. container:: toggled
 
    .. code-block:: python
 
       self.selenium = selenium("localhost", 4444, "*firefox",
-                               "http://seleniumhq.org/")
+                               "http://www.google.com/")
       self.selenium.start()
 
 .. container:: toggled
@@ -784,7 +782,7 @@ Starting The Browser
       if $selenium
         @selenium = $selenium
       else
-        @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://seleniumhq.org/", 10000);
+        @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
 Each of this sentences is in charge of instantiating a browser (which is just
@@ -875,6 +873,7 @@ search in the following way (the example has been written in python):
 
    list = ("IDE", "RC", "GRID")
    for tool in list:
+       sel.open("/")
        sel.type("q", "selenium " + tool)
        sel.click("submit")
        sel.wait_for_page_to_load("30000")
@@ -887,14 +886,41 @@ So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
 search and assert it's existence.
 
+.. TODO: The script for this example
+
+As you can see, this task looks really simple being made using a scripting
+language while it's impossible to do using Selenium-IDE.
+
 Error Handling
 ++++++++++++++
+
+.. TODO: Content!!!
 
 Conditionals
 ++++++++++++
 
+Well, the iteration and data input seem nice, but we've just started. How
+about alternative paths? What if we want our script to change to the next
+page if it finds that the search term was not present in the first one?
+
+That doesn't seem too complicated:
+
+.. TODO: The script for this example
+
+By just using a simple *if* condition, we can do interesting things. Think of
+the possibilities!
+
 Data Base Validations
 +++++++++++++++++++++
+
+Off course, you can also do Data Base queries in your favorite scripting 
+language. Why not using them for some data validations on the application
+under test?
+
+If we had access to Google's databases, I guess this part would be easier to
+explain. But for now you'll have to conform with just the idea...
+
+.. TODO: Do something here!!
 
 Server Command Line options
 ---------------------------
