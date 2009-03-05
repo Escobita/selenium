@@ -8,6 +8,8 @@ The python bindings for WebDriver are now available in the trunk of WebDriver an
 Checkout the source code from http://code.google.com/p/webdriver/source/checkout. In the root directory of the downloaded code, run the following command from a command prompt:
 {{{python setup.py install}}}
 
+Set WEBDRIVER environment variable to your webdriver directory
+
 And you need to have simplejson installed. Or add (webdriver_directory)/firefox/lib-src to your PYTHONPATH(the py_test script described below does this automatically).
 
 That's it :) However you may want to run some sanity tests... If so you can run {{{py_test.py}}} from the same root directory. All the tests should pass. 
@@ -24,8 +26,20 @@ To reflect pythonic behavior of flat object hierarchies the python bindings e.g.
 ==No PageFactory==
 The PageFactory in the Java Bindings makes extensive use of Java Annotations. At this stage we don't intend to implement anything similar. 
 
-==Fewer browsers supported==
-The Python bindings implement the JsonWireProtocol used by the WebDriver Remote API and supports any of the Remote drivers. Currently these are limited to Firefox and the IPhoneDriver.
-
 ==PageObject Implementation==
 Decorators are used to provide the PageObject support. The decorator is {{{@require_loaded}}}
+
+=Browser supports=
+All the browsers supported by the Java implementation are available on the Python binding. However, that's with the help of the remote driver. Currently only the Firefox driver is natively implemented in Python. As you can see from the picture below, the python remote driver connects to the Java remote driver, which then uses Java implementations to access the browser.
+
+[http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0 http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0]
+
+==Firefox==
+There isn't any additional setup to use the firefox driver. For example usage, see http://code.google.com/p/webdriver/source/browse/trunk/common/test/py/example2.py
+
+==Other browsers via remote driver==
+You need to download and run a Remote driver server. [http://webdriver.googlecode.com/files/RemoteDriverServer.jar]  Put it in your webdriver directory and run {{{java -jar  emoteDriverServer.jar 8888}}} The number is the port you want the server to listen on. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
+
+{{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}
+
+For other browsers set the last two parameters according to [http://www.google.com/codesearch/p?hl=en#WT2nGdYBQUk/trunk/remote/common/src/java/org/openqa/selenium/remote/DesiredCapabilities.java&q=Capabilities%20package:http://webdriver%5C.googlecode%5C.com DesiredCapabilities.java]
