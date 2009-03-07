@@ -42,4 +42,8 @@ You need to download and run a Remote driver server. [http://webdriver.googlecod
 
 {{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}
 
+or
+
+{{{driver = WebDriver("localhost:8888", "internet explorer", "WINDOWS")}}}
+
 For other browsers set the last two parameters according to [http://www.google.com/codesearch/p?hl=en#WT2nGdYBQUk/trunk/remote/common/src/java/org/openqa/selenium/remote/DesiredCapabilities.java&q=Capabilities%20package:http://webdriver%5C.googlecode%5C.com DesiredCapabilities.java]
