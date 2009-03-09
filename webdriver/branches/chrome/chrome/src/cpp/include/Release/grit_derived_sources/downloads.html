@@ -1,0 +1,575 @@
+<!DOCTYPE HTML>
+<html id="t" jsvalues="dir:textdirection;">
+<head>
+<meta charset="utf-8">
+<title jscontent="title"></title>
+<style type="text/css">
+body {
+  font-family:arial;
+  background-color:white;
+  color:black;
+  font-size:84%;
+  margin:10px;
+}
+.header {
+  overflow:auto;
+  clear:both;
+}
+.header .logo {
+  float:left;
+}
+.header .form {
+  float:left;
+  margin-top:22px;
+  margin-left:12px;
+}
+#downloads-summary {
+  margin-top:12px;
+  border-top:1px solid #9cc2ef;
+  background-color:#ebeff9;
+  font-weight:bold;
+  padding:3px;
+  margin-bottom:6px;
+}
+#downloads-display {
+  max-width:740px;
+}
+.download {
+  position:relative;
+  padding-left:45px;
+  margin-bottom:16px;
+}
+.download .icon {
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:32px;
+  height:32px;
+}
+.name {
+  display:none;
+  padding-right:16px;
+  max-width:450px;
+  text-overflow:ellipsis;
+}
+.download .status {
+  display:inline;
+  color:#999;
+}
+.download .url {
+  color:#080;
+  width:500px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.controls a {
+  color:#777;
+  margin-right:16px;
+}
+#downloads-pagination {
+  padding-top:24px;
+  margin-left:18px;
+}
+.page-navigation {
+  padding:8px;
+  background-color:#ebeff9;
+  margin-right:4px;
+}
+.footer {
+  height:24px;
+}
+</style>
+<script type="text/javascript">
+///////////////////////////////////////////////////////////////////////////////
+// localStrings:
+/**
+ * We get strings into the page by using JSTemplate to populate some elements
+ * with localized content, then reading the content of those elements into
+ * this global strings object.
+ * @param {Node} node The DOM node containing all our strings.
+ */
+function LocalStrings(node) {
+  this.strings_ = {};
+
+  var children = node.childNodes;
+  for (var i = 0, child; child = children[i]; i++) {
+    var id = child.id;
+    if (id) {
+      this.strings_[id] = child.innerHTML;
+    }
+  }
+}
+
+/**
+ * Gets a localized string by its id.
+ * @param {string} s The id of the string we want
+ * @return {string} The localized string
+ */
+LocalStrings.prototype.getString = function(s) {
+  return (s in this.strings_) ? this.strings_[s] : '';
+}
+
+/**
+ * Returns a formatted localized string (where all %s contents are replaced
+ * by the second argument).
+ * @param {string} s The id of the string we want
+ * @param {string} d The string to include in the formatted string
+ * @return {string} The formatted string.
+ */
+LocalStrings.prototype.formatString = function(s, d) {
+  return (s in this.strings_) ? this.strings_[s].replace(/\%s/, d) : '';
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper functions
+function $(o) {return document.getElementById(o);}
+
+function bind(fn, selfObj, var_args) {
+  var boundArgs = Array.prototype.slice.call(arguments, 2);
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift.apply(args, boundArgs);
+    return fn.apply(selfObj, args);
+  }
+}
+
+/**
+ * Sets the display style of a node.
+ */
+function showInline(node, isShow) {
+  node.style.display = isShow ? 'inline' : 'none';
+}
+
+/**
+ * Creates an element of a specified type with a specified class name.
+ * @param {String} type The node type.
+ * @param {String} className The class name to use.
+ */
+function createElementWithClassName(type, className) {
+  var elm = document.createElement(type);
+  elm.className = className;
+  return elm;
+}
+
+/**
+ * Creates a link with a specified onclick handler and content
+ * @param {String} onclick The onclick handler
+ * @param {String} value The link text
+ */
+function createLink(onclick, value) {
+  var link = document.createElement("a");
+  link.onclick = onclick;
+  link.href = '#';
+  link.innerHTML = value;
+  return link;
+}
+
+/**
+ * Creates a button with a specified onclick handler and content
+ * @param {String} onclick The onclick handler
+ * @param {String} value The button text
+ */
+function createButton(onclick, value) {
+  var button = document.createElement("input");
+  button.type = 'button';
+  button.value = value;
+  button.onclick = onclick;
+  return button;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Downloads
+/**
+ * Class to hold all the information about the visible downloads.
+ */
+function Downloads() {
+  this.downloads_ = {};
+  this.node_ = $('downloads-display');
+  this.summary_ = $('downloads-summary');
+  this.searchText_ = "";
+
+  // Keep track of the dates of the newest and oldest downloads so that we
+  // know where to insert them.
+  this.newestTime_ = -1;
+}
+
+/**
+ * Called when a download has been updated or added.
+ * @param {Object} download A backend download object (see downloads_ui.cc)
+ */
+Downloads.prototype.updated = function(download) {
+  var id = download.id;
+  if (!!this.downloads_[id]) {
+    this.downloads_[id].update(download);
+  } else {
+    this.downloads_[id] = new Download(download);
+    // We get downloads in display order, so we don't have to worry about
+    // maintaining correct order - we can assume that any downloads not in
+    // display order are new ones and so we can add them to the top of the
+    // list.
+    if (download.started > this.newestTime_) {
+      this.node_.insertBefore(this.downloads_[id].node, this.node_.firstChild);
+      this.newestTime_ = download.started;
+    } else {
+      this.node_.appendChild(this.downloads_[id].node);
+    }
+  }
+}
+
+/**
+ * Set our display search text.
+ * @param {String} searchText The string we're searching for.
+ */
+Downloads.prototype.setSearchText = function(searchText) {
+  this.searchText_ = searchText;
+}
+
+/**
+ * Update the summary block above the results
+ */
+Downloads.prototype.updateSummary = function() {
+  if (this.searchText_) {
+    this.summary_.innerHTML = localStrings.formatString(
+        'searchresultsfor', this.searchText_);
+  } else {
+    this.summary_.innerHTML = localStrings.getString('downloads');
+  }
+
+  var hasDownloads = false;
+  for (var i in this.downloads_) {
+    hasDownloads = true;
+    break;
+  }
+
+  if (!hasDownloads) {
+    this.node_.innerHTML = localStrings.getString('noresults');
+  }
+}
+
+/**
+ * Remove a download.
+ * @param {Number} id The id of the download to remove.
+ */
+Downloads.prototype.remove = function(id) {
+  this.node_.removeChild(this.downloads_[id].node);
+  delete this.downloads_[id];
+}
+
+/**
+ * Clear all downloads and reset us back to a null state.
+ */
+Downloads.prototype.clear = function() {
+  for (var id in this.downloads_) {
+    this.downloads_[id].clear();
+    this.remove(id);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Download
+/**
+ * A download and the DOM representation for that download.
+ * @param {Object} download A backend download object (see downloads_ui.cc)
+ */
+function Download(download) {
+  // Create DOM
+  this.node = createElementWithClassName('div', 'download');
+
+  // Container for all 'safe download' UI.
+  this.safe_ = document.createElement("div");
+  this.safe_.ondragstart = bind(this.drag_, this);
+  this.node.appendChild(this.safe_);
+
+  this.nodeImg_ = createElementWithClassName('img', 'icon');
+  this.safe_.appendChild(this.nodeImg_);
+
+  // FileLink is used for completed downloads, otherwise we show FileName.
+  this.nodeTitleArea_ = createElementWithClassName('div', 'title-area');
+  this.safe_.appendChild(this.nodeTitleArea_);
+
+  this.nodeFileLink_ = createLink(bind(this.openFile_, this), '');
+  this.nodeFileLink_.className = 'name';
+  this.nodeFileLink_.style.display = 'none';
+  this.nodeTitleArea_.appendChild(this.nodeFileLink_);
+
+  this.nodeFileName_ = createElementWithClassName('span', 'name');
+  this.nodeFileName_.style.display = 'none';
+  this.nodeTitleArea_.appendChild(this.nodeFileName_);
+
+  this.nodeStatus_ = createElementWithClassName('span', 'status');
+  this.nodeTitleArea_.appendChild(this.nodeStatus_);
+
+  this.nodeURL_ = createElementWithClassName('div', 'url');
+  this.safe_.appendChild(this.nodeURL_);
+
+  // Controls.
+  this.nodeControls_ = createElementWithClassName('div', 'controls');
+  this.safe_.appendChild(this.nodeControls_);
+
+  this.controlShow_ = createLink(bind(this.show_, this),
+      localStrings.getString('control_showinfolder'));
+  this.nodeControls_.appendChild(this.controlShow_);
+
+  // Pause/Resume are a toggle.
+  this.controlPause_ = createLink(bind(this.togglePause_, this),
+      localStrings.getString('control_pause'));
+  this.nodeControls_.appendChild(this.controlPause_);
+
+  this.controlResume_ = createLink(bind(this.togglePause_, this),
+      localStrings.getString('control_resume'));
+  this.nodeControls_.appendChild(this.controlResume_);
+
+  this.controlCancel_ = createLink(bind(this.cancel_, this),
+      localStrings.getString('control_cancel'));
+  this.nodeControls_.appendChild(this.controlCancel_);
+
+  // Container for 'unsafe download' UI.
+  this.danger_ = createElementWithClassName('div', 'show-dangerous');
+  this.node.appendChild(this.danger_);
+
+  this.dangerDesc_ = document.createElement("div");
+  this.danger_.appendChild(this.dangerDesc_);
+
+  this.dangerSave_ = createButton(bind(this.saveDangerous_, this),
+      localStrings.getString("danger_save"));
+  this.danger_.appendChild(this.dangerSave_);
+
+  this.dangerDiscard_ = createButton(bind(this.discardDangerous_, this),
+      localStrings.getString("danger_discard"));
+  this.danger_.appendChild(this.dangerDiscard_);
+
+  // Update member vars.
+  this.update(download);
+}
+
+/**
+ * The states a download can be in. These correspond to states defined in
+ * DownloadsDOMHandler::CreateDownloadItemValue
+ */
+Download.States = {
+  IN_PROGRESS : "IN_PROGRESS",
+  CANCELLED : "CANCELLED",
+  COMPLETE : "COMPLETE",
+  PAUSED : "PAUSED",
+  DANGEROUS : "DANGEROUS",
+}
+
+/**
+ * Updates the download to reflect new data.
+ * @param {Object} download A backend download object (see downloads_ui.cc)
+ */
+Download.prototype.update = function(download) {
+  this.id_ = download.id;
+  this.filePath_ = download.file_path;
+  this.fileName_ = download.file_name;
+  this.url_ = download.url;
+  this.state_ = download.state;
+  this.percent_ = download.percent;
+  this.speed_ = download.speed;
+  this.received_ = download.received;
+
+  if (this.state_ == Download.States.DANGEROUS) {
+    this.dangerDesc_.innerHTML = localStrings.formatString('danger_desc',
+                                                           this.fileName_);
+    this.danger_.style.display = 'block';
+    this.safe_.style.display = 'none';
+  } else {
+    this.nodeImg_.src = 'chrome-ui://fileicon/' + this.filePath_;
+
+    if (this.state_ == Download.States.COMPLETE) {
+      this.nodeFileLink_.innerHTML = this.fileName_;
+      this.nodeFileLink_.href = this.filePath_;
+    } else {
+      this.nodeFileName_.innerHTML = this.fileName_;
+    }
+
+    showInline(this.nodeFileLink_, this.state_ == Download.States.COMPLETE);
+    showInline(this.nodeFileName_, this.state_ != Download.States.COMPLETE);
+
+    showInline(this.controlShow_, this.state_ == Download.States.COMPLETE);
+    showInline(this.controlPause_, this.state_ == Download.States.IN_PROGRESS);
+    showInline(this.controlResume_, this.state_ == Download.States.PAUSED);
+    showInline(this.controlCancel_, this.state_ == Download.States.IN_PROGRESS);
+
+    this.nodeURL_.innerHTML = this.url_;
+    this.nodeStatus_.innerHTML = this.getStatusText_();
+
+    this.danger_.style.display = 'none';
+    this.safe_.style.display = 'block';
+  }
+}
+
+/**
+ * Removes applicable bits from the DOM in preparation for deletion.
+ */
+Download.prototype.clear = function() {
+  this.safe_.ondragstart = null;
+  this.nodeFileLink_.onclick = null;
+  this.controlShow_.onclick = null;
+  this.controlCancel_.onclick = null;
+  this.controlPause_.onclick = null;
+  this.controlResume_.onclick = null;
+  this.dangerDiscard_.onclick = null;
+
+  this.node.innerHTML = '';
+}
+
+/**
+ * @return {String} User-visible status update text.
+ */
+Download.prototype.getStatusText_ = function() {
+  switch (this.state_) {
+    case Download.States.IN_PROGRESS:
+      // TODO(glen): Make pretty, localize, etc.
+      return this.percent_ + '% at ' + this.speed_;
+    case Download.States.CANCELLED:
+      return localStrings.getString('status_cancelled');
+    case Download.States.PAUSED:
+      return localStrings.getString('status_paused');
+    case Download.States.DANGEROUS:
+      return localStrings.getString('danger_desc');
+    case Download.States.COMPLETE:
+      return "";
+  }
+}
+
+/**
+ * Tells the backend to initiate a drag, allowing users to drag
+ * files from the download page and have them appear as native file
+ * drags.
+ */
+Download.prototype.drag_ = function() {
+  chrome.send("drag", [this.id_.toString()]);
+  return false;
+}
+
+/**
+ * Tells the backend to open this file.
+ */
+Download.prototype.openFile_ = function() {
+  chrome.send("openFile", [this.id_.toString()]);
+  return false;
+}
+
+/**
+ * Tells the backend that the user chose to save a dangerous file.
+ */
+Download.prototype.saveDangerous_ = function() {
+  chrome.send("saveDangerous", [this.id_.toString()]);
+  return false;
+}
+
+/**
+ * Tells the backend that the user chose to discard a dangerous file.
+ */
+Download.prototype.discardDangerous_ = function() {
+  chrome.send("discardDangerous", [this.id_.toString()]);
+  downloads.remove(this.id_);
+  return false;
+}
+
+/**
+ * Tells the backend to show the file in explorer.
+ */
+Download.prototype.show_ = function() {
+  chrome.send("show", [this.id_.toString()]);
+  return false;
+}
+
+/**
+ * Tells the backend to pause this download.
+ */
+Download.prototype.togglePause_ = function() {
+  chrome.send("togglepause", [this.id_.toString()]);
+  return false;
+}
+
+/**
+ * Tells the backend to cancel this download.
+ */
+Download.prototype.cancel_ = function() {
+  chrome.send("cancel", [this.id_.toString()]);
+  return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Page:
+var downloads, localStrings, resultsTimeout;
+
+function load() {
+  localStrings = new LocalStrings($('l10n'));
+  downloads = new Downloads();
+  $('term').focus();
+  setSearch("");
+}
+
+function setSearch(searchText) {
+  downloads.clear();
+  downloads.setSearchText(searchText);
+  chrome.send("getDownloads", [searchText.toString()]);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Chrome callbacks:
+/**
+ * Our history system calls this function with results from searches or when
+ * downloads are added or removed.
+ */
+function downloadsList(results) {
+  if (resultsTimeout)
+    clearTimeout(resultsTimeout);
+  downloadUpdated(results);
+}
+
+/**
+ * When a download is updated (progress, state change), this is called.
+ */
+function downloadUpdated(results) {
+  if (results.length) {
+    downloads.updated(results[0]);
+    if (results.length > 1)
+      resultsTimeout = setTimeout(downloadUpdated, 5, results.slice(1));
+    else
+      downloads.updateSummary();
+  }
+}
+</script>
+</head>
+<body onload="load();">
+<div class="header">
+  <a href="" onclick="setSearch(''); return false;">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEMAAABDCAYAAADHyrhzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAETdJREFUeNrdnF2sHddVx39rz8c551478XWjVsht1QiRppEi9UNCkSoqgUReoI1QBfSJB0QlVBoJEogjHmiJ3TbhQ0gJUskDidQHCkRI7RuVKwRRKlqC80DFl52YxE4chaZNYjv+uGdmLR723jN775lz6zjmJVe5OXPPmTOz93//13997DUW/I8ADqjDr+Od+9OH3w5QwEhAEKACmve8//btQ7fe+Vmpmrukaj7qnGtEHHIVd7BwIdKrDx9a8X55ZPG/6UXjGeHYiutacv34peFPK+4Ba7H+GbH+Gz86/b2vvvDf33kzAGMkQLQfuuMzN68OfOCJqmlva9uWtmmo6grnHCLzcIiAIQlYlo3LSmSsnGsBiiXv2DgTK65tGbjmfzUeGWo5QBbBNsNU6bTH1t1/0J371PFjj/xPvIgA7Xvef/sNh277haeadvnB1daS5XJJ3TS4qsY5Tx4RwcwDgHgUh7/LiUuxKumq2oQTZLSwEaTIhvFaI4PM8huY2fBdC8CZ2fAdMEz9e33Xs+7W9Ovuv+zy2Y8+fezRy2ZmNVAduvXOz1ZN+8HV1pLV1haL5ZK6rnGVw4kbJj/8T0ZiiYwrJiLJzQsqFxMdxzh+bnuwISdM+I7GyccvRRDCGQqKgRpmGghk1LXiuopduXIr7ic+Z2Z/CkgNCFXzS23bslwuWSyXtG2bm4iAIN4sTAIbLNpJYjO2JxusYENu24U22JRxg3mYjeeECUZQw5xBDZwh4VXN+SGrYaIYgpmhjl8FvgZccgCuaj7cNg1N01DXdQCiQsRP3IkM9iEugiEBIAHndUPCeRJ9k4uf+7+Hz2EwPQk4hqPx2vF+g8aT2ygSv5j4gYmqDWYskc4CiMNVjqqqUdyHgXcBWw4w51xT1RVSedMQccT5e60YBx39hjgZBEMQbBh8AhQjq8ZJEACZmyDZcbyfiA1SNEh21KoIbrxPcg8LY7UAxPBq/hrihMq5BtgGFs5/z+Gcw4WVdC6OMQDh8hVLV9iDEgITKSYKiBUgjUuVgWRhpeO0DQkSHyaTTDKLCmzKjPFUSfQ8QGmSnD58pwZcMgdJFireSBCXsEHGm8qgEzIcZ2yI1HJTkGRPNhTmgmTnSAAoA1Rs4EyGRuHNJY1pBs8znuxKG4sgRE/hzSy4VklASG0wHURq/8F7C6PQiiUAJp9FBlF6rYQNNlCeZJzphGwIAYh6LpnXDteKLle8+M6CEfVFLKA9moQR30qYUWgDafSChdfgRSR+ZsN6STgeFzqAH4ImCa5EgheRFNB45SwglEnQNp7LGHgRALM8DBiMwCxfgUhPC9GVJKhKeN8Lp2Fi/qaSqMWMNkjiBSxZ6QigIeE1akVxDmOUaeTktEleIPm5FhcnmUMa2wThSIC1LICUjA3ju8YIhFiYgCSrAagppoqqYdaPK5GF1XuE2TZGJYYM9/GezCUxTSqoShq0Sgg3BhOzJDCL90uYUc9kNAm4MrquNBWTYYieITbao5miqmjX0XW79N0ufd9jqj4KLKNII49ajWlOEYRVXI2rG/9a1UMc5C9ryXon4HqMBnNTkYwNaX5U5wOQXIwt8CDTjIjL+F7QseEm2vfc9XMf4tN3fmSSV+TpSRqKl5Fncn747K+++RRP/P1xmsU2mOGqZnTHNqCS2n3CNgk5i9ciHejBJm9ShNNiw0RzlGQQH0tUWxC0V/ruCp/++Y/MJ1gRhBg+WxFeJ/SNVI6J12c+9XEunvshu5cv0PddyDcs0QZJAI55kiXXiQsQNcc2a4aVvtqiiAaTGCY9moxZ4s4wVJVuvb5ubChN6dKbb1C1K1y9xNUtTvD0T8RiBDwHN9U8/7nMmMkw0Dz3jiBE8ZJABUvsaABpmJSh2mds2Ct73VM8Z7LXbvdN+vUVfw9VzGUX9WPTXIJG5gmGjuJbpMR1mWVGLg+eInpDYwi6PBuieRQpfCigbAKiZMOsdynYkALUrdeo9mCK6egdxhiiADPkIQpDGm/RTAvNqEsJjxaVsiHGIHHykQ1J1j4g7X91pnJ17WwYU3c/oei2TUY2TtYz0yEr0v+5RSnNJF2JYIvRtUY3ZcGXmjGvGwPi148N88CS36dgSMw/SEU6E9OpqdQpGyarFIs3GRu87W1a2TEBun5sSN/vVem6nvW6R650dLXLJ2mGaRiB+sU09UVw88VR71Yx+r4Px0WcUa5Arg2SUDFWvHIvMqTIpKtyndiQnKMKpn5CNtb4RjdqzINjOvyt6kW0W/esg+crBNSym8eyXsqGCMLcysYwdGPc8DbYYEXVPFu0yMTZ0iBJwZgh6MrijTnNyIuyYfIpGwbdmGfD4HkSc3mrbMgm/uPOKXQgZUPGECPJi6Y6w2ycYfnKDNqQJGDj/kDBhiTKVzX6Xq8rGzJvknq9jayYZ0O6dWBJwlZoxkjrEe1CGwjeZSitjmyINqxq7HYdfafXlw3ppFNPkTIk8Rrp5OfYMN7DstigZsb9ZaX+GEzIGIzFWagqvXoQbFLqvzY25FHj/NZBmXPMsSEH1Arzyn9zAR0cNImZkGmDx0LBhK7vfYoeIk213rtejH73Ct169/qyIZ1039P3vjzg1pdxqsl5aXruxoJOxgY27NEm3iSjG6k2jAULVaPr1vRdh3Zrun6NaY+qDpFq3+1y5dL5zau+ITmzq9EPM/p+l+7KRdb1AjP83kdSgjBxOASpWhC/7VEWcywJ3ee9ycS+YtXb0N5XrnS9pteeX7vrY3zyZ28vdr3KlbZZ87gmNiTg/PO3/3p6fnKNUy+8wm//4deomyVSL3CuGesthWaUaLjUr2abthiq0HVKt+7oe0UNum7NLwYgssAmLb9nn6XCNgXCysi1AC6tZ8x5htKF3vy+d3PLBw6wvnLRM1g1HwPTcWZgZCsYgeiNddfTd32WAZr2vPKDNzazYSYxmkwmUf0yi8wzyhkw2TSpkY1nXzpL3+9iuh5S9tSlJiFuVs9weagc+hc6Zb0OqJarIMLhh77OyVMv/T+yYX6SU6Asu48ZfOlPHuXlV14N35VkXMUrU81waciqaqz7KRvSugA4Xn3tEr975DFOnDq9gQ25m37rbCgmOQm8pkBhxgMPPcy3/uG7uHqBczXiXEgwN7OW0kzA6HrPhn6GDcOrCOIqqnbJrjbce+QxTpw6M8OGDav6NtkwBXO85wNfeZhj/3icdnWAZrmfql2Ba3zWWpQCzXIxz8Doew0CaRM2pHE+GE5qqqqlXe6nsxX3PvCXnDx15vqxgR/PhjLZOvKVhzn25DMstndotw7QLPZ7dkiV1Vwoiz5FbuLAewidDKaYGCGVdyCuoW4WtKv9dOIBOfHc6evDBrt6NhgMQLTbO7RbOzTLG6naFeIacC4p+JSxxbTs581EiyJMsWJk/VFhN9w1VM3SM0S2+L2jj42AFOzayAaulg3Mpt5HHnyYY08ep93eYbHyQNSNB8LvujHDhoLBJTPmAh6YW9UoPhGQmqpZ0Sz30ZEAsiGjnLDBrpYNNlnZow89zLF/eobF9kHa1Q7N6kaqdgupGhDnK+FzbMhybNsQZyT+N83qNil7zGrFVdTNima1j7Vscd/RxwNDbJJFXg82mBlHH8yBaAMQrqrxDSUyYcPkfomoFq7VZgfFXACVTTI2plRUzYp2sY+1rLjv6ONBVPNds7fLBjCOPPhI0IiDXiwjI1wNUgVGzLBhomdFkTl1rcwNJEvp5+sBXlTFA9KuaBb76GTFfUe92712NuT1VDMPxLeDWC5WB2iWB6jbFeJqxFUTYcyvu0d+UprJnDb4Qmq5kv5Vi5DZ74h7htSLfaxZcfjoY5x47sykEHN1bMhd6dE/emT0GqsdmtWBxGtUufAXTbKUeUyW5M0kaqNtx05a5stlM2F1urXgXBVEdT9r2eLwlx7n5HOnr5kNXiz/3GvE1g7t1sGgEauwC++S8/fWBkOn6cF8OM5s2d32XNFQejdC/wWhD7SiapY0QUMGQN4iG85fuMBv/c4fcOzJ4yy2DtJuH6RZ3jB6jdjVM9EG5rUhZYNl+3CpmaTlNk0SGcttL5pHmbwVqXTUEFcCcur0VbPh3IULfP6eL/LvJ19isX0T7fYOzfIG6iCWPueQ3LxnK+ZW6AWT8LwQ0KIKpDroxbByquM5cWNZx8FrBEpt6B1yUlFVC5p2m7UtuX9gyOZaBcC58xe4+54v8MLZ1zwjtg7QLG6galaI1Ig41MbmEz9RPz4l9KyYDk8X5BHuGJLmadqMa42D04RKGRtMx+KPpTcIzMGbTXyqxaoaVy+plvvYZcXhLz/Os8Htlmww4Nz589x97xd44ewb3iy2PCNciCwtAyIupI5tCKbT7U0rvGK2P2tz3iSu8EySVbBEE0+THs9t/AqAq6nqJXU7epmTp85kbDAzzp8/z+fv+SLPn32ddst7jXq5H9ckYpkJY7I4Wf3EV+kMzbcEilaFkhtjnKGWd+cP+5SaaUa0yZQVGmohFlsFsr2LNHT3gOzKivuPPsbFS1eGe3V9z933PsDpl98IprFDvdg/mAbiilYDDYsUJj/nTouygpJn4zC7VZCE3uonFDv5xhRYh+dJhh7KrH46t/uVdayAOKpmQaPK7uWeP/uLv+NX7voZTI0nvvEtXnj5DZ95rg5Qt9tUzRKhCh19NqmmZ95h6NbR8JhFog1xjBqy0vhdZWZ7sYjT014MEW8GErf2RTIgsg6fdF9kdr/EMHFI3VIttvnu98/w5NOPouvLmMFi303U7Tb1Yh9SL3147djwDEoeRQ4mUYhlvpEUtjzSB10mzGDG9ye7SWPB2DcEWdGCrKZDL0fpw/Oyf+gTdzVVtYTWgTRYuw7dlBVVs0CqBc6FwozKhA2TLcsYKI71iNFMNY1I006fojRO0ZKQ9jAQQmwNrdIaO3YUEL+zNkYn4u2X6Ub0pIIe71dVOFoa53yPVpAwn3CNz7IMjbQF8wYT0SR4Krp4LKneWMKg2C5a/tRZ5Bl2zeJjFWntYtxoDgUe08GUDEWyLQfZexdt6JOqwTlcbIsatnXFg1/0i5R7tykz0gYZLTIzL/b5ZniGarmjNk7eBm3w23U6dObbsAmrfkN6YMnQkZz4embamPL93IFVyTMjY0OMbW6SS+ei+c5dyQYLQFix614kaZJ4k+kmz2hXoXdyeIbCkvYEstUWmDxzWm4V7skYmGgDBRvK64ygBBEt4wiziWezyUPHVISnFw2zXcVaiEqriCatj6GTctyND6jnfetZ1LoXG8qcZDLATS2TEzaQtRx4UlohpCmbNBdNA+fcJWAZwejV7Bnr9Q7VHqfmN5uDRmjIDTU+wpC0P/qFSFqObV4zZtkA08lvYENu4jMimqbqCQiZqZUPyAbm79y49SKwL5pJ33frv+21u6PvFVf14XEGN7qnlPiDe2UwIRluG9Np3djLlS6NFc/B5g8A7wHCHNCWjjFln05cKEme9fGP/eS/AS2wdmaml8+d/Wq/7r7frXf9znWvWOzLsjEHUdPQoWthdztkiuYfslFV39OdhsxoImI6Xks1yXRj168P6+PxEDarJsexHTse21C40UkFbg6IMW246cD2/3758C//C/A6cEHMrAHcbx5+9Oan/vXZbxr1LVW7oKrq4TErS9Y+rpqEjV2StqZSK2a1gZwNXCsbJt+32fNyNoxgvPvgvlcf/+Nf//ptP3XoOPAd4HkxMwesgBvPvvLaod9/8G9+4/kXf/iJH7x+8VaRKntktKR+KX6kveSbvEE50U3agBWhwB5aYqUWzP8YcPN73/XSJ376lmfv/9wnv7e1ak8CTwMngEsSJlIFQG4C3ge8Nxxv8c75h0XiP49hwDngeeA/gReBy4BJQikBmqCsO8ANwOIdBEZwNVwOYPwIuID/F1YA+D/ZKBaBML2rqwAAAABJRU5ErkJggg=="
+         width="67" height="67" class="logo" border="0" /></a>
+  <form method="post" action=""
+      onsubmit="setSearch(this.term.value); return false;"
+      class="form">
+    <input type="text" name="term" id="term" />
+    <input type="submit" name="submit" jsvalues="value:searchbutton" />
+  </form>
+</div>
+<div class="main">
+  <div id="downloads-summary"></div>
+  <div id="downloads-display"></div>
+</div>
+<div class="footer">
+</div>
+<div id="l10n" style="display:none;">
+  <span id="searchresultsfor" jscontent="searchresultsfor">Search results for '%s'</span>
+  <span id="no_results" jscontent="no_results">No results found.</span>
+  <span id="downloads" jscontent="downloads">Downloads</span>
+
+  <span id="status_cancelled" jscontent="status_cancelled">Cancelled</span>
+  <span id="status_paused" jscontent="status_paused">Paused</span>
+
+  <span id="danger_desc" jscontent="danger_desc">This is a dangerous file</span>
+  <span id="danger_save" jscontent="danger_save">Save</span>
+  <span id="danger_discard" jscontent="danger_discard">Discard</span>
+
+  <span id="control_pause" jscontent="control_pause">Pause</span>
+  <span id="control_showinfolder" jscontent="control_showinfolder">Show in folder</span>
+  <span id="control_cancel" jscontent="control_cancel">Cancel</span>
+  <span id="control_resume" jscontent="control_resume">Resume</span>
+</div>
+</body>
+</html>

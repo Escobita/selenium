@@ -1,0 +1,915 @@
+<!DOCTYPE HTML>
+<html id="t" jsvalues="dir:textdirection;firstview:firstview">
+<!--
+ This page is optimized for perceived performance. Our enemies are the time
+ taken for the backend to generate our data, and the time taken to parse
+ and render the starting HTML/CSS content of the page. This page is
+ designed to let Chrome do both of those things in parallel.
+
+ 1. Defines temporary content callback functions
+ 2. Fires off requests for content (these can come back 20-150ms later)
+ 3. Defines basic functions (handlers)
+ 4. Renders a fast-parse hard-coded version of itself (this can take 20-50ms)
+ 5. Defines the full content-rendering functions
+
+ If the requests for content come back before the content-rendering functions
+ are defined, the data is held until those functions are defined.
+-->
+<script type="text/javascript">
+/* Logging info for benchmarking purposes. */
+var log = [];
+function logEvent(name) {
+  log.push([name, new Date().getTime()]);
+}
+
+// Basic functions to send, receive, store and process the data from our
+// backend.
+var unprocessedData = {
+  mostVisitedPages : false,
+  searchURLs : false,
+  recentlyBookmarked : false,
+  recentlyClosedTabs : false
+}
+
+var renderFunctionsDefined = false;
+
+// TODO(glen): Merge into common file used by this and history.
+var localStrings;
+
+///////////////////////////////////////////////////////////////////////////////
+// localStrings:
+/**
+ * We get strings into the page by using JSTemplate to populate some elements
+ * with localized content, then reading the content of those elements into
+ * this global strings object.
+ * @param {Node} node The DOM node containing all our strings.
+ */
+function LocalStrings(node) {
+  this.strings_ = {};
+  
+  var children = node.childNodes;
+  for (var i = 0, child; child = children[i]; i++) {
+    var id = child.id;
+    if (id) {
+      this.strings_[id] = child.innerHTML;
+    }
+  }
+}
+
+/**
+ * Gets a localized string by its id.
+ * @param {string} s The id of the string we want
+ * @return {string} The localized string
+ */
+LocalStrings.prototype.getString = function(s) {
+  return (s in this.strings_) ? this.strings_[s] : '';
+}
+
+/**
+ * Returns a formatted localized string (where all %s contents are replaced 
+ * by the second argument).
+ * @param {string} s The id of the string we want
+ * @param {string} d The string to include in the formatted string
+ * @return {string} The formatted string.
+ */
+LocalStrings.prototype.formatString = function(s, d) {
+  return (s in this.strings_) ? this.strings_[s].replace(/\%s/, d) : '';
+}
+
+function $(o) {return document.getElementById(o);}
+
+/**
+ * If the functions that can render content are defined, render
+ * the content for any data we've received so far.
+ */
+function processData() {
+  if (renderFunctionsDefined) {
+    if (unprocessedData.mostVisitedPages) {
+      renderMostVisitedPages(unprocessedData.mostVisitedPages);
+      unprocessedData.mostVisitedPages = false;
+    }
+    if (unprocessedData.searchURLs) {
+      renderSearchURLs(unprocessedData.searchURLs);
+      unprocessedData.searchURLs = false;
+    }
+    if (unprocessedData.recentlyBookmarked) {
+      renderRecentlyBookmarked(unprocessedData.recentlyBookmarked);
+      unprocessedData.recentlyBookmarked = false;
+    }
+    if (unprocessedData.recentlyClosedTabs) {
+      renderRecentlyClosedTabs(unprocessedData.recentlyClosedTabs);
+      unprocessedData.recentlyClosedTabs = false;
+    }
+  }
+}
+
+function mostVisitedPages(data) {
+  logEvent('received most visited pages');
+  unprocessedData.mostVisitedPages = data;
+  processData();
+}
+
+function searchURLs(data) {
+  logEvent('received search URLs');
+  unprocessedData.searchURLs = data;
+  processData();
+}
+
+function recentlyBookmarked(data) {
+  logEvent('received recently bookmarked data');
+  unprocessedData.recentlyBookmarked = data;
+  processData();
+}
+
+function recentlyClosedTabs(data) {
+  logEvent('received recently closed tabs');
+  unprocessedData.recentlyClosedTabs = data;
+  processData();
+}
+
+function resizeP13N(new_height) {
+   var childf = document.getElementById('p13n');
+   if (new_height < 1) {
+     childf.style.display = "none";
+     return;
+   }
+   childf.height = new_height; 
+   childf.style.display = "block";
+}
+
+chrome.send("getMostVisited");
+chrome.send("getMostSearched");
+chrome.send("getRecentlyBookmarked");
+chrome.send("getRecentlyClosedTabs");
+
+function handleWindowResize() {
+  if (!document.body || document.body.clientWidth < 10) {
+    // We're probably a background tab, so don't do anything.
+    return;
+  }
+
+  if (document.body.className == 'small' && document.body.clientWidth >= 885) {
+    document.body.className = '';
+  } else if (document.body.className == '' && document.body.clientWidth <= 865) {
+    document.body.className = 'small';
+  }
+}
+
+function handleInputFocus() {
+  if (!this.deftext) {
+    this.deftext = this.value;
+  }
+
+  if (this.value == this.deftext) {
+    this.className = '';
+    this.value = '';
+  }
+}
+
+function handleInputBlur() {
+  if (!this.value) {
+    this.className = 'hint';
+    this.value = this.deftext;
+  }
+}
+
+function handleDOMContentLoaded() {
+  logEvent('domcontentloaded fired');
+}
+
+logEvent('log start');
+</script>
+<head>
+<meta charset="utf-8">
+<title jscontent="title"></title>
+<style type="text/css">
+body {
+  font-family:arial;
+  background-color:white;
+  font-size:84%;
+  margin:0px;
+}
+html[firstview='true'] #main {
+  opacity:0.0;
+  -webkit-transition:all 0.4s;
+}
+html[firstview='true'] #main.visible {
+  /* unfortunately, 1.0 results in no animation */
+  opacity:0.999;
+}
+#main {
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:10px;
+}
+form {
+  padding: 0;
+  margin: 0;
+}
+.section {
+  padding:3px 0px 5px 0px;
+  margin-bottom:30px;
+}
+.section-title {
+  color:#000;
+  line-height:19pt;
+  font-size:110%;
+  font-weight:bold;
+  margin-bottom:4px;
+}
+#mostvisitedsection {
+  margin:0px 5px 0px 0px;
+}
+#mostvisited td {
+  padding:0px 10px 10px 0px;
+}
+html[dir='rtl'] #mostvisited td {
+  padding:0px 0px 10px 10px;
+}
+.most-visited-text {
+  width:548px; /* thumbnail + td * 3 - 2*padding - 2*margin */
+  padding:20px;
+  margin:15px;
+  background-color:white;
+  -webkit-box-shadow: 5px 5px 10px #ccc;
+  -webkit-transition:all 0.12s;
+}
+.thumbnail-title {
+  background-image:url(chrome-ui://favicon/);
+  display:block;
+  background-repeat:no-repeat;
+  background-size:16px;
+  background-position:0px 1px;
+  width:172px; /* thumbnail - padding */
+  margin-top:6px; /* line up favicons with search favicons */
+  padding:1px 0px 4px 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration:none;
+  -webkit-transition:all 0.12s;
+}
+html[dir='rtl'] .thumbnail-title {
+  background-position:right;
+  padding-left:0px;
+  padding-right:22px;
+  text-align:right;
+}
+.thumbnail {
+  width:195px;
+  height:136px;
+  border:1px solid #ccc;
+  background-color:#eee;
+  -webkit-transition:all 0.12s;
+}
+a.thumbnail {
+  border:1px solid #abe;
+}
+
+.small .thumbnail-title {
+  width:127px;
+}
+.small .thumbnail {
+  width:150px;
+  height:113px;
+}
+.small .most-visited-text {
+  width:430px;
+  padding:15px;
+  margin:12px;
+}
+
+.recent-bookmark {
+  display:block;
+  background-repeat:no-repeat;
+  background-size:16px;
+  background-position:0px 1px;
+  padding:1px 0px 0px 22px;
+  margin:3px 0px 3px 0px;
+  min-height:16pt;
+  line-height:16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration:underline;
+}
+.recent-window-container {
+  line-height:16px;
+  display:block;
+  margin:3px 0px 3px 0px;
+}
+.recent-window-container img {
+  margin:0 3px -2px 3px;
+}
+.recent-window-hover-container {
+  position:absolute;
+  border:1px solid #999;
+  -webkit-box-shadow: 5px 5px 10px #ccc;
+  background-color:white;
+  width: 157px;
+  left: 20px;
+  white-space:nowrap;
+  opacity:.9;
+}
+.recent-window-hover-container .recent-bookmark {
+  text-decoration:none;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  margin: 3px 0 0 5px;
+}
+.recently-closed-window-link {
+  'text-decoration:none';
+}
+.recently-closed-window-link:hover {
+  cursor:pointer;
+}
+.recently-close-window-text {
+  text-decoration:underline;
+}
+
+html[dir='rtl'] .recent-bookmark {
+  background-position:right;
+  padding-left:0px;
+  padding-right:22px;
+}
+a {
+  color:#0000cc;
+  text-decoration:underline;
+  white-space: nowrap;
+}
+a.manage {
+  color:#77c;
+  margin-left: 5px;
+  margin-right: 5px;
+  line-height:19pt;
+  text-decoration:underline;
+}
+html[dir='rtl'] #managesearcheslink {
+  float: left;
+}
+.sidebar {
+  width: 207px;
+  padding:3px 10px 3px 9px;
+  -webkit-border-radius:5px 5px;
+  margin-bottom:10px;
+}
+#searches {
+  background-color:#e1ecfe;
+}
+#recentlyBookmarked {
+  background-color:#e1ecfe;
+}
+html[dir='rtl'] #recentlyBookmarkedContainer {
+  text-align:right;
+}
+#recentlyClosedContainer {
+  position:relative;
+}
+html[dir='rtl'] #recentlyClosedContainer {
+  text-align:right;
+}
+#searches input {
+  border:1px solid #7f9db9;
+  background-repeat: no-repeat;
+  background-position:4px center;
+  padding-left: 23px;
+  min-height:24px;
+  width:182px;
+  margin-bottom:8px;
+  display:block;
+}
+html[dir='rtl'] #searches input {
+  background-position: right;
+  padding-left:0px;
+  padding-right: 23px;
+}
+#searches input.hint {
+  color:#aaa;
+}
+.footer {
+  border-top:1px solid #ccc;
+  padding-top:4px;
+  font-size:8pt;
+}
+</style>
+</head>
+<body onload="logEvent('body onload fired');">
+<div id="l10n" style="display:none;">
+  <span id="closedwindow" jscontent="closedwindow">Window</span>
+</div>
+<script>
+// We apply the size class here so that we don't trigger layout animations onload.
+handleWindowResize();
+window.addEventListener('resize', handleWindowResize, true);
+document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
+</script>
+
+<table id="main" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+  <td valign="top">
+  <div id="mostvisitedsection" class="section">
+    <div id="mostvisited" style="position:relative;">
+      <div class="section-title" jscontent="mostvisited"></div>
+      <div id="mostvisitedintro" style="display:none;">
+        <div class="most-visited-text" style="position:absolute;" jseval="this.innerHTML = $this.mostvisitedintro;"></div>
+        <table>
+          <tr>
+            <td><div class="thumbnail">&nbsp;</div></td>
+            <td><div class="thumbnail"></div></td>
+            <td><div class="thumbnail">&nbsp;</div></td>
+          </tr>
+          <tr>
+            <td><div class="thumbnail">&nbsp;</div></td>
+            <td><div class="thumbnail"></div></td>
+            <td><div class="thumbnail">&nbsp;</div></td>
+          </tr>
+        </table>
+      </div>
+      <table id="mostvisitedtable">
+        <!-- This content forces the view to the correct width and provides a
+             preview of what's to load to reduce white-flash. Users who get
+             the mostvisitedintro will see a brief flash of this content. We
+             only use one row so that we may avoid flashing extra rows when
+             the user has only one row of items -->
+        <tr>
+          <td>
+            <div class="thumbnail-title">&nbsp;</div>
+            <div class="thumbnail"></div>
+          </td>
+          <td>
+            <div class="thumbnail-title">&nbsp;</div>
+            <div class="thumbnail"></div>
+          </td>
+          <td>
+            <div class="thumbnail-title">&nbsp;</div>
+            <div class="thumbnail"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <a href="#"
+       class="manage"
+       onclick="chrome.send('showHistoryPage'); return false">
+       <span jscontent="showhistory"></span> &raquo;</a>
+  </div>
+  </td>
+  <td valign="top" width="230">
+    <div align="right">
+        <img src="data:image/png;base64,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"
+             width="145" height="52" style="padding-bottom:8px;" />
+    </div>
+    <iframe id="p13n" frameborder="0" width="100%" scrolling="no" height="0"
+            jsdisplay="p13nsrc" style="display:none;"
+            jsvalues="src:p13nsrc"></iframe>
+    <div id="searches" class="sidebar">
+      <div class="section-title" jscontent="searches"></div>
+      <form onsubmit="chrome.send('searchHistoryPage', [this.search.value]); return false;">
+        <input type="text" class="hint"
+               name="search"
+               style="background-image:url(chrome-ui://favicon/);"
+               jsvalues="value:searchhistory"
+               onfocus="handleInputFocus.apply(this);"
+               onblur="handleInputBlur.apply(this);" />
+      </form>
+      <div id='searches-entries'></div>
+    </div>
+
+    <div id="recentlyBookmarked" class="sidebar" style="display:none">
+      <span class="section-title" jscontent="bookmarks"></span>
+      <div id="recentlyBookmarkedContainer"></div>
+    </div>
+
+    <div id="recentlyClosedTabs" class="sidebar" style="display:none">
+      <div class="section-title" jscontent="recentlyclosed"></div>
+      <div id="recentlyClosedContainer"></div>
+    </div>
+  </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+logEvent('start of second script block');
+
+/* Return a DOM element with tag name |elem| and attributes |attrs|. */
+function DOM(elem, attrs) {
+  var elem = document.createElement(elem);
+  for (var attr in attrs) {
+    elem[attr] = attrs[attr];
+  }
+  return elem;
+}
+
+/**
+ * Partially applies this function to a particular 'this object' and zero or
+ * more arguments. The result is a new function with some arguments of the first
+ * function pre-filled and the value of |this| 'pre-specified'.<br><br>
+ *
+ * Remaining arguments specified at call-time are appended to the pre-
+ * specified ones.<br><br>
+ *
+ * @param {Function} fn A function to partially apply.
+ * @param {Object} selfObj Specifies the object which |this| should point to
+ *     when the function is run.
+ * @param {Object} var_args Additional arguments that are partially
+ *     applied to the function.
+ *
+ * @return {!Function} A partially-applied form of the function bind() was
+ *     invoked as a method of. 
+ */
+function bind(fn, selfObj, var_args) {
+  var boundArgs = Array.prototype.slice.call(arguments, 2);
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift.apply(args, boundArgs);
+    return fn.apply(selfObj, args);
+  }
+}
+
+/* Return the DOM element for a "most visited" entry.
+   |page| should be an object with "title", "url", and "direction" fields. */
+function makeMostVisitedDOM(page, number) {
+  /* The HTML we want looks like this:
+    <a class="most-visited-item" href="URL" title="gmail.com">
+      <div class="thumbnail-title" 
+           style="background-image:url(faviconurl);direction:ltr">gmail.com</div>
+      <img class="thumbnail" style="background-image:url(thumbnailurl);" />
+    </a>
+  */
+  var root;
+  if (page.url) {
+    root = DOM('a', {href:page.url, 
+                     title:page.title});
+    root.addEventListener("mousedown", function(event) {
+        chrome.send("metrics", ["NTP_MostVisited" + number])
+        }, false);
+  } else {
+    // Something went wrong; don't make it clickable.
+    root = DOM('span');
+  }
+
+  /* Create the thumbnail */
+  var img_thumbnail = DOM('img', {className:'thumbnail'});
+  img_thumbnail.setAttribute('onload', "logEvent('image loaded');");
+  img_thumbnail.src = 'chrome-ui://thumb/' + page.url;
+
+  /* Create the title */
+  var div_title = DOM('div', {className:'thumbnail-title'});
+  div_title.style.backgroundImage =
+      'url("chrome-ui://favicon/' + page.url + '")';
+  /* Set the title's directionality independently of the overall page
+     directionality. We need to do this since a purely LTR title should always
+     have it's direction set as ltr. We only set the title direction to rtl if
+     it contains a strong RTL character. Please refer to http://crbug.com/5926
+     for more information.
+  */
+  div_title.style.direction = page.direction;
+  if (page.title) {
+    div_title.appendChild(document.createTextNode(page.title));
+  } else {
+    // Make the empty title at least push down the icon.
+    div_title.innerHTML = '&nbsp;';
+  }
+
+  root.appendChild(div_title);
+  root.appendChild(img_thumbnail);
+
+  return root;
+}
+
+/* This function is called by the browser with the most visited pages list.
+   |pages| is a list of page objects, which have url, title, and direction
+   attributes. */
+function renderMostVisitedPages(pages) {
+  logEvent('renderMostVisitedPages called: ' + pages.length);
+
+  document.getElementById("main").className = 'visible';
+  var table = document.getElementById("mostvisitedtable");
+  table.innerHTML = '';
+
+  // Show the most visited helptext if most visited is still useless. This is
+  // a crappy heuristic.
+  if (pages.length < 3) {
+    document.getElementById("mostvisitedintro").style.display = "block";
+    return;
+  }
+
+  document.getElementById('mostvisitedintro').style.display = 'none';
+
+  // Create the items and add them to rows.
+  var rows = [];
+  var rowNum = -1;
+  for (var i = 0, page; page = pages[i]; ++i) {
+    if (i % 3 == 0) {
+      rowNum += 1;
+      rows[rowNum] = DOM('tr', {});
+    }
+
+    var dom = makeMostVisitedDOM(page, i);
+
+    var cell = DOM('td');
+    cell.appendChild(dom);
+
+    rows[rowNum].appendChild(cell);
+
+    logEvent('mostVisitedPage : ' + i);
+  }
+
+  // Add the rows to the table.
+  for (var i = 0, row; row = rows[i]; i++) {
+    table.appendChild(row);
+  }
+
+  logEvent('renderMostVisitedPages done');
+}
+
+function makeSearchURL(url) {
+  /* The HTML we want looks like this:
+     <form>
+     <input type="text" class="hint"
+            style="background-image:url(chrome-ui://favicon/"+url+");"
+            value="Search Wikipedia"
+            onfocus="handleInputFocus();"
+            onblur="handleInputBlur();" />
+     </form>
+  */
+  var input = DOM('input', {type:'text',
+      className:'hint',
+      value:url.short_name});
+  input.keyword = url.keyword;
+
+  if (url.favIconURL) {
+    input.style.backgroundImage =
+      'url("chrome-ui://favicon/iconurl/' + url.favIconURL + '")';
+  } else {
+    input.style.backgroundImage =
+      'url("chrome-ui://favicon/http://' + url.short_name + '")';
+  }
+
+  input.onfocus = handleInputFocus;
+  input.onblur = handleInputBlur;
+
+  var form = DOM('form');
+  form.onsubmit = function() {
+    chrome.send('doSearch', [input.keyword, input.value]);
+    return false;
+  };
+  form.appendChild(input);
+
+  return form;
+}
+
+/* This function is called by the browser when the list of search URLs is
+   available.  |urls| is a list of objects with |name| attributes. */
+function renderSearchURLs(urls) {
+  logEvent('renderSearchURLs called: ' + urls.length);
+  var container = document.getElementById('searches-entries');
+  container.innerHTML = '';  // Clear out any previous contents.
+  if (urls.length > 0) {
+    document.getElementById('searches').style.display = 'block';
+    for (var i = 0; i < urls.length; ++i) {
+      container.appendChild(makeSearchURL(urls[i]));
+    }
+  }
+
+  logEvent('renderSearchURLs done');
+}
+
+/* This function is called by the browser when the list of recently bookmarked
+   URLs is available.  |entries| is a list of objects with title, url, and
+   direction attributes. */
+function renderRecentlyBookmarked(entries) {
+  logEvent('renderRecentlyBookmarked called: ' + entries.length);
+  var section   = document.getElementById('recentlyBookmarked');
+  var container = document.getElementById('recentlyBookmarkedContainer');
+
+  /* recentlyBookmarked is called any time the bookmarks change. Remove existing
+     entries before adding new ones. */
+  section.style.display = 'none';
+  container.innerHTML = '';
+
+  if (entries.length > 0) {
+    section.style.display = 'block';
+    for (var i = 0, entry = entries[0]; entry = entries[i]; ++i) {
+      var link = DOM('a', {href: entry.url, 
+                           className:'recent-bookmark', 
+                           title:entry.title});
+      link.addEventListener("mousedown", function(event) {
+          chrome.send("metrics", ["NTP_Bookmark" + i])
+          }, false);
+      link.style.backgroundImage =
+          'url("chrome-ui://favicon/' + entry.url + '")';
+      /* Set the bookmark title's directionality independently of the page, see
+         comment about setting div_title.style.direction above for details.
+      */
+      link.style.direction = entry.direction;
+      link.appendChild(document.createTextNode(entry.title));
+      container.appendChild(link);
+    }
+  }
+
+  logEvent('renderRecentlyBookmarked done');
+}
+
+/* This function adds incoming information about tabs to the new tab UI. */
+function renderRecentlyClosedTabs(entries) {
+  logEvent('renderRecentlyClosedTabs begin');
+  var section   = document.getElementById('recentlyClosedTabs');
+  var container = document.getElementById('recentlyClosedContainer');
+
+  /* recentlyClosedTabs is called on every internal event which
+     affects tab history to make sure things are up to
+     date. Therefore, reset the recentlyClosedTabs state on every
+     call. */
+  section.style.display = 'none';
+  container.innerHTML = '';
+
+  if (entries.length > 0) {
+    section.style.display = 'block';
+
+    for (var i = 0; entry = entries[i]; ++i) {
+      var link;
+      
+      if (entry.type == "tab") {
+        // Closed tab.
+        link = createRecentBookmark('a', entry);
+        container.appendChild(link);
+      } else {
+        // Closed window.
+        var linkSpanContainer = DOM('div', { className: 'recent-window-container'});
+
+        var linkSpan = DOM('span');
+        linkSpan.appendChild(document.createTextNode(" ("));
+        for (var windowIndex = 0; windowIndex < entry.tabs.length; windowIndex++) {
+          var tab = entry.tabs[windowIndex];
+          var tabImg = DOM('img', {
+              src:'url("chrome-ui://favicon/' + tab.url + '")', 
+              width:16, 
+              height:16});
+          tabImg.onmousedown = function() { return false; }
+          linkSpan.appendChild(tabImg);
+        }
+        linkSpan.appendChild(document.createTextNode(")"));
+
+        link = DOM('span', { className: 'recently-closed-window-link' } );
+        windowSpan = DOM('span', {className: 'recently-close-window-text'});
+        windowSpan.appendChild(
+            document.createTextNode(localStrings.getString('closedwindow')));
+        link.appendChild(windowSpan);
+        link.appendChild(linkSpan);
+        linkSpanContainer.appendChild(link);
+        container.appendChild(linkSpanContainer);
+        
+        // The card takes care of appending itself to the DOM, so no need to
+        // keep a reference to it.
+        new RecentlyClosedHoverCard(linkSpanContainer, entry);
+      }
+
+      link.onclick = function(sessionId) {
+        return function() {
+          chrome.send("metrics", ["NTP_TabRestored" + i]);
+          /* This is a hack because chrome.send is hardcoded to only
+             accept arrays of strings. */
+          chrome.send('reopenTab', [sessionId.toString()]);
+          return false;
+        }
+      }(entry.sessionId);
+    }
+  }
+
+  logEvent('renderRecentlyClosedTabs done');
+}
+
+/**
+ * Creates an item to go in the recent bookmarks or recently closed lists.
+ *
+ * @param {String} tagName Tagname for the DOM element to create.
+ * @param {Object} data Object with title, url, and direction to popuplate the element.
+ *
+ * @return {Node} The element containing the bookmark.
+ */
+function createRecentBookmark(tagName, data) {
+  var link = DOM(tagName, {className:'recent-bookmark', title:data.title});
+  if (tagName == 'a')
+    link.href = data.url;
+  link.style.backgroundImage = 'url("chrome-ui://favicon/' + data.url + '")';
+  /* Set the title's directionality independently of the page, see comment
+     about setting div_title.style.direction above for details.
+  */
+  link.style.direction = data.direction;
+  link.appendChild(document.createTextNode(data.title));
+  return link;
+}
+
+/**
+ * A hover card for windows in the recently closed list to show more details.
+ *
+ * @param {Node} target The element the hover card is for.
+ * @param {Object} data Object containing all the data for the card.
+ */
+function RecentlyClosedHoverCard(target, data) {
+  this.target_ = target;
+  this.data_ = data;
+  this.target_.onmouseover = bind(this.setShowTimeout_, this);
+  this.target_.onmouseout = bind(this.setHideTimeout_, this);
+}
+
+/** Timeout set when closing the card. */
+RecentlyClosedHoverCard.closeTimeout_;
+
+/** Timeout set when opening the card. */
+RecentlyClosedHoverCard.openTimeout_;
+
+/**
+ * Clears the timer for hiding the card.
+ */
+RecentlyClosedHoverCard.clearHideTimeout_ = function() {
+  clearTimeout(RecentlyClosedHoverCard.closeTimeout_);
+};
+
+/**
+ * Clears the timer for opening the card.
+ */
+RecentlyClosedHoverCard.clearOpenTimeout_ = function() {
+  clearTimeout(RecentlyClosedHoverCard.openTimeout_);
+};
+
+/**
+ * Creates and shows the card.
+ */
+RecentlyClosedHoverCard.prototype.show_ = function() {
+  if (!this.container_) {
+    this.container_ = DOM('div', {className: 'recent-window-hover-container'});
+    for (var i = 0; i < this.data_.tabs.length; i++) {
+      var tab = this.data_.tabs[i];
+      var item = createRecentBookmark('span', tab);
+      this.container_.appendChild(item);
+    }
+    this.target_.parentNode.insertBefore(this.container_,
+        this.target_.nextSibling);
+    this.container_.onmouseover = RecentlyClosedHoverCard.clearHideTimeout_;
+    this.container_.onmouseout = bind(this.setHideTimeout_, this);
+  }
+  this.container_.style.display = '';
+};
+
+/**
+ * Hides the card.
+ */
+RecentlyClosedHoverCard.prototype.hide_ = function() {
+  this.container_.style.display = 'none';
+};
+
+/**
+ * Clears any open timers and sets the open timer.
+ * If the card is already showing then we only need to clear
+ * the hide timer.
+ */
+RecentlyClosedHoverCard.prototype.setShowTimeout_ = function() {
+  if (this.container && this.container_.style.display != 'none') {
+    // If we're already showing the hovercard, make sure we don't hide it again
+    // onmouseover.
+    RecentlyClosedHoverCard.clearHideTimeout_();
+    return;
+  }
+
+  RecentlyClosedHoverCard.clearOpenTimeout_();
+  RecentlyClosedHoverCard.openTimeout_ = 
+      setTimeout(bind(this.show_, this), 200);
+};
+
+/**
+ * Clears the open timer and sets the close one.
+ */
+RecentlyClosedHoverCard.prototype.setHideTimeout_ = function() {
+  RecentlyClosedHoverCard.clearOpenTimeout_();
+  RecentlyClosedHoverCard.closeTimeout_ = 
+      setTimeout(bind(this.hide_, this), 200);
+};
+
+function viewLog() {
+  var lines = [];
+  var start = log[0][1];
+
+  for (var i = 0; i < log.length; i++) {
+    lines.push((log[i][1] - start) + ': ' + log[i][0]);
+  }
+
+  var lognode = document.createElement('pre');
+  lognode.appendChild(document.createTextNode(lines.join("\n")));
+  document.body.appendChild(lognode);
+}
+
+logEvent('end of second script block');
+
+localStrings = new LocalStrings($('l10n'));
+
+// We've got all the JS we need, render any unprocessed data.
+renderFunctionsDefined = true;
+processData();
+
+// In case renderMostVisitedItems doesn't come back quickly enough, begin
+// the first-run fade-in. If it has started or if this is not a first
+// run new tab, this will be a no-op.
+setTimeout(function(){document.getElementById('main').className = 'visible'},
+           1000);
+</script>
+</body>
+</html>
