@@ -1,0 +1,33 @@
+Chromium
+ ./chrome
+  chrome.exe built from open source chromium repository r10975
+    URL: http://src.chromium.org/svn/trunk/src
+    Repository Root: http://src.chromium.org/svn
+    Repository UUID: 4ff67af0-8c30-449e-8e8b-ad334ec8d88c
+    Revision: 10975
+    Last Changed Date: 2009-03-05 18:41:14 +1100 (Thu, 05 Mar 2009)
+    Last Changed Rev: 10975
+
+ ./include
+  chromium includes used to build chromium 10975, including the Debug
+  and Release versions of the compiler generated grit_derived_sources
+
+ ../../lib/{Release,Debug}
+  Debug/Release libraries generated when building chrome 10975, needed to
+  build the ChromeDriver.vcproj and ChromeSample.vcproj projects in Debug
+  and Release modes.
+
+Requirements
+  Microsoft Visual Studio 2005, Service Pack 1, with hotfixes, as well as
+  the Windows SDK 6.1, released February 2008, also known as the Windows
+  2008 SDK.  For exact details, follow the "Additional (free) downloads"
+  section, steps 1-3 at:
+
+    http://dev.chromium.org/developers/how-tos/build-instructions-windows
+
+Compilation
+  Open WebDriver.sln, build the ChromeSample project.  At a shell prompt,
+  change directory to chrome/src/cpp/{Debug,Release} (depending on the
+  mode used to build the project) and run ./ChromeSample.exe
+
+
