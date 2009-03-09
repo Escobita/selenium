@@ -35,7 +35,7 @@ script which varies the input, is often performed via a test program
 developed with Selenium-RC. 
 
 Finally, Selenium Core is another way of running tests. One can run test 
-scripts from a web-browser using the html interface TestRunner.html. This is 
+scripts from a web-browser using the HTML interface *TestRunner.html*. This is 
 the original method for running Selenium commands. It has limitations though.
 Similar to Selenium-IDE, it does not support iteration and data-driven 
 testing. 
@@ -49,8 +49,7 @@ tools with few still using Selenium-Core. At the time of writing (Feb 09) it
 is still available and may be convenient for some. However, the Selenium 
 community is encouraging the use Selenium-IDE and RC and discouraging the use 
 of Selenium-Core. Support for Selenium-Core is becoming less h available and 
-it may be deprecated in a future 
-release. 
+it may be deprecated in a future release. 
 
 .. Santiago: should this part about Selenium-Core be in the docs?? As I read 
    before, Selenium Core was in a deprecation rute. 
@@ -102,7 +101,7 @@ SeleniumHQ.org) lists all the available commands.
    the concept of a Selenium command 
 
 A **command** is what tells Selenium what to do. Selenium commands come in 
-three 'flavors': **Actions**, **Accessors** and **Assertions**. 
+three "flavors": **Actions**, **Accessors** and **Assertions**. 
 
 * **Actions** are commands that generally manipulate the state of the 
   application. They do things like "click this link" and "select that option". 

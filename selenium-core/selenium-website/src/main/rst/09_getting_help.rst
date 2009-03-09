@@ -50,7 +50,7 @@ Selenium Reference
 Experimenting - Things to Try
 -----------------------------
 
-.. Paul: Not sure if I need this—it’s here as a reminder to me to consider 
+.. Paul: Not sure if I need this it's here as a reminder to me to consider 
    this) 
 
 .. Santi: mmmm, I'm not sure if we can add something here.

@@ -121,7 +121,7 @@ Selenium commands to run tests on each item.
 .. Dave: I think an example would be a good idea here so that the reader can 
    immediately see the advantage of using Selenium-RC. Maybe some pseudo code.
 
-.. Santi: I think that the previous paragraf is really the example...
+.. Santi: I think that the previous paragraph is really the example...
    maybe we can make that example more simple.
 
 Selenium-RC supports the use of programming languages for test logic by 
@@ -182,7 +182,7 @@ Example Web-Site Test
   
 .. I'm not sure about this section. We already have some sample test scripts in
    both the IDE and RC sections. In addition, I'm not sure if the selenium
-   introduction is the right place to start putting some code.
+   introduction is the right place to start putting code.
 
 About this Book
 ---------------
