@@ -101,7 +101,7 @@ Locating Elements
 
 For many Selenium commands a target is required. This target identifies an 
 element in the content of the web application, and consists of the location 
-strategy followed by the location in the format locatorType=location. The 
+strategy followed by the location in the format ``locatorType=location``. The 
 locator type can be omitted and one of the default strategies will be used 
 depending on the initial characters of the location. The various locator 
 types are explained below with examples for each.
@@ -241,16 +241,16 @@ This is much less likely to change and can make your tests more robust.
 
 - xpath=/html/body/form[1] - *Absolute path (would break if the HTML was 
   changed only slightly)*
-- xpath=//form[1] - *First form element in the HTML.*
+- xpath=//form[1] - *First form element in the HTML*
 - xpath=//form[@id='loginForm'] - *The form element with @id of 'loginForm'*
-- xpath=//form[input/@name='username'] - *First form element with an input child
+- xpath=//form[input/\@name='username'] - *First form element with an input child
   element with @name of 'username'*
 - xpath=//input[@name='username'] - *First input element with @name of 
   'username'*
 - xpath=//form[@id='loginForm']/input[1] - *First input child element of the 
   form element with @id of 'loginForm'*
 - xpath=//input[@name='continue'][@type='button'] - *Input with @name 'continue'
-  and @type of button'*
+  and @type of 'button'*
 - xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the 
   form element with @id of 'loginForm'*
 
@@ -366,8 +366,16 @@ Locating by CSS
    look at writing this topic soon. This is the next topic that I'll be 
    working on.
 
-click vs clickAndWait 
----------------------
+The "AndWait" commands 
+----------------------
+The difference that any user should see between a command and it's *AndWait*
+alternative is that the regular command (e.g. *click*) will do the action and
+continue with the following command as fast as it can. While the *AndWait*
+alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
+load after the action has been done. 
+
+The *andWait* alternative is always used when an action causes the browser to
+navigate to another page or reload the present one. 
 
 verifyTextPresent
 -----------------

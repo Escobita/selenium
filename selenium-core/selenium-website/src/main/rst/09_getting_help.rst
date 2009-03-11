@@ -24,6 +24,8 @@ help.
    find that you didn't even put at least the effort of searching for the
    solution on your own.
 
+.. _`Official Forums`: http://clearspace.openqa.org/community/selenium
+
 Chat Room
 ---------
 
