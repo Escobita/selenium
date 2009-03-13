@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Selenium Basics &mdash; Selenium v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/selenium-favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Selenium v1.0 documentation" href="index.html" />
+    <link rel="next" title="Developing Scripts With Selenium-IDE" href="03_selenium_ide.html" />
+    <link rel="prev" title="Introducing Selenium" href="01_introducing_selenium.html" />
+    <script src="_static/code-snipplets.js" type="text/javascript"></script>
+     
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="03_selenium_ide.html" title="Developing Scripts With Selenium-IDE"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="01_introducing_selenium.html" title="Introducing Selenium"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://seleniumhq.org/">Project Homepage</a> &raquo;</li>
+    
+        <li><a href="index.html">Selenium v1.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="selenium-basics">
+<span id="chapter02-reference"></span><h1>Selenium Basics<a class="headerlink" href="#selenium-basics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-started-choosing-your-selenium-tool">
+<h2>Getting Started &#8211; Choosing Your Selenium Tool<a class="headerlink" href="#getting-started-choosing-your-selenium-tool" title="Permalink to this headline">¶</a></h2>
+<p>Most people get started with the Selenium-IDE. This is what we recommend. It
+is an easy way to get familiar with Selenium commands quickly. You can develop
+your first example script in just a few minutes. Selenium-IDE is also very easy
+to install. See the <a class="reference external" href="03_selenium_ide.html#chapter03-reference"><em>section on Selenium-IDE</em></a> for
+more:</p>
+<p>You may also run your scripts from the Selenium-IDE. The Selenium-IDE is very
+simple to use and is recommended for less-technical users. It can server as a
+way to develop scripts and run tests without the need for programming skills
+as required by Selenium -RC. The Sel-IDE can serve as an excellent way to
+train junior-level employees in test automation. If one has an understanding
+of how to conduct manual testing of a website they can easily transition to
+using the Selenium-IDE for both, running and developing tests.</p>
+<p>Some testing tasks are too complex though for the Selenium-IDE. When
+programming logic is required, then Selenium-RC must be used. For example,
+any tests requiring iteration, such as testing each element of a variable
+length list or table will require running the script from a programming
+language. Selenium-IDE does not support iteration. In addition, data-driven
+testing, allowing multiple tests by varying the data but using a single
+script which varies the input, is often performed via a test program
+developed with Selenium-RC.</p>
+<p>Finally, Selenium Core is another way of running tests. One can run test
+scripts from a web-browser using the HTML interface <em>TestRunner.html</em>. This is
+the original method for running Selenium commands. It has limitations though.
+Similar to Selenium-IDE, it does not support iteration and data-driven
+testing.</p>
+<p>It also cannot switch between http and https protocols. Since the
+development of Selenium-IDE and Selenium-RC, more and more are using these
+tools with few still using Selenium-Core. At the time of writing (Feb 09) it
+is still available and may be convenient for some. However, the Selenium
+community is encouraging the use Selenium-IDE and RC and discouraging the use
+of Selenium-Core. Support for Selenium-Core is becoming less h available and
+it may be deprecated in a future release.</p>
+</div>
+<div class="section" id="introducing-selenium-commands">
+<h2>Introducing Selenium Commands<a class="headerlink" href="#introducing-selenium-commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="script-syntax">
+<h3>Script Syntax<a class="headerlink" href="#script-syntax" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="selenium-commands-selenese">
+<h3>Selenium Commands &#8211; Selenese<a class="headerlink" href="#selenium-commands-selenese" title="Permalink to this headline">¶</a></h3>
+<p>Selenium provides a rich set of commands for fully testing your web-app
+in virtually any way you may imagine. This command set is often called
+selenese. These commands essentially create a testing language.</p>
+<p>In selenese, certainly, one can test the existence of UI elements, based
+on their HTML tags, can test for specific content, can test for broken links,
+input fields, selection list, submitting forms, and table data. In addition
+Selenium commands support testing of window size (is true? must check the
+reference), mouse position, alerts, Ajax functionality, pop up windows, event
+handling, and many other features. The Command Reference (available at
+SeleniumHQ.org) lists all the available commands.</p>
+<p>A <strong>command</strong> is what tells Selenium what to do. Selenium commands come in
+three &#8220;flavors&#8221;: <strong>Actions</strong>, <strong>Accessors</strong> and <strong>Assertions</strong>.</p>
+<ul>
+<li><p class="first"><strong>Actions</strong> are commands that generally manipulate the state of the
+application. They do things like &#8220;click this link&#8221; and &#8220;select that option&#8221;.
+If an Action fails, or has an error, the execution of the current test is
+stopped.</p>
+<p>Many Actions can be called with the &#8220;AndWait&#8221; suffix, e.g. &#8220;clickAndWait&#8221;.
+This suffix tells Selenium that the action will cause the browser to make a
+call to the server, and that Selenium should wait for a new page to load.</p>
+</li>
+<li><p class="first"><strong>Accessors</strong> examine the state of the application and store the results in
+variables, e.g. &#8220;storeTitle&#8221;. They are also used to automatically generate
+Assertions.</p>
+</li>
+<li><p class="first"><strong>Assertions</strong> are like Accessors, but they verify that the state of the
+application conforms to what is expected. Examples include &#8220;make sure the
+page title is X&#8221; and &#8220;verify that this checkbox is checked&#8221;.</p>
+<p>All Selenium Assertions can be used in 3 modes: &#8220;assert&#8221;, &#8220;verify&#8221;, and &#8221;
+waitFor&#8221;. For example, you can &#8220;assertText&#8221;, &#8220;verifyText&#8221; and &#8220;waitForText&#8221;.
+When an &#8220;assert&#8221; fails, the test is aborted. When a &#8220;verify&#8221; fails, the test
+will continue execution, logging the failure. This allows a single &#8220;assert&#8221;
+to ensure that the application is on the correct page, followed by a bunch of
+&#8220;verify&#8221; assertions to test form field values, labels, etc.</p>
+<p>&#8220;waitFor&#8221; commands wait for some condition to become true (which can be
+useful for testing Ajax applications). They will succeed immediately if the
+condition is already true. However, they will fail and halt the test if the
+condition does not become true within the current timeout setting (see the
+setTimeout action below).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>Script Syntax<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Selenium commands are simple, they consist of the command and two parameters.
+For example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="42%" />
+<col width="19%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>verifyText</td>
+<td>//div//a[2]</td>
+<td>Login</td>
+</tr>
+</tbody>
+</table>
+<p>The parameters are not always required. It depends on the command. In some
+cases both are required, in others one parameter is required, and still in
+others the command may take no parameters at all. Here are a couple more
+examples:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="22%" />
+<col width="45%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>goBackAndWait</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>verifyTextPresent</td>
+<td>&nbsp;</td>
+<td>Welcome to My Home Page</td>
+</tr>
+<tr><td>type</td>
+<td>id=phone</td>
+<td>(555) 666-7066</td>
+</tr>
+<tr><td>type</td>
+<td>id=address1</td>
+<td>${myVariableAddress}</td>
+</tr>
+</tbody>
+</table>
+<p>The command reference describes the parameter requirements for each command.</p>
+<p>The parameters vary, however they are typically</p>
+<ul class="simple">
+<li>a <em>locator</em> for identifying a UI element within a page.</li>
+<li>a <em>text pattern</em> for verifying or asserting expected page content</li>
+<li>a <em>text pattern</em> or a selenium variable for entering text in an input field
+or for selecting an option from an option list.</li>
+</ul>
+<p>Here, we are simply providing an introduction to Selenium Basics including
+the basic features of Selenium scripts. Locators, text patterns, and
+selenium variables are described in considerable detail in the section on
+Selenium Commands.</p>
+<p>Selenium scripts developed in the Selenium-IDE may be stored in an HTML text
+file. The format uses an HTML table where a row represents a complete
+command and the three column entries represent the command and it&#8217;s parameters.
+An empty column entry indicates that parameter is not used by the command.
+For instance:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td&gt;</span>verifyText<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>//div//a[2]<span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;</span>Login<span class="nt">&lt;/td&gt;</span>
+<span class="nt">&lt;/tr&gt;</span>
+</pre></div>
+</div>
+<p>The simple Selenese HTML syntax can be used to write tests without knowledge
+of a programming language, and can also be produced by Selenium-IDE. With a
+knowledge of the syntax and Selenium-IDE you can quickly produce and
+customize your testcases.</p>
+<p>The format consists of an HTML table with three columns. The first column is
+used to identify the Selenium command, the second is a target and the final
+column contains a value. The second and third columns may not require values
+depending on the chosen Selenium command, but they should be present. Each
+table row represents a new Selenium command. Here is an example of a test
+that opens a page, asserts the page title and then verifies some content on
+the page:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;table&gt;</span>
+    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>open<span class="nt">&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;</span>/download/<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>assertTitle<span class="nt">&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;</span>Downloads<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>verifyText<span class="nt">&lt;/td&gt;&lt;td&gt;</span>//h2<span class="nt">&lt;/td&gt;&lt;td&gt;</span>Downloads<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</pre></div>
+</div>
+<p>Rendered as a table in a browser this would look like the following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="16%" />
+<col width="40%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>open</td>
+<td>&nbsp;</td>
+<td>/download/</td>
+</tr>
+<tr><td>assertTitle</td>
+<td>&nbsp;</td>
+<td>Downloads</td>
+</tr>
+<tr><td>verifyText</td>
+<td>//h2</td>
+<td>Downloads</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="test-suites">
+<h2>Test Suites<a class="headerlink" href="#test-suites" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="commonly-used-selenium-commands">
+<h2>Commonly Used Selenium Commands<a class="headerlink" href="#commonly-used-selenium-commands" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+    <div align="center">
+    <p class="logo"><a href="index.html">
+    <img class="logo" src="_static/big-logo.png" alt="Logo"/>
+    <h2>SeleniumHQ Documentation</h2>
+  </a></p>
+    </div>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Selenium Basics</a><ul>
+<li><a class="reference external" href="#getting-started-choosing-your-selenium-tool">Getting Started &#8211; Choosing Your Selenium Tool</a></li>
+<li><a class="reference external" href="#introducing-selenium-commands">Introducing Selenium Commands</a><ul>
+<li><a class="reference external" href="#script-syntax">Script Syntax</a></li>
+<li><a class="reference external" href="#selenium-commands-selenese">Selenium Commands &#8211; Selenese</a></li>
+<li><a class="reference external" href="#id1">Script Syntax</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#test-suites">Test Suites</a></li>
+<li><a class="reference external" href="#commonly-used-selenium-commands">Commonly Used Selenium Commands</a></li>
+<li><a class="reference external" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="01_introducing_selenium.html" title="previous chapter">Introducing Selenium</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="03_selenium_ide.html" title="next chapter"> Developing Scripts With Selenium-IDE</a></p>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="03_selenium_ide.html" title="Developing Scripts With Selenium-IDE"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="01_introducing_selenium.html" title="Introducing Selenium"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://seleniumhq.org/">Project Homepage</a> &raquo;</li>
+    
+        <li><a href="index.html">Selenium v1.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Dave Hunt,
+                    Paul Grandgean,
+                    Santiago Suarez Ordoñez,
+                    Tarun Kumar.
+      Last updated on Mar 13, 2009.
+    </div>
+  </body>
+</html>

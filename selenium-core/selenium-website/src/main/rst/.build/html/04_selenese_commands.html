@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&#8220;Selenese&#8221; Selenium Commands &mdash; Selenium v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/selenium-favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Selenium v1.0 documentation" href="index.html" />
+    <link rel="next" title="Selenium-RC" href="05_selenium_rc.html" />
+    <link rel="prev" title="Developing Scripts With Selenium-IDE" href="03_selenium_ide.html" />
+    <script src="_static/code-snipplets.js" type="text/javascript"></script>
+     
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="05_selenium_rc.html" title="Selenium-RC"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="03_selenium_ide.html" title="Developing Scripts With Selenium-IDE"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://seleniumhq.org/">Project Homepage</a> &raquo;</li>
+    
+        <li><a href="index.html">Selenium v1.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="selenese-selenium-commands">
+<span id="chapter04-reference"></span><h1>&#8220;Selenese&#8221; Selenium Commands<a class="headerlink" href="#selenese-selenium-commands" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-choose-a-selenium-command">
+<h2>How to Choose a Selenium Command<a class="headerlink" href="#how-to-choose-a-selenium-command" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="what-to-test">
+<h2>What to Test?<a class="headerlink" href="#what-to-test" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="assertion-or-verification">
+<h2>Assertion or Verification?<a class="headerlink" href="#assertion-or-verification" title="Permalink to this headline">¶</a></h2>
+<p>Choosing between <strong>assert</strong> and <strong>verify</strong> comes down to convenience and
+management of failures. There&#8217;s very little point checking that the first
+paragraph on the page is the correct if your test has already failed when
+checking that the browser is displaying the expected page. If you&#8217;re not on
+the correct page you&#8217;ll probably want to abort your test case so that you can
+investigate the cause and fix the issue(s) promptly. On the other hand, you
+may want to check many attributes of a page without aborting the test case on
+the first failure as this will allow you to review all failures on the page
+and take the appopriate action. Effectively an <strong>assert</strong> will fail the test
+and abort the current test case, whereas a <strong>verify</strong> will fail the test and
+continue to run the testcase.</p>
+<p>The best use of this feature is to logically group your test commands, and
+start each group with an <strong>assert</strong> followed by one or more <strong>verify</strong> test
+commands. An example follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="17%" />
+<col width="41%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>open</td>
+<td>&nbsp;</td>
+<td>/download/</td>
+</tr>
+<tr><td>assertTitle</td>
+<td>&nbsp;</td>
+<td>Downloads</td>
+</tr>
+<tr><td>verifyText</td>
+<td>//h2</td>
+<td>Downloads</td>
+</tr>
+<tr><td>assertTable</td>
+<td>1.2.1</td>
+<td>Selenium IDE</td>
+</tr>
+<tr><td>verifyTable</td>
+<td>1.2.2</td>
+<td>June 3, 2008</td>
+</tr>
+<tr><td>verifyTable</td>
+<td>1.2.3</td>
+<td>1.0 beta 2</td>
+</tr>
+</tbody>
+</table>
+<p>The above example first opens a page and then <strong>asserts</strong> that the correct page
+is loaded by comparing the title with the expected value, only if this passes
+will the following command run and <strong>verify</strong> that the text is present in the
+expected location. The test case then <strong>asserts</strong> the first column in the second
+row of the first table meets the expected value, and only if this passed with
+the remaining cells in that row be <strong>verified</strong>.</p>
+</div>
+<div class="section" id="locating-elements">
+<h2>Locating Elements<a class="headerlink" href="#locating-elements" title="Permalink to this headline">¶</a></h2>
+<p>For many Selenium commands a target is required. This target identifies an
+element in the content of the web application, and consists of the location
+strategy followed by the location in the format <tt class="docutils literal"><span class="pre">locatorType=location</span></tt>. The
+locator type can be omitted and one of the default strategies will be used
+depending on the initial characters of the location. The various locator
+types are explained below with examples for each.</p>
+<div class="section" id="locating-by-identifier">
+<h3>Locating by identifier<a class="headerlink" href="#locating-by-identifier" title="Permalink to this headline">¶</a></h3>
+<p>This is probably the most common method of locating elements and is the catch-
+all default when no recognised locator type is used. With this strategy the
+element with the &#64;id attribute value matching the location will found. If no
+element has a matching &#64;id attribute then the first element with a &#64;name
+attribute matching the location will be found.</p>
+<ul class="simple">
+<li>identifier=loginForm</li>
+<li>identifier=username</li>
+<li>identifier=continue</li>
+</ul>
+<p>For instance, your page source could have identifier (ID) and name attributes
+as follows:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;loginForm&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;Continue&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+ <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locating-by-id">
+<h3>Locating by id<a class="headerlink" href="#locating-by-id" title="Permalink to this headline">¶</a></h3>
+<p>More limited than the identifier locator type but also more explicit. Use
+this when you know an element&#8217;s &#64;id attribute.</p>
+<ul class="simple">
+<li>id=loginForm</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;loginForm&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;Continue&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+ <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locating-by-name">
+<h3>Locating by name<a class="headerlink" href="#locating-by-name" title="Permalink to this headline">¶</a></h3>
+<p>Similar to the identifier locator type when an &#64;id attribute is not found,
+the name locator type will locate the first element with a matching &#64;name
+attribute. If multiple elements have the same value for a name attribute then
+you can use filters to further refine your location strategy. The default
+filter type is value (matching the &#64;value attribute).</p>
+<ul class="simple">
+<li>name=username</li>
+<li>name=continue</li>
+<li>name=continue Continue</li>
+<li>name=continue value=Continue</li>
+<li>name=continue type=button</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;loginForm&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;Continue&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locating-by-xpath">
+<h3>Locating by XPath<a class="headerlink" href="#locating-by-xpath" title="Permalink to this headline">¶</a></h3>
+<p>XPath is the language used for locating nodes in an XML document. As HTML can
+be an implementation of XML (XHTML) Selenium users can leverage this powerful
+language to target elements in their web applications. XPath extends beyond (
+as well as supporting) the simple methods of locating by &#64;id or &#64;name
+attributes, and opens up all sorts of new possibilities such as locating the
+third checkbox on the page or similar.</p>
+<p>One of the main reasons for using XPath is when you don&#8217;t have a suitable &#64;id
+or &#64;name attribute for the element you wish to locate. You can use XPath to
+either locate the element in absolute terms (not advised), or relative to an
+element that does have an &#64;id or &#64;name attribute.</p>
+<p>Absolute XPaths contain the location of all elements from the root (html) and
+as a result are likely to fail with only the slightest adjustment to the
+application. By finding a nearby element with an &#64;id or &#64;name attribute (ideally
+a parent element) you can locate your target element based on the relationship.
+This is much less likely to change and can make your tests more robust.</p>
+<ul class="simple">
+<li>xpath=/html/body/form[1] - <em>Absolute path (would break if the HTML was
+changed only slightly)</em></li>
+<li>xpath=//form[1] - <em>First form element in the HTML</em></li>
+<li>xpath=//form[&#64;id=&#8217;loginForm&#8217;] - <em>The form element with &#64;id of &#8216;loginForm&#8217;</em></li>
+<li>xpath=//form[input/&#64;name=&#8217;username&#8217;] - <em>First form element with an input child
+element with &#64;name of &#8216;username&#8217;</em></li>
+<li>xpath=//input[&#64;name=&#8217;username&#8217;] - <em>First input element with &#64;name of
+&#8216;username&#8217;</em></li>
+<li>xpath=//form[&#64;id=&#8217;loginForm&#8217;]/input[1] - <em>First input child element of the
+form element with &#64;id of &#8216;loginForm&#8217;</em></li>
+<li>xpath=//input[&#64;name=&#8217;continue&#8217;][&#64;type=&#8217;button&#8217;] - <em>Input with &#64;name &#8216;continue&#8217;
+and &#64;type of &#8216;button&#8217;</em></li>
+<li>xpath=//form[&#64;id=&#8217;loginForm&#8217;]/input[4] - <em>Fourth input child element of the
+form element with &#64;id of &#8216;loginForm&#8217;</em></li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;loginForm&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;Continue&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+<p>These examples cover some basics, but in order to really take advantage the
+following references are recommended:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.w3schools.com/Xpath/">W3Schools XPath Tutorial</a></li>
+<li><a class="reference external" href="http://www.w3.org/TR/xpath">W3C XPath Recommendation</a></li>
+<li><a class="reference external" href="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">XPath Tutorial</a>
+- with interactive examples.</li>
+</ul>
+<p>There are also a couple of very useful Firefox Add-ons that can assist in
+discovering the XPath of an element:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://addons.mozilla.org/en-US/firefox/addon/1095?id=1095">XPath Checker</a> - suggests
+XPath and can be used to test XPath results.</li>
+<li><a class="reference external" href="https://addons.mozilla.org/en-US/firefox/addon/1843">Firebug</a> - very
+useful, XPath suggestions are just one of the many powerful features of
+this add-on.</li>
+</ul>
+</div>
+<div class="section" id="locating-hyperlinks-by-link-text">
+<h3>Locating hyperlinks by link text<a class="headerlink" href="#locating-hyperlinks-by-link-text" title="Permalink to this headline">¶</a></h3>
+<p>This is a simple method of locating a hyperlink in your web page by using the
+text of the link. If two links with the same text are present then the first
+match will be used.</p>
+<ul class="simple">
+<li>link=Continue</li>
+<li>link=Cancel</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Are you sure you want to do this?<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;continue.html&quot;</span><span class="nt">&gt;</span>Continue<span class="nt">&lt;/a&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;cancel.html&quot;</span><span class="nt">&gt;</span>Cancel<span class="nt">&lt;/a&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locating-by-dom">
+<h3>Locating by DOM<a class="headerlink" href="#locating-by-dom" title="Permalink to this headline">¶</a></h3>
+<p>The Document Object Model represents a HTML document and can be accessed
+using JavaScript. This location strategy takes JavaScript that evaluates to
+an element on the page, which can be simply the element&#8217;s location using the
+hierarchical dotted notation.</p>
+<ul class="simple">
+<li>dom=document.getElementById(&#8216;loginForm&#8217;)</li>
+<li>dom=document.forms[&#8216;loginForm&#8217;]</li>
+<li>dom=document.forms[0]</li>
+<li>dom=document.forms[0].username</li>
+<li>dom=document.forms[0].elements[&#8216;username&#8217;]</li>
+<li>dom=document.forms[0].elements[0]</li>
+<li>dom=document.forms[0].elements[3]</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;loginForm&quot;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;continue&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;Continue&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+</pre></div>
+</div>
+<p>You can use Selenium itself as well as other sites and extensions to explore
+the DOM of your web application. A good reference exists on <a class="reference external" href="http://www.w3schools.com/HTMLDOM/dom_reference.asp">W3Schools</a>.</p>
+</div>
+<div class="section" id="locating-by-css">
+<h3>Locating by CSS<a class="headerlink" href="#locating-by-css" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="the-andwait-commands">
+<h2>The &#8220;AndWait&#8221; commands<a class="headerlink" href="#the-andwait-commands" title="Permalink to this headline">¶</a></h2>
+<p>The difference that any user should see between a command and it&#8217;s <em>AndWait</em>
+alternative is that the regular command (e.g. <em>click</em>) will do the action and
+continue with the following command as fast as it can. While the <em>AndWait</em>
+alternative (e.g. <em>clickAndWait</em>) tells Selenium to <strong>wait</strong> for the page to
+load after the action has been done.</p>
+<p>The <em>andWait</em> alternative is always used when an action causes the browser to
+navigate to another page or reload the present one.</p>
+</div>
+<div class="section" id="verifytextpresent">
+<h2>verifyTextPresent<a class="headerlink" href="#verifytextpresent" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="verifyelementpresent">
+<h2>verifyElementPresent<a class="headerlink" href="#verifyelementpresent" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="verifytext">
+<h2>verifyText<a class="headerlink" href="#verifytext" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="store">
+<h2>store<a class="headerlink" href="#store" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="storetext">
+<h2>storeText<a class="headerlink" href="#storetext" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="storeelementpresent">
+<h2>storeElementPresent<a class="headerlink" href="#storeelementpresent" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="storeeval">
+<h2>storeEval<a class="headerlink" href="#storeeval" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="javascript-expression-as-a-parameter">
+<h2>Javascript Expression as a Parameter<a class="headerlink" href="#javascript-expression-as-a-parameter" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="alerts-popups-and-multiple-windows">
+<h2>Alerts, Popups, and Multiple Windows<a class="headerlink" href="#alerts-popups-and-multiple-windows" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="ajax-and-waitfor-commands">
+<h2>AJAX and waitFor commands<a class="headerlink" href="#ajax-and-waitfor-commands" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="sequence-of-evaluation">
+<h2>Sequence of Evaluation<a class="headerlink" href="#sequence-of-evaluation" title="Permalink to this headline">¶</a></h2>
+<p>In what order does Selenium process each of these parameter components?</p>
+</div>
+<div class="section" id="example-test-script">
+<h2>Example Test Script<a class="headerlink" href="#example-test-script" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+    <div align="center">
+    <p class="logo"><a href="index.html">
+    <img class="logo" src="_static/big-logo.png" alt="Logo"/>
+    <h2>SeleniumHQ Documentation</h2>
+  </a></p>
+    </div>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">&#8220;Selenese&#8221; Selenium Commands</a><ul>
+<li><a class="reference external" href="#how-to-choose-a-selenium-command">How to Choose a Selenium Command</a></li>
+<li><a class="reference external" href="#what-to-test">What to Test?</a></li>
+<li><a class="reference external" href="#assertion-or-verification">Assertion or Verification?</a></li>
+<li><a class="reference external" href="#locating-elements">Locating Elements</a><ul>
+<li><a class="reference external" href="#locating-by-identifier">Locating by identifier</a></li>
+<li><a class="reference external" href="#locating-by-id">Locating by id</a></li>
+<li><a class="reference external" href="#locating-by-name">Locating by name</a></li>
+<li><a class="reference external" href="#locating-by-xpath">Locating by XPath</a></li>
+<li><a class="reference external" href="#locating-hyperlinks-by-link-text">Locating hyperlinks by link text</a></li>
+<li><a class="reference external" href="#locating-by-dom">Locating by DOM</a></li>
+<li><a class="reference external" href="#locating-by-css">Locating by CSS</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#the-andwait-commands">The &#8220;AndWait&#8221; commands</a></li>
+<li><a class="reference external" href="#verifytextpresent">verifyTextPresent</a></li>
+<li><a class="reference external" href="#verifyelementpresent">verifyElementPresent</a></li>
+<li><a class="reference external" href="#verifytext">verifyText</a></li>
+<li><a class="reference external" href="#store">store</a></li>
+<li><a class="reference external" href="#storetext">storeText</a></li>
+<li><a class="reference external" href="#storeelementpresent">storeElementPresent</a></li>
+<li><a class="reference external" href="#storeeval">storeEval</a></li>
+<li><a class="reference external" href="#javascript-expression-as-a-parameter">Javascript Expression as a Parameter</a></li>
+<li><a class="reference external" href="#alerts-popups-and-multiple-windows">Alerts, Popups, and Multiple Windows</a></li>
+<li><a class="reference external" href="#ajax-and-waitfor-commands">AJAX and waitFor commands</a></li>
+<li><a class="reference external" href="#sequence-of-evaluation">Sequence of Evaluation</a></li>
+<li><a class="reference external" href="#example-test-script">Example Test Script</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="03_selenium_ide.html" title="previous chapter"> Developing Scripts With Selenium-IDE</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="05_selenium_rc.html" title="next chapter"> Selenium-RC</a></p>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="05_selenium_rc.html" title="Selenium-RC"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="03_selenium_ide.html" title="Developing Scripts With Selenium-IDE"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://seleniumhq.org/">Project Homepage</a> &raquo;</li>
+    
+        <li><a href="index.html">Selenium v1.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Dave Hunt,
+                    Paul Grandgean,
+                    Santiago Suarez Ordoñez,
+                    Tarun Kumar.
+      Last updated on Mar 13, 2009.
+    </div>
+  </body>
+</html>

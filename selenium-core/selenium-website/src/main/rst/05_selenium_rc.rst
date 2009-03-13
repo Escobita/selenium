@@ -205,6 +205,9 @@ desktop and just double-click on it anytime you want to wake up the server.
 Java client installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. Santi: I found this link and thought it could be useful:
+   http://epyramid.wordpress.com/2008/11/26/setting-up-selenium-rc-testng-using-eclipse/
+
 In General configuration of Selenium-RC with any java IDE would have following 
 steps:
 
@@ -233,7 +236,7 @@ Configuring Selenium-RC With Eclipse
 **Eclipse** is a multi-language software development platform comprising an IDE 
 and a plug-in system to extend it. It is written primarily in Java and is used 
 to develop applications in this language and, by means of the various plug-ins, 
-in other languages as well — C/C++, Cobol, Python, Perl, PHP and more.
+in other languages as well as C/C++, Cobol, Python, Perl, PHP and more.
 
 This document describes configuration of Selenium-RC with Eclipse - 
 Version: 3.3.0. (Europa Release). It should not be too different for higher 
@@ -250,7 +253,7 @@ versions of Eclipse
 .. image:: images/chapt5_img04_Create_Java_Project.png
    :align: center
 
-* Provide Name to your project, Select JDK in ‘Use a project Specific JRE option (JDK 1.5
+* Provide Name to your project, Select JDK in 'Use a project Specific JRE' option (JDK 1.5
   selected in this example) > click Next 
 
 .. image:: images/chapt5_img05_Create_Java_Project.png
