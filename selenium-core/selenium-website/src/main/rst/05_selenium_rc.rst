@@ -1285,6 +1285,12 @@ This issue has it's own section. Please go here_ for more information.
 
 .. _here: `Howto correctly use your Verify commands in Selenium-RC`_
 
+Safari and multiWindow mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. Santi: we will have to explain the following:
+   http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
+   http://jira.openqa.org/browse/SEL-639
+
 Firefox and Linux 
 ~~~~~~~~~~~~~~~~~
 
