@@ -32,6 +32,30 @@
 					</connectors>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<executions>
+					<execution>
+						<id>run-local-files</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+							    <mkdir dir="target/selenium-website-1.0-SNAPSHOT/new_docs"/>
+                                <exec executable="sphinx-build">
+                                    <arg value="-b"/>
+                                    <arg value="html"/>
+                                    <arg value="src/main/rst"/>
+                                    <arg value="target/selenium-website-1.0-SNAPSHOT/new_docs"/>
+                                </exec>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+		    </plugin>
 		</plugins>
 	</build>
 	<profiles>
