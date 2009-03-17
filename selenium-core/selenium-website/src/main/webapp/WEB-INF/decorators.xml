@@ -1,4 +1,7 @@
 <decorators defaultdir="/">
+    <excludes>
+        <pattern>/new_docs/*</pattern>
+    </excludes>
     <decorator name="main" page="main-decorator.jsp">
        <pattern>/*</pattern>
     </decorator>
