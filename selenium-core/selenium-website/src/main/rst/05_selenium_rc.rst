@@ -9,51 +9,50 @@
 When to Use Selenium-RC?
 ------------------------
 
-Selenium-RC is the response for tests that need a little more that just simple
-browser actions and a linear excecution. Selenium-RC allows the users to use
-the full power of programming languages, allowing the users to create tests
-that can read and write external files, make queries to a Data Base, send emails
-with the tests report, practically anything that a user can do with a common 
-application.
+Selenium-RC is the response for tests that need a little more than just simple
+browser actions and a linear execution. Selenium-RC allows the users to use the 
+full power of programming languages, creating tests that can do things like read
+and write external files, make queries to a Data Base, send emails with test 
+reports, practically anything a user can do with a normal application.
 
 You can see some examples of this in the `Sample Test Scripts`_ section, where
 we will explain how to develop complex tests and leverage the power of a real
-programming language in them.
+programming language on them.
 
-.. TODO: The content of Sameple test scripts section is not what is described
+.. TODO: The content of sample test scripts section is not what is described
    here. For now I'm just explaining simple code on them.
    I'll try to add a last subsection like "Adding spice to your tests".
 
 Basically, you will need to use Selenium-RC whenever your test requires logic
 not supported by running a script from Selenium-IDE. What sort of logic could 
-this be?  For example, Selenium-IDE does not directly support:
+this be? For example, Selenium-IDE does not directly support:
 
-* condition statements 
+* conditional statements 
 * iteration 
 * logging and reporting of test results
-* error handling, particularly of unexpected errors
+* error handling, particularly unexpected errors
 * database testing
 * test case grouping
-* rerun the failed tests
+* re execution of failed tests
 * test case dependency
-* capture screen shots on test failures
+* capture screenshots on test failures
 
-Though few of these are not supported by selenium inherently but can be achieved
+Though most of these are not supported by selenium inherently but can be achieved
 by using language specific libraries. These would be explained in details in the
 `Sample Test Scripts`_ section. 
 
 .. Santi: I'm not sure if we'll be able to explain EVERY pont of these on that 
-   section, some of them even have a separate section.
+   section, some of them may even have a separate section.
 
-It may be possible to add this functionality by adding a custom built user
-extension to Selenium-IDE but most prefer to use Selenium-RC to gain the full
-flexibility of a programming language.
+.. note:: It may be possible to add this functionality by the addition of user 
+   extensions to Selenium-IDE but most prefer to use Selenium-RC to gain all the
+   flexibility of a programming language.
 
 Architecture Diagram
 --------------------
 
 .. Paul: I initiated a couple of forum posts that can shed some light here. 
-   Some of the content in those posts can server as descriptive info for us.
+   Some of the content in those posts can serve as descriptive info for us.
    This comment is a reminder for me to get that info off OpenQA.
 
 Selenium-RC comes in two parts:
@@ -63,7 +62,8 @@ Selenium-RC comes in two parts:
 
 * A server which automatically launches and kills browsers, and acts as a HTTP
   proxy for web requests from them. 
-* Client libraries for your favorite programming language. 
+* Client libraries for your favorite programming language, which communicate 
+  with the server telling him what's next.
 
 The RC server bundles Selenium Core, and automatically injects it into the 
 browser withing the Application Under Test.
@@ -77,7 +77,6 @@ browser withing the Application Under Test.
 
 .. Santi: Yes, from what I know that's right Paul.
 
-
 Here is a simplified architectural representation.... 
 
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
@@ -90,19 +89,26 @@ Here is a simplified architectural representation....
    b) Why is 'linux, Windows, Mac" listed just at the top, I don't think the OS
    is relevant to the diagram but the AUT really is. 
       Tarun: I guess it is to emphasize that tests could be run on multiple 
-	  platforms
+      platforms
    c)  I'd like to see some diagrams that include the messages going between 
    the components. That will add a lot of understanding for people. Is that 
    something we can do? If we don't have the info I'm sure we can get it from 
    the other gurus (notice I said 'other gurus' ;-) )
       Santi: I think we will have to re-do this diagram, I have in mind 
-	  something that has the same content and the next diagram but with some 
-	  corrections (the AUT passes through the proxy also) and with the pretty 
-	  logos
+      something that has the same content than the next diagram but with some 
+      corrections (the AUT passes through the proxy also) and with the pretty 
+      logos
 
-.. Paul: Um, I just wrote that comment, and then saw your 2nd diagram. Looks 
-   like the 2nd diagram may address some of my questions. I'll have to 
-   reconcile my questions against that one, also.
+As you can see on the illustration, the client libraries communicate with the
+Server directly (using port 4444 by default) passing one by one the actions to 
+execute. Then the server passes this actions to the browser by injecting 
+Selenium-Core javascript commands as if they where part of the Application Under
+Test, which causes the browser to execute those actions.
+
+.. Santi: I changed the image a little and added the last paragraph, please let
+   me know if you think this is still confusing of the content is incorrect.
+   I also added the source xcf file in case you want to make changes to the 
+   image.
 
 How Selenium Remote Control works 
 ----------------------------------

@@ -21,18 +21,19 @@ help.
 
 .. note:: Please make sure to look in the forums before asking for something.
    It's very frustrating for the people that's reading and helping others to
-   find that you didn't even put at least the effort of searching for the
-   solution on your own.
+   find that you didn't even put the effort of searching for the solution on
+   your own.
 
 .. _`Official Forums`: http://clearspace.openqa.org/community/selenium
 
 Chat Room
 ---------
 
-Though the best place to ask for help are the forums (because they also keep
-the information accessible for others to read it in the future). If you have a
-very important (or too simple) issue that needs a solution ASAP, you can always
-enter to the IRC chat room. You will find us on #selenium at Freenode.
+Though the best place to ask for help are the forums (because they also keep the
+information accessible for others to read it in the future). If you have a very
+important (or too simple) issue that needs a solution ASAP, you can always enter
+to the IRC chat room. You will always find someone ready to help on #selenium at
+Freenode.
 
 OpenQA 
 ------
@@ -42,7 +43,8 @@ OpenQA
 Jira
 ----
 
-.. Santi: It's good to explain people how to post bugs of the application...
+.. Santi: I think it's good to explain people how to post bugs of the 
+   application...
 
 Selenium Reference 
 ------------------

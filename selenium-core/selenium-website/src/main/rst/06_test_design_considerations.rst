@@ -1,5 +1,9 @@
 .. _chapter06-reference:
 
+.. Santi: I'm not sure about this whole chapter. I looks like most of the content
+   should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 
+   can merge both chapters, it'd keep advanced topics where anyone will expect.
+
 Test Design Considerations
 ==========================
 
@@ -133,6 +137,9 @@ UI Mapping with Selenium
    also very well integrated with selenium IDE.
    Dave: I'd like to look into writing some documentation here.
 
+.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
+   placed on?
+
 Bitmap Comparison
 ------------------
 
@@ -151,6 +158,9 @@ Bitmap Comparison
 
    But I've never implemented this before...
 
+.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
+   placed on?
+
 
 Recovery From Failure
 ---------------------
@@ -159,6 +169,9 @@ Recovery From Failure
    something unexpected i.e. pop up window or unexpected page etc, I guess 
    for selenium this largely depends on how tests are designed. Say in case 
    of java Try Catch Block might help achieving this.
+
+.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
+   placed on?
 
 Types of Tests 
 --------------

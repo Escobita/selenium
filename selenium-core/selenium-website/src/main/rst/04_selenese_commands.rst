@@ -44,9 +44,9 @@ What to Test?
 
 .. Paul: Yes, all of that.  but also, the user must keep in mind what their 
    test goal is.  What IS it that they REALLY need to check.  I can give a 
-   good example from my current experience.....We check page rendering and 
-   for broken links, I call these our "UI Tests".   Then we're building "
-   smoke tests" for basic functionality that follow the common user scenarios.
+   good example from my current experience.....We check page rendering and for
+   broken links, I call these our "UI Tests".   Then we're building "smoke
+   tests" for basic functionality that follow the common user scenarios.
    For our UI Tests, our web-designers frequently (with a capital F) change 
    content.  Mostly for testing page rendering I test for structure rather 
    than content.  But 'stable content' such as the corporate content info, 
@@ -55,6 +55,10 @@ What to Test?
    for the company image.  We can include these kinds of decisions-tradeoffs 
    in this section.
 
+.. Santi: this seems more like a guide for automation testing more than a 
+   selenium sepeific topic. I like the idea and I think most of the people will
+   reach selenium withou having this clear, but maybe we should leave this kind
+   of topics for last, when all the essential Selenium specifics are covered.
 
 Assertion or Verification? 
 --------------------------
@@ -103,16 +107,21 @@ For many Selenium commands a target is required. This target identifies an
 element in the content of the web application, and consists of the location 
 strategy followed by the location in the format ``locatorType=location``. The 
 locator type can be omitted and one of the default strategies will be used 
-depending on the initial characters of the location. The various locator 
-types are explained below with examples for each.
+depending on the initial characters of the location. The various locator types
+are explained below with examples for each.
+
+.. Santi: I really liked how this section was taken. But I found that most of
+   the locator strategies repeat the same HTML fragment over a over. Couldn't
+   we put A example HTML code before starting with each strategie and then use
+   that one on all of them?
 
 Locating by identifier
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This is probably the most common method of locating elements and is the catch-
-all default when no recognised locator type is used. With this strategy the 
-element with the @id attribute value matching the location will found. If no 
-element has a matching @id attribute then the first element with a @name 
+This is probably the most common method of locating elements and is the 
+catch-all default when no recognised locator type is used. With this strategy
+the element with the @id attribute value matching the location will be found. If
+no element has a matching @id attribute then the first element with a @name 
 attribute matching the location will be found.
 
 .. Paul: Are you illustrating a locator in a Sel command?  I think you are.  
@@ -120,7 +129,7 @@ attribute matching the location will be found.
    verifyElementPresent.  It needs context.  I was confused at first what 
    this was doing here.
 
-.. Dave:    I agree that this section needs context.
+.. Dave: I agree that this section needs context.
 
 - identifier=loginForm
 - identifier=username
@@ -366,16 +375,26 @@ Locating by CSS
    look at writing this topic soon. This is the next topic that I'll be 
    working on.
 
+.. Samti: Dave, are you still thinking of taking this topic? I have written
+   about this and could throw some content really fast. I'll still wait some
+   days for you to do it as this is your section not mine.
+   
 The "AndWait" commands 
 ----------------------
-The difference that any user should see between a command and it's *AndWait*
+The difference etween a command and it's *AndWait*
 alternative is that the regular command (e.g. *click*) will do the action and
 continue with the following command as fast as it can. While the *AndWait*
 alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
 load after the action has been done. 
 
-The *andWait* alternative is always used when an action causes the browser to
+The *andWait* alternative is always used when the action causes the browser to
 navigate to another page or reload the present one. 
+
+.. note:: Keep in mind that if you use an *AndWait* command for an action that
+   does not trigger a navigation/refresh, your test will fail. This happens 
+   because Selenium will reach the *AndWait*'s timeout without seeing any 
+   navigation or refresh being made, this is why Selenium raises a timeout 
+   exception.
 
 verifyTextPresent
 -----------------
@@ -404,7 +423,7 @@ verifyText
  
 .. Paul: Useful for debugging a script.  Also very useful for documenting 
    each section of a test and dumping that to an output log.  This can be 
-   very useful for identifying bugs when verifications in a script fail.  I 
+   very useful for identifying bugs when verifications in a script fail. I 
    can come up with an example if you guys need me to.
 
  Selenium Variables
@@ -423,6 +442,9 @@ verifyText
    That approach is also one step away from data-driven testing as these 
    present variable values can then be easily edited in Sel-RC to take values 
    passed by a test app from the command line or a file read into the app.
+
+.. Santi: Not sure is all this Store commands are needed... We are explaining
+   the same for the verify kind of commands on the topic above.
 
 store 
 -----
@@ -465,6 +487,9 @@ In what order does Selenium process each of these parameter components?
    though.  I haven't though about this one much, other than to be thinking 
    that we should think about it.
 
+.. Santi: Is this about the locators used when no locatorType= prefix is used?
+   If so, I think we should put this on the Locators topic.
+
 Example Test Script
 -------------------
 
@@ -472,3 +497,8 @@ Example Test Script
    sample script, that demonstrated how to select the right command for 
    different elements of the website.  We would need to create this, any real 
    website would prob be to complex.
+
+.. Santi: Not sure is this is the right section for this content. There are some
+   attempts for doing this on other sections also. I hope we cover this by the 
+   end, when we have the whole docs structure better visualized.
+

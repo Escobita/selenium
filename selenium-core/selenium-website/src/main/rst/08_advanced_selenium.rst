@@ -18,6 +18,8 @@ Contributing Improvements
 -------------------------
 
 .. Santi: Maybe we can explain the use of Jira for this.
+   I've put the Jira section on the Getting help chapter, maybe here is a better
+   place...
 
 User Extensions 
 ---------------
