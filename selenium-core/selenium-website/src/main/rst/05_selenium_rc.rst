@@ -379,11 +379,17 @@ from the selenium's part).
          http://activestate.com/Products/activepython/index.mhtml 
       2. Run the installer downloaded (ActivePython-x.x.x.x-win32-x86.msi)
 
+..
+
       .. image:: images/chapt5_img19_Python_Install.png
          :align: center
 
+..
+
       .. image:: images/chapt5_img22_Python_Install.png
          :align: center
+
+..
 
     * Mac
     
@@ -429,7 +435,7 @@ clickAndWait       submit
 assertTextPresent  Selenium-RC
 =================  ============  ===========
 
-.. note:: The table doesn't include that the script is written to test 
+.. note:: In the table is not mentioned that the script is written to test 
    a search at http://www.google.com
 
 Here is the test script exported to all the programming languages:
@@ -627,11 +633,11 @@ Here you will find an explanation of the basic test structure on each
 programming language. This tends to differ from one to another, so you'll find
 separate explanations for each of them:
 
-* Python_
-* Java_
 * `C#`_
+* Java_
 * Perl_
 * PHP_ 
+* Python_
 * Ruby_ 
 
 C#
