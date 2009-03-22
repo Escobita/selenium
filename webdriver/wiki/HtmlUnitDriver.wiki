@@ -16,7 +16,7 @@ This is currently the fastest and most lightweight implementation of WebDriver. 
 
 == Javascript in the HtmlUnitDriver ==
 
-No browser that's in widespread use has the javascript engine used by HtmlUnit ([http://www.mozilla.org/rhino/ Rhino]). By disabling javascript in the HtmlUnitDriver we can be sure that any issues which are found will effect end-users of the application under test.
+None of the popular browsers uses the javascript engine used by HtmlUnit ([http://www.mozilla.org/rhino/ Rhino]). If you test javascript using HtmlUnit the results may differ significantly from those browsers. 
 
 When we say "javascript" we actually mean "javascript and the DOM". Although the DOM is [http://www.w3.org/DOM/ defined by the W3C] each browser out there has its own quirks and differences in their implementation of the DOM and in how javascript interacts with it. HtmlUnit has an impressively complete implementation of the DOM and has good support for using javascript, but it is no different from any other browser: it has its own quirks and differences from both the W3C standard and the DOM implementations of the major browsers, despite its ability to [http://htmlunit.sourceforge.net/javascript.html mimic other browsers].
 
