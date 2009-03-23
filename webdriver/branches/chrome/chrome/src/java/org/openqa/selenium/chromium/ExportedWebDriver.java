@@ -53,7 +53,7 @@ interface ExportedWebDriver extends StdCallLibrary {
 
   int wdSwitchToActiveElement(Pointer driver, PointerByReference element);
 
-  int wdSwitchToFrame(Pointer driver, int frame_index);
+  int wdSwitchToFrameIndex(Pointer driver, int frame_index);
 
   int wdSwitchToFrame(Pointer driver, WString frame_name);
 
