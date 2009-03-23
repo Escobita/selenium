@@ -432,7 +432,8 @@ It should not be very different for higher version of intelliJ.
    :align: center
 
 * Browse to the Selenium directory and select selenium-java-client-driver.jar 
-  and selenium-server.jar. (Multiple Jars can be selected b holding down the control key.). 
+  and selenium-server.jar. (Multiple Jars can be selected b holding down the 
+  control key.). 
 
 .. image:: images/chapt5_img39_Library_Files.png
    :align: center
@@ -454,7 +455,8 @@ It should not be very different for higher version of intelliJ.
 .. image:: images/chapt5_img42_Project_Directories.png 
    :align: center
    
-*Note: This is not hard and fast convention and might very from project to project.*
+.. note:: This is not hard and fast convention and might very from project to
+   project.
 
 
 * Herein *core* contains the SelTestCase class which is used to create 
@@ -478,8 +480,8 @@ from the selenium's part).
 
 * Installing Python
 
-    .. note:: This will cover python installation on Windows and Mac only, as in 
-       most linux distributions python is already pre-installed by default. 
+    .. note:: This will cover python installation on Windows and Mac only, as 
+       in most linux distributions python is already pre-installed by default. 
 
     * Windows
     
