@@ -1,22 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <iostream>
+
 #include "webdriver.h"
+#include "chromedriver.h"
+#include "chromeelement.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-// Driver related implemetation.
-int wdNewDriverInstance(WebDriver** ptrDriver) {
-  if (*ptrDriver)
-    return !SUCCESS;
+void error(const char* msg) {
+  std::cerr << "INFO: " << msg << std::endl;
+}
 
-  // Allocate instances
+// ----------------------------------------------------------------------------
+// String Related implementation.
+// ----------------------------------------------------------------------------
+int wdStringLength(StringWrapper* str, int* length) {
+	*length = -1;
+	if (!str || !str->text) {
+		error("No string to get length.");
+		return !SUCCESS;
+	}
+
+	size_t len = wcslen(str->text);
+	*length = (int)len + 1;
+	return SUCCESS;
+}
+
+int wdFreeString(StringWrapper* str) {
+  if (!str) return !SUCCESS;
+	if (str->text) delete[] str->text;
+	delete str;
+
+	return SUCCESS;
+}
+
+int wdCopyString(StringWrapper* src, int size, wchar_t* dest) {
+	if (!src || !src->text) {
+    error("No source string to copy.");
+    return !SUCCESS;
+	}
+
+	wcscpy_s(dest, size, src->text);
+	return SUCCESS;
+}
+
+void CopyToStringWrapper(const std::wstring& src, StringWrapper** wrap) {
+  size_t length = src.length() + 1;
+  *wrap = new StringWrapper();
+  (*wrap)->text = new wchar_t[length];
+  wcscpy_s((*wrap)->text, length, src.c_str());
+}
+
+// ----------------------------------------------------------------------------
+// Driver Related implementation.
+// ----------------------------------------------------------------------------
+int wdNewDriverInstance(WebDriver** ptrDriver) {
+  if (*ptrDriver) return !SUCCESS;
+
+  // Allocate instance
   (*ptrDriver = new WebDriver())->instance = new ChromeDriver();
 
-  // Launch the browser
-  if ((*ptrDriver)->instance->Launch() == SUCCESS)
-    return SUCCESS;
+  if ((*ptrDriver)->instance->Launch() == SUCCESS) return SUCCESS;
 
-  // Clean up and fail
+  // If failed then clean up.
   delete (*ptrDriver)->instance;
   (*ptrDriver)->instance = NULL;
   delete *ptrDriver;
@@ -24,215 +74,531 @@ int wdNewDriverInstance(WebDriver** ptrDriver) {
   return !SUCCESS;
 }
 
-int wdClose(WebDriver* driver) {
-  if (driver)
-     return driver->instance->close();
-  return !SUCCESS;
-}
-
-int wdFreeDriverInstance(WebDriver* driver) {
-  if (driver) {
-    delete driver->instance;
-    delete driver;
+int wdFreeDriverInstance(WebDriver* ptrDriver) {
+  if (ptrDriver) {
+    delete ptrDriver->instance;
+    delete ptrDriver;
     return SUCCESS;
   }
-
   return !SUCCESS;
 }
 
-// String related implementation.
-int wdStringLength(StringWrapper* string, int* length) {
-  if (!string) {
-    cerr << "No string to get length of" << endl;
-    *length = -1;
-    return -1;
+// ----------------------------------------------------------------------------
+// Browser Related implementation.
+// ----------------------------------------------------------------------------
+int wdGetVisible(WebDriver* ptrDriver, int* visible) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
-  if (!string->text) {
-    cerr << "No underlying string to get length of" << endl;
-    *length = -1;
-    return -2;
-  }
-  size_t len = wcslen(string->text);
-  *length = (int) len + 1;
 
+  *visible = ptrDriver->instance->getVisible();
   return SUCCESS;
 }
 
-int wdFreeString(StringWrapper* string) {
-  if (!string) {
-    return  -ENOSTRING;
+int wdSetVisible(WebDriver* ptrDriver, int value) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
 
-  if (string->text) delete[] string->text;
-  delete string;
+  return ptrDriver->instance->setVisible(value);
+}
 
+int wdClose(WebDriver* ptrDriver) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->close();
+}
+
+// ----------------------------------------------------------------------------
+// Page Related implementation.
+// ----------------------------------------------------------------------------
+int wdGet(WebDriver* ptrDriver, const wchar_t* url) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->get(url);
+}
+
+int wdGoBack(WebDriver* ptrDriver) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->back();
+}
+
+int wdGoForward(WebDriver* ptrDriver) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->forward();
+}
+
+int wdGetCurrentUrl(WebDriver* ptrDriver, StringWrapper** result) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  const std::wstring orgStr(ptrDriver->instance->getCurrentUrl());
+  CopyToStringWrapper(orgStr, result);
   return SUCCESS;
 }
 
-int wdCopyString(StringWrapper* source, int size, wchar_t* dest) {
-  if (source && source->text) {
-    wcscpy_s(dest, size, source->text);
-    return SUCCESS;
+int wdGetTitle(WebDriver* ptrDriver, StringWrapper** result) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
 
-  //cerr << "Invalid source wrapper" << endl;
-  LOG(INFO) << "Invalid source wrapper" << endl;
-  return -ENOSTRING;
+  const std::wstring orgStr(ptrDriver->instance->getTitle());
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
 }
 
-int wdGetVisible(WebDriver* driver, int* visible) {
-  if (driver) {
-    *visible = driver->instance->getVisible();
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-int wdSetVisible(WebDriver* driver, int value) {
-  if (driver && !!driver->instance->setVisible(value))
-    return SUCCESS;
-  return !SUCCESS;
-}
-
-int wdGet(WebDriver* driver, const wchar_t* url) {
-  if (driver)
-    return driver->instance->get(url);
-  return !SUCCESS;
-}
-
-int wdGoBack(WebDriver* driver) {
-  if (driver)
-    return driver->instance->back();
-  return !SUCCESS;
-}
-
-int wdGoForward(WebDriver* driver) {
-  if (driver)
-    return driver->instance->forward();
-  return !SUCCESS;
-}
-
-int wdGetCurrentUrl(WebDriver* driver, StringWrapper** result) {
-  if (driver) {
-    const std::wstring originalString(driver->instance->getCurrentUrl());
-
-    size_t length = originalString.length() + 1;
-    wchar_t* toReturn = new wchar_t[length];
-    wcscpy_s(toReturn, length, originalString.c_str());
-
-    *result = new StringWrapper();
-    (*result)->text = toReturn;
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-int wdGetTitle(WebDriver* driver, StringWrapper** result) {
-  if (driver) {
-    const std::wstring originalString(driver->instance->getTitle());
-
-    size_t length = originalString.length() + 1;
-    wchar_t* toReturn = new wchar_t[length];
-    wcscpy_s(toReturn, length, originalString.c_str());
-
-    *result = new StringWrapper();
-    (*result)->text = toReturn;
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-int wdGetPageSource(WebDriver* driver, StringWrapper** result) {
-  if (driver) {
-    const std::wstring originalString(driver->instance->getPageSource());
-
-    size_t length = originalString.length() + 1;
-    wchar_t* toReturn = new wchar_t[length];
-    wcscpy_s(toReturn, length, originalString.c_str());
-
-    *result = new StringWrapper();
-    (*result)->text = toReturn;
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-// Cookies related
-int wdGetCookies(WebDriver* driver, StringWrapper** result) {
-  if (driver) {
-    const std::wstring originalString(driver->instance->getCookies());
-
-    size_t length = originalString.length() + 1;
-    wchar_t* toReturn = new wchar_t[length];
-    wcscpy_s(toReturn, length, originalString.c_str());
-
-    *result = new StringWrapper();
-    (*result)->text = toReturn;
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-int wdAddCookie(WebDriver* driver, const char* cookie) {
-  if (driver)
-    return driver->instance->addCookie(cookie);
-  return !SUCCESS;
-}
-
-int wdDomOperReturnString(WebDriver* driver, const wchar_t* operation, StringWrapper** result) {
-  if (driver) {
-    const std::wstring originalString(driver->instance->domGetString(operation));
-
-    size_t length = originalString.length() + 1;
-    wchar_t* toReturn = new wchar_t[length];
-    wcscpy_s(toReturn, length, originalString.c_str());
-
-    *result = new StringWrapper();
-    (*result)->text = toReturn;
-    return SUCCESS;
-  }
-  return !SUCCESS;
-}
-
-int wdDomOperReturnInteger(WebDriver* driver, const wchar_t* operation, int* wrapper) {
-  if (driver)
-    return driver->instance->domGetInteger(operation, wrapper);
-  return !SUCCESS;
-}
-
-int wdDomOperReturnBoolean(WebDriver* driver, const wchar_t* operation, int* wrapper) {
-  if (driver) {
-    bool result;
-    driver->instance->domGetBoolean(operation, &result);
-    *wrapper = (result ? 1 : 0);
-    return SUCCESS;
+int wdGetPageSource(WebDriver* ptrDriver, StringWrapper** result) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
 
-  return !SUCCESS;
+  const std::wstring orgStr(ptrDriver->instance->getPageSource());
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
 }
 
-int wdDomOperReturnPoint(WebDriver* driver, const wchar_t* opX, const wchar_t* opY, int* x, int *y) {
-  if (driver) {
-    driver->instance->domGetInteger(opX, x);
-    driver->instance->domGetInteger(opY, y);
-    return SUCCESS;
+// ----------------------------------------------------------------------------
+// Cookie Related implementation.
+// ----------------------------------------------------------------------------
+int wdGetCookies(WebDriver* ptrDriver, StringWrapper** result) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
 
-  return !SUCCESS;
+  const std::wstring orgStr(ptrDriver->instance->getCookies());
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
 }
 
-int wdDomOperSetValue(WebDriver* driver, const wchar_t* operation, const wchar_t* value) {
-  if (driver) {
-    return driver->instance->domSetter(operation, value);
+int wdAddCookie(WebDriver* ptrDriver, const wchar_t* cookie) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
   }
 
-  return !SUCCESS;
+  return ptrDriver->instance->addCookie(cookie);
 }
 
-int wdDomOperExecute(WebDriver* driver, const wchar_t* operation) {
-  if (driver)
-    return driver->instance->domExecute(operation);
-  return !SUCCESS;
+// ----------------------------------------------------------------------------
+// Element Related implementation.
+// ----------------------------------------------------------------------------
+int wdFreeElement(WebElement* element) {
+  if (!element || !element->element) {
+    error("No element to free.");
+    return !SUCCESS;
+  }
+
+  delete element->element;
+  delete element;
+  return SUCCESS;
+}
+
+int wdFindElementById(
+    WebDriver* ptrDriver, const wchar_t* id, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementById(id, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsById(
+    WebDriver* ptrDriver, const wchar_t* id, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsById(id);
+  return SUCCESS;
+}
+
+int wdFindElementByTagName(
+    WebDriver* ptrDriver, const wchar_t* tag, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByTagName(tag, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByTagName(
+    WebDriver* ptrDriver, const wchar_t* tag, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByTagName(tag);
+  return SUCCESS;
+}
+
+int wdFindElementByClassName(
+    WebDriver* ptrDriver, const wchar_t* cls, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByClassName(cls, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByClassName(
+    WebDriver* ptrDriver, const wchar_t* cls, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByClassName(cls);
+  return SUCCESS;
+}
+
+int wdFindElementByLinkText(
+    WebDriver* ptrDriver, const wchar_t* text, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByLinkText(text, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByLinkText(
+    WebDriver* ptrDriver, const wchar_t* text, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByLinkText(text);
+  return SUCCESS;
+}
+
+int wdFindElementByPartialLinkText(
+    WebDriver* ptrDriver, const wchar_t* pattern, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByPartialLinkText(pattern, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByPartialLinkText(
+    WebDriver* ptrDriver, const wchar_t* pattern, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByPartialLinkText(pattern);
+  return SUCCESS;
+}
+
+int wdFindElementByName(
+    WebDriver* ptrDriver, const wchar_t* name, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByName(name, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByName(
+    WebDriver* ptrDriver, const wchar_t* name, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByName(name);
+  return SUCCESS;
+}
+
+int wdFindElementByXPath(
+    WebDriver* ptrDriver, const wchar_t* xpath, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->findElementByXPath(xpath, &returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdFindElementsByXPath(
+    WebDriver* ptrDriver, const wchar_t* xpath, WebElementCollection** collection) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  (*collection = new WebElementCollection())->elements
+      = ptrDriver->instance->findElementsByXPath(xpath);
+  return SUCCESS;
+}
+
+// ----------------------------------------------------------------------------
+// Element Collection Related implementation.
+// ----------------------------------------------------------------------------
+int wdFreeElementCollection(WebElementCollection* collection) {
+  if (!collection || !collection->elements) {
+    error("Empty collections to return from.");
+    return !SUCCESS;
+  }
+
+  std::vector<ChromeElement*>::const_iterator cur = collection->elements->begin();
+  std::vector<ChromeElement*>::const_iterator end = collection->elements->end();
+  while (cur != end) {
+    delete *cur;
+    cur++;
+  }
+
+	delete collection->elements;
+	delete collection;
+	return SUCCESS;
+}
+
+int wdGetCollectionLength(WebElementCollection* collection, int* length) {
+  if (!collection || !collection->elements) {
+    error("Empty collections to return from.");
+    return !SUCCESS;
+  }
+
+	*length = (int) collection->elements->size();
+  return SUCCESS;
+}
+
+int wdGetElementAtIndex(
+    WebElementCollection* collection, int index, WebElement** result) {
+  if (!collection || !collection->elements) {
+    error("Empty collections to return from.");
+    return !SUCCESS;
+  }
+
+	std::vector<ChromeElement*>::const_iterator cur = collection->elements->begin();
+	cur += index;
+
+  (*result = new WebElement())->element = *cur;
+  return SUCCESS;
+}
+
+// ----------------------------------------------------------------------------
+// Element Operation Related.
+// ----------------------------------------------------------------------------
+int wdSubmit(WebElement* element) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->submit();
+}
+
+int wdClear(WebElement* element) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->clear();
+}
+
+int wdClick(WebElement* element) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->click();
+}
+
+int wdIsEnabled(WebElement* element, int* selected) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->isEnabled(selected);
+}
+
+int wdGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** result) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  const std::wstring orgStr(element->element->getAttribute(name));
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
+}
+
+int wdGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWrapper** result) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  const std::wstring orgStr(element->element->getValueOfCssProperty(name));
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
+}
+
+int wdIsSelected(WebElement* element, int* selected) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->isSelected(selected);
+}
+
+int wdSetSelected(WebElement* element) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->setSelected();
+}
+
+int wdToggle(WebElement* element, int* toReturn) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->toggle(toReturn);
+}
+
+int wdSendKeys(WebElement* element, const wchar_t* keys) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->sendKeys(keys);
+}
+
+int wdIsDisplayed(WebElement* element, int* displayed) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->isDisplayed(displayed);
+}
+
+int wdGetText(WebElement* element, StringWrapper** result) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  const std::wstring orgStr(element->element->getText());
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
+}
+
+int wdGetElementName(WebElement* element, StringWrapper** result) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  const std::wstring orgStr(element->element->getElementName());
+  CopyToStringWrapper(orgStr, result);
+  return SUCCESS;
+}
+
+int wdGetLocation(WebElement* element, long* x, long* y) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->getLocation(x, y);
+}
+
+int wdGetSize(WebElement* element, long* width, long* height) {
+  if (!element || !element->element) {
+    error("No element to operate on.");
+    return !SUCCESS;
+  }
+
+  return element->element->getSize(width, height);
 }
 
 #ifdef __cplusplus

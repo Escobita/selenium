@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="ChromeDriver"
 	ProjectGUID="{7801CEC0-B5BE-4EE0-846D-95E36D38C914}"
 	RootNamespace="ChromeDriver"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -76,6 +77,8 @@
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -95,9 +98,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -162,6 +162,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -183,9 +185,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -198,26 +197,13 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\chromedriver.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\chromedriver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\errorcodes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\webdriver.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\webdriver.h"
-				>
-			</File>
+      <File RelativePath=".\chromedriver.cc"></File>
+      <File RelativePath=".\chromedriver.h"></File>
+      <File RelativePath=".\chromeelement.cc"></File>
+      <File RelativePath=".\chromeelement.h"></File>
+      <File RelativePath=".\chromescript.h"></File>
+      <File RelativePath=".\webdriver.cc"></File>
+      <File RelativePath=".\webdriver.h"></File>
 		</Filter>
 	</Files>
 	<Globals>

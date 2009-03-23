@@ -1,78 +1,134 @@
-#ifndef CHROME_DRIVER_H_
-#define CHROME_DRIVER_H_
-
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include <windows.h>
-#include "errorcodes.h"
 
 #include "base/at_exit.h"
 #include "base/message_loop.h"
-#include "chrome/test/automation/automation_proxy.h"
-#include "chrome/test/automation/browser_proxy.h"
-#include "chrome/test/automation/tab_proxy.h"
-#include "chrome/test/automation/window_proxy.h"
 
-using namespace std;
+#ifndef SUCCESS
+#define SUCCESS 0
+#endif    // SUCCESS definition.
+
+#ifndef CHROME_DRIVER_H_
+#define CHROME_DRIVER_H_
+
+static const int timeout_ = 4000;
+static base::AtExitManager exitManager;
+static MessageLoopForUI ui_loop_;
+static MessageLoopForIO io_loop_;
+
+class AutomationProxy;
+class BrowserProxy;
+class TabProxy;
+class WindowProxy;
+class ChromeElement;
 
 class ChromeDriver {
- public:
-  ChromeDriver();
-  ~ChromeDriver();
 
-  int Launch();
-  bool getVisible();
-  int setVisible(int visible);
-  int close();
+  public:
+    ChromeDriver();
 
-  int get(const std::wstring url);
-  int back();
-  int forward();
+    ~ChromeDriver();
 
-  std::wstring getCurrentUrl();
-  std::wstring getTitle();
-  std::wstring getPageSource();
+    int Launch();
 
-  // Cookies related.
-  std::wstring getCookies();
-  int addCookie(const char* cookieString);
+    void setWindowProxy(WindowProxy* window_proxy) {
+      this->window_proxy_ = window_proxy;
+    }
 
-  // DOM related.
-  std::wstring domGetString(std::wstring operation);
-  int domGetInteger(std::wstring operation, int* value);
-  int domGetBoolean(std::wstring operation, bool* value);
-  int domSetter(std::wstring operation, const std::wstring value);
-  int domExecute(std::wstring operation);
+    // ------------------------------------------------------------------------
+    // Browser related.
+    // ------------------------------------------------------------------------
+    bool getVisible() { return is_visible_; }
 
- protected:
+    int setVisible(bool visible);
 
-//    bool ExecuteAndExtractString(const std::wstring& frame_xpath,
-//        const std::wstring& jscript, std::wstring* value);
-//    bool ExecuteAndExtractBool(const std::wstring& frame_xpath,
-//        const std::wstring& jscript, bool* value);
-//    bool ExecuteAndExtractInt(const std::wstring& frame_xpath,
-//        const std::wstring& jscript, int* value);
-//    bool ExecuteAndExtractValue(const std::wstring& frame_xpath,
-//        const std::wstring& jscript, Value** value);
+    int close();
 
- private:
+    // ----------------------------------------------------------------------------
+    // Page Related.
+    // ----------------------------------------------------------------------------
+    int get(const std::wstring url);
 
-  // Other requirements.
-  AutomationProxy* proxy_;
-  WindowProxy* window_proxy_;
-  BrowserProxy* browser_proxy_;
-  TabProxy* tab_proxy_;
-  bool is_visible_;
+    int back();
 
-  base::AtExitManager exitManager;
-  // MessageLoopForUI ui_loop_;
-  MessageLoopForIO io_loop_;
+    int forward();
 
-  // Temporary till decided.
-  static const int timeout_ = 10000;
+    std::wstring getCurrentUrl();
 
-private:
-  DISALLOW_COPY_AND_ASSIGN(ChromeDriver);
+    std::wstring getTitle();
+
+    std::wstring getPageSource();
+
+    // ----------------------------------------------------------------------------
+    // Cookie Related.
+    // ----------------------------------------------------------------------------
+    std::wstring getCookies();
+
+    int addCookie(const std::wstring cookieString);
+
+    // ----------------------------------------------------------------------------
+    // Element Related.
+    // ----------------------------------------------------------------------------
+    int findElementById(const std::wstring id, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsById(const std::wstring id);
+
+    int findElementByTagName(const std::wstring tag, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByTagName(const std::wstring tag);
+
+    int findElementByClassName(const std::wstring cls, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByClassName(const std::wstring cls);
+
+    int findElementByLinkText(const std::wstring text, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByLinkText(const std::wstring text);
+
+    int findElementByPartialLinkText(const std::wstring pattern, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByPartialLinkText(const std::wstring pattern);
+
+    int findElementByName(const std::wstring name, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByName(const std::wstring name);
+
+    int findElementByXPath(const std::wstring xpath, ChromeElement** element);
+
+    std::vector<ChromeElement*>* findElementsByXPath(const std::wstring xpath);
+
+  protected:
+    friend class ChromeElement;
+    TabProxy* getTabProxy();
+    BrowserProxy* getBrowserProxy();
+    WindowProxy* getWindowProxy();
+    AutomationProxy* getAutomationProxy();
+
+    std::wstring domGetString(const std::wstring jscript);
+    int domGetInteger(const std::wstring jscript, int* value);
+    int domGetBoolean(const std::wstring jscript, bool* value);
+    int domGetStringArray(const std::wstring jscript, std::vector<std::wstring>& retValue);
+    int domGetIntegerArray(const std::wstring jscript, std::vector<int>& retValue);
+    int domGetBooleanArray(const std::wstring jscript, std::vector<bool>& retValue);
+    int domGetVoid(const std::wstring jscript);
+
+  private:
+    // Copy constructor.
+    ChromeDriver(ChromeDriver* other);
+
+    // Internal variables.
+    int e_counter_;
+    bool is_visible_;
+    AutomationProxy* proxy_;
+    WindowProxy* window_proxy_;
+    BrowserProxy* browser_proxy_;
+    TabProxy* tab_proxy_;
+    std::wstring current_frame_;
+
+    // Internal members.
+    std::wstring getApplicationPath();
+    int currentCount() { return ++e_counter_; }
 };
 
 #endif  // CHROME_DRIVER_H_

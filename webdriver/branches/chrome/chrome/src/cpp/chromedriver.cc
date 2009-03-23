@@ -1,94 +1,98 @@
 #include "chromedriver.h"
+#include "chromescript.h"
+#include "chromeelement.h"
+
+#include <wchar.h>
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
 #include "base/path_service.h"
 #include "base/process_util.h"
 
+#if defined(OS_WIN)
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/chrome_process_filter.h"
-
 #include "chrome/common/json_value_serializer.h"
+#endif
+
 #include "chrome/test/automation/automation_constants.h"
 #include "chrome/test/automation/automation_messages.h"
+#include "chrome/test/automation/automation_proxy.h"
+#include "chrome/test/automation/browser_proxy.h"
+#include "chrome/test/automation/window_proxy.h"
+#include "chrome/test/automation/tab_proxy.h"
+
+void dg(const std::wstring msg) {
+  std::wcout << L"INFO: " << msg << std::endl;
+}
 
 std::wstring StringToWString(const std::string& s) {
-  std::wstring temp(s.length(), L' ');
+  std::wstring temp(s.length(),L' ');
   std::copy(s.begin(), s.end(), temp.begin());
   return temp; 
 }
 
 ChromeDriver::ChromeDriver() {
-  browser_proxy_ = NULL;
-  is_visible_ = false;
   proxy_ = new AutomationProxy(timeout_);
-  tab_proxy_ = NULL;
-  window_proxy_ = NULL;
+  current_frame_ = L"";
+  is_visible_ = true;
+  e_counter_ = 0;
 }
 
 ChromeDriver::~ChromeDriver() {
-  close();
-  delete browser_proxy_;
-  delete window_proxy_;
-  delete proxy_;
 }
 
 int ChromeDriver::Launch() {
-  CommandLine::Init(1, NULL);
+  BrowserProcessFilter filter(L"");
+  int processCount = base::GetProcessCount(
+      chrome::kBrowserProcessExecutableName, &filter);
+  if (processCount == 0) {
+    CommandLine command_(getApplicationPath());
+    command_.AppendSwitch(switches::kDomAutomationController);
+    command_.AppendSwitchWithValue(switches::kTestingChannelID, proxy_->channel_id());
+    base::LaunchApp(command_, false, false, NULL);
 
-  // TODO(noel): use --user-data-dir="profile" when webdriver send anonymous
-  // "profile" used for each browser instance (it's a directory).  Have WD
-  // send the path to chrome.exe.
+    if (!proxy_->WaitForInitialLoads()) {
+      return !SUCCESS;
+    }
 
-  static const std::wstring chrome_executable(L"..\\chrome\\chrome.exe");
+    if (!proxy_->WaitForAppLaunch()) {
+      return !SUCCESS;
+    }
 
-  CommandLine command(chrome_executable);
-  command.AppendSwitch(switches::kDomAutomationController);
-  command.AppendSwitchWithValue(
-      switches::kTestingChannelID, proxy_->channel_id());
-  base::LaunchApp(command, false, false, NULL);
+    if (!proxy_->WaitForWindowCountToBecome(1, 6000)) {
+      return !SUCCESS;
+    }
+    proxy_->SetFilteredInet(true);
+  }
 
-  if (!proxy_->WaitForInitialLoads())
-    return !SUCCESS;
-  if (!proxy_->WaitForAppLaunch())
-    return !SUCCESS;
-  if (!proxy_->WaitForWindowCountToBecome(1, timeout_))
-    return !SUCCESS;
-
-  // Get the window before returning, is that the tab window or the
-  // browser window?
-  window_proxy_ = proxy_->GetActiveWindow();
-  proxy_->SetFilteredInet(true);
+  setWindowProxy(proxy_->GetActiveWindow());
   return SUCCESS;
 }
 
-int ChromeDriver::setVisible(int visible) {
-  if (window_proxy_)
-    return window_proxy_->SetVisible(is_visible_ = !!visible);
+int ChromeDriver::setVisible(bool visible) {
+  if (window_proxy_) {
+    is_visible_ = visible;
+    return window_proxy_->SetVisible(visible);
+  }
   return !SUCCESS;
-}
-
-bool ChromeDriver::getVisible() {
-  return is_visible_;
 }
 
 int ChromeDriver::close() {
   if (tab_proxy_) {
     tab_proxy_->Close();
-    delete tab_proxy_;
-    tab_proxy_ = NULL;
     return SUCCESS;
-  } else {
-    return !SUCCESS;
   }
+  return !SUCCESS;
 }
 
 int ChromeDriver::get(const std::wstring url) {
   browser_proxy_ = proxy_->GetBrowserWindow(0);
   tab_proxy_ = browser_proxy_->GetActiveTab();
-  tab_proxy_->NavigateToURL(GURL(url.c_str()));
+  GURL gurl(url.c_str());
+  tab_proxy_->NavigateToURL(gurl);
   return SUCCESS;
 }
 
@@ -127,7 +131,7 @@ std::wstring ChromeDriver::getTitle() {
 }
 
 std::wstring ChromeDriver::getPageSource() {
-  return L"ugly";
+  return L"";
 }
 
 std::wstring ChromeDriver::getCookies() {
@@ -141,160 +145,209 @@ std::wstring ChromeDriver::getCookies() {
   return L"";
 }
 
-int ChromeDriver::addCookie(const char* cookieString) {
+int ChromeDriver::addCookie(const std::wstring cookieString) {
   if (tab_proxy_) {
-    GURL rgurl;
-    std::string cookies(cookieString);
-    tab_proxy_->GetCurrentURL(&rgurl);
-    tab_proxy_->SetCookie(rgurl, cookies);
+    //GURL rgurl;
+    //std::string cookies(cookieString);
+    //tab_proxy_->GetCurrentURL(&rgurl);
+    //tab_proxy_->SetCookie(rgurl, cookies);
     return SUCCESS;
   }
   return !SUCCESS;
 }
 
-std::wstring ChromeDriver::domGetString(std::wstring operation) {
-  if (tab_proxy_) {
-    std::wstring jscript;
-    SStringPrintf(&jscript, L"window.domAutomationController.send(%ls);", operation.c_str());
-    std::wstring rvalue;
-    if (tab_proxy_->ExecuteAndExtractString(L"", jscript, &rvalue)) {
-      return rvalue;
-    }
+// ----------------------------------------------------------------------------
+// Element Related.
+// ----------------------------------------------------------------------------
+int ChromeDriver::findElementById(const std::wstring id, ChromeElement** element) {
+  std::wstring jscript;
+  SStringPrintf(&jscript, FINDER_BY_ID.c_str(), id.c_str(), currentCount());
+
+  std::vector<std::wstring> found;
+  domGetStringArray(jscript, found);
+  if (found.size() != 2) {
+    return !SUCCESS;
+  } else {
+    std::wstring base;
+    SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(0).c_str());
+    *element = new ChromeElement(this, ChromeElement::BY_ID, id);
+    (*element)->setElementIdentifier(base, id, found.at(1));
+  }
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsById(const std::wstring id) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByTagName(const std::wstring tag) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByClassName(const std::wstring cls, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByClassName(const std::wstring cls) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByLinkText(const std::wstring text, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByLinkText(const std::wstring text) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByPartialLinkText(const std::wstring pattern, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByPartialLinkText(const std::wstring pattern) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByName(const std::wstring name, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByName(const std::wstring name) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+int ChromeDriver::findElementByXPath(const std::wstring xpath, ChromeElement** element) {
+  return SUCCESS;
+}
+
+std::vector<ChromeElement*>* ChromeDriver::findElementsByXPath(const std::wstring xpath) {
+  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
+  return toReturn;
+}
+
+// ----------------------------------------------------------------------------
+// Internal members implementation.
+// ----------------------------------------------------------------------------
+std::wstring ChromeDriver::getApplicationPath() {
+  return L"..\\chrome\\chrome.exe";
+}
+
+std::wstring getRunnableScript(int type, const std::wstring jscript) {
+  std::wstring domOper(L"window.domAutomationController.send(");
+  domOper.append(type == FUNCTION_TYPE_RETURN ? ANON_RETURN : ANON_NORETURN);
+  domOper.append(L");");
+
+  std::wstring runScript;
+  SStringPrintf(&runScript, domOper.c_str(), jscript.c_str());
+  return runScript;
+}
+
+std::wstring ChromeDriver::domGetString(const std::wstring jscript) {
+  if (!tab_proxy_) return L"";
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  std::wstring retValue;
+  if (tab_proxy_->ExecuteAndExtractString(
+        current_frame_.c_str(), runScript, &retValue)) {
+    return retValue;
   }
   return L"";
 }
 
-int ChromeDriver::domGetInteger(std::wstring operation, int* value) {
-  if (tab_proxy_) {
-    std::wstring jscript;
-    SStringPrintf(&jscript, L"window.domAutomationController.send(%ls);", operation.c_str());
-    if (tab_proxy_->ExecuteAndExtractInt(L"", jscript, value)) {
-      return SUCCESS;
-    }
+int ChromeDriver::domGetInteger(const std::wstring jscript, int* value) {
+  if (!tab_proxy_) return !SUCCESS;
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  if (tab_proxy_->ExecuteAndExtractInt(
+        current_frame_.c_str(), runScript, value)) {
+    return SUCCESS;
   }
   return !SUCCESS;
 }
 
-int ChromeDriver::domGetBoolean(std::wstring operation, bool* value) {
-  if (tab_proxy_) {
-    std::wstring jscript;
-    SStringPrintf(&jscript, L"window.domAutomationController.send(%ls);", operation.c_str());
-    bool rvalue;
-    if (tab_proxy_->ExecuteAndExtractBool(L"", jscript, &rvalue)) {
-      *value = rvalue;
-      return SUCCESS;
-    }
+int ChromeDriver::domGetBoolean(const std::wstring jscript, bool* value) {
+  if (!tab_proxy_) return !SUCCESS;
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  if (tab_proxy_->ExecuteAndExtractBool(
+        current_frame_.c_str(), runScript, value)) {
+    return SUCCESS;
   }
   return !SUCCESS;
 }
 
-int ChromeDriver::domSetter(std::wstring operation, const std::wstring value) {
-  if (tab_proxy_) {
-    std::wstring jscript;
-    SStringPrintf(&jscript,
-        L"window.domAutomationController.send((%ls = '%ls') && true);", operation.c_str(), value.c_str());
-    bool rvalue;
-    if (tab_proxy_->ExecuteAndExtractBool(L"", jscript, &rvalue)) {
-      return SUCCESS;
+int ChromeDriver::domGetStringArray(const std::wstring jscript, std::vector<std::wstring>& retValue) {
+  if (!tab_proxy_) return !SUCCESS;
+
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  std::wstring retString;
+  if (tab_proxy_->ExecuteAndExtractString(current_frame_.c_str(), runScript, &retString)) {
+    std::string::size_type lastPos = retString.find_first_not_of(L",", 0);
+    std::string::size_type pos     = retString.find_first_of(L",", lastPos);
+    while (std::string::npos != pos || std::string::npos != lastPos) {
+      retValue.push_back(retString.substr(lastPos, pos - lastPos));
+      lastPos = retString.find_first_not_of(L",", pos);
+      pos = retString.find_first_of(L",", lastPos);
     }
+    return SUCCESS;
   }
   return !SUCCESS;
 }
 
-int ChromeDriver::domExecute(std::wstring operation) {
-  if (tab_proxy_) {
-    std::wstring jscript;
-    SStringPrintf(&jscript,
-        L"window.domAutomationController.send((new function(d){this.value=true; {%ls}}().value) && true);", operation.c_str());
-    bool rvalue;
-    if (tab_proxy_->ExecuteAndExtractBool(L"", jscript, &rvalue)) {
-      return SUCCESS;
+int ChromeDriver::domGetIntegerArray(const std::wstring jscript, std::vector<int>& retValue) {
+  if (!tab_proxy_) return !SUCCESS;
+
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  std::wstring retString;
+  if (tab_proxy_->ExecuteAndExtractString(current_frame_.c_str(), runScript, &retString)) {
+    std::string::size_type lastPos = retString.find_first_not_of(L",", 0);
+    std::string::size_type pos     = retString.find_first_of(L",", lastPos);
+    wchar_t* endChar = L"";
+    while (std::string::npos != pos || std::string::npos != lastPos) {
+      int retInt = (int)wcstol(retString.substr(lastPos, pos - lastPos).c_str(), &endChar, 10);
+      retValue.push_back(retInt);
+      lastPos = retString.find_first_not_of(L",", pos);
+      pos = retString.find_first_of(L",", lastPos);
     }
+    return SUCCESS;
   }
   return !SUCCESS;
 }
 
-//bool ChromeDriver::ExecuteAndExtractString(const std::wstring& frame_xpath,
-//    const std::wstring& jscript, std::wstring* string_value) {
-//
-//  Value* root = NULL;
-//  bool succeeded = ExecuteAndExtractValue(frame_xpath, jscript, &root);
-//  if (!succeeded) return false;
-//
-//  std::wstring read_value;
-//  Value* value = NULL;
-//  succeeded = static_cast<ListValue*>(root)->Get(0, &value);
-//  if (succeeded) {
-//    succeeded = value->GetAsString(&read_value);
-//    if (succeeded) {
-//      string_value->swap(read_value);
-//    }
-//  }
-//
-//  delete root;
-//  return succeeded;
-//}
-//
-//bool ChromeDriver::ExecuteAndExtractBool(const std::wstring& frame_xpath,
-//                                     const std::wstring& jscript,
-//                                     bool* bool_value) {
-//  Value* root = NULL;
-//  bool succeeded = ExecuteAndExtractValue(frame_xpath, jscript, &root);
-//  if (!succeeded)
-//    return false;
-//
-//  bool read_value = false;
-//  Value* value = NULL;
-//  succeeded = static_cast<ListValue*>(root)->Get(0, &value);
-//  if (succeeded) {
-//    succeeded = value->GetAsBoolean(&read_value);
-//    if (succeeded) {
-//      *bool_value = read_value;
-//    }
-//  }
-//
-//  delete value;
-//  return succeeded;
-//}
-//
-//bool ChromeDriver::ExecuteAndExtractInt(const std::wstring& frame_xpath,
-//                                    const std::wstring& jscript,
-//                                    int* int_value) {
-//  Value* root = NULL;
-//  bool succeeded = ExecuteAndExtractValue(frame_xpath, jscript, &root);
-//  if (!succeeded)
-//    return false;
-//
-//  int read_value = 0;
-//  Value* value = NULL;
-//  succeeded = static_cast<ListValue*>(root)->Get(0, &value);
-//  if (succeeded) {
-//    succeeded = value->GetAsInteger(&read_value);
-//    if (succeeded) {
-//      *int_value = read_value;
-//    }
-//  }
-//
-//  delete value;
-//  return succeeded;
-//}
-//
-//bool ChromeDriver::ExecuteAndExtractValue(const std::wstring& frame_xpath,
-//    const std::wstring& jscript, Value** value) {
-//  if (!tab_proxy_->is_valid()) return false;
-//  if (!value) return false;
-//
-//  std::string json;
-//  if (!proxy_->Send(
-//        new AutomationMsg_DomOperation(
-//            0, tab_proxy_->handle(), frame_xpath, jscript, &json))) {
-//    return false;
-//  }
-//
-//  json.insert(0, "[");
-//  json.append("]");
-//
-//  JSONStringValueSerializer deserializer(json);
-//  *value = deserializer.Deserialize(NULL);
-//  return *value != NULL;
-//}
+int ChromeDriver::domGetBooleanArray(const std::wstring jscript, std::vector<bool>& retValue) {
+  if (!tab_proxy_) return !SUCCESS;
+
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_RETURN, jscript);
+  std::wstring retString;
+  if (tab_proxy_->ExecuteAndExtractString(current_frame_.c_str(), runScript, &retString)) {
+    std::string::size_type lastPos = retString.find_first_not_of(L",", 0);
+    std::string::size_type pos     = retString.find_first_of(L",", lastPos);
+    wchar_t* endChar = L"";
+    while (std::string::npos != pos || std::string::npos != lastPos) {
+      int retInt = (int)wcstol(retString.substr(lastPos, pos - lastPos).c_str(), &endChar, 10);
+      retValue.push_back(retInt == 1);
+      lastPos = retString.find_first_not_of(L",", pos);
+      pos = retString.find_first_of(L",", lastPos);
+    }
+    return SUCCESS;
+  }
+  return !SUCCESS;
+}
+
+int ChromeDriver::domGetVoid(const std::wstring jscript) {
+  if (!tab_proxy_) return !SUCCESS;
+  std::wstring runScript = getRunnableScript(FUNCTION_TYPE_NORETURN, jscript);
+  bool value;
+  if (tab_proxy_->ExecuteAndExtractBool(current_frame_.c_str(), runScript, &value)
+      || value) {
+    return SUCCESS;
+  }
+  return !SUCCESS;
+}
