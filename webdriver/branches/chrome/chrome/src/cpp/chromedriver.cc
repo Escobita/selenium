@@ -47,6 +47,8 @@ ChromeDriver::ChromeDriver() {
   current_frame_ = L"";
   is_visible_ = true;
   e_counter_ = 0;
+  default_window_index_ = 0;
+  default_tab_index_ = 0;
 }
 
 ChromeDriver::~ChromeDriver() {
@@ -76,8 +78,15 @@ int ChromeDriver::Launch() {
     proxy_->SetFilteredInet(true);
   }
 
-  setWindowProxy(proxy_->GetActiveWindow());
+  setProxy(default_window_index_, default_tab_index_);
   return SUCCESS;
+}
+
+
+void ChromeDriver::setProxy(int index, int tabindex) {
+  browser_proxy_ = proxy_->GetBrowserWindow(index);
+  tab_proxy_ = browser_proxy_->GetTab(tabindex);
+  window_proxy_ = browser_proxy_->GetWindow();
 }
 
 int ChromeDriver::setVisible(bool visible) {
@@ -97,8 +106,6 @@ int ChromeDriver::close() {
 }
 
 int ChromeDriver::get(const std::wstring url) {
-  browser_proxy_ = proxy_->GetBrowserWindow(0);
-  tab_proxy_ = browser_proxy_->GetActiveTab();
   GURL gurl(url.c_str());
   tab_proxy_->NavigateToURL(gurl);
   return SUCCESS;
@@ -122,9 +129,13 @@ int ChromeDriver::forward() {
 
 std::wstring ChromeDriver::getCurrentUrl() {
   if (tab_proxy_) {
-    GURL rgurl;
-    tab_proxy_->GetCurrentURL(&rgurl);
-    return StringToWString(rgurl.spec());
+    if (current_frame_.length() == 0) {
+      GURL rgurl;
+      tab_proxy_->GetCurrentURL(&rgurl);
+      return StringToWString(rgurl.spec());
+    } else {
+      return this->current_frame_src_;
+    }
   }
   return L"";
 }
@@ -139,24 +150,71 @@ std::wstring ChromeDriver::getTitle() {
 }
 
 std::wstring ChromeDriver::getPageSource() {
+  // TODO (amitabh)
   return L"";
 }
 
 
 int ChromeDriver::switchToActiveElement(ChromeElement** element) {
+  // TODO (amitabh)
   return !SUCCESS;
 }
 
 int ChromeDriver::switchToFrame(int index) {
+  int count = 0;
+  if (domGetInteger(FRAME_COUNT.c_str(), &count) == SUCCESS) {
+    std::wstring jscript;
+    SStringPrintf(&jscript, FRAME_IDENTIFIER_BY_INDEX.c_str(), index+1); // Note: +1 is to address xpath (1-based index).
+    std::vector<std::wstring> framepaths;
+    framepaths.clear();
+    domGetStringArray(jscript, framepaths);
+    if (framepaths.size() > 0) {
+      if (this->current_frame_.length() > 0) {
+        this->current_frame_ = framepaths.at(0).c_str();
+      } else {
+        this->current_frame_.append(L"\n");
+        this->current_frame_.append(framepaths.at(0).c_str());
+      }
+      this->current_frame_src_ = framepaths.at(1).c_str();
+      return SUCCESS;
+    }
+  }
   return !SUCCESS;
 }
 
 int ChromeDriver::switchToFrame(const std::wstring name) {
+  if (name.length() == 0) {
+    current_frame_ = L"";
+  } else {
+  }
   return !SUCCESS;
 }
 
 int ChromeDriver::switchToWindow(const std::wstring name) {
-  return !SUCCESS;
+  // TODO (amitabh): Support more windows/tabs and then allow switching.
+  // Note: Currently it is required only for pop-ups.
+  if (name.length() == 0) {
+    setProxy(default_window_index_, default_tab_index_);
+  } else {
+    int counter = 0;
+    if (proxy_->GetBrowserWindowCount(&counter)) {
+      for (int i = 0; i < counter; i++) {
+        BrowserProxy* browser = proxy_->GetBrowserWindow(i);
+        int tabindex = 0;
+        TabProxy* tab = browser->GetActiveTab();
+        browser->GetActiveTabIndex(&tabindex);
+
+        std::wstring windowname;
+        tab->GetTabTitle(&windowname);
+        if (name == windowname) {
+          setProxy(i, tabindex);
+          return SUCCESS;
+        }
+      }
+      return !SUCCESS;
+    }
+  }
+  return SUCCESS;
 }
 
 std::wstring ChromeDriver::getCookies() {

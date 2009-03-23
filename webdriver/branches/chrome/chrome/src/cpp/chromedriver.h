@@ -32,9 +32,7 @@ class ChromeDriver {
 
     int Launch();
 
-    void setWindowProxy(WindowProxy* window_proxy) {
-      this->window_proxy_ = window_proxy;
-    }
+    void setProxy(int index, int tabindex);
 
     // ------------------------------------------------------------------------
     // Browser related.
@@ -113,6 +111,10 @@ class ChromeDriver {
     WindowProxy* getWindowProxy();
     AutomationProxy* getAutomationProxy();
 
+    // default context
+    int default_window_index_;
+    int default_tab_index_;
+
     std::wstring domGetString(const std::wstring jscript);
     int domGetInteger(const std::wstring jscript, int* value);
     int domGetBoolean(const std::wstring jscript, bool* value);
@@ -133,6 +135,7 @@ class ChromeDriver {
     BrowserProxy* browser_proxy_;
     TabProxy* tab_proxy_;
     std::wstring current_frame_;
+    std::wstring current_frame_src_;
 
     // Internal members.
     std::wstring getApplicationPath();
