@@ -21,7 +21,7 @@ public class ChromeTargetLocator implements WebDriver.TargetLocator {
   }
 
   public WebDriver frame(int frameIndex) {
-    lib.wdSwitchToFrame(driver, frameIndex);
+    lib.wdSwitchToFrameIndex(driver, frameIndex);
     return chromeDriver;
   }
 
