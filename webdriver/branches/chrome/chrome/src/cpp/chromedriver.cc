@@ -34,6 +34,14 @@ std::wstring StringToWString(const std::string& s) {
   return temp; 
 }
 
+std::string WStringToString(const std::wstring& ws) {
+  int length = ws.length();
+  char* sbuf = new char[(length * 2)+2];
+  memset(sbuf, 0x00, length+2);
+  WideCharToMultiByte(CP_ACP, 0, ws.c_str(), length, sbuf, (length*2)+2, 0, 0);
+  return sbuf;
+}
+
 ChromeDriver::ChromeDriver() {
   proxy_ = new AutomationProxy(timeout_);
   current_frame_ = L"";
@@ -134,6 +142,23 @@ std::wstring ChromeDriver::getPageSource() {
   return L"";
 }
 
+
+int ChromeDriver::switchToActiveElement(ChromeElement** element) {
+  return !SUCCESS;
+}
+
+int ChromeDriver::switchToFrame(int index) {
+  return !SUCCESS;
+}
+
+int ChromeDriver::switchToFrame(const std::wstring name) {
+  return !SUCCESS;
+}
+
+int ChromeDriver::switchToWindow(const std::wstring name) {
+  return !SUCCESS;
+}
+
 std::wstring ChromeDriver::getCookies() {
   if (tab_proxy_) {
     GURL rgurl;
@@ -147,10 +172,10 @@ std::wstring ChromeDriver::getCookies() {
 
 int ChromeDriver::addCookie(const std::wstring cookieString) {
   if (tab_proxy_) {
-    //GURL rgurl;
-    //std::string cookies(cookieString);
-    //tab_proxy_->GetCurrentURL(&rgurl);
-    //tab_proxy_->SetCookie(rgurl, cookies);
+    GURL rgurl;
+    std::string cookies = WStringToString(cookieString);
+    tab_proxy_->GetCurrentURL(&rgurl);
+    tab_proxy_->SetCookie(rgurl, cookies);
     return SUCCESS;
   }
   return !SUCCESS;

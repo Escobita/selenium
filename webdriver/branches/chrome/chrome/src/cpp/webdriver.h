@@ -68,6 +68,14 @@ EXPORT int wdGetTitle(WebDriver* driver, StringWrapper** result);
 
 EXPORT int wdGetPageSource(WebDriver* driver, StringWrapper** result);
 
+EXPORT int wdSwitchToActiveElement(WebDriver* driver, WebElement** element);
+
+EXPORT int wdSwitchToFrameIndex(WebDriver* driver, int frame_index);
+
+EXPORT int wdSwitchToFrame(WebDriver* driver, const wchar_t* frame_name);
+
+EXPORT int wdSwitchToWindow(WebDriver* driver, const wchar_t* window_name);
+
 // ----------------------------------------------------------------------------
 // Cookie Related.
 // ----------------------------------------------------------------------------

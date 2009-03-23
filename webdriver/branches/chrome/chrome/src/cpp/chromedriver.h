@@ -60,6 +60,14 @@ class ChromeDriver {
 
     std::wstring getPageSource();
 
+    int switchToActiveElement(ChromeElement** element);
+
+    int switchToFrame(int index);
+
+    int switchToFrame(const std::wstring name);
+
+    int switchToWindow(const std::wstring name);
+
     // ----------------------------------------------------------------------------
     // Cookie Related.
     // ----------------------------------------------------------------------------

@@ -177,6 +177,48 @@ int wdGetPageSource(WebDriver* ptrDriver, StringWrapper** result) {
   return SUCCESS;
 }
 
+int wdSwitchToActiveElement(WebDriver* ptrDriver, WebElement** element) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  ChromeElement* returnElement;
+  if (ptrDriver->instance->switchToActiveElement(&returnElement) != SUCCESS) {
+    return !SUCCESS;
+  }
+
+  (*element = new WebElement())->element = returnElement;
+  return SUCCESS;
+}
+
+int wdSwitchToFrameIndex(WebDriver* ptrDriver, int frame_index) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->switchToFrame(frame_index);
+}
+
+int wdSwitchToFrame(WebDriver* ptrDriver, const wchar_t* frame_name) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->switchToFrame(frame_name);
+}
+
+int wdSwitchToWindow(WebDriver* ptrDriver, const wchar_t* window_name) {
+  if (!ptrDriver || !ptrDriver->instance) {
+    error("No driver found.");
+    return !SUCCESS;
+  }
+
+  return ptrDriver->instance->switchToWindow(window_name);
+}
+
 // ----------------------------------------------------------------------------
 // Cookie Related implementation.
 // ----------------------------------------------------------------------------
