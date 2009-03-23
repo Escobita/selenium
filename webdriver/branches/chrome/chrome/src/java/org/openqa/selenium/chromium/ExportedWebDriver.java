@@ -51,9 +51,13 @@ interface ExportedWebDriver extends StdCallLibrary {
 
   int wdGetPageSource(Pointer driver, PointerByReference source);
 
-  int wdSwitchToActiveElement(Pointer driver, PointerByReference result);
+  int wdSwitchToActiveElement(Pointer driver, PointerByReference element);
 
-  int wdSwitchToFrame(Pointer driver, WString string);
+  int wdSwitchToFrame(Pointer driver, int frame_index);
+
+  int wdSwitchToFrame(Pointer driver, WString frame_name);
+
+  int wdSwitchToWindow(Pointer driver, WString window_name);
 
   // ----------------------------------------------------------------------------
   // Cookie Related.

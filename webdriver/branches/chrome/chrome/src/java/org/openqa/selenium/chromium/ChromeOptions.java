@@ -1,17 +1,23 @@
 package org.openqa.selenium.chromium;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.internal.ReturnedCookie;
+import static org.openqa.selenium.chromium.ExportedWebDriver.SUCCESS;
+
 import org.openqa.selenium.chromium.ExportedWebDriver.StringWrapper;
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
-import com.sun.jna.win32.*;
+
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Speed;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.internal.ReturnedCookie;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.PointerByReference;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.HashSet;
-import java.net.URL;
+import java.util.Set;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ChromeOptions implements WebDriver.Options {
   private ExportedWebDriver lib;
@@ -44,7 +50,7 @@ public class ChromeOptions implements WebDriver.Options {
     String currentUrl = getCurrentHost();
     PointerByReference wrapper = new PointerByReference();
     int result = lib.wdGetCookies(driver, wrapper);
-    if (result != ChromeDriver.SUCCESS) {
+    if (result != SUCCESS) {
       throw new RuntimeException("Unable to get current URL: " + result);
     }
 
@@ -64,7 +70,7 @@ public class ChromeOptions implements WebDriver.Options {
 
   public void addCookie(Cookie cookie) {
     int result = lib.wdAddCookie(driver, new WString(cookie.toString()));
-    if (result != ChromeDriver.SUCCESS) {
+    if (result != SUCCESS) {
       throw new RuntimeException("Unable to get current URL: " + result);
     }
   }
@@ -81,7 +87,7 @@ public class ChromeOptions implements WebDriver.Options {
     try {
       PointerByReference ptr = new PointerByReference();
       int result = lib.wdGetCurrentUrl(driver, ptr);
-      if (result != ChromeDriver.SUCCESS) {
+      if (result != SUCCESS) {
         throw new RuntimeException("Unable to get current URL: " + result);
       }
       return new URL(new StringWrapper(lib, ptr).toString()).getHost();

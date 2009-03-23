@@ -4,15 +4,21 @@ import static org.openqa.selenium.chromium.ExportedWebDriver.SUCCESS;
 
 import org.openqa.selenium.chromium.ExportedWebDriver.StringWrapper;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.*;
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
-import com.sun.jna.win32.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.RenderedWebElement;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.NativeLongByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChromeElement implements RenderedWebElement, SearchContext, Locatable {
   private ExportedWebDriver lib;
@@ -112,8 +118,7 @@ public class ChromeElement implements RenderedWebElement, SearchContext, Locatab
   public boolean isDisplayed() {
     IntByReference retValue = new IntByReference();
     lib.wdIsDisplayed(element, retValue);
-    // TODO(amitabh)
-    return false;
+    return (retValue.getValue() == 1);
   }
 
   // --------------------------------------------------------------------------
@@ -142,15 +147,13 @@ public class ChromeElement implements RenderedWebElement, SearchContext, Locatab
   public boolean toggle() {
     IntByReference retValue = new IntByReference();
     lib.wdToggle(element, retValue);
-    // TODO(amitabh)
-    return false;
+    return (retValue.getValue() == 1);
   }
 
   public boolean isSelected() {
     IntByReference retValue = new IntByReference();
     lib.wdIsSelected(element, retValue);
-    // TODO(amitabh)
-    return false;
+    return (retValue.getValue() == 1);
   }
 
   public void setSelected() {
@@ -160,8 +163,7 @@ public class ChromeElement implements RenderedWebElement, SearchContext, Locatab
   public boolean isEnabled() {
     IntByReference retValue = new IntByReference();
     lib.wdIsEnabled(element, retValue);
-    // TODO(amitabh)
-    return false;
+    return (retValue.getValue() == 1);
   }
 
   // --------------------------------------------------------------------------
@@ -187,10 +189,18 @@ public class ChromeElement implements RenderedWebElement, SearchContext, Locatab
     }
 
     private List<WebElement> extractElements(ExportedWebDriver lib, Pointer driver, Pointer collection) {
-      List<WebElement> toReturn = new ArrayList<WebElement>(1);
-      //toReturn.add(new ChromeElement(lib, driver, query));
+      IntByReference lenReturn = new IntByReference();
+      lib.wdGetCollectionLength(collection, lenReturn);
 
-      // TODO(amitabh): Free the collection memory here.
+      int length = lenReturn.getValue();
+      List<WebElement> toReturn = new ArrayList<WebElement>(length);
+      for (int i = 0; i < length; i++) {
+        PointerByReference elemRef = new PointerByReference();
+        toReturn.add(i, new ChromeElement(lib, driver, elemRef.getValue()));
+      }
+
+      // Free the list in the driver.
+      lib.wdFreeElementCollection(collection);
       return toReturn;
     }
   }

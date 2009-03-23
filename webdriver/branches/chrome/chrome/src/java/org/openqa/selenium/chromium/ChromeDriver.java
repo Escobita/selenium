@@ -1,10 +1,18 @@
 package org.openqa.selenium.chromium;
 
 import org.openqa.selenium.chromium.ExportedWebDriver.StringWrapper;
-import org.openqa.selenium.*;
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
-import com.sun.jna.win32.*;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 import java.util.Set;
 import java.util.List;
@@ -13,6 +21,11 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   public static final int SUCCESS = 0;
   private static ExportedWebDriver lib = null;
   private Pointer driver;
+
+  public ChromeDriver(ExportedWebDriver lib, Pointer driver) {
+    this.lib = lib;
+    this.driver = driver;
+  }
 
   public ChromeDriver() {
     initializeLibrary();
@@ -142,6 +155,12 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     return new Finder(lib, driver).findElement(by);
   }
 
+  // -------------------------------------------------------------------------
+  // Implements TargetLocator interface
+  // -------------------------------------------------------------------------
+  public TargetLocator switchTo() {
+    return new ChromeTargetLocator(lib, driver, this);
+  }
 
   public Set<String> getWindowHandles() {
     // TODO(amitabh): Implement this.
@@ -151,12 +170,6 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   public String getWindowHandle() {
     // TODO(amitabh): Implement this.
     return "";
-  }
-
-  // Implements TargetLocator interface
-  public TargetLocator switchTo() {
-    // TODO(amitabh): Implement this.
-    return new ChromeTargetLocator(lib);
   }
 
   // Implements JavascriptExecutor interface

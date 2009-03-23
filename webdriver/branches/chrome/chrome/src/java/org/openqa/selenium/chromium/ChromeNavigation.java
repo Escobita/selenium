@@ -1,9 +1,9 @@
 package org.openqa.selenium.chromium;
 
-import org.openqa.selenium.*;
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
-import com.sun.jna.win32.*;
+import org.openqa.selenium.WebDriver;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
 
 import java.net.URL;
 
