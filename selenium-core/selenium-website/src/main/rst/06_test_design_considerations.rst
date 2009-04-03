@@ -144,13 +144,15 @@ UI Mapping with Selenium
    
 
 UI Map is a repository for all Objects of test scripts.
-Advantages of using UI Maps are -
+Advantages of using UI Maps are:
 
-- Having centralized location for UI objects instead of having them scattered through out the script.
-- Centralized location of objetcts makes maintenance of Tests easy.
-- Arcane html ids and names can be given comprehensible names and it increases readibility of scripts.
+- Having centralized location for UI objects instead of having them scattered 
+  through out the script.
+- Centralized location of objects makes maintenance of Tests easy.
+- Arcane HTML ids and names can be given comprehensible names and it increases 
+  readability of scripts.
 
-Consider following example (in java) of selenium tests for a website 
+Consider following example (in java) of selenium tests for a website: 
 
 .. code-block:: java
 
@@ -167,8 +169,8 @@ Consider following example (in java) of selenium tests for a website
    } 
    
 There is hardly any thing comprehensible from script. 
-Even the regular users of application would not be able to figue out 
-as to what script does. A btter script would have been -
+Even the regular users of application would not be able to figure out 
+as to what script does. A better script would have been:
    
 .. code-block:: java
 
@@ -185,7 +187,7 @@ as to what script does. A btter script would have been -
    }
    
 Though again there are no comments provided in the script but it is
-more comprehensible because of the keywors used in scripts. (please
+more comprehensible because of the keywords used in scripts. (please
 beware that UI Map is not replacement of comments) So a more comprehensible 
 script would look as following -
    
@@ -216,11 +218,11 @@ script would look as following -
    }
    
 Herein whole idea is to have centralized location for objects and using 
-comprehensible names for objects. To achieve this proerties files can 
+comprehensible names for objects. To achieve this properties files can 
 be used in java. Properties file contains key/value pairs, where in 
 key and value both are String values.
    
-Consider a property file 'prop.properties' which has got definition of 
+Consider a property file *prop.properties* which has got definition of 
 HTML object used above 
    
 .. code-block:: java
@@ -233,12 +235,10 @@ HTML object used above
    
 Hence still our objects refer to html objects but we have introduced a layer 
 of abstraction between test script and UI elements.
-Values can be read from properties file and used in Test Class to implement UI Map.
-For more on Properties files follow this URL_.
+Values can be read from properties file and used in Test Class to implement UI 
+Map. For more on Properties files follow this URL_.
 
-.. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html/
-   
-
+.. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html
 
 Bitmap Comparison
 ------------------

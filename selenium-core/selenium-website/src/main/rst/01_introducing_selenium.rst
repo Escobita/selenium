@@ -143,26 +143,31 @@ multiple test environments.
 Supported Browsers
 ------------------
 
-.. Tarun: Version 1.0 Beta 2 of Selenium list following supported browsers if wrong
-   browser string is provided while creating object for Default Selenium.
+.. Tarun: Version 1.0 Beta 2 of Selenium list following supported browsers if
+   wrong browser string is provided while creating object for Default Selenium.
    I hope these are the supported browsers :-)
+   
+.. Santi: I'm not sure if giving the string used for selenium instantiation is
+   helpful in this content, let's remember that we are in the selenium 
+   introduction and probably no one reading this will understand what 
+   \*piiexplore or *chrome mean...
    
 Following Browsers are supported with Version 1.0 Beta 2 of Selenium RC.
 
-- *firefoxproxy
-- *safari
-- *safariproxy
-- *iexplore
-- *pifirefox
-- *chrome
-- *firefox2
-- *piiexplore
-- *googlechrome
-- *iehta
-- *firefox3
-- *mock
-- *opera
-- *custom
+- \*firefoxproxy
+- \*safari
+- \*safariproxy
+- \*iexplore
+- \*pifirefox
+- \*chrome
+- \*firefox2
+- \*piiexplore
+- \*googlechrome
+- \*iehta
+- \*firefox3
+- \*mock
+- \*opera
+- \*custom
    
 .. TODO: Look this up and get the specific versions off SeleniumHQ.org 
   
