@@ -80,17 +80,11 @@ L"new function(id){\
   this.o_ = document.getElementById(id);\
 }('%ls').o_");
 
-static const std::wstring GET_ELEMENT_BY_TAGNAME(
-L"new function(tn,eid){\
-  this.o_ = '';\
-  var es = document.getElementsByTagName(tn);\
-  for (var i=0; i<es.length; i++) {\
-    if (es[i].hasAttribute('ce_id') && (es[i].getAttribute('ce_id') == eid)) {\
-      this.o_ = es[i];\
-      break;\
-    }\
-  }\
-}('%ls','%ls').o_");
+static const std::wstring GET_ELEMENT_BY_XPATH(
+L"new function(xpath){\
+  this.o_ = document.evaluate(xpath, document, null, '', null).iterateNext();\
+  alert(this.o_);\
+}(\"%ls\").o_");
 
 
 // -----------------------------------------------------------------------------

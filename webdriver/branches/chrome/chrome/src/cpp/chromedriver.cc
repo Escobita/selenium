@@ -290,9 +290,17 @@ int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** e
   if (found.size() <= 3) {
     return !SUCCESS;
   } else {
+	  std::wstring eid = found.at(3).c_str();
+    std::wstring tagName = found.at(2).c_str();
+    std::wstring xpath;
+    xpath.append(L"//");
+    xpath.append(tagName);
+    xpath.append(L"[@ce_id='");
+    xpath.append(eid);
+    xpath.append(L"']");
     std::wstring base;
-	SStringPrintf(&base, GET_ELEMENT_BY_TAGNAME.c_str(), found.at(2).c_str(), found.at(3).c_str());
-	*element = new ChromeElement(this, ChromeElement::BY_TAG, tag);
+    SStringPrintf(&base, GET_ELEMENT_BY_XPATH.c_str(), xpath);
+    *element = new ChromeElement(this, ChromeElement::BY_TAG, tag);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
 	return SUCCESS;
   }
@@ -313,8 +321,14 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByTagName(const std::wstr
 	std::wstring tagName = found.at(2).c_str();
 	for (int i=3; i<total+3; i++) {
 	  std::wstring eid = found.at(i).c_str();
+    std::wstring xpath;
+    xpath.append(L"//");
+    xpath.append(tagName);
+    xpath.append(L"[@ce_id='");
+    xpath.append(eid);
+    xpath.append(L"']");
 	  std::wstring base;
-	  SStringPrintf(&base, GET_ELEMENT_BY_TAGNAME.c_str(), tagName.c_str(), eid.c_str());
+	  SStringPrintf(&base, GET_ELEMENT_BY_XPATH.c_str(), xpath.c_str());
 	  retList->push_back(new ChromeElement(this, ChromeElement::BY_TAG, tag));
 	  retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
 	}
