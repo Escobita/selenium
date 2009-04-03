@@ -143,9 +143,27 @@ multiple test environments.
 Supported Browsers
 ------------------
 
-At the time of writing, the soon-to-be-released Selenium 1.0 supports Internet 
-Explorer, Mozilla Firefox, Opera And Safari 
+.. Tarun: Version 1.0 Beta 2 of Selenium list following supported browsers if wrong
+   browser string is provided while creating object for Default Selenium.
+   I hope these are the supported browsers :-)
+   
+Following Browsers are supported with Version 1.0 Beta 2 of Selenium RC.
 
+- *firefoxproxy
+- *safari
+- *safariproxy
+- *iexplore
+- *pifirefox
+- *chrome
+- *firefox2
+- *piiexplore
+- *googlechrome
+- *iehta
+- *firefox3
+- *mock
+- *opera
+- *custom
+   
 .. TODO: Look this up and get the specific versions off SeleniumHQ.org 
   
 Flexibility and Extensibility
