@@ -501,10 +501,11 @@ int wdGetElementAtIndex(
     return !SUCCESS;
   }
 
-	std::vector<ChromeElement*>::const_iterator cur = collection->elements->begin();
-	cur += index;
+  std::vector<ChromeElement*>::const_iterator cur = collection->elements->begin();
+  cur += index;
 
-  (*result = new WebElement())->element = *cur;
+  (*result = new WebElement())->element = new ChromeElement(0x1010101);
+  (*cur)->propagate((*result)->element);
   return SUCCESS;
 }
 

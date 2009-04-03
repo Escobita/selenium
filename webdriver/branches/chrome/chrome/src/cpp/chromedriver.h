@@ -33,6 +33,10 @@ class ChromeDriver {
 
     void setProxy(int index, int tabindex);
 
+	void setElementCounter(int counter) {
+	  e_counter_ = counter;
+	}
+
     // ------------------------------------------------------------------------
     // Browser related.
     // ------------------------------------------------------------------------

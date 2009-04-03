@@ -54,7 +54,7 @@ L"new function (id,eid,pfx) {\
 //   tagname  - Tagname of the element.
 //   id1...N  - Element ids assigned to the found elements.
 static const std::wstring FINDER_BY_TAGNAME(
-L"new function (tn,eid,pfx,sz) {\
+L"new function (tn,sz,eid,pfx) {\
   this.e_ = [''+eid,'0',''+tn];\
   var es = document.getElementsByTagName(tn);\
   var em = (sz ? es.length : 1);\
@@ -72,8 +72,7 @@ L"new function (tn,eid,pfx,sz) {\
   this.e_[0] = ''+eid;\
   this.e_[1] = ''+cntr;\
   this.e_ = this.e_.join(',');\
-}('%ls',%d,'%d',%d).e_");
-
+}('%ls',%d,%d,'%d').e_");
 
 // -----------------------------------------------------------------------------
 static const std::wstring GET_ELEMENT_BY_ID(

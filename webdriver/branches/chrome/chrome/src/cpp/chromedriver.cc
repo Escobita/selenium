@@ -257,7 +257,7 @@ int ChromeDriver::findElementById(const std::wstring id, ChromeElement** element
   } else {
     std::wstring base;
     SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
-    *element = new ChromeElement(this, ChromeElement::BY_ID, found.at(3).c_str());
+    *element = new ChromeElement(this, ChromeElement::BY_ID, id);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
 	return SUCCESS;
   }
@@ -274,7 +274,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsById(const std::wstring i
   if (found.size() > 3) {
     std::wstring base;
     SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
-	retList->push_back(new ChromeElement(this, ChromeElement::BY_ID, found.at(3).c_str()));
+	retList->push_back(new ChromeElement(this, ChromeElement::BY_ID, id));
 	retList->at(0)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
   }
   return retList;
@@ -283,7 +283,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsById(const std::wstring i
 int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** element) {
   std::wstring jscript;
   time_t curTime = time(NULL);
-  SStringPrintf(&jscript, FINDER_BY_TAGNAME.c_str(), tag.c_str(), currentCount(), curTime, 0);
+  SStringPrintf(&jscript, FINDER_BY_TAGNAME.c_str(), 0, tag.c_str(), currentCount(), curTime);
 
   std::vector<std::wstring> found;
   domGetStringArray(jscript, found);
@@ -292,15 +292,34 @@ int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** e
   } else {
     std::wstring base;
 	SStringPrintf(&base, GET_ELEMENT_BY_TAGNAME.c_str(), found.at(2).c_str(), found.at(3).c_str());
-	*element = new ChromeElement(this, ChromeElement::BY_TAG, found.at(3).c_str());
+	*element = new ChromeElement(this, ChromeElement::BY_TAG, tag);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
 	return SUCCESS;
   }
 }
 
 std::vector<ChromeElement*>* ChromeDriver::findElementsByTagName(const std::wstring tag) {
-  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
-  return toReturn;
+  std::wstring jscript;
+  time_t curTime = time(NULL);
+  SStringPrintf(&jscript, FINDER_BY_TAGNAME.c_str(), tag.c_str(), 1, currentCount(), curTime);
+
+  std::vector<std::wstring> found;
+  domGetStringArray(jscript, found);
+  std::vector<ChromeElement*>* retList = new std::vector<ChromeElement*>();
+  if (found.size() > 3) {
+    wchar_t* endChar = L"";
+	this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
+	int total = wcstol(found.at(1).c_str(), &endChar, 10);
+	std::wstring tagName = found.at(2).c_str();
+	for (int i=3; i<total+3; i++) {
+	  std::wstring eid = found.at(i).c_str();
+	  std::wstring base;
+	  SStringPrintf(&base, GET_ELEMENT_BY_TAGNAME.c_str(), tagName.c_str(), eid.c_str());
+	  retList->push_back(new ChromeElement(this, ChromeElement::BY_TAG, tag));
+	  retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
+	}
+  }
+  return retList;
 }
 
 int ChromeDriver::findElementByClassName(const std::wstring cls, ChromeElement** element) {

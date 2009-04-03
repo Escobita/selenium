@@ -8,6 +8,15 @@
 ChromeElement::~ChromeElement() {
 }
 
+void ChromeElement::propagate(ChromeElement* element) {
+	element->driver_ = this->driver_;
+	element->base_script_ = this->base_script_;
+	element->org_query_ = this->org_query_;
+	element->query_type_ = this->query_type_;
+	element->element_id_ = this->element_id_;
+	element->element_type_ = this->element_type_;
+}
+
 int ChromeElement::submit() {
   std::wstring jscript = base_script_.c_str();
   jscript.append(L".submit()");

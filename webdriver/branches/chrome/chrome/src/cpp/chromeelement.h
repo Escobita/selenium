@@ -20,6 +20,10 @@ class ChromeElement {
       BY_LINK_PARTIAL_TEXT = 7
     };
 
+	ChromeElement(int cid) {
+	  if (cid != 0x1010101) throw "Cannot create ChromeElement";
+	}
+
     ChromeElement(ChromeDriver* driver, QueryType type, const std::wstring query) :
       driver_(driver), query_type_(type), org_query_(query), base_script_(L""),
       element_id_(L""), element_type_(L"") {}
@@ -56,6 +60,7 @@ class ChromeElement {
 
     int getSize(long* width, long* height);
 
+	void propagate(ChromeElement* element);
   protected:
     friend class ChromeDriver;
     void setElementIdentifier(
