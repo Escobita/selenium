@@ -23,12 +23,75 @@ static const std::wstring GET_CURRENT_URL(
 // -----------------------------------------------------------------------------
 // Element related
 // -----------------------------------------------------------------------------
-static const std::wstring FINDER_BY_ID(
-    L"new function(id,eid){this.e_='';var e=document.getElementById(id);\
-    if(e){this.e_=''+id+','+e.nodeName;}}('%ls','e_%d').e_");
 
+// @params id  - Id to be searched.
+// @params eid - Element id current counter.
+// @params pfx - Prefix to be used before counter.
+// @returns [last_eid,N,tagname,id1,id2,...,eidN] Where,
+//   last_eid - Element id after the operations.
+//   N        - Number of elements returned.
+//   tagname  - Tagname of the element.
+//   id1...N  - Element ids assigned to the found elements.
+static const std::wstring FINDER_BY_ID(
+L"new function (id,eid,pfx) {\
+  this.e_ = [''+eid,'0',''];\
+  var e = document.getElementById(id);\
+  if (e) {\
+    this.e_[1] = '' + 1;\
+    this.e_[2] = '' + e.nodeName;\
+    this.e_.push(''+e.id);\
+  }\
+  this.e_ = this.e_.join(',');\
+}('%ls',%d,'%d').e_");
+
+// @params tn  - Tagname to be searched.
+// @params eid - Element id current counter.
+// @params pfx - Prefix to be used before counter.
+// @params sz  - True for all, False for 1.
+// @returns [last_eid,N,tagname,eid1,eid2,...,eidN]
+//   last_eid - Element id after the operations.
+//   N        - Number of elements returned.
+//   tagname  - Tagname of the element.
+//   id1...N  - Element ids assigned to the found elements.
+static const std::wstring FINDER_BY_TAGNAME(
+L"new function (tn,eid,pfx,sz) {\
+  this.e_ = [''+eid,'0',''+tn];\
+  var es = document.getElementsByTagName(tn);\
+  var em = (sz ? es.length : 1);\
+  var cntr = 0;\
+  for (var i=0; i<em; i++) {\
+    if (es[i].hasAttribute('ce_id')) {\
+      this.e_.push(''+es[i].getAttribute('ce_id'));\
+    } else {\
+      var sid = ''+pfx+'_'+(eid++);\
+      es[i].setAttribute('ce_id', sid);\
+      this.e_.push(sid);\
+    }\
+    cntr++;\
+  }\
+  this.e_[0] = ''+eid;\
+  this.e_[1] = ''+cntr;\
+  this.e_ = this.e_.join(',');\
+}('%ls',%d,'%d',%d).e_");
+
+
+// -----------------------------------------------------------------------------
 static const std::wstring GET_ELEMENT_BY_ID(
-    L"new function(id){this.o_ = document.getElementById(id);}('%ls').o_");
+L"new function(id){\
+  this.o_ = document.getElementById(id);\
+}('%ls').o_");
+
+static const std::wstring GET_ELEMENT_BY_TAGNAME(
+L"new function(tn,eid){\
+  this.o_ = '';\
+  var es = document.getElementsByTagName(tn);\
+  for (var i=0; i<es.length; i++) {\
+    if (es[i].hasAttribute('ce_id') && (es[i].getAttribute('ce_id') == eid)) {\
+      this.o_ = es[i];\
+      break;\
+    }\
+  }\
+}('%ls','%ls').o_");
 
 
 // -----------------------------------------------------------------------------

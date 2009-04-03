@@ -2,6 +2,7 @@
 #include "chromescript.h"
 #include "chromeelement.h"
 
+#include <time.h>
 #include <wchar.h>
 
 #include "base/base_switches.h"
@@ -45,6 +46,7 @@ std::string WStringToString(const std::wstring& ws) {
 ChromeDriver::ChromeDriver() {
   proxy_ = new AutomationProxy(timeout_);
   current_frame_ = L"";
+  current_frame_src_ = L"";
   is_visible_ = true;
   e_counter_ = 0;
   default_window_index_ = 0;
@@ -75,6 +77,7 @@ int ChromeDriver::Launch() {
     if (!proxy_->WaitForWindowCountToBecome(1, 6000)) {
       return !SUCCESS;
     }
+
     proxy_->SetFilteredInet(true);
   }
 
@@ -244,28 +247,55 @@ int ChromeDriver::addCookie(const std::wstring cookieString) {
 // ----------------------------------------------------------------------------
 int ChromeDriver::findElementById(const std::wstring id, ChromeElement** element) {
   std::wstring jscript;
-  SStringPrintf(&jscript, FINDER_BY_ID.c_str(), id.c_str(), currentCount());
+  time_t curTime = time(NULL);
+  SStringPrintf(&jscript, FINDER_BY_ID.c_str(), id.c_str(), currentCount(), curTime);
 
   std::vector<std::wstring> found;
   domGetStringArray(jscript, found);
-  if (found.size() != 2) {
+  if (found.size() <= 3) {
     return !SUCCESS;
   } else {
     std::wstring base;
-    SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(0).c_str());
-    *element = new ChromeElement(this, ChromeElement::BY_ID, id);
-    (*element)->setElementIdentifier(base, id, found.at(1));
+    SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
+    *element = new ChromeElement(this, ChromeElement::BY_ID, found.at(3).c_str());
+    (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+	return SUCCESS;
   }
-  return SUCCESS;
 }
 
 std::vector<ChromeElement*>* ChromeDriver::findElementsById(const std::wstring id) {
-  std::vector<ChromeElement*>* toReturn = new std::vector<ChromeElement*>();
-  return toReturn;
+  std::wstring jscript;
+  time_t curTime = time(NULL);
+  SStringPrintf(&jscript, FINDER_BY_ID.c_str(), id.c_str(), currentCount(), curTime);
+
+  std::vector<std::wstring> found;
+  domGetStringArray(jscript, found);
+  std::vector<ChromeElement*>* retList = new std::vector<ChromeElement*>();
+  if (found.size() > 3) {
+    std::wstring base;
+    SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
+	retList->push_back(new ChromeElement(this, ChromeElement::BY_ID, found.at(3).c_str()));
+	retList->at(0)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+  }
+  return retList;
 }
 
 int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** element) {
-  return SUCCESS;
+  std::wstring jscript;
+  time_t curTime = time(NULL);
+  SStringPrintf(&jscript, FINDER_BY_TAGNAME.c_str(), tag.c_str(), currentCount(), curTime, 0);
+
+  std::vector<std::wstring> found;
+  domGetStringArray(jscript, found);
+  if (found.size() <= 3) {
+    return !SUCCESS;
+  } else {
+    std::wstring base;
+	SStringPrintf(&base, GET_ELEMENT_BY_TAGNAME.c_str(), found.at(2).c_str(), found.at(3).c_str());
+	*element = new ChromeElement(this, ChromeElement::BY_TAG, found.at(3).c_str());
+    (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+	return SUCCESS;
+  }
 }
 
 std::vector<ChromeElement*>* ChromeDriver::findElementsByTagName(const std::wstring tag) {

@@ -55,17 +55,28 @@ void CopyToStringWrapper(const std::wstring& src, StringWrapper** wrap) {
   wcscpy_s((*wrap)->text, length, src.c_str());
 }
 
+void dg(const std::wstring msg) {
+  std::wcout << L"INFO: " << msg << std::endl;
+}
 // ----------------------------------------------------------------------------
 // Driver Related implementation.
 // ----------------------------------------------------------------------------
 int wdNewDriverInstance(WebDriver** ptrDriver) {
   if (*ptrDriver) return !SUCCESS;
 
+  dg(L"Step 1..");
   // Allocate instance
   (*ptrDriver = new WebDriver())->instance = new ChromeDriver();
 
-  if ((*ptrDriver)->instance->Launch() == SUCCESS) return SUCCESS;
+  dg(L"Step 2..");
+  int retval = (*ptrDriver)->instance->Launch();
+  dg(L"Step 3..");
+  if (retval == SUCCESS) {
+	  dg(L"Step 3.1.");
+    return SUCCESS;
+  }
 
+  dg(L"Step 4..");
   // If failed then clean up.
   delete (*ptrDriver)->instance;
   (*ptrDriver)->instance = NULL;
@@ -102,7 +113,7 @@ int wdSetVisible(WebDriver* ptrDriver, int value) {
     return !SUCCESS;
   }
 
-  return ptrDriver->instance->setVisible(value);
+  return (int)ptrDriver->instance->setVisible(value);
 }
 
 int wdClose(WebDriver* ptrDriver) {
