@@ -1337,9 +1337,12 @@ Specifying a Separate Firefox Profile
 Firefox will not run two instances simultaneously unless you specify a 
 separate profile for each instance. Later versions of Selenium-RC run in a 
 separate profile automatically, however, if you are using an older version of 
-Selenium, you may need to explicitly specify a separate profile. 
+Selenium or if you need to have a special configuration in your running browser
+(such as adding an https certificate or having some addons installed), you may 
+need to explicitly specify a separate profile. 
 
-Open the Windows "Start" menu, select "Run",then type and enter one of the following:
+Open the Windows Start menu, select "Run", then type and enter one of the 
+following:
 
 .. code-block:: bash
 
@@ -1351,7 +1354,7 @@ Open the Windows "Start" menu, select "Run",then type and enter one of the follo
 
 Create a new profile using the dialog. When you run the Selenium-RC server, 
 tell it to use this new Firefox profile with the server command-line option 
-\-firefoxProfileTemplate and specify the path to the profile:
+*\-firefoxProfileTemplate* and specify the path to the profile:
 
 .. code-block:: bash
 
@@ -1364,6 +1367,10 @@ tell it to use this new Firefox profile with the server command-line option
 .. warning::  Be sure to put your profile in a separate new folder!!! 
    The Firefox profile manager tool will delete all files in a folder if you 
    delete a profile, regardless of whether they are profile files or not. 
+   
+More information about firefox profiles in `Mozilla's Knowledge Base`_
+
+.. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
  
 Specifying the Path to a Specific Browser 
 -----------------------------------------
