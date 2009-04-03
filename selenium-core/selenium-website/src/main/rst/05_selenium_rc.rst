@@ -208,8 +208,8 @@ an executable batch file (.bat on windows and .sh on linux) with just the line
 write above. This way, you can make a shortcut to that executable file in your
 desktop and just double-click on it anytime you want to wake up the server.
 
-Java client installation
-~~~~~~~~~~~~~~~~~~~~~~~~
+Java client driver configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. Santi: I found this link and thought it could be useful:
    http://epyramid.wordpress.com/2008/11/26/setting-up-selenium-rc-testng-using-eclipse/
@@ -470,8 +470,8 @@ It should not be very different for higher version of intelliJ.
 
 .. <Documentation is in progress> 
 
-Python Client Installation 
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python Client Driver Configuration 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following steps describe the basic installation procedure. After following 
 this, the user can start using the desired IDE, (even write tests in a text 
