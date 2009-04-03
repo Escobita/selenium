@@ -1,10 +1,10 @@
 .. _chapter06-reference:
 
-.. Santi: I'm not sure about this whole chapter. I looks like most of the content
+.. Santi: I'm not sure about this whole chapter. It looks like most of the content
    should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 
    can merge both chapters, it'd keep advanced topics where anyone will expect.
 
-Test Design Considerations
+Test Design Considerations 
 ==========================
 
 Introducing Test Design Options
@@ -16,11 +16,10 @@ Web Page Content -- Static vs. Dynamic Pages
 .. Tarun: Any one Please go through description below for Static vs Dynamic 
    and suggest improvement or any thing I have misunderstated.
 
-.. Note: 
-    This topic is covered as - Object identification for Static content and 
-    Object identification for Dynamic contents. The examples described here 
-    are specific to Java but should not be very hard to implement on the 
-    scripting language of your choice.
+
+This topic is explained as - Object identification for Static content and 
+Object identification for Dynamic contents. The examples described here 
+are specific to Java and must have equivalent in the language of your choice.
 
 
 Object Identification for Static HTML Objects       
@@ -51,15 +50,15 @@ Dynamic HTML of an object might look as:
 
 This is HTML snippet for a check box. Its id and name 
 (addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
-(they will change the next time you open the application). Now in this case,
-normal object identification like:
+(they will change the next time you open the application). In this case
+normal object identification would look like:
 
 .. code-block:: java
 
     selenium.click("addForm:_id74:_id75:0:_id79:0:checkBox);
 
-Would not work. The best way is to capture this id dynamically from the website
-itself. This can be done as follows:
+Given the dynamic nature of id this approach would not work. The best way is 
+to capture this id dynamically from the website itself. It can be done as:
 
 .. code-block:: java
 
@@ -74,6 +73,8 @@ itself. This can be done as follows:
 
 .. Santi: I'm not sure if this is a good example... We can just do this by
    using a simple CSS or XPATH locator.
+   
+.. Tarun: Please elaborate more on css locators.   
 
 This approach will work only if there is one field whose id has got the text 
 'addForm' appended to it.
@@ -113,7 +114,8 @@ element link can be achieved as following:
             }
         }
     }
-
+    
+    // Click on collected element.
     selenium.click(editInfo);
                    
 
@@ -139,6 +141,104 @@ UI Mapping with Selenium
 
 .. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
    placed on?
+   
+
+UI Map is a repository for all Objects of test scripts.
+Advantages of using UI Maps are -
+
+- Having centralized location for UI objects instead of having them scattered through out the script.
+- Centralized location of objetcts makes maintenance of Tests easy.
+- Arcane html ids and names can be given comprehensible names and it increases readibility of scripts.
+
+Consider following example (in java) of selenium tests for a website 
+
+.. code-block:: java
+
+   public void testNew() throws Exception { 
+   		selenium.open("http://www.test.com");
+   		selenium.type("loginForm:tbUsername", "xxxxxxxx");
+   		selenium.click("loginForm:btnLogin");
+   		selenium.click("adminHomeForm:_activitynew");
+   		selenium.waitForPageToLoad("30000");
+   		selenium.click("addEditEventForm:_idcancel");
+   		selenium.waitForPageToLoad("30000");
+   		selenium.click("adminHomeForm:_activityold");
+   		selenium.waitForPageToLoad("30000");
+   } 
+   
+There is hardly any thing comprehensible from script. 
+Even the regular users of application would not be able to figue out 
+as to what script does. A btter script would have been -
+   
+.. code-block:: java
+
+   public void testNew() throws Exception {
+   		selenium.open("http://www.test.com");
+   		selenium.type(admin.username, "xxxxxxxx");
+   		selenium.click(admin.loginbutton);
+   		selenium.click(admin.events.createnewevent);
+   		selenium.waitForPageToLoad("30000");
+   		selenium.click(admin.events.cancel);
+   		selenium.waitForPageToLoad("30000");
+   		selenium.click(admin.events.viewoldevents);
+   		selenium.waitForPageToLoad("30000");
+   }
+   
+Though again there are no comments provided in the script but it is
+more comprehensible because of the keywors used in scripts. (please
+beware that UI Map is not replacement of comments) So a more comprehensible 
+script would look as following -
+   
+.. code-block:: java
+
+   public void testNew() throws Exception {
+
+		// Open app url.
+   		selenium.open("http://www.test.com");
+   		
+   		// Provide admin username.
+   		selenium.type(admin.username, "xxxxxxxx");
+   		
+   		// Click on Login button.
+   		selenium.click(admin.loginbutton);
+   		
+   		// Click on Create New Event button.
+   		selenium.click(admin.events.createnewevent);
+   		selenium.waitForPageToLoad("30000");
+   		
+   		// Click on Cancel button.
+   		selenium.click(admin.events.cancel);
+   		selenium.waitForPageToLoad("30000");
+   		
+   		// Click on View Old Events button.
+   		selenium.click(admin.events.viewoldevents);
+   		selenium.waitForPageToLoad("30000");
+   }
+   
+Herein whole idea is to have centralized location for objects and using 
+comprehensible names for objects. To achieve this proerties files can 
+be used in java. Properties file contains key/value pairs, where in 
+key and value both are String values.
+   
+Consider a property file 'prop.properties' which has got definition of 
+HTML object used above 
+   
+.. code-block:: java
+   
+   admin.username = loginForm:tbUsername
+   admin.loginbutton = loginForm:btnLogin
+   admin.events.createnewevent = adminHomeForm:_activitynew
+   admin.events.cancel = addEditEventForm:_idcancel
+   admin.events.viewoldevents = adminHomeForm:_activityold
+   
+Hence still our objects refer to html objects but we have introduced a layer 
+of abstraction between test script and UI elements.
+Values can be read from properties file and used in Test Class to implement UI Map.
+For more on Properties files follow this URL_.
+
+.. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html/
+   
+
 
 Bitmap Comparison
 ------------------
