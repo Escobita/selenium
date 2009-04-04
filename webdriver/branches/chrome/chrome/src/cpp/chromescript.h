@@ -90,24 +90,128 @@ L"new function(cls,sz,eid,pfx) {\
   this.e_ = [''+eid,'0'];\
   var xpath = '//*[@class=\\''+cls+'\\']';\
   var es = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);\
+  var em = (sz ? es.snapshotLength : 1);\
   var cntr = 0;\
-  for(var i=0; i<es.snapshotLength; i++) {\
+  for(var i=0; i<em; i++) {\
     var e = es.snapshotItem(i);\
     cntr++;\
-    this.e_.push(''+e.tagName);\
-	if (e.hasAttribute('ceid')) {\
-	  this.e_.push(''+e.getAttribute('ceid'));\
-	} else {\
-	  var sid = ''+pfx+'_'+(eid++);\
-	  e.setAttribute('ceid',sid);\
-	  this.e_.push(sid);\
-	}\
+    this.e_.push(''+e.nodeName);\
+	  if (e.hasAttribute('ceid')) {\
+	    this.e_.push(''+e.getAttribute('ceid'));\
+	  } else {\
+	    var sid = ''+pfx+'_'+(eid++);\
+	    e.setAttribute('ceid',sid);\
+	    this.e_.push(sid);\
+	  }\
   }\
   this.e_[0] = ''+eid;\
   this.e_[1] = ''+cntr;\
   this.e_ = this.e_.join(',');\
 }('%ls',%d,%d,'%d').e_");
 
+// @params nam - Name to be searched.
+// @params eid - Element id current counter.
+// @params pfx - Prefix to be used before counter.
+// @params sz  - True for all, False for 1.
+// @returns [last_eid,N,tagname1,eid1,tagname2,eid2,...,tagnameN,eidN]
+//   last_eid - Element id after the operations.
+//   N        - Number of elements returned.
+//   tagname  - Tagname of the element.
+//   id1...N  - Element ids assigned to the found elements.
+static const std::wstring FINDER_BY_NAME(
+L"new function(nam,sz,eid,pfx) {\
+  this.e_ = [''+eid,'0'];\
+  var xpath = '//*[@name=\\''+nam+'\\']';\
+  var es = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);\
+  var em = (sz ? es.snapshotLength : 1);\
+  var cntr = 0;\
+  for(var i=0; i<em; i++) {\
+    var e = es.snapshotItem(i);\
+    cntr++;\
+    this.e_.push(''+e.nodeName);\
+	  if (e.hasAttribute('ceid')) {\
+	    this.e_.push(''+e.getAttribute('ceid'));\
+	  } else {\
+	    var sid = ''+pfx+'_'+(eid++);\
+	    e.setAttribute('ceid',sid);\
+	    this.e_.push(sid);\
+	  }\
+  }\
+  this.e_[0] = ''+eid;\
+  this.e_[1] = ''+cntr;\
+  this.e_ = this.e_.join(',');\
+}('%ls',%d,%d,'%d').e_");
+
+// @params txt - Text to be searched.
+// @params eid - Element id current counter.
+// @params pfx - Prefix to be used before counter.
+// @params sz  - True for all, False for 1.
+// @returns [last_eid,N,tagname1,eid1,tagname2,eid2,...,tagnameN,eidN]
+//   last_eid - Element id after the operations.
+//   N        - Number of elements returned.
+//   tagname  - Tagname of the element.
+//   id1...N  - Element ids assigned to the found elements.
+static const std::wstring FINDER_BY_LINKTEXT(
+L"new function(txt,sz,eid,pfx) {\
+  this.e_ = [''+eid,'0'];\
+  var xpath = '//A|//a';\
+  var es = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);\
+  var em = (sz ? es.snapshotLength : 1);\
+  var cntr = 0;\
+  for(var i=0; i<em; i++) {\
+    var e = es.snapshotItem(i);\
+    if (txt == e.innerHTML) {\
+      this.e_.push(''+e.nodeName);\
+	    if (e.hasAttribute('ceid')) {\
+	      this.e_.push(''+e.getAttribute('ceid'));\
+	    } else {\
+	      var sid = ''+pfx+'_'+(eid++);\
+	      e.setAttribute('ceid',sid);\
+	      this.e_.push(sid);\
+	    }\
+      cntr++;\
+    }\
+  }\
+  this.e_[0] = ''+eid;\
+  this.e_[1] = ''+cntr;\
+  this.e_ = this.e_.join(',');\
+}('%ls',%d,%d,'%d').e_");
+
+// @params ptxt - Partial Text to be searched.
+// @params eid  - Element id current counter.
+// @params pfx  - Prefix to be used before counter.
+// @params sz   - True for all, False for 1.
+// @returns [last_eid,N,tagname1,eid1,tagname2,eid2,...,tagnameN,eidN]
+//   last_eid - Element id after the operations.
+//   N        - Number of elements returned.
+//   tagname  - Tagname of the element.
+//   id1...N  - Element ids assigned to the found elements.
+static const std::wstring FINDER_BY_PARTIALLINKTEXT(
+L"new function(ptxt,sz,eid,pfx) {\
+  this.e_ = [''+eid,'0'];\
+  var xpath = '//A|//a';\
+  var es = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);\
+  var em = (sz ? es.snapshotLength : 1);\
+  var cntr = 0;\
+  for(var i=0; i<em; i++) {\
+    var e = es.snapshotItem(i);\
+    var txt = '' + e.innerHTML;\
+    if (txt.search(ptxt) > 0) {\
+      this.e_.push(''+e.nodeName);\
+	    if (e.hasAttribute('ceid')) {\
+	      this.e_.push(''+e.getAttribute('ceid'));\
+	    } else {\
+	      var sid = ''+pfx+'_'+(eid++);\
+	      e.setAttribute('ceid',sid);\
+	      this.e_.push(sid);\
+	    }\
+      cntr++;\
+    }\
+  }\
+  this.e_[0] = ''+eid;\
+  this.e_[1] = ''+cntr;\
+  this.e_ = this.e_.join(',');\
+}('%ls',%d,%d,'%d').e_");
 
 // -----------------------------------------------------------------------------
 static const std::wstring GET_ELEMENT_BY_ID(
@@ -127,7 +231,6 @@ L"new function(tn,ceid){\
     }\
   }\
   }(\"%ls\",\"%ls\").o_");
-
 
 // -----------------------------------------------------------------------------
 // Frames related
