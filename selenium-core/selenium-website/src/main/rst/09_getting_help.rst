@@ -32,20 +32,40 @@ Chat Room
 Though the best place to ask for help are the forums (because they also keep the
 information accessible for others to read it in the future). If you have a very
 important (or too simple) issue that needs a solution ASAP, you can always enter
-to the IRC chat room. You will always find someone ready to help on #selenium at
-Freenode.
+to the IRC chat room. You will always find someone ready to help on *#selenium at
+Freenode* (irc.freenode.net).
 
-OpenQA 
-------
+Commercial Support
+------------------
 
-.. Santi: Not sure what can users do on OpenQA...
+Need more professional help? No problem. We're keeping a list of companies and
+individuals that can provide hands-on, expert support with Selenium, continuous
+integration, and other QA automation techniques.
 
-Jira
-----
+ThoughtWorks_
+  The original creator of Selenium and leader in agile development.
+BrowserMob_
+  Provides Selenium-based load testing services using thousands of real browsers.
+`Sauce Labs`_
+  Cloud-based service to run Selenium tests faster and more easily.
+Gomez_
+  RealityCheck provides Selenium-in-the-cloud for all major browsers and OS's.
+PushToTest_
+  TestMaker runs Selenium as load tests and service monitors.
+W3QA_
+  On-demand test automation services dedicated to Selenium.
 
-.. Santi: I think it's good to explain people how to post bugs of the 
-   application...
+If you think you or your company should be listed here, just let us know by
+posting to the `Selenium Developers`_ forum.
 
+.. _ThoughtWorks: http://thoughtworks.com/
+.. _BrowserMob: http://browsermob.com/
+.. _Sauce Labs: http://saucelabs.com/
+.. _Gomez: http://gomez.com/
+.. _PushToTest: http://pushtotest.com/
+.. _W3QA: http://www.w3qa.eu/
+.. _Selenium Developers: http://clearspace.openqa.org/community/selenium/developers
+ 
 Selenium Reference 
 ------------------
 
