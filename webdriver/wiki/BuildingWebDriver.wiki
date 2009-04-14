@@ -35,17 +35,14 @@ Make sure that you've got the JAVA_HOME environment setting properly set up. In 
 
 == All Firefox Tests Fail ==
 
-The main reason why all the FirefoxDriver tests fail is because the required profile hasn't been set up. The following trouble-shooting steps might be useful:
+Occasionally we change the protocol of how the java code in the Firefox driver talks to the extension. The main reason why all the firefox tests fail is because the user has installed an older version of the WebDriver profile for Firefox. This should be deleted, and the profile packaged into the "webdriver-firefox.jar" should be used.
+
+The following trouble-shooting steps might be useful:
 
  # Check that you have the latest version of the code ({{{svn up}}})
  # Delete the WebDriver profile. The easiest way to do this is to start firefox using {{{firefox -ProfileManager}}}
- # Recreate the profile using the FirefoxLauncher. The easiest way to do this is {{{rake install_firefox}}}
- # Start Firefox using the new WebDriver profile ({{{firefox -P WebDriver}}})
- # Check that the extension has been installed correctly:
-   * First by checking the "Tools->Add-Ons" popup
-   * Looking at the content of {{{${PROFILE_DIR}/.*WebDriver/extensions/fxdriver@googlecode.com}}} This should contain the path to wherever it is that you've checked WebDriver out to and end with {{{firefox/src/extension}}}. {{{${PROFILE_DIR}}}} is the location where Firefox stores its profiles.
 
-Alternatively, it's possible that you have an out-of-date WebDriver profile. To sort this out, try running {{{rake install_firefox}}} again, or delete the profile entirely (using {{{firefox -ProfileManager}}} which may require you to kill any open instances of Firefox before opening properly)
+Although it was necessary in the early days of webdriver development, it is now no longer necessary to install the webdriver extension manually. Indeed, doing so is more likely to be the root of hard to track down errors. It is strongly recommended that you *do not* install the firefox extension manually
 
 == I've Followed the Steps Above and All the Firefox Tests Still Fail ==
 
