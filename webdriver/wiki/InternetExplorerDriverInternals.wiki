@@ -1,19 +1,55 @@
 #summary How the InternetExplorerDriver works, and how to work on it
 
+<wiki:toc max_depth="3" />
+
 = How the InternetExplorerDriver Works =
 
-The "best fit" language for the InternetExplorerDriver is C++, which drives the browser using the IE Automation COM components.
+http://webdriver.googlecode.com/svn/wiki/iearch.png
 
-Key files are:
+The diagram above illustrates the design of the InternetExplorerDriver at a high level. The general flow of control is from left to right, so the obvious place to start when working on the InternetExplorerDriver is on the far left, where the test code calls into the driver!
 
-  * [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/InternetExplorerDriver.cpp InternetExplorerDriver.cpp]
-  * [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/ElementWrapper.cpp ElementWrapper.cpp]
+== Client Code Into the Driver ==
 
-Most languages support calling or linking to exported functions from a C library, and for this reason we export a flattened API, which returns opaque handles to objects in [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h webdriver.h]
+Key files: [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h webdriver.h]
 
-Currently, the Java binding uses JNI, and in this case the C++ source is organised into separate layers. Each Java class that uses native methods has a matching header and source file (with a very long name). These are responsible for handling all the conversion to and from JNI types, and call down to other classes which handle driving IE and marshalling from COM types to simpler types. At some point, we plan on moving to [https://jna.dev.java.net/ JNA] to help simplify development and unify the model used for writing the driver with other language bindings.
+Language bindings are (or should be) thin shims around the underlying driver. In the case of the InternetExplorerDriver, we communicate from the "Object Based" language bindings to a flattened API presented in `[http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h webdriver.h]`. These are presented as a series of exported C functions, and so can be called without difficulty using libraries such as [https://jna.dev.java.net/ JNA], [http://docs.python.org/library/ctypes.html ctypes], [http://msdn.microsoft.com/en-us/library/aa446536.aspx pinvoke] or [http://www.ruby-doc.org/stdlib/libdoc/dl/rdoc/index.html DL]. This increases the complexity of implementing the driver itself, but makes writing new clients a lot easier. It also means that clients are responsible for memory management.
 
-For the Java binding, XPath evaluation is done using Jaxen, an Open Source XPath engine. The key Java class is the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/java/com/googlecode/webdriver/ie/IeNavigator.java IeNavigator]. This ultimately makes use of the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/ElementNode.cpp ElementNode] and [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/DocumentNode.cpp DocumentNode] C++ classes. In order to allow XPath support for other languages, we plan on migrating to a native XPath solution, accessed in the same way as other native functionality.
+=== Memory Management ===
+
+The rule of thumb: if you ask the driver for it, you're responsible for ensuring that the memory is cleared. The basic pattern is that followed by the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h#43 StringWrapper], who's usage is demonstrated below (in C, and omitting any checking of error codes):
+
+{{{
+StringWrapper* wrapper;
+wdGetCurrentUrl(driver, &wrapper);
+
+/* Use the wrapper */
+
+errorCode = wdFreeString(wrapper);
+}}}
+
+In languages that support an object lifecycles, you may find it easiest to ensure that the handle is freed in an object's finalizer or destructor.
+
+=== Error Codes ===
+
+Key files: [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/errorcodes.h errorcodes.h]
+
+Each function exposed from `webdriver.h` returns an `int` as a result. When the function succeeds, this result will be 0. In all other cases, an error code is returned, as indicated in errorcodes.h. Client implementations are free to interpret these response codes as they wish to, but the Java code attempts to give meaningful exceptions.
+
+== The Driver to IE ==
+
+Key files: [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/IEThread.h IEThread.h], [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/InternetExplorerDriver.cpp InternetExplorerDriver.cpp], [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/IEThreadExplorer.cpp IEThreadExplorer.cpp]
+
+The C code in `webdriver.h` is ultimately a thin wrapper around C++ classes that model the the Object-based design of the Java code (the `InternetExplorerDriver (C++)` and `IEThreadExplorer (C++)` in the diagram) The underlying IE COM interfaces are designed for use in a Single Thread Apartment (STA) model. That is, the COM object must only ever be accessed from a single thread. Unfortunately, we cannot control how many threads call into our implementing library, and there are perfectly reasonable occasions where more than one thread may attempt to call the underlying library, even if in serial fashion (for example, the RemoteWebDriver is hosted in a servlet container, where many threads may be in use) In order to isolate the COM interfaces, we pass messages across a thread boundary using the Win32 PostMessage API.
+
+This design causes a certain amount of complexity to enter the InternetExplorerDriver, but does mean that client code can afford to be ignorant of the constraints offered by the underlying implementation: this is seen as being a Good Thing by the webdriver team.
+
+== Keyboard and Mouse Input ==
+
+Key files: [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/interactions.cpp interactions.cpp]
+
+There are two ways that we could simulate keyboard and mouse input. The first way, which is used in parts of webdriver, is to synthesize events on the DOM. This has a number of drawbacks, since each browser (and version of a browser) has its own unique quirks; to model each of these is a demanding task, and impossible to get completely right (for example, it's hard to tell what `window.selection` should be and this is a read-only property on some browsers) The alternative approach is to synthesize keyboard and mouse input at the OS level, ideally without stealing focus from the user (who tends to be doing other things on their computer as long-running webdriver tests run)
+ 
+The code for doing this is in [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/interactions.cpp interactions.cpp] The key thing to note here is that we use PostMessages to push window events on to the message queue of the IE instance. Typing, in particular, is interesting: we only send the "keydown" and "keyup" messages. The "keypress" event is created if necessary by IE's internal event processing. Because the key press event is not always generated (for example, not every character is printable, and if the default event bubbling is cancelled, listeners don't see the key press event) we send a "probe" event in after the key down. Once we see that this has been processed, we know that the key press event is on the stack of events to be processed, and that it is safe to send the key up event. If this was not done, it is possible for events to fire in the wrong order, which is definitely sub-optimal.
 
 = Working On the InternetExplorerDriver = 
 
@@ -28,4 +64,4 @@ Currently, all the tests for the InternetExplorerDriver are written in Java, and
 
 Once the basic setup is done, you can start working on the code pretty quickly. As an alternative, there will soon be .Net bindings added (using C#) Once these have been added, it should be possible to make changes to the IE driver entirely in Visual Studio.
 
-When working with Java, any unhandled exception in the C++ code may cause the JVM to die. If this happens, take a look at the log files that Java generates. This will give you a hint at where to start when tracking down the problem.
+When working with Java, any unhandled exception in the C++ code may cause the JVM to die. If this happens, take a look at the log files that Java generates. This will give you a hint at where to start when tracking down the problem. When the IE driver is compiled in "Release" mode, we turn on Structured Exception Handling, which means that rather than taking out the JVM an `IllegalStateException` is thrown. 
