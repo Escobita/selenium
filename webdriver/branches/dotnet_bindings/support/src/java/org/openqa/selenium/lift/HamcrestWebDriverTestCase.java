@@ -1,9 +1,28 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.lift;
 
 import junit.framework.TestCase;
 
-import org.hamcrest.Matcher;
+import static org.openqa.selenium.lift.match.NumericalMatchers.exactly;
+import static org.openqa.selenium.lift.match.SelectionMatcher.selection;
 
+import org.hamcrest.Matcher;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.lift.find.Finder;
@@ -15,11 +34,24 @@ import org.openqa.selenium.lift.find.Finder;
  */
 public abstract class HamcrestWebDriverTestCase extends TestCase {
 
-	private TestContext context = new WebDriverTestContext(createDriver());
+	private static final long DEFAULT_TIMEOUT = 5000;
+
+        private WebDriver driver = createDriver();
+        private TestContext context = new WebDriverTestContext(driver);
 
 	protected abstract WebDriver createDriver();
 
-	protected void clickOn(Finder<WebElement, WebDriver> finder) {
+	@Override
+	protected void tearDown() throws Exception {
+		context.quit();
+		super.tearDown();
+	}
+
+        protected WebDriver getWebDriver() {
+          return driver;
+        }
+
+        protected void clickOn(Finder<WebElement, WebDriver> finder) {
 		context.clickOn(finder);
 	}
 
@@ -29,6 +61,14 @@ public abstract class HamcrestWebDriverTestCase extends TestCase {
 	
 	protected void assertPresenceOf(Matcher<Integer> cardinalityConstraint, Finder<WebElement, WebDriver> finder) {
 		context.assertPresenceOf(cardinalityConstraint, finder);
+	}
+	
+	protected void waitFor(Finder<WebElement, WebDriver> finder) {
+		waitFor(finder, DEFAULT_TIMEOUT);
+	}
+	
+	protected void waitFor(Finder<WebElement, WebDriver> finder, long timeout) {
+		context.waitFor(finder, timeout);
 	}
 
 	/**
@@ -63,4 +103,34 @@ public abstract class HamcrestWebDriverTestCase extends TestCase {
 	void setContext(TestContext context) {
 		this.context = context;
 	}
+
+      /**
+       * Returns the current page source
+       */
+      public String getPageSource() {
+        return getWebDriver().getPageSource();
+      }
+
+      /**
+       * Returns the current page title
+       */
+      public String getTitle() {
+        return getWebDriver().getTitle();
+      }
+
+      /**
+       * Returns the current URL
+       */
+      public String getCurrentUrl() {
+        return getWebDriver().getCurrentUrl();
+      }
+
+      protected void assertSelected(Finder<WebElement, WebDriver> finder) {
+		assertPresenceOf(finder.with(selection()));
+	}
+	
+	protected void assertNotSelected(Finder<WebElement, WebDriver> finder) {
+		assertPresenceOf(exactly(0), finder.with(selection()));
+	}
+	
 }

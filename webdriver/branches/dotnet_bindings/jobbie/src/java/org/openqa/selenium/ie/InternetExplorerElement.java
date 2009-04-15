@@ -1,20 +1,34 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
 package org.openqa.selenium.ie;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.ie.WebDriverLibrary.HWNDByReference;
-import org.openqa.selenium.internal.InteractionData;
+import org.openqa.selenium.ie.ExportedWebDriverFunctions.HWNDByReference;
 import org.openqa.selenium.internal.Locatable;
 
-import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
@@ -22,187 +36,193 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 public class InternetExplorerElement implements RenderedWebElement, SearchContext, Locatable {
-    private final Pointer element;
-	private final Pointer parent;
-	private final WebDriverLibrary lib;
-	private final Helpers helpers;
 
-	// Called from native code
-    public InternetExplorerElement(WebDriverLibrary lib, Pointer parent, Pointer element) {
-        this.lib = lib;
-		this.parent = parent;
-		this.element = element;
-		
-		helpers = new Helpers(lib);
+  private final ExportedWebDriverFunctions lib;
+  private final Pointer driver;
+  private final Pointer element;
+  private final ErrorHandler errors = new ErrorHandler();
+
+  // Called from native code
+  public InternetExplorerElement(ExportedWebDriverFunctions lib, Pointer driver, Pointer element) {
+    this.lib = lib;
+    this.driver = driver;
+    this.element = element;
+
+    if (element == null) {
+      throw new IllegalStateException("Element pointer is null.");
+    }
+  }
+
+  public void click() {
+    int result = lib.wdeClick(element);
+
+    errors.verifyErrorCode(result, "click");
+  }
+
+  public String getElementName() {
+    PointerByReference wrapper = new PointerByReference();
+    int result = lib.wdeGetElementName(element, wrapper);
+    
+    errors.verifyErrorCode(result, "element name");
+    
+    return new StringWrapper(lib, wrapper).toString();
+  }
+
+  public String getAttribute(String name) {
+    PointerByReference wrapper = new PointerByReference();
+    int result = lib.wdeGetAttribute(element, new WString(name), wrapper);
+
+    errors.verifyErrorCode(result, "get attribute of");
+
+    return new StringWrapper(lib, wrapper).toString();
+  }
+
+  public String getText() {
+    PointerByReference wrapper = new PointerByReference();
+    int result = lib.wdeGetText(element, wrapper);
+
+    errors.verifyErrorCode(result, "get text of");
+
+    return new StringWrapper(lib, wrapper).toString();
+  }
+
+  public String getValue() {
+    return getAttribute("value");
+  }
+
+  public void sendKeys(CharSequence... value) {
+    StringBuilder builder = new StringBuilder();
+    for (CharSequence seq : value) {
+      builder.append(seq);
     }
 
-    public void click() {
-    	InternetExplorerInteractionData data = (InternetExplorerInteractionData) getLocationOnScreenOnceScrolledIntoView();
-    	lib.clickAt(data.getHwnd(), new NativeLong(data.getX()), new NativeLong(data.getY()));
-    	lib.wdWaitForLoadToComplete(parent);
-    }
+    int result = lib.wdeSendKeys(element, new WString(builder.toString()));
+    
+    errors.verifyErrorCode(result, "send keys to");
 
-    public String getElementName() {
-    	PointerByReference result = new PointerByReference();
-    	lib.wdeGetElementName(element, result);
-    	
-    	return helpers.convertToString(result);
-    }
+    result = lib.wdWaitForLoadToComplete(driver);
+  }
 
-    public String getAttribute(String name) {
-    	PointerByReference result = new PointerByReference();
-    	lib.wdeGetAttribute(element, new WString(name), result);
-    	
-    	return helpers.convertToString(result);
-    }
+  public void clear() {
+    int result = lib.wdeClear(element);
 
-    public List<WebElement> getChildrenOfType(String tagName) {
-    	WString name = new WString(tagName);
-		PointerByReference ptr = new PointerByReference();
-		if (lib.wdFindElementsByLinkText(parent, element, name, ptr) != 0) {
-			throw new RuntimeException("Cannot execute search");
-		}
-		
-		return convertFromWrapperToList(ptr);
-    }
+    errors.verifyErrorCode(result, "clear");
+  }
 
-    public String getText() {
-    	PointerByReference result = new PointerByReference();
-    	lib.wdeGetText(element, result);
-    	
-    	return helpers.convertToString(result);
-    }
+  public boolean isEnabled() {
+    IntByReference selected = new IntByReference();
+    int result = lib.wdeIsEnabled(element, selected);
+    
+    errors.verifyErrorCode(result, "get enabled state");
+    
+    return selected.getValue() == 1;
+  }
 
-    public String getValue() {
-    	return getAttribute("value");
-    }
+  public boolean isSelected() {
+    IntByReference selected = new IntByReference();
+    int result = lib.wdeIsSelected(element, selected);
+        
+    errors.verifyErrorCode(result, "get selected state");
+    
+    return selected.getValue() == 1;
+  }
 
-    public void sendKeys(CharSequence... value) {
-    	StringBuilder builder = new StringBuilder();
-    	for (CharSequence seq : value) {
-    		builder.append(seq);
-    	}
+  public void setSelected() {
+    int result = lib.wdeSetSelected(element);
 
-    	lib.wdeSendKeys(element, new WString(builder.toString()));
-    	lib.wdWaitForLoadToComplete(parent);
-    }
+    errors.verifyErrorCode(result, "select");
+  }
 
-    public void clear() {
-    	lib.wdeClear(element);
-    }
+  public void submit() {
+    int result = lib.wdeSubmit(element);
+    
+    errors.verifyErrorCode(result, "submit");
+  }
 
-    public boolean isEnabled() {
-    	IntByReference res = new IntByReference();
-    	lib.wdeIsEnabled(element, res);
-    	return res.getValue() == 1;   	
-    }
+  public boolean toggle() {
+    IntByReference toReturn = new IntByReference();
+    int result = lib.wdeToggle(element, toReturn);
 
-    public boolean isSelected() {
-    	IntByReference res = new IntByReference();
-    	lib.wdeIsSelected(element, res);
-    	return res.getValue() == 1; 
-    }
-
-    public void setSelected() {
-    	lib.wdeSetSelected(element);
-    	lib.wdWaitForLoadToComplete(parent);
-    }
-
-    public void submit() {
-    	if (lib.wdeSubmit(element) != 0) {
-    		throw new RuntimeException("Cannot submit element");
-    	}
-    	lib.wdWaitForLoadToComplete(parent);
-    }
-
-    public boolean toggle() {
-    	IntByReference res = new IntByReference();
-    	lib.wdeToggle(element, res);
-    	lib.wdWaitForLoadToComplete(parent);
-    	return res.getValue() == 1; 
-    }
-
-    public boolean isDisplayed() {
-    	IntByReference res = new IntByReference();
-    	lib.wdeIsDisplayed(element, res);
-    	return res.getValue() == 1;   	
-    }
-
-    public InteractionData getLocationOnScreenOnceScrolledIntoView() {
-    	HWNDByReference hwnd = new HWNDByReference();
-    	IntByReference x = new IntByReference();
-    	IntByReference y = new IntByReference();
-    	IntByReference width = new IntByReference();
-    	IntByReference height = new IntByReference();
-    	if (lib.wdeGetDetailsOnceScrolledOnToScreen(element, hwnd, x, y, width, height) != 0) 
-    		return null;
-    	
-    	return new InternetExplorerInteractionData(hwnd.getValue(), x.getValue(), y.getValue());
+    if (result == -9) {
+      throw new UnsupportedOperationException("You may not toggle this element: " + getElementName());
     }
     
-    public Point getLocation() {
-    	NativeLongByReference x = new NativeLongByReference();
-    	NativeLongByReference y = new NativeLongByReference();
-    	lib.wdeGetLocation(element, x, y);
-    	
-    	return new Point(x.getValue().intValue(), y.getValue().intValue());
-    }
+    errors.verifyErrorCode(result, "toggle");
 
-    public Dimension getSize() {
-    	NativeLongByReference width = new NativeLongByReference();
-    	NativeLongByReference height = new NativeLongByReference();
-    	lib.wdeGetSize(element, width, height);
-    	
-    	return new Dimension(width.getValue().intValue(), height.getValue().intValue());
-    }
+    return toReturn.getValue() == 1;
+  }
 
-    public String getValueOfCssProperty(String propertyName) {
-    	PointerByReference result = new PointerByReference();
-    	lib.wdeGetValueOfCssProperty(element, new WString(propertyName), result);
-    	
-    	return helpers.convertToString(result);
-    }
+  public boolean isDisplayed() {
+    IntByReference displayed = new IntByReference();
+    int result = lib.wdeIsDisplayed(element, displayed);
+
+    errors.verifyErrorCode(result, "clear");
+
+    return displayed.getValue() == 1;
+  }
+
+  public Point getLocationOnScreenOnceScrolledIntoView() {
+    HWNDByReference hwnd = new HWNDByReference();
+    IntByReference x = new IntByReference();
+    IntByReference y = new IntByReference();
+    IntByReference width = new IntByReference();
+    IntByReference height = new IntByReference();
+    if (lib.wdeGetDetailsOnceScrolledOnToScreen(element, hwnd, x, y, width, height) != 0) 
+            return null;
     
-    @Override
-    protected void finalize() throws Throwable {
-        lib.wdeFreeElement(element);
-    }
+    return new Point(x.getValue(), y.getValue());
+  }
 
-    public void dragAndDropBy(int moveRightBy, int moveDownBy) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void dragAndDropOn(RenderedWebElement element) {
-        throw new UnsupportedOperationException();
-    }
-
-    public WebElement findElement(By by) {
-		return new Finder(lib, parent, element).findElement(by);
-    }
-
-    public List<WebElement> findElements(By by) {
-		return new Finder(lib, parent, element).findElements(by);
-    }
+  public Point getLocation() {
+    NativeLongByReference x = new NativeLongByReference();
+    NativeLongByReference y = new NativeLongByReference();
+    int result = lib.wdeGetLocation(element, x, y);
     
-	private List<WebElement> convertFromWrapperToList(PointerByReference ptr) {
-		if (ptr.getValue() == null) {
-			return Collections.emptyList();
-		}
-		
-		Pointer collection = ptr.getValue();
-		IntByReference sizeRef = new IntByReference();
-		lib.wdcGetCollectionLength(collection, sizeRef);
-		int length = sizeRef.getValue();
+    errors.verifyErrorCode(result, "Unable to get location of element");
+    
+    return new Point(x.getValue().intValue(), y.getValue().intValue());
+  }
 
-		System.out.println(length);
-		
-		ArrayList<WebElement> elements = new ArrayList<WebElement>();
-		for (int i = 0; i < length; i++) {
-			PointerByReference result = new PointerByReference();
-			lib.wdcGetElementAtIndex(collection, i, result);
-			elements.add(new InternetExplorerElement(lib, parent, result.getValue()));
-		}
-		
-		return elements;
-	}
+  public Dimension getSize() {
+    NativeLongByReference width = new NativeLongByReference();
+    NativeLongByReference height = new NativeLongByReference();
+    int result = lib.wdeGetSize(element, width, height);
+    
+    errors.verifyErrorCode(result, "Unable to get element size");
+    
+    return new Dimension(width.getValue().intValue(), height.getValue().intValue());
+  }
+
+  public String getValueOfCssProperty(String propertyName) {
+    PointerByReference wrapper = new PointerByReference();
+    int result = lib.wdeGetValueOfCssProperty(element, new WString(propertyName), wrapper);
+    errors.verifyErrorCode(result, ("Unable to get value of css property: " + propertyName));
+    
+    return new StringWrapper(lib, wrapper).toString();
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    lib.wdFreeElement(element);
+  }
+
+  public void dragAndDropBy(int moveRightBy, int moveDownBy) {
+    throw new UnsupportedOperationException();
+  }
+
+  public void dragAndDropOn(RenderedWebElement element) {
+    throw new UnsupportedOperationException();
+  }
+  
+  public WebElement findElement(By by) {
+    return new Finder(lib, driver, element).findElement(by);
+  }
+  
+  public List<WebElement> findElements(By by) {
+    return new Finder(lib, driver, element).findElements(by);
+  }
+  
+  protected int addToScriptArgs(Pointer scriptArgs) {
+    return lib.wdAddElementScriptArg(scriptArgs, element);
+  }
 }

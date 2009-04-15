@@ -5,11 +5,11 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 def windows?
-  RUBY_PLATFORM =~ /win32/i
+  RUBY_PLATFORM.downcase.include?("win32")
 end
 
 def mac?
-  RUBY_PLATFORM =~ /darwin/i
+  RUBY_PLATFORM.downcase.include?("darwin")
 end
 
 def all?
@@ -26,6 +26,10 @@ def present?(arg)
   end
 
   matches.length > 0
+end
+
+def python?
+  present?("python") || present?("python.exe")
 end
 
 task :prebuild do
@@ -45,7 +49,17 @@ task :prebuild do
   end
 end
 
-task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :support, :remote, :selenium]
+def iPhoneSDKPresent?
+  return false unless mac? && present?('xcodebuild')
+  begin
+    sdks = sh "xcodebuild -showsdks 2>/dev/null", :verbose => false
+    !!(sdks =~ /simulator2.2/)
+  rescue
+    false
+  end
+end
+
+task :build => [:prebuild, :common, :htmlunit, :firefox, :jobbie, :safari, :iphone, :support, :remote, :selenium]
 
 task :clean do
   rm_rf 'common/build'
@@ -54,12 +68,13 @@ task :clean do
   rm_rf 'jobbie/src/cpp/InternetExplorerDriver/Release'
   rm_rf 'firefox/build'
   rm_rf 'safari/build'
+  rm_rf 'iphone/build'
   rm_rf 'support/build'
   rm_rf 'selenium/build'
   rm_rf 'build/'
 end
 
-task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_support, :test_remote] do
+task :test => [:prebuild, :test_htmlunit, :test_firefox, :test_jobbie, :test_safari, :test_iphone, :test_support, :test_remote, :test_selenium] do
 end
 
 task :install_firefox => [:firefox] do
@@ -163,7 +178,7 @@ simple_jars = {
     'deps'      => [:remote_common],
     'jar'       => "remote/build/webdriver-remote-client.jar",
     'resources' => nil,
-    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/client/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/client/lib/runtime/**/*.jar", "remote/server/lib/runtime/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
     'test_on'   => false,
   },
   "test_remote_client" => {
@@ -171,16 +186,16 @@ simple_jars = {
     'deps'      => [:test_common, :firefox, :remote_client, :remote_server],
     'jar'       => "remote/build/webdriver-remote-common-test.jar",
     'resources' => nil,
-    'classpath' => ["remote/build/*.jar", "remote/client/lib/**/*.jar", "remote/common/lib/**/*.jar", "firefox/lib/**/*.jar", "firefox/build/webdriver-firefox.jar"] + common_test_libs,
+    'classpath' => ["remote/build/*.jar", "remote/client/lib/**/*.jar", "remote/common/lib/**/*.jar", "firefox/lib/**/*.jar", "firefox/build/webdriver-firefox.jar", "support/build/webdriver-support.jar", "support/lib/runtime/*.jar"] + common_test_libs,
     'test_on'   => all?,
     'test_in'   => 'remote/client',
   },
   "remote_server" => {
     'src'       => "remote/server/src/java/**/*.java",
-    'deps'      => [:remote_common],
+    'deps'      => [:remote_common, :support],
     'jar'       => "remote/build/webdriver-remote-server.jar",
     'resources' => nil,
-    'classpath' => ["remote/common/lib/runtime/**/*.jar", "remote/server/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'classpath' => ["remote/common/lib/runtime/**/*.jar", "support/lib/runtime/*.jar", "support/build/webdriver-support.jar", "remote/server/lib/runtime/**/*.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
     'test_on'   => false,
   },
   "safari" =>   {
@@ -198,6 +213,22 @@ simple_jars = {
     'resources' => nil,
     'classpath' => ["safari/lib/**/*.jar", "safari/build/webdriver-safari.jar"] + common_test_libs,
     'test_on'   => mac?,
+  },
+  "iphone_client" =>   {
+    'src'       => "iphone/src/java/**/*.java",
+    'deps'      => [:common, :remote],
+    'jar'       => "iphone/build/webdriver-iphone.jar",
+    'resources' => nil,
+    'classpath' => ["remote/build/webdriver-remote-client.jar", "remote/build/webdriver-remote-common.jar"] + common_libs,
+    'test_on'   => false,
+  },
+  "test_iphone_client" => {
+    'src'       => "iphone/test/java/**/*.java",
+    'deps'      => [:iphone_client, :test_common, :remote_client],
+    'jar'       => "iphone/build/webdriver-iphone-test.jar",
+    'resources' => nil,
+    'classpath' => ["iphone/build/webdriver-iphone.jar", "remote/build/webdriver-remote-client.jar", "remote/build/webdriver-remote-common.jar"] + common_test_libs,
+    'test_on'   => iPhoneSDKPresent?,
   },
   "support" =>   {
     'src'       => "support/src/java/**/*.java",
@@ -223,6 +254,20 @@ simple_jars = {
     'classpath' => ["selenium/lib/runtime/**/*.jar"] + common_libs,
     'test_on'   => false,
   },
+  "test_selenium" => {
+    'src'       => "selenium/test/java/**/*.java",
+    'deps'      => [:test_common, :firefox, :jobbie, :htmlunit, :selenium],
+    'jar'       => "selenium/build/webdriver-selenium-test.jar",
+    'resources' => nil,
+    'classpath' => [
+                    "selenium/lib/**/*.jar", "selenium/build/webdriver-selenium.jar",
+                    "firefox/build/webdriver-firefox.jar", "firefox/lib/**/*.jar",
+                    "jobbie/build/webdriver-jobbie.jar", "jobbie/lib/**/*.jar",
+                    "htmlunit/build/webdriver-htmlunit.jar", "htmlunit/lib/**/*.jar",
+                    "selenium/build/*.jar"
+                   ] + common_test_libs,
+    'test_on'   => false,
+  }
 }
 
 simple_jars.each do |name, details|
@@ -249,6 +294,24 @@ end
 task :remote => [:remote_client, :remote_server]
 task :test_remote => [:test_remote_client]
 
+file "selenium/build/webdriver-selenium.jar" => "selenium/src/java/org/openqa/selenium/internal/injectableSelenium.js" do
+  sh "jar uf selenium/build/webdriver-selenium.jar -C selenium/src/java org/openqa/selenium/internal/injectableSelenium.js", :verbose => false
+end
+
+task :test_selenium do
+  temp_classpath = simple_jars['test_selenium']['classpath']
+  classpath = FileList.new
+  temp_classpath.each do |item|
+      classpath.add item
+  end
+
+  test_string = 'java '
+  test_string += '-cp ' + classpath.join(File::PATH_SEPARATOR) + ' '
+  test_string += "-Dwebdriver.firefox.bin=\"#{ENV['firefox']}\" " unless ENV['firefox'].nil?
+  test_string += 'org.testng.TestNG selenium/test/java/webdriver-selenium-suite.xml'
+
+  result = sh test_string, :verbose => false
+end
 
 task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :safari, :support] do
   mkdir_p "build/javadoc"
@@ -262,7 +325,7 @@ task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :safari, :sup
 end
 
 #### Internet Explorer ####
-file 'jobbie/build/InternetExplorerDriver.dll' => FileList['jobbie/src/csharp/**/*.cs'] do
+file 'jobbie/build/InternetExplorerDriver.dll' => FileList['jobbie/src/cpp/**/*.cpp'] do
   if windows? then
     sh "MSBuild.exe WebDriver.sln /verbosity:q /target:Rebuild /property:Configuration=Release", :verbose => false
   else
@@ -290,17 +353,32 @@ file 'firefox/build/webdriver-extension.zip' => FileList['firefox/src/extension/
   end
 end
 
-task :generate_headers => [:jobbie] do
-  cmd = "javah -jni -classpath common\\build\\webdriver-common.jar;jobbie\\build\\webdriver-jobbie.jar -d jobbie\\src\\cpp\\InternetExplorerDriver "
-  tests = FileList.new("jobbie/src/java/**/*.java")
-  tests.each {|f|
-    f = f.to_s
-    f =~ /jobbie\/src\/java\/(.*)\.java/
-    f = $1
-    f.tr! '/', '.'
-    cmd += f + " "
-  }
-  sh cmd, :verbose => true
+task :test_firefox_py => :test_firefox do
+  if python? then
+    sh "python py_test.py", :verbose => true
+  end
+end
+
+task :iphone => [:iphone_server, :iphone_client]
+task :test_iphone => [:test_iphone_server, :test_iphone_client, :remote_client]
+
+#### iPhone ####
+task :iphone_server => FileList['iphone/src/objc/**'] do
+  if iPhoneSDKPresent? then
+    puts "Building iWebDriver iphone app"
+    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target iWebDriver >/dev/null", :verbose => false
+  else
+    puts "XCode not found. Not building the iphone driver."
+  end
+end
+
+# This does not depend on :iphone_server because the dependancy is specified in xcode
+task :test_iphone_server do
+  if iPhoneSDKPresent? then
+    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target Tests"
+  else
+    puts "XCode not found. Not testing the iphone driver."
+  end
 end
 
 def version

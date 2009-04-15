@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 // IEThread.cpp : implementation file
 //
 
@@ -6,6 +23,7 @@
 
 #include "IEThread.h"
 
+#include "errorcodes.h"
 #include "utils.h"
 
 #include "InternalCustomMessage.h"
@@ -30,10 +48,12 @@ void IeThread::OnSetVisible(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
-
 	const long& isVisible = data.input_long_;
 
-	pBody->ieThreaded->put_Visible(isVisible ? VARIANT_TRUE : VARIANT_FALSE);
+	if (isVisible)
+		pBody->ieThreaded->put_Visible(VARIANT_TRUE);
+	else 
+		pBody->ieThreaded->put_Visible(VARIANT_FALSE);
 }
 
 void IeThread::OnGetCurrentUrl(WPARAM w, LPARAM lp)
@@ -245,12 +265,12 @@ void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
-	long &errorKind = data.output_long_;
+	int &errorKind = data.error_code;
 	IHTMLElement* &pDom = data.output_html_element_; 
 	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
 
 	pDom = NULL;
-	errorKind = 0;
+	errorKind = SUCCESS;
 
 	const bool inputElementWasNull = (!inputElement);
 
@@ -261,7 +281,7 @@ void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
 		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = 1;
+			errorKind = -ENOSUCHDOCUMENT;
 			return;
 		}
 		root_doc->get_documentElement(&inputElement);
@@ -270,7 +290,7 @@ void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
 	if (!node) 
 	{
-		errorKind = 1;
+		errorKind = -ENOSUCHELEMENT;
 		return;
 	}
 
@@ -278,7 +298,7 @@ void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
 	bool evalToDocument = addEvaluateToDocument(node, 0);
 	if (!evalToDocument) 
 	{
-		errorKind = 2;
+		errorKind = -EUNEXPECTEDJSERROR;
 		return;
 	}
 
@@ -322,6 +342,8 @@ void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
 			return; 
 		}
 	}
+
+	errorKind = -ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsByXPath(WPARAM w, LPARAM lp)
@@ -464,6 +486,10 @@ void IeThread::getDocument2(const IHTMLDOMNode* extractFrom, IHTMLDocument2** pd
 bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child) 
 {
 	CComQIPtr<IHTMLElement> parent(const_cast<IHTMLDOMNode*>(root));
+
+	if (!parent)
+		return true;
+
 	VARIANT_BOOL toReturn;
 	parent->contains(child, &toReturn);
 

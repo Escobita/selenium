@@ -1,61 +1,32 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "stdafx.h"
 
 #include <ctime>
 
 #include "utils.h"
 #include "logging.h"
+#include "webdriver.h"
 
 using namespace std;
 
 safeIO gSafe;
-
-void throwException(JNIEnv *env, const char* className, const char *message)
-{
-	jclass newExcCls;
-	env->ExceptionDescribe();
-	env->ExceptionClear();
-	newExcCls = env->FindClass(className);
-	if (newExcCls == NULL) {
-		return;
-	}
-	env->ThrowNew(newExcCls, message);
-}
-
-void throwException(JNIEnv *env, const char* className, LPCWSTR msg)
-{
-	std::string str;
-	cw2string(msg, str);
-	throwException(env, className, str.c_str());
-}
-
-void throwNoSuchElementException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "org/openqa/selenium/NoSuchElementException", msg);
-}
-
-void throwNoSuchFrameException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "org/openqa/selenium/NoSuchFrameException", msg);
-}
-
-void throwRunTimeException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "java/lang/RuntimeException", msg);
-}
-
-void throwUnsupportedOperationException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "java/lang/UnsupportedOperationException", msg);
-}
-
-jobject newJavaInternetExplorerDriver(JNIEnv* env, InternetExplorerDriver* driver) 
-{
-	jclass clazz = env->FindClass("org/openqa/selenium/ie/InternetExplorerDriver");
-	jmethodID cId = env->GetMethodID(clazz, "<init>", "(J)V");
-
-	return env->NewObject(clazz, cId, (jlong) driver);
-}
-
 
 void wait(long millis)
 {
@@ -117,7 +88,6 @@ LPCWSTR comvariant2cw(CComVariant& toConvert)
 	return L"";
 }
 
-
 LPCWSTR combstr2cw(CComBSTR& from) 
 {
 	if (!from.operator BSTR()) {
@@ -135,17 +105,6 @@ LPCWSTR bstr2cw(BSTR& from)
 
 	return (LPCWSTR) from;
 }
-
-jstring lpcw2jstring(JNIEnv *env, LPCWSTR text, int size)
-{
-	SCOPETRACER
-	if (!text)
-		return NULL;
-
-	return env->NewString((const jchar*) text, 
-		(jsize) ((size==-1) ? wcslen(text):size) );
-}
-
 
 long getLengthOf(SAFEARRAY* ary)
 {

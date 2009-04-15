@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,9 +26,13 @@ import static org.hamcrest.core.IsNot.not;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
 
+import static org.openqa.selenium.Ignore.Driver.*;
+
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Date;
+import java.net.URL;
 
 public class CookieImplementationTest extends AbstractDriverTestCase {
     public void testAddCookiesWithDifferentPaths() {
@@ -41,9 +62,8 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         driver.get(simpleTestPage);
         driver.manage().deleteAllCookies();
         
-        Calendar c = Calendar.getInstance();
-        c.set(2009, 0, 1);
-        Cookie cookie1 = new Cookie("fish", "cod", "", c.getTime());
+        long time = System.currentTimeMillis() + (60 * 60 * 24);
+        Cookie cookie1 = new Cookie("fish", "cod", "", new Date(time));
         Cookie cookie2 = new Cookie("planet", "earth");
         WebDriver.Options options = driver.manage();
         options.addCookie(cookie1);
@@ -54,8 +74,8 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         assertThat(cookies.contains(cookie1), is(true));
         assertThat(cookies.contains(cookie2), is(true));
     }
-	
-	@Ignore("ie")
+
+    @Ignore(IE)
     public void testCookieIntegrity() {
         String url = GlobalTestEnvironment.get().getAppServer().whereElseIs("animals");
 
@@ -63,8 +83,8 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         driver.manage().deleteAllCookies();
         
         Calendar c = Calendar.getInstance();
-        c.set(2009, 0, 1);
-        Cookie cookie1 = new Cookie("fish", "cod", "/animals", c.getTime());
+        long time = System.currentTimeMillis() + (60 * 60 * 24);
+        Cookie cookie1 = new Cookie("fish", "cod", "/animals", new Date(time));
         WebDriver.Options options = driver.manage();
         options.addCookie(cookie1);
 
@@ -88,7 +108,7 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         assertThat(retrievedCookie.isSecure(), equalTo(cookie1.isSecure()));
     }
 
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testDeleteAllCookies() {
         driver.get(simpleTestPage);
         Cookie cookie1 = new Cookie("fish", "cod");
@@ -107,7 +127,7 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         assertThat(cookies.contains(cookie2), is(false));
     }
 
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testDeleteCookie() {
         driver.get(simpleTestPage);
         Cookie cookie1 = new Cookie("fish", "cod");
@@ -180,4 +200,36 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         Set<Cookie> cookies = options.getCookies();
         assertThat(cookies, not(hasItem(cookie1)));
     }
+
+  @Ignore({IE, SAFARI})  
+  public void testShouldBeAbleToSetDomainToTheCurrentDomain() throws Exception {
+    driver.get(simpleTestPage);
+    driver.manage().deleteAllCookies();
+
+    URL url = new URL(driver.getCurrentUrl());
+    String host = url.getHost() + ":" + url.getPort();
+
+    Cookie cookie1 = new Cookie.Builder("fish", "cod").domain(host).build();
+    WebDriver.Options options = driver.manage();
+    options.addCookie(cookie1);
+
+    driver.get(javascriptPage);
+    Set<Cookie> cookies = options.getCookies();
+    assertThat(cookies, hasItem(cookie1));
+  }
+
+  @Ignore({IE, SAFARI})
+  public void testShouldNotBeAbleToSetDomainToSomethingThatIsNotTheCurrentDomain() {
+    driver.get(simpleTestPage);
+    driver.manage().deleteAllCookies();
+
+    Cookie cookie1 = new Cookie.Builder("fish", "cod").domain("example.com").build();
+    WebDriver.Options options = driver.manage();
+    try {
+      options.addCookie(cookie1);
+      fail("Should not be able to set cookie on another domain");
+    } catch (WebDriverException e) {
+      // This is expected
+    }
+  }
 }

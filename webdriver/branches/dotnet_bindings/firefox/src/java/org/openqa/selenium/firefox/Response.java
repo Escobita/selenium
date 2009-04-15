@@ -1,15 +1,36 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.ElementNotVisibleException;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Response {
-	private final JSONObject result;
+    private final JSONObject result;
     private final String methodName;
     private final Context context;
     private final String responseText;
@@ -29,7 +50,7 @@ public class Response {
 
             isError = (Boolean) result.get("isError");
         } catch (Exception e) {
-            throw new RuntimeException("Could not parse \"" + json.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") + "\".", e);
+            throw new WebDriverException("Could not parse \"" + json.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") + "\".", e);
         }
     }
 
@@ -54,16 +75,24 @@ public class Response {
   }
 
   public Object getExtraResult(String fieldName) {
-    	try {
-			return result.get(fieldName);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
+    try {
+      return result.get(fieldName);
+    } catch (JSONException e) {
+      throw new WebDriverException(e);
     }
+  }
 
     public void ifNecessaryThrow(Class<? extends RuntimeException> exceptionClass) {
         if (!isError)
             return;
+
+        if (responseText.startsWith("element is obsolete")) {
+          throw new StaleElementReferenceException("Element is obsolete");
+        }
+
+        if (responseText.startsWith("Element is not currently visible")) {
+          throw new ElementNotVisibleException("Element is not visible, and so cannot be interacted with");
+        }
 
         RuntimeException toThrow = null;
         try {
@@ -90,7 +119,7 @@ public class Response {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(getResponseText());
+            throw new WebDriverException(getResponseText());
         }
 
         throw toThrow;

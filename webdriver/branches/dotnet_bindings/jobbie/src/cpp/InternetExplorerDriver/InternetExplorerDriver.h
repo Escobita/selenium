@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #ifndef InternetExplorerDriver_h
 #define InternetExplorerDriver_h
 
@@ -38,15 +56,19 @@ public:
 
 	ElementWrapper* getActiveElement();
 
-	ElementWrapper* selectElementByXPath(IHTMLElement *p, const wchar_t *xpath);
+	int selectElementByXPath(IHTMLElement *p, const wchar_t *xpath, ElementWrapper** element);
 	std::vector<ElementWrapper*>* selectElementsByXPath(IHTMLElement *p, const wchar_t *xpath);
-	int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** result);
+	int selectElementById(IHTMLElement *p, const wchar_t *elementId, ElementWrapper** element);
 	std::vector<ElementWrapper*>* selectElementsById(IHTMLElement *p, const wchar_t *elementId);
-	ElementWrapper* selectElementByLink(IHTMLElement *p, const wchar_t *elementLink);
+	int selectElementByLink(IHTMLElement *p, const wchar_t *elementLink, ElementWrapper** element);
 	std::vector<ElementWrapper*>* selectElementsByLink(IHTMLElement *p, const wchar_t *elementLink);
-	ElementWrapper* selectElementByName(IHTMLElement *p, const wchar_t *elementName);
+	int selectElementByPartialLink(IHTMLElement *p, const wchar_t *elementLink, ElementWrapper** element);
+	std::vector<ElementWrapper*>* selectElementsByPartialLink(IHTMLElement *p, const wchar_t *elementLink);
+	int selectElementByName(IHTMLElement *p, const wchar_t *elementName, ElementWrapper** wrapper);
 	std::vector<ElementWrapper*>* selectElementsByName(IHTMLElement *p, const wchar_t *elementName);
-	ElementWrapper* selectElementByClassName(IHTMLElement *p, const wchar_t *elementClassName);
+	int selectElementByTagName(IHTMLElement *p, const wchar_t *elementName, ElementWrapper** element);
+	std::vector<ElementWrapper*>* selectElementsByTagName(IHTMLElement *p, const wchar_t *elementName);
+	int selectElementByClassName(IHTMLElement *p, const wchar_t *elementClassName, ElementWrapper** element);
 	std::vector<ElementWrapper*>* selectElementsByClassName(IHTMLElement *p, const wchar_t *elementClassName);
 
 	void waitForNavigateToFinish();

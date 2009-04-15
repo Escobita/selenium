@@ -1,10 +1,31 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.support.pagefactory;
 
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Clock;
+import org.openqa.selenium.support.ui.SystemClock;
+import org.openqa.selenium.support.ui.SlowLoadableComponent;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An element locator that will wait for the specified number of seconds for an
@@ -18,6 +39,7 @@ import java.lang.reflect.Field;
  */
 public class AjaxElementLocator extends DefaultElementLocator {
   protected final int timeOutInSeconds;
+  private final Clock clock;
 
   /**
    * Main constructor.
@@ -28,8 +50,13 @@ public class AjaxElementLocator extends DefaultElementLocator {
    * Measured in seconds.
    */
   public AjaxElementLocator(WebDriver driver, Field field, int timeOutInSeconds) {
+    this(new SystemClock(), driver, field, timeOutInSeconds);
+  }
+
+  public AjaxElementLocator(Clock clock, WebDriver driver, Field field, int timeOutInSeconds) {
     super(driver, field);
     this.timeOutInSeconds = timeOutInSeconds;
+    this.clock = clock;
   }
 
   /**
@@ -38,43 +65,23 @@ public class AjaxElementLocator extends DefaultElementLocator {
    * Will poll the interface on a regular basis until the element is present.
    */
   public WebElement findElement() {
-    long end = now() + timeOutInSeconds * 1000;
-
-    NoSuchElementException lastException = null;
-    do {
-      try {
-        WebElement element = super.findElement();
-        
-        if (isElementUsable(element))
-          return element;
-      } catch (NoSuchElementException e) {
-        lastException = e;
-        // It's fine to keep on looping
-      }
-
-      // But don't poll too frequently.
-      sleep();
-    } while (now() < end);
-
-    throw new NoSuchElementException(
-        String.format("Timed out after %d seconds. %s", timeOutInSeconds, lastException.getMessage()),
-        lastException);
-  }
-
-  protected long now() {
-    return System.currentTimeMillis();
+    SlowLoadingElement loadingElement = new SlowLoadingElement(clock, timeOutInSeconds);
+    try {
+      return loadingElement.get().getElement();
+    } catch (NoSuchElementError e) {
+      throw new NoSuchElementException(
+          String.format("Timed out after %d seconds. %s", timeOutInSeconds, e.getMessage()), e.getCause());
+    }
   }
 
   /**
    * By default, we sleep for 250ms between polls. You may override this method
    * in order to change how it sleeps.
+   *
+   * @return Duration to sleep in milliseconds
    */
-  protected void sleep() {
-    try {
-      Thread.sleep(250);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+  protected long sleepFor() {
+    return 250;
   }
 
   /**
@@ -93,5 +100,49 @@ public class AjaxElementLocator extends DefaultElementLocator {
   @SuppressWarnings({"UnusedDeclaration"})
   protected boolean isElementUsable(WebElement element) {
     return true;
+  }
+
+  private class SlowLoadingElement extends SlowLoadableComponent<SlowLoadingElement> {
+    private NoSuchElementException lastException;
+    private WebElement element;
+
+    public SlowLoadingElement(Clock clock, int timeOutInSeconds) {
+      super(clock, timeOutInSeconds);
+    }
+
+    protected void load() {
+      // Does nothing
+    }
+
+    protected long sleepFor() {
+      return AjaxElementLocator.this.sleepFor();
+    }
+
+    protected void isLoaded() throws Error {
+      try {
+        element = AjaxElementLocator.super.findElement();
+        if (!isElementUsable(element)) {
+          throw new NoSuchElementException("Element is not usable");
+        }
+      } catch (NoSuchElementException e) {
+        lastException = e;
+        // Should use JUnit's AssertionError, but it may not be present
+        throw new NoSuchElementError("Unable to locate the element", e);
+      }
+    }
+
+    public NoSuchElementException getLastException() {
+      return lastException;
+    }
+
+    public WebElement getElement() {
+      return element;
+    }
+  }
+
+  private static class NoSuchElementError extends Error {
+    private NoSuchElementError(String message, Throwable throwable) {
+      super(message, throwable);
+    }
   }
 }

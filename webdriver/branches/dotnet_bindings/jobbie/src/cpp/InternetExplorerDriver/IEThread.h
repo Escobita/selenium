@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #pragma once
 
 #include "IEThreadData.h"
@@ -48,6 +65,8 @@ public:
 	BOOL CustomInternalPumpMessage();
 	BOOL DispatchThreadMessageEx(MSG* pMsg);
 
+	int ieRelease;
+
 private:
 
 	bool isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
@@ -81,8 +100,8 @@ protected:
 	bool isSelected(IHTMLElement *pElement);
 	int isDisplayed(IHTMLElement *element, bool* displayed);
 	bool isEnabled(IHTMLElement *pElement);
-	int getLocationOnceScrolledIntoView(IHTMLElement *pElement, HWND* hwnd, long *x, long *y);
-	void click(IHTMLElement *pElement, CScopeCaller *pSC=NULL);
+	int getLocationWhenScrolledIntoView(IHTMLElement *pElement, HWND* hwnd, long *x, long *y);
+	int click(IHTMLElement *pElement, CScopeCaller *pSC=NULL);
 	void getValue(IHTMLElement *pElement, std::wstring& res);
 	void getValueOfCssProperty(IHTMLElement *pElement, LPCWSTR propertyName, std::wstring& res);
 	void getText(IHTMLElement *pElement, std::wstring& res);
@@ -120,6 +139,7 @@ protected:
 		  void OnElementClear(WPARAM, LPARAM);
 		  void OnElementIsSelected(WPARAM, LPARAM);
 		  void OnElementSetSelected(WPARAM, LPARAM);
+		  void OnElementToggle(WPARAM, LPARAM);
 		  void OnElementGetValueOfCssProp(WPARAM, LPARAM);
 		  void OnElementGetText(WPARAM, LPARAM);
 		  void OnElementClick(WPARAM, LPARAM);
@@ -140,8 +160,12 @@ protected:
 		  void OnSelectElementsById(WPARAM, LPARAM);
 		  void OnSelectElementByLink(WPARAM, LPARAM);
 		  void OnSelectElementsByLink(WPARAM, LPARAM);
+		  void OnSelectElementByPartialLink(WPARAM, LPARAM);
+		  void OnSelectElementsByPartialLink(WPARAM, LPARAM);
 		  void OnSelectElementByName(WPARAM, LPARAM);
 		  void OnSelectElementsByName(WPARAM, LPARAM);
+		  void OnSelectElementByTagName(WPARAM, LPARAM);
+		  void OnSelectElementsByTagName(WPARAM, LPARAM);
 		  void OnSelectElementByClassName(WPARAM, LPARAM);
 		  void OnSelectElementsByClassName(WPARAM, LPARAM);
 		  void OnGetCookies(WPARAM, LPARAM);

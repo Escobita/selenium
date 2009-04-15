@@ -1,22 +1,24 @@
 /*
- * Copyright 2007 ThoughtWorks, Inc
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package org.openqa.selenium;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -79,25 +81,6 @@ public interface WebDriver {
      * @return The title of the current page, or null if one is not already set
      */
     String getTitle();
-
-    /**
-     * Is the browser visible or not?
-     *
-     * @return True if the browser can be seen, or false otherwise
-     * @deprecated Do not use unless you're using the IE driver
-     */
-    @Deprecated
-    boolean getVisible();
-
-    /**
-     * Make the browser visible or not. Note that for some implementations, this
-     * is a no-op.
-     *
-     * @param visible Set whether or not the browser is visible
-     * @deprecated Do not use unless you're using the IE driver
-     */
-    @Deprecated
-    void setVisible(boolean visible);
 
   /**
      * Find all elements within the current page using the given mechanism.
@@ -279,16 +262,7 @@ public interface WebDriver {
          */
         WebDriver window(String windowName);
 
-        /**
-         * Provides a mechanism to iterate over every open browser window.
-         *
-         * @return An iterable of current open windows.
-         * @deprecated This is a poor method. Use the #windowHandles method and "switchTo"
-         */
-        @Deprecated
-        Iterable<WebDriver> windowIterable();
-
-        /**
+      /**
          * Selects either the first frame on the page, or the main document when a page contains iframes.
          */
         WebDriver defaultContent();
@@ -329,5 +303,17 @@ public interface WebDriver {
          * @param url The URL to load. It is best to use a fully qualified URL
          */
         void to(String url);
+
+        /**
+         * Overloaded version of {@link #to(String)} that makes it easy to pass in a URL.
+         *
+         * @param url
+         */
+          void to(URL url);
+
+      /**
+       * Refresh the current page 
+       */
+         void refresh();
     }
 }

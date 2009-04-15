@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 const charset = "UTF-8";
 const CI = Components.interfaces;
 
@@ -41,7 +59,7 @@ SocketListener.prototype.onDataAvailable = function(request, context, inputStrea
     for (var j = 0; j < lines.length; j++) {
         if (this.isReadingHeaders()) {
             var head = lines[j].split(": ", 2);
-            if (head[0] == "Length") {
+            if (head[0] == "Content-Length") {
                 this.linesLeft = head[1] - 0;
                 this.readLength = true;
             } else if (lines[j].length == 0 && this.readLength) {
@@ -76,8 +94,15 @@ SocketListener.prototype.executeCommand = function() {
         elementId : command.elementId
     };
 
+    var statusBarLabel = null;
+
     var respond = {
         send : function() {
+            // Indicate, that we are no longer executing a command ...
+            if (statusBarLabel) {
+                statusBarLabel.style.color = "black";
+            }
+
             sendBack.context = "" + sendBack.context;
             var remainder = JSON.stringify(sendBack);
 
@@ -136,8 +161,9 @@ SocketListener.prototype.executeCommand = function() {
         command.context = command.context.toString();
 
         var allWindows = this.wm.getEnumerator(null);
+        var win;
         while (allWindows.hasMoreElements()) {
-            var win = allWindows.getNext();
+            win = allWindows.getNext();
             if (win["fxdriver"] && win.fxdriver.id == context.windowId) {
                 fxbrowser = win.getBrowser();
                 driver = win.fxdriver;
@@ -191,6 +217,11 @@ SocketListener.prototype.executeCommand = function() {
         }
 
         driver.context.fxdocument = fxdocument;
+        // Indicate, that we are about to execute a command ...
+        statusBarLabel = win.document.getElementById("fxdriver-label");
+        if (statusBarLabel) {
+            statusBarLabel.style.color = "red";
+        }
 
         var webNav = frame.QueryInterface(CI.nsIInterfaceRequestor).getInterface(CI.nsIWebNavigation);
         var loadGroup = webNav.QueryInterface(CI.nsIInterfaceRequestor).getInterface(CI.nsILoadGroup);
@@ -198,7 +229,8 @@ SocketListener.prototype.executeCommand = function() {
         var info = {
             webProgress: loadGroup,
             command: command,
-            driver: driver
+            driver: driver,
+            onBlank: false
         };
 
         this.data = "";
@@ -208,26 +240,34 @@ SocketListener.prototype.executeCommand = function() {
 
         var wait = function(info) {
             if (info.webProgress.isPending()) {
-                info.driver.window.setTimeout(wait, 10, info);
+                info.driver.window.setTimeout(wait, 100, info);
             } else {
-                try {
-                    respond.commandName = info.command.commandName;
-                    info.driver[info.command.commandName](respond, info.command.parameters);
-                } catch (e) {
-                    var obj = {
-                      fileName : e.fileName,
-                      lineNumber : e.lineNumber,
-                      message : e.message,
-                      name : e.name,
-                      stack : e.stack  
-                    };
-                    var message = "Exception caught by driver: " + info.command.commandName + "(" + info.command.parameters + ")\n" + e;
-                    Utils.dumpn(message);
-                    Utils.dump(e);
-                    respond.isError = true;
-                    respond.context = info.driver.context;
-                    respond.response = obj;
-                    respond.send();
+                // Ugh! New windows open on "about:blank" before going to their destination
+                // URL. This check attempts to tell the difference between a newly opened
+                // window and someone actually wanting to do something on about:blank.
+                if (info.driver.window.location == "about:blank" && !info.onBlank) {
+                  info.onBlank = true;
+                  info.driver.window.setTimeout(wait, 100, info);
+                } else {
+                  try {
+                      respond.commandName = info.command.commandName;
+                      info.driver[info.command.commandName](respond, info.command.parameters);
+                  } catch (e) {
+                      var obj = {
+                        fileName : e.fileName,
+                        lineNumber : e.lineNumber,
+                        message : e.message,
+                        name : e.name,
+                        stack : e.stack
+                      };
+                      var message = "Exception caught by driver: " + info.command.commandName + "(" + info.command.parameters + ")\n" + e;
+                      Utils.dumpn(message);
+                      Utils.dump(e);
+                      respond.isError = true;
+                      respond.context = info.driver.context;
+                      respond.response = obj;
+                      respond.send();
+                  }
                 }
             }
         }
@@ -239,7 +279,7 @@ SocketListener.prototype.executeCommand = function() {
         this.readLength = false;
         respond.isError = true;
         respond.response = "Unrecognised command: " + command.commandName;
-        respond.context = new Context(driver.window);
+        // Context was already set.
         respond.send();
     }
 };
@@ -258,14 +298,19 @@ SocketListener.prototype.switchToWindow = function(respond, windowId) {
     var allWindows = wm.getEnumerator(null);
 
     var matches = function(win, lookFor) {
-      if (win.content.name == lookFor)
+      if (win.closed)
+        return false;
+
+      if (win.content && win.content.name == lookFor)
         return true;
 
-      if (win.top.fxdriver && win.top.fxdriver.id == lookFor)
+      if (win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor)
         return true;
 
       return false;
     }
+
+    Utils.dumpn("Looking for: " + windowId);
 
     while (allWindows.hasMoreElements()) {
         var win = allWindows.getNext();

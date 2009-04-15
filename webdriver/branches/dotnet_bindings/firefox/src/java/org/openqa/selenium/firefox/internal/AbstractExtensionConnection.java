@@ -1,11 +1,31 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox.internal;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.ExtensionConnection;
+import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.firefox.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,32 +42,31 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
 public abstract class AbstractExtensionConnection implements ExtensionConnection {
     private Socket socket;
-    protected SocketAddress address;
+    private Set<SocketAddress> addresses;
     private OutputStreamWriter out;
     private BufferedInputStream in;
 
     protected void setAddress(String host, int port) {
-        InetAddress addr;
-
         if ("localhost".equals(host)) {
-            addr = obtainLoopbackAddress();
+            addresses = obtainLoopbackAddresses(port);
         } else {
             try {
-                addr = InetAddress.getByName(host);
+              SocketAddress hostAddress = new InetSocketAddress(InetAddress.getByName(host), port);
+              addresses = Collections.singleton(hostAddress);
             } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
+                throw new WebDriverException(e);
             }
         }
-
-        address = new InetSocketAddress(addr, port);
     }
 
-    private InetAddress obtainLoopbackAddress() {
-        InetAddress localIp4 = null;
-        InetAddress localIp6 = null;
+    private Set<SocketAddress> obtainLoopbackAddresses(int port) {
+        Set<SocketAddress> localhosts = new HashSet<SocketAddress>();
 
         try {
             Enumeration<NetworkInterface> allInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -56,76 +75,97 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
                 Enumeration<InetAddress> allAddresses = iface.getInetAddresses();
                 while (allAddresses.hasMoreElements()) {
                     InetAddress addr = allAddresses.nextElement();
-                    if (addr.isLoopbackAddress()) {
-                        if (addr instanceof Inet4Address && localIp4 == null)
-                            localIp4 = addr;
-                        else if (addr instanceof Inet6Address && localIp6 == null)
-                            localIp6 = addr;
+                    if (addr.isAnyLocalAddress()) {
+                      SocketAddress socketAddress = new InetSocketAddress(addr, port);
+                      localhosts.add(socketAddress);
                     }
                 }
             }
+
+          // On linux, loopback addresses are named "lo". See if we can find that. We do this
+          // craziness because sometimes the loopback device is given an IP range that falls outside
+          // of 127/24
+          if (Platform.getCurrent().is(Platform.UNIX)) {
+            NetworkInterface linuxLoopback = NetworkInterface.getByName("lo");
+            if (linuxLoopback != null) {
+              Enumeration<InetAddress> possibleLoopbacks = linuxLoopback.getInetAddresses();
+              while (possibleLoopbacks.hasMoreElements()) {
+                InetAddress inetAddress = possibleLoopbacks.nextElement();
+                SocketAddress socketAddress = new InetSocketAddress(inetAddress, port);
+                localhosts.add(socketAddress);
+              }
+            }
+          }
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
-        // Firefox binds to the IP4 address by preference
-        if (localIp4 != null)
-            return localIp4;
-
-        if (localIp6 != null)
-            return localIp6;
+        if (!localhosts.isEmpty()) {
+          return localhosts;
+        }
 
         // Nothing found. Grab the first address we can find
-        NetworkInterface firstInterface = null;
+        NetworkInterface firstInterface;
         try {
             firstInterface = NetworkInterface.getNetworkInterfaces().nextElement();
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
         InetAddress firstAddress = null;
         if (firstInterface != null) {
             firstAddress = firstInterface.getInetAddresses().nextElement();
         }
 
-        if (firstAddress != null)
-            return firstAddress;
+        if (firstAddress != null) {
+          SocketAddress socketAddress = new InetSocketAddress(firstAddress, port);
+          return Collections.singleton(socketAddress);
+        }
 
-        throw new RuntimeException("Unable to find loopback address for localhost");
+        throw new WebDriverException("Unable to find loopback address for localhost");
     }
 
-    protected boolean connectToBrowser(long timeToWaitInMilliSeconds) throws IOException {
+    protected void connectToBrowser(long timeToWaitInMilliSeconds) throws IOException {
         long waitUntil = System.currentTimeMillis() + timeToWaitInMilliSeconds;
         while (!isConnected() && waitUntil > System.currentTimeMillis()) {
+          for (SocketAddress addr : addresses) {
             try {
-                connect();
+              connect(addr);
+              break;
             } catch (ConnectException e) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    throw new WebDriverException(ie);
                 }
             }
+          }
         }
-        return isConnected();
+
+        if (!isConnected()) {
+          throw new NotConnectedException(socket, timeToWaitInMilliSeconds);
+        }
     }
 
-    private void connect() throws IOException {
+    private void connect(SocketAddress addr) throws IOException {
         socket = new Socket();
-
-        socket.connect(address);
+        socket.connect(addr);
         in = new BufferedInputStream(socket.getInputStream());
         out = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
     }
 
     public boolean isConnected() {
-        return socket != null && socket.isConnected();
+      return socket != null && socket.isConnected();
     }
 
     public Response sendMessageAndWaitForResponse(Class<? extends RuntimeException> throwOnFailure,
                                                   Command command) {
         String converted = convert(command);
 
-        StringBuilder message = new StringBuilder("Length: ");
+        // Make this look like an HTTP request
+        StringBuilder message = new StringBuilder();
+        message.append("GET / HTTP/1.1\n");
+        message.append("Host: localhost\n");
+        message.append("Content-Length: ");
         message.append(converted.length()).append("\n\n");
         message.append(converted).append("\n");
 
@@ -133,7 +173,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
             out.write(message.toString());
             out.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
         return waitForResponseFor(command.getCommandName());
@@ -153,7 +193,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
 
             json.put("parameters", params);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
 
       try {
@@ -170,7 +210,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         try {
             return readLoop(command);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         }
     }
 
@@ -179,7 +219,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
 
         if (command.equals(response.getCommand()))
             return response;
-        throw new RuntimeException("Expected response to " + command + " but actually got: " + response.getCommand() + " (" + response.getCommand() + ")");
+        throw new WebDriverException("Expected response to " + command + " but actually got: " + response.getCommand() + " (" + response.getCommand() + ")");
     }
 
     private Response nextResponse() throws IOException {

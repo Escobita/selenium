@@ -1,16 +1,39 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.support.events;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.awt.*;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,11 +61,43 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         }
     );
 
-    public EventFiringWebDriver(WebDriver driver) {
-        this.driver = driver;
+    public EventFiringWebDriver(final WebDriver driver) {
+       Class<?>[] allInterfaces = extractInterfaces(driver);
+
+      this.driver = (WebDriver) Proxy.newProxyInstance(
+          WebDriverEventListener.class.getClassLoader(),
+          allInterfaces,
+          new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+              try {
+                return method.invoke(driver, args);
+              } catch (InvocationTargetException e) {
+                dispatcher.onException(e.getTargetException(), driver);
+                throw e.getTargetException();
+              }
+            }
+          }
+      );
     }
 
-    /**
+  private Class<?>[] extractInterfaces(WebDriver driver) {
+    Set<Class<?>> allInterfaces = new HashSet<Class<?>>();
+    extractInterfaces(allInterfaces, driver.getClass());
+
+    return allInterfaces.toArray(new Class<?>[allInterfaces.size()]);
+  }
+
+  private void extractInterfaces(Set<Class<?>> addTo, Class<?> clazz) {
+    if (Object.class.equals(clazz)) {
+      return; // Done
+    }
+
+    Class<?>[] classes = clazz.getInterfaces();
+    addTo.addAll(Arrays.asList(classes));
+    extractInterfaces(addTo, clazz.getSuperclass());
+  }
+
+  /**
      * @return this for method chaining.
      */
     public EventFiringWebDriver register(WebDriverEventListener eventListener) {
@@ -72,21 +127,13 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         return driver.getTitle();
     }
 
-    public boolean getVisible() {
-        return driver.getVisible();
-    }
-
-    public void setVisible(boolean visible) {
-        driver.setVisible(visible);
-    }
-
     public List<WebElement> findElements(By by) {
         dispatcher.beforeFindBy(by, null, driver);
         List<WebElement> temp = driver.findElements(by);
         dispatcher.afterFindBy(by, null, driver);
         List<WebElement> result = new ArrayList<WebElement>(temp.size());
         for (WebElement element : temp) {
-            result.add(new EventFiringWebElement(element));
+            result.add(createWebElement(element));
         }
         return result;
     }
@@ -95,7 +142,7 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         dispatcher.beforeFindBy(by, null, driver);
         WebElement temp = driver.findElement(by);
         dispatcher.afterFindBy(by, null, driver);
-        return new EventFiringWebElement(temp);
+        return createWebElement(temp);
     }
 
     public String getPageSource() {
@@ -121,14 +168,36 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
   public Object executeScript(String script, Object... args) {
         if (driver instanceof JavascriptExecutor) {
             dispatcher.beforeScript(script, driver);
-            Object result = ((JavascriptExecutor) driver).executeScript(script);
+            Object[] usedArgs = unpackWrappedArgs(args);
+            Object result = ((JavascriptExecutor) driver).executeScript(script, usedArgs);
             dispatcher.afterScript(script, driver);
             return result;
         }
         throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
     }
 
-    public TargetLocator switchTo() {
+  public boolean isJavascriptEnabled() {
+    if (driver instanceof JavascriptExecutor) {
+      return ((JavascriptExecutor) driver).isJavascriptEnabled();
+    }
+
+    throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
+  }
+
+  private Object[] unpackWrappedArgs(Object... args) {
+    // Walk the args: the various drivers expect unpacked versions of the elements
+    Object[] usedArgs = new Object[args.length];
+    for (int i = 0; i < args.length; i++) {
+      if (args[i] instanceof EventFiringWebElement) {
+        usedArgs[i] = ((EventFiringWebElement) args[i]).getUnderlyingElement();
+      } else {
+        usedArgs[i] = args[i];
+      }
+    }
+    return usedArgs;
+  }
+
+  public TargetLocator switchTo() {
         return new EventFiringTargetLocator(driver.switchTo());
     }
 
@@ -140,12 +209,32 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         return new EventFiringOptions(driver.manage());
     }
 
+    private WebElement createWebElement(WebElement from) {
+      return from instanceof RenderedWebElement ?
+          new EventFiringRenderedWebElement(from) : new EventFiringWebElement(from);
+    }
+
     private class EventFiringWebElement implements WebElement {
         private final WebElement element;
+        private final WebElement underlyingElement;
 
-        private EventFiringWebElement(WebElement element) {
-            this.element = element;
-        }
+      private EventFiringWebElement(final WebElement element) {
+        this.element = (WebElement) Proxy.newProxyInstance(
+            WebDriverEventListener.class.getClassLoader(),
+            element.getClass().getInterfaces(),
+            new InvocationHandler() {
+              public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                try {
+                  return method.invoke(element, args);
+                } catch (InvocationTargetException e) {
+                  dispatcher.onException(e.getTargetException(), driver);
+                  throw e.getTargetException();
+                }
+              }
+            }
+        );
+        this.underlyingElement = element;
+      }
 
         public void click() {
             dispatcher.beforeClickOn(element, driver);
@@ -204,20 +293,11 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             return element.getText();
         }
 
-        public List<WebElement> getChildrenOfType(String tagName) {
-            List<WebElement> elements = element.getChildrenOfType(tagName);
-            List<WebElement> result = new ArrayList<WebElement>(elements.size());
-            for (WebElement element : elements) {
-                result.add(new EventFiringWebElement(element));
-            }
-            return result;
-        }
-
-        public WebElement findElement(By by) {
+      public WebElement findElement(By by) {
             dispatcher.beforeFindBy(by, element, driver);
             WebElement temp = element.findElement(by);
             dispatcher.afterFindBy(by, element, driver);
-            return new EventFiringWebElement(temp);
+            return createWebElement(temp);
         }
 
         public List<WebElement> findElements(By by) {
@@ -226,10 +306,47 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             dispatcher.afterFindBy(by, element, driver);
             List<WebElement> result = new ArrayList<WebElement>(temp.size());
             for (WebElement element : temp) {
-                result.add(new EventFiringWebElement(element));
+                result.add(createWebElement(element));
             }
             return result;
         }
+
+      public WebElement getUnderlyingElement() {
+        return underlyingElement;
+      }
+    }
+
+    private class EventFiringRenderedWebElement extends EventFiringWebElement implements RenderedWebElement {
+      private final RenderedWebElement delegate;
+
+      public EventFiringRenderedWebElement(WebElement element) {
+        super(element);
+        delegate = (RenderedWebElement) element;
+      }
+
+      public boolean isDisplayed() {
+        return delegate.isDisplayed();
+      }
+
+      public Point getLocation() {
+        return delegate.getLocation();
+      }
+
+      public Dimension getSize() {
+        return delegate.getSize();
+      }
+
+      public void dragAndDropBy(int moveRightBy, int moveDownBy) {
+        delegate.dragAndDropBy(moveRightBy, moveDownBy);
+      }
+
+      public void dragAndDropOn(RenderedWebElement element) {
+        delegate.dragAndDropOn(element);
+      }
+
+      public String getValueOfCssProperty(String propertyName) {
+        return delegate.getValueOfCssProperty(propertyName);
+      }
     }
 
     private class EventFiringNavigation implements Navigation {
@@ -245,6 +362,10 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             dispatcher.afterNavigateTo(url, driver);
         }
 
+        public void to(URL url) {
+          to(String.valueOf(url));
+        }
+
         public void back() {
             dispatcher.beforeNavigateBack(driver);
             navigation.back();
@@ -255,6 +376,10 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             dispatcher.beforeNavigateForward(driver);
             navigation.forward();
             dispatcher.afterNavigateForward(driver);
+        }
+
+        public void refresh() {
+            navigation.refresh();
         }
     }
 
@@ -311,10 +436,6 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
 
         public WebDriver window(String windowName) {
             return targetLocator.window(windowName);
-        }
-
-        public Iterable<WebDriver> windowIterable() {
-            return targetLocator.windowIterable();
         }
 
       public WebDriver defaultContent() {

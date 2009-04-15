@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
 
 import junit.framework.Test;
@@ -19,7 +36,7 @@ public class TestSuiteBuilder {
 
   private File baseDir;
   private Set<File> sourceDirs = new HashSet<File>();
-  private Set<String> ignored = new HashSet<String>();
+  private Set<Ignore.Driver> ignored = new HashSet<Ignore.Driver>();
   private Class<? extends WebDriver> driverClass;
   private boolean keepDriver;
   private boolean includeJavascript;
@@ -42,7 +59,7 @@ public class TestSuiteBuilder {
     assertThat(baseDir.exists(), is(true));
 
     baseDir = baseDir.getParentFile();
-    exclude("all");
+//    exclude("all");
   }
 
   public TestSuiteBuilder addSourceDir(String dirName) {
@@ -69,7 +86,7 @@ public class TestSuiteBuilder {
     }
   }
 
-  public TestSuiteBuilder exclude(String tagToIgnore) {
+  public TestSuiteBuilder exclude(Ignore.Driver tagToIgnore) {
     ignored.add(tagToIgnore);
     return this;
   }
@@ -173,8 +190,16 @@ public class TestSuiteBuilder {
       return method.getName().equals(testMethodName);
     }
 
-    if (!method.getName().startsWith("test")) {
-      return false;
+    Ignore ignore = method.getAnnotation(Ignore.class);
+    for (Ignore.Driver name : ignored) {
+      if (isIgnored(name, ignore)) {
+        if (isIgnored(name, ignore)) {
+          System.err.println("Ignoring: "
+              + method.getDeclaringClass() + "."
+              + method.getName() + ": " + ignore.reason());
+          return false;
+        }
+      }
     }
 
     if (!includeJavascript
@@ -182,19 +207,25 @@ public class TestSuiteBuilder {
       return false;
     }
 
-    Ignore ignore = method.getAnnotation(Ignore.class);
-    if (ignore != null) {
-      for (String name : ignored) {
-        if (ignore.value().contains(name)) {
-          System.err.println("Ignoring: "
-                             + method.getDeclaringClass() + "."
-                             + method.getName() + ": " + ignore.reason());
-          return false;
-        }
+    return method.getName().startsWith("test") || method.getAnnotation(org.junit.Test.class) != null;
+  }
+
+  private boolean isIgnored(Ignore.Driver name, Ignore ignore) {
+    if (ignore == null) {
+      return false;
+    }
+
+    if (ignore.value().length == 0) {
+      return true;
+    }
+
+    for (Ignore.Driver value : ignore.value()) {
+      if (value == name || value == Ignore.Driver.ALL) {
+        return true;
       }
     }
 
-    return true;
+    return false;
   }
 
   private Class<?> getClassFrom(File file) {

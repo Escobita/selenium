@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
 
 /**
@@ -13,7 +30,7 @@ public interface JavascriptExecutor {
      * returned</li> <li>For a boolean, a Boolean is returned</li> <li>For all other cases, a String is
      * returned.</li> <li>For an array, we check the first element, and attempt to return a List of
      * that type, following the rules above. We do not support nested lists.</li> <li>Unless the value
-     * is null or there is no return value</li> </ul>
+     * is null or there is no return value, in which null is returned</li> </ul>
      *
      * <p>Arguments must be a number (which will be converted to a Long), a boolean, String or
      * WebElement. An exception will be thrown if the arguments do not meet these criteria. The
@@ -25,4 +42,9 @@ public interface JavascriptExecutor {
      * @return One of Boolean, Long, String, List or WebElement. Or null.
      */
     Object executeScript(String script, Object... args);
+
+    /**
+     * It's not enough to simply support javascript, it also needs to be enabled too.
+     */
+      boolean isJavascriptEnabled();
 }

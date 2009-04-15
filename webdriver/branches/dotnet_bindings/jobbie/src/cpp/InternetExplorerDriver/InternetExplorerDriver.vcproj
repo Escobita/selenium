@@ -231,14 +231,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\build\InternetExplorerDriver.dll"
-				>
-			</File>
-			<File
-				RelativePath=".\org_openqa_selenium_ie_InternetExplorerDriver.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ScopeTracer.cpp"
 				>
 			</File>

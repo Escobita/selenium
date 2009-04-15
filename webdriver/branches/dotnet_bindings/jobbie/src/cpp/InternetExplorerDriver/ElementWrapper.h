@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #ifndef JOBBIE_ELEMENTWRAPPER_H_
 #define JOBBIE_ELEMENTWRAPPER_H_
 
@@ -16,23 +34,23 @@ public:
     LPCWSTR getElementName();
 	LPCWSTR getAttribute(LPCWSTR name);
 	LPCWSTR getValue();
-	void sendKeys(LPCWSTR newValue);
+	int sendKeys(LPCWSTR newValue);
 	void clear();
 	bool isSelected();
-	void setSelected();
+	int setSelected();
 	bool isEnabled();
 	bool isDisplayed();
-	bool toggle();
+	int toggle();
 	LPCWSTR getText();
 	LPCWSTR getValueOfCssProperty(LPCWSTR propertyName);
 	void releaseInterface();
 
-	void getLocationOnceScrolledIntoView(HWND* hwnd, long *x, long *y);
+	int getLocationWhenScrolledIntoView(HWND* hwnd, long *x, long *y);
 	void getLocation(long *x, long *y);
-	long getWidth();
-	long getHeight();
+	int getWidth(long* width);
+	int getHeight(long* height);
 
-	void click();
+	int click();
 	void submit();
 
 	std::vector<ElementWrapper*>* getChildrenWithTagName(LPCWSTR tagName);

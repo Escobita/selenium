@@ -1,10 +1,29 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium;
+
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 import java.util.ArrayList;
 
 public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnAString() {
         if (!(driver instanceof JavascriptExecutor))
             return;
@@ -18,7 +37,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnALong() {
         if (!(driver instanceof JavascriptExecutor))
             return;
@@ -32,7 +51,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnAWebElement() {
         if (!(driver instanceof JavascriptExecutor))
             return;
@@ -46,7 +65,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnABoolean() {
         if (!(driver instanceof JavascriptExecutor))
             return;
@@ -61,7 +80,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldThrowAnExceptionWhenTheJavascriptIsBad() {
         if (!(driver instanceof JavascriptExecutor))
             return;
@@ -77,7 +96,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToCallFunctionsDefinedOnThePage() {
         if (!(driver instanceof JavascriptExecutor))
           return;
@@ -94,7 +113,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
   @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
     public void testShouldBeAbleToPassAStringAnAsArgument() {
       if (!(driver instanceof JavascriptExecutor))
           return;
@@ -106,7 +125,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
     public void testShouldBeAbleToPassABooleanAnAsArgument() {
       if (!(driver instanceof JavascriptExecutor))
           return;
@@ -118,7 +137,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-  @Ignore("safari")
+  @Ignore(SAFARI)
     public void testShouldBeAbleToPassANumberAnAsArgument() {
       if (!(driver instanceof JavascriptExecutor))
           return;
@@ -130,7 +149,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToPassAWebElementAsArgument() {
       if (!(driver instanceof JavascriptExecutor))
           return;
@@ -143,7 +162,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
 
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldThrowAnExceptionIfAnArgumentIsNotValid() {
       if (!(driver instanceof JavascriptExecutor))
         return;
@@ -158,7 +177,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     }
     
     @JavascriptEnabled
-    @Ignore("safari")
+    @Ignore(SAFARI)
     public void testShouldBeAbleToPassInMoreThanOneArgument() {
     	if (!(driver instanceof JavascriptExecutor))
             return;

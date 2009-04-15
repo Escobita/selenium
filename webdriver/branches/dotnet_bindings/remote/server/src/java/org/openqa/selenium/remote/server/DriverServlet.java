@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote.server;
 
 import org.openqa.selenium.remote.server.handler.AddCookie;
@@ -35,18 +52,17 @@ import org.openqa.selenium.remote.server.handler.GetMouseSpeed;
 import org.openqa.selenium.remote.server.handler.GetPageSource;
 import org.openqa.selenium.remote.server.handler.GetSessionCapabilities;
 import org.openqa.selenium.remote.server.handler.GetTitle;
-import org.openqa.selenium.remote.server.handler.GetVisible;
 import org.openqa.selenium.remote.server.handler.GoBack;
 import org.openqa.selenium.remote.server.handler.GoForward;
 import org.openqa.selenium.remote.server.handler.NewSession;
 import org.openqa.selenium.remote.server.handler.SendKeys;
 import org.openqa.selenium.remote.server.handler.SetElementSelected;
 import org.openqa.selenium.remote.server.handler.SetMouseSpeed;
-import org.openqa.selenium.remote.server.handler.SetVisible;
 import org.openqa.selenium.remote.server.handler.SubmitElement;
 import org.openqa.selenium.remote.server.handler.SwitchToFrame;
 import org.openqa.selenium.remote.server.handler.SwitchToWindow;
 import org.openqa.selenium.remote.server.handler.ToggleElement;
+import org.openqa.selenium.remote.server.handler.RefreshPage;
 import org.openqa.selenium.remote.server.renderer.EmptyResult;
 import org.openqa.selenium.remote.server.renderer.ForwardResult;
 import org.openqa.selenium.remote.server.renderer.JsonErrorExceptionResult;
@@ -73,9 +89,11 @@ public class DriverServlet extends HttpServlet {
 
     DriverSessions driverSessions = new DriverSessions();
 
-    getMapper = new UrlMapper(driverSessions);
-    postMapper = new UrlMapper(driverSessions);
-    deleteMapper = new UrlMapper(driverSessions);
+    ServletLogTo logger = new ServletLogTo();
+
+    getMapper = new UrlMapper(driverSessions, logger);
+    postMapper = new UrlMapper(driverSessions, logger);
+    deleteMapper = new UrlMapper(driverSessions, logger);
 
     getMapper.addGlobalHandler(ResultType.EXCEPTION,
                                new JsonErrorExceptionResult(":exception", ":response"));
@@ -93,9 +111,9 @@ public class DriverServlet extends HttpServlet {
     deleteMapper.bind("/session/:sessionId", DeleteSession.class)
         .on(ResultType.SUCCESS, new EmptyResult());
 
-    getMapper.bind("/session/:sessioId/:context/window_handle", GetCurrentWindowHandle.class)
+    getMapper.bind("/session/:sessionId/:context/window_handle", GetCurrentWindowHandle.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
-    getMapper.bind("/session/:sessioId/:context/window_handles", GetAllWindowHandles.class)
+    getMapper.bind("/session/:sessionId/:context/window_handles", GetAllWindowHandles.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
     postMapper.bind("/session/:sessionId/:context/url", ChangeUrl.class)
@@ -107,6 +125,8 @@ public class DriverServlet extends HttpServlet {
         .on(ResultType.SUCCESS, new EmptyResult());
     postMapper.bind("/session/:sessionId/:context/back", GoBack.class)
         .on(ResultType.SUCCESS, new EmptyResult());
+    postMapper.bind("/session/:sessionId/:context/refresh", RefreshPage.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
 
     postMapper.bind("/session/:sessionId/:context/execute", ExecuteScript.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
@@ -115,11 +135,6 @@ public class DriverServlet extends HttpServlet {
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
     getMapper.bind("/session/:sessionId/:context/title", GetTitle.class)
-        .on(ResultType.SUCCESS, new JsonResult(":response"));
-
-    postMapper.bind("/session/:sessionId/:context/visible", SetVisible.class)
-        .on(ResultType.SUCCESS, new EmptyResult());
-    getMapper.bind("/session/:sessionId/:context/visible", GetVisible.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
     postMapper.bind("/session/:sessionId/:context/element", FindElement.class).on(
@@ -231,8 +246,14 @@ public class DriverServlet extends HttpServlet {
       ResultConfig config = mapper.getConfig(request.getPathInfo());
       config.handle(request.getPathInfo(), request, response);
     } catch (Exception e) {
+      log("Fatal, unhandled exception: " + request.getPathInfo() + ": " + e);
       throw new ServletException(e);
     }
   }
 
+  private class ServletLogTo implements LogTo {
+    public void log(String message) {
+      DriverServlet.this.log(message);
+    }
+  }
 }

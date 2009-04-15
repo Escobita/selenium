@@ -38,6 +38,7 @@
         </select>
         <input type="checkbox" id="checkbox" value="checkbox thing" onchange="javascript:updateContent(this)"/>
         <input id="clickField" type="text" onclick="document.getElementById('clickField').value='Clicked';" value="Hello"/>
+        <input id="clearMe" value="Something" onchange="displayMessage('Cleared')"/>
     </form>
 </div>
 
@@ -100,8 +101,12 @@
   </form>
 </div>
 
+<p id="suppressedParagraph" style="display: none">A paragraph suppressed using CSS display=none</p>
+
 <div>
     <p id="displayed">Displayed</p>
+
+    <form action="#"><input type="hidden" name="hidden" /> </form>
 
     <p id="none" style="display: none;">Display set to none</p>
 
@@ -119,6 +124,8 @@
         <input type="checkbox" id="untogglable" checked="checked" />Check box you can't see
       </span>
     </div>
+
+    <p style="visibility: hidden">A <b id="visibleSubElement" style="visibility: visible">sub-element that is explicitly visible</b> using CSS visibility=visible</p>
 </div>
 
 <div>
@@ -143,6 +150,8 @@
 <p id="zeroheight" style="height:0px;">This is a foo</p>
 
 <p id="zerowidth" style="width:0;">This is a bar</p>
+
+<a href="#" id="close" onclick="window.close();">Close window</a>
 
 </body>
 </html>

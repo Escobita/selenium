@@ -1,11 +1,36 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox;
 
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.internal.Cleanly;
 import org.openqa.selenium.firefox.internal.FileHandler;
-import org.openqa.selenium.firefox.internal.ProfileReaper;
+import org.openqa.selenium.firefox.internal.TemporaryFilesystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,92 +43,59 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 public class FirefoxProfile {
-    private static final String EXTENSION_NAME = "fxdriver@googlecode.com";
-    private File profileDir;
-    private File extensionsDir;
-    private File userPrefs;
-    private Preferences additionalPrefs = new Preferences();
-    private int port;
-    private static AtomicInteger nextId = new AtomicInteger(new Random().nextInt());
+  private static final String EXTENSION_NAME = "fxdriver@googlecode.com";
+  private File profileDir;
+  private File extensionsDir;
+  private File userPrefs;
+  private Preferences additionalPrefs = new Preferences();
+  private int port;
 
-    // Profile management "stuff"
-    private Set<File> profileTempDirs = new HashSet<File>();
-    private ProfileReaper reaper;
+  /**
+   * Constructs a firefox profile from an existing, physical profile directory.
+   * Not a good idea, please don't.
+   * 
+   * <p>Users who need this functionality should be using a named profile.
+   * 
+   * @deprecated Prefer {@link ProfileManager}; this will be private soon.
+   * @param profileDir
+   */
+  @Deprecated
+  public FirefoxProfile(File profileDir) {
+    this.profileDir = profileDir;
+    this.extensionsDir = new File(profileDir, "extensions");
+    this.userPrefs = new File(profileDir, "user.js");
 
-    protected FirefoxProfile(ProfileReaper reaper) {
-      this.reaper = reaper;
+    port = FirefoxDriver.DEFAULT_PORT;
+
+    if (!profileDir.exists()) {
+      throw new WebDriverException(MessageFormat.format("Profile directory does not exist: {0}",
+          profileDir.getAbsolutePath()));
     }
-
-    public FirefoxProfile(File profileDir) {
-      this(ProfileReaper.getInstance());
-      commonConstruction(profileDir);
-    }
-
-    public FirefoxProfile() {
-      this(ProfileReaper.getInstance());
-      profileDir = getUniqueProfileDir();
-
-      if (profileDir == null || !profileDir.mkdirs()) {
-        throw new RuntimeException("Cannot create custom profile directory");
-      }
-
-      commonConstruction(profileDir);
-    }
-
-    private void commonConstruction(File profileDir) {
-      this.profileDir = profileDir;
-      this.extensionsDir = new File(profileDir, "extensions");
-      this.userPrefs = new File(profileDir, "user.js");
-
-      port = FirefoxDriver.DEFAULT_PORT;
-
-      if (!profileDir.exists()) {
-        throw new RuntimeException(MessageFormat.format("Profile directory does not exist: {0}",
-            profileDir.getAbsolutePath()));
-      }
-    }
-
-  protected File getUniqueProfileDir() {
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        if (!tmpDir.exists())
-            throw new RuntimeException("Unable to find default temp directory: " + tmpDir);
-
-    String probablyUniqueName =
-        "webdriver-custom-" + System.currentTimeMillis() + nextId.getAndIncrement();
-
-    File profileDir = new File(tmpDir, probablyUniqueName);
-
-    rememberToClean(profileDir);
-
-    return profileDir;
   }
 
-  protected void addWebDriverExtensionIfNeeded(boolean forceCreation) throws IOException {
+  
+  public FirefoxProfile() {
+    this(TemporaryFilesystem.createTempDir("webdriver", "profile"));
+  }
+
+  protected void addWebDriverExtensionIfNeeded(boolean forceCreation) {
         File extensionLocation = new File(extensionsDir, EXTENSION_NAME);
         if (!forceCreation && extensionLocation.exists())
             return;
 
         boolean isDev = Boolean.getBoolean("webdriver.firefox.development");
-        if (isDev) {
-            installDevelopmentExtension();
-        } else {
-            addExtension(FirefoxProfile.class, "webdriver-extension.zip");
+        try {
+          if (isDev) {
+              installDevelopmentExtension();
+          } else {
+              addExtension(FirefoxProfile.class, "webdriver-extension.zip");
+          }
+        } catch (IOException e) {
+          throw new WebDriverException("Failed to install webdriver extension", e);
         }
 
         deleteExtensionsCacheIfItExists();
@@ -136,7 +128,7 @@ public class FirefoxProfile {
       if (FileHandler.isZipped(loadFrom)) {
         root = FileHandler.unzip(resource);
       } else {
-        throw new RuntimeException("Will only install zipped extensions for now");
+        throw new WebDriverException("Will only install zipped extensions for now");
       }
 
       addExtension(root);
@@ -166,7 +158,7 @@ public class FirefoxProfile {
 
     FileHandler.createDir(extensionDirectory);
     FileHandler.makeWritable(extensionDirectory);
-    FileHandler.copyDir(root, extensionDirectory);
+    FileHandler.copy(root, extensionDirectory);
   }
 
   private String readIdFromInstallRdf(File root) {
@@ -200,7 +192,7 @@ public class FirefoxProfile {
       Node idNode = (Node) xpath.compile("//em:id").evaluate(doc, XPathConstants.NODE);
 
       if (idNode == null) {
-        throw new RuntimeException(
+        throw new WebDriverException(
             "Cannot locate node containing extension id: " + installRdf.getAbsolutePath());
       }
 
@@ -211,7 +203,7 @@ public class FirefoxProfile {
       }
       return id;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new WebDriverException(e);
     }
   }
 
@@ -246,7 +238,7 @@ public class FirefoxProfile {
             writer = new FileWriter(writeTo);
             writer.write(home);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         } finally {
             Cleanly.close(writer);
         }
@@ -256,6 +248,7 @@ public class FirefoxProfile {
     String[] possiblePaths = {
         "firefox/src/extension",
         "../firefox/src/extension",
+        "../../firefox/src/extension",
     };
 
     File current;
@@ -266,7 +259,7 @@ public class FirefoxProfile {
       }
     }
 
-    throw new RuntimeException("Unable to locate firefox driver extension in developer source");
+    throw new WebDriverException("Unable to locate firefox driver extension in developer source");
   }
 
   public File getProfileDir() {
@@ -295,7 +288,7 @@ public class FirefoxProfile {
                 line = reader.readLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         } finally {
             Cleanly.close(reader);
         }
@@ -327,7 +320,7 @@ public class FirefoxProfile {
      * @param value The new value.
      */
     public void setPreference(String key, boolean value) {
-        additionalPrefs.setPreference(key, String.valueOf(value));
+        additionalPrefs.setPreference(key, value);
     }
 
     /**
@@ -337,7 +330,7 @@ public class FirefoxProfile {
      * @param value The new value.
      */
     public void setPreference(String key, int value) {
-        additionalPrefs.setPreference(key, String.valueOf(value));
+        additionalPrefs.setPreference(key, value);
     }
 
     protected Preferences getAdditionalPreferences() {
@@ -346,7 +339,7 @@ public class FirefoxProfile {
 
     public void updateUserPrefs() {
         if (port == 0) {
-            throw new RuntimeException("You must set the port to listen on before updating user.js");
+            throw new WebDriverException("You must set the port to listen on before updating user.js");
         }
 
         Map<String, String> prefs = new HashMap<String, String>();
@@ -354,7 +347,7 @@ public class FirefoxProfile {
         if (userPrefs.exists()) {
             prefs = readExistingPrefs(userPrefs);
             if (!userPrefs.delete())
-                throw new RuntimeException("Cannot delete existing user preferences");
+                throw new WebDriverException("Cannot delete existing user preferences");
         }
 
         additionalPrefs.addTo(prefs);
@@ -411,10 +404,12 @@ public class FirefoxProfile {
         try {
             writer = new FileWriter(userPrefs);
             for (Map.Entry<String, String> entry : prefs.entrySet()) {
-                writer.append("user_pref(\"").append(entry.getKey()).append("\", ").append(entry.getValue()).append(");\n");
+                writer.append(
+                  String.format("user_pref(\"%s\", %s);\n", entry.getKey(), entry.getValue())
+              );
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new WebDriverException(e);
         } finally {
             Cleanly.close(writer);
         }
@@ -435,33 +430,24 @@ public class FirefoxProfile {
         return macAndLinuxLockFile.exists() || windowsLockFile.exists();
     }
 
-    public File init() throws IOException {
-        addWebDriverExtensionIfNeeded(false);
-        return profileDir;
-    }
-
     public void clean() {
-      reaper.clean(this.profileTempDirs);
+      TemporaryFilesystem.deleteTempDir(profileDir);
     }
-
+    
     public FirefoxProfile createCopy(int port) {
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        File to = new File(tmpDir, "webdriver-" + System.currentTimeMillis());
-        to.mkdirs();
+      File to = TemporaryFilesystem.createTempDir("webdriver", "profilecopy");
 
-        FileHandler.copyDir(profileDir, to);
-        FirefoxProfile profile = new FirefoxProfile(to);
-        additionalPrefs.addTo(profile);
-        profile.setPort(port);
-        profile.updateUserPrefs();
+      try {
+        FileHandler.copy(profileDir, to);
+      } catch (IOException e) {
+        throw new WebDriverException(
+            "Cannot create copy of profile " + profileDir.getAbsolutePath(), e);
+      }
+      FirefoxProfile profile = new FirefoxProfile(to);
+      additionalPrefs.addTo(profile);
+      profile.setPort(port);
+      profile.updateUserPrefs();
 
-        rememberToClean(to);
-
-        return profile;
+      return profile;
     }
-
-  private void rememberToClean(File dir) {
-    reaper.deleteOnExit(dir);
-    profileTempDirs.add(dir);
-  }
 }

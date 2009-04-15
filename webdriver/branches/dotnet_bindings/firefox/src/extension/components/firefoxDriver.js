@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 function FirefoxDriver(server) {
     this.server = server;
     this.context = new Context();
@@ -87,7 +105,6 @@ FirefoxDriver.prototype.close = function(respond) {
 }
 
 FirefoxDriver.prototype.executeScript = function(respond, script) {
-  Utils.dumpn("Executing script");
   var context = this.context;
   var window = Utils.getBrowser(this.context).contentWindow;
 
@@ -203,7 +220,7 @@ FirefoxDriver.prototype.selectElementByName = function(respond, name) {
     respond.response = Utils.addToKnownElements(elements[0], this.context);
   } else {
     respond.isError = true;
-    respond.response = "Unable to find element with name '" + name + "'";
+    respond.response = "Unable to locate element with name '" + name + "'";
   }
 
   respond.send();
@@ -227,6 +244,38 @@ FirefoxDriver.prototype.selectElementsUsingName = function(respond, name) {
   respond.send();
 };
 
+FirefoxDriver.prototype.selectElementUsingTagName = function(respond, name) {
+	var doc = Utils.getDocument(this.context);
+
+	var elements = doc.getElementsByTagName(name);
+	if (elements.length) {
+		respond.response = Utils.addToKnownElements(elements[0], this.context);
+	} else {
+		respond.isError = true;
+		respond.response = "Unable to locate element with name '" + name + "'";
+	}
+
+	respond.send();
+};
+
+FirefoxDriver.prototype.selectElementsUsingTagName = function(respond, name) {
+	var doc = Utils.getDocument(this.context);
+
+	var elements = doc.getElementsByTagName(name);
+	var response = "";
+	for ( var i = 0; i < elements.length; i++) {
+		var element = elements[i];
+		var index = Utils.addToKnownElements(element, this.context);
+		response += index + ",";
+	}
+	// Strip the trailing comma
+	response = response.substring(0, response.length - 1);
+
+	respond.context = this.context;
+	respond.response = response;
+	respond.send();
+};
+
 FirefoxDriver.prototype.selectElementUsingClassName = function(respond, name) {
     var doc = Utils.getDocument(this.context);
 
@@ -238,7 +287,7 @@ FirefoxDriver.prototype.selectElementUsingClassName = function(respond, name) {
         respond.response = Utils.addToKnownElements(elements[0], this.context);
       } else {
         respond.isError = true;
-        respond.response = "Unable to find element with class name '" + name + "'";
+        respond.response = "Unable to locate element with class name '" + name + "'";
       }
 
       respond.send();
@@ -286,7 +335,7 @@ FirefoxDriver.prototype.selectElementUsingLink = function(respond, linkText) {
         respond.response = index;
     } else {
         respond.isError = true;
-        respond.response = "Unable to find element with link text '" + linkText + "'";
+        respond.response = "Unable to locate element with link text '" + linkText + "'";
     }
 
     respond.send();
@@ -297,7 +346,6 @@ FirefoxDriver.prototype.selectElementsUsingLink = function(respond, linkText) {
   var indices = "";
   for (var i = 0; i < allLinks.length; i++) {
     var text = Utils.getText(allLinks[i], true);
-    Utils.dumpn(text);
     if (linkText == text) {
       indices += Utils.addToKnownElements(allLinks[i], this.context) + ",";
     }
@@ -344,7 +392,7 @@ FirefoxDriver.prototype.selectElementUsingPartialLinkText = function(respond, li
         respond.response = index;
     } else {
         respond.isError = true;
-        respond.response = "Unable to find element with link text contains '" + linkText + "'";
+        respond.response = "Unable to locate element with link text contains '" + linkText + "'";
     }
 
     respond.send();
@@ -360,7 +408,7 @@ FirefoxDriver.prototype.selectElementById = function(respond, id) {
         respond.response = Utils.addToKnownElements(element, this.context);
     } else {
         respond.isError = true;
-        respond.response = "Unable to find element with id '" + id + "'";
+        respond.response = "Unable to locate element with id '" + id + "'";
     }
 
     respond.send();
@@ -454,6 +502,13 @@ FirefoxDriver.prototype.goForward = function(respond) {
     respond.send();
 }
 
+FirefoxDriver.prototype.refresh = function(respond) {
+    var browser = Utils.getBrowser(this.context);
+    browser.contentWindow.location.reload(true);
+
+    respond.send();
+}
+
 FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     var cookie;
     cookie = eval('(' + cookieString[0] + ')');
@@ -469,9 +524,24 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     cookie.expiry = cookie.expiry.getTime() / 1000; // Stored in seconds
 
     if (!cookie.domain) {
-        var location = Utils.getBrowser(this.context).contentWindow.location
-        cookie.domain = location.hostname; // + ":" + location.port;
+      var location = Utils.getBrowser(this.context).contentWindow.location
+      cookie.domain = location.hostname; // + ":" + location.port;
+      if (location.port != 80) {
+        cookie.domain += ":" + location.port;
+      }
+    } else {
+      var currLocation = Utils.getBrowser(this.context).contentWindow.location;
+      var currDomain = currLocation.host;
+      if (currLocation.port != 80) { currDomain += ":" + currLocation.port; }
+      if (currDomain.indexOf(cookie.domain) == -1) {  // Not quite right, but close enough
+        respond.isError = true;
+        respond.response = "You may only set cookies for the current domain";
+        respond.send();
+        return;
+      }
     }
+
+    Utils.dump(cookie);
 
     var cookieManager = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager2");
 
@@ -492,10 +562,16 @@ function handleCookies(context, toCall) {
 
   var makeStrippedHost = function (aHost) {
     var formattedHost = aHost.charAt(0) == "." ? aHost.substring(1, aHost.length) : aHost;
-    return formattedHost.substring(0, 4) == "www." ? formattedHost.substring(4, formattedHost.length) : formattedHost;
+    formattedHost = formattedHost.substring(0, 4) == "www." ? formattedHost.substring(4, formattedHost.length) : formattedHost;
+
+    return formattedHost;
   };
 
-  var currentDomain = makeStrippedHost(Utils.getBrowser(context).contentWindow.location.hostname);
+  var location = Utils.getBrowser(context).contentWindow.location;
+  var currentDomain = makeStrippedHost(location.host);
+  if (location.port != 80) {
+    currentDomain += ":" + location.port;
+  }
   var isForCurrentHost = function(aHost) {
     return currentDomain.indexOf(aHost) != -1;
   }

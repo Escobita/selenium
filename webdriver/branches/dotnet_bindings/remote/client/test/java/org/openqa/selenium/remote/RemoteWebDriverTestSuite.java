@@ -1,10 +1,29 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.remote;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.environment.webserver.Jetty6AppServer;
@@ -15,6 +34,8 @@ import java.net.URL;
 
 public class RemoteWebDriverTestSuite extends TestCase {
   public static Test suite() throws Exception {
+    System.setProperty("webdriver.firefox.development", "true");
+
     Test rawSuite =
         new TestSuiteBuilder()
             .addSourceDir("common")
@@ -23,8 +44,8 @@ public class RemoteWebDriverTestSuite extends TestCase {
             .keepDriverInstance()
             .includeJavascriptTests()
             .usingDriver(RemoteWebDriverForTest.class)
-            .exclude("firefox")
-            .exclude("remote")
+            .exclude(FIREFOX)
+            .exclude(REMOTE)
             .create();
 
     TestSuite toReturn = new TestSuite();

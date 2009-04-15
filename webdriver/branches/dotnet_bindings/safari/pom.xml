@@ -30,13 +30,25 @@
 	<build>
 		<sourceDirectory>src/java</sourceDirectory>
 		<testSourceDirectory>test/java</testSourceDirectory>
+        <plugins>
+            <!-- See http://maven.apache.org/plugins/maven-surefire-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*TestSuite.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 
 	<repositories>
 		<repository>
 			<id>openqa-releases</id>
 			<name>OpenQA Releases</name>
-			<url>http://archiva.openqa.org/repository/releases/</url>
+			<url>http://nexus.openqa.org/content/repositories/releases</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -47,7 +59,7 @@
 		<repository>
 			<id>openqa-snapshots</id>
 			<name>OpenQA Snapshots</name>
-			<url>http://archiva.openqa.org/repository/snapshots/</url>
+			<url>http://nexus.openqa.org/content/repositories/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>

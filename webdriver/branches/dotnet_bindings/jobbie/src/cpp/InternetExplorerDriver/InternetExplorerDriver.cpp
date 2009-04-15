@@ -1,8 +1,26 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "StdAfx.h"
 #include "utils.h"
 #include "InternalCustomMessage.h"
-#include "errorcodes.h"
 #include "jsxpath.h"
+#include "errorcodes.h"
 
 using namespace std;
 
@@ -124,14 +142,15 @@ ElementWrapper* InternetExplorerDriver::getActiveElement()
 	return new ElementWrapper(this, data.output_html_element_);
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByXPath(IHTMLElement *pElem, const wchar_t *input_string)
+int InternetExplorerDriver::selectElementByXPath(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element)
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYXPATH)
 
-	if(data.output_long_ || !data.output_html_element_) {std::wstring Err(L"Cannot find element by Xpath"); throw Err;}
-	
-	return new ElementWrapper(this, data.output_html_element_);
+	if (data.error_code != SUCCESS) { return data.error_code; };
+
+	*element = new ElementWrapper(this, data.output_html_element_);
+	return SUCCESS;
 }
 
 std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByXPath(IHTMLElement *pElem, const wchar_t *input_string)
@@ -153,15 +172,14 @@ std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByXPath(IHTM
 	return toReturn;
 }
 
-int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** result) 
+int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element) 
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYID)
 
-	if(1 == data.output_long_ || !data.output_html_element_) { return -ENOSUCHELEMENT; }
+	if (data.error_code != SUCCESS) { return data.error_code; }
 
-	*result = new ElementWrapper(this, data.output_html_element_);
-
+	*element = new ElementWrapper(this, data.output_html_element_);	
 	return SUCCESS;
 }
 
@@ -184,15 +202,47 @@ std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsById(IHTMLEl
 	return toReturn;
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByLink(IHTMLElement *pElem, const wchar_t *input_string)
+int InternetExplorerDriver::selectElementByLink(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element)
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYLINK)
 
-	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Link"); throw Err;}
-	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Link"); throw Err;}
+	if (data.error_code == SUCCESS) { 
+		*element = new ElementWrapper(this, data.output_html_element_);
+	}
 
-	return new ElementWrapper(this, data.output_html_element_);	
+	return data.error_code;
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByPartialLink(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYPARTIALLINK)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by Link"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
+}
+
+int InternetExplorerDriver::selectElementByPartialLink(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYPARTIALLINK)
+
+	if (data.error_code == SUCCESS) { 
+		*element = new ElementWrapper(this, data.output_html_element_);
+	}
+
+	return data.error_code;
 }
 
 std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByLink(IHTMLElement *pElem, const wchar_t *input_string)
@@ -214,15 +264,16 @@ std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByLink(IHTML
 	return toReturn;
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByName(IHTMLElement *pElem, const wchar_t *input_string) 
+int InternetExplorerDriver::selectElementByName(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element) 
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYNAME)
 
-	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by Name"); throw Err;}
-	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by Name"); throw Err;}
-	
-	return new ElementWrapper(this, data.output_html_element_);
+	if (data.error_code == SUCCESS) { 
+		*element = new ElementWrapper(this, data.output_html_element_);
+	}
+
+	return data.error_code;
 }
 
 std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByName(IHTMLElement *pElem, const wchar_t *input_string)
@@ -244,15 +295,47 @@ std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByName(IHTML
 	return toReturn;
 }
 
-ElementWrapper* InternetExplorerDriver::selectElementByClassName(IHTMLElement *pElem, const wchar_t *input_string) 
+int InternetExplorerDriver::selectElementByTagName(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element) 
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYTAGNAME)
+
+	if (data.error_code == SUCCESS) { 
+		*element = new ElementWrapper(this, data.output_html_element_);
+	}
+
+	return data.error_code;
+}
+
+std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByTagName(IHTMLElement *pElem, const wchar_t *input_string)
+{
+	SCOPETRACER
+	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYTAGNAME)
+
+	if(1 == data.output_long_) {std::wstring Err(L"Cannot find elements by tag name"); throw Err;}
+
+	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
+
+	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
+	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
+	for(cur = allElems.begin();cur < end; cur++)
+	{
+		IHTMLElement* elem = *cur;
+		toReturn->push_back(new ElementWrapper(this, elem));
+	}
+	return toReturn;
+}
+
+int InternetExplorerDriver::selectElementByClassName(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element) 
 {
 	SCOPETRACER
 	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYCLASSNAME)
 
-	if(1 == data.output_long_) {std::wstring Err(L"Cannot find element by ClassName"); throw Err;}
-	if(NULL == data.output_html_element_) {std::wstring Err(L"Cannot find element by ClassName"); throw Err;}
-	
-	return new ElementWrapper(this, data.output_html_element_);
+	if (data.error_code == SUCCESS) { 
+		*element = new ElementWrapper(this, data.output_html_element_);
+	}
+
+	return data.error_code;
 }
 
 std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByClassName(IHTMLElement *pElem, const wchar_t *input_string)

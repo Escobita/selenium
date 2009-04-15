@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 // IEThread.cpp : implementation file
 //
 
@@ -9,6 +26,7 @@
 #include "utils.h"
 #include "InternalCustomMessage.h"
 #include "EventReleaser.h"
+#include "windows.h"
 
 using namespace std;
 extern wchar_t* XPATHJS[];
@@ -20,6 +38,18 @@ IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0)
 	SCOPETRACER
 
 	m_EventToNotifyWhenNavigationCompleted = NULL;
+
+	HKEY key;
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"software\\microsoft\\internet explorer", 0L,  KEY_READ, &key) == ERROR_SUCCESS) {
+		char value[32];
+		DWORD type = REG_SZ;
+		DWORD size = 32;
+
+		 if (RegQueryValueEx(key, L"version", NULL, &type, (LPBYTE)&value, &size) == ERROR_SUCCESS) {
+			 ieRelease = atoi(value);
+		 }
+	}
+    RegCloseKey(key);
 }
 
 IeThread::~IeThread()
@@ -78,6 +108,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_CLEAR, OnElementClear )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_ISSELECTED, OnElementIsSelected )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SETSELECTED, OnElementSetSelected )
+	CUSTOM_MESSAGE_MAP ( _WD_ELEM_TOGGLE, OnElementToggle )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETVALUEOFCSSPROP, OnElementGetValueOfCssProp )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETTEXT, OnElementGetText )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_CLICK, OnElementClick )
@@ -99,8 +130,12 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYID, OnSelectElementsById )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYLINK, OnSelectElementByLink )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYLINK, OnSelectElementsByLink )
+	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYPARTIALLINK, OnSelectElementByPartialLink )
+	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYPARTIALLINK, OnSelectElementsByPartialLink )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYNAME, OnSelectElementByName )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYNAME, OnSelectElementsByName )
+	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYTAGNAME, OnSelectElementByTagName )
+	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYTAGNAME, OnSelectElementsByTagName )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYCLASSNAME, OnSelectElementByClassName )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYCLASSNAME, OnSelectElementsByClassName )
 	CUSTOM_MESSAGE_MAP ( _WD_GETCOOKIES, OnGetCookies )

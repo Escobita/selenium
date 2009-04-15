@@ -1,9 +1,27 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 function Utils() {
 }
 
 Utils.getUniqueId = function() {
   if (!Utils._generator) {
-    Utils._generator = Utils.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");  
+    Utils._generator = Utils.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");
   }
   return Utils._generator.generateUUID().toString();
 };
@@ -65,6 +83,9 @@ Utils.getActiveElement = function(context) {
 }
 
 function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
+    if (node['tagName'] && node.tagName == "SCRIPT") {
+        return [toReturn, textSoFar];
+    }
     var children = node.childNodes;
 
     for (var i = 0; i < children.length; i++) {
@@ -117,20 +138,48 @@ function isBlockLevel(node) {
     }
 };
 
+Utils.isInHead = function(element) {
+  while (element) {
+    if (element.tagName && element.tagName.toLowerCase() == "head") {
+      return true;
+    }
+    try {
+      element = element.parentNode
+    } catch (e) {
+      // Fine. the DOM has dispeared from underneath us
+      return false;
+    }
+  }
+
+  return false;
+}
+
 Utils.isDisplayed = function(element) {
-    var isDisplayed = true;
-    do {
-        var display = Utils.getStyleProperty(element, "display");
-        var visible = Utils.getStyleProperty(element, "visibility");
-        isDisplayed &= display != "none" && visible != "hidden";
+    // Hidden input elements are, by definition, never displayed
+    if (element.tagName == "input" && element.type == "hidden") {
+      return false;
+    }
 
-        element = element.parentNode;
-    } while (element && element.tagName && element.tagName.toLowerCase() != "body" && isDisplayed);
+    var visibility = Utils.getStyleProperty(element, "visibility");
 
-	return isDisplayed;
+    var _isDisplayed = function(e) {
+      var display = e.ownerDocument.defaultView.getComputedStyle(e, null).getPropertyValue("display");
+      if (display == "none") return display;
+      if (e && e.parentNode && e.parentNode.style) {
+        return _isDisplayed(e.parentNode);
+      }
+      return undefined;
+    }
+
+    var displayed = _isDisplayed(element);
+
+    return displayed != "none" && visibility != "hidden";
 };
 
 Utils.getStyleProperty = function(node, propertyName) {
+    if (!node)
+      return undefined;
+
     var value = node.ownerDocument.defaultView.getComputedStyle(node, null).getPropertyValue(propertyName);
 
     // Convert colours to hex if possible
@@ -147,6 +196,10 @@ Utils.getStyleProperty = function(node, propertyName) {
         }
         hex = hex.toLowerCase();
         value = temp + hex + value.substr(raw.index + raw[0].length);
+    }
+
+    if (value == "inherit" && element.parentNode.style) {
+      value = Utils.getStyleProperty(node.parentNode, propertyName);
     }
 
     return value;

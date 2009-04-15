@@ -1,9 +1,26 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #ifndef utils_h
 #define utils_h
 
 #include <iostream>
 #include <string>
-#include <jni.h>
 
 
 #include "InternetExplorerDriver.h"
@@ -28,25 +45,17 @@
 	DataMarshaller& data = prepareCmData(pElem, input_string); \
 	sendThreadMsg(message, data);
 
-void throwRunTimeException(JNIEnv *, LPCWSTR msg);
-void throwNoSuchFrameException(JNIEnv *, LPCWSTR message);
-void throwNoSuchElementException(JNIEnv *, LPCWSTR msg);
-void throwUnsupportedOperationException(JNIEnv *, LPCWSTR msg);
-
-jobject newJavaInternetExplorerDriver(JNIEnv *, InternetExplorerDriver* driver);
-
 void wait(long millis);
 void waitWithoutMsgPump(long millis);
 HWND getChildWindow(HWND hwnd, LPCTSTR name);
 
-jstring lpcw2jstring(JNIEnv *env, LPCWSTR text, int size = -1);
-
+struct StringWrapper;
+typedef struct StringWrapper StringWrapper;
 LPCWSTR combstr2cw(CComBSTR& from);
 LPCWSTR bstr2cw(BSTR& from);
 LPCWSTR comvariant2cw(CComVariant& toConvert);
 void wstring2string(const std::wstring& inp, std::string &out);
 void cw2string(LPCWSTR inp, std::string &out);
-inline jstring bstr2jstring(JNIEnv *env, BSTR& from) {return lpcw2jstring(env, bstr2cw(from));}
 
 long getLengthOf(SAFEARRAY* ary);
 

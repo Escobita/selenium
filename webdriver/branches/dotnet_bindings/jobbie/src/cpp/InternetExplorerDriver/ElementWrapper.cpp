@@ -1,9 +1,27 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "StdAfx.h"
 
+#include "errorcodes.h"
+#include "logging.h"
 #include "utils.h"
 #include "InternalCustomMessage.h"
-
-
 
 using namespace std;
 
@@ -45,10 +63,11 @@ LPCWSTR ElementWrapper::getValue()
 }
 
 
-void ElementWrapper::sendKeys(LPCWSTR newValue)
+int ElementWrapper::sendKeys(LPCWSTR newValue)
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_SENDKEYS, newValue)
+	return data.error_code;
 }
 
 void ElementWrapper::clear()
@@ -64,10 +83,11 @@ bool ElementWrapper::isSelected()
 	return data.output_bool_;
 }
 
-void ElementWrapper::setSelected()
+int ElementWrapper::setSelected()
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_SETSELECTED,)
+	return data.error_code;
 }
 
 bool ElementWrapper::isEnabled()
@@ -84,44 +104,47 @@ bool ElementWrapper::isDisplayed()
 	return data.output_bool_;
 }
 
-bool ElementWrapper::toggle()
+int ElementWrapper::toggle()
 {
 	SCOPETRACER
-	click();
-	return isSelected();
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_TOGGLE,)
+
+	return data.error_code;
 }
 
-void ElementWrapper::getLocationOnceScrolledIntoView(HWND* hwnd, long* x, long* y) 
+int ElementWrapper::getLocationWhenScrolledIntoView(HWND* hwnd, long* x, long* y) 
 {
 	SCOPETRACER
-	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_GETLOCATIONONCESCROLLEDINTOVIEW,)
+    SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_GETLOCATIONONCESCROLLEDINTOVIEW,)
 
-	VARIANT result = data.output_variant_;
-	
-	if (result.vt != VT_ARRAY) {
-		*hwnd = NULL;
-		*x = 0;
-		*y = 0;
-		return;
-	}
+    VARIANT result = data.output_variant_;
+    
+    if (result.vt != VT_ARRAY) {
+            *hwnd = NULL;
+            *x = 0;
+            *y = 0;
+			return -EUNHANDLEDERROR;
+    }
 
-	SAFEARRAY* ary = result.parray;
-	long index = 0;
-	CComVariant hwndVariant;
-	SafeArrayGetElement(ary, &index, (void*) &hwndVariant);
-	*hwnd = (HWND) hwndVariant.llVal;
+    SAFEARRAY* ary = result.parray;
+    long index = 0;
+    CComVariant hwndVariant;
+    SafeArrayGetElement(ary, &index, (void*) &hwndVariant);
+    *hwnd = (HWND) hwndVariant.llVal;
 
-	index = 1;
-	CComVariant xVariant;
-	SafeArrayGetElement(ary, &index, (void*) &xVariant);
-	*x = xVariant.lVal;
+    index = 1;
+    CComVariant xVariant;
+    SafeArrayGetElement(ary, &index, (void*) &xVariant);
+    *x = xVariant.lVal;
 
-	index = 2;
-	CComVariant yVariant;
-	SafeArrayGetElement(ary, &index, (void*) &yVariant);
-	*y = yVariant.lVal;
+    index = 2;
+    CComVariant yVariant;
+    SafeArrayGetElement(ary, &index, (void*) &yVariant);
+    *y = yVariant.lVal;
 
-	SafeArrayDestroy(ary);
+    SafeArrayDestroy(ary);
+
+	return SUCCESS;
 }
 
 void ElementWrapper::getLocation(long* x, long* y) 
@@ -151,18 +174,24 @@ void ElementWrapper::getLocation(long* x, long* y)
 	SafeArrayDestroy(ary);
 }
 
-long ElementWrapper::getWidth()
+int ElementWrapper::getWidth(long* width)
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_GETWIDTH,)
-	return data.output_long_;
+
+	if (data.error_code != SUCCESS) return data.error_code;
+	*width = data.output_long_;
+	return SUCCESS;
 }
 
-long ElementWrapper::getHeight()
+int ElementWrapper::getHeight(long* height)
 {
 	SCOPETRACER
+
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_GETHEIGHT,)
-	return data.output_long_;
+	if (data.error_code != SUCCESS) return data.error_code;
+	*height = data.output_long_;
+	return SUCCESS;
 }
 
 LPCWSTR ElementWrapper::getValueOfCssProperty(LPCWSTR propertyName)
@@ -179,10 +208,12 @@ LPCWSTR ElementWrapper::getText()
 	return data.output_string_.c_str();
 }
 
-void ElementWrapper::click()
+int ElementWrapper::click()
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ELEM_CLICK,)
+
+	return data.error_code;
 }
 
 void ElementWrapper::submit()

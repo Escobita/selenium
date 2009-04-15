@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox;
 
 import org.json.JSONException;
@@ -12,13 +30,16 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.IllegalLocatorException;
 import org.openqa.selenium.firefox.internal.ExtensionConnectionFactory;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
 
@@ -27,7 +48,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +56,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,7 +74,7 @@ import java.util.Set;
  * This allows multiple instances of firefox to be started.
  */
 public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecutor,
-        FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByXPath {
+        FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
     public static final int DEFAULT_PORT = 7055;
 
     private final ExtensionConnection extension;
@@ -65,61 +85,42 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
     public FirefoxDriver(String profileName) {
-      this(new FirefoxBinary(), findProfile(profileName));
+      this(profileName, DEFAULT_PORT);
     }
 
+  /**
+   * @deprecated Use "new ProfilesIni.getProfile(profileName)" and set the port on the returned profile
+   */
+    @Deprecated
     public FirefoxDriver(String profileName, int port) {
-      this(new FirefoxBinary(), findProfile(profileName), port);
+      this(new FirefoxBinary(), modifyProfile(profileName, port));
+    }
+
+    private static FirefoxProfile modifyProfile(String profileName, int port) {
+      FirefoxProfile profile = new ProfilesIni().getProfile(profileName);
+      profile.setPort(port);
+      return profile;
     }
 
     public FirefoxDriver(FirefoxProfile profile) {
       this(new FirefoxBinary(), profile);
     }
-
-
-    private FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile, int port) {
-      this(binary, modifyProfile(profile, port));
-    }
-
-    private static FirefoxProfile modifyProfile(FirefoxProfile profile, int port) {
-        if (profile == null) {
-          throw new NullPointerException("You must pass in a profile");
-        }
-        profile.setPort(port);
-        return profile;
-    }
-
+    
     public FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile) {
-        if (profile == null) {
-            profile = new FirefoxProfile();
-        }
+      if (profile == null) {
+        profile = ProfileManager.getInstance().createProfile(binary, DEFAULT_PORT);
+      } else {
+        profile.addWebDriverExtensionIfNeeded(false);
+      }
+      prepareEnvironment();
 
-        try {
-            profile.init();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        prepareEnvironment();
-
-        extension = connectTo(binary, profile, "localhost");
-
-        if (!extension.isConnected()) {
-            throw new RuntimeException("Unable to connect to Firefox.");
-        }
-
-        fixId();
+      extension = connectTo(binary, profile, "localhost");
+      fixId();
     }
 
     private FirefoxDriver(ExtensionConnection extension, Context context) {
       this.extension = extension;
       this.context = context;
-    }
-
-    private static FirefoxProfile findProfile(String profileName) {
-      FirefoxProfile profile = new ProfilesIni().getProfile(profileName);
-      if (profile == null)
-        throw new NullPointerException("No firefox profile found: " + profileName);
-      return profile;
     }
 
     protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile, String host) {
@@ -132,30 +133,26 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
     public void close() {
         try {
-            sendMessage(RuntimeException.class, "close");
+            sendMessage(WebDriverException.class, "close");
         } catch (Exception e) {
             // All good
         }
     }
 
     public String getPageSource() {
-        return sendMessage(RuntimeException.class, "getPageSource");
+        return sendMessage(WebDriverException.class, "getPageSource");
     }
 
     public void get(String url) {
-        sendMessage(RuntimeException.class, "get", url);
+        sendMessage(WebDriverException.class, "get", url);
     }
 
     public String getCurrentUrl() {
-        return sendMessage(RuntimeException.class, "getCurrentUrl");
+        return sendMessage(WebDriverException.class, "getCurrentUrl");
     }
 
     public String getTitle() {
-        return sendMessage(RuntimeException.class, "title");
-    }
-
-    public boolean getVisible() {
-        return true;
+        return sendMessage(WebDriverException.class, "title");
     }
 
   public List<WebElement> findElements(By by) {
@@ -195,10 +192,26 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
   }
 
   public List<WebElement> findElementsByClassName(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the class name expression is null.");
+
+    if (using.matches(".*\\s+.*")) {
+      throw new IllegalLocatorException(
+          "Compound class names are not supported. Consider searching for one class name and filtering the results.");
+    }
+        
     return findElements("selectElementsUsingClassName", using);
   }
 
   public WebElement findElementByClassName(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the class name expression is null.");
+
+    if (using.matches(".*\\s+.*")) {
+      throw new IllegalLocatorException(
+          "Compound class names are not supported. Consider searching for one class name and filtering the results.");
+    }
+
     return findElement("selectElementUsingClassName", using);
   }
 
@@ -210,6 +223,14 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
       return findElements("selectElementsUsingName", using);
   }
 
+  public WebElement findElementByTagName(String using) {
+    return findElement("selectElementUsingTagName", using);
+  }
+
+  public List<WebElement> findElementsByTagName(String using) {
+    return findElements("selectElementsUsingTagName", using);
+  }
+  
   public WebElement findElementByXPath(String using) {
     return findElement("selectElementUsingXPath", using);
   }
@@ -221,7 +242,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
   }
 
   private List<WebElement> findElements(String commandName, String argument) {
-    String returnedIds = sendMessage(RuntimeException.class, commandName, argument);
+    String returnedIds = sendMessage(WebDriverException.class, commandName, argument);
     List<WebElement> elements = new ArrayList<WebElement>();
 
     if (returnedIds.length() == 0)
@@ -234,10 +255,6 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     return elements;
   }
 
-  public void setVisible(boolean visible) {
-        // no-op
-    }
-
     public TargetLocator switchTo() {
         return new FirefoxTargetLocator();
     }
@@ -248,7 +265,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
     protected WebDriver findActiveDriver() {
-        String response = sendMessage(RuntimeException.class, "findActiveDriver");
+        String response = sendMessage(WebDriverException.class, "findActiveDriver");
 
         Context newContext = new Context(response);
         if (newContext.getDriverId().equals(newContext.getDriverId())) {
@@ -257,7 +274,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         return new FirefoxDriver(extension, newContext);
     }
 
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
+    private String sendMessage(Class<? extends WebDriverException> throwOnFailure, String methodName, Object... parameters) {
         return sendMessage(throwOnFailure, new Command(context, methodName, parameters));
     }
 
@@ -269,7 +286,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
     private void fixId() {
-        String response = sendMessage(RuntimeException.class, "findActiveDriver");
+        String response = sendMessage(WebDriverException.class, "findActiveDriver");
         this.context = new Context(response);
     }
 
@@ -278,11 +295,11 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
   public String getWindowHandle() {
-    return sendMessage(RuntimeException.class, "getCurrentWindowHandle");
+    return sendMessage(WebDriverException.class, "getCurrentWindowHandle");
   }
 
   public Set<String> getWindowHandles() {
-    String allHandles = sendMessage(RuntimeException.class, "getAllWindowHandles");
+    String allHandles = sendMessage(WebDriverException.class, "getAllWindowHandles");
     String[] handles = allHandles.split(",");
     HashSet<String> toReturn = new HashSet<String>();
     for (String handle : handles) {
@@ -298,9 +315,9 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         Object[] convertedArgs = convertToJsObjects(args);
 
         Command command = new Command(context, null, "executeScript", script, convertedArgs);
-    	Response response = extension.sendMessageAndWaitForResponse(RuntimeException.class, command);
+    	Response response = extension.sendMessageAndWaitForResponse(WebDriverException.class, command);
         context = response.getContext();
-        response.ifNecessaryThrow(RuntimeException.class);
+        response.ifNecessaryThrow(WebDriverException.class);
 
         if ("NULL".equals(response.getExtraResult("resultType")))
           return null;
@@ -311,9 +328,13 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
         Object result = response.getExtraResult("response");
         if (result instanceof Integer)
-          return new Long((String) response.getResponseText());
+          return new Long(response.getResponseText());
         return result;
     }
+
+  public boolean isJavascriptEnabled() {
+    return true;
+  }
 
   private Object[] convertToJsObjects(Object[] args) {
     if (args.length == 0)
@@ -382,7 +403,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         private final int FAST_SPEED = 100;
 
         public void addCookie(Cookie cookie) {
-            sendMessage(RuntimeException.class, "addCookie", convertToJson(cookie));
+            sendMessage(WebDriverException.class, "addCookie", convertToJson(cookie));
         }
 
         private String convertToJson(Cookie cookie) {
@@ -392,7 +413,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
             try {
                 info = Introspector.getBeanInfo(Cookie.class);
             } catch (IntrospectionException e) {
-                throw new RuntimeException(e);
+                throw new WebDriverException(e);
             }
             PropertyDescriptor[] properties = info.getPropertyDescriptors();
 
@@ -403,7 +424,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
                         result = property.getReadMethod().invoke(cookie);
                         json.put(property.getName(), result);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new WebDriverException(e);
                     }
                 }
             }
@@ -412,14 +433,14 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
                 try {
                     json.put("expiry",  RFC_1123_DATE_FORMAT.format(cookie.getExpiry()));
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    throw new WebDriverException(e);
                 }
 
             return json.toString();
         }
 
         public Set<Cookie> getCookies() {
-            String response = sendMessage(RuntimeException.class, "getCookie").trim();
+            String response = sendMessage(WebDriverException.class, "getCookie").trim();
             Set<Cookie> cookies = new HashSet<Cookie>();
 
             if(!"".equals(response)) {
@@ -456,7 +477,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
                   String expiry = attributesMap.get("expires");
                   if (expiry != null && !"".equals(expiry) && !expiry.equals("0")) {
                         //firefox stores expiry as number of seconds
-                        expires = new Date(Long.parseLong(attributesMap.get("expires")));
+                        expires = new Date(Long.parseLong(attributesMap.get("expires")) * 1000);
                     }
 
                     cookies.add(new ReturnedCookie(attributesMap.get("name"), attributesMap.get("value"),
@@ -470,11 +491,11 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
         public void deleteCookieNamed(String name) {
             Cookie toDelete = new Cookie(name, "");
-            sendMessage(RuntimeException.class, "deleteCookie", convertToJson(toDelete));
+            sendMessage(WebDriverException.class, "deleteCookie", convertToJson(toDelete));
         }
 
         public void deleteCookie(Cookie cookie) {
-            sendMessage(RuntimeException.class, "deleteCookie", convertToJson(cookie));
+            sendMessage(WebDriverException.class, "deleteCookie", convertToJson(cookie));
         }
 
         public void deleteAllCookies() {
@@ -485,7 +506,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         }
 
         public Speed getSpeed() {
-            int pixelSpeed = Integer.parseInt(sendMessage(RuntimeException.class, "getMouseSpeed"));
+            int pixelSpeed = Integer.parseInt(sendMessage(WebDriverException.class, "getMouseSpeed"));
             Speed speed;
 
             // TODO: simon 2007-02-01; Delegate to the enum
@@ -523,7 +544,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
                 default:
                     throw new IllegalArgumentException();
             }
-            sendMessage(RuntimeException.class, "setMouseSpeed", "" + pixelSpeed);
+            sendMessage(WebDriverException.class, "setMouseSpeed", "" + pixelSpeed);
         }
     }
 
@@ -545,22 +566,13 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
             try {
                 FirefoxDriver.this.context = new Context(response);
             } catch (NumberFormatException e) {
-                throw new RuntimeException("When switching to window: " + windowName + " ---- " + response);
+                throw new WebDriverException("When switching to window: " + windowName + " ---- " + response);
             }
             return FirefoxDriver.this;
         }
 
-      public Iterable<WebDriver> windowIterable() {
-        final String handles = sendMessage(RuntimeException.class, "getAllWindowHandles");
-        return new Iterable<WebDriver>() {
-          public Iterator<WebDriver> iterator() {
-            return new FirefoxDriverIterator(handles);
-          }
-        };
-      }
-
       public WebDriver defaultContent() {
-            sendMessage(RuntimeException.class, "switchToDefaultContent");
+            sendMessage(WebDriverException.class, "switchToDefaultContent");
             return FirefoxDriver.this;
         }
 
@@ -576,39 +588,25 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
     private class FirefoxNavigation implements Navigation {
       public void back() {
-        sendMessage(RuntimeException.class, "goBack");
+        sendMessage(WebDriverException.class, "goBack");
       }
 
       public void forward() {
-        sendMessage(RuntimeException.class, "goForward");
+        sendMessage(WebDriverException.class, "goForward");
       }
 
       public void to(String url) {
         get(url);
       }
-    }
 
-  private class FirefoxDriverIterator implements Iterator<WebDriver> {
-    private String[] allHandles;
-    private int index = 0;
+      public void to(URL url) {
+        get(String.valueOf(url));
+      }
 
-    public FirefoxDriverIterator(String handlesString) {
-      allHandles = handlesString.split(",");
+      public void refresh() {
+        sendMessage(WebDriverException.class, "refresh");
+      }
     }
-
-    public boolean hasNext() {
-      return allHandles.length > index;
-    }
-
-    public WebDriver next() {
-      // Ugh. The context needs some reworking.
-      return new FirefoxDriver(extension, new Context(allHandles[index++] + " ?"));
-    }
-
-    public void remove() {
-      throw new UnsupportedOperationException("remove");
-    }
-  }
 
     /** Saves a screenshot of the current page into the given file. */
     public void saveScreenshot(File pngFile) {
@@ -617,8 +615,8 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         }
         File dir = pngFile.getParentFile();
         if (!dir.exists() && !dir.mkdirs()) {
-            throw new RuntimeException("Could not create directory " + dir.getAbsolutePath());
+            throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
         }
-        sendMessage(RuntimeException.class, "saveScreenshot", pngFile.getAbsolutePath());
+        sendMessage(WebDriverException.class, "saveScreenshot", pngFile.getAbsolutePath());
     }
 }

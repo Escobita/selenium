@@ -1,3 +1,21 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+Portions copyright 2007 ThoughtWorks, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.firefox;
 
 import org.json.JSONException;
@@ -8,12 +26,13 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.InteractionData;
 import org.openqa.selenium.internal.Locatable;
 
 import java.awt.*;
@@ -21,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
-        FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByClassName, SearchContext {
+        FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName, SearchContext {
     private final FirefoxDriver parent;
     private final String elementId;
 
@@ -31,18 +50,18 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void click() {
-        sendMessage(UnsupportedOperationException.class, "click");
+      sendMessage(UnsupportedOperationException.class, "click");
     }
 
     public void submit() {
-        sendMessage(RuntimeException.class, "submitElement");
+        sendMessage(WebDriverException.class, "submitElement");
     }
 
     public String getValue() {
         try {
-            String toReturn = sendMessage(RuntimeException.class, "getElementValue");
+            String toReturn = sendMessage(WebDriverException.class, "getElementValue");
             return toReturn.replace("\n", Platform.getCurrent().getLineEnding());
-        } catch (RuntimeException e) {
+        } catch (WebDriverException e) {
             return null;
         }
     }
@@ -60,14 +79,14 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getElementName() {
-        String name = sendMessage(RuntimeException.class, "getElementName");
+        String name = sendMessage(WebDriverException.class, "getElementName");
         return name;
     }
 
     public String getAttribute(String name) {
         try {
-            return sendMessage(RuntimeException.class, "getElementAttribute", name);
-        } catch (RuntimeException e) {
+            return sendMessage(WebDriverException.class, "getElementAttribute", name);
+        } catch (WebDriverException e) {
             return null;
         }
     }
@@ -78,7 +97,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public boolean isSelected() {
-        String value = sendMessage(RuntimeException.class, "getElementSelected");
+        String value = sendMessage(WebDriverException.class, "getElementSelected");
         return Boolean.parseBoolean(value);
     }
 
@@ -92,22 +111,22 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getText() {
-    	String toReturn = sendMessage(RuntimeException.class, "getElementText");
+        String toReturn = sendMessage(WebDriverException.class, "getElementText");
         return toReturn.replace("\n", Platform.getCurrent().getLineEnding());
     }
 
-    public List<WebElement> getChildrenOfType(String tagName) {
-        String response = sendMessage(RuntimeException.class, "getElementChildren", tagName);
+  public List<WebElement> getElementsByTagName(String tagName) {
+        String response = sendMessage(WebDriverException.class, "getElementChildren", tagName);
 
         return getElementsFromIndices(response);
     }
 
-    public boolean isDisplayed() {
-    	return Boolean.parseBoolean(sendMessage(RuntimeException.class, "isElementDisplayed"));
+  public boolean isDisplayed() {
+    return Boolean.parseBoolean(sendMessage(WebDriverException.class, "isElementDisplayed"));
     }
 
     public Point getLocation() {
-        String result = sendMessage(RuntimeException.class, "getElementLocation");
+        String result = sendMessage(WebDriverException.class, "getElementLocation");
 
         String[] parts = result.split(",");
         int x = Integer.parseInt(parts[0].trim());
@@ -117,7 +136,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Dimension getSize() {
-        String result = sendMessage(RuntimeException.class, "getElementSize");
+        String result = sendMessage(WebDriverException.class, "getElementSize");
 
         String[] parts = result.split(",");
         int x = Integer.parseInt(parts[0].trim());
@@ -154,7 +173,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public List<WebElement> findElementsByXPath(String xpath) {
-        String indices = sendMessage(RuntimeException.class,
+        String indices = sendMessage(WebDriverException.class,
                 "findElementsByXPath", xpath);
         return getElementsFromIndices(indices);
     }
@@ -169,19 +188,19 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public List<WebElement> findElementsByLinkText(String linkText) {
-        String indices = sendMessage(RuntimeException.class,
+        String indices = sendMessage(WebDriverException.class,
                 "findElementsByLinkText", linkText);
         return getElementsFromIndices(indices);
     }
 
     public WebElement findElementByPartialLinkText(String using) {
-      String id = sendMessage(RuntimeException.class,
+      String id = sendMessage(WebDriverException.class,
                 "findElementByPartialLinkText", using);
       return new FirefoxWebElement(parent, id);
     }
 
     public List<WebElement> findElementsByPartialLinkText(String using) {
-        String indices = sendMessage(RuntimeException.class,
+        String indices = sendMessage(WebDriverException.class,
                 "findElementsByPartialLinkText", using);
         return getElementsFromIndices(indices);
     }
@@ -201,7 +220,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public WebElement findElementById(String id) {
-    	String response = sendMessage(RuntimeException.class, "findElementById", id);
+    	String response = sendMessage(WebDriverException.class, "findElementById", id);
     	if (response.equals("-1"))
     		throw new NoSuchElementException("Unable to find element with id" + id);
     	return new FirefoxWebElement(parent, response);
@@ -228,13 +247,23 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
         return elements.get(0);
     }
 
+    public WebElement findElementByTagName(String using) {
+      String response = sendMessage(NoSuchElementException.class, "findElementByTagName", using);
+      return new FirefoxWebElement(parent, response);
+    }
+    
+    public List<WebElement> findElementsByTagName(String using) {
+      String indices = sendMessage(WebDriverException.class, "findElementsByTagName", using);
+      return getElementsFromIndices(indices);
+    }
+    
     public List<WebElement> findElementsByClassName(String using) {
-    	String indices = sendMessage(RuntimeException.class, "findChildElementsByClassName", using);
+    	String indices = sendMessage(WebDriverException.class, "findChildElementsByClassName", using);
         return getElementsFromIndices(indices);
     }
 
     public String getValueOfCssProperty(String propertyName) {
-    	return sendMessage(RuntimeException.class,"getElementCssProperty", propertyName);
+    	return sendMessage(WebDriverException.class,"getElementCssProperty", propertyName);
     }
 
     private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
@@ -245,15 +274,16 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
         return elementId;
     }
 
-    public InteractionData getLocationOnScreenOnceScrolledIntoView() {
-        String json = sendMessage(RuntimeException.class, "getLocationOnceScrolledIntoView");
+    public Point getLocationOnScreenOnceScrolledIntoView() {
+        String json = sendMessage(WebDriverException.class, "getLocationOnceScrolledIntoView");
         if (json == null) {
             return null;
         }
 
         try {
             JSONObject mapped = new JSONObject(json);
-            return new FirefoxInteractionData(mapped.getLong("windowHandle"), mapped.getInt("x"), mapped.getInt("y"));
+
+            return new Point(mapped.getInt("x"), mapped.getInt("y"));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
