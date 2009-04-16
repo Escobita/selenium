@@ -1,0 +1,22 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>c:\program Files\nunit 2.4.8\bin\nunit.exe</StartProgram>
+    <StartArguments>C:\projects\webdriver_dotnet_clean\build\webdriver-jobbie-test.nunit</StartArguments>
+    <StartWorkingDirectory>c:\program Files\nunit 2.4.8\bin\</StartWorkingDirectory>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <StartProgram>c:\program Files\nunit 2.4.8\bin\nunit.exe</StartProgram>
+    <StartWorkingDirectory>..\build\</StartWorkingDirectory>
+    <StartArguments>webdriver-jobbie-test.nunit</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>c:\program Files\nunit 2.4.8\bin\nunit.exe</StartProgram>
+    <StartArguments>C:\projects\webdriver_dotnet_clean\build\webdriver-jobbie-test.nunit</StartArguments>
+    <StartWorkingDirectory>c:\program Files\nunit 2.4.8\bin\</StartWorkingDirectory>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+  </PropertyGroup>
+</Project>

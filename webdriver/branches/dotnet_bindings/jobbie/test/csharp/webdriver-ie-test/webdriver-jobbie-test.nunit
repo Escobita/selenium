@@ -1,0 +1,6 @@
+<NUnitProject>
+	<Settings appbase="." />
+	<Config name="Default" binpathtype="Auto">
+		<assembly path="webdriver-common-test.dll" />
+	</Config>
+</NUnitProject>
