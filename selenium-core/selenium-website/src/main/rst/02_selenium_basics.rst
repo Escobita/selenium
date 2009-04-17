@@ -154,16 +154,48 @@ The Selenese HTML syntax can be used to write and run tests without requiring kn
 Test Suites 
 ------------
 
-.. Paul: let's show the HTML of a test suite here. then show how it looks in 
-   the IDE section. 
+A test suite is a collection of tests.  Often one will run all the tests in a test suite as one continuous batch-job.  
+
+When using Selenium-IDE, test suites also can be defined using a simple HTML file.  The syntax again is simple.  An HTML table defines a list of tests where each row defines the filesystem path to each test.  An example tells it all.
+
+===========  ====  ==========
+      <html> 
+      <head> 
+      <title>Test Suite Function Tests - Priority 1</title> 
+      </head> 
+      <body> 
+      <table> 
+        <tr><td><b>Suite Of Tests</b></td></tr> 
+        <tr><td><a href="./Login.html">Login</a></td></tr> 
+        <tr><td><a href="./SearchValues.html">Test Searching for Values</a></td></tr> 
+        <tr><td><a href="./SaveValues.html">Test Save</a></td></tr> 
+      </table> 
+      </body> 
+      </html>  
+===========  ====  ==========
+
+A file similar to this would allow running the tests all at once, one after another, from the Selenium-IDE.
+
+Test suites can also be maintained when using Selenium-RC.  This is done via programming and can be done a number of ways.  Commonly Junit is used to maintain a test suite if one is using Selenium-RC with Java.  Additionally, if C# is the chosen language, Nunit could be employed.  If using an interpreted language like Python with Selenium-RC than some simple programming would be involved in setting up a test suite.  Since the whole reason for using Sel-RC is to make use of programming logic for your testing this usually isn't a problem.
 
 Commonly Used Selenium Commands 
 --------------------------------
 
-.. Dave: What are these? My suggestions: open, click, waitForPageToLoad, 
-   verifyText, verifyTextPresent, verifyTable, verifyTitle, verifyElementPresent
+To conclude our introduction of Selenium, we'll show you a few typical Selenium commands.  These are probably the most commonly used commands for building test.
 
-.. Santiago: I'd add type and waitForElementPresent
+===========  ====  ==========
+open -- opens a page using a URL.
+click/clickAndWait -- performs a click operation, and optionally waits for a new page to load.
+verifyTitle/assertTitle -- verifies an expected page title.
+verifyTextPresent -- verifies expected text is somewhere on the page.
+verifyElementPresent -- verifies an expected UI element, as defined by it's HTML tag, is present on the page.
+verifyText -- verifies expected text and it's corresponding HTML tag are present on the page.
+verifyTable -- verifies a table's expected contents.
+waitForPageToLoad -- pauses execution until an expected new page loads.  Called automatically when clickAndWait is used.
+waitForElementPresent -- pauses execution until an expected UI element, as defined by its HTML tag, in present on the page. 
+===========  ====  ==========
+
 
 Summary 
 --------
+Now that you've seen an introduction to Selenium, you're ready to start writing your first scripts.  We recommend beginning with the Selenium IDE and its context-sensitive, right-click, menu.  This will allow you to get familiar with the most common Selenium commands quickly, and you can have a simple script done in just a minute or two.  Chapter 3 gets you started and then guides you through all the features of the Selenium-IDE.
