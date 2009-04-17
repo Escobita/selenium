@@ -30,19 +30,20 @@ There are many advantages to automating testing. Most are related to
 the repeatability of the tests and the speed that the tests can be executed.
 There are a number of commercial and open source tools available for assisting
 with the development of test automation. Selenium, is possibly the most 
-widely-used Open Source solution. This user's guide will assist both new and experienced Selenium users in 
-effective techniques in building test automation for web applications. 
+widely-used Open Source solution. This user's guide will assist both new and 
+experienced Selenium users in effective techniques in building test automation 
+for web applications. 
 
-This guide introduces Selenium, teaches it's most widely used features, and provides useful
-advice in best practices accumulated from the Selenium community. Many examples are provided. 
-Also technical information on the internal structure of Selenium and recommended
-uses of Selenium is provided as contributed by a consortium of experienced 
-Selenium users. It is our hope that this  guide will get additional new 
-users excited about using Selenium for test automation.  We hope this guide
-will assist "getting the word out" that quality assurance and software testing
-has many options beyond what is currently practiced. We hope this user's 
-guide and Selenium itself provide a valuable aid to boosting the reader's 
-efficiency in their software testing processes. 
+This guide introduces Selenium, teaches it's most widely used features, and 
+provides useful advice in best practices accumulated from the Selenium 
+community. Many examples are provided. Also technical information on the 
+internal structure of Selenium and recommended uses of Selenium is provided as 
+contributed by a consortium of experienced Selenium users. It is our hope that 
+this guide will get additional new users excited about using Selenium for test 
+automation.  We hope this guide will assist "getting the word out" that quality
+assurance and software testing has many options beyond what is currently 
+practiced. We hope this user's guide and Selenium itself provide a valuable aid
+to boosting the reader's efficiency in their software testing processes. 
 
 Introducing Selenium 
 --------------------
@@ -74,7 +75,7 @@ improving the long-term efficiency of a software team's testing processes.
 Test automation supports:
   
 * Frequent and rapid regression testing 
-* Rapid feedback to developers during, and parallel to, the development process 
+* Rapid feedback to developers during, and parallel to, the development process
 * Unlimited test-pass iteration 
 * Customized reporting of application defects 
 * Support for Agile, eXtreme development methodologies 
@@ -106,18 +107,19 @@ Finally, the IDE allows unlimited editing of the chosen script commands.
 Selenium-RC
 ~~~~~~~~~~~~
 
-Selenium-RC is the most efficient way of runnings tests. It allows
-the test automation developer to use a programming language for maximum 
-flexibility and extensibility in developing test logic. For instance, if the 
-application under test returns a result set, and if the automated test program
-needs to run tests on each element in the result set, the programming languages
-iteration support can be used to iterate through the result set, calling 
-Selenium commands to run tests on each item. 
+Selenium-RC is the most efficient way of running tests. It allows the test 
+automation developer to use a programming language for maximum flexibility and
+extensibility in developing test logic. For instance, if the application under
+test returns a result set, and if the automated test program needs to run tests
+on each element in the result set, the programming languages iteration support
+can be used to iterate through the result set, calling Selenium commands to run
+tests on each item. 
 
 Selenium-RC supports the use of programming languages for test logic by 
 providing a programming API and library for each of it's 8 supported languages.
-This ability to use Selenium-RC to develop a test program also allows the automated 
-testing to be integrated with a project's automated build environment. 
+This ability to use Selenium-RC to develop a test program also allows the 
+automated testing to be integrated with a project's automated build 
+environment. 
 
 Selenium-Grid 
 ~~~~~~~~~~~~~~
@@ -161,28 +163,31 @@ Following Browsers are supported with Version 1.0 Beta 2 of Selenium RC.
 Flexibility and Extensibility
 ------------------------------
 
-You'll find that Selenium is highly flexible.  There are multiple ways in which one can add functionality upong
-Selenium's framework to customize test automation for one's specific testing needs.  This is, perhaps, Selenium's strongest
-characteristic when compared with proprietary test automation tools and other Open Source solutions.
-Selenium-RC support for multiple programming and scripting 
-languages allows the test writer to build any logic they need into their 
-automated testing and an use a preferred programming or scripting language of their choice. 
+You'll find that Selenium is highly flexible.  There are multiple ways in which
+one can add functionality upon Selenium's framework to customize test 
+automation for one's specific testing needs. This is, perhaps, Selenium's 
+strongest characteristic when compared with proprietary test automation tools
+and other Open Source solutions. Selenium-RC support for multiple programming
+and scripting languages allows the test writer to build any logic they need
+into their automated testing and an use a preferred programming or scripting
+language of their choice. 
   
 Selenium-IDE allows for the addition of user-defined "user-extensions" for 
-creating additional commands customized to the user's needs. Also, it is possible to re-configure how the 
-Selenium-IDE generates its Selenium-RC code. This would allow the user to 
-customize the generated code to fit in with their own test framework.
-Finally, Selenium is fully an Open Source project where code can be modified and enhancements can be 
-submitted for contribution.  
+creating additional commands customized to the user's needs. Also, it is 
+possible to re-configure how the Selenium-IDE generates its Selenium-RC code.
+This would allow the user to customize the generated code to fit in with their
+own test framework. Finally, Selenium is fully an Open Source project where 
+code can be modified and enhancements can be submitted for contribution.
 
 About this Book
 ---------------
 
 This book targets both new users of Selenium and those who have been using 
-Selenium and are seeking additional knowledge. It introduces the novice 
-to Selenium test automation. We do not assume the reader has experience in testing beyond the basics.  
+Selenium and are seeking additional knowledge. It introduces the novice
+to Selenium test automation. We do not assume the reader has experience in 
+testing beyond the basics.  
 
-The experienced Selenium user will also find this book valuable. It compiles 
+The experienced Selenium user will also find this book valuable. It compiles
 in one place a set of useful Selenium techniques and best practices by drawing 
 from the knowledge of multiple experience Selenium QA professionals. 
 
