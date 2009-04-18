@@ -19,7 +19,8 @@ specifics.
   
 You may also run your scripts from the Selenium-IDE. It's  
 simple to use and is recommended for less-technical users. The IDE allows 
-developing and running tests without the need for programming skills as required by Selenium -RC. The Sel-IDE can serve as an excellent way to 
+developing and running tests without the need for programming skills as
+required by Selenium -RC. The Sel-IDE can serve as an excellent way to 
 train junior-level employees in test automation. If one has an understanding 
 of how to conduct manual testing of a website they can easily transition to 
 using the Selenium-IDE for both, running and developing tests. 
@@ -28,10 +29,14 @@ Some testing tasks are too complex though for the Selenium-IDE. When
 programming logic is required Selenium-RC must be used. For example, 
 any tests requiring iteration, such as testing each element of a variable 
 length list requires running the script from a programming 
-language. Selenium-IDE does not support iteration or condition statements. In addition, data-driven 
-testing, allowing multiple tests by varying the data using a single 
-script with varied input, is often done via a test program 
-developed with Selenium-RC.  *NOTE:  a "user-extension" has recently become available for supporting data-driven testing.  At the time of writing the authors have not tried to use this with Sel-IDE.*
+language. Selenium-IDE does not support iteration or condition statements.
+In addition, data-driven testing, allowing multiple tests by varying the data
+using a single script with varied input, is often done via a test program 
+developed with Selenium-RC.  
+
+.. note::  a "user-extension" has recently become available for supporting
+   data-driven testing.  At the time of writing the authors have not tried
+   to use this with Sel-IDE.*
 
 Finally, Selenium-Core is another way of running tests. One can run test 
 scripts from a web-browser using the HTML interface *TestRunner.html*. This is 
@@ -59,9 +64,10 @@ in virtually any way you may imagine. The command set is often called
 
 In selenese, one can test the existence of UI elements based 
 on their HTML tags, test for specific content, test for broken links, 
-input fields, selection list options, submitting forms, and table data among other things. In addition 
-Selenium commands support testing of window size, mouse position, alerts, Ajax functionality, pop up windows, event 
-handling, and many other web-application features. The Command Reference (available at 
+input fields, selection list options, submitting forms, and table data among
+other things. In addition Selenium commands support testing of window size,
+mouse position, alerts, Ajax functionality, pop up windows, event handling,
+and many other web-application features. The Command Reference (available at 
 SeleniumHQ.org) lists all the available commands. 
 
 A *command* is what tells Selenium what to do. Selenium commands come in 
@@ -129,9 +135,17 @@ Parameters vary, however they are typically
   or for selecting an option from an option list. 
 
 Locators, text patterns, 
-selenium variables, and the commands themselves are described in considerable detail in the section on Selenium Commands. 
+selenium variables, and the commands themselves are described in considerable
+detail in the section on Selenium Commands. 
   
-Selenium scripts that will be run from Selenium-IDE may be stored in an HTML text file format. This consists of an HTML table with three columns. The first column is used to identify the Selenium command, the second is a target and the final column contains a value. The second and third columns may not require values depending on the chosen Selenium command, but they should be present. Each table row represents a new Selenium command. Here is an example of a test that opens a page, asserts the page title and then verifies some content on the page:
+Selenium scripts that will be run from Selenium-IDE may be stored in an HTML
+text file format. This consists of an HTML table with three columns. The first
+column is used to identify the Selenium command, the second is a target and the
+final column contains a value. The second and third columns may not require
+values depending on the chosen Selenium command, but they should be present.
+Each table row represents a new Selenium command. Here is an example of a test
+that opens a page, asserts the page title and then verifies some content on the
+page:
            
 .. code-block:: html
 
@@ -149,16 +163,22 @@ assertTitle        Downloads
 verifyText   //h2  Downloads
 ===========  ====  ==========
 
-The Selenese HTML syntax can be used to write and run tests without requiring knowledge of a programming language.  With a basic knowledge of selenese and Selenium-IDE you can quickly produce and run testcases.
+The Selenese HTML syntax can be used to write and run tests without requiring 
+knowledge of a programming language.  With a basic knowledge of selenese and 
+Selenium-IDE you can quickly produce and run testcases.
    
 Test Suites 
 ------------
 
-A test suite is a collection of tests.  Often one will run all the tests in a test suite as one continuous batch-job.  
+A test suite is a collection of tests.  Often one will run all the tests in a
+test suite as one continuous batch-job.  
 
-When using Selenium-IDE, test suites also can be defined using a simple HTML file.  The syntax again is simple.  An HTML table defines a list of tests where each row defines the filesystem path to each test.  An example tells it all.
+When using Selenium-IDE, test suites also can be defined using a simple HTML 
+file.  The syntax again is simple.  An HTML table defines a list of tests where
+each row defines the filesystem path to each test.  An example tells it all.
 
-===========  ====  ==========
+.. code-block:: html
+
       <html> 
       <head> 
       <title>Test Suite Function Tests - Priority 1</title> 
@@ -172,30 +192,54 @@ When using Selenium-IDE, test suites also can be defined using a simple HTML fil
       </table> 
       </body> 
       </html>  
-===========  ====  ==========
 
-A file similar to this would allow running the tests all at once, one after another, from the Selenium-IDE.
+A file similar to this would allow running the tests all at once, one after
+another, from the Selenium-IDE.
 
-Test suites can also be maintained when using Selenium-RC.  This is done via programming and can be done a number of ways.  Commonly Junit is used to maintain a test suite if one is using Selenium-RC with Java.  Additionally, if C# is the chosen language, Nunit could be employed.  If using an interpreted language like Python with Selenium-RC than some simple programming would be involved in setting up a test suite.  Since the whole reason for using Sel-RC is to make use of programming logic for your testing this usually isn't a problem.
+Test suites can also be maintained when using Selenium-RC.  This is done via
+programming and can be done a number of ways.  Commonly Junit is used to
+maintain a test suite if one is using Selenium-RC with Java.  Additionally, if
+C# is the chosen language, Nunit could be employed.  If using an interpreted 
+language like Python with Selenium-RC than some simple programming would be
+involved in setting up a test suite.  Since the whole reason for using Sel-RC
+is to make use of programming logic for your testing this usually isn't a
+problem.
 
 Commonly Used Selenium Commands 
 --------------------------------
 
-To conclude our introduction of Selenium, we'll show you a few typical Selenium commands.  These are probably the most commonly used commands for building test.
+To conclude our introduction of Selenium, we'll show you a few typical Selenium
+commands.  These are probably the most commonly used commands for building test.
 
-===========  ====  ==========
-open -- opens a page using a URL.
-click/clickAndWait -- performs a click operation, and optionally waits for a new page to load.
-verifyTitle/assertTitle -- verifies an expected page title.
-verifyTextPresent -- verifies expected text is somewhere on the page.
-verifyElementPresent -- verifies an expected UI element, as defined by it's HTML tag, is present on the page.
-verifyText -- verifies expected text and it's corresponding HTML tag are present on the page.
-verifyTable -- verifies a table's expected contents.
-waitForPageToLoad -- pauses execution until an expected new page loads.  Called automatically when clickAndWait is used.
-waitForElementPresent -- pauses execution until an expected UI element, as defined by its HTML tag, in present on the page. 
-===========  ====  ==========
+open
+   opens a page using a URL.
+click/clickAndWait
+   performs a click operation, and optionally waits for a new page to load.
+verifyTitle/assertTitle
+   verifies an expected page title.
+verifyTextPresent
+   verifies expected text is somewhere on the page.
+verifyElementPresent
+   verifies an expected UI element, as defined by it's HTML tag, is present on
+   the page.
+verifyText
+   verifies expected text and it's corresponding HTML tag are present on the page.
+verifyTable
+   verifies a table's expected contents.
+waitForPageToLoad
+   pauses execution until an expected new page loads.  Called automatically when 
+   clickAndWait is used.
+waitForElementPresent
+   pauses execution until an expected UI element, as defined by its HTML tag,
+   in present on the page. 
 
 
 Summary 
 --------
-Now that you've seen an introduction to Selenium, you're ready to start writing your first scripts.  We recommend beginning with the Selenium IDE and its context-sensitive, right-click, menu.  This will allow you to get familiar with the most common Selenium commands quickly, and you can have a simple script done in just a minute or two.  Chapter 3 gets you started and then guides you through all the features of the Selenium-IDE.
+
+Now that you've seen an introduction to Selenium, you're ready to start writing
+your first scripts.  We recommend beginning with the Selenium IDE and its
+context-sensitive, right-click, menu.  This will allow you to get familiar with
+the most common Selenium commands quickly, and you can have a simple script
+done in just a minute or two.  Chapter 3 gets you started and then guides you
+through all the features of the Selenium-IDE.

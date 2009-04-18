@@ -140,25 +140,33 @@ Supported Browsers
    helpful in this content, let's remember that we are in the selenium 
    introduction and probably no one reading this will understand what 
    \*piiexplore or *chrome mean...
-   
-Following Browsers are supported with Version 1.0 Beta 2 of Selenium RC.
 
-- \*firefoxproxy
-- \*safari
-- \*safariproxy
-- \*iexplore
-- \*pifirefox
-- \*chrome
-- \*firefox2
-- \*piiexplore
-- \*googlechrome
-- \*iehta
-- \*firefox3
-- \*mock
-- \*opera
-- \*custom
+===========  =========================  ===========================  =================
+**Browser**  **Selenium IDE**           **Selenium Remote Control**  **Selenium Core**
+Firefox 3    Record and playback tests  Start browser, run tests     Run tests
+Firefox 2    Record and playback tests  Start browser, run tests     Run tests
+IE 8         not supported              Under development            Under Development
+IE 7         not supported              Start browser, run tests     Run tests
+Safari 3     not supported              Start browser, run tests     Run tests
+Safari 2     not supported              Start browser, run tests     Run tests
+Opera 9      not supported              Start browser, run tests     Run tests
+Opera 8      not supported              Start browser, run tests     Run tests
+Others       not supported              Partial support possible*    Run tests**
+===========  =========================  ===========================  =================
+
+\* Selenium Remote Control server can start any executable, but depending on 
+browser security settings, there may be technical limitations that would limit
+certain features.
+
+** Selenium Core is written in Javascript so it should work (in theory) on most
+browsers with decent Javascript support. Some operations are only possible via
+Selenium Remote Control because of browser security settings.
+  
+.. Santi: Should we include Selenium Core in this list???
+   How about chrome and mock?? I've noticed they have a browser mod on RC and
+   are not included in this list 
    
-.. TODO: Look this up and get the specific versions off SeleniumHQ.org 
+.. TODO: Refine this list.
   
 Flexibility and Extensibility
 ------------------------------
@@ -217,13 +225,13 @@ The remaining chapters of the book present:
 :ref:`Selenium-RC <chapter05-reference>`
     Explains how to develop an automated test program using the Selenium-RC API.
     Many examples are presented in both, a programming language and a scripting 
-    language. Also, the installation and setup of Selenium-RC is covered here. The various modes,
-    or configurations, that Selenium-RC supports are described along with their 
-    trade-offs and limitations. Architecture diagrams are provided to help 
-    illustrate these points. Also in this section a number of solutions to 
-    problems, often difficult for the new user, are described in this chapter. This 
-    includes handling Security Certificates, https requests, Pop-ups and the 
-    opening of new windows. 
+    language. Also, the installation and setup of Selenium-RC is covered here. 
+    The various modes, or configurations, that Selenium-RC supports are
+    described along with their trade-offs and limitations. Architecture
+    diagrams are provided to help illustrate these points. Also in this section
+    a number of solutions to problems, often difficult for the new user, are
+    described in this chapter. This includes handling Security Certificates,
+    https requests, Pop-ups and the opening of new windows. 
 
 :ref:`Test Design Considerations <chapter06-reference>`
     Presents many useful techniques for using Selenium efficiently. This 
@@ -234,6 +242,7 @@ The remaining chapters of the book present:
     one can vary the data between different test passes).
 
 :ref:`Selenium-Grid <chapter07-reference>`
+
 .. *This chapter is not yet developed.*
   
 :ref:`Advanced Selenium <chapter08-reference>`
