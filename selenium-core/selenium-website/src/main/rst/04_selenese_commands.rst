@@ -1,67 +1,27 @@
 .. _chapter04-reference:
 
+*NOTE:  Paul is working on this chapter.  It's almost finished.  Needs proofreading, and adding some text to a couple of remaining subsections.*
+
 "Selenese" Selenium Commands 
 =============================
+Selenium commands, often called *selenese*, is the set of commands that runs your tests.  A sequence of these commands is a *test script*.  Here we explain those commands in detail, and we present the many choices you have in testing your web-application when using Selenium.
 
-.. Dave: Is this basically a reworking and extension of the existing 'Selenium 
-   Reference'? -Dave 1/6/09 3:49 PM
 
-.. Paul: No, we are going to give them lots more.  Basically how to choose the right 
-   command to do a specific job.  I can help you with this if you need it.  This 
-   like this....when would I use verifyTexPresent vs. verifyText? Also, the 
-   command reference has NO examples.  We'll give them examples.  You may need 
-   to take sometime of a sample website.  We can help them know how to choose 
-   certain commands for certain jobs.
-   We can also give them tradeoffs of different commands, and limitations
+Verifying Page Elements
+-----------------------------------
+Verifying *UI elements* on a web-page is probably the most common feature of your automated tests.  Selenese allows multiple ways of checking for UI elements.  It is important that you understand these different methods because these methods define what you are actually testing.
 
-.. Dave: Sounds good. Perhaps we can use the seleniumhq.org website for our examples?
+For example, will you test for?
 
-How to Choose a Selenium Command
---------------------------------
+a) an element is present somewhere on the page.
+b) specific text is somewhere on the page.
+c) specific text is at a specific location on the page.
 
-.. Paul: This may not be the best title for the introduction of this section, 
-   so Dave, don't let this one mislead you.  You can change this if you need to. 
-.. Dave: I like this topic, but like you say it might not be the best title. 
-   Perhaps 'Choosing the right Selenium command'
-.. Paul: Dave, I could probably write this section.  Would you like me to? 
-
-What to Test?
--------------
-
-.. Paul: So if given a page...Would they test every single item on the page?  
-   Not normally.  Would the check the content of each paragraph?  Depends on 
-   the paragraph.  Like, paragraphs on a company contact page probably won't 
-   change frequently and they may want to test the text itself.  A different 
-   page, they may want to test the paragraph exists.  Another page where the 
-   content is constantly changed by web-designers, they may only want to test 
-   the heading and page title.
-
-.. Dave: So a discussion of checks vs risk. If content is high importance to 
-   your scenario then it should be tested, if it is inconsequential or 
-   covered by other similar scenarios then either a superficial check is 
-   enough or no check at all (again, depending ont he importance of the 
-   content).
-
-.. Paul: Yes, all of that.  but also, the user must keep in mind what their 
-   test goal is.  What IS it that they REALLY need to check.  I can give a 
-   good example from my current experience.....We check page rendering and for
-   broken links, I call these our "UI Tests".   Then we're building "smoke
-   tests" for basic functionality that follow the common user scenarios.
-   For our UI Tests, our web-designers frequently (with a capital F) change 
-   content.  Mostly for testing page rendering I test for structure rather 
-   than content.  But 'stable content' such as the corporate content info, 
-   copywrite statements, company logo images, etc, I would test the actual 
-   content since they don't change frequently and they are highly important 
-   for the company image.  We can include these kinds of decisions-tradeoffs 
-   in this section.
-
-.. Santi: this seems more like a guide for automation testing more than a 
-   selenium sepeific topic. I like the idea and I think most of the people will
-   reach selenium withou having this clear, but maybe we should leave this kind
-   of topics for last, when all the essential Selenium specifics are covered.
-
+So, for example, if you are testing a text heading, the text, and it's position at the top of the page, is probably relevant for your test.  If, however, you are testing for the existance of an image on the home page, and the web-designers frequently change the specific image file along with it's position on the page, then you only want to test that *an image* (as opposed to the specific image file) exists *somewhere on the page*.
+   
+   
 Assertion or Verification? 
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Choosing between **assert** and **verify** comes down to convenience and 
 management of failures. There's very little point checking that the first 
@@ -95,10 +55,34 @@ expected location. The test case then **asserts** the first column in the second
 row of the first table meets the expected value, and only if this passed with 
 the remaining cells in that row be **verified**.
 
-.. Paul: Dave did you write this above section?  This is exactly what I had 
-   in mind also. Nice job!  I couldn't have written it better.
 
-.. Dave: Cool. We must be on the same wavelength!
+verifyTextPresent
+~~~~~~~~~~~~~~~~~
+The command *verifyTextPresent* is used to verify *specific text exists somewhere on the page*.  It takes a single arguement--the text pattern to be verified.  For example.
+
+=============   ==================   ============
+verifyPresent   Marketing Forcasts               
+=============   ==================   ============
+
+This would cause Selenium to search for, and verify, that the text string "Marketing Analysis" appears somewhere on the page currently being tested. Use this verifyTextPresent when only when you are interested only in the text itself and that 
+it is present on the page, but you are not concerned about where it occurs on the page. 
+
+verifyElementPresent
+~~~~~~~~~~~~~~~~~~~~
+ 
+Use this when you must test for the presence of a specific UI element, rather then it's content.  
+
+   is what is important to the test.  Use this when the text itself is not 
+   relevent. This is also used to verify an img exists, or that a link exists.
+   
+   
+
+verifyText
+~~~~~~~~~~
+ 
+Use this when not only the text itself must be checked, but also it's
+   position on the page.
+
 
 Locating Elements 
 -----------------
@@ -110,10 +94,10 @@ locator type can be omitted and one of the default strategies will be used
 depending on the initial characters of the location. The various locator types
 are explained below with examples for each.
 
-.. Santi: I really liked how this section was taken. But I found that most of
+*Santi: I really liked how this section was taken. But I found that most of
    the locator strategies repeat the same HTML fragment over a over. Couldn't
    we put A example HTML code before starting with each strategie and then use
-   that one on all of them?
+   that one on all of them?*
 
 Locating by identifier
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -124,18 +108,11 @@ the element with the @id attribute value matching the location will be found. If
 no element has a matching @id attribute then the first element with a @name 
 attribute matching the location will be found.
 
-.. Paul: Are you illustrating a locator in a Sel command?  I think you are.  
-   Let's put it in the context of a command like verifyText or 
-   verifyElementPresent.  It needs context.  I was confused at first what 
-   this was doing here.
-
-.. Dave: I agree that this section needs context.
+*Does this needs an example with a context.*
 
 - identifier=loginForm
 - identifier=username
 - identifier=continue
-
-.. TODO: Colors here!
 
 For instance, your page source could have identifier (ID) and name attributes 
 as follows:
@@ -161,8 +138,6 @@ this when you know an element's @id attribute.
 
 - id=loginForm
 
-.. TODO: Colors here!
-
 .. code-block:: html
 
    <html>
@@ -177,13 +152,13 @@ this when you know an element's @id attribute.
    <html>
 
 
-.. Paul: There's an important use of this, and similar locators.  These vs. 
+*There's an important use of this, and similar locators.  These vs. 
    xpath allow Selenium to test UI elements independent of it's location on 
    the page.  So if the page structure and organization is altered, the test 
    will still pass.  One may, or may not, want to also test whether the page 
    structure changes.  In the case where web-designers frequently alter the 
    page, but it's functionality must be regression tested, testing via ID and 
-   NAME attribs, or really via any HTML property becomes very important.
+   NAME attribs, or really via any HTML property becomes very important.*
 
 Locating by name 
 ~~~~~~~~~~~~~~~~
@@ -194,21 +169,11 @@ attribute. If multiple elements have the same value for a name attribute then
 you can use filters to further refine your location strategy. The default 
 filter type is value (matching the @value attribute).
 
-.. Paul: I'm indenting your examples and making the Courier New--hope ya don't
-   mind! Actually, they look like they're already in Courier front, but I'm 
-   adding that explicetly as Google Docs couldn't seem to figure out what the 
-   font was
-
-.. Dave: These are just quick examples and I expected them to be refined. 
-   Style is fine as you have it.
-
 - name=username
 - name=continue
 - name=continue Continue
 - name=continue value=Continue
 - name=continue type=button
-
-.. TODO: Colors here!
 
 .. code-block:: html
 
@@ -233,9 +198,9 @@ as well as supporting) the simple methods of locating by @id or @name
 attributes, and opens up all sorts of new possibilities such as locating the 
 third checkbox on the page or similar. 
 
-.. Dave: Is it worth mentioning the varying support of XPath (native in 
+*Dave: Is it worth mentioning the varying support of XPath (native in 
    Firefox, using Google AJAXSLT or the new method in IE)? Probably an 
-   advanced topic if needed at all..?
+   advanced topic if needed at all..?*
 
 One of the main reasons for using XPath is when you don't have a suitable @id 
 or @name attribute for the element you wish to locate. You can use XPath to 
@@ -263,8 +228,6 @@ This is much less likely to change and can make your tests more robust.
 - xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the 
   form element with @id of 'loginForm'*
 
-
-.. TODO: Colors here!
 
 .. code-block:: html
 
@@ -299,10 +262,6 @@ discovering the XPath of an element:
   useful, XPath suggestions are just one of the many powerful features of 
   this add-on.
 
-.. Dave: We could have screenshots of using these add-ons or incorporate the 
-   short guide here http://seleniumhq.org/projects/core/xpath-help.html or 
-   this may be out of scope.
-
 Locating hyperlinks by link text 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -312,8 +271,6 @@ match will be used.
 
 - link=Continue
 - link=Cancel
-
-.. TODO: Colors here!
 
 .. code-block:: html
 
@@ -340,8 +297,6 @@ hierarchical dotted notation.
 - dom=document.forms[0].elements['username']
 - dom=document.forms[0].elements[0]
 - dom=document.forms[0].elements[3]
-
-.. TODO: Colors here!
            
 .. code-block:: html
 
@@ -361,24 +316,20 @@ You can use Selenium itself as well as other sites and extensions to explore
 the DOM of your web application. A good reference exists on `W3Schools 
 <http://www.w3schools.com/HTMLDOM/dom_reference.asp>`_. 
 
-.. Dave: This topic was written fairly quickly as I feel it's XPath's poor 
-   cousin.
-
 Locating by CSS
 ~~~~~~~~~~~~~~~
 
-.. Santiago: This is a great replace for the slow XPATH locators and it hasn't
-   been documented at all (also, there's a los of info around the web) -
-   Santiago Suarez Ordoñez 1/6/09 12:20 PM  
-
-.. Dave: I used one of these yesterday and it was really simple, I'll take a 
-   look at writing this topic soon. This is the next topic that I'll be 
-   working on.
+*This section needs to be developed.*
 
 .. Samti: Dave, are you still thinking of taking this topic? I have written
    about this and could throw some content really fast. I'll still wait some
    days for you to do it as this is your section not mine.
-   
+ 
+Order of Locator Evaluation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+*This section still needs to be developed.  Please refer to the Selenium Command Reference on the SeleniumHq.org website.*
+
+ 
 The "AndWait" commands 
 ----------------------
 The difference etween a command and it's *AndWait*
@@ -390,115 +341,80 @@ load after the action has been done.
 The *andWait* alternative is always used when the action causes the browser to
 navigate to another page or reload the present one. 
 
-.. note:: Keep in mind that if you use an *AndWait* command for an action that
-   does not trigger a navigation/refresh, your test will fail. This happens 
-   because Selenium will reach the *AndWait*'s timeout without seeing any 
-   navigation or refresh being made, this is why Selenium raises a timeout 
-   exception.
-
-verifyTextPresent
------------------
-
-.. Paul: Use this when only when one is concerned about the text itself, that 
-   it is present on the page, but it's position on the page is not important 
-   for the verification.
-
-verifyElementPresent
---------------------
+Be aware, if you use an *AndWait* command for an action that
+does not trigger a navigation/refresh, your test will fail. This happens 
+because Selenium will reach the *AndWait*'s timeout without seeing any 
+navigation or refresh being made, this is why Selenium raises a timeout 
+exception.
  
-.. Paul: Use this when the presence of the UI element, that is, the HTML tag 
-   is what is important to the test.  Use this when the text itself is not 
-   relevent. This is also used to verify an img exists, or that a link exists.
-   Can also be used to verify items in a dynamic list (like of returned 
-   search results) exist on the page.
 
-verifyText
-----------
- 
-.. Paul: Use this when not only the text itself must be checked, but also it's
-   position on the page.
+Sequence of Evaluation and Flow Control
+-----------------------
 
- echo 
- ----
+When a script runs, it simply runs in sequence, one command after another.
+
+Selenese, by itself, does not handle condition statements (if-else, etc) or iteration (for, while, etc).  Many useful tests can be conducted without flow control, however for a function test of dynamic functionality, possibly involving multiple pages, programming logic is often needed.
+
+When flow control is needed there are two options.  
+
+	a) run the script using Sel-RC to take advantage of a programming language.
+	b) run a small javascript snippet from within the script using the StoreEval command.
+
+Most will export the test script into a programming language file that uses the Selenium-RC API (see the Sel-IDE chapter).  However, some organizations prefer to run their scripts from Selenium-IDE whenever possible (such as when they have many junior-level people running tests for them, or when programming skills are lacking).  If this is you, consider a javascript snippet.  However, this will not handle interation.  So, for example, if your test needs to iterate through a variable-lenght result-set of values, you will need Selenium-RC.
+
+   
+Adding Progress Info to Your Script
+--------------------------
+   
+ *echo* 
  
-.. Paul: Useful for debugging a script.  Also very useful for documenting 
+Useful for debugging a script.  Also very useful for documenting 
    each section of a test and dumping that to an output log.  This can be 
    very useful for identifying bugs when verifications in a script fail. I 
    can come up with an example if you guys need me to.
 
- Selenium Variables
- ------------------
  
-.. Paul: Do you guys use these?  I've been using them a lot lately.  I can 
-   get some examples from our scripts at work and modify them for this 
-   section if you need some examples.
-
- Store Commands
- --------------
+Store Commands and Selenium Variables
+-------------------------------------
  
-.. Paul: These are really valiable.  I use them to set constants at the top 
-   of my scripts.  Particularly username and password, but also various pre-
-   known properties that need to be validated as 'expected results' of a test.
-   That approach is also one step away from data-driven testing as these 
-   present variable values can then be easily edited in Sel-RC to take values 
-   passed by a test app from the command line or a file read into the app.
-
-.. Santi: Not sure is all this Store commands are needed... We are explaining
-   the same for the verify kind of commands on the topic above.
+*These are really valiable.  I use them to set constants at the top 
+of my scripts.  Particularly username and password, but also various pre-
+known properties that need to be validated as 'expected results' of a test.
+That approach is also one step away from data-driven testing as these 
+present variable values can then be easily edited in Sel-RC to take values 
+passed by a test app from the command line or a file read into the app.*
 
 store 
------
+~~~~~
 
 storeText 
----------
+~~~~~~~~~
 
 storeElementPresent 
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 storeEval 
----------
+~~~~~~~~~
 
 Javascript Expression as a Parameter 
 ------------------------------------
 
-.. Paul: Whoops, we need a section on Patterns for matching text, and 
-   particularly should mention RegExp's
+*Whoops, we need a section on Patterns for matching text, and 
+particularly should mention RegExp's*
 
 Alerts, Popups, and Multiple Windows
 ------------------------------------
 
-.. Paul: This is an important area, people are constantly asking about this 
-   on the forums.
+*This is an important area, people are constantly asking about this 
+on the forums.*
 
 AJAX and waitFor commands
 -------------------------
 
-.. Santiago: Nowadays, most of the applications has some AJAX and tends to be 
-   a basic requirement for lots of tests, we should cover this topic as soon 
-   as we can
+Many applications use AJAX for dynamic and animated functionality making testing of Ajax behavior often
+a basic testing requirement.
 
-Sequence of Evaluation
------------------------
+*NOTE: This section is not yet developed.*
 
-In what order does Selenium process each of these parameter components?  
 
-.. Paul: There 's some stuff on the Reference about which order the 
-   interpreter uses to evaluate locators.  We may need to do some research 
-   though.  I haven't though about this one much, other than to be thinking 
-   that we should think about it.
-
-.. Santi: Is this about the locators used when no locatorType= prefix is used?
-   If so, I think we should put this on the Locators topic.
-
-Example Test Script
--------------------
-
-.. Paul: My idea here was to have a simple sample web page or two, with a 
-   sample script, that demonstrated how to select the right command for 
-   different elements of the website.  We would need to create this, any real 
-   website would prob be to complex.
-
-.. Santi: Not sure is this is the right section for this content. There are some
-   attempts for doing this on other sections also. I hope we cover this by the 
-   end, when we have the whole docs structure better visualized.
 
