@@ -83,6 +83,7 @@ verifyText
 Use this when not only the text itself must be checked, but also it's
    position on the page.
 
+.. _locators-section:
 
 Locating Elements 
 -----------------
@@ -94,10 +95,10 @@ locator type can be omitted and one of the default strategies will be used
 depending on the initial characters of the location. The various locator types
 are explained below with examples for each.
 
-*Santi: I really liked how this section was taken. But I found that most of
+.. Santi: I really liked how this section was taken. But I found that most of
    the locator strategies repeat the same HTML fragment over a over. Couldn't
    we put A example HTML code before starting with each strategie and then use
-   that one on all of them?*
+   that one on all of them?
 
 Locating by identifier
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -152,13 +153,13 @@ this when you know an element's @id attribute.
    <html>
 
 
-*There's an important use of this, and similar locators.  These vs. 
+.. note:: There's an important use of this, and similar locators.  These vs. 
    xpath allow Selenium to test UI elements independent of it's location on 
    the page.  So if the page structure and organization is altered, the test 
    will still pass.  One may, or may not, want to also test whether the page 
    structure changes.  In the case where web-designers frequently alter the 
    page, but it's functionality must be regression tested, testing via ID and 
-   NAME attribs, or really via any HTML property becomes very important.*
+   NAME attribs, or really via any HTML property becomes very important.
 
 Locating by name 
 ~~~~~~~~~~~~~~~~
@@ -198,9 +199,9 @@ as well as supporting) the simple methods of locating by @id or @name
 attributes, and opens up all sorts of new possibilities such as locating the 
 third checkbox on the page or similar. 
 
-*Dave: Is it worth mentioning the varying support of XPath (native in 
+.. Dave: Is it worth mentioning the varying support of XPath (native in 
    Firefox, using Google AJAXSLT or the new method in IE)? Probably an 
-   advanced topic if needed at all..?*
+   advanced topic if needed at all..?
 
 One of the main reasons for using XPath is when you don't have a suitable @id 
 or @name attribute for the element you wish to locate. You can use XPath to 
@@ -349,7 +350,7 @@ exception.
  
 
 Sequence of Evaluation and Flow Control
------------------------
+---------------------------------------
 
 When a script runs, it simply runs in sequence, one command after another.
 
@@ -364,7 +365,7 @@ Most will export the test script into a programming language file that uses the 
 
    
 Adding Progress Info to Your Script
---------------------------
+-----------------------------------
    
  *echo* 
  
@@ -377,12 +378,12 @@ Useful for debugging a script.  Also very useful for documenting
 Store Commands and Selenium Variables
 -------------------------------------
  
-*These are really valiable.  I use them to set constants at the top 
-of my scripts.  Particularly username and password, but also various pre-
-known properties that need to be validated as 'expected results' of a test.
-That approach is also one step away from data-driven testing as these 
-present variable values can then be easily edited in Sel-RC to take values 
-passed by a test app from the command line or a file read into the app.*
+.. Paul: These are really valiable.  I use them to set constants at the top 
+   of my scripts.  Particularly username and password, but also various pre-
+   known properties that need to be validated as 'expected results' of a test.
+   That approach is also one step away from data-driven testing as these 
+   present variable values can then be easily edited in Sel-RC to take values 
+   passed by a test app from the command line or a file read into the app.
 
 store 
 ~~~~~
@@ -399,14 +400,14 @@ storeEval
 Javascript Expression as a Parameter 
 ------------------------------------
 
-*Whoops, we need a section on Patterns for matching text, and 
-particularly should mention RegExp's*
+.. Paul: Whoops, we need a section on Patterns for matching text, and 
+   particularly should mention RegExp's
 
 Alerts, Popups, and Multiple Windows
 ------------------------------------
 
-*This is an important area, people are constantly asking about this 
-on the forums.*
+.. Paul: This is an important area, people are constantly asking about this 
+   on the forums.
 
 AJAX and waitFor commands
 -------------------------
@@ -414,7 +415,7 @@ AJAX and waitFor commands
 Many applications use AJAX for dynamic and animated functionality making testing of Ajax behavior often
 a basic testing requirement.
 
-*NOTE: This section is not yet developed.*
+.. note:: This section is not yet developed.
 
 
 

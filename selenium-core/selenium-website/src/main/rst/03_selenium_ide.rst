@@ -38,7 +38,7 @@ progress bar, and when the download is complete, displays the following.
 .. image:: images/chapt3_img02_IDE_Installation.png
    :align: center
   
-Restart Firefox.  After Firefox reboots you will find the Selnium IDE listed under the Firefox Tools menu. 
+Restart Firefox.  After Firefox reboots you will find the Selnium-IDE listed under the Firefox Tools menu. 
 
 .. image:: images/chapt3_img03_IDE_Installation.png
    :align: center
@@ -46,7 +46,7 @@ Restart Firefox.  After Firefox reboots you will find the Selnium IDE listed und
 Opening the IDE 
 ---------------
 
-To run the Sel-IDE, simply select it from the Firefox Tools menu.  It opens 
+To run the Selenium-IDE, simply select it from the Firefox Tools menu.  It opens 
 as follows with an empty script-editing window and a menu for loading, or 
 creating new, your scripts. 
   
@@ -64,7 +64,7 @@ operations for editing the commands in your script.  The Options menu allows
 the changing of settings.  Specifically you can set the timeout value for 
 certain commands, add user-defined user extensions to base set of Selenium 
 commands, and you can specify the format (language) used when saving your 
-scripts.  The Help menu is the standard Firefox Help menu.  The Sel-IDE runs 
+scripts.  The Help menu is the standard Firefox Help menu.  The Selenium-IDE runs 
 within a Firefox browser window and therefore displays the standard Firefox 
 Help menu.  There is nothing specific to Selenium-IDE in the Help menu. 
   
@@ -157,12 +157,14 @@ Recording
 ~~~~~~~~~
 
 Many first-time users begin by recording a script from their interactions 
-with a website.  When Sel-IDE is first opened the record button is ON by 
+with a website.  When Selenium-IDE is first opened the record button is ON by 
 default. 
 
 .. note::
     This can be set to OFF as a default with an available user extension. 
-  
+
+.. Peter: Should "Recorder" be capitalized here?
+
 The Recorder will automatically insert commands into your script based on 
 your mouse clicks.  Typically, this will include:
   
@@ -186,10 +188,10 @@ Adding Verifications and Asserts With the Context Menu
   
 Your scripts will also need to check the properties of a web-page.  This 
 requires *assert* and *verify* commands.  We won't describe the specifics of 
-these commands here; that is in the chapter on Selenium commands.  Here we'll 
+these commands here; that is in the chapter on :ref:`Selenium commands <chapter04-reference>`.  Here we'll 
 simply describe how to add them to your script. 
   
-With Sel-IDE recording, go to the browser displaying your test application and 
+With Selenium-IDE recording, go to the browser displaying your test application and 
 right click anywhere on the page.  You will see a context menu showing *verify* 
 and/or *assert* commands.  
 
@@ -230,7 +232,7 @@ Insert Command
 ++++++++++++++
 
 Select the point in your script where you want to insert the command.  Right-
-click and select Insert Command.  Now use the command edit text fields to 
+click and select Insert Command.  Now use the command editing text fields to 
 enter your new command and its parameters. 
   
 Insert Comment 
@@ -239,7 +241,7 @@ Insert Comment
 Comments may be added to make your script more readable.  These comments are 
 ignored when the script is run.  Select the point in your script where you 
 want to insert the comment.  Right-click and select Insert Comment.  Now use 
-the first command edit text fields to enter the comment. 
+the first command editing text fields to enter the comment. 
   
 Edit a Command or Comment 
 +++++++++++++++++++++++++
@@ -348,7 +350,7 @@ Find Button
 The Find button is used to see which UI element on the currently displayed 
 webpage (in the browser) is used in the currently selected Selenium command.  
 This is useful when building a locator for a command's first parameter (see the
-section on locators in the Selenium Commands chapter). It can be used with any
+section on :ref:`locators <locators-section>` in the Selenium Commands chapter). It can be used with any
 command that must identify a UI element on a webpage, i.e. *click*, 
 *clickAndWait*, *type*, and the *assert* and *verify* commands among others. 
   
@@ -401,7 +403,7 @@ you can ignore this feature.
 If, however, you will be using Selenium-RC to run your scripts, this is how 
 you translate your test script into a programming language.  Select the 
 language, i.e. Java, PHP, you will be using with Selenium-RC for developing 
-your test programs.  This simply save the scripts using File-»Save.  Your 
+your test programs.  Then simply save the scripts using File-»Save.  Your 
 script will be translated into a series of functions in the language you 
 choose.  Essentially, program code supporting your test is generated for you 
 by Selenium-IDE. 

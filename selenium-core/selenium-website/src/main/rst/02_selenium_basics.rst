@@ -14,13 +14,13 @@ Getting Started -- Choosing Your Selenium Tool
 Most people get started with Selenium-IDE. This is what we recommend. It's 
 an easy way to get familiar with Selenium commands quickly. You can develop
 your first script in just a few minutes. Selenium-IDE is also very easy
-to install. See the :ref:`section on Selenium-IDE <chapter03-reference>` for 
+to install. See the :ref:`chapter on Selenium-IDE <chapter03-reference>` for 
 specifics.
   
 You may also run your scripts from the Selenium-IDE. It's  
 simple to use and is recommended for less-technical users. The IDE allows 
 developing and running tests without the need for programming skills as
-required by Selenium -RC. The Sel-IDE can serve as an excellent way to 
+required by Selenium-RC. The Selenium-IDE can serve as an excellent way to 
 train junior-level employees in test automation. If one has an understanding 
 of how to conduct manual testing of a website they can easily transition to 
 using the Selenium-IDE for both, running and developing tests. 
@@ -36,7 +36,7 @@ developed with Selenium-RC.
 
 .. note::  a "user-extension" has recently become available for supporting
    data-driven testing.  At the time of writing the authors have not tried
-   to use this with Sel-IDE.*
+   to use this with Selenium-IDE.*
 
 Finally, Selenium-Core is another way of running tests. One can run test 
 scripts from a web-browser using the HTML interface *TestRunner.html*. This is 
@@ -102,6 +102,8 @@ three "flavors": **Actions**, **Accessors** and **Assertions**.
   condition is already true. However, they will fail and halt the test if the 
   condition does not become true within the current timeout setting (see the 
   setTimeout action below). 
+  
+.. Peter: setTimeout doesn't yet exist in this document. I'll assume it's going in the Commonly Used Selenium Commands section. Is there somewhere else this should link to?
 
 Script Syntax 
 ~~~~~~~~~~~~~~
