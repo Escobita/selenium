@@ -9,7 +9,6 @@ org.openqa.selenium.lift.find
 org.openqa.selenium.lift.match
 org.openqa.selenium.remote
 org.openqa.selenium.safari
-org.openqa.selenium.security
 org.openqa.selenium.support
 org.openqa.selenium.support.events
 org.openqa.selenium.support.pagefactory
