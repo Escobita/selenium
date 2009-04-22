@@ -414,7 +414,7 @@ It should not be very different for higher version of intelliJ.
 
 * Click Next and provide Module name and Module content root.
 
-.. image:: images/chapt5_img33_module_root.png
+.. image:: images/chapt5_img33_Module_Root.png
    :align: center
    
 

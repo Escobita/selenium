@@ -372,6 +372,7 @@ Command Reference on the SeleniumHq.org website.*
 The Patterns' syntax
 --------------------
 .. regexp: vs. glob: vs. exact: patterns
+
 *This section still needs to be developed.  Please refer to the Selenium 
 Command Reference on the SeleniumHq.org website.*
  
