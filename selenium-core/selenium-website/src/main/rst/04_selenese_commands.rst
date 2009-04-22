@@ -4,12 +4,18 @@
 
 "Selenese" Selenium Commands 
 =============================
-Selenium commands, often called *selenese*, is the set of commands that runs your tests.  A sequence of these commands is a *test script*.  Here we explain those commands in detail, and we present the many choices you have in testing your web-application when using Selenium.
+Selenium commands, often called *selenese*, is the set of commands that runs 
+your tests.  A sequence of these commands is a *test script*.  Here we explain 
+those commands in detail, and we present the many choices you have in testing 
+your web-application when using Selenium.
 
 
 Verifying Page Elements
 -----------------------------------
-Verifying *UI elements* on a web-page is probably the most common feature of your automated tests.  Selenese allows multiple ways of checking for UI elements.  It is important that you understand these different methods because these methods define what you are actually testing.
+Verifying *UI elements* on a web-page is probably the most common feature of 
+your automated tests.  Selenese allows multiple ways of checking for UI 
+elements.  It is important that you understand these different methods because
+these methods define what you are actually testing.
 
 For example, will you test for?
 
@@ -17,7 +23,12 @@ a) an element is present somewhere on the page.
 b) specific text is somewhere on the page.
 c) specific text is at a specific location on the page.
 
-So, for example, if you are testing a text heading, the text, and it's position at the top of the page, is probably relevant for your test.  If, however, you are testing for the existance of an image on the home page, and the web-designers frequently change the specific image file along with it's position on the page, then you only want to test that *an image* (as opposed to the specific image file) exists *somewhere on the page*.
+So, for example, if you are testing a text heading, the text, and it's position
+at the top of the page, is probably relevant for your test.  If, however, you 
+are testing for the existence of an image on the home page, and the 
+web-designers frequently change the specific image file along with it's position
+on the page, then you only want to test that *an image* (as opposed to the 
+specific image file) exists *somewhere on the page*.
    
    
 Assertion or Verification? 
@@ -31,7 +42,7 @@ the correct page you'll probably want to abort your test case so that you can
 investigate the cause and fix the issue(s) promptly. On the other hand, you 
 may want to check many attributes of a page without aborting the test case on 
 the first failure as this will allow you to review all failures on the page 
-and take the appopriate action. Effectively an **assert** will fail the test 
+and take the appropriate action. Effectively an **assert** will fail the test 
 and abort the current test case, whereas a **verify** will fail the test and 
 continue to run the testcase. 
 
@@ -58,14 +69,19 @@ the remaining cells in that row be **verified**.
 
 verifyTextPresent
 ~~~~~~~~~~~~~~~~~
-The command *verifyTextPresent* is used to verify *specific text exists somewhere on the page*.  It takes a single arguement--the text pattern to be verified.  For example.
+The command *verifyTextPresent* is used to verify *specific text exists 
+somewhere on the page*.  It takes a single argument--the text pattern to be 
+verified.  For example.
 
 =============   ==================   ============
 verifyPresent   Marketing Forcasts               
 =============   ==================   ============
 
-This would cause Selenium to search for, and verify, that the text string "Marketing Analysis" appears somewhere on the page currently being tested. Use this verifyTextPresent when only when you are interested only in the text itself and that 
-it is present on the page, but you are not concerned about where it occurs on the page. 
+This would cause Selenium to search for, and verify, that the text string
+"Marketing Analysis" appears somewhere on the page currently being tested. Use
+this verifyTextPresent when only when you are interested only in the text 
+itself and that it is present on the page, but you are not concerned about 
+where it occurs on the page. 
 
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
@@ -73,7 +89,7 @@ verifyElementPresent
 Use this when you must test for the presence of a specific UI element, rather then it's content.  
 
    is what is important to the test.  Use this when the text itself is not 
-   relevent. This is also used to verify an img exists, or that a link exists.
+   relevent. This is also used to verify an image exists, or that a link exists.
    
    
 
@@ -109,8 +125,6 @@ the element with the @id attribute value matching the location will be found. If
 no element has a matching @id attribute then the first element with a @name 
 attribute matching the location will be found.
 
-*Does this needs an example with a context.*
-
 - identifier=loginForm
 - identifier=username
 - identifier=continue
@@ -126,7 +140,6 @@ as follows:
      <input name="username" type="text" />
      <input name="password" type="password" />
      <input name="continue" type="submit" value="Login" />
-     <input name="continue" type="button" value="Continue" />
     </form>
    </body>
   <html>
@@ -147,7 +160,7 @@ this when you know an element's @id attribute.
       <input name="username" type="text" />
       <input name="password" type="password" />
       <input name="continue" type="submit" value="Login" />
-      <input name="continue" type="button" value="Continue" />
+      <input name="continue" type="button" value="Clear" />
      </form>
     </body>
    <html>
@@ -171,9 +184,8 @@ you can use filters to further refine your location strategy. The default
 filter type is value (matching the @value attribute).
 
 - name=username
-- name=continue
-- name=continue Continue
-- name=continue value=Continue
+- name=continue Clear
+- name=continue value=Clear
 - name=continue type=button
 
 .. code-block:: html
@@ -184,7 +196,7 @@ filter type is value (matching the @value attribute).
       <input name="username" type="text" />
       <input name="password" type="password" />
       <input name="continue" type="submit" value="Login" />
-      <input name="continue" type="button" value="Continue" />
+      <input name="continue" type="button" value="Clear" />
      </form>
    </body>
    <html>
@@ -229,7 +241,6 @@ This is much less likely to change and can make your tests more robust.
 - xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the 
   form element with @id of 'loginForm'*
 
-
 .. code-block:: html
 
    <html>
@@ -238,7 +249,7 @@ This is much less likely to change and can make your tests more robust.
       <input name="username" type="text" />
       <input name="password" type="password" />
       <input name="continue" type="submit" value="Login" />
-      <input name="continue" type="button" value="Continue" />
+      <input name="continue" type="button" value="Clear" />
      </form>
    </body>
    <html>
@@ -307,33 +318,66 @@ hierarchical dotted notation.
       <input name="username" type="text" />
       <input name="password" type="password" />
       <input name="continue" type="submit" value="Login" />
-      <input name="continue" type="button" value="Continue" />
+      <input name="continue" type="button" value="Clear" />
      </form>
    </body>
    <html>
 
 
-You can use Selenium itself as well as other sites and extensions to explore 
-the DOM of your web application. A good reference exists on `W3Schools 
+You can use Selenium itself as well as other sites and extensions to explore
+the DOM of your web application. A good reference exists on `W3Schools
 <http://www.w3schools.com/HTMLDOM/dom_reference.asp>`_. 
 
 Locating by CSS
 ~~~~~~~~~~~~~~~
 
-*This section needs to be developed.*
+CSS (Cascading Style Sheets) is a language for describing the rendering of HTML
+and XML documents. CSS uses Selectors for binding style properties to elements
+in the document. This Selectors can be used by Selenium as another locating 
+strategy.
 
-.. Samti: Dave, are you still thinking of taking this topic? I have written
-   about this and could throw some content really fast. I'll still wait some
-   days for you to do it as this is your section not mine.
- 
-Order of Locator Evaluation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-*This section still needs to be developed.  Please refer to the Selenium Command Reference on the SeleniumHq.org website.*
+- css=form#loginForm
+- css=input[name="username"]
+- css=input.required[type="text"]
+- css=input.passfield
+- css=#loginForm input[type="button"]
+- css=#loginForm input:nth-child(2)
 
+.. code-block:: html
+
+   <html>
+    <body>
+     <form id="loginForm">
+      <input class="required" name="username" type="text" />
+      <input class="required passfield" name="password" type="password" />
+      <input name="continue" type="submit" value="Login" />
+      <input name="continue" type="button" value="Clear" />
+     </form>
+   </body>
+   <html>
+
+For more information about CSS Selectors, the best place to go is `the W3C 
+publication <http://www.w3.org/TR/css3-selectors/>`_ you'll find additional
+references there.
+
+.. note:: Most experimented Selenium users recommend CSS as their locating
+   strategy of choice as it's way faster than xpath and can find the most 
+   complicated objects in an intrinsic HTML document.
+
+Order of Locators Evaluation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+*This section still needs to be developed.  Please refer to the Selenium 
+Command Reference on the SeleniumHq.org website.*
+
+The Patterns' syntax
+--------------------
+.. regexp: vs. glob: vs. exact: patterns
+*This section still needs to be developed.  Please refer to the Selenium 
+Command Reference on the SeleniumHq.org website.*
  
 The "AndWait" commands 
 ----------------------
-The difference etween a command and it's *AndWait*
+The difference between a command and it's *AndWait*
 alternative is that the regular command (e.g. *click*) will do the action and
 continue with the following command as fast as it can. While the *AndWait*
 alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
@@ -354,14 +398,23 @@ Sequence of Evaluation and Flow Control
 
 When a script runs, it simply runs in sequence, one command after another.
 
-Selenese, by itself, does not handle condition statements (if-else, etc) or iteration (for, while, etc).  Many useful tests can be conducted without flow control, however for a function test of dynamic functionality, possibly involving multiple pages, programming logic is often needed.
+Selenese, by itself, does not handle condition statements (if-else, etc.) or 
+iteration (for, while, etc.). Many useful tests can be conducted without flow 
+control, however for a functional test of dynamic content, possibly involving
+multiple pages, programming logic is often needed.
 
 When flow control is needed there are two options.  
 
 	a) run the script using Sel-RC to take advantage of a programming language.
-	b) run a small javascript snippet from within the script using the StoreEval command.
+	b) run a small Javascript snippet from within the script using the storeEval command.
 
-Most will export the test script into a programming language file that uses the Selenium-RC API (see the Sel-IDE chapter).  However, some organizations prefer to run their scripts from Selenium-IDE whenever possible (such as when they have many junior-level people running tests for them, or when programming skills are lacking).  If this is you, consider a javascript snippet.  However, this will not handle interation.  So, for example, if your test needs to iterate through a variable-lenght result-set of values, you will need Selenium-RC.
+Most will export the test script into a programming language file that uses the
+Selenium-RC API (see the Selenium-IDE chapter).  However, some organizations prefer
+to run their scripts from Selenium-IDE whenever possible (such as when they have
+many junior-level people running tests for them, or when programming skills are
+lacking). If this is your case, consider a Javascript snippet.  However, this 
+will not handle iteration. So, for example, if your test needs to iterate 
+through a variable-lenght result-set of values, you will need Selenium-RC.
 
    
 Adding Progress Info to Your Script
