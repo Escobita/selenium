@@ -1363,6 +1363,9 @@ Run Selenese test on multiple browsers using the RC
    person's path to Selenium-awareness!  A *lot* of new users want to know
    how to run their SIDE tests against different browsers; we need to tell
    them early on (before they write to the forum to ask!).
+
+.. The content should be an updated version of the one from:
+   http://seleniumhq.org/projects/remote-control/languages/selenese.html
    
 Paul's part
 -----------
@@ -1379,12 +1382,12 @@ Specify the Host and Port::
 
    localhost:4444 
 
-.. Santi: What's this topic?
+.. Santi: Which is the supposed content of this topic?
 
 The Selenium-RC Program's Main() 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. Santi: What's this topic?
+.. Santi: What's this topic? Is it related with the Tests sctructure chapter?
 
 Handling HTTPS and Security Popups 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
