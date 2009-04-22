@@ -773,6 +773,93 @@ separate explanations for each of them:
 C#
 ++
 
+.NET Client Driver works with Microsoft.NET.
+It can be used together with any .NET testing framework 
+like NUnit or the Visual Studio 2005 Team System.
+
+.. code-block:: c#
+
+	using System;
+	using System.Text;
+	using System.Text.RegularExpressions;
+	using System.Threading;
+	using NUnit.Framework;
+	using Selenium;
+	
+	namespace SeleniumTests
+
+	{
+	    [TestFixture]
+
+	    public class NewTest
+
+	    {
+		private ISelenium selenium;
+
+		private StringBuilder verificationErrors;
+
+		[SetUp]
+
+		public void SetupTest()
+
+		{
+		    selenium = new DefaultSelenium("localhost", 4444, "*iehta",
+		    "http://www.google.com/");
+
+		    selenium.Start();
+
+		    verificationErrors = new StringBuilder();
+		}
+
+		[TearDown]
+
+		public void TeardownTest()
+		{
+		    try
+		    {
+			selenium.Stop();
+		    }
+
+		    catch (Exception)
+		    {
+			// Ignore errors if unable to close the browser
+		    }
+
+		    Assert.AreEqual("", verificationErrors.ToString());
+		}
+		[Test]
+
+		public void TheNewTest()
+		{
+		    // Open Google search engine.		
+		    selenium.Open("http://www.google.com/"); 
+		    
+		    // Assert Title of page.
+		    Assert.AreEqual("Google", selenium.GetTitle());
+		    
+		    // Provide search term as "Selenium OpenQA"
+		    selenium.Type("q", "Selenium OpenQA");
+		    
+		    // Read the keyed search term and assert it.
+		    Assert.AreEqual("Selenium OpenQA", selenium.GetValue("q"));
+		    
+		    // Click on Search button.
+		    selenium.Click("btnG");
+		    
+		    // Wait for page to load.
+		    selenium.WaitForPageToLoad("5000");
+		    
+		    // Assert that "www.openqa.org" is available in search results.
+		    Assert.IsTrue(selenium.IsTextPresent("www.openqa.org"));
+		    
+		    // Assert that page title is - "Selenium OpenQA - Google Search"
+		    Assert.AreEqual("Selenium OpenQA - Google Search", 
+		    		     selenium.GetTitle());
+		}
+	    }
+	}
+
+
 Java
 ++++
 
