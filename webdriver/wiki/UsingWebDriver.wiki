@@ -36,7 +36,7 @@ Unpack the ZIP and copy all the jar files on to your project's classpath. The Fi
     <dependency>
         <groupId>org.openqa.selenium.webdriver</groupId>
         <artifactId>webdriver-htmlunit</artifactId>
-        <version>0.6.870</version>
+        <version>0.6.964</version>
     </dependency>
 }}}
 If you want to use the FirefoxDriver, you need to add the following dependency to your pom.xml:
@@ -44,7 +44,7 @@ If you want to use the FirefoxDriver, you need to add the following dependency t
     <dependency>
         <groupId>org.openqa.selenium.webdriver</groupId>
         <artifactId>webdriver-firefox</artifactId>
-        <version>0.6.870</version>
+        <version>0.6.964</version>
     </dependency>
 }}}
 If you want to use the InternetExplorerDriver, you need to add the following dependency to your pom.xml:
@@ -52,7 +52,7 @@ If you want to use the InternetExplorerDriver, you need to add the following dep
     <dependency>
         <groupId>org.openqa.selenium.webdriver</groupId>
         <artifactId>webdriver-ie</artifactId>
-        <version>0.6.870</version>
+        <version>0.6.964</version>
     </dependency>
 }}}
 If you want to use the SafariDriver, just add the following dependency to your pom.xml:
@@ -60,7 +60,7 @@ If you want to use the SafariDriver, just add the following dependency to your p
     <dependency>
         <groupId>org.openqa.selenium.webdriver</groupId>
         <artifactId>webdriver-safari</artifactId>
-        <version>0.6.870</version>
+        <version>0.6.964</version>
     </dependency>
 }}}
 And finally if you like to use any of our support classes you should add the following dependency to your pom.xml:
@@ -68,7 +68,7 @@ And finally if you like to use any of our support classes you should add the fol
     <dependency>
         <groupId>org.openqa.selenium.webdriver</groupId>
         <artifactId>webdriver-support</artifactId>
-        <version>0.6.870</version>
+        <version>0.6.964</version>
     </dependency>
 }}}
 That's it. 
