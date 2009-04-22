@@ -598,7 +598,7 @@ To Configure it with Visual do as Following.
 With This Visual Studio is ready for Selenium Test Cases.
 For a sample test case in C# look at `C# section`_ of Basic Tests Structure
 
-.. _`C# section`: http://seleniumhq.org/new_docs/05_selenium_rc.html#c/
+.. _`C# section`: `C#`_
   
 
 

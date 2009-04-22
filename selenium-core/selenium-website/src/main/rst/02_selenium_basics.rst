@@ -103,7 +103,9 @@ three "flavors": **Actions**, **Accessors** and **Assertions**.
   condition does not become true within the current timeout setting (see the 
   setTimeout action below). 
   
-.. Peter: setTimeout doesn't yet exist in this document. I'll assume it's going in the Commonly Used Selenium Commands section. Is there somewhere else this should link to?
+.. Peter: setTimeout doesn't yet exist in this document. I'll assume it's 
+   going in the Commonly Used Selenium Commands section. Is there somewhere
+   else this should link to?
 
 Script Syntax 
 ~~~~~~~~~~~~~~
