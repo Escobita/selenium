@@ -1150,7 +1150,9 @@ As you can see, the code has been triplicated to run the same steps 3 times.
 This doesn't look to efficient.
 
 By using a programming language, we can just iterate over a list and do the 
-search in the following way (the example has been written in python):
+search in the following way. 
+
+**In Python:**
 
 .. code-block:: python
 
@@ -1161,6 +1163,45 @@ search in the following way (the example has been written in python):
        sel.click("submit")
        sel.wait_for_page_to_load("30000")
        self.failUnless(sel.is_text_present("Selenium-" + tool))
+       
+**In Java:**       
+       
+.. code-block:: java    
+
+   // Collection of String values.	
+   String[] arr = {"IDE", "RC", "GRID"};	
+		
+   // Execute For loop for each String in 'arr' array.
+   for (String s:arr) {
+   	sel.open("/");
+  	sel.type("q", "selenium " +s);
+   	sel.click("submit");
+        sel.waitForPageToLoad("30000");
+        verifyTrue("Expected text: " +s+ " is missing on page."
+        , sel.isTextPresent("Selenium-" + s));
+   
+   }
+   
+**In C#:**   
+   
+.. code-block:: c#
+
+   // Collection of String values.	
+   String[] arr = {"IDE", "RC", "GRID"};	
+		
+   // Execute For loop for each String in 'arr' array.
+   foreach (String s in arr) {
+   	sel.open("/");
+  	sel.type("q", "selenium " +s);
+   	sel.click("submit");
+        sel.waitForPageToLoad("30000");
+        assertTrue("Expected text: " +s+ " is missing on page."
+        , sel.isTextPresent("Selenium-" + s));
+   
+   }
+
+
+			
 
 Data Driven Testing
 +++++++++++++++++++
@@ -1177,7 +1218,59 @@ language while it's impossible to do using Selenium-IDE.
 Error Handling
 ++++++++++++++
 
-.. TODO: Content!!!
+Most common errors encountered while running selenium test are
+the errors which pop up when corresponding element locator is not available
+on page. For ex.
+
+.. code-block:: java
+   
+   selenium.type("q", "selenium " +s);
+   
+If element 'q' happens to be unavailable on page then following exception is thrown -
+
+.. code-block:: java
+
+   com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
+
+A better approach would be to create custom methods for web application 
+controls and having these methods being available to test methods using Inheritance
+feature of Object Oriented Programming. A custom method for typing in text box 
+might look as following -
+
+.. code-block:: java
+   
+   public void typeAction(String elementLocator, String testData) {
+		
+		// If element is available on page then perform type operation.
+		if(selenium.isElementPresent(elementLocator)) {
+			
+			selenium.type(elementLocator, testData);			
+		
+		// Else log the error in test report.
+		
+		}  else {		
+			
+			Reporter.log("Element: " +elementLocator+ 
+			"is not available on page.");
+		}
+   }
+   
+
+*Above example is specific to java client driver which uses 'Reporter' 
+class of TestNG for logging. Using the same approach corresponding method 
+can be written in a variety of Selenium Client Drivers.*
+
+
+Instead of typing value directly using 'type' method of selenium, 
+'typeAction' method is called. Definition of 'typeAction' method
+makes sure that 'type' method of selenium is used only when
+corresponding element locator is available on page. Call to 
+typeAction method would be - 
+
+.. code-block:: java
+
+   typeAction("username", "MyUserName");
+
 
 Conditionals
 ++++++++++++
