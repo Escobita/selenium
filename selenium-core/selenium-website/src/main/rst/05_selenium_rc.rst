@@ -1290,13 +1290,79 @@ Data Base Validations
 +++++++++++++++++++++
 
 Off course, you can also do Data Base queries in your favorite scripting 
-language. Why not using them for some data validations on the application
+language. Why not using them for some data validations/retrieval on the application
 under test?
 
-If we had access to Google's databases, I guess this part would be easier to
-explain. But for now you'll have to conform with just the idea...
+Consider example of Registration process where in registered email address
+is to be retrieved from database. Specific cases of establishing DB connection 
+and retrieving data from DB would be -
 
-.. TODO: Do something here!!
+**In Java:**
+
+.. code-block:: java
+
+   // Load Microsoft SQL Server JDBC driver.   
+   Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+      
+   // Prepare connection url.
+   String url = "jdbc:sqlserver://192.168.1.180:1433;DatabaseName=TEST_DB";
+   
+   // Get connection to DB.
+   public static Connection con = 
+   DriverManager.getConnection(url, "username", "password");
+   
+   // Create statement object which would be used in writing DDL and DML 
+   // SQL statement.
+   public static Statement stmt = con.createStatement();
+   
+   // Send SQL SELECT statements to the database via the Statement.executeQuery
+   // method which returns the requested information as rows of data in a 
+   // ResultSet object.
+   
+   ResultSet result =  stmt.executeQuery
+   ("select top 1 email_address from user_register_table");
+   
+   // Fetch value of "email_address" from "result" object.
+   String emailaddress = result.getString("email_address");
+   
+   // Use the fetched value to login to application.
+   selenium.type("userid", emailaddress);
+   
+This is very simple example of of data retrieval from DB in Java.
+A more complex test could be to validate that inactive users are not able
+to login to application. Continuing with previous code 
+block it could be written as following -
+
+.. code-block:: java
+
+   ResultSet result = stmt.executeQuery
+   ("select email_address from usertable where user_activation = false");
+   
+   // Counter of number of inactive users.
+   int count = 0;
+   
+   // ResultSet is examined row by row using ResultSet.next() method.
+   while (result.next()) {
+    count++;
+    String emailaddress = result.getString("email_address");
+    selenium.type("userid", emailaddress);
+    selenium.click("login");
+    selenium.waitForPageToLoad();
+    verifyTryue("Exception message for invalid login is not thrown",
+    	selenium.isTextPresent("Invalid UserId"));
+   }
+   
+   // If count of invalid users is 0 then report it in test result.
+   if (count == 0) {
+   Reporter.log("There is no invalid use in db.");
+   
+   // Else report the count of users for whom invalid login was tested.
+   } else {
+    Reporter.log("Login invalidation was tested for: " +count+ " users.");
+   }
+   
+   
+
 
 Server Command Line options
 ---------------------------
