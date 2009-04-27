@@ -79,8 +79,8 @@ verifyPresent   Marketing Forcasts
 
 This would cause Selenium to search for, and verify, that the text string
 "Marketing Analysis" appears somewhere on the page currently being tested. Use
-this verifyTextPresent when only when you are interested only in the text 
-itself and that it is present on the page, but you are not concerned about 
+verifyTextPresent when only when interested in only the text 
+itself and only that it is present on the page.  Do not use this when you also need to test 
 where it occurs on the page. 
 
 verifyElementPresent
