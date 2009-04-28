@@ -1,7 +1,5 @@
 .. _chapter04-reference:
 
-*NOTE:  Paul is working on this chapter.  It's almost finished.  Needs proofreading, and adding some text to a couple of remaining subsections.*
-
 "Selenese" Selenium Commands 
 =============================
 Selenium commands, often called *selenese*, is the set of commands that runs 
@@ -86,18 +84,32 @@ where it occurs on the page.
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
  
-Use this when you must test for the presence of a specific UI element, rather then it's content.  
+Use this verification when you must test for the presence of a specific UI element, rather then it's content.  This verification does not check the text, it checks for the HTML tag.  For example, one common use is to check for an image. 
 
-   is what is important to the test.  Use this when the text itself is not 
-   relevent. This is also used to verify an image exists, or that a link exists.
+====================   ==================   ============
+verifyElementPresent   //div/p/img               
+====================   ==================   ============
    
-   
+This command verifies that an image, specified by the existance of an <img> HTML tag is present on the page, and that it follows a <div> tag and a <p> tag.  The second parameter is a *locator* for telling the Selenese command how to find the element.  Locators are explained in next section.  
+
+VerifyElementPresent can be used to check the existence of any HTML tag within the body (<BODY>) of the page. One can check existence of links, paragraphs, divisions <div>, etc.  Here's a couple more examples.  
+
+====================   ==============================   ============
+verifyElementPresent   //div/p 
+verifyElementPresent   //div/a               
+verifyElementPresent   id=Login
+verifyElementPresent   link=Go to Marketing Research               
+verifyElementPresent   //a[2]
+====================   ==============================   ============
+
+These examples illustrate the variety of ways a UI element may be tested.  Again, locators are explained in the next section.
+
+*NOTE:  The HTML header, <HEAD>, may also be 'testable'.  The author has not verified that at the time of writing.*
 
 verifyText
 ~~~~~~~~~~
  
-Use this when not only the text itself must be checked, but also it's
-   position on the page.
+Use _verifyText_ when, both, text and it's UI element must be tested.
 
 .. _locators-section:
 
