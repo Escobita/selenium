@@ -188,7 +188,7 @@ As a test suite starts in your favorite language, the following happens:
 .. TODO: I've got to update the image and the steps to include some of the 
    information that is missing (Server response to the libs, etc).
    
-.. TODO: Call for review on the Devs list once I finish this topic!!
+.. TODO: Call for review on the Devs list once I finish this topic!!!
 
 Relationship between Client libs and Selenese
 ---------------------------------------------
