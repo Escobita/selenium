@@ -57,98 +57,86 @@ Architecture Diagram
 
 Selenium-RC comes in two parts:
 
-.. Paul: hope you don't mind, I changed this to bullets from your numbers to 
-   make it agree with the earlier sections 
-
 * A server which automatically launches and kills browsers, and acts as a HTTP
   proxy for web requests from them. 
 * Client libraries for your favorite programming language, which communicate 
   with the server telling him what's next.
 
 The RC server bundles Selenium Core, and automatically injects it into the 
-browser withing the Application Under Test.
+browser within the Application Under Test.
 
-.. Paul: So that leads to questions....Does this mean when the server starts up,
-   it takes the Sel-Core javascript, inserts it into a spoofed URL, and opens 
-   the browser with that URL?  Where is the Sel-core code injected?  Into the 
-   AUT?  It can't because the AUT is on a server somewhere. So the Sel-Core is
-   injected straight into the browser and then the Sel-Core-Injected-Browser 
-   communicates with the AUT. Is this correct?
-
-.. Santi: Yes, from what I know that's right Paul.
-
-Here is a simplified architectural representation.... 
+Here is a simplified representation.... 
 
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-.. Paul: This diagram always leads me to more questions than answers. I'll 
-   admit though that it looks really nice. I think what's missing is 
-   a) where is the AUT?
-      Tarun: AUT can be conceived running in browser. 
-   b) Why is 'linux, Windows, Mac" listed just at the top, I don't think the OS
-   is relevant to the diagram but the AUT really is. 
-      Tarun: I guess it is to emphasize that tests could be run on multiple 
-      platforms
-   c)  I'd like to see some diagrams that include the messages going between 
-   the components. That will add a lot of understanding for people. Is that 
-   something we can do? If we don't have the info I'm sure we can get it from 
-   the other gurus (notice I said 'other gurus' ;-) )
-      Santi: I think we will have to re-do this diagram, I have in mind 
-      something that has the same content than the next diagram but with some 
-      corrections (the AUT passes through the proxy also) and with the pretty 
-      logos
-
 As you can see on the illustration, the client libraries communicate with the
-Server directly (using port 4444 by default) passing one by one the actions to 
-execute. Then the server passes this actions to the browser by injecting 
-Selenium-Core javascript commands as if they where part of the Application Under
-Test, which causes the browser to execute those actions.
+Server directly passing one by one the actions to execute. Then the server gives
+this orders to the browser by the use of Selenium-Core javascript commands.
 
-.. Santi: I changed the image a little and added the last paragraph, please let
-   me know if you think this is still confusing of the content is incorrect.
-   I also added the source xcf file in case you want to make changes to the 
-   image.
+The Server receives commands directly using simple HTTP GET/POST requests;
+that means that you can use any programming language that can make HTTP requests
+to automate Selenium tests on the browser.
 
-How Selenium Remote Control works 
-----------------------------------
+Proxy Injection vs. Hightened Privileges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Selenium Server communicates directly with the browser using AJAX 
-(XmlHttpRequest). You can send commands directly to the Server using simple 
-HTTP GET/POST requests; that means that you can use any programming language 
-that can make HTTP requests to automate Selenium tests on the browser. To 
-further ease this process, we provide wrapper objects for a number of 
-mainstream programming languages (.NET, Erlang, Java, Javascript, Perl, PHP, 
-Python and Ruby). 
+.. note:: This topic tries to explain the technical implementation behind 
+   Selenium-RC. It's not fundamental for a Selenium user to know this, but 
+   could be useful for understanding some of the problems you can find in the
+   future.
+   
+To understand in detail how Selenium-RC works  and why it uses proxy injection
+and hightened privilege modes you must first understand `the same origin policy`_.
+   
+The Same Origin Policy
+++++++++++++++++++++++
+The main restriction that Selenium's architecture has faced is the 
+Same Origin Policy. This security restriction is applied by every browser
+in the market and it's objective is to ensure that a site's content will never
+be accessible by a script from other site.
 
-.. Paul: Let's also emphasize that these 'wrapper objects'  are  APIs 
-   supporting the Selenium commands and are provided as libraries to that 
-   programming language
+If this were possible, a script placed on any website you open, would 
+be able to read information on your bank account if you had the account page
+opened on other tab. Which is also called XSS (Cross-site Scripting).
 
-Finally, the Selenium Server acts as a client-configured HTTP proxy, to stand 
-in between the browser and your website. This allows a Selenium-enabled browser
-to run JavaScript on arbitrary websites.
+To work under that policy. Selenium-Core (and it's javascript commands that
+make all the magic happen) must be placed in the same origin as the Application
+Under Test (same URL). This has been the way Selenium-Core was first
+used and implemented (by deploying Selenium-Core and the set of tests inside
+the application's server), but this was a requirement that not all the projects 
+could meet and Selenium Developers had to find an alternative that would allow 
+testers to use Selenium to test site where they didn't have the possibility to
+deploy their code. 
 
-.. Paul: I don't quite understand this. What exactly is a 'proxy'?  and what 
-   does 'client-configured' mean?  which client? I'm assuming the test 
-   application, but some may think of the browser as a 'client'. Can we expand 
-   this a bit with some simplified terminology? I'm thinking especially for the
-   new users, some who may not have a solid a technical background. 
-	  Santi: The proxy is a third person in the middle that passes the ball 
-	  between the two parts. In this case will act as a "web server" that 
-	  delivers the AUT to the browser, by doing this, the server hides the original
-	  URL and uses it's own (this allows us to put selenium Core in the same 
-	  location as the AUT without actually putting it).
-   Paul: What is "client-configured"? 
-      Santi: The client browser (firefox, IE, etc) is launched with a 
-	  configuration profile that has set localhost:4444 as the http proxy, this
-	  is why any http request that the browser does will pass through selenium
-	  server and the response will come from this server and not from the real
-	  server.
+.. note:: You can find additional information about this topic on wikipedia
+   pages about `Same Origin Policy`_ and XSS_. 
+
+.. _Same Origin Policy: http://en.wikipedia.org/wiki/Same_origin_policy
+.. _XSS: http://en.wikipedia.org/wiki/Cross-site_scripting
+
+Proxy Injection
++++++++++++++++
+The first method used to skip the `The Same Origin Policy`_ was Proxy Injection.
+In this method, the Selenium Server acts as a client-configured [1]_ **HTTP 
+proxy** [2]_, that stands in between the browser and the Application Under Test.
+After this, it is able to masks the whole AUT under a fictional URL (embedding
+Selenium-Core and the set of tests and delivering them as if they were coming
+from the same origin). 
+
+.. [1] The proxy is a third person in the middle that passes the ball 
+   between the two parts. In this case will act as a "web server" that 
+   delivers the AUT to the browser. Being a proxy, gives the capability
+   of "lying" about the AUT real URL.  
+   
+.. [2] The client browser (Firefox, IE, etc) is launched with a 
+   configuration profile that has set localhost:4444 as the HTTP proxy, this
+   is why any HTTP request that the browser does will pass through Selenium
+   server and the response will pass through it and not from the real server.
 
 Here is an architectural diagram. 
 
-.. Santi: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
+.. TODO: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
    the Browser....
 
 .. image:: images/chapt5_img02_Architecture_Diagram.png
@@ -156,31 +144,51 @@ Here is an architectural diagram.
 
 As a test suite starts in your favorite language, the following happens:
 
-1. The client/driver establishes a connection with the selenium-server.
-2. Selenium-Server launches a browser (or reuses an old one) with a URL that 
-   will load Selenium core web page.
-
-.. Paul: Where does that URL come from? 
-   Tarun: URL is one of the four parameters which is specified while creating 
-   the Defult Selenium object. Once the DefaultSelenium object is created then 
-   open method used to launch web application, here open method takes url as 
-   parameter and lunches the browser. Does this explanation help?
-
-3. Selenium-Core gets the first instruction from the client/driver (via the 
-   HTTP Proxy built into the Selenium-RC Server).
-
-.. Paul: Is the 'client/driver' the test program?
-   Tarun: No it's the language in which selenium tests are written
-
+1. The client/driver establishes a connection with the selenium-RC server.
+2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
+   will load Selenium-Core in the web page.
+3. Selenium-RC gets the first instruction from the client/driver (via another 
+   HTTP request made to the Selenium-RC Server).
 4. Selenim-Core acts on that first instruction, typically opening a page of the
-   AUT. 
-5. The web server is asked for that page, and it renders in the frame/window 
-   reserved for it. 
+   AUT.
+5. The server is asked for that page, and it renders in the frame/window 
+   reserved for it.
+   
+.. TODO: I've got to update the image and the steps to include some of the 
+   information that is missing (Server response to the libs, AUT passing through 
+   the server, etc).
+   
+Hightened Privileges Browsers
++++++++++++++++++++++++++++++
+This workflow on this method is very similar to Proxy Injection but the main
+difference is that the browsers are launched in a special mode called *Hightened
+Privileges*, which allows websites to do things that are not commonly permitted
+(as doing XSS_, or filling file upload inputs and pretty useful stuff for 
+Selenium). By using this browser modes, Selenium Core is able to directly open
+the AUT and read/interact with it's content without having to pass the whole AUT
+through the Selenium-RC server.
 
-.. Paul: In spite of my many questions, I still think this is a really good 
-   start!
-   Santi: I will create a new diagram that will simplify this and add some 
-   eyecandy.
+Here is the architectural diagram. 
+
+.. image:: images/chapt5_img02_Architecture_Diagram.png
+   :align: center
+
+As a test suite starts in your favorite language, the following happens:
+
+1. The client/driver establishes a connection with the Selenium-RC server.
+2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
+   will load Selenium-Core in the web page.
+3. Selenium-RC gets the first instruction from the client/driver (via another 
+   HTTP request made to the Selenium-RC Server).
+4. Selenim-Core acts on that first instruction, typically opening a page of the
+   AUT.
+5. The server is asked for that page, and it renders in the frame/window 
+   reserved for it.
+   
+.. TODO: I've got to update the image and the steps to include some of the 
+   information that is missing (Server response to the libs, etc).
+   
+.. TODO: Call for review on the Devs list once I finish this topic!!
 
 Relationship between Client libs and Selenese
 ---------------------------------------------
