@@ -48,8 +48,8 @@ by using language specific libraries. These would be explained in details in the
    extensions to Selenium-IDE but most prefer to use Selenium-RC to gain all the
    flexibility of a programming language.
 
-Architecture Diagram
---------------------
+How Selenium Remote Control works
+----------------------------------
 
 .. Paul: I initiated a couple of forum posts that can shed some light here. 
    Some of the content in those posts can serve as descriptive info for us.
@@ -215,8 +215,8 @@ Installation
 
 Once you dowload the whole Selenium-RC zip file from the `downloads page`_ you
 will notice that it has lots of subfolders inside. As you already know from
-the `Architecture Diagram`_, this folders have all the subparts that integrates
-the RC.
+the `How Selenium Remote Control Works`_, this folders have all the subparts
+that integrates the RC.
 
 Once you've chosen a language to work with, you'll only need to install the 
 server and the client driver you need.
