@@ -104,12 +104,17 @@ verifyElementPresent   //a[2]
 
 These examples illustrate the variety of ways a UI element may be tested.  Again, locators are explained in the next section.
 
-*NOTE:  The HTML header, <HEAD>, may also be 'testable'.  The author has not verified that at the time of writing.*
+*NOTE:  At the time of writing the author did not research whether elements within the HTML header, <HEAD>, are also 'testable'.*
 
 verifyText
 ~~~~~~~~~~
  
-Use _verifyText_ when, both, text and it's UI element must be tested.
+Use _verifyText_ when both the text and it's UI element must be tested.  VerifyText must use a locator.  Depending on the locator used(an *xpath* or DOM locator) one can verify that specific text appears at a specific location on the page relative to other UI components on the page which contain it.
+
+==========   ===================    ===================================================================
+verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the div inside the table.
+==========   ===================    ===================================================================
+
 
 .. _locators-section:
 
@@ -381,12 +386,14 @@ Order of Locators Evaluation
 *This section still needs to be developed.  Please refer to the Selenium 
 Command Reference on the SeleniumHq.org website.*
 
-The Patterns' syntax
---------------------
+Matching Text Patterns
+----------------------
+Another topic, almost as important as locating UI elements, is understanding how to match text patterns on the page.  There are multiple ways this can be done.
+
 .. regexp: vs. glob: vs. exact: patterns
 
-*This section still needs to be developed.  Please refer to the Selenium 
-Command Reference on the SeleniumHq.org website.*
+*This section is not yet developed.  Please refer to the Selenium Reference at www.SeleniumHQ.org*
+
  
 The "AndWait" commands 
 ----------------------
@@ -429,48 +436,71 @@ lacking). If this is your case, consider a Javascript snippet.  However, this
 will not handle iteration. So, for example, if your test needs to iterate 
 through a variable-lenght result-set of values, you will need Selenium-RC.
 
-   
-Adding Progress Info to Your Script
------------------------------------
-   
- *echo* 
- 
-Useful for debugging a script.  Also very useful for documenting 
-   each section of a test and dumping that to an output log.  This can be 
-   very useful for identifying bugs when verifications in a script fail. I 
-   can come up with an example if you guys need me to.
-
  
 Store Commands and Selenium Variables
 -------------------------------------
  
-.. Paul: These are really valiable.  I use them to set constants at the top 
-   of my scripts.  Particularly username and password, but also various pre-
-   known properties that need to be validated as 'expected results' of a test.
-   That approach is also one step away from data-driven testing as these 
-   present variable values can then be easily edited in Sel-RC to take values 
-   passed by a test app from the command line or a file read into the app.
+For instance, one can use Selenium variables to store constants at the beginning of a script.  Also, when combined with a data-driven test design (discussed in a later section) Selenium variables can be used to store values passed to your test program from the command-line or from another program.
+ 
+The *store* is used to the most basic of the store commands and can be used to simply store a constant value in a selenium variable.  It takes two parameters, the text value to be stored and a selenium variable.  Use the standard variable naming conventions of only alphanumeric characters when choosing a name for your variable.
 
-store 
-~~~~~
+=====   ===============   ========
+store   paul@mysite.org	  userName               
+=====   ===============   ========
 
-storeText 
-~~~~~~~~~
+Later in your script of course you'll want to use the stored values of your variable.  To cause a variable to return it's value enclose the variable in curly brackets ({}) and precede it with a dollar sign like this.
+
+==========  =======     ===========
+verifyText  //div/p     ${userName}               
+==========  =======     ===========
+
+A common use of variables is for storing input for an input field.
+
+====    ========     ===========
+type	id=login	 ${userName}               
+====    ========     ===========
+
+Selenium variables can be used in either the first or second parameter and are interpreted by Selenium prior to any other operations performed by the command.  A Selenium variable may also even be used from within a locator expression.
+
+An equivalent store command corresponds to each verify command and assert command.  Here are a couple more commonly used store commands.
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
 
+This corresponds to verifyElementPresent.  It simply stores a boolean value, "true" or "false" depending on whether the UI element is found.
+
+storeText 
+~~~~~~~~~
+
+StoreText corresponds to verifyText.  It uses a locater to identify specific page text.  The text, if found, is stored in the variable.  StoreText can be used to extract text from the page being tested.
+
+
 storeEval 
 ~~~~~~~~~
+
+This command takes an expression, generally a javascript expression as its first parameter.  Embedding javascript within Selenese is in the next section.  StoreEval allows the test to store the expression's result within a variable.
+
 
 Javascript Expression as a Parameter 
 ------------------------------------
 
-.. Paul: Whoops, we need a section on Patterns for matching text, and 
-   particularly should mention RegExp's
+*This section is not yet developed.*
+
+
+*echo* - The Selenese Print Command
+-----------------------------------
+Selenese has a simple command that allows you to print text to your test's output.  This is useful for providing informational progress notes in your test which display on the console as your test is running.  They also can be used to provide context within your test result reports, which can be useful for finding where a defect exists on a page in the event your test finds a problem.  Finally, echo statements can be used to print the contents of Selenium variables.
+
+=====   ========================   ========
+echo    Testing page footer now.	
+echo    Username is ${userName}                 
+=====   ========================   ========
+
 
 Alerts, Popups, and Multiple Windows
 ------------------------------------
+
+*This section is not yet developed.*
 
 .. Paul: This is an important area, people are constantly asking about this 
    on the forums.
@@ -481,7 +511,7 @@ AJAX and waitFor commands
 Many applications use AJAX for dynamic and animated functionality making testing of Ajax behavior often
 a basic testing requirement.
 
-.. note:: This section is not yet developed.
+*This section is not yet developed.*
 
 
 
