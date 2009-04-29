@@ -538,6 +538,10 @@ dl.glossary dt {
     font-size: 1.1em;
 }
 
+dl.docutils dt {
+    font-weight: bold;
+}
+
 th {
     text-align: left;
     padding-right: 5px;

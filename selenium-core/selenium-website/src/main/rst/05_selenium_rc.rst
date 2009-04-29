@@ -213,9 +213,9 @@ Relationship between Client libs and Selenese
 Installation
 ------------
 
-Once you dowload the whole Selenium-RC zip file from the `downloads page`_ you
-will notice that it has lots of subfolders inside. As you already know from
-the `How Selenium Remote Control Works`_, this folders have all the subparts
+Once you download the whole Selenium-RC zip file from the `downloads page`_ you
+will notice that it has lots of sub-folders inside. As you already know from
+the `How Selenium Remote Control Works`_, this folders have all the sub-parts
 that integrates the RC.
 
 Once you've chosen a language to work with, you'll only need to install the 
