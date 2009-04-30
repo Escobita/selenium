@@ -9,7 +9,7 @@ your web-application when using Selenium.
 
 
 Verifying Page Elements
------------------------------------
+------------------------
 Verifying *UI elements* on a web-page is probably the most common feature of 
 your automated tests.  Selenese allows multiple ways of checking for UI 
 elements.  It is important that you understand these different methods because
@@ -31,7 +31,6 @@ specific image file) exists *somewhere on the page*.
    
 Assertion or Verification? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Choosing between **assert** and **verify** comes down to convenience and 
 management of failures. There's very little point checking that the first 
 paragraph on the page is the correct if your test has already failed when 
@@ -83,16 +82,23 @@ where it occurs on the page.
 
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
- 
-Use this verification when you must test for the presence of a specific UI element, rather then it's content.  This verification does not check the text, it checks for the HTML tag.  For example, one common use is to check for an image. 
+Use this verification when you must test for the presence of a specific UI 
+element, rather then it's content.  This verification does not check the text
+, it checks for the HTML tag.  For example, one common use is to check for an 
+image. 
 
 ====================   ==================   ============
 verifyElementPresent   //div/p/img               
 ====================   ==================   ============
    
-This command verifies that an image, specified by the existance of an <img> HTML tag is present on the page, and that it follows a <div> tag and a <p> tag.  The second parameter is a *locator* for telling the Selenese command how to find the element.  Locators are explained in next section.  
+This command verifies that an image, specified by the existance of an <img> 
+HTML tag is present on the page, and that it follows a <div> tag and a <p> tag.
+The second parameter is a *locator* for telling the Selenese command how to 
+find the element.  Locators are explained in next section.  
 
-VerifyElementPresent can be used to check the existence of any HTML tag within the body (<BODY>) of the page. One can check existence of links, paragraphs, divisions <div>, etc.  Here's a couple more examples.  
+VerifyElementPresent can be used to check the existence of any HTML tag 
+within the body (<BODY>) of the page. One can check existence of links, 
+paragraphs, divisions <div>, etc.  Here's a couple more examples.  
 
 ====================   ==============================   ============
 verifyElementPresent   //div/p 
@@ -102,14 +108,19 @@ verifyElementPresent   link=Go to Marketing Research
 verifyElementPresent   //a[2]
 ====================   ==============================   ============
 
-These examples illustrate the variety of ways a UI element may be tested.  Again, locators are explained in the next section.
+These examples illustrate the variety of ways a UI element may be tested.  
+Again, locators are explained in the next section.
 
-*NOTE:  At the time of writing the author did not research whether elements within the HTML header, <HEAD>, are also 'testable'.*
+.. note::  At the time of writing the author did not research whether 
+   elements within the HTML header, <HEAD>, are also 'testable'.
 
 verifyText
 ~~~~~~~~~~
  
-Use _verifyText_ when both the text and it's UI element must be tested.  VerifyText must use a locator.  Depending on the locator used(an *xpath* or DOM locator) one can verify that specific text appears at a specific location on the page relative to other UI components on the page which contain it.
+Use _verifyText_ when both the text and it's UI element must be tested.
+VerifyText must use a locator.  Depending on the locator used (an *xpath* or DOM
+locator) one can verify that specific text appears at a specific location on the
+page relative to other UI components on the page which contain it.
 
 ==========   ===================    ===================================================================
 verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the div inside the table.
@@ -120,7 +131,6 @@ verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the 
 
 Locating Elements 
 -----------------
-
 For many Selenium commands a target is required. This target identifies an 
 element in the content of the web application, and consists of the location 
 strategy followed by the location in the format ``locatorType=location``. The 
@@ -388,11 +398,13 @@ Command Reference on the SeleniumHq.org website.*
 
 Matching Text Patterns
 ----------------------
-Another topic, almost as important as locating UI elements, is understanding how to match text patterns on the page.  There are multiple ways this can be done.
+Another topic, almost as important as locating UI elements, is understanding 
+how to match text patterns on the page.  There are multiple ways this can be done.
 
 .. regexp: vs. glob: vs. exact: patterns
 
-*This section is not yet developed.  Please refer to the Selenium Reference at www.SeleniumHQ.org*
+*This section is not yet developed.  Please refer to the Selenium Reference 
+at www.SeleniumHQ.org*
 
  
 The "AndWait" commands 
@@ -439,16 +451,24 @@ through a variable-lenght result-set of values, you will need Selenium-RC.
  
 Store Commands and Selenium Variables
 -------------------------------------
+For instance, one can use Selenium variables to store constants at the 
+beginning of a script.  Also, when combined with a data-driven test design 
+(discussed in a later section) Selenium variables can be used to store values 
+passed to your test program from the command-line or from another program.
  
-For instance, one can use Selenium variables to store constants at the beginning of a script.  Also, when combined with a data-driven test design (discussed in a later section) Selenium variables can be used to store values passed to your test program from the command-line or from another program.
- 
-The *store* is used to the most basic of the store commands and can be used to simply store a constant value in a selenium variable.  It takes two parameters, the text value to be stored and a selenium variable.  Use the standard variable naming conventions of only alphanumeric characters when choosing a name for your variable.
+The *store* is used to the most basic of the store commands and can be used 
+to simply store a constant value in a selenium variable.  It takes two 
+parameters, the text value to be stored and a selenium variable.  Use the 
+standard variable naming conventions of only alphanumeric characters when 
+choosing a name for your variable.
 
 =====   ===============   ========
 store   paul@mysite.org	  userName               
 =====   ===============   ========
 
-Later in your script of course you'll want to use the stored values of your variable.  To cause a variable to return it's value enclose the variable in curly brackets ({}) and precede it with a dollar sign like this.
+Later in your script of course you'll want to use the stored values of your 
+variable.  To cause a variable to return it's value enclose the variable in 
+curly brackets ({}) and precede it with a dollar sign like this.
 
 ==========  =======     ===========
 verifyText  //div/p     ${userName}               
@@ -466,30 +486,37 @@ An equivalent store command corresponds to each verify command and assert comman
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
-
-This corresponds to verifyElementPresent.  It simply stores a boolean value, "true" or "false" depending on whether the UI element is found.
+This corresponds to verifyElementPresent.  It simply stores a boolean value, 
+"true" or "false" depending on whether the UI element is found.
 
 storeText 
 ~~~~~~~~~
-
-StoreText corresponds to verifyText.  It uses a locater to identify specific page text.  The text, if found, is stored in the variable.  StoreText can be used to extract text from the page being tested.
+StoreText corresponds to verifyText.  It uses a locater to identify specific 
+page text.  The text, if found, is stored in the variable.  StoreText can be 
+used to extract text from the page being tested.
 
 
 storeEval 
 ~~~~~~~~~
+This command takes an expression, generally a javascript expression as its 
+first parameter.  Embedding javascript within Selenese is in the next section.
+StoreEval allows the test to store the expression's result within a variable.
 
-This command takes an expression, generally a javascript expression as its first parameter.  Embedding javascript within Selenese is in the next section.  StoreEval allows the test to store the expression's result within a variable.
 
-
-Javascript Expression as a Parameter 
-------------------------------------
-
+Javascript Expressions as a Parameter 
+-------------------------------------
 *This section is not yet developed.*
 
 
 *echo* - The Selenese Print Command
------------------------------------
-Selenese has a simple command that allows you to print text to your test's output.  This is useful for providing informational progress notes in your test which display on the console as your test is running.  They also can be used to provide context within your test result reports, which can be useful for finding where a defect exists on a page in the event your test finds a problem.  Finally, echo statements can be used to print the contents of Selenium variables.
+------------------------------------
+Selenese has a simple command that allows you to print text to your test's 
+output.  This is useful for providing informational progress notes in your 
+test which display on the console as your test is running.  They also can be 
+used to provide context within your test result reports, which can be useful 
+for finding where a defect exists on a page in the event your test finds a 
+problem.  Finally, echo statements can be used to print the contents of 
+Selenium variables.
 
 =====   ========================   ========
 echo    Testing page footer now.	
@@ -499,7 +526,6 @@ echo    Username is ${userName}
 
 Alerts, Popups, and Multiple Windows
 ------------------------------------
-
 *This section is not yet developed.*
 
 .. Paul: This is an important area, people are constantly asking about this 
@@ -507,11 +533,7 @@ Alerts, Popups, and Multiple Windows
 
 AJAX and waitFor commands
 -------------------------
-
-Many applications use AJAX for dynamic and animated functionality making testing of Ajax behavior often
-a basic testing requirement.
+Many applications use AJAX for dynamic and animated functionality making 
+testing of Ajax behavior often a basic testing requirement.
 
 *This section is not yet developed.*
-
-
-

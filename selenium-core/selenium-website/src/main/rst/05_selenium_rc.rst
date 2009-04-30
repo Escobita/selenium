@@ -8,20 +8,15 @@
 
 When to Use Selenium-RC?
 ------------------------
-
 Selenium-RC is the response for tests that need a little more than just simple
 browser actions and a linear execution. Selenium-RC allows the users to use the 
 full power of programming languages, creating tests that can do things like read
 and write external files, make queries to a Data Base, send emails with test 
 reports, practically anything a user can do with a normal application.
 
-You can see some examples of this in the `Sample Test Scripts`_ section, where
-we will explain how to develop complex tests and leverage the power of a real
-programming language on them.
-
-.. TODO: The content of sample test scripts section is not what is described
-   here. For now I'm just explaining simple code on them.
-   I'll try to add a last subsection like "Adding spice to your tests".
+You can see some examples of this in the `Adding Some Spice to Your Tests`_ section, where
+you'll find some examples that demontrate the advantages of using all the power
+of a real programming language for your tests.
 
 Basically, you will need to use Selenium-RC whenever your test requires logic
 not supported by running a script from Selenium-IDE. What sort of logic could 
@@ -37,16 +32,12 @@ this be? For example, Selenium-IDE does not directly support:
 * test case dependency
 * capture screenshots on test failures
 
-Though most of these are not supported by selenium inherently but can be achieved
-by using language specific libraries. These would be explained in details in the
-`Sample Test Scripts`_ section. 
-
-.. Santi: I'm not sure if we'll be able to explain EVERY pont of these on that 
-   section, some of them may even have a separate section.
+Though these are not supported by selenium inherently all of them can be achieved
+by using language specific libraries.
 
 .. note:: It may be possible to add this functionality by the addition of user 
-   extensions to Selenium-IDE but most prefer to use Selenium-RC to gain all the
-   flexibility of a programming language.
+   extensions to Selenium-IDE but most prefer to use Selenium-RC as it's already
+   bundled in any programming language.
 
 How Selenium Remote Control works
 ----------------------------------
@@ -80,7 +71,6 @@ to automate Selenium tests on the browser.
 
 Proxy Injection vs. Hightened Privileges
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. note:: This topic tries to explain the technical implementation behind 
    Selenium-RC. It's not fundamental for a Selenium user to know this, but 
    could be useful for understanding some of the problems you can find in the
@@ -191,8 +181,7 @@ As a test suite starts in your favorite language, the following happens:
 .. TODO: Call for review on the Devs list once I finish this topic!!!
 
 Relationship between Client libs and Selenese
----------------------------------------------
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. TODO: Mary Ann pointed out this and I think is very important:
    Info about the individual language APIs for RC being "wrappers" for the
    Selenese commands covered in the chapter.  We need to make clear that
@@ -212,7 +201,6 @@ Relationship between Client libs and Selenese
 
 Installation
 ------------
-
 Once you download the whole Selenium-RC zip file from the `downloads page`_ you
 will notice that it has lots of sub-folders inside. As you already know from
 the `How Selenium Remote Control Works`_, this folders have all the sub-parts
@@ -223,7 +211,6 @@ server and the client driver you need.
 
 Selenium server installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 The Selenium-RC server is just a jar file, which doesn't need installation at
 all. Just be downloading the zip file and extracting the server in the desired
 directory should be enough. You just go to that directory and execute it using
@@ -238,7 +225,6 @@ desktop and just double-click on it anytime you want to wake up the server.
 
 Java client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. Santi: I found this link and thought it could be useful:
    http://epyramid.wordpress.com/2008/11/26/setting-up-selenium-rc-testng-using-eclipse/
 
@@ -266,7 +252,6 @@ These points have been delineated below with reference to Eclipse and IntelliJ:
 
 Configuring Selenium-RC With Eclipse
 ++++++++++++++++++++++++++++++++++++
-
 **Eclipse** is a multi-language software development platform comprising an IDE 
 and a plug-in system to extend it. It is written primarily in Java and is used 
 to develop applications in this language and, by means of the various plug-ins, 
@@ -379,7 +364,6 @@ Added libraries would appear in Package Explorer as following:
 
 Configuring Selenium-RC With Intellij
 +++++++++++++++++++++++++++++++++++++
-
 **IntelliJ IDEA** is a commercial Java IDE by the company JetBrains. Intellij 
 provides a set of integrated refactoring tools that allow programmers to 
 quickly redesign their code. IntelliJ IDEA provides close integration with 
@@ -500,7 +484,6 @@ It should not be very different for higher version of intelliJ.
 
 Python Client Driver Configuration 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 The following steps describe the basic installation procedure. After following 
 this, the user can start using the desired IDE, (even write tests in a text 
 processor and run them from command line!) without any extra work (at least 
@@ -562,7 +545,6 @@ selenium and start interacting with the browsers.
 
 .NET client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .NET client Driver can be used with Microsoft Visual Studio. 
 To Configure it with Visual do as Following.
 
@@ -608,11 +590,8 @@ For a sample test case in C# look at `C# section`_ of Basic Tests Structure
 
 .. _`C# section`: `C#`_
   
-
-
 Sample Test Scripts
 -------------------
-
 If we use the following test recorded with Selenium-IDE as a base:
 
 .. _search example:
@@ -921,7 +900,6 @@ like NUnit or the Visual Studio 2005 Team System.
 
 Java
 ++++
-
 For java, we use a wrapper_ of the basic Junit test case. With it, you'll save
 many lines of code by just writing the basic part and letting the wrapper do
 all the rest.
@@ -968,7 +946,6 @@ PHP
 
 Python
 ++++++
-
 We use pyunit testing framework (the unittest module) for our tests, you should
 understand how this works to better understand how to write your tests.
 To completely understand pyunit, you should read it's `official documentation
@@ -1025,6 +1002,7 @@ The basic test structure is:
 
 Ruby
 ++++
+
 
 Starting The Browser 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1105,7 +1083,6 @@ it's *start* method.
 
 Running Commands 
 ~~~~~~~~~~~~~~~~
-
 Once you have the browser initialized and assigned to a variable (generally
 named selenium) you can make it run commands by calling the respective 
 methods from the selenium browser. For example, when you call the *type* method
@@ -1122,7 +1099,7 @@ Retrieving and Reporting Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adding Some Spice to Your Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
 only with the IDE. We will try to give you some guidance on things that can 
@@ -1132,7 +1109,6 @@ idea and will be able to translate it to the language of your choice.
 
 Iteration
 +++++++++
-
 Iteration is one of the most common things people needs to do in their tests.
 Generally, to repeat a simple search, or saving you from duplicating the same
 code several times.
@@ -1209,11 +1185,8 @@ search in the following way.
    }
 
 
-			
-
 Data Driven Testing
 +++++++++++++++++++
-
 So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
 search and assert it's existence.
@@ -1225,7 +1198,6 @@ language while it's impossible to do using Selenium-IDE.
 
 Error Handling
 ++++++++++++++
-
 Most common errors encountered while running selenium test are
 the errors which pop up when corresponding element locator is not available
 on page. For ex.
@@ -1282,7 +1254,6 @@ typeAction method would be -
 
 Conditionals
 ++++++++++++
-
 Well, the iteration and data input seem nice, but we've just started. How
 about alternative paths? What if we want our script to change to the next
 page if it finds that the search term was not present in the first one?
@@ -1296,7 +1267,6 @@ the possibilities!
 
 Data Base Validations
 +++++++++++++++++++++
-
 Off course, you can also do Data Base queries in your favorite scripting 
 language. Why not using them for some data validations/retrieval on the application
 under test?
@@ -1339,7 +1309,7 @@ and retrieving data from DB would be -
 This is very simple example of of data retrieval from DB in Java.
 A more complex test could be to validate that inactive users are not able
 to login to application. Continuing with previous code 
-block it could be written as following -
+block it could be written as follows:
 
 .. code-block:: java
 
@@ -1375,11 +1345,7 @@ block it could be written as following -
 Server Command Line options
 ---------------------------
 
-.. Paul: Can we put some info in here about how/when a user would use some of 
-   these features?  Some, like the port, should be obvious. But let's see if
-   we can think of some examples. 
-   Like.....Why would I ever want -singleWindow?  This is a great section 
-   though. I didn't even know about this until about 2 weeks ago.
+This is the help text given by Selenium Server if you use the ``-h`` parameter.
 
 Usage:
 
@@ -1407,11 +1373,6 @@ Options:
 -profilesLocation
     Specifies the directory that holds the profiles that java clients can use 
     to start up selenium. Currently supported for Firefox only.
-	
-.. Paul: Is 'java client' the right word here?  It's the browser that uses the 
-   profile right?
-
-.. Paul: Is this different from -firefoxProfileTemplate?
 
 -forcedBrowserMode
     <browser>
@@ -1493,9 +1454,6 @@ Options:
         "https" strings in the HTML of the test application will be changed to 
         be "http". 
 
-.. Paul: We'll probably need a whole section explaining proxyInjectionMode that
-   includes when, and why, someone might use it.
-
 We also support two Java system properties: -Dhttp.proxyHost and -Dhttp.\
 proxyPort. Selenium-RC normally overrides your proxy server configuration, using
 the Selenium Server as a proxy. Use these options if you need to use your own 
@@ -1514,113 +1472,9 @@ proxyPort:
 
    $ java -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=1234 -Dhttp.proxyUser=joe -Dhttp.proxyPassword=example -jar selenium-server.jar
 
-Howto correctly use your Verify commands in Selenium-RC 
--------------------------------------------------------
 
-.. Santi: I'll put some info from 
-   http://clearspace.openqa.org/message/56908#56908 (we should write an example
-   for all the languages...)
-
-Run Selenese test on multiple browsers using the RC
-----------------------------------------------------
-
-.. Santi: This was recommended by Mary Ann:
-   --Info about using Selenium RC to run tests generated by Selenium IDE, via
-   the -htmlSuite option.  I consider this to be "Step 2" in the average
-   person's path to Selenium-awareness!  A *lot* of new users want to know
-   how to run their SIDE tests against different browsers; we need to tell
-   them early on (before they write to the forum to ask!).
-
-.. The content should be an updated version of the one from:
-   http://seleniumhq.org/projects/remote-control/languages/selenese.html
-   
-Paul's part
------------
-
-Selenium-IDE Generated Code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. Santi: I'm writing something similar in the Sample Test Scripts section
-
-Starting the Browser 
-~~~~~~~~~~~~~~~~~~~~
-
-Specify the Host and Port::
-
-   localhost:4444 
-
-.. Santi: Which is the supposed content of this topic?
-
-The Selenium-RC Program's Main() 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. Santi: What's this topic? Is it related with the Tests sctructure chapter?
-
-Handling HTTPS and Security Popups 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Many applications will switch from using HTTP to HTTPS when they need to send 
-encrypted information such as passwords or credit card information. This is 
-common with many of today's web applications. Selenium-RC supports this. 
-
-To ensure the HTTPS site is genuine, the browser will need a security 
-certificate. Otherwise, when the Selenium code is inserted between the 
-browser and the application under test, the browser will recognize this as a 
-security violation. It will assume some other site is masquerading as your 
-application. When this occurs the browser displays security popups, and these 
-popups cannot be closed using Selenium-RC. 
-
-When dealing with HTTPS you must use a run mode that supports this and handles
-the security certificate for you. You specify the run mode when you test program
-initialized Selenium. 
-
-.. TODO: copy my C# code example here. 
-
-In Selenium-RC 1.0 beta 2 and later use \*firefox or \*iexplore for the run 
-mode. In earlier versions, including Selenium-RC 1.0 beta 1, use \*chrome or 
-\*iehta, for the run mode. Using these run modes, you will not need to install
-any special security certificates to prevent your browser's security warning 
-popups. 
-
-In Selenium 1.0 beta 2 and later, the run modes \*firefox or \*iexplore are 
-recommended. There are additional run modes of \*iexploreproxy and 
-\*firefoxproxy. These are provided only for backwards compatibility and 
-should not be used unless required by legacy test programs. Their use will 
-present limitations with security certificate handling and with the running 
-of multiple windows if your application opens additional browser windows. 
-
-In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
-supported HTTPS and the handling of security popups. These were ‘experimental
-modes in those versions but as of Selenium-RC 1.0 beta 2, these modes have now 
-become stable, and the \*firefox and \*iexplore run modes now translate into 
-the \*chrome and \*iehta modes. 
-
-Security Certificates Explained
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Normally, your browser will trust the application you are testing, most 
-likely by installing a security certificate which you already own. You can 
-check this in your browser's options or internet properties (if you don't 
-know your AUT's security certificate as you system administrator or lead 
-developer). When Selenium loads your browser it injects code to intercept 
-messages between the browser and the server. The browser now thinks 
-something is trying to look like your application, but really is not a 
-significant security risk. So, it responds by alerting you with popup messages. 
-
-Please, can someone verify that I explained certificates correctly?—this is 
-an area I'm not certain I understand well yet. 
-
-To get around this, Selenium-RC, (again when using a run mode that support 
-this) will install its own security certificate, temporarily, onto your 
-client machine in a place where the browser can access it. This tricks the 
-browser into thinking it's accessing a different site from your application 
-under test and effectively suppresses the security popups. 
-
-Another method that has been used with earlier versions of Selenium is to 
-install the Cybervillians security certificate provided with you selenium 
-installation. Most users should no longer need to do this, however, if you are
-running Selenium-RC in proxy injection mode, you may need to explicitly install this
-security certificate to avoid the security popups. 
+Now that you've see the whole picture, the most important and complex options
+will be explained.
 
 Multi-Window Mode
 ~~~~~~~~~~~~~~~~~
@@ -1656,22 +1510,8 @@ option:
  
    -singlewindow 
 
-Using the Browser While Selenium is Running 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You may want to use your browser at the same time that Selenium is also using 
-it. Perhaps you want to run some manual tests while Selenium is running your 
-automated tests and you wish to do this on the same machine. Or perhaps you just
-want to use your Facebook account but Selenium is running in the background. 
-This isn't a problem. 
-
-With Internet Explorer, you can simply start another browser instance and run 
-it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
-this also, but you must specify a separate profile. 
-
 Specifying a Separate Firefox Profile 
--------------------------------------
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Firefox will not run two instances simultaneously unless you specify a 
 separate profile for each instance. Later versions of Selenium-RC run in a 
 separate profile automatically, however, if you are using an older version of 
@@ -1710,9 +1550,59 @@ More information about firefox profiles in `Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
  
+Run Selenese test using -htmlSuite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To use the Selenium Server as a proxy, run your tests like this::
+
+   java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
+
+That will automatically launch your HTML suite, run all the tests and save a
+nice HTML colored report with the results.
+
+.. note::  After this command, the server will start the tests and wait for a
+   specified number of seconds for the test to complete; if the test doesn't 
+   complete within that amount of time, the command will exit with a non-zero 
+   exit code and no results file will be generated.
+
+Note that this command line is very long and very finicky... be careful when 
+you type it in. (You can use the -htmlSuite parameter with the ``-port`` and 
+``-timeout`` options, but it is incompatible with ``-interactive``; you can't 
+do both of those at once.) Also note that it requires you to pass in an HTML 
+Selenese suite, not a single test.
+
+Selenium-IDE Generated Code
+---------------------------
+.. Santi: I'm writing something similar in the Sample Test Scripts section
+
+Starting the Browser 
+--------------------
+Specify the Host and Port::
+
+   localhost:4444 
+
+.. Santi: Which is the supposed content of this topic?
+
+The Selenium-RC Program's Main() 
+--------------------------------
+.. Santi: What's this topic? Is it related with the Tests sctructure chapter?
+
+.. Santi: I don't see the last three sections very useful (maybe I didn't get
+   the idea).
+
+Using the Browser While Selenium is Running 
+-------------------------------------------
+You may want to use your browser at the same time that Selenium is also using 
+it. Perhaps you want to run some manual tests while Selenium is running your 
+automated tests and you wish to do this on the same machine. Or perhaps you just
+want to use your Facebook account but Selenium is running in the background. 
+This isn't a problem. 
+
+With Internet Explorer, you can simply start another browser instance and run 
+it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
+this also, but you must specify a separate profile. 
+
 Specifying the Path to a Specific Browser 
 -----------------------------------------
-
 You can specify to Selenium-RC a path to a specific browser. This is useful if 
 you have different versions of the same browser, and you wish to use a specific
 one. Also, this is used to allow your tests to run against a browser not 
@@ -1725,32 +1615,21 @@ For example
  
 .. Paul: Need an example here that works—the one I tried didn't 
 
-Reports Generation 
-------------------
-
-.. Paul: This is an important section because the generated code in both Java 
-   and C# does not give code for reporting errors, and for anyone who doesn't 
-   know try-catch statements they'll be really confused. We should give some 
-   sample code here. I'd really like to see what you guys are using as I'm 
-   only just starting out in this area--and haven't had time at work to do 
-   much here yet.
-
 Troubleshooting 
 ---------------
-
-.. Paul: Here's 3 other issues we had on our orig list of topics for this 
-   chapter. Shall we still develop these?
-
 .. Santi: must recheck if all the topics here: 
    http://seleniumhq.org/documentation/remote-control/troubleshooting.html
    are covered.
 
-Empty verify strings
-~~~~~~~~~~~~~~~~~~~~
+Howto correctly use your Verify commands in Selenium-RC 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you export your tests from Selenium-IDE, you may find yourself getting
+empty verify strings from your tests (depending on the programming language
+used).
 
-This issue has it's own section. Please go here_ for more information.
-
-.. _here: `Howto correctly use your Verify commands in Selenium-RC`_
+.. Santi: I'll put some info from 
+   http://clearspace.openqa.org/message/56908#56908 (we should write an example
+   for all the languages...)
 
 Safari and multiWindow mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1758,9 +1637,8 @@ Safari and multiWindow mode
    http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
    http://jira.openqa.org/browse/SEL-639
 
-Firefox and Linux 
-~~~~~~~~~~~~~~~~~
-
+Firefox on Linux 
+~~~~~~~~~~~~~~~~
 On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin" 
 directly, so if you are using a previous version, make sure that the real 
 executable is on the path. 
@@ -1789,7 +1667,6 @@ like this::
 
 IE and the style attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. Santi: When used in the XPATH, the keys in  @style should be uppercase to 
    work on IE, even if they are lowercase in the source code
 
@@ -1801,7 +1678,6 @@ IE and the style attributes
 
 Unable to Connect to Server 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 When your test program cannot connect to the Selenium Server, an exception 
 will be thrown in your test program. It should display this message or a 
 similar one::
@@ -1838,7 +1714,6 @@ This error seems to occur when Selenium-RC cannot load the browser.
 
 Selenium Starts but Cannot Find the AUT 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 If your test program starts Selenium successfully, but the browser window 
 cannot display the website you're testing, the most likely cause is your test 
 program is not using the correct URL. 
@@ -1850,7 +1725,6 @@ need to explicitly modify the URL in the generated code.
 
 Firefox refused shutdown while preparing a profile 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 This most often occurs when your run your Selenium-RC test program against Firefox,
 but you already have a Firefox browser session running, and, you didn't specify
 a separate profile when you started the Selenium Server. The error from the 
@@ -1876,11 +1750,77 @@ Here's the complete error msg from the server::
 
 To resolve this, see the section on `Specifying a Separate Firefox Profile`_
 
+Handling HTTPS and Security Popups 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Many applications will switch from using HTTP to HTTPS when they need to send 
+encrypted information such as passwords or credit card information. This is 
+common with many of today's web applications. Selenium-RC supports this. 
+
+To ensure the HTTPS site is genuine, the browser will need a security 
+certificate. Otherwise, when the Selenium code is inserted between the 
+browser and the application under test, the browser will recognize this as a 
+security violation. It will assume some other site is masquerading as your 
+application. When this occurs the browser displays security popups, and these 
+popups cannot be closed using Selenium-RC. 
+
+When dealing with HTTPS you must use a run mode that supports this and handles
+the security certificate for you. You specify the run mode when you test program
+initialized Selenium. 
+
+.. TODO: copy my C# code example here. 
+
+In Selenium-RC 1.0 beta 2 and later use \*firefox or \*iexplore for the run 
+mode. In earlier versions, including Selenium-RC 1.0 beta 1, use \*chrome or 
+\*iehta, for the run mode. Using these run modes, you will not need to install
+any special security certificates to prevent your browser's security warning 
+popups. 
+
+In Selenium 1.0 beta 2 and later, the run modes \*firefox or \*iexplore are 
+recommended. There are additional run modes of \*iexploreproxy and 
+\*firefoxproxy. These are provided only for backwards compatibility and 
+should not be used unless required by legacy test programs. Their use will 
+present limitations with security certificate handling and with the running 
+of multiple windows if your application opens additional browser windows. 
+
+In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
+supported HTTPS and the handling of security popups. These were ‘experimental
+modes in those versions but as of Selenium-RC 1.0 beta 2, these modes have now 
+become stable, and the \*firefox and \*iexplore run modes now translate into 
+the \*chrome and \*iehta modes. 
+
+Security Certificates Explained
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally, your browser will trust the application you are testing, most 
+likely by installing a security certificate which you already own. You can 
+check this in your browser's options or internet properties (if you don't 
+know your AUT's security certificate as you system administrator or lead 
+developer). When Selenium loads your browser it injects code to intercept 
+messages between the browser and the server. The browser now thinks 
+something is trying to look like your application, but really is not a 
+significant security risk. So, it responds by alerting you with popup messages. 
+
+.. Please, can someone verify that I explained certificates correctly?—this is 
+   an area I'm not certain I understand well yet. 
+
+To get around this, Selenium-RC, (again when using a run mode that support 
+this) will install its own security certificate, temporarily, onto your 
+client machine in a place where the browser can access it. This tricks the 
+browser into thinking it's accessing a different site from your application 
+under test and effectively suppresses the security popups. 
+
+Another method that has been used with earlier versions of Selenium is to 
+install the Cybervillians security certificate provided with you selenium 
+installation. Most users should no longer need to do this, however, if you are
+running Selenium-RC in proxy injection mode, you may need to explicitly install this
+security certificate to avoid the security popups. 
+
 Versioning Problems 
 ~~~~~~~~~~~~~~~~~~~
-
 Make sure your version of Selenium supports the version of your browser. For
 example, Selenium-RC 0.92 does not support Firefox 3. At times, you may be lucky
 (I was) in that it may still work. But regardless, don't forget to check which
 browser versions are supported by the version of Selenium you are using. When in
 doubt, use the latest release version of Selenium.
+
+.. Santi: Mary Ann sugested We should also mention about JRE version needed by
+   the server
