@@ -10,7 +10,7 @@ Introduction
 ------------
 
 The Selenium-IDE (Integrated Development Environment) is the tool you use to 
-develop your Selenium scripts.  Its an easy to use Firefox plug-in and is the 
+develop your Selenium scripts.  It's an easy-to-use Firefox plug-in and is 
 generally the most efficient way to develop test scripts.  It also contains a 
 context menu that allows you to first select a UI element from the browser's 
 currently displayed page and then select from a list of Selenium commands 
@@ -48,7 +48,7 @@ Opening the IDE
 
 To run the Selenium-IDE, simply select it from the Firefox Tools menu.  It opens 
 as follows with an empty script-editing window and a menu for loading, or 
-creating new, your scripts. 
+creating new scripts. 
   
 .. Darn!  I need to redo this.  No time now, gotta go!!!!
 
@@ -121,7 +121,7 @@ The Source tab displays the script in the native format in which the file
 will be stored.  By default this is HTML although it can be changed to a 
 programming language such as Java or C#, or a scripting language like Python.
 See the Options menu for details.  The Source view also allows one to edit 
-the script in it's raw form, including copy, cut and paste operations. 
+the script in its raw form, including copy, cut and paste operations. 
   
 The Command, Target, and Value entry fields display the currently selected 
 command along with its parameters (if any).  These are entry fields where you 
@@ -166,18 +166,18 @@ default.
 .. Peter: Should "Recorder" be capitalized here?
 
 The Recorder will automatically insert commands into your script based on 
-your mouse clicks.  Typically, this will include:
+your user actions.  Typically, this will include:
   
 * clicking a link - *click* or *clickAndWait* commands 
 * entering values - *type* command 
 * selecting options from a drop-down listbox - *select* command 
-* click checkboxes or radio buttons - *click* command 
+* clicking checkboxes or radio buttons - *click* command 
   
-Here's some "gotchas" to be aware of:
+Here are some "gotchas" to be aware of:
   
 * The *type* command may require clicking on some other area of the web page 
   for it to record. 
-* Following a link usually records a *click* commands. You will often need to 
+* Following a link usually records a *click* command. You will often need to 
   change this to *clickAndWait* to ensure your script pauses until the new page 
   is completely loaded.  Otherwise, your script will continue running commands
   before the page has loaded all its UI elements. This will cause unexpected 
@@ -231,8 +231,8 @@ Editing
 Insert Command 
 ++++++++++++++
 
-Select the point in your script where you want to insert the command.  Right-
-click and select Insert Command.  Now use the command editing text fields to 
+Select the point in your script where you want to insert the command.  
+Right-click and select Insert Command.  Now use the command editing text fields to 
 enter your new command and its parameters. 
   
 Insert Comment 
@@ -252,7 +252,7 @@ fields.
 Opening and Saving a Script 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The File-»Open, Save and Save As menu commands behave similar to opening and 
+The File-»Open, Save and Save As menu commands behave similarly to opening and 
 saving files in most other programs.  When you open an existing script, it 
 loads that script file into the IDE and displays its Selenium commands in the 
 main script editing window. 
@@ -301,7 +301,7 @@ Start from the Middle
 Run Any Single Command
     Double-click any single command to run it by itself.  This is useful when 
     writing a single command.  It lets you immediately test a command you are 
-    constructing, but not sure if it is correct.  You can double-click it to 
+    constructing, but are not sure if it is correct.  You can double-click it to 
     see if it runs correctly.  This is also available from the context menu.
   
 Debugging 
@@ -370,10 +370,10 @@ to test.
 Writing a Test Suite 
 --------------------
 
-A test suite is a collection of test scripts and is displayed in the left-most
-pane in the IDE. Test scripts may be added to the list and deleted from it.  
-Test suites may be opened and saved.  When a test suite is saved any changes 
-to tests scripts within that suite are also saved. 
+A test suite is a collection of test scripts which is displayed in the left-most
+pane in the IDE. New test scripts will be automatically added to the list. 
+Any test case can be deleted from an open test suite.  
+When a test suite is saved, any changes to tests scripts within that suite are also saved. 
   
 .. do some testing here of test suites—do they save correctly?
    I've seen errors in the past. 
@@ -382,7 +382,7 @@ User Extensions
 ---------------
 
 User extensions are javascript files that allow one to create their own 
-customized and features to add additional functionality.  Often this is in 
+customizations and features to add additional functionality.  Often this is in 
 the form of customized commands although this extensibility is not limited to 
 additional commands.  User extensions are loaded by setting the path to user 
 extension files through the Options menu. 
@@ -396,12 +396,10 @@ Format
 ------
 
 Format, under the Options menu, allows you to select a language for saving 
-and displaying the script.  This is for supporting Selenium-RC.  The default 
-is HTML and if you will only be running your Selenium scripts from the IDE 
-you can ignore this feature. 
+and displaying the script.  The default is HTML.
   
-If, however, you will be using Selenium-RC to run your scripts, this is how 
-you translate your test script into a programming language.  Select the 
+If you will be using Selenium-RC to run your scripts, this feature is used 
+to translate your test script into a programming language.  Select the 
 language, i.e. Java, PHP, you will be using with Selenium-RC for developing 
 your test programs.  Then simply save the scripts using File-»Save.  Your 
 script will be translated into a series of functions in the language you 
