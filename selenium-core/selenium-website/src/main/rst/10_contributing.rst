@@ -8,7 +8,6 @@
 
 Getting Involved with Selenium
 ==============================
-
 Selenium is certainly a team effort! There are several ways you can help out,
 whether you're a programmer, designer, QA engineer, writer, project manager, or
 just willing to help. If you're interested in helping, the best way to connect
@@ -19,7 +18,6 @@ You can help by...
 
 Answering questions in the forums_
 ----------------------------------
-
 We get a lot of questions and we have a great community to help answer them.
 If you could register and log into the forums_ to answer a question or two, that
 would be great! There are often some very basic questions that are easy to 
@@ -27,7 +25,6 @@ answer.
 
 Updating our website
 --------------------
-
 We have a lot of out-of-date information that needs to be tidied up on the site!
 Help by writing documentation, producing helpful diagrams, re-skinning the
 website, or organizing content.
@@ -54,7 +51,6 @@ Feel free to post questions on the `Selenium Developers`_ section of the forums.
 
 Writing documentation
 ---------------------
-
 .. TODO: Update this section with everything we are doing for the new docs
 
 For the most part our documentation is held in source control, on the wiki,
@@ -69,25 +65,56 @@ set up Maven and Jetty locally to try it out on your own computer).
 
 Bug reports and feature requests
 --------------------------------
-
 If you ran into a problem with Selenium, feel free to file a bug report about
-it on our `Bug Tracker`_. Similarly, if you have an idea for a feature you'd like to see in a future
-version, report that as well.
+it on JIRA_, our Bug Tracker. Similarly, if you have an idea for a feature you'd 
+like to see in a future version, report that as well.
 
-You may also want to check the forums_ to see if a similar question has been
-asked. In many cases the bug reports are the result of not being familiar with
-the way Selenium works, is installed or its limitations. We would love help
-going through the bug reports and adding comments (which automatically get sent
-to the reporter) for cases where advice is all they need.
+Alseo, we would love help going through the bug reports and adding comments (which 
+automatically get sent to the reporter) for cases where advice is all they need.
+
+When creating issues in JIRA, the following templates should be used:
+
+Bug template::
+
+    Description
+    ===========
+    ...
+    Steps to reproduce
+    ==================
+    ...
+    Expected
+    ========
+    ...
+    Actual
+    ======
+    ...
+
+Feature / change request template::
+
+    Description
+    ===========
+    ...
+    Reason
+    ======
+    ...
+    Benefits
+    ========
+    ...
+    Drawbacks
+    =========
+    ...
+
+.. note:: Although these templates help the clear structuring of an issue please
+   keep in mind that bugs have to be reproducible and the feature / change 
+   requests be understandable! 
 
 If you're a programmer and are skilled in the language in question, then dive
 in and see if you can fix the bug (see `Contributing code to Selenium`_).
 
-.. _Bug Tracker: http://jira.openqa.org/
+.. _JIRA: http://jira.openqa.org/
 
 Contributing code to Selenium
 -----------------------------
-
 Much of the magic behind Selenium is the hard work of programmers with
 backgrounds in Javascript, Java, Ruby, PHP, Python, Perl, C#, HTML and other
 languages. If you haven't already, you can download the source code from our
@@ -103,7 +130,6 @@ to the `Selenium Developers`_ section of the forums.
 
 Shaping the vision for Selenium
 -------------------------------
-
 How could we make Selenium better? What would increase its value to end users
 and help it be more accessible and practical? `Contribute to the discussion`_ on
 the forums.
