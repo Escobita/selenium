@@ -1332,7 +1332,7 @@ block it could be written as follows:
    
    // If count of invalid users is 0 then report it in test result.
    if (count == 0) {
-   Reporter.log("There is no invalid use in db.");
+   Reporter.log("There is no invalid user in db.");
    
    // Else report the count of users for whom invalid login was tested.
    } else {
