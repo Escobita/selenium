@@ -2,7 +2,7 @@
 
 = Next Steps For Using WebDriver =
 
-Once you've begun GettingStarted, you may want to know more. This is the right place to look!
+Once you've completed the GettingStarted tutorial, you may want to know more. This is the right place to look!
 
 WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that's easy to explore and understand, which will help make your tests easier to read and maintain. It's not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old "main" method. 
 
