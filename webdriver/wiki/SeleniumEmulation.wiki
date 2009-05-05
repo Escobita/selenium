@@ -1,0 +1,40 @@
+#summary Emulating Selenium
+
+= Selenium Emulation =
+
+The Java version of WebDriver provides an implementation of the existing Selenium API. It is used like so:
+
+{{{
+// You may use any WebDriver implementation. Firefox is used here as an example
+WebDriver driver = new FirefoxDriver();
+
+// A "base url", used by selenium to resolve relative URLs
+String baseUrl = "http://www.google.com";
+
+// Create the Selenium implementation
+Selenium selenium = new WebDriverBackedSelenium(driver, baseUrl);
+
+// Perform actions with selenium
+selenium.open("http://www.google.com");
+selenium.type("name=q", "cheese");
+selenium.click("name=btnG");
+
+// And get the underlying WebDriver implementation back. This will refer to the
+// same WebDriver instance as the "driver" variable above.
+WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWebDriver();
+}}}
+
+== Pros ==
+
+  * Allows for WebDriver and Selenium to live side-by-side.
+  * Provides a simple mechanism for a managed migration from the existing Selenium API to WebDriver's.
+  * Does not require the standalone Selenium RC server to be run
+  * The Selenium interface is now more s
+
+== Cons ==
+
+  * Does not implement every method
+    * But we'd love feedback!
+  * Does also emulate Selenium Core
+    * So more advanced Selenium usage (that is, using "browserbot" or other built-in Javascript methods from Selenium Core) may need work
+  * Some methods may be slower due to underlying implementation differences
