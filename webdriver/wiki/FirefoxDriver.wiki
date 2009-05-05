@@ -16,8 +16,7 @@ The following system properties (read using {{{System.getProperty()}}} and set u
 
 || *Property* || *What it means* ||
 || webdriver.firefox.bin || The location of the binary used to control firefox. ||
-|| webdriver.firefox.development || When using the {{{FirefoxLauncher}}} class to create the profile, this indicates that you are using the development version of WebDriver (that is, one that is checked out from source) ||
-|| webdriver.firefox.profile || The name of the profile to use when starting firefox. This defaults to *WebDriver* ||
+|| webdriver.firefox.profile || The name of the profile to use when starting firefox. This defaults to webdriver creating an anonymous profile ||
 || webdriver.firefox.useExisting || Use a running instance of firefox if one is present ||
 
 Normally the Firefox binary is assumed to be in the default location for your particular operating system:
@@ -37,25 +36,11 @@ The "wedriver-firefox.zip" which may be downloaded from the website, contains al
 
 == Installing the Quick Way From Source (with Ruby) ==
 
-If you're doing development work, you may will need to install the FirefoxDriver into a profile called {{{WebDriver}}} (the case matters!) If you have the source, you can set everything up correctly by running:
+If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{firefox/src/extension}}}
 
-{{{rake install_firefox}}}
+This assumes that your installation of Firefox 2 or 3 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the firefox driver where your Firefox binary is:
 
-This assumes that your installation of Firefox 2 or 3 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then set the "firefox" variable to be the firefox binary to use:
-
-{{{rake install_firefox firefox="d:\apps\mozilla firefox\firefox"}}}
-
-After the installation is completed, Firefox should start using the new WebDriver profile. Go to "{{{Tools->Add-ons}}}" and check that there's an extension called "Firefox WebDriver" installed. Carry on reading below if it's not!
-
-== Installing the Long Way ==
-
-If the quick way doesn't work for you, or you'd like to understand more about what to do, you'll need to install the extension by hand. This isn't as terrifying as you might think:
-
- # Find out where your profile directory ($PROFILE_DIR) is. The best guide for that is here: http://www.mozilla.org/support/firefox/profile
- # Create a new "WebDriver" profile. The camel case matters!
-   * This is done using {{{firefox -ProfileManager}}}
-   * Or by following the instructions from the page mentioned above
- # Create a file called {{{fxdriver@googlecode.com}}} in {{{$PROFILE_DIR/xxxxxxxx.WebDriver/extensions/}}} The contents of this file should be a single line, containing the absolute path to the FirefoxDriver's extension directory ({{{firefox/src/extension}}})
+{{{System.setProperty("webdriver.firefox.bin", "d:\\apps\\mozilla firefox\\firefox");}}}
 
 == Pros ==
 

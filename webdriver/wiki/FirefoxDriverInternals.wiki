@@ -6,17 +6,14 @@ The FirefoxDriver is largely written in the form of a Firefox extension. Languag
 
 = Working on the FirefoxDriver Code = 
 
-Firstly, set up a clean WebDriver profile:
+Firstly, make sure that there's no old version of the FirefoxDriver installed: 
 
   * Start firefox's profile manager: {{{firefox -ProfileManager}}}
   * Delete the existing WebDriver profile if there is one. Delete the files too (it's an option that's offered when you delete the profile in the profile manager)
-  * Create a new, fresh WebDriver profile: {{{rake install_firefox}}}
 
-Secondly, take a look at the [http://developer.mozilla.org/en/docs/Extensions Mozilla Developer Center], particularly the section to do with [http://developer.mozilla.org/en/docs/Setting_up_extension_development_environment setting up an extension development environment]. You should now be ready to edit code. It's best to create a test around the area of code that you're working on, and to run this using the {{{SingleTestSuite}}}. In order to log output from the Javascript code, firstly start Firefox on the command line. On Linux and Mac OS X, the command will look something like:
+Secondly, take a look at the [http://developer.mozilla.org/en/docs/Extensions Mozilla Developer Center], particularly the section to do with [http://developer.mozilla.org/en/docs/Setting_up_extension_development_environment setting up an extension development environment]. You should now be ready to edit code. It's best to create a test around the area of code that you're working on, and to run this using the {{{SingleTestSuite}}}. The FirefoxDriver logs errors to Firefox's error console, so if a test fails, that's a great place to start looking.
 
-{{{MOZ_NO_REMOTE=1 firefox -P WebDriver}}}
-
-You should also ensure that the Java System property "webdriver.firefox.useExisting" is set to "true", which will cause the FirefoxDriver to reuse the instance of Firefox that's running and which has bound itself to port 7055 (the default port). Finally, to actually log information to the console, use the "[http://developer.mozilla.org/en/docs/DOM:window.dump dump]" method in your javascript code. Note that you'll need to include newlines manually when using the dump method.
+You should also ensure that the Java System property "webdriver.firefox.useExisting" is set to "true", which will cause the FirefoxDriver to reuse the instance of Firefox that's running and which has bound itself to port 7055 (the default port). Finally, to actually log information to the console, use the "{{{Utils.dumpn()}}}" method in your javascript code..
 
 If you find that you'd like to examine an object in detail, use the "{{{Utils.dump()}}}" method, which will report which interfaces an object implements, as well as outputting as much information as it can to the console..
 
