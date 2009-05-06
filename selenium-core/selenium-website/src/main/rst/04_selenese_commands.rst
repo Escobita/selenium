@@ -66,23 +66,23 @@ the remaining cells in that row be **verified**.
 
 verifyTextPresent
 ~~~~~~~~~~~~~~~~~
-The command *verifyTextPresent* is used to verify *specific text exists 
+The command ``verifyTextPresent`` is used to verify *specific text exists 
 somewhere on the page*.  It takes a single argument--the text pattern to be 
 verified.  For example.
 
-=============   ==================   ============
-verifyPresent   Marketing Forcasts               
-=============   ==================   ============
+=================   ==================   ============
+verifyTextPresent   Marketing Forcasts               
+=================   ==================   ============
 
 This would cause Selenium to search for, and verify, that the text string
 "Marketing Analysis" appears somewhere on the page currently being tested. Use
-verifyTextPresent when only when interested in only the text 
+``verifyTextPresent`` when only when interested in only the text 
 itself and only that it is present on the page.  Do not use this when you also need to test 
 where it occurs on the page. 
 
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
-Use this verification when you must test for the presence of a specific UI 
+Use this command when you must test for the presence of a specific UI 
 element, rather then it's content.  This verification does not check the text
 , it checks for the HTML tag.  For example, one common use is to check for an 
 image. 
@@ -96,9 +96,9 @@ HTML tag is present on the page, and that it follows a <div> tag and a <p> tag.
 The second parameter is a *locator* for telling the Selenese command how to 
 find the element.  Locators are explained in next section.  
 
-VerifyElementPresent can be used to check the existence of any HTML tag 
-within the body (<BODY>) of the page. One can check existence of links, 
-paragraphs, divisions <div>, etc.  Here's a couple more examples.  
+``verifyElementPresent`` can be used to check the existence of any HTML tag 
+within the page. One can check existence of links, paragraphs, divisions 
+<div>, etc.  Here's a couple more examples.  
 
 ====================   ==============================   ============
 verifyElementPresent   //div/p 
@@ -106,19 +106,17 @@ verifyElementPresent   //div/a
 verifyElementPresent   id=Login
 verifyElementPresent   link=Go to Marketing Research               
 verifyElementPresent   //a[2]
+verifyElementPresent   //head/title
 ====================   ==============================   ============
 
 These examples illustrate the variety of ways a UI element may be tested.  
 Again, locators are explained in the next section.
 
-.. note::  At the time of writing the author did not research whether 
-   elements within the HTML header, <HEAD>, are also 'testable'.
-
 verifyText
 ~~~~~~~~~~
  
-Use _verifyText_ when both the text and it's UI element must be tested.
-VerifyText must use a locator.  Depending on the locator used (an *xpath* or DOM
+Use ``verifyText`` when both the text and it's UI element must be tested.
+``verifyText`` must use a locator.  Depending on the locator used (an *xpath* or DOM
 locator) one can verify that specific text appears at a specific location on the
 page relative to other UI components on the page which contain it.
 
@@ -152,14 +150,11 @@ the element with the @id attribute value matching the location will be found. If
 no element has a matching @id attribute then the first element with a @name 
 attribute matching the location will be found.
 
-- identifier=loginForm
-- identifier=username
-- identifier=continue
-
 For instance, your page source could have identifier (ID) and name attributes 
 as follows:
            
 .. code-block:: html
+  :linenos:
 
   <html>
    <body>
@@ -171,16 +166,22 @@ as follows:
    </body>
   <html>
 
+The following locator strategies would return the elements from the HTML 
+snippet above indicated by line number:
+
+- ``identifier=loginForm`` (3)
+- ``identifier=username`` (4)
+- ``identifier=continue`` (5)
+
 Locating by id 
 ~~~~~~~~~~~~~~
 
 More limited than the identifier locator type but also more explicit. Use 
 this when you know an element's @id attribute.
 
-- id=loginForm
-
 .. code-block:: html
-
+  :linenos:
+  
    <html>
     <body>
      <form id="loginForm">
@@ -192,6 +193,7 @@ this when you know an element's @id attribute.
     </body>
    <html>
 
+- ``id=loginForm`` (3)
 
 .. note:: There's an important use of this, and similar locators.  These vs. 
    xpath allow Selenium to test UI elements independent of it's location on 
@@ -199,7 +201,7 @@ this when you know an element's @id attribute.
    will still pass.  One may, or may not, want to also test whether the page 
    structure changes.  In the case where web-designers frequently alter the 
    page, but it's functionality must be regression tested, testing via ID and 
-   NAME attribs, or really via any HTML property becomes very important.
+   name attributes, or really via any HTML property becomes very important.
 
 Locating by name 
 ~~~~~~~~~~~~~~~~
@@ -210,13 +212,9 @@ attribute. If multiple elements have the same value for a name attribute then
 you can use filters to further refine your location strategy. The default 
 filter type is value (matching the @value attribute).
 
-- name=username
-- name=continue Clear
-- name=continue value=Clear
-- name=continue type=button
-
 .. code-block:: html
-
+  :linenos:
+  
    <html>
     <body>
      <form id="loginForm">
@@ -227,6 +225,11 @@ filter type is value (matching the @value attribute).
      </form>
    </body>
    <html>
+
+- ``name=username`` (4)
+- ``name=continue Clear`` (7)
+- ``name=continue value=Clear`` (7)
+- ``name=continue type=button`` (7)
 
 Locating by XPath 
 ~~~~~~~~~~~~~~~~~
@@ -253,23 +256,9 @@ application. By finding a nearby element with an @id or @name attribute (ideally
 a parent element) you can locate your target element based on the relationship.
 This is much less likely to change and can make your tests more robust.
 
-- xpath=/html/body/form[1] - *Absolute path (would break if the HTML was 
-  changed only slightly)*
-- xpath=//form[1] - *First form element in the HTML*
-- xpath=//form[@id='loginForm'] - *The form element with @id of 'loginForm'*
-- xpath=//form[input/\@name='username'] - *First form element with an input child
-  element with @name of 'username'*
-- xpath=//input[@name='username'] - *First input element with @name of 
-  'username'*
-- xpath=//form[@id='loginForm']/input[1] - *First input child element of the 
-  form element with @id of 'loginForm'*
-- xpath=//input[@name='continue'][@type='button'] - *Input with @name 'continue'
-  and @type of 'button'*
-- xpath=//form[@id='loginForm']/input[4] - *Fourth input child element of the 
-  form element with @id of 'loginForm'*
-
 .. code-block:: html
-
+  :linenos:
+  
    <html>
     <body>
      <form id="loginForm">
@@ -281,6 +270,20 @@ This is much less likely to change and can make your tests more robust.
    </body>
    <html>
 
+- ``xpath=/html/body/form[1]`` (3) - *Absolute path (would break if the HTML was 
+  changed only slightly)*
+- ``xpath=//form[1]`` (3) - *First form element in the HTML*
+- ``xpath=//form[@id='loginForm']`` (3) - *The form element with @id of 'loginForm'*
+- ``xpath=//form[input/\@name='username']`` (4) - *First form element with an input child
+  element with @name of 'username'*
+- ``xpath=//input[@name='username']`` (4) - *First input element with @name of 
+  'username'*
+- ``xpath=//form[@id='loginForm']/input[1]`` (4) - *First input child element of the 
+  form element with @id of 'loginForm'*
+- ``xpath=//input[@name='continue'][@type='button']`` (7) - *Input with @name 'continue'
+  and @type of 'button'*
+- ``xpath=//form[@id='loginForm']/input[4]`` (7) - *Fourth input child element of the 
+  form element with @id of 'loginForm'*
 
 These examples cover some basics, but in order to really take advantage the 
 following references are recommended:
@@ -308,10 +311,8 @@ This is a simple method of locating a hyperlink in your web page by using the
 text of the link. If two links with the same text are present then the first 
 match will be used.
 
-- link=Continue
-- link=Cancel
-
 .. code-block:: html
+  :linenos:
 
   <html>
    <body>
@@ -321,6 +322,9 @@ match will be used.
   </body>
   <html>
 
+- ``link=Continue`` (4)
+- ``link=Cancel`` (5)
+
 Locating by DOM  
 ~~~~~~~~~~~~~~~
 
@@ -329,15 +333,8 @@ using JavaScript. This location strategy takes JavaScript that evaluates to
 an element on the page, which can be simply the element's location using the 
 hierarchical dotted notation.
 
-- dom=document.getElementById('loginForm')
-- dom=document.forms['loginForm']
-- dom=document.forms[0]
-- dom=document.forms[0].username
-- dom=document.forms[0].elements['username']
-- dom=document.forms[0].elements[0]
-- dom=document.forms[0].elements[3]
-           
 .. code-block:: html
+  :linenos:
 
    <html>
     <body>
@@ -350,6 +347,13 @@ hierarchical dotted notation.
    </body>
    <html>
 
+- ``dom=document.getElementById('loginForm')`` (3)
+- ``dom=document.forms['loginForm']`` (3)
+- ``dom=document.forms[0]`` (3)
+- ``dom=document.forms[0].username`` (4)
+- ``dom=document.forms[0].elements['username']`` (4)
+- ``dom=document.forms[0].elements[0]`` (4)
+- ``dom=document.forms[0].elements[3]`` (7)
 
 You can use Selenium itself as well as other sites and extensions to explore
 the DOM of your web application. A good reference exists on `W3Schools
@@ -363,14 +367,8 @@ and XML documents. CSS uses Selectors for binding style properties to elements
 in the document. This Selectors can be used by Selenium as another locating 
 strategy.
 
-- css=form#loginForm
-- css=input[name="username"]
-- css=input.required[type="text"]
-- css=input.passfield
-- css=#loginForm input[type="button"]
-- css=#loginForm input:nth-child(2)
-
 .. code-block:: html
+  :linenos:
 
    <html>
     <body>
@@ -383,13 +381,20 @@ strategy.
    </body>
    <html>
 
+- ``css=form#loginForm (3)``
+- ``css=input[name="username"]`` (4)
+- ``css=input.required[type="text"]`` (4)
+- ``css=input.passfield (5)``
+- ``css=#loginForm input[type="button"]`` (4)
+- ``css=#loginForm input:nth-child(2)`` (5)
+
 For more information about CSS Selectors, the best place to go is `the W3C 
 publication <http://www.w3.org/TR/css3-selectors/>`_ you'll find additional
 references there.
 
 .. note:: Most experimented Selenium users recommend CSS as their locating
-   strategy of choice as it's way faster than xpath and can find the most 
-   complicated objects in an intrinsic HTML document.
+   strategy of choice as it's considerably faster than xpath and can find the 
+   most complicated objects in an intrinsic HTML document.
 
 Order of Locators Evaluation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
