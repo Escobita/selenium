@@ -632,9 +632,8 @@ is under the Options=>Options=>Format tab.
   
 Executing Selenium-IDE Tests on Different Browsers
 --------------------------------------------------
-
 While Selenium-IDE can only run tests against Firefox, tests
 developed with Selenium-IDE can be run against other browsers, using a
 simple command-line interface that invokes the Selenium-RC server.  This topic
-is covered in the :ref:`Selenium-IDE Generated Code <IDE-generated-tests-section` chapter on Selenium-RC. The *-htmlSuite* command-line option is the particular
-feature of interest.
+is covered in the :ref:`Run Selenese tests <html-suite>` section on Selenium-RC
+chapter. The *-htmlSuite* command-line option is the particular feature of interest.

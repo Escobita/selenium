@@ -1549,9 +1549,11 @@ tell it to use this new Firefox profile with the server command-line option
 More information about firefox profiles in `Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
- 
-Run Selenese test using -htmlSuite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _html-suite:
+
+Run Selenese tests using -htmlSuite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To use the Selenium Server as a proxy, run your tests like this::
 
    java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
