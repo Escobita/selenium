@@ -141,6 +141,22 @@ are explained below with examples for each.
    we put A example HTML code before starting with each strategie and then use
    that one on all of them?
 
+Default locators 
+~~~~~~~~~~~~~~~~
+You can choose to omit the locator type in the following situations:
+ 
+ - Locators starting with "document" will use the DOM locator strategy. 
+   See :ref:`locating-by-dom`.
+
+ - Locators starting with "//" will use the XPath locator strategy. 
+   See :ref:`locating-by-xpath`.
+
+ - Locators that start with anything other than the above or a valid locator 
+   type will default to using the identifier locator strategy. 
+   See :ref:`locating-by-identifier`.
+
+.. _locating-by-identifier:
+
 Locating by identifier
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,6 +246,8 @@ filter type is value (matching the @value attribute).
 - ``name=continue Clear`` (7)
 - ``name=continue value=Clear`` (7)
 - ``name=continue type=button`` (7)
+
+.. _locating-by-xpath:
 
 Locating by XPath 
 ~~~~~~~~~~~~~~~~~
@@ -324,6 +342,8 @@ match will be used.
 
 - ``link=Continue`` (4)
 - ``link=Cancel`` (5)
+
+.. _locating-by-dom:
 
 Locating by DOM  
 ~~~~~~~~~~~~~~~
