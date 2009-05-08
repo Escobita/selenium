@@ -2,29 +2,28 @@
 
 "Selenese" Selenium Commands 
 =============================
-Selenium commands, often called *selenese*, is the set of commands that runs 
-your tests.  A sequence of these commands is a *test script*.  Here we explain 
+Selenium commands, often called *selenese*, are the set of commands that run your tests.  A sequence of these commands is a *test script*.  Here we explain 
 those commands in detail, and we present the many choices you have in testing 
-your web-application when using Selenium.
+your web application when using Selenium.
 
 
 Verifying Page Elements
 ------------------------
-Verifying *UI elements* on a web-page is probably the most common feature of 
+Verifying *UI elements* on a web page is probably the most common feature of 
 your automated tests.  Selenese allows multiple ways of checking for UI 
 elements.  It is important that you understand these different methods because
 these methods define what you are actually testing.
 
-For example, will you test for?
+For example, will you test that...
 
-a) an element is present somewhere on the page.
-b) specific text is somewhere on the page.
-c) specific text is at a specific location on the page.
+a) an element is present somewhere on the page?
+b) specific text is somewhere on the page?
+c) specific text is at a specific location on the page?
 
-So, for example, if you are testing a text heading, the text, and it's position
-at the top of the page, is probably relevant for your test.  If, however, you 
+For example, if you are testing a text heading, the text and its position
+at the top of the page are probably relevant for your test.  If, however, you 
 are testing for the existence of an image on the home page, and the 
-web-designers frequently change the specific image file along with it's position
+web designers frequently change the specific image file along with its position
 on the page, then you only want to test that *an image* (as opposed to the 
 specific image file) exists *somewhere on the page*.
    
@@ -33,34 +32,34 @@ Assertion or Verification?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Choosing between **assert** and **verify** comes down to convenience and 
 management of failures. There's very little point checking that the first 
-paragraph on the page is the correct if your test has already failed when 
+paragraph on the page is the correct one if your test has already failed when 
 checking that the browser is displaying the expected page. If you're not on 
-the correct page you'll probably want to abort your test case so that you can 
+the correct page, you'll probably want to abort your test case so that you can 
 investigate the cause and fix the issue(s) promptly. On the other hand, you 
 may want to check many attributes of a page without aborting the test case on 
 the first failure as this will allow you to review all failures on the page 
 and take the appropriate action. Effectively an **assert** will fail the test 
 and abort the current test case, whereas a **verify** will fail the test and 
-continue to run the testcase. 
+continue to run the test case. 
 
 The best use of this feature is to logically group your test commands, and 
 start each group with an **assert** followed by one or more **verify** test 
 commands. An example follows:
 
-============    =====   ============
-open                    /download/      
-assertTitle             Downloads       
-verifyText      //h2    Downloads       
-assertTable     1.2.1   Selenium IDE    
-verifyTable     1.2.2   June 3, 2008    
-verifyTable     1.2.3   1.0 beta 2      
-============    =====   ============
+============    ==========  ============
+open            /download/      
+assertTitle     Downloads       
+verifyText      //h2        Downloads       
+assertTable     1.2.1       Selenium IDE    
+verifyTable     1.2.2       June 3, 2008    
+verifyTable     1.2.3       1.0 beta 2      
+============    ==========  ============
 
 The above example first opens a page and then **asserts** that the correct page 
-is loaded by comparing the title with the expected value, only if this passes 
+is loaded by comparing the title with the expected value. Only if this passes 
 will the following command run and **verify** that the text is present in the 
 expected location. The test case then **asserts** the first column in the second
-row of the first table meets the expected value, and only if this passed with 
+row of the first table contains the expected value, and only if this passed will 
 the remaining cells in that row be **verified**.
 
 
@@ -68,37 +67,36 @@ verifyTextPresent
 ~~~~~~~~~~~~~~~~~
 The command ``verifyTextPresent`` is used to verify *specific text exists 
 somewhere on the page*.  It takes a single argument--the text pattern to be 
-verified.  For example.
+verified.  For example:
 
 =================   ==================   ============
-verifyTextPresent   Marketing Forcasts               
+verifyTextPresent   Marketing Analysis 
 =================   ==================   ============
 
 This would cause Selenium to search for, and verify, that the text string
 "Marketing Analysis" appears somewhere on the page currently being tested. Use
-``verifyTextPresent`` when only when interested in only the text 
-itself and only that it is present on the page.  Do not use this when you also need to test 
-where it occurs on the page. 
+``verifyTextPresent`` when you are interested in only the text 
+itself being present on the page.  Do not use this when you also need to test 
+where the text occurs on the page. 
 
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
 Use this command when you must test for the presence of a specific UI 
-element, rather then it's content.  This verification does not check the text
-, it checks for the HTML tag.  For example, one common use is to check for an 
-image. 
+element, rather then its content.  This verification does not check the text, 
+only the HTML tag.  One common use is to check for the presence of an image. 
 
 ====================   ==================   ============
 verifyElementPresent   //div/p/img               
 ====================   ==================   ============
    
-This command verifies that an image, specified by the existance of an <img> 
-HTML tag is present on the page, and that it follows a <div> tag and a <p> tag.
-The second parameter is a *locator* for telling the Selenese command how to 
-find the element.  Locators are explained in next section.  
+This command verifies that an image, specified by the existence of an <img> 
+HTML tag, is present on the page, and that it follows a <div> tag and a <p> tag.
+The first (and only) parameter is a *locator* for telling the Selenese command how to 
+find the element.  Locators are explained in the next section.  
 
 ``verifyElementPresent`` can be used to check the existence of any HTML tag 
-within the page. One can check existence of links, paragraphs, divisions 
-<div>, etc.  Here's a couple more examples.  
+within the page. One can check the existence of links, paragraphs, divisions 
+<div>, etc.  Here are a few more examples.  
 
 ====================   ==============================   ============
 verifyElementPresent   //div/p 
@@ -115,10 +113,12 @@ Again, locators are explained in the next section.
 verifyText
 ~~~~~~~~~~
  
-Use ``verifyText`` when both the text and it's UI element must be tested.
-``verifyText`` must use a locator.  Depending on the locator used (an *xpath* or DOM
-locator) one can verify that specific text appears at a specific location on the
-page relative to other UI components on the page which contain it.
+.. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
+
+Use ``verifyText`` when both the text and its UI element must be tested.
+``verifyText`` must use a locator.  If one chooses an *XPath* or *DOM*
+locator, one can verify that specific text appears at a specific location on the
+page relative to other UI components on the page.
 
 ==========   ===================    ===================================================================
 verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the div inside the table.
@@ -129,11 +129,11 @@ verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the 
 
 Locating Elements 
 -----------------
-For many Selenium commands a target is required. This target identifies an 
+For many Selenium commands, a target is required. This target identifies an 
 element in the content of the web application, and consists of the location 
 strategy followed by the location in the format ``locatorType=location``. The 
-locator type can be omitted and one of the default strategies will be used 
-depending on the initial characters of the location. The various locator types
+locator type can be omitted in many cases.
+The various locator types
 are explained below with examples for each.
 
 .. Santi: I really liked how this section was taken. But I found that most of
@@ -141,7 +141,7 @@ are explained below with examples for each.
    we put A example HTML code before starting with each strategie and then use
    that one on all of them?
 
-Default locators 
+Default Locators 
 ~~~~~~~~~~~~~~~~
 You can choose to omit the locator type in the following situations:
  
@@ -157,16 +157,16 @@ You can choose to omit the locator type in the following situations:
 
 .. _locating-by-identifier:
 
-Locating by identifier
+Locating by Identifier
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This is probably the most common method of locating elements and is the 
-catch-all default when no recognised locator type is used. With this strategy
-the element with the @id attribute value matching the location will be found. If
-no element has a matching @id attribute then the first element with a @name 
-attribute matching the location will be found.
+catch-all default when no recognised locator type is used. With this strategy,
+the first element with the id attribute value matching the location will be used. If
+no element has a matching id attribute, then the first element with an name 
+attribute matching the location will be used.
 
-For instance, your page source could have identifier (ID) and name attributes 
+For instance, your page source could have id and name attributes 
 as follows:
            
 .. code-block:: html
@@ -188,12 +188,15 @@ snippet above indicated by line number:
 - ``identifier=loginForm`` (3)
 - ``identifier=username`` (4)
 - ``identifier=continue`` (5)
+- ``continue`` (5)
 
-Locating by id 
+Since the ``identifier`` type of locator is the default, the ``identifier=``
+in the first three examples above is not necessary.
+
+Locating by Id 
 ~~~~~~~~~~~~~~
 
-More limited than the identifier locator type but also more explicit. Use 
-this when you know an element's @id attribute.
+This type of locator is more limited than the identifier locator type, but also more explicit. Use this when you know an element's id attribute.
 
 .. code-block:: html
   :linenos:
@@ -211,22 +214,13 @@ this when you know an element's @id attribute.
 
 - ``id=loginForm`` (3)
 
-.. note:: There's an important use of this, and similar locators.  These vs. 
-   xpath allow Selenium to test UI elements independent of it's location on 
-   the page.  So if the page structure and organization is altered, the test 
-   will still pass.  One may, or may not, want to also test whether the page 
-   structure changes.  In the case where web-designers frequently alter the 
-   page, but it's functionality must be regression tested, testing via ID and 
-   name attributes, or really via any HTML property becomes very important.
-
-Locating by name 
+Locating by Name 
 ~~~~~~~~~~~~~~~~
 
-Similar to the identifier locator type when an @id attribute is not found, 
-the name locator type will locate the first element with a matching @name 
-attribute. If multiple elements have the same value for a name attribute then 
+The name locator type will locate the first element with a matching name 
+attribute. If multiple elements have the same value for a name attribute, then 
 you can use filters to further refine your location strategy. The default 
-filter type is value (matching the @value attribute).
+filter type is value (matching the value attribute).  
 
 .. code-block:: html
   :linenos:
@@ -243,9 +237,18 @@ filter type is value (matching the @value attribute).
    <html>
 
 - ``name=username`` (4)
-- ``name=continue Clear`` (7)
 - ``name=continue value=Clear`` (7)
+- ``name=continue Clear`` (7)
 - ``name=continue type=button`` (7)
+
+.. note:: Unlike some types of XPath and DOM locators, the three
+   types of locators above allow Selenium to test a UI element independent 
+   of its location on 
+   the page.  So if the page structure and organization is altered, the test 
+   will still pass.  One may or may not want to also test whether the page 
+   structure changes.  In the case where web designers frequently alter the 
+   page, but its functionality must be regression tested, testing via id and 
+   name attributes, or really via any HTML property, becomes very important.
 
 .. _locating-by-xpath:
 
@@ -253,26 +256,30 @@ Locating by XPath
 ~~~~~~~~~~~~~~~~~
 
 XPath is the language used for locating nodes in an XML document. As HTML can 
-be an implementation of XML (XHTML) Selenium users can leverage this powerful 
-language to target elements in their web applications. XPath extends beyond (
-as well as supporting) the simple methods of locating by @id or @name 
+be an implementation of XML (XHTML), Selenium users can leverage this powerful 
+language to target elements in their web applications. XPath extends beyond (as 
+well as supporting) the simple methods of locating by id or name 
 attributes, and opens up all sorts of new possibilities such as locating the 
-third checkbox on the page or similar. 
+third checkbox on the page.
 
 .. Dave: Is it worth mentioning the varying support of XPath (native in 
    Firefox, using Google AJAXSLT or the new method in IE)? Probably an 
    advanced topic if needed at all..?
 
-One of the main reasons for using XPath is when you don't have a suitable @id 
-or @name attribute for the element you wish to locate. You can use XPath to 
+One of the main reasons for using XPath is when you don't have a suitable id 
+or name attribute for the element you wish to locate. You can use XPath to 
 either locate the element in absolute terms (not advised), or relative to an 
-element that does have an @id or @name attribute.
+element that does have an id or name attribute.  XPath locators can also be
+used to specify elements via attributes other than id and name.
 
 Absolute XPaths contain the location of all elements from the root (html) and 
 as a result are likely to fail with only the slightest adjustment to the 
-application. By finding a nearby element with an @id or @name attribute (ideally
+application. By finding a nearby element with an id or name attribute (ideally
 a parent element) you can locate your target element based on the relationship.
 This is much less likely to change and can make your tests more robust.
+
+Since only ``xpath`` locators start with "//", it is not necessary to include
+the ``xpath=`` label when specifying an XPath locator.
 
 .. code-block:: html
   :linenos:
@@ -288,22 +295,24 @@ This is much less likely to change and can make your tests more robust.
    </body>
    <html>
 
+.. TODO: mam-p:  Is the fourth example below correct?
+
 - ``xpath=/html/body/form[1]`` (3) - *Absolute path (would break if the HTML was 
   changed only slightly)*
-- ``xpath=//form[1]`` (3) - *First form element in the HTML*
+- ``//form[1]`` (3) - *First form element in the HTML*
 - ``xpath=//form[@id='loginForm']`` (3) - *The form element with @id of 'loginForm'*
 - ``xpath=//form[input/\@name='username']`` (4) - *First form element with an input child
   element with @name of 'username'*
-- ``xpath=//input[@name='username']`` (4) - *First input element with @name of 
+- ``//input[@name='username']`` (4) - *First input element with @name of 
   'username'*
-- ``xpath=//form[@id='loginForm']/input[1]`` (4) - *First input child element of the 
+- ``//form[@id='loginForm']/input[1]`` (4) - *First input child element of the 
   form element with @id of 'loginForm'*
-- ``xpath=//input[@name='continue'][@type='button']`` (7) - *Input with @name 'continue'
+- ``//input[@name='continue'][@type='button']`` (7) - *Input with @name 'continue'
   and @type of 'button'*
-- ``xpath=//form[@id='loginForm']/input[4]`` (7) - *Fourth input child element of the 
+- ``//form[@id='loginForm']/input[4]`` (7) - *Fourth input child element of the 
   form element with @id of 'loginForm'*
 
-These examples cover some basics, but in order to really take advantage the 
+These examples cover some basics, but in order to learn more, the 
 following references are recommended:
 
 * `W3Schools XPath Tutorial <http://www.w3schools.com/Xpath/>`_ 
@@ -318,15 +327,16 @@ discovering the XPath of an element:
 * `XPath Checker 
   <https://addons.mozilla.org/en-US/firefox/addon/1095?id=1095>`_ - suggests 
   XPath and can be used to test XPath results. 
-* `Firebug <https://addons.mozilla.org/en-US/firefox/addon/1843>`_ - very 
-  useful, XPath suggestions are just one of the many powerful features of 
-  this add-on.
+* `Firebug <https://addons.mozilla.org/en-US/firefox/addon/1843>`_ -  XPath 
+  suggestions are just one of the many powerful features of this very useful add-on.
 
-Locating hyperlinks by link text 
+Locating Hyperlinks by Link Text 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. TODO: mam-p:  Users often are unaware that a link locator is a pattern, not just a string.  So, I think we need an example here that necessitates a link=regexp:pattern locator in the test case.
+
 This is a simple method of locating a hyperlink in your web page by using the 
-text of the link. If two links with the same text are present then the first 
+text of the link. If two links with the same text are present, then the first 
 match will be used.
 
 .. code-block:: html
@@ -348,10 +358,13 @@ match will be used.
 Locating by DOM  
 ~~~~~~~~~~~~~~~
 
-The Document Object Model represents a HTML document and can be accessed 
+The Document Object Model represents an HTML document and can be accessed 
 using JavaScript. This location strategy takes JavaScript that evaluates to 
 an element on the page, which can be simply the element's location using the 
 hierarchical dotted notation.
+
+Since only ``dom`` locators start with "document", it is not necessary to include
+the ``dom=`` label when specifying a dom locator.
 
 .. code-block:: html
   :linenos:
@@ -370,10 +383,10 @@ hierarchical dotted notation.
 - ``dom=document.getElementById('loginForm')`` (3)
 - ``dom=document.forms['loginForm']`` (3)
 - ``dom=document.forms[0]`` (3)
-- ``dom=document.forms[0].username`` (4)
-- ``dom=document.forms[0].elements['username']`` (4)
-- ``dom=document.forms[0].elements[0]`` (4)
-- ``dom=document.forms[0].elements[3]`` (7)
+- ``document.forms[0].username`` (4)
+- ``document.forms[0].elements['username']`` (4)
+- ``document.forms[0].elements[0]`` (4)
+- ``document.forms[0].elements[3]`` (7)
 
 You can use Selenium itself as well as other sites and extensions to explore
 the DOM of your web application. A good reference exists on `W3Schools
@@ -384,7 +397,7 @@ Locating by CSS
 
 CSS (Cascading Style Sheets) is a language for describing the rendering of HTML
 and XML documents. CSS uses Selectors for binding style properties to elements
-in the document. This Selectors can be used by Selenium as another locating 
+in the document. These Selectors can be used by Selenium as another locating 
 strategy.
 
 .. code-block:: html
@@ -409,11 +422,11 @@ strategy.
 - ``css=#loginForm input:nth-child(2)`` (5)
 
 For more information about CSS Selectors, the best place to go is `the W3C 
-publication <http://www.w3.org/TR/css3-selectors/>`_ you'll find additional
+publication <http://www.w3.org/TR/css3-selectors/>`_.  You'll find additional
 references there.
 
-.. note:: Most experimented Selenium users recommend CSS as their locating
-   strategy of choice as it's considerably faster than xpath and can find the 
+.. note:: Most experienced Selenium users recommend CSS as their locating
+   strategy of choice as it's considerably faster than XPath and can find the 
    most complicated objects in an intrinsic HTML document.
 
 Order of Locators Evaluation
@@ -432,21 +445,24 @@ how to match text patterns on the page.  There are multiple ways this can be don
 at www.SeleniumHQ.org*
 
  
-The "AndWait" commands 
+The "AndWait" Commands 
 ----------------------
-The difference between a command and it's *AndWait*
+
+The difference between a command and its *AndWait*
 alternative is that the regular command (e.g. *click*) will do the action and
-continue with the following command as fast as it can. While the *AndWait*
+continue with the following command as fast as it can, while the *AndWait*
 alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
 load after the action has been done. 
 
-The *andWait* alternative is always used when the action causes the browser to
+.. TODO: mam-p:  I don't believe the following is true, at least in Selenium-IDE.  Perhaps it is supposed to be true, but I don't think we should misrepresent the current status. 
+
+The *AndWait* alternative is always used when the action causes the browser to
 navigate to another page or reload the present one. 
 
 Be aware, if you use an *AndWait* command for an action that
 does not trigger a navigation/refresh, your test will fail. This happens 
 because Selenium will reach the *AndWait*'s timeout without seeing any 
-navigation or refresh being made, this is why Selenium raises a timeout 
+navigation or refresh being made, causing Selenium to raise a timeout 
 exception.
  
 
@@ -455,44 +471,47 @@ Sequence of Evaluation and Flow Control
 
 When a script runs, it simply runs in sequence, one command after another.
 
-Selenese, by itself, does not handle condition statements (if-else, etc.) or 
+Selenese, by itself, does not support condition statements (if-else, etc.) or 
 iteration (for, while, etc.). Many useful tests can be conducted without flow 
-control, however for a functional test of dynamic content, possibly involving
+control. However, for a functional test of dynamic content, possibly involving
 multiple pages, programming logic is often needed.
 
-When flow control is needed there are two options.  
+When flow control is needed, there are three options:  
 
-	a) run the script using Sel-RC to take advantage of a programming language.
-	b) run a small Javascript snippet from within the script using the storeEval command.
+	a) Run the script using Selenium-RC and a client library such as Java or
+	   PHP to utilize the programming language's flow control features.
+	b) Run a small JavaScript snippet from within the script using the storeEval command.
+        c) Install the `goto_sel_ide.js <http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html>`_ extension.
 
-Most will export the test script into a programming language file that uses the
+Most testers will export the test script into a programming language file that uses the
 Selenium-RC API (see the Selenium-IDE chapter).  However, some organizations prefer
 to run their scripts from Selenium-IDE whenever possible (such as when they have
 many junior-level people running tests for them, or when programming skills are
-lacking). If this is your case, consider a Javascript snippet.  However, this 
-will not handle iteration. So, for example, if your test needs to iterate 
-through a variable-lenght result-set of values, you will need Selenium-RC.
+lacking). If this is your case, consider a JavaScript snippet or the goto_sel_ide.js extension.  
 
  
 Store Commands and Selenium Variables
 -------------------------------------
-For instance, one can use Selenium variables to store constants at the 
+One can use Selenium variables to store constants at the 
 beginning of a script.  Also, when combined with a data-driven test design 
-(discussed in a later section) Selenium variables can be used to store values 
-passed to your test program from the command-line or from another program.
+(discussed in a later section), Selenium variables can be used to store values 
+passed to your test program from the command-line, from another program, or from
+a file.
  
-The *store* is used to the most basic of the store commands and can be used 
+The plain *store* command is the most basic of the many store commands and can be used 
 to simply store a constant value in a selenium variable.  It takes two 
 parameters, the text value to be stored and a selenium variable.  Use the 
 standard variable naming conventions of only alphanumeric characters when 
 choosing a name for your variable.
 
+.. TODO: mam-p:  Why are we telling them the last sentence above?  Any JavaScript identifiershould be okay, no?
+
 =====   ===============   ========
 store   paul@mysite.org	  userName               
 =====   ===============   ========
 
-Later in your script of course you'll want to use the stored values of your 
-variable.  To cause a variable to return it's value enclose the variable in 
+Later in your script, you'll want to use the stored value of your 
+variable.  To access the value of a variable, enclose the variable in 
 curly brackets ({}) and precede it with a dollar sign like this.
 
 ==========  =======     ===========
@@ -502,17 +521,17 @@ verifyText  //div/p     ${userName}
 A common use of variables is for storing input for an input field.
 
 ====    ========     ===========
-type	id=login	 ${userName}               
+type	id=login     ${userName}               
 ====    ========     ===========
 
-Selenium variables can be used in either the first or second parameter and are interpreted by Selenium prior to any other operations performed by the command.  A Selenium variable may also even be used from within a locator expression.
+Selenium variables can be used in either the first or second parameter and are interpreted by Selenium prior to any other operations performed by the command.  A Selenium variable may also be used within a locator expression.
 
-An equivalent store command corresponds to each verify command and assert command.  Here are a couple more commonly used store commands.
+An equivalent store command exists for each verify and assert command.  Here are a couple more commonly used store commands.
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
-This corresponds to verifyElementPresent.  It simply stores a boolean value, 
-"true" or "false" depending on whether the UI element is found.
+This corresponds to verifyElementPresent.  It simply stores a boolean value--"true" 
+or "false"--depending on whether the UI element is found.
 
 storeText 
 ~~~~~~~~~
@@ -520,16 +539,14 @@ StoreText corresponds to verifyText.  It uses a locater to identify specific
 page text.  The text, if found, is stored in the variable.  StoreText can be 
 used to extract text from the page being tested.
 
-
 storeEval 
 ~~~~~~~~~
-This command takes an expression, generally a javascript expression as its 
-first parameter.  Embedding javascript within Selenese is in the next section.
+This command takes an expression, generally a JavaScript expression, as its 
+first parameter.  Embedding JavaScript within Selenese is covered in the next section.
 StoreEval allows the test to store the expression's result within a variable.
 
-
-Javascript Expressions as a Parameter 
--------------------------------------
+JavaScript Expressions as Parameters 
+------------------------------------
 *This section is not yet developed.*
 
 
@@ -537,7 +554,7 @@ Javascript Expressions as a Parameter
 ------------------------------------
 Selenese has a simple command that allows you to print text to your test's 
 output.  This is useful for providing informational progress notes in your 
-test which display on the console as your test is running.  They also can be 
+test which display on the console as your test is running.  These notes also can be 
 used to provide context within your test result reports, which can be useful 
 for finding where a defect exists on a page in the event your test finds a 
 problem.  Finally, echo statements can be used to print the contents of 
@@ -556,9 +573,9 @@ Alerts, Popups, and Multiple Windows
 .. Paul: This is an important area, people are constantly asking about this 
    on the forums.
 
-AJAX and waitFor commands
+AJAX and waitFor Commands
 -------------------------
 Many applications use AJAX for dynamic and animated functionality making 
-testing of Ajax behavior often a basic testing requirement.
+testing of AJAX behavior often a basic testing requirement.
 
 *This section is not yet developed.*
