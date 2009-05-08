@@ -282,6 +282,30 @@ Utils.platform = function(context) {
 Utils.shiftCount = 0;
 
 Utils.type = function(context, element, text) {
+    try {
+        const cid = "@openqa.org/nativeevents;1";
+        var obj = Components.classes[cid].createInstance();
+        obj = obj.QueryInterface(Components.interfaces.nsINativeEvents);
+
+        // This stuff changes between releases. Do as much up-front work in JS as possible
+        var retrieval = Utils.newInstance("@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
+        var accessible = retrieval.getAccessibleFor(element.ownerDocument);
+        Utils.dumpn("Accessible: " + accessible);
+        var accessibleDoc = accessible.QueryInterface(Components.interfaces.nsIAccessibleDocument);
+        Utils.dumpn("doc: " + accessibleDoc);
+        var supports = accessibleDoc.QueryInterface(Components.interfaces.nsISupports);
+        Utils.dumpn("supports: " + supports);
+
+        // Now do the native thing.
+        obj.sendKeys(supports, text);
+        return;
+    } catch (err) {
+        // We've not got native events here. Simulate.
+        Utils.dumpn(err);
+    }
+
+    return;
+
     // Special-case file input elements. This is ugly, but should be okay
     if (element.tagName == "INPUT") {
       var inputtype = element.getAttribute("type");

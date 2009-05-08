@@ -33,8 +33,10 @@ public class SingleTestSuite extends TestCase {
   private final static String SAFARI = "org.openqa.selenium.safari.SafariDriver";
 
   public static Test suite() throws Exception {
-    String driver = IE;
+    String driver = FIREFOX;
 
+//    System.setProperty("webdriver.firefox.bin", "C:\\Users\\simonstewart\\work\\FirefoxPortable\\FirefoxPortable.exe");
+//    System.setProperty("webdriver.firefox.bin", "C:\\Program Files (x86)\\Mozilla Firefox 3.5 Beta 4\\firefox.exe");
     System.setProperty("webdriver.firefox.development", "true");
     System.setProperty("jna.library.path", ".\\jobbie;.");
 //    System.setProperty("webdriver.firefox.useExisting", "true");
@@ -46,8 +48,8 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("TextHandlingTest")
-//        .method("testShouldNotBeAbleToFindAnElementOnABlankPage")
+        .onlyRun("TypingTest")
+        .method("testShouldBeAbleToTypeQuoteMarks")
         .exclude(ALL)
         .exclude(Ignore.Driver.IE)
         .leaveRunning()

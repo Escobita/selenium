@@ -1,8 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\web\", "common\src\web\", "{DB560F4B-1F41-4E8E-AC06-640D736E8A72}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "common\src\web\", "{DB560F4B-1F41-4E8E-AC06-640D736E8A72}"
 	ProjectSection(WebsiteProperties) = preProject
+		TargetFramework = "3.5"
 		Debug.AspNetCompiler.VirtualPath = "/web"
 		Debug.AspNetCompiler.PhysicalPath = "common\src\web\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\web\"
@@ -22,10 +23,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\web\", "common\src\w
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InternetExplorerDriver", "jobbie\src\cpp\InternetExplorerDriver\InternetExplorerDriver.vcproj", "{0BC72326-88BE-4369-9077-74AA7B2BE15D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webdriver-firefox", "firefox\src\cpp\webdriver-firefox\webdriver-firefox.vcproj", "{F46D2A87-1178-4622-9C0D-2B761197AE76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +70,20 @@ Global
 		{0BC72326-88BE-4369-9077-74AA7B2BE15D}.Release|Win32.Build.0 = Release|Win32
 		{0BC72326-88BE-4369-9077-74AA7B2BE15D}.Release|x64.ActiveCfg = Release|x64
 		{0BC72326-88BE-4369-9077-74AA7B2BE15D}.Release|x64.Build.0 = Release|x64
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|.NET.ActiveCfg = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|Win32.Build.0 = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Debug|x64.ActiveCfg = Debug|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|.NET.ActiveCfg = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|Win32.ActiveCfg = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|Win32.Build.0 = Release|Win32
+		{F46D2A87-1178-4622-9C0D-2B761197AE76}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
