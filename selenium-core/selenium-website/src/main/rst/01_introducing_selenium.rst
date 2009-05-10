@@ -6,118 +6,126 @@ Introducing Selenium
 .. This is a very rough draft have not proofread it yet. Still, you are 
    welcome to provide comments. 
 
+To Automate or Not to Automate?  That is the Question!
+------------------------------------------------------
+
+Is automation always advantageous? When should one decide to automate one's
+test cases? 
+
+It is **not** always advantageous to automate test cases. There are 
+times when manual testing may be more appropriate. For instance, if the 
+application's user interface will change considerably in the near future, 
+then any automation would need to be rewritten. Also, sometimes there simply 
+is not enough time to build test automation. For the short term, manual testing 
+may be more effective. If an application has a very tight deadline, there is 
+currently no test automation available, and it's imperative that the testing 
+get done within that time frame, then manual testing is the best solution. 
+
+However, automation has specific advantages for 
+improving the long-term efficiency of a software team's testing processes. 
+Test automation supports:
+
+* Frequent and rapid regression testing 
+* Rapid feedback to developers during the development process
+* Virtually unlimited iterations of test case execution
+* Customized reporting of application defects 
+* Support for Agile and eXtreme development methodologies 
+* Disciplined documentation of test cases
+* Finding defects missed by manual testing
+
 Test Automation for Web Applications
 ------------------------------------
 
-Many, perhaps most, software applications now are written as web-
-based applications to be run in an Internet browser. The  
+Many, perhaps most, software applications today are written as web-based 
+applications to be run in an Internet browser. The  
 effectiveness of testing these applications varies widely among companies and 
 organizations. In an era of continuously improving software processes,  
-promoting methodologies such as eXtreme programming  (XP) and Agile,  
+such as eXtreme programming (XP) and Agile,  
 it can be argued that disciplined testing and quality assurance practices are 
 still underdeveloped in many organizations. Software testing is often 
-conducted manually. At times, this is effective, however there are 
-options to manual testing that many organizations are unaware of, or 
-not skilled in.  Developing these options that would greatly improve the 
-efficiency of their software development by adding efficiencies to there 
-testing. 
+conducted manually. At times, this is effective; however there are 
+alternatives to manual testing that many organizations are unaware of, or 
+lack the skills to perform.  Utilizing these alternatives would in most cases
+greatly improve the efficiency of their software development by adding 
+efficiencies to their testing. 
 
 Test automation is often the answer. Test automation means using software 
 to run tests against other software. In other words, one uses a software 
-program to automatically run the tests against the application to be tested.
+program to automatically run tests against the application to be tested.
   
-There are many advantages to automating testing. Most are related to 
-the repeatability of the tests and the speed that the tests can be executed.
+There are many advantages to test automation. Most are related to 
+the repeatability of the tests and the speed at which the tests can be executed.
 There are a number of commercial and open source tools available for assisting
-with the development of test automation. Selenium, is possibly the most 
-widely-used Open Source solution. This user's guide will assist both new and 
-experienced Selenium users in effective techniques in building test automation 
-for web applications. 
+with the development of test automation. Selenium is possibly the most 
+widely-used open source solution. This user's guide will assist both new and 
+experienced Selenium users in learning effective techniques in building 
+test automation for web applications. 
 
-This guide introduces Selenium, teaches it's most widely used features, and 
+This guide introduces Selenium, teaches its most widely used features, and 
 provides useful advice in best practices accumulated from the Selenium 
-community. Many examples are provided. Also technical information on the 
-internal structure of Selenium and recommended uses of Selenium is provided as 
+community. Many examples are provided. Also, technical information on the 
+internal structure of Selenium and recommended uses of Selenium are provided as 
 contributed by a consortium of experienced Selenium users. It is our hope that 
 this guide will get additional new users excited about using Selenium for test 
-automation.  We hope this guide will assist "getting the word out" that quality
-assurance and software testing has many options beyond what is currently 
+automation.  We hope this guide will assist in "getting the word out" that quality
+assurance and software testing have many options beyond what is currently 
 practiced. We hope this user's guide and Selenium itself provide a valuable aid
-to boosting the reader's efficiency in their software testing processes. 
+to boosting the reader's efficiency in his or her software testing processes. 
 
 Introducing Selenium 
 --------------------
 
-Selenium is a robust set of tools that support rapid development of test 
-automation for web-based applications. It is highly extensible, 
-allowing the developer of test automation unlimited options in testing logic 
-and defect reporting by supporting multiple programming languages. Selenium 
-provides a rich set of testing functions, specifically geared to the needs 
-of function testing a web application. These functions are highly 
+Selenium is a robust set of tools that supports rapid development of test 
+automation for web-based applications. 
+Selenium provides a rich set of testing functions specifically geared to the needs 
+of functionality testing of a web application. These functions are highly 
 flexible, allowing many options for locating UI elements and comparing 
 expected test results against actual application behavior. 
 
-To Automate or Not to Automate -- That is a Question!
------------------------------------------------------
-
-Is automation always an advantage? When should one decide to automate their 
-testcases? It is not always advantageous to automate testcases. There are 
-times when manual testing may be more appropriate. For instance, if the 
-application's user interface will change considerably in the near future, 
-then any automation would need to be rewritten. Also, sometimes there simply 
-is not enough time to build test automation. For the short-term, manual testing 
-is more effective. If an application has a very tight deadline, there is 
-currently no test automation available, and it's imperative that the testing 
-get done within that time frame, then manual testing is the best solution. 
-
-Test automation has it's place though, and has specific advantages for 
-improving the long-term efficiency of a software team's testing processes. 
-Test automation supports:
-  
-* Frequent and rapid regression testing 
-* Rapid feedback to developers during, and parallel to, the development process
-* Unlimited test-pass iteration 
-* Customized reporting of application defects 
-* Support for Agile, eXtreme development methodologies 
-* Disciplined documentation of testcases
-* Finding defects missed by manual testing
-  
+One of Selenium's key features is the support for executing one's tests on
+multiple browser platforms.  
 
 Selenium Components
 -------------------
 
 Selenium is composed of three major tools. Each one has a specific role in 
-aiding the development of webapps test automation. 
+aiding the development of web application test automation. 
 
 Selenium-IDE
 ~~~~~~~~~~~~
 
-The Selenium-IDE is the Integrated Development Environment for building 
-Selenium test scripts. It operates as a Firefox plug-in. The Selenium-IDE 
-provides an easy to use interface for both developing and running testcases. 
-It also can run an entire test suite. The Selenium-IDE has a recording feature
+Selenium-IDE is the Integrated Development Environment for building 
+Selenium test cases. It operates as a Firefox add-on. Selenium-IDE 
+provides an easy-to-use interface for both developing and running test cases. 
+It also can run an entire test suite. Selenium-IDE has a recording feature
 for recording user actions into a script as the user performs them. 
 It also has an options menu (right-click) integrated with the Firefox browser 
 which allows the user to pick from a list of assertions and verifications 
 based on a currently selected UI component and then add the selected test to 
-their script. The IDE predicts the assertions and verifications desired by 
+the script. Selenium-IDE predicts the assertions and verifications desired by 
 the script developer based on the context of the currently selected UI element.
-Finally, the IDE allows unlimited editing of the chosen script commands. 
+Finally, Selenium-IDE allows unlimited editing of the test case's commands. 
 
-Selenium-RC
-~~~~~~~~~~~~
+Although Selenium-IDE is a Firefox-only add-on, tests created in Selenium-IDE
+can be run against other browsers via a simple command line invoking the
+Selenium-RC server and specifying the name of the test suite created in Selenium-IDE.
 
-Selenium-RC is the most efficient way of running tests. It allows the test 
+Selenium-RC (Remote Control)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Selenium-RC allows the test 
 automation developer to use a programming language for maximum flexibility and
 extensibility in developing test logic. For instance, if the application under
 test returns a result set, and if the automated test program needs to run tests
-on each element in the result set, the programming languages iteration support
+on each element in the result set, the programming language's iteration support
 can be used to iterate through the result set, calling Selenium commands to run
 tests on each item. 
 
-Selenium-RC supports the use of programming languages for test logic by 
-providing a programming API and library for each of it's 8 supported languages.
-This ability to use Selenium-RC to develop a test program also allows the 
+Selenium-RC provides an API (Application Programming Interface)
+and library for each of its supported languages:
+HTML, Java, C#, Perl, PHP, Python, and Ruby.
+This ability to use Selenium-RC with a high-level programming language
+to develop test cases also allows the 
 automated testing to be integrated with a project's automated build 
 environment. 
 
@@ -141,65 +149,63 @@ Supported Browsers
    introduction and probably no one reading this will understand what 
    \*piiexplore or *chrome mean...
 
-===========  =========================  ===========================  =================
-**Browser**  **Selenium IDE**           **Selenium Remote Control**  **Selenium Core**
-Firefox 3    Record and playback tests  Start browser, run tests     Run tests
-Firefox 2    Record and playback tests  Start browser, run tests     Run tests
-IE 8         not supported              Under development            Under Development
-IE 7         not supported              Start browser, run tests     Run tests
-Safari 3     not supported              Start browser, run tests     Run tests
-Safari 2     not supported              Start browser, run tests     Run tests
-Opera 9      not supported              Start browser, run tests     Run tests
-Opera 8      not supported              Start browser, run tests     Run tests
-Others       not supported              Partial support possible*    Run tests**
-===========  =========================  ===========================  =================
+===========  ==================================================  ===========================  
+**Browser**  **Selenium-IDE**                                    **Selenium-RC** 
+Firefox 3    1.0 Beta-1 & 1.0 Beta-2: Record and playback tests  Start browser, run tests   
+Firefox 2    1.0 Beta-1: Record and playback tests               Start browser, run tests   
+IE 8                                                             Under development
+IE 7         Test execution only via Selenium-RC*                Start browser, run tests   
+Safari 3     Test execution only via Selenium-RC                 Start browser, run tests   
+Safari 2     Test execution only via Selenium-RC                 Start browser, run tests   
+Opera 9      Test execution only via Selenium-RC                 Start browser, run tests   
+Opera 8      Test execution only via Selenium-RC                 Start browser, run tests   
+Others       Test execution only via Selenium-RC                 Partial support possible**  
+===========  ==================================================  ===========================  
 
-\* Selenium Remote Control server can start any executable, but depending on 
+\* Tests developed on Firefox via Selenium-IDE can be executed on any other supported browser via a simple Selenium-RC command line.
+
+** Selenium-RC server can start any executable, but depending on 
 browser security settings, there may be technical limitations that would limit
 certain features.
 
-** Selenium Core is written in Javascript so it should work (in theory) on most
-browsers with decent Javascript support. Some operations are only possible via
-Selenium Remote Control because of browser security settings.
-  
 .. Santi: Should we include Selenium Core in this list???
    How about chrome and mock?? I've noticed they have a browser mod on RC and
    are not included in this list 
-   
+
 .. TODO: Refine this list.
   
 Flexibility and Extensibility
 ------------------------------
 
 You'll find that Selenium is highly flexible.  There are multiple ways in which
-one can add functionality upon Selenium's framework to customize test 
+one can add functionality to Selenium's framework to customize test 
 automation for one's specific testing needs. This is, perhaps, Selenium's 
 strongest characteristic when compared with proprietary test automation tools
-and other Open Source solutions. Selenium-RC support for multiple programming
+and other open source solutions. Selenium-RC support for multiple programming
 and scripting languages allows the test writer to build any logic they need
-into their automated testing and an use a preferred programming or scripting
-language of their choice. 
+into their automated testing and to use a preferred programming or scripting
+language of one's choice. 
   
 Selenium-IDE allows for the addition of user-defined "user-extensions" for 
 creating additional commands customized to the user's needs. Also, it is 
 possible to re-configure how the Selenium-IDE generates its Selenium-RC code.
-This would allow the user to customize the generated code to fit in with their
-own test framework. Finally, Selenium is fully an Open Source project where 
+This allows users to customize the generated code to fit in with their
+own test frameworks. Finally, Selenium is fully an Open Source project where 
 code can be modified and enhancements can be submitted for contribution.
 
 About this Book
 ---------------
 
-This book targets both new users of Selenium and those who have been using 
+This reference documentation targets both new users of Selenium and those who have been using 
 Selenium and are seeking additional knowledge. It introduces the novice
 to Selenium test automation. We do not assume the reader has experience in 
 testing beyond the basics.  
 
-The experienced Selenium user will also find this book valuable. It compiles
+The experienced Selenium user will also find this reference valuable. It compiles
 in one place a set of useful Selenium techniques and best practices by drawing 
-from the knowledge of multiple experience Selenium QA professionals. 
+from the knowledge of multiple experienced Selenium QA professionals. 
 
-The remaining chapters of the book present:
+The remaining chapters of the reference present:
 
 :ref:`Selenium Basics <chapter02-reference>`
     Introduces Selenium by describing how to select the Selenium component 
@@ -209,29 +215,29 @@ The remaining chapters of the book present:
     helps you decide where to begin. 
 
 :ref:`Selenium-IDE <chapter03-reference>`
-    Teaches how to build test scripts using the Selenium Integrated Development 
+    Teaches how to build test cases using the Selenium Integrated Development 
     Environment. This chapter also describes useful techniques for making your 
     scripts more readable when interpreting defects caught by your Selenium tests. 
     We explain how your test script can be 
     "exported" to the programming language of your choice. Finally, this section 
     describes some configurations available for extending and customizing how 
-    the Selenium-IDE supports script development. 
+    the Selenium-IDE supports test case development. 
 
 :ref:`Selenium Commands <chapter04-reference>`
-    Describes the Selenium commands in detail providing many examples. This 
-    chapter shows the full extent of what types of actions, verifications and 
+    Describes a subset of the most useful Selenium commands in detail. This 
+    chapter shows what types of actions, verifications and 
     assertions can be made against a web application. 
 
 :ref:`Selenium-RC <chapter05-reference>`
     Explains how to develop an automated test program using the Selenium-RC API.
-    Many examples are presented in both, a programming language and a scripting 
+    Many examples are presented in both a programming language and a scripting 
     language. Also, the installation and setup of Selenium-RC is covered here. 
     The various modes, or configurations, that Selenium-RC supports are
-    described along with their trade-offs and limitations. Architecture
-    diagrams are provided to help illustrate these points. Also in this section
-    a number of solutions to problems, often difficult for the new user, are
+    described, along with their trade-offs and limitations. Architecture
+    diagrams are provided to help illustrate these points. 
+    A number of solutions to problems which are often difficult for the new user, are
     described in this chapter. This includes handling Security Certificates,
-    https requests, Pop-ups and the opening of new windows. 
+    https requests, pop-ups and the opening of new windows. 
 
 :ref:`Test Design Considerations <chapter06-reference>`
     Presents many useful techniques for using Selenium efficiently. This 
