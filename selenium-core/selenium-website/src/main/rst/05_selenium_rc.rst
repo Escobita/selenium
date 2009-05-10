@@ -6,17 +6,13 @@
 .. |logo| image:: images/selenium-rc-logo.png
    :alt:
 
-When to Use Selenium-RC?
-------------------------
+Introduction
+------------
 Selenium-RC is the response for tests that need a little more than just simple
 browser actions and a linear execution. Selenium-RC allows the users to use the 
 full power of programming languages, creating tests that can do things like read
 and write external files, make queries to a Data Base, send emails with test 
 reports, practically anything a user can do with a normal application.
-
-You can see some examples of this in the `Adding Some Spice to Your Tests`_ section, where
-you'll find some examples that demontrate the advantages of using all the power
-of a real programming language for your tests.
 
 Basically, you will need to use Selenium-RC whenever your test requires logic
 not supported by running a script from Selenium-IDE. What sort of logic could 
@@ -39,19 +35,20 @@ by using language specific libraries.
    extensions to Selenium-IDE but most prefer to use Selenium-RC as it's already
    bundled in any programming language.
 
+In `Adding Some Spice to Your Tests`_ section, you'll find some examples that 
+demontrate the advantages of using all the power of a real programming language
+for your tests.
+
 How Selenium Remote Control works
 ----------------------------------
-
-.. Paul: I initiated a couple of forum posts that can shed some light here. 
-   Some of the content in those posts can serve as descriptive info for us.
-   This comment is a reminder for me to get that info off OpenQA.
-
-Selenium-RC comes in two parts:
+Selenium-RC Basic Structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Selenium-RC is composed of two parts:
 
 * A server which automatically launches and kills browsers, and acts as a HTTP
   proxy for web requests from them. 
 * Client libraries for your favorite programming language, which communicate 
-  with the server telling him what's next.
+  with the server giving the orders to excecute the tests.
 
 The RC server bundles Selenium Core, and automatically injects it into the 
 browser within the Application Under Test.
@@ -68,117 +65,6 @@ this orders to the browser by the use of Selenium-Core javascript commands.
 The Server receives commands directly using simple HTTP GET/POST requests;
 that means that you can use any programming language that can make HTTP requests
 to automate Selenium tests on the browser.
-
-Proxy Injection vs. Hightened Privileges
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. note:: This topic tries to explain the technical implementation behind 
-   Selenium-RC. It's not fundamental for a Selenium user to know this, but 
-   could be useful for understanding some of the problems you can find in the
-   future.
-   
-To understand in detail how Selenium-RC works  and why it uses proxy injection
-and hightened privilege modes you must first understand `the same origin policy`_.
-   
-The Same Origin Policy
-++++++++++++++++++++++
-The main restriction that Selenium's architecture has faced is the 
-Same Origin Policy. This security restriction is applied by every browser
-in the market and it's objective is to ensure that a site's content will never
-be accessible by a script from other site.
-
-If this were possible, a script placed on any website you open, would 
-be able to read information on your bank account if you had the account page
-opened on other tab. Which is also called XSS (Cross-site Scripting).
-
-To work under that policy. Selenium-Core (and it's javascript commands that
-make all the magic happen) must be placed in the same origin as the Application
-Under Test (same URL). This has been the way Selenium-Core was first
-used and implemented (by deploying Selenium-Core and the set of tests inside
-the application's server), but this was a requirement that not all the projects 
-could meet and Selenium Developers had to find an alternative that would allow 
-testers to use Selenium to test site where they didn't have the possibility to
-deploy their code. 
-
-.. note:: You can find additional information about this topic on wikipedia
-   pages about `Same Origin Policy`_ and XSS_. 
-
-.. _Same Origin Policy: http://en.wikipedia.org/wiki/Same_origin_policy
-.. _XSS: http://en.wikipedia.org/wiki/Cross-site_scripting
-
-Proxy Injection
-+++++++++++++++
-The first method used to skip the `The Same Origin Policy`_ was Proxy Injection.
-In this method, the Selenium Server acts as a client-configured [1]_ **HTTP 
-proxy** [2]_, that stands in between the browser and the Application Under Test.
-After this, it is able to masks the whole AUT under a fictional URL (embedding
-Selenium-Core and the set of tests and delivering them as if they were coming
-from the same origin). 
-
-.. [1] The proxy is a third person in the middle that passes the ball 
-   between the two parts. In this case will act as a "web server" that 
-   delivers the AUT to the browser. Being a proxy, gives the capability
-   of "lying" about the AUT real URL.  
-   
-.. [2] The client browser (Firefox, IE, etc) is launched with a 
-   configuration profile that has set localhost:4444 as the HTTP proxy, this
-   is why any HTTP request that the browser does will pass through Selenium
-   server and the response will pass through it and not from the real server.
-
-Here is an architectural diagram. 
-
-.. TODO: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
-   the Browser....
-
-.. image:: images/chapt5_img02_Architecture_Diagram.png
-   :align: center
-
-As a test suite starts in your favorite language, the following happens:
-
-1. The client/driver establishes a connection with the selenium-RC server.
-2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
-   will load Selenium-Core in the web page.
-3. Selenium-RC gets the first instruction from the client/driver (via another 
-   HTTP request made to the Selenium-RC Server).
-4. Selenim-Core acts on that first instruction, typically opening a page of the
-   AUT.
-5. The server is asked for that page, and it renders in the frame/window 
-   reserved for it.
-   
-.. TODO: I've got to update the image and the steps to include some of the 
-   information that is missing (Server response to the libs, AUT passing through 
-   the server, etc).
-   
-Hightened Privileges Browsers
-+++++++++++++++++++++++++++++
-This workflow on this method is very similar to Proxy Injection but the main
-difference is that the browsers are launched in a special mode called *Hightened
-Privileges*, which allows websites to do things that are not commonly permitted
-(as doing XSS_, or filling file upload inputs and pretty useful stuff for 
-Selenium). By using this browser modes, Selenium Core is able to directly open
-the AUT and read/interact with it's content without having to pass the whole AUT
-through the Selenium-RC server.
-
-Here is the architectural diagram. 
-
-.. image:: images/chapt5_img02_Architecture_Diagram.png
-   :align: center
-
-As a test suite starts in your favorite language, the following happens:
-
-1. The client/driver establishes a connection with the Selenium-RC server.
-2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
-   will load Selenium-Core in the web page.
-3. Selenium-RC gets the first instruction from the client/driver (via another 
-   HTTP request made to the Selenium-RC Server).
-4. Selenim-Core acts on that first instruction, typically opening a page of the
-   AUT.
-5. The server is asked for that page, and it renders in the frame/window 
-   reserved for it.
-   
-.. TODO: I've got to update the image and the steps to include some of the 
-   information that is missing (Server response to the libs, etc).
-   
-.. TODO: Call for review on the Devs list once I finish this topic!!!
 
 Relationship between Client libs and Selenese
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -200,7 +86,7 @@ Relationship between Client libs and Selenese
    etc.
 
 Installation
-------------
+-------------
 Once you download the whole Selenium-RC zip file from the `downloads page`_ you
 will notice that it has lots of sub-folders inside. As you already know from
 the `How Selenium Remote Control Works`_, this folders have all the sub-parts
@@ -212,384 +98,55 @@ server and the client driver you need.
 Selenium server installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The Selenium-RC server is just a jar file, which doesn't need installation at
-all. Just be downloading the zip file and extracting the server in the desired
-directory should be enough. You just go to that directory and execute it using
-java:: 
+all. Just downloading the zip file and extracting the server in the desired
+directory should be enough. To start running any tests you've written in any 
+programming language, you just have to go to the directory where Selenium-RC
+is located and execute the following line in a console:: 
 
     java -jar selenium-server.jar
 
 Most people like to have a more simplified setup, which can be made by creating
 an executable batch file (.bat on windows and .sh on linux) with just the line
-write above. This way, you can make a shortcut to that executable file in your
-desktop and just double-click on it anytime you want to wake up the server.
+writen above. This way, you can make a shortcut to that executable file in your
+desktop and just double-click on it anytime you want to wake up the server to 
+start your tests.
 
-Java client driver configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Santi: I found this link and thought it could be useful:
-   http://epyramid.wordpress.com/2008/11/26/setting-up-selenium-rc-testng-using-eclipse/
+.. note:: For the server to run you'll need java installed on your computer 
+   and propperly setup on the PATH variable to run it from the console.
+   You can check that you have java correctly installed by running the following
+   on a console::
 
-In General configuration of Selenium-RC with any java IDE would have following 
-steps:
+       java -version
 
-* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Start any java IDE
-* Create new project
-* Add to your project classpath selenium-java-client-driver.jar 
-* Record your test to from Selenium-IDE and translate it to java code (Selenium
-  IDE has automation translation feature)
-* Run selenium server from console (You need initialized java environment 
-  variable to do this) like:
-
-.. code-block:: bash
-
-   $ java -jar selenium-server -proxyInjectionMode. 
-
-.. note:: Server can be started from java as well.
-
-* Run your test in the IDE
-
-These points have been delineated below with reference to Eclipse and IntelliJ: 
-
-Configuring Selenium-RC With Eclipse
-++++++++++++++++++++++++++++++++++++
-**Eclipse** is a multi-language software development platform comprising an IDE 
-and a plug-in system to extend it. It is written primarily in Java and is used 
-to develop applications in this language and, by means of the various plug-ins, 
-in other languages as well as C/C++, Cobol, Python, Perl, PHP and more.
-
-Following lines describes configuration of Selenium-RC with Eclipse - 
-Version: 3.3.0. (Europa Release). It should not be too different for higher 
-versions of Eclipse 
-
-* Launch Eclipse. 
-* Select File > New > Other. 
-
-.. image:: images/chapt5_img03_Launch_Eclipse.png
-   :align: center
-
-* Java > Java Project > Next 
-
-.. image:: images/chapt5_img04_Create_Java_Project.png
-   :align: center
-
-* Provide Name to your project, Select JDK in 'Use a project Specific JRE' option (JDK 1.5
-  selected in this example) > click Next 
-
-.. image:: images/chapt5_img05_Create_Java_Project.png
-   :align: center
-
-* Keep 'JAVA Settings' intact in next window. Project specific libraries can be 
-  added here. (This described in detail in later part of document.)
-
-.. image:: images/chapt5_img06_Create_Java_Project.png 
-   :align: center
-
-* Click Finish > Click on Yes in Open Associated Perspective pop up window. 
-
-.. image:: images/chapt5_img07_Create_Java_Project.png 
-   :align: center
-
-This would create Project Google in Package Explorer/Navigator pane.
-
-.. image:: images/chapt5_img08_Package_Explorer.png 
-   :align: center
-
-* Right click on src folder and click on New > Folder 
-
-.. image:: images/chapt5_img09_Create_Com_Package.png 
-   :align: center
-
-Name this folder as com and click on Finish button.
-
-* This should get com package insider src folder. 
-
-.. image:: images/chapt5_img10_Create_Com_Package.png 
-   :align: center
-
-* Following the same steps create *core* folder inside *com*
-
-.. image:: images/chapt5_img11_Create_Core_Package.png 
-   :align: center
-
-SelTestCase class can be kept inside *core* package. 
-
-Create one more package inside *src* folder named *testscripts*. This is a 
-place holder for test scripts. 
-
-*Please notice this is about the organization of project and it entirely 
-depends on individual's choice /  organization's standards. Test scripts 
-package can further be segregated depending upon the project requirements.*
-
-.. image:: images/chapt5_img12_Create_Test_Script_Package.png 
-   :align: center
-
-* Create a folder called lib inside project Google. Right click on Project name
-  > New > Folder. This is a place holder for jar files to project (i.e. Selenium 
-  client driver, selenium server etc) 
-
-.. image:: images/chapt5_img13_Create_Library_Package.png
-   :align: center
-
-This would create lib folder in Project directory. 
-
-.. image:: images/chapt5_img14_Create_Library_Package.png
-   :align: center
-
-* Right click on *lib* folder > Build Path > Configure build Path 
-
-.. image:: images/chapt5_img15_Configure_Build_Path.png
-   :align: center
-
-* Under Library tab click on Add External Jars to navigate to directory where 
-  jar files are saved. Select the jar files which are to be added and click on 
-  Open button. 
-
-.. image:: images/chapt5_img16_Configure_Build_Path.png
-   :align: center
-
-.. note: Here in Selenium Server, Selenium Java Client driver and TestNG jar 
-   files have been added. TestNG is a testing framework which can be used to
-   build selenium tests. As an alternative to TestNG, JUnit jar can be added to
-   write selenium tests. 
-
-After having added jar files click on OK button. 
-
-.. image:: images/chapt5_img17_Configure_Build_Path.png
-   :align: center
-
-Added libraries would appear in Package Explorer as following:
-
-.. image:: images/chapt5_img18_Configure_Build_Path.png
-   :align: center
-
-Configuring Selenium-RC With Intellij
-+++++++++++++++++++++++++++++++++++++
-**IntelliJ IDEA** is a commercial Java IDE by the company JetBrains. Intellij 
-provides a set of integrated refactoring tools that allow programmers to 
-quickly redesign their code. IntelliJ IDEA provides close integration with 
-popular open source development tools such as CVS, Subversion, Apache Ant and 
-JUnit.
-
-Following lines describes configuration of Selenium-RC with IntelliJ 6.0
-It should not be very different for higher version of intelliJ.
-
-* Open a New Project in IntelliJ IDEA.
-
-.. image:: images/chapt5_img28_Create_New_Project.png
-   :align: center
-     
-* Provide name and location to Project.
-
-.. image:: images/chapt5_img28_Name_Project.png
-   :align: center
-   
-* Click Next and provide compiler output path.
-
-.. image:: images/chapt5_img29_Compiler_Output.png
-   :align: center 
-   
-* Click Next and select the JDK to be used.   
-
-.. image:: images/chapt5_img30_JDK_Selection.png
-   :align: center
-
-* Click Next and select Single Module Project.
-
-.. image:: images/chapt5_img31_Single_module.png
-   :align: center
-   
-* Click Next and select Java module.
-
-.. image:: images/chapt5_img32_Java_module.png
-   :align: center
-
-
-* Click Next and provide Module name and Module content root.
-
-.. image:: images/chapt5_img33_Module_Root.png
-   :align: center
-   
-
-* Click Next and select Source directory.   
-
-.. image:: images/chapt5_img34_Src.png
-   :align: center
-   
-* At last click Finish. This will launch the Project Pan.
-
-.. image:: images/chapt5_img34_Project_Pan.png
-   :align: center
-   
-
-**Adding Libraries to Project:**
-
-* Click on *Settings* button in the Project Tool bar.
-
-.. image:: images/chapt5_img35_Add_Lib.png
-   :align: center
-
-* Click on *Project Structure* in Settings pan. 
-
-.. image:: images/chapt5_img36_Proj_Struct.png
-   :align: center
-   
-* Select *Module* in Project Structure and browse to *Dependencies* tab.   
-
-.. image:: images/chapt5_img37_Dependencies.png
-   :align: center
-   
-* Click on Add button followed by click on Module Library.  
-
-.. image:: images/chapt5_img38_Module_Library.png
-   :align: center
-
-* Browse to the Selenium directory and select selenium-java-client-driver.jar 
-  and selenium-server.jar. (Multiple Jars can be selected b holding down the 
-  control key.). 
-
-.. image:: images/chapt5_img39_Library_Files.png
-   :align: center
-   
-* Select both jar files in project pan and click on *Apply* button.   
-
-.. image:: images/chapt5_img40_Add_Jars.png
-   :align: center
-   
-   
-* Now click ok on Project Structure followed by click on Close on 
-  Project Settings pan. Added jars would appear in project Library as following.    
-
-.. image:: images/chapt5_img41_Added_Jars.png
-   :align: center
-   
-* Create the directory structure in src folder as following.   
-
-.. image:: images/chapt5_img42_Project_Directories.png 
-   :align: center
-   
-.. note:: This is not hard and fast convention and might very from project to
-   project.
-
-
-* Herein *core* contains the SelTestCase class which is used to create 
-  Selenium object and fire up the browser. *testscripts* package contains 
-  the test classes which extend the SelTestCase class. Hence extended 
-  structure would look as following.
-  
-.. image:: images/chapt5_img43_Project_Structure.png
-   :align: center 
-   
-
-.. <Documentation is in progress> 
-
-Python Client Driver Configuration 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The following steps describe the basic installation procedure. After following 
-this, the user can start using the desired IDE, (even write tests in a text 
-processor and run them from command line!) without any extra work (at least 
-from the selenium's part).
-
-* Installing Python
-
-    .. note:: This will cover python installation on Windows and Mac only, as 
-       in most linux distributions python is already pre-installed by default. 
-
-    * Windows
-    
-      1. Download Active python's installer from ActiveState's official site: 
-         http://activestate.com/Products/activepython/index.mhtml 
-      2. Run the installer downloaded (ActivePython-x.x.x.x-win32-x86.msi)
-
-..
-
-      .. image:: images/chapt5_img19_Python_Install.png
-         :align: center
-
-..
-
-      .. image:: images/chapt5_img22_Python_Install.png
-         :align: center
-
-..
-
-    * Mac
-    
-      The latest Mac OS X version (Leopard at this time) comes with Python 
-      pre-installed. To install an extra Python, get a universal binary at 
-      http://www.pythonmac.org/ (packages for Python 2.5.x). You will get a 
-      .dmg file that you can mount. It contains a .pkg file that you can launch.
-
-      .. image:: images/chapt5_img19_Python_Mac_Install.png
-         :align: center
-	
-* Installing the Selenium driver client for python 
-
-    1. Download the last version of Selenium Remote Control from the 
-       `downloads page`_
-    2. Extract the content of the downloaded zip file 
-    3. Copy the module with the Selenium's driver for Python (selenium.py)
-       in the folder *C:/Python25/Lib* (this will allow you to import it 
-       directly in any script you write).
-
-       You will find the module in the extracted folder, it's located inside 
-       *selenium-python-driver-client*.
-
-    .. image:: images/chapt5_img25_Python_Driver_Install.png
-       :align: center
-
-Congratulations, you're done! Now any python script that you create can import
-selenium and start interacting with the browsers.
+   If you get a version number, your setup ready to start using Selenium-RC.
 
 .. _`downloads page`: http://seleniumhq.org/download/
 
+Java client driver configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
+* Extract the file *selenium-java-client-driver.jar*
+* Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)
+* Create a new project
+* Add to your project classpath the file *selenium-java-client-driver.jar*
+* Write your Selenium test in Java
+* Run selenium server from console
+* Execute your test from the IDE
+
+Python client driver configuration 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
+* Extract the file *selenium.py*
+* Write your Selenium test in Python
+* Add to your tests path the file *selenium.py*
+* Run selenium server from console
+* Execute your test from a console or the IDE
 
 .NET client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.NET client Driver can be used with Microsoft Visual Studio. 
-To Configure it with Visual do as Following.
+.. Someone should resume the whole installation procedure in a 
+   list of steps as in previous languages.
 
-* Launch Visual Studio and navigate to File > New > Project.
-  
-  .. image:: images/chapt5_img01_Launch_VisualStudio.png
-     :align: center
-      
-..
-
-* Select Visual C# > Class Library > Name your project > Click on OK button.
-
-  .. image:: images/chapt5_img02_CreateProject.png
-     :align: center
-  
-..
-
-* A Class (.cs) is created. Rename it as appropriate.
-
-  .. image:: images/chapt5_img03_TestClassFile.png
-    :align: center
-
-..
-
-* Under right hand pane of Solution Explorer right click on References > Add
-  References. 
-
-  .. image:: images/chapt5_img04_AddReference.png
-    :align: center
-
-..
-
-*  Select following dll files - 
-   nmock.dll, nunit.core.dll, nunit.framework.dll,ThoughtWorks.
-   Selenium.Core.dll, ThoughtWorks.Selenium.IntegrationTests.dll,
-   ThoughtWorks.Selenium.UnitTests.dll and click on Ok button
-   
-   .. image:: images/chapt5_img05_AddDlls.png
-      :align: center
-      
-With This Visual Studio is ready for Selenium Test Cases.
-For a sample test case in C# look at `C# section`_ of Basic Tests Structure
-
-.. _`C# section`: `C#`_
-  
 Sample Test Scripts
 -------------------
 If we use the following test recorded with Selenium-IDE as a base:
@@ -603,8 +160,8 @@ clickAndWait       submit
 assertTextPresent  Selenium-RC
 =================  ============  ===========
 
-.. note:: In the table is not mentioned that the script is written to test 
-   a search at http://www.google.com
+.. note:: In the table is not mentioned that the domain to test is 
+   http://www.google.com
 
 Here is the test script exported to all the programming languages:
 
@@ -1003,7 +560,6 @@ The basic test structure is:
 Ruby
 ++++
 
-
 Starting The Browser 
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1097,18 +653,22 @@ properties), in backend it's making the real browser do things.
 
 Retrieving and Reporting Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Each programming language has it's own testing framework which is used to
+run the tests. Everyone of them has it's own way of reporting the results
+and you'll surely find third-party libraries specially created for reporting
+test results in different formats as HTML or PDF.
 
 Adding Some Spice to Your Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+-------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
-only with the IDE. We will try to give you some guidance on things that can 
-only be done using a programming language. The different examples are just 
-written on only one of the languages, but we think that you'll understand the
-idea and will be able to translate it to the language of your choice.
+only with the IDE. We will try to give you some guidance on things that can
+only be done using a programming language. The different examples are written
+in only one of the languages, the idea is that you understand the concept, be
+able to translate it to the language of your choice and upgrade it for your
+needs.
 
 Iteration
-+++++++++
+~~~~~~~~~
 Iteration is one of the most common things people needs to do in their tests.
 Generally, to repeat a simple search, or saving you from duplicating the same
 code several times.
@@ -1136,36 +696,6 @@ This doesn't look to efficient.
 By using a programming language, we can just iterate over a list and do the 
 search in the following way. 
 
-**In Python:**
-
-.. code-block:: python
-
-   list = ("IDE", "RC", "GRID")
-   for tool in list:
-       sel.open("/")
-       sel.type("q", "selenium " + tool)
-       sel.click("submit")
-       sel.wait_for_page_to_load("30000")
-       self.failUnless(sel.is_text_present("Selenium-" + tool))
-       
-**In Java:**       
-       
-.. code-block:: java    
-
-   // Collection of String values.	
-   String[] arr = {"IDE", "RC", "GRID"};	
-		
-   // Execute For loop for each String in 'arr' array.
-   for (String s:arr) {
-   	sel.open("/");
-  	sel.type("q", "selenium " +s);
-   	sel.click("submit");
-        sel.waitForPageToLoad("30000");
-        verifyTrue("Expected text: " +s+ " is missing on page."
-        , sel.isTextPresent("Selenium-" + s));
-   
-   }
-   
 **In C#:**   
    
 .. code-block:: c#
@@ -1184,9 +714,42 @@ search in the following way.
    
    }
 
+Conditionals
+~~~~~~~~~~~~
+Most common errors are encountered while running selenium test are the errors 
+which pop up when corresponding element locator is not available on page.
+For example, when running the following line:
+
+.. code-block:: java
+   
+   selenium.type("q", "selenium " +s);
+   
+If element 'q' happens to be unavailable on page then following exception is
+thrown:
+
+.. code-block:: java
+
+   com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
+
+A better approach would be to first validate if the element is really present
+and then take different alternatives in case it is not:
+
+**In Java:**
+
+.. code-block:: java
+   
+   // If element is available on page then perform type operation.
+   if(selenium.isElementPresent("q")) {
+       selenium.type("q", "Selenium-RC");			
+   } else {
+       selenium.open("/")
+   }
+
+By just using a simple *if* condition, we can do interesting things. Think of
+the possibilities!
 
 Data Driven Testing
-+++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~
 So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
 search and assert it's existence.
@@ -1197,79 +760,16 @@ As you can see, this task looks really simple being made using a scripting
 language while it's impossible to do using Selenium-IDE.
 
 Error Handling
-++++++++++++++
-Most common errors encountered while running selenium test are
-the errors which pop up when corresponding element locator is not available
-on page. For ex.
+~~~~~~~~~~~~~~
 
-.. code-block:: java
-   
-   selenium.type("q", "selenium " +s);
-   
-If element 'q' happens to be unavailable on page then following exception is thrown -
-
-.. code-block:: java
-
-   com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
-
-A better approach would be to create custom methods for web application 
-controls and having these methods being available to test methods using Inheritance
-feature of Object Oriented Programming. A custom method for typing in text box 
-might look as following -
-
-.. code-block:: java
-   
-   public void typeAction(String elementLocator, String testData) {
-		
-		// If element is available on page then perform type operation.
-		if(selenium.isElementPresent(elementLocator)) {
-			
-			selenium.type(elementLocator, testData);			
-		
-		// Else log the error in test report.
-		
-		}  else {		
-			
-			Reporter.log("Element: " +elementLocator+ 
-			"is not available on page.");
-		}
-   }
-   
-
-*Above example is specific to java client driver which uses 'Reporter' 
-class of TestNG for logging. Using the same approach corresponding method 
-can be written in a variety of Selenium Client Drivers.*
-
-
-Instead of typing value directly using 'type' method of selenium, 
-'typeAction' method is called. Definition of 'typeAction' method
-makes sure that 'type' method of selenium is used only when
-corresponding element locator is available on page. Call to 
-typeAction method would be - 
-
-.. code-block:: java
-
-   typeAction("username", "MyUserName");
-
-
-Conditionals
-++++++++++++
-Well, the iteration and data input seem nice, but we've just started. How
-about alternative paths? What if we want our script to change to the next
-page if it finds that the search term was not present in the first one?
-
-That doesn't seem too complicated:
-
-.. TODO: The script for this example
-
-By just using a simple *if* condition, we can do interesting things. Think of
-the possibilities!
+.. The idea here is to use a try-catch statement to grab a really unexpected
+   error.
 
 Data Base Validations
-+++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~
 Off course, you can also do Data Base queries in your favorite scripting 
-language. Why not using them for some data validations/retrieval on the application
-under test?
+language. Why not using them for some data validations/retrieval on the 
+Application Under Test?
 
 Consider example of Registration process where in registered email address
 is to be retrieved from database. Specific cases of establishing DB connection 
@@ -1306,179 +806,147 @@ and retrieving data from DB would be -
    // Use the fetched value to login to application.
    selenium.type("userid", emailaddress);
    
-This is very simple example of of data retrieval from DB in Java.
+This is very simple example of data retrieval from DB in Java.
 A more complex test could be to validate that inactive users are not able
-to login to application. Continuing with previous code 
-block it could be written as follows:
+to login to application. This wouldn't take too much work from what you've 
+already seen.
+   
+How the Server works
+--------------------
+.. note:: This topic tries to explain the technical implementation behind 
+   Selenium-RC. It's not fundamental for a Selenium user to know this, but 
+   could be useful for understanding some of the problems you can find in the
+   future.
+   
+To understand in detail how Selenium-RC Server works  and why it uses proxy injection
+and hightened privilege modes you must first understand `the same origin policy`_.
+   
+The Same Origin Policy
+~~~~~~~~~~~~~~~~~~~~~~
+The main restriction that Selenium's architecture has faced is the 
+Same Origin Policy. This security restriction is applied by every browser
+in the market and it's objective is to ensure that a site's content will never
+be accessible by a script from other site.
 
-.. code-block:: java
+If this were possible, a script placed on any website you open, would 
+be able to read information on your bank account if you had the account page
+opened on other tab. Which is also called XSS (Cross-site Scripting).
 
-   ResultSet result = stmt.executeQuery
-   ("select email_address from usertable where user_activation = false");
-   
-   // Counter of number of inactive users.
-   int count = 0;
-   
-   // ResultSet is examined row by row using ResultSet.next() method.
-   while (result.next()) {
-    count++;
-    String emailaddress = result.getString("email_address");
-    selenium.type("userid", emailaddress);
-    selenium.click("login");
-    selenium.waitForPageToLoad();
-    verifyTryue("Exception message for invalid login is not thrown",
-    	selenium.isTextPresent("Invalid UserId"));
-   }
-   
-   // If count of invalid users is 0 then report it in test result.
-   if (count == 0) {
-   Reporter.log("There is no invalid user in db.");
-   
-   // Else report the count of users for whom invalid login was tested.
-   } else {
-    Reporter.log("Login invalidation was tested for: " +count+ " users.");
-   }
-   
-   
+To work under that policy. Selenium-Core (and it's javascript commands that
+make all the magic happen) must be placed in the same origin as the Application
+Under Test (same URL). This has been the way Selenium-Core was first
+used and implemented (by deploying Selenium-Core and the set of tests inside
+the application's server), but this was a requirement that not all the projects 
+could meet and Selenium Developers had to find an alternative that would allow 
+testers to use Selenium to test site where they didn't have the possibility to
+deploy their code. 
 
+.. note:: You can find additional information about this topic on wikipedia
+   pages about `Same Origin Policy`_ and XSS_. 
+
+.. _Same Origin Policy: http://en.wikipedia.org/wiki/Same_origin_policy
+.. _XSS: http://en.wikipedia.org/wiki/Cross-site_scripting
+
+Proxy Injection
+~~~~~~~~~~~~~~~
+The first method used to skip the `The Same Origin Policy`_ was Proxy Injection.
+In this method, the Selenium Server acts as a client-configured [1]_ **HTTP 
+proxy** [2]_, that stands in between the browser and the Application Under Test.
+After this, it is able to masks the whole AUT under a fictional URL (embedding
+Selenium-Core and the set of tests and delivering them as if they were coming
+from the same origin). 
+
+.. [1] The proxy is a third person in the middle that passes the ball 
+   between the two parts. In this case will act as a "web server" that 
+   delivers the AUT to the browser. Being a proxy, gives the capability
+   of "lying" about the AUT real URL.  
+   
+.. [2] The client browser (Firefox, IE, etc) is launched with a 
+   configuration profile that has set localhost:4444 as the HTTP proxy, this
+   is why any HTTP request that the browser does will pass through Selenium
+   server and the response will pass through it and not from the real server.
+
+Here is an architectural diagram. 
+
+.. TODO: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
+   the Browser....
+
+.. image:: images/chapt5_img02_Architecture_Diagram.png
+   :align: center
+
+As a test suite starts in your favorite language, the following happens:
+
+1. The client/driver establishes a connection with the selenium-RC server.
+2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
+   will load Selenium-Core in the web page.
+3. Selenium-RC gets the first instruction from the client/driver (via another 
+   HTTP request made to the Selenium-RC Server).
+4. Selenim-Core acts on that first instruction, typically opening a page of the
+   AUT.
+5. The server is asked for that page, and it renders in the frame/window 
+   reserved for it.
+   
+.. TODO: I've got to update the image and the steps to include some of the 
+   information that is missing (Server response to the libs, AUT passing through 
+   the server, etc).
+   
+Hightened Privileges Browsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This workflow on this method is very similar to Proxy Injection but the main
+difference is that the browsers are launched in a special mode called *Hightened
+Privileges*, which allows websites to do things that are not commonly permitted
+(as doing XSS_, or filling file upload inputs and pretty useful stuff for 
+Selenium). By using this browser modes, Selenium Core is able to directly open
+the AUT and read/interact with it's content without having to pass the whole AUT
+through the Selenium-RC server.
+
+Here is the architectural diagram. 
+
+.. image:: images/chapt5_img02_Architecture_Diagram.png
+   :align: center
+
+As a test suite starts in your favorite language, the following happens:
+
+1. The client/driver establishes a connection with the Selenium-RC server.
+2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
+   will load Selenium-Core in the web page.
+3. Selenium-RC gets the first instruction from the client/driver (via another 
+   HTTP request made to the Selenium-RC Server).
+4. Selenim-Core acts on that first instruction, typically opening a page of the
+   AUT.
+5. The server is asked for that page, and it renders in the frame/window 
+   reserved for it.
+   
+.. TODO: I've got to update the image and the steps to include some of the 
+   information that is missing (Server response to the libs, etc).
+   
+.. TODO: Call for review on the Devs list once I finish this topic!!!
 
 Server Command Line options
 ---------------------------
+When the server is launced, some command line options can be used to change the
+default behaviour if it is needed.
 
-This is the help text given by Selenium Server if you use the ``-h`` parameter.
-
-Usage:
+As you already know, the server is started by running the following:
 
 .. code-block:: bash
  
-   $ java -jar selenium-server.jar [-interactive] [options] 
+   $ java -jar selenium-server.jar
 
-Options: 
-
--port 
-    <nnnn>
-    The port number the selenium server should use (default 4444) 
-
--timeout
-    <nnnn>
-    An integer number of seconds before we should give up 
-
--interactive
-    Puts you into interactive mode. See the tutorial for more details.
-
--singleWindow
-    Puts you into a mode where the test web site executes in a frame. This mode
-    should only be selected if the application under test does not use frames. 
-
--profilesLocation
-    Specifies the directory that holds the profiles that java clients can use 
-    to start up selenium. Currently supported for Firefox only.
-
--forcedBrowserMode
-    <browser>
-    Sets the browser mode (e.g. "\*iexplore" for all sessions, no matter what is 
-    passed to getNewBrowserSession 
-
--forcedBrowserModeRestOfLine
-    <browser>
-    Sets the browser mode to all the remaining tokens on the line (e.g. 
-    "\*custom /some/random/place/iexplore.exe") for all sessions, no matter what
-    is passed to getNewBrowserSession 
-
--userExtensions
-    <file>
-    Indicates a JavaScript file that will be loaded into selenium 
-
--browserSessionReuse
-    Stops re-initialization and spawning of the browser between tests 
-
--avoidProxy
-    By default, we proxy every browser request; set this flag to make the 
-    browser use our proxy only for URLs containing '/selenium-server' 
-
--firefoxProfileTemplate 
-    <dir>
-    Normally, we generate a fresh empty Firefox profile every time we launch. 
-    You can specify a directory to make us copy your profile directory instead. 
-
--debug
-    Puts you into debug mode, with more trace information and diagnostics 
-
--browserSideLog
-    Enables logging on the browser side; logging messages will be transmitted 
-    to the server. This can affect performance. 
-
--ensureCleanSession
-    If the browser does not have user profiles, make sure every new session has
-    no artifacts from previous sessions. For example, enabling this option will
-    cause all user cookies to be archived before launching IE, and restored 
-    after IE is closed. 
-
--trustAllSSLCertificates
-    Forces the Selenium proxy to trust all SSL certificates. This doesn't work 
-    in browsers that don't use the Selenium proxy. 
-
--log
-    <LogFileName>
-    Writes lots of debug information out to a log file 
-
--htmlSuite
-    <browser> <startURL> <suiteFile> <resultFile>
-    Run a single HTML Selenese (Selenium Core) suite and then exit immediately, 
-    using the specified browser (e.g. "\*firefox") on the specified URL 
-    (e.g. "http://www.google.com"). You need to specify the absolute path to 
-    the HTML test suite as well as the path to the HTML results file we'll 
-    generate. 
-
--proxyInjectionMode
-    Puts you into proxy injection mode, a mode where the selenium server acts
-    as a proxy server for all content going to the test application. Under 
-    this mode, multiple domains can be visited, and the following additional 
-    flags are supported:
-
-    -dontInjectRegex
-        <regex>
-        An optional regular expression that proxy injection mode can use to 
-        know when to bypss injection 
-
-    -userJsInjection
-        <file>
-        Specifies a JavaScript file which will then be injected into all pages 
-
-    -userContentTransformation
-        <regex> <replacement>
-        A regular expression which is matched against all test HTML content; 
-        the second is a string which will replace matches. These flags can be 
-        used any number of times. A simple example of how this could be 
-        useful: if you add "-userContentTransformation https http" then all 
-        "https" strings in the HTML of the test application will be changed to 
-        be "http". 
-
-We also support two Java system properties: -Dhttp.proxyHost and -Dhttp.\
-proxyPort. Selenium-RC normally overrides your proxy server configuration, using
-the Selenium Server as a proxy. Use these options if you need to use your own 
-proxy together with the Selenium Server proxy. Use the proxy settings like like
-this:
+If you want to see the list of all the available options, you just have to use
+the ``-h`` option:
 
 .. code-block:: bash
+ 
+   $ java -jar selenium-server.jar -h
 
-   $ java -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=1234 -jar selenium-server.jar 
-
-If your HTTP proxy requires authentication, you will also need to set -Dhttp.\
-proxyUser and -Dhttp.proxyPassword, in addition to http.proxyHost and http.\
-proxyPort:
-
-.. code-block:: bash
-
-   $ java -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=1234 -Dhttp.proxyUser=joe -Dhttp.proxyPassword=example -jar selenium-server.jar
-
-
-Now that you've see the whole picture, the most important and complex options
-will be explained.
+You'll receive a list of all the options you can use on the server and a brief
+explanation on all of them. 
+Though, for some of those options, that short overview is not enough, so we've
+written an in deep explanation for them.
 
 Multi-Window Mode
 ~~~~~~~~~~~~~~~~~
-
 Before 1.0, Selenium by default ran the application under test in a subframe 
 which looks like this:
 
@@ -1510,8 +978,8 @@ option:
  
    -singlewindow 
 
-Specifying a Separate Firefox Profile 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Personalizing the Firefox Profile used in the tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Firefox will not run two instances simultaneously unless you specify a 
 separate profile for each instance. Later versions of Selenium-RC run in a 
 separate profile automatically, however, if you are using an older version of 
@@ -1572,50 +1040,25 @@ you type it in. (You can use the -htmlSuite parameter with the ``-port`` and
 do both of those at once.) Also note that it requires you to pass in an HTML 
 Selenese suite, not a single test.
 
-Selenium-IDE Generated Code
----------------------------
-.. Santi: I'm writing something similar in the Sample Test Scripts section
-
-Starting the Browser 
---------------------
-Specify the Host and Port::
-
+.. Selenium-IDE Generated Code
+   ---------------------------
+   Starting the Browser 
+   --------------------
+   Specify the Host and Port::
    localhost:4444 
-
-.. Santi: Which is the supposed content of this topic?
-
-The Selenium-RC Program's Main() 
---------------------------------
-.. Santi: What's this topic? Is it related with the Tests sctructure chapter?
-
-.. Santi: I don't see the last three sections very useful (maybe I didn't get
-   the idea).
-
-Using the Browser While Selenium is Running 
--------------------------------------------
-You may want to use your browser at the same time that Selenium is also using 
-it. Perhaps you want to run some manual tests while Selenium is running your 
-automated tests and you wish to do this on the same machine. Or perhaps you just
-want to use your Facebook account but Selenium is running in the background. 
-This isn't a problem. 
-
-With Internet Explorer, you can simply start another browser instance and run 
-it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
-this also, but you must specify a separate profile. 
-
-Specifying the Path to a Specific Browser 
------------------------------------------
-You can specify to Selenium-RC a path to a specific browser. This is useful if 
-you have different versions of the same browser, and you wish to use a specific
-one. Also, this is used to allow your tests to run against a browser not 
-directly supported by Selenium-RC. When specifying the run mode, use the 
-\*custom specifier followed by the full path to the browser's executable::
-
-   *custom <path to browser> 
- 
-For example 
- 
-.. Paul: Need an example here that works—the one I tried didn't 
+   The Selenium-RC Program's Main() 
+   --------------------------------
+   Using the Browser While Selenium is Running 
+   -------------------------------------------
+   You may want to use your browser at the same time that Selenium is also using 
+   it. Perhaps you want to run some manual tests while Selenium is running your 
+   automated tests and you wish to do this on the same machine. Or perhaps you just
+   want to use your Facebook account but Selenium is running in the background. 
+   This isn't a problem. 
+   
+   With Internet Explorer, you can simply start another browser instance and run 
+   it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
+   this also, but you must specify a separate profile. 
 
 Troubleshooting 
 ---------------
@@ -1750,7 +1193,8 @@ Here's the complete error msg from the server::
     her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
     ~1\Temp\customProfileDir203138\parent.lock 
 
-To resolve this, see the section on `Specifying a Separate Firefox Profile`_
+To resolve this, see the section on `Specifying a Separate Firefox Profile 
+<Personalizing the Firefox Profile used in the tests>`_
 
 Handling HTTPS and Security Popups 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1826,3 +1270,18 @@ doubt, use the latest release version of Selenium.
 
 .. Santi: Mary Ann sugested We should also mention about JRE version needed by
    the server
+
+Specifying the Path to a Specific Browser 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can specify to Selenium-RC a path to a specific browser. This is useful if 
+you have different versions of the same browser, and you wish to use a specific
+one. Also, this is used to allow your tests to run against a browser not 
+directly supported by Selenium-RC. When specifying the run mode, use the 
+\*custom specifier followed by the full path to the browser's executable::
+
+   *custom <path to browser> 
+ 
+For example 
+ 
+.. Paul: Need an example here that works—the one I tried didn't 
+
