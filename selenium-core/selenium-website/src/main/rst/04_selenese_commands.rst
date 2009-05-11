@@ -434,15 +434,80 @@ Order of Locators Evaluation
 *This section still needs to be developed.  Please refer to the Selenium 
 Command Reference on the SeleniumHq.org website.*
 
+.. _patterns-section:
+
 Matching Text Patterns
 ----------------------
-Another topic, almost as important as locating UI elements, is understanding 
-how to match text patterns on the page.  There are multiple ways this can be done.
 
-.. regexp: vs. glob: vs. exact: patterns
+Like locators, *patterns* are a type of parameter frequently required by Selenese
+commands.  Examples of commands which require 
+patterns are **verifyTextPresent**,
+**verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and **verifyPrompt**.  And as has been mentioned above, link locators can 
+utilize a pattern.  Patterns allow one to
+*describe*, via the use of special characters, what text is expected rather than
+having to specify that text exactly.
 
-*This section is not yet developed.  Please refer to the Selenium Reference 
-at www.SeleniumHQ.org*
+There are three types of patterns: *globbing*, *regular expressions*, and *exact*.
+
+Globbing Patterns
+~~~~~~~~~~~~~~~~~
+
+Most people are familiar with globbing as it is utilized in
+filename expansion at a DOS or Unix/Linux command line such as ``ls *.c``.
+In this case, globbing is used to display all the files ending with a ``.c`` 
+extension that exist in the current directory.  Globbing is fairly limited.  
+Only two special characters are supported in the Selenium implementation:
+
+    **\*** which translates to "match anything," i.e., nothing, a single character, or many characters.
+
+    **[ ]** (*character class*) which translates to "match any single character 
+    found inside the square brackets." A dash (hyphen) can be used as a shorthand
+    to specify a range of characters (which are contiguous in the ASCII character
+    set).  A few examples will make the functionality of a character class clear:
+
+	``[aeiou]`` matches any lowercase vowel
+
+	``[0-9]`` matches any digit
+
+	``[a-zA-Z0-9]`` matches any alphanumeric character
+
+In most other contexts, globbing includes a third special character, the **?**.
+However, Selenium globbing patterns only support the asterisk and character
+class.
+
+To specify a globbing pattern parameter for a Selenese command, one can
+prefix the pattern with a **glob:** label.  However, because globbing
+patterns are the default, one can also omit the label and specify just the
+pattern itself.
+
+Below is an example of two commands that use globbing patterns.  The
+actual link text on the page being tested
+was "Film/Television Department"; by using a pattern
+rather than the exact text, the **click** command will work even if the
+link text is changed to "Film & Television Department" or "Film and Television
+Department".  The glob pattern's asterisk will match "anything or nothing"
+between the word "Film" and the word "Television".
+
+===========   ====================================    ========
+click         link=glob:Film*Television Department
+verifyTitle   glob:\*Film\*Television\*
+===========   ====================================    ========
+
+The actual title of the page reached by clicking on the link was "De Anza Film And
+Television Department - Menu".  By using a pattern rather than the exact
+text, the ``verifyTitle`` will pass as long as the two words "Film" and "Television" appear
+(in that order) anywhere in the page's title.  For example, if 
+the page's owner should shorten
+the title to just "Film & Television Department," the test would still pass.
+Using a pattern for both a link and a simple test that the link worked (such as
+the ``verifyTitle`` above does) can greatly reduce the maintenance for such
+test cases.
+
+Regular Expression Patterns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exact Patterns
+~~~~~~~~~~~~~~
 
  
 The "AndWait" Commands 
