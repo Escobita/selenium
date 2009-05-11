@@ -97,16 +97,17 @@ server and the client driver you need.
 
 Selenium server installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The Selenium-RC server is just a jar file, which doesn't need installation at
-all. Just downloading the zip file and extracting the server in the desired
-directory should be enough. To start running any tests you've written in any 
-programming language, you just have to go to the directory where Selenium-RC
-is located and execute the following line in a console:: 
+The Selenium-RC server is just a jar file (*selenium-server.jar*), which doesn't
+need installation at all. Just downloading the zip file and extracting the 
+server in the desired directory should be enough. Before starting any tests
+you've written in any programming language, you just have to go to the directory
+where Selenium-RC's server is located and execute the following line in a 
+console::
 
     java -jar selenium-server.jar
 
 Most people like to have a more simplified setup, which can be made by creating
-an executable batch file (.bat on windows and .sh on linux) with just the line
+an executable batch file (.bat on windows and .sh on linux) with that command
 writen above. This way, you can make a shortcut to that executable file in your
 desktop and just double-click on it anytime you want to wake up the server to 
 start your tests.
