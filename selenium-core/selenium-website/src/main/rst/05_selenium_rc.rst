@@ -981,6 +981,10 @@ option:
 
 Personalizing the Firefox Profile used in the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. TODO: Better descibe how selenium handles firefox profiles (it creates,
+   uses and then deletes sandbox profiles unless you specify special ones)
+   
 Firefox will not run two instances simultaneously unless you specify a 
 separate profile for each instance. Later versions of Selenium-RC run in a 
 separate profile automatically, however, if you are using an older version of 
