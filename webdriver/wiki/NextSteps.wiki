@@ -84,7 +84,7 @@ We've already seen how to enter text into a textarea or text field, but what abo
 
 {{{
 WebElement select = driver.findElement(By.xpath("//select"));
-List<WebElement> allOptions = select.getChildrenOfType("option");
+List<WebElement> allOptions = select.findElements(By.tagName("option"));
 for (WebElement option : allOptions) {
     System.out.println(String.format("Value is: %s", option.getValue()));
     option.setSelected();
