@@ -122,6 +122,7 @@ start your tests.
    If you get a version number, your setup ready to start using Selenium-RC.
 
 .. _`downloads page`: http://seleniumhq.org/download/
+.. _`NUnit`: http://www.nunit.org/index.php?p=download
 
 Java client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,7 +132,7 @@ Java client driver configuration
 * Create a new project
 * Add to your project classpath the file *selenium-java-client-driver.jar*
 * Write your Selenium test in Java
-* Run selenium server from console
+* Run Selenium server from console
 * Execute your test from the IDE
 
 Python client driver configuration 
@@ -140,13 +141,20 @@ Python client driver configuration
 * Extract the file *selenium.py*
 * Write your Selenium test in Python
 * Add to your tests path the file *selenium.py*
-* Run selenium server from console
+* Run Selenium server from console
 * Execute your test from a console or the IDE
 
 .NET client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Someone should resume the whole installation procedure in a 
-   list of steps as in previous languages.
+* Download Selenium-RC from the SeleniumHQ `downloads page`_
+* Extract the folder
+* Download and install `NUnit`_
+* Open your desired .Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
+* Create a class library (.dll)
+* Add references to the following DLLs: nmock.dll, nunit.core.dll, nunit.framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
+* Write your Selenium test in a .Net language (C#, VB.Net)
+* Run Selenium server from console
+* Execute your test using the NUnit gui or NUnit command line
 
 Sample Test Scripts
 -------------------
