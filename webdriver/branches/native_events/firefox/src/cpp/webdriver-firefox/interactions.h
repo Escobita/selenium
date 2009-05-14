@@ -18,18 +18,21 @@ limitations under the License.
 #ifndef interactions_h
 #define interactions_h
 
-#include "stdafx.h"
-
 #include <wchar.h>
 
+#ifdef _WIN32
+#include "stdafx.h"
 #define EXPORT __declspec(dllexport)
+#else
+#define EXPORT 
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Keyboard interactions
-EXPORT void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey);
+EXPORT void sendKeys(void* windowHandle, const wchar_t* value, int timePerKey);
 
 #ifdef __cplusplus
 }

@@ -20,13 +20,13 @@ NS_IMETHODIMP nsNativeEvents::SendKeys(nsISupports *aNode, const PRUnichar *valu
 {
 	AccessibleDocumentWrapper doc(aNode);
 
-	HWND hWnd = doc.getHWND();
+	void* windowHandle = doc.getWindowHandle();
 
-	if (!hWnd) {
+	if (!windowHandle) {
 		return NS_ERROR_NULL_POINTER;
 	}
 
-	sendKeys(hWnd, value, 0);
+	sendKeys(windowHandle, value, 0);
 
 	return NS_OK;
 }

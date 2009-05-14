@@ -13,21 +13,21 @@ public:
 		wrapper_19 = do_QueryInterface(node);
 	}
 
-	HWND getHWND() 
+	void* getWindowHandle() 
 	{
 		if (!isValid()) return NULL;
 
-		void *hwnd = NULL;
+		void *handle = NULL;
 		nsresult rv;
 		
 		if (wrapper_19) {
-			rv = wrapper_19->GetWindowHandle(&hwnd);
-			if(NS_SUCCEEDED(rv)){ return static_cast<HWND>(hwnd); }
+			rv = wrapper_19->GetWindowHandle(&handle);
+			if(NS_SUCCEEDED(rv)){ return handle; }
 		}
 
 		if (wrapper_18) {
-			rv = wrapper_18->GetWindowHandle(&hwnd);
-			if(NS_SUCCEEDED(rv)){ return static_cast<HWND>(hwnd); }
+			rv = wrapper_18->GetWindowHandle(&handle);
+			if(NS_SUCCEEDED(rv)){ return handle; }
 		}
 
 		return NULL;
