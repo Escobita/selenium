@@ -42,10 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Selenium'
-copyright = u'''2009, Dave Hunt,
-                    Paul Grandgean,
-                    Santiago Suarez Ordoñez,
-                    Tarun Kumar'''
+copyright = u'''2009, Selenium Project'''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -173,10 +170,10 @@ htmlhelp_basename = 'seleniumdoc'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
-latex_documents = [
-  ('index', 'selenium.tex', ur'selenium Documentation',
-   ur'Santiago Suarez Ordoñez', 'manual'),
-]
+#latex_documents = [
+#('index', 'selenium.tex', ur'selenium Documentation',
+#ur'Selenium Project', 'manual'),
+#]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.

@@ -3,9 +3,6 @@
 Introducing Selenium 
 ====================
 
-.. This is a very rough draft have not proofread it yet. Still, you are 
-   welcome to provide comments. 
-
 To Automate or Not to Automate?  That is the Question!
 ------------------------------------------------------
 
