@@ -13,7 +13,7 @@ A: The aim is the same (to allow you to test your webapp), but the implementatio
 
 *Q: What is Selenium 2.0?*
 
-A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver will make is its API and the native drivers. The process of rolling WebDriver into Selenium will probably take some time, so until it's complete if you'd like to use the WebDriver API then the best bet will be to use WebDriver directly.
+A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver will make is its API and the native drivers. The process of rolling WebDriver into Selenium will probably take some time, so until it's complete if you'd like to use the WebDriver API then the best bet will be to use WebDriver directly. There's an introduction to this at the [http://google-opensource.blogspot.com/2009/05/introducing-webdriver.html Google Open Source blog].
 
 *Q: What's the plan for migrating WebDriver into Selenium?*
 
@@ -27,7 +27,7 @@ A: We believe that within a software application's development team, the people 
 
 A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
 
-We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a JavascriptExecutor. In Java, this looks like:
+We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
 
 {{{
 WebDriver driver; // Assigned elsewhere
@@ -35,15 +35,11 @@ JavascriptExecutor js = (JavascriptExecutor) driver;
 js.executeScript("return document.title");
 }}}
 
-Other language bindings will follow a similar approach.
+Other language bindings will follow a similar approach. Take a look at the UsingJavascript page for more information.
 
 *Q: Which browsers does WebDriver support?*
 
-A: The existing drivers are the InternetExplorerDriver, FirefoxDriver, SafariDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
-
-*Q: HtmlUnit Supports Javascript So Why Doesn't the HtmlUnitDriver?*
-
-A: In early releases of WebDriver, the Javascript support provided by HtmlUnit was explicitly turned off. In current release, it is possible to enable this javascript support. Please see the HtmlUnitDriver page for more details.
+A: The existing drivers are the InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
 
 *Q: My XPath finds elements in one browser, but not in others. Why is this?*
 
@@ -52,12 +48,12 @@ A: The short answer is that each supported browser handles XPath slightly differ
 *Q: The InternetExplorerDriver does not work well on Vista. How do I get it to work as expected?*
 
 A: There are a number of solutions:
-   * Add any domains the browser visits to IE's "trustworthy sites". If you use a large number of sites, this might be problematic.
+   * Add any domains the browser visits to IE's "trustworthy sites". If you use a large number of sites, this might be problematic, so think about using a wild card (though only if you don't use IE as your main browser!)
    * Run Java with Administrator rights. Note, that this is potentially a large security hole: only visit sites you trust when running in this mode.
 
 *Q: What about support for languages other than Java?*
 
-A: Support for other languages is planned, and we will be announcing these on the mailing list as they are checked in.
+A: Python support is already available. Support for other languages is planned, and we will be announcing these on the mailing list as they are checked in.
 
 *Q: How do I handle pop up windows?*
 
@@ -75,6 +71,10 @@ alert.getText();
 // And acknowledge the alert (equivalent to clicking "OK")
 alert.accept();
 }}}
+
+*Q: I'm using NX to connect to my Linux session, and the Linux firefox browser isn't starting, with an error about not being able to connect*
+
+A: The normal reason for this is that the DISPLAY and XAUTH environment variables aren't set up quite right. If you've started your NX session in headless mode, running a single command, make sure that the command starts with executing the "nxxauth" program (on my system, to start the KDE console app, I use: {{{/usr/NX/bin/nxxauth konsole}}})
 
 *Q: I'd like it if WebDriver did....*
 
