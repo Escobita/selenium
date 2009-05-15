@@ -18,7 +18,7 @@ with parameters pre-defined according to the context of the selected UI
 element.  This is not only a time-saver, but also an excellent way of 
 learning Selenium script syntax. 
   
-This chapter is all about the Selenuim IDE and how to use it effectively. 
+This chapter is all about the Selenium IDE and how to use it effectively. 
   
 Installing the IDE 
 ------------------
@@ -637,3 +637,80 @@ developed with Selenium-IDE can be run against other browsers, using a
 simple command-line interface that invokes the Selenium-RC server.  This topic
 is covered in the :ref:`Run Selenese tests <html-suite>` section on Selenium-RC
 chapter. The *-htmlSuite* command-line option is the particular feature of interest.
+
+Troubleshooting
+---------------
+
+|open|
+    You've used **File=>Open** to try to open a test suite file. Use **File=>Open Test Suite** instead.
+
+------------------
+
+|timing|
+    This type of **error** may indicate a timing problem, i.e., the element 
+    specified by a locator in your command wasn't fully loaded when the command 
+    was executed.  Try putting a **pause 5000** before the command to determine 
+    whether the problem is indeed related to timing.  If so, investigate using an 
+    appropriate **waitFor\*** or **\*AndWait** command immediately before the 
+    failing command.
+
+------------------
+
+|param|
+    Whenever your attempt to use variable substitution fails as is the
+    case for the **open** command above, it indicates
+    that you haven't actually created the variable whose value you're
+    trying to access.  This is 
+    sometimes due to putting the variable in the **Value** field when it 
+    should be in the **Target** field or vice versa.  In the example above,
+    the two parameters for the **store** command have been erroneously
+    placed in the reverse order of what is required.
+    For any Selenese command, the first required parameter must go 
+    in the **Target** field, and the second required parameter (if one exists) 
+    must go in the **Value** field.  
+
+----------
+
+|ts|
+    One of the test cases in your test suite cannot be found.  Make sure 
+    that the test case is indeed located where the test suite indicates 
+    it is located.  Also, 
+    make sure that your actual test case files have the .html extension both 
+    in their filenames, and in the test suite file where they are referenced.
+
+----------
+
+|space|
+    Selenium-IDE is very *space-sensitive*!  An extra space before or after 
+    a command will cause it to be unrecognizable.
+
+----------
+
+|extension|
+    Your extension file's contents have not been read by Selenium-IDE.  Be 
+    sure you have specified the proper pathname to the extensions file via 
+    **Options=>Options=>General** in the **Selenium Core extensions** field.
+    Also, Selenium-IDE must be restarted after any change to either an
+    extensions file *or* to the contents of the **Selenium Core extensions**
+    field.
+
+----------
+
+|collapsed|
+    This type of error message makes it appear that Selenium-IDE has generated
+    a failure where there is none.  However, Selenium-IDE is correct that
+    the actual value does not match the value specified in such test cases.
+    The problem is that the log file error messages collapse a series of
+    two or more spaces into a single space, which is confusing.  In the 
+    example above, note that the parameter for **verifyTitle** has two 
+    spaces between the words "System" and "Division."  The page's actual 
+    title has only one space between these words.  Thus, Selenium-IDE is 
+    correct to generate an error.
+
+.. |open| image:: images/chapt3_img24_Trouble_open.png
+.. |param| image:: images/chapt3_img28_Trouble_param.png
+.. |timing| image:: images/chapt3_img27_Trouble_timing.png
+.. |ts| image:: images/chapt3_img23_Trouble_ts.png
+.. |space| image:: images/chapt3_img25_Trouble_space.png
+.. |extension| image:: images/chapt3_img26_Trouble_extension.png
+.. |collapsed| image:: images/chapt3_img29_Trouble_collapsed.png
