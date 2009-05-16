@@ -509,7 +509,40 @@ Regular Expression Patterns
 Exact Patterns
 ~~~~~~~~~~~~~~
 
+The **exact** type of Selenium pattern is of marginal usefulness.
+It uses no special characters at all.  So, if one needed to look for
+an actual asterisk character (which is special for both globbing and
+regular expression patterns), the **exact** pattern would be one way
+to do that.  For example, if one wanted to select an item labeled
+"Real \*" from a dropdown, the following code might work or it might not.
+The asterisk in the ``glob:Real *`` pattern will match anything or nothing.
+So, if there was an earlier select option labeled "Real Numbers," it would
+be the option selected rather than the "Real \*" option.
+
+===========   ====================================    =============
+select        //select                                glob:Real \*
+===========   ====================================    =============
+
+In order to ensure that the "Real \*" item would be selected, the ``exact:``
+prefix could be used to create an **exact** pattern as shown below:
+
+===========   ====================================    =============
+select        //select                                exact:Real \*
+===========   ====================================    =============
+
+But the same effect could be achieved via escaping the asterisk in a
+regular expression pattern:
  
+===========   ====================================    ================
+select        //select                                regexp:Real \\\*
+===========   ====================================    ================
+
+It's rather unlikely that most testers will ever need to look for
+an asterisk or a set of square brackets with characters inside them (the
+character class for globbing patterns).  Thus, globbing patterns and
+regular expression patterns are sufficient for the vast majority of us.
+
+
 The "AndWait" Commands 
 ----------------------
 
@@ -644,3 +677,4 @@ Many applications use AJAX for dynamic and animated functionality making
 testing of AJAX behavior often a basic testing requirement.
 
 *This section is not yet developed.*
+
