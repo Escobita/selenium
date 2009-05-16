@@ -639,13 +639,58 @@ used to extract text from the page being tested.
 
 storeEval 
 ~~~~~~~~~
-This command takes an expression, generally a JavaScript expression, as its 
+This command takes a script as its 
 first parameter.  Embedding JavaScript within Selenese is covered in the next section.
-StoreEval allows the test to store the expression's result within a variable.
+StoreEval allows the test to store the result of running the script in a variable.
 
-JavaScript Expressions as Parameters 
-------------------------------------
-*This section is not yet developed.*
+
+JavaScript and Selenese Parameters
+----------------------------------
+
+JavaScript can be used with two types of Selenese parameters--**script**
+and non-script (usually expressions).  In most cases,
+you'll want to access and/or manipulate a test case variable
+inside the JavaScript snippet used as a Selenese parameter.
+All variables created in your test case are stored in a
+JavaScript *associative array*.
+An associative array
+has string indexes rather than sequential numeric indexes.
+The associative array containing your test case's variables is named **storedVars**.
+Whenever you wish to access or manipulate a variable
+within a JavaScript snippet, you must refer to it
+as **storedVars['yourVariableName']**.
+
+JavaScript Usage with Script Parameters  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Several Selenese commands specify a **script** parameter including
+**assertEval**, **verifyEval**, **storeEval**, and **waitForEval**.
+These parameters require no special syntax.  A Selenium-IDE
+user would simply place a snippet of JavaScript code into
+the  appropriate field, normally the **Target** field (because
+a **script** parameter is normally the first or only parameter).
+
+The example below illustrates how a JavaScript snippet
+can be used to perform a simple numerical calculation:
+
+===============    ============================================   ===========
+store              10                                             hits
+storeXpathCount    //blockquote                                   blockquotes
+storeEval          storedVars['hits']-storedVars['blockquotes']   paragraphs
+===============    ============================================   ===========
+
+This next example illustrates how a JavaScript snippet can include
+calls to methods, in this case the JavaScript 
+String object's ``toUpperCase`` method and ``toLowerCase`` method.  
+
+===============    ============================================   ===========
+store              Edith Wharton                                  name
+storeEval          storedVars['name'].toUpperCase()               uc
+storeEval          storedVars['name'].toLowerCase()               lc
+===============    ============================================   ===========
+
+JavaScript Usage with Non-Script Parameters  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 *echo* - The Selenese Print Command
