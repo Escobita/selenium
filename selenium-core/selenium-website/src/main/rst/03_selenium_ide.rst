@@ -641,6 +641,16 @@ chapter. The *-htmlSuite* command-line option is the particular feature of inter
 Troubleshooting
 ---------------
 
+Below is a list of image/explanation pairs which describe frequent
+sources of problems with Selenium-IDE:
+
+|startup|
+    This problem occurs occasionally when Selenium IDE is first brought up.  The solution is to close and reopen Selenium IDE.  The bug has been filed as `SIDE-230`_.
+
+.. _SIDE-230: http://jira.openqa.org/browse/SIDE-230
+
+------------------
+
 |open|
     You've used **File=>Open** to try to open a test suite file. Use **File=>Open Test Suite** instead.
 
@@ -707,6 +717,7 @@ Troubleshooting
     title has only one space between these words.  Thus, Selenium-IDE is 
     correct to generate an error.
 
+.. |startup| image:: images/chapt3_img30_Trouble_startup.png
 .. |open| image:: images/chapt3_img24_Trouble_open.png
 .. |param| image:: images/chapt3_img28_Trouble_param.png
 .. |timing| image:: images/chapt3_img27_Trouble_timing.png
