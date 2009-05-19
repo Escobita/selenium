@@ -763,13 +763,37 @@ So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
 search and assert it's existence.
 
-.. TODO: The script for this example
+** In Python**
 
-As you can see, this task looks really simple being made using a scripting
-language while it's impossible to do using Selenium-IDE.
+.. code-block:: python
+   
+      // Collection of String values.	
+   source = open("input_file.txt", "r")
+   values = source.readlines()
+   source.close()	
+		
+   // Execute For loop for each String in 'arr' array.
+   for search in values:
+       sel.open("/");
+       sel.type("q", search);
+   	   sel.click("submit");
+       sel.waitForPageToLoad("30000");
+       self.failUnless(sel.is_text_present(search))
+
+Here, this Python script opens a txt file that we've written with one search
+string on each line. Then is saving that in an array of strings, and at last,
+it's iterating over that strings array and doing the search and assert on each.
+
+This is a very basic example of what you can do, but the idea is to show you
+things that can easily be done with a scripting language while they're impossible
+to do using Selenium-IDE.
 
 Error Handling
 ~~~~~~~~~~~~~~
+.. TODO: Complete this... Not sure if the scenario that I put is the best example to use
+.. Then, what if google.com is down at the moment of our tests? Even if that sounds
+   completely imposible. We can create a recovery scenario for that test. We can
+   make our tests to wait for a certain ammount of time and try again:
 
 .. The idea here is to use a try-catch statement to grab a really unexpected
    error.
@@ -1125,14 +1149,21 @@ like this::
 
 IE and the style attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Santi: When used in the XPATH, the keys in  @style should be uppercase to 
-   work on IE, even if they are lowercase in the source code
+If you are running your tests on Internet Explorer and you are trying to locate
+elements using their `style` attribute, you're definitely in trouble.
+Probably a locator like this::
 
-.. Paul: Hey Santi, what is this section?  Does this belong inthe Selenese 
-   chapter?  That's where we're putting stuff on locators like XPATH.
+    //td[@style="background-color:yellow"]
 
-.. Santi: I put this under the SelRC part, because it's only caused working 
-   with IE (and this can only be done using Sel RC)
+Would perfectly work in Firefox, Opera or Safari but it won't work on IE. 
+That's because the keys in  `@style` are interpreted as uppercase once the page
+is parsed by IE. So, even if the source code is in lowercase, you should use::
+
+	//td[@style="BACKGROUND-COLOR:yellow"]
+	
+This is a problem if your test is intended to work on multiple browsers, but
+you can easily code your test to detect the situation and try the alternative
+locator that only works in IE.
 
 Unable to Connect to Server 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
