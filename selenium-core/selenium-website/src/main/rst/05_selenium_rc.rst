@@ -767,17 +767,16 @@ search and assert it's existence.
 
 .. code-block:: python
 
-   # Collection of String values.	
+   # Collection of String values
    source = open("input_file.txt", "r")
    values = source.readlines()
-   source.close()	
-		
-   # Execute For loop for each String in the values array.
+   source.close()
+   # Execute For loop for each String in the values array
    for search in values:
-       sel.open("/");
-       sel.type("q", search);
-   	   sel.click("submit");
-       sel.waitForPageToLoad("30000");
+       sel.open("/")
+       sel.type("q", search)
+       sel.click("submit")
+       sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present(search))
 
 Here, this Python script opens a txt file that we've written with one search
