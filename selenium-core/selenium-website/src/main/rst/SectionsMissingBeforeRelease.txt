@@ -1,0 +1,45 @@
+4 Selenese Commands
+Order of Locators Evaluation
+Regular Expression Patterns
+Exact Patterns
+JavaScript Expressions as Parameters
+Alerts, Popups, and Multiple Windows
+AJAX and waitFor Commands
+
+5 Selenium RC
+Relationship between Client libs and Selenese - Santi
+Basic Test Structure
+    PHP
+    Perl
+    Ruby
+Error Handling
+Safari and multiWindow mode - Santi
+IE and the style attributes - Santi
+Specifying the Path to a Specific Browser
+
+6 Test Design Considerations
+Introducing Test Design Options
+Add Location Strategies
+Bitmap Comparison
+Recovery From Failure
+Interpreting Test Results
+Organizing Your Test Scripts
+Organizing Your Test Suites
+Example Test Suites
+
+7 Selenium Grid
+Empty
+
+8 Advanced Selenium
+
+*Being depricated in place of User extension chapter by Peter*
+Empty but with headings
+Writing User Extensions
+Writings Tests for Pages Using Ajax and Other Web Technologies
+Contributing Improvements
+User Extensions
+Selenium on Rails
+
+9 Getting Help
+Selenium Reference
+Experimenting - Things to Try
