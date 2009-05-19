@@ -9,7 +9,7 @@ The following examples try to give an indication of how Selenium can be extended
 Actions
 -------
 
-All methods on the Selenium prototype beginning with “do” are added as actions. For each action foo there is also an action fooAndWait registered. An action method can take up to two parameters, which will be passed the second and third column values in the test.
+All methods on the Selenium prototype beginning with "do" are added as actions. For each action foo there is also an action fooAndWait registered. An action method can take up to two parameters, which will be passed the second and third column values in the test.
 Example: Add a "typeRepeated" action to Selenium, which types the text twice into a text box.
         Selenium.prototype.doTypeRepeated = function(locator, text) {
             // All locator-strategies are automatically handled by "findElement"
@@ -77,7 +77,7 @@ Using User-Extensions With Selenium-IDE
 --------------------------------------
 
 User-extensions are very easy to use with the selenium IDE. 
-1. Create your user extension and save it as user-extensions.js. While this name isn’t technically necessary, it’s good practice to keep things consistent.
+1. Create your user extension and save it as user-extensions.js. While this name isn't technically necessary, it's good practice to keep things consistent.
 2. Open Firefox and open Selenium-IDE.
 3. Click on Tools > Options
 4. In Selenium Core Extensions click on Browse and find the user-extensions.js file. Click on OK.
@@ -87,7 +87,7 @@ User-extensions are very easy to use with the selenium IDE.
 Using User-Extensions With Selenium RC
 --------------------------------------
 
-If you Google “Selenium RC user-extension” ten times you will find ten different approaches to using this feature. Below, is the official Selenium suggested approach
+If you Google "Selenium RC user-extension" ten times you will find ten different approaches to using this feature. Below, is the official Selenium suggested approach
 
 Simple Example
 ~~~~~~~~~~~~~
