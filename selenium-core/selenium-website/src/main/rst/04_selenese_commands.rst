@@ -506,6 +506,74 @@ test cases.
 Regular Expression Patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+*Regular expression* patterns are the most powerful of the three types
+of patterns that Selenese supports.  Regular expressions
+are also supported by most high-level programming languages, many text
+editors, and a host of tools, including the Linux/Unix command-line
+utilities **grep**, **sed**, and **awk**.  In Selenese, regular
+expression patterns allow a user to perform many tasks that would
+be very difficult otherwise.  For example, suppose your test needed
+to ensure that a particular table cell contained nothing but a number.
+``regexp: [0-9]+`` is a simple pattern that will match a decimal number of any length.
+
+Whereas Selenese globbing patterns support only the **\*** 
+and **[ ]** (character
+class) features, Selenese regular expression patterns offer the same
+wide array of special characters that exist in JavaScript.  Below 
+are a subset of those special characters:
+
+=============     ======================================================================
+    PATTERN            MATCH
+=============     ======================================================================
+   .              any single character
+   [ ]            character class: any single character that appears inside the brackets 
+   \*             quantifier: 0 or more of the preceding character (or group)
+   \+             quantifier: 1 or more of the preceding character (or group)
+   ?              quantifier: 0 or 1 of the preceding character (or group)
+   {1,5}          quantifier: 1 through 5 of the preceding character (or group)
+   \|             alternation: the character/group on the left or the character/group on the right
+   ( )            grouping: often used with alternation and/or quantifier
+=============     ======================================================================
+
+Regular expression patterns in Selenese need to be prefixed with
+either ``regexp:`` or ``regexpi:``.  The former is case-sensitive; the
+latter is case-insensitive.
+
+A few examples will help clarify how regular expression patterns can
+be used with Selenese commands.  The first one uses what is probably
+the most commonly used regular expression pattern--**.\*** ("dot star").  This
+two-character sequence can be translated as "0 or more occurrences of
+any character" or more simply, "anything or nothing."  It is the
+equivalent of the one-character globbing pattern **\*** (a single asterisk).
+
+===========   =======================================    ========
+click         link=regexp:Film.*Television Department
+verifyTitle   regexp:.\*Film.\*Television.\*
+===========   =======================================    ========
+
+The example above is functionally equivalent to the earlier example
+that used globbing patterns for this same test.  The only differences
+are the prefix (**regexp:** instead of **glob:**) and the "anything
+or nothing" pattern (**.\*** instead of just **\***).
+
+The more complex example below tests that the Yahoo!
+Weather page for Anchorage, Alaska contains info on the sunrise time:
+
+==================  ===============================================    ========
+open                http://weather.yahoo.com/forecast/USAK0012.html
+verifyTextPresent   regexp:Sunrise: \*[0-9]{1,2}:[0-9]{2} [ap]m
+==================  ===============================================    ========
+
+Let's examine the regular expression above one part at a time:
+
+==============   ====================================================
+``Sunrise: *``   The string **Sunrise:** followed by 0 or more spaces
+``[0-9]{1,2}``   1 or 2 digits (for the hour of the day)
+``:``            The character **:** (no special characters involved)
+``[0-9]{2}``     2 digits (for the minutes) followed by a space
+``[ap]m``        "a" or "p" followed by "m" (am or pm)
+==============   ====================================================
+
 Exact Patterns
 ~~~~~~~~~~~~~~
 
@@ -692,6 +760,17 @@ storeEval          storedVars['name'].toLowerCase()               lc
 JavaScript Usage with Non-Script Parameters  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+JavaScript can also be used to help generate values for parameters, even
+when the parameter is not specified to be of type **script**.  
+However, in this case, special syntax is required--the JavaScript
+snippet must be enclosed inside curly braces and preceded by the
+label ``javascript``, as in ``javascript {*yourCodeHere*}``.
+Below is an example in which the ``type`` command's second parameter--``value``--is generated via JavaScript code using this special syntax:
+
+===============    ============================================   ===========
+store              league of nations                              searchString
+type               q                                              javascript{storedVars['searchString'].toUpperCase()}
+===============    ============================================   ===========
 
 *echo* - The Selenese Print Command
 ------------------------------------
