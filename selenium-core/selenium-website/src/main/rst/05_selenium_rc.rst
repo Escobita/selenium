@@ -763,16 +763,16 @@ So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
 search and assert it's existence.
 
-** In Python**
+**In Python:**
 
 .. code-block:: python
-   
-      // Collection of String values.	
+
+   # Collection of String values.	
    source = open("input_file.txt", "r")
    values = source.readlines()
    source.close()	
 		
-   // Execute For loop for each String in 'arr' array.
+   # Execute For loop for each String in the values array.
    for search in values:
        sel.open("/");
        sel.type("q", search);

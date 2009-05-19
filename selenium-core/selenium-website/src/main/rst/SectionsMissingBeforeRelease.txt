@@ -14,7 +14,7 @@ Basic Test Structure
     Ruby
 Error Handling
 Safari and multiWindow mode - Santi
-IE and the style attributes - Santi
+IE and the style attributes - Santi - Done!
 Specifying the Path to a Specific Browser
 
 6 Test Design Considerations
