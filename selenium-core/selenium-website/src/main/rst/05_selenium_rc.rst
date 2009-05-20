@@ -684,7 +684,7 @@ test results in different formats as HTML or PDF.
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
 -	One can generate more *decent* reports using TestNG-xslt. 
-	TestNG-xslt Report look as -
+	TestNG-xslt Report looks as -
 
 	.. image:: images/chapt5_TestNGxsltReport.png
 
