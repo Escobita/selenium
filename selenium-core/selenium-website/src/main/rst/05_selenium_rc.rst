@@ -751,8 +751,13 @@ and then take different alternatives in case it is not:
    if(selenium.isElementPresent("q")) {
        selenium.type("q", "Selenium-RC");			
    } else {
-       selenium.open("/")
+       Reporter.log("Element: " +q+ " is not available on page.")
    }
+   
+Herein *Reporter* is API in TestNG framework. One can log exceptions using 
+the API of framework on which Sel Test Cases are built. Advantage of this 
+approach is to be able to continue with test execution even if *less* 
+important elements are not available on page.
 
 By just using a simple *if* condition, we can do interesting things. Think of
 the possibilities!
