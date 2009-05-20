@@ -16,6 +16,8 @@ Error Handling
 Safari and multiWindow mode - Santi
 IE and the style attributes - Santi - Done!
 Specifying the Path to a Specific Browser
+Retrieving and Reporting Results - Tarun
+Executing JS from with in Selenium RC - Tarun
 
 6 Test Design Considerations
 Introducing Test Design Options
