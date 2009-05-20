@@ -667,6 +667,54 @@ run the tests. Everyone of them has it's own way of reporting the results
 and you'll surely find third-party libraries specially created for reporting
 test results in different formats as HTML or PDF.
 
+**Generating Test Report for java client driver:**
+    
+
+-	If Selenium Test cases are developed using JUnit then JUnit Report 
+	can be availed 	to generate test report. Look at `JUnit Report`_ 
+	for more on this.
+
+.. _`JUnit Report`: http://ant.apache.org/manual/OptionalTasks/junitreport.html
+
+-	If Selenium Test cases are developed using TestNG then no external task 
+	is required to generate test report. TestNG framework generates one 
+	HTML report which list details of tests. Look at `TestNG Report`_ for 
+	more on this.
+
+.. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
+
+-	One can generate more *decent* reports using TestNG-xslt. 
+	TestNG-xslt Report look as -
+
+	.. image:: images/chapt5_TestNGxsltReport.png
+
+	Look at `TestNG-xslt`_ for more.
+
+.. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
+
+-	Logging Selenium can be used to generate reports with java client driver
+	of selenium. Logging Selenium extends java client driver to add logging 
+	ability. Look at `Logging Selenium`_ for more on this.
+	
+.. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
+
+**Generating Test Report for Python Client driver:**
+
+-	When using Python Client Driver then HTMLTestRunner can be used to
+	generate Test Report. Look at `HTMLTestRunner`_ for more on this.
+	
+.. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
+
+**Generating Test Report for Ruby Client driver:**
+
+-	If RSpec framework is used for writing Selenium Test Cases in Ruby
+	then its HTML report can be used to generate test report.
+	Look at `RSpec Report`_ for more on this.
+	
+.. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
+
+
+
 Adding Some Spice to Your Tests
 -------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
