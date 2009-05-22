@@ -28,7 +28,7 @@ this be? For example, Selenium-IDE does not directly support:
 * test case dependency
 * capture screenshots on test failures
 
-Though these are not supported by selenium inherently all of them can be achieved
+Though these are not supported by Selenium inherently all of them can be achieved
 by using language specific libraries.
 
 .. note:: It may be possible to add this functionality by the addition of user 
@@ -498,7 +498,7 @@ all the rest.
    //script.
 
    public class NewTest extends SeleneseTestCase {
-   // We create our selenium test case
+   // We create our Selenium test case
 
          public void setUp() throws Exception {
    		setUp("http://www.google.com/", "*firefox");
@@ -784,7 +784,7 @@ search in the following way.
 
 Conditionals
 ~~~~~~~~~~~~
-Most common errors are encountered while running selenium test are the errors 
+Most common errors encountered while running Selenium tests are the errors 
 which pop up when corresponding element locator is not available on page.
 For example, when running the following line:
 
@@ -1077,7 +1077,7 @@ option:
 Personalizing the Firefox Profile used in the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. TODO: Better descibe how selenium handles firefox profiles (it creates,
+.. TODO: Better descibe how Selenium handles firefox profiles (it creates,
    uses and then deletes sandbox profiles unless you specify special ones)
    
 Firefox will not run two instances simultaneously unless you specify a 
@@ -1362,7 +1362,7 @@ browser into thinking it's accessing a different site from your application
 under test and effectively suppresses the security popups. 
 
 Another method that has been used with earlier versions of Selenium is to 
-install the Cybervillians security certificate provided with you selenium 
+install the Cybervillians security certificate provided with your Selenium 
 installation. Most users should no longer need to do this, however, if you are
 running Selenium-RC in proxy injection mode, you may need to explicitly install this
 security certificate to avoid the security popups. 
