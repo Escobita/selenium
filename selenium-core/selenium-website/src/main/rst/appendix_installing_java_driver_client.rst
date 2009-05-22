@@ -15,6 +15,9 @@ steps:
 
 These points have been delineated below with reference to Eclipse and IntelliJ: 
 
+
+.. _configuring-selenium-RC-eclipse-reference:
+
 Configuring Selenium-RC With Eclipse
 ++++++++++++++++++++++++++++++++++++
 **Eclipse** is a multi-language software development platform comprising an IDE 
@@ -126,6 +129,9 @@ Added libraries would appear in Package Explorer as following:
 
 .. image:: images/chapt5_img18_Configure_Build_Path.png
    :align: center
+   
+   
+.. _configuring-selenium-RC-Intellij-reference:   
 
 Configuring Selenium-RC With Intellij
 +++++++++++++++++++++++++++++++++++++
