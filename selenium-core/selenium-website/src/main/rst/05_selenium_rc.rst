@@ -967,24 +967,26 @@ Here is an architectural diagram.
 .. TODO: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
    the Browser....
 
-.. image:: images/chapt5_img02_Architecture_Diagram.png
+.. image:: images/chapt5_img02_Architecture_Diagram_1.png
    :align: center
 
 As a test suite starts in your favorite language, the following happens:
 
 1. The client/driver establishes a connection with the selenium-RC server.
-2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
-   will load Selenium-Core in the web page.
-3. Selenium-RC gets the first instruction from the client/driver (via another 
+2. Selenium-RC server launches a browser (or reuses an old one) with an URL 
+   that will load Selenium-Core in the web page.
+3. Selenium-Core gets the first instruction from the client/driver (via another 
    HTTP request made to the Selenium-RC Server).
-4. Selenim-Core acts on that first instruction, typically opening a page of the
+4. Selenium-Core acts on that first instruction, typically opening a page of the
    AUT.
-5. The server is asked for that page, and it renders in the frame/window 
-   reserved for it.
-   
-.. TODO: I've got to update the image and the steps to include some of the 
-   information that is missing (Server response to the libs, AUT passing through 
-   the server, etc).
+5. The browser receives the open request and asks for the website's content to
+   the Selenium-RC server (set as the HTTP proxy for the browser to use).
+6. Selenium-RC server comunicates with the Web server asking for the page and once
+   it receives it, it sends the page to the browser masking the origin to look
+   like the page comes from the same server as Selenium-Core (this allows 
+   Selenium-Core to comply with the Same Origin Policy).
+7. The browser receives the web page and renders it in the frame/window reserved
+   for it.
    
 Hightened Privileges Browsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -998,26 +1000,22 @@ through the Selenium-RC server.
 
 Here is the architectural diagram. 
 
-.. image:: images/chapt5_img02_Architecture_Diagram.png
+.. image:: images/chapt5_img02_Architecture_Diagram_2.png
    :align: center
 
 As a test suite starts in your favorite language, the following happens:
 
-1. The client/driver establishes a connection with the Selenium-RC server.
-2. Selenium-Server launches a browser (or reuses an old one) with an URL that 
-   will load Selenium-Core in the web page.
-3. Selenium-RC gets the first instruction from the client/driver (via another 
+1. The client/driver establishes a connection with the selenium-RC server.
+2. Selenium-RC server launches a browser (or reuses an old one) with an URL 
+   that will load Selenium-Core in the web page.
+3. Selenium-Core gets the first instruction from the client/driver (via another 
    HTTP request made to the Selenium-RC Server).
-4. Selenim-Core acts on that first instruction, typically opening a page of the
+4. Selenium-Core acts on that first instruction, typically opening a page of the
    AUT.
-5. The server is asked for that page, and it renders in the frame/window 
-   reserved for it.
+5. The browser receives the open request and asks the Web Server for the page.
+   Once the browser receives the web page, renders it in the frame/window reserved
+   for it.
    
-.. TODO: I've got to update the image and the steps to include some of the 
-   information that is missing (Server response to the libs, etc).
-   
-.. TODO: Call for review on the Devs list once I finish this topic!!!
-
 Server Command Line options
 ---------------------------
 When the server is launced, some command line options can be used to change the
