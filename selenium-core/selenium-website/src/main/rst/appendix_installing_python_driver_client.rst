@@ -1,3 +1,5 @@
+.. _configuring-selenium-RC-python-reference:
+
 Python Client Driver Configuration 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
