@@ -135,6 +135,11 @@ Java client driver configuration
 * Run Selenium server from console
 * Execute your test from the IDE
 
+For more on java client driver configuration with java ide look at 
+:ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
+and 
+:ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
+
 Python client driver configuration 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
@@ -143,6 +148,9 @@ Python client driver configuration
 * Add to your tests path the file *selenium.py*
 * Run Selenium server from console
 * Execute your test from a console or the IDE
+
+For more on python client driver configuration look at 
+:ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
 .NET client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,6 +163,9 @@ Python client driver configuration
 * Write your Selenium test in a .Net language (C#, VB.Net)
 * Run Selenium server from console
 * Execute your test using the NUnit gui or NUnit command line
+
+For more on .NET client driver configuration with Visual Studio look at 
+:ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
 Sample Test Scripts
 -------------------
