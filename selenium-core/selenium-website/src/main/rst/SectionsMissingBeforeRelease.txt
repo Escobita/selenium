@@ -6,13 +6,12 @@ AJAX and waitFor Commands
 5 Selenium RC
 Relationship between Client libs and Selenese - Santi
 Basic Test Structure
-    PHP
+    PHP - Santi
     Perl
     Ruby
 Error Handling
 Safari and multiWindow mode - Santi
-IE and the style attributes - Santi - Done!
-Specifying the Path to a Specific Browser
+Specifying the Path to a Specific Browser - Santi
 Retrieving and Reporting Results - Tarun
 Executing JS from with in Selenium RC - Tarun
 
@@ -28,16 +27,6 @@ Example Test Suites
 
 7 Selenium Grid
 Empty
-
-8 Advanced Selenium
-
-*Being depricated in place of User extension chapter by Peter*
-Empty but with headings
-Writing User Extensions
-Writings Tests for Pages Using Ajax and Other Web Technologies
-Contributing Improvements
-User Extensions
-Selenium on Rails
 
 9 Getting Help
 Selenium Reference
