@@ -177,11 +177,19 @@ For more on python client driver configuration see the appendix
 For more on .NET client driver configuration with Visual Studio see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
-Sample Test Scripts
--------------------
-If we use the following test recorded with Selenium-IDE as a base:
+Programming Your Test
+---------------------
 
-.. _search example:
+The first step of programming a test is to understand the basic structure of a Selenium-RC
+test program.  Although similar, this is language specific so we provide a few different language-specific examples.
+
+
+Sample Test Script
+~~~~~~~~~~~~~~~~~~
+
+First, let's start with an example Selenese test script.  Imagine recorded the following test with Selenium-IDE.
+
+.. _google search example:
 
 =================  ============  ===========
 open               /
@@ -190,10 +198,14 @@ clickAndWait       submit
 assertTextPresent  Selenium-RC
 =================  ============  ===========
 
-.. note:: In the table is not mentioned that the domain to test is 
-   http://www.google.com
+.. note:: This example would work with the Google search page http://www.google.com
 
-Here is the test script exported to all the programming languages:
+Language Specific Test
+~~~~~~~~~~~~~~~~~~~~~~
+
+Here is the test script exported (via Selenium-IDC) to each of the programming languages.
+If you have at least basic knowledge of an object-oriented programming language you should be able to understand
+how Selenium runs Selenese commands from a programming language by reading one of these examples.
 
 .. container:: toggled
 
@@ -381,12 +393,11 @@ Here is the test script exported to all the programming languages:
 Now we will analyze the different parts of the tests for you to understand
 each statement.
 
-Basic Tests Structure
-~~~~~~~~~~~~~~~~~~~~~
+Language-Specific Tests
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Here you will find an explanation of the basic test structure on each 
-programming language. This tends to differ from one to another, so you'll find
-separate explanations for each of them:
+Now we will show you specific examples in each of the supported programming languages. The language-specific APIs tend to differ from one to another, so you'll find
+separate explanations for each of them.  Click on the button for a specific language to expand the examples.
 
 * `C#`_
 * Java_
