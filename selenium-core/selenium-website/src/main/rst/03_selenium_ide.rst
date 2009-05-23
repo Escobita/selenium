@@ -587,12 +587,32 @@ User Extensions
 User extensions are JavaScript files that allow one to create his or her own 
 customizations and features to add additional functionality.  Often this is in 
 the form of customized commands although this extensibility is not limited to 
-additional commands.  User extensions are loaded by setting the path to user 
-extension files via Options=>Options=>General.
+additional commands.  
   
 There are a number of useful extensions_ created by users.
 
 .. _extensions: http://wiki.openqa.org/display/SEL/Contributed+User-Extensions
+
+Perhaps the most popular of all Selenium-IDE extensions
+is one which provides flow control in the form of while loops and primitive
+conditionals.  This extension is the goto_sel_ide.js_.  For an example
+of how to use the functionality provided by this extension, look at the
+page_ created by its author.
+
+
+.. _goto_sel_ide.js: http://wiki.openqa.org/download/attachments/379/goto_sel_ide.js
+.. _page: http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html
+
+To install this extension, put the pathname to its location on your
+computer in the **Selenium Core extensions** field of Selenium-IDE's
+Options=>Options=>General tab.
+
+.. image:: images/chapt3_img31_Extensions_install.png
+   :align: center
+
+After selecting the **OK** button, you must close and reopen Selenium-IDE
+in order for the extensions file to be read.  Any change you make to an
+extension will also require you to close and reopen Selenium-IDE.
 
 Information on writing your own extensions can be found near the
 bottom of the Selenium Reference_ document.
