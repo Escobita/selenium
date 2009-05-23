@@ -792,6 +792,9 @@ Alerts, Popups, and Multiple Windows
 
 AJAX and waitFor Commands
 -------------------------
+
+*This section is not yet developed.*
+
 Many applications use AJAX for dynamic and animated functionality making 
 testing of AJAX behavior often a basic testing requirement.
 

@@ -69,12 +69,6 @@ posting to the `Selenium Developers`_ forum.
 Selenium Reference 
 ------------------
 
-.. Santi: Will this topic still be useful once we finish this docs?
+One final source of information is the Selenium Reference available at the SeleniumHq.org website.
 
-Experimenting - Things to Try
------------------------------
-
-.. Paul: Not sure if I need this it's here as a reminder to me to consider 
-   this) 
-
-.. Santi: mmmm, I'm not sure if we can add something here.
+*NOTE:  We need to add the URL here.*

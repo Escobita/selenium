@@ -3,6 +3,8 @@
 User-Extensions
 ===============
 
+*NOTE:  This section is close to completion, but it has not been reviewed and edited.*
+
 Introduction
 ------------------
 
