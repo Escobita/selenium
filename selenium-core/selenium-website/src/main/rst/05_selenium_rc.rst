@@ -8,17 +8,17 @@
 
 Introduction
 ------------
-Selenium-RC is the response for tests that need a little more than just simple
-browser actions and a linear execution. Selenium-RC allows the users to use the 
+Selenium-RC is the solution for tests that need a little more than just simple
+browser actions and a linear execution. Selenium-RC allows the 
 full power of programming languages, creating tests that can do things like read
 and write external files, make queries to a Data Base, send emails with test 
 reports, practically anything a user can do with a normal application.
 
-Basically, you will need to use Selenium-RC whenever your test requires logic
+You will want to use Selenium-RC whenever your test requires logic
 not supported by running a script from Selenium-IDE. What sort of logic could 
 this be? For example, Selenium-IDE does not directly support:
 
-* conditional statements 
+* condition statements 
 * iteration 
 * logging and reporting of test results
 * error handling, particularly unexpected errors
@@ -28,15 +28,16 @@ this be? For example, Selenium-IDE does not directly support:
 * test case dependency
 * capture screenshots on test failures
 
-Though these are not supported by Selenium inherently all of them can be achieved
-by using language specific libraries.
+Although these tasks are not supported by Selenium directly, all of them can be achieved
+by using common programming techniques along with language specific libraries.
 
-.. note:: It may be possible to add this functionality by the addition of user 
-   extensions to Selenium-IDE but most prefer to use Selenium-RC as it's already
-   bundled in any programming language.
+.. note:: It may be possible to perform these testing task by the addition of user 
+   extensions to Selenium-IDE but most prefer to use Selenium-RC.  Using Selenium-RC
+   is much more flexible and extensible than Selenium-IDE when it comes to complex testing
+   problems.
 
-In `Adding Some Spice to Your Tests`_ section, you'll find some examples that 
-demontrate the advantages of using all the power of a real programming language
+In `Adding Some Spice to Your Tests`_ section, you'll find examples that 
+demonstrate the advantages of using all the power of a real programming language
 for your tests.
 
 How Selenium Remote Control works
@@ -45,8 +46,8 @@ Selenium-RC Basic Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Selenium-RC is composed of two parts:
 
-* A server which automatically launches and kills browsers, and acts as a HTTP
-  proxy for web requests from them. 
+* A server which automatically launches and kills browsers, and acts as an HTTP
+  proxy for browser requests. 
 * Client libraries for your favorite programming language, which communicate 
   with the server giving the orders to excecute the tests.
 
@@ -58,9 +59,9 @@ Here is a simplified representation....
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-As you can see on the illustration, the client libraries communicate with the
-Server directly passing one by one the actions to execute. Then the server gives
-this orders to the browser by the use of Selenium-Core javascript commands.
+The diagram shows the client libraries communicate with the
+Server passing each Selenium command to execute. Then the server gives
+to the browser by the use of Selenium-Core javascript commands.
 
 The Server receives commands directly using simple HTTP GET/POST requests;
 that means that you can use any programming language that can make HTTP requests
@@ -87,13 +88,14 @@ Relationship between Client libs and Selenese
 
 Installation
 -------------
-Once you download the whole Selenium-RC zip file from the `downloads page`_ you
-will notice that it has lots of sub-folders inside. As you already know from
-the `How Selenium Remote Control Works`_, this folders have all the sub-parts
-that integrates the RC.
+After downloading the Selenium-RC zip file from the `downloads page`_ you'll
+notice it has several sub-folders. These folders have all the components you'll 
+need for using Selnium-RC with the supported programming language of your choice.
 
-Once you've chosen a language to work with, you'll only need to install the 
-server and the client driver you need.
+Once you've chosen a language to work with, you simply need to
+
+install the Selenium-RC Server
+set up a programming project using one of the language specific client drivers.
 
 Selenium server installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
