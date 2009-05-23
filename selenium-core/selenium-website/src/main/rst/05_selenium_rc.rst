@@ -130,14 +130,16 @@ Java client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium-java-client-driver.jar*
-* Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)
+* Open your desired java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, etc.)
 * Create a new project
+* Add the selenium-java-client-driver.jar files to your project as references.
 * Add to your project classpath the file *selenium-java-client-driver.jar*
-* Write your Selenium test in Java
+* From Selenium-IDE, export a script to a Java fileand include in your Java 
+  project, or write your Selenium test in Java using the selenium-java-client API.
 * Run Selenium server from console
 * Execute your test from the IDE
 
-For more on java client driver configuration with java ide look at 
+For specific details on java test project configuration see the Appendix sections
 :ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
 and 
 :ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
@@ -146,27 +148,33 @@ Python client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium.py*
-* Write your Selenium test in Python
-* Add to your tests path the file *selenium.py*
+* Either write your Selenium test in Python or export
+  a script from Selenium-IDE to a python file.
+* Add to your test's path the file *selenium.py*
 * Run Selenium server from console
-* Execute your test from a console or the IDE
+* Execute your test from a console or your IDE 
+  (i.e. programming IDE, not Selenium-IDE)
 
-For more on python client driver configuration look at 
+For more on python client driver configuration see the appendix 
 :ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
 .NET client driver configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_
 * Extract the folder
-* Download and install `NUnit`_
+* Download and install `NUnit`_ (
+  Note:  You can use NUnit as your test engine.  If not familiar yet with 
+  NUnit, you can also write a simple main() function to run your tests, 
+  however NUnit is very useful as a test engine.)
 * Open your desired .Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
 * Create a class library (.dll)
 * Add references to the following DLLs: nmock.dll, nunit.core.dll, nunit.framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
-* Write your Selenium test in a .Net language (C#, VB.Net)
+* Write your Selenium test in a .Net language (C#, VB.Net), or export
+  a script from Selenium-IDE to a C# file and copy this code into the class file you just created.
 * Run Selenium server from console
 * Execute your test using the NUnit gui or NUnit command line
 
-For more on .NET client driver configuration with Visual Studio look at 
+For more on .NET client driver configuration with Visual Studio see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
 Sample Test Scripts
