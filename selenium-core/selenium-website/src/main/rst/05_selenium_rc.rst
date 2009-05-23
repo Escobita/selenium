@@ -1235,8 +1235,8 @@ Troubleshooting
    http://seleniumhq.org/documentation/remote-control/troubleshooting.html
    are covered.
 
-Howto correctly use your Verify commands in Selenium-RC 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Problems With Verify Commands 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you export your tests from Selenium-IDE, you may find yourself getting
 empty verify strings from your tests (depending on the programming language
 used).
