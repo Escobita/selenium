@@ -49,32 +49,61 @@ RC Components
 
 Selenium-RC is composed of two parts:
 
-* The Selenium Server which launches and kills browsers, and acts as an HTTP
-  proxy for browser requests. That is, it intercepts HTTP browser messages 
-  between the browser and the application under test (AUT) for the purposes 
-  of running your Selenese tests against those HTTP messages.
+* The Selenium Server which launches and kills browsers, and acts as an *HTTP
+  proxy* for browser requests. 
 * Client libraries for your favorite programming language, which instructs the 
   Selenium Server in how to test the AUT by passing it your test script's Selenium commands. 
 
-The RC server bundles Selenium Core, and then automatically injects it into the 
-browser.  Selenium Core is a javascript program which interprets and executes Selenese commands.
-
-Here is a simplified representation.... 
+Here is a simplified architecture diagram.... 
 
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
+
 The diagram shows the client libraries communicate with the
 Server passing each Selenium command for execution. Then the server passes the Selenium command
-to the browser using Selenium-Core javascript commands.  The browser, using it's Javascript interpreter then executes the Selenium command, which effectively, runs the check you specified in your Selenese test script.
+to the browser using Selenium-Core javascript commands.  The browser, using it's Javascript interpreter executes the Selenium command, which effectively, runs the check you specified in your Selenese test script.
 
-The Server receives commands directly using simple HTTP GET/POST requests;
-This means you can use any programming language that can send HTTP requests
-to automate Selenium tests on the browser.
+Selenium Server
+~~~~~~~~~~~~~~~
+Selenium Server receives Selenium commands from your test program,
+interprets them, and reports back to your program the results of
+running those tests.
 
-Selenium-RC Client Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The RC server bundles Selenium Core, and then automatically injects
+it into the browser.  This occurs when your test program causes the
+browser to open (using a client library API function).
+Selenium Core is a javascript program, actually a set of Javascript
+functions, that interprets and executes Selenese commands using the
+browser's built-in Javascript interpreter.
 
+The Server receives the Selenese commands from your test program
+using simple HTTP GET/POST requests; This means you can use any
+programming language that can send HTTP requests to automate
+Selenium tests on the browser.
+
+Client Libraries
+~~~~~~~~~~~~~~~~
+
+The client libraries provide the programming support that allow you to
+run Selenium commands from a program of your own design.  There is a different client library for each supported language.  A Selenium client library provides a programming interface, that is, a set of functions,
+that run selenium commands from your program. Within each interface
+there is a programming function that supports each Selenese command.
+
+It is the client library that takes a Selenese command and passes it to the Selenium Server
+for processing a specific action or test against the AUT.  The client library
+will also recieve the result of that command and pass it back to your program.
+Then, your program can recieve the result and report it as a success or failure, 
+or possibly take corrective action if it was an unexpected error. 
+
+So to create a test program, you simply write a program that runs 
+a set of Selenium commands using a client library API.  And, optionally, if you already
+have a Selenese test script created in the Selenium-IDE, you can *generate the Selenium-RC code*.
+The Selenium-IDE can translate (using its Export menu item) its Selenium commands into a client-driver's
+API function calls.
+
+.. Paul: I added the above text after this comment below was made.  
+   The table suggested below may still be helpful.  We can evaluate that later.
 
 .. TODO: Mary Ann pointed out this and I think is very important:
    Info about the individual language APIs for RC being "wrappers" for the
@@ -195,7 +224,7 @@ Sample Test Script
 
 First, let's start with an example Selenese test script.  Imagine recorded the following test with Selenium-IDE.
 
-.. _google search example:
+.. _Google search example:
 
 =================  ============  ===========
 open               /
@@ -206,8 +235,8 @@ assertTextPresent  Selenium-RC
 
 .. note:: This example would work with the Google search page http://www.google.com
 
-Selenese Exported to Program Code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Selenese as Programming Code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is the test script exported (via Selenium-IDC) to each of the programming languages.
 If you have at least basic knowledge of an object-oriented programming language you should be able to understand
@@ -613,9 +642,9 @@ Ruby
 *Note: This section is not yet developed.*
 
 
-The Selenium-RC API
+Learning the API
 ----------------
-We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC Api uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
+We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
 
 
 Starting The Browser 
@@ -764,7 +793,7 @@ test results in different formats as HTML or PDF.
 
 
 
-Adding Some Spice to Your Tests -- Writing Test Logic
+Adding Some Spice to Your Tests
 -----------------------------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
 only with the IDE. We will try to give you some guidance on things that can
@@ -779,7 +808,7 @@ Iteration is one of the most common things people needs to do in their tests.
 Generally, to repeat a simple search, or saving you from duplicating the same
 code several times.
 
-If we take the `search example`_ we've been looking at, it's not so crazy to 
+If we take the `Google search example`_ we've been looking at, it's not so crazy to 
 think that we want to check that all the Selenium tools appear on the search
 we make. This kind of test could be made doing the following using Selenese:
 
