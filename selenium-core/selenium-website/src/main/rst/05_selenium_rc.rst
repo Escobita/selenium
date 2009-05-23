@@ -40,20 +40,24 @@ In `Adding Some Spice to Your Tests`_ section, you'll find examples that
 demonstrate the advantages of using all the power of a real programming language
 for your tests.
 
-How Selenium Remote Control Works
----------------------------------
+Selenium-RC Architecture
+------------------------
+This section describes the components of Selenium-RC and the role that each plays when running your test script.
 
-Selenium-RC Components
-~~~~~~~~~~~~~~~~~~~~~~
+RC Components
+~~~~~~~~~~~~~
+
 Selenium-RC is composed of two parts:
 
-* A server which automatically launches and kills browsers, and acts as an HTTP
-  proxy for browser requests. 
-* Client libraries for your favorite programming language, which communicate 
-  with the server giving the orders to excecute the tests.
+* The Selenium Server which launches and kills browsers, and acts as an HTTP
+  proxy for browser requests. That is, it intercepts HTTP browser messages 
+  between the browser and the application under test (AUT) for the purposes 
+  of running your Selenese tests against those HTTP messages.
+* Client libraries for your favorite programming language, which instructs the 
+  Selenium Server in how to test the AUT by passing it your test script's Selenium commands. 
 
-The RC server bundles Selenium Core, and automatically injects it into the 
-browser within the Application Under Test.
+The RC server bundles Selenium Core, and then automatically injects it into the 
+browser.  Selenium Core is a javascript program which interprets and executes Selenese commands.
 
 Here is a simplified representation.... 
 
@@ -61,15 +65,16 @@ Here is a simplified representation....
    :align: center
 
 The diagram shows the client libraries communicate with the
-Server passing each Selenium command to execute. Then the server gives
-to the browser by the use of Selenium-Core javascript commands.
+Server passing each Selenium command for execution. Then the server passes the Selenium command
+to the browser using Selenium-Core javascript commands.  The browser, using it's Javascript interpreter then executes the Selenium command, which effectively, runs the check you specified in your Selenese test script.
 
 The Server receives commands directly using simple HTTP GET/POST requests;
-that means that you can use any programming language that can make HTTP requests
+This means you can use any programming language that can send HTTP requests
 to automate Selenium tests on the browser.
 
-Relationship between Client libs and Selenese
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Selenium-RC Client Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. TODO: Mary Ann pointed out this and I think is very important:
    Info about the individual language APIs for RC being "wrappers" for the
    Selenese commands covered in the chapter.  We need to make clear that
