@@ -429,11 +429,6 @@ references there.
    strategy of choice as it's considerably faster than XPath and can find the 
    most complicated objects in an intrinsic HTML document.
 
-Order of Locators Evaluation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-*This section still needs to be developed.  Please refer to the Selenium 
-Command Reference on the SeleniumHq.org website.*
-
 .. _patterns-section:
 
 Matching Text Patterns
