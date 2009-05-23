@@ -40,9 +40,9 @@ In `Adding Some Spice to Your Tests`_ section, you'll find examples that
 demonstrate the advantages of using all the power of a real programming language
 for your tests.
 
-Selenium-RC Architecture
-------------------------
-This section describes the components of Selenium-RC and the role that each plays when running your test script.
+How It Works
+------------
+How the components of Selenium-RC operate and the role each plays in running your test scripts.
 
 RC Components
 ~~~~~~~~~~~~~
@@ -75,6 +75,7 @@ to automate Selenium tests on the browser.
 Selenium-RC Client Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 .. TODO: Mary Ann pointed out this and I think is very important:
    Info about the individual language APIs for RC being "wrappers" for the
    Selenese commands covered in the chapter.  We need to make clear that
@@ -100,8 +101,8 @@ need for using Selnium-RC with the supported programming language of your choice
 
 Once you've chosen a language to work with, you simply need to
 
-install the Selenium-RC Server
-set up a programming project using one of the language specific client drivers.
+* Install the Selenium-RC Server.
+* Set up a programming project using a language specific client driver.
 
 Installing Selenium Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
