@@ -3,11 +3,6 @@
 Selenium Basics 
 ================
 
-.. This is a rough draft. I have not proofread this yet, although you're 
-   still welcome to add your comments. 
-   I have removed some of our comments in places where I've incorporated 
-   comments into the document. 
-   
 Getting Started -- Choosing Your Selenium Tool 
 -----------------------------------------------
 
@@ -30,19 +25,11 @@ programming logic is required Selenium-RC must be used. For example,
 any tests requiring iteration, such as testing each element of a variable 
 length list requires running the script from a programming 
 language. Selenium-IDE does not support iteration or condition statements.
-In addition, data-driven testing, allowing multiple tests by varying the data
-using a single script with varied input, is often done via a test program 
-developed with Selenium-RC.  
-
-.. note::  a "user-extension" has recently become available for supporting
-   data-driven testing.  At the time of writing the authors have not tried
-   to use this with Selenium-IDE.*
 
 Finally, Selenium-Core is another way of running tests. One can run test 
 scripts from a web-browser using the HTML interface *TestRunner.html*. This is 
 the original method for running Selenium commands. It has limitations though.
-Similar to Selenium-IDE, it does not support iteration and data-driven 
-testing.
+Similar to Selenium-IDE, it does not support iteration.
 
 Selenium-Core also cannot switch between http and https protocols. Since the 
 development of Selenium-IDE and Selenium-RC, more are using these 
