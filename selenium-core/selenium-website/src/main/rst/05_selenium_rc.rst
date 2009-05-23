@@ -40,10 +40,11 @@ In `Adding Some Spice to Your Tests`_ section, you'll find examples that
 demonstrate the advantages of using all the power of a real programming language
 for your tests.
 
-How Selenium Remote Control works
-----------------------------------
-Selenium-RC Basic Structure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How Selenium Remote Control Works
+---------------------------------
+
+Selenium-RC Components
+~~~~~~~~~~~~~~~~~~~~~~
 Selenium-RC is composed of two parts:
 
 * A server which automatically launches and kills browsers, and acts as an HTTP
@@ -97,8 +98,8 @@ Once you've chosen a language to work with, you simply need to
 install the Selenium-RC Server
 set up a programming project using one of the language specific client drivers.
 
-Selenium server installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing Selenium Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 The Selenium-RC server is just a jar file (*selenium-server.jar*), which doesn't
 need installation at all. Just downloading the zip file and extracting the 
 server in the desired directory should be enough. Before starting any tests
@@ -177,11 +178,10 @@ For more on python client driver configuration see the appendix
 For more on .NET client driver configuration with Visual Studio see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
-Programming Your Test
----------------------
+From Selenese to a Program
+--------------------------
 
-The first step of programming a test is to understand the basic structure of a Selenium-RC
-test program.  Although similar, this is language specific so we provide a few different language-specific examples.
+A key step to using Selenium-RC is to convert your Selenese into a programming language.  This is also key to understand  Selenium-RC itslf.  Although similar, each language, out of necessity, will represent the same Selenese test script differently.  In this section we provide several different language-specific examples.
 
 
 Sample Test Script
@@ -200,12 +200,12 @@ assertTextPresent  Selenium-RC
 
 .. note:: This example would work with the Google search page http://www.google.com
 
-Language Specific Test
-~~~~~~~~~~~~~~~~~~~~~~
+Selenese Exported to Program Code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is the test script exported (via Selenium-IDC) to each of the programming languages.
 If you have at least basic knowledge of an object-oriented programming language you should be able to understand
-how Selenium runs Selenese commands from a programming language by reading one of these examples.
+how Selenium runs Selenese commands from a programming language by reading one of these examples.  To see an example,  click one of these buttons.
 
 .. container:: toggled
 
@@ -390,14 +390,13 @@ how Selenium runs Selenese commands from a programming language by reading one o
         end
       end
 
-Now we will analyze the different parts of the tests for you to understand
-each statement.
+Now, in the next section, we'll explain how to build a test program using the generated code.
 
-Language-Specific Tests
-~~~~~~~~~~~~~~~~~~~~~~~
 
-Now we will show you specific examples in each of the supported programming languages. The language-specific APIs tend to differ from one to another, so you'll find
-separate explanations for each of them.  Click on the button for a specific language to expand the examples.
+Programming Your Test
+---------------------
+
+Now we'll show specific examples in each of the supported programming languages. The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
 
 * `C#`_
 * Java_
@@ -407,7 +406,7 @@ separate explanations for each of them.  Click on the button for a specific lang
 * Ruby_ 
 
 C#
-++
+~~
 
 .NET Client Driver works with Microsoft.NET.
 It can be used together with any .NET testing framework 
@@ -497,10 +496,10 @@ like NUnit or the Visual Studio 2005 Team System.
 
 
 Java
-++++
+~~~~
 For java, we use a wrapper_ of the basic Junit test case. With it, you'll save
-many lines of code by just writing the basic part and letting the wrapper do
-all the rest.
+many lines of code by just writing the basic part and letting Junit do
+the rest.
 
 .. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
 
@@ -537,13 +536,17 @@ all the rest.
    }
 
 Perl
-++++
+~~~~
+
+*Note: This section is not yet developed.*
 
 PHP
-+++
+~~~
+
+*Note: This section is not yet developed.*
 
 Python
-++++++
+~~~~~~
 We use pyunit testing framework (the unittest module) for our tests, you should
 understand how this works to better understand how to write your tests.
 To completely understand pyunit, you should read it's `official documentation
@@ -599,7 +602,15 @@ The basic test structure is:
            # where found
 
 Ruby
-++++
+~~~~
+
+*Note: This section is not yet developed.*
+
+
+The Selenium-RC API
+----------------
+We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC Api uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
+
 
 Starting The Browser 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -693,7 +704,7 @@ summarizing, what for your code is just a regular object (with methods and
 properties), in backend it's making the real browser do things.
 
 Retrieving and Reporting Results
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 Each programming language has it's own testing framework which is used to
 run the tests. Everyone of them has it's own way of reporting the results
 and you'll surely find third-party libraries specially created for reporting
@@ -747,8 +758,8 @@ test results in different formats as HTML or PDF.
 
 
 
-Adding Some Spice to Your Tests
--------------------------------
+Adding Some Spice to Your Tests -- Writing Test Logic
+-----------------------------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
 only with the IDE. We will try to give you some guidance on things that can
 only be done using a programming language. The different examples are written
@@ -803,8 +814,8 @@ search in the following way.
    
    }
 
-Conditionals
-~~~~~~~~~~~~
+Condition Statements
+~~~~~~~~~~~~~~~~~~~~
 Most common errors encountered while running Selenium tests are the errors 
 which pop up when corresponding element locator is not available on page.
 For example, when running the following line:
@@ -874,6 +885,9 @@ to do using Selenium-IDE.
 
 Error Handling
 ~~~~~~~~~~~~~~
+
+*Note: This section is not yet developed.*
+
 .. TODO: Complete this... Not sure if the scenario that I put is the best example to use
 .. Then, what if google.com is down at the moment of our tests? Even if that sounds
    completely imposible. We can create a recovery scenario for that test. We can
@@ -884,7 +898,8 @@ Error Handling
 
 Data Base Validations
 ~~~~~~~~~~~~~~~~~~~~~
-Off course, you can also do Data Base queries in your favorite scripting 
+
+You can also do database queries from your favorite programming 
 language. Why not using them for some data validations/retrieval on the 
 Application Under Test?
 
@@ -928,7 +943,7 @@ A more complex test could be to validate that inactive users are not able
 to login to application. This wouldn't take too much work from what you've 
 already seen.
    
-How the Server works
+How the Server Works
 --------------------
 .. note:: This topic tries to explain the technical implementation behind 
    Selenium-RC. It's not fundamental for a Selenium user to know this, but 
@@ -1139,8 +1154,8 @@ More information about firefox profiles in `Mozilla's Knowledge Base`_
 
 .. _html-suite:
 
-Run Selenese tests using -htmlSuite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Run Selenese Tests Directly from the Server Using -htmlSuite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To use the Selenium Server as a proxy, run your tests like this::
 
    java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
@@ -1191,12 +1206,19 @@ If you export your tests from Selenium-IDE, you may find yourself getting
 empty verify strings from your tests (depending on the programming language
 used).
 
+*Note: This section is not yet developed.*
+
 .. Santi: I'll put some info from 
    http://clearspace.openqa.org/message/56908#56908 (we should write an example
    for all the languages...)
 
-Safari and multiWindow mode
+.. Paul:  Are we sure this is still a problem?  I've never encountered it.
+
+Safari and MultiWindow Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Note: This section is not yet developed.*
+
 .. Santi: we will have to explain the following:
    http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
    http://jira.openqa.org/browse/SEL-639
@@ -1229,8 +1251,8 @@ like this::
 
    "*firefox /usr/lib/firefox-x.x.x/firefox-bin"
 
-IE and the style attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+IE and Style Attributes
+~~~~~~~~~~~~~~~~~~~~~~~
 If you are running your tests on Internet Explorer and you are trying to locate
 elements using their `style` attribute, you're definitely in trouble.
 Probably a locator like this::
@@ -1283,8 +1305,8 @@ This error seems to occur when Selenium-RC cannot load the browser.
 * you specified the path to the browser explicitly (see above) but the path is 
   incorrect. 
 
-Selenium Starts but Cannot Find the AUT 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Selenium Cannot Find the AUT 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If your test program starts Selenium successfully, but the browser window 
 cannot display the website you're testing, the most likely cause is your test 
 program is not using the correct URL. 
@@ -1294,7 +1316,7 @@ from your script it inserts a dummy URL. It may not (in the .NET-C# format
 this problem exists) use the base URL when it generates the code. You will 
 need to explicitly modify the URL in the generated code. 
 
-Firefox refused shutdown while preparing a profile 
+Firefox Refused Shutdown While Preparing a Profile 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This most often occurs when your run your Selenium-RC test program against Firefox,
 but you already have a Firefox browser session running, and, you didn't specify
@@ -1409,5 +1431,5 @@ directly supported by Selenium-RC. When specifying the run mode, use the
  
 For example 
  
-.. Paul: Need an example here that works—the one I tried didn't 
+*Note:  we need to add an example here.*
 
