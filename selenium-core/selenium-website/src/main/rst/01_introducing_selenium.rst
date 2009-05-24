@@ -274,7 +274,7 @@ Current Authors
 * Mary Ann May-Pumphrey
 * Peter Newhook
 
-In addition to the original team members who are still involved (May '09), Mary Ann, and Peter have recently made major contributions.  Their reviewing and editorial contributions proved invaluable.  Mary Ann is actively writing new subsections and has provided editorial assistance throughout the document.  Peter has provided valuable assistant with restructuring a couple of our most difficult chapters and has provided valuable advice on topics to include and not to include. Their enthusiasm and dedication has been incredibly helpful.  We hope they continue to be involved.  Especially, as some of us will eventually want to "pass the reigns".
+In addition to the original team members who are still involved (May '09), Mary Ann, and Peter have recently made major contributions.  Their reviewing and editorial contributions proved invaluable.  Mary Ann is actively writing new subsections and has provided editorial assistance throughout the document.  Peter has provided assistance with restructuring our most difficult chapter and has provided valuable advice on topics to include. Their enthusiasm and dedication has been incredibly helpful.  We hope they continue to be involved.  
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
