@@ -723,9 +723,9 @@ Starting the Browser
         @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
-Each of these sentences is in charge of instantiating a browser (which is just
-an object for your code) and assigning the "browser" instance to a variable 
-(which will later be used to call methods from the browser, like *open* or 
+Each of these examples would instantiate a browser (which is just
+an object for your code) by assigning a "browser instance" to a program variable.
+The browser instance variable is then used to call methods from the browser, like *open* or 
 *type*)
 
 The initial parameters that you should give when you create the browser instance
@@ -747,13 +747,13 @@ url
     client libs and Selenium-RC needs it before starting the browser due to the
     way the same server is implemented.
 
-Finally, some languages require the browser to be started explicitly by calling
+Note that some languages require the browser to be started explicitly by calling
 its *start* method.
 
 Running Commands 
 ~~~~~~~~~~~~~~~~
 Once you have the browser initialized and assigned to a variable (generally
-named selenium) you can make it run commands by calling the respective 
+named "selenium") you can make it run commands by calling the respective 
 methods from the selenium browser. For example, when you call the *type* method
 of the selenium object::
 
@@ -761,8 +761,9 @@ of the selenium object::
 
 In the backend (by the magic of Selenium-RC), the browser will actually **type** 
 using the locator and the string you specified during the method call. So, 
-summarizing, what for your code is just a regular object (with methods and 
-properties), in backend, it's making the real browser do things.
+summarizing, what for you code is just a regular object (with methods and 
+properties).  The backend of the Selenium Server and the browser-injected 
+Selenium-Core is doing the real work of testing your application.
 
 Retrieving and Reporting Results
 --------------------------------
