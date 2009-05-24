@@ -10,18 +10,18 @@ trying to help you save yours.
 User Forums 
 -----------
 
-The first place where people ask for help about Selenium are the `Official 
-Forums`_. Here, you'll find that most of the times, someone already found the
-problem you are facing right now, and usually they had reached the solution
-you are looking for.
+The first place where people ask for help about Selenium is the `Official 
+Forums`_. Here, you'll find that most of the time, someone already found the
+problem you are facing right now, and usually reached the solution for
+which you are looking.
 
-Off course, if you can't find any previous solution to your problem, you can
+Of course, if you can't find any previous solution to your problem, you can
 always create an account in the forums and start your own thread asking for 
 help.
 
 .. note:: Please make sure to look in the forums before asking for something.
-   It's very frustrating for the people that's reading and helping others to
-   find that you didn't even put the effort of searching for the solution on
+   It's very frustrating for the people that are reading and helping others to
+   find that you didn't even make the effort of searching for the solution on
    your own.
 
 .. _`Official Forums`: http://clearspace.openqa.org/community/selenium
@@ -29,16 +29,16 @@ help.
 Chat Room
 ---------
 
-Though the best place to ask for help are the forums (because they also keep the
-information accessible for others to read it in the future). If you have a very
+The best place to ask for help is the forums (because they also keep the
+information accessible for others to read in the future). However, if you have a very
 important (or too simple) issue that needs a solution ASAP, you can always enter
-to the IRC chat room. You will always find someone ready to help on *#selenium at
+the IRC chat room. You will always find someone ready to help on *#selenium at
 Freenode* (irc.freenode.net).
 
 Commercial Support
 ------------------
 
-Need more professional help? No problem. We're keeping a list of companies and
+Need more professional help?  No problem. We're keeping a list of companies and
 individuals that can provide hands-on, expert support with Selenium, continuous
 integration, and other QA automation techniques.
 
