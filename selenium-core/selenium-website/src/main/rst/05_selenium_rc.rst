@@ -9,7 +9,7 @@
 Introduction
 ------------
 Selenium-RC is the solution for tests that need a little more than just simple
-browser actions and a linear execution. Selenium-RC allows the 
+browser actions and a linear execution. Selenium-RC leverages the 
 full power of programming languages, creating tests that can do things like read
 and write external files, make queries to a Data Base, send emails with test 
 reports, practically anything a user can do with a normal application.
@@ -31,7 +31,7 @@ this be? For example, Selenium-IDE does not directly support:
 Although these tasks are not supported by Selenium directly, all of them can be achieved
 by using common programming techniques along with language specific libraries.
 
-.. note:: It may be possible to perform these testing task by the addition of user 
+.. note:: It may be possible to perform these testing tasks by the addition of user 
    extensions to Selenium-IDE but most prefer to use Selenium-RC.  Using Selenium-RC
    is much more flexible and extensible than Selenium-IDE when it comes to complex testing
    problems.
@@ -42,7 +42,8 @@ for your tests.
 
 How It Works
 ------------
-How the components of Selenium-RC operate and the role each plays in running your test scripts.
+How the components of Selenium-RC operate and the role each plays in running 
+your test scripts.
 
 RC Components
 ~~~~~~~~~~~~~
@@ -59,10 +60,11 @@ Here is a simplified architecture diagram....
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-
 The diagram shows the client libraries communicate with the
-Server passing each Selenium command for execution. Then the server passes the Selenium command
-to the browser using Selenium-Core javascript commands.  The browser, using it's Javascript interpreter executes the Selenium command, which effectively, runs the check you specified in your Selenese test script.
+Server passing each Selenium command for execution. Then the server passes the 
+Selenium command to the browser using Selenium-Core Javascript commands.  The 
+browser, using it's Javascript interpreter executes the Selenium command, which
+effectively, runs the check you specified in your Selenese test script.
 
 Selenium Server
 ~~~~~~~~~~~~~~~
@@ -73,7 +75,7 @@ running those tests.
 The RC server bundles Selenium Core, and then automatically injects
 it into the browser.  This occurs when your test program causes the
 browser to open (using a client library API function).
-Selenium Core is a javascript program, actually a set of Javascript
+Selenium Core is a Javascript program, actually a set of Javascript
 functions, that interprets and executes Selenese commands using the
 browser's built-in Javascript interpreter.
 
@@ -84,23 +86,25 @@ Selenium tests on the browser.
 
 Client Libraries
 ~~~~~~~~~~~~~~~~
-
 The client libraries provide the programming support that allow you to
-run Selenium commands from a program of your own design.  There is a different client library for each supported language.  A Selenium client library provides a programming interface, that is, a set of functions,
+run Selenium commands from a program of your own design.  There is a 
+different client library for each supported language.  A Selenium client 
+library provides a programming interface, that is, a set of functions,
 that run selenium commands from your program. Within each interface
 there is a programming function that supports each Selenese command.
 
 It is the client library that takes a Selenese command and passes it to the Selenium Server
 for processing a specific action or test against the AUT.  The client library
-will also recieve the result of that command and pass it back to your program.
-Then, your program can recieve the result and report it as a success or failure, 
+will also receive the result of that command and pass it back to your program.
+Then, your program can receive the result and report it as a success or failure, 
 or possibly take corrective action if it was an unexpected error. 
 
 So to create a test program, you simply write a program that runs 
-a set of Selenium commands using a client library API.  And, optionally, if you already
-have a Selenese test script created in the Selenium-IDE, you can *generate the Selenium-RC code*.
-The Selenium-IDE can translate (using its Export menu item) its Selenium commands into a client-driver's
-API function calls.
+a set of Selenium commands using a client library API.  And, optionally, if 
+you already have a Selenese test script created in the Selenium-IDE, you can 
+*generate the Selenium-RC code*. The Selenium-IDE can translate (using its 
+Export menu item) its Selenium commands into a client-driver's API function 
+calls.
 
 .. Paul: I added the above text after this comment below was made.  
    The table suggested below may still be helpful.  We can evaluate that later.
@@ -126,9 +130,9 @@ Installation
 -------------
 After downloading the Selenium-RC zip file from the `downloads page`_ you'll
 notice it has several sub-folders. These folders have all the components you'll 
-need for using Selnium-RC with the supported programming language of your choice.
+need for using Selenium-RC with the supported programming language of your choice.
 
-Once you've chosen a language to work with, you simply need to
+Once you've chosen a language to work with, you simply need to:
 
 * Install the Selenium-RC Server.
 * Set up a programming project using a language specific client driver.
@@ -145,14 +149,14 @@ console::
     java -jar selenium-server.jar
 
 Most people like to have a more simplified setup, which can be made by creating
-an executable batch file (.bat on windows and .sh on linux) with that command
-writen above. This way, you can make a shortcut to that executable file in your
+an executable batch file (.bat on Windows and .sh on Linux) with that command
+written above. This way, you can make a shortcut to that executable file in your
 desktop and just double-click on it anytime you want to wake up the server to 
 start your tests.
 
-.. note:: For the server to run you'll need java installed on your computer 
-   and propperly setup on the PATH variable to run it from the console.
-   You can check that you have java correctly installed by running the following
+.. note:: For the server to run you'll need Java installed on your computer 
+   and properly setup on the PATH variable to run it from the console.
+   You can check that you have Java correctly installed by running the following
    on a console::
 
        java -version
@@ -170,7 +174,7 @@ Java client driver configuration
 * Create a new project
 * Add the selenium-java-client-driver.jar files to your project as references.
 * Add to your project classpath the file *selenium-java-client-driver.jar*
-* From Selenium-IDE, export a script to a Java fileand include in your Java 
+* From Selenium-IDE, export a script to a Java file and include it in your Java
   project, or write your Selenium test in Java using the selenium-java-client API.
 * Run Selenium server from console
 * Execute your test from the IDE
@@ -191,7 +195,7 @@ Python client driver configuration
 * Execute your test from a console or your IDE 
   (i.e. programming IDE, not Selenium-IDE)
 
-For more on python client driver configuration see the appendix 
+For specific details on python client driver configuration see the appendix 
 :ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
 .NET client driver configuration
@@ -204,25 +208,30 @@ For more on python client driver configuration see the appendix
   however NUnit is very useful as a test engine.)
 * Open your desired .Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
 * Create a class library (.dll)
-* Add references to the following DLLs: nmock.dll, nunit.core.dll, nunit.framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
+* Add references to the following DLLs: nmock.dll, nunit.core.dll, nunit.
+  framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.
+  IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
 * Write your Selenium test in a .Net language (C#, VB.Net), or export
-  a script from Selenium-IDE to a C# file and copy this code into the class file you just created.
+  a script from Selenium-IDE to a C# file and copy this code into the class file 
+  you just created.
 * Run Selenium server from console
 * Execute your test using the NUnit gui or NUnit command line
 
-For more on .NET client driver configuration with Visual Studio see the appendix 
+For specific details on .NET client driver configuration with Visual Studio see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
 From Selenese to a Program
 --------------------------
-
-A key step to using Selenium-RC is to convert your Selenese into a programming language.  This is also key to understand  Selenium-RC itslf.  Although similar, each language, out of necessity, will represent the same Selenese test script differently.  In this section we provide several different language-specific examples.
-
+A key step to using Selenium-RC is to convert your Selenese into a programming 
+language.  This is also key to understand  Selenium-RC itself.  Although 
+similar, each language, out of necessity, will represent the same Selenese 
+test script differently.  In this section we provide several different 
+language-specific examples.
 
 Sample Test Script
 ~~~~~~~~~~~~~~~~~~
-
-First, let's start with an example Selenese test script.  Imagine recorded the following test with Selenium-IDE.
+First, let's start with an example Selenese test script.  Imagine recorded 
+the following test with Selenium-IDE.
 
 .. _Google search example:
 
@@ -237,10 +246,11 @@ assertTextPresent  Selenium-RC
 
 Selenese as Programming Code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Here is the test script exported (via Selenium-IDC) to each of the programming languages.
-If you have at least basic knowledge of an object-oriented programming language you should be able to understand
-how Selenium runs Selenese commands from a programming language by reading one of these examples.  To see an example,  click one of these buttons.
+Here is the test script exported (via Selenium-IDE) to each of the 
+programming languages.  If you have at least basic knowledge of an object-
+oriented programming language you should be able to understand how Selenium 
+runs Selenese commands from a programming language by reading one of these 
+examples.  To see the example in the desired language,  click one of these buttons.
 
 .. container:: toggled
 
@@ -427,10 +437,8 @@ how Selenium runs Selenese commands from a programming language by reading one o
 
 Now, in the next section, we'll explain how to build a test program using the generated code.
 
-
 Programming Your Test
 ---------------------
-
 Now we'll show specific examples in each of the supported programming languages. The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
 
 * `C#`_
@@ -528,7 +536,6 @@ like NUnit or the Visual Studio 2005 Team System.
 		}
 	    }
 	}
-
 
 Java
 ~~~~
@@ -641,11 +648,9 @@ Ruby
 
 *Note: This section is not yet developed.*
 
-
 Learning the API
 ----------------
 We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
-
 
 Starting The Browser 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -745,7 +750,7 @@ run the tests. Everyone of them has it's own way of reporting the results
 and you'll surely find third-party libraries specially created for reporting
 test results in different formats as HTML or PDF.
 
-**Generating Test Report for java client driver:**
+**Generating Test Reports for Java client driver:**
     
 
 -	If Selenium Test cases are developed using JUnit then JUnit Report 
@@ -762,7 +767,7 @@ test results in different formats as HTML or PDF.
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
 -	One can generate more *decent* reports using TestNG-xslt. 
-	TestNG-xslt Report looks as -
+	TestNG-xslt Report looks as:
 
 	.. image:: images/chapt5_TestNGxsltReport.png
 
@@ -776,14 +781,14 @@ test results in different formats as HTML or PDF.
 	
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
 
-**Generating Test Report for Python Client driver:**
+**Generating Test Reports for Python Client driver:**
 
 -	When using Python Client Driver then HTMLTestRunner can be used to
 	generate Test Report. Look at `HTMLTestRunner`_ for more on this.
 	
 .. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
 
-**Generating Test Report for Ruby Client driver:**
+**Generating Test Reports for Ruby Client driver:**
 
 -	If RSpec framework is used for writing Selenium Test Cases in Ruby
 	then its HTML report can be used to generate test report.
@@ -791,10 +796,8 @@ test results in different formats as HTML or PDF.
 	
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
-
-
 Adding Some Spice to Your Tests
------------------------------------------------------
+-------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
 only with the IDE. We will try to give you some guidance on things that can
 only be done using a programming language. The different examples are written
@@ -925,8 +928,8 @@ Error Handling
 
 .. TODO: Complete this... Not sure if the scenario that I put is the best example to use
 .. Then, what if google.com is down at the moment of our tests? Even if that sounds
-   completely imposible. We can create a recovery scenario for that test. We can
-   make our tests to wait for a certain ammount of time and try again:
+   completely impossible. We can create a recovery scenario for that test. We can
+   make our tests to wait for a certain amount of time and try again:
 
 .. The idea here is to use a try-catch statement to grab a really unexpected
    error.
@@ -940,7 +943,7 @@ Application Under Test?
 
 Consider example of Registration process where in registered email address
 is to be retrieved from database. Specific cases of establishing DB connection 
-and retrieving data from DB would be -
+and retrieving data from DB would be:
 
 **In Java:**
 
@@ -986,7 +989,7 @@ How the Server Works
    future.
    
 To understand in detail how Selenium-RC Server works  and why it uses proxy injection
-and hightened privilege modes you must first understand `the same origin policy`_.
+and heightened privilege modes you must first understand `the same origin policy`_.
    
 The Same Origin Policy
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -999,7 +1002,7 @@ If this were possible, a script placed on any website you open, would
 be able to read information on your bank account if you had the account page
 opened on other tab. Which is also called XSS (Cross-site Scripting).
 
-To work under that policy. Selenium-Core (and it's javascript commands that
+To work under that policy. Selenium-Core (and it's Javascript commands that
 make all the magic happen) must be placed in the same origin as the Application
 Under Test (same URL). This has been the way Selenium-Core was first
 used and implemented (by deploying Selenium-Core and the set of tests inside
@@ -1052,7 +1055,7 @@ As a test suite starts in your favorite language, the following happens:
    AUT.
 5. The browser receives the open request and asks for the website's content to
    the Selenium-RC server (set as the HTTP proxy for the browser to use).
-6. Selenium-RC server comunicates with the Web server asking for the page and once
+6. Selenium-RC server communicates with the Web server asking for the page and once
    it receives it, it sends the page to the browser masking the origin to look
    like the page comes from the same server as Selenium-Core (this allows 
    Selenium-Core to comply with the Same Origin Policy).
@@ -1062,7 +1065,7 @@ As a test suite starts in your favorite language, the following happens:
 Hightened Privileges Browsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This workflow on this method is very similar to Proxy Injection but the main
-difference is that the browsers are launched in a special mode called *Hightened
+difference is that the browsers are launched in a special mode called *Heightened
 Privileges*, which allows websites to do things that are not commonly permitted
 (as doing XSS_, or filling file upload inputs and pretty useful stuff for 
 Selenium). By using this browser modes, Selenium Core is able to directly open
@@ -1146,7 +1149,7 @@ option:
 Personalizing the Firefox Profile used in the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. TODO: Better descibe how Selenium handles firefox profiles (it creates,
+.. TODO: Better describe how Selenium handles Firefox profiles (it creates,
    uses and then deletes sandbox profiles unless you specify special ones)
    
 Firefox will not run two instances simultaneously unless you specify a 
@@ -1183,7 +1186,7 @@ tell it to use this new Firefox profile with the server command-line option
    The Firefox profile manager tool will delete all files in a folder if you 
    delete a profile, regardless of whether they are profile files or not. 
    
-More information about firefox profiles in `Mozilla's Knowledge Base`_
+More information about Firefox profiles in `Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
 
@@ -1249,6 +1252,9 @@ used).
 
 .. Paul:  Are we sure this is still a problem?  I've never encountered it.
 
+.. I'll investigate into this, I only use python and using that client it's
+failing
+
 Safari and MultiWindow Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1264,7 +1270,7 @@ On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin"
 directly, so if you are using a previous version, make sure that the real 
 executable is on the path. 
 
-On most linux distributions, the real firefox-bin is located on::
+On most Linux distributions, the real *firefox-bin* is located on::
 
    /usr/lib/firefox-x.x.x/ 
 
@@ -1275,8 +1281,7 @@ to the user's path. you will have to add the following to your .bashrc file:
 
    export PATH="$PATH:/usr/lib/firefox-x.x.x/"
 
-
-.. This problem is caused because in linux, firefox is executed through a shell
+.. This problem is caused because in linux, Firefox is executed through a shell
    script (the one located on /usr/bin/firefox), when it comes the time to kill
    the browser Selenium-RC will kill the shell script, leaving the browser 
    running.  Santi: not sure if we should put this here...
@@ -1332,7 +1337,7 @@ This error seems to occur when Selenium-RC cannot load the browser.
 
 (using .NET and XP Service Pack 2) 
 
-* Firefox cannot start because the Firefox browser is already open and you did 
+* Firefox cannot start because the browser is already open and you did 
   not specify a separate profile. 
 * The run mode you're using doesn't match any browser on your machine is this 
   true?  I haven't tried this one as I didn't want to uninstall either of my 
@@ -1451,7 +1456,7 @@ example, Selenium-RC 0.92 does not support Firefox 3. At times, you may be lucky
 browser versions are supported by the version of Selenium you are using. When in
 doubt, use the latest release version of Selenium.
 
-.. Santi: Mary Ann sugested We should also mention about JRE version needed by
+.. Santi: Mary Ann suggested We should also mention about JRE version needed by
    the server
 
 Specifying the Path to a Specific Browser 
@@ -1466,5 +1471,4 @@ directly supported by Selenium-RC. When specifying the run mode, use the
  
 For example 
  
-*Note:  we need to add an example here.*
-
+.. TODO:  we need to add an example here.

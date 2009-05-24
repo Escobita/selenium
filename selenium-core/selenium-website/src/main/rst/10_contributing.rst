@@ -128,6 +128,9 @@ Subversion repositories:
 We encourage code patches and other contributions - get involved by posting
 to the `Selenium Developers`_ section of the forums.
 
+.. note:: Useful information for people willing to code for Selenium-RC can be
+   found in the `Developer's Guide`_ at OpenQA's wiki.
+   
 Shaping the vision for Selenium
 -------------------------------
 How could we make Selenium better? What would increase its value to end users
@@ -143,3 +146,4 @@ the forums.
 .. _Selenium IDE: https://svn.openqa.org/svn/selenium-ide/website/src/main/webapp/
 .. _Selenium Grid: https://svn.openqa.org/svn/selenium-grid/website/src/main/webapp/
 .. _Contribute to the discussion: http://clearspace.openqa.org/thread/14975?tstart=0
+.. _Developer's Guide: http://wiki.openqa.org/display/SRC/Developer%27s+Guide
