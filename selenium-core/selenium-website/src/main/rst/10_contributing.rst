@@ -63,6 +63,14 @@ You can also help with the documentation of `Selenium Core`_, `Selenium
 Remote Control`_, `Selenium IDE`_, and `Selenium Grid`_ (see above for how to 
 set up Maven and Jetty locally to try it out on your own computer).
 
+Submitting Documentation "Bugs"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you find an error in our documentation, either a "typo" or innaccurate information.  Please let us know.  You can submit these as a Jira ticket.
+
+http://jira.openqa.org/browse/SEDOC
+
+
 Bug Reports and Feature Requests
 --------------------------------
 If you run into a problem with Selenium, feel free to file a bug report about
