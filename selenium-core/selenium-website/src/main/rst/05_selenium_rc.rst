@@ -11,8 +11,8 @@ Introduction
 Selenium-RC is the solution for tests that need a little more than just simple
 browser actions and a linear execution. Selenium-RC leverages the 
 full power of programming languages, creating tests that can do things like read
-and write external files, make queries to a Data Base, send emails with test 
-reports, practically anything a user can do with a normal application.
+and write external files, make queries to a database, send emails with test 
+reports, and practically anything else a user can do with a normal application.
 
 You will want to use Selenium-RC whenever your test requires logic
 not supported by running a script from Selenium-IDE. What sort of logic could 
@@ -24,7 +24,7 @@ this be? For example, Selenium-IDE does not directly support:
 * error handling, particularly unexpected errors
 * database testing
 * test case grouping
-* re execution of failed tests
+* re-execution of failed tests
 * test case dependency
 * capture screenshots on test failures
 
@@ -36,14 +36,14 @@ by using common programming techniques along with language specific libraries.
    is much more flexible and extensible than Selenium-IDE when it comes to complex testing
    problems.
 
-In `Adding Some Spice to Your Tests`_ section, you'll find examples that 
+In the `Adding Some Spice to Your Tests`_ section, you'll find examples that 
 demonstrate the advantages of using all the power of a real programming language
 for your tests.
 
 How It Works
 ------------
 How the components of Selenium-RC operate and the role each plays in running 
-your test scripts.
+your test scripts are described below.
 
 RC Components
 ~~~~~~~~~~~~~
@@ -52,7 +52,7 @@ Selenium-RC is composed of two parts:
 
 * The Selenium Server which launches and kills browsers, and acts as an *HTTP
   proxy* for browser requests. 
-* Client libraries for your favorite programming language, which instructs the 
+* Client libraries for various programming languages, each of which instructs the 
   Selenium Server in how to test the AUT by passing it your test script's Selenium commands. 
 
 Here is a simplified architecture diagram.... 
@@ -62,8 +62,8 @@ Here is a simplified architecture diagram....
 
 The diagram shows the client libraries communicate with the
 Server passing each Selenium command for execution. Then the server passes the 
-Selenium command to the browser using Selenium-Core Javascript commands.  The 
-browser, using it's Javascript interpreter executes the Selenium command, which
+Selenium command to the browser using Selenium-Core JavaScript commands.  The 
+browser, using its JavaScript interpreter, executes the Selenium command, which
 effectively, runs the check you specified in your Selenese test script.
 
 Selenium Server
@@ -75,12 +75,12 @@ running those tests.
 The RC server bundles Selenium Core, and then automatically injects
 it into the browser.  This occurs when your test program causes the
 browser to open (using a client library API function).
-Selenium Core is a Javascript program, actually a set of Javascript
+Selenium-Core is a JavaScript program, actually a set of JavaScript
 functions, that interprets and executes Selenese commands using the
-browser's built-in Javascript interpreter.
+browser's built-in JavaScript interpreter.
 
 The Server receives the Selenese commands from your test program
-using simple HTTP GET/POST requests; This means you can use any
+using simple HTTP GET/POST requests. This means you can use any
 programming language that can send HTTP requests to automate
 Selenium tests on the browser.
 
@@ -89,8 +89,8 @@ Client Libraries
 The client libraries provide the programming support that allow you to
 run Selenium commands from a program of your own design.  There is a 
 different client library for each supported language.  A Selenium client 
-library provides a programming interface, that is, a set of functions,
-that run selenium commands from your program. Within each interface
+library provides a programming interface, i.e., a set of functions,
+that run Selenium commands from your program. Within each interface,
 there is a programming function that supports each Selenese command.
 
 It is the client library that takes a Selenese command and passes it to the Selenium Server
@@ -128,7 +128,7 @@ calls.
 
 Installation
 -------------
-After downloading the Selenium-RC zip file from the `downloads page`_ you'll
+After downloading the Selenium-RC zip file from the `downloads page`_, you'll
 notice it has several sub-folders. These folders have all the components you'll 
 need for using Selenium-RC with the supported programming language of your choice.
 
@@ -149,42 +149,42 @@ console::
     java -jar selenium-server.jar
 
 Most people like to have a more simplified setup, which can be made by creating
-an executable batch file (.bat on Windows and .sh on Linux) with that command
-written above. This way, you can make a shortcut to that executable file in your
+an executable file (.bat on Windows and .sh on Linux) containing the command
+above. This way, you can make a shortcut to that executable file in your
 desktop and just double-click on it anytime you want to wake up the server to 
 start your tests.
 
-.. note:: For the server to run you'll need Java installed on your computer 
-   and properly setup on the PATH variable to run it from the console.
+.. note:: For the server, to run you'll need Java installed on your computer 
+   and properly set up on the PATH variable to run it from the console.
    You can check that you have Java correctly installed by running the following
    on a console::
 
        java -version
 
-   If you get a version number, your setup ready to start using Selenium-RC.
+   If you get a version number (which needs to be 1.5 or later), you're ready to start using Selenium-RC.
 
 .. _`downloads page`: http://seleniumhq.org/download/
 .. _`NUnit`: http://www.nunit.org/index.php?p=download
 
-Java client driver configuration
+Java Client Driver Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium-java-client-driver.jar*
-* Open your desired java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, etc.)
+* Open your desired Java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, etc.)
 * Create a new project
 * Add the selenium-java-client-driver.jar files to your project as references.
 * Add to your project classpath the file *selenium-java-client-driver.jar*
 * From Selenium-IDE, export a script to a Java file and include it in your Java
   project, or write your Selenium test in Java using the selenium-java-client API.
-* Run Selenium server from console
-* Execute your test from the IDE
+* Run Selenium server from the console
+* Execute your test from the Java IDE
 
-For specific details on java test project configuration see the Appendix sections
+For specific details on Java test project configuration, see the Appendix sections
 :ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
 and 
 :ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
 
-Python client driver configuration 
+Python Client Driver Configuration 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium.py*
@@ -192,19 +192,18 @@ Python client driver configuration
   a script from Selenium-IDE to a python file.
 * Add to your test's path the file *selenium.py*
 * Run Selenium server from console
-* Execute your test from a console or your IDE 
-  (i.e. programming IDE, not Selenium-IDE)
+* Execute your test from a console or your Python IDE 
 
-For specific details on python client driver configuration see the appendix 
+For specific details on Python client driver configuration, see the appendix 
 :ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
-.NET client driver configuration
+.NET Client Driver Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_
 * Extract the folder
 * Download and install `NUnit`_ (
-  Note:  You can use NUnit as your test engine.  If not familiar yet with 
-  NUnit, you can also write a simple main() function to run your tests, 
+  Note:  You can use NUnit as your test engine.  If you're not familiar yet with 
+  NUnit, you can also write a simple main() function to run your tests; 
   however NUnit is very useful as a test engine.)
 * Open your desired .Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
 * Create a class library (.dll)
@@ -215,22 +214,22 @@ For specific details on python client driver configuration see the appendix
   a script from Selenium-IDE to a C# file and copy this code into the class file 
   you just created.
 * Run Selenium server from console
-* Execute your test using the NUnit gui or NUnit command line
+* Execute your test using either the NUnit GUI or NUnit command line
 
-For specific details on .NET client driver configuration with Visual Studio see the appendix 
+For specific details on .NET client driver configuration with Visual Studio, see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
 From Selenese to a Program
 --------------------------
 A key step to using Selenium-RC is to convert your Selenese into a programming 
-language.  This is also key to understand  Selenium-RC itself.  Although 
+language.  This is also key to understanding Selenium-RC itself.  Although 
 similar, each language, out of necessity, will represent the same Selenese 
-test script differently.  In this section we provide several different 
+test script differently.  In this section, we provide several different 
 language-specific examples.
 
 Sample Test Script
 ~~~~~~~~~~~~~~~~~~
-First, let's start with an example Selenese test script.  Imagine recorded 
+First, let's start with an example Selenese test script.  Imagine recording
 the following test with Selenium-IDE.
 
 .. _Google search example:
@@ -248,7 +247,7 @@ Selenese as Programming Code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here is the test script exported (via Selenium-IDE) to each of the 
 programming languages.  If you have at least basic knowledge of an object-
-oriented programming language you should be able to understand how Selenium 
+oriented programming language, you should be able to understand how Selenium 
 runs Selenese commands from a programming language by reading one of these 
 examples.  To see the example in the desired language,  click one of these buttons.
 
@@ -539,7 +538,7 @@ like NUnit or the Visual Studio 2005 Team System.
 
 Java
 ~~~~
-For java, we use a wrapper_ of the basic Junit test case. With it, you'll save
+For Java, we use a wrapper_ of the basic Junit test case. With it, you'll save
 many lines of code by just writing the basic part and letting Junit do
 the rest.
 
@@ -551,13 +550,13 @@ the rest.
    // We specify the package of our tess
 
    import com.thoughtworks.selenium.*;
-   // This is the driver's import, you'll use this for instantiating a
-   // browser and make it do what you need.
+   // This is the driver's import. You'll use this for instantiating a
+   // browser and making it do what you need.
 
    import java.util.regex.Pattern;
    // Selenium-IDE add the Pattern module because it's sometimes used for 
    // regex validations. You can remove the module if it's not used in your 
-   //script.
+   // script.
 
    public class NewTest extends SeleneseTestCase {
    // We create our Selenium test case
@@ -589,9 +588,9 @@ PHP
 
 Python
 ~~~~~~
-We use pyunit testing framework (the unittest module) for our tests, you should
+We use pyunit testing framework (the unittest module) for our tests. You should
 understand how this works to better understand how to write your tests.
-To completely understand pyunit, you should read it's `official documentation
+To completely understand pyunit, you should read its `official documentation
 <http://docs.python.org/library/unittest.html>`_.
 
 The basic test structure is:
@@ -599,8 +598,8 @@ The basic test structure is:
 .. code-block:: python
 
    from selenium import selenium
-   # This is the driver's import, you'll use this class for instantiating a
-   # browser and make it do what you need.
+   # This is the driver's import.  You'll use this class for instantiating a
+   # browser and making it do what you need.
 
    import unittest, time, re
    # This are the basic imports added by Selenium-IDE by default.
@@ -620,8 +619,8 @@ The basic test structure is:
            # We instantiate and start the browser
 
        def test_new(self):
-           # This is the test code, here you should put the actions you need
-           # the browser to do during your test
+           # This is the test code.  Here you should put the actions you need
+           # the browser to do during your test.
             
            sel = self.selenium
            # We assign the browser to the variable "sel" (just to save us from 
@@ -641,7 +640,7 @@ The basic test structure is:
 
            self.assertEqual([], self.verificationErrors)
            # And make the test fail if we found that any verification errors
-           # where found
+           # were found
 
 Ruby
 ~~~~
@@ -652,7 +651,7 @@ Learning the API
 ----------------
 We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
 
-Starting The Browser 
+Starting the Browser 
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. container:: toggled
@@ -702,7 +701,7 @@ Starting The Browser
         @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
-Each of this sentences is in charge of instantiating a browser (which is just
+Each of these sentences is in charge of instantiating a browser (which is just
 an object for your code) and assigning the "browser" instance to a variable 
 (which will later be used to call methods from the browser, like *open* or 
 *type*)
@@ -711,12 +710,12 @@ The initial parameters that you should give when you create the browser instance
 are: 
 
 host
-    This is the ip location where the server is located. Most of the times is
-    the same machine than the one where the client is running, so you'll see
+    This is the ip location where the server is located. Most of the time, this is
+    the same machine as the one where the client is running, so you'll see
     that it's an optional parameter on some clients.
 port
-    As the host, it determines on which socket is the server listening waiting
-    for the client to communicate with him. Again, it can be optional in some
+    As the host, it determines on which socket the server is listening waiting
+    for the client to communicate with it. Again, it can be optional in some
     client drivers.
 browser
     The browser in which you want to run the tests. This is a required 
@@ -727,7 +726,7 @@ url
     way the same server is implemented.
 
 Finally, some languages require the browser to be started explicitly by calling
-it's *start* method.
+its *start* method.
 
 Running Commands 
 ~~~~~~~~~~~~~~~~
@@ -736,19 +735,19 @@ named selenium) you can make it run commands by calling the respective
 methods from the selenium browser. For example, when you call the *type* method
 of the selenium object::
 
-    selenium.type("field-id","sting to type")
+    selenium.type("field-id","string to type")
 
-In backend (by the magic of Selenium-RC), the browser will actually **type** 
+In the backend (by the magic of Selenium-RC), the browser will actually **type** 
 using the locator and the string you specified during the method call. So, 
 summarizing, what for your code is just a regular object (with methods and 
-properties), in backend it's making the real browser do things.
+properties), in backend, it's making the real browser do things.
 
 Retrieving and Reporting Results
 --------------------------------
-Each programming language has it's own testing framework which is used to
-run the tests. Everyone of them has it's own way of reporting the results
-and you'll surely find third-party libraries specially created for reporting
-test results in different formats as HTML or PDF.
+Each programming language has its own testing framework which is used to
+run the tests. Every one of them has its own way of reporting the results
+and you'll find third-party libraries specially created for reporting
+test results in different formats such as HTML or PDF.
 
 **Generating Test Reports for Java client driver:**
     
@@ -775,8 +774,8 @@ test results in different formats as HTML or PDF.
 
 .. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
 
--	Logging Selenium can be used to generate reports with java client driver
-	of selenium. Logging Selenium extends java client driver to add logging 
+-	Logging Selenium can be used to generate reports with Java client driver
+	of selenium. Logging Selenium extends Java client driver to add logging 
 	ability. Look at `Logging Selenium`_ for more on this.
 	
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
@@ -895,7 +894,7 @@ Data Driven Testing
 ~~~~~~~~~~~~~~~~~~~
 So, the iteration_ idea seems cool. Let's improve this by allowing the users to
 write an external text file from which the script should read the input data,
-search and assert it's existence.
+search and assert its existence.
 
 **In Python:**
 
@@ -913,8 +912,8 @@ search and assert it's existence.
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present(search))
 
-Here, this Python script opens a txt file that we've written with one search
-string on each line. Then is saving that in an array of strings, and at last,
+This Python script opens a text file that we've written with one search
+string on each line. Then it is saving that in an array of strings, and at last,
 it's iterating over that strings array and doing the search and assert on each.
 
 This is a very basic example of what you can do, but the idea is to show you
@@ -995,14 +994,14 @@ The Same Origin Policy
 ~~~~~~~~~~~~~~~~~~~~~~
 The main restriction that Selenium's architecture has faced is the 
 Same Origin Policy. This security restriction is applied by every browser
-in the market and it's objective is to ensure that a site's content will never
+in the market and its objective is to ensure that a site's content will never
 be accessible by a script from other site.
 
 If this were possible, a script placed on any website you open, would 
 be able to read information on your bank account if you had the account page
 opened on other tab. Which is also called XSS (Cross-site Scripting).
 
-To work under that policy. Selenium-Core (and it's Javascript commands that
+To work under that policy. Selenium-Core (and its JavaScript commands that
 make all the magic happen) must be placed in the same origin as the Application
 Under Test (same URL). This has been the way Selenium-Core was first
 used and implemented (by deploying Selenium-Core and the set of tests inside
@@ -1062,14 +1061,14 @@ As a test suite starts in your favorite language, the following happens:
 7. The browser receives the web page and renders it in the frame/window reserved
    for it.
    
-Hightened Privileges Browsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Heightened Privileges Browsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This workflow on this method is very similar to Proxy Injection but the main
 difference is that the browsers are launched in a special mode called *Heightened
 Privileges*, which allows websites to do things that are not commonly permitted
 (as doing XSS_, or filling file upload inputs and pretty useful stuff for 
 Selenium). By using this browser modes, Selenium Core is able to directly open
-the AUT and read/interact with it's content without having to pass the whole AUT
+the AUT and read/interact with its content without having to pass the whole AUT
 through the Selenium-RC server.
 
 Here is the architectural diagram. 
@@ -1146,7 +1145,7 @@ option:
  
    -singlewindow 
 
-Personalizing the Firefox Profile used in the tests
+Personalizing the Firefox Profile Used in the Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO: Better describe how Selenium handles Firefox profiles (it creates,
