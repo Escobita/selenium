@@ -255,3 +255,32 @@ The remaining chapters of the reference present:
     Describes how to be a part of the Selenium community for getting help and 
     exchanging advice. Specifically this section describes the user forums as 
     an avenue for obtaining assistance. 
+
+The Documentation Team
+----------------------
+
+The Original Authors
+~~~~~~~~~~~~~~~~~~~~
+
+Dave Hunt
+Paul Grandjean
+Santiago Suarez Ordonez(what's your last name?)
+Tarun Kumar (did I get that right?)
+
+The original authors who kickstarted this document are listed in alphabetical order.  Each of us contributed significantly by taking a leadership role in specific areas.  Each chapter originally had a primary author who kicked off the chapter, but in the end, each of us made significant contributions to each chapter throughout the project.
+
+Current Authors
+~~~~~~~~~~~~~~~
+Mary Ann May-Pumphrey
+Peter Newhook
+
+In addition to the original team members who are still involved (May '09), Mary Ann, and Peter have recently made major contributions.  Their reviewing and editorial contributions proved invaluable.  Mary Ann is actively writing new subsections and has provided editorial assistance throughout the document.  Peter has provided valuable assistant with restructuring a couple of our most difficult chapters and has provided valuable advice on topics to include and not to include. Their enthusiasm and dedication has been incredibly helpful.  We hope they continue to be involved.  Especially, as some of us will eventually want to "pass the reigns".
+
+Acknowledgements
+~~~~~~~~~~~~~~~~
+A huge special thanks goes to Patrick Lightbody, the leader of the SeleniumHQ website.  His support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SelniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definetely helped drive this project.  Also thanks goes to 
+
+Andras Hatvani for his advice on publishing solutions.
+Amit Kumar for participating in our discussions and for assisting with reviewing the document.
+
+And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
