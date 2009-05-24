@@ -264,8 +264,8 @@ The Original Authors
 
 * Dave Hunt
 * Paul Grandjean
-* Santiago Suarez Ordonez(what's your last name?)
-* Tarun Kumar (did I get that right?)
+* Santiago Suarez Ordonez
+* Tarun Kumar
 
 The original authors who kickstarted this document are listed in alphabetical order.  Each of us contributed significantly by taking a leadership role in specific areas.  Each chapter originally had a primary author who kicked off the chapter, but in the end, each of us made significant contributions to each chapter throughout the project.
 
@@ -284,3 +284,7 @@ Andras Hatvani for his advice on publishing solutions.
 Amit Kumar for participating in our discussions and for assisting with reviewing the document.
 
 And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
+
+The Future
+~~~~~~~~~~
+We expect this page will change over time as new people get involved with the documentation.  We hope that happens.
