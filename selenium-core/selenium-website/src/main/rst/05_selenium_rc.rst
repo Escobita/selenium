@@ -776,37 +776,36 @@ test results in different formats such as HTML or PDF.
     
 
 -	If Selenium Test cases are developed using JUnit then JUnit Report 
-	can be availed 	to generate test report. Look at `JUnit Report`_ 
-	for more on this.
+	can be used	to generate test reports. Refere to `JUnit Report`_ 
+	for specifics.
 
 .. _`JUnit Report`: http://ant.apache.org/manual/OptionalTasks/junitreport.html
 
 -	If Selenium Test cases are developed using TestNG then no external task 
-	is required to generate test report. TestNG framework generates one 
-	HTML report which list details of tests. Look at `TestNG Report`_ for 
-	more on this.
+	is required to generate test reports. The TestNG framework generates an 
+	HTML report which list details of tests. See `TestNG Report`_ for 
+	more.
 
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
--	One can generate more *decent* reports using TestNG-xslt. 
-	TestNG-xslt Report looks as:
+-	Also, for a very nice summary report try using TestNG-xslt. 
+	TestNG-xslt Report looks like this.
 
 	.. image:: images/chapt5_TestNGxsltReport.png
 
-	Look at `TestNG-xslt`_ for more.
+	See `TestNG-xslt`_ for more.
 
 .. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
 
--	Logging Selenium can be used to generate reports with Java client driver
-	of selenium. Logging Selenium extends Java client driver to add logging 
-	ability. Look at `Logging Selenium`_ for more on this.
+-	Logging Selenium can also be used to generate reports for the Java client driver.  
+	Logging Selenium extends the Java client driver to add logging ability. Please refer to `Logging Selenium`_.
 	
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
 
 **Generating Test Reports for Python Client driver:**
 
 -	When using Python Client Driver then HTMLTestRunner can be used to
-	generate Test Report. Look at `HTMLTestRunner`_ for more on this.
+	generate a Test Report. See `HTMLTestRunner`_.
 	
 .. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
 
@@ -814,28 +813,40 @@ test results in different formats such as HTML or PDF.
 
 -	If RSpec framework is used for writing Selenium Test Cases in Ruby
 	then its HTML report can be used to generate test report.
-	Look at `RSpec Report`_ for more on this.
+	Refer to `RSpec Report`_ for more.
 	
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
 Adding Some Spice to Your Tests
 -------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
-only with the IDE. We will try to give you some guidance on things that can
-only be done using a programming language. The different examples are written
-in only one of the languages, the idea is that you understand the concept, be
-able to translate it to the language of your choice and upgrade it for your
-needs.
+strictly with Selenium-IDE. We will give you guidance here on things that can
+only be done using a programming language.
+
+You find, as you transition from running simple tests of page elements, to building tests
+of dynamic functionality involving multiple web-pages and varying data that you will
+require programming logic for verifying expected test results.  Basically, the Selenium-IDE
+does not support iteration and condition statements.  You will find you can do some simple
+condition statements by embedding javascript in your Selenese parameters, however iteration
+is impossible, and many conditions simply will need to be done in a programming language.  
+In addition, you may need to use exception-handling for error recovery.  For these reasons and others,
+we have written this section to give you ideas on how to leverage common programming techniques
+to give you greater 'verification power' in your automated testing.
+
+The examples in this section are written
+in a single programming language--the idea being that you understand the concept and be
+able to translate it to the language of your choice.  If you have some basic knowledge
+of object-oriented programming you shouldn't have difficulty making use of this section.
 
 Iteration
 ~~~~~~~~~
 Iteration is one of the most common things people needs to do in their tests.
-Generally, to repeat a simple search, or saving you from duplicating the same
-code several times.
+For example, you may want to to execute a search multiple times.  Or, perhaps for
+verifying your test results you need to process a "result set" returned from a database.
 
-If we take the `Google search example`_ we've been looking at, it's not so crazy to 
-think that we want to check that all the Selenium tools appear on the search
-we make. This kind of test could be made doing the following using Selenese:
+If we take the same `Google search example`_ we've been using, it's not so crazy to 
+to check that all the Selenium tools appear in the search
+results. This test could use the Selenese:
 
 =================  =============  =============
 open               /
@@ -850,11 +861,12 @@ clickAndWait       submit
 assertTextPresent  Selenium-Grid 
 =================  =============  =============
 
-As you can see, the code has been triplicated to run the same steps 3 times.
-This doesn't look to efficient.
+The code has been triplicated to run the same steps 3 times.  No half-way
+decent software person would want to do it this way, it makes
+managing the code much more difficult.
 
-By using a programming language, we can just iterate over a list and do the 
-search in the following way. 
+By using a programming language, we can iterate over a list and run 
+the search this way. 
 
 **In C#:**   
    
@@ -876,23 +888,26 @@ search in the following way.
 
 Condition Statements
 ~~~~~~~~~~~~~~~~~~~~
-Most common errors encountered while running Selenium tests are the errors 
-which pop up when corresponding element locator is not available on page.
+A common problem encountered while running Selenium tests occurs when an expected element is not available on page.
 For example, when running the following line:
 
 .. code-block:: java
    
    selenium.type("q", "selenium " +s);
    
-If element 'q' happens to be unavailable on page then following exception is
+If element 'q' happens to be unavailable on the page then an exception is
 thrown:
 
 .. code-block:: java
 
    com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
 
+This can cause your test to abort.  Some types of tests may want that.  But
+often that is not desireable as your test script has many other subsequent tests
+to perform.
+
 A better approach would be to first validate if the element is really present
-and then take different alternatives in case it is not:
+and then take alternatives when it it is not:
 
 **In Java:**
 
@@ -935,18 +950,27 @@ search and assert its existence.
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present(search))
 
-This Python script opens a text file that we've written with one search
-string on each line. Then it is saving that in an array of strings, and at last,
-it's iterating over that strings array and doing the search and assert on each.
+Why would we want a separate file with data in it for our tests?  One important method of
+testing concerns running the same test repetetively with differnt data values.  This
+is called *data-driven-testing* and is a very common testing task.  Test automation tools,
+Selenium included, generally handle this as it's often a common reason for building
+test automation to support manual testing methods.
+
+The Python script above opens a text file.  This file contain a different search
+string on each line. The code then saves this in an array of strings, and at last,
+it's iterating over the strings array and doing the search and assert on each.
 
 This is a very basic example of what you can do, but the idea is to show you
-things that can easily be done with a scripting language while they're impossible
-to do using Selenium-IDE.
+things that can easily be done with either a programming or scripting language when they're difficult
+or even impossible to do using Selenium-IDE.
 
 Error Handling
 ~~~~~~~~~~~~~~
 
 *Note: This section is not yet developed.*
+
+A quick note though--recognize that your programming language's exception-handling support 
+can be used for error handling and recovery.
 
 .. TODO: Complete this... Not sure if the scenario that I put is the best example to use
 .. Then, what if google.com is down at the moment of our tests? Even if that sounds
@@ -956,12 +980,12 @@ Error Handling
 .. The idea here is to use a try-catch statement to grab a really unexpected
    error.
 
-Data Base Validations
+Database Validations
 ~~~~~~~~~~~~~~~~~~~~~
 
-You can also do database queries from your favorite programming 
-language. Why not using them for some data validations/retrieval on the 
-Application Under Test?
+Since you can also do database queries from your favorite programming 
+language, assuming you have database support functions, why not using them
+for some data validations/retrieval on the Application Under Test?
 
 Consider example of Registration process where in registered email address
 is to be retrieved from database. Specific cases of establishing DB connection 
@@ -1168,8 +1192,8 @@ option:
  
    -singlewindow 
 
-Personalizing the Firefox Profile Used in the Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Specifying the Firefox Profile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO: Better describe how Selenium handles Firefox profiles (it creates,
    uses and then deletes sandbox profiles unless you specify special ones)
