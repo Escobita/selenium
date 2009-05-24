@@ -438,7 +438,9 @@ Now, in the next section, we'll explain how to build a test program using the ge
 
 Programming Your Test
 ---------------------
-Now we'll show specific examples in each of the supported programming languages. The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
+Now we'll show specific examples in each of the supported programming languages. Basically there's two tasks.  One, generate your script into a programming language from Selenium-IDE, optionally modifying the result.  And two, write a very simple main program that executes the generated code.  Optionally, you can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
+
+Here, we show language-specific examples.  The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
 
 * `C#`_
 * Java_
@@ -450,9 +452,18 @@ Now we'll show specific examples in each of the supported programming languages.
 C#
 ~~
 
-.NET Client Driver works with Microsoft.NET.
+The .NET Client Driver works with Microsoft.NET.
 It can be used together with any .NET testing framework 
 like NUnit or the Visual Studio 2005 Team System.
+
+Selenium-IDE automatically assumes you will use NUnit as your testing framework.  You can see this in the generated code 
+below.  It includes the *using* statement for the NUnit framework along with corresponding NUnit attributes identifyiing the role for each generated member function of the test class.  
+
+Note that you will probably have to rename the test class from "NewTest" to something of your own choosing.  Also, you will need to change the browser-open parameters in the statement::
+
+	selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
+
+The generated code will look similar to this.
 
 .. code-block:: c#
 
@@ -536,11 +547,22 @@ like NUnit or the Visual Studio 2005 Team System.
 	    }
 	}
 
+The main program is very simple.  You can allow NUnit to manage the execution of your tests.  Or alternatively, you can write a simple main() program that instantiates the test object and runs each of the three methods, SetupTest(), TheNewTest(), and TeardownTest() in turn.
+
+	
 Java
 ~~~~
-For Java, we use a wrapper_ of the basic Junit test case. With it, you'll save
-many lines of code by just writing the basic part and letting Junit do
-the rest.
+For Java, most people use Junit as the test engine.  With it, you'll save
+many lines of code by allowing Junit to manage the execution of your tests.
+Some development environments like Eclipse have direct support for JUnit via plug-ins which make it even easier.
+Teaching JUnit is beyond the scope of this document however materials may be found online and there are publications 
+available.  If you are already a "java-shop" chances are your developers will already have experience with JUnit.
+
+You will probably want to rename the test class from "NewTest" to something of your own choosing.  Also, you will need to change the browser-open parameters in the statement::
+
+	selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
+
+The Selenium-IDE generated code will look something like this.  This example has coments added manually for additional clarity.
 
 .. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
 
@@ -1251,8 +1273,7 @@ used).
 
 .. Paul:  Are we sure this is still a problem?  I've never encountered it.
 
-.. I'll investigate into this, I only use python and using that client it's
-failing
+.. I'll investigate into this, I only use python and using that client it's failing
 
 Safari and MultiWindow Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
