@@ -245,8 +245,7 @@ The remaining chapters of the reference present:
     one can vary the data between different test passes).
 
 :ref:`Selenium-Grid <chapter07-reference>`
-
-.. *This chapter is not yet developed.*
+    *This chapter is not yet developed.*
   
 :ref:`Advanced Selenium <chapter08-reference>`
     Presents a number of advanced topics geared to the experienced Selenium 
