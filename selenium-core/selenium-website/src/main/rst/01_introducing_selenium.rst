@@ -284,7 +284,3 @@ Andras Hatvani for his advice on publishing solutions.
 Amit Kumar for participating in our discussions and for assisting with reviewing the document.
 
 And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
-
-The Future
-~~~~~~~~~~
-We expect this page will change over time as new people get involved with the documentation.  We hope that happens.
