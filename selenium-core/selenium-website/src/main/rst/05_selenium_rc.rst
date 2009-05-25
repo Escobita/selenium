@@ -76,7 +76,7 @@ The RC server bundles Selenium Core, and then automatically injects
 it into the browser.  This occurs when your test program causes the
 browser to open (using a client library API function).
 Selenium-Core is a JavaScript program, actually a set of JavaScript
-functions, that interprets and executes Selenese commands using the
+functions, which interprets and executes Selenese commands using the
 browser's built-in JavaScript interpreter.
 
 The Server receives the Selenese commands from your test program
@@ -86,11 +86,11 @@ Selenium tests on the browser.
 
 Client Libraries
 ~~~~~~~~~~~~~~~~
-The client libraries provide the programming support that allow you to
+The client libraries provide the programming support that allows you to
 run Selenium commands from a program of your own design.  There is a 
 different client library for each supported language.  A Selenium client 
 library provides a programming interface, i.e., a set of functions,
-that run Selenium commands from your program. Within each interface,
+which run Selenium commands from your program. Within each interface,
 there is a programming function that supports each Selenese command.
 
 It is the client library that takes a Selenese command and passes it to the Selenium Server
@@ -128,7 +128,7 @@ calls.
 
 Installation
 -------------
-After downloading the Selenium-RC zip file from the `downloads page`_, you'll
+After downloading the Selenium-RC zip file from `downloads page`_, you'll
 notice it has several sub-folders. These folders have all the components you'll 
 need for using Selenium-RC with the supported programming language of your choice.
 
@@ -438,7 +438,7 @@ Now, in the next section, we'll explain how to build a test program using the ge
 
 Programming Your Test
 ---------------------
-Now we'll show specific examples in each of the supported programming languages. Basically there's two tasks.  One, generate your script into a programming language from Selenium-IDE, optionally modifying the result.  And two, write a very simple main program that executes the generated code.  Optionally, you can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
+Now we'll show specific examples in each of the supported programming languages. Basically there are two tasks.  One, generate your script into a programming language from Selenium-IDE, optionally modifying the result.  And two, write a very simple main program that executes the generated code.  Optionally, you can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
 
 Here, we show language-specific examples.  The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
 
@@ -457,7 +457,7 @@ It can be used together with any .NET testing framework
 like NUnit or the Visual Studio 2005 Team System.
 
 Selenium-IDE automatically assumes you will use NUnit as your testing framework.  You can see this in the generated code 
-below.  It includes the *using* statement for the NUnit framework along with corresponding NUnit attributes identifyiing the role for each generated member function of the test class.  
+below.  It includes the *using* statement for the NUnit framework along with corresponding NUnit attributes identifying the role for each generated member function of the test class.  
 
 Note that you will probably have to rename the test class from "NewTest" to something of your own choosing.  Also, you will need to change the browser-open parameters in the statement::
 
@@ -554,7 +554,7 @@ Java
 ~~~~
 For Java, most people use Junit as the test engine.  With it, you'll save
 many lines of code by allowing Junit to manage the execution of your tests.
-Some development environments like Eclipse have direct support for JUnit via plug-ins which make it even easier.
+Some development environments like Eclipse have direct support for JUnit via plug-ins which makes it even easier.
 Teaching JUnit is beyond the scope of this document however materials may be found online and there are publications 
 available.  If you are already a "java-shop" chances are your developers will already have experience with JUnit.
 
@@ -610,7 +610,7 @@ PHP
 
 Python
 ~~~~~~
-We use pyunit testing framework (the unittest module) for our tests. You should
+We use pyunit testing framework (the unit test module) for our tests. You should
 understand how this works to better understand how to write your tests.
 To completely understand pyunit, you should read its `official documentation
 <http://docs.python.org/library/unittest.html>`_.
@@ -671,7 +671,7 @@ Ruby
 
 Learning the API
 ----------------
-We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important, and possibly less obvious, aspects of the API.
+We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important and possibly less obvious, aspects of the API.
 
 Starting the Browser 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -776,7 +776,7 @@ test results in different formats such as HTML or PDF.
     
 
 -	If Selenium Test cases are developed using JUnit then JUnit Report 
-	can be used	to generate test reports. Refere to `JUnit Report`_ 
+	can be used	to generate test reports. Refer to `JUnit Report`_ 
 	for specifics.
 
 .. _`JUnit Report`: http://ant.apache.org/manual/OptionalTasks/junitreport.html
@@ -840,12 +840,12 @@ of object-oriented programming you shouldn't have difficulty making use of this 
 
 Iteration
 ~~~~~~~~~
-Iteration is one of the most common things people needs to do in their tests.
+Iteration is one of the most common things people need to do in their tests.
 For example, you may want to to execute a search multiple times.  Or, perhaps for
 verifying your test results you need to process a "result set" returned from a database.
 
 If we take the same `Google search example`_ we've been using, it's not so crazy to 
-to check that all the Selenium tools appear in the search
+check that all the Selenium tools appear in the search
 results. This test could use the Selenese:
 
 =================  =============  =============
@@ -956,7 +956,7 @@ is called *data-driven-testing* and is a very common testing task.  Test automat
 Selenium included, generally handle this as it's often a common reason for building
 test automation to support manual testing methods.
 
-The Python script above opens a text file.  This file contain a different search
+The Python script above opens a text file.  This file contains a different search
 string on each line. The code then saves this in an array of strings, and at last,
 it's iterating over the strings array and doing the search and assert on each.
 
@@ -1057,7 +1057,7 @@ could meet and Selenium Developers had to find an alternative that would allow
 testers to use Selenium to test site where they didn't have the possibility to
 deploy their code. 
 
-.. note:: You can find additional information about this topic on wikipedia
+.. note:: You can find additional information about this topic on Wikipedia
    pages about `Same Origin Policy`_ and XSS_. 
 
 .. _Same Origin Policy: http://en.wikipedia.org/wiki/Same_origin_policy
@@ -1114,7 +1114,7 @@ This workflow on this method is very similar to Proxy Injection but the main
 difference is that the browsers are launched in a special mode called *Heightened
 Privileges*, which allows websites to do things that are not commonly permitted
 (as doing XSS_, or filling file upload inputs and pretty useful stuff for 
-Selenium). By using this browser modes, Selenium Core is able to directly open
+Selenium). By using these browser modes, Selenium Core is able to directly open
 the AUT and read/interact with its content without having to pass the whole AUT
 through the Selenium-RC server.
 
@@ -1138,7 +1138,7 @@ As a test suite starts in your favorite language, the following happens:
    
 Server Command Line options
 ---------------------------
-When the server is launced, some command line options can be used to change the
+When the server is launched, some command line options can be used to change the
 default behaviour if it is needed.
 
 As you already know, the server is started by running the following:
@@ -1161,14 +1161,14 @@ written an in deep explanation for them.
 
 Multi-Window Mode
 ~~~~~~~~~~~~~~~~~
-Before 1.0, Selenium by default ran the application under test in a subframe 
+Before 1.0, Selenium by default ran the application under test in a sub frame 
 which looks like this:
 
 .. image:: images/chapt5_img26_single_window_mode.png
    :align: center
 
-Unfortunately, some apps don't run properly in a subframe, preferring to be 
-loaded into the top frame of the window. That's why we made the multiWindow 
+Unfortunately, some apps don't run properly in a sub frame, preferring to be 
+loaded into the top frame of the window. That's why we made the multi Window 
 mode (the new default since Selenium 1.0). Using this you can make your 
 application under test run in a separate window rather than in the default 
 frame.
@@ -1404,7 +1404,7 @@ need to explicitly modify the URL in the generated code.
 Firefox Refused Shutdown While Preparing a Profile 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This most often occurs when your run your Selenium-RC test program against Firefox,
-but you already have a Firefox browser session running, and, you didn't specify
+but you already have a Firefox browser session running and, you didn't specify
 a separate profile when you started the Selenium Server. The error from the 
 test program looks like this::
 
@@ -1485,13 +1485,13 @@ To get around this, Selenium-RC, (again when using a run mode that support
 this) will install its own security certificate, temporarily, onto your 
 client machine in a place where the browser can access it. This tricks the 
 browser into thinking it's accessing a different site from your application 
-under test and effectively suppresses the security popups. 
+under test and effectively suppresses the security popups.  
 
 Another method that has been used with earlier versions of Selenium is to 
 install the Cybervillians security certificate provided with your Selenium 
-installation. Most users should no longer need to do this, however, if you are
+installation. Most users should no longer need to do this however, if you are
 running Selenium-RC in proxy injection mode, you may need to explicitly install this
-security certificate to avoid the security popups. 
+security certificate to avoid the security popup. 
 
 Versioning Problems 
 ~~~~~~~~~~~~~~~~~~~
