@@ -6,7 +6,7 @@ Introducing Selenium
 To Automate or Not to Automate?  That is the Question!
 ------------------------------------------------------
 
-Is automation always advantageous? When should one decide to automate one's
+Is automation always advantageous? When should one decide to automate
 test cases? 
 
 It is **not** always advantageous to automate test cases. There are 
@@ -22,7 +22,7 @@ However, automation has specific advantages for
 improving the long-term efficiency of a software team's testing processes. 
 Test automation supports:
 
-* Frequent and rapid regression testing 
+* Frequent regression testing 
 * Rapid feedback to developers during the development process
 * Virtually unlimited iterations of test case execution
 * Customized reporting of application defects 
@@ -46,9 +46,7 @@ lack the skills to perform.  Utilizing these alternatives would in most cases
 greatly improve the efficiency of their software development by adding 
 efficiencies to their testing. 
 
-Test automation is often the answer. Test automation means using software 
-to run tests against other software. In other words, one uses a software 
-program to automatically run tests against the application to be tested.
+Test automation is often the answer. Test automation means using a tool to run repeatable tests against the target application whenever necessary.
   
 There are many advantages to test automation. Most are related to 
 the repeatability of the tests and the speed at which the tests can be executed.
@@ -73,11 +71,7 @@ Introducing Selenium
 --------------------
 
 Selenium is a robust set of tools that supports rapid development of test 
-automation for web-based applications. 
-Selenium provides a rich set of testing functions specifically geared to the needs 
-of functionality testing of a web application. These functions are highly 
-flexible, allowing many options for locating UI elements and comparing 
-expected test results against actual application behavior. 
+automation for web-based applications. Selenium provides a rich set of testing functions specifically geared to the needs of testing of a web application. These operations are highly flexible, allowing many options for locating UI elements and comparing expected test results against actual application behavior. 
 
 One of Selenium's key features is the support for executing one's tests on
 multiple browser platforms.  
@@ -91,21 +85,19 @@ aiding the development of web application test automation.
 Selenium-IDE
 ~~~~~~~~~~~~
 
-Selenium-IDE is the Integrated Development Environment for building 
-Selenium test cases. It operates as a Firefox add-on. Selenium-IDE 
-provides an easy-to-use interface for both developing and running test cases. 
-It also can run an entire test suite. Selenium-IDE has a recording feature
-for recording user actions into a script as the user performs them. 
-It also has an options menu (right-click) integrated with the Firefox browser 
-which allows the user to pick from a list of assertions and verifications 
-based on a currently selected UI component and then add the selected test to 
-the script. Selenium-IDE predicts the assertions and verifications desired by 
-the script developer based on the context of the currently selected UI element.
-Finally, Selenium-IDE allows unlimited editing of the test case's commands. 
+Selenium-IDE is the Integrated Development Environment for building Selenium 
+test cases. It operates as a Firefox add-on and provides an easy-to-use 
+interface for developing and running individual test cases or entire test 
+suites. Selenium-IDE has a recording feature, which will keep account of user 
+actions as they are performed and store them as a reusable script to play back. 
+It also has a context menu (right-click) integrated with the Firefox browser, 
+which allows the user to pick from a list of assertions and verifications for 
+the selected location. Selenium-IDE also offers full editing of test cases for 
+more precision and control. 
 
-Although Selenium-IDE is a Firefox-only add-on, tests created in Selenium-IDE
-can be run against other browsers via a simple command line invoking the
-Selenium-RC server and specifying the name of the test suite created in Selenium-IDE.
+Although Selenium-IDE is a Firefox only add-on, tests created in it can also be 
+run against other browsers by using Selenium-RC and specifying the name of the 
+test suite on the command line.
 
 Selenium-RC (Remote Control)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,9 +121,7 @@ environment.
 Selenium-Grid 
 ~~~~~~~~~~~~~~
 
-Selenium-Grid extends Selenium-RC's capabilities by supporting the execution 
-of automated tests against multiple browsers and multiple machines supporting 
-multiple test environments. 
+Selenium-Grid allows the Selenium-RC solution to scale for large test suites or test suites that must be run in multiple environments. With Selenium-Grid multiple instances of Selenium-RC are running on various operating system and browser configurations, each of these when launching register with a hub. When tests are sent to the hub they are then redirected to an available Selenium-RC, which will launch the browser and run the test. This allows for running tests in parallel, with the entire test suite theoretically taking only as long to run as the longest individual test.
  
   
 Supported Browsers
@@ -146,18 +136,19 @@ Supported Browsers
    introduction and probably no one reading this will understand what 
    \*piiexplore or *chrome mean...
 
-===========  ==================================================  ===========================  =====================
-**Browser**  **Selenium-IDE**                                    **Selenium-RC**              **Operating Systems**
-Firefox 3    1.0 Beta-1 & 1.0 Beta-2: Record and playback tests  Start browser, run tests     Windows, Linux, Mac
-Firefox 2    1.0 Beta-1: Record and playback tests               Start browser, run tests     Windows, Linux, Mac
-IE 8                                                             Under development            Windows
-IE 7         Test execution only via Selenium-RC*                Start browser, run tests     Windows
-Safari 3     Test execution only via Selenium-RC                 Start browser, run tests     Mac
-Safari 2     Test execution only via Selenium-RC                 Start browser, run tests     Mac
-Opera 9      Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac
-Opera 8      Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac 
-Others       Test execution only via Selenium-RC                 Partial support possible**   As applicable 
-===========  ==================================================  ===========================  =====================
+=============  ==================================================  ===========================  =====================
+**Browser**    **Selenium-IDE**                                    **Selenium-RC**              **Operating Systems**
+Firefox 3      1.0 Beta-1 & 1.0 Beta-2: Record and playback tests  Start browser, run tests     Windows, Linux, Mac
+Firefox 2      1.0 Beta-1: Record and playback tests               Start browser, run tests     Windows, Linux, Mac
+IE 8                                                   			   Under development            Windows
+IE 7           Test execution only via Selenium-RC*                Start browser, run tests     Windows
+Safari 3       Test execution only via Selenium-RC                 Start browser, run tests     Mac
+Safari 2       Test execution only via Selenium-RC                 Start browser, run tests     Mac
+Opera 9        Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac
+Opera 8        Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac 
+Google Chrome  Test execution only via Selenium-RC(Windows)        Start browser, run tests     Windows
+Others         Test execution only via Selenium-RC                 Partial support possible**   As applicable 
+=============  ==================================================  ===========================  =====================
 
 \* Tests developed on Firefox via Selenium-IDE can be executed on any other supported browser via a simple Selenium-RC command line.
 
@@ -187,7 +178,7 @@ Selenium-IDE allows for the addition of user-defined "user-extensions" for
 creating additional commands customized to the user's needs. Also, it is 
 possible to re-configure how the Selenium-IDE generates its Selenium-RC code.
 This allows users to customize the generated code to fit in with their
-own test frameworks. Finally, Selenium is fully an Open Source project where 
+own test frameworks. Finally, Selenium is an Open Source project where 
 code can be modified and enhancements can be submitted for contribution.
 
 About this Book
@@ -267,7 +258,7 @@ The Original Authors
 * Santiago Suarez Ordonez
 * Tarun Kumar
 
-The original authors who kickstarted this document are listed in alphabetical order.  Each of us contributed significantly by taking a leadership role in specific areas.  Each chapter originally had a primary author who kicked off the chapter, but in the end, each of us made significant contributions to each chapter throughout the project.
+The original authors who kickstarted this document are listed in alphabetical order.  Each of us contributed significantly by taking a leadership role in specific areas.  Each chapter originally had a primary author who kicked off the intial writing, but in the end, each of us made significant contributions to each chapter throughout the project.
 
 Current Authors
 ~~~~~~~~~~~~~~~
@@ -278,9 +269,7 @@ In addition to the original team members who are still involved (May '09), Mary 
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
-A huge special thanks goes to Patrick Lightbody.  As an administrator of the SeleniumHQ website his support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SelniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definetely helped drive this project.  Also thanks goes to 
-
-Andras Hatvani for his advice on publishing solutions.
+A huge special thanks goes to Patrick Lightbody.  As an administrator of the SeleniumHQ website his support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SelniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definetely helped drive this project.  Also thanks goes to Andras Hatvani for his advice on publishing solutions.
 Amit Kumar for participating in our discussions and for assisting with reviewing the document.
 
 And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
