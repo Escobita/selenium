@@ -237,7 +237,7 @@ the following test with Selenium-IDE.
 =================  ============  ===========
 open               /
 type               q             selenium rc
-clickAndWait       submit
+clickAndWait       btnG
 assertTextPresent  Selenium-RC
 =================  ============  ===========
 
@@ -297,7 +297,7 @@ examples.  To see the example in the desired language,  click one of these butto
         		{
         			selenium.Open("/");
         			selenium.Type("q", "selenium rc");
-        			selenium.Click("submit");
+        			selenium.Click("btnG");
         			selenium.WaitForPageToLoad("30000");
         			Assert.IsTrue(selenium.IsTextPresent("Selenium-RC"));
         		}
@@ -320,7 +320,7 @@ examples.  To see the example in the desired language,  click one of these butto
             public void testNew() throws Exception {
       	      selenium.open("/");
       	      selenium.type("q", "selenium rc");
-      	      selenium.click("submit");
+      	      selenium.click("btnG");
       	      selenium.waitForPageToLoad("30000");
       	      assertTrue(selenium.isTextPresent("Selenium-RC"));
       	}
@@ -344,7 +344,7 @@ examples.  To see the example in the desired language,  click one of these butto
 
       $sel->open_ok("/");
       $sel->type_ok("q", "selenium rc");
-      $sel->click_ok("submit");
+      $sel->click_ok("btnG");
       $sel->wait_for_page_to_load_ok("30000");
       $sel->is_text_present_ok("Selenium-RC");
 
@@ -368,7 +368,7 @@ examples.  To see the example in the desired language,  click one of these butto
         {
           $this->open("/");
           $this->type("q", "selenium rc");
-          $this->click("submit");
+          $this->click("btnG");
           $this->waitForPageToLoad("30000");
           $this->assertTrue($this->isTextPresent("Selenium-RC"));
         }
@@ -393,7 +393,7 @@ examples.  To see the example in the desired language,  click one of these butto
               sel = self.selenium
               sel.open("/")
               sel.type("q", "selenium rc")
-              sel.click("submit")
+              sel.click("btnG")
               sel.wait_for_page_to_load("30000")
               self.failUnless(sel.is_text_present("Selenium-RC"))
          
@@ -428,7 +428,7 @@ examples.  To see the example in the desired language,  click one of these butto
         def test_new
           @selenium.open "/"
           @selenium.type "q", "selenium rc"
-          @selenium.click "submit"
+          @selenium.click "btnG"
           @selenium.wait_for_page_to_load "30000"
           assert @selenium.is_text_present("Selenium-RC")
         end
@@ -591,7 +591,7 @@ The Selenium-IDE generated code will look something like this.  This example has
          public void testNew() throws Exception {
               selenium.open("/");
               selenium.type("q", "selenium rc");
-              selenium.click("submit");
+              selenium.click("btnG");
               selenium.waitForPageToLoad("30000");
               assertTrue(selenium.isTextPresent("Selenium-RC"));
               // These are the real test steps
@@ -650,7 +650,7 @@ The basic test structure is:
             
            sel.open("/")
            sel.type("q", "selenium rc")
-           sel.click("submit")
+           sel.click("btnG")
            sel.wait_for_page_to_load("30000")
            self.failUnless(sel.is_text_present("Selenium-RC"))
            # These are the real test steps
@@ -851,13 +851,13 @@ results. This test could use the Selenese:
 =================  =============  =============
 open               /
 type               q              selenium rc
-clickAndWait       submit
+clickAndWait       btnG
 assertTextPresent  Selenium-RC
 type               q              selenium ide
-clickAndWait       submit 
+clickAndWait       btnG 
 assertTextPresent  Selenium-IDE 
 type               q              selenium grid
-clickAndWait       submit 
+clickAndWait       btnG 
 assertTextPresent  Selenium-Grid 
 =================  =============  =============
 
@@ -879,7 +879,7 @@ the search this way.
    foreach (String s in arr) {
    	sel.open("/");
   	sel.type("q", "selenium " +s);
-   	sel.click("submit");
+   	sel.click("btnG");
         sel.waitForPageToLoad("30000");
         assertTrue("Expected text: " +s+ " is missing on page."
         , sel.isTextPresent("Selenium-" + s));
@@ -946,7 +946,7 @@ search and assert its existence.
    for search in values:
        sel.open("/")
        sel.type("q", search)
-       sel.click("submit")
+       sel.click("btnG")
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present(search))
 
