@@ -269,7 +269,8 @@ In addition to the original team members who are still involved (May '09), Mary 
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
-A huge special thanks goes to Patrick Lightbody.  As an administrator of the SeleniumHQ website his support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SelniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definetely helped drive this project.  Also thanks goes to Andras Hatvani for his advice on publishing solutions.
+
+A huge special thanks goes to Patrick Lightbody.  As an administrator of the SeleniumHQ website, his support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SeleniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definitely helped drive this project.  Also thanks goes to Andras Hatvani for his advice on publishing solutions, and to
 Amit Kumar for participating in our discussions and for assisting with reviewing the document.
 
 And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
