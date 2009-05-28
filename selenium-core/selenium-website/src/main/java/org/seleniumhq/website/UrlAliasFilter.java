@@ -23,6 +23,11 @@ public class UrlAliasFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String path = req.getRequestURI();
+
+        if (path.startsWith("/documentation")) {
+            res.sendRedirect("/docs/");
+        }
+
         String newUrl = aliasMap.get(path);
 
         if (newUrl == null) {

@@ -4,7 +4,7 @@
 <decorator:useHtmlPage id="p"/>
 <head>
     <title><decorator:title default="Selenium"/></title>
-    <link href="/seleniumhq.css?20090410" rel="stylesheet" type="text/css"/>
+    <link href="/seleniumhq.css?20090528" rel="stylesheet" type="text/css"/>
     <link rel="shortcut icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <link rel="icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <script src="/page-tools.js" type="text/javascript"></script>
@@ -94,18 +94,12 @@
     <%
         } else if ("sectionDocumentation".equals(p.getProperty("body.class"))) {
     %>
+
     <div id="side" class="left">
-        <ul id="nav">
-            <li><a href="/about/">Selenium Documentation</a>
-                <ul>
-                <li><a href="/documentation/examples/">Examples</a></li>
-                <li><a href="/documentation/screencasts/">Screencasts</a></li>
-                <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
-                <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                <li><a href="/documentation/core/reference.html">Selenium API</a></li>
-                </ul>
-            </li>
-        </ul>
+        <%= p.getProperty("page.related") %>
+
+        <%= p.getProperty("page.sphinxsidebar") %>
+
         <div class="ads">
             <script type="text/javascript"><!--
             google_ad_client = "pub-6291771388053870";

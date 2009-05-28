@@ -1,4 +1,4 @@
-Welcome to Selenium's new documentation!
+Selenium Documentation
 ========================================
 
 Contents:

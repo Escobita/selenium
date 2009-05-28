@@ -457,9 +457,6 @@ th
 	.note {
 		font-style: italic;
 	}
-	.note:before {
-		content: "Note: ";
-	}
 
 	.remark {
 		font-size: smaller;
