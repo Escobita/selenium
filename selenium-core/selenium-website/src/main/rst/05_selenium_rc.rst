@@ -234,12 +234,12 @@ the following test with Selenium-IDE.
 
 .. _Google search example:
 
-=================  ============  ===========
+=================  =========================  ===========
 open               /
-type               q             selenium rc
+type               q                          selenium rc
 clickAndWait       btnG
-assertTextPresent  Selenium-RC
-=================  ============  ===========
+assertTextPresent  Results * for selenium rc
+=================  =========================  ===========
 
 .. note:: This example would work with the Google search page http://www.google.com
 
@@ -299,7 +299,7 @@ examples.  To see the example in the desired language,  click one of these butto
         			selenium.Type("q", "selenium rc");
         			selenium.Click("btnG");
         			selenium.WaitForPageToLoad("30000");
-        			Assert.IsTrue(selenium.IsTextPresent("Selenium-RC"));
+        			Assert.IsTrue(selenium.IsTextPresent("Results * for selenium rc"));
         		}
         	}
         }
@@ -322,7 +322,7 @@ examples.  To see the example in the desired language,  click one of these butto
       	      selenium.type("q", "selenium rc");
       	      selenium.click("btnG");
       	      selenium.waitForPageToLoad("30000");
-      	      assertTrue(selenium.isTextPresent("Selenium-RC"));
+      	      assertTrue(selenium.isTextPresent("Results * for selenium rc"));
       	}
       }
 
@@ -346,7 +346,7 @@ examples.  To see the example in the desired language,  click one of these butto
       $sel->type_ok("q", "selenium rc");
       $sel->click_ok("btnG");
       $sel->wait_for_page_to_load_ok("30000");
-      $sel->is_text_present_ok("Selenium-RC");
+      $sel->is_text_present_ok("Results * for selenium rc");
 
 .. container:: toggled
 
@@ -370,7 +370,7 @@ examples.  To see the example in the desired language,  click one of these butto
           $this->type("q", "selenium rc");
           $this->click("btnG");
           $this->waitForPageToLoad("30000");
-          $this->assertTrue($this->isTextPresent("Selenium-RC"));
+          $this->assertTrue($this->isTextPresent("Results * for selenium rc"));
         }
       }
       ?>
@@ -395,7 +395,7 @@ examples.  To see the example in the desired language,  click one of these butto
               sel.type("q", "selenium rc")
               sel.click("btnG")
               sel.wait_for_page_to_load("30000")
-              self.failUnless(sel.is_text_present("Selenium-RC"))
+              self.failUnless(sel.is_text_present("Results * for selenium rc"))
          
           def tearDown(self):
               self.selenium.stop()
@@ -430,7 +430,7 @@ examples.  To see the example in the desired language,  click one of these butto
           @selenium.type "q", "selenium rc"
           @selenium.click "btnG"
           @selenium.wait_for_page_to_load "30000"
-          assert @selenium.is_text_present("Selenium-RC")
+          assert @selenium.is_text_present("Results * for selenium rc")
         end
       end
 
@@ -593,7 +593,7 @@ The Selenium-IDE generated code will look something like this.  This example has
               selenium.type("q", "selenium rc");
               selenium.click("btnG");
               selenium.waitForPageToLoad("30000");
-              assertTrue(selenium.isTextPresent("Selenium-RC"));
+              assertTrue(selenium.isTextPresent("Results * for selenium rc"));
               // These are the real test steps
         }
    }
@@ -652,7 +652,7 @@ The basic test structure is:
            sel.type("q", "selenium rc")
            sel.click("btnG")
            sel.wait_for_page_to_load("30000")
-           self.failUnless(sel.is_text_present("Selenium-RC"))
+           self.failUnless(sel.is_text_present("Results * for selenium rc"))
            # These are the real test steps
 
        def tearDown(self):
@@ -848,18 +848,18 @@ If we take the same `Google search example`_ we've been using, it's not so crazy
 check that all the Selenium tools appear in the search
 results. This test could use the Selenese:
 
-=================  =============  =============
+=================  ===========================  =============
 open               /
-type               q              selenium rc
+type               q                            selenium rc
 clickAndWait       btnG
-assertTextPresent  Selenium-RC
-type               q              selenium ide
+assertTextPresent  Results * for selenium rc
+type               q                            selenium ide
 clickAndWait       btnG 
-assertTextPresent  Selenium-IDE 
-type               q              selenium grid
+assertTextPresent  Results * for selenium ide
+type               q                            selenium grid
 clickAndWait       btnG 
-assertTextPresent  Selenium-Grid 
-=================  =============  =============
+assertTextPresent  Results * for selenium grid
+=================  ===========================  =============
 
 The code has been triplicated to run the same steps 3 times.  No half-way
 decent software person would want to do it this way, it makes
@@ -873,7 +873,7 @@ the search this way.
 .. code-block:: c#
 
    // Collection of String values.	
-   String[] arr = {"IDE", "RC", "GRID"};	
+   String[] arr = {"ide", "rc", "grid"};	
 		
    // Execute For loop for each String in 'arr' array.
    foreach (String s in arr) {
@@ -882,7 +882,7 @@ the search this way.
    	sel.click("btnG");
         sel.waitForPageToLoad("30000");
         assertTrue("Expected text: " +s+ " is missing on page."
-        , sel.isTextPresent("Selenium-" + s));
+        , sel.isTextPresent("Results * for selenium " + s));
    
    }
 
@@ -915,7 +915,7 @@ and then take alternatives when it it is not:
    
    // If element is available on page then perform type operation.
    if(selenium.isElementPresent("q")) {
-       selenium.type("q", "Selenium-RC");			
+       selenium.type("q", "Selenium rc");			
    } else {
        Reporter.log("Element: " +q+ " is not available on page.")
    }
@@ -948,11 +948,11 @@ search and assert its existence.
        sel.type("q", search)
        sel.click("btnG")
        sel.waitForPageToLoad("30000")
-       self.failUnless(sel.is_text_present(search))
+       self.failUnless(sel.is_text_present("Results * for " + search))
 
 Why would we want a separate file with data in it for our tests?  One important method of
 testing concerns running the same test repetetively with differnt data values.  This
-is called *data-driven-testing* and is a very common testing task.  Test automation tools,
+is called *Data Driven Testing* and is a very common testing task.  Test automation tools,
 Selenium included, generally handle this as it's often a common reason for building
 test automation to support manual testing methods.
 
