@@ -1710,3 +1710,46 @@ img.promo {
 .tjmymsgs{ /* the giver's message row(s)*/
 	display:block;
 }
+
+/*-------------------------Selenium Docs -----------------------------*/
+
+.sectionDocumentation a.headerlink {
+color:#C60F0F;
+font-size:0.8em;
+padding:0 4px;
+text-decoration:none;
+visibility:hidden;
+}
+
+.sectionDocumentation h1:hover > a.headerlink, 
+.sectionDocumentation h2:hover > a.headerlink,
+.sectionDocumentation h3:hover > a.headerlink,
+.sectionDocumentation h4:hover > a.headerlink,
+.sectionDocumentation h5:hover > a.headerlink,
+.sectionDocumentation h6:hover > a.headerlink,
+.sectionDocumentation dt:hover > a.headerlink 
+{
+visibility:visible;
+}
+
+.sectionDocumentation a.headerlink:hover {
+background-color:#C60F0F;
+color:white;
+}
+
+.sectionDocumentation pre {
+background-color:#F0F0F0;
+border-color:#CCCCCC -moz-use-text-color;
+border-style:solid none;
+border-width:1px medium;
+color:#333333;
+overflow:auto;
+padding:5px;
+}
+
+.sectionDocumentation td.linenos pre {
+background-color:transparent;
+border:0 none;
+color:#AAAAAA;
+padding:5px 0;
+}

@@ -4,7 +4,7 @@
 <decorator:useHtmlPage id="p"/>
 <head>
     <title><decorator:title default="Selenium"/></title>
-    <link href="/seleniumhq.css?20090528" rel="stylesheet" type="text/css"/>
+    <link href="/seleniumhq.css?20090529" rel="stylesheet" type="text/css"/>
     <link rel="shortcut icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <link rel="icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <script src="/page-tools.js" type="text/javascript"></script>
