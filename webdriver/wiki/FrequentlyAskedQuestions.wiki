@@ -72,6 +72,10 @@ alert.getText();
 alert.accept();
 }}}
 
+*Q: The "onchange" event doesn't fire after a call "sendKeys"*
+
+A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onchange" event will only fire when focus leaves that element. As such, you need to move the focus, perhaps using a "click" on another element.
+
 *Q: I'm using NX to connect to my Linux session, and the Linux firefox browser isn't starting, with an error about not being able to connect*
 
 A: The normal reason for this is that the DISPLAY and XAUTH environment variables aren't set up quite right. If you've started your NX session in headless mode, running a single command, make sure that the command starts with executing the "nxxauth" program (on my system, to start the KDE console app, I use: {{{/usr/NX/bin/nxxauth konsole}}})
