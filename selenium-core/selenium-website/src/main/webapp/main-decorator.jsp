@@ -9,12 +9,6 @@
     <link rel="icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <script src="/page-tools.js" type="text/javascript"></script>
     <decorator:head/>
-    <script type="text/javascript">
-        $(document).ready(function() {
-          //This is completely temporary. We're using js to fix the coding issue
-          $(".headerlink").html("¶");
-         })
-    </script>
 </head>
 <body <decorator:getProperty property="body.class" default="homepage" writeEntireProperty="true"/>>
 <div id="container">
