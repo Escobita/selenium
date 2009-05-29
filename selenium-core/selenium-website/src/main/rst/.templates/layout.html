@@ -7,6 +7,7 @@
 
 {%- macro relbar() %}
 <content tag="related">
+<!-- 
     <div class="related">
       <h3>{{ _('Navigation') }}</h3>
       <ul>
@@ -16,15 +17,15 @@
              {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
           {%- if not loop.first %}{{ reldelim2 }}{% endif %}</li>
         {%- endfor %}
+        {%- block rootrellink %}
+        <!-- <li class="master_doc"><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a>{{ reldelim1 }}</li> -->
+        {%- endblock %}
         {%- for parent in parents %}
           <li><a href="{{ parent.link|e }}" {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a>{{ reldelim1 }}</li>
         {%- endfor %}
         {%- block relbaritems %} {% endblock %}
       </ul>
-      {%- block rootrellink %}
-        <a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a>{{ reldelim1 }}
-      {%- endblock %}
-    </div>
+    </div> -->
 </content>
 {%- endmacro %}
 
