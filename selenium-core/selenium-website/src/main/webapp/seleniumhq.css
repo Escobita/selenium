@@ -1753,3 +1753,27 @@ border:0 none;
 color:#AAAAAA;
 padding:5px 0;
 }
+
+.sectionDocumentation .sphinxsidebarwrapper ul {
+margin-left:15px;
+padding-left:0;
+}
+
+.sectionDocumentation .sphinxsidebarwrapper li {
+list-style:disc;
+}
+
+.sectionDocumentation .related ul {
+margin-left:10px;
+padding-left:0px;
+width:180px
+}
+
+.sectionDocumentation .related li {
+list-style:none;
+}
+
+.sectionDocumentation .related .right {
+float:right;
+padding: 3px;
+}
