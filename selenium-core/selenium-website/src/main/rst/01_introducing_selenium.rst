@@ -5,7 +5,6 @@ Introducing Selenium
 
 To Automate or Not to Automate?  That is the Question!
 ------------------------------------------------------
-
 Is automation always advantageous? When should one decide to automate
 test cases? 
 
@@ -32,7 +31,6 @@ Test automation supports:
 
 Test Automation for Web Applications
 ------------------------------------
-
 Many, perhaps most, software applications today are written as web-based 
 applications to be run in an Internet browser. The  
 effectiveness of testing these applications varies widely among companies and 
@@ -46,7 +44,8 @@ lack the skills to perform.  Utilizing these alternatives would in most cases
 greatly improve the efficiency of their software development by adding 
 efficiencies to their testing. 
 
-Test automation is often the answer. Test automation means using a tool to run repeatable tests against the target application whenever necessary.
+Test automation is often the answer. Test automation means using a tool to 
+run repeatable tests against the target application whenever necessary.
   
 There are many advantages to test automation. Most are related to 
 the repeatability of the tests and the speed at which the tests can be executed.
@@ -69,22 +68,23 @@ to boosting the reader's efficiency in his or her software testing processes.
 
 Introducing Selenium 
 --------------------
-
 Selenium is a robust set of tools that supports rapid development of test 
-automation for web-based applications. Selenium provides a rich set of testing functions specifically geared to the needs of testing of a web application. These operations are highly flexible, allowing many options for locating UI elements and comparing expected test results against actual application behavior. 
+automation for web-based applications. Selenium provides a rich set of 
+testing functions specifically geared to the needs of testing of a web 
+application. These operations are highly flexible, allowing many options for 
+locating UI elements and comparing expected test results against actual 
+application behavior. 
 
 One of Selenium's key features is the support for executing one's tests on
 multiple browser platforms.  
 
 Selenium Components
 -------------------
-
 Selenium is composed of three major tools. Each one has a specific role in 
 aiding the development of web application test automation. 
 
 Selenium-IDE
 ~~~~~~~~~~~~
-
 Selenium-IDE is the Integrated Development Environment for building Selenium 
 test cases. It operates as a Firefox add-on and provides an easy-to-use 
 interface for developing and running individual test cases or entire test 
@@ -101,7 +101,6 @@ test suite on the command line.
 
 Selenium-RC (Remote Control)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Selenium-RC allows the test 
 automation developer to use a programming language for maximum flexibility and
 extensibility in developing test logic. For instance, if the application under
@@ -120,21 +119,18 @@ environment.
 
 Selenium-Grid 
 ~~~~~~~~~~~~~~
-
-Selenium-Grid allows the Selenium-RC solution to scale for large test suites or test suites that must be run in multiple environments. With Selenium-Grid multiple instances of Selenium-RC are running on various operating system and browser configurations, each of these when launching register with a hub. When tests are sent to the hub they are then redirected to an available Selenium-RC, which will launch the browser and run the test. This allows for running tests in parallel, with the entire test suite theoretically taking only as long to run as the longest individual test.
+Selenium-Grid allows the Selenium-RC solution to scale for large test suites 
+or test suites that must be run in multiple environments. With Selenium-Grid 
+multiple instances of Selenium-RC are running on various operating system and 
+browser configurations, each of these when launching register with a hub. 
+When tests are sent to the hub they are then redirected to an available 
+Selenium-RC, which will launch the browser and run the test. This allows for 
+running tests in parallel, with the entire test suite theoretically taking 
+only as long to run as the longest individual test.
  
   
 Supported Browsers
 ------------------
-
-.. Tarun: Version 1.0 Beta 2 of Selenium list following supported browsers if
-   wrong browser string is provided while creating object for Default Selenium.
-   I hope these are the supported browsers :-)
-   
-.. Santi: I'm not sure if giving the string used for selenium instantiation is
-   helpful in this content, let's remember that we are in the selenium 
-   introduction and probably no one reading this will understand what 
-   \*piiexplore or *chrome mean...
 
 =============  ==================================================  ===========================  =====================
 **Browser**    **Selenium-IDE**                                    **Selenium-RC**              **Operating Systems**
@@ -150,7 +146,8 @@ Google Chrome  Test execution only via Selenium-RC(Windows)        Start browser
 Others         Test execution only via Selenium-RC                 Partial support possible**   As applicable 
 =============  ==================================================  ===========================  =====================
 
-\* Tests developed on Firefox via Selenium-IDE can be executed on any other supported browser via a simple Selenium-RC command line.
+\* Tests developed on Firefox via Selenium-IDE can be executed on any other 
+supported browser via a simple Selenium-RC command line.
 
 ** Selenium-RC server can start any executable, but depending on 
 browser security settings, there may be technical limitations that would limit
@@ -164,7 +161,6 @@ certain features.
   
 Flexibility and Extensibility
 ------------------------------
-
 You'll find that Selenium is highly flexible.  There are multiple ways in which
 one can add functionality to Selenium's framework to customize test 
 automation for one's specific testing needs. This is, perhaps, Selenium's 
@@ -183,11 +179,10 @@ code can be modified and enhancements can be submitted for contribution.
 
 About this Book
 ---------------
-
-This reference documentation targets both new users of Selenium and those who have been using 
-Selenium and are seeking additional knowledge. It introduces the novice
-to Selenium test automation. We do not assume the reader has experience in 
-testing beyond the basics.  
+This reference documentation targets both new users of Selenium and those who 
+have been using Selenium and are seeking additional knowledge. It introduces 
+the novice to Selenium test automation. We do not assume the reader has 
+experience in testing beyond the basics.  
 
 The experienced Selenium user will also find this reference valuable. It compiles
 in one place a set of useful Selenium techniques and best practices by drawing 
@@ -238,11 +233,10 @@ The remaining chapters of the reference present:
 :ref:`Selenium-Grid <chapter07-reference>`
     *This chapter is not yet developed.*
   
-:ref:`Advanced Selenium <chapter08-reference>`
-    Presents a number of advanced topics geared to the experienced Selenium 
-    user.
+:ref:`User extensions <chapter08-reference>`
+    Presents all the information required for easily extending Selenium. 
   
-:ref:`Getting Help <chapter09-reference>`
+..  :ref:`Getting Help <chapter09-reference>`
     Describes how to be a part of the Selenium community for getting help and 
     exchanging advice. Specifically this section describes the user forums as 
     an avenue for obtaining assistance. 
@@ -252,25 +246,42 @@ The Documentation Team
 
 The Original Authors
 ~~~~~~~~~~~~~~~~~~~~
-
 * Dave Hunt
 * Paul Grandjean
 * Santiago Suarez Ordonez
 * Tarun Kumar
 
-The original authors who kickstarted this document are listed in alphabetical order.  Each of us contributed significantly by taking a leadership role in specific areas.  Each chapter originally had a primary author who kicked off the intial writing, but in the end, each of us made significant contributions to each chapter throughout the project.
+The original authors who kickstarted this document are listed in alphabetical 
+order.  Each of us contributed significantly by taking a leadership role in 
+specific areas.  Each chapter originally had a primary author who kicked off 
+the intial writing, but in the end, each of us made significant contributions 
+to each chapter throughout the project.
 
 Current Authors
 ~~~~~~~~~~~~~~~
 * Mary Ann May-Pumphrey
 * Peter Newhook
 
-In addition to the original team members who are still involved (May '09), Mary Ann, and Peter have recently made major contributions.  Their reviewing and editorial contributions proved invaluable.  Mary Ann is actively writing new subsections and has provided editorial assistance throughout the document.  Peter has provided assistance with restructuring our most difficult chapter and has provided valuable advice on topics to include. Their enthusiasm and dedication has been incredibly helpful.  We hope they continue to be involved.  
+In addition to the original team members who are still involved (May '09), 
+Mary Ann, and Peter have recently made major contributions.  Their reviewing 
+and editorial contributions proved invaluable.  Mary Ann is actively writing 
+new subsections and has provided editorial assistance throughout the document.
+Peter has provided assistance with restructuring our most difficult chapter 
+and has provided valuable advice on topics to include. Their enthusiasm and 
+dedication has been incredibly helpful.  We hope they continue to be involved.  
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
+A huge special thanks goes to Patrick Lightbody.  As an administrator of the 
+SeleniumHQ website, his support has been invaluable.  Patrick has helped us 
+understand the Selenium community--our audience. He also set us up with 
+everything we needed on the SeleniumHQ website for developing and releasing 
+this user's guide.  His enthusiasm and encouragement definitely helped drive 
+this project.  Also thanks goes to Andras Hatvani for his advice on publishing
+solutions, and to Amit Kumar for participating in our discussions and for 
+assisting with reviewing the document.
 
-A huge special thanks goes to Patrick Lightbody.  As an administrator of the SeleniumHQ website, his support has been invaluable.  Patrick has helped us understand the Selenium community--our audience. He also set us up with everything we needed on the SeleniumHQ website for developing and releasing this user's guide.  His enthusiasm and encouragement definitely helped drive this project.  Also thanks goes to Andras Hatvani for his advice on publishing solutions, and to
-Amit Kumar for participating in our discussions and for assisting with reviewing the document.
-
-And of course, we must *recognize the Selenium Developers*.  They have truly designed an amazing tool. Without the vision of the original designers, and the continued efforts of the current developers, we would not have such a great tool to pass on to you, the reader.
+And of course, we must *recognize the Selenium Developers*.  They have truly 
+designed an amazing tool. Without the vision of the original designers, and 
+the continued efforts of the current developers, we would not have such a 
+great tool to pass on to you, the reader.

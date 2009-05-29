@@ -1,5 +1,5 @@
 Java Client Driver Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 In General configuration of Selenium-RC with any java IDE would have following 
 steps:
@@ -19,7 +19,7 @@ These points have been delineated below with reference to Eclipse and IntelliJ:
 .. _configuring-selenium-RC-eclipse-reference:
 
 Configuring Selenium-RC With Eclipse
-++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Eclipse** is a multi-language software development platform comprising an IDE 
 and a plug-in system to extend it. It is written primarily in Java and is used 
 to develop applications in this language and, by means of the various plug-ins, 
@@ -134,7 +134,7 @@ Added libraries would appear in Package Explorer as following:
 .. _configuring-selenium-RC-Intellij-reference:   
 
 Configuring Selenium-RC With Intellij
-+++++++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **IntelliJ IDEA** is a commercial Java IDE by the company JetBrains. Intellij 
 provides a set of integrated refactoring tools that allow programmers to 
 quickly redesign their code. IntelliJ IDEA provides close integration with 

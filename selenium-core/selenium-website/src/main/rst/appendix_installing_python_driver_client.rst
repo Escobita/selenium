@@ -1,7 +1,7 @@
 .. _configuring-selenium-RC-python-reference:
 
 Python Client Driver Configuration 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium-java-client-driver.jar*
 * Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)

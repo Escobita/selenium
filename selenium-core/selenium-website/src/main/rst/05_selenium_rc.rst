@@ -47,7 +47,6 @@ your test scripts are described below.
 
 RC Components
 ~~~~~~~~~~~~~
-
 Selenium-RC is composed of two parts:
 
 * The Selenium Server which launches and kills browsers, and acts as an *HTTP
@@ -264,44 +263,44 @@ examples.  To see the example in the desired language,  click one of these butto
 
         namespace SeleniumTests
         {
-        	[TestFixture]
-        	public class NewTest
-        	{
-        		private ISelenium selenium;
-        		private StringBuilder verificationErrors;
-        		
-        		[SetUp]
-        		public void SetupTest()
-        		{
-        			selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com/");
-        			selenium.Start();
-        			verificationErrors = new StringBuilder();
-        		}
-        		
-        		[TearDown]
-        		public void TeardownTest()
-        		{
-        			try
-        			{
-        				selenium.Stop();
-        			}
-        			catch (Exception)
-        			{
-        				// Ignore errors if unable to close the browser
-        			}
-        			Assert.AreEqual("", verificationErrors.ToString());
-        		}
-        		
-        		[Test]
-        		public void TheNewTest()
-        		{
-        			selenium.Open("/");
-        			selenium.Type("q", "selenium rc");
-        			selenium.Click("btnG");
-        			selenium.WaitForPageToLoad("30000");
-        			Assert.IsTrue(selenium.IsTextPresent("Results * for selenium rc"));
-        		}
-        	}
+            [TestFixture]
+            public class NewTest
+            {
+                private ISelenium selenium;
+                private StringBuilder verificationErrors;
+                
+                [SetUp]
+                public void SetupTest()
+                {
+                    selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com/");
+                    selenium.Start();
+                    verificationErrors = new StringBuilder();
+                }
+                
+                [TearDown]
+                public void TeardownTest()
+                {
+                    try
+                    {
+                        selenium.Stop();
+                    }
+                    catch (Exception)
+                    {
+                        // Ignore errors if unable to close the browser
+                    }
+                    Assert.AreEqual("", verificationErrors.ToString());
+                }
+                
+                [Test]
+                public void TheNewTest()
+                {
+                    selenium.Open("/");
+                    selenium.Type("q", "selenium rc");
+                    selenium.Click("btnG");
+                    selenium.WaitForPageToLoad("30000");
+                    Assert.IsTrue(selenium.IsTextPresent("Results * for selenium rc"));
+                }
+            }
         }
 
 .. container:: toggled
@@ -314,16 +313,16 @@ examples.  To see the example in the desired language,  click one of these butto
       import java.util.regex.Pattern;
 
       public class NewTest extends SeleneseTestCase {
-      	public void setUp() throws Exception {
-      		setUp("http://www.google.com/", "*firefox");
-      	}
+          public void setUp() throws Exception {
+              setUp("http://www.google.com/", "*firefox");
+          }
             public void testNew() throws Exception {
-      	      selenium.open("/");
-      	      selenium.type("q", "selenium rc");
-      	      selenium.click("btnG");
-      	      selenium.waitForPageToLoad("30000");
-      	      assertTrue(selenium.isTextPresent("Results * for selenium rc"));
-      	}
+                selenium.open("/");
+                selenium.type("q", "selenium rc");
+                selenium.click("btnG");
+                selenium.waitForPageToLoad("30000");
+                assertTrue(selenium.isTextPresent("Results * for selenium rc"));
+          }
       }
 
 .. container:: toggled
@@ -438,9 +437,14 @@ Now, in the next section, we'll explain how to build a test program using the ge
 
 Programming Your Test
 ---------------------
-Now we'll show specific examples in each of the supported programming languages. Basically there are two tasks.  One, generate your script into a programming language from Selenium-IDE, optionally modifying the result.  And two, write a very simple main program that executes the generated code.  Optionally, you can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
+Now we'll show specific examples in each of the supported programming languages.
+Basically there are two tasks.  One, generate your script into a programming 
+language from Selenium-IDE, optionally modifying the result.  And two, write 
+a very simple main program that executes the generated code.  Optionally, you 
+can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
 
-Here, we show language-specific examples.  The language-specific APIs tend to differ from one to another, so you'll find a separate explanation for each.  
+Here, we show language-specific examples.  The language-specific APIs tend to 
+differ from one to another, so you'll find a separate explanation for each.  
 
 * `C#`_
 * Java_
@@ -456,113 +460,125 @@ The .NET Client Driver works with Microsoft.NET.
 It can be used together with any .NET testing framework 
 like NUnit or the Visual Studio 2005 Team System.
 
-Selenium-IDE automatically assumes you will use NUnit as your testing framework.  You can see this in the generated code 
-below.  It includes the *using* statement for the NUnit framework along with corresponding NUnit attributes identifying the role for each generated member function of the test class.  
+Selenium-IDE automatically assumes you will use NUnit as your testing framework.
+You can see this in the generated code below.  It includes the *using* statement
+for the NUnit framework along with corresponding NUnit attributes identifying 
+the role for each generated member function of the test class.  
 
-Note that you will probably have to rename the test class from "NewTest" to something of your own choosing.  Also, you will need to change the browser-open parameters in the statement::
+Note that you will probably have to rename the test class from "NewTest" to 
+something of your own choosing.  Also, you will need to change the browser-open
+parameters in the statement::
 
-	selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
+    selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
 
 The generated code will look similar to this.
 
 .. code-block:: c#
 
-	using System;
-	using System.Text;
-	using System.Text.RegularExpressions;
-	using System.Threading;
-	using NUnit.Framework;
-	using Selenium;
-	
-	namespace SeleniumTests
+    using System;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading;
+    using NUnit.Framework;
+    using Selenium;
+    
+    namespace SeleniumTests
 
-	{
-	    [TestFixture]
+    {
+        [TestFixture]
 
-	    public class NewTest
+        public class NewTest
 
-	    {
-		private ISelenium selenium;
+        {
+        private ISelenium selenium;
 
-		private StringBuilder verificationErrors;
+        private StringBuilder verificationErrors;
 
-		[SetUp]
+        [SetUp]
 
-		public void SetupTest()
+        public void SetupTest()
 
-		{
-		    selenium = new DefaultSelenium("localhost", 4444, "*iehta",
-		    "http://www.google.com/");
+        {
+            selenium = new DefaultSelenium("localhost", 4444, "*iehta",
+            "http://www.google.com/");
 
-		    selenium.Start();
+            selenium.Start();
 
-		    verificationErrors = new StringBuilder();
-		}
+            verificationErrors = new StringBuilder();
+        }
 
-		[TearDown]
+        [TearDown]
 
-		public void TeardownTest()
-		{
-		    try
-		    {
-			selenium.Stop();
-		    }
+        public void TeardownTest()
+        {
+            try
+            {
+            selenium.Stop();
+            }
 
-		    catch (Exception)
-		    {
-			// Ignore errors if unable to close the browser
-		    }
+            catch (Exception)
+            {
+            // Ignore errors if unable to close the browser
+            }
 
-		    Assert.AreEqual("", verificationErrors.ToString());
-		}
-		[Test]
+            Assert.AreEqual("", verificationErrors.ToString());
+        }
+        [Test]
 
-		public void TheNewTest()
-		{
-		    // Open Google search engine.		
-		    selenium.Open("http://www.google.com/"); 
-		    
-		    // Assert Title of page.
-		    Assert.AreEqual("Google", selenium.GetTitle());
-		    
-		    // Provide search term as "Selenium OpenQA"
-		    selenium.Type("q", "Selenium OpenQA");
-		    
-		    // Read the keyed search term and assert it.
-		    Assert.AreEqual("Selenium OpenQA", selenium.GetValue("q"));
-		    
-		    // Click on Search button.
-		    selenium.Click("btnG");
-		    
-		    // Wait for page to load.
-		    selenium.WaitForPageToLoad("5000");
-		    
-		    // Assert that "www.openqa.org" is available in search results.
-		    Assert.IsTrue(selenium.IsTextPresent("www.openqa.org"));
-		    
-		    // Assert that page title is - "Selenium OpenQA - Google Search"
-		    Assert.AreEqual("Selenium OpenQA - Google Search", 
-		    		     selenium.GetTitle());
-		}
-	    }
-	}
+        public void TheNewTest()
+        {
+            // Open Google search engine.        
+            selenium.Open("http://www.google.com/"); 
+            
+            // Assert Title of page.
+            Assert.AreEqual("Google", selenium.GetTitle());
+            
+            // Provide search term as "Selenium OpenQA"
+            selenium.Type("q", "Selenium OpenQA");
+            
+            // Read the keyed search term and assert it.
+            Assert.AreEqual("Selenium OpenQA", selenium.GetValue("q"));
+            
+            // Click on Search button.
+            selenium.Click("btnG");
+            
+            // Wait for page to load.
+            selenium.WaitForPageToLoad("5000");
+            
+            // Assert that "www.openqa.org" is available in search results.
+            Assert.IsTrue(selenium.IsTextPresent("www.openqa.org"));
+            
+            // Assert that page title is - "Selenium OpenQA - Google Search"
+            Assert.AreEqual("Selenium OpenQA - Google Search", 
+                         selenium.GetTitle());
+        }
+        }
+    }
 
-The main program is very simple.  You can allow NUnit to manage the execution of your tests.  Or alternatively, you can write a simple main() program that instantiates the test object and runs each of the three methods, SetupTest(), TheNewTest(), and TeardownTest() in turn.
+The main program is very simple.  You can allow NUnit to manage the execution 
+of your tests.  Or alternatively, you can write a simple main() program that 
+instantiates the test object and runs each of the three methods, SetupTest(), 
+TheNewTest(), and TeardownTest() in turn.
 
-	
+    
 Java
 ~~~~
 For Java, most people use Junit as the test engine.  With it, you'll save
 many lines of code by allowing Junit to manage the execution of your tests.
-Some development environments like Eclipse have direct support for JUnit via plug-ins which makes it even easier.
-Teaching JUnit is beyond the scope of this document however materials may be found online and there are publications 
-available.  If you are already a "java-shop" chances are your developers will already have experience with JUnit.
+Some development environments like Eclipse have direct support for JUnit via 
+plug-ins which makes it even easier. Teaching JUnit is beyond the scope of 
+this document however materials may be found online and there are publications
+available.  If you are already a "java-shop" chances are your developers will 
+already have experience with JUnit.
 
-You will probably want to rename the test class from "NewTest" to something of your own choosing.  Also, you will need to change the browser-open parameters in the statement::
+You will probably want to rename the test class from "NewTest" to something 
+of your own choosing.  Also, you will need to change the browser-open 
+parameters in the statement::
 
-	selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
+    selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
 
-The Selenium-IDE generated code will look something like this.  This example has coments added manually for additional clarity.
+The Selenium-IDE generated code will look something like this.  This example 
+has coments added manually for additional clarity.
 
 .. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
 
@@ -584,7 +600,7 @@ The Selenium-IDE generated code will look something like this.  This example has
    // We create our Selenium test case
 
          public void setUp() throws Exception {
-   		setUp("http://www.google.com/", "*firefox");
+           setUp("http://www.google.com/", "*firefox");
                 // We instantiate and start the browser
          }
 
@@ -671,7 +687,13 @@ Ruby
 
 Learning the API
 ----------------
-We mentioned earlier that each selenium-client-library provides a language-specific programming interface which supports executing Selenese commands from your test program.  The Selenium-RC API uses naming conventions that, assuming you're familiar with your chosen programming language, and you now understand Selenese, most of the interface for your selected language will be self-explanatory. Here, however, we explain the most important and possibly less obvious, aspects of the API.
+We mentioned earlier that each selenium-client-library provides a
+language-specific programming interface which supports executing Selenese 
+commands from your test program.  The Selenium-RC API uses naming conventions 
+that, assuming you're familiar with your chosen programming language, and you 
+now understand Selenese, most of the interface for your selected language 
+will be self-explanatory. Here, however, we explain the most important and 
+possibly less obvious, aspects of the API.
 
 Starting the Browser 
 ~~~~~~~~~~~~~~~~~~~~~
@@ -723,10 +745,10 @@ Starting the Browser
         @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
-Each of these examples would instantiate a browser (which is just
-an object for your code) by assigning a "browser instance" to a program variable.
-The browser instance variable is then used to call methods from the browser, like *open* or 
-*type*)
+Each of these examples would instantiate a browser (which is just an object 
+for your code) by assigning a "browser instance" to a program variable.  The 
+browser instance variable is then used to call methods from the browser, 
+like *open* or *type*)
 
 The initial parameters that you should give when you create the browser instance
 are: 
@@ -775,46 +797,45 @@ test results in different formats such as HTML or PDF.
 **Generating Test Reports for Java client driver:**
     
 
--	If Selenium Test cases are developed using JUnit then JUnit Report 
-	can be used	to generate test reports. Refer to `JUnit Report`_ 
-	for specifics.
+- If Selenium Test cases are developed using JUnit then JUnit Report can be used
+  to generate test reports. Refer to `JUnit Report`_ for specifics.
 
 .. _`JUnit Report`: http://ant.apache.org/manual/OptionalTasks/junitreport.html
 
--	If Selenium Test cases are developed using TestNG then no external task 
-	is required to generate test reports. The TestNG framework generates an 
-	HTML report which list details of tests. See `TestNG Report`_ for 
-	more.
+- If Selenium Test cases are developed using TestNG then no external task 
+  is required to generate test reports. The TestNG framework generates an 
+  HTML report which list details of tests. See `TestNG Report`_ for more.
 
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
--	Also, for a very nice summary report try using TestNG-xslt. 
-	TestNG-xslt Report looks like this.
+- Also, for a very nice summary report try using TestNG-xslt. 
+  TestNG-xslt Report looks like this.
 
-	.. image:: images/chapt5_TestNGxsltReport.png
+  .. image:: images/chapt5_TestNGxsltReport.png
 
-	See `TestNG-xslt`_ for more.
+  See `TestNG-xslt`_ for more.
 
 .. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
 
--	Logging Selenium can also be used to generate reports for the Java client driver.  
-	Logging Selenium extends the Java client driver to add logging ability. Please refer to `Logging Selenium`_.
-	
+- Logging Selenium can also be used to generate reports for the Java client driver.  
+  Logging Selenium extends the Java client driver to add logging ability. 
+  Please refer to `Logging Selenium`_.
+    
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
 
 **Generating Test Reports for Python Client driver:**
 
--	When using Python Client Driver then HTMLTestRunner can be used to
-	generate a Test Report. See `HTMLTestRunner`_.
-	
+- When using Python Client Driver then HTMLTestRunner can be used to
+  generate a Test Report. See `HTMLTestRunner`_.
+    
 .. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
 
 **Generating Test Reports for Ruby Client driver:**
 
--	If RSpec framework is used for writing Selenium Test Cases in Ruby
-	then its HTML report can be used to generate test report.
-	Refer to `RSpec Report`_ for more.
-	
+- If RSpec framework is used for writing Selenium Test Cases in Ruby
+  then its HTML report can be used to generate test report.
+  Refer to `RSpec Report`_ for more.
+
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
 Adding Some Spice to Your Tests
@@ -823,15 +844,17 @@ Now you'll understand why you needed Selenium-RC and you just couldn't stay
 strictly with Selenium-IDE. We will give you guidance here on things that can
 only be done using a programming language.
 
-You find, as you transition from running simple tests of page elements, to building tests
-of dynamic functionality involving multiple web-pages and varying data that you will
-require programming logic for verifying expected test results.  Basically, the Selenium-IDE
-does not support iteration and condition statements.  You will find you can do some simple
-condition statements by embedding javascript in your Selenese parameters, however iteration
-is impossible, and many conditions simply will need to be done in a programming language.  
-In addition, you may need to use exception-handling for error recovery.  For these reasons and others,
-we have written this section to give you ideas on how to leverage common programming techniques
-to give you greater 'verification power' in your automated testing.
+You find, as you transition from running simple tests of page elements, to 
+building tests of dynamic functionality involving multiple web-pages and 
+varying data that you will require programming logic for verifying expected 
+test results.  Basically, the Selenium-IDE does not support iteration and 
+condition statements.  You will find you can do some simple condition 
+statements by embedding javascript in your Selenese parameters, however 
+iteration is impossible, and many conditions simply will need to be done in a 
+programming language.  In addition, you may need to use exception-handling for
+error recovery.  For these reasons and others, we have written this section
+to give you ideas on how to leverage common programming techniques to
+give you greater 'verification power' in your automated testing.
 
 The examples in this section are written
 in a single programming language--the idea being that you understand the concept and be
@@ -872,24 +895,24 @@ the search this way.
    
 .. code-block:: c#
 
-   // Collection of String values.	
-   String[] arr = {"ide", "rc", "grid"};	
-		
+   // Collection of String values.
+   String[] arr = {"ide", "rc", "grid"};    
+        
    // Execute For loop for each String in 'arr' array.
    foreach (String s in arr) {
-   	sel.open("/");
-  	sel.type("q", "selenium " +s);
-   	sel.click("btnG");
-        sel.waitForPageToLoad("30000");
-        assertTrue("Expected text: " +s+ " is missing on page."
-        , sel.isTextPresent("Results * for selenium " + s));
-   
-   }
+       sel.open("/");
+       sel.type("q", "selenium " +s);
+       sel.click("btnG");
+       sel.waitForPageToLoad("30000");
+       assertTrue("Expected text: " +s+ " is missing on page."
+       , sel.isTextPresent("Results * for selenium " + s));
+    }
 
 Condition Statements
 ~~~~~~~~~~~~~~~~~~~~
-A common problem encountered while running Selenium tests occurs when an expected element is not available on page.
-For example, when running the following line:
+A common problem encountered while running Selenium tests occurs when an 
+expected element is not available on page.  For example, when running the 
+following line:
 
 .. code-block:: java
    
@@ -915,7 +938,7 @@ and then take alternatives when it it is not:
    
    // If element is available on page then perform type operation.
    if(selenium.isElementPresent("q")) {
-       selenium.type("q", "Selenium rc");			
+       selenium.type("q", "Selenium rc");
    } else {
        Reporter.log("Element: " +q+ " is not available on page.")
    }
@@ -950,27 +973,28 @@ search and assert its existence.
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present("Results * for " + search))
 
-Why would we want a separate file with data in it for our tests?  One important method of
-testing concerns running the same test repetetively with differnt data values.  This
-is called *Data Driven Testing* and is a very common testing task.  Test automation tools,
-Selenium included, generally handle this as it's often a common reason for building
-test automation to support manual testing methods.
+Why would we want a separate file with data in it for our tests?  One 
+important method of testing concerns running the same test repetetively with 
+differnt data values.  This is called *Data Driven Testing* and is a very 
+common testing task.  Test automation tools, Selenium included, generally 
+handle this as it's often a common reason for building test automation to 
+support manual testing methods.
 
 The Python script above opens a text file.  This file contains a different search
 string on each line. The code then saves this in an array of strings, and at last,
 it's iterating over the strings array and doing the search and assert on each.
 
 This is a very basic example of what you can do, but the idea is to show you
-things that can easily be done with either a programming or scripting language when they're difficult
-or even impossible to do using Selenium-IDE.
+things that can easily be done with either a programming or scripting 
+language when they're difficult or even impossible to do using Selenium-IDE.
 
 Error Handling
 ~~~~~~~~~~~~~~
 
 *Note: This section is not yet developed.*
 
-A quick note though--recognize that your programming language's exception-handling support 
-can be used for error handling and recovery.
+A quick note though--recognize that your programming language's exception-
+handling support can be used for error handling and recovery.
 
 .. TODO: Complete this... Not sure if the scenario that I put is the best example to use
 .. Then, what if google.com is down at the moment of our tests? Even if that sounds
@@ -1348,8 +1372,8 @@ Would perfectly work in Firefox, Opera or Safari but it won't work on IE.
 That's because the keys in  `@style` are interpreted as uppercase once the page
 is parsed by IE. So, even if the source code is in lowercase, you should use::
 
-	//td[@style="BACKGROUND-COLOR:yellow"]
-	
+    //td[@style="BACKGROUND-COLOR:yellow"]
+
 This is a problem if your test is intended to work on multiple browsers, but
 you can easily code your test to detect the situation and try the alternative
 locator that only works in IE.

@@ -5,7 +5,6 @@ Selenium Basics
 
 Getting Started -- Choosing Your Selenium Tool 
 -----------------------------------------------
-
 Most people get started with Selenium-IDE. This is what we recommend. It's 
 an easy way to get familiar with Selenium commands quickly. You can develop
 your first script in just a few minutes. Selenium-IDE is also very easy
@@ -44,7 +43,6 @@ Introducing Selenium Commands
 
 Selenium Commands -- Selenese
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Selenium provides a rich set of commands for fully testing your web-app 
 in virtually any way you may imagine. The command set is often called 
 *selenese*. These commands essentially create a testing language. 
@@ -96,7 +94,6 @@ three "flavors": **Actions**, **Accessors** and **Assertions**.
 
 Script Syntax 
 ~~~~~~~~~~~~~~
- 
 Selenium commands are simple, they consist of the command and two parameters. 
 For example:
 
@@ -160,7 +157,6 @@ Selenium-IDE you can quickly produce and run testcases.
    
 Test Suites 
 ------------
-
 A test suite is a collection of tests.  Often one will run all the tests in a
 test suite as one continuous batch-job.  
 
@@ -198,7 +194,6 @@ problem.
 
 Commonly Used Selenium Commands 
 --------------------------------
-
 To conclude our introduction of Selenium, we'll show you a few typical Selenium
 commands.  These are probably the most commonly used commands for building test.
 
@@ -227,7 +222,6 @@ waitForElementPresent
 
 Summary 
 --------
-
 Now that you've seen an introduction to Selenium, you're ready to start writing
 your first scripts.  We recommend beginning with the Selenium IDE and its
 context-sensitive, right-click, menu.  This will allow you to get familiar with

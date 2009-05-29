@@ -1,7 +1,7 @@
 .. _configuring-selenium-RC-NET-reference:
 
 .NET client driver configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 .NET client Driver can be used with Microsoft Visual Studio. 
 To Configure it with Visual do as Following.
 

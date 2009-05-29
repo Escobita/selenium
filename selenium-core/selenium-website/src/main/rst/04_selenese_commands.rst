@@ -2,7 +2,8 @@
 
 "Selenese" Selenium Commands 
 =============================
-Selenium commands, often called *selenese*, are the set of commands that run your tests.  A sequence of these commands is a *test script*.  Here we explain 
+Selenium commands, often called *selenese*, are the set of commands that run 
+your tests.  A sequence of these commands is a *test script*.  Here we explain 
 those commands in detail, and we present the many choices you have in testing 
 your web application when using Selenium.
 
@@ -121,7 +122,7 @@ locator, one can verify that specific text appears at a specific location on the
 page relative to other UI components on the page.
 
 ==========   ===================    ===================================================================
-verifyText   //table/tr/td/div/p 	This is my text and it occurs right after the div inside the table.
+verifyText   //table/tr/td/div/p    This is my text and it occurs right after the div inside the table.
 ==========   ===================    ===================================================================
 
 
@@ -159,7 +160,6 @@ You can choose to omit the locator type in the following situations:
 
 Locating by Identifier
 ~~~~~~~~~~~~~~~~~~~~~~
-
 This is probably the most common method of locating elements and is the 
 catch-all default when no recognised locator type is used. With this strategy,
 the first element with the id attribute value matching the location will be used. If
@@ -195,8 +195,8 @@ in the first three examples above is not necessary.
 
 Locating by Id 
 ~~~~~~~~~~~~~~
-
-This type of locator is more limited than the identifier locator type, but also more explicit. Use this when you know an element's id attribute.
+This type of locator is more limited than the identifier locator type, but 
+also more explicit. Use this when you know an element's id attribute.
 
 .. code-block:: html
   :linenos:
@@ -216,7 +216,6 @@ This type of locator is more limited than the identifier locator type, but also 
 
 Locating by Name 
 ~~~~~~~~~~~~~~~~
-
 The name locator type will locate the first element with a matching name 
 attribute. If multiple elements have the same value for a name attribute, then 
 you can use filters to further refine your location strategy. The default 
@@ -254,7 +253,6 @@ filter type is value (matching the value attribute).
 
 Locating by XPath 
 ~~~~~~~~~~~~~~~~~
-
 XPath is the language used for locating nodes in an XML document. As HTML can 
 be an implementation of XML (XHTML), Selenium users can leverage this powerful 
 language to target elements in their web applications. XPath extends beyond (as 
@@ -333,7 +331,9 @@ discovering the XPath of an element:
 Locating Hyperlinks by Link Text 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. TODO: mam-p:  Users often are unaware that a link locator is a pattern, not just a string.  So, I think we need an example here that necessitates a link=regexp:pattern locator in the test case.
+.. TODO: mam-p:  Users often are unaware that a link locator is a pattern, 
+   not just a string.  So, I think we need an example here that necessitates 
+   a link=regexp:pattern locator in the test case.
 
 This is a simple method of locating a hyperlink in your web page by using the 
 text of the link. If two links with the same text are present, then the first 
@@ -435,12 +435,11 @@ Matching Text Patterns
 ----------------------
 
 Like locators, *patterns* are a type of parameter frequently required by Selenese
-commands.  Examples of commands which require 
-patterns are **verifyTextPresent**,
-**verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and **verifyPrompt**.  And as has been mentioned above, link locators can 
-utilize a pattern.  Patterns allow one to
-*describe*, via the use of special characters, what text is expected rather than
-having to specify that text exactly.
+commands.  Examples of commands which require patterns are **verifyTextPresent**,
+**verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and 
+**verifyPrompt**.  And as has been mentioned above, link locators can utilize 
+a pattern.  Patterns allow one to *describe*, via the use of special characters,
+what text is expected rather than having to specify that text exactly.
 
 There are three types of patterns: *globbing*, *regular expressions*, and *exact*.
 
@@ -460,11 +459,11 @@ Only two special characters are supported in the Selenium implementation:
     to specify a range of characters (which are contiguous in the ASCII character
     set).  A few examples will make the functionality of a character class clear:
 
-	``[aeiou]`` matches any lowercase vowel
+    ``[aeiou]`` matches any lowercase vowel
 
-	``[0-9]`` matches any digit
+    ``[0-9]`` matches any digit
 
-	``[a-zA-Z0-9]`` matches any alphanumeric character
+    ``[a-zA-Z0-9]`` matches any alphanumeric character
 
 In most other contexts, globbing includes a third special character, the **?**.
 However, Selenium globbing patterns only support the asterisk and character
@@ -526,7 +525,8 @@ are a subset of those special characters:
    \+             quantifier: 1 or more of the preceding character (or group)
    ?              quantifier: 0 or 1 of the preceding character (or group)
    {1,5}          quantifier: 1 through 5 of the preceding character (or group)
-   \|             alternation: the character/group on the left or the character/group on the right
+   \|             alternation: the character/group on the left or the character/group on
+                  the right
    ( )            grouping: often used with alternation and/or quantifier
 =============     ======================================================================
 
@@ -615,7 +615,9 @@ continue with the following command as fast as it can, while the *AndWait*
 alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
 load after the action has been done. 
 
-.. TODO: mam-p:  I don't believe the following is true, at least in Selenium-IDE.  Perhaps it is supposed to be true, but I don't think we should misrepresent the current status. 
+.. TODO: mam-p:  I don't believe the following is true, at least in Selenium-
+   IDE.  Perhaps it is supposed to be true, but I don't think we should 
+   misrepresent the current status. 
 
 The *AndWait* alternative is always used when the action causes the browser to
 navigate to another page or reload the present one. 
@@ -639,10 +641,10 @@ multiple pages, programming logic is often needed.
 
 When flow control is needed, there are three options:  
 
-	a) Run the script using Selenium-RC and a client library such as Java or
-	   PHP to utilize the programming language's flow control features.
-	b) Run a small JavaScript snippet from within the script using the storeEval command.
-        c) Install the `goto_sel_ide.js <http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html>`_ extension.
+a) Run the script using Selenium-RC and a client library such as Java or
+   PHP to utilize the programming language's flow control features.
+b) Run a small JavaScript snippet from within the script using the storeEval command.
+c) Install the `goto_sel_ide.js <http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html>`_ extension.
 
 Most testers will export the test script into a programming language file that uses the
 Selenium-RC API (see the Selenium-IDE chapter).  However, some organizations prefer
@@ -665,10 +667,11 @@ parameters, the text value to be stored and a selenium variable.  Use the
 standard variable naming conventions of only alphanumeric characters when 
 choosing a name for your variable.
 
-.. TODO: mam-p:  Why are we telling them the last sentence above?  Any JavaScript identifiershould be okay, no?
+.. TODO: mam-p:  Why are we telling them the last sentence above?  Any 
+   JavaScript identifiershould be okay, no?
 
 =====   ===============   ========
-store   paul@mysite.org	  userName               
+store   paul@mysite.org   userName               
 =====   ===============   ========
 
 Later in your script, you'll want to use the stored value of your 
@@ -682,12 +685,15 @@ verifyText  //div/p     ${userName}
 A common use of variables is for storing input for an input field.
 
 ====    ========     ===========
-type	id=login     ${userName}               
+type    id=login     ${userName}               
 ====    ========     ===========
 
-Selenium variables can be used in either the first or second parameter and are interpreted by Selenium prior to any other operations performed by the command.  A Selenium variable may also be used within a locator expression.
+Selenium variables can be used in either the first or second parameter and 
+are interpreted by Selenium prior to any other operations performed by the 
+command.  A Selenium variable may also be used within a locator expression.
 
-An equivalent store command exists for each verify and assert command.  Here are a couple more commonly used store commands.
+An equivalent store command exists for each verify and assert command.  Here 
+are a couple more commonly used store commands.
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
@@ -709,23 +715,18 @@ StoreEval allows the test to store the result of running the script in a variabl
 
 JavaScript and Selenese Parameters
 ----------------------------------
-
 JavaScript can be used with two types of Selenese parameters--**script**
-and non-script (usually expressions).  In most cases,
-you'll want to access and/or manipulate a test case variable
-inside the JavaScript snippet used as a Selenese parameter.
-All variables created in your test case are stored in a
-JavaScript *associative array*.
-An associative array
-has string indexes rather than sequential numeric indexes.
-The associative array containing your test case's variables is named **storedVars**.
-Whenever you wish to access or manipulate a variable
-within a JavaScript snippet, you must refer to it
-as **storedVars['yourVariableName']**.
+and non-script (usually expressions).  In most cases, you'll want to access 
+and/or manipulate a test case variable inside the JavaScript snippet used as 
+a Selenese parameter.  All variables created in your test case are stored in 
+a JavaScript *associative array*.  An associative array has string indexes 
+rather than sequential numeric indexes.  The associative array containing 
+your test case's variables is named **storedVars**.  Whenever you wish to 
+access or manipulate a variable within a JavaScript snippet, you must refer 
+to it as **storedVars['yourVariableName']**.
 
 JavaScript Usage with Script Parameters  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Several Selenese commands specify a **script** parameter including
 **assertEval**, **verifyEval**, **storeEval**, and **waitForEval**.
 These parameters require no special syntax.  A Selenium-IDE
@@ -742,9 +743,9 @@ storeXpathCount    //blockquote                                   blockquotes
 storeEval          storedVars['hits']-storedVars['blockquotes']   paragraphs
 ===============    ============================================   ===========
 
-This next example illustrates how a JavaScript snippet can include
-calls to methods, in this case the JavaScript 
-String object's ``toUpperCase`` method and ``toLowerCase`` method.  
+This next example illustrates how a JavaScript snippet can include calls to 
+methods, in this case the JavaScript String object's ``toUpperCase`` method 
+and ``toLowerCase`` method.  
 
 ===============    ============================================   ===========
 store              Edith Wharton                                  name
@@ -760,7 +761,8 @@ when the parameter is not specified to be of type **script**.
 However, in this case, special syntax is required--the JavaScript
 snippet must be enclosed inside curly braces and preceded by the
 label ``javascript``, as in ``javascript {*yourCodeHere*}``.
-Below is an example in which the ``type`` command's second parameter--``value``--is generated via JavaScript code using this special syntax:
+Below is an example in which the ``type`` command's second parameter 
+``value`` is generated via JavaScript code using this special syntax:
 
 ===============    ============================================   ===========
 store              league of nations                              searchString
@@ -778,7 +780,7 @@ problem.  Finally, echo statements can be used to print the contents of
 Selenium variables.
 
 =====   ========================   ========
-echo    Testing page footer now.	
+echo    Testing page footer now.    
 echo    Username is ${userName}                 
 =====   ========================   ========
 

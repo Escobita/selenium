@@ -4,7 +4,9 @@
    should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 
    can merge both chapters, it'd keep advanced topics where anyone will expect.
 
-.. Paul: This chapter is about all the tradeoffs a person must make when building their tests.  All the decisions they will have to make.  How to choose a test for a given testing situation.  There's a lot that could go here.
+.. Paul: This chapter is about all the tradeoffs a person must make when 
+   building their tests.  All the decisions they will have to make.  How to 
+   choose a test for a given testing situation.  There's a lot that could go here.
 
 Test Design Considerations 
 ==========================
@@ -15,19 +17,21 @@ Test Design Considerations
 
 Introducing Test Design Options
 -------------------------------
-
 *This section is not yet developed.*
 
 
 Web Page Content -- Static vs. Dynamic Pages
 --------------------------------------------
-
 *This section is not yet developed.*
 
 .. Tarun: Any one Please go through description below for Static vs Dynamic 
    and suggest improvement or any thing I have misunderstated.
    
-.. Paul:  Actually, I've got some vision for this section, in presenting the different decisions and types of testing a person will need to consider.  There's, I think, a sizable sub-section in here.  No time to think about it now though.  I'll also need to read what you guys wrote on Object Identification as that will influence my ideas on this topic.
+.. Paul:  Actually, I've got some vision for this section, in presenting the 
+   different decisions and types of testing a person will need to consider.  
+   There's, I think, a sizable sub-section in here.  No time to think about 
+   it now though.  I'll also need to read what you guys wrote on Object 
+   Identification as that will influence my ideas on this topic.
 
 This topic is explained as - Object identification for Static content and 
 Object identification for Dynamic contents. The examples described here 
@@ -150,7 +154,6 @@ Location Strategies
 
 UI Mapping with Selenium
 -------------------------
-
 *This section has not been reviewed or edited.*
 
 
@@ -264,7 +267,6 @@ Map. For more on Properties files follow this URL_.
 
 Bitmap Comparison
 ------------------
-
 *This section has not been developed yet.*
 
 .. Tarun: Bitmap comparison is about comparison of two images. This feature 
@@ -288,7 +290,6 @@ Bitmap Comparison
 
 Recovery From Failure
 ---------------------
-
 *This section has not been developed yet.*
 
 .. Tarun: Here Test attempt is re made against a website which comes up with 
@@ -301,23 +302,28 @@ Recovery From Failure
 
 Types of Tests 
 --------------
-
-.. Paul:  I have a lot of vision for this section.  And it is 'introductory' and probably will go towards the beginning of this chapter.  I've got some ideas here based on how we organized our tests at my work.
+.. Paul:  I have a lot of vision for this section.  And it is 'introductory' 
+   and probably will go towards the beginning of this chapter.  I've got some 
+   ideas here based on how we organized our tests at my work.
 
 *This section has not been developed yet.*
 
 
 * Page Rendering Tests 
 * Forms Tests 
-* Specific Function Tests - For example, if a .jsp is called from used to retrieve data based on parameter input. 
+* Specific Function Tests - For example, if a .jsp is called from used to 
+  retrieve data based on parameter input. 
 * User Scenario Test - A Multiple Page Functional Test 
 
 Solving Common Web-App Problems 
 -------------------------------
-
 *This section has not been developed yet.*
 
-.. Paul:  This sub-section was my idea.  We may have some duplication here with Chapter 4.  But there's also some ideas here that are more appropriate for this chapter.  I can take the lead on this sub-section and then have you guys add to it.  Unless, of course, this list is already sparking ideas in you.  If so, go ahead and add them here before I add mine and we'll reconcile.
+.. Paul:  This sub-section was my idea.  We may have some duplication here 
+   with Chapter 4.  But there's also some ideas here that are more appropriate
+   for this chapter.  I can take the lead on this sub-section and then have 
+   you guys add to it.  Unless, of course, this list is already sparking 
+   ideas in you.  If so, go ahead and add them here before I add mine and we'll reconcile.
 
 * Assert vs Verify (or possibly put this under script development) 
 * Judgement calls, when to *verifyTextPresent*, *verifyElementPresent*, or 
@@ -327,7 +333,6 @@ Solving Common Web-App Problems
 
 Interpreting Test Results
 -------------------------
-
 *This section has not been developed yet.*
 
 .. Tarun: This topic and followed ones seem more general to me and probably 
@@ -336,19 +341,19 @@ Interpreting Test Results
 
 Organizing Your Test Scripts 
 ----------------------------
-
 *This section has not been developed yet.*
 
 
 Organizing Your Test Suites 
 ----------------------------
-
 *This section has not been developed yet.*
 
 
 Example Test Suites 
 -------------------
-
-.. Paul:  This probably is not a separate section, but a sub-sub-section of 'Organizing Your Test Suites'.  And really?  do we want to give them a whole test suite example?  We may be able to handle this just fine with small snippets.
+.. Paul:  This probably is not a separate section, but a sub-sub-section of '
+   Organizing Your Test Suites'.  And really?  do we want to give them a 
+   whole test suite example?  We may be able to handle this just fine with small
+   snippets.
 
 *This section has not been developed yet.*

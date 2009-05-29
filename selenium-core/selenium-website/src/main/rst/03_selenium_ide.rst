@@ -8,7 +8,6 @@
 
 Introduction 
 ------------
-
 The Selenium-IDE (Integrated Development Environment) is the tool you use to 
 develop your Selenium test cases.  It's an easy-to-use Firefox plug-in and is 
 generally the most efficient way to develop test cases.  It also contains a 
@@ -22,7 +21,6 @@ This chapter is all about the Selenium IDE and how to use it effectively.
   
 Installing the IDE 
 ------------------
-
 Using Firefox, first, download the IDE from the SeleniumHQ `downloads page`_
   
 .. _`downloads page`: http://seleniumhq.org/download/
@@ -45,7 +43,6 @@ Restart Firefox.  After Firefox reboots you will find the Selnium-IDE listed und
 
 Opening the IDE 
 ---------------
-
 To run the Selenium-IDE, simply select it from the Firefox Tools menu.  It opens 
 as follows with an empty script-editing window and a menu for loading, or 
 creating new test cases. 
@@ -57,7 +54,6 @@ creating new test cases.
   
 IDE Features  
 ------------
-
 Menu Bar 
 ++++++++
 
@@ -198,7 +194,6 @@ UI-Element Documentation on the Help menu of Selenium-IDE.
      
 Building Test Cases
 -------------------
-
 There are three primary methods for developing test cases.  Frequently, 
 a test
 developer will require all three techniques. 
@@ -394,7 +389,6 @@ Run Any Single Command
 
 Using Base URL to Run Test Cases in Different Domains 
 -----------------------------------------------------
-
 .. TODO: mam-p: Figure out how to display the many URLs in the section below without generating links for each one.  (They're just examples, i.e., not real!)
 
 The *Base URL* field at the top of the Selenium-IDE window is very useful
@@ -420,7 +414,6 @@ http://beta.news.portal.com/about.html:
 
 Debugging 
 ---------
-
 Debugging means finding and fixing errors in your test case.  This is a normal 
 part of test case development. 
   
@@ -531,7 +524,6 @@ indicates the type of each alternative.
 
 Writing a Test Suite 
 --------------------
-
 A test suite is a collection of test cases which is displayed in the leftmost
 pane in the IDE.  
 The test suite pane can be manually opened or closed via selecting a small dot
@@ -585,7 +577,6 @@ The example below is of a test suite containing four test cases:
   
 User Extensions 
 ---------------
-
 User extensions are JavaScript files that allow one to create his or her own 
 customizations and features to add additional functionality.  Often this is in 
 the form of customized commands although this extensibility is not limited to 
@@ -662,7 +653,6 @@ chapter. The *-htmlSuite* command-line option is the particular feature of inter
 
 Troubleshooting
 ---------------
-
 Below is a list of image/explanation pairs which describe frequent
 sources of problems with Selenium-IDE:
 
