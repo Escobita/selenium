@@ -26,6 +26,7 @@ public class UrlAliasFilter implements Filter {
 
         if (path.startsWith("/documentation")) {
             res.sendRedirect("/docs/");
+            return;
         }
 
         String newUrl = aliasMap.get(path);
