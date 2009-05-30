@@ -164,13 +164,10 @@
                 <li><a href="http://cubictest.seleniumhq.org">CubicTest (for Eclipse)</a></li>
             </ul>
         </li>
-        <li><a href="/documentation/">Documentation</a>
+        <li><a href="/docs/">Documentation</a>
             <ul>
-                <li><a href="/documentation/examples/">Examples</a></li>
-                <li><a href="/documentation/screencasts/">Screencasts</a></li>
-                <li><a href="/documentation/tutorials/">Tutorials/Labs</a></li>
                 <li><a href="http://wiki.openqa.org/">Wiki</a></li>
-                <li><a href="/documentation/core/reference.html">Selenium API</a></li>
+                <li><a href="http://release.openqa.org/selenium-core/1.0/reference.html">Selenium API</a></li>
             </ul>
         </li>
         <li><a href="/support/">Support</a>

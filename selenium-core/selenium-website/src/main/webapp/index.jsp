@@ -124,7 +124,7 @@
     <li><a href="/documentation/tutorials">Tutorials /
     Labs</a></li>
 
-    <li><a href="/projects/core/reference.html">Selenium
+    <li><a href="http://release.openqa.org/selenium-core/1.0/reference.html">Selenium
     API</a></li>
   </ul>
 

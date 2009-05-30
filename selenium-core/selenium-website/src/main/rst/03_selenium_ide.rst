@@ -183,7 +183,7 @@ run correctly.
 While the Reference tab is invaluable as a quick reference, it is still often
 necessary to consult the Selenium Reference_ document.
 
-.. _Reference: http://seleniumhq.org/documentation/core/reference.html
+.. _Reference: http://release.openqa.org/selenium-core/1.0/reference.html
   
 UI-Element and Rollup
 ~~~~~~~~~~~~~~~~~~~~~
@@ -610,7 +610,7 @@ extension will also require you to close and reopen Selenium-IDE.
 Information on writing your own extensions can be found near the
 bottom of the Selenium Reference_ document.
 
-.. _Reference: http://seleniumhq.org/documentation/core/reference.html
+.. _Reference: http://release.openqa.org/selenium-core/1.0/reference.html
 
 .. TODO:  mam-p: need info on how to install user extensions, especially on the diff
    between "Selenium Core Extensions" and "Selenium IDE" extensions on the
