@@ -118,7 +118,11 @@ public class Executable {
       case WINDOWS:
       case VISTA:
       case XP:
-          return new File(getEnvVar("PROGRAMFILES", "\\Program Files") + "\\Mozilla Firefox\\firefox.exe");
+        // Expected values: x86 or amd64
+        String arch = System.getProperty("os.arch");
+
+        String propertyName = arch.indexOf("64") == -1 ? "ProgramFiles" : "ProgramFiles(x86)";
+          return new File(getEnvVar(propertyName, "\\Program Files") + "\\Mozilla Firefox\\firefox.exe");
       case MAC:
           return new File("/Applications/Firefox.app/Contents/MacOS/firefox");
       default:

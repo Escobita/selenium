@@ -105,7 +105,7 @@ public class DriverServlet extends HttpServlet {
     postMapper.bind("/session", NewSession.class)
         .on(ResultType.SUCCESS, new RedirectResult("/session/:sessionId/:context"));
     getMapper.bind("/session/:sessionId/:context", GetSessionCapabilities.class)
-        .on(ResultType.SUCCESS, new ForwardResult("/WEB-INF/views/sessionCapabilities.jsp"))
+//        .on(ResultType.SUCCESS, new ForwardResult("/WEB-INF/views/sessionCapabilities.jsp"))
         .on(ResultType.SUCCESS, new JsonResult(":response"), "application/json");
 
     deleteMapper.bind("/session/:sessionId", DeleteSession.class)

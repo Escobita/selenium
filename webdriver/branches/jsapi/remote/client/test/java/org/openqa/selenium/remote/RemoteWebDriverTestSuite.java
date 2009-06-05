@@ -33,6 +33,7 @@ import java.io.File;
 import java.net.URL;
 
 public class RemoteWebDriverTestSuite extends TestCase {
+
   public static Test suite() throws Exception {
     System.setProperty("webdriver.firefox.development", "true");
 
@@ -54,12 +55,14 @@ public class RemoteWebDriverTestSuite extends TestCase {
   }
 
   public static class RemoteWebDriverForTest extends RemoteWebDriver {
+
     public RemoteWebDriverForTest() throws Exception {
       super(new URL("http://localhost:6000/hub"), DesiredCapabilities.firefox());
     }
   }
 
   public static class RemoteDriverServerStarter extends TestSetup {
+
     private AppServer appServer;
 
     public RemoteDriverServerStarter(Test test) {
@@ -68,22 +71,9 @@ public class RemoteWebDriverTestSuite extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-      appServer = new Jetty6AppServer() {
-        protected File findRootOfWebApp() {
-          File common = super.findRootOfWebApp();
-          File file = new File(common, "../../../remote/server/src/web");
-          System.out.println(
-              String.format("file exists %s and is: %s", file.exists(), file.getAbsolutePath()));
-          return file;
-        }
-
-        protected File getKeyStore() {
-          return new File(findRootOfWebApp(), "../../../../common/test/java/keystore");
-        }
-      };
+      appServer = new RemoteServer();
       appServer.listenOn(6000);
       appServer.listenSecurelyOn(7000);
-      appServer.addServlet("remote webdriver", "/hub/*", DriverServlet.class);
       appServer.start();
 
       super.setUp();
@@ -97,4 +87,30 @@ public class RemoteWebDriverTestSuite extends TestCase {
     }
   }
 
+  public static class RemoteServer extends Jetty6AppServer {
+    public RemoteServer() {
+      addServlet("remote webdriver", "/hub/*", DriverServlet.class);
+    }
+
+    @Override
+    protected File findRootOfWebApp() {
+      File common = super.findRootOfWebApp();
+      File file = new File(common, "../../../remote/server/src/web");
+      System.out.println(
+          String.format("file exists %s and is: %s", file.exists(), file.getAbsolutePath()));
+      return file;
+    }
+
+    @Override
+    protected File getKeyStore() {
+      return new File(findRootOfWebApp(), "../../../../common/test/java/keystore");
+    }
+
+    public static void main(String[] args) {
+      System.setProperty("webdriver.firefox.development", "true");
+      RemoteServer s = new RemoteServer();
+      s.listenOn(3001);
+      s.start();
+    }
+  }
 }

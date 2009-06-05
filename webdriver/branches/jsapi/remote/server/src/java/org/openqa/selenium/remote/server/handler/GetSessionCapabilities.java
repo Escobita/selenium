@@ -36,7 +36,6 @@ public class GetSessionCapabilities extends WebDriverHandler {
     Session session = sessions.get(sessionId);
 
     response = newResponse();
-    // Hard code it for HtmlUnit for now
     response.setValue(session.getCapabilities());
 
     return ResultType.SUCCESS;

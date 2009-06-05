@@ -46,6 +46,7 @@ public class JsonResult implements Renderer {
 
     response.setContentLength(length);
     response.setContentType("application/json");
+//    response.setContentType("text/html");
     response.getWriter().append(json).flush();
   }
 }
