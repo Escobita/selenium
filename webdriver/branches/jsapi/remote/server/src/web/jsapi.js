@@ -5,90 +5,134 @@
 var jsapi = (function() {
   var ready_ = false;
   var remote_ = '/hub';
+  var sessionId_ = undefined;
+  var commands_ = [];
 
-  return {
-    setReady: function (state) {
-      ready_ = state;
-    },
+  var newXhr = function() {
+    if (window.XMLHttpRequest) {
+      return new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+      return new ActiveXObject('Msxml2.XMLHTTP');
+    }
+  };
 
-    request_: function(xhr, method, url, options) {
+  var setReady = function (state) {
+    ready_ = state;
+  };
+
+  var private_ = {
+    request: function(callback, method, url, options) {
       var endpoint = remote_ + url;
 
-      xhr.open(method, endpoint, false);
+      var xhr = newXhr();
+      xhr.open(method, endpoint, true);
       xhr.setRequestHeader('Content-type', 'application/json');
-      xhr.send(options ? JSON.stringify(options) : undefined);
+      xhr.onreadystatechange = function(event) {
+        if (xhr.readyState == 4) {
+          var data;
+          var type = xhr.getResponseHeader('Content-type');
+          if (type && type.indexOf('application/json') != -1) {
+            data = JSON.parse(xhr.responseText);
+          }
 
-      var type = xhr.getResponseHeader('Content-type');
-      if (type && type.indexOf('application/json') != -1) {
-        var result = JSON.parse(xhr.responseText);
-        if (result.error) {
-          throw new Error(result.value);
+          callback(data);
         }
-        return result;
-      }
+      };
 
-      if (type) {
-        throw new Error(
-            'Incomprehensible response: (' + type + '): ' + xhr.responseText);
-      }
+      xhr.send(options ? JSON.stringify(options) : undefined);
     },
 
-    create: function(browser_name) {
-      var request = jsapi.request_;
+    nextCommand: function() {
+      setReady(true);
+    },
 
-      var sessionId_;
-      var xhr_;
-      if (window.XMLHttpRequest) {
-        xhr_ = new XMLHttpRequest();
-      } else if (window.ActiveXObject) {
-        xhr_ = new ActiveXObject('Msxml2.XMLHTTP');
+    convertToLocator : function(value) {
+      // Default to using ID as the locator
+      if (value instanceof String) {
+        return ['id', value];
       }
 
-      var result = this.request_(xhr_, 'POST', '/session',
-          [{browserName: browser_name, version: '', javascriptEnabled: true}]);
-      sessionId_ = result.sessionId;
+      // And then loop through the alternatives
+      if (value.id) {
+        return ['id', value.id];
+      }
+      if (value.name) {
+        return ['name', value.name];
+      }
+      if (value.link) {
+        return ['link text', value.link];
+      }
+      if (value.xpath) {
+        return ['xpath', value.xpath];
+      }
 
-      var convertToLocator = function(value) {
-        // Default to using ID as the locator
-        if (value instanceof String) {
-          return ['id', value];
-        }
+      throw new Error("Unmappable locator: " + value);
+    }
+  };
 
-        // And then loop through the alternatives
-        if (value.id) {
-          return ['id', value.id];
-        }
-        if (value.name) {
-          return ['name', value.name];
-        }
-        if (value.link) {
-          return ['link text', value.link];
-        }
-        if (value.xpath) {
-          return ['xpath', value.xpath];
-        }
+  // Kick off the main event loop
+  var process_commands = function() {
+    if (ready_ && commands_.length) {
+      // Pull off the top command, mark us as not ready and execute
+      var args = commands_.shift();
+      var method = args.shift();
+      try {
+        setReady(false);
+        method.apply(null, args);
+      } catch (e) {
+        alert(e);
+        // Fall through for now.
+        setReady(true);
+      }
+    }
 
-        throw new Error("Unmappable locator: " + value);
+    window.setTimeout(process_commands, 200);
+  };
+  process_commands();
+  setReady(true);
+
+  // And return something for the user to (ummm...) use
+  return {
+    click: function(locator) {
+      var withElement = function(data) {
+        var element = data.value[0].replace('element/', '');
+        private_.request(private_.nextCommand, 'POST', '/session/' + private_.sessionId_ + '/ignored/element/'
+            + element + '/click');
+    };
+
+    private_.request(withElement, 'POST',
+        '/session/' + private_.sessionId_ + '/ignored/element', private_.convertToLocator(locator));
+    },
+
+    get: function(url) {
+      private_.request(private_.nextCommand, 'POST', '/session/' + private_.sessionId_ + '/ignored/url', [url]);
+    },
+
+    type: function(locator, value) {
+      var withElement = function(data) {
+        var element = data.value[0].replace('element/', '');
+        private_.request(private_.nextCommand, 'POST', '/session/' + private_.sessionId_ + '/ignored/element/' + element
+          + '/value', [{id: element, value: [value]}]);
       };
+      private_.request(withElement,  'POST',
+          '/session/' + private_.sessionId_ + '/ignored/element', private_.convertToLocator(locator));
+    },
 
-      return {
-        click: function(locator) {
-          var result = request(xhr_, 'POST', '/session/' + sessionId_ + '/ignored/element', convertToLocator(locator));
-          var element = result.value[0].replace('element/', '');
-          request(xhr_, 'POST', '/session/' + sessionId_ + '/ignored/element/' + element + '/click');
-        },
+    run: function() {
+      var args = [];
+      for (var i = 0; i < arguments.length; i++) args[i] = arguments[i];
+      commands_.push(args);
+    },
 
-        get: function(url) {
-          request(xhr_, 'POST', '/session/' + sessionId_ + '/ignored/url', [url]);
-        },
-
-        type: function(locator, value) {
-          var result = request(xhr_, 'POST', '/session/' + sessionId_ + '/ignored/element', convertToLocator(locator));
-          var element = result.value[0].replace('element/', '');
-          request(xhr_, 'POST', '/session/' + sessionId_ + '/ignored/element/' + element + '/value', [{id: element, value: [value]}]);
-        }
-      };
+    use: function(browser_name) {
+      this.run(function() {
+        var callback = function(data) {
+          private_.sessionId_ = data.sessionId;
+          private_.nextCommand();
+        };
+        private_.request(callback, 'POST', '/session',
+            [{browserName: browser_name, version: '', javascriptEnabled: true}]);
+      });
     }
   };
 })();
-
