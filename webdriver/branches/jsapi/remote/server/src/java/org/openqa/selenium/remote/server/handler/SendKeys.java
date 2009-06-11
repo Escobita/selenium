@@ -34,20 +34,20 @@ public class SendKeys extends WebDriverHandler implements JsonParametersAware {
     super(sessions);
   }
 
+  public void setId(String elementId) {
+    this.elementId = elementId;
+  }
+
   @SuppressWarnings({"unchecked"})
   public void setJsonParameters(List<Object> allParameters) throws Exception {
-    Map namedParameters = (Map) allParameters.get(0);
-
-    elementId = (String) namedParameters.get("id");
-
-    List<String> rawKeys = (List) namedParameters.get("value");
+    List<String> rawKeys = (List) allParameters.get(0);
     for (String key : rawKeys) {
       keys.add(key);
     }
   }
 
   public ResultType call() throws Exception {
-    String[] keysToSend = keys.toArray(new String[0]);
+    CharSequence[] keysToSend = keys.toArray(new CharSequence[keys.size()]);
     getKnownElements().get(elementId).sendKeys(keysToSend);
 
     return ResultType.SUCCESS;

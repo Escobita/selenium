@@ -1,3 +1,6 @@
+<head>
+  <title>WebDriver JS API</title>
+
 <script type="text/javascript" src="json2.js"></script>
 <script type="text/javascript" src="jsapi.js"></script>
 
@@ -8,6 +11,14 @@
             run(get, 'http://www.google.com');
             run(type, {name: 'q'}, "webdriver");
             run(click, {name: 'btnG'});
+            run(script, function() { document.getElementsByName('q')[0].value = 'fishy'; });
         }
     };
 </script>
+</head>
+<body>
+<div>
+    <b>Running: </b> <span id="current">None</span><br />
+    <b>Messages: </b> <span id="echo"> </span>
+</div>
+</body>
