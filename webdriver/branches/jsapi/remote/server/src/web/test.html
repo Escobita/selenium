@@ -12,6 +12,7 @@
             run(type, {name: 'q'}, "webdriver");
             run(click, {name: 'btnG'});
             run(script, function() { document.getElementsByName('q')[0].value = 'fishy'; });
+            run(script, function() { document.getElementsByName('q')[0].value = arguments[0]; }, 'tuesday');
         }
     };
 </script>

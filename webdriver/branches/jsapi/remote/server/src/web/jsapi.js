@@ -161,7 +161,8 @@ function get(url) {
 }
 
 function script(to_execute) {
-  var raw_func = to_execute;
+  var args = Array.prototype.slice.call(arguments);
+  var raw_func = args.shift();
   if (to_execute instanceof Function) {
     // Convert the function to a string.
     raw_func = to_execute.toString();
@@ -169,8 +170,19 @@ function script(to_execute) {
     raw_func = raw_func.replace(/^.*?{/, '').replace(/}.*?$/, '');
   }
 
-  alert(raw_func);
-  jsapi.execute({name: 'execute', args: [raw_func]});
+  // Grab each of the arguments in turn
+  var converted_args = [];
+  while(args.length) {
+    if (args[0] instanceof Number) {
+      converted_args.push({type: "NUMBER", value: args.shift()});
+    } else if (args[0] instanceof Boolean) {
+      converted_args.push({type: "BOOLEAN", value: args.shift()});
+    } else {
+      converted_args.push({type: "STRING", value: args.shift().toString()});
+    }
+  }
+
+  jsapi.execute({name: 'execute', args: [raw_func, converted_args]});
 }
 
 // Methods from WebElement
@@ -182,6 +194,8 @@ function type(locator, value) {
   jsapi.on_element(locator, 'type', [[value]]);
 }
 
+// TODO(simonstewart): At some point, this should work
+/*
 function evalWithElement(toEval, locator, args) {
   var func = arguments.shift();
   var element_locator = arguments.shift();
@@ -203,7 +217,8 @@ function setValue(locator, value) {
   };
   evalWithElement(setter, locator, value);
 }
-
+*/
+// TODO(simonstewart): Functions to update the interface
 /*
  var echo = function(message) {
  var e = document.getElementById("echo");
