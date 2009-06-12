@@ -6,7 +6,6 @@
 if (!jsapi) {
   var jsapi = (function() {
     var remote_ = '/hub';
-    var sessionId_ = undefined;
 
     var newXhr = function() {
       if (window.XMLHttpRequest) {
@@ -22,7 +21,8 @@ if (!jsapi) {
       execute: {method: 'POST', url: '/session/:sessionId/ignored/execute'},
       init:    {method: 'POST', url: '/session'},
       get:     {method: 'POST', url: '/session/:sessionId/ignored/url'},
-      type:    {method: 'POST', url: '/session/:sessionId/ignored/element/:elementId/value'}
+      type:    {method: 'POST', url: '/session/:sessionId/ignored/element/:elementId/value'},
+      visible: {method: 'GET',  url: '/session/:sessionId/ignored/element/:elementId/displayed'}
     };
 
     return {
@@ -59,7 +59,7 @@ if (!jsapi) {
               data = JSON.parse(xhr.responseText);
             }
 
-            callback(data);
+            jsapi.setReady(callback(data));
           }
         };
 
@@ -153,6 +153,33 @@ function run() {
   var args = [];
   for (var i = 0; i < arguments.length; i++) args[i] = arguments[i];
   jsapi.commands_.push(args);
+}
+
+function wait(func, all_args) {
+  // Grab the current arguments and stash them. This will be the function to call, plus any args
+  var args = Array.prototype.slice.call(arguments);
+  var method = args.shift();
+
+  // All functions end up calling jsapi.setReady when they succeed. Store it and replace it
+  jsapi.original_set_ready = jsapi.original_set_ready || jsapi.setReady;
+
+  jsapi.setReady = function(done) {
+    if (done) {
+      jsapi.setReady = jsapi.original_set_ready;
+      jsapi.original_set_ready = undefined;
+      jsapi.setReady(true);
+      return;
+    }
+    window.setTimeout(function() {
+      method.apply(null, args);
+    }, 200);
+  };
+
+  method.apply(null, args);
+}
+
+function visible(locator) {
+  jsapi.on_element(locator, 'visible', undefined, function(data) { return data && data.value; });
 }
 
 // Methods analogous to WebDriver methods

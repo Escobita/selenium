@@ -8,7 +8,8 @@
     window.onload = function() {
         with (jsapi) {
             use('firefox');
-            run(get, 'http://www.google.com');
+//            run(get, 'http://www.google.com');
+            run(wait, visible, {name: 'q'});
             run(type, {name: 'q'}, "webdriver");
             run(click, {name: 'btnG'});
             run(script, function() { document.getElementsByName('q')[0].value = 'fishy'; });
