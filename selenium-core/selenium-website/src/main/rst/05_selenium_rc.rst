@@ -1192,7 +1192,7 @@ like this -
 
 .. code-block:: bash
 
-$ java -jar selenium-server.jar -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080 -Dhttp.proxyUser=username -Dhttp.proxyPassword=password
+   $ java -jar selenium-server.jar -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080 -Dhttp.proxyUser=username -Dhttp.proxyPassword=password
 
 
 Multi-Window Mode
