@@ -1183,6 +1183,18 @@ explanation on all of them.
 Though, for some of those options, that short overview is not enough, so we've
 written an in deep explanation for them.
 
+
+Proxy Configuration
+~~~~~~~~~~~~~~~~~~~
+If one is behind HTTP proxy which requires authentication then one should 
+set up http.proxyHost, http.proxyPort, http.proxyUser and http.proxyPassword
+like this - 
+
+.. code-block:: bash
+
+$ java -jar selenium-server.jar -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080 -Dhttp.proxyUser=username -Dhttp.proxyPassword=password
+
+
 Multi-Window Mode
 ~~~~~~~~~~~~~~~~~
 Before 1.0, Selenium by default ran the application under test in a sub frame 
