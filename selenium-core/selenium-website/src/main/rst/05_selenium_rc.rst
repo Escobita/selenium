@@ -1553,3 +1553,185 @@ directly supported by Selenium-RC. When specifying the run mode, use the
 For example 
  
 .. TODO:  we need to add an example here.
+
+
+Error message: "(Unsupported major.minor version 49.0)" while starting server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This message indicates that one is not using the correct version of Java. 
+The Selenium Server requires Java 1.5 or higher; this error appears when 
+one uses Java 1.4 or backward version instead of 1.5. 
+
+Try running this from the command line:
+
+.. code-block:: bash
+
+   java -version
+
+You should see a brief message telling you what version of Java is installed,
+like this:
+
+.. code-block:: bash
+
+   java version "1.5.0_07"
+   Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-b03)
+   Java HotSpot(TM) Client VM (build 1.5.0_07-b03, mixed mode)
+
+If you see a lower version number instead, you may need to install a newer 
+version of the JRE, or you may need to add it to your PATH environment variable.
+
+I get a 404 error when running the getNewBrowserSession command!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you're getting a 404 error while attempting to open a page on 
+"http://www.google.com/selenium-server/", then it must be because the Selenium
+Server was not correctly configured as a proxy. "selenium-server" directory 
+doesn't really exist on google.com; it only appears to exist when the proxy is 
+properly configured. Proxy Configuration highly depends on way browser is 
+launched with \*firefox, \*iexplore, \*opera, or \*custom.
+
+    * \*iexplore: If browser is launched using \*iexplore, there are a number
+      of likely possibilities.Selenium Server attempts to configure the global
+      proxy settings in Internet Options control panel; one needs to make 
+      sure that those are correctly configured when Selenium Server launches 
+      the browser. Try looking at your Internet Options control panel. 
+      Click on the "Connections" tab and click on "LAN Settings". 
+      
+          - If you need to use a proxy to access the application you want to test,
+            you'll need to start Selenium Server with "-Dhttp.proxyHost"; 
+            see the `Proxy Configuration`_ for more details.
+          - You may also try configuring your proxy manually and then launching
+            browser with \*custom, or with \*iehta browser launcher.
+            
+    * \*custom: When using \*custom, it's up to you to configure the proxy correctly
+      (manually). If you forgot to do this, or if you configured the proxy incorrectly, 
+      you'll get a 404 error. Double-check that you've configured your proxy 
+      settings correctly. 
+      One way to check whether one has configured proxy correctly is to attempt 
+      to intentionally configure browser incorrectly. Try configuring browser 
+      to use the wrong proxy server hostname, or the wrong port. 
+      If one had successfully configured browser's proxy settings incorrectly, 
+      then browser will be unable to connect to the Internet, which is one way 
+      to make sure that one is adjusting the relevant settings. 
+      
+    * others (\*firefox, \*opera): For the others browsers, we automatically hard-code
+      the proxy for you, and don't know of any known issues with this functionality.
+      If you're encountering 404 errors in the tutorial while using these browser 
+      launchers, post them to user forums.
+      
+Why am I getting a permission denied error?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The most common reason for this error is that your session is attempting to violate
+the same-origin policy by crossing domain boundaries (e.g., accesses a page from 
+http://domain1 and then accesses a page from http://domain2) or switching protocols 
+(moving from http://domainX to https://domainX).
+This error can also sometimes occur when JavaScript attempts to look at objects 
+which are not yet available (before the page has completely loaded), or tries to 
+look at objects which are no longer available (after the page has started 
+to be unloaded). This kind of pitfall is most typically encountered with AJAX pages
+which are working with sections of a page or subframes that load and/or reload 
+independently of the larger page. For this category of problem, it is usual
+that the error is intermittent. Often it is impossible to reproduce the problem 
+with a debugger running because the trouble stems from race conditions which 
+settle down when the debugger's overhead is added to the system.
+This is covered in some detail in the tutorial. Make sure you read the section 
+about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
+
+
+Executing tests with different configurations of Browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally Selenium RC automatically configures browser, but if one launches 
+browser using "\*custom" as browser launcher, one can force Selenium RC
+to launch the browser as-is, without changing configuration. 
+(Note that this is also the way one launches other browsers that Selenium RC 
+doesn't yet explicitly support.)
+
+For example, one can launch Firefox with a custom configuration like this:
+
+.. code-block:: bash
+
+   cmd=getNewBrowserSession&1=*custom c:\Program Files\Mozilla Firefox\firefox.exe&2=http://www.google.com
+
+Note that when launching the browser in this way, one will have to manually 
+configure browser to use the Selenium Server as a proxy. (Normally this just 
+means opening your browser preferences and specifying "localhost:4444" as 
+an HTTP proxy, but instructions for this can differ radically from browser to 
+browser, so consult your browser's documentation for details.)
+
+Beware that Mozilla browsers can be a little fidgety about how they start and stop. 
+One may need to set the MOZ_NO_REMOTE environment variable to make Mozilla browsers 
+behave a little more predictably. Unix users should avoid launching browser using 
+a shell script; always prefer to use the binary executable (e.g. firefox-bin) directly.
+
+How to block pop up windows?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are several kinds of "pop-ups" that one can get during a Selenium test;
+each of them need to be addressed differently.
+
+    * HTTP basic authentication dialogs: These dialogs prompt for a 
+      username/password to login to the site. To login to a site that requires 
+      HTTP basic authentication, use a username and password in the URL, as 
+      described in `RFC 1738`_, like this: open("http://myusername:myuserpassword@myexample.com/blah/blah/blah").
+      
+.. _`RFC 1738`: http://tools.ietf.org/html/rfc1738#section-3.1
+
+    * SSL certificate warnings: Selenium RC automatically attempts to spoof SSL 
+      certificates when it is enabled as a proxy; see more details about this 
+      in the tutorial section on HTTPS. If your browser is configured correctly,
+      you should never see SSL certificate warnings, but you may need to 
+      configure your browser to trust our dangerous "CyberVillains" SSL certificate 
+      authority. (The tutorial explains how to do this.)
+
+    * modal JavaScript alert/confirmation/prompt dialogs: Selenium tries to conceal
+      those dialogs from you (by replacing window.alert, window.confirm and 
+      window.prompt) so they won't stop the execution of your page. If you're 
+      actually seeing an alert pop-up, it's probably because it fired during 
+      the page load process, which is usually too early for us to protect the page.
+      
+      
+On Linux, why isn't my Firefox browser session closing?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
+      On Unix/Linux one needs to invoke "firefox-bin" directly, so make sure that
+      executable is on the path. If one is  forced to execute Firefox through a 
+      shell script, when it comes time to kill the browser Selenium RC will kill
+      the shell script, leaving the browser running.
+      
+      If necessary, one can specify the path to firefox-bin directly, like this:
+      
+.. code-block:: bash      
+      
+   cmd=getNewBrowserSession&1=*firefox /usr/local/firefox/firefox-bin&2=http://www.google.com
+
+Firefox \*chrome doesn't work with custom profile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Check Firefox profile folder -> prefs.js -> user_pref("browser.startup.page", 0);
+Comment this line like this: "//user_pref("browser.startup.page", 0);" and try again.
+
+How can I avoid using complex xpath expressions to my test?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If the elements in HTML (button, table, label, etc) have element IDs, 
+then one can reliably retrieve all elements without ever resorting
+to xpath. These element IDs should be explicitly created by the application.
+But non-descriptive element ID (i.e. id_147) tends to cause two problems: 
+first, each time the application is deployed, different element ids could be generated. 
+Second, a non-specific element id makes it hard for automation testers to keep 
+track of and determine which element ids are required for testing.
+
+You might consider trying the `UI-Element`_ extension in this situation.
+
+.. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
+
+
+Is it ok to load a custom pop-up as the parent page is loading (i.e., before the parent page's javascript window.onload() function runs)?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+No. Selenium relies on interceptors to determine window names as they are being loaded.
+These interceptors work best in catching new windows if the windows are loaded AFTER 
+the onload() function. Selenium may not recognize windows loaded before the onload function.
+
+
+Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Try our `user forums`_
+
+.. _`user forums`: http://seleniumhq.org/support/
