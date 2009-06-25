@@ -6,7 +6,6 @@
 	ProjectGUID="{7801CEC0-B5BE-4EE0-846D-95E36D38C914}"
 	RootNamespace="ChromeDriver"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -18,11 +17,12 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="$(InputDir)\..\..\build"
+			IntermediateDirectory="$(InputDir)\..\..\build\Debug"
 			ConfigurationType="2"
 			UseOfATL="0"
 			CharacterSet="1"
+			BuildLogFile="$(IntDir)\BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -51,6 +51,9 @@
 				RuntimeLibrary="1"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc80.pdb"
+				XMLDocumentationFileName="$(IntDir)\"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
@@ -70,6 +73,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/LIBPATH:&quot;C:\Program Files\Microsoft SDKs\Windows\v6.1\Lib&quot; /LIBPATH:&quot;C:\Program Files\Microsoft Visual Studio 8\VC\lib&quot; automation.lib base.lib common.lib googleurl.lib icu.lib skia.lib base_gfx.lib Psapi.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(ConfigurationName)"
 				GenerateManifest="false"
@@ -77,8 +81,6 @@
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -100,13 +102,16 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="$(InputDir)\..\..\build"
+			IntermediateDirectory="$(InputDir)\..\..\build\Release"
 			ConfigurationType="2"
 			UseOfATL="0"
 			CharacterSet="1"
@@ -162,8 +167,6 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -185,6 +188,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -197,13 +203,34 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-      <File RelativePath=".\chromedriver.cc"></File>
-      <File RelativePath=".\chromedriver.h"></File>
-      <File RelativePath=".\chromeelement.cc"></File>
-      <File RelativePath=".\chromeelement.h"></File>
-      <File RelativePath=".\chromescript.h"></File>
-      <File RelativePath=".\webdriver.cc"></File>
-      <File RelativePath=".\webdriver.h"></File>
+			<File
+				RelativePath=".\chromedriver.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\chromedriver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\chromeelement.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\chromeelement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\chromescript.h"
+				>
+			</File>
+			<File
+				RelativePath=".\webdriver.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\webdriver.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
