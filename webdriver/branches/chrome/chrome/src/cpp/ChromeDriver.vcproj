@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="8.00"
 	Name="ChromeDriver"
 	ProjectGUID="{7801CEC0-B5BE-4EE0-846D-95E36D38C914}"
 	RootNamespace="ChromeDriver"
