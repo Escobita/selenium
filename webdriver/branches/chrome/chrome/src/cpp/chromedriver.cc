@@ -115,7 +115,9 @@ int ChromeDriver::close() {
 
 int ChromeDriver::get(const std::wstring url) {
   GURL gurl(url.c_str());
-  tab_proxy_->NavigateToURL(gurl);
+  bool is_timeout;
+  tab_proxy_->NavigateToURLWithTimeout(gurl, 5000, &is_timeout);
+  if (is_timeout) return !SUCCESS;
   return SUCCESS;
 }
 
