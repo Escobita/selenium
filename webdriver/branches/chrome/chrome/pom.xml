@@ -30,6 +30,27 @@
 	<build>
 		<sourceDirectory>src/java</sourceDirectory>
 		<testSourceDirectory>test/java</testSourceDirectory>
+    <plugins>
+      <!-- See http://maven.apache.org/plugins/maven-antrun-plugin -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy_ChromeDriver.dll</id>
+            <phase>generate-resources</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="target/classes" />
+                <copy file="build/ChromeDriver.dll" todir="target/classes" />
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
 	</build>
 
 	<repositories>

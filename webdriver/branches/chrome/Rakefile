@@ -67,7 +67,8 @@ task :clean do
   rm_rf 'iphone/build'
   rm_rf 'support/build'
   rm_rf 'selenium/build'
-  rm_rf 'chrome/build'
+  rm_rf 'chrome/build/webdriver-chrome.jar'
+  rm_rf 'chrome/build/webdriver-chrome-test.jar'
   rm_rf 'build/'
 end
 
@@ -267,9 +268,9 @@ simple_jars = {
   },
   "chrome" =>   {
     'src'       => "chrome/src/java/**/*.java",
-    'deps'      => [:common],
+    'deps'      => [:common, 'chrome/build/ChromeDriver.dll'],
     'jar'       => "chrome/build/webdriver-chrome.jar",
-    'resources' => nil,
+    'resources' => 'chrome/build/ChromeDriver.dll',
     'classpath' => ["chrome/lib/runtime/**/*.jar"] + common_libs,
     'test_on'   => false,
   },
