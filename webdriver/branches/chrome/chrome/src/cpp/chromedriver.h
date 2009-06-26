@@ -13,8 +13,6 @@
 #define CHROME_DRIVER_H_
 
 static const int timeout_ = 4000;
-static base::AtExitManager exitManager;
-static MessageLoopForUI ui_loop_;
 
 class AutomationProxy;
 class BrowserProxy;

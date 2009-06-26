@@ -25,6 +25,9 @@
 #include "chrome/test/automation/window_proxy.h"
 #include "chrome/test/automation/tab_proxy.h"
 
+static base::AtExitManager exitManager;
+static MessageLoopForUI ui_loop_;
+
 void dg(const std::wstring msg) {
   std::wcout << L"INFO: " << msg << std::endl;
 }
@@ -61,10 +64,12 @@ int ChromeDriver::Launch() {
   int processCount = base::GetProcessCount(
       chrome::kBrowserProcessExecutableName, &filter);
   if (processCount == 0) {
-    CommandLine command_(getApplicationPath());
+	base::ProcessHandle ph;
+	CommandLine::Init(0, NULL);
+	CommandLine command_(getApplicationPath());
     command_.AppendSwitch(switches::kDomAutomationController);
     command_.AppendSwitchWithValue(switches::kTestingChannelID, proxy_->channel_id());
-    base::LaunchApp(command_, false, false, NULL);
+    base::LaunchApp(command_, false, false, &ph);
 
     if (!proxy_->WaitForInitialLoads()) {
       return !SUCCESS;
@@ -408,7 +413,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByXPath(const std::wstrin
 // Internal members implementation.
 // ----------------------------------------------------------------------------
 std::wstring ChromeDriver::getApplicationPath() {
-  return L"..\\chrome\\chrome.exe";
+  return _wgetenv(L"WEBDRIVER_CHROMIUM_PATH");
 }
 
 std::wstring getRunnableScript(int type, const std::wstring jscript) {

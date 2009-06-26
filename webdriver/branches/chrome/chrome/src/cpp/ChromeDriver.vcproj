@@ -157,8 +157,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				UseLibraryDependencyInputs="false"
 				AdditionalOptions="/LIBPATH:&quot;C:\Program Files\Microsoft SDKs\Windows\v6.1\Lib&quot; /LIBPATH:&quot;C:\Program Files\Microsoft Visual Studio 8\VC\lib&quot; automation.lib base.lib common.lib googleurl.lib icu.lib skia.lib base_gfx.lib Psapi.lib"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(ConfigurationName)"
 				GenerateManifest="false"
 				IgnoreAllDefaultLibraries="false"
