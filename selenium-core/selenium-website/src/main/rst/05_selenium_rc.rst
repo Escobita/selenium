@@ -838,6 +838,51 @@ test results in different formats such as HTML or PDF.
 
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
+
+Selenium RC Logging
+-------------------
+
+Server-Side Logs
+~~~~~~~~~~~~~~~~
+
+When launching selenium server then **-log** option can be used to direct 
+lots of valuable debugging information to a text file.
+
+.. code-block:: bash
+   java -jar selenium-server.jar -log selenium.log
+   
+This log file is more verbose than the standard console logs (it includes DEBUG 
+level logging messages). The log file also includes the logger name, and the ID
+number of the thread that logged the message. For example:   
+
+.. code-block:: bash
+
+   20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
+   Browser 465828/:top frame1 posted START NEW
+   
+Format is 
+
+.. code-block:: bash
+
+   TIMESTAMP(HH:mm:ss) LEVEL [THREAD] LOGGER - MESSAGE
+   
+This message may be multiline.
+
+Browser-Side Logs
+~~~~~~~~~~~~~~~~~
+
+JavaScript on the browser side (Selenium Core) also logs important messages; 
+in many cases, these can be more useful to the end-user than the regular Selenium 
+Server logs. To access browser-side logs, one will need to pass the **-browserSideLog**
+argument to the Selenium Server, like this:
+
+.. code-block:: bash
+
+   java -jar selenium-server.jar -browserSideLog
+   
+**-browserSideLog** can also be combined with the **-log** argument, to log 
+browserSideLogs (as well as all other DEBUG level logging messages) to a file.
+
 Adding Some Spice to Your Tests
 -------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
@@ -1689,12 +1734,11 @@ each of them need to be addressed differently.
       
 On Linux, why isn't my Firefox browser session closing?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
-      On Unix/Linux one needs to invoke "firefox-bin" directly, so make sure that
-      executable is on the path. If one is  forced to execute Firefox through a 
-      shell script, when it comes time to kill the browser Selenium RC will kill
-      the shell script, leaving the browser running.
-      
-      If necessary, one can specify the path to firefox-bin directly, like this:
+On Unix/Linux one needs to invoke "firefox-bin" directly, so make sure that
+executable is on the path. If one is  forced to execute Firefox through a 
+shell script, when it comes time to kill the browser Selenium RC will kill
+the shell script, leaving the browser running.   
+If necessary, one can specify the path to firefox-bin directly, like this:
       
 .. code-block:: bash      
       
@@ -1722,8 +1766,6 @@ You might consider trying the `UI-Element`_ extension in this situation.
 
 Is it ok to load a custom pop-up as the parent page is loading (i.e., before the parent page's javascript window.onload() function runs)?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 No. Selenium relies on interceptors to determine window names as they are being loaded.
 These interceptors work best in catching new windows if the windows are loaded AFTER 
 the onload() function. Selenium may not recognize windows loaded before the onload function.
@@ -1731,7 +1773,6 @@ the onload() function. Selenium may not recognize windows loaded before the onlo
 
 Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Try our `user forums`_
 
 .. _`user forums`: http://seleniumhq.org/support/
