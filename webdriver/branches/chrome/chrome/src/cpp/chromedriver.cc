@@ -364,7 +364,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByClassName(const std::ws
     wchar_t* endChar = L"";
     this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
     int total = wcstol(found.at(1).c_str(), &endChar, 10);
-    for (int i=2; i<total*2; i=i+2) {
+    for (int i=2; i< (total + 1) * 2; i=i+2) {
       std::wstring tagName = found.at(i).c_str();
       std::wstring eid = found.at(i+1).c_str();
       std::wstring base;
@@ -408,7 +408,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByLinkText(const std::wst
     wchar_t* endChar = L"";
     this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
     int total = wcstol(found.at(1).c_str(), &endChar, 10);
-    for (int i=2; i<total*2; i=i+2) {
+    for (int i=2; i< (total + 1) * 2; i=i+2) {
       std::wstring tagName = found.at(i).c_str();
       std::wstring eid = found.at(i+1).c_str();
       std::wstring base;
@@ -452,7 +452,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByPartialLinkText(const s
     wchar_t* endChar = L"";
     this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
     int total = wcstol(found.at(1).c_str(), &endChar, 10);
-    for (int i=2; i<total*2; i=i+2) {
+    for (int i=2; i< (total + 1) * 2; i=i+2) {
       std::wstring tagName = found.at(i).c_str();
       std::wstring eid = found.at(i+1).c_str();
       std::wstring base;
@@ -496,7 +496,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByName(const std::wstring
     wchar_t* endChar = L"";
     this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
     int total = wcstol(found.at(1).c_str(), &endChar, 10);
-    for (int i=2; i<total*2; i=i+2) {
+    for (int i=2; i< (total + 1) * 2; i=i+2) {
       std::wstring tagName = found.at(i).c_str();
       std::wstring eid = found.at(i+1).c_str();
       std::wstring base;
@@ -512,15 +512,12 @@ int ChromeDriver::findElementByXPath(const std::wstring xpath, ChromeElement** e
   std::wstring jscript;
   time_t curTime = time(NULL);
   SStringPrintf(&jscript, FINDER_BY_XPATH.c_str(), xpath.c_str(), 0, currentCount(), curTime);
-  dg(jscript.c_str());
 
   std::vector<std::wstring> found;
   domGetStringArray(jscript, found);
   if (found.size() <= 3) {
-    dg(L"Reached size() <= 3");
     return !SUCCESS;
   } else {
-    dg(L"Reached found something.");
     std::wstring eid = found.at(3).c_str();
     std::wstring tagName = found.at(2).c_str();
     std::wstring base;
@@ -543,7 +540,7 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByXPath(const std::wstrin
     wchar_t* endChar = L"";
     this->setElementCounter(wcstol(found.at(0).c_str(), &endChar, 10));
     int total = wcstol(found.at(1).c_str(), &endChar, 10);
-    for (int i=2; i<total*2; i=i+2) {
+    for (int i=2; i< (total + 1) * 2; i=i+2) {
       std::wstring tagName = found.at(i).c_str();
       std::wstring eid = found.at(i+1).c_str();
       std::wstring base;
