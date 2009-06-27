@@ -137,16 +137,19 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   public void back() {
     if (driver == null) throw new RuntimeException("Driver was not loaded.");
     lib.wdGoBack(driver);
+    try { Thread.sleep(100); } catch(Exception e) {}
   }
 
   public void forward() {
     if (driver == null) throw new RuntimeException("Driver was not loaded.");
     lib.wdGoForward(driver);
+    try { Thread.sleep(100); } catch(Exception e) {}
   }
 
   public void get(String url) {
     if (driver == null) throw new RuntimeException("Driver was not loaded.");
     lib.wdGet(driver, new WString(url));
+    try { Thread.sleep(100); } catch(Exception e) {}
   }
 
   public String getCurrentUrl() {

@@ -61,10 +61,12 @@ public class ChromeElement implements RenderedWebElement, SearchContext, Locatab
   // --------------------------------------------------------------------------
   public void click() {
     lib.wdClick(element);
+    try { Thread.sleep(100); } catch(Exception e) {}
   }
 
   public void submit() {
     lib.wdSubmit(element);
+    try { Thread.sleep(100); } catch(Exception e) {}
   }
 
   public String getValue() {
