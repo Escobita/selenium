@@ -18,8 +18,8 @@ void ChromeElement::propagate(ChromeElement* element) {
 }
 
 int ChromeElement::submit() {
-  std::wstring jscript = base_script_.c_str();
-  jscript.append(L".submit()");
+  std::wstring jscript;
+  driver_->createSubmitScript(jscript, base_script_);
   return driver_->domGetVoid(jscript);
 }
 
@@ -30,8 +30,8 @@ int ChromeElement::clear() {
 }
 
 int ChromeElement::click() {
-  std::wstring jscript = base_script_.c_str();
-  jscript.append(L".click()");
+  std::wstring jscript;
+  driver_->createClickScript(jscript, base_script_);
   return driver_->domGetVoid(jscript);
 }
 

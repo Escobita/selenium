@@ -64,19 +64,15 @@ void dg(const std::wstring msg) {
 int wdNewDriverInstance(WebDriver** ptrDriver) {
   if (*ptrDriver) return !SUCCESS;
 
-  dg(L"Step 1..");
   // Allocate instance
   (*ptrDriver = new WebDriver())->instance = new ChromeDriver();
 
-  dg(L"Step 2..");
   int retval = (*ptrDriver)->instance->Launch();
-  dg(L"Step 3..");
   if (retval == SUCCESS) {
-	  dg(L"Step 3.1.");
     return SUCCESS;
   }
 
-  dg(L"Step 4..");
+  error("\n\nFailed to load the driver....\n\n");
   // If failed then clean up.
   delete (*ptrDriver)->instance;
   (*ptrDriver)->instance = NULL;
@@ -518,7 +514,9 @@ int wdSubmit(WebElement* element) {
     return !SUCCESS;
   }
 
-  return element->element->submit();
+  int retVal = element->element->submit();
+  SLEEP(1);
+  return retVal;
 }
 
 int wdClear(WebElement* element) {
@@ -536,7 +534,9 @@ int wdClick(WebElement* element) {
     return !SUCCESS;
   }
 
-  return element->element->click();
+  int retVal = element->element->click();
+  SLEEP(1);
+  return retVal;
 }
 
 int wdIsEnabled(WebElement* element, int* selected) {

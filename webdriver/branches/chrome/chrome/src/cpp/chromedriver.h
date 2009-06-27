@@ -1,9 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 
 #include "base/at_exit.h"
 #include "base/message_loop.h"
+
+#if defined(OS_WIN)
+#include <windows.h>
+#include <winbase.h>
+#else
+#include <unistd.h>
+#endif
+
+#ifndef SLEEP
+#if defined(OS_WIN)
+#define SLEEP(x) Sleep(x * 1000)
+#else
+#define SLEEP(x) sleep(x)
+#endif	// OS_WIN
+#endif  // SLEEP 
 
 #ifndef SUCCESS
 #define SUCCESS 0
@@ -26,6 +40,8 @@ class ChromeDriver {
     ChromeDriver();
 
     ~ChromeDriver();
+
+	static void dg(const std::wstring msg);
 
     int Launch();
 
@@ -116,6 +132,8 @@ class ChromeDriver {
     int default_window_index_;
     int default_tab_index_;
 
+	void createSubmitScript(std::wstring& jscript, const std::wstring& base_script);
+	void createClickScript(std::wstring& jscript, const std::wstring& base_script);
     std::wstring domGetString(const std::wstring jscript);
     int domGetInteger(const std::wstring jscript, int* value);
     int domGetBoolean(const std::wstring jscript, bool* value);
