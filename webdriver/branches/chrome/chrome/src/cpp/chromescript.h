@@ -154,12 +154,12 @@ static const std::wstring FINDER_BY_CLASSNAME(
         this.e_.push(''+e.nodeName);\
         if (e.hasAttribute('ceid')) {\
           this.e_.push(''+e.getAttribute('ceid'));\
-          if (cntr == em) break;
+          if (cntr == em) break;\
         } else {\
           var sid = ''+pfx+'_'+(eid++);\
           e.setAttribute('ceid',sid);\
           this.e_.push(sid);\
-          if (cntr == em) break;
+          if (cntr == em) break;\
         }\
       }\
       this.e_[0] = ''+eid;\
@@ -336,7 +336,7 @@ static const std::wstring FINDER_BY_XPATH(
       this.e_[0] = ''+eid;\
       this.e_[1] = ''+cntr;\
       this.e_ = this.e_.join(',');\
-    }('%ls',%d,%d,'%d').e_");
+    }(\"%ls\",%d,%d,'%d').e_");
 
 
 

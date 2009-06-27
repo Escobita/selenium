@@ -83,7 +83,9 @@ std::wstring ChromeElement::getValueOfCssProperty(const std::wstring name) {
 }
 
 std::wstring ChromeElement::getText() {
-  return L"";
+  std::wstring jscript = base_script_.c_str();
+  jscript.append(L".innerText");
+  return driver_->domGetString(jscript);
 }
 
 std::wstring ChromeElement::getElementName() {
