@@ -1,71 +1,55 @@
-.. _chapter03-reference:
+﻿.. _chapter03-reference:
 
-|logo| Developing Test Cases With Selenium-IDE 
+|logo| 用Selenium-IDE开发测试用例
 ==============================================
 
 .. |logo| image:: ../images/selenium-ide-logo.png
    :alt:
 
-Introduction 
+介绍 
 ------------
-The Selenium-IDE (Integrated Development Environment) is the tool you use to 
-develop your Selenium test cases.  It's an easy-to-use Firefox plug-in and is 
-generally the most efficient way to develop test cases.  It also contains a 
-context menu that allows you to first select a UI element from the browser's 
-currently displayed page and then select from a list of Selenium commands 
-with parameters pre-defined according to the context of the selected UI 
-element.  This is not only a time-saver, but also an excellent way of 
-learning Selenium script syntax. 
+Selenium-IDE (集成开发环境) 是你用来开发你的Selenium测试用例的工具。它是一个易用的FireFox插件并且通常是开发测试用例的最有效方式。它还包含一个上下文菜单，允许你先从浏览器当前显示页面选择用户界面元素，然后从列表中根据已选择的用户界面元素的上下文背景选择带预定义参数的Selenium命令。这不但节省时间，而且也是一个学习Selenium脚本语法的极好方法。
   
-This chapter is all about the Selenium IDE and how to use it effectively. 
+本章将介绍Selenium IDE，以及有效使用它的方法。 
   
-Installing the IDE 
+安装IDE 
 ------------------
-Using Firefox, first, download the IDE from the SeleniumHQ `downloads page`_
+首先用Firefox从SeleniumHQ `downloads page`_ 下载IDE
   
 .. _`downloads page`: http://seleniumhq.org/download/
   
-When downloading from Firefox, you'll be presented with the following window. 
+从Firefox的下载时，您将获得如下的窗口。
  
 .. image:: ../images/chapt3_img01_IDE_Installation.png
    :align: center
 
-Select Install Now.  The Firefox Add-ons window pops up, first showing a 
-progress bar, and when the download is complete, displays the following. 
+选择立即安装。Firefox的加载项窗口弹出，先显示下载进度条，当下载完成后，显示如下。
+
   
 .. image:: ../images/chapt3_img02_IDE_Installation.png
    :align: center
   
-Restart Firefox.  After Firefox reboots you will find the Selnium-IDE listed under the Firefox Tools menu. 
+重新启动Firefox 。在Firefox重新启动后，你将发现Selnium-IDE列在Firefox工具菜单上。
 
 .. image:: ../images/chapt3_img03_IDE_Installation.png
    :align: center
 
-Opening the IDE 
+打开IDE 
 ---------------
-To run the Selenium-IDE, simply select it from the Firefox Tools menu.  It opens 
-as follows with an empty script-editing window and a menu for loading, or 
-creating new test cases. 
+要运行Selenium-IDE，只需从Firefox的工具菜单中选择。它会打开一个空的脚本编辑窗口和菜单用以加载和创建新测试用例。
   
 .. Darn!  I need to redo this.  No time now, gotta go!!!!
 
 .. image:: ../images/chapt3_img04_IDE_open.png
    :align: center
   
-IDE Features  
+IDE特色
 ------------
-Menu Bar 
+菜单栏 
 ++++++++
 
-The File menu allows you to create, open and save test case and test suite 
-files.  The Edit menu allows copy, paste, delete, undo and select all 
-operations for editing the commands in your test case.  The Options menu allows 
-the changing of settings.  You can set the timeout value for 
-certain commands, add user-defined user extensions to the base set of Selenium 
-commands, and specify the format (language) used when saving your 
-test cases.  The Help menu is the standard Firefox Help menu; only one
-item on this menu--UI-Element Documentation--pertains to Selenium-IDE.
-  
+文件菜单允许你创建、打开和保存测试用例和测试套件文件。编辑菜单可以复制、粘贴、删除、撤消和选择所有操作以编辑你的测试用例里的命令。选项菜单可以改变设置。你可以为某些命令设置超时时间，添加用户自定义的用户扩展到Selenium命令的基础集合中，以及指定保存测试用例的（语言）格式。帮助菜单是Firefox的标准帮助菜单；只有一个菜单项——UI-Element文档——涉及到Selenium-IDE 。
+
 Toolbar 
 ++++++++
 
@@ -572,7 +556,7 @@ The example below is of a test suite containing four test cases:
    from being able to place the test cases elsewhere than with the test suite
    that invokes them.
 
-.. do some testing here of test suites—do they save correctly?
+.. do some testing here of test suites鈥攄o they save correctly?
    I've seen errors in the past. 
   
 User Extensions 
