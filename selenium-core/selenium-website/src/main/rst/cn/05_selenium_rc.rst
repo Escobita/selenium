@@ -1,4 +1,4 @@
-.. _chapter05-reference:
+﻿.. _chapter05-reference:
 
 |logo| Selenium-RC
 ==================
@@ -6,104 +6,75 @@
 .. |logo| image:: ../images/selenium-rc-logo.png
    :alt:
 
-Introduction
+引言
 ------------
-Selenium-RC is the solution for tests that need a little more than just simple
-browser actions and a linear execution. Selenium-RC leverages the 
-full power of programming languages, creating tests that can do things like read
-and write external files, make queries to a database, send emails with test 
-reports, and practically anything else a user can do with a normal application.
+Selenium-RC 为那些稍微复杂，不仅仅是几个简单的浏览器动作和线性执行的测试提供了解决方案。
+Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试，比如：读写外部文件，查询数据库，通过邮件发送报告，以及用户通过
+程序可以完成的其他事务。
 
-You will want to use Selenium-RC whenever your test requires logic
-not supported by running a script from Selenium-IDE. What sort of logic could 
-this be? For example, Selenium-IDE does not directly support:
+当Selenium-IDE 的测试脚本不能满足你的测试需求的时候你会想使用Selenium-RC. 
+比如Selenium-IDE不直接支持以下功能:
 
-* condition statements 
-* iteration 
-* logging and reporting of test results
-* error handling, particularly unexpected errors
-* database testing
-* test case grouping
-* re-execution of failed tests
-* test case dependency
-* capture screenshots on test failures
+* 条件语句
+* 迭代 
+* 测试日子以及测试结果报告
+* 错误处理，尤其是意外的错误
+* 数据库测试
+* 测试用例归类
+* 重复执行失败用例
+* 测试用例依赖关系
+* 测试失败时候截取屏幕图像
 
-Although these tasks are not supported by Selenium directly, all of them can be achieved
-by using common programming techniques along with language specific libraries.
+尽管Selenium-RC没有直接支持以上所有功能，但是它们可以通过常用的编程技术及其类库来实现。
 
-.. note:: It may be possible to perform these testing tasks by the addition of user 
-   extensions to Selenium-IDE but most prefer to use Selenium-RC.  Using Selenium-RC
-   is much more flexible and extensible than Selenium-IDE when it comes to complex testing
-   problems.
+.. 注:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
 
-In the `Adding Some Spice to Your Tests`_ section, you'll find examples that 
-demonstrate the advantages of using all the power of a real programming language
-for your tests.
 
-How It Works
+在 `Adding Some Spice to Your Tests`_ 章节, 会有一些例子很好的证明了用编程语言写测试脚本的优势。
+
+工作原理
 ------------
-How the components of Selenium-RC operate and the role each plays in running 
-your test scripts are described below.
+以下介绍的是Selenium-RC 里面各个组件以及其工作原理
 
-RC Components
+RC 组件
 ~~~~~~~~~~~~~
-Selenium-RC is composed of two parts:
+Selenium-RC 由两部分组成:
 
-* The Selenium Server which launches and kills browsers, and acts as an *HTTP
-  proxy* for browser requests. 
-* Client libraries for various programming languages, each of which instructs the 
-  Selenium Server in how to test the AUT by passing it your test script's Selenium commands. 
+* Selenium Server启动和终止浏览器，同时为浏览器提供 *HTTP* 代理服务。 
+* 各种编程语言的客户端类库传递Selenium命令，驱动Selenium Server对AUT进行测试。
 
-Here is a simplified architecture diagram.... 
+以下是一个简单的构架图......
 
 .. image:: ../images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-The diagram shows the client libraries communicate with the
-Server passing each Selenium command for execution. Then the server passes the 
-Selenium command to the browser using Selenium-Core JavaScript commands.  The 
-browser, using its JavaScript interpreter, executes the Selenium command, which
-effectively, runs the check you specified in your Selenese test script.
+这个图表展示了客户端类库与Selenium Server通信并传递每个要执行的Selenium 命令。
+然后Selenium server把Selenium命令转化为Selenium-Core JavaScript命令传递给浏览器。 
+浏览器用它自己的JavaScript 解析器，执行Selenium 命令, 有效地运行Selenese测试脚本上步骤。
 
 Selenium Server
 ~~~~~~~~~~~~~~~
-Selenium Server receives Selenium commands from your test program,
-interprets them, and reports back to your program the results of
-running those tests.
+Selenium Server 从测试程序接收并解析Selenium 命令，然后返回一个测试结果给测试程序。
 
-The RC server bundles Selenium Core, and then automatically injects
-it into the browser.  This occurs when your test program causes the
-browser to open (using a client library API function).
-Selenium-Core is a JavaScript program, actually a set of JavaScript
-functions, which interprets and executes Selenese commands using the
-browser's built-in JavaScript interpreter.
+Selenium Server绑定了Selenium Core, 并且当测试程序使用客户端API启动浏览器的时候，
+Selenium Core被自动注入到浏览器里。Selenium-Core 是一个JavaScript程序, 实际上就是一套 JavaScript
+功能函数, 它使用浏览器内置的JavaScript解析器来解析和执行Selenese命令。
 
-The Server receives the Selenese commands from your test program
-using simple HTTP GET/POST requests. This means you can use any
-programming language that can send HTTP requests to automate
-Selenium tests on the browser.
+Selenium Server 用简单的HTTP GET/POST请求的方式从测试程序接收Selenese命令。
+这就意味着你可以通过任何支持发送HTTP请求的编程语言来驱动Selenium测试。
 
-Client Libraries
+客户端类库
 ~~~~~~~~~~~~~~~~
-The client libraries provide the programming support that allows you to
-run Selenium commands from a program of your own design.  There is a 
-different client library for each supported language.  A Selenium client 
-library provides a programming interface, i.e., a set of functions,
-which run Selenium commands from your program. Within each interface,
-there is a programming function that supports each Selenese command.
+Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一个不同的客户端类库，
+允许用户使用各自喜好的编程语言来编写和运行Selenium命令。
+每个客户端类库都是一个程序接口，也可以说是一组在程序里运行Selenium命令的函数。而这些函数和Selenium命令一一对应。
 
-It is the client library that takes a Selenese command and passes it to the Selenium Server
-for processing a specific action or test against the AUT.  The client library
-will also receive the result of that command and pass it back to your program.
-Then, your program can receive the result and report it as a success or failure, 
-or possibly take corrective action if it was an unexpected error. 
+客户端类库通过发送一条Selenese 命令到Selenium Server 来对AUT进行一个特定操作或者测试。
+客户端类库也会收到命令运行结果，然后返回给你的测试程序。你测试程序可以收到这个测试结果，然后报告成功与否，
+或者采取错误处理操作如果返回的是一个意外错误信息。 
 
-So to create a test program, you simply write a program that runs 
-a set of Selenium commands using a client library API.  And, optionally, if 
-you already have a Selenese test script created in the Selenium-IDE, you can 
-*generate the Selenium-RC code*. The Selenium-IDE can translate (using its 
-Export menu item) its Selenium commands into a client-driver's API function 
-calls.
+因此你可以用客户端类库的API编写一些简单的Selenium命令来创建测试程序。
+或者，如果你已经有了在Selenium-IDE里创建的Selenese命令，Selenium-IDE可以通过使用Export目录选项转换成Selenium RC代码。
 
 .. Paul: I added the above text after this comment below was made.  
    The table suggested below may still be helpful.  We can evaluate that later.
@@ -125,111 +96,96 @@ calls.
    PHP
    etc.
 
-Installation
+安装
 -------------
-After downloading the Selenium-RC zip file from `downloads page`_, you'll
-notice it has several sub-folders. These folders have all the components you'll 
-need for using Selenium-RC with the supported programming language of your choice.
+从 `downloads page`_ 下载Selenium-RC zip文件后，你会注意到它包含一些子目录，
+这些目录包含了在所有支持的编程语言运行Selenium-RC所需的组件。
 
-Once you've chosen a language to work with, you simply need to:
+你只要选中一种编程语言，然后
 
-* Install the Selenium-RC Server.
-* Set up a programming project using a language specific client driver.
+* 安装Selenium-RC Server.
+* 用你选中的语言对应的客户端类库建立起一个程序工程
 
-Installing Selenium Server
+安装 Selenium Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The Selenium-RC server is just a jar file (*selenium-server.jar*), which doesn't
-need installation at all. Just downloading the zip file and extracting the 
-server in the desired directory should be enough. Before starting any tests
-you've written in any programming language, you just have to go to the directory
-where Selenium-RC's server is located and execute the following line in a 
-console::
+Selenium server 只是一个jar包 (*selenium-server.jar*), 其实根本不需要安装。
+只要下载并解压，然后放在你想放的目录就足够了。
+当你写完一些测试脚本之后，你只要进入到Selenium server 所在目录下面，在控制台上执行
+以下命令::
 
     java -jar selenium-server.jar
 
-Most people like to have a more simplified setup, which can be made by creating
-an executable file (.bat on Windows and .sh on Linux) containing the command
-above. This way, you can make a shortcut to that executable file in your
-desktop and just double-click on it anytime you want to wake up the server to 
-start your tests.
+可能大多数人想要更加快捷的方式。
+这个可以通过创建一个包含以上命令的可执行文件（Windows下面的.bat文件或者Linux下面的.sh文件）。
+然后在你的桌面创建一个快捷方式。那么你就可以在任意时候双击快捷方式启动Selenium server，开始你的测试。
 
-.. note:: For the server, to run you'll need Java installed on your computer 
-   and properly set up on the PATH variable to run it from the console.
-   You can check that you have Java correctly installed by running the following
-   on a console::
+
+.. 注:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
+   你可以在控制台输入以下命令来确认Java是否安装正确::
 
        java -version
 
-   If you get a version number (which needs to be 1.5 or later), you're ready to start using Selenium-RC.
+   如果你得到一个版本号（必须1.5或以上），那么你可以开始使用Selenium-RC了。
 
 .. _`downloads page`: http://seleniumhq.org/download/
 .. _`NUnit`: http://www.nunit.org/index.php?p=download
 
-Java Client Driver Configuration
+Java 客户端驱动配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Extract the file *selenium-java-client-driver.jar*
-* Open your desired Java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, etc.)
-* Create a new project
-* Add the selenium-java-client-driver.jar files to your project as references.
-* Add to your project classpath the file *selenium-java-client-driver.jar*
-* From Selenium-IDE, export a script to a Java file and include it in your Java
-  project, or write your Selenium test in Java using the selenium-java-client API.
-* Run Selenium server from the console
-* Execute your test from the Java IDE
+* 从SeleniumHQ `downloads page`_ 下载Selenium-RC  
+* 解压提取 *selenium-java-client-driver.jar* 文件
+* 打开你的Java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, 等等.)
+* 创建一个新的工程
+* 把文件 *selenium-java-client-driver.jar* 加到工程的classpath里。
+* 从Selenium-IDE, 导出一个java文件，然后加到你的Java工程中去。或者用Java调用selenium-java-client API来写你自己的Selenium 测试脚本。
+* 从控制台启动 Selenium server
+* 在Java IDE里执行测试
 
-For specific details on Java test project configuration, see the Appendix sections
+具体的Java 测试工程配置，请参看附录
 :ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
-and 
+和
 :ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
 
-Python Client Driver Configuration 
+Python 客户端驱动配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Extract the file *selenium.py*
-* Either write your Selenium test in Python or export
-  a script from Selenium-IDE to a python file.
-* Add to your test's path the file *selenium.py*
-* Run Selenium server from console
-* Execute your test from a console or your Python IDE 
+* 从SeleniumHQ `downloads page`_ 下载Selenium-RC  
+* 解压提取 *selenium.py* 文件
+* 用Python直接写测试脚本或者从Selenium-IDE导出 python文件。
+* 把 *selenium.py* 文件加到你测试脚本路径
+* 从控制台启动 Selenium server
+* 从控制台或者Python IDE执行测试。
 
-For specific details on Python client driver configuration, see the appendix 
+具体的Java 客户端驱动配置，请参看附录
 :ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
-.NET Client Driver Configuration
+.NET 客户端驱动配
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Download Selenium-RC from the SeleniumHQ `downloads page`_
-* Extract the folder
-* Download and install `NUnit`_ (
-  Note:  You can use NUnit as your test engine.  If you're not familiar yet with 
-  NUnit, you can also write a simple main() function to run your tests; 
-  however NUnit is very useful as a test engine.)
-* Open your desired .Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
-* Create a class library (.dll)
-* Add references to the following DLLs: nmock.dll, nunit.core.dll, nunit.
+* 从SeleniumHQ `downloads page`_ 下载Selenium-RC  
+* 解压缩
+* 下载安装 `NUnit`_ （
+  注: 你可以把NUnit当作你的测试引擎.  如果你不熟悉NUnit，你可以编写简单的main() 函数来运行测试； 
+  不过NUnit 是一个非常不错的测试引擎。）
+* 打开你的.Net IDE (Visual Studio, SharpDevelop, MonoDevelop)
+* 创建一个动态链接库文件 (.dll)
+* 加载以下动态链接库文件: nmock.dll, nunit.core.dll, nunit.
   framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.
   IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
-* Write your Selenium test in a .Net language (C#, VB.Net), or export
-  a script from Selenium-IDE to a C# file and copy this code into the class file 
-  you just created.
-* Run Selenium server from console
-* Execute your test using either the NUnit GUI or NUnit command line
+* 使用.Net语言 (C#, VB.Net)编写Selenium测试，或者从Selenium-IDE 导出C#文件，然后拷贝代码到刚才创建的动态链接库文件里。
+* 从控制台启动 Selenium server
+* 从NUnit GUI 或者 NUnit 命令行执行测试。
 
-For specific details on .NET client driver configuration with Visual Studio, see the appendix 
+具体的在Visual Studio里 .NET 客户端驱动配置，请参看附录
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
-From Selenese to a Program
+从Selenese 到 测试程序
 --------------------------
-A key step to using Selenium-RC is to convert your Selenese into a programming 
-language.  This is also key to understanding Selenium-RC itself.  Although 
-similar, each language, out of necessity, will represent the same Selenese 
-test script differently.  In this section, we provide several different 
-language-specific examples.
+使用Selenium-RC的最重要一步是把Selenese转化为程序代码.  
+这同时也是理解Selenium-RC本身的重要一步，尽管同样的Selenese 脚本，在不同的编程语言下显示不同。 
+在这个章节，我们会提供一些基于不同语言的例子。
 
-Sample Test Script
+测试脚本实例
 ~~~~~~~~~~~~~~~~~~
-First, let's start with an example Selenese test script.  Imagine recording
-the following test with Selenium-IDE.
+首先，让我们从一个Selenese测试脚本例子开始，假设用Selenium-IDE录制了以下Selenese脚本.
 
 .. _Google search example:
 
@@ -240,15 +196,11 @@ clickAndWait       btnG
 assertTextPresent  Results * for selenium rc
 =================  =========================  ===========
 
-.. note:: This example would work with the Google search page http://www.google.com
+.. note:: 这个例子可以从Google search 页面 http://www.google.com 录制到
 
-Selenese as Programming Code
+Selenese 程序代码
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Here is the test script exported (via Selenium-IDE) to each of the 
-programming languages.  If you have at least basic knowledge of an object-
-oriented programming language, you should be able to understand how Selenium 
-runs Selenese commands from a programming language by reading one of these 
-examples.  To see the example in the desired language,  click one of these buttons.
+下面是通过Selenium-IDE导出的各种编程编程语言的测试脚本. 如果你有基础的面向对象编程语言的知识，你查看下面其中一个例子应该就可以理解Selenium是如何由编程语言运行Selenese命令的。点击下面其中一个按钮，查看对应语言的例子。
 
 .. container:: toggled
 
@@ -433,18 +385,13 @@ examples.  To see the example in the desired language,  click one of these butto
         end
       end
 
-Now, in the next section, we'll explain how to build a test program using the generated code.
+在接下来的章节，我们来解释怎么用上面生成的代码来创建一个测试程序。
 
-Programming Your Test
+编写测试代码
 ---------------------
-Now we'll show specific examples in each of the supported programming languages.
-Basically there are two tasks.  One, generate your script into a programming 
-language from Selenium-IDE, optionally modifying the result.  And two, write 
-a very simple main program that executes the generated code.  Optionally, you 
-can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
+现在，我们将展示所有支持的语言的详细例子。主要有两个步骤，第一，从Selenium-IDE把脚本转化成一种程序语言,也可以对生成的代码略加修改。第二，写一个最简单的main 函数来运行刚才生成的代码。或者，你可以采用一个测试引擎平台比如Java里的JUnit,TestNG, .Net里的NUnit。
 
-Here, we show language-specific examples.  The language-specific APIs tend to 
-differ from one to another, so you'll find a separate explanation for each.  
+这里我们展示不同语言下面的例子。不同语言下的AIPs可能不同，所以你会发现每个都有各自的解释。
 
 * `C#`_
 * Java_
@@ -456,22 +403,17 @@ differ from one to another, so you'll find a separate explanation for each.
 C#
 ~~
 
-The .NET Client Driver works with Microsoft.NET.
-It can be used together with any .NET testing framework 
-like NUnit or the Visual Studio 2005 Team System.
+.NET 客户端驱动在Microsoft.NET环境下运行。
+它可以和任何 .NET 测试框架，比如NUnit 或者Visual Studio 2005 一起使用。
 
-Selenium-IDE automatically assumes you will use NUnit as your testing framework.
-You can see this in the generated code below.  It includes the *using* statement
-for the NUnit framework along with corresponding NUnit attributes identifying 
-the role for each generated member function of the test class.  
+你可以从转化来的代码里发现，Selenium-IDE 自动默认你将使用NUnit 作为你的测试框架。
+在代码里它包含了*using* 语句来调用NUnit框架，同时使用了NUnit标签定义了测试代码中各个函数。  
 
-Note that you will probably have to rename the test class from "NewTest" to 
-something of your own choosing.  Also, you will need to change the browser-open
-parameters in the statement::
+注意，你可能需要把测试类名从"NewTest" 改为你想要的名称。而且，可能需要在以下语句里修改要打开的浏览器的参数::
 
     selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
 
-The generated code will look similar to this.
+生成的代码可能与下面的类似。
 
 .. code-block:: c#
 
@@ -555,15 +497,14 @@ The generated code will look similar to this.
         }
     }
 
-The main program is very simple.  You can allow NUnit to manage the execution 
-of your tests.  Or alternatively, you can write a simple main() program that 
-instantiates the test object and runs each of the three methods, SetupTest(), 
-TheNewTest(), and TeardownTest() in turn.
+
+主程序非常简单。你可以用NUnit来管理执行测试。或者你可以写一个简单的main()函数来实例化这个测试对象，然后轮流调用SetupTest(), 
+TheNewTest(), 和TeardownTest() 这三个函数。
 
     
 Java
 ~~~~
-For Java, most people use Junit as the test engine.  With it, you'll save
+在Java里, 很多人用Junit 运行测试. 用 With it, you'll save
 many lines of code by allowing Junit to manage the execution of your tests.
 Some development environments like Eclipse have direct support for JUnit via 
 plug-ins which makes it even easier. Teaching JUnit is beyond the scope of 
@@ -1384,8 +1325,8 @@ When your test program cannot connect to the Selenium Server, an exception
 will be thrown in your test program. It should display this message or a 
 similar one::
 
-    "Unable to connect to remote server….Inner Exception Message: No 
-    connection could be made because the target machine actively refused it…."
+    "Unable to connect to remote server鈥?Inner Exception Message: No 
+    connection could be made because the target machine actively refused it鈥?"
     (using .NET and XP Service Pack 2) 
 
 If you see a message like this, be sure you started the Selenium Server. If 
@@ -1445,7 +1386,7 @@ Here's the complete error msg from the server::
     java.lang.RuntimeException: Firefox refused shutdown while preparing a profile 
             at org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
     her.waitForFullProfileToBeCreated(FirefoxCustomProfileLauncher.java:277) 
-    ……………………. 
+    鈥︹€︹€︹€︹€︹€︹€︹€? 
     Caused by: org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
     her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
     ~1\Temp\customProfileDir203138\parent.lock 
@@ -1486,7 +1427,7 @@ present limitations with security certificate handling and with the running
 of multiple windows if your application opens additional browser windows. 
 
 In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
-supported HTTPS and the handling of security popups. These were ‘experimental
+supported HTTPS and the handling of security popups. These were 鈥榚xperimental
 modes in those versions but as of Selenium-RC 1.0 beta 2, these modes have now 
 become stable, and the \*firefox and \*iexplore run modes now translate into 
 the \*chrome and \*iehta modes. 
@@ -1502,7 +1443,7 @@ messages between the browser and the server. The browser now thinks
 something is trying to look like your application, but really is not a 
 significant security risk. So, it responds by alerting you with popup messages. 
 
-.. Please, can someone verify that I explained certificates correctly?—this is 
+.. Please, can someone verify that I explained certificates correctly?鈥攖his is 
    an area I'm not certain I understand well yet. 
 
 To get around this, Selenium-RC, (again when using a run mode that support 
