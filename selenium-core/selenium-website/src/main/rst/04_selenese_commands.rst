@@ -1,52 +1,43 @@
-Selenese Selenium Commands 
-==========================
+﻿.. _第四章:
+"Selenese" Selenium 命令集
+=============================
+Selenium 命令集,通常称作 *selenese*,是运行你的测试的一组命令集合。
+这些命令的组合就是 *测试脚本*.
+现在我们详细解释一下这些命令,告诉你一些在用Selenium测试web应用的时候用到的例子。
 
-.. _chapter04-reference:
+验证页面元素
 
-Selenium commands, often called *selenese*, are the set of commands that run 
-your tests.  A sequence of these commands is a *test script*.  Here we explain 
-those commands in detail, and we present the many choices you have in testing 
-your web application when using Selenium.
-
-
-Verifying Page Elements
 ------------------------
-Verifying *UI elements* on a web page is probably the most common feature of 
-your automated tests.  Selenese allows multiple ways of checking for UI 
-elements.  It is important that you understand these different methods because
-these methods define what you are actually testing.
+验证 在页面上的*UI元素* 或许是自动化测试中最常用到的功能。
+Selenese 允许多种方式验证UI元素。
+理解这些不同的方法是很重要的，因为这些方法定义了你真正要测试的。
 
-For example, will you test that...
+例如：
 
-a) an element is present somewhere on the page?
-b) specific text is somewhere on the page?
-c) specific text is at a specific location on the page?
+a) 一个元素是否出现在页面中的某个地方？
+b) 某文本是否出现在页面中某个地方？
+c) 某文本是否出现在页面上特定的位置?
 
-For example, if you are testing a text heading, the text and its position
-at the top of the page are probably relevant for your test.  If, however, you 
-are testing for the existence of an image on the home page, and the 
-web designers frequently change the specific image file along with its position
-on the page, then you only want to test that *an image* (as opposed to the 
-specific image file) exists *somewhere on the page*.
+例如,测试一个文本的头，文本以及在这页的顶部位置或许对你的测试来说是恰当的.然而，
+如果你测试的是在主页存在的一个图片,网站设计者经常改变这个图片在这个也页面上的位置，
+如果你只是想测试*一个图片*（这个图片文件）存在*页面上的某个位置*
    
    
-Assertion or Verification? 
+判定还是验证?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Choosing between **assert** and **verify** comes down to convenience and 
-management of failures. There's very little point checking that the first 
-paragraph on the page is the correct one if your test has already failed when 
-checking that the browser is displaying the expected page. If you're not on 
-the correct page, you'll probably want to abort your test case so that you can 
-investigate the cause and fix the issue(s) promptly. On the other hand, you 
-may want to check many attributes of a page without aborting the test case on 
-the first failure as this will allow you to review all failures on the page 
-and take the appropriate action. Effectively an **assert** will fail the test 
-and abort the current test case, whereas a **verify** will fail the test and 
-continue to run the test case. 
+选择使用***assert*还是**verify**取决于方便性和对case失败的管理方式.
+如果测试本章节页是正确的那页，而且当检查浏览器中显示的是你想要的那页的测试 
+已经不通过了，这种情况这两个方法差别是很小的。如果不是正确的那页
+你或许想终止这个测试， 
+及时地找出原因并解决其中问题.另外,
+你可能想检查页面上的很多属性，当第一个执行不通过，而不需要终止这个测试用例 
+同时允许你看到所有这个页面上执行不通过的情况，然后采取适当的措施。 
+使用**assert**将此测试用例执行不通过并终止. 
+而**verify**将继续执行这个测试用例到结束，并告知这个测试用例不通过. 
 
-The best use of this feature is to logically group your test commands, and 
-start each group with an **assert** followed by one or more **verify** test 
-commands. An example follows:
+使用这个功能的最好办法是给你的测试命令集分组，然后按组执行一个**assert**紧跟着
+一个或多个**verify**命令集
+例如:
 
 ============    ==========  ============
 open            /download/      
@@ -57,12 +48,12 @@ verifyTable     1.2.2       June 3, 2008
 verifyTable     1.2.3       1.0 beta 2      
 ============    ==========  ============
 
-The above example first opens a page and then **asserts** that the correct page 
-is loaded by comparing the title with the expected value. Only if this passes 
-will the following command run and **verify** that the text is present in the 
-expected location. The test case then **asserts** the first column in the second
-row of the first table contains the expected value, and only if this passed will 
-the remaining cells in that row be **verified**.
+上面的例子中，首先打开一个页面，然后 **asserts** 这个当前页面已经加载通过比较题目是期望的值
+只有这个通过，
+接下来的命令 **verify** 在特定的位置某个位置存在.
+这个测试用例接着 ***assert** 第一个表中第一列第二行包含期望的数值,
+只有这个通过
+那行中其它的方格将用 **verified**
 
 
 verifyTextPresent
@@ -802,4 +793,5 @@ Many applications use AJAX for dynamic and animated functionality making
 testing of AJAX behavior often a basic testing requirement.
 
 *This section is not yet developed.*
+
 
