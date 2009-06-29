@@ -1793,6 +1793,36 @@ These interceptors work best in catching new windows if the windows are loaded A
 the onload() function. Selenium may not recognize windows loaded before the onload function.
 
 
+How can I wait for an element in AJAX driven application?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In AJAX driven web applications; data is retrieved from server with out refreshing 
+the page. Usage of *waitForPageToLoad* would not work as page is not actually 
+loaded. Pausing the test execution for certain period of time is also not a good 
+approach as web element might appear late or earlier than stipulated period; leading
+to test failures. A better approach would be to wait for element for predefined 
+period and then continue execution as soon as element is found.
+
+For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
+on page (with out refreshing the page)
+This could be handled employing a for loop in selenium. 
+
+.. code-block:: bash
+   
+   // Loop initialization.
+   for (int second = 0;; second++) {
+	
+	// If loop is reached 60 seconds then break the loop.
+	if (second >= 60) break;
+	
+	// Search for element "link=ajaxLink" and if available then break loop.
+	try { if (selenium.isElementPresent("link=ajaxLink")) break; } catch (Exception e) {}
+	
+	// Pause for 1 second.
+	Thread.sleep(1000);
+	
+   } 
+
+
 Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Try our `user forums`_
