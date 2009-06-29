@@ -1,7 +1,7 @@
-.. _chapter02-reference:
-
 Selenium Basics 
 ================
+
+.. _chapter02-reference:
 
 Getting Started -- Choosing Your Selenium Tool 
 -----------------------------------------------

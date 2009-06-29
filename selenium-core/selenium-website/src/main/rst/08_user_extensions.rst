@@ -1,10 +1,10 @@
-.. _chapter08-reference:
-
 User-Extensions
 ===============
 
 *NOTE:  This section is close to completion, but it has not been reviewed and 
 edited.*
+
+.. _chapter08-reference:
 
 Introduction
 ------------

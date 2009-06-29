@@ -1,4 +1,4 @@
-.. _configuring-selenium-RC-NET-reference:
+.. _configuring-selenium-RC-NET-cn-reference:
 
 .NET client driver configuration
 --------------------------------

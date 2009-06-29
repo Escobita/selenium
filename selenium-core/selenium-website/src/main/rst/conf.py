@@ -97,8 +97,7 @@ pygments_style = 'colorful'
 html_style = 'basic'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-#html_title = None
+html_title = "Selenium Documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -163,21 +162,21 @@ htmlhelp_basename = 'seleniumdoc'
 # ------------------------
 
 # The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
+latex_paper_size = 'a4'
 
 # The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+latex_font_size = '11pt'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
-#latex_documents = [
-#('index', 'selenium.tex', ur'selenium Documentation',
-#ur'Selenium Project', 'manual'),
-#]
+latex_documents = [
+('index', 'Selenium_Documentation.tex', ur'Selenium Documentation',
+ur'Selenium Project', 'manual'),
+]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = u'images/big-logo.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

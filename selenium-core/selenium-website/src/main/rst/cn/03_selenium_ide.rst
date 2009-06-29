@@ -1,19 +1,19 @@
-﻿.. _chapter03-reference:
+﻿.. _chapter03-cn-reference:
 
 |logo| 用Selenium-IDE开发测试用例
-==============================================
+=================================
 
 .. |logo| image:: ../images/selenium-ide-logo.png
    :alt:
 
 介绍 
-------------
+----
 Selenium-IDE (集成开发环境) 是你用来开发你的Selenium测试用例的工具。它是一个易用的FireFox插件并且通常是开发测试用例的最有效方式。它还包含一个上下文菜单，允许你先从浏览器当前显示页面选择用户界面元素，然后从列表中根据已选择的用户界面元素的上下文背景选择带预定义参数的Selenium命令。这不但节省时间，而且也是一个学习Selenium脚本语法的极好方法。
   
 本章将介绍Selenium IDE，以及有效使用它的方法。 
   
 安装IDE 
-------------------
+--------
 首先用Firefox从SeleniumHQ `downloads page`_ 下载IDE
   
 .. _`downloads page`: http://seleniumhq.org/download/
@@ -35,7 +35,7 @@ Selenium-IDE (集成开发环境) 是你用来开发你的Selenium测试用例�
    :align: center
 
 打开IDE 
----------------
+--------
 要运行Selenium-IDE，只需从Firefox的工具菜单中选择。它会打开一个空的脚本编辑窗口和菜单用以加载和创建新测试用例。
   
 .. Darn!  I need to redo this.  No time now, gotta go!!!!
@@ -44,9 +44,9 @@ Selenium-IDE (集成开发环境) 是你用来开发你的Selenium测试用例�
    :align: center
   
 IDE特色
-------------
+-------
 菜单栏 
-++++++++
+++++++
 
 文件菜单允许你创建、打开和保存测试用例和测试套件文件。编辑菜单可以复制、粘贴、删除、撤消和选择所有操作以编辑你的测试用例里的命令。选项菜单可以改变设置。你可以为某些命令设置超时时间，添加用户自定义的用户扩展到Selenium命令的基础集合中，以及指定保存测试用例的（语言）格式。帮助菜单是Firefox的标准帮助菜单；只有一个菜单项——UI-Element文档——涉及到Selenium-IDE 。
 
@@ -218,7 +218,7 @@ Adding Verifications and Asserts With the Context Menu
   
 Your test cases will also need to check the properties of a web-page.  This 
 requires *assert* and *verify* commands.  We won't describe the specifics of 
-these commands here; that is in the chapter on :ref:`"Selenese" Selenium Commands <chapter04-reference>`.  Here we'll 
+these commands here; that is in the chapter on :ref:`"Selenese" Selenium Commands <chapter04-cn-reference>`.  Here we'll 
 simply describe how to add them to your test case. 
   
 With Selenium-IDE recording, go to the browser displaying your test application and 

@@ -1,4 +1,4 @@
-.. _chapter02-reference:
+.. _chapter02-cn-reference:
 
 Selenium Basics 
 ================
@@ -8,7 +8,7 @@ Getting Started -- Choosing Your Selenium Tool
 Most people get started with Selenium-IDE. This is what we recommend. It's 
 an easy way to get familiar with Selenium commands quickly. You can develop
 your first script in just a few minutes. Selenium-IDE is also very easy
-to install. See the :ref:`chapter on Selenium-IDE <chapter03-reference>` for 
+to install. See the :ref:`chapter on Selenium-IDE <chapter03-cn-reference>` for 
 specifics.
   
 You may also run your scripts from the Selenium-IDE. It's  

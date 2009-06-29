@@ -1,4 +1,4 @@
-.. _chapter08-reference:
+.. _chapter08-cn-reference:
 
 User-Extensions
 ===============

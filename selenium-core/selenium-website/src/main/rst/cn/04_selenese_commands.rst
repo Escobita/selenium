@@ -1,4 +1,4 @@
-.. _chapter04-reference:
+.. _chapter04-cn-reference:
 
 "Selenese" Selenium Commands 
 =============================

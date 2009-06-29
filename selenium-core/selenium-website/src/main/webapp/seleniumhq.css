@@ -1762,7 +1762,8 @@ padding-left:0;
 .sectionDocumentation .related ul {
 margin-left:10px;
 padding-left:0px;
-width:180px
+width:180px;
+overflow:auto;
 }
 
 .sectionDocumentation .related li {
@@ -1777,4 +1778,42 @@ padding: 3px;
 .sectionDocumentation .related .right {
 float:right;
 padding: 3px;
+}
+
+/* Quick fix to get the image alignment as expected (using
+ * the normal align param in rst is breaking the pdf output)
+ */
+
+.sectionDocumentation .align-right {
+text-align:right;
+}
+
+.sectionDocumentation .align-center {
+text-align:center;
+}
+
+/* Quick fix to get the logos in the header of rc, ide and grid
+ * titles
+ */
+
+.sectionDocumentation #selenium-rc h1 {
+    background:#fff url('_images/selenium-rc-logo.png') no-repeat fixed right;
+    background: rgb(255, 255, 255) url(/docs/_images/selenium-rc-logo.png) no-repeat left bottom;
+    padding:40px 0 0 65px
+}
+
+.sectionDocumentation #selenium-ide h1 {
+    background:#fff url('_images/selenium-ide-logo.png') no-repeat fixed right;
+    background: rgb(255, 255, 255) url(/docs/_images/selenium-rc-logo.png) no-repeat left bottom;
+    padding:40px 0 0 65px
+}
+
+.sectionDocumentation #selenium-grid h1 {
+    background:#fff url('_images/selenium-grid-logo.png') no-repeat fixed right;
+    background: rgb(255, 255, 255) url(/docs/_images/selenium-rc-logo.png) no-repeat left bottom;
+    padding:40px 0 0 65px
+}
+
+.sectionDocumentation .body img {
+    margin-bottom:3px;
 }

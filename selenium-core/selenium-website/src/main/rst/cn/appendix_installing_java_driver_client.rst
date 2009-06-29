@@ -16,7 +16,7 @@ steps:
 These points have been delineated below with reference to Eclipse and IntelliJ: 
 
 
-.. _configuring-selenium-RC-eclipse-reference:
+.. _configuring-selenium-RC-eclipse-cn-reference:
 
 Configuring Selenium-RC With Eclipse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,7 +131,7 @@ Added libraries would appear in Package Explorer as following:
    :align: center
    
    
-.. _configuring-selenium-RC-Intellij-reference:   
+.. _configuring-selenium-RC-Intellij-cn-reference:   
 
 Configuring Selenium-RC With Intellij
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,4 +1,4 @@
-﻿.. _chapter05-reference:
+﻿.. _chapter05-cn-reference:
 
 |logo| Selenium-RC
 ==================
@@ -27,7 +27,7 @@ Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试�
 
 尽管Selenium-RC没有直接支持以上所有功能，但是它们可以通过常用的编程技术及其类库来实现。
 
-.. 注:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
+.. note:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
 
 
 在 `Adding Some Spice to Your Tests`_ 章节, 会有一些例子很好的证明了用编程语言写测试脚本的优势。
@@ -120,7 +120,7 @@ Selenium server 只是一个jar包 (*selenium-server.jar*), 其实根本不需�
 然后在你的桌面创建一个快捷方式。那么你就可以在任意时候双击快捷方式启动Selenium server，开始你的测试。
 
 
-.. 注:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
+.. note:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
    你可以在控制台输入以下命令来确认Java是否安装正确::
 
        java -version

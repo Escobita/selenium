@@ -1,10 +1,7 @@
+Selenium-IDE 
+============
+
 .. _chapter03-reference:
-
-|logo| Developing Test Cases With Selenium-IDE 
-==============================================
-
-.. |logo| image:: images/selenium-ide-logo.png
-   :alt:
 
 Introduction 
 ------------
@@ -28,18 +25,18 @@ Using Firefox, first, download the IDE from the SeleniumHQ `downloads page`_
 When downloading from Firefox, you'll be presented with the following window. 
  
 .. image:: images/chapt3_img01_IDE_Installation.png
-   :align: center
+   :class: align-center
 
 Select Install Now.  The Firefox Add-ons window pops up, first showing a 
 progress bar, and when the download is complete, displays the following. 
   
 .. image:: images/chapt3_img02_IDE_Installation.png
-   :align: center
+   :class: align-center
   
 Restart Firefox.  After Firefox reboots you will find the Selnium-IDE listed under the Firefox Tools menu. 
 
 .. image:: images/chapt3_img03_IDE_Installation.png
-   :align: center
+   :class: align-center
 
 Opening the IDE 
 ---------------
@@ -50,13 +47,12 @@ creating new test cases.
 .. Darn!  I need to redo this.  No time now, gotta go!!!!
 
 .. image:: images/chapt3_img04_IDE_open.png
-   :align: center
+   :class: align-center
   
 IDE Features  
 ------------
 Menu Bar 
 ++++++++
-
 The File menu allows you to create, open and save test case and test suite 
 files.  The Edit menu allows copy, paste, delete, undo and select all 
 operations for editing the commands in your test case.  The Options menu allows 
@@ -68,13 +64,12 @@ item on this menu--UI-Element Documentation--pertains to Selenium-IDE.
   
 Toolbar 
 ++++++++
-
 The toolbar contains buttons for controlling the execution of your test 
 cases, including a step feature for debugging your test cases.  The right-most 
 button, the one with the red-dot, is the record button.  
   
 .. image:: images/chapt3_img05_IDE_features.png
-   :align: center
+   :class: align-center
   
 |speed control|
     Speed Control:  controls how fast your test case runs. 
@@ -115,12 +110,11 @@ button, the one with the red-dot, is the record button.
  
 Test Case Pane
 ++++++++++++++
-
 Your script is displayed in the test case pane.  It has two tabs, one for 
 displaying the command and their parameters in a readable "table" format.  
 
 .. image:: images/chapt3_img15_Table_Format.png
-   :align: center
+   :class: align-center
   
 The Source tab displays the test case in the native format in which the file 
 will be stored.  By default, this is HTML although it can be changed to a 
@@ -136,7 +130,7 @@ field.  If a second parameter is specified by the Reference tab, it always
 goes in the Value field.
   
 .. image:: images/chapt3_img16_Entry_Fields.png
-   :align: center
+   :class: align-center
   
 If you start typing in the Command field, a drop-down list will be populated 
 based on the first characters you type; you can then select your desired 
@@ -144,7 +138,6 @@ command from the drop-down.
   
 Log/Reference/UI-Element/Rollup Pane
 ++++++++++++++++++++++++++++++++++++
-
 The bottom pane is used for four different functions--Log, Reference,
 UI-Element, and Rollup--depending on which tab is selected.
 
@@ -159,7 +152,7 @@ button for clearing the Log.  Also notice the Info button is a drop-down
 allowing selection of different levels of information to display.  
   
 .. image:: images/chapt3_img17_Bottom_Box.png
-   :align: center
+   :class: align-center
 
 Reference
 ~~~~~~~~~
@@ -178,7 +171,7 @@ If there is a mismatch in any of these three areas, the command will not
 run correctly.
 
 .. image:: images/chapt3_img18_Bottom_Box_Ref.png
-   :align: center
+   :class: align-center
 
 While the Reference tab is invaluable as a quick reference, it is still often
 necessary to consult the Selenium Reference_ document.
@@ -200,7 +193,6 @@ developer will require all three techniques.
 
 Recording  
 +++++++++
-
 Many first-time users begin by recording a test case from their interactions 
 with a website.  When Selenium-IDE is first opened, the record button is ON by 
 default. 
@@ -273,20 +265,16 @@ the Selenium commands simply by experimenting though the IDE.
   
 Editing  
 +++++++
-
 Insert Command 
 ~~~~~~~~~~~~~~
-
 Table View
 __________
-
 Select the point in your test case where you want to insert the command.  
 Right-click and select Insert Command.  Now use the command editing text fields to 
 enter your new command and its parameters. 
 
 Source View
 ___________
-
 Select the point in your test case where you want to insert the command, and
 enter the HTML tags needed to create a 3-column row containing the Command,
 first parameter (if one is required by the Command), and second parameter (again,
@@ -295,7 +283,6 @@ Table view.
   
 Insert Comment 
 ~~~~~~~~~~~~~~
-
 Comments may be added to make your test case more readable.  These comments are 
 ignored when the test case is run. 
 
@@ -304,7 +291,6 @@ create empty comments.  An empty command will cause an error during execution.
 
 Table View
 __________
-
 Select the point in your test case where you 
 want to insert the comment.  Right-click and select Insert Comment.  Now use 
 the Command field to enter the comment.  Your comment will appear in purple
@@ -312,13 +298,11 @@ font.
 
 Source View
 ___________
-
 Select the point in your test case where you want to insert the comment.  Add
 an HTML-style comment, i.e., *<!-- your comment here -->*.
   
 Edit a Command or Comment 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Table View
 __________
 
@@ -327,13 +311,11 @@ and Value fields.
 
 Source View
 ___________
-
 Since Source view provides the equivalent of a WYSIWYG editor, simply modify
 which line you wish--command, parameter, or comment.
 
 Opening and Saving a Test Case
 ++++++++++++++++++++++++++++++
-
 The File=>Open, Save and Save As menu commands behave similarly to opening and 
 saving files in most other programs.  When you open an existing test case, Selenium-IDE 
 displays its Selenium commands in the test case pane.
@@ -389,28 +371,26 @@ Run Any Single Command
 
 Using Base URL to Run Test Cases in Different Domains 
 -----------------------------------------------------
-.. TODO: mam-p: Figure out how to display the many URLs in the section below without generating links for each one.  (They're just examples, i.e., not real!)
-
 The *Base URL* field at the top of the Selenium-IDE window is very useful
 for allowing test cases to be run across different domains. 
-Suppose that a site named http://news.portal.com had an in-house beta site named
-http://beta.news.portal.com.  Any test cases for these sites that begin with
+Suppose that a site named \http://news.portal.com had an in-house beta site named
+\http://beta.news.portal.com.  Any test cases for these sites that begin with
 an *open*
 statement should specify a *relative URL* as the argument to *open*
 rather than an *absolute URL* (one
 starting with a protocol such as http: or https:).  Selenium-IDE will
 then create an absolute URL by appending the *open* command's
 argument onto the end of the value of Base URL.  For example, the 
-test case below would be run against http://news.portal.com/about.html:
+test case below would be run against \http://news.portal.com/about.html:
 
 .. image:: images/chapt3_img20_BaseURL_prod.png
-   :align: center
+   :class: align-center
 
 This same test case with a modified Base URL setting would be run against
-http://beta.news.portal.com/about.html:
+\http://beta.news.portal.com/about.html:
 
 .. image:: images/chapt3_img21_BaseURL_beta.png
-   :align: center
+   :class: align-center
 
 Debugging 
 ---------
@@ -451,34 +431,29 @@ test case beginning at that startpoint.
   
 Stepping Through a Testcase
 +++++++++++++++++++++++++++
-
 To execute a test case one command at a time ("step through" it), follow these
 steps:
 
-1. Start the test case running with the Run button from the toolbar.  
+1. Start the test case running with the Run button from the toolbar.
 
 .. image:: images/chapt3_img08_Run.png
-   :align: center
 
 2. Immediately pause the executing test case with the Pause button.
 
 .. image:: images/chapt3_img19_Pause-only.png
-   :align: center
 
 3. Repeatedly select the Step button.
 
 .. image:: images/chapt3_img11_Step.png
-   :align: center
 
 Find Button 
 +++++++++++
-
 The Find button is used to see which UI element on the currently displayed 
 webpage (in the browser) is used in the currently selected Selenium command.  
 This is useful when building a locator for a command's first parameter (see the
-section on :ref:`locators <locators-section>` in the Selenium Commands chapter). It can be used with any
-command that must identify a UI element on a webpage, i.e. *click*, 
-*clickAndWait*, *type*, and certain *assert* and *verify* commands, 
+section on :ref:`locators <locators-section>` in the Selenium Commands chapter).
+It can be used with any command that must identify a UI element on a webpage, 
+i.e. *click*, *clickAndWait*, *type*, and certain *assert* and *verify* commands, 
 among others. 
   
 From Table view, select any command that has a locator parameter.
@@ -489,7 +464,6 @@ by the locator parameter.
 
 Page Source for Debugging 
 +++++++++++++++++++++++++
-
 Often, when debugging a test case, you simply must look at the page source (the 
 HTML for the webpage you're trying to test) to determine a problem.  Firefox 
 makes this easy.  Simply, right-click the webpage and select Page Source.  
@@ -505,7 +479,6 @@ selection.
 
 Locator Assistance
 ++++++++++++++++++
-
 Whenever Selenium-IDE records a locator-type argument, it stores
 additional information which allows the user to view other possible 
 locator-type arguments that could be used instead.  This feature can be
@@ -592,7 +565,6 @@ conditionals.  This extension is the goto_sel_ide.js_.  For an example
 of how to use the functionality provided by this extension, look at the
 page_ created by its author.
 
-
 .. _goto_sel_ide.js: http://wiki.openqa.org/download/attachments/379/goto_sel_ide.js
 .. _page: http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html
 
@@ -601,7 +573,7 @@ computer in the **Selenium Core extensions** field of Selenium-IDE's
 Options=>Options=>General tab.
 
 .. image:: images/chapt3_img31_Extensions_install.png
-   :align: center
+   :class: align-center
 
 After selecting the **OK** button, you must close and reopen Selenium-IDE
 in order for the extensions file to be read.  Any change you make to an
@@ -616,10 +588,8 @@ bottom of the Selenium Reference_ document.
    between "Selenium Core Extensions" and "Selenium IDE" extensions on the
    Options=>Options=>General page.
 
-
 Format 
 ------
-
 Format, under the Options menu, allows you to select a language for saving 
 and displaying the test case.  The default is HTML.
   
@@ -656,84 +626,84 @@ Troubleshooting
 Below is a list of image/explanation pairs which describe frequent
 sources of problems with Selenium-IDE:
 
-|startup|
-    This problem occurs occasionally when Selenium IDE is first brought up.  The solution is to close and reopen Selenium IDE.  The bug has been filed as `SIDE-230`_.
+.. image:: images/chapt3_img30_Trouble_startup.png
+
+This problem occurs occasionally when Selenium IDE is first brought up.  The 
+solution is to close and reopen Selenium IDE.  The bug has been filed as `SIDE-230`_.
 
 .. _SIDE-230: http://jira.openqa.org/browse/SIDE-230
 
 ------------------
 
-|open|
-    You've used **File=>Open** to try to open a test suite file. Use **File=>Open Test Suite** instead.
+.. image:: images/chapt3_img24_Trouble_open.png
+
+You've used **File=>Open** to try to open a test suite file. Use **File=>Open Test Suite** instead.
 
 ------------------
 
-|timing|
-    This type of **error** may indicate a timing problem, i.e., the element 
-    specified by a locator in your command wasn't fully loaded when the command 
-    was executed.  Try putting a **pause 5000** before the command to determine 
-    whether the problem is indeed related to timing.  If so, investigate using an 
-    appropriate **waitFor\*** or **\*AndWait** command immediately before the 
-    failing command.
+.. image:: images/chapt3_img27_Trouble_timing.png
+
+This type of **error** may indicate a timing problem, i.e., the element 
+specified by a locator in your command wasn't fully loaded when the command 
+was executed.  Try putting a **pause 5000** before the command to determine 
+whether the problem is indeed related to timing.  If so, investigate using an 
+appropriate **waitFor\*** or **\*AndWait** command immediately before the 
+failing command.
 
 ------------------
 
-|param|
-    Whenever your attempt to use variable substitution fails as is the
-    case for the **open** command above, it indicates
-    that you haven't actually created the variable whose value you're
-    trying to access.  This is 
-    sometimes due to putting the variable in the **Value** field when it 
-    should be in the **Target** field or vice versa.  In the example above,
-    the two parameters for the **store** command have been erroneously
-    placed in the reverse order of what is required.
-    For any Selenese command, the first required parameter must go 
-    in the **Target** field, and the second required parameter (if one exists) 
-    must go in the **Value** field.  
+.. image:: images/chapt3_img28_Trouble_param.png
+
+Whenever your attempt to use variable substitution fails as is the
+case for the **open** command above, it indicates
+that you haven't actually created the variable whose value you're
+trying to access.  This is 
+sometimes due to putting the variable in the **Value** field when it 
+should be in the **Target** field or vice versa.  In the example above,
+the two parameters for the **store** command have been erroneously
+placed in the reverse order of what is required.
+For any Selenese command, the first required parameter must go 
+in the **Target** field, and the second required parameter (if one exists) 
+must go in the **Value** field.  
 
 ----------
 
-|ts|
-    One of the test cases in your test suite cannot be found.  Make sure 
-    that the test case is indeed located where the test suite indicates 
-    it is located.  Also, 
-    make sure that your actual test case files have the .html extension both 
-    in their filenames, and in the test suite file where they are referenced.
+.. image:: images/chapt3_img23_Trouble_ts.png
+
+One of the test cases in your test suite cannot be found.  Make sure 
+that the test case is indeed located where the test suite indicates 
+it is located.  Also, 
+make sure that your actual test case files have the .html extension both 
+in their filenames, and in the test suite file where they are referenced.
 
 ----------
 
-|space|
-    Selenium-IDE is very *space-sensitive*!  An extra space before or after 
-    a command will cause it to be unrecognizable.
+.. image:: images/chapt3_img25_Trouble_space.png
+
+Selenium-IDE is very *space-sensitive*!  An extra space before or after 
+a command will cause it to be unrecognizable.
 
 ----------
 
-|extension|
-    Your extension file's contents have not been read by Selenium-IDE.  Be 
-    sure you have specified the proper pathname to the extensions file via 
-    **Options=>Options=>General** in the **Selenium Core extensions** field.
-    Also, Selenium-IDE must be restarted after any change to either an
-    extensions file *or* to the contents of the **Selenium Core extensions**
-    field.
+.. image:: images/chapt3_img26_Trouble_extension.png
+
+Your extension file's contents have not been read by Selenium-IDE.  Be 
+sure you have specified the proper pathname to the extensions file via 
+**Options=>Options=>General** in the **Selenium Core extensions** field.
+Also, Selenium-IDE must be restarted after any change to either an
+extensions file *or* to the contents of the **Selenium Core extensions**
+field.
 
 ----------
 
-|collapsed|
-    This type of error message makes it appear that Selenium-IDE has generated
-    a failure where there is none.  However, Selenium-IDE is correct that
-    the actual value does not match the value specified in such test cases.
-    The problem is that the log file error messages collapse a series of
-    two or more spaces into a single space, which is confusing.  In the 
-    example above, note that the parameter for **verifyTitle** has two 
-    spaces between the words "System" and "Division."  The page's actual 
-    title has only one space between these words.  Thus, Selenium-IDE is 
-    correct to generate an error.
+.. image:: images/chapt3_img29_Trouble_collapsed.png
 
-.. |startup| image:: images/chapt3_img30_Trouble_startup.png
-.. |open| image:: images/chapt3_img24_Trouble_open.png
-.. |param| image:: images/chapt3_img28_Trouble_param.png
-.. |timing| image:: images/chapt3_img27_Trouble_timing.png
-.. |ts| image:: images/chapt3_img23_Trouble_ts.png
-.. |space| image:: images/chapt3_img25_Trouble_space.png
-.. |extension| image:: images/chapt3_img26_Trouble_extension.png
-.. |collapsed| image:: images/chapt3_img29_Trouble_collapsed.png
+This type of error message makes it appear that Selenium-IDE has generated
+a failure where there is none.  However, Selenium-IDE is correct that
+the actual value does not match the value specified in such test cases.
+The problem is that the log file error messages collapse a series of
+two or more spaces into a single space, which is confusing.  In the 
+example above, note that the parameter for **verifyTitle** has two 
+spaces between the words "System" and "Division."  The page's actual 
+title has only one space between these words.  Thus, Selenium-IDE is 
+correct to generate an error.

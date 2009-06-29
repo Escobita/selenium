@@ -4,7 +4,7 @@
 <decorator:useHtmlPage id="p"/>
 <head>
     <title><decorator:title default="Selenium"/></title>
-    <link href="/seleniumhq.css?20090529" rel="stylesheet" type="text/css"/>
+    <link href="/seleniumhq.css?20090629" rel="stylesheet" type="text/css"/>
     <link rel="shortcut icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <link rel="icon" href="/selenium-favicon.ico" type="image/vnd.microsoft.icon"/>
     <script src="/page-tools.js" type="text/javascript"></script>
@@ -166,6 +166,7 @@
         </li>
         <li><a href="/docs/">Documentation</a>
             <ul>
+                <!-- <li><a href="/docs/book/Selenium_Documentation.pdf">Offline version</a></li> -->
                 <li><a href="http://wiki.openqa.org/">Wiki</a></li>
                 <li><a href="http://release.openqa.org/selenium-core/1.0/reference.html">Selenium API</a></li>
             </ul>

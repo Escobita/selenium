@@ -1,7 +1,7 @@
-.. _chapter01-reference:
-
 Introducing Selenium 
 ====================
+
+.. _chapter01-reference:
 
 To Automate or Not to Automate?  That is the Question!
 ------------------------------------------------------

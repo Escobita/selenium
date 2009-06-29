@@ -1,5 +1,3 @@
-.. _chapter06-reference:
-
 .. Santi: I'm not sure about this whole chapter. It looks like most of the content
    should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 
    can merge both chapters, it'd keep advanced topics where anyone will expect.
@@ -10,6 +8,8 @@
 
 Test Design Considerations 
 ==========================
+
+.. _chapter06-reference:
 
 *NOTE: This chapter is not finished.  We have some content here already though.  We decided not to hold back on information just because a chapter was not ready.*
 

@@ -1,10 +1,7 @@
+Selenium-RC
+===========
+
 .. _chapter05-reference:
-
-|logo| Selenium-RC
-==================
-
-.. |logo| image:: images/selenium-rc-logo.png
-   :alt:
 
 Introduction
 ------------
@@ -57,7 +54,7 @@ Selenium-RC is composed of two parts:
 Here is a simplified architecture diagram.... 
 
 .. image:: images/chapt5_img01_Architecture_Diagram_Simple.png
-   :align: center
+   :class: align-center
 
 The diagram shows the client libraries communicate with the
 Server passing each Selenium command for execution. Then the server passes the 
@@ -252,6 +249,8 @@ examples.  To see the example in the desired language,  click one of these butto
 
 .. container:: toggled
 
+   **In C#**:
+
    .. code-block:: c#
 
         using System;
@@ -305,6 +304,8 @@ examples.  To see the example in the desired language,  click one of these butto
 
 .. container:: toggled
 
+   **In Java**:
+
    .. code-block:: java
 
       package com.example.tests;
@@ -327,6 +328,8 @@ examples.  To see the example in the desired language,  click one of these butto
 
 .. container:: toggled
 
+   **In Perl**:
+
    .. code-block:: perl
 
       use strict;
@@ -348,6 +351,8 @@ examples.  To see the example in the desired language,  click one of these butto
       $sel->is_text_present_ok("Results * for selenium rc");
 
 .. container:: toggled
+
+   **In PHP**:
 
    .. code-block:: php
 
@@ -376,6 +381,8 @@ examples.  To see the example in the desired language,  click one of these butto
 
 .. container:: toggled
 
+   **in Python**:
+
    .. code-block:: python
 
       from selenium import selenium
@@ -401,6 +408,8 @@ examples.  To see the example in the desired language,  click one of these butto
               self.assertEqual([], self.verificationErrors)
 
 .. container:: toggled
+
+   **in Ruby**:
 
    .. code-block:: ruby
 
@@ -700,6 +709,8 @@ Starting the Browser
 
 .. container:: toggled
 
+   **In C#**:
+
    .. code-block:: c#
 
       selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com/");
@@ -707,11 +718,15 @@ Starting the Browser
 
 .. container:: toggled
 
+   **In Java**:
+
    .. code-block:: java
 
       setUp("http://www.google.com/", "*firefox");
 
 .. container:: toggled
+
+   **In Perl**:
 
    .. code-block:: perl
 
@@ -722,12 +737,16 @@ Starting the Browser
 
 .. container:: toggled
 
+   **In PHP**:
+
    .. code-block:: php
 
       $this->setBrowser("*firefox");
       $this->setBrowserUrl("http://www.google.com/");
 
 .. container:: toggled
+
+   **In Python**:
 
    .. code-block:: python
 
@@ -736,6 +755,8 @@ Starting the Browser
       self.selenium.start()
 
 .. container:: toggled
+
+   **In Ruby**:
 
    .. code-block:: ruby
 
@@ -849,6 +870,7 @@ When launching selenium server then **-log** option can be used to direct
 lots of valuable debugging information to a text file.
 
 .. code-block:: bash
+
    java -jar selenium-server.jar -log selenium.log
    
 This log file is more verbose than the standard console logs (it includes DEBUG 
@@ -1157,7 +1179,7 @@ Here is an architectural diagram.
    the Browser....
 
 .. image:: images/chapt5_img02_Architecture_Diagram_1.png
-   :align: center
+   :class: align-center
 
 As a test suite starts in your favorite language, the following happens:
 
@@ -1190,7 +1212,7 @@ through the Selenium-RC server.
 Here is the architectural diagram. 
 
 .. image:: images/chapt5_img02_Architecture_Diagram_2.png
-   :align: center
+   :class: align-center
 
 As a test suite starts in your favorite language, the following happens:
 
@@ -1246,7 +1268,7 @@ Before 1.0, Selenium by default ran the application under test in a sub frame
 which looks like this:
 
 .. image:: images/chapt5_img26_single_window_mode.png
-   :align: center
+   :class: align-center
 
 Unfortunately, some apps don't run properly in a sub frame, preferring to be 
 loaded into the top frame of the window. That's why we made the multi Window 
@@ -1255,7 +1277,7 @@ application under test run in a separate window rather than in the default
 frame.
 
 .. image:: images/chapt5_img27_multi_window_mode.png
-   :align: center
+   :class: align-center
 
 Older versions of Selenium however did not handle this unless you explicitly 
 told the server to run in multiwindow mode. For handling multiple windows, 

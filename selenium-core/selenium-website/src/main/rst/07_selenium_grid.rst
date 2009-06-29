@@ -1,10 +1,7 @@
+Selenium-Grid
+=============
+
 .. _chapter07-reference:
-
-|logo| Selenium-Grid
-====================
-
-.. |logo| image:: images/selenium-grid-logo.png
-   :alt:
 
 Please refer to the Selenium Grid website
 

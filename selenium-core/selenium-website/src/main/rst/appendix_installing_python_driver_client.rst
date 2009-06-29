@@ -1,7 +1,8 @@
-.. _configuring-selenium-RC-python-reference:
-
 Python Client Driver Configuration 
 ----------------------------------
+
+.. _configuring-selenium-RC-python-reference:
+
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium-java-client-driver.jar*
 * Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)
@@ -30,12 +31,12 @@ from the selenium's part).
 ..
 
       .. image:: images/chapt5_img19_Python_Install.png
-         :align: center
+         :class: align-center
 
 ..
 
       .. image:: images/chapt5_img22_Python_Install.png
-         :align: center
+         :class: align-center
 
 ..
 
@@ -47,7 +48,7 @@ from the selenium's part).
       .dmg file that you can mount. It contains a .pkg file that you can launch.
 
       .. image:: images/chapt5_img19_Python_Mac_Install.png
-         :align: center
+         :class: align-center
 	
 * Installing the Selenium driver client for python 
 
@@ -62,7 +63,7 @@ from the selenium's part).
        *selenium-python-driver-client*.
 
     .. image:: images/chapt5_img25_Python_Driver_Install.png
-       :align: center
+       :class: align-center
 
 Congratulations, you're done! Now any python script that you create can import
 selenium and start interacting with the browsers.

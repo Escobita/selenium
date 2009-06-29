@@ -1,7 +1,8 @@
+Selenese Selenium Commands 
+==========================
+
 .. _chapter04-reference:
 
-"Selenese" Selenium Commands 
-=============================
 Selenium commands, often called *selenese*, are the set of commands that run 
 your tests.  A sequence of these commands is a *test script*.  Here we explain 
 those commands in detail, and we present the many choices you have in testing 

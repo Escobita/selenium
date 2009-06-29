@@ -1,4 +1,4 @@
-.. _configuring-selenium-RC-python-reference:
+.. _configuring-selenium-RC-python-cn-reference:
 
 Python Client Driver Configuration 
 ----------------------------------

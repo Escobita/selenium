@@ -1,4 +1,4 @@
-.. _appendix_locators-reference:
+.. _appendix_locators-cn-reference:
 
 Locating Techniques
 ===================

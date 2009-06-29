@@ -1,4 +1,4 @@
-.. _chapter06-reference:
+.. _chapter06-cn-reference:
 
 .. Santi: I'm not sure about this whole chapter. It looks like most of the content
    should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 

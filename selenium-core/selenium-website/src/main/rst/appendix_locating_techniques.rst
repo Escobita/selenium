@@ -1,7 +1,7 @@
-.. _appendix_locators-reference:
-
 Locating Techniques
 ===================
+
+.. _appendix_locators-reference:
 
 .. This is a very rough draft 
 
@@ -10,12 +10,10 @@ Useful XPATH patterns
 
 text
 ~~~~
-
 Not yet written - locate elements based on the text content of the node.
 
 starts-with
 ~~~~~~~~~~~
-
 Many sites use dynamic values for element's id attributes, which can make them
 difficult to locate. One simple solution is to use XPath functions and base the
 location on what you do know about the element. For example, if your dynamic ids
@@ -24,7 +22,6 @@ you could use the following XPath: ``//input[starts-with(@id, 'text-')]``
 
 contains
 ~~~~~~~~
-
 If an element can be located by a value that could be surrounded by other text, the
 contains function can be used. To demonstrate, the element ``<span class="top heading 
 bold">`` can be located based on the 'heading' class without having to couple it with
@@ -34,7 +31,6 @@ the CSS locator strategy ``css=span.heading``
 
 siblings
 ~~~~~~~~
-
 Not yet written - locate elements based on their siblings. Useful for forms and tables.
 
 Starting to use CSS instead of XPATH
@@ -42,7 +38,6 @@ Starting to use CSS instead of XPATH
 
 Locating elements based on class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 In order to locate an element based on associated class in XPath you must consider that
 the element could have multiple classes and defined in any order, however with CSS 
 locators this is much simpler (and faster).

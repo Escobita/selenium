@@ -1,4 +1,4 @@
-.. _chapter07-reference:
+.. _chapter07-cn-reference:
 
 |logo| Selenium-Grid
 ====================
