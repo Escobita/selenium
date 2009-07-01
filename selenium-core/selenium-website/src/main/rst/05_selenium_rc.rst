@@ -859,51 +859,8 @@ test results in different formats such as HTML or PDF.
 
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
-
-Selenium RC Logging
--------------------
-
-Server-Side Logs
-~~~~~~~~~~~~~~~~
-
-When launching selenium server then **-log** option can be used to direct 
-lots of valuable debugging information to a text file.
-
-.. code-block:: bash
-
-   java -jar selenium-server.jar -log selenium.log
-   
-This log file is more verbose than the standard console logs (it includes DEBUG 
-level logging messages). The log file also includes the logger name, and the ID
-number of the thread that logged the message. For example:   
-
-.. code-block:: bash
-
-   20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
-   Browser 465828/:top frame1 posted START NEW
-   
-Format is 
-
-.. code-block:: bash
-
-   TIMESTAMP(HH:mm:ss) LEVEL [THREAD] LOGGER - MESSAGE
-   
-This message may be multiline.
-
-Browser-Side Logs
-~~~~~~~~~~~~~~~~~
-
-JavaScript on the browser side (Selenium Core) also logs important messages; 
-in many cases, these can be more useful to the end-user than the regular Selenium 
-Server logs. To access browser-side logs, one will need to pass the **-browserSideLog**
-argument to the Selenium Server, like this:
-
-.. code-block:: bash
-
-   java -jar selenium-server.jar -browserSideLog
-   
-**-browserSideLog** can also be combined with the **-log** argument, to log 
-browserSideLogs (as well as all other DEBUG level logging messages) to a file.
+.. note:: If you are interested in a language independent log of what's going
+   on, take a look at `Selenium RC Logging`_
 
 Adding Some Spice to Your Tests
 -------------------------------
@@ -1360,6 +1317,49 @@ you type it in. (You can use the -htmlSuite parameter with the ``-port`` and
 ``-timeout`` options, but it is incompatible with ``-interactive``; you can't 
 do both of those at once.) Also note that it requires you to pass in an HTML 
 Selenese suite, not a single test.
+
+Selenium RC Logging
+~~~~~~~~~~~~~~~~~~~
+
+Server-Side Logs
+++++++++++++++++
+When launching selenium server then **-log** option can be used to direct 
+lots of valuable debugging information to a text file.
+
+.. code-block:: bash
+
+   java -jar selenium-server.jar -log selenium.log
+   
+This log file is more verbose than the standard console logs (it includes DEBUG 
+level logging messages). The log file also includes the logger name, and the ID
+number of the thread that logged the message. For example:   
+
+.. code-block:: bash
+
+   20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
+   Browser 465828/:top frame1 posted START NEW
+   
+Format is 
+
+.. code-block:: bash
+
+   TIMESTAMP(HH:mm:ss) LEVEL [THREAD] LOGGER - MESSAGE
+   
+This message may be multiline.
+
+Browser-Side Logs
++++++++++++++++++
+JavaScript on the browser side (Selenium Core) also logs important messages; 
+in many cases, these can be more useful to the end-user than the regular Selenium 
+Server logs. To access browser-side logs, one will need to pass the **-browserSideLog**
+argument to the Selenium Server, like this:
+
+.. code-block:: bash
+
+   java -jar selenium-server.jar -browserSideLog
+   
+**-browserSideLog** can also be combined with the **-log** argument, to log 
+browserSideLogs (as well as all other DEBUG level logging messages) to a file.
 
 .. Selenium-IDE Generated Code
    ---------------------------
