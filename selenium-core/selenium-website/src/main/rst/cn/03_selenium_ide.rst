@@ -14,9 +14,9 @@ Selenium-IDE (集成开发环境) 是你用来开发你的Selenium测试用例�
   
 安装IDE 
 --------
-首先用Firefox从SeleniumHQ `downloads page`_ 下载IDE
+首先用Firefox从SeleniumHQ `下载页面`_ 下载IDE
   
-.. _`downloads page`: http://seleniumhq.org/download/
+.. _`下载页面`: http://seleniumhq.org/download/
   
 从Firefox的下载时，您将获得如下的窗口。
  
