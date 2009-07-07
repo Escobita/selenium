@@ -27,7 +27,7 @@ Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试�
 
 尽管Selenium-RC没有直接支持以上所有功能，但是它们可以通过常用的编程技术及其类库来实现。
 
-.. note:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
+.. 注:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
 
 
 在 `Adding Some Spice to Your Tests`_ 章节, 会有一些例子很好的证明了用编程语言写测试脚本的优势。
@@ -120,7 +120,7 @@ Selenium server 只是一个jar包 (*selenium-server.jar*), 其实根本不需�
 然后在你的桌面创建一个快捷方式。那么你就可以在任意时候双击快捷方式启动Selenium server，开始你的测试。
 
 
-.. note:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
+.. 注:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
    你可以在控制台输入以下命令来确认Java是否安装正确::
 
        java -version
@@ -504,22 +504,15 @@ TheNewTest(), 和TeardownTest() 这三个函数。
     
 Java
 ~~~~
-在Java里, 很多人用Junit 运行测试. 用 With it, you'll save
-many lines of code by allowing Junit to manage the execution of your tests.
-Some development environments like Eclipse have direct support for JUnit via 
-plug-ins which makes it even easier. Teaching JUnit is beyond the scope of 
-this document however materials may be found online and there are publications
-available.  If you are already a "java-shop" chances are your developers will 
-already have experience with JUnit.
+在Java里, 很多人用JUnit运行测试. 用JUnit来管理运行测试可以帮助你省去很多代码。
+很多开发环境比如Eclipse都通过插件直接支持JUnit。如何使用JUnit不包含在本文档内，但是你可以在线找到很多相关资料。 
+如果你已经有一个java团队，那么你的开发员会有JUnit的经验。
 
-You will probably want to rename the test class from "NewTest" to something 
-of your own choosing.  Also, you will need to change the browser-open 
-parameters in the statement::
+你可能会想把测试类名“NewTest”重新命名成你想要的名称。同时需要修改打开浏览器参数的语句::
 
     selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
 
-The Selenium-IDE generated code will look something like this.  This example 
-has coments added manually for additional clarity.
+Selenium-IDE 生成的代码和下面的相似。为了更加明确一点，这个例子上已经手工加了注释上去。
 
 .. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
 
@@ -567,12 +560,10 @@ PHP
 
 Python
 ~~~~~~
-We use pyunit testing framework (the unit test module) for our tests. You should
-understand how this works to better understand how to write your tests.
-To completely understand pyunit, you should read its `official documentation
-<http://docs.python.org/library/unittest.html>`_.
+我们使用 pyunit 测试框架（单元测试模块）来执行测试。为了更好的写测试脚本，你需要了解这个框架是如何工作的。
+如过想全面了解pyunit，请阅读它的 `官方文档 <http://docs.python.org/library/unittest.html>`_ 。
 
-The basic test structure is:
+基本测试结果如下:
 
 .. code-block:: python
 
@@ -626,7 +617,7 @@ Ruby
 
 *Note: This section is not yet developed.*
 
-Learning the API
+学习 API
 ----------------
 We mentioned earlier that each selenium-client-library provides a
 language-specific programming interface which supports executing Selenese 
