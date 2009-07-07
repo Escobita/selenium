@@ -60,6 +60,14 @@ int ChromeElement::toggle(int* toReturn) {
 }
 
 int ChromeElement::sendKeys(const std::wstring keys) {
+  std::wstring jscript = base_script_.c_str();
+  jscript.append(L".focus()");
+  driver_->domGetVoid(jscript);
+
+  driver_->dg(jscript.c_str());
+  driver_->dg(keys.c_str());
+
+  ::sendKeys((void *)&window_handle_, keys.c_str(), 0);
   return SUCCESS;
 }
 

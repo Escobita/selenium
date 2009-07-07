@@ -94,6 +94,7 @@ void ChromeDriver::setProxy(int index, int tabindex) {
   browser_proxy_ = proxy_->GetBrowserWindow(index);
   tab_proxy_ = browser_proxy_->GetTab(tabindex);
   window_proxy_ = browser_proxy_->GetWindow();
+  window_proxy_->Activate();
 }
 
 int ChromeDriver::setVisible(bool visible) {
@@ -267,6 +268,10 @@ int ChromeDriver::findElementById(const std::wstring id, ChromeElement** element
     SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
     *element = new ChromeElement(this, ChromeElement::BY_ID, id);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -284,6 +289,10 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsById(const std::wstring i
     SStringPrintf(&base, GET_ELEMENT_BY_ID.c_str(), found.at(3).c_str());
     retList->push_back(new ChromeElement(this, ChromeElement::BY_ID, id));
     retList->at(0)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+	
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	retList->at(0)->setWindowHandle(handle);
   }
   return retList;
 }
@@ -304,7 +313,11 @@ int ChromeDriver::findElementByTagName(const std::wstring tag, ChromeElement** e
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_TAG, tag);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
-    return SUCCESS;
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
+	return SUCCESS;
   }
 }
 
@@ -327,7 +340,11 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByTagName(const std::wstr
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_TAG, tag));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
-    }
+
+	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
+	}
   }
   return retList;
 }
@@ -348,6 +365,10 @@ int ChromeDriver::findElementByClassName(const std::wstring cls, ChromeElement**
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_CLASSNAME, cls);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -371,7 +392,11 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByClassName(const std::ws
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_CLASSNAME, cls));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
-    }
+
+	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
+	}
   }
   return retList;
 }
@@ -392,6 +417,10 @@ int ChromeDriver::findElementByLinkText(const std::wstring text, ChromeElement**
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_LINK_TEXT, text);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -415,6 +444,10 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByLinkText(const std::wst
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_LINK_TEXT, text));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
+
+	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
     }
   }
   return retList;
@@ -436,6 +469,10 @@ int ChromeDriver::findElementByPartialLinkText(const std::wstring pattern, Chrom
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_LINK_PARTIAL_TEXT, pattern);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -459,6 +496,10 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByPartialLinkText(const s
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_LINK_PARTIAL_TEXT, pattern));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
+
+	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
     }
   }
   return retList;
@@ -480,6 +521,10 @@ int ChromeDriver::findElementByName(const std::wstring name, ChromeElement** ele
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_NAME, name);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -503,6 +548,10 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByName(const std::wstring
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_NAME, name));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
+
+  	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
     }
   }
   return retList;
@@ -524,6 +573,10 @@ int ChromeDriver::findElementByXPath(const std::wstring xpath, ChromeElement** e
     SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
     *element = new ChromeElement(this, ChromeElement::BY_XPATH, xpath);
     (*element)->setElementIdentifier(base, found.at(3).c_str(), found.at(2).c_str());
+
+	HWND handle;
+	window_proxy_->GetHWND(&handle);
+	(*element)->setWindowHandle(handle);
     return SUCCESS;
   }
 }
@@ -547,6 +600,10 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByXPath(const std::wstrin
       SStringPrintf(&base, GET_ELEMENT_BY_NONID.c_str(), tagName.c_str(), eid.c_str());
       retList->push_back(new ChromeElement(this, ChromeElement::BY_XPATH, xpath));
       retList->at(retList->size() - 1)->setElementIdentifier(base, eid, tagName);
+
+  	  HWND handle;
+      window_proxy_->GetHWND(&handle);
+	  retList->at(retList->size() - 1)->setWindowHandle(handle);
     }
   }
   return retList;
@@ -556,7 +613,12 @@ std::vector<ChromeElement*>* ChromeDriver::findElementsByXPath(const std::wstrin
 // Internal members implementation.
 // ----------------------------------------------------------------------------
 std::wstring ChromeDriver::getApplicationPath() {
-  return _wgetenv(L"WEBDRIVER_CHROMIUM_PATH");
+	std::wstring path = _wgetenv(L"WEBDRIVER_CHROMIUM_PATH");
+	if (path.empty()) {
+		std::cerr << "Please set the path WEBDRIVER_CHROMIUM_PATH to location of testable chrome" << std::endl;
+	   exit(0);
+	}
+	return path.c_str();
 }
 
 std::wstring getRunnableScript(int type, const std::wstring jscript) {

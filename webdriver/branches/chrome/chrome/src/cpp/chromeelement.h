@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <windows.h>
+#include "interactions.h"
 
 #ifndef CHROME_ELEMENT_H_
 #define CHROME_ELEMENT_H_
@@ -70,6 +71,8 @@ class ChromeElement {
       element_type_ = type;
     }
 
+	void setWindowHandle(HWND handle) { window_handle_ = handle; }
+
   private:
     ChromeDriver* driver_;
     std::wstring base_script_;
@@ -77,6 +80,7 @@ class ChromeElement {
     std::wstring element_type_;
     std::wstring org_query_;
     int query_type_;
+	HWND window_handle_;
 };
 
 #endif  // CHROME_ELEMENT_H_

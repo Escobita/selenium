@@ -56,6 +56,7 @@ public class ChromeOptions implements WebDriver.Options {
 
     Set<Cookie> toReturn = new HashSet<Cookie>();
     String domainCookies = new StringWrapper(lib, wrapper).toString(); 
+    System.out.println("ALL COOKIES ::::::::::::: " + domainCookies);
 			
 		String[] cookies = domainCookies.split("; ");
     for (String cookie : cookies) {
@@ -69,6 +70,7 @@ public class ChromeOptions implements WebDriver.Options {
   }
 
   public void addCookie(Cookie cookie) {
+    System.out.println("Adding >>>> " + cookie.toString());
     int result = lib.wdAddCookie(driver, new WString(cookie.toString()));
     if (result != SUCCESS) {
       throw new RuntimeException("Unable to get current URL: " + result);

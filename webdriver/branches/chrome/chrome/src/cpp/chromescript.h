@@ -343,7 +343,7 @@ static const std::wstring FINDER_BY_XPATH(
 // -----------------------------------------------------------------------------
 // Frames related
 // -----------------------------------------------------------------------------
-// THINGS TO REMEMBER: XPATH index starts with 1.
+// Note: XPATH index starts with 1.
 static const std::wstring FRAME_COUNT(
     L"new function(){this.rv_=0; try{\
     this.rv_=document.getElementsByTagName('frame').length + \
