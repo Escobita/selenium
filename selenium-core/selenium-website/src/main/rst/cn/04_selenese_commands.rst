@@ -1,6 +1,8 @@
-.. _第四章:
 "Selenese" Selenium 命令集
 =============================
+
+.. _第四章:
+
 Selenium 命令集,通常称作 *selenese*,是运行你的测试的一组命令集合。
 这些命令的序列就是 *测试脚本*.
 现在我们详细解释一下这些命令,告诉你一些在用Selenium测试web应用的精选例子。
@@ -105,14 +107,10 @@ verifyText
 ~~~~~~~~~~
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
-Use ``verifyText`` when both the text and its UI element must be tested.
 当文本和它的UI元素都必须要测试时，使用``verifyText``.
-``verifyText`` must use a locator.  If one chooses an *XPath* or *DOM*
 ``verifyText`` 必须使用一个locator,如果你选择一个*XPath* 或者 *DOM* 的locator,
-locator, one can verify that specific text appears at a specific location on the
 你可以验证在页面上某个特定位置有某个特定文本，相对于这个页面上其它的UI组件.
 
-page relative to other UI components on the page.
 
 ==========   ===================    ===================================================================
 verifyText   //table/tr/td/div/p    This is my text and it occurs right after the div inside the table.
@@ -124,16 +122,10 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
 Locating Elements 
 定位元素
 -----------------
-For many Selenium commands, a target is required. This target identifies an 
 对许多Selenium命令，一个目标是必须的.这个目标标示在web应用内容中的一个元素,
-element in the content of the web application, and consists of the location
 这个目标包含这样的位置格式:``locatorType=location`` 策略.
-strategy followed by the location in the format ``locatorType=location``. The 
-locator type can be omitted in many cases.
 locator类型在许多情况下可以忽略.
-The various locator types
 不同的locator类型将在以下例子中以此讲述.
-are explained below with examples for each.
 
 .. Santi: I really liked how this section was taken. But I found that most of
    the locator strategies repeat the same HTML fragment over a over. Couldn't
