@@ -2,8 +2,8 @@
 "Selenese" Selenium 命令集
 =============================
 Selenium 命令集,通常称作 *selenese*,是运行你的测试的一组命令集合。
-这些命令的组合就是 *测试脚本*.
-现在我们详细解释一下这些命令,告诉你一些在用Selenium测试web应用的时候用到的例子。
+这些命令的序列就是 *测试脚本*.
+现在我们详细解释一下这些命令,告诉你一些在用Selenium测试web应用的精选例子。
 
 
 验证页面元素
@@ -99,15 +99,19 @@ verifyElementPresent   //head/title
 ====================   ==============================   ============
 
 这些例子说明了要测的各种UI元素的方法.
-再次说明,locaotos将在下部分说明.
+再次说明,locators将在下部分说明.
 
 verifyText
 ~~~~~~~~~~
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
 Use ``verifyText`` when both the text and its UI element must be tested.
+当文本和它的UI元素都必须要测试时，使用``verifyText``.
 ``verifyText`` must use a locator.  If one chooses an *XPath* or *DOM*
+``verifyText`` 必须使用一个locator,如果你选择一个*XPath* 或者 *DOM* 的locator,
 locator, one can verify that specific text appears at a specific location on the
+你可以验证在页面上某个特定位置有某个特定文本，相对于这个页面上其它的UI组件.
+
 page relative to other UI components on the page.
 
 ==========   ===================    ===================================================================
@@ -118,12 +122,17 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
 .. _locators-section:
 
 Locating Elements 
+定位元素
 -----------------
 For many Selenium commands, a target is required. This target identifies an 
-element in the content of the web application, and consists of the location 
+对许多Selenium命令，一个目标是必须的.这个目标标示在web应用内容中的一个元素,
+element in the content of the web application, and consists of the location
+这个目标包含这样的位置格式:``locatorType=location`` 策略.
 strategy followed by the location in the format ``locatorType=location``. The 
 locator type can be omitted in many cases.
+locator类型在许多情况下可以忽略.
 The various locator types
+不同的locator类型将在以下例子中以此讲述.
 are explained below with examples for each.
 
 .. Santi: I really liked how this section was taken. But I found that most of
@@ -131,32 +140,30 @@ are explained below with examples for each.
    we put A example HTML code before starting with each strategie and then use
    that one on all of them?
 
-Default Locators 
+默认locator
 ~~~~~~~~~~~~~~~~
-You can choose to omit the locator type in the following situations:
+在以下情况下你可以选择忽略locator类型:
  
- - Locators starting with "document" will use the DOM locator strategy. 
+ - locator以 "document"开头, 将使用DOM locator策略.
    See :ref:`locating-by-dom`.
+   参见 :说明:`通过dom定位`.
 
- - Locators starting with "//" will use the XPath locator strategy. 
-   See :ref:`locating-by-xpath`.
+ - locator 以 "//" 开头,将使用 XPath locator策略.
+   参见 : 说明:`通过xpath定位`.
 
- - Locators that start with anything other than the above or a valid locator 
-   type will default to using the identifier locator strategy. 
-   See :ref:`locating-by-identifier`.
+ - locator以除了以上的其它或者正确的locator类型开始,
+   将默认为用identifier locator 策略. 
+   参见 : 说明:`identifier通过定位`.
 
-.. _locating-by-identifier:
-
+.. _通过identifier定位:
 Locating by Identifier
+通过identifier定位:
 ~~~~~~~~~~~~~~~~~~~~~~
-This is probably the most common method of locating elements and is the 
-catch-all default when no recognised locator type is used. With this strategy,
-the first element with the id attribute value matching the location will be used. If
-no element has a matching id attribute, then the first element with an name 
-attribute matching the location will be used.
+这或许是最常用的定位元素的方法,也是当没有被识别的locator类型使用时，默认使用的方法
+使用这种方法,第一个id属性值的相配位置的元素将被使用.
+如果没有相配的id属性,第一个name属性值的相配位置的元素将被使用.
 
-For instance, your page source could have id and name attributes 
-as follows:
+例如, 页面可能有如下id和name属性:
            
 .. code-block:: html
   :linenos:
@@ -171,21 +178,20 @@ as follows:
    </body>
   <html>
 
-The following locator strategies would return the elements from the HTML 
-snippet above indicated by line number:
+接下来的locator策略将从以上HTML片段按行号返回元素:
 
 - ``identifier=loginForm`` (3)
 - ``identifier=username`` (4)
 - ``identifier=continue`` (5)
 - ``continue`` (5)
 
-Since the ``identifier`` type of locator is the default, the ``identifier=``
-in the first three examples above is not necessary.
+因为 ``identifier`` locator类型是默认的,  ``identifier=`` 在前三个例子中 
+是不必要的.
 
-Locating by Id 
+通过Id定位
 ~~~~~~~~~~~~~~
-This type of locator is more limited than the identifier locator type, but 
-also more explicit. Use this when you know an element's id attribute.
+这种locator类型仅局限在identifier locator类型,
+很明显当你知道一个元素的id属性时使用它.
 
 .. code-block:: html
   :linenos:
@@ -203,12 +209,11 @@ also more explicit. Use this when you know an element's id attribute.
 
 - ``id=loginForm`` (3)
 
-Locating by Name 
+通过Name定位
 ~~~~~~~~~~~~~~~~
-The name locator type will locate the first element with a matching name 
-attribute. If multiple elements have the same value for a name attribute, then 
-you can use filters to further refine your location strategy. The default 
-filter type is value (matching the value attribute).  
+name locator类型将定位与name属性相配的第一个 元素.
+如果一个name属性对应多个有相同值的元素,那么你可以用过滤器去再定义你的定位策略.
+默认的过滤器类型是vale(与value属性相配).
 
 .. code-block:: html
   :linenos:
@@ -230,43 +235,37 @@ filter type is value (matching the value attribute).
 - ``name=continue type=button`` (7)
 
 .. note:: Unlike some types of XPath and DOM locators, the three
+.. 注释:: 不像XPah和DOM locator类型,以上三种locator类型允许Selenium测试在
    types of locators above allow Selenium to test a UI element independent 
-   of its location on 
-   the page.  So if the page structure and organization is altered, the test 
-   will still pass.  One may or may not want to also test whether the page 
-   structure changes.  In the case where web designers frequently alter the 
-   page, but its functionality must be regression tested, testing via id and 
-   name attributes, or really via any HTML property, becomes very important.
+   页面上位置独立的UI元素.所以如果页面架构和组织方式改变了,这个测试
+   将仍然通过.不管你是希望还是不希望页面结构变化，你都要进行测试.
+   web设计者频繁改变页面的情况,但它的功能必须迭代测试.
+   测试通过id和name属性或者通过任何HTML属性，变得非常重要.
 
 .. _locating-by-xpath:
+.. _通过xpath定位:
 
-Locating by XPath 
+通过XPath定位
 ~~~~~~~~~~~~~~~~~
-XPath is the language used for locating nodes in an XML document. As HTML can 
-be an implementation of XML (XHTML), Selenium users can leverage this powerful 
-language to target elements in their web applications. XPath extends beyond (as 
-well as supporting) the simple methods of locating by id or name 
-attributes, and opens up all sorts of new possibilities such as locating the 
-third checkbox on the page.
+XPath是在XML文档中定位节点的语言.
+HTML可以作为XML(XHTML)的一个实现,Selenium用户可以借助这个有用的语言在web应用程序中
+去寻找元素.XPath扩展了通过id或者name属性定位的简单方法,它展示了所有像定位页面上第三个
+复选框之类元素的新的可能.
 
-.. Dave: Is it worth mentioning the varying support of XPath (native in 
-   Firefox, using Google AJAXSLT or the new method in IE)? Probably an 
-   advanced topic if needed at all..?
+.. Dave: 是否有必要指出对XPath支持的不同(本地Firefox,用Google AJAXSLT或者在IE的新方法)?
+   可能是即使需要的话也是一个高级话题，
 
-One of the main reasons for using XPath is when you don't have a suitable id 
-or name attribute for the element you wish to locate. You can use XPath to 
-either locate the element in absolute terms (not advised), or relative to an 
-element that does have an id or name attribute.  XPath locators can also be
-used to specify elements via attributes other than id and name.
+用XPath的一个主要原因是对于你想定位的元素没有一个合适的id或者name属性.
+你可以使用XPath去定位元素用绝对路径(不推荐),或者相对于某个有id或name属性的元素
+XPath locator 还可以用在通过不是id和name属性的其它属性定位元素.
 
-Absolute XPaths contain the location of all elements from the root (html) and 
-as a result are likely to fail with only the slightest adjustment to the 
-application. By finding a nearby element with an id or name attribute (ideally
-a parent element) you can locate your target element based on the relationship.
-This is much less likely to change and can make your tests more robust.
+绝对路径的XPath 包含所有从根(html)的所有元素,最终可以因为一个应用程序细微地方的调整而失败.
+通过寻找一个相近的有id或者name属性的元素(一个父元素最好了),你可以定位你的目标元素基于它们的关系
 
-Since only ``xpath`` locators start with "//", it is not necessary to include
-the ``xpath=`` label when specifying an XPath locator.
+这些是很少变化的，可以使得你的测试更智能.
+
+因为只有 ``xpath`` locator 以 "//"开头,当表明一个XPath locator的时候加 ``xpath`` 标签
+是没有必要的.
 
 .. code-block:: html
   :linenos:
@@ -283,24 +282,17 @@ the ``xpath=`` label when specifying an XPath locator.
    <html>
 
 .. TODO: mam-p:  Is the fourth example below correct?
+.. TODO: mam-p:下面第四个例子正确吗?
+- ``xpath=/html/body/form[1]`` (3) - *绝对路径 (如果HTML有细微改变的时候将中断)*
+- ``//form[1]`` (3) - *在HTML中的第一个form元素*
+- ``xpath=//form[@id='loginForm']`` (3) - *id属性值是 'oginForm'的form元素*
+- ``xpath=//form[input/\@name='username']`` (4) - *有一个子元素的name属性值是username的input字段的第一个form元素*
+- ``//input[@name='username']`` (4) - *name属性值是username的input元素*
+- ``//form[@id='loginForm']/input[1]`` (4) - *id属性值为loginFomr的form元素中第一个子input字段*
+- ``//input[@name='continue'][@type='button']`` (7) - *name属性值为continue,type属性值为button的Input元素*
+- ``//form[@id='loginForm']/input[4]`` (7) - *id属性值为loginForm'的form元素的第四个input*
 
-- ``xpath=/html/body/form[1]`` (3) - *Absolute path (would break if the HTML was 
-  changed only slightly)*
-- ``//form[1]`` (3) - *First form element in the HTML*
-- ``xpath=//form[@id='loginForm']`` (3) - *The form element with @id of 'loginForm'*
-- ``xpath=//form[input/\@name='username']`` (4) - *First form element with an input child
-  element with @name of 'username'*
-- ``//input[@name='username']`` (4) - *First input element with @name of 
-  'username'*
-- ``//form[@id='loginForm']/input[1]`` (4) - *First input child element of the 
-  form element with @id of 'loginForm'*
-- ``//input[@name='continue'][@type='button']`` (7) - *Input with @name 'continue'
-  and @type of 'button'*
-- ``//form[@id='loginForm']/input[4]`` (7) - *Fourth input child element of the 
-  form element with @id of 'loginForm'*
-
-These examples cover some basics, but in order to learn more, the 
-following references are recommended:
+这些例子包括了一些基础,为了学习更多,推荐以下教程:
 
 * `W3Schools XPath Tutorial <http://www.w3schools.com/Xpath/>`_ 
 * `W3C XPath Recommendation <http://www.w3.org/TR/xpath>`_
