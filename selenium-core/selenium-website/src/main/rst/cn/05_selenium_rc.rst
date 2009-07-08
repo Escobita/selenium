@@ -9,15 +9,14 @@
 引言
 ------------
 Selenium-RC 为那些稍微复杂，不仅仅是几个简单的浏览器动作和线性执行的测试提供了解决方案。
-Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试，比如：读写外部文件，查询数据库，通过邮件发送报告，以及用户通过
-程序可以完成的其他事务。
+Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试，比如：读写外部文件，查询数据库，通过邮件发送报告，以及用户通过应用程序可以做的其它几乎任何事。
 
 当Selenium-IDE 的测试脚本不能满足你的测试需求的时候你会想使用Selenium-RC. 
 比如Selenium-IDE不直接支持以下功能:
 
 * 条件语句
 * 迭代 
-* 测试日子以及测试结果报告
+* 测试日志以及测试结果报告
 * 错误处理，尤其是意外的错误
 * 数据库测试
 * 测试用例归类
@@ -40,7 +39,7 @@ RC 组件
 ~~~~~~~~~~~~~
 Selenium-RC 由两部分组成:
 
-* Selenium Server启动和终止浏览器，同时为浏览器提供 *HTTP* 代理服务。 
+* Selenium Server启动和终止浏览器，同时也充当浏览器请求的 *HTTP* 代理。 
 * 各种编程语言的客户端类库传递Selenium命令，驱动Selenium Server对AUT进行测试。
 
 以下是一个简单的构架图......
@@ -50,7 +49,7 @@ Selenium-RC 由两部分组成:
 
 这个图表展示了客户端类库与Selenium Server通信并传递每个要执行的Selenium 命令。
 然后Selenium server把Selenium命令转化为Selenium-Core JavaScript命令传递给浏览器。 
-浏览器用它自己的JavaScript 解析器，执行Selenium 命令, 有效地运行Selenese测试脚本上步骤。
+浏览器用它自己的JavaScript 解析器，执行Selenium 命令, 有效地运行Selenese测试脚本。
 
 Selenium Server
 ~~~~~~~~~~~~~~~
@@ -74,7 +73,7 @@ Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一
 或者采取错误处理操作如果返回的是一个意外错误信息。 
 
 因此你可以用客户端类库的API编写一些简单的Selenium命令来创建测试程序。
-或者，如果你已经有了在Selenium-IDE里创建的Selenese命令，Selenium-IDE可以通过使用Export目录选项转换成Selenium RC代码。
+或者，如果你已经有了在Selenium-IDE里创建的Selenese命令，Selenium-IDE可以通过使用Export菜单选项转换成Selenium RC代码。
 
 .. Paul: I added the above text after this comment below was made.  
    The table suggested below may still be helpful.  We can evaluate that later.
