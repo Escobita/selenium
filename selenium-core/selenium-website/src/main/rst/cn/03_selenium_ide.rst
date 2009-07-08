@@ -50,43 +50,40 @@ IDE特色
 
 文件菜单允许你创建、打开和保存测试用例和测试套件文件。编辑菜单可以复制、粘贴、删除、撤消和选择所有这些操作，用来编辑你的测试用例里的命令。选项菜单可以改变设置。你可以为某些命令设置超时时间，添加用户自定义的用户扩展到Selenium命令的基础集合中，以及指定保存测试用例的（语言）格式。帮助菜单是Firefox的标准帮助菜单；只有一个菜单项——UI-Element文档——涉及到Selenium-IDE 。
 
-Toolbar 
+工具栏 
 ++++++++
 
-The toolbar contains buttons for controlling the execution of your test 
-cases, including a step feature for debugging your test cases.  The right-most 
-button, the one with the red-dot, is the record button.  
+工具栏包含控制测试用例的按钮，
+其中包括调试测试用例的单步执行功能。
+最右侧的红色圆点按钮是录制按钮。
+
   
 .. image:: ../images/chapt3_img05_IDE_features.png
    :align: center
   
 |speed control|
-    Speed Control:  controls how fast your test case runs. 
+    速度控制：控制运行测试用例的速度的快慢。
 |run all|
-    Run All: Runs the entire test suite when a test suite with multiple test 
-    cases is loaded. 
+    运行全部：运行整个测试套件，该测试套件加载了许多测试用例。
 |run|
-    Run:  Runs the currently selected test.  When only a single test is 
-    loaded this button and the Run All button have the same effect.  
+    运行：运行当前选择的测试用例。
+    当只有一个测试用例时，这个按钮和运行所有按钮有相同的效果。
 |pause resume|
-    Pause/Resume:  Allows stopping and re-starting of a running test case.
+    暂停/回复：停止和再开始运行中的测试用例。
 |step|
-    Step:  Allows one to "step" through a test case by running it one command at a 
-    time.  Use for debugging test cases. 
+    单步执行：一次执行一条命令的逐步运行测试用例。
+    用于调试测试用例。
 |testrunner|
-    TestRunner Mode:  Allows you to run the test case in a browser loaded with 
-    the Selenium-Core TestRunner.  The TestRunner is not commonly used now 
-    and is likely to be deprecated.  This button is for evaluating test cases
-    for backwards compatibility with the TestRunner.  Most users will 
-    probably not need this button.   
+    测试运行器模式：在加载了Selenium-Core的测试运行器的浏览器中运行测试用例。
+    测试运行器并不是很常用，有可能会被弃用。
+    这个按钮是为了以向后兼容测试运行器的方式运行测试用例。
+    大多数用户将来可能不需要这个按钮。
 |rollup|
-    Apply Rollup Rules: This advanced feature allows repetitive sequences of
-    Selenium commands to be grouped into a single action.  Detailed documentation
-    on rollup rules can be found in the UI-Element Documentation on the Help
-    menu.
+    运用聚合规则：这个高级功能可以把重复执行的Selenium命令序列组成一个单一的动作。
+    关于聚合规则的详细文档参见帮助菜单中的UI-Element文档。
 
 |record|
-    Record:  Records the user's browser actions.  
+    录制：记录用户的浏览器操作。
 
 .. |speed control| image:: ../images/chapt3_img06_Speed_Control.png
 .. |run all| image:: ../images/chapt3_img07_Run_All.png
@@ -97,34 +94,32 @@ button, the one with the red-dot, is the record button.
 .. |rollup| image:: ../images/chapt3_img13_Apply_Rollup_Rules.png
 .. |record| image:: ../images/chapt3_img14_Record.png
  
-Test Case Pane
+测试用例窗格
 ++++++++++++++
 
-Your script is displayed in the test case pane.  It has two tabs, one for 
-displaying the command and their parameters in a readable "table" format.  
+测试脚本显示在测试用例窗格内。
+它有两个标签页，一个用于以清晰的表格样式显示命令和命令参数。
 
 .. image:: ../images/chapt3_img15_Table_Format.png
    :align: center
   
-The Source tab displays the test case in the native format in which the file 
-will be stored.  By default, this is HTML although it can be changed to a 
-programming language such as Java or C#, or a scripting language like Python.
-See the Options menu for details.  The Source view also allows one to edit 
-the test case in its raw form, including copy, cut and paste operations. 
-  
-The Command, Target, and Value entry fields display the currently selected 
-command along with its parameters.  These are entry fields where you 
-can modify the currently selected command.  The first parameter specified for
-a command in the Reference tab of the bottom pane always goes in the Target
-field.  If a second parameter is specified by the Reference tab, it always
-goes in the Value field.
+源代码标签页以原生格式显示测试用例，测试用例文件也以这个格式保存。
+HTML是默认的格式，当然这个格式可以换成编程语言，例如Java或者C#，
+或者是脚本语言，像Python。具体细节参见选项菜单。
+源码视图也允许以原始形式编辑测试用例，
+包括复制、剪切和粘贴操作。
+
+命令、目标和数值输入域可以显示当前选择的命令和命令参数。
+通过输入域你可以修改当前选择的命令。
+在窗格底部的参考标签中，命令的第一个参数总是进入目标域。
+如果参考标签需要指定第二个参数，它总是进入数值域。
   
 .. image:: ../images/chapt3_img16_Entry_Fields.png
    :align: center
-  
-If you start typing in the Command field, a drop-down list will be populated 
-based on the first characters you type; you can then select your desired 
-command from the drop-down. 
+
+如果你开始在命令域中打字，一个以你键入首字母开头的命令下拉列表将被弹出；
+然后你可以在下拉列表中选择你想要的命令。
+
   
 Log/Reference/UI-Element/Rollup Pane
 ++++++++++++++++++++++++++++++++++++
