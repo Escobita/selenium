@@ -290,27 +290,25 @@ XPath locator 还可以用在通过不是id和name属性的其它属性定位元
 * `W3C XPath Recommendation <http://www.w3.org/TR/xpath>`_
 * `XPath Tutorial 
   <http://www.zvon.org/xxl/XPathTutorial/General/examples.html>`_ 
-  - with interactive examples. 
+  - 有交互的例子. 
 
-There are also a couple of very useful Firefox Add-ons that can assist in 
-discovering the XPath of an element:
+也有很多有用的firefox插件来协助我们发现元素的XPath:
 
 * `XPath Checker 
-  <https://addons.mozilla.org/en-US/firefox/addon/1095?id=1095>`_ - suggests 
-  XPath and can be used to test XPath results. 
+  <https://addons.mozilla.org/en-US/firefox/addon/1095?id=1095>`_ - XPath建议,
+  能用来测试XPath结果. 
 * `Firebug <https://addons.mozilla.org/en-US/firefox/addon/1843>`_ -  XPath 
-  suggestions are just one of the many powerful features of this very useful add-on.
+  建议是这个非常有用插件的许多功能中的一个.
 
-Locating Hyperlinks by Link Text 
+通过链接文本定位超链接
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO: mam-p:  Users often are unaware that a link locator is a pattern, 
    not just a string.  So, I think we need an example here that necessitates 
    a link=regexp:pattern locator in the test case.
 
-This is a simple method of locating a hyperlink in your web page by using the 
-text of the link. If two links with the same text are present, then the first 
-match will be used.
+用链接的文本定位web页面中的超链接，这是一个简单的方法.
+如果两个链接在页面上是相同的文本,则第一个匹配的将被使用.
 
 .. code-block:: html
   :linenos:
@@ -326,18 +324,17 @@ match will be used.
 - ``link=Continue`` (4)
 - ``link=Cancel`` (5)
 
-.. _locating-by-dom:
+.. _通过dom定位:
 
-Locating by DOM  
+通过DOM定位
 ~~~~~~~~~~~~~~~
 
-The Document Object Model represents an HTML document and can be accessed 
-using JavaScript. This location strategy takes JavaScript that evaluates to 
-an element on the page, which can be simply the element's location using the 
-hierarchical dotted notation.
+文档对象模型表示能用JavaScript访问的HTML文档.
+这种定位策略使用JavaScript计算给页面上的元素.
+它用层级点符号定位元素的位置
 
-Since only ``dom`` locators start with "document", it is not necessary to include
-the ``dom=`` label when specifying a dom locator.
+因为只有 ``dom`` locator 以  "document" 开头,因此当用dom locator时没有必要包含 ``dom=`` 
+标签.
 
 .. code-block:: html
   :linenos:
@@ -362,16 +359,15 @@ the ``dom=`` label when specifying a dom locator.
 - ``document.forms[0].elements[3]`` (7)
 
 You can use Selenium itself as well as other sites and extensions to explore
-the DOM of your web application. A good reference exists on `W3Schools
-<http://www.w3schools.com/HTMLDOM/dom_reference.asp>`_. 
+你可以用Selenium或者其它的站点和扩展来捕获web应用程序的DOM.
+在 `W3Schools
+<http://www.w3schools.com/HTMLDOM/dom_reference.asp>`_  有一个不错的教程. 
 
-Locating by CSS
+通过CSS定位
 ~~~~~~~~~~~~~~~
 
-CSS (Cascading Style Sheets) is a language for describing the rendering of HTML
-and XML documents. CSS uses Selectors for binding style properties to elements
-in the document. These Selectors can be used by Selenium as another locating 
-strategy.
+CSS (Cascading Style Sheets) 是一种描述HTML和XML文档外观的语言.
+CSS使用给文档中的元素加样式属性的选择器.这些选择器被Selenium用作另一种定位策略.
 
 .. code-block:: html
   :linenos:
@@ -394,32 +390,32 @@ strategy.
 - ``css=#loginForm input[type="button"]`` (4)
 - ``css=#loginForm input:nth-child(2)`` (5)
 
-For more information about CSS Selectors, the best place to go is `the W3C 
-publication <http://www.w3.org/TR/css3-selectors/>`_.  You'll find additional
-references there.
+要想获得更多关于CSS选择器的信息,最好的地方是去 `the W3C
+publication <http://www.w3.org/TR/css3-selectors/>`_.  你将获得更多参考信息.
 
 .. note:: Most experienced Selenium users recommend CSS as their locating
    strategy of choice as it's considerably faster than XPath and can find the 
    most complicated objects in an intrinsic HTML document.
+.. 注释:: 有经验的Selenium用户建议使用CSS作为他们定位策略的一种选择,因为它比
+   XPath快速,而且在HTML文档中能找到很多复杂的对象.
 
-.. _patterns-section:
+.. _模式部分:      
 
-Matching Text Patterns
+文本模式匹配
 ----------------------
 
-Like locators, *patterns* are a type of parameter frequently required by Selenese
-commands.  Examples of commands which require patterns are **verifyTextPresent**,
-**verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and 
-**verifyPrompt**.  And as has been mentioned above, link locators can utilize 
-a pattern.  Patterns allow one to *describe*, via the use of special characters,
-what text is expected rather than having to specify that text exactly.
+和定位器类似, *模式*  是Selenese命令中经常用到的一种参数类型.
+需要模式的命令有:**verifyTextPresent**, **verifyTitle**, **verifyAlert**, 
+**assertConfirmation**, **verifyText** 和 **verifyPrompt**.  
+上面提及的链接locator也可以使用模式.模式允许 *描述* ,通过使用特定的字符,
+期望的文本内容不必与指定文字完全相同.
+有三种类型的模式: *文件名替换*, *正则表达式* 和 *完全*.
 
-There are three types of patterns: *globbing*, *regular expressions*, and *exact*.
-
-Globbing Patterns
+文件名替换模式
 ~~~~~~~~~~~~~~~~~
 
 Most people are familiar with globbing as it is utilized in
+很多人熟悉文件名替换，
 filename expansion at a DOS or Unix/Linux command line such as ``ls *.c``.
 In this case, globbing is used to display all the files ending with a ``.c`` 
 extension that exist in the current directory.  Globbing is fairly limited.  
