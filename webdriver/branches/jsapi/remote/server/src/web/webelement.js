@@ -42,10 +42,9 @@ goog.require('webdriver.Future');
  * </code>
  * @param {webdriver.WebDriver} driver The WebDriver instance that will
  *     actually execute commands.
- * @param {?string} opt_elementId The ID of this WebElement, if known.
  * @constructor
  */
-webdriver.WebElement = function(driver, opt_elementId) {
+webdriver.WebElement = function(driver) {
 
   /**
    * The WebDriver instance to issue commands to.
@@ -55,11 +54,13 @@ webdriver.WebElement = function(driver, opt_elementId) {
   this.driver_ = driver;
 
   /**
-   * The UUID used by WebDriver to identify this element on the page.
-   * @type {?string}
+   * The UUID used by WebDriver to identify this element on the page. The ID is
+   * wrapped in a webdriver.Future instance so it can be determined
+   * asynchronously.
+   * @type {webdriver.Future}
    * @private
    */
-  this.elementId_ = opt_elementId || null;
+  this.elementId_ = new webdriver.Future(this.driver_);
 };
 
 
@@ -102,11 +103,10 @@ webdriver.WebElement.findElementLocatorToCommandInfo_ = function(by) {
 webdriver.WebElement.findElement = function(driver, by) {
   var commandInfo = webdriver.WebElement.findElementLocatorToCommandInfo_(by);
   var webElement = new webdriver.WebElement(driver);
+  var webElementId = webElement.getId();
   driver.addCommand(commandInfo.buildCommand(
-      driver, [by.target], goog.bind(function(response) {
-        webdriver.logging.debug('...setting element id to: ' + response.value);
-        this.elementId_ = response.value;
-      }, webElement)));
+      driver, [by.target],
+      goog.bind(webElementId.setValueFromResponse, webElementId)));
   return webElement;
 };
 
@@ -128,13 +128,13 @@ webdriver.WebElement.isElementPresent = function(driver, by) {
       // If returns without an error, element is present
       function(response) {
         response.value = true;
-        isPresent.setValue(response);
+        isPresent.setValue(true);
       },
       // If returns with an error, element is not present (clear the error!)
       function(response) {
         response.isError = false;
         response.value = false;
-        isPresent.setValue(response);
+        isPresent.setValue(false);
       }));
   return isPresent;
 };
@@ -169,7 +169,9 @@ webdriver.WebElement.findElements = function(driver, by) {
         var ids = response.value.split(',');
         var elements = [];
         for (var i = 0, id; id = ids[i]; i++) {
-          elements.push(new webdriver.WebElement(driver, id));
+          var element = new webdriver.WebElement(driver);
+          element.getId().setValue(id);
+          elements.push(element);
         }
         response.value = elements;
       }));
@@ -180,7 +182,7 @@ webdriver.WebElement.prototype.isElementPresent = function(findBy) {
   var isPresent = new webdriver.Future(this.driver_);
   var foundCallbackFn = function(response) {
     response.value = !!response.value;
-    isPresent.setValue(response);
+    isPresent.setValue(response.value);
   };
 
   var commandInfo;
@@ -212,7 +214,7 @@ webdriver.WebElement.prototype.isElementPresent = function(findBy) {
           webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME;
       foundCallbackFn = function(response) {
         response.value = !!response.value.split(',').length;
-        isPresent.setValue(response);
+        isPresent.setValue(response.value);
       };
       break;
   }
@@ -224,7 +226,7 @@ webdriver.WebElement.prototype.isElementPresent = function(findBy) {
       function(response) {
         response.isError = false;
         response.value = false;
-        isPresent.setValue(response);
+        isPresent.setValue(false);
       });
   return isPresent;
 };
@@ -246,9 +248,9 @@ webdriver.WebElement.prototype.findElement = function(by) {
 
   var webElement = new webdriver.WebElement(this.driver_);
   if (commandInfo) {
-    this.addCommand_(commandInfo, [by.target], goog.bind(function(response) {
-      this.elementId_ = response.value;
-    }, webElement));
+    var webElementId = webElement.getId();
+    this.addCommand_(commandInfo, [by.target],
+        goog.bind(webElementId.setValueFromResponse, webElementId));
   } else if (by.type == 'tagName') {
     xpath = './/' + by.target;
   } else if (by.type == 'linkText') {
@@ -261,7 +263,8 @@ webdriver.WebElement.prototype.findElement = function(by) {
         [by.target],
         goog.bind(function(response) {
           // TODO(jmleyba): Is this the correct way to handle this?
-          this.elementId_ = response.value.split(',')[0];
+          response.value = response.value.split(',')[0];
+          this.getId().setValue(response.value);
         }, webElement));
   } else if (by.type == 'partialLinkText') {
     xpath = ".//a[contains(text(),'" + by.target + "')]";
@@ -274,7 +277,8 @@ webdriver.WebElement.prototype.findElement = function(by) {
         webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH, [xpath],
         goog.bind(function(response) {
           // TODO(jmleyba): Is this the correct way to handle this?
-          this.elementId_ = response.value.split(',')[0];
+          response.value = response.value.split(',')[0];
+          this.getId().setValue(response.value);
         }, webElement));
   }
 
@@ -312,7 +316,9 @@ webdriver.WebElement.prototype.findElements = function(by) {
     var ids = response.value.split(',');
     var elements = [];
     for (var i = 0, id; id = ids[i]; i++) {
-      elements.push(new webdriver.WebElement(this.driver_, id));
+      var element = new webdriver.WebElement(this.driver_);
+      element.getId().setValue(id);
+      elements.push(element);
     }
     response.value = elements;
   }, this));
@@ -329,10 +335,9 @@ webdriver.WebElement.prototype.getDriver = function() {
 
 
 /**
- * @return {?string} The UUID of the element represented by this instance. If
- *     the element has not yet been located, the ID will be set to {@code null}.
+ * @return {webdriver.Futur} The UUID of this element wrapped in a Future.
  */
-webdriver.WebElement.prototype.getElementId = function() {
+webdriver.WebElement.prototype.getId = function() {
   return this.elementId_;
 };
 
@@ -358,7 +363,7 @@ webdriver.WebElement.prototype.addCommand_ = function(commandInfo,
                                                       opt_addToFront) {
   var command = commandInfo.buildCommand(
       this.driver_, opt_parameters, opt_callbackFn, opt_errorCallbackFn);
-  command.elementId = goog.bind(this.getElementId, this);
+  command.elementId = this.getId();
   this.driver_.addCommand(command, opt_addToFront);
 };
 
@@ -387,7 +392,7 @@ webdriver.WebElement.prototype.sendKeys = function(var_args) {
 webdriver.WebElement.prototype.getElementName = function() {
   var name = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_NAME, null,
-      goog.bind(name.setValue, name));
+      goog.bind(name.setValueFromResponse, name));
   return name;
 };
 
@@ -399,7 +404,7 @@ webdriver.WebElement.prototype.getElementName = function() {
 webdriver.WebElement.prototype.getAttribute = function(attributeName) {
   var value = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_ATTRIBUTE,
-      [attributeName], goog.bind(value.setValue, value),
+      [attributeName], goog.bind(value.setValueFromResponse, value),
       // If there is an error b/c the attribute was not found, set value to null
       function (response) {
         // TODO(jmleyba): This error message needs to be consistent for all
@@ -407,7 +412,7 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
         if (response.value == 'No match') {
           response.isError = false;
           response.value = null;
-          value.setValue(response);
+          value.setValue(null);
         }
       });
   return value;
@@ -417,7 +422,7 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
 webdriver.WebElement.prototype.getValue = function() {
   var value = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_VALUE, null,
-      goog.bind(value.setValue, value));
+      goog.bind(value.setValueFromResponse, value));
   return value;
 };
 
@@ -425,7 +430,7 @@ webdriver.WebElement.prototype.getValue = function() {
 webdriver.WebElement.prototype.getText = function() {
   var text = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_TEXT, null,
-      goog.bind(text.setValue, text));
+      goog.bind(text.setValueFromResponse, text));
   return text;
 };
 
@@ -444,7 +449,7 @@ webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
                                                                response) {
   var xy = response.value.replace(/\s/g, '').split(',');
   response.value = new goog.math.Coordinate(xy[0], xy[1]);
-  future.setValue(response);
+  future.setValue(response.value);
 };
 
 
@@ -491,7 +496,7 @@ webdriver.WebElement.prototype.isEnabled = function() {
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_ATTRIBUTE, ['disabled'],
       function(response) {
         response.value = !!!response.value;
-        futureValue.setValue(response);
+        futureValue.setValue(response.value);
       });
   return futureValue;
 };
@@ -506,7 +511,7 @@ webdriver.WebElement.prototype.isCheckedOrSelected_ = function() {
             webdriver.CommandInfo.GET_ELEMENT_ATTRIBUTE, [attribute],
             function(response) {
               response.value = !!response.value;
-              value.setValue(response);
+              value.setValue(response.value);
             }, null, true);
       }, this));
   return value;

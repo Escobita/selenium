@@ -245,6 +245,29 @@ webdriver.WebDriver.prototype.resume = function() {
 };
 
 
+webdriver.WebDriver.updateCommandFutures_ = function(command) {
+  function getValue(obj) {
+    if (obj instanceof webdriver.Future) {
+      return obj.getValue();
+    } else if (obj instanceof webdriver.WebDriver.ScriptArgument) {
+      obj.value = getValue(obj.value);
+    }
+    return obj;
+  }
+  if (goog.isDef(command.elementId)) {
+    command.elementId = getValue(command.elementId);
+  }
+  command.parameters = goog.array.map(command.parameters, function(param) {
+    // TODO(jmleyba): Need a better way of detecting this.
+    if (goog.isArray(param)) {
+      return goog.array.map(param, getValue);
+    } else {
+      return getValue(param);
+    }
+  });
+};
+
+
 /**
  * Event handler for whenever this driver is ready to execute a command.
  * @private
@@ -287,16 +310,12 @@ webdriver.WebDriver.prototype.onReady_ = function() {
       nextCommand.sessionId = this.sessionId_;
       nextCommand.context = this.context_.toString();
 
-      // Command was issued by a webdriver.WebElement, need to fetch its
-      // ID, which is determined asynchronously.
-      if (goog.isFunction(nextCommand.elementId)) {
-        try {
-          nextCommand.elementId = nextCommand.elementId();
-        } catch (ex) {
-          this.handleResponse_(new webdriver.Response(
-              nextCommand, true, this.context_, ex));
-          return;
-        }
+      try {
+        webdriver.WebDriver.updateCommandFutures_(nextCommand);
+      } catch (ex) {
+        this.handleResponse_(new webdriver.Response(
+            nextCommand, true, this.context_, ex));
+        return;
       }
 
       this.commandProcessor_.execute(nextCommand,
@@ -454,6 +473,11 @@ webdriver.WebDriver.prototype.close = function() {
 };
 
 
+
+webdriver.WebDriver.ScriptArgument = function(type, value) {
+  this.type = type;
+  this.value = value;
+};
 /**
  * Helper function for converting an argument to a script into a parameter
  * object to send with the {@code webdriver.Command}.
@@ -464,15 +488,14 @@ webdriver.WebDriver.prototype.close = function() {
  */
 webdriver.WebDriver.argumentToScriptArgument_ = function(arg) {
   if (arg instanceof webdriver.WebElement) {
-    return {
-      'type': 'ELEMENT',
-      'value': arg.getElementId()
-    };
+    return new webdriver.WebDriver.ScriptArgument('ELEMENT', arg.getId());
+  } else if (goog.isBoolean(arg) ||
+             goog.isNumber(arg) ||
+             goog.isString(arg)) {
+    return new webdriver.WebDriver.ScriptArgument(
+        goog.typeOf(arg).toUpperCase(), arg);
   } else {
-    return {
-      'type': typeof arg,
-      'value': arg
-    };
+    throw new Error('Invalid script argument type: ' + goog.typeOf(arg));
   }
 };
 
@@ -487,14 +510,19 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
   var args = goog.array.map(
       goog.array.slice(arguments, 1),
       webdriver.WebDriver.argumentToScriptArgument_);
+  var result = new webdriver.Future(this);
   this.addCommand(webdriver.CommandInfo.EXECUTE_SCRIPT.buildCommand(
       this, [script, args],
       goog.bind(function(response) {
         if (goog.isString(response.value) &&
             webdriver.WebElement.UUID_REGEX.test(response.value)) {
-          response.value = new webdriver.WebElement(this, response.value);
+          var id = response.value;
+          response.value = new webdriver.WebElement(this);
+          response.value.getId().setValue(id);
         }
+        result.setValue(response.value);
       }, this)));
+  return result;
 };
 
 
@@ -515,7 +543,7 @@ webdriver.WebDriver.prototype.get = function(url) {
 webdriver.WebDriver.prototype.getTitle = function() {
   var title = new webdriver.Future(this);
   this.addCommand(webdriver.CommandInfo.GET_TITLE.buildCommand(
-      this, null, goog.bind(title.setValue, title)));
+      this, null, goog.bind(title.setValueFromResponse, title)));
   return title;
 };
 
@@ -574,7 +602,7 @@ webdriver.WebDriver.prototype.getMouseSpeed = function() {
       webdriver.CommandInfo.GET_MOUSE_SPEED.buildCommand(this, null,
           function(response) {
             response.value = Number(response.value);
-            speed.setValue(response);
+            speed.setValue(response.value);
           }));
   return speed;
 };

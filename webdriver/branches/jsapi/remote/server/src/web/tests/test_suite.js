@@ -1,3 +1,6 @@
+goog.require('goog.Uri');
+goog.require('goog.dom');
+goog.require('goog.events');
 goog.require('goog.math.Coordinate');
 goog.require('goog.math.Size');
 goog.require('goog.string');
@@ -5,24 +8,30 @@ goog.require('webdriver.By');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.asserts');
 
+var TEST_FILES = [
+  'childrenfinding_test.js',
+  'correcteventfiring_test.js',
+  'draganddrop_test.js',
+  'elementattribute_test.js',
+  'elementfinding_test.js',
+  'elementname_test.js',
+  'executingjavascript_test.js',
+  'formhandling_test.js'
+];
+
 /**
  * Hackery! When this file is loaded, we also want to load all of the individual
  * test files.
  */
 (function() {
-  var testFiles = [
-    'childrenfinding_test.js',
-    'correcteventfiring_test.js',
-    'draganddrop_test.js',
-    'elementattribute_test.js',
-    'elementfinding_test.js',
-    'elementname_test.js',
-    'executingjavascript_test.js',
-    'formhandling_test.js'
-  ];
-  for (var i = 0, file; file = testFiles[i]; i++) {
-    document.write(
-        '<script type="text/javascript" src="' + file + '"></script>');
+  var uri = new goog.Uri(window.location.href);
+  var fileName = uri.getParameterValue('file');
+
+  for (var i = 0, file; file = TEST_FILES[i]; i++) {
+    if (!fileName || file == fileName) {
+      document.write(
+          '<script type="text/javascript" src="' + file + '"></script>');
+    }
   }
 })();
 
@@ -53,16 +62,57 @@ var TEST_PAGES = {
 };
 
 
-var openedTestWindow = false;
+var hasSetupPage = false;
+
+
+// TODO(jmleyba): Update the test runner to check for and run this.
+function setUpPage(driver) {
+  if (hasSetupPage) {
+    return;
+  }
+  hasSetupPage = true;
+  hasSetupPage = true;
+  driver.callFunction(function() {
+    window.open('', 'test_window');
+  });
+
+  var uri = new goog.Uri(window.location.href);
+  var currentFile = uri.getParameterValue('file');
+  var options = goog.array.map(TEST_FILES, function(file, index) {
+    return goog.dom.createDom('OPTION', {
+      value: file,
+      innerHTML: file,
+      selected: file == currentFile
+    });
+  });
+  goog.array.splice(options, 0, 0, goog.dom.createDom('OPTION', {
+    value: 'All Tests',
+    innerHTML: 'All Tests',
+    selected: !goog.isDef(currentFile)
+  }));
+  var container = goog.dom.createDom('DIV', null,
+      goog.dom.createDom('SPAN', {style:'margin-right:5px;'},
+          'Select a test file to run:'),
+      goog.dom.createDom('SELECT', null, options));
+  if (document.body.firstChild) {
+    goog.dom.insertSiblingBefore(container, document.body.firstChild);
+  } else {
+    goog.dom.appendChild(document.body, container);
+  }
+  goog.events.listen(container, goog.events.EventType.CHANGE,
+      function(e) {
+        var option = e.target.childNodes[e.target.selectedIndex];
+        uri.getQueryData().clear();
+        if (option.value != 'All Tests') {
+          uri.getQueryData().add('file', option.value);
+        }
+        window.location.href = uri.toString();
+      });
+}
 
 
 function setUp(driver) {
-  if (!openedTestWindow) {
-    openedTestWindow = true;
-    driver.callFunction(function() {
-      window.open('', 'test_window');
-    });
-  }
+  setUpPage(driver);
   driver.switchToWindow('test_window');
 }
 

@@ -37,7 +37,7 @@ webdriver.asserts.getValue_ = function(obj) {
 
 webdriver.asserts.getValueAndType_ = function(obj) {
   var value = webdriver.asserts.getValue_(obj);
-  return '<' + value + '> (' + goog.typeOf(value) + ')';
+  return '<' + value.toString() + '> (' + goog.typeOf(value) + ')';
 };
 
 

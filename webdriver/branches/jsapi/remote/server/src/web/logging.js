@@ -236,11 +236,11 @@ webdriver.logging.describe = function(obj, opt_indent) {
   var indent = opt_indent || '';
   var msgLines = [];
   if (goog.isString(obj)) {
-    msgLines.push(indent + ' (' + typeof obj + ') ' + obj);
+    msgLines.push(indent + ' (' + goog.typeOf(obj) + ') ' + obj);
   } else {
     for (var prop in obj) {
       msgLines.push(
-        indent + prop + ': (' + typeof obj[prop] + ') ' + obj[prop]);
+        indent + prop + ': (' + goog.typeOf(obj[prop]) + ') ' + obj[prop]);
       if (goog.isObject(obj[prop]) && !goog.isFunction(obj[prop]) &&
           goog.isArray(obj[prop])) {
         msgLines.push(webdriver.logging.describe(obj[prop], indent + '  '));

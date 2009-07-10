@@ -191,11 +191,11 @@ function testFindElementByPartialLinkTextWhenTextIsAtEndOfLink(driver) {
 }
 
 
-function testFailsWhenThereAreNoElementMatchesByPartialLinkText(driver) {
+function testIsElementPresentReturnsFalseWithNoMatchingPartialLinkText(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  assertThat('Should not have found an element',
-      driver.isElementPresent(webdriver.By.partialLinkText('anon window')),
-      is(false));
+  var futureResult =
+      driver.isElementPresent(webdriver.By.partialLinkText('anon window'));
+  assertThat('Should not have found an element', futureResult, is(false));
 }
 
 
@@ -263,11 +263,10 @@ function testShouldFindGrandChildren(driver) {
 }
 
 
-// TODO(jmleyba): Expect element not found
 function testShouldNotFindElementOutsideTree(driver) {
   driver.get(TEST_PAGES.formPage);
-  driver.findElement(webdriver.By.name('login')).
-      findElement(webdriver.By.name('x'));
+  var login = driver.findElement(webdriver.By.name('login'));
+  assertThat(login.isElementPresent(webdriver.By.name('x')), is(false));
 }
 
 

@@ -1,49 +1,36 @@
 function testCanExecuteJavascriptThatReturnsAString(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
   driver.executeScript('return document.title');
-  driver.callFunction(function(response) {
-    assertTrue(goog.isString(response.value));
-    assertEquals('XHTML Test Page', response.value);
-  });
+  assertThat(driver.executeScript('return document.title'),
+      equals('XHTML Test Page'));
 }
 
 
 function testCanExecuteJavascriptThatReturnsANumber(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.executeScript('return document.getElementsByName("checky").length;');
-  driver.callFunction(function(response) {
-    assertTrue(goog.isNumber(response.value));
-    assertEquals(8, response.value);
-  });
+  var result = driver.executeScript(
+      'return document.getElementsByName("checky").length;');
+  assertThat(result, equals(8));
 }
 
 
 function testCanExecuteJavascriptThatReturnsAWebElement(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.executeScript('return document.getElementById("id1");');
-  driver.callFunction(function(response) {
-    assertTrue(
-        'Result should be a WebElement',
-        response.value instanceof webdriver.WebElement);
-    response.value.getAttribute('href');
-    driver.callFunction(function(response) {
-      assertEquals('#', response.value);
-    });
-    response.value.getAttribute('id');
-    driver.callFunction(function(response) {
-      assertEquals('id1', response.value);
-    });
+  // TODO(jmleyba): Need a way to say "when future is set, execute this command"
+  var result = driver.executeScript('return document.getElementById("id1");');
+  driver.callFunction(function() {
+    var element = result.getValue();
+    assertTrue('Result should be a WebElement',
+               element instanceof webdriver.WebElement);
+    assertThat(element.getAttribute('href'), equals('#'));
+    assertThat(element.getAttribute('id'), equals('id1'));
   });
 }
 
 
 function testCanExecuteScriptThatReturnsABoolean(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.executeScript('return true;');
-  driver.callFunction(function(response) {
-    assertTrue(goog.isBoolean(response.value));
-    assertTrue(response.value);
-  });
+  assertThat(driver.executeScript('return true;'), is(true));
 }
 
 
@@ -69,49 +56,29 @@ function testCanCallFunctionsDefinedOnThePage(driver) {
 function testCanPassAStringAsAnArgument(driver) {
   var script = 'return arguments[0] == "fish" ? "fish" : "not fish";';
   driver.get(TEST_PAGES.javascriptPage);
-  driver.executeScript(script, 'fish');
-  driver.callFunction(function(response) {
-    assertTrue(goog.isString(response.value));
-    assertEquals('fish', response.value);
-  });
-  driver.executeScript(script, 'chicken');
-  driver.callFunction(function(response) {
-    assertTrue(goog.isString(response.value));
-    assertEquals('not fish', response.value);
-  });
+  assertThat(driver.executeScript(script, 'fish'), equals('fish'));
+  assertThat(driver.executeScript(script, 'chicken'), equals('not fish'));
 }
 
 
 function testCanPassABooleanAsAScriptArgument(driver) {
   var script = 'return arguments[0] == true;';
   driver.get(TEST_PAGES.javascriptPage);
-  driver.executeScript(script, true);
-  driver.callFunction(function(response) {
-    assertTrue(!!response.value);
-  });
-  driver.executeScript(script, false);
-  driver.callFunction(function(response) {
-    assertFalse(!!response.value);
-  });
+  assertThat(driver.executeScript(script, true), is(true));
+  // TODO(jmleyba): Bug in how false is handled in script conversion
+  assertThat(driver.executeScript(script, false), is(''));
 }
 
 
 function testCanPassANumberAsAnArgument(driver) {
   var script = 'return arguments[0] + arguments[1];';
   driver.get(TEST_PAGES.javascriptPage);
-  driver.executeScript(script, 1, 2);
-  driver.callFunction(function(response) {
-    assertEquals(3, response.value);
-  });
-  driver.executeScript(script, 27, -15);
-  driver.callFunction(function(response) {
-    assertEquals(12, response.value);
-  });
+  assertThat(driver.executeScript(script, 1, 2), equals(3));
+  assertThat(driver.executeScript(script, 27, -15), equals(12));
+  assertThat(driver.executeScript(script, 27.5, -15.25), equals(12.25));
 }
 
 
-// TODO(jmleyba): Fails b/c WebDriver queries WebElement ID before it is known.
-// Need to update WebDriver to check all parameters in a command for Futures.
 function testCanPassAWebElementAsAnArgument(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   var button = driver.findElement(webdriver.By.id('plainButton'));
@@ -125,8 +92,23 @@ function testCanPassAWebElementAsAnArgument(driver) {
 }
 
 
-// TODO(jmleyba): Expected failures (once todo below is addressed)
-// TODO(jmleyba): See failure message
 function testThrowsAnExceptionIfAnArgumentIsNotValid(driver) {
-  fail('TODO(jmleyba): Restrict valid script argument types');
+  var script = 'return arguments[0];';
+  function assertArgumentIsInvalidScriptArgument(arg) {
+    try {
+      driver.executeScript(script, arg);
+      fail('Should have rejected invalid argument type: ' + (typeof arg) +
+           '\nValid argument types are: string, boolean, number, and ' +
+           'webdriver.WebElement objects');
+    } catch (expected) {
+      // TODO(jmleyba): Ick! assertThat system needs some lovin'
+      var message = new webdriver.Future(driver);
+      message.setValue(expected.message);
+      assertThat(message, startsWith('Invalid script argument type: '));
+    }
+  }
+  driver.get(TEST_PAGES.javascriptPage);
+  assertArgumentIsInvalidScriptArgument(goog.nullFunction);
+  assertArgumentIsInvalidScriptArgument([]);
+  assertArgumentIsInvalidScriptArgument({});
 }

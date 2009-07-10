@@ -20,11 +20,11 @@ webdriver.Future.prototype.getDriver = function() {
 };
 
 
-webdriver.Future.prototype.setValue = function(response) {
-  this.value_ = response.value;
+webdriver.Future.prototype.setValue = function(value) {
+  this.value_ = value;
 };
 
 
-webdriver.Future.prototype.setBooleanValue = function(response) {
-  this.value_ = !!response.value;
+webdriver.Future.prototype.setValueFromResponse = function(response) {
+  this.setValue(response.value);
 };
