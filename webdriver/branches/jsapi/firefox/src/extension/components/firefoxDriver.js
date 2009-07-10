@@ -425,9 +425,11 @@ FirefoxDriver.prototype.selectElementById = function(respond, id) {
 
 FirefoxDriver.prototype.selectElementsUsingId = function(respond, id) {
     var doc = Utils.getDocument(this.context);
-	var allElements = doc.evaluate("//*", doc, null, Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+    var allElements = doc.evaluate("//*[@id='" + id + "']", doc, null,
+        Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE,
+        null);
     var indices = "";
-	var element = allElements.iterateNext();
+    var element = allElements.iterateNext();
     while (element) {
         var index = Utils.addToKnownElements(element, this.context);
         indices += index + ",";

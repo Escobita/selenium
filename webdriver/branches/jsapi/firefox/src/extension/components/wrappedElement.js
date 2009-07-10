@@ -247,7 +247,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, value) {
         } else if (attributeName.toLowerCase() == "selected") {
             respond.response = element.selected;
         } else if (attributeName.toLowerCase() == "checked") {
-            respond.response = response.toLowerCase() == "checked" || response.toLowerCase() == "true";
+            respond.response = element.checked;
         } else if (attributeName.toLowerCase() == "readonly") {
             respond.response = element.getAttributeNode('readonly');
         }
