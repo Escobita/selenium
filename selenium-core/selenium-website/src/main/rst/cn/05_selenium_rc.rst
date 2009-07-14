@@ -29,7 +29,7 @@ Selenium-RC 发挥了所有编程语言的优势，可以创建的各种测试�
 .. 注:: 尽管使用Selenium-IDE的附加的user extensions 可能可以实现这些测试任务，但是大部分人选择使用Selenium-RC.  因为当面临复杂的测试时候Selenium-RC比Selenium-IDE更加灵活，更强的可扩展性。
 
 
-在 `Adding Some Spice to Your Tests`_ 章节, 会有一些例子很好的证明了用编程语言写测试脚本的优势。
+在 `给你的测试添加些趣味`_ 章节, 会有一些例子很好的证明了用编程语言写测试脚本的优势。
 
 工作原理
 ------------
@@ -39,8 +39,9 @@ RC 组件
 ~~~~~~~~~~~~~
 Selenium-RC 由两部分组成:
 
-* Selenium Server启动和终止浏览器，同时也充当浏览器请求的 *HTTP* 代理。 
-* 各种编程语言的客户端类库传递Selenium命令，驱动Selenium Server对AUT进行测试。
+* 负责启动和终止浏览器的Selenium Server，同时也充当浏览器请求的 *HTTP* 代理。 
+* 各种编程语言的客户端类库，通过传递Selenium命令，客户端就可以驱动Selenium
+Server对AUT进行测试。
 
 以下是一个简单的构架图......
 
@@ -69,7 +70,7 @@ Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一
 每个客户端类库都是一个程序接口，也可以说是一组在程序里运行Selenium命令的函数。而这些函数和Selenium命令一一对应。
 
 客户端类库通过发送一条Selenese 命令到Selenium Server 来对AUT进行一个特定操作或者测试。
-客户端类库也会收到命令运行结果，然后返回给你的测试程序。你测试程序可以收到这个测试结果，然后报告成功与否，
+客户端类库也会收到命令运行结果，然后返回给你的测试程序。你的测试程序可以收到这个测试结果，然后报告成功与否，
 或者采取错误处理操作如果返回的是一个意外错误信息。 
 
 因此你可以用客户端类库的API编写一些简单的Selenium命令来创建测试程序。
@@ -769,7 +770,7 @@ test results in different formats such as HTML or PDF.
 
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
-Adding Some Spice to Your Tests
+给你的测试添加些趣味
 -------------------------------
 Now you'll understand why you needed Selenium-RC and you just couldn't stay
 strictly with Selenium-IDE. We will give you guidance here on things that can
