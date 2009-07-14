@@ -121,92 +121,81 @@ HTML是默认的格式，当然这个格式可以换成编程语言，例如Java
 然后你可以在下拉列表中选择你想要的命令。
 
   
-Log/Reference/UI-Element/Rollup Pane
+日志/参考/UI-Element/Rollup 窗格
 ++++++++++++++++++++++++++++++++++++
 
-The bottom pane is used for four different functions--Log, Reference,
-UI-Element, and Rollup--depending on which tab is selected.
+底部的窗格用于显示四个不同的功能：日志、参考、UI-Element和Rollup。具体显示的是哪个功能取决于哪个标签被选定了。
 
-Log
+日志
 ~~~
 
-When you run your test case, error messages
-and information messages showing the progress are displayed 
-in this pane automatically, even if you do not first select the Log
-tab.  These messages are often useful for test case debugging.   Notice the Clear 
-button for clearing the Log.  Also notice the Info button is a drop-down 
-allowing selection of different levels of information to display.  
+当运行测试用例时，
+即使你没有先选择日志标签，
+显示进度的错误消息和信息消息也会自动的显示在这个窗格内。
+这些消息对测试用例的调试通常都非常有用。
+注意清除按钮用于清除日志。
+还要注意信息按钮可以选择显示信息的不同级别。
   
 .. image:: ../images/chapt3_img17_Bottom_Box.png
    :align: center
 
-Reference
+参考
 ~~~~~~~~~
 
-The Reference tab is the default selection whenever you are
-entering or modifying Selenese commands and parameters in Table
-mode.  In Table mode, the Reference pane will display documentation on the current command.  When entering or modifying
-commands, whether from Table or Source mode, it is critically
-important to ensure that the parameters specified in the
-Target and Value fields match those specified in the parameter
-list specified in the Reference pane.  The number of parameters provided
-must match the number specified, the order of parameters provided must
-match the order specified, and the type of parameters provided must match
-the type specified.  
-If there is a mismatch in any of these three areas, the command will not 
-run correctly.
+只要在表格样式下输入或修改Selenese命令和参数，
+参考标签就是默认选择的。
+在表格样式下，参考窗格将显示当前命令的文档。
+当输入或修改命令式，
+无论是表格样式还是源码样式，
+确保在目标和数值域中指定的参数与参考窗格中指定的参数相对应是十分重要的。
+提供的参数数量与指定测参数数量要对应，
+提供的参数顺序与指定的参数顺序要对应，
+提供的参数类型与指定的参数类型要对应。
+如果三个条件中的任何一个没有相符，命令将不会正确的执行。
 
 .. image:: ../images/chapt3_img18_Bottom_Box_Ref.png
    :align: center
 
-While the Reference tab is invaluable as a quick reference, it is still often
-necessary to consult the Selenium Reference_ document.
+当参考标签中的快速参考没有价值时，查阅Selenium `参考`_ 文档是非常必要的。
 
-.. _Reference: http://release.openqa.org/selenium-core/1.0/reference.html
+.. _`参考`: http://release.openqa.org/selenium-core/1.0/reference.html
   
 UI-Element and Rollup
 ~~~~~~~~~~~~~~~~~~~~~
 
-Detailed information on these two panes (which cover advanced features)
-can be found in the 
-UI-Element Documentation on the Help menu of Selenium-IDE.
+这个两个窗格中的详细信息（涉及高级功能）可以在Selenium-IDE的帮助菜单中UI-Element文档中找到。
      
-Building Test Cases
+创建测试用例
 -------------------
-There are three primary methods for developing test cases.  Frequently, 
-a test
-developer will require all three techniques. 
+这里有三种开发测试用例的基本方法。
+通常测试开发人员需要掌握所有三种技术。 
 
-Recording  
+录制  
 +++++++++
 
-Many first-time users begin by recording a test case from their interactions 
-with a website.  When Selenium-IDE is first opened, the record button is ON by 
-default. 
+许多首次使用者都是以录制测试用例开始的，这些测试用例都来自他们在网站上的互动。
+当Selenium-IDE首次打开时，录制按钮默认是打开的。
 
 .. note::
-    This can be set to OFF as a default with an available user extension. 
+    通过一个可用的用户插件这个按钮可以设置成默认关闭。
 
 .. TODO: mam-p: We need a link to this user extension.  It doesn't appear to be on the extensions page to which we've already referred readers. 
 
-During recording, Selenium-IDE will automatically insert commands into your 
-test case based on 
-your actions.  Typically, this will include:
+在录制过程中，Selenium-IDE将自动地根据你的操作吧命令插入到你的测试用例中。
+通常，这讲包括：
   
-* clicking a link - *click* or *clickAndWait* commands 
-* entering values - *type* command 
-* selecting options from a drop-down listbox - *select* command 
-* clicking checkboxes or radio buttons - *click* command 
+* 点击一个链接 - *click* 或者 *clickAndWait* 命令
+* 输入数值 - *type* 命令
+* 从下拉列表框选择选项 - *select* 命令
+* 点击复选框或单选按钮 - *click* 命令
   
-Here are some "gotchas" to be aware of:
+这里有些“已知问题”需要注意：
   
-* The *type* command may require clicking on some other area of the web page 
-  for it to record. 
-* Following a link usually records a *click* command. You will often need to 
-  change this to *clickAndWait* to ensure your test case pauses until the new page 
-  is completely loaded.  Otherwise, your test case will continue running commands
-  before the page has loaded all its UI elements. This will cause unexpected 
-  test case failures.
+* 为了能够录制 *type* 命令，需要点击页面的其他地方。
+* 跟踪一个链接，通常会录制 *click* 命令。 
+  你经常需要把它改成 *clickAndWait*  以确保测试用例暂停一会儿直到新页面加载完成。
+  否则测试用例会在所以UI元素加载之前就继续运行命令。
+  这样会导致意想不到的测试用例失败。
   
 Adding Verifications and Asserts With the Context Menu 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
