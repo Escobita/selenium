@@ -114,7 +114,6 @@ Again, locators are explained in the next section.
 
 verifyText
 ~~~~~~~~~~
- 
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
 Use ``verifyText`` when both the text and its UI element must be tested.
@@ -148,16 +147,14 @@ Default Locators
 You can choose to omit the locator type in the following situations:
  
  - Locators starting with "document" will use the DOM locator strategy. 
-   See :ref:`locating-by-dom`.
+   See `Locating by DOM`_
 
  - Locators starting with "//" will use the XPath locator strategy. 
-   See :ref:`locating-by-xpath`.
+   See `Locating by XPath`_.
 
  - Locators that start with anything other than the above or a valid locator 
    type will default to using the identifier locator strategy. 
-   See :ref:`locating-by-identifier`.
-
-.. _locating-by-identifier:
+   See `Locating by Identifier`_.
 
 Locating by Identifier
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -249,8 +246,6 @@ filter type is value (matching the value attribute).
    structure changes.  In the case where web designers frequently alter the 
    page, but its functionality must be regression tested, testing via id and 
    name attributes, or really via any HTML property, becomes very important.
-
-.. _locating-by-xpath:
 
 Locating by XPath 
 ~~~~~~~~~~~~~~~~~
@@ -354,11 +349,8 @@ match will be used.
 - ``link=Continue`` (4)
 - ``link=Cancel`` (5)
 
-.. _locating-by-dom:
-
 Locating by DOM  
 ~~~~~~~~~~~~~~~
-
 The Document Object Model represents an HTML document and can be accessed 
 using JavaScript. This location strategy takes JavaScript that evaluates to 
 an element on the page, which can be simply the element's location using the 
@@ -395,7 +387,6 @@ the DOM of your web application. A good reference exists on `W3Schools
 
 Locating by CSS
 ~~~~~~~~~~~~~~~
-
 CSS (Cascading Style Sheets) is a language for describing the rendering of HTML
 and XML documents. CSS uses Selectors for binding style properties to elements
 in the document. These Selectors can be used by Selenium as another locating 
@@ -434,7 +425,6 @@ references there.
 
 Matching Text Patterns
 ----------------------
-
 Like locators, *patterns* are a type of parameter frequently required by Selenese
 commands.  Examples of commands which require patterns are **verifyTextPresent**,
 **verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and 
@@ -446,7 +436,6 @@ There are three types of patterns: *globbing*, *regular expressions*, and *exact
 
 Globbing Patterns
 ~~~~~~~~~~~~~~~~~
-
 Most people are familiar with globbing as it is utilized in
 filename expansion at a DOS or Unix/Linux command line such as ``ls *.c``.
 In this case, globbing is used to display all the files ending with a ``.c`` 
@@ -500,7 +489,6 @@ test cases.
 
 Regular Expression Patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 *Regular expression* patterns are the most powerful of the three types
 of patterns that Selenese supports.  Regular expressions
 are also supported by most high-level programming languages, many text
@@ -572,7 +560,6 @@ Let's examine the regular expression above one part at a time:
 
 Exact Patterns
 ~~~~~~~~~~~~~~
-
 The **exact** type of Selenium pattern is of marginal usefulness.
 It uses no special characters at all.  So, if one needed to look for
 an actual asterisk character (which is special for both globbing and
@@ -609,7 +596,6 @@ regular expression patterns are sufficient for the vast majority of us.
 
 The "AndWait" Commands 
 ----------------------
-
 The difference between a command and its *AndWait*
 alternative is that the regular command (e.g. *click*) will do the action and
 continue with the following command as fast as it can, while the *AndWait*
@@ -632,7 +618,6 @@ exception.
 
 Sequence of Evaluation and Flow Control
 ---------------------------------------
-
 When a script runs, it simply runs in sequence, one command after another.
 
 Selenese, by itself, does not support condition statements (if-else, etc.) or 
@@ -795,7 +780,6 @@ Alerts, Popups, and Multiple Windows
 
 AJAX and waitFor Commands
 -------------------------
-
 *This section is not yet developed.*
 
 Many applications use AJAX for dynamic and animated functionality making 
