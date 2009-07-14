@@ -562,7 +562,7 @@ Python
 我们使用 pyunit 测试框架（单元测试模块）来执行测试。为了更好的写测试脚本，你需要了解这个框架是如何工作的。
 如过想全面了解pyunit，请阅读它的 `官方文档 <http://docs.python.org/library/unittest.html>`_ 。
 
-基本测试结果如下:
+基本测试脚本结构如下:
 
 .. code-block:: python
 
