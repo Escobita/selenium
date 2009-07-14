@@ -148,7 +148,7 @@ locator类型在许多情况下可以忽略.
    参见 : 说明:`identifier通过定位`.
 
 .. _通过identifier定位:
-Locating by Identifier
+
 通过identifier定位:
 ~~~~~~~~~~~~~~~~~~~~~~
 这或许是最常用的定位元素的方法,也是当没有被识别的locator类型使用时，默认使用的方法
@@ -414,165 +414,134 @@ publication <http://www.w3.org/TR/css3-selectors/>`_.  你将获得更多参考�
 文件名替换模式
 ~~~~~~~~~~~~~~~~~
 
-Most people are familiar with globbing as it is utilized in
-很多人熟悉文件名替换，
-filename expansion at a DOS or Unix/Linux command line such as ``ls *.c``.
-In this case, globbing is used to display all the files ending with a ``.c`` 
-extension that exist in the current directory.  Globbing is fairly limited.  
-Only two special characters are supported in the Selenium implementation:
+很多人熟悉文件名替换，因为它用在DOS或者Unix/Linux命令行的文件名扩展,像
+``ls *.c`` 命令.
+在这种情况下,文件名替换被用来显示所有以 ``.c`` 扩展的所有在当前目录下的文件.
+文件名替换用处非常有限.
+只有两个特殊字符在Selenium实现中被支持:
 
-    **\*** which translates to "match anything," i.e., nothing, a single character, or many characters.
+    **\*** 翻译为 "匹配所有," 如下,空,单个字符,或者多个字符.
+    **[ ]** (*字符类*) 翻译为 "匹配在方括号里面的任何单个字符.",
+    破折号(连字符)可以作为一种简写方式,来指定一个范围内的字符(这些字符在ASCII字符集中连续),
+    以下几个例子可以清楚的说明字符类的功能.
 
-    **[ ]** (*character class*) which translates to "match any single character 
-    found inside the square brackets." A dash (hyphen) can be used as a shorthand
-    to specify a range of characters (which are contiguous in the ASCII character
-    set).  A few examples will make the functionality of a character class clear:
+    ``[aeiou]`` 匹配任意小写的vowel字符中的一个
 
-    ``[aeiou]`` matches any lowercase vowel
+    ``[0-9]`` 匹配任意一个数字
 
-    ``[0-9]`` matches any digit
+    ``[a-zA-Z0-9]`` 匹配任意字母和数字字符
 
-    ``[a-zA-Z0-9]`` matches any alphanumeric character
+在很多其它环境中,文件名替换包括第三个特殊字符 **?**.
+但Selenium 文件名替换只支持星号和字符类.
 
-In most other contexts, globbing includes a third special character, the **?**.
-However, Selenium globbing patterns only support the asterisk and character
-class.
+在Selenese命令中指定文件名替换模式参数,需要加一个 **glob:** 标签前缀.
+但是，因为文件名替换模式是默认的,所以你也可以省略掉这个标签而特指模式本身.
 
-To specify a globbing pattern parameter for a Selenese command, one can
-prefix the pattern with a **glob:** label.  However, because globbing
-patterns are the default, one can also omit the label and specify just the
-pattern itself.
-
-Below is an example of two commands that use globbing patterns.  The
-actual link text on the page being tested
-was "Film/Television Department"; by using a pattern
-rather than the exact text, the **click** command will work even if the
-link text is changed to "Film & Television Department" or "Film and Television
-Department".  The glob pattern's asterisk will match "anything or nothing"
-between the word "Film" and the word "Television".
+以下例子是用文件名替换模式的两个命令.实际的在页面上被测的链接文本是 
+"Film/Television Department";通过使用一个模式而不是完全的文本, **click**
+命令将起作用，即使这个文本变为 "Film & Television Department" 或者
+"Film and Television Department".
+文件名替换模式的星号将匹配在字 "Film" 和字 "Television"之间的 "任意的或空的" .
 
 ===========   ====================================    ========
 click         link=glob:Film*Television Department
 verifyTitle   glob:\*Film\*Television\*
 ===========   ====================================    ========
 
-The actual title of the page reached by clicking on the link was "De Anza Film And
-Television Department - Menu".  By using a pattern rather than the exact
-text, the ``verifyTitle`` will pass as long as the two words "Film" and "Television" appear
-(in that order) anywhere in the page's title.  For example, if 
-the page's owner should shorten
-the title to just "Film & Television Department," the test would still pass.
-Using a pattern for both a link and a simple test that the link worked (such as
-the ``verifyTitle`` above does) can greatly reduce the maintenance for such
-test cases.
+通过点击链接 "De Anza Film And Television Department - Menu"得到页面标题.
+通过一个模式而不是完全的文本,只要两个字"Film" 和 "Television"在页面标题的任何位置,
+命令 ``verifyTitle`` 将会通过.例如,当这页的标题缩短为"Film & Television Department,"
+这个测试仍然通过.用一个模式用于链接和测试链接是否工作的简单的测试
+(正如上面 ``verifyTitle`` 做的) 能有效的减少这类测试的维护成本.
 
-Regular Expression Patterns
+正则表达式
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*Regular expression* patterns are the most powerful of the three types
-of patterns that Selenese supports.  Regular expressions
-are also supported by most high-level programming languages, many text
-editors, and a host of tools, including the Linux/Unix command-line
-utilities **grep**, **sed**, and **awk**.  In Selenese, regular
-expression patterns allow a user to perform many tasks that would
-be very difficult otherwise.  For example, suppose your test needed
-to ensure that a particular table cell contained nothing but a number.
-``regexp: [0-9]+`` is a simple pattern that will match a decimal number of any length.
+*正则表达* 模式是Selenese支持的三类模式中功能最强的.
+正则表达式在大多高级编程语言中支持,许多文本编辑器以及很多工具,包括
+Linux/Unix的命令行工具 **grep**, **sed**和**awk** 也支持.
+在Selenese中,正则表达式允许用户完成许多非常复杂的任务.
+例如,假设你的测试需要测试确保一个特定表格内只包含数字.
+``regexp: [0-9]+`` 是一个匹配任何长度数字的简短模式.
 
-Whereas Selenese globbing patterns support only the **\*** 
-and **[ ]** (character
-class) features, Selenese regular expression patterns offer the same
-wide array of special characters that exist in JavaScript.  Below 
-are a subset of those special characters:
+Selenese的文件名替换模式只支持 **\*** 和 **[ ]** (字符类)功能.
+Selenese正则表达式提供在JavaScript存在的特定字符集范围.
+以下是这些特殊字符集的一个子集.
 
 =============     ======================================================================
     PATTERN            MATCH
 =============     ======================================================================
-   .              any single character
-   [ ]            character class: any single character that appears inside the brackets 
-   \*             quantifier: 0 or more of the preceding character (or group)
-   \+             quantifier: 1 or more of the preceding character (or group)
-   ?              quantifier: 0 or 1 of the preceding character (or group)
-   {1,5}          quantifier: 1 through 5 of the preceding character (or group)
-   \|             alternation: the character/group on the left or the character/group on
-                  the right
-   ( )            grouping: often used with alternation and/or quantifier
+   .              任意单字符
+   [ ]            字符类: 位于括号内的任意字符 
+   \*             量词: 0个或多个前面的字符(或组)
+   \+             量词: 1个或多个前面的字符(或组)
+   ?              量词: 0个或1个前面的字符(或组)
+   {1,5}          量词: 1个到5个前面的字符(或组)
+   \|             可选: 左边字符/组或右边字符/组
+   ( )            分组：往往交替使用和/或量词
 =============     ======================================================================
 
-Regular expression patterns in Selenese need to be prefixed with
-either ``regexp:`` or ``regexpi:``.  The former is case-sensitive; the
-latter is case-insensitive.
+正则表达式在Selenese中需要以 ``regexp:`` 或 ``regexpi:`` 作前缀.  
+前面这个是区分大小写的;后面这个不区分大小写.
 
-A few examples will help clarify how regular expression patterns can
-be used with Selenese commands.  The first one uses what is probably
-the most commonly used regular expression pattern--**.\*** ("dot star").  This
-two-character sequence can be translated as "0 or more occurrences of
-any character" or more simply, "anything or nothing."  It is the
-equivalent of the one-character globbing pattern **\*** (a single asterisk).
+很多例子将帮助你清晰地来了解正则表达式在Selenese是如何使用的.
+第一个或许是最经常用到的正则表达式--**.\***("星号").
+这两个字符序列翻译为 "0个或者多个字符"或者更简单的 "有或者没有"
+它和一个字符的文件名替换模式 **\** (单个星号).
 
 ===========   =======================================    ========
 click         link=regexp:Film.*Television Department
 verifyTitle   regexp:.\*Film.\*Television.\*
 ===========   =======================================    ========
 
-The example above is functionally equivalent to the earlier example
-that used globbing patterns for this same test.  The only differences
-are the prefix (**regexp:** instead of **glob:**) and the "anything
-or nothing" pattern (**.\*** instead of just **\***).
+上面这个例子和之前用文件名替换模式用于同一个测试的实现的功能相同.
+唯一的不同是前缀(**regexp:** 而不是 **glob:**) 和 "有或者没有"模式(
+**.\*** 而不是 **\***).
 
-The more complex example below tests that the Yahoo!
-Weather page for Anchorage, Alaska contains info on the sunrise time:
+下面这些更复杂些的测试例子是yahoo! 天气页导航, Alaska日出的信息:
 
 ==================  ===============================================    ========
 open                http://weather.yahoo.com/forecast/USAK0012.html
 verifyTextPresent   regexp:Sunrise: \*[0-9]{1,2}:[0-9]{2} [ap]m
 ==================  ===============================================    ========
 
-Let's examine the regular expression above one part at a time:
+让我们测试以上正则表达式一个时间:
 
 ==============   ====================================================
-``Sunrise: *``   The string **Sunrise:** followed by 0 or more spaces
-``[0-9]{1,2}``   1 or 2 digits (for the hour of the day)
-``:``            The character **:** (no special characters involved)
-``[0-9]{2}``     2 digits (for the minutes) followed by a space
-``[ap]m``        "a" or "p" followed by "m" (am or pm)
+``Sunrise: *``   字符串 **Sunrise:** 后一个或者多个空格
+``[0-9]{1,2}``   1个或者2个数字(一天中的小时)
+``:``            字符 **:** (不涉及特殊字符)
+``[0-9]{2}``     2个数字(分钟) 跟着1个空格
+``[ap]m``        "a" 或者 "p" 跟着1个 "m" (am 或者 pm)
 ==============   ====================================================
 
-Exact Patterns
+完整模式
 ~~~~~~~~~~~~~~
 
-The **exact** type of Selenium pattern is of marginal usefulness.
-It uses no special characters at all.  So, if one needed to look for
-an actual asterisk character (which is special for both globbing and
-regular expression patterns), the **exact** pattern would be one way
-to do that.  For example, if one wanted to select an item labeled
-"Real \*" from a dropdown, the following code might work or it might not.
-The asterisk in the ``glob:Real *`` pattern will match anything or nothing.
-So, if there was an earlier select option labeled "Real Numbers," it would
-be the option selected rather than the "Real \*" option.
+Selenium 模式的 **完整** 类型用处比较有限.
+它完全没有特殊字符.所以,如果想找一个真实的星号字符(这个字符对文件名替换和正则表达式
+来说是特殊的), **完整** 模式是一个办法.例如,如果想选择在下拉框中的含有 "Real \*" 
+的一个标签,下面的代码将可以或者不可以.在 ``glob:Real *`` 模式中的星号将匹配所有或者没有.
+所以,如果在前面有个"Real Numbers,"标签的选择项.它将选择这个而不是 "Real \*"项.
 
 ===========   ====================================    =============
 select        //select                                glob:Real \*
 ===========   ====================================    =============
 
-In order to ensure that the "Real \*" item would be selected, the ``exact:``
-prefix could be used to create an **exact** pattern as shown below:
+为了确保"Real \*"项被选中, ``exact:`` 前缀将被用来产生一个 **完整** 模式如下:
 
 ===========   ====================================    =============
 select        //select                                exact:Real \*
 ===========   ====================================    =============
 
-But the same effect could be achieved via escaping the asterisk in a
-regular expression pattern:
+但通过在正则表达式对星号转义,也可以达到同样的效果:
  
 ===========   ====================================    ================
 select        //select                                regexp:Real \\\*
 ===========   ====================================    ================
 
-It's rather unlikely that most testers will ever need to look for
-an asterisk or a set of square brackets with characters inside them (the
-character class for globbing patterns).  Thus, globbing patterns and
-regular expression patterns are sufficient for the vast majority of us.
+大多数的测试员很少在字符集内部(文件名替换模式中的字符类)找一个星号或者一组方括号.
+因此,w文件名替换模式和正则表达式模式对我们大多是人来说足够了.
 
 
 The "AndWait" Commands 
