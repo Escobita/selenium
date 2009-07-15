@@ -541,69 +541,57 @@ select        //select                                regexp:Real \\\*
 ===========   ====================================    ================
 
 大多数的测试员很少在字符集内部(文件名替换模式中的字符类)找一个星号或者一组方括号.
-因此,w文件名替换模式和正则表达式模式对我们大多是人来说足够了.
+因此,文件名替换模式和正则表达式模式对我们大多是人来说足够了.
 
 
-The "AndWait" Commands 
+"AndWait" 命令集
+
 ----------------------
 
-The difference between a command and its *AndWait*
-alternative is that the regular command (e.g. *click*) will do the action and
-continue with the following command as fast as it can, while the *AndWait*
-alternative (e.g. *clickAndWait*) tells Selenium to **wait** for the page to
-load after the action has been done. 
+一个命令和它的 *AndWait* 可选项的不同在于:一个普通的命令(例如, *click*) 将执行这
+个动作，然后接着执行接下来的命令,而 *AndWait* 可选项(例如, *clickAndWait*) 将
+告诉Selenium 执行这个命令后 **等待** 页面加载.
 
 .. TODO: mam-p:  I don't believe the following is true, at least in Selenium-
    IDE.  Perhaps it is supposed to be true, but I don't think we should 
    misrepresent the current status. 
 
-The *AndWait* alternative is always used when the action causes the browser to
-navigate to another page or reload the present one. 
+*AndWait* 可选项经常用在当这个动作导致浏览器导航到另个页面或者重新加载当前这个页面. 
 
-Be aware, if you use an *AndWait* command for an action that
-does not trigger a navigation/refresh, your test will fail. This happens 
-because Selenium will reach the *AndWait*'s timeout without seeing any 
-navigation or refresh being made, causing Selenium to raise a timeout 
-exception.
+当心，如果你用一个 *AndWait* 命令执行不是执行一个导航/刷新动作,你的这个测试将失败.
+这是因为Selenium将 等待 *AndWait* 的时间去看任何导航或者刷新执行,导致Selenium抛出一个
+超时异常.
  
 
-Sequence of Evaluation and Flow Control
+计算序列和流程控制
 ---------------------------------------
 
-When a script runs, it simply runs in sequence, one command after another.
+当一个脚步执行的时候,这个脚本是依次执行的,一个命令接着另一个命令.
 
-Selenese, by itself, does not support condition statements (if-else, etc.) or 
-iteration (for, while, etc.). Many useful tests can be conducted without flow 
-control. However, for a functional test of dynamic content, possibly involving
-multiple pages, programming logic is often needed.
+Selenese本身并不支持条件语句(if-else等) 或者循环语句(for, while等). 
+许多有用的测试可以在没有流程控制的情况下执行.
+然而,对一个动态内容的功能性测试来说，可能涉及多个页面，编程逻辑的情况是经常需要的.
 
-When flow control is needed, there are three options:  
+当流程控制需要的时候,有三种选择:  
 
-a) Run the script using Selenium-RC and a client library such as Java or
-   PHP to utilize the programming language's flow control features.
-b) Run a small JavaScript snippet from within the script using the storeEval command.
-c) Install the `goto_sel_ide.js <http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html>`_ extension.
+a) 用Selenium-RC执行脚本,一个客户端库象Java或者PHP去使用编程语言的流程控制功能.
+b) 在脚本中用StoreEval命令,运行一个小的JavaScript片段.
+c) 安装 `goto_sel_ide.js <http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html>`_ 扩展.
 
-Most testers will export the test script into a programming language file that uses the
-Selenium-RC API (see the Selenium-IDE chapter).  However, some organizations prefer
-to run their scripts from Selenium-IDE whenever possible (such as when they have
-many junior-level people running tests for them, or when programming skills are
-lacking). If this is your case, consider a JavaScript snippet or the goto_sel_ide.js extension.  
+大多数的测试员将导出测试脚本为一种使用Selenium-RC API(见Selenium-IDE章节)的编程语言文件.
+然而,有些组织更乐于尽可能的从Selenium-IDE运行他们的脚本(比如,当他们运行这些脚本的人
+是初级水平的或者缺乏编程经验的),如果你是这种情况,可以考虑JavaScript片段或者goto_sel_ide.js扩展.  
 
  
-Store Commands and Selenium Variables
+Store命令集和Selenium 变量
 -------------------------------------
-One can use Selenium variables to store constants at the 
-beginning of a script.  Also, when combined with a data-driven test design 
-(discussed in a later section), Selenium variables can be used to store values 
-passed to your test program from the command-line, from another program, or from
-a file.
+可以用Selenium变量存储常量在脚本的开始.
+当连接一个data-driven设计的时候(后面的部分会讨论),Selenium 变量可以用来存储值,
+这些值是你的测试测试程序通过命令行,或者另个程序，或者通过一个文件传入的. 
  
-The plain *store* command is the most basic of the many store commands and can be used 
-to simply store a constant value in a selenium variable.  It takes two 
-parameters, the text value to be stored and a selenium variable.  Use the 
-standard variable naming conventions of only alphanumeric characters when 
-choosing a name for your variable.
+简单的 *store* 命令是许多存储命令中最基本的,它能用来在Selenium变量中存储一个常量值. 
+它需要两个参数,要存储的文本值和selenium变量.   用标准的变量命名规则,即用数字和字母来命名你的
+变量.
 
 .. TODO: mam-p:  Why are we telling them the last sentence above?  Any 
    JavaScript identifiershould be okay, no?
@@ -612,26 +600,23 @@ choosing a name for your variable.
 store   paul@mysite.org   userName               
 =====   ===============   ========
 
-Later in your script, you'll want to use the stored value of your 
-variable.  To access the value of a variable, enclose the variable in 
-curly brackets ({}) and precede it with a dollar sign like this.
+在你后面的脚本中,你或许想用你存储值的变量.或者变量的值，将这个变量用括号 ({})括在中间,
+前面加一个美元符号标识.
 
 ==========  =======     ===========
 verifyText  //div/p     ${userName}               
 ==========  =======     ===========
 
-A common use of variables is for storing input for an input field.
+一个通常的变量用法是存储input字段的输入值.
 
 ====    ========     ===========
 type    id=login     ${userName}               
 ====    ========     ===========
 
-Selenium variables can be used in either the first or second parameter and 
-are interpreted by Selenium prior to any other operations performed by the 
-command.  A Selenium variable may also be used within a locator expression.
+Selenium变量可以用在第一个或者第二个参数中,它被Selenium编译,优先于这个命令中任何其他行为.
+Selenium变量还可以被用在一个locator表达式中.
 
-An equivalent store command exists for each verify and assert command.  Here 
-are a couple more commonly used store commands.
+等价的存储命令存在于每个验证和判定中.  以下是经常用到的存储命令.
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
