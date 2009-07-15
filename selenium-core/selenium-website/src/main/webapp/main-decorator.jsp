@@ -166,7 +166,8 @@
         </li>
         <li><a href="/docs/">Documentation</a>
             <ul>
-                <!-- <li><a href="/docs/book/Selenium_Documentation.pdf">Offline version</a></li> -->
+                <li><a href="/docs/">Online version</a></li>
+                <li><a href="/docs/book/Selenium_Documentation.pdf">Offline version (pdf)</a></li>
                 <li><a href="http://wiki.openqa.org/">Wiki</a></li>
                 <li><a href="http://release.openqa.org/selenium-core/1.0/reference.html">Selenium API</a></li>
             </ul>

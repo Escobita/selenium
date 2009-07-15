@@ -39,25 +39,20 @@
 						<id>build-docs</id>
 						<phase>generate-sources</phase>
 						<goals>
-                            <goal>run</goal>
+							<goal>run</goal>
 						</goals>
 						<configuration>
 							<tasks>
-                                <mkdir dir="target/selenium-website-1.0-SNAPSHOT/docs"/>
-                                <exec executable="sphinx-build">
-                                    <arg value="-b"/>
-                                    <arg value="html"/>
-                                    <arg value="src/main/rst"/>
-                                    <arg value="target/selenium-website-1.0-SNAPSHOT/docs/"/>
-                                </exec>
+								<mkdir dir="target/selenium-website-1.0-SNAPSHOT/docs"/>
+								<exec executable="sphinx-build">
+									<arg value="-b"/>
+									<arg value="html"/>
+									<arg value="src/main/rst"/>
+									<arg value="target/selenium-website-1.0-SNAPSHOT/docs/"/>
+								</exec>
 							</tasks>
 						</configuration>
 					</execution>
-				</executions>
-		    </plugin>
-            <plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
 					<execution>
 						<id>build-book-base</id>
 						<phase>generate-sources</phase>
@@ -66,21 +61,16 @@
 						</goals>
 						<configuration>
 							<tasks>
-                                <mkdir dir="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
-                                <exec executable="sphinx-build">
-                                    <arg value="-b"/>
-                                    <arg value="latex"/>
-                                    <arg value="src/main/rst"/>
-                                    <arg value="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
-                                </exec>
+								<mkdir dir="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
+								<exec executable="sphinx-build">
+									<arg value="-b"/>
+									<arg value="latex"/>
+									<arg value="src/main/rst"/>
+									<arg value="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
+								</exec>
 							</tasks>
 						</configuration>
 					</execution>
-				</executions>
-		    </plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
 					<execution>
 						<id>build-book-pdf</id>
 						<phase>process-sources</phase>
@@ -89,16 +79,16 @@
 						</goals>
 						<configuration>
 							<tasks>
-                                <exec executable="make">
-                                    <arg value="-C"/>
-                                    <arg value="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
-                                    <arg value="all-pdf"/>
-                                </exec>
+								<exec executable="make">
+									<arg value="-C"/>
+									<arg value="target/selenium-website-1.0-SNAPSHOT/docs/book/"/>
+									<arg value="all-pdf"/>
+								</exec>
 							</tasks>
 						</configuration>
 					</execution>
 				</executions>
-            </plugin>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
