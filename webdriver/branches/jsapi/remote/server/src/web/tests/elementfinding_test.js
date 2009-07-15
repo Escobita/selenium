@@ -40,6 +40,8 @@ function testCannotFindNonExistantLinkUsingLinkText(driver) {
   assertThat('Should not have found an element by nonexistant link text',
       driver.isElementPresent(webdriver.By.linkText('Not here either')),
       is(false));
+  driver.findElement(webdriver.By.linkText('Not here either'));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -57,6 +59,8 @@ function testCannotFindNonExistantId(driver) {
   assertThat('Should not have found an element by nonexistant ID',
       driver.isElementPresent(webdriver.By.id('notThere')),
       is(false));
+  driver.findElement(webdriver.By.id('notThere'));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -128,6 +132,8 @@ function testDoesNotFindElementByClassWhenRealNameIsShorterThanQuery(driver) {
   assertThat('Should not have found an element',
       driver.isElementPresent(webdriver.By.className('nameB')),
       is(false));
+  driver.findElement(webdriver.By.className('nameB'));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -193,9 +199,11 @@ function testFindElementByPartialLinkTextWhenTextIsAtEndOfLink(driver) {
 
 function testIsElementPresentReturnsFalseWithNoMatchingPartialLinkText(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  var futureResult =
-      driver.isElementPresent(webdriver.By.partialLinkText('anon window'));
+  var locator = webdriver.By.partialLinkText('anon window');
+  var futureResult = driver.isElementPresent(locator);
   assertThat('Should not have found an element', futureResult, is(false));
+  driver.findElement(locator);
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -267,6 +275,8 @@ function testShouldNotFindElementOutsideTree(driver) {
   driver.get(TEST_PAGES.formPage);
   var login = driver.findElement(webdriver.By.name('login'));
   assertThat(login.isElementPresent(webdriver.By.name('x')), is(false));
+  login.findElement(webdriver.By.name('x'));
+  driver.expectErrorFromPreviousCommand();
 }
 
 

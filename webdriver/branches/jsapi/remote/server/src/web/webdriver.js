@@ -185,12 +185,8 @@ webdriver.WebDriver.prototype.addCommand = function(command, opt_addToFront) {
   } else {
     this.commands_.push(command);
   }
-  webdriver.logging.debug([
-    'Command added',
-    '  there are now ' + this.commands_.length + ' pending commands'
-  ].join('\n'));
+
   if (this.commands_.length == 1 && this.isReady_ && !this.isPaused_) {
-    webdriver.logging.debug('Driver is ready now');
     this.dispatchEvent(webdriver.Event.Type.READY);
   }
 };
@@ -204,19 +200,66 @@ webdriver.WebDriver.prototype.hasPendingCommands = function() {
 };
 
 
+webdriver.WebDriver.prototype.expectErrorFromPreviousCommand = function(
+    opt_msg) {
+  var caughtError = false;
+  var handleError = goog.bind(function(e) {
+    caughtError = true;
+    e.stopPropagation();
+    this.clearError(/*resumeCommands=*/true);
+  }, this);
+  var numCommands = this.commands_.length;
+  if (!numCommands) {
+    throw new Error('No commands to expect an error from!!');
+  }
+
+  // Surround the last command with two new commands. The first enables our
+  // error listener which cancels any errors. The second verifies that we
+  // caught an error. If not, it fails the test.
+  goog.array.splice(this.commands_, Math.max(0, numCommands - 1), 0,
+      goog.bind(function() {
+        goog.events.listen(this, webdriver.Event.Type.ERROR, handleError,
+                           /*capture=*/true);
+      }, this));
+  this.commands_.push(goog.bind(function() {
+    // Need to unlisten for error events so the error below doesn't get blocked.
+    goog.events.unlisten(this, webdriver.Event.Type.ERROR, handleError,
+                         /*capture=*/true);
+    if (!caughtError) {
+      throw new Error(
+          (opt_msg ? (opt_msg + '\n') : '') +
+          'Expected an error but none were raised.\n' +
+          'Last response was: ' +
+          (this.lastResponse_ ? this.lastResponse_.value : 'null'));
+    }
+  }, this));
+};
+
+
 /**
- * Clears the this instance's error state, if there is one.  When the error
- * state is cleared, all pending commands are aborted.  Dispatches a
- * {@code webdriver.Event.Type.IDLE} event.
+ * Clears the this instance's error state, if there is one.
+ * @param {boolean} opt_resumeCommands Whether to resume command execution when
+ *     error state is cleared. If {@code false}, all pending commands will be
+ *     aborted and an {@code webdriver.Event.Type.IDLE} event dispatched. If
+ *     {@code true}, dispatches a {@code webdriver.Event.Type.READY} event to
+ *     resume command execution. Defaults to {@code false}.
  */
-webdriver.WebDriver.prototype.clearError = function() {
+webdriver.WebDriver.prototype.clearError = function(opt_resumeCommands) {
   if (this.inError_) {
     this.isReady_ = true;
     this.inError_ = false;
-    this.commands_ = [];
-    webdriver.logging.debug(
-        'Error state cleared; all queued commands removed');
-    this.dispatchEvent(webdriver.Event.Type.IDLE);
+    var eventType;
+    if (opt_resumeCommands) {
+      eventType = webdriver.Event.Type.READY;
+      webdriver.logging.debug(
+          'Error state cleared; resuming command execution...');
+    } else {
+      eventType = webdriver.Event.Type.IDLE;
+      this.commands_ = [];
+      webdriver.logging.debug(
+          'Error state cleared; aborting pending commands...');
+    }
+    window.setTimeout(goog.bind(this.dispatchEvent, this, eventType), 0);
   }
 };
 
@@ -462,14 +505,69 @@ webdriver.WebDriver.prototype.switchToWindow = function(name) {
 
 
 /**
+ * Adds a command to switch to a frame in the current window.
+ * @param {string} name The name of the window to transfer control to.
+ */
+webdriver.WebDriver.prototype.switchToFrame = function(name) {
+  this.addCommand(webdriver.CommandInfo.SWITCH_TO_FRAME.buildCommand(
+      this, [name], goog.bind(function(response) {
+        this.context_ = response.value;
+      }, this)));
+};
+
+
+/**
+ * Adds a command to switch to the top frame in the current window.
+ */
+webdriver.WebDriver.prototype.switchToDefaultContent = function() {
+  this.addCommand(webdriver.CommandInfo.SWITCH_TO_FRAME.buildCommand(
+      this, [null], goog.bind(function(response) {
+        this.context_ = response.value;
+      }, this)));
+};
+
+
+/**
+ * Adds a command to get the current window handle.
+ * @return {webdriver.Future} The current handle wrapped in a Future.
+ */
+webdriver.WebDriver.prototype.getWindowHandle = function() {
+  var handle = new webdriver.Future(this);
+  this.addCommand(webdriver.CommandInfo.GET_CURRENT_WINDOW_HANDLE.buildCommand(
+      this, null, goog.bind(handle.setValueFromResponse, handle)));
+  return handle;
+};
+
+
+/**
+ * Adds a command to get all of the current window handles.
+ */
+webdriver.WebDriver.prototype.getAllWindowHandles = function() {
+  this.addCommand(webdriver.CommandInfo.GET_CURRENT_WINDOW_HANDLES.buildCommand(
+      this, null,
+      function(response) {
+        response.value = response.value.split(',');
+      }));
+};
+
+
+/**
+ * Adds a command to fetch the HTML source of the current page.
+ * @return {webdriver.Future} The page source wrapped in a Future.
+ */
+webdriver.WebDriver.prototype.getPageSource = function() {
+  var source = new webdriver.Future(this);
+  this.addCommand(webdriver.CommandInfo.GET_PAGE_SOURCE.buildCommand(
+      this, null, goog.bind(source.setValueFromResponse, source)));
+  return source;
+};
+
+
+/**
  * Adds a command to close the current window.
  */
 webdriver.WebDriver.prototype.close = function() {
-  this.addCommand(webdriver.CommandInfo.CLOSE.buildCommand(
-      this, null, goog.bind(function(response) {
-        // TODO(jmleyba): How do we prevent closing the test page window?
-        // TODO(jmleyba): How do we get back to the main window?
-      }, this)));
+  this.addCommand(webdriver.CommandInfo.CLOSE.buildCommand(this));
 };
 
 
@@ -533,6 +631,26 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
 webdriver.WebDriver.prototype.get = function(url) {
   this.addCommand(webdriver.CommandInfo.GET.buildCommand(
       this, [url.toString()]));
+};
+
+
+webdriver.WebDriver.prototype.back = function() {
+  this.addCommand(webdriver.CommandInfo.BACK.buildCommand(this));
+};
+
+
+webdriver.WebDriver.prototype.forward = function() {
+  this.addCommand(webdriver.CommandInfo.FORWARD.buildCommand(this));
+};
+
+
+webdriver.WebDriver.prototype.refresh = function() {
+  this.addCommand(webdriver.CommandInfo.REFRESH.buildCommand(this));
+};
+
+
+webdriver.WebDriver.prototype.getCurrentUrl = function() {
+  return this.executeScript('return window.location.href');
 };
 
 

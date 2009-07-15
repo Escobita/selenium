@@ -4,9 +4,11 @@ goog.require('goog.events');
 goog.require('goog.math.Coordinate');
 goog.require('goog.math.Size');
 goog.require('goog.string');
+goog.require('goog.userAgent');
 goog.require('webdriver.By');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.asserts');
+
 
 var TEST_FILES = [
   'childrenfinding_test.js',
@@ -16,8 +18,26 @@ var TEST_FILES = [
   'elementfinding_test.js',
   'elementname_test.js',
   'executingjavascript_test.js',
-  'formhandling_test.js'
+  'expectederrors_test.js',
+  'formhandling_test.js',
+  'frameswitching_test.js',
+  'getinnerouterhtml_test.js',
+  'misc_test.js',
+  'pageloading_test.js',
+  'partiallinktextmatch_test.js',
+  'selectelementhandling_test.js',
+  'staleelementreference_test.js',
+  'textpages_test.js',
+  'typing_test.js',
+  'visibility_test.js',
+  'windowswitching_test.js',
+  'xpathelementfinding_test.js'
 ];
+
+
+var IS_FF_3 = goog.userAgent.GECKO &&
+              navigator.userAgent.search(/Firefox\/3\.\d+/) > -1;
+
 
 /**
  * Hackery! When this file is loaded, we also want to load all of the individual
@@ -58,7 +78,9 @@ var TEST_PAGES = {
   iframePage: whereIs('iframes.html'),
   dragAndDropPage: whereIs('dragAndDropTest.html'),
   chinesePage: whereIs('cn-test.html'),
-  nestedPage: whereIs('nestedElements.html')
+  nestedPage: whereIs('nestedElements.html'),
+  textPage: whereIs('plain.txt'),
+  richtextPage: whereIs('rich_text.html')
 };
 
 
@@ -78,7 +100,7 @@ function setUpPage(driver) {
 
   var uri = new goog.Uri(window.location.href);
   var currentFile = uri.getParameterValue('file');
-  var options = goog.array.map(TEST_FILES, function(file, index) {
+  var options = goog.array.map(TEST_FILES, function(file) {
     return goog.dom.createDom('OPTION', {
       value: file,
       innerHTML: file,

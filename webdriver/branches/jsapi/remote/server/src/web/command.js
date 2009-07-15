@@ -81,6 +81,7 @@ webdriver.CommandInfo.prototype.buildCommand = function(driver, opt_args,
   info.GET_CURRENT_WINDOW_HANDLES = new info(
       'getAllWindowHandles', '/session/:sessionId/:context/window_handles',
       'GET');
+  info.GET_PAGE_SOURCE = new info('getPageSource', '', 'GET');
 
   info.GET = new info('get', '/session/:sessionId/:context/url', 'POST');
   info.FORWARD = new info(

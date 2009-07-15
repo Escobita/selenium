@@ -98,15 +98,13 @@ function testTogglingACheckboxReturnsItsCurrentState(driver) {
 }
 
 
-// TODO(jmleyba): Expected failures?
 function testCannotSelectSomethingThatIsDisabled(driver) {
   driver.get(TEST_PAGES.formPage);
   var radioButton = driver.findElement(webdriver.By.id('nothing'));
   assertThat(radioButton.isEnabled(), is(false));
   radioButton.setSelected();
-  driver.callFunction(function() {
-    fail('Should not have succeeded');
-  });
+  driver.expectErrorFromPreviousCommand(
+      'Should not be able to select disabled element');
 }
 
 
@@ -156,14 +154,12 @@ function testRadioButtonsInSameGroupChangeWhenNewButtonIsSelected(driver) {
 }
 
 
-// TODO(jmleyba): expected failure?
 function testThrowsAnExceptionWhenTogglingTheStateOfARadioButton(driver) {
   driver.get(TEST_PAGES.formPage);
   var cheese = driver.findElement(webdriver.By.id('cheese'));
   cheese.toggle();
-  driver.callFunction(function() {
-    fail('Should not be able to toggle a radio button');
-  });
+  driver.expectErrorFromPreviousCommand(
+      'Should not be able to toggle a radio button');
 }
 
 
@@ -173,9 +169,8 @@ function testThrowsAnExceptionWhenTogglingOptionNotInAMultiSelect(driver) {
       findElements(webdriver.By.tagName('option'));
   driver.callFunction(function(response) {
     response.value[0].toggle();
-    driver.callFunction(function() {
-      fail('Should not be able to toggle an option not in a multi-select');
-    });
+    driver.expectErrorFromPreviousCommand(
+        'Should not be able to toggle an option not in a multi-select');
   });
 }
 
@@ -204,13 +199,11 @@ function testCanAlterTheContentsOfAFileUploadInputElement(driver) {
 }
 
 
-// TODO(jmleyba): Expected failures
 function testThrowsAnExceptionWhenSelectingAnUnselectableElement(driver) {
   driver.get(TEST_PAGES.formPage);
   driver.findElement(webdriver.By.xpath('//title')).setSelected();
-  driver.callFunction(function() {
-    fail('Should not be able to select unselectable element');
-  });
+  driver.expectErrorFromPreviousCommand(
+      'Should not be able to select unselectable element');
 }
 
 

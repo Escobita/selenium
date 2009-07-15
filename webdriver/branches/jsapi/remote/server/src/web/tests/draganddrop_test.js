@@ -5,7 +5,8 @@
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 
-// TODO(jmleyba): Need to limit the tests in this file to FF only.
+// TODO(jmleyba): Need to limit the tests in this file to FF only. (Limit them
+// so the page under test is FF only, not limit them to only being run from FF).
 
 
 function drag(element, initialLocation, moveRightBy, moveDownBy) {

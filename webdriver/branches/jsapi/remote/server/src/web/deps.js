@@ -10,6 +10,7 @@ goog.addDependency('../factory.js', ['webdriver.factory'],
                    ['goog.userAgent', 'webdriver.LocalCommandProcessor',
                     'webdriver.WebDriver']);
 goog.addDependency('../future.js', ['webdriver.Future'], []);
+goog.addDependency('../key.js', ['webdriver.Key'], ['goog.array']);
 goog.addDependency('../localcommandprocessor.js',
                    ['webdriver.LocalCommandProcessor'],
                    ['webdriver.Context', 'webdriver.Response']);
@@ -31,5 +32,5 @@ goog.addDependency('../webdriver.js',
                     'webdriver.Future', 'webdriver.Response',
                     'webdriver.WebElement']);
 goog.addDependency('../webelement.js', ['webdriver.WebElement'],
-                   ['goog.array', 'goog.math.Coordinate',
+                   ['goog.array', 'goog.math.Coordinate', 'goog.math.Size',
                     'webdriver.CommandInfo', 'webdriver.Future']);

@@ -160,6 +160,12 @@ Utils.isDisplayed = function(element) {
       return false;
     }
 
+
+    // Elements with zero width or height are never displayed
+    if (element.offsetWidth == 0 || element.offsetHeight == 0) {
+      return false;
+    }
+
     var visibility = Utils.getStyleProperty(element, "visibility");
 
     var _isDisplayed = function(e) {
@@ -286,6 +292,7 @@ Utils.type = function(context, element, text) {
     var controlKey = false;
     var shiftKey = false;
     var altKey = false;
+    var metaKey = false;
 
     Utils.shiftCount = 0;
 
@@ -300,19 +307,25 @@ Utils.type = function(context, element, text) {
           if (controlKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
             Utils.keyEvent(context, element, "keyup", kCode, 0,
-              controlKey = false, shiftKey, altKey);
+              controlKey = false, shiftKey, altKey, metaKey);
           }
 
           if (shiftKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
             Utils.keyEvent(context, element, "keyup", kCode, 0,
-              controlKey, shiftKey = false, altKey);
+              controlKey, shiftKey = false, altKey, metaKey);
           }
 
           if (altKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
             Utils.keyEvent(context, element, "keyup", kCode, 0,
-              controlKey, shiftKey, altKey = false);
+              controlKey, shiftKey, altKey = false, metaKey);
+          }
+
+          if (metaKey) {
+            var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
+            Utils.keyEvent(context, element, "keyup", kCode, 0,
+              controlKey, shiftKey, altKey, metaKey = false);
           }
 
           continue;
@@ -350,6 +363,10 @@ Utils.type = function(context, element, text) {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
             altKey = !altKey;
             modifierEvent = altKey ? "keydown" : "keyup";
+        } else if (c == '\uE03D') {
+            keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
+            metaKey = !metaKey;
+            modifierEvent = metaKey ? "keydown" : "keyup";
         } else if (c == '\uE00B') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_PAUSE;
         } else if (c == '\uE00C') {
@@ -500,7 +517,7 @@ Utils.type = function(context, element, text) {
 
         if (modifierEvent) {
           Utils.keyEvent(context, element, modifierEvent, keyCode, 0,
-              controlKey, shiftKey, altKey);
+              controlKey, shiftKey, altKey, metaKey);
           continue;
         }
 
@@ -514,7 +531,7 @@ Utils.type = function(context, element, text) {
         if (needsShift && !shiftKey) {
           var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
           Utils.keyEvent(context, element, "keydown", kCode, 0,
-              controlKey, true, altKey);
+              controlKey, true, altKey, metaKey);
           Utils.shiftCount += 1;
         }
 
@@ -526,20 +543,20 @@ Utils.type = function(context, element, text) {
 
         var accepted =
           Utils.keyEvent(context, element, "keydown", keyCode, 0,
-              controlKey, needsShift || shiftKey, altKey);
+              controlKey, needsShift || shiftKey, altKey, metaKey);
 
         Utils.keyEvent(context, element, "keypress", pressCode, charCode,
-            controlKey, needsShift || shiftKey, altKey, !accepted);
+            controlKey, needsShift || shiftKey, altKey, metaKey, !accepted);
 
         Utils.keyEvent(context, element, "keyup", keyCode, 0,
-            controlKey, needsShift || shiftKey, altKey);
+            controlKey, needsShift || shiftKey, altKey, metaKey);
 
         // shift up if needed
 
         if (needsShift && !shiftKey) {
           var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
           Utils.keyEvent(context, element, "keyup", kCode, 0,
-              controlKey, false, altKey);
+              controlKey, false, altKey, metaKey);
         }
     }
 
@@ -548,24 +565,30 @@ Utils.type = function(context, element, text) {
     if (controlKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
       Utils.keyEvent(context, element, "keyup", kCode, 0,
-        controlKey = false, shiftKey, altKey);
+        controlKey = false, shiftKey, altKey, metaKey);
     }
 
     if (shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
       Utils.keyEvent(context, element, "keyup", kCode, 0,
-        controlKey, shiftKey = false, altKey);
+        controlKey, shiftKey = false, altKey, metaKey);
     }
 
     if (altKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
       Utils.keyEvent(context, element, "keyup", kCode, 0,
-        controlKey, shiftKey, altKey = false);
+        controlKey, shiftKey, altKey = false, metaKey);
+    }
+
+    if (metaKey) {
+      var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
+      Utils.keyEvent(context, element, "keyup", kCode, 0,
+        controlKey, shiftKey, altKey, metaKey = false);
     }
 };
 
 Utils.keyEvent = function(context, element, type, keyCode, charCode,
-    controlState, shiftState, altState, shouldPreventDefault) {
+    controlState, shiftState, altState, metaState, shouldPreventDefault) {
   var preventDefault = shouldPreventDefault == undefined ? false : shouldPreventDefault;
 
   var keyboardEvent =
@@ -581,7 +604,7 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
     controlState, //  in boolean ctrlKeyArg
     altState,     //  in boolean altKeyArg
     shiftState,   //  in boolean shiftKeyArg
-    false,        //  in boolean metaKeyArg
+    metaState,    //  in boolean metaKeyArg
     keyCode,      //  in unsigned long keyCodeArg
     charCode);    //  in unsigned long charCodeArg
 

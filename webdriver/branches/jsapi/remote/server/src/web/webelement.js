@@ -24,11 +24,12 @@ goog.provide('webdriver.WebElement');
 
 goog.require('goog.array');
 goog.require('goog.math.Coordinate');
+goog.require('goog.math.Size');
 goog.require('webdriver.CommandInfo');
 goog.require('webdriver.Future');
 
 /**
- * TODO
+ * TODO(jmleyba): Beefier documentation please
  * Usage:
  * <code>
  * var driver = webdriver.createLocalWebDriver();
@@ -242,21 +243,18 @@ webdriver.WebElement.prototype.isElementPresent = function(findBy) {
  */
 webdriver.WebElement.prototype.findElement = function(by) {
   var commandInfo, xpath;
+  var webElement = new webdriver.WebElement(this.driver_);
   if (by.type == 'id') {
     commandInfo = webdriver.CommandInfo.FIND_ELEMENT_USING_ELEMENT_BY_ID;
-  }
-
-  var webElement = new webdriver.WebElement(this.driver_);
-  if (commandInfo) {
-    var webElementId = webElement.getId();
     this.addCommand_(commandInfo, [by.target],
-        goog.bind(webElementId.setValueFromResponse, webElementId));
-  } else if (by.type == 'tagName') {
-    xpath = './/' + by.target;
-  } else if (by.type == 'linkText') {
-    xpath = ".//a[text()='" + by.target + "']";
-  } else if (by.type == 'name') {
-    xpath = ".//*[@name='" + by.target + "']";
+        function(response) {
+          // TODO(jmleyba): FF extension needs to report error, not return -1
+          // That is what it does for finding from the root anyway...
+          if (response.value == '-1') {
+            throw new Error('Element not found');
+          }
+          webElement.getId().setValueFromResponse(response);
+        });
   } else if (by.type == 'className') {
     this.addCommand_(
         webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME,
@@ -266,6 +264,22 @@ webdriver.WebElement.prototype.findElement = function(by) {
           response.value = response.value.split(',')[0];
           this.getId().setValue(response.value);
         }, webElement));
+  } else if (by.type == 'partialLinkText') {
+    this.addCommand_(
+        webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_PARTIAL_LINK_TEXT,
+        [by.target],
+        goog.bind(function(response) {
+          // TODO(jmleyba): Is this the correct way to handle this?
+          response.value = response.value.split(',')[0];
+          this.getId().setValue(response.value);
+        }, webElement));
+  } else if (by.type == 'tagName') {
+    xpath = './/' + by.target;
+  } else if (by.type == 'linkText') {
+    xpath = ".//a[text()='" + by.target + "']";
+  } else if (by.type == 'name') {
+    xpath = ".//*[@name='" + by.target + "']";
+  } else if (by.type == 'className') {
   } else if (by.type == 'partialLinkText') {
     xpath = ".//a[contains(text(),'" + by.target + "')]";
   } else if (by.type == 'xpath') {
@@ -277,6 +291,10 @@ webdriver.WebElement.prototype.findElement = function(by) {
         webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH, [xpath],
         goog.bind(function(response) {
           // TODO(jmleyba): Is this the correct way to handle this?
+          if (!response.value) {
+            throw new Error('No element found: ' +
+                webdriver.logging.describe(response));
+          }
           response.value = response.value.split(',')[0];
           this.getId().setValue(response.value);
         }, webElement));
@@ -445,6 +463,18 @@ webdriver.WebElement.prototype.clear = function() {
 };
 
 
+webdriver.WebElement.prototype.getSize = function() {
+  var size = new webdriver.Future(this.driver_);
+  this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_SIZE, null,
+      goog.bind(function(response) {
+        var wh = response.value.replace(/\s/g, '').split(',');
+        response.value = new goog.math.Size(wh[0], wh[1]);
+        size.setValue(response.value);
+      }, this));
+  return size;
+};
+
+
 webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
                                                                response) {
   var xy = response.value.replace(/\s/g, '').split(',');
@@ -502,8 +532,10 @@ webdriver.WebElement.prototype.isEnabled = function() {
 };
 
 
-webdriver.WebElement.prototype.isCheckedOrSelected_ = function() {
-  var value = new webdriver.Future(this.driver_);
+/** @private */
+webdriver.WebElement.prototype.isCheckedOrSelected_ = function(opt_future,
+                                                               opt_addToFront) {
+  var value = opt_future ||  new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_NAME, null,
       goog.bind(function(response) {
         var attribute = response.value == 'input' ? 'checked' : 'selected';
@@ -513,13 +545,12 @@ webdriver.WebElement.prototype.isCheckedOrSelected_ = function() {
               response.value = !!response.value;
               value.setValue(response.value);
             }, null, true);
-      }, this));
+      }, this), null, opt_addToFront);
   return value;
 };
 
 
 
-// TODO(jmleyba): isSelected should also check isChecked for checkbox INPUTs
 webdriver.WebElement.prototype.isSelected = function() {
   return this.isCheckedOrSelected_();
 };
@@ -527,6 +558,16 @@ webdriver.WebElement.prototype.isSelected = function() {
 
 webdriver.WebElement.prototype.isChecked = function() {
   return this.isCheckedOrSelected_();
+};
+
+
+webdriver.WebElement.prototype.toggle = function() {
+  var toggleResult = new webdriver.Future(this.driver_);
+  this.addCommand_(webdriver.CommandInfo.TOGGLE_ELEMENT, null,
+      goog.bind(function() {
+        this.isCheckedOrSelected_(toggleResult, true);
+      }, this));
+  return toggleResult;
 };
 
 
@@ -540,7 +581,35 @@ webdriver.WebElement.prototype.clear = function() {
 };
 
 
-webdriver.WebElement.prototype.toggle = function() {
-  this.addCommand_(webdriver.CommandInfo.TOGGLE_ELEMENT);
-  return this.isCheckedOrSelected_();
+webdriver.WebElement.prototype.isDisplayed = function() {
+  var futureValue = new webdriver.Future(this.driver_);
+  this.addCommand_(webdriver.CommandInfo.IS_ELEMENT_DISPLAYED, null,
+      function(response) {
+        // TODO(jmleyba): FF extension should not be returning a string here...
+        if (goog.isString(response.value)) {
+          futureValue.setValue(response.value == 'true');
+        } else {
+          futureValue.setValue(response.value);
+        }
+      });
+  return futureValue;
 };
+
+
+webdriver.WebElement.prototype.getOuterHtml = function() {
+  return this.driver_.executeScript(
+      ['var element = arguments[0];',
+       'if ("outerHTML" in element) {',
+       '  return element.outerHTML;',
+       '} else {',
+       '  var div = document.createElement("div");',
+       '  div.appendChild(element.cloneNode(true));',
+       '  return div.innerHTML;',
+       '}'].join(''), this);
+};
+
+
+webdriver.WebElement.prototype.getInnerHtml = function() {
+  return this.driver_.executeScript('return arguments[0].innerHTML', this);
+};
+

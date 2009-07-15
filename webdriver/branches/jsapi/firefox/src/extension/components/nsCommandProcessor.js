@@ -369,39 +369,20 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
  * @param {Array.<*>} windowId The parameters sent with the original command.
  *     The first element in the array must be the ID of the window to switch to.
  *     Note all other command parameters are ignored.
+ * @param {boolean} opt_isSecondSearch Whether this is the second attempt to
+ *     find the window.
  */
-nsCommandProcessor.prototype.switchToWindow = function(response, windowId) {
+nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
+                                                       opt_isSecondSearch) {
   var lookFor = windowId[0];
-  var foundWindows = [];
   var matches = function(win, lookFor) {
-    var info = {
-      closed: win.closed,
-      name: (win.content ? win.content.name : ''),
-      id: (win.top && win.top.fxdriver ? win.top.fxdriver.id : '')
-    };
-    foundWindows.push(JSON.stringify(info));
-    if (win.closed) {
-      return false;
-    } else if (win.content && win.content.name == lookFor) {
-      return true;
-    } else {
-      return win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor;
-    }
+    return !win.closed &&
+           (win.content && win.content.name == lookFor) ||
+           (win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor);
   };
 
   Utils.dumpn('Looking for: ' + windowId);
-  var windowFound = this.searchWindows_(null, function(win) {
-//    Utils.dumpn('Switch to window?');
-//    Utils.dump(win);
-//    if (win.content) {
-//      Utils.dump(win.content);
-//    }
-//    if (win.top) {
-//      Utils.dump(win.top);
-//      if (win.top.fxdriver) {
-//        Utils.dump(win.top.fxdriver);
-//      }
-//    }
+  var windowFound = this.searchWindows_('navigator:browser', function(win) {
     if (matches(win, lookFor)) {
       win.focus();
       if (win.top.fxdriver) {
@@ -416,36 +397,27 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId) {
     }
   });
 
+  // It is possible that the window won't be found on the first attempt. This is
+  // typically true for anchors with a target attribute set. This search could
+  // execute before the target window has finished loaded, meaning the content
+  // window won't have a name or FirefoxDriver instance yet (see matches above).
+  // If we don't find the window, set a timeout to try one more time.
   if (!windowFound) {
-    response.isError = true;
-    response.response =
-        'Unable to locate window "' + lookFor + '"; ' +
-        (foundWindows.length ?
-            'located windows: ' + foundWindows.join(', ') :
-            'no windows found!');
-    response.send();
+    if (opt_isSecondSearch) {
+      Utils.dumpn('Window not found on 2nd attempt; reporting error');
+      response.isError = true;
+      response.response = 'Unable to locate window "' + lookFor + '"';
+      response.send();
+    } else {
+      Utils.dumpn('Window not found on 1st attempt...');
+      var self = this;
+      this.wm.getMostRecentWindow('navigator:browser').
+          setTimeout(function() {
+            Utils.dumpn('...trying to find window again');
+            self.switchToWindow(response, windowId, true);
+          }, 500);
+    }
   }
-//
-//  var allWindows = this.wm.getEnumerator(null);
-//  while (allWindows.hasMoreElements()) {
-//    var win = allWindows.getNext();
-//    if (matches(win, lookFor)) {
-//      win.focus();
-//      var driver = win.top.fxdriver;
-//      if (!driver) {
-//        response.isError = true;
-//        response.response = 'No driver found attached to top window!';
-//        return response.send();
-//      }
-//
-//      response.response = new Context(win.fxdriver.id).toString();
-//      return response.send();
-//    }
-//  }
-//
-//  response.isError = true;
-//  response.response = 'No window found';
-//  response.send();
 };
 
 

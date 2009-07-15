@@ -13,13 +13,24 @@ function testFindElementByXpath(driver) {
 }
 
 
-function testFindElementByXpathWhenNoMatch(driver) {
+function testCanDetectWhenElementsArePresentByXPath(driver) {
   driver.get(TEST_PAGES.nestedPage);
   var xpath = webdriver.By.xpath('//form[@name="form2"]/select/x');
   assertThat(driver.isElementPresent(xpath), is(false));
   var select = driver.findElement(
       webdriver.By.xpath('//form[@name="form2"]/select'));
   assertThat(select.isElementPresent(webdriver.By.xpath('.//x')), is(false));
+}
+
+
+function testRaisesAnErrorWhenChildElementIsNotFoundByXPath(driver) {
+  driver.get(TEST_PAGES.nestedPage);
+  var xpath = webdriver.By.xpath('//form[@name="form2"]/select/x');
+  assertThat(driver.isElementPresent(xpath), is(false));
+  var select = driver.findElement(
+      webdriver.By.xpath('//form[@name="form2"]/select'));
+  select.findElement(webdriver.By.xpath('.//x'));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -42,21 +53,22 @@ function testFindElementById(driver) {
 
 
 function testFindElementByIdWhenMultipleMatchesExist(driver) {
+  driver.callFunction(webdriver.logging.clear);
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.id('test_id_div')).
+  var text = driver.findElement(webdriver.By.id('test_id_div')).
       findElement(webdriver.By.id('test_id')).
       getText();
-  driver.callFunction(function(response) {
-    assertEquals('inside', response.value);
-  });
+  assertThat(text, equals('inside'));
 }
 
 
-// TODO(jmleyba): Catch expected failures - how?
 function testFindElementByIdWhenNoMatchInContext(driver) {
   driver.get(TEST_PAGES.nestedPage);
   driver.findElement(webdriver.By.id('test_id_div')).
       findElement(webdriver.By.id('test_id_out'));
+  driver.expectErrorFromPreviousCommand(
+      'Should not be able to find an element by ID when that element does ' +
+      'not exist under the given root');
 }
 
 
