@@ -619,15 +619,12 @@ Ruby
 
 学习 API
 ----------------
-We mentioned earlier that each selenium-client-library provides a
-language-specific programming interface which supports executing Selenese 
-commands from your test program.  The Selenium-RC API uses naming conventions 
-that, assuming you're familiar with your chosen programming language, and you 
-now understand Selenese, most of the interface for your selected language 
-will be self-explanatory. Here, however, we explain the most important and 
-possibly less obvious, aspects of the API.
+我们之前提到过每个selenium客户端类库提供一个特定语言的程序接口来支持从你测试程序执行Selenese命令。
+Selenium-RC API 使用命名惯例，假设你熟悉你选择的编程语言，并且你现在理解Selenese，那么大部分你选定语言的接口会不解自明的。
+不过我们这里会解释API的最重要的也可能是不那么显而易见的方面。
 
-Starting the Browser 
+
+启动浏览器 
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. container:: toggled
@@ -677,96 +674,75 @@ Starting the Browser
         @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
-Each of these examples would instantiate a browser (which is just an object 
-for your code) by assigning a "browser instance" to a program variable.  The 
-browser instance variable is then used to call methods from the browser, 
-like *open* or *type*)
+每个例子将会通过分配一个“浏览器实例”给一个程序变量来实例化一个浏览器（这个只是你代码里的一个对象）。
+这个浏览器实例然后被用来从浏览器调用方法，例如*open* 或 *type*。
 
-The initial parameters that you should give when you create the browser instance
-are: 
+当你创建浏览器实例的时候你必须给出的一些初始参数是：
 
 host
-    This is the ip location where the server is located. Most of the time, this is
-    the same machine as the one where the client is running, so you'll see
-    that it's an optional parameter on some clients.
+    这个是服务器所在地方的IP地址。大部分时间，这和运行客户端的是同一个机器，因此你可以在有些客户端看到这是一个可选的参数。
 port
-    As the host, it determines on which socket the server is listening waiting
-    for the client to communicate with it. Again, it can be optional in some
-    client drivers.
+    和host类似，这决定了服务器监听等待客户端与其通信的Socket端口。同样, 在有些客户端驱动，这个是可选的。
 browser
-    The browser in which you want to run the tests. This is a required 
-    parameter (I hope you understand why :))
+    你想要运行测试的浏览器。这个是必须的参数。（我希望你能理解为什么:)）
 url
-    The base url of the application under test. This is also required on all the
-    client libs and Selenium-RC needs it before starting the browser due to the
-    way the same server is implemented.
+    待测程序的基准url。这个在所有的客户端类库里也是必须的，并且由于有些服务器的实现方式，Selenium-RC在启动浏览器之前就需要它。
 
-Note that some languages require the browser to be started explicitly by calling
-its *start* method.
+注：有些语言需要明确地调用它的*start*方法来启动浏览器。
 
-Running Commands 
+运行命令
 ~~~~~~~~~~~~~~~~
-Once you have the browser initialized and assigned to a variable (generally
-named "selenium") you can make it run commands by calling the respective 
-methods from the selenium browser. For example, when you call the *type* method
-of the selenium object::
+一旦游览器被初始化并且赋值给一个变量（通常命名为"selenium"），你就可以从selenium 浏览器调用各自的方法来让它运行命令了。
+比如你从selenium对象调用*type*方法::
 
     selenium.type("field-id","string to type")
 
-In the backend (by the magic of Selenium-RC), the browser will actually **type** 
-using the locator and the string you specified during the method call. So, 
-summarizing, what for you code is just a regular object (with methods and 
-properties).  The backend of the Selenium Server and the browser-injected 
-Selenium-Core is doing the real work of testing your application.
+在后台（由于Selenium-RC的魔力）浏览器会用locator和你在调用这个方法的时候指定的字符串，真正地*type**。
+因此，总而言之，你的代码仅仅是一个普通的对象（包含方法和属性）。
+Selenium Server和内嵌到浏览器的Selenium-Core的后台程序做测试你程序的正真工作。
 
-Retrieving and Reporting Results
+检索和报告测试结果
 --------------------------------
-Each programming language has its own testing framework which is used to
-run the tests. Every one of them has its own way of reporting the results
-and you'll find third-party libraries specially created for reporting
-test results in different formats such as HTML or PDF.
+每种编程语言都有自己的测试框架用来运行测试。每一个都有它自己的方式来报告测试结果，并且你会发现一些专门创建的第三方类库用来报告不同格式的测试结果，比如HTML或者PDF格式。
 
-**Generating Test Reports for Java client driver:**
+
+**为Java客户端驱动生成测试报告:**
     
 
-- If Selenium Test cases are developed using JUnit then JUnit Report can be used
-  to generate test reports. Refer to `JUnit Report`_ for specifics.
+- 如果Selenium测试用例是用JUnit开发的，那么JUnit Report可以被用来生成测试报告。详细信息请参考 `JUnit Report`_ 。
 
 .. _`JUnit Report`: http://ant.apache.org/manual/OptionalTasks/junitreport.html
 
-- If Selenium Test cases are developed using TestNG then no external task 
-  is required to generate test reports. The TestNG framework generates an 
-  HTML report which list details of tests. See `TestNG Report`_ for more.
+- 如果Selenium测试用例是用TestNG开发的，那么不需要额外的工作就可以生成测试报告了。TestNG框架会生成一个把测试细节编列成表的HTML格式的报告。
+ 详细信息请参考 `TestNG Report`_ 。
 
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
-- Also, for a very nice summary report try using TestNG-xslt. 
-  TestNG-xslt Report looks like this.
+- 同时，需要一个很不错的概要报告，可以用TestNG-xslt. 
+  TestNG-xslt 报告看起来像这样的。
 
   .. image:: ../images/chapt5_TestNGxsltReport.png
 
-  See `TestNG-xslt`_ for more.
+  详细信息请参考 `TestNG-xslt`_ 。
 
 .. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
 
-- Logging Selenium can also be used to generate reports for the Java client driver.  
-  Logging Selenium extends the Java client driver to add logging ability. 
-  Please refer to `Logging Selenium`_.
+- Logging Selenium 也可以被用来生成Java客户端驱动的报告。  
+  Logging Selenium 通过扩展Java客户端驱动增加了记录日志的功能. 
+  请参考 `Logging Selenium`_.
     
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
 
-**Generating Test Reports for Python Client driver:**
+**生成Python客户端驱动的测试报告:**
 
-- When using Python Client Driver then HTMLTestRunner can be used to
-  generate a Test Report. See `HTMLTestRunner`_.
+- 当使用Python客户端驱动的时候，那么HTMLTestRunner可以被用来生成一个测试报告。参考 `HTMLTestRunner`_.
     
 .. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
 
-**Generating Test Reports for Ruby Client driver:**
+**生成Ruby客户端驱动的测试报告:**
 
-- If RSpec framework is used for writing Selenium Test Cases in Ruby
-  then its HTML report can be used to generate test report.
-  Refer to `RSpec Report`_ for more.
+- 如果在Ruby里RSpec框架被用来编写Selenium测试用例，那么它的HTML报告可以被用来生成测试报告。
+  详细信息请参考 `RSpec Report`_ .
 
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
