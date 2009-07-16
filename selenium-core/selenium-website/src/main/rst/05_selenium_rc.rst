@@ -829,6 +829,13 @@ test results in different formats such as HTML or PDF.
 
 .. _`TestNG Report`: http://testng.org/doc/documentation-main.html#test-results
 
+- ReportNG is a HTML reporting plug-in for the TestNG framework. 
+  It is intended as a replacement for the default TestNG HTML report. 
+  ReportNG provides a simple, colour-coded view of the test results. 
+  See `ReportNG`_ for more. 
+  
+.. _`ReportNG`: https://reportng.dev.java.net/  
+
 - Also, for a very nice summary report try using TestNG-xslt. 
   TestNG-xslt Report looks like this.
 
