@@ -1079,6 +1079,46 @@ This is very simple example of data retrieval from DB in Java.
 A more complex test could be to validate that inactive users are not able
 to login to application. This wouldn't take too much work from what you've 
 already seen.
+
+Executing java script 
+~~~~~~~~~~~~~~~~~~~~~
+
+java script comes very handy in exercising application which is not directly supported
+by selenium. **getEval** method of selenium API can be used to execute java script from
+selenium RC. 
+
+Consider an application having check boxes with no static identifiers. 
+In this case one could evaluate js from selenium RC to get ids of all 
+check boxes and then exercise them. 
+
+.. code-block:: java
+   
+   public static String[] getAllCheckboxIds () { 
+		String script = "var inputId  = new Array();";// Create array in java script.
+		script += "var cnt = 0;"; // Counter for check box ids.  
+		script += "var inputFields  = new Array();"; // Create array in java script.
+		script += "inputFields = window.document.getElementsByTagName('input');"; // Collect input elements.
+		script += "for(var i=0; i<inputFields.length; i++) {"; // Loop through the collected elements.
+		script += "if(inputFields[i].id !=null " +
+		"&& inputFields[i].id !='undefined' " +
+		"&& inputFields[i].getAttribute('type') == 'checkbox') {"; // If input field is of type check box and input id is not null.
+		script += "inputId[cnt]=inputFields[i].id ;" + // Save check box id to inputId array.
+		"cnt++;" + // increment the counter.
+		"}" + // end of if.
+		"}"; // end of for.
+		script += "inputId.toString();" ;// Convert array in to string.			
+		String[] checkboxIds = selenium.getEval(script).split(","); // Split the string.
+		return checkboxIds;
+    }
+
+To count number of images on a page:
+
+.. code-block:: java
+   
+   selenium.getEval("window.document.images.length;");
+	
+Remember to use window object in case of dom expressions as by default selenium
+window is referred and not the test window.
    
 How the Server Works
 --------------------
