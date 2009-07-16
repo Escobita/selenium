@@ -778,12 +778,3 @@ Alerts, Popups, and Multiple Windows
 .. Paul: This is an important area, people are constantly asking about this 
    on the forums.
 
-AJAX and waitFor Commands
--------------------------
-*This section is not yet developed.*
-
-Many applications use AJAX for dynamic and animated functionality making 
-testing of AJAX behavior often a basic testing requirement.
-
-*This section is not yet developed.*
-
