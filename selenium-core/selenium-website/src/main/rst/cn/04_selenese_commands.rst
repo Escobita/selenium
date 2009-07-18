@@ -1,7 +1,7 @@
-"Selenese" Selenium 命令集
+﻿"Selenese" Selenium 命令集
 =============================
 
-.. _第四章:
+.. _chapter04-cn-reference:
 
 Selenium 命令集,通常称作 *selenese*,是运行你的测试的一组命令集合。
 这些命令的序列就是 *测试脚本*.
