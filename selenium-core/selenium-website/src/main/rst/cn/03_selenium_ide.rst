@@ -197,92 +197,84 @@ UI-Element and Rollup
   否则测试用例会在所以UI元素加载之前就继续运行命令。
   这样会导致意想不到的测试用例失败。
   
-Adding Verifications and Asserts With the Context Menu 
+用右键菜单添加验证和断言
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
   
-Your test cases will also need to check the properties of a web-page.  This 
-requires *assert* and *verify* commands.  We won't describe the specifics of 
-these commands here; that is in the chapter on :ref:`"Selenese" Selenium Commands <chapter04-cn-reference>`.  Here we'll 
-simply describe how to add them to your test case. 
-  
-With Selenium-IDE recording, go to the browser displaying your test application and 
-right click anywhere on the page.  You will see a context menu showing *verify* 
-and/or *assert* commands.  
+测试用例还需要检查网页的属性。
+这就需要 *assert* 和 *verify* 命令。
+但是在这里我们不会描述这些命令的具体使用情况；那将是 :ref:`"Selenese" Selenium命令集 <chapter04-cn-reference>` 章节的内容。
+这里我们只是简单的描述如何把他们添加到测试用例中。
+
+用Selenium-IDE录制的时候，在显示被测应用的浏览器页面的任何地方点击右键，
+你将看到显示 *verify* 和 *assert* 命令的右键菜单。
 
 .. TODO: add image here (it wasn't correctly uploaded in the GDocs version
 
-The first time you use Selenium, there may only be one Selenium command listed.
-As you use the IDE however, you will find additional commands will quickly be
-added to this menu.  Selenium-IDE will attempt to predict what command, along 
-with the parameters, you will need for a selected UI element on the current 
-web-page. 
+首次使用Selenium，可能只有一条Selenium命令被列出。
+然而随着IDE的使用，额外的命令很快被添加到这个菜单中。
+你只需要在当前页面上选择UI元素，
+Selenium-IDE会尝试预测命令以及命令的参数。
   
-Let's see how this works. Open a web-page of your choosing and select a block 
-of text on the page. A paragraph or a heading will work fine.  Now, right-click
-the selected text.  The context menu should give you a *verifyTextPresent*
-command and the suggested parameter should be the text itself. 
+让我们来看看这是如何工作的。打开一个网页选择一段文本。段落或者标题都可以。
+现在右键点击你选择的文本。
+右键菜单会显示 *verifyTextPresent* 命令并且建议参数就是这段文本自身。
   
-Also, notice the Show All Available Commands menu option.  This shows many, 
-many more commands, again, along with suggested parameters, for testing your 
-currently selected UI element. 
+还请注意“显示所有命令”菜单选项。
+它能显示更多的带建议参数的命令来测试当前选择的UI元素。
   
-Try a few more UI elements. Try right-clicking an image, or a user control 
-like a button or a checkbox.  You may need to use Show All Available Commands 
-to see options other than *verifyTextPresent*. Once you select these other 
-options, the more commonly used ones will show up on the primary context menu.
-For example, selecting *verifyElementPresent* for an image should later cause 
-that command to be available on the primary context menu the next time you 
-select an image and right-click. 
+试试更多的UI元素。试着右键点击图片或者用户控件，例如按钮或者复选框。
+你可能要用“显示所有命令”显示除 *verifyTextPresent* 以外的其他命令。
+一旦选择了这些其他的选项，更常用的命令将会出现在初级的右键菜单中。
+例如，对图片选择 *verifyElementPresent* ，当下次选择图片并右键点击的时候，
+这条命令会在初级的右键菜单中可用。
   
-Again, these commands will be explained in detail in the chapter on Selenium 
-commands.  For now though, feel free to use the IDE to record and select 
-commands into a test case and then run it.  You can learn a lot about 
-the Selenium commands simply by experimenting though the IDE. 
+再次说明，这些命令会在 :ref:`"Selenese" Selenium命令集 <chapter04-cn-reference>` 章节里详细解释。
+但是现在，请随意使用IDE在测试用例里录制和选择命令然后运行。
+通过IDE的简单实验，你能学会许多Selenium命令。
   
-Editing  
+编辑  
 +++++++
 
-Insert Command 
+插入命令 
 ~~~~~~~~~~~~~~
 
-Table View
+表格视图
 __________
 
-Select the point in your test case where you want to insert the command.  
-Right-click and select Insert Command.  Now use the command editing text fields to 
-enter your new command and its parameters. 
+在测试用例中选择一个插入命令的点。
+右键点击并选择插入命令。
+现在用命令编辑的文本域输入新命令和它的参数。
 
-Source View
+源码视图
 ___________
 
-Select the point in your test case where you want to insert the command, and
-enter the HTML tags needed to create a 3-column row containing the Command,
-first parameter (if one is required by the Command), and second parameter (again,
-if one is required).  Be sure to save your test before switching back to
-Table view.
+在测试用例中选择一个插入命令的点，输入HTML标签。
+这些标签必须能够创建一个有3列的行，用来包含：命令，
+第一参数（如果命令需要），第二参数（同样，如果有必要）。
+确保切换回表格视图之前，保存你的测试。
+
   
-Insert Comment 
+插入注释 
 ~~~~~~~~~~~~~~
 
-Comments may be added to make your test case more readable.  These comments are 
-ignored when the test case is run. 
+添加注释可以使你的测试更具可读性。
+在运行测试用例的时候，这些注释会被忽略。
 
-In order to add vertical white space (one or more blank lines) in your tests, you must
-create empty comments.  An empty command will cause an error during execution.
+为了在你的测试中添加垂直方向上的空格（一个或更多的空行），你必须创建空注释。
+空命令将导致运行时的错误。
 
-Table View
+表格视图
 __________
 
-Select the point in your test case where you 
-want to insert the comment.  Right-click and select Insert Comment.  Now use 
-the Command field to enter the comment.  Your comment will appear in purple
-font.
+在测试用例中选择一个插入注释的点。
+右键点击并选择插入注释。
+现在用命令域输入注释。你的注释将显示成紫色字体。
 
-Source View
+源码视图
 ___________
 
-Select the point in your test case where you want to insert the comment.  Add
-an HTML-style comment, i.e., *<!-- your comment here -->*.
+在测试用例中选择一个插入注释的点。
+添加HTML风格的注释，例如， *<!-- 你的注释在这里 -->* 。
   
 Edit a Command or Comment 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
