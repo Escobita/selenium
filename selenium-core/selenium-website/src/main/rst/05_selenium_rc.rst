@@ -5,14 +5,14 @@ Selenium-RC
 
 Introduction
 ------------
-Selenium-RC is the solution for tests that need a little more than just simple
-browser actions and a linear execution. Selenium-RC leverages the 
-full power of programming languages, creating tests that can do things like read
-and write external files, make queries to a database, send emails with test 
-reports, and practically anything else a user can do with a normal application.
+Selenium-RC is the solution for tests that need more than  simple
+browser actions and linear execution. Selenium-RC uses the 
+full power of programming languages to create more complex tests like reading
+and writing files, querying a database, emailing test 
+results.
 
-You will want to use Selenium-RC whenever your test requires logic
-not supported by running a script from Selenium-IDE. What sort of logic could 
+You'll want to use Selenium-RC whenever your test requires logic
+not supported by Selenium-IDE. What logic could 
 this be? For example, Selenium-IDE does not directly support:
 
 * condition statements 
@@ -23,24 +23,24 @@ this be? For example, Selenium-IDE does not directly support:
 * test case grouping
 * re-execution of failed tests
 * test case dependency
-* capture screenshots on test failures
+* screenshot capture of test failures
 
 Although these tasks are not supported by Selenium directly, all of them can be achieved
-by using common programming techniques along with language specific libraries.
+by using programming techniques with a language-specific Selenium-RC client library.
 
-.. note:: It may be possible to perform these testing tasks by the addition of user 
-   extensions to Selenium-IDE but most prefer to use Selenium-RC.  Using Selenium-RC
-   is much more flexible and extensible than Selenium-IDE when it comes to complex testing
+.. Note: It may be possible to perform these testing tasks by adding user 
+   extensions to Selenium-IDE.  Most prefer to use Selenium-RC.  Selenium-RC
+   is considerably more flexible and extensible when it comes to complex testing
    problems.
 
 In the `Adding Some Spice to Your Tests`_ section, you'll find examples that 
-demonstrate the advantages of using all the power of a real programming language
+demonstrate the advantages of using a programming language
 for your tests.
 
-How It Works
-------------
-How the components of Selenium-RC operate and the role each plays in running 
-your test scripts are described below.
+How Selenium-RC Works
+---------------------
+First, we will describe how the components of Selenium-RC operate and the role each plays in running 
+your test scripts.
 
 RC Components
 ~~~~~~~~~~~~~
@@ -48,8 +48,7 @@ Selenium-RC is composed of two parts:
 
 * The Selenium Server which launches and kills browsers, and acts as an *HTTP
   proxy* for browser requests. 
-* Client libraries for various programming languages, each of which instructs the 
-  Selenium Server in how to test the AUT by passing it your test script's Selenium commands. 
+* Multiple language-specific client libraries which provide the interface between each programming language and Selenium.
 
 Here is a simplified architecture diagram.... 
 
