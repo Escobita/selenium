@@ -129,9 +129,9 @@ Selenium-IDE.
 
 Installation
 -------------
-After downloading the Selenium-RC zip file from `downloads page`_, you'll
-notice it has several sub-folders. These folders have all the components you'll 
-need for using Selenium-RC with the supported programming language of your choice.
+After downloading the Selenium-RC zip file from the `downloads page`_, you'll
+notice it has several sub-folders. These folders have all the components you 
+need for using Selenium-RC with the programming language of your choice.
 
 Once you've chosen a language to work with, you simply need to:
 
@@ -140,66 +140,71 @@ Once you've chosen a language to work with, you simply need to:
 
 Installing Selenium Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The Selenium-RC server is just a jar file (*selenium-server.jar*), which doesn't
-need installation at all. Just downloading the zip file and extracting the 
-server in the desired directory should be enough. Before starting any tests
-you've written in any programming language, you just have to go to the directory
-where Selenium-RC's server is located and execute the following line in a 
-console::
+The Selenium-RC server is simply a Java *jar* file (*selenium-server.jar*), which doesn't
+require any special installation. Just downloading the zip file and extracting the 
+server in the desired directory is suffiient. 
+
+Running Selenium Server
+~~~~~~~~~~~~~~~~~~~~~~~
+Before starting any tests you must start the server.  Go to the directory
+where Selenium-RC's server is located and run the following from a command-line 
+console.
 
     java -jar selenium-server.jar
 
-Most people like to have a more simplified setup, which can be made by creating
-an executable file (.bat on Windows and .sh on Linux) containing the command
-above. This way, you can make a shortcut to that executable file in your
-desktop and just double-click on it anytime you want to wake up the server to 
-start your tests.
+This can be simplified by creating
+a batch or shell executable file (.bat on Windows and .sh on Linux) containing the command
+above. Then make a shortcut to that executable on your
+desktop and simply double-click the icon to start the server.
 
-.. note:: For the server, to run you'll need Java installed on your computer 
-   and properly set up on the PATH variable to run it from the console.
-   You can check that you have Java correctly installed by running the following
-   on a console::
+For the server to run you'll need Java installed 
+and the PATH environment variable correctly configured to run it from the console.
+You can check that you have Java correctly installed by running the following
+on a console::
 
        java -version
 
-   If you get a version number (which needs to be 1.5 or later), you're ready to start using Selenium-RC.
+If you get a version number (which needs to be 1.5 or later), you're ready to start using Selenium-RC.
 
 .. _`downloads page`: http://seleniumhq.org/download/
 .. _`NUnit`: http://www.nunit.org/index.php?p=download
 
-Java Client Driver Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Extract the file *selenium-java-client-driver.jar*
+Using the Java Client Driver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Download Selenium-RC from the SeleniumHQ `downloads page`_.
+* Extract the file *selenium-java-client-driver.jar*.
 * Open your desired Java IDE (Eclipse, NetBeans, IntelliJ, Netweaver, etc.)
-* Create a new project
+* Create a new project.
 * Add the selenium-java-client-driver.jar files to your project as references.
-* Add to your project classpath the file *selenium-java-client-driver.jar*
-* From Selenium-IDE, export a script to a Java file and include it in your Java
+* Add to your project classpath the file *selenium-java-client-driver.jar*.
+* From Selenium-IDE, export a script to a Java file and include it in your Java.
   project, or write your Selenium test in Java using the selenium-java-client API.
-* Run Selenium server from the console
-* Execute your test from the Java IDE
+  The API is presented later in this chapter.  You can either use JUnit, or TestNg
+  to run your test, or you can write your own simple main() program.  These concepts are
+  explained later in this section.
+* Run Selenium server from the console.
+* Execute your test from the Java IDE or from the command-line.
 
-For specific details on Java test project configuration, see the Appendix sections
+For details on Java test project configuration, see the Appendix sections
 :ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
 and 
 :ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
 
-Python Client Driver Configuration 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the Python Client Driver 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
 * Extract the file *selenium.py*
 * Either write your Selenium test in Python or export
   a script from Selenium-IDE to a python file.
 * Add to your test's path the file *selenium.py*
-* Run Selenium server from console
+* Run Selenium server from the console
 * Execute your test from a console or your Python IDE 
 
-For specific details on Python client driver configuration, see the appendix 
+For details on Python client driver configuration, see the appendix 
 :ref:`Python Client Driver Configuration <configuring-selenium-RC-python-reference>`.
 
-.NET Client Driver Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the .NET Client Driver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Download Selenium-RC from the SeleniumHQ `downloads page`_
 * Extract the folder
 * Download and install `NUnit`_ (
@@ -214,23 +219,23 @@ For specific details on Python client driver configuration, see the appendix
 * Write your Selenium test in a .Net language (C#, VB.Net), or export
   a script from Selenium-IDE to a C# file and copy this code into the class file 
   you just created.
+* Write your own simple main() program or you can include NUnit in your project 
+  for running your test.  These concepts are explained later in this chapter.
 * Run Selenium server from console
-* Execute your test using either the NUnit GUI or NUnit command line
+* Run your test either from the IDE, from the NUnit GUI or from the command line
 
 For specific details on .NET client driver configuration with Visual Studio, see the appendix 
 :ref:`.NET client driver configuration <configuring-selenium-RC-NET-reference>`. 
 
 From Selenese to a Program
 --------------------------
-A key step to using Selenium-RC is to convert your Selenese into a programming 
-language.  This is also key to understanding Selenium-RC itself.  Although 
-similar, each language, out of necessity, will represent the same Selenese 
-test script differently.  In this section, we provide several different 
+The primary task for using Selenium-RC is to convert your Selenese into a programming 
+language.  In this section, we provide several different 
 language-specific examples.
 
 Sample Test Script
 ~~~~~~~~~~~~~~~~~~
-First, let's start with an example Selenese test script.  Imagine recording
+Let's start with an example Selenese test script.  Imagine recording
 the following test with Selenium-IDE.
 
 .. _Google search example:
@@ -242,15 +247,15 @@ clickAndWait       btnG
 assertTextPresent  Results * for selenium rc
 =================  =========================  ===========
 
-.. note:: This example would work with the Google search page http://www.google.com
+Note: This example would work with the Google search page http://www.google.com
 
 Selenese as Programming Code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Here is the test script exported (via Selenium-IDE) to each of the 
+Here is the test script exported (via Selenium-IDE) to each of the supported
 programming languages.  If you have at least basic knowledge of an object-
-oriented programming language, you should be able to understand how Selenium 
-runs Selenese commands from a programming language by reading one of these 
-examples.  To see the example in the desired language,  click one of these buttons.
+oriented programming language, you will understand how Selenium 
+runs Selenese commands by reading one of these 
+examples.  To see an example in a specific language, select one of these buttons.
 
 .. container:: toggled
 
@@ -447,15 +452,18 @@ examples.  To see the example in the desired language,  click one of these butto
         end
       end
 
-Now, in the next section, we'll explain how to build a test program using the generated code.
+In the next section we'll explain how to build a test program using the generated code.
 
 Programming Your Test
 ---------------------
-Now we'll show specific examples in each of the supported programming languages.
-Basically there are two tasks.  One, generate your script into a programming 
-language from Selenium-IDE, optionally modifying the result.  And two, write 
-a very simple main program that executes the generated code.  Optionally, you 
-can adopt a test engine platform like JUnit or TestNG for Java, or NUnit for .NET.
+Now we'll illustrate how to program your own tests using examples in each of the
+supported programming languages.
+There are essemtially two tasks.  
+* Generate your script into a programming 
+language from Selenium-IDE, optionally modifying the result.  
+* And two, write a very simple main program that executes the generated code.  
+Optionally, you can adopt a test engine platform like JUnit or TestNG for Java, 
+or NUnit for .NET if you are using one of those languages.
 
 Here, we show language-specific examples.  The language-specific APIs tend to 
 differ from one to another, so you'll find a separate explanation for each.  
