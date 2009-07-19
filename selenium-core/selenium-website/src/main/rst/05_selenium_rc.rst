@@ -44,10 +44,10 @@ your test scripts.
 
 RC Components
 ~~~~~~~~~~~~~
-Selenium-RC is composed of two parts:
+Selenium-RC components are:
 
-* The Selenium Server which launches and kills browsers, and acts as an *HTTP
-  proxy* for browser requests. 
+* The Selenium Server which launches and kills browsers, and interprets and executes Selenium commands passed to it from the test program via it's client-library.
+* Selenium-Core which acts as an *HTTP proxy* for browser requests. Selenium-Core sits between the browser and the application under test (AUT), intercepting and verifying HTTP messages sent between the browser and AUT as part of the server's testing processes.
 * Multiple language-specific client libraries which provide the interface between each programming language and Selenium.
 
 Here is a simplified architecture diagram.... 
@@ -58,8 +58,8 @@ Here is a simplified architecture diagram....
 The diagram shows the client libraries communicate with the
 Server passing each Selenium command for execution. Then the server passes the 
 Selenium command to the browser using Selenium-Core JavaScript commands.  The 
-browser, using its JavaScript interpreter, executes the Selenium command, which
-effectively, runs the check you specified in your Selenese test script.
+browser, using its JavaScript interpreter, executes the Selenium command.  This
+runs the Selenese action or verification you specified in your test script.
 
 Selenium Server
 ~~~~~~~~~~~~~~~
@@ -67,11 +67,11 @@ Selenium Server receives Selenium commands from your test program,
 interprets them, and reports back to your program the results of
 running those tests.
 
-The RC server bundles Selenium Core, and then automatically injects
-it into the browser.  This occurs when your test program causes the
-browser to open (using a client library API function).
+The RC server bundles Selenium Core and  automatically injects
+it into the browser.  This occurs when your test program opens the
+browser (using a client library API function).
 Selenium-Core is a JavaScript program, actually a set of JavaScript
-functions, which interprets and executes Selenese commands using the
+functions which interprets and executes Selenese commands using the
 browser's built-in JavaScript interpreter.
 
 The Server receives the Selenese commands from your test program
@@ -84,25 +84,31 @@ Client Libraries
 The client libraries provide the programming support that allows you to
 run Selenium commands from a program of your own design.  There is a 
 different client library for each supported language.  A Selenium client 
-library provides a programming interface, i.e., a set of functions,
-which run Selenium commands from your program. Within each interface,
+library provides a programming interface (API), i.e., a set of functions,
+which run Selenium commands from your own program. Within each interface,
 there is a programming function that supports each Selenese command.
 
-It is the client library that takes a Selenese command and passes it to the Selenium Server
-for processing a specific action or test against the AUT.  The client library
-will also receive the result of that command and pass it back to your program.
-Then, your program can receive the result and report it as a success or failure, 
-or possibly take corrective action if it was an unexpected error. 
+The client library takes a Selenese command and passes it to the Selenium Server
+for processing a specific action or test against the application under test 
+(AUT).  The client library
+also receives the result of that command and passes it back to your program.
+Your program can receive the result and store it into a program variable and
+reporting it as a success or failure, 
+or possibly taking corrective action if it was an unexpected error. 
 
 So to create a test program, you simply write a program that runs 
 a set of Selenium commands using a client library API.  And, optionally, if 
 you already have a Selenese test script created in the Selenium-IDE, you can 
 *generate the Selenium-RC code*. The Selenium-IDE can translate (using its 
 Export menu item) its Selenium commands into a client-driver's API function 
-calls.
+calls.  See the Selenium-IDE chapter for specifics on exporting RC code from 
+Selenium-IDE.
 
-.. Paul: I added the above text after this comment below was made.  
-   The table suggested below may still be helpful.  We can evaluate that later.
+.. Paul: I added the above text after this comment below was made.  I don't
+   quite understand the vision behind this suggested table.  I do agree with
+   the suggestion to emphasize learning the API and making clear that it 
+   wrappers Selenese.  Actually, does it wrapper Selenese or pass along 
+   Selenese.
 
 .. TODO: Mary Ann pointed out this and I think is very important:
    Info about the individual language APIs for RC being "wrappers" for the
