@@ -46,9 +46,8 @@ RC Components
 ~~~~~~~~~~~~~
 Selenium-RC components are:
 
-* The Selenium Server which launches and kills browsers, and interprets and executes Selenium commands passed to it from the test program via it's client-library.
-* Selenium-Core which acts as an *HTTP proxy* for browser requests. Selenium-Core sits between the browser and the application under test (AUT), intercepting and verifying HTTP messages sent between the browser and AUT as part of the server's testing processes.
-* Multiple language-specific client libraries which provide the interface between each programming language and Selenium.
+* The Selenium Server which launches and kills browsers, interprets and runs the Selenese commands passed to it from the test program, and acts as an *HTTP proxy*, intercepting and verifying HTTP messages sent between the browser and the AUT.
+* Multiple language-specific client libraries which provide the interface between each programming language and the Selenium-RC Server.
 
 Here is a simplified architecture diagram.... 
 
