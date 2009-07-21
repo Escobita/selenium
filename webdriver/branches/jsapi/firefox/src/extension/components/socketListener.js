@@ -19,6 +19,8 @@ limitations under the License.
 const charset = "UTF-8";
 const CI = Components.interfaces;
 
+function StaleElementError() {};
+
 function SocketListener(server, transport)
 {
     this.outstream = transport.openOutputStream(Components.interfaces.nsITransport.OPEN_BLOCKING, 0, 0);
@@ -79,10 +81,10 @@ SocketListener.prototype.onDataAvailable = function(request, context, inputStrea
     if (this.linesLeft <= 0 && this.data) {
         this.executeCommand();
     }
-}
+};
 
 SocketListener.prototype.executeCommand = function() {
-    var fxbrowser, fxdocument;
+    var fxbrowser;
     var self = this;
 
     var command = JSON.parse(this.data);
@@ -146,12 +148,30 @@ SocketListener.prototype.executeCommand = function() {
         command.commandName == "quit") {
 
         this.data = "";
-        this.linesLeft = 0;
+        this.linesLeft = 0;                                                                                   
         this.step = 0;
         this.readLength = false;
 
+      try {
         respond.commandName = command.commandName;
         this[command.commandName](respond, command.parameters);
+      } catch (e) {
+        var obj = {
+          fileName : e.fileName,
+          lineNumber : e.lineNumber,
+          message : e.message,
+          name : e.name,
+          stack : e.stack
+        };
+        var message = "Exception caught by driver: " + info.command.commandName
+            + "(" + info.command.parameters + ")\n" + e;
+        Utils.dumpn(message);
+        Utils.dump(e);
+        respond.isError = true;
+        respond.context = info.driver.context;
+        respond.response = obj;
+        respond.send();
+      }
     } else if (this.driverPrototype[command.commandName]) {
         var driver;
 
@@ -202,28 +222,18 @@ SocketListener.prototype.executeCommand = function() {
                 driver.context.frameId = undefined;
             }
         }
-
-        var frame = fxbrowser.contentWindow;
         if (driver.context.frameId !== undefined) {
-            frame = Utils.findFrame(fxbrowser, driver.context.frameId);
-            if (!frame) {
-                frame = fxbrowser.contentWindow;
-                fxdocument = fxbrowser.contextDocument;
-            } else {
-                fxdocument = frame.document;
-            }
-        } else {
-            fxdocument = fxbrowser.contentDocument;
+            driver.context.frame = Utils.findFrame(fxbrowser, driver.context.frameId);
         }
 
-        driver.context.fxdocument = fxdocument;
         // Indicate, that we are about to execute a command ...
         statusBarLabel = win.document.getElementById("fxdriver-label");
         if (statusBarLabel) {
             statusBarLabel.style.color = "red";
         }
 
-        var webNav = frame.QueryInterface(CI.nsIInterfaceRequestor).getInterface(CI.nsIWebNavigation);
+        var activeWindow = driver.context.frame || fxbrowser.contentWindow;
+        var webNav = activeWindow.QueryInterface(CI.nsIInterfaceRequestor).getInterface(CI.nsIWebNavigation);
         var loadGroup = webNav.QueryInterface(CI.nsIInterfaceRequestor).getInterface(CI.nsILoadGroup);
 
         var info = {
@@ -253,20 +263,28 @@ SocketListener.prototype.executeCommand = function() {
                       respond.commandName = info.command.commandName;
                       info.driver[info.command.commandName](respond, info.command.parameters);
                   } catch (e) {
-                      var obj = {
-                        fileName : e.fileName,
-                        lineNumber : e.lineNumber,
-                        message : e.message,
-                        name : e.name,
-                        stack : e.stack
-                      };
-                      var message = "Exception caught by driver: " + info.command.commandName + "(" + info.command.parameters + ")\n" + e;
-                      Utils.dumpn(message);
-                      Utils.dump(e);
-                      respond.isError = true;
-                      respond.context = info.driver.context;
-                      respond.response = obj;
-                      respond.send();
+                      if (e instanceof StaleElementError) {
+                        respond.isError = true;
+                        respond.context  = info.driver.context;
+                        respond.response = "element is obsolete";
+                        respond.send();
+                      } else {
+                        var obj = {
+                          fileName : e.fileName,
+                          lineNumber : e.lineNumber,
+                          message : e.message,
+                          name : e.name,
+                          stack : e.stack
+                        };
+                        var message = "Exception caught by driver: " + info.command.commandName
+                            + "(" + info.command.parameters + ")\n" + e;
+                        Utils.dumpn(message);
+                        Utils.dump(e);
+                        respond.isError = true;
+                        respond.context = info.driver.context;
+                        respond.response = obj;
+                        respond.send();
+                      }
                   }
                 }
             }

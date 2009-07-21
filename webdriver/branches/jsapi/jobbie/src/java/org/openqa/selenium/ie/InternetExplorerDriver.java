@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.BufferedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -42,6 +44,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.internal.Cleanly;
+import org.openqa.selenium.internal.FileHandler;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
@@ -54,10 +59,11 @@ import com.sun.jna.ptr.PointerByReference;
 public class InternetExplorerDriver implements WebDriver, SearchContext, JavascriptExecutor {
     private static ExportedWebDriverFunctions lib;
     private Pointer driver;
+    private Speed speed = Speed.FAST;
     private ErrorHandler errors = new ErrorHandler();
 
     public InternetExplorerDriver() {
-      intializeLib();
+      initializeLib();
       PointerByReference ptr = new PointerByReference();
       int result = lib.wdNewDriverInstance(ptr);
       if (result != SUCCESS) {
@@ -109,11 +115,14 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
       result = lib.wdExecuteScript(driver, new WString(script), scriptArgs, scriptResultRef);
       
       errors.verifyErrorCode(result, "Cannot execute script");
-      Object toReturn = extractReturnValue(scriptResultRef);
-      return toReturn;
+      return extractReturnValue(scriptResultRef);
     } finally {
       lib.wdFreeScriptArgs(scriptArgs);
     }
+  }
+
+  public boolean isJavascriptEnabled() {
+    return true;
   }
 
   private Object extractReturnValue(PointerByReference scriptResultRef) {
@@ -153,7 +162,7 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
         PointerByReference element = new PointerByReference();
         result = lib.wdGetElementScriptResult(scriptResult, driver, element);
         errors.verifyErrorCode(result, "Cannot extract element result");
-        toReturn = new InternetExplorerElement(lib, driver, element.getValue());
+        toReturn = new InternetExplorerElement(lib, this, element.getValue());
         break;
         
       case 5:
@@ -200,7 +209,7 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
     public void get(String url) {
       int result = lib.wdGet(driver, new WString(url));
       if (result != SUCCESS) {
-        throw new IllegalStateException(String.format("Cannot get \"%s\": %s", url, result));
+        errors.verifyErrorCode(result, String.format("Cannot get \"%s\": %s", url, result));
       }
     }
 
@@ -250,11 +259,11 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
    }
 
     public List<WebElement> findElements(By by) {
-    	return new Finder(lib, driver, null).findElements(by);
+    	return new Finder(lib, this, null).findElements(by);
     }
 
     public WebElement findElement(By by) {
-        return new Finder(lib, driver, null).findElement(by);
+        return new Finder(lib, this, null).findElement(by);
     }
 
     @Override
@@ -275,16 +284,24 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
         return new InternetExplorerOptions();
     }
 
-    protected native void waitForLoadToComplete();
+    protected void waitForLoadToComplete() {
+      lib.wdWaitForLoadToComplete(driver);
+    }
 
     @Override
     protected void finalize() throws Throwable {
-    	if (driver != null) {
-    	  lib.wdFreeDriver(driver);
-    	}
+      super.finalize();
+      if (driver != null) {
+        lib.wdFreeDriver(driver);
+      }
     }
-    
-    private class InternetExplorerTargetLocator implements TargetLocator {
+
+  // Deliberately package level visibility
+  Pointer getUnderlyingPointer() {
+    return driver;
+  }
+
+  private class InternetExplorerTargetLocator implements TargetLocator {
         public WebDriver frame(int frameIndex) {
             return frame(String.valueOf(frameIndex));
         }
@@ -312,7 +329,7 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
           
           errors.verifyErrorCode(result, "Unable to find active element");
           
-          return new InternetExplorerElement(lib, driver, element.getValue());
+          return new InternetExplorerElement(lib, InternetExplorerDriver.this, element.getValue());
         }
 
         public Alert alert() {
@@ -345,8 +362,8 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
     }
     
     private class InternetExplorerOptions implements Options {
-      
-		public void addCookie(Cookie cookie) {
+
+      public void addCookie(Cookie cookie) {
 		  int result = lib.wdAddCookie(driver, new WString(cookie.toString()));
 		 
 		  errors.verifyErrorCode(result, ("Unable to add cookie: " + cookie));
@@ -403,78 +420,48 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
 		}
 
         public Speed getSpeed() {
-            throw new UnsupportedOperationException();
+            return speed;
         }
 
         public void setSpeed(Speed speed) {
-//            doSetMouseSpeed(speed.getTimeOut());
+          InternetExplorerDriver.this.speed = speed;
         }
     }
 
-    public WebElement findElementByPartialLinkText(String using) {
-        throw new UnsupportedOperationException();
+  private synchronized void initializeLib() {
+    if (lib != null) {
+      return;
     }
 
-    public List<WebElement> findElementsByPartialLinkText(String using) {
-        throw new UnsupportedOperationException();
-    }
-    
-    private synchronized void intializeLib() {
-      if (lib != null) {
-        return;
-      }
-      
-      StringBuilder jnaPath = new StringBuilder();
-      jnaPath.append(System.getProperty("java.class.path"));
-      jnaPath.append(File.pathSeparator);
-      
-      
-      // We need to do this before calling any JNA methods because 
-      // the map of paths to search is static. Apparently.
-      File dll = writeResourceToDisk("InternetExplorerDriver.dll");
-      String driverLib = dll.getName().replace(".dll", "");
-      jnaPath.append(dll.getParent());
-      
-      System.setProperty("jna.library.path", jnaPath.toString());
-      
-      try {
-        lib = (ExportedWebDriverFunctions)  Native.loadLibrary("InternetExplorerDriver", ExportedWebDriverFunctions.class);
-      } catch (UnsatisfiedLinkError e) {
-        lib = (ExportedWebDriverFunctions)  Native.loadLibrary(driverLib, ExportedWebDriverFunctions.class);
+    File parentDir = TemporaryFilesystem.createTempDir("webdriver", "libs");
+
+    // We need to do this before calling any JNA methods because
+    // the map of paths to search is static. Apparently.
+    StringBuilder jnaPath = new StringBuilder(System.getProperty("jna.library.path", ""));
+    jnaPath.append(File.pathSeparator);
+    jnaPath.append(System.getProperty("java.class.path"));
+    jnaPath.append(File.pathSeparator);
+    jnaPath.append(parentDir.getAbsolutePath());
+    jnaPath.append(File.pathSeparator);
+
+    try {
+      FileHandler.copyResource(parentDir, getClass(), "InternetExplorerDriver.dll");
+    } catch (IOException e) {
+      if (Boolean.getBoolean("webdriver.development")) {
+        System.err.println("Exception unpacking required libraries, but in development mode. Continuing");
+      } else {
+        throw new WebDriverException(e);
       }
     }
-    
-    private File writeResourceToDisk(String resourceName) throws UnsatisfiedLinkError {
-      InputStream is = InternetExplorerDriver.class.getResourceAsStream(resourceName);
-      if (is == null) 
-          is = InternetExplorerDriver.class.getResourceAsStream("/" + resourceName);
-          if (is == null) {
-              throw new UnsatisfiedLinkError("Could not find " + resourceName);
-          }
-          FileOutputStream fos = null;
-          
-      try {
-          File dll = File.createTempFile("webdriver", ".dll");
-          dll.deleteOnExit();
-          fos = new FileOutputStream(dll);
-          
-          int count;
-          byte[] buf = new byte[4096];
-          while ((count = is.read(buf, 0, buf.length)) > 0) {
-              fos.write(buf, 0, count);
-          }
-          
-          return dll;
-      } catch(IOException e) {
-          throw new UnsatisfiedLinkError("Could not create temporary DLL: " + e.getMessage());
-      }
-      finally {
-          if (is != null) {
-              try { is.close(); } catch(IOException ignored) { }
-          }
-          if (fos != null) {
-              try { fos.close(); } catch(IOException ignored) { }
-          }
-      }
+
+    System.setProperty("jna.library.path", jnaPath.toString());
+
+    try {
+      lib =
+          (ExportedWebDriverFunctions) Native
+              .loadLibrary("InternetExplorerDriver", ExportedWebDriverFunctions.class);
+    } catch (UnsatisfiedLinkError e) {
+      System.out.println("new File(\".\").getAbsolutePath() = " + new File(".").getAbsolutePath());
     }
+  }
 }

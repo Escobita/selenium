@@ -17,18 +17,12 @@ limitations under the License.
 */
 
 function FirefoxDriver(server) {
-    this.server = server;
-    this.context = new Context();
-    this.mouseSpeed = 1;
+  this.server = server;
+  this.context = new Context();
+  this.mouseSpeed = 1;
 
-    this.getValueOf = function(e) {
-        if (e["value"] !== undefined) {
-          return e.value;
-        } else if (e.hasAttribute("value")) {
-          return e.getAttribute("value");
-        }
-        return undefined;
-    }
+  this.currentX = 0;
+  this.currentY = 0;
 }
 
 FirefoxDriver.prototype.__defineGetter__("id", function() {
@@ -115,7 +109,7 @@ FirefoxDriver.prototype.close = function(respond) {
 
 FirefoxDriver.prototype.executeScript = function(respond, script) {
   var context = this.context;
-  var window = Utils.getBrowser(this.context).contentWindow;
+  var window = Utils.getDocument(this.context).defaultView;
 
   var parameters = new Array();
   var runScript;
@@ -187,7 +181,7 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
     }
     respond.response = "" + url;
     respond.send();
-}
+};
 
 FirefoxDriver.prototype.title = function(respond) {
     var browser = Utils.getBrowser(this.context);
@@ -424,28 +418,28 @@ FirefoxDriver.prototype.selectElementById = function(respond, id) {
 };
 
 FirefoxDriver.prototype.selectElementsUsingId = function(respond, id) {
-    var doc = Utils.getDocument(this.context);
-    var allElements = doc.evaluate("//*[@id='" + id + "']", doc, null,
-        Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE,
-        null);
-    var indices = "";
-    var element = allElements.iterateNext();
-    while (element) {
-        var index = Utils.addToKnownElements(element, this.context);
-        indices += index + ",";
-        element = allElements.iterateNext();
-    }
-    // Strip the trailing comma
-    indices = indices.substring(0, indices.length - 1);
+  var doc = Utils.getDocument(this.context);
+  var allElements = doc.evaluate("//*[@id='" + id + "']", doc, null,
+      Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE,
+      null);
+  var indices = "";
+  var element = allElements.iterateNext();
+  while (element) {
+    var index = Utils.addToKnownElements(element, this.context);
+    indices += index + ",";
+    element = allElements.iterateNext();
+  }
+  // Strip the trailing comma
+  indices = indices.substring(0, indices.length - 1);
 
-    respond.context = this.context;
-    respond.response = indices;
-    respond.send();
+  respond.context = this.context;
+  respond.response = indices;
+  respond.send();
 };
 
 
 FirefoxDriver.prototype.selectElementsUsingXPath = function(respond, xpath) {
-    var doc = Utils.getDocument(this.context)
+    var doc = Utils.getDocument(this.context);
     var result = doc.evaluate(xpath, doc, null, Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
     var response = "";
     var element = result.iterateNext();
@@ -552,7 +546,13 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
       }
     }
 
-    Utils.dump(cookie);
+    var document = Utils.getDocument(this.context);
+    if (!document || !document.contentType.match(/html/i)) {
+      respond.isError = true;
+      respond.response = "You may only set cookies on html documents";
+      respond.send();
+      return;
+    }
 
     var cookieManager = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager2");
 

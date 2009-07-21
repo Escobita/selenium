@@ -17,10 +17,16 @@ limitations under the License.
 
 package org.openqa.selenium.iphone;
 
-import java.net.URL;
-
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * IPhoneDriver is a driver for running tests on Mobile Safari on the iPhone
@@ -62,6 +68,39 @@ public class IPhoneDriver extends RemoteWebDriver {
     // This is the default port and URL for iWebDriver. Eventually it would
     // be nice to use DNS-SD to detect iWebDriver instances running non
     // locally or on non-default ports.
-    this("http://localhost:16000/hub");
+    this("http://localhost:3001/hub");
+  }
+
+  public byte[] getScreenshot() {
+    return (byte[]) execute("screenshot").getValue();
+  }
+
+  /** Saves a screenshot of the current page into the given file. */
+  public void saveScreenshot(File pngFile) {
+    if (pngFile == null) {
+      throw new IllegalArgumentException("Method parameter pngFile must not be null");
+    }
+    File dir = pngFile.getParentFile();
+    if (dir != null && !dir.exists() && !dir.mkdirs()) {
+      throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
+    }
+
+    OutputStream out = null;
+    try {
+      out = new BufferedOutputStream(new FileOutputStream(pngFile));
+      out.write(getScreenshot());
+      out.flush();
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    } finally {
+      if (out != null) {
+        try {
+          out.close();
+        } catch (IOException e) {
+          // Nothing sane to do. Swallow and fall through
+        }
+      }
+    }
+
   }
 }

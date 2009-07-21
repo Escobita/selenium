@@ -20,20 +20,22 @@ package org.openqa.selenium.support.events;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.RenderedWebElement;
 
+import java.awt.*;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.awt.*;
 
 /**
  * A wrapper around an arbitrary {@link WebDriver} instance
@@ -60,11 +62,11 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
     );
 
     public EventFiringWebDriver(final WebDriver driver) {
-
+       Class<?>[] allInterfaces = extractInterfaces(driver);
 
       this.driver = (WebDriver) Proxy.newProxyInstance(
           WebDriverEventListener.class.getClassLoader(),
-          driver.getClass().getInterfaces(),
+          allInterfaces,
           new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
               try {
@@ -77,6 +79,23 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
           }
       );
     }
+
+  private Class<?>[] extractInterfaces(WebDriver driver) {
+    Set<Class<?>> allInterfaces = new HashSet<Class<?>>();
+    extractInterfaces(allInterfaces, driver.getClass());
+
+    return allInterfaces.toArray(new Class<?>[allInterfaces.size()]);
+  }
+
+  private void extractInterfaces(Set<Class<?>> addTo, Class<?> clazz) {
+    if (Object.class.equals(clazz)) {
+      return; // Done
+    }
+
+    Class<?>[] classes = clazz.getInterfaces();
+    addTo.addAll(Arrays.asList(classes));
+    extractInterfaces(addTo, clazz.getSuperclass());
+  }
 
   /**
      * @return this for method chaining.
@@ -94,6 +113,18 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         return this;
     }
 
+    /**
+     * Getter to access the encapsulated WebDriver.
+     * A typical example for having to use this getter is when this class is 
+     * wrapping a RemoteWebDriver, and we need to perform some queries on it 
+     * (such as calling getCapabilities).
+     * 
+     * @return the encapsulated WebDriver.
+     */
+    public WebDriver getDriver() {
+        return driver;
+    }
+    
     public void get(String url) {
         dispatcher.beforeNavigateTo(url, driver);
         driver.get(url);
@@ -156,6 +187,14 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
         }
         throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
     }
+
+  public boolean isJavascriptEnabled() {
+    if (driver instanceof JavascriptExecutor) {
+      return ((JavascriptExecutor) driver).isJavascriptEnabled();
+    }
+
+    throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
+  }
 
   private Object[] unpackWrappedArgs(Object... args) {
     // Walk the args: the various drivers expect unpacked versions of the elements
@@ -235,6 +274,13 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             dispatcher.afterChangeValueOf(element, driver);
         }
 
+        public String getTagName() {
+            return element.getTagName();
+        }
+
+        /**
+         * @deprecated Use {@link #getTagName()} instead, this method will be removed in the near future.
+         */
         public String getElementName() {
             return element.getElementName();
         }

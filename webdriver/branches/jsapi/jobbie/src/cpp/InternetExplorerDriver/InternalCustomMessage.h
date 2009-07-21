@@ -28,7 +28,7 @@ limitations under the License.
 #define _WD_ELEM_GETLOCATION			WM_USER+13
 #define _WD_ELEM_GETHEIGHT				WM_USER+14
 #define _WD_ELEM_GETWIDTH				WM_USER+15
-#define _WD_ELEM_GETELEMENTNAME			WM_USER+16
+#define _WD_ELEM_GETTAGNAME 			WM_USER+16
 #define _WD_ELEM_GETATTRIBUTE			WM_USER+17
 #define _WD_ELEM_GETVALUE				WM_USER+18
 #define _WD_ELEM_SENDKEYS				WM_USER+19
@@ -41,6 +41,7 @@ limitations under the License.
 #define _WD_ELEM_CLICK					WM_USER+26
 #define _WD_ELEM_SUBMIT					WM_USER+27
 #define _WD_ELEM_GETCHILDRENWTAGNAME	WM_USER+28
+#define _WD_ELEM_ISFRESH				WM_USER+29
 
 #define _WD_GETVISIBLE					WM_USER+30
 #define _WD_SETVISIBLE					WM_USER+31
@@ -66,16 +67,23 @@ limitations under the License.
 #define _WD_SELELEMENTBYTAGNAME			WM_USER+52
 #define _WD_SELELEMENTSBYTAGNAME		WM_USER+53
 
-
 #define _WD_GETCOOKIES					WM_USER+60
 #define _WD_ADDCOOKIE					WM_USER+61
 
 #define _WD_WAITFORNAVIGATIONTOFINISH	WM_USER+70
 #define _WD_ELEM_RELEASE				WM_USER+71
-#define _WD_ELEM_BLUR					WM_USER+72
 
 #define _WD_QUIT_IE						WM_USER+80
 #define _WD_EXECUTESCRIPT				WM_USER+81
 #define _WD_GETACTIVEELEMENT			WM_USER+82
+
+// ==============================================================
+//     HEART BEATS
+// ==============================================================
+#define _WD_HB_START					WM_USER+0x100
+#define _WD_HB_STOP					    WM_USER+0x101
+#define _WD_HB_BEAT					    WM_USER+0x102
+#define _WD_HB_CRASHED					WM_USER+0x103
+
 
 #endif // JOBBIE_INTERNALCUSTOMMESSAGE_H_

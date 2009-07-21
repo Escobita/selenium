@@ -20,40 +20,59 @@ package org.openqa.selenium.ie;
 import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
 
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
 
 class ErrorHandler {
   public void verifyErrorCode(int errorCode, String message) {
     switch (errorCode) {
     case SUCCESS: 
       break; // Nothing to do
-      
-    case -8:
-      throw new NoSuchFrameException(message);
      
-    case -9:
+    case 7:
+      throw new NoSuchElementException(message);
+      
+    case 8:
+      throw new NoSuchFrameException(message);
+           
+    case 9:
       throw new UnsupportedOperationException("You may not perform the requested action");
       
-    case -10:
+    case 10:
       throw new StaleElementReferenceException(
           String.format("You may not %s this element. It looks as if the reference is stale. " +
                         "Did you navigate away from the page with this element on?", message));
 
-    case -11:
+    case 11:
       throw new ElementNotVisibleException(
           String.format("You may not %s an element that is not displayed", message));
       
-    case -12:
+    case 12:
       throw new UnsupportedOperationException(
               String.format("You may not %s an element that is not enabled", message));
-      
-    case -15:
+
+    case 14:
+      throw new WebDriverException("An unhandled exception has occured. " + message);
+
+    case 15:
       throw new UnsupportedOperationException(
-              String.format("The element appears to be unselectable", message));
-      
-      default: 
-        throw new IllegalStateException(String.format("%s (%d)", message, errorCode));
+              String.format("The element appears to be unselectable: %s", message));
+
+    case 16:
+      throw new NoSuchElementException(message + " (no document found)");
+
+    case 21:
+      throw new TimedOutException("The driver reported that the command timed out. There may "
+                                      + "be several reasons for this. Check that the destination"
+                                      + "site is in IE's 'Trusted Sites' (accessed from Tools->"
+                                      + "Internet Options in the 'Security' tab) If it is a "
+                                      + "trusted site, then the request may have taken more than"
+                                      + "a minute to finish.");
+
+    default: 
+      throw new IllegalStateException(String.format("%s (%d)", message, errorCode));
     }
   }
 }

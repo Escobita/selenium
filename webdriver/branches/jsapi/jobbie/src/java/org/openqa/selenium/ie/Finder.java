@@ -17,15 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
-import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
-
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.IllegalLocatorException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.ie.ElementCollection;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -43,31 +40,49 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
         FindsByTagName, FindsByXPath {
 
   private final ExportedWebDriverFunctions lib;
+  private final InternetExplorerDriver parent;
   private final Pointer driver;
   private final Pointer element;
 
-  public Finder(ExportedWebDriverFunctions lib, Pointer driver, Pointer element) {
+  public Finder(ExportedWebDriverFunctions lib, InternetExplorerDriver parent, Pointer element) {
     this.lib = lib;
-    this.driver = driver;
+    this.parent = parent;
+    this.driver = parent.getUnderlyingPointer();
     this.element = element;
   }
 
   public WebElement findElementByClassName(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the class name expression is null.");
+
+    if (using.matches(".*\\s+.*")) {
+      throw new IllegalLocatorException(
+          "Compound class names are not supported. Consider searching for one class name and filtering the results.");
+    }
+
     PointerByReference rawElement = new PointerByReference();
     int result = lib.wdFindElementByClassName(driver, element, new WString(using), rawElement);
 
     handleErrorCode("id", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByClassName(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the class name expression is null.");
+
+    if (using.matches(".*\\s+.*")) {
+      throw new IllegalLocatorException(
+          "Compound class names are not supported. Consider searching for one class name and filtering the results.");
+    }
+
     PointerByReference elements = new PointerByReference();
     int result = lib.wdFindElementsByClassName(driver, element, new WString(using), elements);
 
     handleErrorCode("id", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElementById(String using) {
@@ -76,7 +91,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("id", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsById(String using) {
@@ -85,7 +100,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("id", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElementByLinkText(String using) {
@@ -94,7 +109,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("link text", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByLinkText(String using) {
@@ -103,7 +118,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("link text", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElementByPartialLinkText(String using) {
@@ -112,7 +127,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("link text", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByPartialLinkText(String using) {
@@ -121,7 +136,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("link text", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }  
   public WebElement findElementByName(String using) {
     PointerByReference rawElement = new PointerByReference();
@@ -129,7 +144,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("name", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByName(String using) {
@@ -138,7 +153,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("name", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElementByTagName(String using) {
@@ -147,7 +162,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("xpath", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByTagName(String using) {
@@ -156,7 +171,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("tag name", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElementByXPath(String using) {
@@ -165,7 +180,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("xpath", using, result);
 
-    return new InternetExplorerElement(lib, driver, rawElement.getValue());
+    return new InternetExplorerElement(lib, parent, rawElement.getValue());
   }
 
   public List<WebElement> findElementsByXPath(String using) {
@@ -174,7 +189,7 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
 
     handleErrorCode("xpath", using, result);
 
-    return new ElementCollection(lib, driver, elements.getValue()).toList();
+    return new ElementCollection(lib, parent, elements.getValue()).toList();
   }
 
   public WebElement findElement(By by) {
@@ -186,20 +201,10 @@ class Finder implements SearchContext, FindsByClassName, FindsById, FindsByLinkT
   }
 
   private void handleErrorCode(String how, String using, int errorCode) {
-    switch (errorCode) {
-    case SUCCESS:
-      break; // Nothing to be done
-
-    case -7:
-      throw new NoSuchElementException(String.format("Unable to find element by %s using \"%s\"",
-              how, using));
-
-    case -9:
-      throw new UnsupportedOperationException("The method that called me has not been implemented yet");
-      
-    default:
-      throw new IllegalStateException(String.format(
-              "Unable to find element by %s using \"%s\" (%d)", how, using, errorCode));
-    }
+    ErrorHandler errors = new ErrorHandler();
+    
+    String message = String.format(
+            "Unable to find element by %s using \"%s\" (%d)", how, using, errorCode);
+    errors.verifyErrorCode(errorCode, message);
   }
 }

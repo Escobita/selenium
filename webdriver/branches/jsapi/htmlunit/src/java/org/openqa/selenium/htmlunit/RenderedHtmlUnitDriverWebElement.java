@@ -22,12 +22,15 @@ package org.openqa.selenium.htmlunit;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.StyledElement;
+import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.ElementNotVisibleException;
-import org.mozilla.javascript.Undefined;
+import org.openqa.selenium.WebDriverException;
 
 import java.awt.*;
+
+import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 
 public class RenderedHtmlUnitDriverWebElement extends HtmlUnitWebElement
     implements RenderedWebElement {
@@ -36,28 +39,40 @@ public class RenderedHtmlUnitDriverWebElement extends HtmlUnitWebElement
     super(parent, element);
   }
 
+  @Override
   public void sendKeys(CharSequence... value) {
+    assertElementNotStale();
+
     if (!isDisplayed())
       throw new ElementNotVisibleException("You may only sendKeys to visible elements");
 
     super.sendKeys(value);
   }
 
+  @Override
   public boolean toggle() {
+    assertElementNotStale();
+
     if (!isDisplayed())
           throw new ElementNotVisibleException("You may only toggle visible elements");
 
     return super.toggle();
   }
 
+  @Override
   public void click() {
+    assertElementNotStale();
+
     if (!isDisplayed())
           throw new ElementNotVisibleException("You may only click visible elements");
 
     super.click();
   }
 
+  @Override
   public void setSelected() {
+    assertElementNotStale();
+
     if (!isDisplayed())
           throw new ElementNotVisibleException("You may only select visible elements");
 
@@ -65,49 +80,77 @@ public class RenderedHtmlUnitDriverWebElement extends HtmlUnitWebElement
   }
 
   public boolean isDisplayed() {
-    if (element instanceof HtmlInput) {
-      if (((HtmlInput) element).getTypeAttribute().equalsIgnoreCase("hidden")) {
-        return false;
-      }
-    }
+    assertElementNotStale();
 
-    String display = "";
-    String visible = "";
-    HtmlElement node = element;
-    while (node instanceof StyledElement) {
-      display = getEffectiveStyle(node, "display");
-      if ("none".equals(display)) {
-        break;
-      }
-
-      visible = getEffectiveStyle(node, "visibility");
-      if ("hidden".equals(visible)) {
-        break;
-      }
-
-      node = (HtmlElement) node.getParentNode();
-    }
-
-    return !"none".equals(display) && !"hidden".equals(visible);
+    return !(element instanceof HtmlHiddenInput) && element.isDisplayed();
   }
 
   public Point getLocation() {
-    throw new UnsupportedOperationException("getLocation");
+    assertElementNotStale();
+
+    // Try the bounding client rect first.
+    String script = "var e = arguments[0]; "
+                    + "if (e.getBoundingClientRect instanceof Function) {"
+                    + "var r = e.getBoundingClientRect();"
+                    + "return r.left + ',' + r.top;"
+                    + "} return undefined;";
+    String result = (String) parent.executeScript(script, element);
+    if (result == null) {
+      // fall back to returning some value
+      // TODO(simon): This is wrong, but better something than nothing
+      result = (String) parent.executeScript(
+        "var w = arguments[0].offsetLeft; var h = arguments[0].offsetTop; return w + ',' + h;",
+        element);
+    }
+
+    try {
+      String[] sizes = result.split(",", 2);
+      return new Point(Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1]));
+    } catch (Exception e) {
+      throw new WebDriverException("Cannot determine size of element from: " + result);
+    }
   }
 
   public Dimension getSize() {
-    throw new UnsupportedOperationException("getSize");
+    assertElementNotStale();
+
+    // Try the bounding client rect first.
+    String script = "var e = arguments[0]; "
+                    + "if (e.getBoundingClientRect instanceof Function) {"
+                    + "var r = e.getBoundingClientRect();"
+                    + "var w = r.left - r.right; var h = r.top - r.bottom;"
+                    + "return w + ',' + h;"
+                    + "} return undefined;";
+    String result = (String) parent.executeScript(script, element);
+    if (result == null) {
+      // fall back to returning some value
+      // TODO(simon): This is probably very lame.
+      result = (String) parent.executeScript(
+        "var w = arguments[0].scrollWidth; var h = arguments[0].scrollHeight; return w + ',' + h;",
+        element);
+    }
+
+    try {
+      String[] sizes = result.split(",", 2);
+      return new Dimension(Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1]));
+    } catch (Exception e) {
+      throw new WebDriverException("Cannot determine size of element from: " + result);
+    }
   }
 
   public void dragAndDropBy(int moveRightBy, int moveDownBy) {
+    assertElementNotStale();
     throw new UnsupportedOperationException("dragAndDropBy");
   }
 
   public void dragAndDropOn(RenderedWebElement element) {
+    assertElementNotStale();
     throw new UnsupportedOperationException("dragAndDropOn");
   }
 
   public String getValueOfCssProperty(String propertyName) {
+    assertElementNotStale();
+
     return getEffectiveStyle(element, propertyName);
   }
 

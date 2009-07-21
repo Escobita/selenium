@@ -22,11 +22,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FormHandlingTest extends AbstractDriverTestCase {
 	public void testShouldClickOnSubmitInputElements() {
@@ -245,7 +245,7 @@ public class FormHandlingTest extends AbstractDriverTestCase {
 		assertThat(value.getCanonicalPath(), equalTo(file.getCanonicalPath()));
 	}
 
-        public void testShouldThrowAnExceptionWhenSelectingAnUnselectableElement() {
+	public void testShouldThrowAnExceptionWhenSelectingAnUnselectableElement() {
 		driver.get(formPage);
 
 		WebElement element = driver.findElement(By.xpath("//title"));
@@ -270,7 +270,7 @@ public class FormHandlingTest extends AbstractDriverTestCase {
 		assertThat(value, is("Some text"));
 	}
 	
-	@Ignore(value= {IE, SAFARI}, reason="Not implemented going to the end of the line first")
+	@Ignore(value= {IE, SAFARI, HTMLUNIT}, reason="Not implemented going to the end of the line first")
 	public void testSendingKeyboardEventsShouldAppendTextinTextAreas() {
 		driver.get(formPage);
 		WebElement element = driver.findElement(By.id("withText"));

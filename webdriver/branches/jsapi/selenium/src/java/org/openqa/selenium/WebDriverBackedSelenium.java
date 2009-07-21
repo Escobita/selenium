@@ -38,6 +38,7 @@ import org.openqa.selenium.internal.RegExTextMatchingStrategy;
 import org.openqa.selenium.internal.TextMatchingStrategy;
 import org.openqa.selenium.internal.ValueOptionSelectStrategy;
 import org.openqa.selenium.internal.XPathLookupStrategy;
+import org.openqa.selenium.internal.DomTraversalLookupStrategy;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -78,6 +79,11 @@ public class WebDriverBackedSelenium implements Selenium {
   private boolean controlKeyDown;
   private boolean shiftKeyDown;
   private String originalWindowHandle;
+  
+  // Emulated timeout in milliseconds.
+  private long timeout = 30000;
+  // Thread to emulate the timeout
+  private TimeoutThread timeoutThread;
 
   public WebDriverBackedSelenium(WebDriver baseDriver, String baseUrl) {
     setUpElementFindingStrategies();
@@ -93,6 +99,30 @@ public class WebDriverBackedSelenium implements Selenium {
     originalWindowHandle = driver.getWindowHandle();
   }
 
+  /**
+   * Stops the timeout thread if it exists.
+   */
+  private void stopTimeoutThreadIfExists() {
+    if (timeoutThread != null) {
+      timeoutThread.interrupt();
+      timeoutThread = null;
+    }
+  }
+
+  public WebDriver getUnderlyingWebDriver() {
+    return driver;
+  }
+
+  /**
+   * Creates a new timeout thread. If exists a previous existing timeout will
+   * be stopped.
+   */
+  private void startTimeoutThread() {
+    stopTimeoutThreadIfExists();
+    timeoutThread = new TimeoutThread(Thread.currentThread(), timeout);
+    timeoutThread.start();
+  }
+  
   private void setUpTextMatchingStrategies() {
     textMatchingStrategies.put("implicit", new GlobTextMatchingStrategy());
     textMatchingStrategies.put("glob", new GlobTextMatchingStrategy());
@@ -117,6 +147,7 @@ public class WebDriverBackedSelenium implements Selenium {
     lookupStrategies.put("link", new LinkLookupStrategy());
     lookupStrategies.put("name", new NameLookupStrategy());
     lookupStrategies.put("xpath", new XPathLookupStrategy());
+    lookupStrategies.put("dom", new DomTraversalLookupStrategy());
   }
 
   /**
@@ -495,7 +526,11 @@ public class WebDriverBackedSelenium implements Selenium {
       value = value.toUpperCase();
 
     WebElement element = findElement(locator);
-    callEmbeddedSelenium("replaceText", element, value);
+    if(driver instanceof JavascriptExecutor && ((JavascriptExecutor) driver).isJavascriptEnabled()) {
+        callEmbeddedSelenium("replaceText", element, value);
+    } else {
+        element.sendKeys(value);
+    }
   }
 
   /**
@@ -674,7 +709,10 @@ public class WebDriverBackedSelenium implements Selenium {
     if (url.indexOf("://") == -1) {
       urlToOpen = baseUrl + (!url.startsWith("/") ? "/" : "") + url;
     }
+    
+    startTimeoutThread();
     driver.get(urlToOpen);
+    stopTimeoutThreadIfExists();
   }
 
   /**
@@ -690,7 +728,9 @@ public class WebDriverBackedSelenium implements Selenium {
    * @param windowID the JavaScript window ID of the window to select
    */
   public void openWindow(String url, String windowID) {
+    startTimeoutThread();
     getEval(String.format("window.open('%s', '%s');", url, windowID));
+    stopTimeoutThreadIfExists();
   }
 
   /**
@@ -725,9 +765,11 @@ public class WebDriverBackedSelenium implements Selenium {
    *
    * @param windowID the JavaScript window ID of the window to select
    */
-  public void selectWindow(String windowID) {
+  public void selectWindow(String windowID) { 
     if ("null".equals(windowID)) {
       driver.switchTo().window(originalWindowHandle);
+    } else if ("_blank".equals(windowID)) {
+      selectBlankWindow();
     } else {
       if (windowID.startsWith("title=")) {
         selectWindowWithTitle(windowID.substring("title=".length()));
@@ -757,6 +799,68 @@ public class WebDriverBackedSelenium implements Selenium {
     
     driver.switchTo().window(current);
     throw new SeleniumException("Unable to select window with title: " + title);
+  }
+
+  /**
+   * Selects the only <code>_blank</code> window. A window open with 
+   * <code>target='_blank'</code> will have a <code>window.name = null</code>.
+   * 
+   * <p>This method assumes that there will only be one single
+   * <code>_blank</code> window and selects the first one with no name.
+   * Therefore if for any reasons there are multiple windows with
+   * <code>window.name = null</code> the first found one will be selected.
+   * 
+   * <p>If none of the windows have <code>window.name = null</code> the last
+   * selected one will be re-selected and a {@link SeleniumException} will
+   * be thrown.
+   * 
+   * @throws NoSuchWindowException if no window with
+   *     <code>window.name = null</code> is found.
+   */
+  private void selectBlankWindow() {
+    String current = driver.getWindowHandle();
+    // Find the first window without a "name" attribute
+    List<String> handles = new ArrayList<String>(driver.getWindowHandles());
+    for (String handle: handles) {
+      driver.switchTo().window(handle);
+      String value = (String) 
+          ((JavascriptExecutor) driver).executeScript("return window.name;");
+      if (value == null) {
+        // We found it!
+        return;
+      }
+    }
+    // We couldn't find it
+    driver.switchTo().window(current);
+    throw new SeleniumException("Unable to select window _blank");
+  }
+
+  /** Simplifies the process of selecting a popup window (and does not offer
+   * functionality beyond what <code>selectWindow()</code> already provides).
+   * <ul><li>If <code>windowID</code> is either not specified, or specified as
+   * "null", the first non-top window is selected. The top window is the one
+   * that would be selected by <code>selectWindow()</code> without providing a
+   * <code>windowID</code> . This should not be used when more than one popup
+   * window is in play.</li><li>Otherwise, the window will be looked up considering
+   * <code>windowID</code> as the following in order: 1) the "name" of the
+   * window, as specified to <code>window.open()</code>; 2) a javascript
+   * variable which is a reference to a window; and 3) the title of the
+   * window. This is the same ordered lookup performed by
+   * <code>selectWindow</code> .</li></ul>
+   *
+   * @param windowID an identifier for the popup window, which can take on a
+   *                 number of different meanings
+   */
+  public void selectPopUp(String windowID) {
+    throw new UnsupportedOperationException("Not implemented yet.");
+  }
+
+  /** Selects the main window. Functionally equivalent to using
+   * <code>selectWindow()</code> and specifying no value for
+   * <code>windowID</code>.
+   */
+  public void deselectPopUp() {
+    throw new UnsupportedOperationException("Not implemented yet.");
   }
 
   /**
@@ -820,25 +924,40 @@ public class WebDriverBackedSelenium implements Selenium {
 
   /**
    * Waits for a popup window to appear and load up.
+   * 
+   * <p>If <code>windowID</code> is equals to <code>_blank</code> then instead
+   * of searching the window by ID it is necessary to search for the only window
+   * without a name.
+   * 
+   * @see #selectBlankWindow()
    *
    * @param windowID the JavaScript window "name" of the window that will appear (not the text of the title bar)
    * @param timeout  a timeout in milliseconds, after which the action will return with an error
    */
   public void waitForPopUp(final String windowID, String timeout) {
-    long millis = Long.parseLong(timeout);
-
+    final long millis = Long.parseLong(timeout);
+    final String current = driver.getWindowHandle();
+    
+    startTimeoutThread();
     new Wait() {
-
+      @Override
       public boolean until() {
         try {
-          driver.switchTo().window(windowID);
+          if ("_blank".equals(windowID)) {
+            selectBlankWindow();
+          } else {
+            driver.switchTo().window(windowID);
+          }
           return !"about:blank".equals(driver.getCurrentUrl());
-        } catch (NoSuchWindowException e) {
+        } catch (SeleniumException e) {
           // Swallow
         }
         return false;
       }
     }.wait(String.format("Timed out waiting for %s. Waited %s", windowID, timeout), millis);
+    stopTimeoutThreadIfExists();
+    
+    driver.switchTo().window(current);
   }
 
   /**
@@ -894,14 +1013,18 @@ public class WebDriverBackedSelenium implements Selenium {
    * Simulates the user clicking the "back" button on their browser.
    */
   public void goBack() {
+    startTimeoutThread();
     driver.navigate().back();
+    stopTimeoutThreadIfExists();
   }
 
   /**
    * Simulates the user clicking the "Refresh" button on their browser.
    */
   public void refresh() {
+    startTimeoutThread();
     driver.navigate().refresh();
+    stopTimeoutThreadIfExists();
   }
 
   /**
@@ -1087,7 +1210,7 @@ public class WebDriverBackedSelenium implements Selenium {
    */
   public String getEval(String script) {
     script = script.replaceAll("\n", "\\\\n");
-    script = String.format("return eval(\"%s\");", script); 
+    script = String.format("return eval(\"%s\");", script);
     return String.valueOf(((JavascriptExecutor) driver).executeScript(script));
   }
 
@@ -1240,8 +1363,8 @@ public class WebDriverBackedSelenium implements Selenium {
    */
   public boolean isSomethingSelected(String selectLocator) {
     WebElement select = findElement(selectLocator);
-    String name = select.getElementName().toLowerCase();
-    if (!"select".equals(name)) {
+    String tagName = select.getTagName().toLowerCase();
+    if (!"select".equals(tagName)) {
       throw new SeleniumException("Specified element is not a Select");
     }
 
@@ -1764,9 +1887,17 @@ public class WebDriverBackedSelenium implements Selenium {
    * @param script  the JavaScript snippet to run
    * @param timeout a timeout in milliseconds, after which this command will return with an error
    */
-  public void waitForCondition(String script, String timeout) {
-    throw new UnsupportedOperationException("waitForCondition");
+  public void waitForCondition(final String script, String timeout) {
+    startTimeoutThread();
+    new Wait() {
+      @Override
+      public boolean until() {
+        return (Boolean) ((JavascriptExecutor) driver).executeScript(script);
+      }
+    }.wait("Failed to resolve " + script, Long.valueOf(timeout));
+    stopTimeoutThreadIfExists();
   }
+  
 
   /**
    * Specifies the amount of time that Selenium will wait for actions to complete.
@@ -1777,9 +1908,9 @@ public class WebDriverBackedSelenium implements Selenium {
    * @param timeout a timeout in milliseconds, after which the action will return with an error
    */
   public void setTimeout(String timeout) {
-//    throw new UnsupportedOperationException("setTimeout");
+      this.timeout = Long.parseLong(timeout); 
   }
-
+  
   /**
    * Waits for a new page to load.
    * <p/>
@@ -2043,6 +2174,20 @@ public class WebDriverBackedSelenium implements Selenium {
   }
 
   /**
+   * Returns the network traffic seen by the browser, including headers,
+   * AJAX requests, status codes, and timings. When this function is called,
+   * the traffic log is cleared, so the returned content is only the traffic
+   * seen since the last call.
+   *
+   * @param type The type of data to return the network traffic as.
+   *             Valid values are: json, xml, or plain.
+   * @return A string representation in the defined type of the network traffic seen by the browser.
+   */
+  public String captureNetworkTraffic(String type) {
+    throw new UnsupportedOperationException("Not implemented yet.");
+  }
+    
+  /**
    * Downloads a screenshot of the browser current window canvas to a
    * based 64 encoded PNG file. The <em>entire</em> windows canvas is captured,
    * including parts rendered outside of the current view port.
@@ -2275,4 +2420,46 @@ public class WebDriverBackedSelenium implements Selenium {
         "The underlying WebDriver instance does not support executing javascript");
   }
 
+  public void captureEntirePageScreenshot(String s) {
+      throw new UnsupportedOperationException("captureEntirePageScreenshot");
+  }
+
+  public void addScript(String arg0, String arg1) {
+      throw new UnsupportedOperationException("Selenium.addScript() not implemented yet.");
+  }
+
+  public void removeScript(String arg0) {
+      throw new UnsupportedOperationException("Selenium.removeScript() not implemented yet.");
+  }
+
+  public void addCustomRequestHeader(String s, String s1) {
+    throw new UnsupportedOperationException("Selenium.addCustomRequestHeader() not implemented yet.");
+  }
+
+  /**
+   * Fake timeout thread to emulate the timeout feature in Selenium.
+   */
+  private final class TimeoutThread extends Thread {
+
+    private long wait = 0;
+    private Thread callback;
+
+    public TimeoutThread(Thread callback, long wait) {
+      this.callback = callback;
+      this.wait = wait;
+    }
+    
+    @Override
+    public void run() {
+      try {
+        Thread.sleep(wait);
+      } catch (InterruptedException e) {
+        // The timeoput has been interrupted.
+        return;
+      }
+      // The timeout has been reach, interrupting the original thread.
+      callback.interrupt();
+    }
+    
+  }
 }

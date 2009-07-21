@@ -21,11 +21,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-
-import static org.openqa.selenium.Ignore.Driver.*;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 public class TypingTest extends AbstractDriverTestCase {
-	@JavascriptEnabled
+  @JavascriptEnabled
 	public void testShouldFireKeyPressEvents() {
 		driver.get(javascriptPage);
 
@@ -561,4 +563,39 @@ public class TypingTest extends AbstractDriverTestCase {
 		silent.sendKeys("s");
     	assertThat(result.getText(), containsString("press"));
     }
+
+  @JavascriptEnabled
+  @Ignore({SAFARI, HTMLUNIT, IE})
+  public void testTypingIntoAnIFrameWithContentEditableOrDesignModeSet() {
+    driver.get(richTextPage);
+
+    driver.switchTo().frame("editFrame");
+    WebElement element = driver.switchTo().activeElement();
+    element.sendKeys("Fishy");
+
+    driver.switchTo().defaultContent();
+    WebElement trusted = driver.findElement(By.id("istrusted"));
+    WebElement id = driver.findElement(By.id("tagId"));
+
+    assertEquals("[true]", trusted.getText());
+    assertEquals("[frameHtml]", id.getText());
+  }
+
+  @JavascriptEnabled
+  @Ignore({SAFARI, HTMLUNIT})
+  public void testNonPrintableCharactersShouldWorkWithContentEditableOrDesignModeSet() {
+    driver.get(richTextPage);
+
+    // not tested on mac
+    if (Platform.getCurrent().is(Platform.MAC)) {
+      return;
+    }
+
+    driver.switchTo().frame("editFrame");
+    WebElement element = driver.switchTo().activeElement();
+    element.sendKeys("Dishy", Keys.BACK_SPACE, Keys.LEFT, Keys.LEFT);
+    element.sendKeys(Keys.LEFT, Keys.LEFT, "F", Keys.DELETE, Keys.END, "ee!");
+
+    assertEquals("Fishee!", element.getText());
+  }
 }

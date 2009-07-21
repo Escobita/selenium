@@ -53,6 +53,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.SgmlPage;
@@ -168,67 +169,62 @@ public class HtmlUnitWebElement implements WebElement,
       return submit == null;
     }
 
-  public String getValue() {
-    assertElementNotStale();
+	public String getValue() {
+          assertElementNotStale();
 
-    if (element instanceof HtmlTextArea) {
-      return ((HtmlTextArea) element).getText();
-    }
-    return getAttribute("value");
-  }
-
-  public void clear() {
-    assertElementNotStale();
-
-    if (element instanceof HtmlInput) {
-      ((HtmlInput) element).setValueAttribute("");
-    } else if (element instanceof HtmlTextArea) {
-      ((HtmlTextArea) element).setText("");
-    }
-  }
-
-  public void sendKeys(CharSequence... value) {
-    assertElementNotStale();
-
-    StringBuilder builder = new StringBuilder();
-    for (CharSequence seq : value) {
-      builder.append(seq);
+        if (element instanceof HtmlTextArea)
+            return ((HtmlTextArea) element).getText();
+        return getAttribute("value");
     }
 
-    if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
-      try {
-        element.type(builder.toString());
-        element.blur();
-        return;
-      } catch (IOException e) {
-        throw new WebDriverException(e);
-      }
-    }
-
-    String originalValue = getValue();
-
-    if (element instanceof HtmlInput) {
-      String v = getValue();
-      element.setAttribute("value", (v == null ? "" : v) + builder.toString());
-    } else if (element instanceof HtmlTextArea) {
-      String v = getValue();
-      ((HtmlTextArea) element).setText((v == null ? "" : v) + builder.toString());
-    } else {
-      throw new UnsupportedOperationException(
-          "You may only set the value of elements that are input elements");
-    }
-
-    if (element instanceof HtmlFileInput &&
-        !originalValue.equals(getValue()) &&
-        parent.isJavascriptEnabled()) {
-      element.fireEvent("change");
-    }
-  }
-
-  public String getElementName() {
+    public void clear() {
       assertElementNotStale();
 
+        if (element instanceof HtmlInput) {
+            ((HtmlInput)element).setValueAttribute("");
+        } else if (element instanceof HtmlTextArea) {
+            ((HtmlTextArea) element).setText("");
+        }
+    }
+
+    public void sendKeys(CharSequence... value) {
+      assertElementNotStale();
+
+        StringBuilder builder = new StringBuilder();
+        for (CharSequence seq : value) {
+            builder.append(seq);
+        }
+
+        if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
+          try {
+            element.type(builder.toString());
+            return;
+          } catch (IOException e) {
+            throw new WebDriverException(e);
+          }
+        }
+
+        if (element instanceof HtmlInput) {
+            String currentValue = getValue();
+            element.setAttribute("value", (currentValue == null ? "" : currentValue) + builder.toString());
+        } else if (element instanceof HtmlTextArea) {
+            String currentValue = getValue();
+            ((HtmlTextArea) element).setText((currentValue == null ? "" : currentValue) + builder.toString());
+        } else {
+            throw new UnsupportedOperationException("You may only set the value of elements that are input elements");
+        }
+    }
+
+    public String getTagName() {
+        assertElementNotStale();
         return element.getNodeName();
+    }
+
+    /**
+     * @deprecated Use {@link #getTagName()} instead, this method will be removed in the near future.
+     */
+    public String getElementName() {
+        return getTagName();
     }
 
     public String getAttribute(String name) {
@@ -298,7 +294,7 @@ public class HtmlUnitWebElement implements WebElement,
                 }
             }
 
-            throw new UnsupportedOperationException("You may only toggle checkboxes or options in a select which allows multiple selections: " + getElementName());
+            throw new UnsupportedOperationException("You may only toggle checkboxes or options in a select which allows multiple selections: " + getTagName());
         } catch (IOException e) {
             throw new WebDriverException("Unexpected exception: " + e);
         }
@@ -370,18 +366,22 @@ public class HtmlUnitWebElement implements WebElement,
         for (DomNode child : node.getChildren()) {
             // Do we need to collapse the text so far?
             if (child instanceof HtmlPreformattedText) {
+              if (child.isDisplayed()) {
                 toReturn.append(collapseWhitespace(textSoFar));
                 textSoFar.delete(0, textSoFar.length());
-                getTextFromNode(child, toReturn, textSoFar, true);
-                continue;
+              }
+              getTextFromNode(child, toReturn, textSoFar, true);
+              continue;
             }
 
             // Or is this just plain text?
             if (child instanceof DomText) {
+              if (child.isDisplayed()) {
                 String textToAdd = ((DomText) child).getData();
                 textToAdd = textToAdd.replace(nbspChar, ' ');
                 textSoFar.append(textToAdd);
-                continue;
+              }
+              continue;
             }
 
             // Treat as another child node.
@@ -419,8 +419,10 @@ public class HtmlUnitWebElement implements WebElement,
     }
 
     private void getPreformattedText(DomNode node, StringBuffer toReturn) {
-        String xmlText = node.asXml();
-        toReturn.append(xmlText.replaceAll("^<pre.*?>", "").replaceAll("</pre.*>$", ""));
+        if (node.isDisplayed()) {
+          String xmlText = node.asXml();
+          toReturn.append(xmlText.replaceAll("^<pre.*?>", "").replaceAll("</pre.*>$", ""));
+        }
     }
 
   public List<WebElement> getElementsByTagName(String tagName) {
@@ -498,8 +500,8 @@ public class HtmlUnitWebElement implements WebElement,
     public List<WebElement> findElementsByLinkText(String linkText) {
       assertElementNotStale();
 
-        List<HtmlElement> htmlElements =
-            (List<HtmlElement>) element.getHtmlElementsByTagName("a");
+        List<? extends HtmlElement> htmlElements =
+            (List<? extends HtmlElement>) element.getHtmlElementsByTagName("a");
         List<WebElement> webElements = new ArrayList<WebElement>();
         for (HtmlElement e : htmlElements) {
             if (e.getTextContent().equals(linkText)
@@ -524,8 +526,8 @@ public class HtmlUnitWebElement implements WebElement,
     public List<WebElement> findElementsByPartialLinkText(String linkText) {
       assertElementNotStale();
 
-        List<HtmlElement> htmlElements =
-            (List<HtmlElement>) element.getHtmlElementsByTagName("a");
+        List<? extends HtmlElement> htmlElements =
+            (List<? extends HtmlElement>) element.getHtmlElementsByTagName("a");
         List<WebElement> webElements = new ArrayList<WebElement>();
         for (HtmlElement e : htmlElements) {
             if (e.getTextContent().contains(linkText)
@@ -590,7 +592,7 @@ public class HtmlUnitWebElement implements WebElement,
         return toString;
     }
 
-  private void assertElementNotStale() {
+  protected void assertElementNotStale() {
     SgmlPage elementPage = element.getPage();
     Page currentPage = parent.lastPage();
 
@@ -598,6 +600,17 @@ public class HtmlUnitWebElement implements WebElement,
       throw new StaleElementReferenceException(
           "Element appears to be stale. Did you navigate away from the page that contained it? "
           + " And is the current window focussed the same as the one holding this element?");
+    }
+
+    // We need to walk the DOM to determine if the element is actually attached
+    DomNode parent = element;
+    while (parent != null && !(parent instanceof HtmlHtml)) {
+      parent = parent.getParentNode();
+    }
+
+    if (parent == null) {
+      throw new StaleElementReferenceException("The element seems to be disconnected from the DOM. "
+        + " This means that a user cannot interact with it.");
     }
   }
 }

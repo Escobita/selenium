@@ -21,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import static org.openqa.selenium.Ignore.Driver.*;
+import static org.openqa.selenium.Ignore.Driver.IPHONE;
 
 public class PageLoadingTest extends AbstractDriverTestCase {
     public void testShouldWaitForDocumentToBeLoaded() {
@@ -46,14 +47,21 @@ public class PageLoadingTest extends AbstractDriverTestCase {
     }
 
     public void testShouldReturnWhenGettingAUrlThatDoesNotResolve() {
+      try {
         // Of course, we're up the creek if this ever does get registered
         driver.get("http://www.thisurldoesnotexist.comx/");
+      } catch (IllegalStateException e) {
+        if (!isIeDriverTimedOutException(e)) {
+          throw e;
+        }
+      }
     }
 
-    public void testShouldReturnWhenGettingAUrlThatDoesNotConnect() {
-        // Here's hoping that there's nothing here. There shouldn't be
-        driver.get("http://localhost:3001");
-    }
+  @Ignore(IPHONE)
+  public void testShouldReturnWhenGettingAUrlThatDoesNotConnect() {
+    // Here's hoping that there's nothing here. There shouldn't be
+    driver.get("http://localhost:3001");
+  }
 
     @Ignore(SAFARI)
     public void testShouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded() {
@@ -68,7 +76,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
         assertThat(pageNumber.getText().trim(), equalTo("2"));
     }
 
-    @Ignore(SAFARI)
+    @Ignore({SAFARI, IPHONE})
     @NeedsFreshDriver
     public void testSouldDoNothingIfThereIsNothingToGoBackTo() {
         driver.get(formPage);

@@ -81,7 +81,7 @@ EXPORT int wdeClick(WebElement* element);
 EXPORT int wdeGetAttribute(WebElement* element, const wchar_t* string, StringWrapper** result);
 EXPORT int wdeGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWrapper** result);
 EXPORT int wdeGetText(WebElement* element, StringWrapper** result);
-EXPORT int wdeGetElementName(WebElement* element, StringWrapper** result);
+EXPORT int wdeGetTagName(WebElement* element, StringWrapper** result);
 EXPORT int wdeIsSelected(WebElement* element, int* result);
 EXPORT int wdeSetSelected(WebElement* element);
 EXPORT int wdeToggle(WebElement* element, int* result);
@@ -139,6 +139,11 @@ EXPORT int wdcGetElementAtIndex(ElementCollection* collection, int index, WebEle
 EXPORT int wdStringLength(StringWrapper* string, int* length);
 EXPORT int wdFreeString(StringWrapper* string);
 EXPORT int wdCopyString(StringWrapper* source, int length, wchar_t* dest);
+
+// Things that should be interactions
+EXPORT int wdeMouseDownAt(HWND hwnd, long windowX, long windowY);
+EXPORT int wdeMouseUpAt(HWND hwnd, long windowX, long windowY);
+EXPORT int wdeMouseMoveTo(HWND hwnd, long duration, long fromX, long fromY, long toX, long toY);
 
 #ifdef __cplusplus
 }

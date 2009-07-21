@@ -76,6 +76,7 @@ class ApiExampleTest (unittest.TestCase):
         except NoSuchElementException:
             pass
 
+    @not_available_on_remote #TODO: the remote driver is still giving NSE
     def testFindElementByXpathThrowErrorInResponseExceptionForInvalidXPath(self):
         self._loadSimplePage()
         try:
@@ -136,6 +137,23 @@ class ApiExampleTest (unittest.TestCase):
         elem.send_keys("some text")
         elem = self.driver.find_element_by_xpath("//form[@name='someForm']/input[@id='username']")
         self.assertEquals("some text", elem.get_value())
+
+    @not_available_on_remote
+    def testFindElementByTagName(self):
+        self._loadPage("simpleTest")
+        elems = self.driver.find_elements_by_tag_name("div")
+        num_by_xpath = len(self.driver.find_elements_by_xpath("//div"))
+        print num_by_xpath
+        self.assertEquals(num_by_xpath, len(elems))
+        elems = self.driver.find_elements_by_tag_name("iframe")
+        self.assertEquals(0, len(elems))
+
+    @not_available_on_remote
+    def testFindElementByTagNameWithinElement(self):
+        self._loadPage("simpleTest")
+        div = self.driver.find_element_by_id("multiline")
+        elems = div.find_elements_by_tag_name("p")
+        self.assertTrue(len(elems) == 1)
 
     def testSwitchToWindow(self):
         title_1 = "XHTML Test Page"
@@ -244,7 +262,7 @@ class ApiExampleTest (unittest.TestCase):
         file_name = os.path.join(tempfile.mkdtemp(), "screenshot.png")
         self.driver.save_screenshot(file_name)
         self.assertTrue(os.path.exists(file_name))
-        shutil.rmtree(os.path.dirname(file_name))
+        shutil.rmtree(os.path.dirname(file_name))    
 
     def _loadSimplePage(self):
         self.driver.get("http://localhost:%d/simpleTest.html" % webserver.port)

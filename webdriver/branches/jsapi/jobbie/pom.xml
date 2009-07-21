@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>org.openqa.selenium.webdriver</groupId>
 			<artifactId>webdriver-common</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.openqa.selenium.webdriver</groupId>
 			<artifactId>webdriver-common</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -45,8 +45,10 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<tasks>
-								<mkdir dir="target/classes" />
-								<copy file="build/InternetExplorerDriver.dll" todir="target/classes" />
+								<mkdir dir="target/classes/x86" />
+								<mkdir dir="target/classes/amd64" />
+								<copy file="build/Win32/Release/InternetExplorerDriver.dll" todir="target/classes/x86" />
+								<copy file="build/x64/Release/InternetExplorerDriver.dll" todir="target/classes/amd64" />
 							</tasks>
 						</configuration>
 						<goals>

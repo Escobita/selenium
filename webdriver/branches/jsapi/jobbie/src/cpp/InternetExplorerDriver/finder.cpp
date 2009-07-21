@@ -29,7 +29,8 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_;
 	const wchar_t *elementId= data.input_string_;
 
@@ -43,7 +44,7 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = -ENOSUCHDOCUMENT;
+			errorKind = ENOSUCHDOCUMENT;
 			return;
 		}
 		root_doc->get_documentElement(&inputElement);
@@ -52,7 +53,7 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
 	if (!node) 
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
@@ -61,7 +62,7 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 
 	if (!doc) 
 	{
-		errorKind = -ENOSUCHDOCUMENT;
+		errorKind = ENOSUCHDOCUMENT;
 		return;
 	}
  
@@ -70,7 +71,7 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 	doc->getElementById(id, &element);
 
 	if(NULL == element) {
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 	
@@ -115,7 +116,7 @@ void IeThread::OnSelectElementById(WPARAM w, LPARAM lp)
 		}
 	}	
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsById(WPARAM w, LPARAM lp)
@@ -123,7 +124,8 @@ void IeThread::OnSelectElementsById(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *elementId= data.input_string_;
 
@@ -191,47 +193,44 @@ void IeThread::OnSelectElementByLink(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_;
 	const wchar_t *elementLink= data.input_string_;
 
 	pDom = NULL;
 	errorKind = SUCCESS;
 
+	CComPtr<IHTMLDocument3> root_doc;
+	getDocument3(&root_doc);
+
 	/// Start from root DOM by default
 	if(!inputElement)
 	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = -ENOSUCHDOCUMENT;
+			errorKind = ENOSUCHDOCUMENT;
 			return;
 		}
-		root_doc->get_documentElement(&inputElement);
+		CComQIPtr<IHTMLDocument2> bodyDoc(root_doc);
+		if (bodyDoc) {
+			bodyDoc->get_body(&inputElement);
+		}
 	}
 
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
+	CComQIPtr<IHTMLElement2> element2(inputElement);
+	if (!element2 || !node)
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
-
-	CComPtr<IHTMLDocument2> doc;
-	getDocument2(node, &doc);
-	if (!doc) 
-	{
-		errorKind = -ENOSUCHDOCUMENT;
-		return;
-	}
-
-	CComPtr<IHTMLElementCollection> linkCollection;
-	doc->get_links(&linkCollection);
+	CComPtr<IHTMLElementCollection> elements;
+	element2->getElementsByTagName(CComBSTR("A"), &elements);
 	
 	long linksLength;
-	linkCollection->get_length(&linksLength);
+	elements->get_length(&linksLength);
 
 	for (int i = 0; i < linksLength; i++) {
 		CComVariant idx;
@@ -241,7 +240,7 @@ void IeThread::OnSelectElementByLink(WPARAM w, LPARAM lp)
 		zero.vt = VT_I4;
 		zero.lVal = 0;
 		CComPtr<IDispatch> dispatch;
-		linkCollection->item(idx, zero, &dispatch);
+		elements->item(idx, zero, &dispatch);
 
 		CComQIPtr<IHTMLElement> element(dispatch);
 
@@ -254,7 +253,7 @@ void IeThread::OnSelectElementByLink(WPARAM w, LPARAM lp)
 		}
 	}
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsByLink(WPARAM w, LPARAM lp)
@@ -262,46 +261,43 @@ void IeThread::OnSelectElementsByLink(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *elementLink= data.input_string_;
 
-	errorKind = 0;
+	errorKind = SUCCESS;
+
+	CComPtr<IHTMLDocument3> root_doc;
+	getDocument3(&root_doc);
 
 	/// Start from root DOM by default
 	if(!inputElement)
 	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = 1;
+			errorKind = ENOSUCHDOCUMENT;
 			return;
 		}
-		root_doc->get_documentElement(&inputElement);
+		CComQIPtr<IHTMLDocument2> bodyDoc(root_doc);
+		if (bodyDoc) {
+			bodyDoc->get_body(&inputElement);
+		}
 	}
 
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
+	CComQIPtr<IHTMLElement2> element2(inputElement);
+	if (!element2 || !node)
 	{
-		errorKind = 1;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
-	CComPtr<IHTMLDocument2> doc2;
-	getDocument2(node, &doc2);
-
-	if (!doc2) 
-	{
-		errorKind = 1;
-		return;
-	}
-
-	CComPtr<IHTMLElementCollection> linkCollection;
-	doc2->get_links(&linkCollection);
+	CComPtr<IHTMLElementCollection> elements;
+	element2->getElementsByTagName(CComBSTR("A"), &elements);
 	
 	long linksLength;
-	linkCollection->get_length(&linksLength);
+	elements->get_length(&linksLength);
 
 	for (int i = 0; i < linksLength; i++) {
 		CComVariant idx;
@@ -311,7 +307,7 @@ void IeThread::OnSelectElementsByLink(WPARAM w, LPARAM lp)
 		zero.vt = VT_I4;
 		zero.lVal = 0;
 		CComPtr<IDispatch> dispatch;
-		linkCollection->item(idx, zero, &dispatch);
+		elements->item(idx, zero, &dispatch);
 
 		CComQIPtr<IHTMLElement> element(dispatch);
 
@@ -331,7 +327,8 @@ void IeThread::OnSelectElementByPartialLink(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_;
 	const wchar_t *elementLink= data.input_string_;
 
@@ -354,7 +351,7 @@ void IeThread::OnSelectElementByPartialLink(WPARAM w, LPARAM lp)
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
 	if (!node) 
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
@@ -363,7 +360,7 @@ void IeThread::OnSelectElementByPartialLink(WPARAM w, LPARAM lp)
 	getDocument2(node, &doc);
 	if (!doc) 
 	{
-		errorKind = -ENOSUCHDOCUMENT;
+		errorKind = ENOSUCHDOCUMENT;
 		return;
 	}
 
@@ -394,7 +391,7 @@ void IeThread::OnSelectElementByPartialLink(WPARAM w, LPARAM lp)
 		}
 	}
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsByPartialLink(WPARAM w, LPARAM lp)
@@ -402,7 +399,8 @@ void IeThread::OnSelectElementsByPartialLink(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *elementLink= data.input_string_;
 
@@ -471,7 +469,8 @@ void IeThread::OnSelectElementByName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code; 
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_; 
 	const wchar_t *elementName= data.input_string_; 
 
@@ -485,7 +484,7 @@ void IeThread::OnSelectElementByName(WPARAM w, LPARAM lp)
 		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = -ENOSUCHDOCUMENT;
+			errorKind = ENOSUCHDOCUMENT;
 			return;
 		}
 		root_doc->get_documentElement(&inputElement);
@@ -494,7 +493,7 @@ void IeThread::OnSelectElementByName(WPARAM w, LPARAM lp)
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
 	if (!node) 
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
@@ -502,7 +501,7 @@ void IeThread::OnSelectElementByName(WPARAM w, LPARAM lp)
 	getDocument2(node, &doc);
 	if (!doc) 
 	{
-		errorKind = -ENOSUCHDOCUMENT;
+		errorKind = ENOSUCHDOCUMENT;
 		return;
 	}
 
@@ -535,7 +534,7 @@ void IeThread::OnSelectElementByName(WPARAM w, LPARAM lp)
 		}
 	}
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 
@@ -544,7 +543,8 @@ void IeThread::OnSelectElementsByName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *elementName= data.input_string_;
 
@@ -613,7 +613,8 @@ void IeThread::OnSelectElementByTagName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code; 
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_; 
 	const wchar_t *tagName = data.input_string_; 
 
@@ -624,7 +625,7 @@ void IeThread::OnSelectElementByTagName(WPARAM w, LPARAM lp)
 	getDocument3(&root_doc);
 	if (!root_doc) 
 	{
-		errorKind = -ENOSUCHDOCUMENT;
+		errorKind = ENOSUCHDOCUMENT;
 		return;
 	}
 	
@@ -633,7 +634,7 @@ void IeThread::OnSelectElementByTagName(WPARAM w, LPARAM lp)
 
 	if (!elements)
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
@@ -662,7 +663,7 @@ void IeThread::OnSelectElementByTagName(WPARAM w, LPARAM lp)
 		}
 	}
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsByTagName(WPARAM w, LPARAM lp)
@@ -670,7 +671,8 @@ void IeThread::OnSelectElementsByTagName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *tagName = data.input_string_;
 
@@ -724,7 +726,8 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	int &errorKind = data.error_code;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	IHTMLElement* &pDom = data.output_html_element_; 
 	const wchar_t *elementClassName= data.input_string_; 
 
@@ -738,7 +741,7 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 		getDocument3(&root_doc);
 		if (!root_doc) 
 		{
-			errorKind = -ENOSUCHDOCUMENT;
+			errorKind = ENOSUCHDOCUMENT;
 			return;
 		}
 		root_doc->get_documentElement(&inputElement);
@@ -747,7 +750,7 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 	CComQIPtr<IHTMLDOMNode> node(inputElement);
 	if (!node) 
 	{
-		errorKind = -ENOSUCHELEMENT;
+		errorKind = ENOSUCHELEMENT;
 		return;
 	}
 
@@ -755,7 +758,7 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 	getDocument2(node, &doc2);
 	if (!doc2) 
 	{
-		errorKind = -ENOSUCHDOCUMENT;
+		errorKind = ENOSUCHDOCUMENT;
 		return;
 	}
 
@@ -787,7 +790,7 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 			  token;
 			  token = wcstok_s( NULL, seps, &next_token) )
 		{
-			__w64 int lengthRead = next_token - token;
+			__int64 lengthRead = next_token - token;
 			if(*next_token!=NULL) lengthRead--;
 			if(exactLength != lengthRead) continue;
 			if(0!=wcscmp(elementClassName, token)) continue;
@@ -798,7 +801,7 @@ void IeThread::OnSelectElementByClassName(WPARAM w, LPARAM lp)
 		}
 	}
 
-	errorKind = -ENOSUCHELEMENT;
+	errorKind = ENOSUCHELEMENT;
 }
 
 void IeThread::OnSelectElementsByClassName(WPARAM w, LPARAM lp)
@@ -806,7 +809,8 @@ void IeThread::OnSelectElementsByClassName(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	ON_THREAD_COMMON(data)
 	long &errorKind = data.output_long_;
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
+	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
+	checkValidDOM(inputElement);
 	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
 	const wchar_t *elementClassName= data.input_string_;
 
@@ -868,7 +872,7 @@ void IeThread::OnSelectElementsByClassName(WPARAM w, LPARAM lp)
 			  token;
 			  token = wcstok_s( NULL, seps, &next_token) )
 		{
-			__w64 int lengthRead = next_token - token;
+			__int64 lengthRead = next_token - token;
 			if(*next_token!=NULL) lengthRead--;
 			if(exactLength != lengthRead) continue;
 			if(0!=wcscmp(elementClassName, token)) continue;

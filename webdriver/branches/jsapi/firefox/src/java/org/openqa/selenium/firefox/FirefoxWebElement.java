@@ -53,6 +53,10 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
       sendMessage(UnsupportedOperationException.class, "click");
     }
 
+    public void hover() {
+      sendMessage(WebDriverException.class, "hover");
+    }
+
     public void submit() {
         sendMessage(WebDriverException.class, "submitElement");
     }
@@ -78,9 +82,16 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
         sendMessage(UnsupportedOperationException.class, "sendKeys", builder.toString());
     }
 
-    public String getElementName() {
-        String name = sendMessage(WebDriverException.class, "getElementName");
+    public String getTagName() {
+        String name = sendMessage(WebDriverException.class, "getTagName");
         return name;
+    }
+
+    /**
+     * @deprecated Use {@link #getTagName()} instead, this method will be removed in the near future.
+     */
+    public String getElementName() {
+        return getTagName();
     }
 
     public String getAttribute(String name) {

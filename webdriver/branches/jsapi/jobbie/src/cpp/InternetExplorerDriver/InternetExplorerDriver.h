@@ -22,6 +22,8 @@ limitations under the License.
 #include "ElementWrapper.h"
 #include "IEThread.h"
 
+extern IeThread* g_IE_Thread;
+
 class InternetExplorerDriver
 {
 public:
@@ -75,7 +77,7 @@ public:
 	bool switchToFrame(LPCWSTR pathToFrame);
 
 	LPCWSTR getCookies();
-	void addCookie(const wchar_t *cookieString);
+	int addCookie(const wchar_t *cookieString);
 
 	IeThread* p_IEthread;
 

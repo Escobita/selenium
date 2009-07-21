@@ -23,7 +23,9 @@ import org.openqa.selenium.WebElement;
 
 public class ImplicitLookupStrategy implements LookupStrategy {
     public WebElement find(WebDriver driver, String use) {
-        if (use.startsWith("//")) {
+        if (use.startsWith("document.")) {
+            return new DomTraversalLookupStrategy().find(driver, use);
+        } else if (use.startsWith("//")) {
             return new XPathLookupStrategy().find(driver, use);
         } else {
             return new IdentifierLookupStrategy().find(driver, use);

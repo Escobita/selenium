@@ -110,8 +110,19 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
         assertThat(driver.getTitle(), equalTo("Page3"));
     }
 
+    @JavascriptEnabled
+	@Ignore(value = {IE, SAFARI}, reason="safari: not implemented, ie: Fails")
+    public void testShouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad() throws InterruptedException
+    {
+        driver.get(formPage);
+
+        driver.findElement(By.id("changeme")).setSelected();
+
+        assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("3"));
+    }
+
 	@JavascriptEnabled
-	@Ignore({HTMLUNIT, SAFARI})
+	@Ignore(SAFARI)
     public void testShouldBeAbleToDetermineTheLocationOfAnElement() {
         driver.get(xhtmlTestPage);
 
@@ -123,7 +134,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     }
 
 	@JavascriptEnabled
-	@Ignore({HTMLUNIT, SAFARI})
+	@Ignore(SAFARI)
     public void testShouldBeAbleToDetermineTheSizeOfAnElement() {
         driver.get(xhtmlTestPage);
 
@@ -176,7 +187,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({HTMLUNIT, SAFARI})
+  @Ignore(SAFARI)
   public void testShouldBeAbleToSwitchToFocusedElement() {
     driver.get(javascriptPage);
 
@@ -196,9 +207,8 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     assertThat(element.getAttribute("name"), is("body"));
   }
 
-  // TODO(simon.m.stewart): Fix this by end of 2009-04-02
   @JavascriptEnabled
-  @Ignore(value = {FIREFOX, HTMLUNIT, REMOTE, SAFARI, IE}, reason = "Firefox: Window demands focus to work. Other platforms: not properly tested")
+  @Ignore(value = {IE, FIREFOX, REMOTE, SAFARI}, reason = "Firefox: Window demands focus to work. Other platforms: not properly tested")
   public void testChangeEventIsFiredAppropriatelyWhenFocusIsLost() {
     driver.get(javascriptPage);
 

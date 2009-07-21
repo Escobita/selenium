@@ -29,6 +29,8 @@
   NSCondition *loadLock_;
   
   NSString *lastJSResult_;
+	
+  NSURLRequestCachePolicy cachePolicy_;
   
   // Pointer to the status / activity label.
   IBOutlet UILabel *statusLabel_;
@@ -82,6 +84,9 @@
 
 // Get the HTML source of the page we've loaded
 - (NSString *)source;
+
+// Get a screenshot of the page we've loaded
+- (UIImage *)screenshot;
 
 - (void)clickOnPageElementAt:(CGPoint)point;
 

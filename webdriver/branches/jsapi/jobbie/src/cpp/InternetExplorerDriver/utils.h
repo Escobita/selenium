@@ -21,9 +21,8 @@ limitations under the License.
 
 #include <iostream>
 #include <string>
-#include <jni.h>
 
-
+#include "interaction_utils.h"
 #include "InternetExplorerDriver.h"
 
 
@@ -46,32 +45,18 @@ limitations under the License.
 	DataMarshaller& data = prepareCmData(pElem, input_string); \
 	sendThreadMsg(message, data);
 
-
-void throwRunTimeException(JNIEnv *, LPCWSTR msg);
-void throwNoSuchFrameException(JNIEnv *, LPCWSTR message);
-void throwNoSuchElementException(JNIEnv *, LPCWSTR msg);
-void throwUnsupportedOperationException(JNIEnv *, LPCWSTR msg);
-
-jobject newJavaInternetExplorerDriver(JNIEnv *, InternetExplorerDriver* driver);
-
-void wait(long millis);
-void waitWithoutMsgPump(long millis);
-HWND getChildWindow(HWND hwnd, LPCTSTR name);
-
-jstring lpcw2jstring(JNIEnv *env, LPCWSTR text, int size = -1);
-
 struct StringWrapper;
 typedef struct StringWrapper StringWrapper;
-jstring convertToJString(JNIEnv* env, StringWrapper* wrapper);
 LPCWSTR combstr2cw(CComBSTR& from);
 LPCWSTR bstr2cw(BSTR& from);
 LPCWSTR comvariant2cw(CComVariant& toConvert);
-void wstring2string(const std::wstring& inp, std::string &out);
 void cw2string(LPCWSTR inp, std::string &out);
-inline jstring bstr2jstring(JNIEnv *env, BSTR& from) {return lpcw2jstring(env, bstr2cw(from));}
+void AppendValue(std::wstring& dest, long value);
+BSTR CopyBSTR(const BSTR& inp);
 
 long getLengthOf(SAFEARRAY* ary);
 
+bool checkValidDOM(IHTMLElement* r);
 
 char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn);
 void ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn, std::string &out);
@@ -90,11 +75,13 @@ class safeIO
 public:
 	safeIO();
 	CComCriticalSection m_cs_out;
-	static void CoutL(LPCWSTR str, bool showThread = false, int cc=0);
-	static void CoutA(LPCSTR str, bool showThread = false, int cc=0);
+	static void CoutL(LPCWSTR str, bool showThread = true, int cc=0);
+	static void CoutA(LPCSTR str, bool showThread = true, int cc=0);
+	static void CoutLong(long value);
+	static void CoutW(std::wstring& str, bool showThread = true, int cc=0);
 };
 
-extern safeIO gSafe;
+extern safeIO* gSafe;
 
 #endif
 

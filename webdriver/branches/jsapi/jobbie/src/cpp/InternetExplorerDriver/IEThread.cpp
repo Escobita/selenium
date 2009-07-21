@@ -26,17 +26,35 @@ limitations under the License.
 #include "utils.h"
 #include "InternalCustomMessage.h"
 #include "EventReleaser.h"
+#include "windows.h"
 
 using namespace std;
 extern wchar_t* XPATHJS[];
+extern IeThread* g_IE_Thread;
 
 // IeThread
 
-IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0)
+IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0), m_HeartBeatTimerID(0),
+    m_NavigationCompletionTimerID(0)
 {
 	SCOPETRACER
 
+	m_HeartBeatListener = NULL;
 	m_EventToNotifyWhenNavigationCompleted = NULL;
+
+	HKEY key;
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"software\\microsoft\\internet explorer", 0L,  KEY_READ, &key) == ERROR_SUCCESS) {
+		char value[32];
+		DWORD type = REG_SZ;
+		DWORD size = 32;
+
+		 if (RegQueryValueEx(key, L"version", NULL, &type, (LPBYTE)&value, &size) == ERROR_SUCCESS) {
+			 ieRelease = atoi(value);
+		 }
+	}
+    RegCloseKey(key);
+
+	m_HeartBeatListener = FindWindow(NULL, L"__WebdriverHeartBeatListener__");
 }
 
 IeThread::~IeThread()
@@ -50,20 +68,24 @@ IeThread::~IeThread()
 	std::wstring& error = dataMarshaller.output_string_; \
 	try {b(pMsg->lParam, pMsg->wParam);} \
 	catch(std::wstring& content) { \
-		safeIO::CoutA("in catch1"); \
+		safeIO::CoutA("in catch1, content = "); \
 		dataMarshaller.exception_caught_ = true; \
 		error = L"Error in ["; \
 		error += L#b; \
 		error += L"] "; \
 		error += content; \
+		safeIO::CoutW(error); \
 	}\
 	catch(...) { \
 		safeIO::CoutA("in catch2"); \
 		dataMarshaller.exception_caught_ = true; \
 		error = L"Unhandled exception thrown in "; \
 		error += L#b; \
+		safeIO::CoutW(error); \
 	}\
 	return TRUE;}
+
+HWND IeThread::m_HeartBeatListener = 0;
 
 BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 {
@@ -88,7 +110,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETHEIGHT, OnElementGetHeight )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETWIDTH, OnElementGetWidth )
 
-	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETELEMENTNAME, OnElementGetElementName )
+	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETTAGNAME, OnElementGetTagName )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETATTRIBUTE, OnElementGetAttribute )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETVALUE, OnElementGetValue )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SENDKEYS, OnElementSendKeys )
@@ -102,7 +124,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SUBMIT, OnElementSubmit )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETCHILDRENWTAGNAME, OnElementGetChildrenWithTagName )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_RELEASE, OnElementRelease )
-	CUSTOM_MESSAGE_MAP ( _WD_ELEM_BLUR, OnElementBlur )
+	CUSTOM_MESSAGE_MAP ( _WD_ELEM_ISFRESH, OnIsElementFresh )
 
 	CUSTOM_MESSAGE_MAP ( _WD_GETVISIBLE, OnGetVisible )
 	CUSTOM_MESSAGE_MAP ( _WD_SETVISIBLE, OnSetVisible )
@@ -149,6 +171,9 @@ int IeThread::runProcess()
 	SCOPETRACER
 	InitInstance();
 
+	// This will create the message pump
+	::PeekMessage(&curMsg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+
 	SetEvent(sync_LaunchThread);
 
 	bool quitASAP = false;
@@ -173,15 +198,44 @@ int IeThread::runProcess()
 	return ExitInstance();
 }
 
+VOID CALLBACK HeartBeatTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) 
+{
+	if(IeThread::m_HeartBeatListener != NULL)
+	{
+		PostMessage(IeThread::m_HeartBeatListener, _WD_HB_BEAT, 0, 0);
+	}
+}
+
+VOID CALLBACK NavigationCompletionTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) 
+{
+	SCOPETRACER
+	safeIO::CoutA("g_IE_Thread =");
+	safeIO::CoutLong((long)g_IE_Thread);
+	if(!g_IE_Thread) return;
+	if(idEvent != g_IE_Thread->m_NavigationCompletionTimerID)
+	{
+		safeIO::CoutLong(idEvent);
+		safeIO::CoutLong(g_IE_Thread->m_NavigationCompletionTimerID);
+		return;
+	}
+	g_IE_Thread->waitForNavigateToFinish();
+}
+
 BOOL IeThread::InitInstance()
 {
 	SCOPETRACER
 	threadID = GetCurrentThreadId();
-	pBody = new IeThreadData;
+	pBody = new IeThreadData();
 
 	pBody->m_CmdData.output_string_.resize(5000);
 
 	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+
+	if(m_HeartBeatListener != NULL)
+	{
+		PostMessage(m_HeartBeatListener, _WD_HB_START, 0, 0);
+		m_HeartBeatTimerID = SetTimer(NULL, 0, 40000, HeartBeatTimer);
+	}
 
 	return TRUE;
 }
@@ -189,6 +243,18 @@ BOOL IeThread::InitInstance()
 int IeThread::ExitInstance()
 {
 	SCOPETRACER
+
+	if(m_HeartBeatListener != NULL)
+	{
+		if (m_HeartBeatTimerID)
+		{
+			KillTimer( NULL, m_HeartBeatTimerID);
+			m_HeartBeatListener = 0;
+		}
+		PostMessage(m_HeartBeatListener, _WD_HB_STOP, 0, 0);
+	}
+	stopNavigationCompletionTimer();
+
 	delete pBody;
 	pBody = NULL;
 	try{
@@ -233,18 +299,38 @@ void IeThread::OnStartIE(WPARAM w, LPARAM lp)
 	EventReleaser er(sync_LaunchIE);
 	HRESULT hr = pBody->ieThreaded.CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER);
 
-	LOG(INFO) << "Has instanciated IE. Multithreaded version." ;
+	safeIO::CoutA("Has instanciated IE. Multithreaded version.");
 
 	if (!SUCCEEDED(hr))
 	{
-		std::wstring Err(L"Cannot create InternetExplorer instance");
-		throw Err;
+		std::wstring Err(L"Cannot create InternetExplorer instance, hr =");
+		AppendValue(Err, hr); 
+		safeIO::CoutW(Err, true);
+		if(m_HeartBeatListener != NULL) 
+		{
+			PostMessage(m_HeartBeatListener, _WD_HB_CRASHED, 0 ,0 );
+		}
+ 		throw Err;
 	}
 
 	pBody->mSink.p_Thread = this;
 	pBody->mSink.ConnectionAdvise();
+}
 
-	bringToFront();
+void IeThread::startNavigationCompletionTimer()
+{
+	SCOPETRACER
+	if(m_NavigationCompletionTimerID) return;
+	stopNavigationCompletionTimer();
+	m_NavigationCompletionTimerID = SetTimer(NULL, 0, 300, NavigationCompletionTimer);
+}
+
+void IeThread::stopNavigationCompletionTimer()
+{
+	SCOPETRACER
+	if(!m_NavigationCompletionTimerID) return;
+	KillTimer(NULL, m_NavigationCompletionTimerID);
+	m_NavigationCompletionTimerID = 0;
 }
 
 void IeThread::setVisible(bool isVisible)
@@ -382,8 +468,7 @@ void IeThread::findCurrentFrame(IHTMLWindow2 **result)
 			index.lVal = frameIndex;
 		} else {
 			// Alternatively, it's a name
-			index.vt = VT_BSTR;
-			index.bstrVal = frameName;
+			frameName.CopyTo(&index);
 		}
 
 		// Find the frame
@@ -425,6 +510,7 @@ void IeThread::getDocument3(IHTMLDocument3** pOutDoc)
 
 bool IeThread::getEval(IHTMLDocument2* doc, DISPID* evalId, bool* added)
 {
+	SCOPETRACER
 	CComPtr<IDispatch> scriptEngine;
 	doc->get_Script(&scriptEngine);
 
@@ -476,7 +562,8 @@ void IeThread::removeScript(IHTMLDocument2* doc)
 		CComPtr<IHTMLElement> body;
 		doc->get_body(&body);
 		CComQIPtr<IHTMLDOMNode> bodyNode(body);
-		bodyNode->removeChild(elementNode, NULL);
+		CComPtr<IHTMLDOMNode> removed;
+		bodyNode->removeChild(elementNode, &removed);
 	}
 }
 
@@ -484,9 +571,13 @@ bool IeThread::createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, c
 {
 	CComVariant script_variant(script);
 	DISPPARAMS parameters = {0};
-    parameters.cArgs = 1;
-    parameters.rgvarg = &script_variant;
+    memset(&parameters, 0, sizeof parameters);
+	parameters.cArgs      = 1;
+	parameters.rgvarg     = &script_variant;
+	parameters.cNamedArgs = 0;
+
 	EXCEPINFO exception;
+	memset(&exception, 0, sizeof exception);
 
 	HRESULT hr = scriptEngine->Invoke(evalId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, result, &exception, 0);
 	if (FAILED(hr)) {
@@ -498,7 +589,7 @@ bool IeThread::createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, c
 
   	  if (result) {
 		  result->vt = VT_USERDEFINED;
-		  result->bstrVal = exception.bstrDescription;
+		  result->bstrVal = CopyBSTR(exception.bstrDescription);
 	  }
 
 	  return false;
@@ -508,7 +599,8 @@ bool IeThread::createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, c
 }
 
 
-void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *result, bool tryAgain)
+void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, CComVariant* result, bool tryAgain)
+
 {
 	SCOPETRACER
 	CComPtr<IHTMLDocument2> doc;
@@ -547,13 +639,14 @@ void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *re
 	}
 
 	DISPPARAMS callParameters = { 0 };
+	memset(&callParameters, 0, sizeof callParameters);
 	int nargs = getLengthOf(args);
 	callParameters.cArgs = nargs + 1;
 
 	CComPtr<IHTMLWindow2> win;
 	doc->get_parentWindow(&win);
 	_variant_t *vargs = new _variant_t[nargs + 1];
-	vargs[nargs] = CComVariant(win);
+	VariantCopy(&(vargs[nargs]), &CComVariant(win));
 
 	long index;
     for (int i = 0; i < nargs; i++)
@@ -561,14 +654,19 @@ void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *re
 		index = i;
 		CComVariant v;
 		SafeArrayGetElement(args, &index, (void*) &v);
-		vargs[nargs - 1 - i] = new _variant_t(v);
+		VariantCopy(&(vargs[nargs - 1 - i]), &v);
     }
 
 	callParameters.rgvarg = vargs;
 
 	EXCEPINFO exception;
-	HRESULT hr4 = tempFunction.pdispVal->Invoke(callid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &callParameters, result, &exception, 0);
+	memset(&exception, 0, sizeof exception);
+	CComVariant callResult;
+	HRESULT hr4 = tempFunction.pdispVal->Invoke(callid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &callParameters, 
+		(result) ? (&(*result)):&callResult, 
+		&exception, 0);
 	if (FAILED(hr4)) {
+	  CComBSTR errorDescription(exception.bstrDescription);
 	  if (DISP_E_EXCEPTION == hr4) {
 		  wcerr << L"Exception message was: " << exception.bstrDescription << endl;
 	  } else {
@@ -576,8 +674,10 @@ void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *re
 	  }
 
 	  if (result) {
-		  result->vt = VT_USERDEFINED;
-		  result->bstrVal = exception.bstrDescription;
+		  CComVariant& ref_result = *result;
+		  ref_result.Clear();
+		  ref_result.vt = VT_USERDEFINED;
+		  ref_result.bstrVal = CopyBSTR(exception.bstrDescription);
 	  }
 	}
 
@@ -590,7 +690,7 @@ void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *re
 HWND IeThread::getHwnd()
 {
 	SCOPETRACER
-	HWND hWnd;
+	HWND hWnd = NULL;
 	pBody->ieThreaded->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hWnd));
 
 	DWORD ieWinThreadId = GetWindowThreadProcessId(hWnd, NULL);
@@ -601,7 +701,6 @@ HWND IeThread::getHwnd()
     }
 
 	SetActiveWindow(hWnd);
-	SetFocus(hWnd);
 
 	if( ieWinThreadId != currThreadId )
     {
@@ -611,6 +710,13 @@ HWND IeThread::getHwnd()
 	return hWnd;
 }
 
+bool IeThread::isStillBusy()
+{
+	VARIANT_BOOL busy;
+ 
+	pBody->ieThreaded->get_Busy(&busy);
+	return (busy == VARIANT_TRUE);
+}
 
 void IeThread::waitForNavigateToFinish()
 {
@@ -624,15 +730,13 @@ void IeThread::waitForNavigateToFinish()
 	SCOPETRACER
 	alreadyInsideWFNTF = true;
 	CScopeSetter<bool> S(&alreadyInsideWFNTF, false);
-	VARIANT_BOOL busy;
-
 
 	HRESULT hr;
 
-	pBody->ieThreaded->get_Busy(&busy);
-	if(busy == VARIANT_TRUE)
+	if (isStillBusy())
 	{
 		safeIO::CoutA("still busy", true);
+		startNavigationCompletionTimer();
 		return;
 	}
 
@@ -644,7 +748,8 @@ void IeThread::waitForNavigateToFinish()
 	int counter = 0;
 	if(readyState != READYSTATE_COMPLETE)
 	{
-		safeIO::CoutA("not ready yet", true);
+		safeIO::CoutLong(readyState);
+		startNavigationCompletionTimer();
 		return;
 	}
 
@@ -654,7 +759,12 @@ void IeThread::waitForNavigateToFinish()
 	pBody->ieThreaded->get_Document(&dispatch);
 	CComQIPtr<IHTMLDocument2> doc(dispatch);
 
-	waitForDocumentToComplete(doc);
+	if (0==waitForDocumentToComplete(doc)) 
+	{
+		safeIO::CoutA("doc not complete yet", true);
+		startNavigationCompletionTimer();
+		return;
+	}
 
 	CComPtr<IHTMLFramesCollection2> frames;
 	hr = doc->get_frames(&frames);
@@ -676,37 +786,38 @@ void IeThread::waitForNavigateToFinish()
 			CComPtr<IHTMLDocument2> frameDoc;
 			window->get_document(&frameDoc);
 
-			waitForDocumentToComplete(frameDoc);
+			if (0==waitForDocumentToComplete(frameDoc))
+			{
+				safeIO::CoutA("frame not complete yet", true);
+				startNavigationCompletionTimer();
+				return;
+			}
 		}
 	}
 
 	tryNotifyNavigCompleted();
 }
 
-void IeThread::waitForDocumentToComplete(IHTMLDocument2* doc)
+// returns 1 if it is complete, 0 if incomplete.
+int IeThread::waitForDocumentToComplete(IHTMLDocument2* doc)
 {
 	SCOPETRACER
 	CComBSTR state;
 
 	if (!doc) {
 		// There's no way to tell what's meant to happen. Bail
-		return;
+		return 1;
 	}
 
 	HRESULT hr = doc->get_readyState(&state);
-
-	int counter = 0;
-	while ( _wcsicmp( combstr2cw(state) , L"complete") != 0) {
-		counter++;
-		waitWithoutMsgPump(50);
-		state.Empty();
-		hr = doc->get_readyState(&state);
-		if(counter > 60 && !SUCCEEDED(hr))
-		{
-			safeIO::CoutA("Error: failed to call get_readyState", true);
-			break;
-		}
+	hr = doc->get_readyState(&state);
+	if ( _wcsicmp( combstr2cw(state) , L"complete") != 0) {
+		// Still NOT complete
+		safeIO::CoutL(combstr2cw(state), true);
+		return 0;
 	}
+
+	return 1;
 }
 
 bool IeThread::addEvaluateToDocument(const IHTMLDOMNode* node, int count)
@@ -755,6 +866,8 @@ bool IeThread::addEvaluateToDocument(const IHTMLDOMNode* node, int count)
 void IeThread::tryNotifyNavigCompleted()
 {
 	SCOPETRACER
+
+	stopNavigationCompletionTimer();
 	if(m_EventToNotifyWhenNavigationCompleted)
 	{
 		HANDLE h = m_EventToNotifyWhenNavigationCompleted;

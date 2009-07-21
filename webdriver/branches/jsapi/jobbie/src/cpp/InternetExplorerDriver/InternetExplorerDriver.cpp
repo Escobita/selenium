@@ -23,9 +23,13 @@ limitations under the License.
 #include "errorcodes.h"
 
 using namespace std;
+IeThread* g_IE_Thread = NULL;
 
 InternetExplorerDriver::InternetExplorerDriver() : p_IEthread(NULL)
 {
+	if (NULL == gSafe) {
+		gSafe = new safeIO();
+	}
 	SCOPETRACER
 	speed = 0;
 	
@@ -54,11 +58,10 @@ InternetExplorerDriver::~InternetExplorerDriver()
 IeThread* InternetExplorerDriver::ThreadFactory()
 {
 	SCOPETRACER
-	static IeThread* gThread = NULL;
-	if(!gThread) 
+	if(!g_IE_Thread) 
 	{
 		// Spawning the GUI worker thread, which will instantiate the ActiveX component
-		gThread = p_IEthread = new IeThread();
+		g_IE_Thread = p_IEthread = new IeThread();
 		p_IEthread->hThread = CreateThread (NULL, 0, (DWORD (__stdcall *)(LPVOID)) (IeThread::runProcessStatic), 
 					(void *)p_IEthread, 0, NULL);
 
@@ -68,7 +71,7 @@ IeThread* InternetExplorerDriver::ThreadFactory()
 		WaitForSingleObject(p_IEthread->sync_LaunchThread, 60000);
 	}
 
-	return gThread;
+	return g_IE_Thread;
 }
 
 void InternetExplorerDriver::close()
@@ -379,10 +382,12 @@ LPCWSTR InternetExplorerDriver::getCookies()
 	return data.output_string_.c_str();
 }
 
-void InternetExplorerDriver::addCookie(const wchar_t *cookieString)
+int InternetExplorerDriver::addCookie(const wchar_t *cookieString)
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ADDCOOKIE, cookieString)
+
+	return data.error_code;
 }
 
 
@@ -393,6 +398,7 @@ CComVariant& InternetExplorerDriver::executeScript(const wchar_t *script, SAFEAR
 	DataMarshaller& data = prepareCmData(script);
 	data.input_safe_array_ = args;
 	sendThreadMsg(_WD_EXECUTESCRIPT, data);
+
 	return data.output_variant_;
 }
 
@@ -415,13 +421,17 @@ bool InternetExplorerDriver::sendThreadMsg(UINT msg, DataMarshaller& data)
 	// NOTE(alexis.j.vuillemin): do not do here data.resetOutputs()
 	//   it has to be performed FROM the worker thread (see ON_THREAD_COMMON).
 	p_IEthread->PostThreadMessageW(msg, 0, 0);
-	DWORD res = WaitForSingleObject(data.synchronization_flag_, 60000);
+	DWORD res = WaitForSingleObject(data.synchronization_flag_, 120000);
 	data.resetInputs();
 	if(WAIT_TIMEOUT == res)
 	{
 		safeIO::CoutA("Unexpected TIME OUT.");
 		p_IEthread->m_EventToNotifyWhenNavigationCompleted = NULL;
-		std::wstring Err(L"Error: had to TIME OUT as a request to the worker thread did not complete after 1 min.");
+		std::wstring Err(L"Error: had to TIME OUT as a request to the worker thread did not complete after 2 min.");
+		if(p_IEthread->m_HeartBeatListener != NULL)
+		{
+			PostMessage(p_IEthread->m_HeartBeatListener, _WD_HB_CRASHED, 0 ,0 );
+		}
 		throw Err;
 	}
 	if(data.exception_caught_)

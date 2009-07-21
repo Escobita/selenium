@@ -208,13 +208,13 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     	assertTrue(elements.size() > 1);
     }
 
-    @Ignore({FIREFOX, SAFARI})
+    @Ignore(SAFARI)
     public void testShouldBeAbleToFindMultipleElementsById() {
     	driver.get(nestedPage);
     	
     	List<WebElement> elements = driver.findElements(By.id("2"));
     	
-    	assertTrue(elements.size() > 1);
+    	assertEquals(8, elements.size());
     }
     
     @Ignore(SAFARI)
@@ -297,5 +297,90 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     List<WebElement> elements = driver.findElements(By.tagName("input"));
 
     assertNotNull(elements);
+  }
+
+  public void testFindingByCompoundClassNameIsAnError() {
+    driver.get(xhtmlTestPage);
+
+    try {
+      driver.findElement(By.className("a b"));
+      fail("Compound class names aren't allowed");
+    } catch (IllegalLocatorException e) {
+      // This is expected
+    }
+
+    try {
+      driver.findElements(By.className("a b"));
+      fail("Compound class names aren't allowed");
+    } catch (IllegalLocatorException e) {
+      // This is expected
+    }
+  }
+
+  @Ignore(SAFARI)
+  @JavascriptEnabled
+  public void testShouldBeAbleToClickOnLinksWithNoHrefAttribute() {
+    driver.get(javascriptPage);
+    
+    WebElement element = driver.findElement(By.linkText("No href"));
+    element.click();
+    
+    // if any exception is thrown, we won't get this far. Sanity check
+    assertEquals("Changed", driver.getTitle());
+  }
+  
+  @Ignore({HTMLUNIT, SAFARI})
+  public void testShouldNotBeAbleToFindAnElementOnABlankPage() {
+    driver.get("about:blank");
+    
+    try {
+      // Search for anything. This used to cause an IllegalStateException in IE.
+      driver.findElement(By.tagName("a"));
+      fail("Should not have been able to find a link");
+    } catch (NoSuchElementException e) {
+      // this is expected
+    }
+  }
+  
+  @Ignore({HTMLUNIT, SAFARI, IPHONE})
+  @NeedsFreshDriver
+  public void testShouldNotBeAbleToLocateASingleElementOnABlankPage() {
+    // Note we're on the default start page for the browser at this point.
+    
+    try {
+      driver.findElement(By.id("nonExistantButton"));
+      fail("Should not have succeeded");
+    } catch (NoSuchElementException e) {
+      // this is expected
+    }
+  }
+
+  @JavascriptEnabled
+  @Ignore(SAFARI)
+  public void testRemovingAnElementDynamicallyFromTheDomShouldCauseAStaleRefException() {
+    driver.get(javascriptPage);
+
+    RenderedWebElement toBeDeleted = (RenderedWebElement) driver.findElement(By.id("deleted"));
+    assertTrue(toBeDeleted.isDisplayed());
+
+    driver.findElement(By.id("delete")).click();
+
+    try {
+      toBeDeleted.isDisplayed();
+      fail("Element should be stale at this point");
+    } catch (StaleElementReferenceException e) {
+      // this is expected
+    }
+  }
+
+  public void testFindingALinkByXpathUsingContainsKeywordShouldWork() {
+    driver.get(nestedPage);
+
+    try {
+      driver.findElement(By.xpath("//a[contains(.,'hello world')]"));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Should not have thrown an exception");
+    }
   }
 }

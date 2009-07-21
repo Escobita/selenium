@@ -31,7 +31,9 @@ public:
 	ElementWrapper(InternetExplorerDriver* ie, IHTMLElement *pElem);
 	~ElementWrapper();
 
-    LPCWSTR getElementName();
+	bool isFresh();
+
+    LPCWSTR getTagName();
 	LPCWSTR getAttribute(LPCWSTR name);
 	LPCWSTR getValue();
 	int sendKeys(LPCWSTR newValue);
@@ -45,7 +47,7 @@ public:
 	LPCWSTR getValueOfCssProperty(LPCWSTR propertyName);
 	void releaseInterface();
 
-	int getLocationWhenScrolledIntoView(HWND* hwnd, long *x, long *y);
+	int getLocationWhenScrolledIntoView(HWND* hwnd, long *x, long *y, long *width, long *height);
 	void getLocation(long *x, long *y);
 	int getWidth(long* width);
 	int getHeight(long* height);

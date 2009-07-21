@@ -35,8 +35,9 @@ import org.openqa.selenium.lift.find.Finder;
 public abstract class HamcrestWebDriverTestCase extends TestCase {
 
 	private static final long DEFAULT_TIMEOUT = 5000;
-	
-	private TestContext context = new WebDriverTestContext(createDriver());
+
+        private WebDriver driver = createDriver();
+        private TestContext context = new WebDriverTestContext(driver);
 
 	protected abstract WebDriver createDriver();
 
@@ -45,8 +46,12 @@ public abstract class HamcrestWebDriverTestCase extends TestCase {
 		context.quit();
 		super.tearDown();
 	}
-	
-	protected void clickOn(Finder<WebElement, WebDriver> finder) {
+
+        protected WebDriver getWebDriver() {
+          return driver;
+        }
+
+        protected void clickOn(Finder<WebElement, WebDriver> finder) {
 		context.clickOn(finder);
 	}
 
@@ -98,8 +103,29 @@ public abstract class HamcrestWebDriverTestCase extends TestCase {
 	void setContext(TestContext context) {
 		this.context = context;
 	}
-	
-	protected void assertSelected(Finder<WebElement, WebDriver> finder) {
+
+      /**
+       * Returns the current page source
+       */
+      public String getPageSource() {
+        return getWebDriver().getPageSource();
+      }
+
+      /**
+       * Returns the current page title
+       */
+      public String getTitle() {
+        return getWebDriver().getTitle();
+      }
+
+      /**
+       * Returns the current URL
+       */
+      public String getCurrentUrl() {
+        return getWebDriver().getCurrentUrl();
+      }
+
+      protected void assertSelected(Finder<WebElement, WebDriver> finder) {
 		assertPresenceOf(finder.with(selection()));
 	}
 	

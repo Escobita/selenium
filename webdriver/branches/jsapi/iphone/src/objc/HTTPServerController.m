@@ -20,6 +20,7 @@
 #import "WebDriverHTTPServer.h"
 #import "WebDriverHTTPConnection.h"
 #import "RESTServiceMapping.h"
+#import "WebDriverPreferences.h"
 
 #import <sys/types.h>
 #import <sys/socket.h>
@@ -49,7 +50,7 @@
     
     struct sockaddr *sock = ifaddr->ifa_addr;
 
-    NSString *interfaceName = [NSString stringWithCString:ifaddr->ifa_name];
+    NSString *interfaceName = [NSString stringWithUTF8String:ifaddr->ifa_name];
 
     // Ignore localhost.
     if ([interfaceName isEqualToString:@"lo0"])
@@ -59,7 +60,7 @@
     if (sock->sa_family == AF_INET) {
       struct in_addr inaddr = ((struct sockaddr_in *)sock)->sin_addr;
       char *name = inet_ntoa(inaddr);
-      address = [NSString stringWithCString:name];
+      address = [NSString stringWithUTF8String:name];
       break;
     }
   }
@@ -72,11 +73,12 @@
 -(id) init {
   if (![super init])
     return nil;
-  
+  UInt16 portNumber = [[WebDriverPreferences sharedInstance] serverPortNumber];
+
   server_ = [[WebDriverHTTPServer alloc] init];
 
   [server_ setType:@"_http._tcp."];
-  [server_ setPort:16000];
+  [server_ setPort:portNumber];
   [server_ setDelegate:self];
   [server_ setConnectionClass:[WebDriverHTTPConnection class]];
   
@@ -114,6 +116,14 @@ static HTTPServerController *singleton = nil;
 
 - (NSObject<HTTPResponse> *)httpResponseForRequest:(CFHTTPMessageRef)request {
   return [serviceMapping_ httpResponseForRequest:request];
+}
+
+- (NSObject *)httpResponseForQuery:(NSString *)query
+														method:(NSString *)method
+													withData:(NSData *)theData {
+	return [serviceMapping_.serverRoot httpResponseForQuery:query
+																									 method:method
+																								 withData:theData];
 }
 
 @end

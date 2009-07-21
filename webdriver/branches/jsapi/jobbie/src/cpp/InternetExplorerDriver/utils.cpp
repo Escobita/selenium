@@ -26,90 +26,7 @@ limitations under the License.
 
 using namespace std;
 
-safeIO gSafe;
-
-void throwException(JNIEnv *env, const char* className, const char *message)
-{
-	jclass newExcCls;
-	env->ExceptionDescribe();
-	env->ExceptionClear();
-	newExcCls = env->FindClass(className);
-	if (newExcCls == NULL) {
-		return;
-	}
-	env->ThrowNew(newExcCls, message);
-}
-
-void throwException(JNIEnv *env, const char* className, LPCWSTR msg)
-{
-	std::string str;
-	cw2string(msg, str);
-	throwException(env, className, str.c_str());
-}
-
-void throwNoSuchElementException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "org/openqa/selenium/NoSuchElementException", msg);
-}
-
-void throwNoSuchFrameException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "org/openqa/selenium/NoSuchFrameException", msg);
-}
-
-void throwRunTimeException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "org/openqa/selenium/WebDriverException", msg);
-}
-
-void throwUnsupportedOperationException(JNIEnv *env, LPCWSTR msg)
-{
-	throwException(env, "java/lang/UnsupportedOperationException", msg);
-}
-
-jobject newJavaInternetExplorerDriver(JNIEnv* env, InternetExplorerDriver* driver) 
-{
-	jclass clazz = env->FindClass("org/openqa/selenium/ie/InternetExplorerDriver");
-	jmethodID cId = env->GetMethodID(clazz, "<init>", "(J)V");
-
-	return env->NewObject(clazz, cId, (jlong) driver);
-}
-
-
-void wait(long millis)
-{
-	clock_t end = clock() + millis;
-	do {
-        MSG msg;
-		if (PeekMessage( &msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg); 
-			DispatchMessage(&msg); 
-		}
-		Sleep(0);
-	} while (clock() < end);
-}
-
-void waitWithoutMsgPump(long millis)
-{
-	Sleep(millis);
-}
-
-// "Internet Explorer_Server" + 1
-#define LONGEST_NAME 25
-
-HWND getChildWindow(HWND hwnd, LPCTSTR name)
-{
-	TCHAR pszClassName[LONGEST_NAME];
-	HWND hwndtmp = GetWindow(hwnd, GW_CHILD);
-	while (hwndtmp != NULL) {
-		::GetClassName(hwndtmp, pszClassName, LONGEST_NAME);
-		if (lstrcmp(pszClassName, name) == 0) {
-			return hwndtmp;
-		}
-		hwndtmp = GetWindow(hwndtmp, GW_HWNDNEXT);
-	}
-	return NULL;
-}
+safeIO* gSafe = NULL;
 
 LPCWSTR comvariant2cw(CComVariant& toConvert) 
 {
@@ -136,29 +53,15 @@ LPCWSTR comvariant2cw(CComVariant& toConvert)
 	return L"";
 }
 
-jstring convertToJString(JNIEnv* env, StringWrapper* wrapper)
+BSTR CopyBSTR(const BSTR& inp)
 {
-	int length;
-	int errCode = wdStringLength(wrapper, &length);
-	if (errCode != 0) {
-		cerr << "Unable to determine string length" << endl;
-		return NULL;
+	if (inp != NULL)
+	{
+		return ::SysAllocStringByteLen((char*)inp, ::SysStringByteLen(inp));
 	}
-
-	wchar_t* value = new wchar_t[length];
-	errCode = wdCopyString(wrapper, length, value);
-	if (errCode != 0) {
-		cerr << "Unable to copy string" << endl;
-		return NULL;
-	}
-
-	jstring toReturn = env->NewString((const jchar*) value, (jsize) ((length > 0) ? wcslen(value):length) );
-
-	delete[] value;
-	wdFreeString(wrapper);
-
-	return toReturn;
+	return ::SysAllocStringByteLen(NULL, 0);
 }
+
 
 LPCWSTR combstr2cw(CComBSTR& from) 
 {
@@ -177,17 +80,6 @@ LPCWSTR bstr2cw(BSTR& from)
 
 	return (LPCWSTR) from;
 }
-
-jstring lpcw2jstring(JNIEnv *env, LPCWSTR text, int size)
-{
-	SCOPETRACER
-	if (!text)
-		return NULL;
-
-	return env->NewString((const jchar*) text, 
-		(jsize) ((size==-1) ? wcslen(text):size) );
-}
-
 
 long getLengthOf(SAFEARRAY* ary)
 {
@@ -215,6 +107,12 @@ safeIO::safeIO()
 	m_cs_out.Init();
 	// LOG::File("C:/tmp/test.log");
 	LOG::Level("INFO");
+	LOG::Limit(10000000);
+}
+
+void safeIO::CoutW(std::wstring& str, bool showThread, int cc)
+{
+	safeIO::CoutL(str.c_str(), showThread, cc);
 }
 
 void safeIO::CoutL(LPCWSTR str, bool showThread, int cc)
@@ -228,7 +126,8 @@ void safeIO::CoutL(LPCWSTR str, bool showThread, int cc)
 void safeIO::CoutA(LPCSTR str, bool showThread, int cc)
 {
 #ifdef __VERBOSING_DLL__
-	gSafe.m_cs_out.Lock();
+	if (!gSafe) return;
+	gSafe->m_cs_out.Lock();
 	if(showThread)
 	{
 		DWORD thrID = GetCurrentThreadId();
@@ -249,9 +148,28 @@ void safeIO::CoutA(LPCSTR str, bool showThread, int cc)
 	{
 		LOG(INFO) << str;
 	}
-	gSafe.m_cs_out.Unlock();
+	gSafe->m_cs_out.Unlock();
 #endif
 }
+
+void AppendValue(std::wstring& dest, long value)
+{
+	wstringstream st;
+	st << value;
+	dest += st.str();
+}
+
+
+void safeIO::CoutLong(long value)
+{
+#ifdef __VERBOSING_DLL__
+	if (!gSafe) return;
+	gSafe->m_cs_out.Lock();
+	LOG(INFO) << value << " Hex=" << hex << value;
+	gSafe->m_cs_out.Unlock();
+#endif
+}
+
 
 char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn)
 {
@@ -272,11 +190,7 @@ char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn)
   }
   return pszOut;
 }
-
-inline void wstring2string(const std::wstring& inp, std::string &out)
-{
-	cw2string(inp.c_str(), out);
-} 
+ 
 
 void cw2string(LPCWSTR inp, std::string &out)
 {
@@ -289,3 +203,9 @@ void cw2string(LPCWSTR inp, std::string &out)
 	out = pszOut;
 	delete [] pszOut;
 } 
+
+bool checkValidDOM(IHTMLElement* r) {
+	if(r != NULL) return true;
+	safeIO::CoutA("IHTMLElement is null");
+	return false;
+}

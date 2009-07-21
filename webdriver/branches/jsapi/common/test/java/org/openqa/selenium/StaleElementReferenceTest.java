@@ -21,7 +21,6 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 public class StaleElementReferenceTest extends AbstractDriverTestCase {
-
   @Ignore(SAFARI)
   public void testOldPage() {
     driver.get(simpleTestPage);
@@ -36,7 +35,7 @@ public class StaleElementReferenceTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({HTMLUNIT, SAFARI})
+  @Ignore(SAFARI)
   public void testShouldNotCrashWhenCallingGetSizeOnAnObsoleteElement() {
     driver.get(simpleTestPage);
     RenderedWebElement elem = (RenderedWebElement) driver.findElement(By.id("links"));

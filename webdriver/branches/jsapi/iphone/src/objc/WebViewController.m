@@ -15,11 +15,16 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
 #import "WebViewController.h"
 #import "HTTPServerController.h"
 #import "UIResponder+SimulateTouch.h"
+#import "WebDriverPreferences.h"
+#import "WebDriverRequestFetcher.h"
+#import "WebDriverUtilities.h"
 #import <objc/runtime.h>
+#import "RootViewController.h"
+#import <QuartzCore/QuartzCore.h>œ
+
 @implementation WebViewController
 
 @dynamic webView;
@@ -28,12 +33,38 @@
 // Configure the webview to match the mobile safari app.
 - (void)viewDidLoad {
   [super viewDidLoad];
-  [[self webView] setScalesPageToFit:YES];
+  [[self webView] setScalesPageToFit:NO];
   [[self webView] setDelegate:self];
-  [[HTTPServerController sharedInstance] setViewController:self];
-  [self describeLastAction:[[HTTPServerController sharedInstance] status]];
+
   loadLock_ = [[NSCondition alloc] init];
   lastJSResult_ = nil;
+	
+  // Creating a new session if auto-create is enabled
+  if ([[RootViewController sharedInstance] isAutoCreateSession]) {
+    [[HTTPServerController sharedInstance]
+      httpResponseForQuery:@"/hub/session"
+                    method:@"POST"
+                  withData:[@"{\"browserName\":\"firefox\",\"platform\":\"ANY\","
+                            "\"javascriptEnabled\":false,\"version\":\"\"}"
+                            dataUsingEncoding:NSASCIIStringEncoding]];
+  }
+
+  WebDriverPreferences *preferences = [WebDriverPreferences sharedInstance];
+
+  cachePolicy_ = [preferences cache_policy];
+  NSURLCache *sharedCache = [NSURLCache sharedURLCache];
+  [sharedCache setDiskCapacity:[preferences diskCacheCapacity]];
+  [sharedCache setMemoryCapacity:[preferences memoryCacheCapacity]];
+
+  if ([[preferences mode] isEqualToString: @"Server"]) {
+    HTTPServerController* serverController = [HTTPServerController sharedInstance];
+    [serverController setViewController:self];
+    [self describeLastAction:[serverController status]];		
+  } else {
+    WebDriverRequestFetcher* fetcher = [WebDriverRequestFetcher sharedInstance]; 
+    [fetcher setViewController:self];
+    [self describeLastAction:[fetcher status]];		
+  }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -141,7 +172,9 @@
 
 // Get the specified URL and block until it's finished loading.
 - (void)setURL:(NSString *)urlString {
-  NSURLRequest *url = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+  NSURLRequest *url = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]
+                                       cachePolicy:cachePolicy_
+                                   timeoutInterval:60];
   
   [self performSelectorOnView:@selector(loadRequest:)
                    withObject:url
@@ -201,7 +234,7 @@
                          withObject:script
                       waitUntilDone:YES];
   
-  return [lastJSResult_ copy];
+  return [[lastJSResult_ copy] autorelease];
 }
 
 - (NSString *)jsEvalAndBlock:(NSString *)format, ... {
@@ -255,6 +288,22 @@
 
 - (NSString *)source {
   return [self jsEval:@"document.documentElement.innerHTML"];
+}
+
+// Takes a screenshot.
+- (UIImage *)screenshot {
+  UIGraphicsBeginImageContext([[self webView] bounds].size);
+  [[self webView].layer renderInContext:UIGraphicsGetCurrentContext()];
+  UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  // dump the screenshot into a file for debugging
+  //NSString *path = [[[NSSearchPathForDirectoriesInDomains
+  //   (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+  //  stringByAppendingPathComponent:@"screenshot.png"] retain];
+  //[UIImagePNGRepresentation(viewImage) writeToFile:path atomically:YES];
+  
+  return viewImage;
 }
 
 - (NSString *)URL {

@@ -39,4 +39,29 @@ public class TextPagesTest extends AbstractDriverTestCase {
     String source = driver.getPageSource();
     assertEquals("Test", source);
   }
+  
+  @Ignore(SAFARI)
+  public void testFindingAnElementOnAPlainTextPageWillNeverWork() {
+    driver.get(textPage);
+    
+    try {
+      driver.findElement(By.id("foo"));
+      fail("This shouldn't work");
+    } catch (NoSuchElementException e) {
+      // this is expected
+    }
+  }
+
+  @Ignore(SAFARI)
+  public void testShouldThrowExceptionWhenAddingCookieToAPageThatIsNotHtml() {
+    driver.get(textPage);
+
+    Cookie cookie = new Cookie.Builder("hello", "goodbye").build();
+    try {
+      driver.manage().addCookie(cookie);
+      fail("Should throw exception when adding cookie to non existing domain");
+    } catch (WebDriverException e) {
+      // This is expected
+    }
+  }
 }

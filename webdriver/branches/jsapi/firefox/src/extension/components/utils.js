@@ -48,14 +48,18 @@ Utils.getService = function(className, serviceName) {
 Utils.getServer = function() {
     var handle = Utils.newInstance("@googlecode.com/webdriver/fxdriver;1", "nsISupports");
     return handle.wrappedJSObject;
-}
+};
 
 Utils.getBrowser = function(context) {
     return context.fxbrowser;
 };
 
 Utils.getDocument = function(context) {
-    return context.fxdocument;
+    if (context.frame)
+    {
+        return context.frame.document;
+    }
+    return context.fxbrowser.contentDocument;
 };
 
 Utils.getActiveElement = function(context) {
@@ -80,7 +84,7 @@ Utils.getActiveElement = function(context) {
   }
 
   return element;
-}
+};
 
 function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
     if (node['tagName'] && node.tagName == "SCRIPT") {
@@ -102,9 +106,11 @@ function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
 
         // Or is this just plain text?
         if (child.nodeName == "#text") {
-            var textToAdd = child.nodeValue;
-            textToAdd = textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
-            textSoFar += textToAdd;
+            if (Utils.isDisplayed(child)) {
+                var textToAdd = child.nodeValue;
+                textToAdd = textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
+                textSoFar += textToAdd;
+            }
             continue;
         }
 
@@ -144,7 +150,7 @@ Utils.isInHead = function(element) {
       return true;
     }
     try {
-      element = element.parentNode
+      element = element.parentNode;
     } catch (e) {
       // Fine. the DOM has dispeared from underneath us
       return false;
@@ -152,32 +158,37 @@ Utils.isInHead = function(element) {
   }
 
   return false;
-}
+};
 
 Utils.isDisplayed = function(element) {
-    // Hidden input elements are, by definition, never displayed
-    if (element.tagName == "input" && element.type == "hidden") {
-      return false;
+    // Ensure that we're dealing with an element.
+    var el = element;
+    while (el.nodeType != 1 && !(el.nodeType >= 9 && el.nodeType <= 11)) {
+        el = el.parentNode;
     }
 
+    // Hidden input elements are, by definition, never displayed
+    if (el.tagName == "input" && el.type == "hidden") {
+      return false;
+    }
 
     // Elements with zero width or height are never displayed
-    if (element.offsetWidth == 0 || element.offsetHeight == 0) {
+    if (el.offsetWidth == 0 || el.offsetHeight == 0) {
       return false;
     }
 
-    var visibility = Utils.getStyleProperty(element, "visibility");
+    var visibility = Utils.getStyleProperty(el, "visibility");
 
     var _isDisplayed = function(e) {
       var display = e.ownerDocument.defaultView.getComputedStyle(e, null).getPropertyValue("display");
       if (display == "none") return display;
-      if (e.parentNode.style) {
+      if (e && e.parentNode && e.parentNode.style) {
         return _isDisplayed(e.parentNode);
       }
       return undefined;
-    }
+    };
 
-    var displayed = _isDisplayed(element);
+    var displayed = _isDisplayed(el);
 
     return displayed != "none" && visibility != "hidden";
 };
@@ -253,10 +264,26 @@ Utils.addToKnownElements = function(element, context) {
 };
 
 Utils.getElementAt = function(index, context) {
-    var doc = Utils.getDocument(context);
-    if (doc.fxdriver_elements)
-        return doc.fxdriver_elements[index];
-    return undefined;
+  var doc = Utils.getDocument(context);
+  var e = doc.fxdriver_elements ? doc.fxdriver_elements[index] : undefined;
+  if (e) {
+    // Is this a stale reference?
+    var parent = e;
+    while (parent && parent != e.ownerDocument.documentElement) {
+      parent = parent.parentNode;
+    }
+
+    if (parent !== e.ownerDocument.documentElement) {
+      // Remove from the cache
+      delete doc.fxdriver_elements[index];
+
+      throw new StaleElementError();
+    }
+  } else {
+    throw new StaleElementError();
+  }
+
+  return e;
 };
 
 Utils.currentDocument = function(context) {
@@ -279,17 +306,50 @@ Utils.platform = function(context) {
 
 Utils.shiftCount = 0;
 
+Utils.getNativeEvents = function() {
+  try {
+    const cid = "@openqa.org/nativeevents;1";
+    var obj = Components.classes[cid].createInstance();
+    return obj.QueryInterface(Components.interfaces.nsINativeEvents);
+  } catch(e) {
+    // Unable to retrieve native events. No biggie, because we fall back to synthesis later
+    return undefined;
+  }
+};
+
+Utils.getNodeForNativeEvents = function(element) {
+  try {
+    // This stuff changes between releases. Do as much up-front work in JS as possible
+    var retrieval = Utils.newInstance("@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
+    var accessible = retrieval.getAccessibleFor(element.ownerDocument);
+    var accessibleDoc = accessible.QueryInterface(Components.interfaces.nsIAccessibleDocument);
+    return accessibleDoc.QueryInterface(Components.interfaces.nsISupports);
+  } catch(e) {
+    // Unable to retrieve the accessible doc
+    return undefined;
+  }
+};
+
 Utils.type = function(context, element, text) {
     // Special-case file input elements. This is ugly, but should be okay
-    if (element.tagName == "INPUT") {
-      var inputtype = element.getAttribute("type");
-      if (inputtype && inputtype.toLowerCase() == "file") {
-        element.value = text;
-        return;
-      }
+  if (element.tagName == "INPUT") {
+    var inputtype = element.getAttribute("type");
+    if (inputtype && inputtype.toLowerCase() == "file") {
+      element.value = text;
+      return;
     }
+  }
 
-    var controlKey = false;
+  var obj = Utils.getNativeEvents();
+  var node = Utils.getNodeForNativeEvents(element);
+
+  if (obj && node) {
+    // Now do the native thing.
+    obj.sendKeys(node, text);
+    return;
+  }
+
+  var controlKey = false;
     var shiftKey = false;
     var altKey = false;
     var metaKey = false;
@@ -616,11 +676,11 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
 };
 
 Utils.fireHtmlEvent = function(context, element, eventName) {
-    var doc = element.ownerDocument;
+    var doc = Utils.getDocument(context);
     var e = doc.createEvent("HTMLEvents");
     e.initEvent(eventName, true, true);
     element.dispatchEvent(e);
-}
+};
 
 Utils.findForm = function(element) {
     // Are we already on an element that can be used to submit the form?
@@ -644,11 +704,11 @@ Utils.findForm = function(element) {
         form = form.parentNode;
     }
     return undefined;
-}
+};
 
 Utils.fireMouseEventOn = function(context, element, eventName) {
     Utils.triggerMouseEvent(element, eventName, 0, 0);
-}
+};
 
 Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
     var event = element.ownerDocument.createEvent("MouseEvents");
@@ -656,7 +716,7 @@ Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
 
     event.initMouseEvent(eventType, true, true, view, 1, 0, 0, clientX, clientY, false, false, false, false, 0, element);
     element.dispatchEvent(event);
-}
+};
 
 Utils.findDocumentInFrame = function(browser, frameId) {
     var frame = Utils.findFrame(browser, frameId);
@@ -737,7 +797,7 @@ Utils.dump = function(element) {
 
     dump += "=============\n\n\n";
     Utils.dumpText(dump);
-}
+};
 
 Utils.dumpProperties = function(view, rows) {
     for (var i in view) {
@@ -754,7 +814,7 @@ Utils.dumpProperties = function(view, rows) {
 
         rows.push(value);
     }
-}
+};
 
 Utils.stackTrace = function() {
     var stack = Components.stack;
@@ -766,7 +826,7 @@ Utils.stackTrace = function() {
     }
 
     Utils.dumpText(dump);
-}
+};
 
 Utils.getElementLocation = function(element, context) {
     var x = element.offsetLeft;
@@ -818,4 +878,57 @@ Utils.findElementsByXPath = function (xpath, contextNode, context) {
         element = result.iterateNext();
     }
     return indices;
+};
+
+Utils.getLocationOnceScrolledIntoView = function(element) {
+  element.scrollIntoView(true);
+
+  var retrieval = Utils.newInstance("@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
+
+  try {
+    element = element.wrappedJSObject ? element.wrappedJSObject : element;
+
+    var clientRect = element.getBoundingClientRect();
+
+    // Firefox 3.5
+    if (clientRect['width']) {
+      return {
+        x : clientRect.left + 3,
+        y : clientRect.top,
+        width: clientRect.width,
+        height: clientRect.height
+      };
+    }
+
+    // Firefox 3.0
+    Utils.dumpn("Falling back to firefox3 mechanism");
+    var accessible = retrieval.getAccessibleFor(element);
+    var x = {}, y = {}, width = {}, height = {};
+    accessible.getBounds(x, y, width, height);
+
+    return {
+      x : clientRect.left + 3,
+      y : clientRect.top,
+      width: width.value,
+      height: height.value
+    };
+  } catch(e) {
+    Utils.dumpn(e);
+    // Element doesn't have an accessibility node
+  }
+
+  // Firefox 2.0
+
+  // Fallback. Use the (deprecated) method to find out where the element is in
+  // the viewport. This should be fine to use because we only fall down this
+  // code path on older versions of Firefox (I think!)
+  var theDoc = element.ownerDocument;
+  var box = theDoc.getBoxObjectFor(element);
+
+  return {
+    x : box.x + 3,
+    y : box.y,
+    width: box.width,
+    height: box.height
+  };
 };

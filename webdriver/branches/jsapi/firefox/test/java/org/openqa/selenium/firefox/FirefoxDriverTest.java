@@ -66,6 +66,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       assertThat(seenText, equalTo(expectedText));
     }
 
+  @Ignore
     public void testShouldBeAbleToStartMoreThanOneInstanceOfTheFirefoxDriverSimultaneously() {
       WebDriver secondDriver = new FirefoxDriver();
 
@@ -79,6 +80,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       secondDriver.quit();
     }
 
+  @Ignore
     public void testShouldBeAbleToStartFromAUniqueProfile() {
       FirefoxProfile profile = new FirefoxProfile();
 
@@ -108,14 +110,24 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       }
     }
 
+  @Ignore
   public void testShouldBeAbleToStartANamedProfile() {
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
 
-    if (profile != null) {
-      WebDriver firefox = new FirefoxDriver("default");
-      firefox.quit();
-    } else {
-      System.out.println("Not running start with named profile test: no default profile found");
-    }
+//    if (profile != null) {
+//      WebDriver firefox = new FirefoxDriver("default");
+//      firefox.quit();
+//    } else {
+//      System.out.println("Not running start with named profile test: no default profile found");
+//    }
+  }
+
+  @Ignore
+  public void testShouldBeAbleToStartANewInstanceEvenWithVerboseLogging() {
+    FirefoxBinary binary = new FirefoxBinary();
+    binary.setEnvironmentProperty("NSPR_LOG_MODULES", "all:5");
+
+    // We will have an infinite hang if this driver does not start properly
+    new FirefoxDriver(binary, null).quit();
   }
 }

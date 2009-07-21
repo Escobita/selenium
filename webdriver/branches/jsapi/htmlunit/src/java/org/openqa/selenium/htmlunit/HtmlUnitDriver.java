@@ -54,8 +54,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlInlineFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.host.HTMLElement;
 
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.ScriptableObject;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -90,6 +88,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.IOException;
+
+import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
+import net.sourceforge.htmlunit.corejs.javascript.Function;
+import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
         FindsById, FindsByLinkText, FindsByXPath, FindsByName, FindsByTagName {
@@ -274,13 +276,16 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public void close() {
-        webClient = createWebClient(version);
+      webClient = createWebClient(version);
     }
 
     public void quit() {
-    	webClient = null;
-    	currentWindow = null;
-        histories.clear();
+      if (webClient != null) {
+        webClient.closeAllWindows();
+        webClient = null;
+      }
+      currentWindow = null;
+      histories.clear();
     }
 
   public Set<String> getWindowHandles() {
@@ -357,11 +362,15 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         Object value = result.getJavaScriptResult();
 
         if (value instanceof HTMLElement) {
-            return new HtmlUnitWebElement(this, ((HTMLElement) value).getHtmlElementOrDie());
+            return newHtmlUnitWebElement(((HTMLElement) value).getDomNodeOrDie());
         }
 
         if (value instanceof Number) {
             return ((Number) value).longValue();
+        }
+
+        if (value instanceof Undefined) {
+          return null;
         }
 
         return result.getJavaScriptResult();
@@ -424,7 +433,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
     public WebElement findElementById(String id) {
         if (!(lastPage() instanceof HtmlPage))
-            throw new IllegalStateException("Cannot find element by id for " + lastPage());
+            throw new NoSuchElementException("Cannot find element by id for " + lastPage());
 
         try {
             HtmlElement element = ((HtmlPage) lastPage()).getHtmlElementById(id);
@@ -598,6 +607,8 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
           if (allBodies.size() > 0) {
             return newHtmlUnitWebElement(allBodies.get(0));
           }
+        } else {
+          return newHtmlUnitWebElement(element);
         }
       }
 
@@ -703,6 +714,13 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
     private class HtmlUnitOptions implements Options {
         public void addCookie(Cookie cookie) {
+          Page page = lastPage();
+          if (!(page instanceof HtmlPage)) {
+            throw new WebDriverException("You may not set cookies on a page that is not HTML");
+          }
+
+          // Cookies only make sense if the page is
+
           String domain = getDomainForCookie(cookie);
           verifyDomain(cookie, domain);
 

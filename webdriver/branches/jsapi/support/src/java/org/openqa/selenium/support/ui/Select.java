@@ -23,6 +23,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Models a SELECT tag, providing helper methods to select and deselect options.
@@ -30,6 +32,7 @@ import java.util.List;
 public class Select {
 
   private final WebElement element;
+  private boolean isMulti;
 
   /**
    * Constructor. A check is made that the given element is, indeed, a SELECT tag. If it is not,
@@ -39,13 +42,17 @@ public class Select {
    * @throws UnexpectedTagNameException when element is not a SELECT
    */
   public Select(WebElement element) {
-    String tagName = element.getElementName();
+    String tagName = element.getTagName();
 
     if (null == tagName || !"select".equals(tagName.toLowerCase())) {
       throw new UnexpectedTagNameException("select", tagName);
     }
 
     this.element = element;
+
+    String value = element.getAttribute("multiple");
+    isMulti = value != null && "multiple".equals(value.toLowerCase());
+
   }
 
   /**
@@ -53,8 +60,7 @@ public class Select {
    *         is done by checking the value of the "multiple" attribute.
    */
   public boolean isMultiple() {
-    String value = element.getAttribute("multiple");
-    return value != null && "multiple".equals(value.toLowerCase());
+    return isMulti;
   }
 
   /**
@@ -102,10 +108,14 @@ public class Select {
    * @param text The visible text to match against
    */
   public void selectByVisibleText(String text) {
-    for (WebElement option : getOptions()) {
-      if (text.equals(option.getText())) {
-        option.setSelected();
-      }
+    StringBuilder builder = new StringBuilder(".//option[. = ");
+    builder.append(escapeQuotes(text));
+    builder.append("]");
+
+    List<WebElement> options = element.findElements(By.xpath(builder.toString()));
+    for (WebElement option : options) {
+      option.setSelected();
+      if (isMultiple()) {  return;  }
     }
   }
 
@@ -121,6 +131,7 @@ public class Select {
     for (WebElement option : getOptions()) {
       if (match.equals(option.getAttribute("index"))) {
         option.setSelected();
+        if (isMultiple()) {  return;  }
       }
     }
   }
@@ -134,10 +145,13 @@ public class Select {
    * @param value The value to match against
    */
   public void selectByValue(String value) {
-    for (WebElement option : getOptions()) {
-      if (value.equals(option.getValue())) {
-        option.setSelected();
-      }
+    StringBuilder builder = new StringBuilder(".//option[@value = ");
+    builder.append(escapeQuotes(value));
+    builder.append("]");
+    List<WebElement> options = element.findElements(By.xpath(builder.toString()));
+    for (WebElement option : options) {
+      option.setSelected();
+      if (isMultiple()) {  return;  }
     }
   }
 
@@ -168,8 +182,12 @@ public class Select {
    * @param value The value to match against
    */
   public void deselectByValue(String value) {
-    for (WebElement option : getOptions()) {
-      if (value.equals(option.getValue()) && option.isSelected()) {
+    StringBuilder builder = new StringBuilder(".//option[@value = ");
+    builder.append(escapeQuotes(value));
+    builder.append("]");
+    List<WebElement> options = element.findElements(By.xpath(builder.toString()));
+    for (WebElement option : options) {
+      if (option.isSelected()) {
         option.toggle();
       }
     }
@@ -200,10 +218,36 @@ public class Select {
    * @param text The visible text to match against
    */
   public void deselectByVisibleText(String text) {
-    for (WebElement option : getOptions()) {
-      if (text.equals(option.getText()) && option.isSelected()) {
+    StringBuilder builder = new StringBuilder(".//option[. = ");
+    builder.append(escapeQuotes(text));
+    builder.append("]");
+    List<WebElement> options = element.findElements(By.xpath(builder.toString()));
+    for (WebElement option : options) {
+      if (option.isSelected()) {
         option.toggle();
       }
     }
+  }
+
+  protected String escapeQuotes(String toEscape) {
+    // Convert strings with both quotes and ticks into: foo'"bar -> concat("foo'", '"', "bar")
+    if (toEscape.indexOf("\"") > -1 && toEscape.indexOf("'") > -1) {
+      String[] substrings = toEscape.split("\"");
+
+      StringBuilder quoted = new StringBuilder("concat(");
+      for (int i = 0; i < substrings.length - 1; i++) {
+        quoted.append("\"").append(substrings[i]).append("\", '\"', ");
+      }
+      quoted.append("\"").append(substrings[substrings.length - 1]).append("\")");
+      return quoted.toString();
+    }
+
+    // Escape string with just a quote into being single quoted: f"oo -> 'f"oo'
+    if (toEscape.indexOf("\"") > -1) {
+      return String.format("'%s'", toEscape);
+    }
+
+    // Otherwise return the quoted string
+    return String.format("\"%s\"", toEscape);
   }
 }
