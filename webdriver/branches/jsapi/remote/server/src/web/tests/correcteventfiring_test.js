@@ -64,21 +64,8 @@ function testShouldFireMouseUpEventWhenClicking(driver) {
 function testShouldFireEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   clickOnElementWhichRecordsEvents(driver);
-  driver.findElement(webdriver.By.id('result')).getText();
-  driver.callFunction(function (response) {
-    var expectedEvents = ['mousedown', 'focus', 'mouseup', 'click'];
-    var actualEvents = response.value.split(' ');
-    for (var i = 0, event; event = expectedEvents[i]; i++) {
-      assertEquals(
-          'Wrong event in sequence at index ' + i +
-              '\nExpected ' + expectedEvents + ' but was ' + actualEvents,
-          event, actualEvents[i]);
-    }
-    assertEquals(
-        'Unexpected events at end of sequence' +
-            '\nExpected ' + expectedEvents + ' but was ' + actualEvents,
-        expectedEvents.length, actualEvents.length);
-  });
+  var text = driver.findElement(webdriver.By.id('result')).getText();
+  assertThat(text, matchesRegex(/mousedown focus ([^ ] )*mouseup click/));
 }
 
 
@@ -152,40 +139,8 @@ function testShouldEmitClickEventWhenClickingOnATextInputElement(driver) {
   });
 }
 
-
-function testShouldCauseTheOnChangeHandlerToFireWhenEditingTextInputs(driver) {
+function testClearingAnElementCausesTheOnChangeHandlerToFire(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('changing-input')).
-      sendKeys('I like cheese');
-  assertResultTextContains(driver, 'Changed');
-}
-
-
-function testShouldCauseTheOnChangeHandlerToFireWhenEditingTextareas(driver) {
-  driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('changing-textarea')).
-      sendKeys('I like cheese');
-  assertResultTextContains(driver, 'Changed');
-}
-
-
-function testShouldCauseTheOnChangeHandlerToFireWhenEditingFileUploads(driver) {
-  driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('changing-file')).
-      sendKeys('/some/file/path/foo.txt');
-  assertResultTextContains(driver, 'Changed');
-}
-
-
-function testShouldCauseTheOnChangeHandlerToFireWhenClearingTextInputs(driver) {
-  driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('changing-input')).clear();
-  assertResultTextContains(driver, 'Changed');
-}
-
-
-function testShouldCauseTheOnChangeHandlerToFireWhenClearingTextareas(driver) {
-  driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('changing-textarea')).clear();
-  assertResultTextContains(driver, 'Changed');
+  driver.findElement(webdriver.By.id('clearMe')).clear();
+  assertResultTextIs(driver, 'Cleared');
 }

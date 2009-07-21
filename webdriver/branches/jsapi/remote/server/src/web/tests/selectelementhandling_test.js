@@ -24,7 +24,7 @@ function testShouldNotBeAbleToDeselectAnOptionFromANormalSelect(driver) {
   driver.callFunction(function(response) {
     var options = response.value;
     options[0].toggle();
-    driver.callFunction(goog.bind(fail, null, 'Should not have succeeded'));
+    driver.expectErrorFromPreviousCommand();
   });
 }
 

@@ -146,16 +146,9 @@ function testReturnsTheContentsOfATextAreaAsItsValue(driver) {
 
 function testTreatsReadonlyAsAValue(driver) {
   driver.get(TEST_PAGES.formPage);
-  driver.findElement(webdriver.By.name('readonly')).
+  var readonly = driver.findElement(webdriver.By.name('readonly')).
       getAttribute('readonly');
-  driver.callFunction(function(readOnly) {
-    driver.findElement(webdriver.By.name('x')).
-        getAttribute('readonly');
-    driver.callFunction(function(notReadOnly) {
-      assertFalse(
-          'Expected not to be <' + readOnly +
-              '>, but was <' + notReadOnly + '>',
-          readOnly == notReadOnly);
-    });
-  });
+  var notReadonly = driver.findElement(webdriver.By.name('x')).
+      getAttribute('readonly');
+  assertThat(readonly, not(equals(notReadonly)));
 }

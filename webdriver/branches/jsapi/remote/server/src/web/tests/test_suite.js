@@ -57,14 +57,13 @@ var IS_FF_3 = goog.userAgent.GECKO &&
 
 
 function whereIs(file) {
-  if (!this.currentLocation) {
-    this.currentLocation = window.location.href.match(/(.*\/)/)[1];
-  }
-  // TODO(jmleyba): This needs to be cleaned up so we can automate running these
-  // tests with a Java client.
-  return this.currentLocation + '../../../../../common/src/web/' + file;
+  return 'http://localhost:3000/common/' + file;
 }
 
+
+function toSecureUrl(url) {
+  return url.replace(/^http:\/\/localhost:3000/, 'https://localhost:3443');
+}
 
 var TEST_PAGES = {
   simpleTestPage: whereIs('simpleTest.html'),

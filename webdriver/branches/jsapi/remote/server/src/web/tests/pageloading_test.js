@@ -44,9 +44,9 @@ function testShouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded(
 
   driver.switchToFrame(1);
   assertThat(
-      driver.findElement(webdriver.By.xpath("//span[@id='pageNumber']").
+      driver.findElement(webdriver.By.xpath("//span[@id='pageNumber']")).
           getText(),
-      equals('2')));
+      equals('2'));
 }
 
 
@@ -92,10 +92,16 @@ function testShouldBeAbleToNavigateForwardsInTheBrowserHistory(driver) {
 }
 
 
-function testShouldBeAbleToAccessPagesWithAnInsecureSslCertificate(driver) {
-  var url = TEST_PAGES.simpleTestPage.replace(/^http:/, 'https:');
-  driver.get(url);
-  assertThat(driver.getTitle(), equals("Hello WebDriver"));
+// TODO(jmleyba): This will suppress the test when _run_ on Firefox. But what if
+// we're using a remote driver controlling something that isn't Firefox? We want
+// the test to run in that case...
+if (!goog.userAgent.GECKO) {
+  var testShouldBeAbleToAccessPagesWithAnInsecureSslCertificate = function(
+      driver) {
+    var url = toSecureUrl(TEST_PAGES.simpleTestPage);
+    driver.get(url);
+    assertThat(driver.getTitle(), equals("Hello WebDriver"));
+  };
 }
 
 

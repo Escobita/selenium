@@ -388,6 +388,9 @@ webdriver.WebDriver.prototype.handleResponse_ = function(response) {
       '...received response. Was error? ' + response.isError);
   this.lastResponse_ = response;
   if (response.isError) {
+    with(webdriver.logging) { // TODO
+      error(describe(response));
+    }
     // The errorCallbackFn may be expecting our error.
     if (response.command.errorCallbackFn) {
       try {
@@ -408,6 +411,7 @@ webdriver.WebDriver.prototype.handleResponse_ = function(response) {
     return;
   }
 
+  this.context_ = response.context;
   if (response.command.callbackFn) {
     try {
       response.command.callbackFn(response);
@@ -511,7 +515,7 @@ webdriver.WebDriver.prototype.switchToWindow = function(name) {
 webdriver.WebDriver.prototype.switchToFrame = function(name) {
   this.addCommand(webdriver.CommandInfo.SWITCH_TO_FRAME.buildCommand(
       this, [name], goog.bind(function(response) {
-        this.context_ = response.value;
+        this.context_ = response.context;
       }, this)));
 };
 
@@ -520,9 +524,9 @@ webdriver.WebDriver.prototype.switchToFrame = function(name) {
  * Adds a command to switch to the top frame in the current window.
  */
 webdriver.WebDriver.prototype.switchToDefaultContent = function() {
-  this.addCommand(webdriver.CommandInfo.SWITCH_TO_FRAME.buildCommand(
+  this.addCommand(webdriver.CommandInfo.SWITCH_TO_DEFAULT_CONTENT.buildCommand(
       this, [null], goog.bind(function(response) {
-        this.context_ = response.value;
+        this.context_ = response.context;
       }, this)));
 };
 
@@ -630,7 +634,9 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
  */
 webdriver.WebDriver.prototype.get = function(url) {
   this.addCommand(webdriver.CommandInfo.GET.buildCommand(
-      this, [url.toString()]));
+      this, [url.toString()], goog.bind(function(response) {
+    this.context_ = response.context;
+  }, this)));
 };
 
 

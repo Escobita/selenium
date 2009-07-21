@@ -16,6 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+function StaleElementError() {};
+
 function Utils() {
 }
 
@@ -55,11 +57,7 @@ Utils.getBrowser = function(context) {
 };
 
 Utils.getDocument = function(context) {
-    if (context.frame)
-    {
-        return context.frame.document;
-    }
-    return context.fxbrowser.contentDocument;
+    return context.fxdocument;
 };
 
 Utils.getActiveElement = function(context) {
@@ -86,12 +84,13 @@ Utils.getActiveElement = function(context) {
   return element;
 };
 
-function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
+function getTextFromNode(node, toReturn, textSoFar) {
     if (node['tagName'] && node.tagName == "SCRIPT") {
         return [toReturn, textSoFar];
     }
     var children = node.childNodes;
 
+    var bits;
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
 
@@ -99,7 +98,7 @@ function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
         if (child["tagName"] && child.tagName == "PRE") {
             toReturn += collapseWhitespace(textSoFar);
             textSoFar = "";
-            var bits = getTextFromNode(child, toReturn, "", true);
+            bits = getTextFromNode(child, toReturn, "", true);
             toReturn += bits[1];
             continue;
         }
@@ -115,7 +114,7 @@ function getTextFromNode(node, toReturn, textSoFar, isPreformatted) {
         }
 
         // Treat as another child node.
-        var bits = getTextFromNode(child, toReturn, textSoFar, false);
+        bits = getTextFromNode(child, toReturn, textSoFar, false);
         toReturn = bits[0];
         textSoFar = bits[1];
     }
@@ -209,7 +208,7 @@ Utils.getStyleProperty = function(node, propertyName) {
             var colour = (raw[i] - 0).toString(16);
             if (colour.length == 1)
                 colour = "0" + colour;
-            hex += colour
+            hex += colour;
         }
         hex = hex.toLowerCase();
         value = temp + hex + value.substr(raw.index + raw[0].length);
@@ -676,7 +675,7 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
 };
 
 Utils.fireHtmlEvent = function(context, element, eventName) {
-    var doc = Utils.getDocument(context);
+    var doc = element.ownerDocument;
     var e = doc.createEvent("HTMLEvents");
     e.initEvent(eventName, true, true);
     element.dispatchEvent(e);
@@ -732,8 +731,8 @@ Utils.findFrame = function(browser, frameId) {
         var index = names[i] - 0;
         if (!isNaN(index)) {
             frame = frame.frames[index];
-            if (!frame) {
-                return null;
+            if (frame) {
+              return frame;
             }
         } else {
             // Fine. Use the name and loop
@@ -757,16 +756,16 @@ Utils.findFrame = function(browser, frameId) {
 };
 
 Utils.dumpText = function(text) {
-	var consoleService = Utils.getService("@mozilla.org/consoleservice;1", "nsIConsoleService");
-	if (consoleService)
-		consoleService.logStringMessage(text);
-	else
-		dump(text);
-}
+  var consoleService = Utils.getService("@mozilla.org/consoleservice;1", "nsIConsoleService");
+  if (consoleService)
+    consoleService.logStringMessage(text);
+  else
+    dump(text);
+};
 
 Utils.dumpn = function(text) {
-	Utils.dumpText(text + "\n");
-}
+  Utils.dumpText(text + "\n");
+};
 
 Utils.dump = function(element) {
     var dump = "=============\n";

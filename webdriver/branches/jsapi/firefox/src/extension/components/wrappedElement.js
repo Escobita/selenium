@@ -50,7 +50,7 @@ FirefoxDriver.prototype.click = function(respond) {
       return;
     }
 
-    Utils.dumpn("Falling back to synthesized click");    
+    Utils.dumpn("Falling back to synthesized click");
     var currentlyActive = Utils.getActiveElement(this.context);
 
     Utils.fireMouseEventOn(this.context, element, "mousedown");
@@ -228,7 +228,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, value) {
         } else if (attributeName.toLowerCase() == "checked") {
             respond.response = element.checked;
         } else if (attributeName.toLowerCase() == "readonly") {
-            respond.response = element.getAttributeNode('readonly');
+            respond.response = element.getAttribute('readonly');
         }
 
         respond.send();
@@ -287,7 +287,7 @@ FirefoxDriver.prototype.submitElement = function(respond) {
     var submitElement = Utils.findForm(element);
     if (submitElement) {
         var driver = this;
-        new WebLoadingListener(this, function(event) {
+        new WebLoadingListener(this, function() {
             respond.context = driver.context;
             respond.send();
         });
@@ -307,13 +307,13 @@ FirefoxDriver.prototype.getElementSelected = function(respond) {
     var selected = false;
 
     try {
-        var option = element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement)
+        var option = element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement);
         selected = option.selected;
     } catch(e) {
     }
 
     try {
-        var inputElement = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement)
+        var inputElement = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
         if (inputElement.type == "checkbox" || inputElement.type == "radio") {
             selected = inputElement.checked;
         }
@@ -340,7 +340,7 @@ FirefoxDriver.prototype.setElementSelected = function(respond) {
     respond.isError = true;
 
     try {
-        var inputElement = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement)
+        var inputElement = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
         if (inputElement.disabled) {
             respond.response = "You may not select a disabled element";
             respond.send();
@@ -350,7 +350,7 @@ FirefoxDriver.prototype.setElementSelected = function(respond) {
     }
 
     try {
-        var option = element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement)
+        var option = element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement);
         respond.isError = false;
         if (!option.selected) {
             option.selected = true;
@@ -361,7 +361,7 @@ FirefoxDriver.prototype.setElementSelected = function(respond) {
     }
 
     try {
-        var checkbox = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement)
+        var checkbox = element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
         respond.isError = false;
         if (checkbox.type == "checkbox" || checkbox.type == "radio") {
             if (!checkbox.checked) {
@@ -489,7 +489,7 @@ FirefoxDriver.prototype.dragAndDrop = function(respond, movementString) {
     if (current == dest) return current;
     if (Math.abs(current - dest) < mouseSpeed) return dest;
     return (current < dest) ? current + mouseSpeed : current - mouseSpeed;
-  }
+  };
 
   Utils.triggerMouseEvent(element, 'mousedown', clientStartX, clientStartY);
   Utils.triggerMouseEvent(element, 'mousemove', clientStartX, clientStartY);

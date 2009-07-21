@@ -86,6 +86,12 @@ webdriver.WebElement.findElementLocatorToCommandInfo_ = function(by) {
 
   var commandInfo = commandMap[by.type];
   if (goog.isDef(commandInfo)) {
+    if (by.type == 'className') {
+      by.target = goog.string.trim(by.target);
+      if (by.target.search(/\s/) >= 0) {
+        throw new Error('Compound class names are not allowed for searches');
+      }
+    }
     return commandInfo;
   }
   throw new Error('Undefined locator type: ' + by.type);

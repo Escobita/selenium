@@ -21,8 +21,12 @@ function testShouldAutomaticallyUseTheFirstFrameOnAPage(driver) {
 
 function testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage(driver) {
   driver.get(TEST_PAGES.framesetPage);
+  driver.switchToFrame(0);
   driver.findElement(webdriver.By.linkText("top")).click();
   assertThat(driver.getTitle(), equals("XHTML Test Page"));
+  assertThat(
+      driver.findElement(webdriver.By.xpath('/html/head/title')).getText(),
+      equals('XHTML Test Page'));
 }
 
 
@@ -37,18 +41,20 @@ function testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage(
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame(0);
   driver.switchToDefaultContent();
+  driver.findElement(webdriver.By.id('nested_form'));
+  driver.expectErrorFromPreviousCommand(
+      'Should have switched back to main content');
   driver.findElement(webdriver.By.id("iframe_page_heading"));
-  driver.callFunction(goog.bind(fail, null,
-      "Should have switched back to main content"));
 }
 
 
 function testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt(driver) {
+  webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame(0);
-  driver.findElement(webdriver.By.id("submitButton")).click();
-  var hello = driver.findElement(webdriver.By.id("greeting")).getText();
-  assertThat(hello, equals("Success!"));
+  driver.findElement(webdriver.By.id('submitButton')).click();
+  var hello = driver.findElement(webdriver.By.id('greeting')).getText();
+  assertThat(hello, equals('Success!'));
 }
 
 
@@ -80,21 +86,20 @@ function testShouldBeAbleToFlipToAFrameIdentifiedByItsId(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame("fifth");
   driver.findElement(webdriver.By.id("username"));
-  driver.callFunction(goog.bind(fail));
 }
 
 
 function testShouldThrowAnExceptionWhenAFrameCannotBeFound(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
   driver.switchToFrame("Nothing here");
-  driver.callFunction(goog.bind(fail));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
 function testShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
   driver.switchToFrame(27);
-  driver.callFunction(goog.bind(fail));
+  driver.expectErrorFromPreviousCommand();
 }
 
 
@@ -117,13 +122,25 @@ function testGetCurrentUrl(driver) {
 
   driver.switchToFrame("second");
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/page/2?title=Fish"));
+             equals("http://localhost:3000/common/page/2?title=Fish"));
 
   driver.get(TEST_PAGES.iframePage);
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/iframes.html"));
+             equals("http://localhost:3000/common/iframes.html"));
 
   driver.switchToFrame("iframe1");
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/formPage.html"));
+             equals("http://localhost:3000/common/formPage.html"));
 }
+
+
+function testScriptsExecuteInSelectedFrame(driver) {
+  var script = 'return window.location.href';
+  driver.get(TEST_PAGES.framesetPage);
+  assertThat(driver.executeScript(script),
+             equals('http://localhost:3000/common/page/1'));
+  driver.switchToFrame('second');
+  assertThat(driver.executeScript(script),
+             equals('http://localhost:3000/common/page/2?title=Fish'));
+}
+

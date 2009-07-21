@@ -91,7 +91,7 @@ function testFiresFocusKeyEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   var result = driver.findElement(webdriver.By.id('result'));
   driver.findElement(webdriver.By.id('theworks')).sendKeys('a');
-  assertThat(result.getText(), is('focus keydown keypress keyup change'));
+  assertThat(result.getText(), is('focus keydown keypress keyup'));
 }
 
 

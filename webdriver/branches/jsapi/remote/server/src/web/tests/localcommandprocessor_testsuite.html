@@ -33,7 +33,7 @@
     window.onload = function() {
 //      webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
       webdriver.logging.enableFirebugLogging(false);
-//      webdriver.logging.enableDomLogging(false);
+      webdriver.logging.enableDomLogging(false);
       var testRunner = new webdriver.TestRunner(
           webdriver.factory.createLocalWebDriver);
       testRunner.go();

@@ -110,3 +110,14 @@ function testThrowsAnExceptionIfAnArgumentIsNotValid(driver) {
   assertArgumentIsInvalidScriptArgument([]);
   assertArgumentIsInvalidScriptArgument({});
 }
+
+
+function testShouldBeAbleToGrabTheBodyOfFrameOnceSwitchedTo(driver) {
+  driver.get(TEST_PAGES.richtextPage);
+  driver.switchToFrame('editFrame');
+  // TODO(jmleyba): This is ugly.
+  var body = driver.executeScript('return document.body;');
+  driver.callFunction(function() {
+    assertThat(body.getValue().getText(), equals(''));
+  });
+}

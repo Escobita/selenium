@@ -310,3 +310,43 @@ function testShouldFindElementsByTagName(driver) {
         19, response.value.length);
   });
 }
+
+
+function testFindingByCompoundClassNameIsAnError(driver) {
+  driver.get(TEST_PAGES.xhtmlTestPage);
+  try {
+    driver.findElement(webdriver.By.className('a b'));
+    fail('Compound class names are not allowed');
+  } catch (expected) {
+  }
+
+  try {
+    driver.findElements(webdriver.By.className('a b'));
+    fail('Compound class names are not allowed');
+  } catch (expected) {
+  }
+}
+
+
+function testShouldBeAbleToClickOnLinksWithNoHrefAttribute(driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  driver.findElement(webdriver.By.linkText('No href')).click();
+  assertThat(driver.getTitle(), equals('Changed'));
+}
+
+
+function testShouldNotBeAbleToFindAnElementOnABlankPage(driver) {
+  driver.get('about:blank');
+  driver.findElement(webdriver.By.id('imaginaryButton'));
+  driver.expectErrorFromPreviousCommand();
+  assertThat(
+      driver.isElementPresent(webdriver.By.id('imaginaryButton')), is(false));
+}
+
+
+function testFindingALinkByXpathUsingContainsKeywordShouldWork(driver) {
+  driver.get(TEST_PAGES.nestedPage);
+  var element = driver.findElement(
+      webdriver.By.xpath('//a[contains(.,"hello world")]'));
+  assertThat(element.getText(), contains('hello world'));
+}

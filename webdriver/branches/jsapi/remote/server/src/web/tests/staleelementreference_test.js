@@ -14,3 +14,15 @@ function testShouldNotCrashWhenCallingGetSizeOnAnObsoleteElement(driver) {
   element.getSize();
   driver.expectErrorFromPreviousCommand('Element should be stale');
 }
+
+
+function testDynamicallyRemovingAnElementFromTheDomCausesAStaleReference(
+    driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  var toDelete = driver.findElement(webdriver.By.id('deleted'));
+  assertThat(toDelete.isDisplayed(), is(true));
+  driver.findElement(webdriver.By.id('delete')).click();
+  toDelete.isDisplayed();
+  driver.expectErrorFromPreviousCommand(
+      'Element should be stale at this point');
+}

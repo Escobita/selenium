@@ -101,6 +101,9 @@ webdriver.CommandInfo.prototype.buildCommand = function(driver, opt_args,
       'switchToWindow', '/session/:sessionId/:context/window/:name', 'POST');
   info.SWITCH_TO_FRAME = new info(
       'switchToFrame', '/session/:sessionId/:context/frame/:id', 'POST');
+  info.SWITCH_TO_DEFAULT_CONTENT = new info(
+      'switchToDefaultContent',
+      '/session/:sessionId/:context/frame/:id', 'POST');
 
   info.EXECUTE_SCRIPT = new info(
       'executeScript', '/session/:sessionId/:context/execute', 'POST');
@@ -180,8 +183,7 @@ webdriver.CommandInfo.prototype.buildCommand = function(driver, opt_args,
       'getElementValue', '/session/:sessionId/:context/element/:id/value',
       'GET');
   info.GET_ELEMENT_NAME = new info(
-      'getElementName', '/session/:sessionId/:context/element/:id/name',
-      'GET');
+      'getTagName', '/session/:sessionId/:context/element/:id/name', 'GET');
   info.IS_ELEMENT_SELECTED = new info(
       'isElementSelected', '/session/:sessionId/:context/element/:id/selected',
       'GET');

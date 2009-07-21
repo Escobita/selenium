@@ -196,11 +196,18 @@ DelayedCommand.prototype.executeInternal_ = function() {
         this.driver_[this.command_.commandName](
             this.response_, this.command_.parameters);
       } catch (e) {
-        Utils.dumpn(
-            'Exception caught by driver: ' + this.command_.commandName +
-            '(' + this.command_.parameters + ')\n' + e);
-        this.response_.context = this.driver_.context;
-        this.response_.reportError(e);
+        if (e instanceof StaleElementError) {
+          this.response_.isError = true;
+          this.response_.context = this.driver_.context;
+          this.response_.response = 'element is obsolete';
+          this.response.send();
+        } else {
+          Utils.dumpn(
+              'Exception caught by driver: ' + this.command_.commandName +
+              '(' + this.command_.parameters + ')\n' + e);
+          this.response_.context = this.driver_.context;
+          this.response_.reportError(e);
+        }
       }
     }
   }
@@ -263,7 +270,6 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
     nsCommandProcessor.logError(
         'wrappedJsonCommand must have a wrappedJSObject property!');
   }
-  Utils.dumpn('Command: ' + JSON.stringify(command));
 
   // TODO(jmleyba): DELETE FOR RELEASE vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   // The magic "reload" command makes us reload this script file and monkey
@@ -336,8 +342,12 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
   // Determine whether or not we need to care about frames.
   var frames = fxbrowser.contentWindow.frames;
   if ("?" == driver.context.frameId) {
-    if (frames && frames.length && "FRAME" == frames[0].frameElement.tagName) {
-      driver.context.frameId = 0;
+    if (frames && frames.length) {
+      if ("FRAME" == frames[0].frameElement.tagName) {
+          driver.context.frameId = 0;
+      } else {
+          driver.context.frameId = undefined;
+      }
     } else {
       driver.context.frameId = undefined;
     }
@@ -381,7 +391,6 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
            (win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor);
   };
 
-  Utils.dumpn('Looking for: ' + windowId);
   var windowFound = this.searchWindows_('navigator:browser', function(win) {
     if (matches(win, lookFor)) {
       win.focus();
@@ -404,16 +413,13 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
   // If we don't find the window, set a timeout to try one more time.
   if (!windowFound) {
     if (opt_isSecondSearch) {
-      Utils.dumpn('Window not found on 2nd attempt; reporting error');
       response.isError = true;
       response.response = 'Unable to locate window "' + lookFor + '"';
       response.send();
     } else {
-      Utils.dumpn('Window not found on 1st attempt...');
       var self = this;
       this.wm.getMostRecentWindow('navigator:browser').
           setTimeout(function() {
-            Utils.dumpn('...trying to find window again');
             self.switchToWindow(response, windowId, true);
           }, 500);
     }

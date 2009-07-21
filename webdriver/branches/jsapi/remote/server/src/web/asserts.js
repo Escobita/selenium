@@ -139,6 +139,22 @@ function contains(expected) {
       });
 }
 
+function matchesRegex(regex) {
+  if (!(regex instanceof RegExp)) {
+    throw new Error('IllegalArgument; must be a RegExp, but was: ' + regex +
+                    '(' + goog.typeOf(regex) + ')');
+  }
+  return new webdriver.asserts.Matcher(
+      function (actual) {
+        var av = webdriver.asserts.getValue_(actual);
+        webdriver.asserts.assertIsString_(false, 'contains', av);
+        return av.match(regex) != null;
+      },
+      function () {
+        return 'match regex ' + regex;
+      });
+}
+
 
 function startsWith(expected) {
   return new webdriver.asserts.Matcher(

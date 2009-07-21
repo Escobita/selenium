@@ -39,8 +39,8 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         driver.get(simpleTestPage);
         driver.manage().deleteAllCookies();
 
-        Cookie cookie1 = new Cookie("fish", "cod", "/animals");
-        Cookie cookie2 = new Cookie("planet", "earth", "/galaxy");
+        Cookie cookie1 = new Cookie("fish", "cod", "/common/animals");
+        Cookie cookie2 = new Cookie("planet", "earth", "/common/galaxy");
         WebDriver.Options options = driver.manage();
         options.addCookie(cookie1);
         options.addCookie(cookie2);
@@ -84,7 +84,7 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
         
         Calendar c = Calendar.getInstance();
         long time = System.currentTimeMillis() + (60 * 60 * 24);
-        Cookie cookie1 = new Cookie("fish", "cod", "/animals", new Date(time));
+        Cookie cookie1 = new Cookie("fish", "cod", "/common/animals", new Date(time));
         WebDriver.Options options = driver.manage();
         options.addCookie(cookie1);
 
