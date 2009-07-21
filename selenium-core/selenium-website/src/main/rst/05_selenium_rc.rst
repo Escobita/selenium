@@ -46,10 +46,7 @@ RC Components
 ~~~~~~~~~~~~~
 Selenium-RC components are:
 
-* The Selenium Server which 
-** launches and kills browsers
-** interprets and runs the Selenese commands passed to it from the test program
-** acts as an *HTTP proxy*, intercepting and verifying HTTP messages passed between the browser and the AUT.
+* The Selenium Server which launches and kills browsers, interprets and runs the Selenese commands passed from the test program, and acts as an *HTTP proxy*, intercepting and verifying HTTP messages passed between the browser and the AUT.
 * Client libraries which provide the interface between each programming language and the Selenium-RC Server.
 
 Here is a simplified architecture diagram.... 
@@ -711,12 +708,9 @@ Ruby
 
 Learning the API
 ----------------
-We mentioned earlier that each selenium-client-library provides a
-language-specific programming interface which supports executing Selenese 
-commands from your test program.  The Selenium-RC API uses naming conventions 
-that, assuming you're familiar with your chosen programming language, and you 
-now understand Selenese, most of the interface for your selected language 
-will be self-explanatory. Here, however, we explain the most important and 
+The Selenium-RC API uses naming conventions 
+that, assuming you understand Selenese, much of the interface  
+will be self-explanatory. Here, however, we explain the most critical and 
 possibly less obvious, aspects of the API.
 
 Starting the Browser 
@@ -781,47 +775,47 @@ Starting the Browser
         @selenium = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox", "http://www.google.com/", 10000);
         @selenium.start
 
-Each of these examples would instantiate a browser (which is just an object 
-for your code) by assigning a "browser instance" to a program variable.  The 
-browser instance variable is then used to call methods from the browser, 
-like *open* or *type*)
+Each of these examples opens the browser and represents that browser 
+by assigning a "browser instance" to a program variable.  This 
+browser variable is then used to call methods from the browser. 
+These methods execute the Selenium commands, i.e. like *open* or *type* or the *verify* 
+commands.
 
-The initial parameters that you should give when you create the browser instance
+The parameters required when creating the browser instance
 are: 
 
-host
-    This is the ip location where the server is located. Most of the time, this is
-    the same machine as the one where the client is running, so you'll see
-    that it's an optional parameter on some clients.
-port
-    As the host, it determines on which socket the server is listening waiting
-    for the client to communicate with it. Again, it can be optional in some
+**host**
+    Specifies the IP address of the computer where the server is located. Usually, this is
+    the same machine as where the client is running, so in this case *localhost* is passed.  In some clients this is an optional parameter.
+	
+**port**
+    Specifies the TCP/IP socket where the server is listening waiting
+    for the client to establish a connection.  This also is optional in some
     client drivers.
-browser
+	
+**browser**
     The browser in which you want to run the tests. This is a required 
-    parameter (I hope you understand why :))
-url
-    The base url of the application under test. This is also required on all the
-    client libs and Selenium-RC needs it before starting the browser due to the
-    way the same server is implemented.
+    parameter.
+	
+**url**
+    The base url of the application under test. This is required by all the
+    client libs and is integral information for starting up the browser-proxy-AUT communication.
 
-Note that some languages require the browser to be started explicitly by calling
-its *start* method.
+Note that some of the client libraries require the browser to be started explicitly by calling
+its *start()* method.
 
 Running Commands 
 ~~~~~~~~~~~~~~~~
 Once you have the browser initialized and assigned to a variable (generally
-named "selenium") you can make it run commands by calling the respective 
-methods from the selenium browser. For example, when you call the *type* method
+named "selenium") you can make it run Selenese commands by calling the respective 
+methods from the browser variable. For example, to call the *type* method
 of the selenium object::
 
     selenium.type("field-id","string to type")
 
-In the backend (by the magic of Selenium-RC), the browser will actually **type** 
-using the locator and the string you specified during the method call. So, 
-summarizing, what for you code is just a regular object (with methods and 
-properties).  The backend of the Selenium Server and the browser-injected 
-Selenium-Core is doing the real work of testing your application.
+In the background the browser will actually perform a *type* operation, 
+essentially identical to a user typing input into the browser, by  
+using the locator and the string you specified during the method call.
 
 Retrieving and Reporting Results
 --------------------------------
