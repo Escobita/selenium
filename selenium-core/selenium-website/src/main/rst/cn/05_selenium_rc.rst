@@ -748,36 +748,22 @@ Selenium Server和内嵌到浏览器的Selenium-Core的后台程序做测试你�
 
 给你的测试添加些趣味
 -------------------------------
-Now you'll understand why you needed Selenium-RC and you just couldn't stay
-strictly with Selenium-IDE. We will give you guidance here on things that can
-only be done using a programming language.
+现在你会理解为什么你需要Selenium-RC，以及为什么你不能完全依靠Selenium-IDE. 
+这里，在那些只能通过编程语言才能完成的事情上，我们会提供指导。
 
-You find, as you transition from running simple tests of page elements, to 
-building tests of dynamic functionality involving multiple web-pages and 
-varying data that you will require programming logic for verifying expected 
-test results.  Basically, the Selenium-IDE does not support iteration and 
-condition statements.  You will find you can do some simple condition 
-statements by embedding javascript in your Selenese parameters, however 
-iteration is impossible, and many conditions simply will need to be done in a 
-programming language.  In addition, you may need to use exception-handling for
-error recovery.  For these reasons and others, we have written this section
-to give you ideas on how to leverage common programming techniques to
-give you greater 'verification power' in your automated testing.
+你会发现，当你从运行页面上元素的简单测试转换到建立调用多个web页面和各种数据的动态功能性测试，你会需要编程逻辑去验证期望的测试结果。
+基本上，Selenium-IDE不支持迭代和条件语句。你会发现你能通过嵌入javascript到你的Selenese参数里面来做一些简单的条件语句，但是迭代是不可能的，
+并且很多情况将会需要通过编程语言来完成。另外，你可能需要使用异常处理用来出错恢复。
+介于这些原因我们编写了这个章节，让你理解如何让普通的编程技术在你的自动化测试中给你带来巨大的“验证力”
 
-The examples in this section are written
-in a single programming language--the idea being that you understand the concept and be
-able to translate it to the language of your choice.  If you have some basic knowledge
-of object-oriented programming you shouldn't have difficulty making use of this section.
+在这个章节的例子是在一种单一的编程语言下编写的--如果你有面向对象编程基础知识，你应该不会有困难在这个章节。
 
-Iteration
+迭代
 ~~~~~~~~~
-Iteration is one of the most common things people need to do in their tests.
-For example, you may want to to execute a search multiple times.  Or, perhaps for
-verifying your test results you need to process a "result set" returned from a database.
+迭代是人们在他们的测试中需要用到的最普通的东西之一。比如，你可能会想多次执行一个搜索。 或者，可能为了验证你的测试结果，你需要处理一个从数据库里返回的“一组结果”
 
-If we take the same `Google search example`_ we've been using, it's not so crazy to 
-check that all the Selenium tools appear in the search
-results. This test could use the Selenese:
+如果我们拿我们之前用的相同的 `Google 搜索例子`_ ，检查所有Selenium工具出现在搜索结果里不会是很疯狂的。  
+这个测试可以用以下Selenese:
 
 =================  ===========================  =============
 open               /
@@ -792,13 +778,9 @@ clickAndWait       btnG
 assertTextPresent  Results * for selenium grid
 =================  ===========================  =============
 
-The code has been triplicated to run the same steps 3 times.  No half-way
-decent software person would want to do it this way, it makes
-managing the code much more difficult.
+代码被作成三份运行了同样的步骤3次。没有正真的软件人员会想这样的完成它，这使得管理代码非常困难。
 
-By using a programming language, we can iterate over a list and run 
-the search this way. 
-
+通过使用编程语言，我们可以在一个列表上迭代，并这样运行搜索。
 **In C#:**   
    
 .. code-block:: c#
@@ -816,29 +798,24 @@ the search this way.
        , sel.isTextPresent("Results * for selenium " + s));
     }
 
-Condition Statements
+条件语句
 ~~~~~~~~~~~~~~~~~~~~
-A common problem encountered while running Selenium tests occurs when an 
-expected element is not available on page.  For example, when running the 
-following line:
+当一个期望的元素在页面上不可用的时候，一个普通的运行Selenium测试过程中的问题会出现。
+比如，当运行一下行时候：
 
 .. code-block:: java
    
    selenium.type("q", "selenium " +s);
    
-If element 'q' happens to be unavailable on the page then an exception is
-thrown:
+如果元素 'q' 在这个页面上刚好不可用，那么一个异常会被抛出：
 
 .. code-block:: java
 
    com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
 
-This can cause your test to abort.  Some types of tests may want that.  But
-often that is not desireable as your test script has many other subsequent tests
-to perform.
+这个会导致你测试中断。一些类型的测试可能想要这样。但是经常当你的测试脚本有许多并发的测试要完成的时候，这不是所被期望的。
 
-A better approach would be to first validate if the element is really present
-and then take alternatives when it it is not:
+一个更好的方法可能是首先确认一下这个元素是否已经真的出现，然后当它没有出现的时候选者一个替代的方法:
 
 **In Java:**
 
@@ -851,19 +828,13 @@ and then take alternatives when it it is not:
        Reporter.log("Element: " +q+ " is not available on page.")
    }
    
-Herein *Reporter* is API in TestNG framework. One can log exceptions using 
-the API of framework on which Sel Test Cases are built. Advantage of this 
-approach is to be able to continue with test execution even if *less* 
-important elements are not available on page.
+在此处 *Reporter* 是 TestNG测试框架里的API。你可以用构建Selenium测试用例的框架的API来记录异常。
+这个方法的好处是能够继续执行测试，即使一些 *比较不* 重要的元素在页面中不可用。
+通过仅仅使用一个简单的 *if* 条件，我们可以做一些有趣的事情。想想一下可能性！
 
-By just using a simple *if* condition, we can do interesting things. Think of
-the possibilities!
-
-Data Driven Testing
+数据驱动测试
 ~~~~~~~~~~~~~~~~~~~
-So, the iteration_ idea seems cool. Let's improve this by allowing the users to
-write an external text file from which the script should read the input data,
-search and assert its existence.
+因此，迭代_ 的想法看起来酷。让我们改良它，通过允许用户编写一个外部的文本文件，从那里测试脚本可以读取输入数据，搜索和断言它的存在。
 
 **In Python:**
 
@@ -881,22 +852,13 @@ search and assert its existence.
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present("Results * for " + search))
 
-Why would we want a separate file with data in it for our tests?  One 
-important method of testing concerns running the same test repetetively with 
-differnt data values.  This is called *Data Driven Testing* and is a very 
-common testing task.  Test automation tools, Selenium included, generally 
-handle this as it's often a common reason for building test automation to 
-support manual testing methods.
+为什么我们会为我们的测试，想要一个包含数据的单独文件。测试涉及到的一个重要方法是用不同的数据值各自运行同样的测试。
+这被称为 *数据驱动测试*,并且是一个非常普遍的测试任务。自动化测试工具，包括Selenium, 基本上都运用它，因为这常常是一个为了构建测试自动化支持手动测试方法的常见原因。
 
-The Python script above opens a text file.  This file contains a different search
-string on each line. The code then saves this in an array of strings, and at last,
-it's iterating over the strings array and doing the search and assert on each.
+上面的Python脚本打开一个文本文件。这个文件里每行包含一个不同的搜索字符串。然后代码把这个保存到一个数组里，最后，它在字符串数组上迭代，并各自做搜索和断言。
+虽然这是一个非常基础的你能做的例子，但是这个想法是展示用Selenium-IDE很困难或者不可能完成的事，可以简单的通过编程或者脚本语言来完成。
 
-This is a very basic example of what you can do, but the idea is to show you
-things that can easily be done with either a programming or scripting 
-language when they're difficult or even impossible to do using Selenium-IDE.
-
-Error Handling
+错误处理
 ~~~~~~~~~~~~~~
 
 *Note: This section is not yet developed.*
@@ -912,16 +874,11 @@ handling support can be used for error handling and recovery.
 .. The idea here is to use a try-catch statement to grab a really unexpected
    error.
 
-Database Validations
+数据库验证
 ~~~~~~~~~~~~~~~~~~~~~
-
-Since you can also do database queries from your favorite programming 
-language, assuming you have database support functions, why not using them
-for some data validations/retrieval on the Application Under Test?
-
-Consider example of Registration process where in registered email address
-is to be retrieved from database. Specific cases of establishing DB connection 
-and retrieving data from DB would be:
+以后你也可以用你喜欢的编程语言做数据库查询，如果你有支持数据库的功能，为什么不用他们在被测程序上做一些数据验证和恢复呢？ 
+考虑注册过程的例子，注册的email地址是从数据库里取得的。
+建立数据连接和从数据库取得数据的具体用例是：
 
 **In Java:**
 
@@ -954,20 +911,15 @@ and retrieving data from DB would be:
    // Use the fetched value to login to application.
    selenium.type("userid", emailaddress);
    
-This is very simple example of data retrieval from DB in Java.
-A more complex test could be to validate that inactive users are not able
-to login to application. This wouldn't take too much work from what you've 
-already seen.
+这是一个Java里非常简单的从数据库里取回数据的例子。
+一个更复杂的测试可以是验证未激活的用户是不能登录程序的。从你刚才已经看到的来看，这不会需要很多工作。
    
-How the Server Works
+
+服务器如何工作
 --------------------
-.. note:: This topic tries to explain the technical implementation behind 
-   Selenium-RC. It's not fundamental for a Selenium user to know this, but 
-   could be useful for understanding some of the problems you can find in the
-   future.
-   
-To understand in detail how Selenium-RC Server works  and why it uses proxy injection
-and heightened privilege modes you must first understand `the same origin policy`_.
+.. 注释:: 这个主题尝试解释Selenium-RC背后的技术实现。对Selenium用户来说，这个不是必须要懂的，但能对理解以后你会发现的一些问题有所帮助。
+
+为了详细地理解Selenium-RC服务器如何工作，以及为什么它使用代理注入和提高权限模式，你必须首先理解 `同源策略`_ 。
    
 The Same Origin Policy
 ~~~~~~~~~~~~~~~~~~~~~~
