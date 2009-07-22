@@ -1031,7 +1031,7 @@ language when they're difficult or even impossible to do using Selenium-IDE.
 Refer to `Selnium RC wiki`_ for examples on reading data from spread sheet or using
 data provider capabilities of TestNG with java client driver.
 
-.. _`Selnium RC wiki`: http://wiki.openqa.org/pages/viewpageattachments.action?pageId=2005
+.. _`Selnium RC wiki`: http://wiki.openqa.org/pages/viewpage.action?pageId=21430298
 
 Error Handling
 ~~~~~~~~~~~~~~
