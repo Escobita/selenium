@@ -1,0 +1,43 @@
+#summary Details about the implementation of native keyboard events for Firefox on Linux.
+
+= Introduction =
+This page details how native events for Firefox on Linux were implemented. Basically, this feature allows better user emulation for WebDriver in Firefox on Linux. Using this implementation, it should be easily extended to any other browser with a plug-in mechanism that is implemented using GTK+.
+
+= Purpose and scope =
+== Existing State ==
+When this task started, WebDriver already has user emulation via Javascript on all platforms it was supported and support for native events on Windows for Firefox. Hence, it had all of the code for getting native code running from within a Firefox extension on windows.
+Specifically, sending keys to Firefox on Windows was done by calling a native method - _sendKeys(...)_, having it generate the Windows-specific events to make Firefox think it received user input.
+== Requirement ==
+The requirement was to implement the same native method _sendKeys(...)_ on Linux, so Firefox on Linux will behave in the same way. Mouse emulation was scheduled to a later stage.
+Additional (strong) requirement was being able to run multiple Firefox instances by WebDriver and have them all working without having the user input focus.
+== Technical knowledge required ==
+In order to understand the underlying mechanism of calling native code from within a Firefox extension, familiarity with XPCOM is recommended. The following links were useful:
+ * https://developer.mozilla.org/en/Creating_XPCOM_Components/An_Overview_of_XPCOM
+ * http://blog.mozilla.com/addons/2009/01/28/how-to-develop-a-firefox-extension/
+
+
+= Possible solutions surveyed =
+== X11 Events ==
+The basic approach is creating a raw _XEvent_ and send it to the appropriate window using _XSendEvent_. Unfortunately, this approach will not work because synthetic events are marked, so applications receiving them actually know that those are generated events and usually ignore them. A suggestion on how to over-ride this problem was suggested by [http://www.semicomplete.com/blog/geekery/xsendevent-xdotool-and-ld_preload.html semicomplete.com] : Over-ride XNextEvent (which is the function used to pop the next X event from the send queue) to pop the next event and turn off the _send_event_ flag. While this solves the problem of synthetic events, it does not solve another problem: Some applications, including Firefox, will simply ignore events when in the background.
+
+== XTest ==
+Xtest is the most straightforward way to send X input events. It is used by many project to emulate user input or to translate input from a non-standard device to X windows input. For example, [http://synergy2.sourceforge.net/ Synergy] uses it. The problem with this solution is, again, that the window requires the focus to get those evnts.
+
+=== XTest + Xvnc ===
+A possible way to overcome this disadvantage would be to run Firefox inside Xvnc server in which it'll have all the focus it wants. This means packing more stuff with WebDriver or forcing our user to have some more pre-requisites for running WebDriver. For these reasons, it was frowned upon by SimonStewart, so we didn't go this way. *Update:* It looks like running Firefox 3 in Xvnc is problematic (Firefox will exit with some X error).
+
+== GDK Events / GTK Signals ==
+Under Windows, the native code receives a window handle to the current window from the accessibility API (See [https://developer.mozilla.org/en/NsIAccessibleDocument NsIAccessibleDocument]). On Linux, the same API yields a GdkWindow*. There are two ways from there:
+ * The GTK way.
+ * The GDK way.
+
+A distinction between GTK+ and GDK is required: GDK is a slim wrapping over the raw, painful X API. GTK+ (which uses GDK) is a complete toolkit by itself, supplying a whole set of widgets for GUI application builders to use.
+
+The GTK way would be to create GTK signals. The GDK way would be creating GdkEvents and pushing them into the queue that (normally) gets the translated X events. Since we're getting a GdkWindow*, it only makes sense we'll go the GDK way, doesn't it?
+
+= Implementation =
+== GDK Events ==
+== Over-coming the focus problem ==
+== Event Generation ==
+
+= Detailed implementation details =
