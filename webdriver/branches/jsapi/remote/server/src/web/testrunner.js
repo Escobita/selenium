@@ -20,14 +20,13 @@ limitations under the License.
  * JavaScript API.
  * Example Usage:
  * 
- * goog.require('webdriver.By');
  * goog.require('webdriver.TestRunner');
  * goog.require('webdriver.factory');
  *
  * function testGoogleSearch(driver) {
  *   driver.get('http://www.google.com');
- *   driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
- *   driver.findElement(webdriver.By.name('btnG')).click();
+ *   driver.findElement({name: 'q'}).sendKeys('webdriver');
+ *   driver.findElement({name: 'btnG'}).click();
  * }
  *
  * window.onload = function() {

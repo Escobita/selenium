@@ -31,9 +31,9 @@
     }
 
     window.onload = function() {
-//      webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
-      webdriver.logging.enableFirebugLogging(false);
+      webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
       webdriver.logging.enableDomLogging(false);
+      webdriver.logging.enableFirebugLogging(false);
       var testRunner = new webdriver.TestRunner(
           webdriver.factory.createLocalWebDriver);
       testRunner.go();

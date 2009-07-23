@@ -1,7 +1,7 @@
 function testSwitchesFocusToANewWindowWhenItIsOpenedAndNotStopFutureOperations(
     driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.findElement(webdriver.By.linkText('Open new window')).click();
+  driver.findElement({linkText: 'Open new window'}).click();
   assertThat(driver.getTitle(), equals('XHTML Test Page'));
   driver.switchToWindow('result');
   assertThat(driver.getTitle(), equals('We Arrive Here'));
@@ -20,7 +20,7 @@ function testThrowsAnErrorWhenNoMatchingWindowsAreFound(driver) {
 
 function testAbleToIterateOverAllOpenWindows(driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.findElement(webdriver.By.name('windowOne')).click();
+  driver.findElement({name: 'windowOne'}).click();
   driver.getAllWindowHandles();
   driver.callFunction(function(response) {
     assertEquals(
@@ -46,8 +46,8 @@ function testAbleToIterateOverAllOpenWindows(driver) {
 function testClickingOnAButtonThatClosesAnOpenWindowDoesNotHangTheBrowser(
     driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.findElement(webdriver.By.name('windowThree')).click();
+  driver.findElement({name: 'windowThree'}).click();
   driver.switchToWindow('result');
-  driver.findElement(webdriver.By.id('close')).click();
+  driver.findElement({id: 'close'}).click();
   // Coolness, all good if we get here.
 }

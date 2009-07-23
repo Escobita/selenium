@@ -5,7 +5,6 @@ goog.require('goog.math.Coordinate');
 goog.require('goog.math.Size');
 goog.require('goog.string');
 goog.require('goog.userAgent');
-goog.require('webdriver.By');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.asserts');
 
@@ -22,6 +21,7 @@ var TEST_FILES = [
   'formhandling_test.js',
   'frameswitching_test.js',
   'getinnerouterhtml_test.js',
+  'locatorbuilder_test.js',
   'misc_test.js',
   'pageloading_test.js',
   'partiallinktextmatch_test.js',

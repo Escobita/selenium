@@ -3,42 +3,39 @@ goog.require('webdriver.Key');
 
 function testFiresKeyPressEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyReporter')).sendKeys('a');
-  assertThat(driver.findElement(webdriver.By.id('result')).getText(),
+  driver.findElement({id: 'keyReporter'}).sendKeys('a');
+  assertThat(driver.findElement({id: 'result'}).getText(),
       contains('press:'));
 }
 
 
 function testFiresKeyDownEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyReporter')).sendKeys('a');
-  assertThat(driver.findElement(webdriver.By.id('result')).getText(),
-      contains('down:'));
+  driver.findElement({id: 'keyReporter'}).sendKeys('a');
+  assertThat(driver.findElement({id: 'result'}).getText(), contains('down:'));
 }
 
 
 function testFiresKeyUpEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyReporter')).sendKeys('a');
-  assertThat(driver.findElement(webdriver.By.id('result')).getText(),
-      contains('up:'));
+  driver.findElement({id: 'keyReporter'}).sendKeys('a');
+  assertThat(driver.findElement({id: 'result'}).getText(), contains('up:'));
 }
 
 
 function testWillSimulateAKeyUpWhenEnteringTextIntoInputElements(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyUp')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyUp'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
-      equals('I like cheese'));
+      driver.findElement({id: 'result'}).getText(), equals('I like cheese'));
 }
 
 
 function testWillSimulateAKeyDownWhenEnteringTextIntoInputElements(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyDown')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyDown'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
+      driver.findElement({id: 'result'}).getText(),
       // Because the key down gets the result before the input element is
       // filled, we're a letter short here
       equals('I like chees'));
@@ -47,9 +44,9 @@ function testWillSimulateAKeyDownWhenEnteringTextIntoInputElements(driver) {
 
 function testWillSimulateAKeyPressWhenEnteringTextIntoInputElements(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyPress')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyPress'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
+      driver.findElement({id: 'result'}).getText(),
       // Because the key down gets the result before the input element is
       // filled, we're a letter short here
       equals('I like chees'));
@@ -58,18 +55,17 @@ function testWillSimulateAKeyPressWhenEnteringTextIntoInputElements(driver) {
 
 function testWillSimulateAKeyUpWhenEnteringTextIntoTextArea(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyUpArea')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyUpArea'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
-      equals('I like cheese'));
+      driver.findElement({id: 'result'}).getText(), equals('I like cheese'));
 }
 
 
 function testWillSimulateAKeyDownWhenEnteringTextIntoTextArea(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyDownArea')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyDownArea'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
+      driver.findElement({id: 'result'}).getText(),
       // Because the key down gets the result before the input element is
       // filled, we're a letter short here
       equals('I like chees'));
@@ -78,9 +74,9 @@ function testWillSimulateAKeyDownWhenEnteringTextIntoTextArea(driver) {
 
 function testWillSimulateAKeyPressWhenEnteringTextIntoTextArea(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('keyPressArea')).sendKeys('I like cheese');
+  driver.findElement({id: 'keyPressArea'}).sendKeys('I like cheese');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
+      driver.findElement({id: 'result'}).getText(),
       // Because the key down gets the result before the input element is
       // filled, we're a letter short here
       equals('I like chees'));
@@ -89,16 +85,16 @@ function testWillSimulateAKeyPressWhenEnteringTextIntoTextArea(driver) {
 
 function testFiresFocusKeyEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var result = driver.findElement(webdriver.By.id('result'));
-  driver.findElement(webdriver.By.id('theworks')).sendKeys('a');
+  var result = driver.findElement({id: 'result'});
+  driver.findElement({id: 'theworks'}).sendKeys('a');
   assertThat(result.getText(), is('focus keydown keypress keyup'));
 }
 
 
 function testReportsKeyCodeOfArrowKeys(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var result = driver.findElement(webdriver.By.id('result'));
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var result = driver.findElement({id: 'result'});
+  var element = driver.findElement({id: 'keyReporter'});
 
   function testKey(key, code) {
     element.sendKeys(key);
@@ -117,7 +113,7 @@ function testReportsKeyCodeOfArrowKeys(driver) {
 
 function testShouldTypeIntoInputElementsThatHaveNoTypeAttribute(driver) {
   driver.get(TEST_PAGES.formPage);
-  var element = driver.findElement(webdriver.By.id('no-type'));
+  var element = driver.findElement({id: 'no-type'});
   element.sendKeys('Should Say Cheese');
   assertThat(element.getValue(), is('Should Say Cheese'));
 }
@@ -125,7 +121,7 @@ function testShouldTypeIntoInputElementsThatHaveNoTypeAttribute(driver) {
 
 function testShouldNotTypeIntoElementsThatPreventKeyDownEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var silent = driver.findElement(webdriver.By.name('suppress'));
+  var silent = driver.findElement({name: 'suppress'});
   silent.sendKeys('silent sammy');
   assertThat(silent.getValue(), is(''));
 }
@@ -133,8 +129,8 @@ function testShouldNotTypeIntoElementsThatPreventKeyDownEvents(driver) {
 
 function testGenerateKeyPressEventEvenWhenElementPreventsDefault(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var silent = driver.findElement(webdriver.By.name('suppress'));
-  var result = driver.findElement(webdriver.By.id('result'));
+  var silent = driver.findElement({name: 'suppress'});
+  var result = driver.findElement({id: 'result'});
   silent.sendKeys('ss');
   assertThat(result.getText(), contains('press'));
 }
@@ -148,7 +144,7 @@ function testGenerateKeyPressEventEvenWhenElementPreventsDefault(driver) {
 
 function testTypingLowercaseLettersOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('abcdefghijklmnopqrstuvwxyz');
   assertThat(element.getValue(), is('abcdefghijklmnopqrstuvwxyz'));
 }
@@ -156,7 +152,7 @@ function testTypingLowercaseLettersOnAnInputElement(driver) {
 
 function testTypingUppercaseLettersOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
   assertThat(element.getValue(), is('ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
 }
@@ -164,7 +160,7 @@ function testTypingUppercaseLettersOnAnInputElement(driver) {
 
 function testTypignQuotationMarksOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('"');
   assertThat(element.getValue(), is('"'));
 }
@@ -180,7 +176,7 @@ function testTypingTheAtCharacterOnAnInputElement(driver) {
   // in a lightweight manner when my keyboard is set to the DE mapping
   // and we're using IE.
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('@');
   assertThat(element.getValue(), is('@'));
 }
@@ -188,7 +184,7 @@ function testTypingTheAtCharacterOnAnInputElement(driver) {
 
 function testTypingAMixOfUpperAndLowercaseLettersOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('me@eXample.com');
   assertThat(element.getValue(), is('me@eXample.com'));
 }
@@ -196,7 +192,7 @@ function testTypingAMixOfUpperAndLowercaseLettersOnAnInputElement(driver) {
 
 function testArrowKeysAreNotPrintableOnInputElements(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys(webdriver.Key.ARROW_LEFT);
   assertThat(element.getValue(), is(''));
 }
@@ -204,7 +200,7 @@ function testArrowKeysAreNotPrintableOnInputElements(driver) {
 
 function testUsingArrowKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('Tet', webdriver.Key.ARROW_LEFT, 's');
   assertThat(element.getValue(), is('Test'));
 }
@@ -212,7 +208,7 @@ function testUsingArrowKeysOnAnInputElement(driver) {
 
 function testNumericNonShiftKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   var numericLineCharsNonShifted = "`1234567890-=[]\\;,.'/42";
   element.sendKeys(numericLineCharsNonShifted);
   assertThat(element.getValue(), is(numericLineCharsNonShifted));
@@ -221,18 +217,17 @@ function testNumericNonShiftKeysOnAnInputElement(driver) {
 
 function testNumericShiftKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   var numericShiftsEtc = '~!@#$%^&*()_+{}:"<>?|END~';
   element.sendKeys(numericShiftsEtc);
   assertThat(element.getValue(), is(numericShiftsEtc));
-  assertThat(driver.findElement(webdriver.By.id('result')).getText(),
-             contains(' up: 16'));
+  assertThat(driver.findElement({id: 'result'}).getText(), contains(' up: 16'));
 }
 
 
 function testAllPrintableKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   var allPrintable =
       "!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFGHIJKLMNO" +
       "PQRSTUVWXYZ [\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
@@ -243,7 +238,7 @@ function testAllPrintableKeysOnAnInputElement(driver) {
 
 function testArrowKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys(
       'a', webdriver.Key.LEFT,
       'b', webdriver.Key.RIGHT,
@@ -260,7 +255,7 @@ function testArrowKeysOnAnInputElement(driver) {
 if (goog.userAgent.MAC) {
   var testHomeEndPageUpAndPageDownOnAnInputElementOnAMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys(
         // CMD+UP = PageUp
         'a', webdriver.Key.chord(webdriver.Key.COMMAND, webdriver.Key.UP),
@@ -276,7 +271,7 @@ if (goog.userAgent.MAC) {
 } else {
   var testHomeEndPageUpAndPageDownOnAnInputElementOnANonMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys(
         'a', webdriver.Key.PAGE_UP,
         'b', webdriver.Key.PAGE_DOWN,
@@ -290,7 +285,7 @@ if (goog.userAgent.MAC) {
 
 function testDeleteAndBackspaceKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
 
   element.sendKeys('abcdefghi');
   assertThat(element.getValue(), is('abcdefghi'));
@@ -308,7 +303,7 @@ function testDeleteAndBackspaceKeysOnAnInputElement(driver) {
 
 function testSpecialSpaceKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys(
       'abcd', webdriver.Key.SPACE, 'efg', webdriver.Key.SPACE, 'hij');
   assertThat(element.getValue(), is('abcd efg hij'));
@@ -317,7 +312,7 @@ function testSpecialSpaceKeysOnAnInputElement(driver) {
 
 function testNumberpadKeysOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys(
       'abcd', webdriver.Key.MULTIPLY, webdriver.Key.SUBTRACT, webdriver.Key.ADD,
       webdriver.Key.DECIMAL, webdriver.Key.SEPARATOR, webdriver.Key.NUMPAD0,
@@ -330,7 +325,7 @@ function testNumberpadKeysOnAnInputElement(driver) {
 
 function testFunctionKeysAreNotPrintableOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys('FUNCTION' + webdriver.Key.F2 + '-KEYS' + webdriver.Key.F2);
   element.sendKeys(webdriver.Key.F2, '-TOO', webdriver.Key.F2);
   assertThat(element.getValue(), is('FUNCTION-KEYS-TOO'));
@@ -339,7 +334,7 @@ function testFunctionKeysAreNotPrintableOnAnInputElement(driver) {
 
 function testShiftSelectionDeletesOnAnInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var element = driver.findElement(webdriver.By.id('keyReporter'));
+  var element = driver.findElement({id: 'keyReporter'});
   element.sendKeys("abcd efgh");
   assertThat(element.getValue(), is("abcd efgh"));
 
@@ -353,8 +348,8 @@ function testShiftSelectionDeletesOnAnInputElement(driver) {
 if (goog.userAgent.MAC) {
   var testChordControlHomeShiftEndDeleteOnAnInputElementMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var result = driver.findElement(webdriver.By.id('result'));
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var result = driver.findElement({id: 'result'});
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys("!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFG");
     element.sendKeys(
         webdriver.Key.chord(webdriver.Key.COMMAND, webdriver.Key.LEFT));
@@ -368,7 +363,7 @@ if (goog.userAgent.MAC) {
 
   var testChordReverseShiftHomeSelectionDeletesMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys(
         'done',
         webdriver.Key.chord(webdriver.Key.COMMAND, webdriver.Key.LEFT));
@@ -390,7 +385,7 @@ if (goog.userAgent.MAC) {
 
   var testChordControlCutAndPasteMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     var paste = "!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFG";
     element.sendKeys(paste);
     assertThat(element.getValue(), is(paste));
@@ -430,8 +425,8 @@ if (goog.userAgent.MAC) {
   var testChordControlHomeShiftEndDeleteOnAnInputElementNonMac = function(
       driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var result = driver.findElement(webdriver.By.id('result'));
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var result = driver.findElement({id: 'result'});
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys("!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFG");
     element.sendKeys(webdriver.Key.HOME);
     element.sendKeys(webdriver.Key.chord(
@@ -443,7 +438,7 @@ if (goog.userAgent.MAC) {
 
   var testChordReverseShiftHomeSelectionDeletesNonMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     element.sendKeys('done', webdriver.Key.HOME);
     element.sendKeys(webdriver.Key.chord(
         webdriver.Key.SHIFT, 'ALL ', webdriver.Key.HOME));
@@ -460,7 +455,7 @@ if (goog.userAgent.MAC) {
 
   var testChordControlCutAndPasteNonMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
-    var element = driver.findElement(webdriver.By.id('keyReporter'));
+    var element = driver.findElement({id: 'keyReporter'});
     var paste = "!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFG";
     element.sendKeys(paste);
     assertThat(element.getValue(), is(paste));

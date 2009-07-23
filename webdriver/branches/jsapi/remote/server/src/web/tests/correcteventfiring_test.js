@@ -6,30 +6,22 @@
  */
 
 function assertResultTextIs(driver, text) {
-  assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
-      equals(text));
+  assertThat(driver.findElement({id: 'result'}).getText(), equals(text));
 }
 
 
 function assertResultTextContains(driver, text) {
-  assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
-      contains(text));
+  assertThat(driver.findElement({id: 'result'}).getText(), contains(text));
 }
 
 
 function clickOnElementWhichRecordsEvents(driver) {
-  driver.findElement(webdriver.By.id('plainButton')).click();
+  driver.findElement({id: 'plainButton'}).click();
 }
 
 function assertEventFired(driver, event) {
-  driver.findElement(webdriver.By.id('result')).
-      getText();
-  driver.callFunction(function(response) {
-    assertTrue('No ' + event + ' fired: ' + response.value,
-        goog.string.contains(response.value, event));
-  });
+  assertThat('No ' + event + ' fired',
+      driver.findElement({id: 'result'}).getText(), contains(event));
 }
 
 
@@ -64,35 +56,35 @@ function testShouldFireMouseUpEventWhenClicking(driver) {
 function testShouldFireEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   clickOnElementWhichRecordsEvents(driver);
-  var text = driver.findElement(webdriver.By.id('result')).getText();
+  var text = driver.findElement({id: 'result'}).getText();
   assertThat(text, matchesRegex(/mousedown focus ([^ ] )*mouseup click/));
 }
 
 
 function testShouldIssueMouseDownEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('mousedown')).click();
+  driver.findElement({id: 'mousedown'}).click();
   assertResultTextIs(driver, 'mouse down');
 }
 
 
 function testShouldIssueClickEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('mouseclick')).click();
+  driver.findElement({id: 'mouseclick'}).click();
   assertResultTextIs(driver, 'mouse click');
 }
 
 
 function testShouldIssueMouseUpEvents(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('mouseup')).click();
+  driver.findElement({id: 'mouseup'}).click();
   assertResultTextIs(driver, 'mouse up');
 }
 
 
 function testMouseEventsShouldBubbleUpToContainingElements(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('child')).click();
+  driver.findElement({id: 'child'}).click();
   assertResultTextIs(driver, 'mouse down');
 }
 
@@ -102,8 +94,8 @@ function testShouldEmitOnChangeEventsWhenSelectingElements(driver) {
   var barOption;
 
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('selector')).
-      findElements(webdriver.By.tagName('option'));
+  driver.findElement({id: 'selector'}).
+      findElements({tagName: 'option'});
   driver.callFunction(function(response) {
     var optionElements = response.value;
     fooOption = optionElements[0];
@@ -111,7 +103,7 @@ function testShouldEmitOnChangeEventsWhenSelectingElements(driver) {
     assertTrue('fooOption is undefined', goog.isDef(fooOption));
     assertTrue('barOption is undefined', goog.isDef(barOption));
   });
-  driver.findElement(webdriver.By.id('result')).getText();
+  driver.findElement({id: 'result'}).getText();
   driver.callFunction(function(response) {
     var initialText = response.value;
     fooOption.setSelected();
@@ -124,23 +116,20 @@ function testShouldEmitOnChangeEventsWhenSelectingElements(driver) {
 
 function testShouldEmitOnChangeEventsWhenChangingTheStateOfACheckbox(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('checkbox')).setSelected();
+  driver.findElement({id: 'checkbox'}).setSelected();
   assertResultTextIs(driver, 'checkbox thing');
 }
 
 
 function testShouldEmitClickEventWhenClickingOnATextInputElement(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var clicker = driver.findElement(webdriver.By.id('clickField'));
+  var clicker = driver.findElement({id: 'clickField'});
   clicker.click();
-  clicker.getValue();
-  driver.callFunction(function(response) {
-    assertEquals('Clicked', response.value);
-  });
+  assertThat(clicker.getValue(), equals('Clicked'));
 }
 
 function testClearingAnElementCausesTheOnChangeHandlerToFire(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  driver.findElement(webdriver.By.id('clearMe')).clear();
+  driver.findElement({id: 'clearMe'}).clear();
   assertResultTextIs(driver, 'Cleared');
 }

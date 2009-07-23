@@ -1,20 +1,17 @@
 function testShouldContinueToReferToTheSameFrameOnceItHasBeenSelected(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame(2);
-  var checkbox = driver.findElement(
-      webdriver.By.xpath("//input[@name='checky']"));
+  var checkbox = driver.findElement({name: 'checky'});
   checkbox.toggle();
   checkbox.submit();
-  assertThat(driver.findElement(webdriver.By.xpath("//p")).getText(),
-             equals("Success!"));
+  assertThat(driver.findElement({xpath: "//p"}).getText(), equals("Success!"));
 }
 
 
 function testShouldAutomaticallyUseTheFirstFrameOnAPage(driver) {
   driver.get(TEST_PAGES.framesetPage);
   // Notice that we've not switched to the 0th frame
-  var pageNumber = driver.findElement(
-      webdriver.By.xpath("//span[@id='pageNumber']"));
+  var pageNumber = driver.findElement({id: 'pageNumber'});
   assertThat(pageNumber.getText(), equals("1"));
 }
 
@@ -22,17 +19,17 @@ function testShouldAutomaticallyUseTheFirstFrameOnAPage(driver) {
 function testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame(0);
-  driver.findElement(webdriver.By.linkText("top")).click();
+  driver.findElement({linkText: 'top'}).click();
   assertThat(driver.getTitle(), equals("XHTML Test Page"));
   assertThat(
-      driver.findElement(webdriver.By.xpath('/html/head/title')).getText(),
+      driver.findElement({xpath: '/html/head/title'}).getText(),
       equals('XHTML Test Page'));
 }
 
 
 function testShouldNotAutomaticallySwitchFocusToAnIFrameWhenAPageContainingThemIsLoaded(driver) {
   driver.get(TEST_PAGES.iframePage);
-  driver.findElement(webdriver.By.id("iframe_page_heading"));
+  driver.findElement({id: "iframe_page_heading"});
 }
 
 
@@ -41,10 +38,10 @@ function testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage(
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame(0);
   driver.switchToDefaultContent();
-  driver.findElement(webdriver.By.id('nested_form'));
+  driver.findElement({id: 'nested_form'});
   driver.expectErrorFromPreviousCommand(
       'Should have switched back to main content');
-  driver.findElement(webdriver.By.id("iframe_page_heading"));
+  driver.findElement({id: "iframe_page_heading"});
 }
 
 
@@ -52,8 +49,8 @@ function testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt(driver) {
   webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame(0);
-  driver.findElement(webdriver.By.id('submitButton')).click();
-  var hello = driver.findElement(webdriver.By.id('greeting')).getText();
+  driver.findElement({id: 'submitButton'}).click();
+  var hello = driver.findElement({id: 'greeting'}).getText();
   assertThat(hello, equals('Success!'));
 }
 
@@ -61,7 +58,7 @@ function testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt(driver) {
 function testShouldBeAbleToSelectAFrameByName(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame("second");
-  assertThat(driver.findElement(webdriver.By.id("pageNumber")).getText(),
+  assertThat(driver.findElement({id: "pageNumber"}).getText(),
              equals("2"));
 }
 
@@ -69,7 +66,7 @@ function testShouldBeAbleToSelectAFrameByName(driver) {
 function testShouldSelectChildFramesByUsingADotSeparatedString(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame("fourth.child2");
-  assertThat(driver.findElement(webdriver.By.id("pageNumber")).getText(),
+  assertThat(driver.findElement({id: "pageNumber"}).getText(),
              equals("11"));
 }
 
@@ -77,7 +74,7 @@ function testShouldSelectChildFramesByUsingADotSeparatedString(driver) {
 function testShouldSwitchToChildFramesTreatingNumbersAsIndex(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame("fourth.1");
-  assertThat(driver.findElement(webdriver.By.id("pageNumber")).getText(),
+  assertThat(driver.findElement({id: "pageNumber"}).getText(),
              equals("11"));
 }
 
@@ -85,7 +82,7 @@ function testShouldSwitchToChildFramesTreatingNumbersAsIndex(driver) {
 function testShouldBeAbleToFlipToAFrameIdentifiedByItsId(driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame("fifth");
-  driver.findElement(webdriver.By.id("username"));
+  driver.findElement({id: "username"});
 }
 
 
@@ -106,14 +103,14 @@ function testShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex(driver) {
 function testShouldBeAbleToFindElementsInIframesByName(driver) {
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame("iframe1");
-  driver.findElement(webdriver.By.name("id-name1"));
+  driver.findElement({name: 'id-name1'});
 }
 
 
 function testShouldBeAbleToFindElementsInIframesByXPath(driver) {
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame("iframe1");
-  driver.findElement(webdriver.By.xpath("//*[@id = 'changeme']"));
+  driver.findElement({xpath: "//*[@id = 'changeme']"});
 }
 
 

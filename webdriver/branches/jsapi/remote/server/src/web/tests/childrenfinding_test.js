@@ -7,29 +7,26 @@
 
 function testFindElementByXpath(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  var select =
-      driver.findElement(webdriver.By.xpath('//form[@name="form2"]/select'));
+  var select = driver.findElement({xpath: '//form[@name="form2"]/select'});
   assertThat(select.getAttribute('id'), is('2'));
 }
 
 
 function testCanDetectWhenElementsArePresentByXPath(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  var xpath = webdriver.By.xpath('//form[@name="form2"]/select/x');
+  var xpath = {xpath: '//form[@name="form2"]/select/x'};
   assertThat(driver.isElementPresent(xpath), is(false));
-  var select = driver.findElement(
-      webdriver.By.xpath('//form[@name="form2"]/select'));
-  assertThat(select.isElementPresent(webdriver.By.xpath('.//x')), is(false));
+  var select = driver.findElement({xpath: '//form[@name="form2"]/select'});
+  assertThat(select.isElementPresent({xpath: './/x'}), is(false));
 }
 
 
 function testRaisesAnErrorWhenChildElementIsNotFoundByXPath(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  var xpath = webdriver.By.xpath('//form[@name="form2"]/select/x');
+  var xpath = {xpath: '//form[@name="form2"]/select/x'};
   assertThat(driver.isElementPresent(xpath), is(false));
-  var select = driver.findElement(
-      webdriver.By.xpath('//form[@name="form2"]/select'));
-  select.findElement(webdriver.By.xpath('.//x'));
+  var select = driver.findElement({xpath: '//form[@name="form2"]/select'});
+  select.findElement({xpath: './/x'});
   driver.expectErrorFromPreviousCommand();
 }
 
@@ -37,8 +34,8 @@ function testRaisesAnErrorWhenChildElementIsNotFoundByXPath(driver) {
 function testFindElementByName(driver) {
   driver.get(TEST_PAGES.nestedPage);
   assertThat(
-      driver.findElement(webdriver.By.name('form2')).
-          findElement(webdriver.By.name('selectomatic')).
+      driver.findElement({name: 'form2'}).
+          findElement({name: 'selectomatic'}).
           getAttribute('id'),
       is('2'));
 }
@@ -47,16 +44,15 @@ function testFindElementByName(driver) {
 function testFindElementById(driver) {
   driver.get(TEST_PAGES.nestedPage);
   assertThat(
-      driver.findElement(webdriver.By.id('2')).getAttribute('name'),
-      is('selectomatic'));
+      driver.findElement({id: '2'}).getAttribute('name'), is('selectomatic'));
 }
 
 
 function testFindElementByIdWhenMultipleMatchesExist(driver) {
   driver.callFunction(webdriver.logging.clear);
   driver.get(TEST_PAGES.nestedPage);
-  var text = driver.findElement(webdriver.By.id('test_id_div')).
-      findElement(webdriver.By.id('test_id')).
+  var text = driver.findElement({id: 'test_id_div'}).
+      findElement({id: 'test_id'}).
       getText();
   assertThat(text, equals('inside'));
 }
@@ -64,8 +60,8 @@ function testFindElementByIdWhenMultipleMatchesExist(driver) {
 
 function testFindElementByIdWhenNoMatchInContext(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.id('test_id_div')).
-      findElement(webdriver.By.id('test_id_out'));
+  driver.findElement({id: 'test_id_div'}).
+      findElement({id: 'test_id_out'});
   driver.expectErrorFromPreviousCommand(
       'Should not be able to find an element by ID when that element does ' +
       'not exist under the given root');
@@ -74,8 +70,8 @@ function testFindElementByIdWhenNoMatchInContext(driver) {
 
 function testFindElementsById(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.name('form2')).
-      findElements(webdriver.By.id('2'));
+  driver.findElement({name: 'form2'}).
+      findElements({id: '2'});
   driver.callFunction(function(response) {
     assertEquals('Should find two elements', 2, response.value.length);
   });
@@ -85,8 +81,8 @@ function testFindElementsById(driver) {
 function testFindElementByLinkText(driver) {
   driver.get(TEST_PAGES.nestedPage);
   assertThat(
-      driver.findElement(webdriver.By.name('div1')).
-          findElement(webdriver.By.linkText('hello world')).
+      driver.findElement({name: 'div1'}).
+          findElement({linkText: 'hello world'}).
           getAttribute('name'),
       is('link1'));
 }
@@ -94,8 +90,8 @@ function testFindElementByLinkText(driver) {
 
 function testFindElementsByLinkTest(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.name('div1')).
-      findElements(webdriver.By.linkText('hello world'));
+  driver.findElement({name: 'div1'}).
+      findElements({linkText: 'hello world'});
   driver.callFunction(function(response) {
     var webElements = response.value;
     assertEquals('Should find two elements', 2, webElements.length);
@@ -107,8 +103,8 @@ function testFindElementsByLinkTest(driver) {
 
 function testFindElementsByLinkText(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.name('div1')).
-      findElements(webdriver.By.linkText('hello world'));
+  driver.findElement({name: 'div1'}).
+      findElements({linkText: 'hello world'});
   driver.callFunction(function(response) {
     assertEquals('Should find two elements', 2, response.value.length);
   });
@@ -117,16 +113,16 @@ function testFindElementsByLinkText(driver) {
 
 function testShouldFindChildElementsByClassName(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  var one = driver.findElement(webdriver.By.name('classes')).
-      findElement(webdriver.By.className('one'));
+  var one = driver.findElement({name: 'classes'}).
+      findElement({className: 'one'});
   assertThat(one.getText(), equals('Find me'));
 }
 
 
 function testShouldFindChildrenByClassName(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.name('classes')).
-      findElements(webdriver.By.className('one'));
+  driver.findElement({name: 'classes'}).
+      findElements({className: 'one'});
   driver.callFunction(function(response) {
     assertEquals(2, response.value.length);
   });
@@ -136,8 +132,8 @@ function testShouldFindChildrenByClassName(driver) {
 function testShouldFindChildElementByTagName(driver) {
   driver.get(TEST_PAGES.nestedPage);
   assertThat(
-      driver.findElement(webdriver.By.name('div1')).
-          findElement(webdriver.By.tagName('A')).
+      driver.findElement({name: 'div1'}).
+          findElement({tagName: 'A'}).
           getAttribute('name'),
       is('link1'));
 }
@@ -145,8 +141,8 @@ function testShouldFindChildElementByTagName(driver) {
 
 function testShouldFindChildrenByTagName(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  driver.findElement(webdriver.By.name('div1')).
-      findElements(webdriver.By.tagName('A'));
+  driver.findElement({name: 'div1'}).
+      findElements({tagName: 'A'});
   driver.callFunction(function(response) {
     assertEquals(2, response.value.length);
   });

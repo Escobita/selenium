@@ -1,7 +1,6 @@
 goog.addDependency('../asserts.js',
                    ['webdriver.asserts', 'webdriver.asserts.Matcher'],
                    ['goog.math.Coordinate', 'webdriver.Future']);
-goog.addDependency('../by.js', ['webdriver.By'], ['webdriver.CommandInfo']);
 goog.addDependency('../command.js',
                    ['webdriver.Command', 'webdriver.CommandInfo',
                     'webdriver.Response'], []);
@@ -31,6 +30,8 @@ goog.addDependency('../webdriver.js',
                     'webdriver.CommandInfo', 'webdriver.Context',
                     'webdriver.Future', 'webdriver.Response',
                     'webdriver.WebElement']);
-goog.addDependency('../webelement.js', ['webdriver.WebElement'],
-                   ['goog.array', 'goog.math.Coordinate', 'goog.math.Size',
-                    'webdriver.CommandInfo', 'webdriver.Future']);
+goog.addDependency('../webelement.js',
+                   ['webdriver.Locator', 'webdriver.WebElement'],
+                   ['goog.array', 'goog.json', 'goog.math.Coordinate',
+                    'goog.math.Size', 'webdriver.CommandInfo',
+                    'webdriver.Future']);

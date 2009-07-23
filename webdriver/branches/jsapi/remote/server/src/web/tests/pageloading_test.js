@@ -38,15 +38,11 @@ function testShouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded(
     driver) {
   driver.get(TEST_PAGES.framesetPage);
   driver.switchToFrame(0);
-  var pageNumber = driver.findElement(
-      webdriver.By.xpath("//span[@id='pageNumber']"));
+  var pageNumber = driver.findElement({id: 'pageNumber'});
   assertThat(pageNumber.getText(), equals("1"));
 
   driver.switchToFrame(1);
-  assertThat(
-      driver.findElement(webdriver.By.xpath("//span[@id='pageNumber']")).
-          getText(),
-      equals('2'));
+  assertThat(driver.findElement({id: 'pageNumber'}).getText(), equals('2'));
 }
 
 
@@ -64,7 +60,7 @@ function testShouldDoNothingIfThereIsNothingToGoBackTo(driver) {
 
 function testShouldBeAbleToNavigateBackInTheBrowserHistory(driver) {
   driver.get(TEST_PAGES.formPage);
-  driver.findElement(webdriver.By.id("imageButton")).submit();
+  driver.findElement({id: "imageButton"}).submit();
   assertThat(driver.getTitle(), equals("We Arrive Here"));
   driver.back();
   assertThat(driver.getTitle(), equals("We Leave From Here"));
@@ -74,7 +70,7 @@ function testShouldBeAbleToNavigateBackInTheBrowserHistory(driver) {
 function testShouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes(
     driver) {
   driver.get(TEST_PAGES.xhtmlTestPage);
-  driver.findElement(webdriver.By.name("sameWindow")).click();
+  driver.findElement({name: "sameWindow"}).click();
   assertThat(driver.getTitle(), equals("This page has iframes"));
   driver.back();
   assertThat(driver.getTitle(), equals("XHTML Test Page"));
@@ -83,7 +79,7 @@ function testShouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes(
 
 function testShouldBeAbleToNavigateForwardsInTheBrowserHistory(driver) {
   driver.get(TEST_PAGES.formPage);
-  driver.findElement(webdriver.By.id("imageButton")).submit();
+  driver.findElement({id: "imageButton"}).submit();
   assertThat(driver.getTitle(), equals("We Arrive Here"));
   driver.back();
   assertThat(driver.getTitle(), equals("We Leave From Here"));

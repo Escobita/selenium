@@ -20,13 +20,246 @@ limitations under the License.
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 
+goog.provide('webdriver.Locator');
 goog.provide('webdriver.WebElement');
 
 goog.require('goog.array');
+goog.require('goog.json');
 goog.require('goog.math.Coordinate');
 goog.require('goog.math.Size');
 goog.require('webdriver.CommandInfo');
 goog.require('webdriver.Future');
+
+
+/**
+ * A datastructure representing a strategy to use for locating an element on the
+ * current page under test.
+ * @param {webdriver.CommandInfo} info A CommandInfo object identifying which
+ *     command to use for finding the element.
+ * @param {string} target The target of the search.
+ * @constructor
+ */
+webdriver.Locator = function(info, target) {
+  this.info = info;
+  this.target = target;
+};
+
+
+/**
+ * Class for building {@code webdriver.Locator} objects.
+ * @constructor
+ */
+webdriver.Locator.Builder = function() {
+  this.findUsingElement_ = false;
+  this.findMany_ = false;
+  this.locatorMap_ = webdriver.Locator.Builder.FIND_UNDER_ROOT_;
+};
+
+
+/**
+ * A map of strategies to local command processor methods that can be used to
+ * find an element under the document root. Each enumerated item is a 2-element
+ * array; the first element is the method to use for finding a single element
+ * and the second is for finding multiple elements.
+ * @enum {Array.<string>}
+ */
+webdriver.Locator.Builder.FIND_UNDER_ROOT_ = {
+  id: ['selectElementById', 'selectElementsUsingId'],
+  name: ['selectElementByName', 'selectElementsUsingName'],
+  className: ['selectElementUsingClassName', 'selectElementsUsingClassName'],
+  linkText: ['selectElementUsingLink', 'selectElementsUsingLink'],
+  partialLinkText: ['selectElementUsingPartialLinkText',
+                    'selectElementsUsingPartialLinkText'],
+  tagName: ['selectElementUsingTagName', 'selectElementsUsingTagName'],
+  xpath: ['selectElementUsingXPath', 'selectElementsUsingXPath']
+};
+
+
+/**
+ * A map of strategies to local command processor methods that can be used to
+ * find a collection of child elements. Any strategies not in the map will be
+ * converted to XPath.
+ * @enum {string}
+ */
+webdriver.Locator.Builder.FIND_MANY_UNDER_ELEMENT_ = {
+  className: 'findChildElementsByClassName',
+  linkText: 'findElementsByLinkText',
+  partialLinkText: 'findElementsByPartialLinkText',
+  tagName: 'findElementsByTagName',
+  xpath: 'findElementsByXPath'
+};
+
+
+/**
+ * Build a locator that searches under the current element.
+ * @return {webdriver.Locator.Builder} A self reference for chaining calls.
+ */
+webdriver.Locator.Builder.prototype.underCurrentElement = function() {
+  this.findUsingElement_ = true;
+  return this.findManyElements();
+};
+
+
+/**
+ * Build a locator that searches for multiple elements instead of just one.
+ * @return {webdriver.Locator.Builder} A self reference for chaining calls.
+ */
+webdriver.Locator.Builder.prototype.findManyElements = function() {
+  this.findMany_ = true;
+  this.locatorMap_ = this.findUsingElement_ ?
+      webdriver.Locator.Builder.FIND_MANY_UNDER_ELEMENT_ :
+      webdriver.Locator.Builder.FIND_UNDER_ROOT_;
+  return this;
+};
+
+
+/**
+ * Map a locator target to an XPath target.
+ * @param {Object} locator A hash object to build a locator from. The object
+ *     should have {@code type} and {@code target} properties.
+ * @return {string} The value of {@code locator.target} as an XPath expression.
+ * @throws If the locator target cannot be mapped to an XPath expression.
+ * @private
+ */
+webdriver.Locator.Builder.prototype.mapToXPath_ = function(locator) {
+  var prefix = this.findUsingElement_ ? '.' : '';
+  switch (locator.type) {
+    case 'id':
+    case 'name':
+      return prefix + '//*[@' + locator.type + '="' + locator.target + '"]';
+    case 'className':
+      return  prefix + "//*[contains(" +
+              "concat(' ', normalize-space(@class), ' '),' " +
+              locator.target + " ')]";
+    case 'linkText':
+      return prefix + '//a[text()="' + locator.target + '"]';
+    case 'partialLinkText':
+      return prefix + '//a[contains(text(),"' + locator.target + '")]';
+    case 'tagName':
+      return prefix + '//' + locator.target;
+    case 'xpath':
+      return locator.target;
+  }
+  throw new Error('Locator cannot be mapped to xpath: ' +
+                  goog.json.serialize(locator));
+};
+
+
+/**
+ * Builds the URL the command should be sent to when using a remote command
+ * processor.
+ * @return {string} The URL to send the locator command to.
+ * @private
+ */
+webdriver.Locator.Builder.prototype.buildUrl_ = function() {
+  var url = '/session/:sessionId/:context/element';
+  if (this.findMany_) {
+    url += 's';
+  }
+  if (this.findUsingElement_) {
+    url += '/:using';
+  }
+  return url;
+};
+
+
+/**
+ * Builds a locator that searches under the current document root.
+ * @param {Object} locator A hash object to build a locator from. The object
+ *     should have {@code type} and {@code target} properties.
+ * @param {string} url The URL to send the locator command to.
+ * @return {webdriver.Locator} A new locator.
+ * @private
+ */
+webdriver.Locator.Builder.prototype.buildLocatorFromRoot_ = function(locator,
+                                                                     url) {
+  var method = this.locatorMap_[locator.type][Number(this.findMany_)];
+  return new webdriver.Locator(
+      new webdriver.CommandInfo(method, url, 'POST'), locator.target);
+};
+
+
+/**
+ * Builds a locator that searches under an element in the DOM tree.
+ * @param {Object} locator A hash object to build a locator from. The object
+ *     should have {@code type} and {@code target} properties.
+ * @param {string} url The URL to send the locator command to.
+ * @return {webdriver.Locator} A new locator.
+ * @private
+ */
+webdriver.Locator.Builder.prototype.buildLocatorFromElement_ = function(locator,
+                                                                        url) {
+  var method = this.locatorMap_[locator.type];
+  var target = locator.target;
+  if (!method) {
+    method = webdriver.Locator.Builder.FIND_MANY_UNDER_ELEMENT_.xpath;
+    target = this.mapToXPath_(locator);
+  }
+  return new webdriver.Locator(
+      new webdriver.CommandInfo(method, url, 'POST'), target);
+};
+
+
+/**
+ * Builds a new locator using this {@code Builder} object's current
+ * configuration. This method takes an anonymous object describing the locator
+ * strategy to use and the target to search for.  The hash object should define
+ * one of the following strategies:
+ * <ol>
+ * <li>id</li>
+ * <li>name</li>
+ * <li>className</li>
+ * <li>linkText</li>
+ * <li>partialLinkText</li>
+ * <li>tagName</li>
+ * <li>xpath</li>
+ * </ol>
+ * The strategy should be the hash key and the target its value. Strategies are
+ * given the priority listed above.
+ * Example usage:
+ * <code>
+ * new webdriver.Locator.Builder().
+ *     underCurrentElement().
+ *     build({id: 'my-id'});
+ * </code>
+ * @param {Object} by An anonymous hash object describing the locator strategy
+ *     to use and the target to search for.
+ * @return {webdriver.Locator} A new locator.
+ * @throws If the hash object does not specify a supported locator strategy or
+ *     if attempting to build a {@code className} locator with a compound class
+ *     as the target (e.g. "lorem ipsum").
+ */
+webdriver.Locator.Builder.prototype.build = function(by) {
+  var searchOrder = ['id', 'name', 'className', 'linkText', 'partialLinkText',
+                     'tagName', 'xpath'];
+  var mappedLocator = goog.array.reduce(searchOrder, function(current, item) {
+    if (current) {
+      return current;
+    } else if (item in by) {
+      return {type: item, target: by[item]};
+    } else {
+      return null;
+    }
+  }, null, this);
+
+  if (!mappedLocator) {
+    throw new Error('Unsupported locator: ' + goog.json.serialize(by));
+  } else if (mappedLocator.type == 'className') {
+    var normalized = goog.string.normalizeWhitespace(mappedLocator.target);
+    mappedLocator.target = goog.string.trim(normalized);
+    if (mappedLocator.target.search(/\s/) >= 0) {
+      throw new Error('Compound class names are not allowed for searches: ' +
+          goog.string.quote(mappedLocator.target));
+    }
+  }
+
+  if (this.findUsingElement_) {
+    return this.buildLocatorFromElement_(mappedLocator, this.buildUrl_());
+  } else {
+    return this.buildLocatorFromRoot_(mappedLocator, this.buildUrl_());
+  }
+};
+
 
 /**
  * TODO(jmleyba): Beefier documentation please
@@ -36,9 +269,9 @@ goog.require('webdriver.Future');
  * driver.init();
  * driver.switchToWindow('test_window');
  * driver.get('http://www.google.com');
- * var element = driver.findElement(webdriver.By.name('q'));
+ * var element = driver.findElement({name: 'q'});
  * element.sendKeys('webdriver');
- * element = driver.findElement(webdriver.By.name('btnG'));
+ * element = driver.findElement({name: 'btnG'});
  * element.click();
  * </code>
  * @param {webdriver.WebDriver} driver The WebDriver instance that will
@@ -73,105 +306,25 @@ webdriver.WebElement.UUID_REGEX =
     /^{[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}}$/i;
 
 
-webdriver.WebElement.findElementLocatorToCommandInfo_ = function(by) {
-  var commandMap = {
-    id: webdriver.CommandInfo.FIND_ELEMENT_BY_ID,
-    className: webdriver.CommandInfo.FIND_ELEMENT_BY_CLASS_NAME,
-    name: webdriver.CommandInfo.FIND_ELEMENT_BY_NAME,
-    linkText: webdriver.CommandInfo.FIND_ELEMENT_BY_LINK_TEXT,
-    partialLinkText: webdriver.CommandInfo.FIND_ELEMENT_BY_PARTIAL_LINK_TEXT,
-    tagName: webdriver.CommandInfo.FIND_ELEMENT_BY_TAG_NAME,
-    xpath: webdriver.CommandInfo.FIND_ELEMENT_BY_XPATH
-  };
-
-  var commandInfo = commandMap[by.type];
-  if (goog.isDef(commandInfo)) {
-    if (by.type == 'className') {
-      by.target = goog.string.trim(by.target);
-      if (by.target.search(/\s/) >= 0) {
-        throw new Error('Compound class names are not allowed for searches');
-      }
-    }
-    return commandInfo;
-  }
-  throw new Error('Undefined locator type: ' + by.type);
-};
-
-
 /**
- * Adds a command to the given {@code webdriver.WebDriver} instance to find an
- * element on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By} by The strategy to use for finding the element.
- * @return {webdriver.WebElement} A WebElement that can be used to issue
- *     commands on the found element.  The element's ID will be set
- *     asynchronously once the driver successfully finds the element.
+ * Adds a command to the given driver to find an element on the current page
+ * under test.
+ * @param {webdriver.WebDriver} driver Instance to add the command to.
+ * @param {webdriver.Locator} locator Locator strategy to use.
+ * @param {function} opt_callbackFn Function to call if the command succeeds.
+ * @param {function} opt_errorCallbackFn Function to call if the command fails.
+ * @param {webdriver.Future} opt_elementId A future for the ID of the element
+ *     to search under. If not specified, the search will be conducted from the
+ *     document root.
+ * @private
  */
-webdriver.WebElement.findElement = function(driver, by) {
-  var commandInfo = webdriver.WebElement.findElementLocatorToCommandInfo_(by);
-  var webElement = new webdriver.WebElement(driver);
-  var webElementId = webElement.getId();
-  driver.addCommand(commandInfo.buildCommand(
-      driver, [by.target],
-      goog.bind(webElementId.setValueFromResponse, webElementId)));
-  return webElement;
-};
-
-
-/**
- * Adds a command to the given {@code webdriver.WebDriver} instance to test if
- * an element is present on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By} by The strategy to use for finding the element.
- * @return {webdriver.Future} A future whose value will be set when the driver
- *     completes the search; value will be {@code true} if the element was
- *     found, false otherwise.
- */
-webdriver.WebElement.isElementPresent = function(driver, by) {
-  var commandInfo = webdriver.WebElement.findElementLocatorToCommandInfo_(by);
-  var isPresent = new webdriver.Future(driver);
-  driver.addCommand(commandInfo.buildCommand(
-      driver, [by.target],
-      // If returns without an error, element is present
-      function(response) {
-        response.value = true;
-        isPresent.setValue(true);
-      },
-      // If returns with an error, element is not present (clear the error!)
-      function(response) {
-        response.isError = false;
-        response.value = false;
-        isPresent.setValue(false);
-      }));
-  return isPresent;
-};
-
-
-
-
-/**
- * Adds a command to the given {@code webdriver.WebDriver} instance to find
- * multiple elements on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By} by The strategy to use for finding the elements.
- */
-webdriver.WebElement.findElements = function(driver, by) {
-  var commandMap = {
-    id: webdriver.CommandInfo.FIND_ELEMENTS_BY_ID,
-    className: webdriver.CommandInfo.FIND_ELEMENTS_BY_CLASS_NAME,
-    name: webdriver.CommandInfo.FIND_ELEMENTS_BY_NAME,
-    linkText: webdriver.CommandInfo.FIND_ELEMENTS_BY_LINK_TEXT,
-    partialLinkText: webdriver.CommandInfo.FIND_ELEMENTS_BY_PARTIAL_LINK_TEXT,
-    tagName: webdriver.CommandInfo.FIND_ELEMENTS_BY_TAG_NAME,
-    xpath: webdriver.CommandInfo.FIND_ELEMENTS_BY_XPATH
-  };
-
-  var commandInfo = commandMap[by.type];
-  if (!goog.isDef(commandInfo)) {
-    throw new Error('Undefined locator type');
-  }
-
-  driver.addCommand(commandInfo.buildCommand(driver, [by.target],
+webdriver.WebElement.findElementInternal_ = function(driver,
+                                                     locator,
+                                                     opt_callbackFn,
+                                                     opt_errorCallbackFn,
+                                                     opt_elementId) {
+  var command = locator.info.buildCommand(
+      driver, [locator.target],
       function(response) {
         var ids = response.value.split(',');
         var elements = [];
@@ -181,55 +334,61 @@ webdriver.WebElement.findElements = function(driver, by) {
           elements.push(element);
         }
         response.value = elements;
-      }));
+        if (opt_callbackFn) {
+          opt_callbackFn(response);
+        }
+      },
+      opt_errorCallbackFn);
+  if (opt_elementId) {
+    command.elementId = opt_elementId;
+  }
+  driver.addCommand(command);
 };
 
 
-webdriver.WebElement.prototype.isElementPresent = function(findBy) {
-  var isPresent = new webdriver.Future(this.driver_);
-  var foundCallbackFn = function(response) {
-    response.value = !!response.value;
-    isPresent.setValue(response.value);
-  };
+/**
+ * Adds a command to the given {@code webdriver.WebDriver} instance to find an
+ * element on the page.
+ * @param {webdriver.WebDriver} driver The driver to perform the search with.
+ * @param {Object} by A hash object describing the strategy to use for finding
+ *     the element.
+ * @return {webdriver.WebElement} A WebElement that can be used to issue
+ *     commands on the found element.  The element's ID will be set
+ *     asynchronously once the driver successfully finds the element.
+ */
+webdriver.WebElement.findElement = function(driver, by) {
+  var locator = new webdriver.Locator.Builder().build(by);
+  var webElement = new webdriver.WebElement(driver);
+  webdriver.WebElement.findElementInternal_(
+      driver, locator,
+      function(response) {
+        webElement.getId().setValue(response.value[0].getId().getValue());
+      });
+  return webElement;
+};
 
-  var commandInfo;
-  switch (findBy.type) {
-    case 'id':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENT_USING_ELEMENT_BY_ID;
-      break;
-    case 'tagName':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH;
-      findBy.target = './/' + findBy.target;
-      break;
-    case 'linkText':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH;
-      findBy.target = ".//a[text()='" + findBy.target + "']";
-      break;
-    case 'name':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH;
-      findBy.target = ".//*[@name='" + findBy.target + "']";
-      break;
-    case 'partialLinkText':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH;
-      findBy.target = ".//a[contains(text(),'" + findBy.target + "')]";
-      break;
-    case 'xpath':
-      commandInfo = webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH;
-      break;
-    case 'className':
-      commandInfo =
-          webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME;
-      foundCallbackFn = function(response) {
-        response.value = !!response.value.split(',').length;
+
+/**
+ * Adds a command to the given {@code webdriver.WebDriver} instance to test if
+ * an element is present on the page.
+ * @param {webdriver.WebDriver} driver The driver to perform the search with.
+ * @param {Object} by A hash object describing the strategy to use for finding
+ *     the element.
+ * @return {webdriver.Future} A future whose value will be set when the driver
+ *     completes the search; value will be {@code true} if the element was
+ *     found, false otherwise.
+ */
+webdriver.WebElement.isElementPresent = function(driver, by) {
+  var locator = new webdriver.Locator.Builder().build(by);
+  var isPresent = new webdriver.Future(driver);
+  webdriver.WebElement.findElementInternal_(
+      driver, locator,
+      // If returns without an error, element is present
+      function(response) {
+        response.value = response.value.length > 0;
         isPresent.setValue(response.value);
-      };
-      break;
-  }
-
-  if (!goog.isDef(commandInfo)) {
-    throw new Error('Unsupported locator type: ' + findBy.type);
-  }
-  this.addCommand_(commandInfo, [findBy.target], foundCallbackFn,
+      },
+      // If returns with an error, element is not present (clear the error!)
       function(response) {
         response.isError = false;
         response.value = false;
@@ -240,72 +399,72 @@ webdriver.WebElement.prototype.isElementPresent = function(findBy) {
 
 
 /**
+ * Adds a command to the given {@code webdriver.WebDriver} instance to find
+ * multiple elements on the page.
+ * @param {webdriver.WebDriver} driver The driver to perform the search with.
+ * @param {Object} by A hash object describing the strategy to use for finding
+ *     the element.
+ */
+webdriver.WebElement.findElements = function(driver, by) {
+  webdriver.WebElement.findElementInternal_(driver,
+      new webdriver.Locator.Builder().
+          findManyElements().
+          build(by));
+};
+
+
+/**
+ * Adds a command to determine if an element is present under this element in
+ * the DOM tree.
+ * @param {Object} findBy A hash object describing the strategy to use for
+ *     finding the element.
+ * @return {webdriver.Future} A future whose value will be set when the driver
+ *     completes the search; value will be {@code true} if the element was
+ *     found, false otherwise.
+ */
+webdriver.WebElement.prototype.isElementPresent = function(findBy) {
+  var locator = new webdriver.Locator.Builder().
+      underCurrentElement().
+      build(findBy);
+  var isPresent = new webdriver.Future(this.driver_);
+  webdriver.WebElement.findElementInternal_(
+      this.driver_, locator,
+      // If returns without an error, element could be present (check response).
+      function(response) {
+        response.value = response.value.length > 0;
+        isPresent.setValue(response.value);
+      },
+      // If returns with an error, element is not present (clear the error!)
+      function(response) {
+        response.isError = false;
+        response.value = false;
+        isPresent.setValue(false);
+      },
+      this.getId());
+  return isPresent;
+};
+
+
+/**
  * Adds a command to search for a single element on the page, restricting the
  * search to the descendants of the element represented by this instance.
- * @param {webdriver.By} by The strategy to use for finding the elements.
+ * @param {Object} by The strategy to use for finding the element.
  * @return {webdriver.WebElement} A WebElement that can be used to issue
  *     commands on the found element.  The element's ID will be set
  *     asynchronously once the element is successfully located.
  */
 webdriver.WebElement.prototype.findElement = function(by) {
-  var commandInfo, xpath;
+  var locator = new webdriver.Locator.Builder().
+      underCurrentElement().
+      build(by);
   var webElement = new webdriver.WebElement(this.driver_);
-  if (by.type == 'id') {
-    commandInfo = webdriver.CommandInfo.FIND_ELEMENT_USING_ELEMENT_BY_ID;
-    this.addCommand_(commandInfo, [by.target],
-        function(response) {
-          // TODO(jmleyba): FF extension needs to report error, not return -1
-          // That is what it does for finding from the root anyway...
-          if (response.value == '-1') {
-            throw new Error('Element not found');
-          }
-          webElement.getId().setValueFromResponse(response);
-        });
-  } else if (by.type == 'className') {
-    this.addCommand_(
-        webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME,
-        [by.target],
-        goog.bind(function(response) {
-          // TODO(jmleyba): Is this the correct way to handle this?
-          response.value = response.value.split(',')[0];
-          this.getId().setValue(response.value);
-        }, webElement));
-  } else if (by.type == 'partialLinkText') {
-    this.addCommand_(
-        webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_PARTIAL_LINK_TEXT,
-        [by.target],
-        goog.bind(function(response) {
-          // TODO(jmleyba): Is this the correct way to handle this?
-          response.value = response.value.split(',')[0];
-          this.getId().setValue(response.value);
-        }, webElement));
-  } else if (by.type == 'tagName') {
-    xpath = './/' + by.target;
-  } else if (by.type == 'linkText') {
-    xpath = ".//a[text()='" + by.target + "']";
-  } else if (by.type == 'name') {
-    xpath = ".//*[@name='" + by.target + "']";
-  } else if (by.type == 'className') {
-  } else if (by.type == 'partialLinkText') {
-    xpath = ".//a[contains(text(),'" + by.target + "')]";
-  } else if (by.type == 'xpath') {
-    xpath = by.target;
-  }
-
-  if (xpath) {
-    this.addCommand_(
-        webdriver.CommandInfo.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH, [xpath],
-        goog.bind(function(response) {
-          // TODO(jmleyba): Is this the correct way to handle this?
-          if (!response.value) {
-            throw new Error('No element found: ' +
-                webdriver.logging.describe(response));
-          }
-          response.value = response.value.split(',')[0];
-          this.getId().setValue(response.value);
-        }, webElement));
-  }
-
+  webdriver.WebElement.findElementInternal_(
+      this.driver_, locator,
+      function(response) {
+        webElement.getId().setValue(response.value[0].getId().getValue());
+      },
+      /*let any errors bubble up*/null,
+      this.getId());
   return webElement;
 };
 
@@ -313,39 +472,17 @@ webdriver.WebElement.prototype.findElement = function(by) {
 /**
  * Adds a command to search for multiple elements on the page, restricting the
  * search to the descendants of hte element represented by this instance.
- * @param {webdriver.By} by The strategy to use for finding the elements.
+ * @param {Object} by The strategy to use for finding the element.
  */
 webdriver.WebElement.prototype.findElements = function(by) {
-  if (by.type == 'id') {
-    by = webdriver.By.xpath(".//*[@id='" + by.target + "']");
-  } else if (by.type == 'name') {
-    by = webdriver.By.xpath(".//*[@name='" + by.target + "']");
-  }
-
-  var ci = webdriver.CommandInfo;
-  var commandMap = {
-    'className': ci.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME,
-    'linkText': ci.FIND_ELEMENTS_USING_ELEMENT_BY_LINK_TEXT,
-    'partialLinkText': ci.FIND_ELEMENTS_USING_ELEMENT_BY_PARTIAL_LINK_TEXT,
-    'tagName': ci.FIND_ELEMENTS_USING_ELEMENT_BY_TAG_NAME,
-    'xpath': ci.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH
-  };
-
-  var commandInfo = commandMap[by.type];
-  if (!goog.isDef(commandInfo)) {
-    throw new Error('Undefined locator type: ' + by.type);
-  }
-
-  this.addCommand_(commandInfo, [by.target], goog.bind(function(response) {
-    var ids = response.value.split(',');
-    var elements = [];
-    for (var i = 0, id; id = ids[i]; i++) {
-      var element = new webdriver.WebElement(this.driver_);
-      element.getId().setValue(id);
-      elements.push(element);
-    }
-    response.value = elements;
-  }, this));
+  webdriver.WebElement.findElementInternal_(this.driver_,
+      new webdriver.Locator.Builder().
+          underCurrentElement().
+          findManyElements().
+          build(by),
+      /*default callback handler is enough*/null,
+      /*let any errors bubble up*/null,
+      this.getId());
 };
 
 

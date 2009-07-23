@@ -46,8 +46,7 @@ function testCanCallFunctionsDefinedOnThePage(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   driver.executeScript('displayMessage("I like cheese");');
   assertThat(
-      driver.findElement(webdriver.By.id('result')).getText(),
-      equals('I like cheese'));
+      driver.findElement({id: 'result'}).getText(), equals('I like cheese'));
 }
 
 
@@ -79,7 +78,7 @@ function testCanPassANumberAsAnArgument(driver) {
 
 function testCanPassAWebElementAsAnArgument(driver) {
   driver.get(TEST_PAGES.javascriptPage);
-  var button = driver.findElement(webdriver.By.id('plainButton'));
+  var button = driver.findElement({id: 'plainButton'});
   driver.executeScript(
       "arguments[0]['flibble'] = arguments[0].getAttribute('id');" +
           "return arguments[0]['flibble'];",

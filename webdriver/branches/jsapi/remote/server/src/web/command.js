@@ -113,54 +113,6 @@ webdriver.CommandInfo.prototype.buildCommand = function(driver, opt_args,
   info.SET_MOUSE_SPEED = new info(
       'setMouseSpeed', '/session/:sessionId/:context/speed', 'POST');
 
-  
-  function findElement(methodName, usingOtherElement) {
-    var url = '/session/:sessionId/:context/element' +
-              (usingOtherElement ? '/:using' : '');
-    return new info(methodName, url, 'POST');
-  }
-
-  function findElements(methodName, usingOtherElement) {
-    var url = '/session/:sessionId/:context/elements' +
-              (usingOtherElement ? '/:using' : '');
-    return new info(methodName, url, 'POST');
-  }
-
-  info.FIND_ELEMENT_BY_ID = findElement('selectElementById');
-  info.FIND_ELEMENT_BY_NAME = findElement('selectElementByName');
-  info.FIND_ELEMENT_BY_CLASS_NAME = findElement('selectElementUsingClassName');
-  info.FIND_ELEMENT_BY_LINK_TEXT = findElement('selectElementUsingLink');
-  info.FIND_ELEMENT_BY_PARTIAL_LINK_TEXT =
-      findElement('selectElementUsingPartialLinkText');
-  info.FIND_ELEMENT_BY_TAG_NAME = findElement('selectElementUsingTagName');
-  info.FIND_ELEMENT_BY_XPATH = findElement('selectElementUsingXPath');
-
-  info.FIND_ELEMENTS_BY_ID = findElements('selectElementsUsingId');
-  info.FIND_ELEMENTS_BY_NAME = findElements('selectElementsUsingName');
-  info.FIND_ELEMENTS_BY_CLASS_NAME =
-      findElements('selectElementsUsingClassName');
-  info.FIND_ELEMENTS_BY_LINK_TEXT = findElements('selectElementsUsingLink');
-  info.FIND_ELEMENTS_BY_PARTIAL_LINK_TEXT =
-      findElements('selectElementsUsingPartialLinkText');
-  info.FIND_ELEMENTS_BY_TAG_NAME = findElements('selectElementsUsingTagName');
-  info.FIND_ELEMENTS_BY_XPATH = findElements('selectElementsUsingXPath');
-
-  info.FIND_ELEMENT_USING_ELEMENT_BY_ID = findElement('findElementById', true);
-  info.FIND_ELEMENT_USING_ELEMENT_BY_TAG_NAME =
-      findElement('selectElementUsingTagName', true);
-
-  info.FIND_ELEMENTS_USING_ELEMENT_BY_CLASS_NAME =
-      findElements('findChildElementsByClassName', true);
-  info.FIND_ELEMENTS_USING_ELEMENT_BY_LINK_TEXT =
-      findElements('findElementsByLinkText', true);
-  info.FIND_ELEMENTS_USING_ELEMENT_BY_PARTIAL_LINK_TEXT =
-      findElements('findElementsByPartialLinkText', true);
-  info.FIND_ELEMENTS_USING_ELEMENT_BY_TAG_NAME =
-      findElements('findElementsByTagName', true);
-  info.FIND_ELEMENTS_USING_ELEMENT_BY_XPATH =
-      findElements('findElementsByXPath', true);
-  
-
   info.GET_ACTIVE_ELEMENT = new info('getActiveElement',
       '/session/:sessionId/:context/element/active', 'POST');
 

@@ -674,7 +674,7 @@ webdriver.WebDriver.prototype.getTitle = function() {
 
 /**
  * Adds a command to find a single element on the current page.
- * @param {webdriver.By} by The strategy to use for finding the element.
+ * @param {Object} by The strategy to use for finding the element.
  * @return {webdriver.WebElement} A WebElement wrapper that can be used to
  *     issue commands against the located element.
  */
@@ -685,7 +685,7 @@ webdriver.WebDriver.prototype.findElement = function(by) {
 
 /**
  * Adds a command to test if an element can be found on the page.
- * @param {webdriver.By} by The strategy to use for finding the element.
+ * @param {Object} by The strategy to use for finding the element.
  * @return {webdriver.Future} Whether the element was present on the page. The
  *    return value is wrapped in a Future that will be defined when the driver
  *    completes the command.
@@ -698,7 +698,7 @@ webdriver.WebDriver.prototype.isElementPresent = function(by) {
 
 /**
  * Adds a command to find a multiple element on the current page.
- * @param {webdriver.By} by The strategy to use for finding the elements.
+ * @param {Object} by The strategy to use for finding the element.
  */
 webdriver.WebDriver.prototype.findElements = function(by) {
   return webdriver.WebElement.findElements(this, by);

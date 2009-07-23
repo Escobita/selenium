@@ -20,7 +20,7 @@ function drag(element, initialLocation, moveRightBy, moveDownBy) {
 
 function testDragAndDrop(driver) {
   driver.get(TEST_PAGES.dragAndDropPage);
-  var img = driver.findElement(webdriver.By.id('test1'));
+  var img = driver.findElement({id:'test1'});
   img.getLocation();
   driver.callFunction(function(response) {
     var initialLocation = response.value;
@@ -42,8 +42,8 @@ function testDragAndDrop(driver) {
 
 function testDragAndDropToElement(driver) {
   driver.get(TEST_PAGES.dragAndDropPage);
-  var img1 = driver.findElement(webdriver.By.id('test1'));
-  var img2 = driver.findElement(webdriver.By.id('test2'));
+  var img1 = driver.findElement({id:'test1'});
+  var img2 = driver.findElement({id:'test2'});
   var img1Location = img1.dragAndDropBy(100, 100);
   var img2Location = img2.dragAndDropTo(img1);
   assertThat(img1Location, isTheSameLocationAs(img2Location));
@@ -52,7 +52,7 @@ function testDragAndDropToElement(driver) {
 
 function testDragElementInDiv(driver) {
   driver.get(TEST_PAGES.dragAndDropPage);
-  var img = driver.findElement(webdriver.By.id('test3'));
+  var img = driver.findElement({id:'test3'});
   img.getLocation();
   driver.callFunction(function(response) {
     var initialLocation = response.value;
@@ -64,7 +64,7 @@ function testDragElementInDiv(driver) {
 
 function testDragTooFar(driver) {
   driver.get(TEST_PAGES.dragAndDropPage);
-  var img = driver.findElement(webdriver.By.id('test1'));
+  var img = driver.findElement({id:'test1'});
   img.getLocation();
   driver.callFunction(function(response) {
     var initialLocation = response.value;

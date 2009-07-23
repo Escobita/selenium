@@ -1,8 +1,8 @@
 function testCanDeselectASingleOptionFromASelectWhichAllowsMultipleChoices(
     driver) {
   driver.get(TEST_PAGES.formPage);
-  var multiSelect = driver.findElement(webdriver.By.id("multi"));
-  multiSelect.findElements(webdriver.By.tagName("option"));
+  var multiSelect = driver.findElement({id: "multi"});
+  multiSelect.findElements({tagName: "option"});
   driver.callFunction(function(response) {
     var options = response.value;
     var option = options[0];
@@ -18,9 +18,8 @@ function testCanDeselectASingleOptionFromASelectWhichAllowsMultipleChoices(
 
 function testShouldNotBeAbleToDeselectAnOptionFromANormalSelect(driver) {
   driver.get(TEST_PAGES.formPage);
-  var select = driver.findElement(
-      webdriver.By.xpath("//select[@name='selectomatic']"));
-  select.findElements(webdriver.By.tagName("option"));
+  var select = driver.findElement({xpath:"//select[@name='selectomatic']"});
+  select.findElements({tagName: "option"});
   driver.callFunction(function(response) {
     var options = response.value;
     options[0].toggle();
@@ -30,9 +29,8 @@ function testShouldNotBeAbleToDeselectAnOptionFromANormalSelect(driver) {
 
 function testShouldBeAbleToChangeTheSelectedOptionInASelect(driver) {
   driver.get(TEST_PAGES.formPage);
-  var selectBox = driver.findElement(
-      webdriver.By.xpath("//select[@name='selectomatic']"));
-  selectBox.findElements(webdriver.By.tagName("option"));
+  var selectBox = driver.findElement({xpath:"//select[@name='selectomatic']"});
+  selectBox.findElements({tagName: "option"});
   driver.callFunction(function(response) {
     var options = response.value;
     var one = options[0];
@@ -50,8 +48,8 @@ function testShouldBeAbleToChangeTheSelectedOptionInASelect(driver) {
 function testCanSelectMoreThanOneOptionFromASelectWhichAllowsMultipleChoices(
     driver) {
   driver.get(TEST_PAGES.formPage);
-  var multiSelect = driver.findElement(webdriver.By.id("multi"));
-  multiSelect.findElements(webdriver.By.tagName("option"));
+  var multiSelect = driver.findElement({id: "multi"});
+  multiSelect.findElements({tagName: "option"});
   driver.callFunction(function(response) {
     var options = response.value;
     goog.array.forEach(options, function(option) {
