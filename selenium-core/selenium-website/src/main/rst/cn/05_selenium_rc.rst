@@ -98,7 +98,7 @@ Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一
 
 安装
 -------------
-从 `downloads page`_ 下载Selenium-RC zip文件后，你会注意到它包含一些子目录，
+从 `下载页面`_ 下载Selenium-RC zip文件后，你会注意到它包含一些子目录，
 这些目录包含了在所有支持的编程语言运行Selenium-RC所需的组件。
 
 你只要选中一种编程语言，然后
@@ -127,7 +127,7 @@ Selenium 服务器只是一个jar包 (*selenium-server.jar*), 其实根本不需
 
    如果你得到一个版本号（必须1.5或以上），那么你可以开始使用Selenium-RC了。
 
-.. _`downloads page`: http://seleniumhq.org/download/
+.. _`下载页面`: http://seleniumhq.org/download/
 .. _`NUnit`: http://www.nunit.org/index.php?p=download
 
 Java 客户端驱动配置
