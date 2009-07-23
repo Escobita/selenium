@@ -48,7 +48,7 @@ Server对AUT进行测试。
 .. image:: ../images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-这个图表展示了客户端类库与Selenium 服务器通信并传递每个要执行的Selenium 命令。
+这个图表展示了客户端类库以传递每个要执行的Selenium命令的方式与Selenium服务器进行通信。
 然后Selenium 服务器把Selenium命令转化为Selenium-Core JavaScript命令传递给浏览器。 
 浏览器用它自己的JavaScript 解析器，执行Selenium 命令, 有效地运行Selenese测试脚本。
 
