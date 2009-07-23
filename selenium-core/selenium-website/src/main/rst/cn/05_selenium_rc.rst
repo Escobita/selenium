@@ -39,7 +39,7 @@ RC 组件
 ~~~~~~~~~~~~~
 Selenium-RC 由两部分组成:
 
-* 负责启动和终止浏览器的Selenium Server，同时也充当浏览器请求的 *HTTP* 代理。 
+* 负责启动和终止浏览器的Selenium 服务器，同时也充当浏览器请求的 *HTTP* 代理。 
 * 各种编程语言的客户端类库，通过传递Selenium命令，客户端就可以驱动Selenium
 Server对AUT进行测试。
 
@@ -48,19 +48,19 @@ Server对AUT进行测试。
 .. image:: ../images/chapt5_img01_Architecture_Diagram_Simple.png
    :align: center
 
-这个图表展示了客户端类库与Selenium Server通信并传递每个要执行的Selenium 命令。
-然后Selenium server把Selenium命令转化为Selenium-Core JavaScript命令传递给浏览器。 
+这个图表展示了客户端类库与Selenium 服务器通信并传递每个要执行的Selenium 命令。
+然后Selenium 服务器把Selenium命令转化为Selenium-Core JavaScript命令传递给浏览器。 
 浏览器用它自己的JavaScript 解析器，执行Selenium 命令, 有效地运行Selenese测试脚本。
 
-Selenium Server
+Selenium 服务器
 ~~~~~~~~~~~~~~~
-Selenium Server 从测试程序接收并解析Selenium 命令，然后返回一个测试结果给测试程序。
+Selenium 服务器从测试程序接收并解析Selenium 命令，然后返回一个测试结果给测试程序。
 
-Selenium Server绑定了Selenium Core, 并且当测试程序使用客户端API启动浏览器的时候，
+Selenium 服务器绑定了Selenium Core, 并且当测试程序使用客户端API启动浏览器的时候，
 Selenium Core被自动注入到浏览器里。Selenium-Core 是一个JavaScript程序, 实际上就是一套 JavaScript
 功能函数, 它使用浏览器内置的JavaScript解析器来解析和执行Selenese命令。
 
-Selenium Server 用简单的HTTP GET/POST请求的方式从测试程序接收Selenese命令。
+Selenium 服务器用简单的HTTP GET/POST请求的方式从测试程序接收Selenese命令。
 这就意味着你可以通过任何支持发送HTTP请求的编程语言来驱动Selenium测试。
 
 客户端类库
@@ -69,7 +69,7 @@ Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一
 允许用户使用各自喜好的编程语言来编写和运行Selenium命令。
 每个客户端类库都是一个程序接口，也可以说是一组在程序里运行Selenium命令的函数。而这些函数和Selenium命令一一对应。
 
-客户端类库通过发送一条Selenese 命令到Selenium Server 来对AUT进行一个特定操作或者测试。
+客户端类库通过发送一条Selenese 命令到Selenium 服务器来对AUT进行一个特定操作或者测试。
 客户端类库也会收到命令运行结果，然后返回给你的测试程序。你的测试程序可以收到这个测试结果，然后报告成功与否，
 或者采取错误处理操作如果返回的是一个意外错误信息。 
 
@@ -106,21 +106,21 @@ Selenium-RC支持多种编程语言，为每种不同的编程语言提供了一
 * 安装Selenium-RC Server.
 * 用特定语言的客户端类库建立一个程序工程。
 
-安装 Selenium Server
+安装 Selenium 服务器
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Selenium server 只是一个jar包 (*selenium-server.jar*), 其实根本不需要安装。
+Selenium 服务器只是一个jar包 (*selenium-server.jar*), 其实根本不需要安装。
 只要下载并解压，然后放在你想放的目录就足够了。
-当你写完一些测试脚本之后，你只要进入到Selenium server 所在目录下面，在控制台上执行
+当你写完一些测试脚本之后，你只要进入到Selenium 服务器所在目录下面，在控制台上执行
 以下命令::
 
     java -jar selenium-server.jar
 
 可能大多数人想要更加快捷的方式。
 这个可以通过创建一个包含以上命令的可执行文件（Windows下面的.bat文件或者Linux下面的.sh文件）。
-然后在你的桌面创建一个快捷方式。那么你就可以在任意时候双击快捷方式启动Selenium server，开始你的测试。
+然后在你的桌面创建一个快捷方式。那么你就可以在任意时候双击快捷方式启动Selenium 服务器，开始你的测试。
 
 
-.. 注:: 启动Selenium server 要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
+.. 注:: 启动Selenium 服务器要求你的电脑必须事先安装好Java,并设置好PATH环境变量。
    你可以在控制台输入以下命令来确认Java是否安装正确::
 
        java -version
@@ -138,7 +138,7 @@ Java 客户端驱动配置
 * 创建一个新的工程
 * 把文件 *selenium-java-client-driver.jar* 加到工程的classpath里。
 * 从Selenium-IDE, 导出一个java文件，然后加到你的Java工程中去。或者用Java调用selenium-java-client API来写你自己的Selenium 测试脚本。
-* 从控制台启动 Selenium server
+* 从控制台启动 Selenium 服务器
 * 在Java IDE里执行测试
 
 具体的Java 测试工程配置，请参看附录
@@ -152,7 +152,7 @@ Python 客户端驱动配置
 * 解压提取 *selenium.py* 文件
 * 用Python直接写测试脚本或者从Selenium-IDE导出 python文件。
 * 把 *selenium.py* 文件加到你测试脚本路径
-* 从控制台启动 Selenium server
+* 从控制台启动 Selenium 服务器
 * 从控制台或者Python IDE执行测试。
 
 具体的Java 客户端驱动配置，请参看附录
@@ -171,7 +171,7 @@ Python 客户端驱动配置
   framework.dll, ThoughtWorks.Selenium.Core.dll, ThoughtWorks.Selenium.
   IntegrationTests.dll and ThoughtWorks.Selenium.UnitTests.dll
 * 使用.Net语言 (C#, VB.Net)编写Selenium测试，或者从Selenium-IDE 导出C#文件，然后拷贝代码到刚才创建的动态链接库文件里。
-* 从控制台启动 Selenium server
+* 从控制台启动 Selenium 服务器
 * 从NUnit GUI 或者 NUnit 命令行执行测试。
 
 具体的在Visual Studio里 .NET 客户端驱动配置，请参看附录
@@ -699,7 +699,7 @@ url
 
 在后台（由于Selenium-RC的魔力）浏览器会用locator和你在调用这个方法的时候指定的字符串，真正地*type**。
 因此，总而言之，你的代码仅仅是一个普通的对象（包含方法和属性）。
-Selenium Server和内嵌到浏览器的Selenium-Core的后台程序做测试你程序的正真工作。
+Selenium 服务器和内嵌到浏览器的Selenium-Core的后台程序做测试你程序的正真工作。
 
 检索和报告测试结果
 --------------------------------
