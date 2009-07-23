@@ -142,9 +142,9 @@ Java 客户端驱动配置
 * 在Java IDE里执行测试
 
 具体的Java 测试工程配置，请参看附录
-:ref:`Configuring Selenium-RC With Eclipse <configuring-selenium-RC-eclipse-reference>` 
+:ref:`用Eclipse配置Selenium-RC<configuring-selenium-RC-eclipse-reference>` 
 和
-:ref:`Configuring Selenium-RC With Intellij <configuring-selenium-RC-Intellij-reference>`.
+:ref:`用Intellij配置Selenium-RC<configuring-selenium-RC-Intellij-reference>`.
 
 Python 客户端驱动配置
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
