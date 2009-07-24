@@ -169,6 +169,13 @@ webdriver.TestRunner = function(opt_driverFactoryFn, opt_dom) {
   this.tests_ = [];
 
   /**
+   * A hash of all known test case names.
+   * @type {Object}
+   * @private
+   */
+  this.testNames_ = {};
+
+  /**
    * The index of the test currently running.
    * @type {number}
    * @private
@@ -280,6 +287,11 @@ webdriver.TestRunner.prototype.findTestFunctions_ = function() {
   for (var prop in win) {
     if (matchFn(prop) && goog.isFunction(win[prop])) {
       this.tests_.push(new webdriver.TestCase(prop, win[prop]));
+      if (prop in this.testNames_) {
+        webdriver.logging.error('Duplicate test name found: ' + prop);
+      } else {
+        this.testNames_[prop] = true;
+      }
     }
   }
   webdriver.logging.info('...found ' + this.tests_.length + ' test(s)');

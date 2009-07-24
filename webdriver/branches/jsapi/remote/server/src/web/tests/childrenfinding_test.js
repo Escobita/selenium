@@ -5,10 +5,48 @@
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 
-function testFindElementByXpath(driver) {
+function testReturnAnEmptyListWhenThereAreNoChildrenOfANode(driver) {
+  driver.get(TEST_PAGES.xhtmlTestPage);
+  driver.findElement({id: 'table'}).
+      findElements({tagName: 'tr'});
+  driver.callFunction(function(response) {
+    assertEquals(0, response.value.length);
+  });
+}
+
+
+function testShouldNotFindElementOutsideTree(driver) {
+  driver.get(TEST_PAGES.formPage);
+  var login = driver.findElement({name: 'login'});
+  assertThat(login.isElementPresent({name: 'x'}), is(false));
+  login.findElement({name: 'x'});
+  driver.expectErrorFromPreviousCommand();
+}
+
+
+function testShouldFindGrandChildren(driver) {
+  driver.get(TEST_PAGES.formPage);
+  driver.findElement({id: 'nested_form'}).
+      findElement({name: 'x'});
+}
+
+
+function testFindElementByIdWhenMultipleMatchesExist(driver) {
   driver.get(TEST_PAGES.nestedPage);
-  var select = driver.findElement({xpath: '//form[@name="form2"]/select'});
-  assertThat(select.getAttribute('id'), is('2'));
+  var text = driver.findElement({id: 'test_id_div'}).
+      findElement({id: 'test_id'}).
+      getText();
+  assertThat(text, equals('inside'));
+}
+
+
+function testFindElementByIdWhenNoMatchInContext(driver) {
+  driver.get(TEST_PAGES.nestedPage);
+  driver.findElement({id: 'test_id_div'}).
+      findElement({id: 'test_id_out'});
+  driver.expectErrorFromPreviousCommand(
+      'Should not be able to find an element by ID when that element does ' +
+      'not exist under the given root');
 }
 
 
@@ -31,43 +69,6 @@ function testRaisesAnErrorWhenChildElementIsNotFoundByXPath(driver) {
 }
 
 
-function testFindElementByName(driver) {
-  driver.get(TEST_PAGES.nestedPage);
-  assertThat(
-      driver.findElement({name: 'form2'}).
-          findElement({name: 'selectomatic'}).
-          getAttribute('id'),
-      is('2'));
-}
-
-
-function testFindElementById(driver) {
-  driver.get(TEST_PAGES.nestedPage);
-  assertThat(
-      driver.findElement({id: '2'}).getAttribute('name'), is('selectomatic'));
-}
-
-
-function testFindElementByIdWhenMultipleMatchesExist(driver) {
-  driver.callFunction(webdriver.logging.clear);
-  driver.get(TEST_PAGES.nestedPage);
-  var text = driver.findElement({id: 'test_id_div'}).
-      findElement({id: 'test_id'}).
-      getText();
-  assertThat(text, equals('inside'));
-}
-
-
-function testFindElementByIdWhenNoMatchInContext(driver) {
-  driver.get(TEST_PAGES.nestedPage);
-  driver.findElement({id: 'test_id_div'}).
-      findElement({id: 'test_id_out'});
-  driver.expectErrorFromPreviousCommand(
-      'Should not be able to find an element by ID when that element does ' +
-      'not exist under the given root');
-}
-
-
 function testFindElementsById(driver) {
   driver.get(TEST_PAGES.nestedPage);
   driver.findElement({name: 'form2'}).
@@ -75,16 +76,6 @@ function testFindElementsById(driver) {
   driver.callFunction(function(response) {
     assertEquals('Should find two elements', 2, response.value.length);
   });
-}
-
-
-function testFindElementByLinkText(driver) {
-  driver.get(TEST_PAGES.nestedPage);
-  assertThat(
-      driver.findElement({name: 'div1'}).
-          findElement({linkText: 'hello world'}).
-          getAttribute('name'),
-      is('link1'));
 }
 
 

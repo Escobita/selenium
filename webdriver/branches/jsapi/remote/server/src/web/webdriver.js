@@ -388,9 +388,6 @@ webdriver.WebDriver.prototype.handleResponse_ = function(response) {
       '...received response. Was error? ' + response.isError);
   this.lastResponse_ = response;
   if (response.isError) {
-    with(webdriver.logging) { // TODO
-      error(describe(response));
-    }
     // The errorCallbackFn may be expecting our error.
     if (response.command.errorCallbackFn) {
       try {
