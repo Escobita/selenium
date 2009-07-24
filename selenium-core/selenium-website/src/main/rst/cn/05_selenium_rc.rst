@@ -921,37 +921,26 @@ handling support can be used for error handling and recovery.
 
 为了详细地理解Selenium-RC服务器如何工作，以及为什么它使用代理注入和提高权限模式，你必须首先理解 `同源策略`_ 。
    
-The Same Origin Policy
+同源策略
 ~~~~~~~~~~~~~~~~~~~~~~
-The main restriction that Selenium's architecture has faced is the 
-Same Origin Policy. This security restriction is applied by every browser
-in the market and its objective is to ensure that a site's content will never
-be accessible by a script from other site.
+Selenium构架面临的主要限制是同源策略。这个安全限制被市场上每个浏览器所应用，并且它的目的是保证一个站点的内容永远不被其他站点的脚本访问。
 
-If this were possible, a script placed on any website you open, would 
-be able to read information on your bank account if you had the account page
-opened on other tab. Which is also called XSS (Cross-site Scripting).
+如果这个可能的话，那么放置在你打开的任何一个站点上的一段脚本，将能够读取你银行账户的信息，如果你在其他标签页上打开了这个账户的页面。
+这个也被称为XSS (跨站脚本执行).
+工作在这个策略之下，Selenium-Core (和它的促使所有魔术发生的JavaScript命令)必须被放置在和被测程序相同的源。
+这是Selenium-Core首先被使用和实现的方法(通过把Selenium-Core 和测试套件配置在程序服务器里面)， 
+但是这个需求不是说有的项目能满足的，因此Selenium开发人员必须找到其他方法来允许测试人员用Selenium测试那些他们不可能配置他们代码的站点。
 
-To work under that policy. Selenium-Core (and its JavaScript commands that
-make all the magic happen) must be placed in the same origin as the Application
-Under Test (same URL). This has been the way Selenium-Core was first
-used and implemented (by deploying Selenium-Core and the set of tests inside
-the application's server), but this was a requirement that not all the projects 
-could meet and Selenium Developers had to find an alternative that would allow 
-testers to use Selenium to test site where they didn't have the possibility to
-deploy their code. 
+.. 注释:: 你可以在Wikipedia关于`同源策略`_ 和 XSS_ 页面上发现关于这个主题的附加信息。 
 
-.. note:: You can find additional information about this topic on Wikipedia
-   pages about `Same Origin Policy`_ and XSS_. 
-
-.. _Same Origin Policy: http://en.wikipedia.org/wiki/Same_origin_policy
+.. _同源策略: http://en.wikipedia.org/wiki/Same_origin_policy
 .. _XSS: http://en.wikipedia.org/wiki/Cross-site_scripting
 
-Proxy Injection
+代理注入
 ~~~~~~~~~~~~~~~
-The first method used to skip the `The Same Origin Policy`_ was Proxy Injection.
-In this method, the Selenium Server acts as a client-configured [1]_ **HTTP 
-proxy** [2]_, that stands in between the browser and the Application Under Test.
+第一个用来跳过`同源策略`_ 的方法是代理注入。
+在这个方法里，Selenium服务器从当一个客户端配置[1]_ 的 **HTTP 
+代理** [2]_, 它站在浏览器和被测程序之间。
 After this, it is able to masks the whole AUT under a fictional URL (embedding
 Selenium-Core and the set of tests and delivering them as if they were coming
 from the same origin). 
