@@ -74,8 +74,8 @@ function assertThat(a, b, opt_c) {
   future.getDriver().callFunction(function() {
     if (!matcher.matches(future)) {
       throw new Error(message +
-          'Expected ' + webdriver.asserts.getValueAndType_(future) +
-          ' to ' + matcher.describe());
+          'Expected to ' + matcher.describe() +
+          '\n  but was ' + webdriver.asserts.getValueAndType_(future));
     }
   });
 };

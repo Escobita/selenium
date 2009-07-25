@@ -5,6 +5,7 @@ goog.require('goog.math.Coordinate');
 goog.require('goog.math.Size');
 goog.require('goog.string');
 goog.require('goog.userAgent');
+goog.require('webdriver.Key');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.asserts');
 
@@ -28,6 +29,9 @@ var TEST_FILES = [
   'selectelementhandling_test.js',
   'staleelementreference_test.js',
   'textpages_test.js',
+  'typing_contenteditable_test.js',
+  'typing_forms_test.js',
+  'typing_richtext_test.js',
   'typing_test.js',
   'visibility_test.js',
   'windowswitching_test.js',
@@ -79,7 +83,8 @@ var TEST_PAGES = {
   chinesePage: whereIs('cn-test.html'),
   nestedPage: whereIs('nestedElements.html'),
   textPage: whereIs('plain.txt'),
-  richtextPage: whereIs('rich_text.html')
+  richtextPage: whereIs('rich_text.html'),
+  resultPage: whereIs('resultPage.html')
 };
 
 
