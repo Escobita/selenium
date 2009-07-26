@@ -39,7 +39,7 @@ import java.util.HashMap;
 public class FirefoxDriverTestSuite extends TestCase {
   public static Test suite() throws Exception {
 
-    System.setProperty("webdriver.development", "true");
+//    System.setProperty("webdriver.development", "true");
 //  System.setProperty("webdriver.firefox.useExisting", "true");
     
     return new TestSuiteBuilder()
@@ -76,7 +76,11 @@ public class FirefoxDriverTestSuite extends TestCase {
 
       // Copy in the native events library/libraries
       Map<String, String> fromTo = new HashMap<String, String>();
-      fromTo.put("Debug/webdriver-firefox.dll", "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
+      fromTo.put("Debug/webdriver-firefox.dll",
+          "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
+      
+      fromTo.put("../linux64/Release/libwebdriver-firefox.so",
+          "platform/Linux/components/libwebdriver-firefox.so");
 
       // We know the location of the "from" in relation to the extension source
       for (Map.Entry<String, String> entry : fromTo.entrySet()) {
