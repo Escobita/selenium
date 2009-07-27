@@ -109,3 +109,4 @@ Given this information, the following methods can be used to locate an element
 
 || *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
 || /session/:sessionId/:context/cookie || POST || A single org.openqa.selenium.Cookie wrapped up in a JSON object || none || Creates a new cookie || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options.addCookie] ||
+|| /session/:session/:context/cookie/:cookieName || DELETE || none || none || Deletes cookie named :cookieName || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#deleteCookieNamed(java.lang.String) WebDriver.Options.deleteCookieNamed] ||
