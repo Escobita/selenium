@@ -46,7 +46,6 @@ function testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage(
 
 
 function testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt(driver) {
-  webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
   driver.get(TEST_PAGES.iframePage);
   driver.switchToFrame(0);
   driver.findElement({id: 'submitButton'}).click();
