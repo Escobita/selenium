@@ -386,12 +386,20 @@ webdriver.TestRunner.prototype.reportResult_ = function(result, driver) {
   var resultDiv = this.dom_.createDom('DIV');
   goog.style.setStyle(resultDiv, 'fontFamily', 'Courier');
   goog.style.setStyle(resultDiv, 'fontSize', '9pt');
-  goog.dom.appendChild(this.resultsDiv_, resultDiv);
   if (result.passed) {
+    goog.dom.appendChild(this.resultsDiv_, resultDiv);
+    if (!this.firstPassing_) {
+      this.firstPassing_ = resultDiv;
+    }
     this.numPassing_ += 1;
     goog.dom.setTextContent(resultDiv, result.testCase.name + ' [PASSED]');
     goog.style.setStyle(resultDiv, 'color', 'green');
   } else {
+    if (this.firstPassing_) {
+      goog.dom.insertSiblingBefore(resultDiv, this.firstPassing_);
+    } else {
+      goog.dom.appendChild(this.resultsDiv_, resultDiv);
+    }
     goog.dom.setTextContent(resultDiv, result.testCase.name + ' [FAILED]');
     goog.style.setStyle(resultDiv, 'color', 'red');
 
