@@ -120,6 +120,19 @@ webdriver.TestResult = function(testCase, passed, opt_errMsg) {
 
 
 /**
+ * @return {string} A summary of this result.
+ */
+webdriver.TestResult.prototype.getSummary = function() {
+  if (this.passed) {
+    return this.testCase.name + ' [PASSED]';
+  } else {
+    return this.testCase.name + ' [FAILED]\n    ' +
+           this.errMsg.replace(/\n/g, '\n    ');
+  }
+};
+
+
+/**
  * The actual test runner.  When created, scans the global scope for all test
  * functions (those functions whose name is prefixed with "test").  Once
  * started, the TestRunner will execute each test case and pass a new
@@ -160,6 +173,13 @@ webdriver.TestRunner = function(opt_driverFactoryFn, opt_dom) {
    * @private
    */
   this.started_ = false;
+
+  /**
+   * Whether this instance has finished executing tests.
+   * @type {boolean}
+   * @private
+   */
+  this.finished_ = false;
 
   /**
    * The tests discovered on the page that will be executed.
@@ -252,6 +272,18 @@ webdriver.TestRunner = function(opt_driverFactoryFn, opt_dom) {
 
   this.findTestFunctions_();
   this.initResultsSection_();
+};
+
+
+webdriver.TestRunner.SINGLETON = null;
+
+
+webdriver.TestRunner.start = function(factoryFn) {
+  if (webdriver.TestRunner.SINGLETON) {
+    throw new Error('Singleton already initialized');
+  }
+  webdriver.TestRunner.SINGLETON = new webdriver.TestRunner(factoryFn);
+  webdriver.TestRunner.SINGLETON.go();
 };
 
 
@@ -401,6 +433,45 @@ webdriver.TestRunner.prototype.go = function() {
 
 
 /**
+ * @return {boolean} Whether this instance has finished executing tests.
+ */
+webdriver.TestRunner.prototype.isFinished = function() {
+  return this.finished_;
+};
+
+
+/**
+ * @return {number} The current number of passing tests executed by this
+ *    runner.
+ */
+webdriver.TestRunner.prototype.getNumPassed = function() {
+  return this.numPassing_;
+};
+
+
+/**
+ * @return {number} The number of tests executed by this runner.
+ */
+webdriver.TestRunner.prototype.getNumTests = function() {
+  return this.results_.length;
+};
+
+
+/**
+ * @return {string} A summary of all tests that have been completed by this
+ *     runner.
+ */
+webdriver.TestRunner.prototype.getReport = function() {
+  if (!this.isFinished()) {
+    return null;
+  }
+  return goog.array.map(this.results_, function(result) {
+    return result.getSummary();
+  }).join('\n');
+};
+
+
+/**
  * Executes the next test.
  * @private
  */
@@ -408,6 +479,7 @@ webdriver.TestRunner.prototype.executeNextTest_ = function() {
   this.currentTest_ += 1;
   if (this.currentTest_ >= this.tests_.length) {
     webdriver.logging.info('No more tests');
+    this.finished_ = true;
     return;
   }
 

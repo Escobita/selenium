@@ -10,16 +10,14 @@ import java.io.File;
  * 
  * @author jmleyba@gmail.com (Jason Leyba)
  */
-public class JsApiTestServer {
+public class JsApiTestServer extends Jetty6AppServer {
 
-  public static void main(String[] args) {
-    Jetty6AppServer server = new Jetty6AppServer();
+  public JsApiTestServer() {
     File path = findWebSrc();
     if (null == path) {
       throw new IllegalStateException("Unable to locate remote/server/src/web");
     }
-    server.addAdditionalWebApplication("/remote", path.getAbsolutePath());
-    server.start();
+    addAdditionalWebApplication("/remote", path.getAbsolutePath());
   }
 
   protected static File findWebSrc() {
@@ -36,5 +34,10 @@ public class JsApiTestServer {
       }
     }
     return null;
+  }
+
+  public static void main(String[] args) {
+    JsApiTestServer server = new JsApiTestServer();
+    server.start();
   }
 }
