@@ -3,6 +3,21 @@
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
   </component>
+  <component name="BlazePluginSettings" buildBeforeRefresh="true" />
+  <component name="Build editor project-level loader">
+    <settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.ClearOutputChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker">
+        <setting name="getHeapSize" value="800" />
+      </class-settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker">
+        <setting name="getModuleJdks" value="rO0ABXNyABFqYXZhLnV0aWwuSGFzaFNldLpEhZWWuLc0AwAAeHB3DAAAABA/QAAAAAAAAHg=" />
+        <setting name="getProjectJdk" value="/usr/local/buildtools/java/jdk1.5.0_06" />
+      </class-settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
+    </settings>
+  </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
   </component>
@@ -33,6 +48,11 @@
       <entry name="?*.jpg" />
       <entry name="?*.js" />
     </wildcardResourcePatterns>
+  </component>
+  <component name="ContinuousBuildConfigurationComponent">
+    <builds>
+      <build intervalToCheckBuild="1" buildKey="" buildLabel="" enabled="false" />
+    </builds>
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright />
@@ -701,6 +721,7 @@
     <option name="FILTER_INFO" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
+  <component name="Mach LOCAL_PREFIX stripper" stripping="true" />
   <component name="Palette2">
     <group name="Swing">
       <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
@@ -827,7 +848,7 @@
   </component>
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="https://webdriver.googlecode.com/svn/branches/jsapi/WebDriver.ipr" />
+    <option name="state" value="https://webdriver.googlecode.com/svn/trunk/WebDriver.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
@@ -837,7 +858,6 @@
       <module fileurl="file://$PROJECT_DIR$/iphone/iphone.iml" filepath="$PROJECT_DIR$/iphone/iphone.iml" />
       <module fileurl="file://$PROJECT_DIR$/jobbie/jobbie.iml" filepath="$PROJECT_DIR$/jobbie/jobbie.iml" />
       <module fileurl="file://$PROJECT_DIR$/remote/remote.iml" filepath="$PROJECT_DIR$/remote/remote.iml" />
-      <module fileurl="file://$PROJECT_DIR$/safari/safari.iml" filepath="$PROJECT_DIR$/safari/safari.iml" />
       <module fileurl="file://$PROJECT_DIR$/selenium/selenium.iml" filepath="$PROJECT_DIR$/selenium/selenium.iml" />
       <module fileurl="file://$PROJECT_DIR$/support/support.iml" filepath="$PROJECT_DIR$/support/support.iml" />
     </modules>
