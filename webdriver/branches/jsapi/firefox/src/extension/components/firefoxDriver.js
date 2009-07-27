@@ -105,7 +105,10 @@ FirefoxDriver.prototype.close = function(respond) {
 
 FirefoxDriver.prototype.executeScript = function(respond, script) {
   var context = this.context;
-  var window = Utils.getDocument(this.context).defaultView;
+
+  var doc = Utils.getDocument(this.context);
+  var window = doc ? doc.defaultView :
+               Utils.getBrowser(this.context).contentWindow;
 
   var parameters = new Array();
   var runScript;
