@@ -353,16 +353,8 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
     }
   }
 
-  var frame;
-  if (driver.context.frameId === undefined) {
-    frame = fxbrowser.contentWindow;
-    driver.context.fxdocument = fxbrowser.contentDocument;
-  } else {
-    frame = Utils.findFrame(fxbrowser, driver.context.frameId);
-    if (!frame) {
-      frame = fxbrowser.contentWindow;
-    }
-    driver.context.fxdocument = frame.document;
+  if (driver.context.frameId !== undefined) {
+    driver.context.frame = Utils.findFrame(fxbrowser, driver.context.frameId);
   }
 
   response.startCommand(win);

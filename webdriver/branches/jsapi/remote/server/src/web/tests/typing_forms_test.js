@@ -117,7 +117,7 @@ function testArrowKeysAreNotPrintableInAnInputElement(driver) {
 
 
 function testNavigatingWithArrowKeysInAnInputElement(driver) {
-  runInputTypingTest(driver, 'dbac1',
+  runInputTypingTest(driver, goog.userAgent.MAC ? 'dbac1' : 'bacd1',
       'a', webdriver.Key.LEFT,
       'b', webdriver.Key.RIGHT,
       'c', webdriver.Key.UP,
@@ -161,12 +161,14 @@ if (goog.userAgent.MAC) {
   };
 
 
-  var testPageUpDownJumpToEndsInAnInputElement = function(driver) {
-    runInputTypingTest(driver, 'begin middle end',
-        'middle',
-        webdriver.Key.PAGE_UP, 'begin ',
-        webdriver.Key.PAGE_DOWN, ' end');
-  };
+  if (goog.userAgent.IE) {
+    var testPageUpDownJumpToEndsInAnInputElementOnIe = function(driver) {
+      runInputTypingTest(driver, 'begin middle end',
+          'middle',
+          webdriver.Key.PAGE_UP, 'begin ',
+          webdriver.Key.PAGE_DOWN, ' end');
+    };
+  }
 }
 
 
@@ -230,7 +232,8 @@ function testCutCopyPasteInAnInputElement(driver) {
   assertThat(element.getValue(), equals(''));
   element.sendKeys('hello, ', paste);
   assertThat(element.getValue(), equals('hello, world'));
-  element.sendKeys(selectAll, copy, paste, paste);
+  element.sendKeys(selectAll, copy, paste, key.RIGHT);
+  element.sendKeys(paste);
   assertThat(element.getValue(), equals('hello, worldhello, world'));
 }
 
@@ -268,19 +271,22 @@ if (goog.userAgent.MAC) {
   };
 
 
-  var testPageUpSelectionInAnInputElement = function (driver) {
-    var key = webdriver.Key;
-    var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
-    runInputTypingTest(driver, 'now is',
-        'was', selectToFrontChord, 'now is');
-  };
+  if (goog.userAgent.IE) {
+    var testPageUpSelectionInAnInputElement = function (driver) {
+      var key = webdriver.Key;
+      var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
+      runInputTypingTest(driver, 'now is',
+          'was', selectToFrontChord, 'now is');
+    };
 
-  var testPageDownSelectionInAnInputElement = function(driver) {
-    var key = webdriver.Key;
-    var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
-    runInputTypingTest(driver, 'now is',
-        'was', key.HOME, selectToEndChord, 'now is');
-  };
+
+    var testPageDownSelectionInAnInputElement = function(driver) {
+      var key = webdriver.Key;
+      var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
+      runInputTypingTest(driver, 'now is',
+          'was', key.HOME, selectToEndChord, 'now is');
+    };
+  }
 }
 
 
@@ -453,7 +459,7 @@ function testForwardSelectionReplacementInATextAreaElement(driver) {
 function testReverseSelectionReplacementInATextAreaElement(driver) {
   var key = webdriver.Key;
   var jumpToStartChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_LEFT) : key.END;
+      key.chord(key.COMMAND, key.ARROW_LEFT) : key.HOME;
   var jumpToEndChord = goog.userAgent.MAC ?
       key.chord(key.COMMAND, key.ARROW_RIGHT) : key.END;
   runTextAreaTypingTest(driver, 'line 1\nmiddle\nline 3\n',
@@ -500,19 +506,24 @@ function testCutCopyPasteInATextAreaElement(driver) {
   var element = driver.findElement({id: 'keyUpArea'});
   element.sendKeys('world');
   assertThat(element.getValue(), equals('world'));
+
   element.sendKeys(selectAll, cut);
   assertThat(element.getValue(), equals(''));
+
   element.sendKeys('hello, ', paste, key.ENTER);
   assertThat(element.getValue(), equals('hello, world\n'));
-  element.sendKeys(selectAll, copy, paste, paste);
-  assertThat(element.getValue(), equals('hello, world\nhello, world\n'));
+
+  element.sendKeys(selectAll, copy, paste, key.RIGHT);
+  element.sendKeys(paste);
+  assertThat('Double paste failed',
+      element.getValue(), equals('hello, world\nhello, world\n'));
 }
 
 
 function testMultilineSelectionEditingInTextAreaElement(driver) {
   var key = webdriver.Key;
   var jumpToStartChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_LEFT) : key.END;
+      key.chord(key.COMMAND, key.ARROW_LEFT) : key.HOME;
   var jumpToEndChord = goog.userAgent.MAC ?
       key.chord(key.COMMAND, key.ARROW_RIGHT) : key.END;
   var pageUpChord = goog.userAgent.MAC ?
@@ -529,16 +540,15 @@ function testMultilineSelectionEditingInTextAreaElement(driver) {
                    key.SHIFT, jumpToEndChord,
                    'middle');
   assertThat(element.getValue(), equals('line1\nmiddle\nline3'));
-  element.sendKeys(jumpToStartChord,
-                   key.SHIFT, jumpToEndChord,
-                   key.SHIFT, pageUpChord,
-                   'beginning\n');
+
+  element.sendKeys(jumpToStartChord, key.SHIFT, key.UP);
+  element.sendKeys('beginning\n');
   assertThat(element.getValue(), equals('beginning\nmiddle\nline3'));
-  element.sendKeys(jumpToStartChord,
-                   key.SHIFT, jumpToEndChord,
-                   key.SHIFT, pageUpChord,
-                   key.SHIFT, pageDownChord,
-                   'the end');
+
+  element.sendKeys(jumpToStartChord, key.SHIFT, jumpToEndChord);
+  element.sendKeys(key.SHIFT, pageUpChord);
+  element.sendKeys(key.SHIFT, pageDownChord);
+  element.sendKeys('the end');
   assertThat(element.getValue(), equals('beginning\nthe end'));
 }
 
@@ -580,14 +590,14 @@ if (goog.userAgent.MAC) {
     var key = webdriver.Key;
     var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
     runTextAreaTypingTest(driver, 'now is',
-        'was', selectToFrontChord, 'now is');
+        'content\nwas\n', selectToFrontChord, 'now is');
   };
 
   var testPageDownSelectionInATextAreaElement = function(driver) {
     var key = webdriver.Key;
     var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
     runTextAreaTypingTest(driver, 'now is',
-        'was', key.HOME, selectToEndChord, 'now is');
+        'content\nwas\n', key.PAGE_UP, selectToEndChord, 'now is');
   };
 }
 

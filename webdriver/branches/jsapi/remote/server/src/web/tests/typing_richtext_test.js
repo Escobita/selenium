@@ -139,7 +139,7 @@ if (!goog.userAgent.IE) {
     var testHomeAndEndJumpToEndsInADesignModeEnabledDocument = function(
         driver) {
       runDesignModeEnabledDocumentTypingTest(driver,
-          'line 1\nbegin middle end\nline 3\n',
+          'line 1\nbegin middle end\nline 3',
           'line 1\nline 3\n',
           webdriver.Key.ARROW_UP,
           'middle\n', webdriver.Key.ARROW_LEFT,
@@ -253,14 +253,14 @@ if (!goog.userAgent.IE) {
       var key = webdriver.Key;
       var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
       runDesignModeEnabledDocumentTypingTest(driver, 'now is',
-          'was', selectToFrontChord, 'now is');
+          'content\nwas\n', selectToFrontChord, 'now is');
     };
 
     var testPageDownSelectionInADesignModeEnabledDocument = function(driver) {
       var key = webdriver.Key;
       var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
       runDesignModeEnabledDocumentTypingTest(driver, 'now is',
-          'was', key.HOME, selectToEndChord, 'now is');
+          'content\nwas\n', key.PAGE_UP, selectToEndChord, 'now is');
     };
   }
 }

@@ -14,7 +14,10 @@ if (goog.userAgent.IE || IS_FF_3) {
     driver.get(TEST_PAGES.richtextPage);
     var element = driver.findElement({id: 'editDiv'});
     element.sendKeys.apply(element, keySequence);
-    assertThat(element.getText(), equals(expected));
+    assertThat(
+        'In firefox, typing certain keys will not work if Firefox is not the ' +
+        'active application: Arrow UP|DOWN|LEFT|RIGHT',
+        element.getText(), equals(expected));
   }
 
 
@@ -128,7 +131,7 @@ if (goog.userAgent.IE || IS_FF_3) {
 
   if (!goog.userAgent.MAC) {
     var testHomeAndEndJumpToEndsInAContentEditableElement = function(driver) {
-      runContentEditableTypingTest(driver, 'line 1\nbegin middle end\nline 3\n',
+      runContentEditableTypingTest(driver, 'line 1\nbegin middle end\nline 3',
           'line 1\nline 3\n',
           webdriver.Key.ARROW_UP,
           'middle\n', webdriver.Key.ARROW_LEFT,
@@ -139,14 +142,18 @@ if (goog.userAgent.IE || IS_FF_3) {
     };
 
 
-    var testPageUpDownJumpToEndsInAContentEditableElement = function(driver) {
-      runContentEditableTypingTest(driver, 'line 1\nline 2\nline 3\nline 4',
-          'line 2\nline 3\n',
-          webdriver.Key.PAGE_UP,
-          'line 1\n',
-          webdriver.Key.PAGE_DOWN,
-          'line 4');
-    };
+    // In FF3, PageUp/Down default to navigating the page, not jumping to the
+    // ends of content.
+    if (goog.userAgent.IE) {
+      var testPageUpDownJumpToEndsInAContentEditableElement = function(driver) {
+        runContentEditableTypingTest(driver, 'line 1\nline 2\nline 3\nline 4',
+            'line 2\nline 3\n',
+            webdriver.Key.PAGE_UP,
+            'line 1\n',
+            webdriver.Key.PAGE_DOWN,
+            'line 4');
+      };
+    }
   }
 
 
@@ -195,7 +202,6 @@ if (goog.userAgent.IE || IS_FF_3) {
   function testCutCopyPasteInAContentEditableElement(driver) {
     var key = webdriver.Key;
     var modifier = goog.userAgent.MAC ? key.COMMAND : key.CONTROL;
-    var selectAll = key.chord(modifier, 'a');
     var cut = key.chord(modifier, 'x');
     var copy = key.chord(modifier, 'c');
     var paste = key.chord(modifier, 'v');
@@ -234,18 +240,21 @@ if (goog.userAgent.IE || IS_FF_3) {
     };
 
 
-    var testPageUpSelectionInAContentEditableElement = function (driver) {
-      var key = webdriver.Key;
-      var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
-      runContentEditableTypingTest(driver, 'now is',
-          'was', selectToFrontChord, 'now is');
-    };
+    // Shift+PageUp/Down doesn't work for contentEditable in FF3
+    if (goog.userAgent.IE) {
+      var testPageUpSelectionInAContentEditableElement = function (driver) {
+        var key = webdriver.Key;
+        var selectToFrontChord = key.chord(key.SHIFT, key.PAGE_UP);
+        runContentEditableTypingTest(driver, 'now is',
+            'was', selectToFrontChord, 'now is');
+      };
 
-    var testPageDownSelectionInAContentEditableElement = function(driver) {
-      var key = webdriver.Key;
-      var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
-      runContentEditableTypingTest(driver, 'now is',
-          'was', key.HOME, selectToEndChord, 'now is');
-    };
+      var testPageDownSelectionInAContentEditableElement = function(driver) {
+        var key = webdriver.Key;
+        var selectToEndChord = key.chord(key.SHIFT, key.PAGE_DOWN);
+        runContentEditableTypingTest(driver, 'now is',
+            'was', key.HOME, selectToEndChord, 'now is');
+      };
+    }
   }
 }

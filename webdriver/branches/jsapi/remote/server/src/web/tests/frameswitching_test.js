@@ -118,25 +118,24 @@ function testGetCurrentUrl(driver) {
 
   driver.switchToFrame("second");
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/common/page/2?title=Fish"));
+             equals(decodeURIComponent(whereIs('page/2?title=Fish'))));
 
   driver.get(TEST_PAGES.iframePage);
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/common/iframes.html"));
+             equals(decodeURIComponent(whereIs('iframes.html'))));
 
   driver.switchToFrame("iframe1");
   assertThat(driver.getCurrentUrl(),
-             equals("http://localhost:3000/common/formPage.html"));
+             equals(decodeURIComponent(whereIs('formPage.html'))));
 }
 
 
 function testScriptsExecuteInSelectedFrame(driver) {
   var script = 'return window.location.href';
   driver.get(TEST_PAGES.framesetPage);
-  assertThat(driver.executeScript(script),
-             equals('http://localhost:3000/common/page/1'));
+  assertThat(driver.executeScript(script), equals(whereIs('page/1')));
   driver.switchToFrame('second');
   assertThat(driver.executeScript(script),
-             equals('http://localhost:3000/common/page/2?title=Fish'));
+             equals(decodeURIComponent(whereIs('page/2?title=Fish'))));
 }
 

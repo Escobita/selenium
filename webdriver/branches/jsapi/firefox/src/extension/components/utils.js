@@ -57,7 +57,10 @@ Utils.getBrowser = function(context) {
 };
 
 Utils.getDocument = function(context) {
-    return context.fxdocument;
+  if (context.frame) {
+    return context.frame.document;
+  }
+  return context.fxbrowser.contentDocument;
 };
 
 Utils.getActiveElement = function(context) {

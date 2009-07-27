@@ -61,12 +61,18 @@ var IS_FF_3 = goog.userAgent.GECKO &&
 
 
 function whereIs(file) {
-  return 'http://localhost:3000/common/' + file;
+  return new goog.Uri(window.location.href).
+      setPath('/common/' + file).
+      setQueryData('').
+      toString();
 }
 
 
 function toSecureUrl(url) {
-  return url.replace(/^http:\/\/localhost:3000/, 'https://localhost:3443');
+  return new goog.Uri(url).
+      setScheme('https').
+      setPort(3443).
+      toString();
 }
 
 var TEST_PAGES = {

@@ -87,7 +87,9 @@ function testFiresFocusKeyEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   var result = driver.findElement({id: 'result'});
   driver.findElement({id: 'theworks'}).sendKeys('a');
-  assertThat(result.getText(), is('focus keydown keypress keyup'));
+  assertThat(
+      'Firefox will not fire the focus event if it is not active app',
+      result.getText(), is('focus keydown keypress keyup'));
 }
 
 
@@ -245,7 +247,13 @@ function testArrowKeysOnAnInputElement(driver) {
       'c', webdriver.Key.UP,
       'd', webdriver.Key.DOWN,
       '1');
-  assertThat(element.getValue(), is('dbac1'));
+  if (goog.userAgent.MAC) {
+    // On a mac, the up and down arrow keys jump to the beginning and end of the
+    // field.
+    assertThat(element.getValue(), is('dbac1'));
+  } else {
+    assertThat(element.getValue(), is('bacd1'));
+  }
 }
 
 
@@ -278,7 +286,12 @@ if (goog.userAgent.MAC) {
         'c', webdriver.Key.HOME,
         'd', webdriver.Key.END,
         '1');
-    assertThat(element.getValue(), is('dbac1'));
+    if (goog.userAgent.IE) {
+      // On IE pageUp/Down jump to the beginning and end of the field.
+      assertThat(element.getValue(), is('dbac1'));
+    } else {
+      assertThat(element.getValue(), is('dabc1'));
+    }
   };
 }
 
@@ -470,8 +483,10 @@ if (goog.userAgent.MAC) {
 
     element.sendKeys(webdriver.Key.LEFT, webdriver.Key.LEFT, webdriver.Key.LEFT,
                      webdriver.Key.SHIFT, webdriver.Key.END);
-    element.sendKeys(webdriver.Key.CONTROL, 'xv');
-    assertThat(element.getValue(), is(paste));
+    element.sendKeys(webdriver.Key.CONTROL, 'x');
+    element.sendKeys(webdriver.Key.CONTROL, 'v');
+    assertThat('Cut and paste failed',
+        element.getValue(), is(paste));
 
     element.sendKeys(webdriver.Key.HOME);
     element.sendKeys(webdriver.Key.CONTROL, 'v');
