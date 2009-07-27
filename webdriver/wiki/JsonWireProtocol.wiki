@@ -88,13 +88,13 @@ Given this information, the following methods can be used to locate an element
 || /session/:sessionId/:context/element || POST || See above || A single relative URL, representing the found element || Find an element on the page || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.findElement] ||
 || /session/:sessionId/:context/elements || POST || See above || An array of relative URLs || Find all element matching the given arguments || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.findElements] ||
 || /session/:sessionId/:context/element/:id/element/:using || POST || See above || A single relative URL, representing the found element || Find an element on the page which is a child of the element this resource points to || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement.findElement] ||
-|| /session/:sessionId/:context/element/:id/element/:using || POST || See above || An array of relative URLs || Find an element on the page which is a child of the element this resource points to || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement.findElements] ||
+|| /session/:sessionId/:context/element/:id/elements/:using || POST || See above || An array of relative URLs || Find all elements on the page which are children of the element this resource points to || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement.findElements] ||
 
 === WebDriver Methods ===
 
 || *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| get || POST || A single argument: a string || none || Go to the specified URL and wait until the page has completely loaded || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver.get] || 
-|| currentTitle || GET || none || String || Get the title of the page, as it would be displayed by the browser || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getTitle() WebDriver.getTitle] ||
+|| /session/:sessionId/:context/url || POST || A single argument: a string || none || Go to the specified URL and wait until the page has completely loaded || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver.get] || 
+|| /session/:sessionId/:context/title || GET || none || String || Get the title of the page, as it would be displayed by the browser || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getTitle() WebDriver.getTitle] ||
 
 === Element Specific Methods ===
 
@@ -102,4 +102,10 @@ Given this information, the following methods can be used to locate an element
 || /session/:sessionId/:context/element/:id/click || POST || none || none || Clicks the specified element and waits for a page to finish loading before returning || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#click() WebElement.click] || 
 || /session/:sessionId/:context/element/:id/clear || POST || none || none || Clears the contents of elements that a user would normally type into, such as INPUT or TEXTAREA || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#clear() WebElement.clear] || 
 ||session/:sessionId/:context/element/:id/value || POST || String of characters to type || none || Simulates sending keyboard input to the specified element. Can be used to set an element's value || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement.sendKeys] ||
+||session/:sessionId/:context/element/:id/attribute/:attribute || GET || none || String || Gets the element's value of :attribute || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement.getAtribute] ||
+||session/:sessionId/:context/element/:id/value || GET || none || String || Gets the element's value attribute (alias of session/:sessionId/:context/element/:id/attribute/value) || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#getValue() WebElement.getValue] ||
 
+=== Cookie Methods ===
+
+|| *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
+|| /session/:sessionId/:context/cookie || POST || A single org.openqa.selenium.Cookie wrapped up in a JSON object || none || Creates a new cookie || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options.addCookie] ||
