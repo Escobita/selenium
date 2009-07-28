@@ -19,7 +19,7 @@ limitations under the License.
  * @fileoverview A xUnit framework for writing unit tests using the WebDriver
  * JavaScript API.
  * Example Usage:
- * 
+ * <code>
  * goog.require('webdriver.TestRunner');
  * goog.require('webdriver.factory');
  *
@@ -33,6 +33,7 @@ limitations under the License.
  *   new webdriver.TestRunner(webdriver.factory.createLocalWebDriver).
  *       go();
  * };
+ * </code>
  *
  * @author jmleyba@gmail.com (Jason Leyba)
  */
@@ -48,48 +49,6 @@ goog.require('webdriver.factory');
 goog.require('webdriver.logging');
 goog.require('webdriver.Event');
 goog.require('webdriver.Event.Type');
-
-
-goog.global.fail = function(opt_msg) {
-  var msg = 'Call to fail()';
-  if (opt_msg) {
-    msg += ': ' + opt_msg;
-  }
-  throw new Error(msg);
-};
-
-
-goog.global.assertEquals = function(a, b, opt_c) {
-  var args = goog.array.slice(arguments, 0);
-  var msg = args.length > 2 ? args[0] : '';
-  var expected = args.length > 2 ? args[1] : args[0];
-  var actual = args.length > 2 ? args[2] : args[1];
-  if (expected !== actual) {
-    goog.global.fail(msg +
-        '\nExpected [' + expected + '] (' + goog.typeOf(expected) + ') ' +
-        'but was [' + actual + '] (' + goog.typeOf(actual) + ')');
-  }
-};
-
-
-goog.global.assertTrue = function(a, opt_b) {
-  var args = goog.array.slice(arguments, 0);
-  if (args.length > 1) {
-    goog.global.assertEquals(args[0], true, args[1]);
-  } else {
-    goog.global.assertEquals(true, args[0]);
-  }
-};
-
-
-goog.global.assertFalse = function(a, opt_b) {
-  var args = goog.array.slice(arguments, 0);
-  if (args.length > 1) {
-    goog.global.assertEquals(args[0], false, args[1]);
-  } else {
-    goog.global.assertEquals(false, args[0]);
-  }
-};
 
 
 /**
@@ -374,12 +333,9 @@ webdriver.TestRunner.prototype.initResultsSection_ = function() {
  * @private
  */
 webdriver.TestRunner.prototype.reportResult_ = function(result, driver) {
-  if (this.errorListener_) {
-    goog.events.unlisten(driver, webdriver.Event.Type.ERROR,
-        this.errorListener_);
-    this.errorListener_ = null;
-    // TODO(jmleyba): Should quit the driver for remote driver instances.
-  }
+  goog.events.removeAll(driver);
+  this.errorListener_ = null;
+  // TODO(jmleyba): Should quit the driver for remote driver instances.
 
   this.results_.push(result);
 
@@ -424,6 +380,43 @@ webdriver.TestRunner.prototype.reportResult_ = function(result, driver) {
   goog.dom.setTextContent(this.numPendingSpan_,
       (this.tests_.length - this.currentTest_ - 1));
   window.setTimeout(goog.bind(this.executeNextTest_, this), 0);
+};
+
+
+/**
+ * Event handler for when a test pauses the command processing.  Adds a button
+ * to the DOM that resumes the driver when clicked.
+ * @param {goog.event.Event} e The pause event to handle.  The target of this
+ *     event will be the paused {@code webdriver.WebDriver} instance.
+ * @private
+ */
+webdriver.TestRunner.prototype.onPause_ = function(e) {
+  this.pausedDriver = e.target;
+  if (!this.pausedButton_) {
+    this.pausedButton_ = this.dom_.createDom('INPUT', {
+      type: 'button',
+      style: 'margin-left: 10px',
+      value: 'Click to resume'
+    });
+    this.pausedDiv_ = this.dom_.createDom('DIV', null,
+        this.dom_.createTextNode('WebDriver paused'),
+        this.pausedButton_);
+    goog.style.setStyle(this.pausedDiv_, 'width', '100%');
+    goog.style.setStyle(this.pausedDiv_, 'backgroundColor', 'yellow');
+    goog.style.setStyle(this.pausedDiv_, 'fontFamily', 'Courier;');
+    goog.style.setStyle(this.pausedDiv_, 'fontSize', '10pt;');
+    goog.style.setStyle(this.pausedDiv_, 'fontWeight', 'bold');
+    goog.dom.insertSiblingAfter(this.pausedDiv_, this.headerDiv_);
+  }
+
+  goog.style.setStyle(this.pausedDiv_, 'display', 'block');
+  this.pausedButton_.disabled = false;
+  goog.events.listenOnce(this.pausedButton_, goog.events.EventType.CLICK,
+      function() {
+        this.pausedButton_.disabled = true;
+        goog.style.setStyle(this.pausedDiv_, 'display', 'none');
+        this.pausedDriver.resume();
+      }, false, this);
 };
 
 
@@ -501,6 +494,8 @@ webdriver.TestRunner.prototype.executeNextTest_ = function() {
     driver = this.driverFactoryFn_();
     this.errorListener_ = goog.bind(this.handleError_, this, result);
     goog.events.listen(driver, webdriver.Event.Type.ERROR, this.errorListener_);
+    goog.events.listen(driver, webdriver.Event.Type.PAUSED,
+        goog.bind(this.onPause_, this));
 
     // TODO(jmleyba): Need to hide pause/resume from test functions
     driver.newSession(true);
@@ -527,15 +522,9 @@ webdriver.TestRunner.prototype.executeNextTest_ = function() {
 webdriver.TestRunner.prototype.collectAndRunDriverCommands_ = function(
     result, driver, commandFn, nextPhase) {
   try {
-    driver.pause();
     commandFn.apply(result.testCase, [driver]);
     nextPhase = goog.bind(nextPhase, this, result, driver);
-    if (driver.hasPendingCommands()) {
-      goog.events.listenOnce(driver, webdriver.Event.Type.IDLE, nextPhase);
-      window.setTimeout(goog.bind(driver.resume, driver), 0);
-    } else {
-      window.setTimeout(nextPhase, 0);
-    }
+    driver.callFunction(nextPhase);
   } catch (ex) {
     this.handleError_(result,
         new webdriver.Event(webdriver.Event.Type.ERROR, ex, driver));

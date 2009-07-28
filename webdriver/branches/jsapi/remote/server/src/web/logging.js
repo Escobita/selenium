@@ -29,6 +29,7 @@ goog.require('goog.string');
 
 
 /**
+ * Represents a level that can be used to filter log messages.
  * @param {number} code Numeric value for this level.
  * @param {string} firebugLogFnName The name of the firebug function to use for
  *    logging messages at this level to the console.
@@ -41,6 +42,7 @@ webdriver.logging.Level = function(code, firebugLogFnName, domColor) {
   this.firebugLogFnName = firebugLogFnName;
   this.domColor = domColor;
 };
+
 
 webdriver.logging.Level.ERROR = new webdriver.logging.Level(0, 'error', 'red');
 webdriver.logging.Level.WARN = new webdriver.logging.Level(1, 'warn', 'orange');
@@ -134,7 +136,6 @@ webdriver.logging.log = function(msg, opt_logLevel) {
     return;
   }
 
-  // TODO(jmleyba): Format this date.
   msg = '[' + goog.now() + ']: ' + msg;
 
   if (webdriver.logging.firebugLogging_) {
@@ -155,7 +156,6 @@ webdriver.logging.log = function(msg, opt_logLevel) {
       style: 'border: 1px solid black; margin: 3px; padding: 3px'
     });
     goog.dom.appendChild(goog.dom.getDocument().body, webdriver.logging.div_);
-    // TODO(jmleyba): Add logic for toggling visibility.
   }
 
   var logRecord = goog.dom.createDom('DIV', {
@@ -226,8 +226,6 @@ webdriver.logging.error = function(message) {
 /**
  * Utility function for recursively describing all of the properties in an
  * object using a DFS traversal.
- * TODO(jmleyba): This is basically just JSON serialization with support for
- * indentation and function printing; we can zap this for release.
  * @param {*} obj The object to describe.
  * @param {string} opt_indent Indentation for the current DFS level.
  * @return {string} The object description.

@@ -8,7 +8,8 @@ goog.addDependency('../context.js', ['webdriver.Context'], []);
 goog.addDependency('../factory.js', ['webdriver.factory'],
                    ['goog.userAgent', 'webdriver.LocalCommandProcessor',
                     'webdriver.WebDriver']);
-goog.addDependency('../future.js', ['webdriver.Future'], []);
+goog.addDependency('../future.js', ['webdriver.Future'],
+                   ['goog.events.EventType', 'goog.events.EventTarget']);
 goog.addDependency('../key.js', ['webdriver.Key'], ['goog.array']);
 goog.addDependency('../localcommandprocessor.js',
                    ['webdriver.LocalCommandProcessor'],

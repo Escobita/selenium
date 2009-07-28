@@ -71,10 +71,43 @@ webdriver.Event.Type = {
 
 
 /**
- * TODO(jmleyba): More documentation.
+ * The main interface for controlling a web browser.  How the browser is
+ * controlled is dictated by the injected {@code commandProcessor}. The command
+ * processor may control the browser either through an extension or plugin, or
+ * by sending commands to a RemoteWebDriver server.
+ *
+ * In order to facilitate asynchronous handling of commands, the entire
+ * {@code webdriver.WebDriver} runs in an asychronous loop. Commands issued to
+ * the driver are placed on a queue. As each command finishes, the driver will
+ * yield (with a 0ms {@code window.setTimeout}) before processing the next
+ * command.
+ *
+ * Any WebDriver command that is expected to produce a return value will return
+ * a {@code webdriver.Future}.  This Future can passed as an argument to another
+ * command, or an assertion function in the {@code webdriver.asserts} namespace.
+ * For example:
+ *   driver.get('http://www.google.com');
+ *   var futureTitle = driver.getTitle();
+ *   assertThat(futureTitle, equals('Google Search'));
+ *
+ * The WebDriver will dispatch the following events:
+ * <ul>
+ * <li>webdriver.Event.Type.IDLE - The driver is not executing any commands and
+ *     there are none pending in the queue</li>
+ * <li>webdriver.Event.Type.READY - The driver is not executing a command and
+ *     there are (possibly) commands pending in the queue</li>
+ * <li>webdriver.Event.Type.PAUSED - Command execution has been halted and no
+ *     more commands will be processed until {@code #resume()} is called</li>
+ * <li>webdriver.Event.Type.RESUMED - The driver has resumed execution after
+ *     being paused</li>
+ * <li>webdriver.Event.Type.ERROR - Dispatched whenever a WebDriver command
+ *     fails</li>
+ * </ul>
+ *
  * @param {Object} commandProcessor The command processor to use for executing
  *     individual {@code webdriver.Command}s.
  * @constructor
+ * @extends {goog.events.EventTarget}
  */
 webdriver.WebDriver = function(commandProcessor) {
   goog.events.EventTarget.call(this);
@@ -200,6 +233,14 @@ webdriver.WebDriver.prototype.hasPendingCommands = function() {
 };
 
 
+/**
+ * Inverts the result of the previous command. If the command resulted in an
+ * error, that error is suppressed and execution will continue as usual. If the
+ * last command did not trigger an error, a {@code webdriver.Event.Type.ERROR}
+ * event will be dispatched.
+ * @param {string} opt_msg The message to include with the ERROR event if the
+ *     expected error does not occur.
+ */
 webdriver.WebDriver.prototype.expectErrorFromPreviousCommand = function(
     opt_msg) {
   var caughtError = false;
@@ -265,16 +306,25 @@ webdriver.WebDriver.prototype.clearError = function(opt_resumeCommands) {
 
 
 /**
- * Pauses this driver so it will not execute any commands.  Dispatches a
- * {@code webdriver.Event.Type.PAUSED} event.
+ * Adds a command to pause this driver so it will not execute anymore commands
+ * until {@code #resume()} is called. When this command executes, a
+ * {@code webdriver.Event.Type.PAUSED} event will be dispatched.
  */
 webdriver.WebDriver.prototype.pause = function() {
+  this.callFunction(goog.bind(this.pauseImmediately, this));
+};
+
+
+/**
+ * Immediately pauses the driver so it will not execute anymore commands until
+ * {@code #resume()} is called.
+ * Dispatches a {@code webdriver.Event.Type.PAUSED} event.
+ */
+webdriver.WebDriver.prototype.pauseImmediately = function() {
   this.isPaused_ = true;
   webdriver.logging.debug('Webdriver paused');
   this.dispatchEvent(webdriver.Event.Type.PAUSED);
 };
-
-
 
 
 /**
@@ -288,6 +338,15 @@ webdriver.WebDriver.prototype.resume = function() {
 };
 
 
+/**
+ * Updates a {@code webdriver.Command} instance so that any parameters that
+ * are {@code webdriver.Future} values are reverted to their asynchronously set
+ * values.
+ * @param {webdriver.Command} commmand The command object to modify.
+ * @throws If an attempt is made to fetch the value of a {@code Future} that
+ *     hasn't been computed yet.
+ * @private
+ */
 webdriver.WebDriver.updateCommandFutures_ = function(command) {
   function getValue(obj) {
     if (obj instanceof webdriver.Future) {
@@ -297,11 +356,13 @@ webdriver.WebDriver.updateCommandFutures_ = function(command) {
     }
     return obj;
   }
+
+  // elementId is set for commands that execute against a WebElement.
   if (goog.isDef(command.elementId)) {
     command.elementId = getValue(command.elementId);
   }
+
   command.parameters = goog.array.map(command.parameters, function(param) {
-    // TODO(jmleyba): Need a better way of detecting this.
     if (goog.isArray(param)) {
       return goog.array.map(param, getValue);
     } else {
@@ -320,7 +381,6 @@ webdriver.WebDriver.prototype.onReady_ = function() {
     webdriver.logging.debug('not ready to execute a command');
     return;
   } else if (this.inError_) {
-    // TODO(jmleyba): What's the correct way to do this.
     throw new Error('WebDriver is in an error state.');
   }
 
@@ -393,7 +453,10 @@ webdriver.WebDriver.prototype.handleResponse_ = function(response) {
       try {
         response.command.errorCallbackFn(response);
       } catch (ex) {
-        // TODO(jmleyba): Do nothing? Report the error? What?
+        this.inError_ = true;
+        this.dispatchEvent(new webdriver.Event(webdriver.Event.Type.ERROR,
+           'Error attempting to recover from command failure: ' + ex.message +
+           '\n  Original command failure was: ' + response.value, this));
       }
     }
 
@@ -447,7 +510,8 @@ webdriver.WebDriver.prototype.getContext = function() {
 // ----------------------------------------------------------------------------
 
 /**
- * Adds a command to make the driver sleep for the specified amount of time.
+ * Has the driver temporarily halt command execution. This command does
+ * <em>not</em> result in a {@code webdriver.Event.Type.PAUSED} event.
  * @param {number} ms The amount of time in milliseconds for the driver to
  *     sleep.
  */
@@ -459,7 +523,8 @@ webdriver.WebDriver.prototype.sleep = function(ms) {
 /**
  * Inserts a function into the command queue for the driver to call. The
  * function will be passed the last {@code webdriver.Response} retrieved from
- * the command processor.
+ * the command processor.  The result of the function will be stored in a new
+ * {@code webdriver.Response} and passed to any subsequent function commands.
  * @param {function} fn The function to call; should take a single
  *     {@code webdriver.Response} object.
  */
@@ -469,8 +534,8 @@ webdriver.WebDriver.prototype.callFunction = function(fn) {
 
 
 /**
- * Adds a command to request a new session ID. This is a no-op if this instance
- * is already locked into another session.
+ * Request a new session ID.  This is a no-op if this instance is already locked
+ * into a session.
  * @param {boolean} lockSession Whether to lock this instance into the returned
  *     session. Once locked into a session, the driver cannot ask for a new
  *     session (a new instance must be created).
@@ -494,8 +559,11 @@ webdriver.WebDriver.prototype.newSession = function(lockSession) {
 
 
 /**
- * Adds a command to switch to a window with the given name.
- * @param {string} name The name of the window to transfer control to.
+ * Switch the focus of future commands for this driver to the window with the
+ * given name.
+ * @param {string|webdriver.Future} name The name of the window to transfer
+ *     control to.  Alternatively, the UUID of a window handle, returned by
+ *     {@code #getWindowHandle()} or {@code #getAllWindowHandles()}.
  */
 webdriver.WebDriver.prototype.switchToWindow = function(name) {
   this.addCommand(webdriver.CommandInfo.SWITCH_TO_WINDOW.buildCommand(
@@ -506,8 +574,13 @@ webdriver.WebDriver.prototype.switchToWindow = function(name) {
 
 
 /**
- * Adds a command to switch to a frame in the current window.
- * @param {string} name The name of the window to transfer control to.
+ * Switch the focus of future commands for this driver to the frame with the
+ * given name or ID.  To select sub-frames, simply separate the frame names/IDs
+ * by dots. As an example, {@code 'main.child'} will select the frame with the
+ * name 'main' and hten its child 'child'.  If a frame name is a number, then it
+ * will be treated as an index into the {@code window.frames} array of the
+ * current window.
+ * @param {string|number} name The name of the window to transfer control to.
  */
 webdriver.WebDriver.prototype.switchToFrame = function(name) {
   this.addCommand(webdriver.CommandInfo.SWITCH_TO_FRAME.buildCommand(
@@ -518,7 +591,8 @@ webdriver.WebDriver.prototype.switchToFrame = function(name) {
 
 
 /**
- * Adds a command to switch to the top frame in the current window.
+ * Selects either the first frame on the page, or the main document when a page
+ * contains iframes.
  */
 webdriver.WebDriver.prototype.switchToDefaultContent = function() {
   this.addCommand(webdriver.CommandInfo.SWITCH_TO_DEFAULT_CONTENT.buildCommand(
@@ -529,7 +603,7 @@ webdriver.WebDriver.prototype.switchToDefaultContent = function() {
 
 
 /**
- * Adds a command to get the current window handle.
+ * Retrieves the internal UUID handle for the current window.
  * @return {webdriver.Future} The current handle wrapped in a Future.
  */
 webdriver.WebDriver.prototype.getWindowHandle = function() {
@@ -541,7 +615,7 @@ webdriver.WebDriver.prototype.getWindowHandle = function() {
 
 
 /**
- * Adds a command to get all of the current window handles.
+ * Retrieves the handles for all known windows.
  */
 webdriver.WebDriver.prototype.getAllWindowHandles = function() {
   this.addCommand(webdriver.CommandInfo.GET_CURRENT_WINDOW_HANDLES.buildCommand(
@@ -553,7 +627,7 @@ webdriver.WebDriver.prototype.getAllWindowHandles = function() {
 
 
 /**
- * Adds a command to fetch the HTML source of the current page.
+ * Retrieves the HTML source of the current page.
  * @return {webdriver.Future} The page source wrapped in a Future.
  */
 webdriver.WebDriver.prototype.getPageSource = function() {
@@ -565,7 +639,9 @@ webdriver.WebDriver.prototype.getPageSource = function() {
 
 
 /**
- * Adds a command to close the current window.
+ * Closes the current window.
+ * <strong>WARNING: This command provides no protection against closing the
+ * script window (e.g. the window sending commands to the driver)</strong>
  */
 webdriver.WebDriver.prototype.close = function() {
   this.addCommand(webdriver.CommandInfo.CLOSE.buildCommand(this));
@@ -573,10 +649,19 @@ webdriver.WebDriver.prototype.close = function() {
 
 
 
+/**
+ * Static class encapsulating an argument to send with an {@code #executeScript}
+ * command.
+ * @param {string} type The type of argument.
+ * @param {*} value The argument value.
+ * @constructor
+ */
 webdriver.WebDriver.ScriptArgument = function(type, value) {
   this.type = type;
   this.value = value;
 };
+
+
 /**
  * Helper function for converting an argument to a script into a parameter
  * object to send with the {@code webdriver.Command}.
@@ -601,9 +686,11 @@ webdriver.WebDriver.argumentToScriptArgument_ = function(arg) {
 
 /**
  * Adds a command to execute a JavaScript snippet in the window of the page
- * current under test.
+ * currently under test.
  * @param {string} script The JavaScript snippet to execute.
  * @param {*} var_args The arguments to pass to the script.
+ * @return {webdriver.Future} The result of the executed script, wrapped in a
+ *     {@code webdriver.Future} instance.
  */
 webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
   var args = goog.array.map(
@@ -637,29 +724,42 @@ webdriver.WebDriver.prototype.get = function(url) {
 };
 
 
+/**
+ * Navigate backwards in the current browser window's history.
+ */
 webdriver.WebDriver.prototype.back = function() {
   this.addCommand(webdriver.CommandInfo.BACK.buildCommand(this));
 };
 
 
+/**
+ * Navigate forwards in the current browser window's history.
+ */
 webdriver.WebDriver.prototype.forward = function() {
   this.addCommand(webdriver.CommandInfo.FORWARD.buildCommand(this));
 };
 
 
+/**
+ * Refresh the current page.
+ */
 webdriver.WebDriver.prototype.refresh = function() {
   this.addCommand(webdriver.CommandInfo.REFRESH.buildCommand(this));
 };
 
 
+/**
+ * Retrieves the current window URL.
+ * @return {webdriver.Future} The current URL in a webdriver.Future.
+ */
 webdriver.WebDriver.prototype.getCurrentUrl = function() {
   return this.executeScript('return window.location.href');
 };
 
 
 /**
- * Adds a command to query for the current page title.
- * @return {webdriver.Future} 
+ * Retrieves the current page's title.
+ * @return {webdriver.Future} The current page title.
  */
 webdriver.WebDriver.prototype.getTitle = function() {
   var title = new webdriver.Future(this);
@@ -670,7 +770,8 @@ webdriver.WebDriver.prototype.getTitle = function() {
 
 
 /**
- * Adds a command to find a single element on the current page.
+ * Find an element on the current page. If the element cannot be found, an
+ * {@code webdriver.Event.Type.ERROR} event will be dispatched.
  * @param {Object} by The strategy to use for finding the element.
  * @return {webdriver.WebElement} A WebElement wrapper that can be used to
  *     issue commands against the located element.
@@ -681,7 +782,7 @@ webdriver.WebDriver.prototype.findElement = function(by) {
 
 
 /**
- * Adds a command to test if an element can be found on the page.
+ * Determine if an element is present on the page.
  * @param {Object} by The strategy to use for finding the element.
  * @return {webdriver.Future} Whether the element was present on the page. The
  *    return value is wrapped in a Future that will be defined when the driver
@@ -694,7 +795,15 @@ webdriver.WebDriver.prototype.isElementPresent = function(by) {
 
 
 /**
- * Adds a command to find a multiple element on the current page.
+ * Search for multiple elements on the current page. The result of this
+ * operation can be accessed from the last saved {@code webdriver.Response}
+ * object:
+ * driver.findElements({xpath: '//div'});
+ * driver.callFunction(function(response) {
+ *   response.value[0].click();
+ *   response.value[1].click();
+ *   // etc.
+ * });
  * @param {Object} by The strategy to use for finding the element.
  */
 webdriver.WebDriver.prototype.findElements = function(by) {
@@ -703,7 +812,7 @@ webdriver.WebDriver.prototype.findElements = function(by) {
 
 
 /**
- * Adds a comman to adjust the speed of the mouse.
+ * Adjust the speed of the mouse for mouse related commands.
  * @param {webdriver.WebDriver.Speed} speed The new speed setting.
  */
 webdriver.WebDriver.prototype.setMouseSpeed = function(speed) {
@@ -713,7 +822,7 @@ webdriver.WebDriver.prototype.setMouseSpeed = function(speed) {
 
 
 /**
- * Adds a command to query for the current mouse speed.
+ * Fetch the current mouse speed.
  * @return {webdriver.Future} A Future whose value will be set by this driver
  *     when the query command completes.
  */

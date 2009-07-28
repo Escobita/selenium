@@ -56,17 +56,6 @@ webdriver.LocalCommandProcessor.prototype.execute = function(command,
           rawResponse['isError'],
           webdriver.Context.fromString(rawResponse['context']),
           rawResponse['response']);
-      // TODO(jmleyba): zap this debug statement for release
-      with(webdriver.logging) {
-        debug([
-          '',
-          'command:          ' + command.info.methodName,
-          'parameters:       ' + command.parameters,
-          'command-context:  ' + command.context,
-          'returned-context: ' + response.context,
-          'response: ' + rawResponse.response
-        ].join('\n'));
-      }
       // Execute callback in a timeout so any errors in the callback do not get
       // covered up by the try-catch below (the controlling WebDriver instance
       // should catch callback errors on its own).

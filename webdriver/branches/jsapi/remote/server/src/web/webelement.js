@@ -262,18 +262,14 @@ webdriver.Locator.Builder.prototype.build = function(by) {
 
 
 /**
- * TODO(jmleyba): Beefier documentation please
- * Usage:
- * <code>
- * var driver = webdriver.createLocalWebDriver();
- * driver.init();
- * driver.switchToWindow('test_window');
- * driver.get('http://www.google.com');
- * var element = driver.findElement({name: 'q'});
- * element.sendKeys('webdriver');
- * element = driver.findElement({name: 'btnG'});
- * element.click();
- * </code>
+ * Represents a DOM element.
+ * <p/>
+ * WebElements can be found using a {@code webdriver.WebDriver}:
+ *
+ *   driver.get('http://www.google.com');
+ *   var searchBoxWebElement = driver.findElement({name: 'q'});
+ *   searchBoxWebElement.sendKeys('webdriver');
+ *
  * @param {webdriver.WebDriver} driver The WebDriver instance that will
  *     actually execute commands.
  * @constructor
@@ -301,6 +297,7 @@ webdriver.WebElement = function(driver) {
 /**
  * Regular expression for a UUID.
  * @type {RegExp}
+ * @static
  */
 webdriver.WebElement.UUID_REGEX =
     /^{[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}}$/i;
@@ -316,6 +313,7 @@ webdriver.WebElement.UUID_REGEX =
  * @param {webdriver.Future} opt_elementId A future for the ID of the element
  *     to search under. If not specified, the search will be conducted from the
  *     document root.
+ * @static
  * @private
  */
 webdriver.WebElement.findElementInternal_ = function(driver,
@@ -580,6 +578,10 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
 };
 
 
+/**
+ * @return {webdriver.Future} The value attribute for the element represented by
+ *    this instance.
+ */
 webdriver.WebElement.prototype.getValue = function() {
   var value = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_VALUE, null,
@@ -588,6 +590,10 @@ webdriver.WebElement.prototype.getValue = function() {
 };
 
 
+/**
+ * @return {webdriver.Future} The innerText of this element, without any leading
+ *     or trailing whitespace.
+ */
 webdriver.WebElement.prototype.getText = function() {
   var text = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_TEXT, null,
@@ -596,16 +602,17 @@ webdriver.WebElement.prototype.getText = function() {
 };
 
 
+/**
+ * Selects this element.
+ */
 webdriver.WebElement.prototype.setSelected = function() {
   this.addCommand_(webdriver.CommandInfo.SET_ELEMENT_SELECTED);
 };
 
 
-webdriver.WebElement.prototype.clear = function() {
-  this.addCommand_(webdriver.CommandInfo.CLEAR_ELEMENT);
-};
-
-
+/**
+ * @return {webdriver.Future} The size of this element.
+ */
 webdriver.WebElement.prototype.getSize = function() {
   var size = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_SIZE, null,
@@ -618,6 +625,13 @@ webdriver.WebElement.prototype.getSize = function() {
 };
 
 
+/**
+ * Parses a response of the form "$x $y" into a {@code goog.math.Coordinate}
+ * object.
+ * @param {webdriver.Future} future The Future to store the parsed result in.
+ * @param {webdriver.Response} response The response to parse.
+ * @private
+ */
 webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
                                                                response) {
   var xy = response.value.replace(/\s/g, '').split(',');
@@ -626,6 +640,9 @@ webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
 };
 
 
+/**
+ * @return {webdriver.Future} The location of this element.
+ */
 webdriver.WebElement.prototype.getLocation = function() {
   var currentLocation = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_LOCATION, null,
@@ -635,6 +652,12 @@ webdriver.WebElement.prototype.getLocation = function() {
 };
 
 
+/**
+ * Drags this element by the given offset.
+ * @param {number} x The horizontal amount, in pixels, to drag this element.
+ * @param {nubmer} y The vertical amount, in pixels, to drag this element.
+ * @return {webdriver.Future} The new location of the element.
+ */
 webdriver.WebElement.prototype.dragAndDropBy = function(x, y) {
   var newLocation = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.DRAG_ELEMENT, [x, y],
@@ -644,6 +667,13 @@ webdriver.WebElement.prototype.dragAndDropBy = function(x, y) {
 };
 
 
+/**
+ * Drags this element to the location of another {@code webElement}. After this
+ * command executes, this element's upper-left hand corner should be the same
+ * location as the upper-left hand corner of the given {@code webElement}.
+ * @param {webdriver.WebElement} webElement The element to drag this element to.
+ * @return {webdriver.Future} This element's new location.
+ */
 webdriver.WebElement.prototype.dragAndDropTo = function(webElement) {
   if (this.driver_ != webElement.driver_) {
     throw new Error(
@@ -664,6 +694,10 @@ webdriver.WebElement.prototype.dragAndDropTo = function(webElement) {
 };
 
 
+/**
+ * @return {boolean} Whether the DOM element represented by this instance is
+ *     enabled, as dictated by the {@code disabled} attribute.
+ */
 webdriver.WebElement.prototype.isEnabled = function() {
   var futureValue = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.GET_ELEMENT_ATTRIBUTE, ['disabled'],
@@ -675,7 +709,14 @@ webdriver.WebElement.prototype.isEnabled = function() {
 };
 
 
-/** @private */
+/**
+ * Determines if this element is checked or selected; will generate an error if
+ * the DOM element represented by this instance is not an OPTION or checkbox
+ * INPUT element.
+ * @return {webdriver.Future} Whether this instance is currently checked or
+ *    selected.
+ * @private
+ */
 webdriver.WebElement.prototype.isCheckedOrSelected_ = function(opt_future,
                                                                opt_addToFront) {
   var value = opt_future ||  new webdriver.Future(this.driver_);
@@ -693,17 +734,28 @@ webdriver.WebElement.prototype.isCheckedOrSelected_ = function(opt_future,
 };
 
 
-
+/**
+ * @return {webdriver.Future} Whether this element is selected.
+ */
 webdriver.WebElement.prototype.isSelected = function() {
   return this.isCheckedOrSelected_();
 };
 
 
+/**
+ * @return {webdriver.Future} Whether this element is checked.
+ */
 webdriver.WebElement.prototype.isChecked = function() {
   return this.isCheckedOrSelected_();
 };
 
 
+/**
+ * Toggles the checked/selected state of this element; will generate an error if
+ * the DOM element represented by this instance is not an OPTION or checkbox
+ * input element.
+ * @return {webdriver.Future} The new checked/selected state of this element.
+ */
 webdriver.WebElement.prototype.toggle = function() {
   var toggleResult = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.TOGGLE_ELEMENT, null,
@@ -714,16 +766,27 @@ webdriver.WebElement.prototype.toggle = function() {
 };
 
 
+/**
+ * If this current element is a form, or an element within a form, then this
+ * will that form.
+ */
 webdriver.WebElement.prototype.submit = function() {
   this.addCommand_(webdriver.CommandInfo.SUBMIT_ELEMENT);
 };
 
 
+/**
+ * If this instance represents a text INPUT element, or a TEXTAREA element, this
+ * will clear its {@code value}.
+ */
 webdriver.WebElement.prototype.clear = function() {
   this.addCommand_(webdriver.CommandInfo.CLEAR_ELEMENT);
 };
 
 
+/**
+ * @return {webdriver.Future} Whether this element is currently displayed.
+ */
 webdriver.WebElement.prototype.isDisplayed = function() {
   var futureValue = new webdriver.Future(this.driver_);
   this.addCommand_(webdriver.CommandInfo.IS_ELEMENT_DISPLAYED, null,
@@ -739,6 +802,9 @@ webdriver.WebElement.prototype.isDisplayed = function() {
 };
 
 
+/**
+ * @return {webdriver.Future} The outer HTML of this element.
+ */
 webdriver.WebElement.prototype.getOuterHtml = function() {
   return this.driver_.executeScript(
       ['var element = arguments[0];',
@@ -752,6 +818,9 @@ webdriver.WebElement.prototype.getOuterHtml = function() {
 };
 
 
+/**
+ * @return {webdriver.Future} The inner HTML of this element.
+ */
 webdriver.WebElement.prototype.getInnerHtml = function() {
   return this.driver_.executeScript('return arguments[0].innerHTML', this);
 };
