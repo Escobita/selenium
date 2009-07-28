@@ -276,75 +276,68 @@ ___________
 在测试用例中选择一个插入注释的点。
 添加HTML风格的注释，例如， *<!-- 你的注释在这里 -->* 。
   
-Edit a Command or Comment 
+编辑命令或者注释
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Table View
+表格视图
 __________
 
-Simply select the line to be changed and edit it using the Command, Target,
-and Value fields. 
+只需选择需要修改的行并用命令、目标和数值域修改它。
 
-Source View
+源码视图
 ___________
 
-Since Source view provides the equivalent of a WYSIWYG editor, simply modify
-which line you wish--command, parameter, or comment.
+因为源码视图提供了一种相当于所见即所得的编辑器，
+所以只需修改你想修改的行——命令、参数或者注释。
 
-Opening and Saving a Test Case
+打开和保存测试用例
 ++++++++++++++++++++++++++++++
 
-The File=>Open, Save and Save As menu commands behave similarly to opening and 
-saving files in most other programs.  When you open an existing test case, Selenium-IDE 
-displays its Selenium commands in the test case pane.
-  
-Test suite files can also be opened and saved via the File menu.  However,
-such operations have their own menu entries near the bottom; the Open,
-Save, and Save As items are only for files.  
+作为菜单命令的文件=>打开、保存和另存为在大多数其他的程序中都有相似的打开和保存文件功能。
+当你打开一个已存在的测试用例时，Selenium-IDE就在测试用例窗格显示它的命令。
+
+通过文件菜单，测试套件文件也可以被打开和保存。
+然而这些操作在菜单底部有自己的菜单项；
+打开、保存和另存为只针对文件。  
   
 .. note:: 
-    At the time of this writing, there's a bug, where at times, when the IDE is 
-    first opened and then you select File=>Open, nothing happens.  If you see 
-    this, close down the IDE and restart it (you don't need to close the 
-    browser itself).  This will fix the problem. 
+    写到目前为止，这里有一个缺陷。
+    有时当IDE第一次打开，然后选择文件=>打开，但是什么都没有发生。
+    如果你遇到这种情况，就关掉IDE然后再打开（你不必关闭浏览器自身）。
+    这样可以解决以上的问题。
   
-Running Test Cases
+运行测试用例
 ------------------
+
+IDE有许多种运行测试用例的选项。你可以一次运行整个测试用例，
+停止和启动它，一次执行一行，执行你正在开发的命令，
+你还可以批处理运行整个测试套件。
+用IDE执行测试用例是非常灵活的。
   
-The IDE allows many options for running your test case. You can run a test case
-all at once, stop and start it, run it one line at a time, run a single command 
-you are current developing, and you can do a batch run of an entire test suite.
-Execution of test cases is very flexible in the IDE. 
+运行测试用例
+    点击运行按钮运行当前显示的测试用例。
   
-Run a Test Case
-    Click the Run button to run the currently displayed test case. 
+运行测试套件
+    点击运行所有按钮运行当前加载的测试套件的所有测试用例。
   
-Run a Test Suite
-    Click the Run All button to run all the test cases in the currently loaded 
-    test suite. 
+停止和启动
+    暂停按钮可以用于停止正在运行的测试用例。
+    然后这个按钮的图标会变成恢复按钮。
+    点击恢复按钮可以继续运行。
   
-Stop and Start
-    The Pause button can be used to stop the test case while it is running.  The 
-    icon of this button then changes to indicate the Resume button.  To continue
-    click Resume. 
+在中间停止
+    你可以在测试用例中设置一个断点以使得测试用例停在一条特定的命令上。
+    这对于调试测试用例是非常有用的。
+    要设置断点，选择一条命令，点击右键，从右键菜单中选择切换断点。
   
-Stop in the Middle
-    You can set a breakpoint in the test case to cause it to stop on a 
-    particular command.  This is useful for debugging your test case. To set a 
-    breakpoint, select a command, right-click, and from the context menu 
-    select Toggle Breakpoint. 
+从中间开始
+    你可以告诉IDE从测试用例中间的一条特定命令开始运行。这也是用于调试。
+    要设置一个起点，选择一条命令，点击右键，从右键菜单中选择设置/清除断点。
   
-Start from the Middle
-    You can tell the IDE to begin running from a specific command in the 
-    middle of the test case.  This also is used for debugging.  To set a 
-    startpoint, select a command, right-click, and from the context menu 
-    select Set/Clear Start Point. 
-  
-Run Any Single Command
-    Double-click any single command to run it by itself.  This is useful when 
-    writing a single command.  It lets you immediately test a command you are 
-    constructing, when you are not sure if it is correct.  You can double-click it to 
-    see if it runs correctly.  This is also available from the context menu.
+运行任意一条命令
+    双击任何一条命令可以运行它。这对于编写单条命令是很有用的。
+    当你不能确定命令是否正确时，它可以立即测试你正创建的命令。
+    你可以双击它，看它是否运行正确。它还可以在右键菜单里执行。
   
 
 Using Base URL to Run Test Cases in Different Domains 
