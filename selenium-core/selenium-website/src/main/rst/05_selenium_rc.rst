@@ -714,7 +714,7 @@ will be self-explanatory. Here, however, we explain the most critical and
 possibly less obvious, aspects of the API.
 
 Starting the Browser 
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. container:: toggled
 
@@ -1349,7 +1349,7 @@ tell it to use this new Firefox profile with the server command-line option
    Try to start using a simple location like *C:\\seleniumProfile* to make it
    work and then move the profile where you want and try to find it again.
 
-.. warning::  Be sure to put your profile in a separate new folder!!! 
+.. warning::  Be sure to put your profile in a new folder separate from the default!!! 
    The Firefox profile manager tool will delete all files in a folder if you 
    delete a profile, regardless of whether they are profile files or not. 
    
@@ -1444,79 +1444,8 @@ browserSideLogs (as well as all other DEBUG level logging messages) to a file.
 
 Troubleshooting 
 ---------------
-.. Santi: must recheck if all the topics here: 
-   http://seleniumhq.org/documentation/remote-control/troubleshooting.html
-   are covered.
-
-Problems With Verify Commands 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If you export your tests from Selenium-IDE, you may find yourself getting
-empty verify strings from your tests (depending on the programming language
-used).
-
-*Note: This section is not yet developed.*
-
-.. Santi: I'll put some info from 
-   http://clearspace.openqa.org/message/56908#56908 (we should write an example
-   for all the languages...)
-
-.. Paul:  Are we sure this is still a problem?  I've never encountered it.
-
-.. I'll investigate into this, I only use python and using that client it's failing
-
-Safari and MultiWindow Mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*Note: This section is not yet developed.*
-
-.. Santi: we will have to explain the following:
-   http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
-   http://jira.openqa.org/browse/SEL-639
-
-Firefox on Linux 
-~~~~~~~~~~~~~~~~
-On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin" 
-directly, so if you are using a previous version, make sure that the real 
-executable is on the path. 
-
-On most Linux distributions, the real *firefox-bin* is located on::
-
-   /usr/lib/firefox-x.x.x/ 
-
-Where the x.x.x is the version number you currently have. So, to add that path 
-to the user's path. you will have to add the following to your .bashrc file:
-
-.. code-block:: bash
-
-   export PATH="$PATH:/usr/lib/firefox-x.x.x/"
-
-.. This problem is caused because in linux, Firefox is executed through a shell
-   script (the one located on /usr/bin/firefox), when it comes the time to kill
-   the browser Selenium-RC will kill the shell script, leaving the browser 
-   running.  Santi: not sure if we should put this here...
-
-If necessary, you can specify the path to firefox-bin directly in your test,
-like this::
-
-   "*firefox /usr/lib/firefox-x.x.x/firefox-bin"
-
-IE and Style Attributes
-~~~~~~~~~~~~~~~~~~~~~~~
-If you are running your tests on Internet Explorer and you are trying to locate
-elements using their `style` attribute, you're definitely in trouble.
-Probably a locator like this::
-
-    //td[@style="background-color:yellow"]
-
-Would perfectly work in Firefox, Opera or Safari but it won't work on IE. 
-That's because the keys in  `@style` are interpreted as uppercase once the page
-is parsed by IE. So, even if the source code is in lowercase, you should use::
-
-    //td[@style="BACKGROUND-COLOR:yellow"]
-
-This is a problem if your test is intended to work on multiple browsers, but
-you can easily code your test to detect the situation and try the alternative
-locator that only works in IE.
+When first getting started with Selenium-RC there's a few potential problems
+that are commonly encountered.  We present them along with their solutions here.
 
 Unable to Connect to Server 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1530,9 +1459,20 @@ similar one::
 
 If you see a message like this, be sure you started the Selenium Server. If 
 you did, then there is some problem with the connectivity between the two 
-problems. This should not normally happen when your operating system has 
+components. This should not normally happen when your operating system has 
 typical networking and TCP/IP settings. If you continue to have trouble, try 
-a different computer. 
+a different computer.  
+
+You can also use common networking tools like *ping*, *telnet*, *ipconfig/ifconfig*(on windows), 
+etc to ensure you first have a valid network connection.  Also, if you're trying to 
+connect to the Selenium Server on a remote machine try running it locally first and
+verifying you can get a connection using "localhost" as your connection parameter.  
+ 
+Unable to Load the Browser 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ok, not a very friendly error, sorry!  But if the Selenium Server cannot load the browser 
+you will probably see this error.
  
 :: 
 
@@ -1546,24 +1486,24 @@ This error seems to occur when Selenium-RC cannot load the browser.
 
 (using .NET and XP Service Pack 2) 
 
-* Firefox cannot start because the browser is already open and you did 
+This could be caused by
+
+* Firefox (prior to Selenium 1.0) cannot start because the browser is already open and you did 
   not specify a separate profile. 
-* The run mode you're using doesn't match any browser on your machine is this 
-  true?  I haven't tried this one as I didn't want to uninstall either of my 
-  browsers. 
-* you specified the path to the browser explicitly (see above) but the path is 
+* The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
+  passed to Selenium when you program opens the browser. 
+* You specified the path to the browser explicitly (using *custom--see above) but the path is 
   incorrect. 
 
 Selenium Cannot Find the AUT 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If your test program starts Selenium successfully, but the browser window 
-cannot display the website you're testing, the most likely cause is your test 
+If your test program starts the browser successfully, but the browser doesn't
+display the website you're testing, the most likely cause is your test 
 program is not using the correct URL. 
 
-This can easily happen. When Selenium-IDE generates the native language code 
-from your script it inserts a dummy URL. It may not (in the .NET-C# format 
-this problem exists) use the base URL when it generates the code. You will 
-need to explicitly modify the URL in the generated code. 
+This can easily happen. When you use Selenium-IDE to export you script,
+it inserts a dummy URL. You must manually change the URL to the correct one
+for your application to be tested. 
 
 Firefox Refused Shutdown While Preparing a Profile 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1574,8 +1514,6 @@ test program looks like this::
 
     Error:  java.lang.RuntimeException: Firefox refused shutdown while 
     preparing a profile 
-
-(using .NET and XP Service Pack 2) 
 
 Here's the complete error msg from the server::
 
@@ -1592,6 +1530,7 @@ Here's the complete error msg from the server::
 
 To resolve this, see the section on `Specifying a Separate Firefox Profile 
 <Personalizing the Firefox Profile used in the tests>`_
+
 
 Handling HTTPS and Security Popups 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1883,6 +1822,81 @@ This could be handled employing a for loop in selenium.
 	
    } 
 
+   
+   .. Santi: must recheck if all the topics here: 
+   http://seleniumhq.org/documentation/remote-control/troubleshooting.html
+   are covered.
+
+Problems With Verify Commands 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you export your tests from Selenium-IDE, you may find yourself getting
+empty verify strings from your tests (depending on the programming language
+used).
+
+*Note: This section is not yet developed.*
+
+.. Santi: I'll put some info from 
+   http://clearspace.openqa.org/message/56908#56908 (we should write an example
+   for all the languages...)
+
+.. Paul:  Are we sure this is still a problem?  I've never encountered it.
+
+.. I'll investigate into this, I only use python and using that client it's failing
+
+Safari and MultiWindow Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Note: This section is not yet developed.*
+
+.. Santi: we will have to explain the following:
+   http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
+   http://jira.openqa.org/browse/SEL-639
+
+Firefox on Linux 
+~~~~~~~~~~~~~~~~
+On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin" 
+directly, so if you are using a previous version, make sure that the real 
+executable is on the path. 
+
+On most Linux distributions, the real *firefox-bin* is located on::
+
+   /usr/lib/firefox-x.x.x/ 
+
+Where the x.x.x is the version number you currently have. So, to add that path 
+to the user's path. you will have to add the following to your .bashrc file:
+
+.. code-block:: bash
+
+   export PATH="$PATH:/usr/lib/firefox-x.x.x/"
+
+.. This problem is caused because in linux, Firefox is executed through a shell
+   script (the one located on /usr/bin/firefox), when it comes the time to kill
+   the browser Selenium-RC will kill the shell script, leaving the browser 
+   running.  Santi: not sure if we should put this here...
+
+If necessary, you can specify the path to firefox-bin directly in your test,
+like this::
+
+   "*firefox /usr/lib/firefox-x.x.x/firefox-bin"
+
+IE and Style Attributes
+~~~~~~~~~~~~~~~~~~~~~~~
+If you are running your tests on Internet Explorer and you are trying to locate
+elements using their `style` attribute, you're definitely in trouble.
+Probably a locator like this::
+
+    //td[@style="background-color:yellow"]
+
+Would perfectly work in Firefox, Opera or Safari but it won't work on IE. 
+That's because the keys in  `@style` are interpreted as uppercase once the page
+is parsed by IE. So, even if the source code is in lowercase, you should use::
+
+    //td[@style="BACKGROUND-COLOR:yellow"]
+
+This is a problem if your test is intended to work on multiple browsers, but
+you can easily code your test to detect the situation and try the alternative
+locator that only works in IE.
+   
 
 Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
