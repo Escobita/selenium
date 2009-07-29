@@ -8,8 +8,8 @@ steps:
 * Start any java IDE
 * Create new project
 * Add to your project classpath selenium-java-client-driver.jar 
-* Record your test to from Selenium-IDE and translate it to java code (Selenium
-  IDE has automation translation feature)
+* Record your test from Selenium-IDE and translate it to java code (Selenium
+  IDE has automatic translation feature to generate tests in variety of languages)
 * Run selenium server from console
 * Run your test in the IDE
 
