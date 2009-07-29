@@ -164,6 +164,7 @@ FirefoxDriver.prototype.sendKeys = function(respond, value) {
   if (currentlyActive != element) {
       currentlyActive.blur();
       element.focus();
+      element.ownerDocument.defaultView.focus();
   }
 
   var use = element;

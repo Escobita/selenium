@@ -175,6 +175,23 @@ if (goog.userAgent.IE || IS_FF_3) {
   }
 
 
+  function testSelectionReplacementInAContentEditableElement(driver) {
+    driver.get(TEST_PAGES.richtextPage);
+    var element = driver.findElement({id: 'editDiv'});
+    element.sendKeys("one");
+    assertThat(element.getText(), equals("one"));
+
+    element.sendKeys(webdriver.Key.SHIFT, webdriver.Key.UP);
+    element.sendKeys("two");
+    assertThat(element.getText(), equals("two"));
+
+    element.sendKeys(webdriver.Key.UP);
+    element.sendKeys(webdriver.Key.SHIFT, webdriver.Key.DOWN);
+    element.sendKeys("three");
+    assertThat(element.getText(), equals("three"));
+  }
+
+
   function testSelectAllAndTypeInAContentEditableElement(driver) {
     var key = webdriver.Key;
     var selectAll =

@@ -57,7 +57,11 @@ function testShouldFireEventsInTheRightOrder(driver) {
   driver.get(TEST_PAGES.javascriptPage);
   clickOnElementWhichRecordsEvents(driver);
   var text = driver.findElement({id: 'result'}).getText();
-  assertThat(text, matchesRegex(/mousedown focus ([^ ] )*mouseup click/));
+  // In Firefox, the focus event will not fire if Firefox is not on top. Also,
+  // there may be an additional blur/focus events captured if the window's focus
+  // state changes before the mouseup event fires.
+  assertThat(text,
+      matchesRegex(/mousedown (focus ((focus|blur) )*)?mouseup click/));
 }
 
 

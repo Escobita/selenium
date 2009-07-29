@@ -468,7 +468,7 @@ webdriver.TestRunner.prototype.getReport = function() {
   }
   return goog.array.map(this.results_, function(result) {
     return result.getSummary();
-  }).join('\n');
+  }).join('\n') + '\n';
 };
 
 

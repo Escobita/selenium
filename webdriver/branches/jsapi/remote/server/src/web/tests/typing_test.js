@@ -88,8 +88,9 @@ function testFiresFocusKeyEventsInTheRightOrder(driver) {
   var result = driver.findElement({id: 'result'});
   driver.findElement({id: 'theworks'}).sendKeys('a');
   assertThat(
-      'Firefox will not fire the focus event if it is not active app',
-      result.getText(), is('focus keydown keypress keyup'));
+      'Firefox will not fire the focus event if it is not the active app',
+      result.getText(),
+      matchesRegex(/(focus )?keydown keypress keyup/));
 }
 
 

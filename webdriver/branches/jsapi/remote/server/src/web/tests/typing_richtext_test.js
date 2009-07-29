@@ -172,6 +172,24 @@ if (!goog.userAgent.IE) {
   }
 
 
+  function testSelectionReplacementInADesignModeEnabledDocument(driver) {
+    driver.get(TEST_PAGES.richtextPage);
+    driver.switchToFrame('editFrame');
+    var element = driver.findElement({xpath: '//body'});
+    element.sendKeys("one");
+    assertThat(element.getText(), equals("one"));
+
+    element.sendKeys(webdriver.Key.SHIFT, webdriver.Key.UP);
+    element.sendKeys("two");
+    assertThat(element.getText(), equals("two"));
+
+    element.sendKeys(webdriver.Key.UP);
+    element.sendKeys(webdriver.Key.SHIFT, webdriver.Key.DOWN);
+    element.sendKeys("three");
+    assertThat(element.getText(), equals("three"));
+  }
+
+
   function testReverseSelectionReplacementInADesignModeEnabledDocument(driver) {
     var key = webdriver.Key;
     runDesignModeEnabledDocumentTypingTest(driver, 'a\n123',

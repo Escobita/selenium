@@ -596,4 +596,24 @@ public class TypingTest extends AbstractDriverTestCase {
 
     assertEquals("Fishee!", element.getText());
   }
+
+
+  @JavascriptEnabled
+  @Ignore(HTMLUNIT)
+  public void testSelectionReplacementInAContentEditableElement() {
+    driver.get(richTextPage);
+    driver.switchTo().frame("editFrame");
+    WebElement element = driver.switchTo().activeElement();
+
+    element.sendKeys("one");
+    assertEquals("one", element.getText());
+
+    element.sendKeys(Keys.SHIFT, Keys.UP);
+    element.sendKeys("two");
+    assertEquals("two", element.getText());
+
+    element.sendKeys(Keys.UP, Keys.SHIFT, Keys.DOWN);
+    element.sendKeys("three");
+    assertEquals("three", element.getText());
+  }
 }
