@@ -1455,7 +1455,8 @@ similar one::
 
     "Unable to connect to remote server….Inner Exception Message: No 
     connection could be made because the target machine actively refused it…."
-    (using .NET and XP Service Pack 2) 
+    
+	(using .NET and XP Service Pack 2) 
 
 If you see a message like this, be sure you started the Selenium Server. If 
 you did, then there is some problem with the connectivity between the two 
@@ -1463,8 +1464,9 @@ components. This should not normally happen when your operating system has
 typical networking and TCP/IP settings. If you continue to have trouble, try 
 a different computer.  
 
-You can also use common networking tools like *ping*, *telnet*, *ipconfig/ifconfig*(on windows), 
-etc to ensure you first have a valid network connection.  Also, if you're trying to 
+You can also use common networking tools like *ping*, *telnet*, *ipconfig/ifconfig*
+(on windows), etc to ensure you first have a valid network connection.  
+Also, if you're trying to 
 connect to the Selenium Server on a remote machine try running it locally first and
 verifying you can get a connection using "localhost" as your connection parameter.  
  
@@ -1492,7 +1494,7 @@ This could be caused by
   not specify a separate profile. 
 * The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
   passed to Selenium when you program opens the browser. 
-* You specified the path to the browser explicitly (using *custom--see above) but the path is 
+* You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
   incorrect. 
 
 Selenium Cannot Find the AUT 
