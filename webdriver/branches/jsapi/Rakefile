@@ -278,10 +278,10 @@ end
 task :debug_jsapi => [:jsapi] do
   classpath = "-cp "
   %w(webdriver-firefox.jar webdriver-common-test.jar webdriver-jsapi.jar).each do |m|
-    classpath += ":build/#{m}"
+    classpath += File::PATH_SEPARATOR + "build/#{m}"
   end
   Dir.glob('common/lib/buildtime/*.jar').each do |m|
-    classpath += ":#{m}"
+    classpath += File::PATH_SEPARATOR + "#{m}"
   end
   command_string = 'java ' + classpath
   command_string += ' org.openqa.selenium.remote.server.JsApiTestServer'
