@@ -316,7 +316,7 @@ FirefoxDriver.prototype.selectElementsUsingClassName = function(respond, name) {
 };
 
 FirefoxDriver.prototype.selectElementUsingLink = function(respond, linkText) {
-    var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+    var allLinks = Utils.getDocument(this.context).getElementsByTagName("a");
     var index;
     for (var i = 0; i < allLinks.length && !index; i++) {
         var text = Utils.getText(allLinks[i], true);
@@ -338,7 +338,7 @@ FirefoxDriver.prototype.selectElementUsingLink = function(respond, linkText) {
 };
 
 FirefoxDriver.prototype.selectElementsUsingLink = function(respond, linkText) {
-  var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+  var allLinks = Utils.getDocument(this.context).getElementsByTagName("a");
   var indices = "";
   for (var i = 0; i < allLinks.length; i++) {
     var text = Utils.getText(allLinks[i], true);
@@ -357,7 +357,7 @@ FirefoxDriver.prototype.selectElementsUsingLink = function(respond, linkText) {
 };
 
 FirefoxDriver.prototype.selectElementsUsingPartialLinkText = function(respond, linkText) {
-    var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+    var allLinks = Utils.getDocument(this.context).getElementsByTagName("a");
     var indices = "";
     for (var i = 0; i < allLinks.length; i++) {
         var text = Utils.getText(allLinks[i], true);
@@ -372,7 +372,7 @@ FirefoxDriver.prototype.selectElementsUsingPartialLinkText = function(respond, l
 };
 
 FirefoxDriver.prototype.selectElementUsingPartialLinkText = function(respond, linkText) {
-    var allLinks = Utils.getDocument(this.context).getElementsByTagName("A");
+    var allLinks = Utils.getDocument(this.context).getElementsByTagName("a");
     var index;
     for (var i = 0; i < allLinks.length && !index; i++) {
         var text = Utils.getText(allLinks[i], true);
