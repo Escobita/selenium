@@ -83,7 +83,7 @@ to capture this id dynamically from the website itself. It can be done as:
 .. code-block:: java
 
    String[] checkboxIds  = selenium.getAllFields(); // Collect all input ids on page.
-   if(GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
+   if(!GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
           {
                    // If the id starts with addForm
                    if(checkboxIds[i].indexOf("addForm") > -1) {                       
@@ -106,8 +106,11 @@ element link can be achieved as following:
 
 .. code-block:: java
 
-    // Stores reference for second appearance of link.
+    // Flag for second appearance of link.
     boolean isSecondInstanceLink = false;
+    
+    // Desired link.
+    String editInfo = null;
 
     // Collect all links.
     String[] links = selenium.getAllLinks();
@@ -118,15 +121,16 @@ element link can be achieved as following:
         // If retrieved link is not null
         if(!GenericValidator.isBlankOrNull(linkID))  {
 
-            // Find the inner HTML of collected links.
-            editTermSectionInfo = selenium.getEval("window.document.getElementById('"+linkID+"').innerHTML");
+            // Find the inner HTML of link.
+            String editTermSectionInfo = selenium.getEval("window.document.getElementById('"+linkID+"').innerHTML");
 
             // If retrieved link is expected link.
             if(editTermSectionInfo.equalsIgnoreCase("expectedlink")) {
 
-                // If it is second appearance of link then save the link id.
-                if(isSecondInstanceAutumnLink) {
+                // If it is second appearance of link then save the link id and break the loop.
+                if(isSecondInstanceLink) {
                     editInfo = linkID;
+                    break;
                 }
 
             // Set the second appearance of Autumn term link to true as
@@ -135,7 +139,7 @@ element link can be achieved as following:
         }
     }
     
-    // Click on collected element.
+    // Click on link.
     selenium.click(editInfo);
                    
 
