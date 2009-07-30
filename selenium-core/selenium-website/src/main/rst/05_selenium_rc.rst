@@ -950,9 +950,8 @@ Iteration is one of the most common things people need to do in their tests.
 For example, you may want to to execute a search multiple times.  Or, perhaps for
 verifying your test results you need to process a "result set" returned from a database.
 
-If we take the same `Google search example`_ we've been using, it's not so crazy to 
-check that all the Selenium tools appear in the search
-results. This test could use the Selenese:
+Using the same `Google search example`_ we used earlier, let's 
+check the Selenium the search results. This test could use the Selenese:
 
 =================  ===========================  =============
 open               /
@@ -967,12 +966,10 @@ clickAndWait       btnG
 assertTextPresent  Results * for selenium grid
 =================  ===========================  =============
 
-The code has been triplicated to run the same steps 3 times.  No half-way
-decent software person would want to do it this way, it makes
-managing the code much more difficult.
-
-By using a programming language, we can iterate over a list and run 
-the search this way. 
+The code has been repeated to run the same steps 3 times.  But multiple
+copies of the same code is not good program practice because it's more
+work to maintain.  By using a programming language, we can iterate
+over the search results for a more flexible and maintainable solution. 
 
 **In C#:**   
    
