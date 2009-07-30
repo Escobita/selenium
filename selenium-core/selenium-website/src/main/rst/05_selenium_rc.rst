@@ -817,15 +817,51 @@ In the background the browser will actually perform a *type* operation,
 essentially identical to a user typing input into the browser, by  
 using the locator and the string you specified during the method call.
 
-Retrieving and Reporting Results
---------------------------------
-Each programming language has its own testing framework which is used to
-run the tests. Every one of them has its own way of reporting the results
-and you'll find third-party libraries specially created for reporting
-test results in different formats such as HTML or PDF.
+Reporting Results
+-----------------
+Selenium-RC does not have its own mechanism for reporting results.  Rather, it allows
+you to build your reporting customized to your needs using features of your
+chosen programming language.  That's great, but what if you simply want something
+quick that's already done for you?  Often an existing library or test framework will
+exist that can meet your needs faster than developing your own test reporting code.
 
-**Generating Test Reports for Java client driver:**
-    
+Test Framework Reporting Tools 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Test frameworks are available for many programming languages.  These, along with
+their primary function of providing a flexible test engine for executing your tests, 
+include library code for reporting results.  For example, Java has two 
+commonly used test frameworks, JUnit and TestNG.  .NET also has its own, NUnit.
+
+We won't teach the frameworks themselves here; that's beyond the scope of this
+user guide.  We will simply introduce the framework features that relate to Selenium
+along with some techniques you can apply.  Their are good books available on these
+test frameworks however along with information on the internet.
+
+Test Report Libraries 
+~~~~~~~~~~~~~~~~~~~~~
+Also available are third-party libraries specifically created for reporting
+test results in your chosen programming language.  These often support a 
+variety of formats such as HTML or PDF.
+
+What's The Best Approach? 
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Most people new to the testing frameworks will being with the framework's
+built-in reporting features.  From there most will examine any available libraries
+as that's less time consuming than developing your own.  As you begin to use
+Selenium no doubt you will start putting in your own "print statements" for 
+reporting progress.  That may gradually lead to you developing your own 
+reporting, possibly in parallel to using a library or test framework.  Regardless,
+after the initial, but short, learning curve you will naturally develop what works
+best for your own situation.
+
+Test Reporting Examples
+~~~~~~~~~~~~~~~~~~~~~~~
+To illustrate, we'll direct you to some specific tools in some of the other languages 
+supported by Selenium.  The ones listed here are commonly used and have been used 
+extensively (and therefore recommended) by the authors of this guide.
+
+Test Reports in Java
+++++++++++++++++++++
 
 - If Selenium Test cases are developed using JUnit then JUnit Report can be used
   to generate test reports. Refer to `JUnit Report`_ for specifics.
@@ -846,7 +882,7 @@ test results in different formats such as HTML or PDF.
 .. _`ReportNG`: https://reportng.dev.java.net/  
 
 - Also, for a very nice summary report try using TestNG-xslt. 
-  TestNG-xslt Report looks like this.
+  A TestNG-xslt Report looks like this.
 
   .. image:: images/chapt5_TestNGxsltReport.png
 
@@ -854,20 +890,25 @@ test results in different formats such as HTML or PDF.
 
 .. _`TestNG-xslt`: http://code.google.com/p/testng-xslt/
 
-- Logging Selenium can also be used to generate reports for the Java client driver.  
-  Logging Selenium extends the Java client driver to add logging ability. 
-  Please refer to `Logging Selenium`_.
+**Logging the Selenese Commands**
+
+- Logging Selenium can be used to generate a report of all the Selenese commands
+  in your test along with the success of failure of each. Logging Selenium extends
+  the Java client driver to add this Selenense logging ability. Please refer 
+  to `Logging Selenium`_.
     
 .. _`Logging Selenium`: http://loggingselenium.sourceforge.net/index.html
 
-**Generating Test Reports for Python Client driver:**
+Test Reports for Python
++++++++++++++++++++++++
 
 - When using Python Client Driver then HTMLTestRunner can be used to
   generate a Test Report. See `HTMLTestRunner`_.
     
 .. _`HTMLTestRunner`: http://tungwaiyip.info/software/HTMLTestRunner.html
 
-**Generating Test Reports for Ruby Client driver:**
+Test Reports for Ruby
++++++++++++++++++++++
 
 - If RSpec framework is used for writing Selenium Test Cases in Ruby
   then its HTML report can be used to generate test report.
@@ -1384,8 +1425,8 @@ Selenium RC Logging
 
 Server-Side Logs
 ++++++++++++++++
-When launching selenium server then **-log** option can be used to direct 
-lots of valuable debugging information to a text file.
+When launching selenium server the **-log** option can be used to save
+valuable debugging information reported by the Selenium Server to a text file.
 
 .. code-block:: bash
 
@@ -1400,7 +1441,7 @@ number of the thread that logged the message. For example:
    20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
    Browser 465828/:top frame1 posted START NEW
    
-Format is 
+The message format is 
 
 .. code-block:: bash
 
