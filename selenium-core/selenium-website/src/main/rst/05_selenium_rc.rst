@@ -921,9 +921,11 @@ Test Reports for Ruby
 
 Adding Some Spice to Your Tests
 -------------------------------
-Now you'll understand why you needed Selenium-RC and you just couldn't stay
-strictly with Selenium-IDE. We will give you guidance here on things that can
-only be done using a programming language.
+Now we'll get to the whole reason for using Selenium-RC, adding programming logic to your tests.
+It's the same as for any program.  Program flow is controlled using condition statements
+and iteration.  In addition you can report progress information using I/O.  In this section
+we'll show some examples of how programming language constructs can be combined with 
+Selenium to solve common testing problems. 
 
 You find, as you transition from running simple tests of page elements, to 
 building tests of dynamic functionality involving multiple web-pages and 
@@ -1453,14 +1455,14 @@ Browser-Side Logs
 +++++++++++++++++
 JavaScript on the browser side (Selenium Core) also logs important messages; 
 in many cases, these can be more useful to the end-user than the regular Selenium 
-Server logs. To access browser-side logs, one will need to pass the **-browserSideLog**
-argument to the Selenium Server, like this:
+Server logs. To access browser-side logs, pass the **-browserSideLog**
+argument to the Selenium Server.
 
 .. code-block:: bash
 
    java -jar selenium-server.jar -browserSideLog
    
-**-browserSideLog** can also be combined with the **-log** argument, to log 
+**-browserSideLog** can  be combined with the **-log** argument, to log 
 browserSideLogs (as well as all other DEBUG level logging messages) to a file.
 
 .. Selenium-IDE Generated Code
