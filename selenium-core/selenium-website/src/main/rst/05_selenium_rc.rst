@@ -940,9 +940,9 @@ to illustrate the use of common programming techniques to
 give you greater 'verification power' in your automated testing.
 
 The examples in this section are written
-in a single programming language--the idea being that you understand the concept and be
-able to translate it to the language of your choice.  If you have some basic knowledge
-of object-oriented programming you shouldn't have difficulty making use of this section.
+in Java, although the code is simple and can be easily adapted to the other supported
+languages.  If you have some basic knowledge
+of an object-oriented programming language you shouldn't have difficulty understanding this section.
 
 Iteration
 ~~~~~~~~~
