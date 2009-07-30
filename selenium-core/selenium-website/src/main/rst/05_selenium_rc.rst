@@ -927,16 +927,16 @@ and iteration.  In addition you can report progress information using I/O.  In t
 we'll show some examples of how programming language constructs can be combined with 
 Selenium to solve common testing problems. 
 
-You find, as you transition from running simple tests of page elements, to 
-building tests of dynamic functionality involving multiple web-pages and 
+You will find as you transition from the simple tests of the existence of 
+page elements to tests of dynamic functionality involving multiple web-pages and 
 varying data that you will require programming logic for verifying expected 
-test results.  Basically, the Selenium-IDE does not support iteration and 
-condition statements.  You will find you can do some simple condition 
-statements by embedding javascript in your Selenese parameters, however 
-iteration is impossible, and many conditions simply will need to be done in a 
-programming language.  In addition, you may need to use exception-handling for
+results.  Basically, the Selenium-IDE does not support iteration and 
+standard condition statements.  You can do some conditions by embedding javascript
+in Selenese parameters, however 
+iteration is impossible, and most conditions will be much easier in a  
+programming language.  In addition, you may need exception-handling for
 error recovery.  For these reasons and others, we have written this section
-to give you ideas on how to leverage common programming techniques to
+to illustrate the use of common programming techniques to
 give you greater 'verification power' in your automated testing.
 
 The examples in this section are written
