@@ -349,7 +349,7 @@ Utils.type = function(context, element, text) {
   if (obj && node && thmgr_cls) {
     // Now do the native thing.
     obj.sendKeys(node, text);
-    
+
     var hasEvents = {};
     do {
       // This sleep is needed so that Firefox on Linux will manage to process
@@ -566,31 +566,31 @@ Utils.type = function(context, element, text) {
             }
         } else if (c == '\n') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_RETURN;
-            charCode = text.charCodeAt(i);
-        } else if (c == ',') {
+            charCode = c.charCodeAt(0);
+        } else if (c == ',' || c == '<') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_COMMA;
-            charCode = text.charCodeAt(i);
-        } else if (c == '.') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '.' || c == '>') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_PERIOD;
-            charCode = text.charCodeAt(i);
-        } else if (c == '/') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '/' || c == '?') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SLASH;
             charCode = text.charCodeAt(i);
-        } else if (c == '`') {
+        } else if (c == '`' || c == '~') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_BACK_QUOTE;
-            charCode = text.charCodeAt(i);
-        } else if (c == '{') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '{' || c == '[') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_OPEN_BRACKET;
-            charCode = text.charCodeAt(i);
-        } else if (c == '\\') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '\\' || c == '|') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_BACK_SLASH;
-            charCode = text.charCodeAt(i);
-        } else if (c == '}') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '}' || c == ']') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CLOSE_BRACKET;
-            charCode = text.charCodeAt(i);
-        } else if (c == '\'') {
+            charCode = c.charCodeAt(0);
+        } else if (c == '\'' || c == '"') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_QUOTE;
-            charCode = text.charCodeAt(i);
+            charCode = c.charCodeAt(0);
         } else {
             keyCode = upper.charCodeAt(i);
             charCode = text.charCodeAt(i);
@@ -621,8 +621,27 @@ Utils.type = function(context, element, text) {
         // generate key[down/press/up] for key
 
         var pressCode = keyCode;
-        if (charCode >= 32 && charCode < 127)
+        if (charCode >= 32 && charCode < 127) {
           pressCode = 0;
+          if (!needsShift && shiftKey && charCode > 32) {
+            // If typing a lowercase character key and the shiftKey is down, the
+            // charCode should be mapped ot the shifted key value. This assumes
+            // a default 104 international keyboard layout.
+            if (charCode >= 97 && charCode <= 122) {
+              charCode = charCode + 65 - 97;  // [a-z] -> [A-Z]
+            } else {
+              var mapFrom = '`1234567890-=[]\\;\',./';
+              var mapTo   = '~!@#$%^&*()_+{}|:"<>?';
+
+              var value = String.fromCharCode(charCode).
+                  replace(/([\[\\\.])/g, '\\$1');
+              var index = mapFrom.search(value);
+              if (index >= 0) {
+                charCode = mapTo.charCodeAt(index);
+              }
+            }
+          }
+        }
 
         var accepted =
           Utils.keyEvent(context, element, "keydown", keyCode, 0,

@@ -165,7 +165,7 @@ if (!goog.userAgent.IE) {
 
   function testForwardSelectionReplacementInADesignModeEnabledDocument(driver) {
     var key = webdriver.Key;
-    runDesignModeEnabledDocumentTypingTest(driver, 'a\nmiddle\nc',
+    runDesignModeEnabledDocumentTypingTest(driver, 'a\nMIDDLE\nc',
         'a\nb\nc\n',
         key.UP, key.UP, key.SHIFT, key.RIGHT,
         'middle');
@@ -192,7 +192,7 @@ if (!goog.userAgent.IE) {
 
   function testReverseSelectionReplacementInADesignModeEnabledDocument(driver) {
     var key = webdriver.Key;
-    runDesignModeEnabledDocumentTypingTest(driver, 'a\n123',
+    runDesignModeEnabledDocumentTypingTest(driver, 'a\n!@#',
         'a\nb\nc\n',
         key.SHIFT, key.LEFT, key.LEFT, key.LEFT, key.LEFT,
         '123');

@@ -447,7 +447,7 @@ if (goog.userAgent.MAC) {
 function testForwardSelectionReplacementInATextAreaElement(driver) {
   var key = webdriver.Key;
   var jumpToEndChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.END;
+      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.chord(key.END);
   runTextAreaTypingTest(driver, 'line 1\nmiddle\nline 3\n',
       'line 1\nline 2\nline 3\n',
       webdriver.Key.ARROW_UP, webdriver.Key.ARROW_UP,
@@ -459,9 +459,9 @@ function testForwardSelectionReplacementInATextAreaElement(driver) {
 function testReverseSelectionReplacementInATextAreaElement(driver) {
   var key = webdriver.Key;
   var jumpToStartChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_LEFT) : key.HOME;
+      key.chord(key.COMMAND, key.ARROW_LEFT) : key.chord(key.HOME);
   var jumpToEndChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.END;
+      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.chord(key.END);
   runTextAreaTypingTest(driver, 'line 1\nmiddle\nline 3\n',
       'line 1\nline 2\nline 3\n',
       webdriver.Key.ARROW_UP, webdriver.Key.ARROW_UP, jumpToEndChord,
@@ -523,13 +523,13 @@ function testCutCopyPasteInATextAreaElement(driver) {
 function testMultilineSelectionEditingInTextAreaElement(driver) {
   var key = webdriver.Key;
   var jumpToStartChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_LEFT) : key.HOME;
+      key.chord(key.COMMAND, key.ARROW_LEFT) : key.chord(key.HOME);
   var jumpToEndChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.END;
+      key.chord(key.COMMAND, key.ARROW_RIGHT) : key.chord(key.END);
   var pageUpChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_UP) : key.PAGE_UP;
+      key.chord(key.COMMAND, key.ARROW_UP) : key.chord(key.PAGE_UP);
   var pageDownChord = goog.userAgent.MAC ?
-      key.chord(key.COMMAND, key.ARROW_DOWN) : key.PAGE_DOWN;
+      key.chord(key.COMMAND, key.ARROW_DOWN) : key.chord(key.PAGE_DOWN);
 
   driver.get(TEST_PAGES.javascriptPage);
   var element = driver.findElement({id: 'keyUpArea'});

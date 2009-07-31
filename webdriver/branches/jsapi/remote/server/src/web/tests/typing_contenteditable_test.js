@@ -159,7 +159,7 @@ if (goog.userAgent.IE || IS_FF_3) {
 
   function testForwardSelectionReplacementInAContentEditableElement(driver) {
     var key = webdriver.Key;
-    runContentEditableTypingTest(driver, 'a\nmiddle\nc',
+    runContentEditableTypingTest(driver, 'a\nMIDDLE\nc',
         'a\nb\nc\n',
         key.UP, key.UP, key.SHIFT, key.RIGHT,
         'middle');
@@ -168,7 +168,7 @@ if (goog.userAgent.IE || IS_FF_3) {
 
   function testReverseSelectionReplacementInAContentEditableElement(driver) {
     var key = webdriver.Key;
-    runContentEditableTypingTest(driver, 'a\n123',
+    runContentEditableTypingTest(driver, 'a\n!@#',
         'a\nb\nc\n',
         key.SHIFT, key.LEFT, key.LEFT, key.LEFT, key.LEFT,
         '123');

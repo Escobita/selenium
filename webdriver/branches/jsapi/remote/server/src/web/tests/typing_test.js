@@ -278,21 +278,11 @@ if (goog.userAgent.MAC) {
     assertThat(element.getValue(), is('dbac1'));
   };
 } else {
-  var testHomeEndPageUpAndPageDownOnAnInputElementOnANonMac = function(driver) {
+  var testHomeAndEndOnAnInputElementOnANonMac = function(driver) {
     driver.get(TEST_PAGES.javascriptPage);
     var element = driver.findElement({id: 'keyReporter'});
-    element.sendKeys(
-        'a', webdriver.Key.PAGE_UP,
-        'b', webdriver.Key.PAGE_DOWN,
-        'c', webdriver.Key.HOME,
-        'd', webdriver.Key.END,
-        '1');
-    if (goog.userAgent.IE) {
-      // On IE pageUp/Down jump to the beginning and end of the field.
-      assertThat(element.getValue(), is('dbac1'));
-    } else {
-      assertThat(element.getValue(), is('dabc1'));
-    }
+    element.sendKeys('a', webdriver.Key.HOME, 'b', webdriver.Key.END, 'd');
+    assertThat(element.getValue(), is('bad'));
   };
 }
 
@@ -501,3 +491,69 @@ if (goog.userAgent.MAC) {
   };
 }
 
+
+function testTypingAsciiCharactersThatDoNotNeedShiftWithAShift(driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  var element = driver.findElement({id: 'keyReporter'});
+
+  function runTest(text, expect) {
+    element.clear();
+    var sentKeys = '; sent keys <SHIFT + "' + text + '">';
+    element.sendKeys(webdriver.Key.SHIFT,  text);
+    assertThat('Incorrect text' + sentKeys, element.getValue(), equals(expect));
+  }
+
+  var alphabetsoup = 'abcdefghijklmnopqrstuvwxyz';
+  for (var i = 0, character; character = alphabetsoup[i]; i++) {
+    runTest(character, character.toUpperCase());
+  }
+
+  runTest('`', '~');
+  runTest('1', '!');
+  runTest('2', '@');
+  runTest('3', '#');
+  runTest('4', '$');
+  runTest('5', '%');
+  runTest('6', '^');
+  runTest('7', '&');
+  runTest('8', '*');
+  runTest('9', '(');
+  runTest('0', ')');
+  runTest('-', '_');
+  runTest('=', '+');
+  runTest('[', '{');
+  runTest(']', '}');
+  runTest('\\', '|');
+  runTest(';', ':');
+  runTest('\'', '"');
+  runTest(',', '<');
+  runTest('.', '>');
+  runTest('/', '?');
+}
+
+
+function testShiftingMultipleTimesInOneKeySequenceTogglesShiftState(driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  var element = driver.findElement({id: 'keyReporter'});
+  element.sendKeys(
+      'abc', webdriver.Key.SHIFT, 'def', webdriver.Key.SHIFT, 'ghi');
+  assertThat(element.getValue(), equals('abcDEFghi'));
+}
+
+
+function testCannotShiftUnshiftWhenTypingCapitalLetters(driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  var element = driver.findElement({id: 'keyReporter'});
+  element.sendKeys(
+      'ABC', webdriver.Key.SHIFT, 'DEF', webdriver.Key.SHIFT, 'GHI');
+  assertThat(element.getValue(), equals('ABCDEFGHI'));
+}
+
+
+function testCanTerminateShiftWithSpecialNullKey(driver) {
+  driver.get(TEST_PAGES.javascriptPage);
+  var element = driver.findElement({id: 'keyReporter'});
+  element.sendKeys(
+      'abc', webdriver.Key.SHIFT, 'def', webdriver.Key.NULL, 'ghi');
+  assertThat(element.getValue(), equals('abcDEFghi'));
+}
