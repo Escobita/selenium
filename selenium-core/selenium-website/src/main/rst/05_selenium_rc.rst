@@ -1025,115 +1025,12 @@ and then take alternatives when it it is not.  Let's look at this using Java.
 The aadvantage of this approach is to continue with test execution even if some UI 
 elements are not available on page.
 
-Data Driven Testing
-~~~~~~~~~~~~~~~~~~~
-So, the iteration_ idea seems cool. Let's improve this by allowing the users to
-write an external text file from which the script should read the input data,
-search and assert its existence.
 
-**In Python:**
-
-.. code-block:: python
-
-   # Collection of String values
-   source = open("input_file.txt", "r")
-   values = source.readlines()
-   source.close()
-   # Execute For loop for each String in the values array
-   for search in values:
-       sel.open("/")
-       sel.type("q", search)
-       sel.click("btnG")
-       sel.waitForPageToLoad("30000")
-       self.failUnless(sel.is_text_present("Results * for " + search))
-
-Why would we want a separate file with data in it for our tests?  One 
-important method of testing concerns running the same test repetetively with 
-differnt data values.  This is called *Data Driven Testing* and is a very 
-common testing task.  Test automation tools, Selenium included, generally 
-handle this as it's often a common reason for building test automation to 
-support manual testing methods.
-
-The Python script above opens a text file.  This file contains a different search
-string on each line. The code then saves this in an array of strings, and at last,
-it's iterating over the strings array and doing the search and assert on each.
-
-This is a very basic example of what you can do, but the idea is to show you
-things that can easily be done with either a programming or scripting 
-language when they're difficult or even impossible to do using Selenium-IDE.
-
-Refer to `Selnium RC wiki`_ for examples on reading data from spread sheet or using
-data provider capabilities of TestNG with java client driver.
-
-.. _`Selnium RC wiki`: http://wiki.openqa.org/pages/viewpage.action?pageId=21430298
-
-Error Handling
-~~~~~~~~~~~~~~
-
-*Note: This section is not yet developed.*
-
-A quick note though--recognize that your programming language's exception-
-handling support can be used for error handling and recovery.
-
-.. TODO: Complete this... Not sure if the scenario that I put is the best example to use
-.. Then, what if google.com is down at the moment of our tests? Even if that sounds
-   completely impossible. We can create a recovery scenario for that test. We can
-   make our tests to wait for a certain amount of time and try again:
-
-.. The idea here is to use a try-catch statement to grab a really unexpected
-   error.
-
-Database Validations
-~~~~~~~~~~~~~~~~~~~~~
-
-Since you can also do database queries from your favorite programming 
-language, assuming you have database support functions, why not using them
-for some data validations/retrieval on the Application Under Test?
-
-Consider example of Registration process where in registered email address
-is to be retrieved from database. Specific cases of establishing DB connection 
-and retrieving data from DB would be:
-
-**In Java:**
-
-.. code-block:: java
-
-   // Load Microsoft SQL Server JDBC driver.   
-   Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-      
-   // Prepare connection url.
-   String url = "jdbc:sqlserver://192.168.1.180:1433;DatabaseName=TEST_DB";
-   
-   // Get connection to DB.
-   public static Connection con = 
-   DriverManager.getConnection(url, "username", "password");
-   
-   // Create statement object which would be used in writing DDL and DML 
-   // SQL statement.
-   public static Statement stmt = con.createStatement();
-   
-   // Send SQL SELECT statements to the database via the Statement.executeQuery
-   // method which returns the requested information as rows of data in a 
-   // ResultSet object.
-   
-   ResultSet result =  stmt.executeQuery
-   ("select top 1 email_address from user_register_table");
-   
-   // Fetch value of "email_address" from "result" object.
-   String emailaddress = result.getString("email_address");
-   
-   // Use the fetched value to login to application.
-   selenium.type("userid", emailaddress);
-   
-This is very simple example of data retrieval from DB in Java.
-A more complex test could be to validate that inactive users are not able
-to login to application. This wouldn't take too much work from what you've 
-already seen.
 
 Executing java script 
 ~~~~~~~~~~~~~~~~~~~~~
 
-java script comes very handy in exercising application which is not directly supported
+Javascript comes very handy in exercising application which is not directly supported
 by selenium. **getEval** method of selenium API can be used to execute java script from
 selenium RC. 
 
