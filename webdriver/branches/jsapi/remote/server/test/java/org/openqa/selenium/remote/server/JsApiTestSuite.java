@@ -4,10 +4,7 @@ import junit.framework.TestCase;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.TestSuiteBuilder;
-import org.openqa.selenium.Ignore;
 import org.openqa.selenium.JavascriptExecutor;
-import static org.openqa.selenium.Ignore.Driver.ALL;
 
 import java.util.logging.Logger;
 
@@ -21,7 +18,7 @@ public class JsApiTestSuite extends TestCase {
   private static final Logger LOGGER =
       Logger.getLogger(JsApiTestSuite.class.getName());
 
-  private static final long FIVE_MINUTES = 5 * 60 * 1000;
+  private static final long FIFTEEN_MINUTES = 15 * 60 * 1000;
   private static final String IS_FINISHED_SCRIPT =
       "return webdriver.TestRunner.SINGLETON.isFinished();";
   private static final String NUM_PASSED_SCRIPT =
@@ -83,8 +80,8 @@ public class JsApiTestSuite extends TestCase {
 
       long now = System.currentTimeMillis();
       long ellapsed = now - start;
-      if (ellapsed > FIVE_MINUTES) {
-        fail("TIMEOUT: JS API tests should not take more than 5 minutes");
+      if (ellapsed > FIFTEEN_MINUTES) {
+        fail("TIMEOUT: JS API tests should not take more than 15 minutes");
       }
     } while (true);
 
