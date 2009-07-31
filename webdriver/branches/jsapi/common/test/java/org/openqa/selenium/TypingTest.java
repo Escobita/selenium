@@ -616,4 +616,55 @@ public class TypingTest extends AbstractDriverTestCase {
     element.sendKeys("three");
     assertEquals("three", element.getText());
   }
+
+
+  @JavascriptEnabled
+  @Ignore(HTMLUNIT)
+  public void testTypingAsciiCharactersThatDoNotNeedShiftWithAShift() {
+    driver.get(javascriptPage);
+    WebElement element = driver.findElement(By.id("keyReporter"));
+
+    String alphabetsoup = "abcdefghijklmnopqrstuvwxyz";
+    for (int i = 0; i < alphabetsoup.length(); i++) {
+      String character = alphabetsoup.substring(i, i + 1);
+      element.clear();
+      element.sendKeys(Keys.SHIFT, character);
+      assertEquals(
+          "Incorrect text; sent keys <SHIFT + "  + character + ">",
+          character.toUpperCase(), element.getValue());
+    }
+  }
+
+
+  @JavascriptEnabled
+  @Ignore(HTMLUNIT)
+  public void testShiftingMultipleTimesInOneKeySequenceTogglesShiftState() {
+    driver.get(javascriptPage);
+    WebElement element = driver.findElement(By.id("keyReporter"));
+    element.sendKeys(
+        "abc", Keys.SHIFT, "def", Keys.SHIFT, "ghi");
+    assertThat(element.getValue(), is("abcDEFghi"));
+  }
+
+
+  @JavascriptEnabled
+  @Ignore(HTMLUNIT)
+  public void testCannotShiftUnshiftWhenTypingCapitalLetters() {
+    driver.get(javascriptPage);
+    WebElement element = driver.findElement(By.id("keyReporter"));
+    element.sendKeys(
+        "ABC", Keys.SHIFT, "DEF", Keys.SHIFT, "GHI");
+    assertThat(element.getValue(), is("ABCDEFGHI"));
+  }
+
+
+  @JavascriptEnabled
+  @Ignore(HTMLUNIT)
+  public void testCanTerminateShiftWithSpecialNullKey() {
+    driver.get(javascriptPage);
+    WebElement element = driver.findElement(By.id("keyReporter"));
+    element.sendKeys(
+        "abc", Keys.SHIFT, "def", Keys.NULL, "ghi");
+    assertThat(element.getValue(), is("abcDEFghi"));
+  }
 }

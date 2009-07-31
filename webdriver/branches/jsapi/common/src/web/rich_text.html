@@ -39,12 +39,12 @@ window.onload = function () {
   setKeypressHandler(editDiv, printEventData);
   editDiv.contentEditable = true;
 
-  editFrame.document.body.style.margin = 1;
-  editFrame.document.body.style.padding = 0;
+  editFrame.document.body.style.margin = '1px';
+  editFrame.document.body.style.padding = '0';
   editFrame.document.body.id = 'theBody';
 
-  editDiv.style.margin = 1;
-  editDiv.style.padding = 0;
+  editDiv.style.margin = '1px';
+  editDiv.style.padding = '0';
 
   window.setTimeout(function() {
     var pre = document.createElement('pre');
