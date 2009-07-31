@@ -978,7 +978,7 @@ over the search results for a more flexible and maintainable solution.
    // Collection of String values.
    String[] arr = {"ide", "rc", "grid"};    
         
-   // Execute For loop for each String in 'arr' array.
+   // Execute loop for each String in array 'arr'.
    foreach (String s in arr) {
        sel.open("/");
        sel.type("q", "selenium " +s);
@@ -990,6 +990,7 @@ over the search results for a more flexible and maintainable solution.
 
 Condition Statements
 ~~~~~~~~~~~~~~~~~~~~
+To illustrate using conditions in tests we'll start with an example.
 A common problem encountered while running Selenium tests occurs when an 
 expected element is not available on page.  For example, when running the 
 following line:
@@ -998,21 +999,19 @@ following line:
    
    selenium.type("q", "selenium " +s);
    
-If element 'q' happens to be unavailable on the page then an exception is
+If element 'q' is not on the page then an exception is
 thrown:
 
 .. code-block:: java
 
    com.thoughtworks.selenium.SeleniumException: ERROR: Element q not found
 
-This can cause your test to abort.  Some types of tests may want that.  But
+This can cause your test to abort.  For some tests that's what you want.  But
 often that is not desireable as your test script has many other subsequent tests
 to perform.
 
-A better approach would be to first validate if the element is really present
-and then take alternatives when it it is not:
-
-**In Java:**
+A better approach is to first validate if the element is really present
+and then take alternatives when it it is not.  Let's look at this using Java.
 
 .. code-block:: java
    
@@ -1020,16 +1019,11 @@ and then take alternatives when it it is not:
    if(selenium.isElementPresent("q")) {
        selenium.type("q", "Selenium rc");
    } else {
-       Reporter.log("Element: " +q+ " is not available on page.")
+       System.out.printf("Element: " +q+ " is not available on page.")
    }
    
-Herein *Reporter* is API in TestNG framework. One can log exceptions using 
-the API of framework on which Sel Test Cases are built. Advantage of this 
-approach is to be able to continue with test execution even if *less* 
-important elements are not available on page.
-
-By just using a simple *if* condition, we can do interesting things. Think of
-the possibilities!
+The aadvantage of this approach is to continue with test execution even if some UI 
+elements are not available on page.
 
 Data Driven Testing
 ~~~~~~~~~~~~~~~~~~~
