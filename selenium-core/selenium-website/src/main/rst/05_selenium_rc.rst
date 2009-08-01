@@ -1401,7 +1401,7 @@ verifying you can get a connection using "localhost" as your connection paramete
 Unable to Load the Browser 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ok, not a very friendly error, sorry!  But if the Selenium Server cannot load the browser 
+Ok, not a very friendly error, sorry, but if the Selenium Server cannot load the browser 
 you will probably see this error.
  
 :: 
@@ -1419,11 +1419,12 @@ This error seems to occur when Selenium-RC cannot load the browser.
 This could be caused by
 
 * Firefox (prior to Selenium 1.0) cannot start because the browser is already open and you did 
-  not specify a separate profile. 
+  not specify a separate profile.   See the section on Firefox profiles under Server Options.
 * The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
   passed to Selenium when you program opens the browser. 
 * You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
-  incorrect. 
+  incorrect.  Check to be sure the path is correct.  Also check the forums to be sure there are
+  no known issues with your browser and the *custom parameters.
 
 Selenium Cannot Find the AUT 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
