@@ -917,7 +917,7 @@ Test Reports for Ruby
 .. _`RSpec Report`: http://rspec.info/documentation/tools/rake.html
 
 .. note:: If you are interested in a language independent log of what's going
-   on, take a look at `Selenium RC Logging`_
+   on, take a look at `Selenium Server Logging`_
 
 Adding Some Spice to Your Tests
 -------------------------------
@@ -1027,8 +1027,8 @@ elements are not available on page.
 
 
 
-Executing java script 
-~~~~~~~~~~~~~~~~~~~~~
+Executing Javascript from Your Test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Javascript comes very handy in exercising application which is not directly supported
 by selenium. **getEval** method of selenium API can be used to execute java script from
@@ -1177,28 +1177,26 @@ As a test suite starts in your favorite language, the following happens:
    Once the browser receives the web page, renders it in the frame/window reserved
    for it.
    
-Server Command Line options
----------------------------
-When the server is launched, some command line options can be used to change the
-default behaviour if it is needed.
+Server Options
+--------------
+When the server is launched, command line options can be used to change the
+default server behaviour.
 
-As you already know, the server is started by running the following:
+Recall, the server is started by running the following.
 
 .. code-block:: bash
  
    $ java -jar selenium-server.jar
 
-If you want to see the list of all the available options, you just have to use
-the ``-h`` option:
+To see the list of options, run the server with the ``-h`` option.
 
 .. code-block:: bash
  
    $ java -jar selenium-server.jar -h
 
-You'll receive a list of all the options you can use on the server and a brief
-explanation on all of them. 
-Though, for some of those options, that short overview is not enough, so we've
-written an in deep explanation for them.
+You'll see a list of all the options you can use with the server and a brief
+description of each. The provided descriptions will not always be enough, so we've
+provided explanations for some of the more important options.
 
 
 Proxy Configuration
@@ -1214,32 +1212,31 @@ like this -
 
 Multi-Window Mode
 ~~~~~~~~~~~~~~~~~
-Before 1.0, Selenium by default ran the application under test in a sub frame 
-which looks like this:
+If you are using Selenium 1.0 you can probably skip this section, since multiwindow mode is 
+the default behavior.  However, prior to version 1.0, Selenium by default ran the 
+application under test in a sub frame as shown here.
 
 .. image:: images/chapt5_img26_single_window_mode.png
    :class: align-center
 
-Unfortunately, some apps don't run properly in a sub frame, preferring to be 
-loaded into the top frame of the window. That's why we made the multi Window 
-mode (the new default since Selenium 1.0). Using this you can make your 
-application under test run in a separate window rather than in the default 
-frame.
+Some applications didn't run correctly in a sub frame, and needed to be 
+loaded into the top frame of the window. The multi-window mode option allowed
+the AUT to run in a separate window rather than in the default 
+frame where it could then have the top frame it required.
 
 .. image:: images/chapt5_img27_multi_window_mode.png
    :class: align-center
 
-Older versions of Selenium however did not handle this unless you explicitly 
-told the server to run in multiwindow mode. For handling multiple windows, 
-Selenium 0.9.2 required the Server to be started with the following option:
+For older versions of Selenium you must specify multiwindow mode explicitely
+with the following option:
 
 .. code-block:: bash
 
    -multiwindow 
 
-In Selenium-RC 1.0 and later if you want to require your testing to run in a
-single frame you can explicitly state this to the Selenium Server using the
-option:
+In Selenium-RC 1.0, if you want to run your test within a
+single frame (i.e. using the standard for earlier Selenium versions) 
+you can state this to the Selenium Server using the option
 
 .. code-block:: bash
  
@@ -1252,12 +1249,14 @@ Specifying the Firefox Profile
    uses and then deletes sandbox profiles unless you specify special ones)
    
 Firefox will not run two instances simultaneously unless you specify a 
-separate profile for each instance. Later versions of Selenium-RC run in a 
-separate profile automatically, however, if you are using an older version of 
-Selenium or if you need to have a special configuration in your running browser
-(such as adding an https certificate or having some addons installed), you may 
-need to explicitly specify a separate profile. 
+separate profile for each instance. Selenium-RC 1.0 and later runs in a 
+separate profile automatically, so if you are using Selenium 1.0, you can 
+probably skip this section.  However, if you're using an older version of 
+Selenium or if you need to use a specific profile for your tests
+(such as adding an https certificate or having some addons installed), you will 
+need to explicitly specify the profile. 
 
+First, to create a separate Firefox profile, follow this procedure.
 Open the Windows Start menu, select "Run", then type and enter one of the 
 following:
 
@@ -1269,54 +1268,51 @@ following:
 
    firefox.exe -P 
 
-Create a new profile using the dialog. When you run the Selenium-RC server, 
+Create the new profile using the dialog. The when you run Selenium Server, 
 tell it to use this new Firefox profile with the server command-line option 
-*\-firefoxProfileTemplate* and specify the path to the profile:
+*\-firefoxProfileTemplate* and specify the path to the profile using it's filename 
+and directory path.
 
 .. code-block:: bash
 
    -firefoxProfileTemplate "path to the profile" 
 
-.. note:: On windows, people tend to have problems with the profiles location.
-   Try to start using a simple location like *C:\\seleniumProfile* to make it
-   work and then move the profile where you want and try to find it again.
-
-.. warning::  Be sure to put your profile in a new folder separate from the default!!! 
+.. Warning::  Be sure to put your profile in a new folder separate from the default!!! 
    The Firefox profile manager tool will delete all files in a folder if you 
    delete a profile, regardless of whether they are profile files or not. 
    
-More information about Firefox profiles in `Mozilla's Knowledge Base`_
+More information about Firefox profiles can be found in `Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
 
 .. _html-suite:
 
-Run Selenese Tests Directly from the Server Using -htmlSuite
+Run Selenese Directly Within the Server Using -htmlSuite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To use the Selenium Server as a proxy, run your tests like this::
+You can run Selenese html files directly within the Selenium Server
+by passing the html file to the server's command line.  For instance::
 
    java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
 
-That will automatically launch your HTML suite, run all the tests and save a
-nice HTML colored report with the results.
+This will automatically launch your HTML suite, run all the tests and save a
+nice HTML report with the results.
 
-.. note::  After this command, the server will start the tests and wait for a
+.. note::  When using this option, the server will start the tests and wait for a
    specified number of seconds for the test to complete; if the test doesn't 
    complete within that amount of time, the command will exit with a non-zero 
    exit code and no results file will be generated.
 
-Note that this command line is very long and very finicky... be careful when 
-you type it in. (You can use the -htmlSuite parameter with the ``-port`` and 
-``-timeout`` options, but it is incompatible with ``-interactive``; you can't 
-do both of those at once.) Also note that it requires you to pass in an HTML 
-Selenese suite, not a single test.
+This command line is very long so be careful when 
+you type it. Note this requires you to pass in an HTML 
+Selenese suite, not a single test. Also be aware the -htmlSuite option is incompatible with ``-interactive``
+You cannot run both at the same time.
 
-Selenium RC Logging
-~~~~~~~~~~~~~~~~~~~
+Selenium Server Logging
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Server-Side Logs
 ++++++++++++++++
-When launching selenium server the **-log** option can be used to save
+When launching selenium server the **-log** option can be used to record
 valuable debugging information reported by the Selenium Server to a text file.
 
 .. code-block:: bash
