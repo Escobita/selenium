@@ -85,24 +85,6 @@ goog.exportSymbol('is', webdriver.asserts.Matcher.equals);
 
 
 /**
- * Factory method for a {@code webdriver.asserts.Matcher} that inverts
- * another Matcher.
- * @param {webdriver.asserts.Matcher} matcher The matcher to invert.
- * @return {webdriver.asserts.Matcher} A new matcher.
- */
-webdriver.asserts.Matcher.not = function(matcher) {
-  return new webdriver.asserts.Matcher(
-      function (actual) {
-        return !matcher.matches(actual);
-      },
-      function () {
-        return 'not ' + matcher.describe();
-      });
-};
-goog.exportSymbol('not', webdriver.asserts.Matcher.not);
-
-
-/**
  * Creates a {@code webdriver.asserts.Matcher} that tests if the actual
  * value contains the expected value.
  * @param {string} expected The string expected to be in the actual value.
@@ -276,3 +258,39 @@ goog.global.assertFalse = goog.global.assertFalse || function(a, opt_b) {
   }
 };
 
+
+/**
+ * Utility function for inverting a value.  If the input is a...
+ * <ul>
+ * <li>{@code webdriver.asserts.Matcher}, returns a new Matcher that inverts
+ * the result of the input</li>
+ * <li>{@code webdriver.Future}, returns a new Future whose result will be the
+ * inverse of hte input</li>
+ * <li>any other type of object, it will be converted to a boolean and
+ * inverted</li>
+ * </ul>
+ * @param {*) input The value to invert.
+ * @return {webdriver.asserts.Matcher|webdriver.Future|boolean} The inverted
+ *     value according to the rules defined above.
+ */
+webdriver.not = function(input) {
+  if (input instanceof webdriver.Future) {
+    var invertedFuture = new webdriver.Future(input.getDriver());
+    goog.events.listen(input, goog.events.EventType.CHANGE,
+        function() {
+          invertedFuture.setValue(!!!input.getValue());
+        });
+    return invertedFuture;
+  } else if (input instanceof webdriver.asserts.Matcher) {
+    return new webdriver.asserts.Matcher(
+        function (actual) {
+          return !input.matches(actual);
+        },
+        function () {
+          return 'not ' + input.describe();
+        });
+  } else {
+    return !!!value;
+  }
+};
+goog.exportSymbol('not', webdriver.not);
