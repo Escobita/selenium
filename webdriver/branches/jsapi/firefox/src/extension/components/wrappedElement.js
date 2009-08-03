@@ -38,7 +38,7 @@ FirefoxDriver.prototype.click = function(respond) {
     // TODO(simon): Get native clicks working for gecko 1.8+
     var useNativeClick = versionChecker.compare(appInfo.platformVersion, "1.9") >= 0;
 
-    if (nativeEvents && node && useNativeClick) {
+    if (this.enableNativeEvents && nativeEvents && node && useNativeClick) {
       var loc = Utils.getLocationOnceScrolledIntoView(element);
       var x = loc.x + (loc.width ? loc.width / 2 : 0);
       var y = loc.y + (loc.height ? loc.height / 2 : 0);
@@ -176,7 +176,7 @@ FirefoxDriver.prototype.sendKeys = function(respond, value) {
       use = element.ownerDocument.getElementsByTagName("html")[0];
   }
 
-  Utils.type(this.context, use, value[0]);
+  Utils.type(this.context, use, value[0], this.enableNativeEvents);
 
   respond.context = this.context;
   respond.send();
@@ -281,7 +281,7 @@ FirefoxDriver.prototype.hover = function(respond) {
   var events = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
 
-  if (events && node) {
+  if (this.enableNativeEvents && events && node) {
       var loc = Utils.getLocationOnceScrolledIntoView(element);
 
       var x = loc.x + (loc.width ? loc.width / 2 : 0);

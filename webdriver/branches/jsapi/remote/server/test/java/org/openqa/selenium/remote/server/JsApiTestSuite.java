@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.JavascriptExecutor;
 
 import java.util.logging.Logger;
@@ -54,7 +55,9 @@ public class JsApiTestSuite extends TestCase {
     t.start();
     Thread.sleep(1000);
 
-    driver = new FirefoxDriver();
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.setEnableNativeEvents(false);  // Native events aren't 100% yet.
+    driver = new FirefoxDriver(profile);
   }
 
   @Override

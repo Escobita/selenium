@@ -332,7 +332,7 @@ Utils.getNodeForNativeEvents = function(element) {
   }
 };
 
-Utils.type = function(context, element, text) {
+Utils.type = function(context, element, text, opt_useNativeEvents) {
     // Special-case file input elements. This is ugly, but should be okay
   if (element.tagName == "INPUT") {
     var inputtype = element.getAttribute("type");
@@ -346,7 +346,7 @@ Utils.type = function(context, element, text) {
   var node = Utils.getNodeForNativeEvents(element);
   const thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
 
-  if (obj && node && thmgr_cls) {
+  if (opt_useNativeEvents && obj && node && thmgr_cls) {
     // Now do the native thing.
     obj.sendKeys(node, text);
 

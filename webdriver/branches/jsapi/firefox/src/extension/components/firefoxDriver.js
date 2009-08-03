@@ -16,10 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-function FirefoxDriver(server) {
+function FirefoxDriver(server, enableNativeEvents) {
   this.server = server;
   this.context = new Context();
   this.mouseSpeed = 1;
+  this.enableNativeEvents = enableNativeEvents;
 
   this.currentX = 0;
   this.currentY = 0;
