@@ -1079,23 +1079,27 @@ and heightened privilege modes you must first understand `the same origin policy
    
 The Same Origin Policy
 ~~~~~~~~~~~~~~~~~~~~~~
-The main restriction that Selenium's architecture has faced is the 
+The main restriction that Selenium's has faced is the 
 Same Origin Policy. This security restriction is applied by every browser
 in the market and its objective is to ensure that a site's content will never
-be accessible by a script from other site.
+be accessible by a script from other site.  The Same Origin Policy dictates that
+any code loaded within the browser can only operate within that website's domain.
+It cannot perform functions on another website.  So for example, if the browser
+loads javascript code when it loads www.mysite.com, it cannot run that loaded code
+against www.mysite2.com--even if that's another of your sites. If this were possible, 
+a script placed on any website you open, would be able to read information on 
+your bank account if you had the account page
+opened on other tab. This is called XSS (Cross-site Scripting).
 
-If this were possible, a script placed on any website you open, would 
-be able to read information on your bank account if you had the account page
-opened on other tab. Which is also called XSS (Cross-site Scripting).
-
-To work under that policy. Selenium-Core (and its JavaScript commands that
+To work within this policy, Selenium-Core (and its JavaScript commands that
 make all the magic happen) must be placed in the same origin as the Application
-Under Test (same URL). This has been the way Selenium-Core was first
-used and implemented (by deploying Selenium-Core and the set of tests inside
-the application's server), but this was a requirement that not all the projects 
-could meet and Selenium Developers had to find an alternative that would allow 
-testers to use Selenium to test site where they didn't have the possibility to
-deploy their code. 
+Under Test (same URL). 
+
+Historically, Selenium-Core was limited by this problem since it was implemented in
+Javascript.  Selenium-RC is not, however, restricted by the Same Origin Policy.  Its 
+use of the Selenium Server as a proxy avoids this problem.  It, essentially, tells the 
+browser that the browser is working on a single "spoofed" website that the Server
+provides. 
 
 .. note:: You can find additional information about this topic on Wikipedia
    pages about `Same Origin Policy`_ and XSS_. 
@@ -1105,19 +1109,19 @@ deploy their code.
 
 Proxy Injection
 ~~~~~~~~~~~~~~~
-The first method used to skip the `The Same Origin Policy`_ was Proxy Injection.
-In this method, the Selenium Server acts as a client-configured [1]_ **HTTP 
-proxy** [2]_, that stands in between the browser and the Application Under Test.
-After this, it is able to masks the whole AUT under a fictional URL (embedding
+The first method Selenium used to avoid the `The Same Origin Policy`_ was Proxy Injection.
+In Proxy Injection Mode, the Selenium Server acts as a client-configured [1]_ **HTTP 
+proxy** [2]_, that sits between the browser and the Application Under Test.
+It then masks the AUT under a fictional URL (embedding
 Selenium-Core and the set of tests and delivering them as if they were coming
 from the same origin). 
 
 .. [1] The proxy is a third person in the middle that passes the ball 
-   between the two parts. In this case will act as a "web server" that 
+   between the two parts. It acts as a "web server" that 
    delivers the AUT to the browser. Being a proxy, gives the capability
-   of "lying" about the AUT real URL.  
+   of "lying" about the AUT's real URL.  
    
-.. [2] The client browser (Firefox, IE, etc) is launched with a 
+.. [2] The browser is launched with a 
    configuration profile that has set localhost:4444 as the HTTP proxy, this
    is why any HTTP request that the browser does will pass through Selenium
    server and the response will pass through it and not from the real server.
@@ -1424,7 +1428,7 @@ This could be caused by
   passed to Selenium when you program opens the browser. 
 * You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
   incorrect.  Check to be sure the path is correct.  Also check the forums to be sure there are
-  no known issues with your browser and the *custom parameters.
+  no known issues with your browser and the "\*custom" parameters.
 
 Selenium Cannot Find the AUT 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1555,18 +1559,16 @@ For example
 
 Error message: "(Unsupported major.minor version 49.0)" while starting server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This message indicates that one is not using the correct version of Java. 
-The Selenium Server requires Java 1.5 or higher; this error appears when 
-one uses Java 1.4 or backward version instead of 1.5. 
+This error says you're not using a correct version of Java. 
+The Selenium Server requires Java 1.5 or higher. 
 
-Try running this from the command line:
+To check double-check your java version, run this from the command line.
 
 .. code-block:: bash
 
    java -version
 
-You should see a brief message telling you what version of Java is installed,
-like this:
+You should see a message showing the Java version.
 
 .. code-block:: bash
 
@@ -1574,46 +1576,44 @@ like this:
    Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-b03)
    Java HotSpot(TM) Client VM (build 1.5.0_07-b03, mixed mode)
 
-If you see a lower version number instead, you may need to install a newer 
-version of the JRE, or you may need to add it to your PATH environment variable.
+If you see a lower version number, you may need to update the JRE,
+or you may simply need to add it to your PATH environment variable.
 
-I get a 404 error when running the getNewBrowserSession command!
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+404 error when running the getNewBrowserSession command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you're getting a 404 error while attempting to open a page on 
 "http://www.google.com/selenium-server/", then it must be because the Selenium
-Server was not correctly configured as a proxy. "selenium-server" directory 
-doesn't really exist on google.com; it only appears to exist when the proxy is 
-properly configured. Proxy Configuration highly depends on way browser is 
+Server was not correctly configured as a proxy. The "selenium-server" directory 
+doesn't exist on google.com; it only appears to exist when the proxy is 
+properly configured. Proxy Configuration highly depends on how the browser is 
 launched with \*firefox, \*iexplore, \*opera, or \*custom.
 
-    * \*iexplore: If browser is launched using \*iexplore, there are a number
-      of likely possibilities.Selenium Server attempts to configure the global
-      proxy settings in Internet Options control panel; one needs to make 
-      sure that those are correctly configured when Selenium Server launches 
-      the browser. Try looking at your Internet Options control panel. 
-      Click on the "Connections" tab and click on "LAN Settings". 
+    * \*iexplore: If the browser is launched using \*iexplore, you could be having
+	  a problem with Internet Explorer's proxy settings.  Selenium Server attempts
+	  to configure the global proxy settings in the Internet Options Control Panel. 
+	  You must make sure that those are correctly configured when Selenium Server launches 
+      the browser. Try looking at your Internet Options control panel. Click on the 
+	  "Connections" tab and click on "LAN Settings". 
       
           - If you need to use a proxy to access the application you want to test,
             you'll need to start Selenium Server with "-Dhttp.proxyHost"; 
             see the `Proxy Configuration`_ for more details.
           - You may also try configuring your proxy manually and then launching
-            browser with \*custom, or with \*iehta browser launcher.
+            the browser with \*custom, or with \*iehta browser launcher.
             
-    * \*custom: When using \*custom, it's up to you to configure the proxy correctly
-      (manually). If you forgot to do this, or if you configured the proxy incorrectly, 
-      you'll get a 404 error. Double-check that you've configured your proxy 
-      settings correctly. 
-      One way to check whether one has configured proxy correctly is to attempt 
-      to intentionally configure browser incorrectly. Try configuring browser 
-      to use the wrong proxy server hostname, or the wrong port. 
-      If one had successfully configured browser's proxy settings incorrectly, 
-      then browser will be unable to connect to the Internet, which is one way 
-      to make sure that one is adjusting the relevant settings. 
+    * \*custom: When using \*custom you must configure the proxy correctly
+      (manually), otherwise you'll get a 404 error. Double-check that you've
+      configured your proxy settings correctly. To check whether you've
+	  configured the proxy correctly is to attempt to intentionally configure
+	  the browser incorrectly. Try configuring the browser to use the wrong proxy server hostname, or the wrong port.
+      If you had successfully configured the browser's proxy settings incorrectly,
+      then the browser will be unable to connect to the Internet, which is one way
+      to make sure that one is adjusting the relevant settings.
       
-    * others (\*firefox, \*opera): For the others browsers, we automatically hard-code
-      the proxy for you, and don't know of any known issues with this functionality.
-      If you're encountering 404 errors in the tutorial while using these browser 
-      launchers, post them to user forums.
+    * For other browsers (\*firefox, \*opera) we automatically hard-code
+      the proxy for you, and so ther are no known issues with this functionality.
+      If you're encountering 404 errors and have followed this user guide carefully
+	  post your results to user forums for some help from the user community.
       
 Why am I getting a permission denied error?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1624,12 +1624,12 @@ http://domain1 and then accesses a page from http://domain2) or switching protoc
 This error can also sometimes occur when JavaScript attempts to look at objects 
 which are not yet available (before the page has completely loaded), or tries to 
 look at objects which are no longer available (after the page has started 
-to be unloaded). This kind of pitfall is most typically encountered with AJAX pages
+to be unloaded). This is most typically encountered with AJAX pages
 which are working with sections of a page or subframes that load and/or reload 
-independently of the larger page. For this category of problem, it is usual
+independently of the larger page. For this type of problem, it is common
 that the error is intermittent. Often it is impossible to reproduce the problem 
-with a debugger running because the trouble stems from race conditions which 
-settle down when the debugger's overhead is added to the system.
+with a debugger because the trouble stems from race conditions which 
+are not reproducable when the debugger's overhead is added to the system.
 This is covered in some detail in the tutorial. Make sure you read the section 
 about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
 
