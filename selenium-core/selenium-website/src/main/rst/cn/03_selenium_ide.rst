@@ -339,86 +339,72 @@ IDE有许多种运行测试用例的选项。你可以一次运行整个测试�
     当你不能确定命令是否正确时，它可以立即测试你正创建的命令。
     你可以双击它，看它是否运行正确。它还可以在右键菜单里执行。
   
-
-Using Base URL to Run Test Cases in Different Domains 
+用基准URL在不同域中运行测试用例
 -----------------------------------------------------
 .. TODO: mam-p: Figure out how to display the many URLs in the section below without generating links for each one.  (They're just examples, i.e., not real!)
 
-The *Base URL* field at the top of the Selenium-IDE window is very useful
-for allowing test cases to be run across different domains. 
-Suppose that a site named http://news.portal.com had an in-house beta site named
-http://beta.news.portal.com.  Any test cases for these sites that begin with
-an *open*
-statement should specify a *relative URL* as the argument to *open*
-rather than an *absolute URL* (one
-starting with a protocol such as http: or https:).  Selenium-IDE will
-then create an absolute URL by appending the *open* command's
-argument onto the end of the value of Base URL.  For example, the 
-test case below would be run against http://news.portal.com/about.html:
+在Selenium-IDE顶部的 *基准URL* 域对允许测试用例跨域运行非常有用。
+假设一个站点命名为\http://news.portal.com ，它有一个内部的beta站点命名为
+\http://beta.news.portal.com 。
+任何测试这些站点并以 *open* 命令开头的测试用例应该指定一个 *相对URL* 作为
+*open* 命令的参数，而不是 *绝对URL* （绝对URL以协议开头，例如http:或者https:）。
+Selenium-IDE将会以在 *基准URL* 的基础上追加 *open* 命令参数的方式创建绝对URL。
+例如，下面的测试用例将会测试\http://news.portal.com/about.html：
+
 
 .. image:: ../images/chapt3_img20_BaseURL_prod.png
    :align: center
 
-This same test case with a modified Base URL setting would be run against
+修改过基准URL的相同测试用例将运行在
 http://beta.news.portal.com/about.html:
 
 .. image:: ../images/chapt3_img21_BaseURL_beta.png
    :align: center
-
-Debugging 
+ 
+调试
 ---------
-Debugging means finding and fixing errors in your test case.  This is a normal 
-part of test case development. 
+调试意味着发现并修改测试用例中的错误。这是测试用例开发的正常部分。
   
-We won't teach debugging here as most new users to Selenium will already have 
-some basic experience with debugging.  If this is new to you, we recommend 
-you ask one of the developers in your organization. 
-  
+我们在这里不教授调试，因为大多数Selenium-IDE的使用者已经有了基础的调试经验。
+如果这对你来说是新的，我们建议你问问在你的组织中的开发人员。
+
 .. TODO: mam-p: The two sections below have a great deal of overlap with "Running Test Cases" above.
 
-Breakpoints and Startpoints 
-+++++++++++++++++++++++++++
- 
-The Sel-IDE supports the setting of breakpoints and the ability to start and 
-stop the running of a test case, from any point within the test case.  That is, one 
-can run up to a specific command in the middle of the test case and inspect how 
-the test case behaves at that point.  To do this, set a breakpoint on the 
-command just before the one to be examined.  
-  
-To set a breakpoint, select a command, right-click, and from the context menu 
-select *Toggle Breakpoint*.  Then click the Run button to run your test case from 
-the beginning up to the breakpoint. 
-  
-It is also sometimes useful to run a test case from somewhere in the middle to 
-the end of the test case or up to a breakpoint that follows the starting point.  
-For example, suppose your test case first logs into the website and then 
-performs a series of tests and you are trying to debug one of those tests.  
-However, you only need to login once, but you need to keep rerunning your 
-tests as you are developing them.  You can login once, then run your test case
-from a startpoint placed after the login portion of your test case.  That will 
-prevent you from having to manually logout each time you rerun your test case. 
-  
-To set a startpoint, select a command, right-click, and from the context 
-menu select *Set/Clear Start Point*.  Then click the Run button to execute the 
-test case beginning at that startpoint. 
-  
-Stepping Through a Testcase
+断点和起点
 +++++++++++++++++++++++++++
 
-To execute a test case one command at a time ("step through" it), follow these
-steps:
+Sel-IDE支持断点设置，从测试用例的任何一点都可以启动和停止测试用例的运行。
+你可以在测试用例中间运行特定的命令，并且检查测试用例在那一点是如何工作的。
+做到这一点，请在你要检查的命令前设置断点。
+  
+要设置断点，选择一个命令，单击右键，并从右键菜单中选择 *切换断点* 。
+然后单击运行按钮执行从起始到断点处的测试用例。
 
-1. Start the test case running with the Run button from the toolbar.  
+有时候从测试用例的中间某处执行到结尾，或者从起点运行到断点是非常有用的。
+例如，假设你的测试用例先登录网站，然后进行了一系列测试并且正调试其中的一个测试。
+然而，您只需要登录一次，但是你需要再运行你的测试的时候就像你开发他们的时候一样。
+你可以登录一次，然后从登录部分后面已经设置好起点的地方运行你的测试用例。
+这将阻止你每次再次运行测试用例的时候不必手动注销。
+  
+要设置起点，选择一个命令，单击右键，并从右键菜单中选择 *设置/清除起点* 。
+然后点击运行按钮从起点处执行测试用例。
+  
+单步调试测试用例
++++++++++++++++++++++++++++
+
+一次执行一条测试用例命令（单步执行它），依照下面的步骤：
+
+1. 用工具栏的运行按钮启动测试用例的运行。  
 
 .. image:: ../images/chapt3_img08_Run.png
    :align: center
 
-2. Immediately pause the executing test case with the Pause button.
+2. 立即用暂停按钮暂停正在执行的测试用例。
 
 .. image:: ../images/chapt3_img19_Pause-only.png
    :align: center
 
-3. Repeatedly select the Step button.
+3. 反复选择步骤按钮。
 
 .. image:: ../images/chapt3_img11_Step.png
    :align: center
