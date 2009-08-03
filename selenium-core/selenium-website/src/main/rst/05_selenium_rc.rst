@@ -467,10 +467,66 @@ or NUnit for .NET if you are using one of those languages.
 Here, we show language-specific examples.  The language-specific APIs tend to 
 differ from one to another, so you'll find a separate explanation for each.  
 
-* `C#`_
 * Java_
+* `C#`_
 * Python_
 * `Perl, PHP, Ruby`_
+
+
+Java
+~~~~
+For Java, people use either Junit or TestNG as the test engine.  
+Some development environments like Eclipse have direct support for these via 
+plug-ins.  This makes it even easier. Teaching JUnit or TestNG is beyond the scope of 
+this document however materials may be found online and there are publications
+available.  If you are already a "java-shop" chances are your developers will 
+already have some experience with one of these test frameworks.
+
+You will probably want to rename the test class from "NewTest" to something 
+of your own choosing.  Also, you will need to change the browser-open 
+parameters in the statement::
+
+    selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
+
+The Selenium-IDE generated code will look like this.  This example 
+has coments added manually for additional clarity.
+
+.. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
+
+.. code-block:: java
+
+   package com.example.tests;
+   // We specify the package of our tess
+
+   import com.thoughtworks.selenium.*;
+   // This is the driver's import. You'll use this for instantiating a
+   // browser and making it do what you need.
+
+   import java.util.regex.Pattern;
+   // Selenium-IDE add the Pattern module because it's sometimes used for 
+   // regex validations. You can remove the module if it's not used in your 
+   // script.
+
+   public class NewTest extends SeleneseTestCase {
+   // We create our Selenium test case
+
+         public void setUp() throws Exception {
+           setUp("http://www.google.com/", "*firefox");
+                // We instantiate and start the browser
+         }
+
+         public void testNew() throws Exception {
+              selenium.open("/");
+              selenium.type("q", "selenium rc");
+              selenium.click("btnG");
+              selenium.waitForPageToLoad("30000");
+              assertTrue(selenium.isTextPresent("Results * for selenium rc"));
+              // These are the real test steps
+        }
+   }
+
+
+
 
 C#
 ~~
@@ -574,64 +630,10 @@ The generated code will look similar to this.
         }
     }
 
-The main program is very simple.  You can allow NUnit to manage the execution 
+You can allow NUnit to manage the execution 
 of your tests.  Or alternatively, you can write a simple main() program that 
 instantiates the test object and runs each of the three methods, SetupTest(), 
 TheNewTest(), and TeardownTest() in turn.
-
-    
-Java
-~~~~
-For Java, most people use Junit as the test engine.  With it, you'll save
-many lines of code by allowing Junit to manage the execution of your tests.
-Some development environments like Eclipse have direct support for JUnit via 
-plug-ins which makes it even easier. Teaching JUnit is beyond the scope of 
-this document however materials may be found online and there are publications
-available.  If you are already a "java-shop" chances are your developers will 
-already have experience with JUnit.
-
-You will probably want to rename the test class from "NewTest" to something 
-of your own choosing.  Also, you will need to change the browser-open 
-parameters in the statement::
-
-    selenium = new DefaultSelenium("localhost", 4444, "*iehta", "http://www.google.com/");
-
-The Selenium-IDE generated code will look something like this.  This example 
-has coments added manually for additional clarity.
-
-.. _wrapper: http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/doc/java/com/thoughtworks/selenium/SeleneseTestCase.html
-
-.. code-block:: java
-
-   package com.example.tests;
-   // We specify the package of our tess
-
-   import com.thoughtworks.selenium.*;
-   // This is the driver's import. You'll use this for instantiating a
-   // browser and making it do what you need.
-
-   import java.util.regex.Pattern;
-   // Selenium-IDE add the Pattern module because it's sometimes used for 
-   // regex validations. You can remove the module if it's not used in your 
-   // script.
-
-   public class NewTest extends SeleneseTestCase {
-   // We create our Selenium test case
-
-         public void setUp() throws Exception {
-           setUp("http://www.google.com/", "*firefox");
-                // We instantiate and start the browser
-         }
-
-         public void testNew() throws Exception {
-              selenium.open("/");
-              selenium.type("q", "selenium rc");
-              selenium.click("btnG");
-              selenium.waitForPageToLoad("30000");
-              assertTrue(selenium.isTextPresent("Results * for selenium rc"));
-              // These are the real test steps
-        }
-   }
 
 
 Python
