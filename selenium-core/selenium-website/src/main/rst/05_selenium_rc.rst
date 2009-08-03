@@ -1180,6 +1180,62 @@ As a test suite starts in your favorite language, the following happens:
 5. The browser receives the open request and asks the Web Server for the page.
    Once the browser receives the web page, renders it in the frame/window reserved
    for it.
+
+Handling HTTPS and Security Popups 
+----------------------------------
+Many applications switch from using HTTP to HTTPS when they need to send 
+encrypted information such as passwords or credit card information. This is 
+common with many of today's web applications. Selenium-RC supports this. 
+
+To ensure the HTTPS site is genuine, the browser will need a security 
+certificate. Otherwise, when the browser accesses the AUT using HTTPS, it will
+assume that application is not 'trusted'. When this occurs the browser
+displays security popups, and these popups cannot be closed using Selenium-RC. 
+
+When dealing with HTTPS in a Selenium-RC test, you must use a run mode that supports this and handles
+the security certificate for you. You specify the run mode when your test program
+initializes Selenium. 
+
+In Selenium-RC 1.0 beta 2 and later use \*firefox or \*iexplore for the run 
+mode. In earlier versions, including Selenium-RC 1.0 beta 1, use \*chrome or 
+\*iehta, for the run mode. Using these run modes, you will not need to install
+any special security certificates; Selenium-RC will handle it for you.
+
+In version 1.0 the run modes \*firefox or \*iexplore are 
+recommended. However, there are additional run modes of \*iexploreproxy and 
+\*firefoxproxy. These are provided only for backwards compatibility only, and 
+should not be used unless required by legacy test programs. Their use will 
+present limitations with security certificate handling and with the running 
+of multiple windows if your application opens additional browser windows. 
+
+In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
+supported HTTPS and the handling of security popups. These were considered ‘experimental
+modes although they became quite stable and many used them.  If you are using
+Selenium 1.0 you do not need, and should not use, these older run modes.
+
+Security Certificates Explained
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally, your browser will trust the application you are testing
+by installing a security certificate which you already own. You can 
+check this in your browser's options or internet properties (if you don't 
+know your AUT's security certificate ask you system administrator). 
+When Selenium loads your browser it injects code to intercept 
+messages between the browser and the server. The browser now thinks 
+untrusted software is trying to look like your application.  It responds by alerting you with popup messages. 
+
+.. Please, can someone verify that I explained certificates correctly?—this is 
+   an area I'm not certain I understand well yet. 
+
+To get around this, Selenium-RC, (again when using a run mode that support 
+this) will install its own security certificate, temporarily, to your 
+client machine in a place where the browser can access it. This tricks the 
+browser into thinking it's accessing a site different from your AUT and effectively suppresses the popups.  
+
+Another method used with earlier versions of Selenium was to 
+install the Cybervillians security certificate provided with your Selenium 
+installation. Most users should no longer need to do this however, if you are
+running Selenium-RC in proxy injection mode, you may need to explicitly install this
+security certificate. 
    
 Server Options
 --------------
@@ -1374,6 +1430,22 @@ browserSideLogs (as well as all other DEBUG level logging messages) to a file.
    it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
    this also, but you must specify a separate profile. 
 
+
+Specifying the Path to a Specific Browser 
+-----------------------------------------
+You can specify to Selenium-RC a path to a specific browser. This is useful if 
+you have different versions of the same browser, and you wish to use a specific
+one. Also, this is used to allow your tests to run against a browser not 
+directly supported by Selenium-RC. When specifying the run mode, use the 
+\*custom specifier followed by the full path to the browser's executable::
+
+   *custom <path to browser> 
+ 
+For example 
+ 
+.. TODO:  we need to add an example here.
+  
+   
 Troubleshooting 
 ---------------
 When first getting started with Selenium-RC there's a few potential problems
@@ -1467,94 +1539,17 @@ To resolve this, see the section on `Specifying a Separate Firefox Profile
 <Personalizing the Firefox Profile used in the tests>`_
 
 
-Handling HTTPS and Security Popups 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Many applications will switch from using HTTP to HTTPS when they need to send 
-encrypted information such as passwords or credit card information. This is 
-common with many of today's web applications. Selenium-RC supports this. 
-
-To ensure the HTTPS site is genuine, the browser will need a security 
-certificate. Otherwise, when the Selenium code is inserted between the 
-browser and the application under test, the browser will recognize this as a 
-security violation. It will assume some other site is masquerading as your 
-application. When this occurs the browser displays security popups, and these 
-popups cannot be closed using Selenium-RC. 
-
-When dealing with HTTPS you must use a run mode that supports this and handles
-the security certificate for you. You specify the run mode when you test program
-initialized Selenium. 
-
-.. TODO: copy my C# code example here. 
-
-In Selenium-RC 1.0 beta 2 and later use \*firefox or \*iexplore for the run 
-mode. In earlier versions, including Selenium-RC 1.0 beta 1, use \*chrome or 
-\*iehta, for the run mode. Using these run modes, you will not need to install
-any special security certificates to prevent your browser's security warning 
-popups. 
-
-In Selenium 1.0 beta 2 and later, the run modes \*firefox or \*iexplore are 
-recommended. There are additional run modes of \*iexploreproxy and 
-\*firefoxproxy. These are provided only for backwards compatibility and 
-should not be used unless required by legacy test programs. Their use will 
-present limitations with security certificate handling and with the running 
-of multiple windows if your application opens additional browser windows. 
-
-In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
-supported HTTPS and the handling of security popups. These were ‘experimental
-modes in those versions but as of Selenium-RC 1.0 beta 2, these modes have now 
-become stable, and the \*firefox and \*iexplore run modes now translate into 
-the \*chrome and \*iehta modes. 
-
-Security Certificates Explained
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Normally, your browser will trust the application you are testing, most 
-likely by installing a security certificate which you already own. You can 
-check this in your browser's options or internet properties (if you don't 
-know your AUT's security certificate as you system administrator or lead 
-developer). When Selenium loads your browser it injects code to intercept 
-messages between the browser and the server. The browser now thinks 
-something is trying to look like your application, but really is not a 
-significant security risk. So, it responds by alerting you with popup messages. 
-
-.. Please, can someone verify that I explained certificates correctly?—this is 
-   an area I'm not certain I understand well yet. 
-
-To get around this, Selenium-RC, (again when using a run mode that support 
-this) will install its own security certificate, temporarily, onto your 
-client machine in a place where the browser can access it. This tricks the 
-browser into thinking it's accessing a different site from your application 
-under test and effectively suppresses the security popups.  
-
-Another method that has been used with earlier versions of Selenium is to 
-install the Cybervillians security certificate provided with your Selenium 
-installation. Most users should no longer need to do this however, if you are
-running Selenium-RC in proxy injection mode, you may need to explicitly install this
-security certificate to avoid the security popup. 
-
 Versioning Problems 
 ~~~~~~~~~~~~~~~~~~~
 Make sure your version of Selenium supports the version of your browser. For
-example, Selenium-RC 0.92 does not support Firefox 3. At times, you may be lucky
-(I was) in that it may still work. But regardless, don't forget to check which
+example, Selenium-RC 0.92 does not support Firefox 3. At times you may be lucky
+(I was). But don't forget to check which
 browser versions are supported by the version of Selenium you are using. When in
-doubt, use the latest release version of Selenium.
+doubt, use the latest release version of Selenium with the most widely used version
+of your browser.
 
 .. Santi: Mary Ann suggested We should also mention about JRE version needed by
    the server
-
-Specifying the Path to a Specific Browser 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can specify to Selenium-RC a path to a specific browser. This is useful if 
-you have different versions of the same browser, and you wish to use a specific
-one. Also, this is used to allow your tests to run against a browser not 
-directly supported by Selenium-RC. When specifying the run mode, use the 
-\*custom specifier followed by the full path to the browser's executable::
-
-   *custom <path to browser> 
- 
-For example 
- 
-.. TODO:  we need to add an example here.
 
 
 Error message: "(Unsupported major.minor version 49.0)" while starting server
