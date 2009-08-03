@@ -469,24 +469,22 @@ differ from one to another, so you'll find a separate explanation for each.
 
 * `C#`_
 * Java_
-* Perl_
-* PHP_ 
 * Python_
-* Ruby_ 
+* `Perl, PHP, Ruby`_
 
 C#
 ~~
 
 The .NET Client Driver works with Microsoft.NET.
-It can be used together with any .NET testing framework 
+It can be used with any .NET testing framework 
 like NUnit or the Visual Studio 2005 Team System.
 
-Selenium-IDE automatically assumes you will use NUnit as your testing framework.
+Selenium-IDE assumes you will use NUnit as your testing framework.
 You can see this in the generated code below.  It includes the *using* statement
-for the NUnit framework along with corresponding NUnit attributes identifying 
-the role for each generated member function of the test class.  
+for NUnit along with corresponding NUnit attributes identifying 
+the role for each member function of the test class.  
 
-Note that you will probably have to rename the test class from "NewTest" to 
+You will probably have to rename the test class from "NewTest" to 
 something of your own choosing.  Also, you will need to change the browser-open
 parameters in the statement::
 
@@ -635,22 +633,11 @@ has coments added manually for additional clarity.
         }
    }
 
-Perl
-~~~~
-
-*Note: This section is not yet developed.*
-
-PHP
-~~~
-
-*Note: This section is not yet developed.*
 
 Python
 ~~~~~~
-We use pyunit testing framework (the unit test module) for our tests. You should
-understand how this works to better understand how to write your tests.
-To completely understand pyunit, you should read its `official documentation
-<http://docs.python.org/library/unittest.html>`_.
+Pyunit is the test framework to use for Python. To learn pyunit refer
+to its `official documentation` <http://docs.python.org/library/unittest.html>_.
 
 The basic test structure is:
 
@@ -701,10 +688,15 @@ The basic test structure is:
            # And make the test fail if we found that any verification errors
            # were found
 
-Ruby
-~~~~
+		   
 
-*Note: This section is not yet developed.*
+Perl, PHP, Ruby
+~~~~~~~~~~~~~~~
+The members of the documentation team
+have not used Sel-RC with Perl, PHP or Ruby.  If you are using Selenium-RC with either of
+these two languages please contact the Documentation Team (see the chapter on contributing).
+We would love to include some examples from you and your experiences support Perl and PHP users.
+
 
 Learning the API
 ----------------
