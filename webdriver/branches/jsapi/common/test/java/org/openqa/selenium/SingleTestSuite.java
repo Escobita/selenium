@@ -32,7 +32,7 @@ public class SingleTestSuite extends TestCase {
   private final static String REMOTE = "org.openqa.selenium.remote.RemoteWebDriverTestSuite$RemoteWebDriverForTest";
 
   public static Test suite() throws Exception {
-    String driver = FIREFOX;
+    String driver = IE;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -48,9 +48,9 @@ public class SingleTestSuite extends TestCase {
         .includeJavascriptTests()
         .onlyRun("TypingFormsTest")
         .onlyRun("TypingRichtextTest")
-//        .method("testShouldAllowUsersToHoverOverElements")
+        .method("testShouldBeAbleToIterateOverAllOpenWindows")
         .exclude(ALL)
-        .exclude(Ignore.Driver.FIREFOX)
+        .exclude(Ignore.Driver.IE)
         .leaveRunning()
         ;  // Yeah, this look strange :)
 
