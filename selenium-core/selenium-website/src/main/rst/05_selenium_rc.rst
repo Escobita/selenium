@@ -1623,35 +1623,37 @@ This is covered in some detail in the tutorial. Make sure you read the section
 about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
 
 
-Executing tests with different configurations of Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Normally Selenium RC automatically configures browser, but if one launches 
-browser using "\*custom" as browser launcher, one can force Selenium RC
-to launch the browser as-is, without changing configuration. 
+Running Tests with Different Browser Configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally Selenium-RC automatically configures the browser, but if you launch 
+the browser using the "\*custom" run mode, you can force Selenium RC
+to launch the browser as-is, without using an automatic configuration. 
 (Note that this is also the way one launches other browsers that Selenium RC 
 doesn't yet explicitly support.)
 
-For example, one can launch Firefox with a custom configuration like this:
+For example, you can launch Firefox with a custom configuration like this:
 
 .. code-block:: bash
 
    cmd=getNewBrowserSession&1=*custom c:\Program Files\Mozilla Firefox\firefox.exe&2=http://www.google.com
 
-Note that when launching the browser in this way, one will have to manually 
-configure browser to use the Selenium Server as a proxy. (Normally this just 
+Note that when launching the browser this way, you must manually 
+configure the browser to use the Selenium Server as a proxy. Normally this just 
 means opening your browser preferences and specifying "localhost:4444" as 
 an HTTP proxy, but instructions for this can differ radically from browser to 
-browser, so consult your browser's documentation for details.)
+browser.  Consult your browser's documentation for details.
 
-Beware that Mozilla browsers can be a little fidgety about how they start and stop. 
+Beware that Mozilla browsers can be a little fussy about how they start and stop. 
 One may need to set the MOZ_NO_REMOTE environment variable to make Mozilla browsers 
-behave a little more predictably. Unix users should avoid launching browser using 
-a shell script; always prefer to use the binary executable (e.g. firefox-bin) directly.
+behave a little more predictably. Unix users should avoid launching the browser using 
+a shell script; it's generally better to use the binary executable (e.g. firefox-bin) directly.
 
-How to block pop up windows?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There are several kinds of "pop-ups" that one can get during a Selenium test;
-each of them need to be addressed differently.
+How to Block Popup Windows?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are several kinds of "Popups" that you can get during a Selenium test.
+You may not be able to close these popups by running selenium commands if 
+they are initiated by the browser as opposed to your AUT.  Therefore, you'll
+need to know how to manage these.  Each type needs to be addressed differently.
 
     * HTTP basic authentication dialogs: These dialogs prompt for a 
       username/password to login to the site. To login to a site that requires 
@@ -1661,26 +1663,29 @@ each of them need to be addressed differently.
 .. _`RFC 1738`: http://tools.ietf.org/html/rfc1738#section-3.1
 
     * SSL certificate warnings: Selenium RC automatically attempts to spoof SSL 
-      certificates when it is enabled as a proxy; see more details about this 
-      in the tutorial section on HTTPS. If your browser is configured correctly,
+      certificates when it is enabled as a proxy; see more on this 
+      in the section on HTTPS. If your browser is configured correctly,
       you should never see SSL certificate warnings, but you may need to 
       configure your browser to trust our dangerous "CyberVillains" SSL certificate 
-      authority. (The tutorial explains how to do this.)
+      authority. Again, refer to the HTTPS section for how to do this.
 
     * modal JavaScript alert/confirmation/prompt dialogs: Selenium tries to conceal
       those dialogs from you (by replacing window.alert, window.confirm and 
       window.prompt) so they won't stop the execution of your page. If you're 
       actually seeing an alert pop-up, it's probably because it fired during 
       the page load process, which is usually too early for us to protect the page.
+	  Selenese contains commands for asserting or verifying alert and confirmation popups.
+	  See the sections on these topics in Chapter 4.  (Note at this time of writing
+	  we haven't written those sections, but intend to do so very soon).
       
       
 On Linux, why isn't my Firefox browser session closing?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
-On Unix/Linux one needs to invoke "firefox-bin" directly, so make sure that
-executable is on the path. If one is  forced to execute Firefox through a 
+On Unix/Linux you must invoke "firefox-bin" directly, so make sure that
+executable is on the path. If executing Firefox through a 
 shell script, when it comes time to kill the browser Selenium RC will kill
-the shell script, leaving the browser running.   
-If necessary, one can specify the path to firefox-bin directly, like this:
+the shell script, leaving the browser running.   You can specify the path
+to firefox-bin directly, like this.
       
 .. code-block:: bash      
       
