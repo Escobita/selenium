@@ -1,0 +1,42 @@
+#summary Setting up the remote webdriver server
+
+= The RemoteWebDriver Server =
+
+The RemoteWebDriver is composed of two pieces: a client and a server. The server is simply a Java servlet, which can be hosted in any modern JEE app server. In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
+
+== Details ==
+
+  # Download the "webdriver-remote-server.zip" and unpack. Put the JARs on the CLASSPATH
+  # Create a new class called "AppServer". Here, I'm using Jetty, so you'll need to download that as well:
+{{{
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.SslSocketConnector;
+import org.mortbay.jetty.webapp.WebAppContext;
+
+import javax.servlet.Servlet;
+import java.io.File;
+
+import org.openqa.selenium.remote.server.DriverServlet;
+
+public class AppServer {
+  private Server server = new Server();
+
+  public AppServer() throws Exception {
+    WebAppContext context = new WebAppContext();
+    context.setContextPath("");
+    context.setWar(new File("."));
+    server.addHandler(context);
+
+    context.addServlet(DriverServlet.class, "/wd/*");
+
+    SelectChannelConnector connector = new SelectChannelConnector();
+    connector.setPort(3001);
+    server.addConnector(connector);
+
+    server.start();
+  }
+}
+}}}
+  # Once this is done, start the server up. You can now connect to at using {{{new RemoteWebDriver(new URL("http://localhost:3000/wd", DesiredCapabilities.firefox());}}}
