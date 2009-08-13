@@ -14,12 +14,12 @@ For all versions of WebDriver:
 
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
 
- * Visual Studio 2005
- * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2005 Command Prompt" from that Start menu.
+ * Visual Studio 2008
+ * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from that Start menu.
 
 == Building ==
 
-The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows and the SafariDriver only on Mac OS X. Now:
+The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. When there are native components that must be built, the build file will attempt to construct them before falling back to prebuilt binaries. Now:
 
 {{{
 cd $WEBDRIVER_HOME   # Where the top level Rakefile is kept
@@ -50,10 +50,5 @@ Although it was necessary in the early days of webdriver development, it is now 
 Other things to check:
 
  * The FirefoxDriver is only compatible with Firefox 2 and above. Check that the first available version of firefox on the PATH is version 2 or 3.
- * The driver assumes that Firefox is installed in the default location for your OS. If Firefox is not in this location, then you need to set the VM property {{{webdriver.firefox.bin}}} (when using rake, this is done by setting the "firefox=" flag on the command line, as demonstrated on the FirefoxDriver page)
- * When setting the binary to use, specify the full path to the Firefox binary. In particular, on Windows the path should end with ".exe".
+ * The driver assumes that Firefox is installed in the default location for your OS. If Firefox is not in this location, then you need to set the VM property {{{webdriver.firefox.bin}}} or modify the PATH variable to include the directory with the firefox binary in it.
  * On some platforms such as Linux, Firefox is started with a shell script. There have been reports that if your installation of Firefox wraps this shell script with another one the FirefoxDriver won't work properly. Consider calling the original Firefox script.
-
-== The InternetExplorerDriver Doesn't Compile ==
-
-If you are building WebDriver on Windows, the build will _always_ try and build the InternetExplorerDriver, regardless of whether or not you have the required build tools. If you only want the FirefoxDriver or HtmlUnitDriver then you can run {{{rake test_htmlunit test_firefox}}} to only build the other drivers.
