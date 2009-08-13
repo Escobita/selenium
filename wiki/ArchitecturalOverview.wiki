@@ -1,4 +1,5 @@
 #summary An overview of the WebDriver architecture.
+#labels WebDriver
 
 = Architectural Overview =
 

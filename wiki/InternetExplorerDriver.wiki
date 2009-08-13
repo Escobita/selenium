@@ -1,4 +1,5 @@
 #summary Everything you wanted to know about the Internet Explorer driver
+#labels WebDriver
 
 = Internet Explorer Driver =
 

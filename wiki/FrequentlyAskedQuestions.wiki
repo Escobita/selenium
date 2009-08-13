@@ -1,5 +1,5 @@
 ﻿#summary WebDriver FAQs
-#labels Featured
+#labels Featured, WebDriver
 
 = FAQ =
 

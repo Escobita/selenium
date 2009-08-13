@@ -1,4 +1,5 @@
 #summary Easy ways to get involved with the webdriver project
+#labels WebDriver
 
 = Getting Involved =
 

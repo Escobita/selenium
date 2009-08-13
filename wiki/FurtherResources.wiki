@@ -1,5 +1,5 @@
 #summary Additional resources related to WebDriver
-#labels Featured
+#labels Featured, WebDriver
 
   * [http://www.youtube.com/watch?v=tGu1ud7hk5I Video of Simon Stewart presenting WebDriver at GTAC 2007]
   * [http://webdriver.googlecode.com/svn/wiki/WebDriver_JAX_2008_Slides.pdf Slides of Michae Tamm presenting WebDriver at JAX 2008] and the [http://webdriver.googlecode.com/svn/wiki/WebDriver_JAX_2008_Samples.zip code for the examples]

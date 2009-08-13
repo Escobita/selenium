@@ -1,4 +1,5 @@
 #summary What is HtmlUnit
+#labels WebDriver
 
 = HtmlUnit =
 

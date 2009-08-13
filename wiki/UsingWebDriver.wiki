@@ -1,4 +1,5 @@
 #summary Using WebDriver in your project and finding the jars and required libraries
+#labels WebDriver
 
 = Using WebDriver =
 

@@ -1,4 +1,5 @@
 #summary Tips and tricks for using WebDriver
+#labels WebDriver
 
 = Tips and Tricks =
 

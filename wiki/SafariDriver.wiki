@@ -1,4 +1,5 @@
 #summary Information about the Safari Driver
+#labels WebDriver
 
 = Safari Driver =
 

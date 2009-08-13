@@ -1,4 +1,5 @@
 #summary How to commit code to WebDriver
+#labels WebDriver
 
 = Committing Code =
 

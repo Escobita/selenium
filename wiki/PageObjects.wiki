@@ -1,4 +1,5 @@
 #summary The Page Object pattern represents the screens of your web app as a series of objects
+#labels WebDriver
 
 = Page Objects =
 

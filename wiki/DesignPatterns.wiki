@@ -1,5 +1,5 @@
 #summary Design Patterns that have worked well on WebDriver projects
-#labels Featured
+#labels Featured, WebDriver
 
 = Design Patterns and Development Strategies =
 

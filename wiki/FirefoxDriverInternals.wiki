@@ -1,4 +1,5 @@
 #summary How the FirefoxDriver works
+#labels WebDriver
 
 = FirefoxDriver Interals =
 

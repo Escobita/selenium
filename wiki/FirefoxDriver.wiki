@@ -1,4 +1,5 @@
 #summary Information about the Firefox Driver
+#labels WebDriver
 
 = Firefox Driver =
 

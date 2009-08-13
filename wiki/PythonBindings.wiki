@@ -1,5 +1,5 @@
 #summary A summary of the python bindings for WebDriver.
-#labels Phase-Deploy,Phase-Support
+#labels Phase-Deploy,Phase-Support,WebDriver
 
 =Introduction=
 The python bindings for WebDriver are now available in the trunk of WebDriver and are ready for use. The work is still in progress, your feedback would be welcome.

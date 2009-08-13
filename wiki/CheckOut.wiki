@@ -1,4 +1,5 @@
 #summary Getting hold of the source in order to build WebDriver
+#labels WebDriver
 
 = Downloading Binaries =
 

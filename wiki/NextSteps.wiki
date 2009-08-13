@@ -1,4 +1,5 @@
 #summary Provides a more in-depth view of using WebDriver
+#labels WebDriver
 
 = Next Steps For Using WebDriver =
 

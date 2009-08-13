@@ -1,4 +1,5 @@
 #summary A description of the protocol used by WebDriver to communicate with remote instances
+#labels WebDriver
 
 = The Wire Protocol =
 

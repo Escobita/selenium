@@ -1,4 +1,5 @@
 #summary Information on how to work on the WebDriver codebase.
+#labels WebDriver
 
 = Developer Tips =
 

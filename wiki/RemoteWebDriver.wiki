@@ -1,4 +1,5 @@
 #summary Information about the RemoteWebDriver
+#labels WebDriver
 
 = Remote WebDriver =
 

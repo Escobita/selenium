@@ -1,4 +1,5 @@
 #summary Emulating Selenium
+#labels WebDriver
 
 = Selenium Emulation =
 

@@ -1,4 +1,5 @@
 #summary The WebDriver roadmap. Where we're going.
+#labels WebDriver
 
 = WebDriver RoadMap =
 

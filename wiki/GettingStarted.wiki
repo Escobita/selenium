@@ -1,5 +1,5 @@
 #summary Getting started with WebDriver
-#labels Featured
+#labels Featured, WebDriver
 
 = The 5 Minute Getting Started Guide =
 

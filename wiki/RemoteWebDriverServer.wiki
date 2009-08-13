@@ -1,4 +1,5 @@
 #summary Setting up the remote webdriver server
+#labels WebDriver
 
 = The RemoteWebDriver Server =
 

@@ -1,4 +1,5 @@
 #summary How XPath works in WebDriver
+#labels WebDriver
 
 = How XPath Works in WebDriver =
 

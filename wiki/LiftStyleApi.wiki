@@ -1,3 +1,5 @@
+#labels WebDriver
+
 = Introduction =
 
 A higher level API integrating WebDriver and Hamcrest to give something in the style of LiFT is provided in the support project. We aim to allow writing tests that are very readable, almost like English sentences.

@@ -1,4 +1,5 @@
 #summary Details about the implementation of native keyboard events for Firefox on Linux.
+#labels WebDriver
 
 = Introduction =
 This page details how native events for Firefox on Linux were implemented. Basically, this feature allows better user emulation for WebDriver in Firefox on Linux. Using this implementation, it should be easily extended to any other browser with a plug-in mechanism that is implemented using GTK+.
