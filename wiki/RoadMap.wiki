@@ -5,26 +5,26 @@
 
 At least the following issues need to be completed before an alpha release:
 
-|| *Issue* || *Summary* || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* || *SafariDriver Progress* ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=21 21] || Fix the InternetExplorerDriver || n/a || n/a || Done || n/a ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started || Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements || Done || Done || Done || Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide |||||||| Started ||
+|| *Issue* || *Summary* || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=21 21] || Fix the InternetExplorerDriver || n/a || n/a || Done ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements |||||| Done ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide |||||| Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=14 14]  || Block on AJAX calls || n/a || Not Started || Not Started || Not Started ||
 
 Additional changes that are required for a beta release
 
-|| *Issue* || Summary  || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* || *SafariDriver Progress* ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=10 10]  || Add CSS Selectors for finding elements |||||||| Not Started ||
+|| *Issue* || Summary  || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=10 10]  || Add CSS Selectors for finding elements |||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=33 33]  || Speed improvements in the InternetExplorerDriver || n/a || Done || n/a || n/a ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=34 34]  || Support HTTP Basic and Digest Authentication |||||||| Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=20 20]  || Cookie management || Done || Done || Done || Done ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation |||||||| Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Not Started || Not Started ||
-|| none  || Example tests |||||||| Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings |||||||| Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings |||||||| Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings |||||||| Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=34 34]  || Support HTTP Basic and Digest Authentication |||||| Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=20 20]  || Cookie management |||||| Done ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation |||||| Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Not Started ||
+|| none  || Example tests |||||| Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings |||||| Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings |||||| Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings |||||| Started ||
 
 A final release will be done once the beta has been out and successfully used on a number of projects. Other drivers have been left off because none have been started.
 
@@ -32,7 +32,6 @@ A final release will be done once the beta has been out and successfully used on
 
 The following are also planned:
 
-  * *JsonWireProtocol* --- The formalisation of the current FirefoxDriver wire protocol in [http://www.json.org/ JSON].
-  * *SocketServer* --- Providing a socket server that understands the JsonWireProtocol for the existing InternetExplorerDriver and SafariDriver.
+  * *JsonWireProtocol* --- The formalisation of the current RemoteWebDriver wire protocol in [http://www.json.org/ JSON].
   * *RemoteWebDriver* --- The ability to control a single instance of WebDriver on one machine from another.
   * *FarmedWebDriver* --- Built on top of RemoteWebDriver, this will allow the use of WebDriver on a grid.

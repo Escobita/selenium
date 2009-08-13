@@ -26,10 +26,9 @@ The default target that's used will compile the code and run all the tests. More
 
 || *Target* || *Description* ||
 || clean || Delete the contents of the build directory, removing all compiled artifacts ||
-|| test || Compile the dependencies of and run all the tests for the HtmlUnitDriver, FirefoxDriver, InternetExplorerDriver and SafariDriver as well as the support library's tests ||
+|| test || Compile the dependencies of and run all the tests for the HtmlUnitDriver, FirefoxDriver, and InternetExplorerDriver as well as the support library's tests ||
 || firefox || Compile the FirefoxDriver ||
 || htmlunit || Compile the HtmlUnitDriver ||
-|| jobbie || Compile the InternetExplorerDriver. This won't compile the C++ on a non-Windows system, but will always compile the Java, no matter which OS you happen to be using ||
-|| safari || Compile the SafariDriver ||
+|| ie || Compile the InternetExplorerDriver. This won't compile the C++ on a non-Windows system, but will always compile the Java, no matter which OS you happen to be using ||
 || support || Guess what this does :) ||
 || test_htmlunit || Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. ||

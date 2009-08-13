@@ -15,7 +15,7 @@ RenderedWebElement to = (RenderedWebElement) driver.findElement(By.id("two"));
 from.dragAndDropOn(to);
 }}}
 
-Currently, only the FirefoxDriver supports this, but you should also expect support for the InternetExplorerDriver and SafariDriver too.
+Currently, only the FirefoxDriver supports this, but you should also expect support for the InternetExplorerDriver too.
 
 == Changing the user agent ==
 

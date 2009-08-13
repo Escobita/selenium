@@ -10,7 +10,6 @@ The key idea behind the various implementations of WebDriver is that each browse
 || *Browser* || *"Best Fit" Language* ||
 || Firefox || Javascript in an XPCOM component ||
 || Internet Explorer || C++ mainly using the IE Automation APIs, but occasionally using other features of Windows ||
-|| Safari || Apple Events ||
 
 In addition, some of the languages that WebDriver is offered in (notably Java) have something that supports simulating a browser. These are generally modeled using composition.
 
@@ -27,4 +26,3 @@ More detailed information about each driver, how to write language bindings and 
   * FirefoxDriverInternals
   * HtmlUnitDriverInternals
   * InternetExplorerDriverInternals
-  * SafariDriverInternals
