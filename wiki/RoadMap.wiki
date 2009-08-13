@@ -6,17 +6,17 @@
 At least the following issues need to be completed before an alpha release:
 
 || *Issue* || *Summary* || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=21 21] || Fix the InternetExplorerDriver || n/a || n/a || Done ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=21 21] || Fix the InternetExplorerDriver |||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements |||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide |||||| Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=14 14]  || Block on AJAX calls || n/a || Not Started || Not Started || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=14 14]  || Block on AJAX calls || n/a || Not Started || Not Started ||
 
 Additional changes that are required for a beta release
 
 || *Issue* || Summary  || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* ||
 || [http://code.google.com/p/webdriver/issues/detail?id=10 10]  || Add CSS Selectors for finding elements |||||| Not Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=33 33]  || Speed improvements in the InternetExplorerDriver || n/a || Done || n/a || n/a ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=33 33]  || Speed improvements in the InternetExplorerDriver |||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=34 34]  || Support HTTP Basic and Digest Authentication |||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=20 20]  || Cookie management |||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation |||||| Started ||
