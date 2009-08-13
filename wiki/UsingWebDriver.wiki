@@ -86,7 +86,7 @@ Fortunately, all the libraries required for a particular driver are located unde
 || *Driver* || *Location of driver jar under trunk* || *Location of required libraries* || *Notes* ||
 || common || common/build/webdriver-common.jar || none needed || Required by every driver ||
 || htmlunit || htmlunit/build/webdriver-htmlunit.jar || htmlunit/lib/runtime || none ||
-|| firefox || firefox/build/webdriver-firefox.jar || firefox/lib/runtime || You must install the webdriver-firefox.xpi into a Firefox profile called "WebDriver" ||
-|| internet explorer || jobbie/build/webdriver-jobbie.jar || jobbie/lib/runtime || Copy the DLL from jobbie/build on to your PATH ||
+|| firefox || firefox/build/webdriver-firefox.jar || firefox/lib/runtime || none ||
+|| internet explorer || jobbie/build/webdriver-jobbie.jar || jobbie/lib/runtime || none ||
 
 Once you've done that, you should be ready to start using WebDriver in your project.
