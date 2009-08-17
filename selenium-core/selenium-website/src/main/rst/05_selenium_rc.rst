@@ -887,7 +887,7 @@ Test Reports in Java
 **Logging the Selenese Commands**
 
 - Logging Selenium can be used to generate a report of all the Selenese commands
-  in your test along with the success of failure of each. Logging Selenium extends
+  in your test along with the success or failure of each. Logging Selenium extends
   the Java client driver to add this Selenense logging ability. Please refer 
   to `Logging Selenium`_.
     
@@ -945,7 +945,7 @@ For example, you may want to to execute a search multiple times.  Or, perhaps fo
 verifying your test results you need to process a "result set" returned from a database.
 
 Using the same `Google search example`_ we used earlier, let's 
-check the Selenium the search results. This test could use the Selenese:
+check the Selenium search results. This test could use the Selenese:
 
 =================  ===========================  =============
 open               /
