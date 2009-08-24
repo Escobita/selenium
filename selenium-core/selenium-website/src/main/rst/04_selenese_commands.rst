@@ -615,6 +615,22 @@ because Selenium will reach the *AndWait*'s timeout without seeing any
 navigation or refresh being made, causing Selenium to raise a timeout 
 exception.
  
+.. _waitfor:
+
+The waitFor Commands in AJAX applications
+-----------------------------------------
+In AJAX driven web applications; data is retrieved from server without 
+refreshing the page. Using *andWait* commands will not work as the page is not 
+actually refreshed. Pausing the test execution for certain period of time is 
+also not a good approach as web element might appear later or earlier than the 
+stipulated period depending on the system's responsiveness, load or other 
+uncontrolled factors of the moment; leading to test failures. The best approach 
+would be to wait for the needed element in a dynamic period and then continue 
+the execution as soon as element is found.
+
+This is done using *waitFor* commands, as *waitForElementPresent* or
+*waitForVisible*, which wait dynamically, checking for the desired condition
+every second and stop as soon as the condition is met.
 
 Sequence of Evaluation and Flow Control
 ---------------------------------------

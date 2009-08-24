@@ -690,7 +690,7 @@ The basic test structure is:
            # And make the test fail if we found that any verification errors
            # were found
 
-		   
+           
 
 Perl, PHP, Ruby
 ~~~~~~~~~~~~~~~
@@ -781,16 +781,16 @@ are:
 **host**
     Specifies the IP address of the computer where the server is located. Usually, this is
     the same machine as where the client is running, so in this case *localhost* is passed.  In some clients this is an optional parameter.
-	
+    
 **port**
     Specifies the TCP/IP socket where the server is listening waiting
     for the client to establish a connection.  This also is optional in some
     client drivers.
-	
+    
 **browser**
     The browser in which you want to run the tests. This is a required 
     parameter.
-	
+    
 **url**
     The base url of the application under test. This is required by all the
     client libs and is integral information for starting up the browser-proxy-AUT communication.
@@ -1035,21 +1035,21 @@ check boxes and then exercise them.
 .. code-block:: java
    
    public static String[] getAllCheckboxIds () { 
-		String script = "var inputId  = new Array();";// Create array in java script.
-		script += "var cnt = 0;"; // Counter for check box ids.  
-		script += "var inputFields  = new Array();"; // Create array in java script.
-		script += "inputFields = window.document.getElementsByTagName('input');"; // Collect input elements.
-		script += "for(var i=0; i<inputFields.length; i++) {"; // Loop through the collected elements.
-		script += "if(inputFields[i].id !=null " +
-		"&& inputFields[i].id !='undefined' " +
-		"&& inputFields[i].getAttribute('type') == 'checkbox') {"; // If input field is of type check box and input id is not null.
-		script += "inputId[cnt]=inputFields[i].id ;" + // Save check box id to inputId array.
-		"cnt++;" + // increment the counter.
-		"}" + // end of if.
-		"}"; // end of for.
-		script += "inputId.toString();" ;// Convert array in to string.			
-		String[] checkboxIds = selenium.getEval(script).split(","); // Split the string.
-		return checkboxIds;
+        String script = "var inputId  = new Array();";// Create array in java script.
+        script += "var cnt = 0;"; // Counter for check box ids.  
+        script += "var inputFields  = new Array();"; // Create array in java script.
+        script += "inputFields = window.document.getElementsByTagName('input');"; // Collect input elements.
+        script += "for(var i=0; i<inputFields.length; i++) {"; // Loop through the collected elements.
+        script += "if(inputFields[i].id !=null " +
+        "&& inputFields[i].id !='undefined' " +
+        "&& inputFields[i].getAttribute('type') == 'checkbox') {"; // If input field is of type check box and input id is not null.
+        script += "inputId[cnt]=inputFields[i].id ;" + // Save check box id to inputId array.
+        "cnt++;" + // increment the counter.
+        "}" + // end of if.
+        "}"; // end of for.
+        script += "inputId.toString();" ;// Convert array in to string.            
+        String[] checkboxIds = selenium.getEval(script).split(","); // Split the string.
+        return checkboxIds;
     }
 
 To count number of images on a page:
@@ -1057,7 +1057,7 @@ To count number of images on a page:
 .. code-block:: java
    
    selenium.getEval("window.document.images.length;");
-	
+    
 Remember to use window object in case of dom expressions as by default selenium
 window is referred and not the test window.
    
@@ -1454,7 +1454,7 @@ similar one::
     "Unable to connect to remote server….Inner Exception Message: No 
     connection could be made because the target machine actively refused it…."
     
-	(using .NET and XP Service Pack 2) 
+    (using .NET and XP Service Pack 2) 
 
 If you see a message like this, be sure you started the Selenium Server. If 
 you did, then there is some problem with the connectivity between the two 
@@ -1578,11 +1578,11 @@ properly configured. Proxy Configuration highly depends on how the browser is
 launched with \*firefox, \*iexplore, \*opera, or \*custom.
 
     * \*iexplore: If the browser is launched using \*iexplore, you could be having
-	  a problem with Internet Explorer's proxy settings.  Selenium Server attempts
-	  to configure the global proxy settings in the Internet Options Control Panel. 
-	  You must make sure that those are correctly configured when Selenium Server launches 
+      a problem with Internet Explorer's proxy settings.  Selenium Server attempts
+      to configure the global proxy settings in the Internet Options Control Panel. 
+      You must make sure that those are correctly configured when Selenium Server launches 
       the browser. Try looking at your Internet Options control panel. Click on the 
-	  "Connections" tab and click on "LAN Settings". 
+      "Connections" tab and click on "LAN Settings". 
       
           - If you need to use a proxy to access the application you want to test,
             you'll need to start Selenium Server with "-Dhttp.proxyHost"; 
@@ -1593,8 +1593,8 @@ launched with \*firefox, \*iexplore, \*opera, or \*custom.
     * \*custom: When using \*custom you must configure the proxy correctly
       (manually), otherwise you'll get a 404 error. Double-check that you've
       configured your proxy settings correctly. To check whether you've
-	  configured the proxy correctly is to attempt to intentionally configure
-	  the browser incorrectly. Try configuring the browser to use the wrong proxy server hostname, or the wrong port.
+      configured the proxy correctly is to attempt to intentionally configure
+      the browser incorrectly. Try configuring the browser to use the wrong proxy server hostname, or the wrong port.
       If you had successfully configured the browser's proxy settings incorrectly,
       then the browser will be unable to connect to the Internet, which is one way
       to make sure that one is adjusting the relevant settings.
@@ -1602,7 +1602,7 @@ launched with \*firefox, \*iexplore, \*opera, or \*custom.
     * For other browsers (\*firefox, \*opera) we automatically hard-code
       the proxy for you, and so ther are no known issues with this functionality.
       If you're encountering 404 errors and have followed this user guide carefully
-	  post your results to user forums for some help from the user community.
+      post your results to user forums for some help from the user community.
       
 Why am I getting a permission denied error?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1610,18 +1610,23 @@ The most common reason for this error is that your session is attempting to viol
 the same-origin policy by crossing domain boundaries (e.g., accesses a page from 
 http://domain1 and then accesses a page from http://domain2) or switching protocols 
 (moving from http://domainX to https://domainX).
-This error can also sometimes occur when JavaScript attempts to look at objects 
-which are not yet available (before the page has completely loaded), or tries to 
-look at objects which are no longer available (after the page has started 
-to be unloaded). This is most typically encountered with AJAX pages
-which are working with sections of a page or subframes that load and/or reload 
-independently of the larger page. For this type of problem, it is common
-that the error is intermittent. Often it is impossible to reproduce the problem 
-with a debugger because the trouble stems from race conditions which 
-are not reproducable when the debugger's overhead is added to the system.
+For this to be solved, try using the 'Heightened Privileges Browsers'_ if you're
+working with the Proxy Injection browsers.
 This is covered in some detail in the tutorial. Make sure you read the section 
 about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
 
+If the previous situation was not your case, it can also occur when JavaScript 
+attempts to look at objects which are not yet available (before the page has 
+completely loaded), or tries to look at objects which are no longer available 
+(after the page has started to be unloaded). This is most typically encountered 
+with AJAX pages which are working with sections of a page or subframes that load 
+and/or reload independently of the larger page. For this type of problem, it is
+common that the error is intermittent. Often it is impossible to reproduce the 
+problem with a debugger because the trouble stems from race conditions which 
+are not reproducible when the debugger's overhead is added to the system.
+Try first adding a static pause to make sure this is the situation and then
+moving on to the waitFor kind of commands:
+:ref:`waitFor commands in Selenese Chapter <waitfor>` 
 
 Running Tests with Different Browser Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1674,9 +1679,9 @@ need to know how to manage these.  Each type needs to be addressed differently.
       window.prompt) so they won't stop the execution of your page. If you're 
       actually seeing an alert pop-up, it's probably because it fired during 
       the page load process, which is usually too early for us to protect the page.
-	  Selenese contains commands for asserting or verifying alert and confirmation popups.
-	  See the sections on these topics in Chapter 4.  (Note at this time of writing
-	  we haven't written those sections, but intend to do so very soon).
+      Selenese contains commands for asserting or verifying alert and confirmation popups.
+      See the sections on these topics in Chapter 4.  (Note at this time of writing
+      we haven't written those sections, but intend to do so very soon).
       
       
 On Linux, why isn't my Firefox browser session closing?
@@ -1710,47 +1715,11 @@ You might consider trying the `UI-Element`_ extension in this situation.
 
 .. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
-
 Is it ok to load a custom pop-up as the parent page is loading (i.e., before the parent page's javascript window.onload() function runs)?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 No. Selenium relies on interceptors to determine window names as they are being loaded.
 These interceptors work best in catching new windows if the windows are loaded AFTER 
 the onload() function. Selenium may not recognize windows loaded before the onload function.
-
-
-How can I wait for an element in AJAX driven application?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX driven web applications; data is retrieved from server with out refreshing 
-the page. Usage of *waitForPageToLoad* would not work as page is not actually 
-loaded. Pausing the test execution for certain period of time is also not a good 
-approach as web element might appear late or earlier than stipulated period; leading
-to test failures. A better approach would be to wait for element for predefined 
-period and then continue execution as soon as element is found.
-
-For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
-on page (with out refreshing the page)
-This could be handled employing a for loop in selenium. 
-
-.. code-block:: bash
-   
-   // Loop initialization.
-   for (int second = 0;; second++) {
-	
-	// If loop is reached 60 seconds then break the loop.
-	if (second >= 60) break;
-	
-	// Search for element "link=ajaxLink" and if available then break loop.
-	try { if (selenium.isElementPresent("link=ajaxLink")) break; } catch (Exception e) {}
-	
-	// Pause for 1 second.
-	Thread.sleep(1000);
-	
-   } 
-
-   
-   .. Santi: must recheck if all the topics here: 
-   http://seleniumhq.org/documentation/remote-control/troubleshooting.html
-   are covered.
 
 Problems With Verify Commands 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
