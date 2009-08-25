@@ -80,6 +80,27 @@ A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onch
 
 A: Each instance of HtmlUnit, FirefoxDriver and (when we're done) ChromeDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses) Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
 
+*Q: How do I handle authentication with the HtmlUnitDriver?*
+
+A: When creating your instance of the HtmlUnitDriver, override the "modifyWebClient" method, for example:
+
+{{{
+WebDriver driver = new HtmlUnitDriver() {
+  protected WebClient modifyWebClient(WebClient client) {
+    // This class ships with HtmlUnit itself
+    DefaultCredentialsProvider creds = DefaultCredentialsProvider();
+
+    // Set some example credentials
+    creds.addCredentials("username", "password");
+
+    // And now add the provider to the webClient instance
+    client.setCredentialsProvider(creds);
+
+    return client;
+  }
+};
+}}}
+
 *Q: Is WebDriver thread-safe?*
 
 A: WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable.
