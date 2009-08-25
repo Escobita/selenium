@@ -1,0 +1,5 @@
+<!--fr-FR-->
+<!ENTITY sendLabel "Envoyer au créateur de test">
+<!ENTITY sendTooltipText "Envoie le flux à l'application Eclipse RCP.">
+<!ENTITY pageLoadedLabel "Page chargée">
+<!ENTITY pageLoadingLabel "Chargement de la page...">

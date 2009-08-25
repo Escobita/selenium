@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="style.css" type="text/css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://helium/locale/helium.dtd">
+
+<overlay id="helium_overlay"
+		 xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		 xmlns:html="http://www.w3.org/1999/xhtml" >
+
+<!-- JavaScript -->
+
+<script src="../util/JSUtil.js" type="text/javascript"></script>
+<script src="../util/NetworkUtil.js" type="text/javascript"></script>
+
+<script src="../model/TestReceiver.js" type="text/javascript"></script>
+<script src="../model/HEPreferences.js" type="text/javascript"></script>
+<script src="../model/PageStatus.js" type="text/javascript"></script>
+<script src="../model/PageStream.js" type="text/javascript"></script>
+<script src="../model/StreamObject.js" type="text/javascript"></script>
+<script src="../model/RcpChecker.js" type="text/javascript"></script>
+
+<script src="../model/spy/StreamHandler.js" type="text/javascript"></script>
+<script src="../model/spy/StreamSpy.js" type="text/javascript"></script>
+<script src="../model/spy/StreamSpyEvent.js" type="text/javascript"></script>
+
+<script src="helium.js" type="text/javascript"></script>
+
+<!-- Interface -->
+
+<hbox id="heliumView" flex="1" >
+
+	<vbox flex="2">
+	 		 	
+		<hbox align="center">
+		
+			<spacer width="5"/>
+			
+			<hbox id="loading" hidden="true" align="center">			
+				<image src="chrome://helium/content/view/loading.gif" width="20" height="20" />
+				<label value="&pageLoadingLabel;" />
+			</hbox>
+					
+			<label id="loaded" value="&pageLoadedLabel;" hidden="true" />
+			
+			<spacer flex="1"/>
+		
+			<button id="helium_send" label="&sendLabel;" oncommand="send();" disabled="true" tooltiptext="&sendTooltipText;"/>
+		</hbox> 	
+	 	
+     	<listbox flex="1" id="helium_list" />
+     	
+     	<!-- RCP status line -->
+     	
+     	<hbox id="status" align="center" >
+     		<spacer width="5"/>
+     		<image id="status_icon" src="" width="15" height="15" />
+			<label id="status_text" value="" flex="1" />
+		</hbox>
+     	     	
+     	<!-- The list element tooltip -->
+     	
+     	<tooltip id="info" orient="vertical" onpopupshowing="show( event );" noautohide="true" >
+     		<hbox>
+     			<label value="Content-type :" class="bold"/>
+     			<label id="ctype" flex="1"/>
+     		</hbox>
+     		<hbox>
+     			<label value="Size :" class="bold"/>
+     			<label id="size" flex="1" />
+     		</hbox>   
+     		<vbox id="miniature" align="center" flex="1" hidden="true" >
+     			<spacer height="6" />
+     			<image id="iconic" src=""  />
+     			<html:img id="html_image" src="" style="display:none;" />
+     			<spacer height="4" />
+     			<label id="imsize" class="bold" />
+     		</vbox>
+     	</tooltip>
+     	
+     	<!-- hidden iframe for java web start -->
+     	
+     	<html:iframe id="webstart" src="" style="display:none;" />
+    
+    	<!-- locale -->
+		
+		<stringbundle id="he_strings" src="chrome://helium/locale/helium.properties/" />
+     	
+	</vbox>
+</hbox>
+
+</overlay>
+

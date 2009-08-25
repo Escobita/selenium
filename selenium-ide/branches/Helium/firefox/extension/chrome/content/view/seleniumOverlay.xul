@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xul-overlay href="chrome://helium/content/view/helium.xul"?> <!-- Overlay in the same package -->
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?> 
+
+<overlay id="selenium_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  
+<!-- Script -->
+
+   <script src="editorhelium.js" />
+
+<!-- Overlay content -->
+
+  <vbox id="logBox">
+
+    <hbox id="logMenu" align="center">
+      <toolbarbutton id="heliumTab" label="Helium" class="console-tab" insertafter="rollupTab" onclick="window.editor.infoPanel.switchView(helium)" />
+    </hbox> 
+
+    <hbox id="heliumView" hidden="true"/>
+
+  </vbox>
+
+</overlay>
