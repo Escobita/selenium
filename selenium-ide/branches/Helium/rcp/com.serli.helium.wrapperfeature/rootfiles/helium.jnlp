@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf8"?>
+<jnlp spec="1.0+" codebase="http://192.168.86.147/~kevin/JavaWebStart/helium/" href="helium.jnlp">
+
+  <information>
+    <title>Helium</title>
+    <vendor>SERLI</vendor>
+    <description kind="short">This application is used to create verification on the Helium Firefox extension capturated stream.</description>
+    <description kind="one-line">This is the Selenium IDE, Helium RCP application</description>
+    <shortcut online="false">
+      <desktop/>
+    </shortcut>
+    <offline-allowed/>
+  </information>
+  
+  <security>
+    <all-permissions/>
+  </security>
+  
+  <update check="timeout" policy="always"/>
+  
+  <resources>
+    <jar name="Launcher" href="plugins/org.eclipse.equinox.launcher_1.0.200.v20090520.jar" main="true"/>
+    <extension name="WrapperFeature" href="features/com.serli.helium.wrapperfeature_1.0.0.beta.jnlp" />
+    
+    <property name="osgi.configuration.area" value="@user.home/.helium/config/"/>
+    <property name="osgi.instance.area" value="@user.home/.helium/instance/"/>
+    <property name="osgi.bundles" value="org.eclipse.equinox.ds@4:start, org.eclipse.equinox.http.registry@4:start, com.serli.helium.core.server@4:start"/>
+    <property name="osgi.nl" value="en"/>
+    
+    <property name="eclipse.application" value="com.serli.helium.ui.product.workbench.application"/>
+    <property name="eclipse.product" value="com.serli.helium.ui.product.workbench.product"/>
+    <property name="eclipse.registry.nulltoken" value="true"/>
+    <property name="org.eclipse.equinox.http.jetty.autostart" value="false"/>
+    <property name="org.mortbay.jetty.Request.maxFormContentSize" value="9999999"/>
+    
+  </resources>
+ 
+ <!-- System resources -->
+ 
+<resources os="Mac">
+	<property name="osgi.ws" value="cocoa" />
+	<java version="1.6" java-vm-args="-XstartOnFirstThread" />
+</resources>
+
+<resources os="Linux">
+	<property name="osgi.ws" value="gtk" />
+	<java version="1.6" />
+</resources> 
+ 
+<resources os="Windows">
+	<java version="1.6" />
+</resources>
+ 
+ <!-- Application descriptor -->
+  
+  <application-desc main-class="org.eclipse.equinox.launcher.WebStartMain">
+    <argument>-nosplash </argument>
+  </application-desc>
+ 
+</jnlp>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.serli.helium.wrapperfeature"
+      label="WrapperFeature"
+      version="1.0.0.beta"
+      provider-name="SERLI">
+
+   <description>
+      This feature package all plug-ins for jnlp deployment.
+   </description>
+
+   <includes
+         id="com.serli.helium.base.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.serli.helium.core.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.serli.helium.stream.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.serli.helium.ui.feature"
+         version="0.0.0"/>
+
+</feature>

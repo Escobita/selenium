@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.serli.helium.core.modelhandler">
+   <implementation class="com.serli.helium.core.modelfactory.internal.service.Logger"/>
+   <reference bind="bind" cardinality="0..1" interface="com.serli.helium.commons.logging.service.ILogger" name="ILogger" policy="dynamic" target="(service=logging)" unbind="unbind"/>
+  
+</scr:component>

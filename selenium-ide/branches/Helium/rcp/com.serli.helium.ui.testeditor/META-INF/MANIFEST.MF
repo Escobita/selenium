@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TestEditor
+Bundle-SymbolicName: com.serli.helium.ui.testeditor;singleton:=true
+Bundle-Version: 1.0.0.beta
+Bundle-Activator: com.serli.helium.ui.testeditor.TestEditorActivator
+Bundle-Vendor: SERLI
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ com.serli.helium.core.modelhandler;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: com.serli.helium.ui.testeditor.constants,
+ com.serli.helium.ui.testeditor.extension

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="Helium Update Site" url="file:///Users/kevin/Desktop/Update/">
+      This update site contains updates for the Helium features.
+   </description>
+   <feature url="features/com.serli.helium.stream.feature_1.0.0.beta.jar" id="com.serli.helium.stream.feature" version="1.0.0.beta">
+      <category name="Stream Feature"/>
+   </feature>
+   <feature url="features/com.serli.helium.core.feature_1.0.0.beta.jar" id="com.serli.helium.core.feature" version="1.0.0.beta">
+      <category name="Core Feature"/>
+   </feature>
+   <feature url="features/com.serli.helium.ui.feature_1.0.0.beta.jar" id="com.serli.helium.ui.feature" version="1.0.0.beta">
+      <category name="UI Feature"/>
+   </feature>
+   <category-def name="Stream Feature" label="Stream Feature"/>
+   <category-def name="Core Feature" label="Core Feature"/>
+   <category-def name="UI Feature" label="UI Feature"/>
+</site>
