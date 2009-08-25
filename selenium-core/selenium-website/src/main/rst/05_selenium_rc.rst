@@ -941,7 +941,7 @@ of an object-oriented programming language you shouldn't have difficulty underst
 Iteration
 ~~~~~~~~~
 Iteration is one of the most common things people need to do in their tests.
-For example, you may want to to execute a search multiple times.  Or, perhaps for
+For example, you may want to execute a search multiple times.  Or, perhaps for
 verifying your test results you need to process a "result set" returned from a database.
 
 Using the same `Google search example`_ we used earlier, let's 
@@ -1016,7 +1016,7 @@ and then take alternatives when it it is not.  Let's look at this using Java.
        System.out.printf("Element: " +q+ " is not available on page.")
    }
    
-The aadvantage of this approach is to continue with test execution even if some UI 
+The advantage of this approach is to continue with test execution even if some UI 
 elements are not available on page.
 
 
