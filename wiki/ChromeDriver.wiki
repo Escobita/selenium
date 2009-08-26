@@ -30,9 +30,7 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 
 == Installing a Downloaded Binary ==
 
-The "wedriver-chrome.zip" which may be downloaded from the website, contains all the dependencies (including the common and remote libraries) required to run the ChromeDriver. In order to use it:
-
- # Copy all the "jar" files on to your classpath.
+The "wedriver-chrome.zip" which may be downloaded from the website, contains all the dependencies (including the common and remote libraries) required to run the ChromeDriver. In order to use it, copy all the "jar" files on to your classpath.
 
 == Installing the Quick Way From Source (with Ruby) ==
 
