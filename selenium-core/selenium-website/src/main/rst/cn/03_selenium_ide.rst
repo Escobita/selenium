@@ -98,12 +98,12 @@ IDE特色
 ++++++++++++++
 
 测试脚本显示在测试用例窗格内。
-它有两个标签页，一个用于以清晰的表格样式显示命令和命令参数。
+它有两个选项卡，一个用于以清晰的表格样式显示命令和命令参数。
 
 .. image:: ../images/chapt3_img15_Table_Format.png
    :align: center
   
-源代码标签页以原生格式显示测试用例，测试用例文件也以这个格式保存。
+源代码选项卡以原生格式显示测试用例，测试用例文件也以这个格式保存。
 HTML是默认的格式，当然这个格式可以换成编程语言，例如Java或者C#，
 或者是脚本语言，像Python。具体细节参见选项菜单。
 源码视图也允许以原始形式编辑测试用例，
@@ -356,7 +356,7 @@ Selenium-IDE将会以在 *基准URL* 的基础上追加 *open* 命令参数的�
    :align: center
 
 修改过基准URL的相同测试用例将运行在
-http://beta.news.portal.com/about.html:
+\http://beta.news.portal.com/about.html:
 
 .. image:: ../images/chapt3_img21_BaseURL_beta.png
    :align: center
@@ -409,78 +409,60 @@ Sel-IDE支持断点设置，从测试用例的任何一点都可以启动和停�
 .. image:: ../images/chapt3_img11_Step.png
    :align: center
 
-Find Button 
+查找按钮
 +++++++++++
 
-The Find button is used to see which UI element on the currently displayed 
-webpage (in the browser) is used in the currently selected Selenium command.  
-This is useful when building a locator for a command's first parameter (see the
-section on :ref:`locators <locators-section>` in the Selenium Commands chapter). It can be used with any
-command that must identify a UI element on a webpage, i.e. *click*, 
-*clickAndWait*, *type*, and certain *assert* and *verify* commands, 
-among others. 
-  
-From Table view, select any command that has a locator parameter.
-Click the Find button.  
-Now look on the webpage displayed in the Firefox browser.  
-There should be a bright green rectangle enclosing the element specified
-by the locator parameter. 
+查找按钮用于查看当前显示网页（浏览器里）上的当前选择的Selenium命令的UI元素。
+当为命令的第一个参数创建定位器时（参见Selenium命令章的 :ref:`定位器<locators-section>` ），
+这是非常有用的。它可以用于任何一条需要识别网页元素的命令，例如： *click*, *clickAndWait*,
+*type*, 等等。
 
-Page Source for Debugging 
+从表格视图中选择任何一条有定位器参数的命令。点击查找按钮。
+现在看看FireFox浏览器里显示的网页。
+一个明亮的绿色方框包围着由定位器参数指明的元素。
+
+页面源码进行调试
 +++++++++++++++++++++++++
 
-Often, when debugging a test case, you simply must look at the page source (the 
-HTML for the webpage you're trying to test) to determine a problem.  Firefox 
-makes this easy.  Simply, right-click the webpage and select Page Source.  
-The HTML opens in a separate window.  Use its Search feature (Edit=>Find)
-to search for a keyword to find the HTML for the UI element you're trying 
-to test. 
+经常，当你调试测试用例时，你一定会看页面源码（你正在测试的网页的HTML）以确定问题。
+FireFox使这变得轻松。只要右键点击网页并选择源码。HTML就在一个单独的窗口打开。
+使用其查找功能（编辑=>查找）搜索关键字，以查找你正在测试的UI元素的HTML。
 
-Alternatively, select just that portion of the webpage for which you want to
-see the source.  Then right-click the webpage and select View Selection
-Source.  In this case, the separate HTML window will contain just a small
-amount of source, with highlighting on the portion representing your
-selection.
+另外，选择你想看源码的部分网页。然后右键点击网页并选择查看已选择的源码。
+在这种情况下，单独的HTML窗口将只包含少量的源码，高亮的部分就代表你的选择。
 
-Locator Assistance
+定位器协助
 ++++++++++++++++++
 
-Whenever Selenium-IDE records a locator-type argument, it stores
-additional information which allows the user to view other possible 
-locator-type arguments that could be used instead.  This feature can be
-very useful for learning more about locators, and is often needed to help
-one build a different type of locator than the type that was recorded.  
+只要Selenium-IDE录制了定位器类型参数，它就会存储额外的信息，
+以允许用户查看其他可能的定位器类型用于代替。
+这个功能对于更进一步的学习定位器是非常有益的，
+而且人们常常需要它帮助构建一个非录制的不同类型的定位器。 
 
-This locator assistance is presented on the Selenium-IDE window as a drop-down
-list accessible at the right end of the Target field 
-(only when the Target field contains a recorded locator-type argument).  
-Below is a snapshot showing the
-contents of this drop-down for one command.  Note that the first column of
-the drop-down provides alternative locators, whereas the second column
-indicates the type of each alternative.
+定位器协助在Selenium-IDE窗口中以下拉列表框的方式展现，在目标域的右端
+（只有当目标域包含可录制的定位器类型参数时）。
+下面是一个命令的下拉类表框内容的快照。
+请注意下拉类表的第一列是可供替代的定位器，第二列说明每个定位器的类型。
 
 .. image:: ../images/chapt3_img22_IDE_Locator_Assistance.png
 
-Writing a Test Suite 
+开发测试套件 
 --------------------
-A test suite is a collection of test cases which is displayed in the leftmost
-pane in the IDE.  
-The test suite pane can be manually opened or closed via selecting a small dot
-halfway down the right edge of the pane (which is the left edge of the 
-entire Selenium-IDE window if the pane is closed).
+测试套件是测试用例的集合，它显示在IDE的最左侧窗格。
+测试套件窗格可以手动的通过选择窗格右边框中间的小圆点开启或关闭
+（如果关闭，小圆点位于整个Selenium-IDE窗口的左边框）。
 
-The test suite pane will be automatically opened when an existing test suite 
-is opened *or* when the user selects the New Test Case item from the
-File menu.  In the latter case, the new test case will appear immediately
-below the previous test case.
+当一个已经存在的测试套件被打开 *或者* 从文件菜单中选择新的测试用例时，
+测试套件窗格会自动打开。在后一种情况下，
+新测试用例会立即出现在前一个测试用例的下面。
 
-Selenium-IDE does not yet support loading pre-existing test cases into 
-a test suite.  Users who want to create or modify a test suite by adding
-pre-existing test cases must manually edit a test suite file.
+Selenium-IDE不支持向测试套件加载预先存在的测试用例。
+用户如果想要以添加预先存在的测试用例的方式创建或修改测试套件，
+就必须用工编辑测试套件文件。
 
-A test suite file is an HTML file containing a one-column table.  Each
-cell of each row in the <tbody> section contains a link to a test case.
-The example below is of a test suite containing four test cases:
+测试套件文件是一个HTML文件，包含一个单列的表。
+在<tbody>部分每行的每个表格都包含一个测试用例的链接。
+下面的例子是一个包含了四个测试用例的测试套件：
 
 .. code-block:: html
 
@@ -505,168 +487,133 @@ The example below is of a test suite containing four test cases:
 	</html>
 	
 .. note::
-   Test case files should not have to be co-located with the test suite file
-   that invokes them.  And on Mac OS and Linux systems, that is indeed the
-   case.  However, at the time of this writing, a bug prevents Windows users
-   from being able to place the test cases elsewhere than with the test suite
-   that invokes them.
+   测试用例文件不应该和调用它们的测试套件在同一个地方。
+   和在Mac OS和Linux系统，这确实是如此。
+   然而，在写作此文档时，一个错误会放置Windows用户把测试用例放置在调用它们的测试套件以外的其他地方。
 
 .. do some testing here of test suites鈥攄o they save correctly?
    I've seen errors in the past. 
   
-User Extensions 
+用户插件 
 ---------------
-User extensions are JavaScript files that allow one to create his or her own 
-customizations and features to add additional functionality.  Often this is in 
-the form of customized commands although this extensibility is not limited to 
-additional commands.  
-  
-There are a number of useful extensions_ created by users.
+用户插件是JavaScript文件，允许用户创建他或她自己的定制和特色以增加额外的功能。
+大多数情况下，这是以定制命令的形式，但是这种扩展性并不限于增加命令。
 
-.. _extensions: http://wiki.openqa.org/display/SEL/Contributed+User-Extensions
+这里有许多有用户创建的有用的 `插件`_ 。  
 
-Perhaps the most popular of all Selenium-IDE extensions
-is one which provides flow control in the form of while loops and primitive
-conditionals.  This extension is the goto_sel_ide.js_.  For an example
-of how to use the functionality provided by this extension, look at the
-page_ created by its author.
+.. _`插件`: http://wiki.openqa.org/display/SEL/Contributed+User-Extensions
+
+也许在所有Selenium-IDE插件中最受欢迎的是流程控制插件，它提供while循环和简单条件判断。
+它是 goto_sel_ide.js_ 。一个如何使用由这个插件提供的功能的例子，请看它的作者创建的 `页面`_ 。
 
 
 .. _goto_sel_ide.js: http://wiki.openqa.org/download/attachments/379/goto_sel_ide.js
-.. _page: http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html
+.. _`页面`: http://51elliot.blogspot.com/2008/02/selenium-ide-goto.html
 
-To install this extension, put the pathname to its location on your
-computer in the **Selenium Core extensions** field of Selenium-IDE's
-Options=>Options=>General tab.
+要安装此插件，把它在你的电脑中的位置路径填写到Selenium-IDE的选项=>选项=>常规选项卡的 **Selenium Core 插件** 域中。
 
 .. image:: ../images/chapt3_img31_Extensions_install.png
    :align: center
 
-After selecting the **OK** button, you must close and reopen Selenium-IDE
-in order for the extensions file to be read.  Any change you make to an
-extension will also require you to close and reopen Selenium-IDE.
+为了此插件文件被读取，在选择 **确定** 按钮之后，你必须关闭并再打开Selenium-IDE。
+任何对插件的修改都需要你关闭和再打开Selenium-IDE。
 
-Information on writing your own extensions can be found near the
-bottom of the Selenium Reference_ document.
+编写你自己的插件的信息可以在靠近底部的selenium `参考`_ 文档中找到。
 
-.. _Reference: http://release.openqa.org/selenium-core/1.0/reference.html
+.. _`参考`: http://release.openqa.org/selenium-core/1.0/reference.html
 
 .. TODO:  mam-p: need info on how to install user extensions, especially on the diff
    between "Selenium Core Extensions" and "Selenium IDE" extensions on the
    Options=>Options=>General page.
 
 
-Format 
+格式 
 ------
 
-Format, under the Options menu, allows you to select a language for saving 
-and displaying the test case.  The default is HTML.
-  
-If you will be using Selenium-RC to run your test cases, this feature is used 
-to translate your test case into a programming language.  Select the 
-language, i.e. Java, PHP, you will be using with Selenium-RC for developing 
-your test programs.  Then simply save the test case using File=>Save.  Your 
-test case will be translated into a series of functions in the language you 
-choose.  Essentially, program code supporting your test is generated for you 
-by Selenium-IDE. 
-  
-Also, note that if the generated code does not suit your needs, you can alter 
-it by editing a configuration file which defines the generation process.  
-Each supported language has configuration settings which are editable.  This 
-is under the Options=>Options=>Format tab. 
+在选项菜单里的格式允许你选择保存和显示测试用例的语言。默认是HTML。
+
+如果你用Selenium-RC运行你的测试用例，这个功能用来把你的测试用例翻译成编程语言。
+选择一种用Selenium-RC开发的测试程序的语言，例如Java、PHP。
+然后用文件=>保存，保存你的测试用例。你的测试用例就会翻译成由你选择的语言写成的一系列函数。
+本质上，支持你的测试的程序代码是由Selenium-IDE为你生成。
+
+另外，请注意，如果生成的代码不能满足你的要求，你可以通过编辑定义生成过程的配置文件改变它。
+每种支持语言都有可编辑的配置设置。它是在选项=>选项=>格式选项卡中。
+
   
 .. TODO: Add the steps here to change the format. 
   
 .. note::
-   At the time of this writing, this feature is not yet supported by the Selenium 
-   developers.  However the author has altered the C# format in a limited 
-   manner and it has worked well. 
+   在本文写作之时，此功能目前还不被Selenium的开发者支持。
+   然而，作者以有限的方式改变了C#的格式，并且它一直运作良好。
   
-Executing Selenium-IDE Tests on Different Browsers
+在不同的浏览器中执行Selenium-IDE测试
 --------------------------------------------------
-While Selenium-IDE can only run tests against Firefox, tests
-developed with Selenium-IDE can be run against other browsers, using a
-simple command-line interface that invokes the Selenium-RC server.  This topic
-is covered in the :ref:`Run Selenese tests <html-suite>` section on Selenium-RC
-chapter. The *-htmlSuite* command-line option is the particular feature of interest.
+虽然Seleniu-IDE只能在FireFox上运行测试，但是通过使用命令行接口调用Selenium-RC服务器，
+用Selenium-IDE开发的测试可以在其他的浏览器中运行。
+这个话题包含在Selenium-RC章的 :ref:`运行Selenese测试<html-suite>` 节。
 
-Troubleshooting
+疑难解答
 ---------------
-Below is a list of image/explanation pairs which describe frequent
-sources of problems with Selenium-IDE:
+下面是一个图像/解释的列表，它描述了使用Selenium-IDE经常出现的问题的根源。
 
 |startup|
-    This problem occurs occasionally when Selenium IDE is first brought up.  The solution is to close and reopen Selenium IDE.  The bug has been filed as `SIDE-230`_.
+    这个问题经常发生在Selenium IDE首次启动时。解决方法是关闭和再次打开Selenium IDE。这个缺陷已经提交成 `SIDE-230`_ 。
 
 .. _SIDE-230: http://jira.openqa.org/browse/SIDE-230
 
 ------------------
 
 |open|
-    You've used **File=>Open** to try to open a test suite file. Use **File=>Open Test Suite** instead.
+    你已经习惯用 **文件=>打开** 打开测试套件文件。用 **文件=>打开测试套件** 代替。
 
 ------------------
 
 |timing|
-    This type of **error** may indicate a timing problem, i.e., the element 
-    specified by a locator in your command wasn't fully loaded when the command 
-    was executed.  Try putting a **pause 5000** before the command to determine 
-    whether the problem is indeed related to timing.  If so, investigate using an 
-    appropriate **waitFor\*** or **\*AndWait** command immediately before the 
-    failing command.
+    这种类型的 **错误** 可能表明一个时间问题，例如，当命令执行时，
+    在你的命令中的定位器指明的元素还没有完全加载。
+    试着在命令前加 **pause 5000** 以确定这个问题是不是确实和时间有关。
+    如果是，试试在失败的命令前适当的加 **waitFor\*** or **\*AndWait** 命令。
 
 ------------------
 
 |param|
-    Whenever your attempt to use variable substitution fails as is the
-    case for the **open** command above, it indicates
-    that you haven't actually created the variable whose value you're
-    trying to access.  This is 
-    sometimes due to putting the variable in the **Value** field when it 
-    should be in the **Target** field or vice versa.  In the example above,
-    the two parameters for the **store** command have been erroneously
-    placed in the reverse order of what is required.
-    For any Selenese command, the first required parameter must go 
-    in the **Target** field, and the second required parameter (if one exists) 
-    must go in the **Value** field.  
+    每当你的变量替换的尝试失败的时候，就像上面的 **open** 命令一样，
+    这表明实际上你没有用你要访问的数值创建变量。
+    这有时是由于把本该在 **目标** 域中的变量放到了 **数值** 域，反之亦然。
+    在上面的例子中，**store** 命令的两个参数被错误的放置在相反的顺序。
+    对于任何的Selenese命令，第一个请求参数必须放到 **目标** 域，
+    第二个请求参数（如果它存在）必须放在 **数值** 域。
 
 ----------
 
 |ts|
-    One of the test cases in your test suite cannot be found.  Make sure 
-    that the test case is indeed located where the test suite indicates 
-    it is located.  Also, 
-    make sure that your actual test case files have the .html extension both 
-    in their filenames, and in the test suite file where they are referenced.
+    一个测试用例在你的测试套件无法找到。
+    确保测试用例的确是在测试套件标明位置。
+    同时，请确认实际的测试用例文件在它的
+    文件名和测试套件的引用中都有.html扩展名。
 
 ----------
 
 |space|
-    Selenium-IDE is very *space-sensitive*!  An extra space before or after 
-    a command will cause it to be unrecognizable.
+    Selenium-IDE对空格敏感！命令前后多余的空格将导致它无法辨认。
 
 ----------
 
 |extension|
-    Your extension file's contents have not been read by Selenium-IDE.  Be 
-    sure you have specified the proper pathname to the extensions file via 
-    **Options=>Options=>General** in the **Selenium Core extensions** field.
-    Also, Selenium-IDE must be restarted after any change to either an
-    extensions file *or* to the contents of the **Selenium Core extensions**
-    field.
+    你的插件的文件内容还没有被Selenium-IDE读取。请确保你已经通过
+    **选项=>选项=>常规** 在 **Selenium Croe 插件** 域，指定了正确的插件路径名。
+    并且，在插件文件 *或*  **Selenium Core 插件** 域的内容修改之后，
+    Selenium-IDE必须重新启动。
 
 ----------
 
 |collapsed|
-    This type of error message makes it appear that Selenium-IDE has generated
-    a failure where there is none.  However, Selenium-IDE is correct that
-    the actual value does not match the value specified in such test cases.
-    The problem is that the log file error messages collapse a series of
-    two or more spaces into a single space, which is confusing.  In the 
-    example above, note that the parameter for **verifyTitle** has two 
-    spaces between the words "System" and "Division."  The page's actual 
-    title has only one space between these words.  Thus, Selenium-IDE is 
-    correct to generate an error.
+    这种类型的错误信息说明Selenium-IDE在没有失败的地方产生了一个失败。
+    然而Selenium-IDE是正确的，在这个测试用例中实际值和指定的数值不相匹配。
+    问题在于日志中的错误信息把一系列空格压缩成了一个，这的确令人困惑。
+    在上面的例子中，请注意 **verifyTitle** 的参数在“System”和“Division”中有两个空格。
+    页面的实际标题在这两个字之间只有一个。因此Selenium-IDE产生错误是正确的。
 
 .. |startup| image:: ../images/chapt3_img30_Trouble_startup.png
 .. |open| image:: ../images/chapt3_img24_Trouble_open.png
