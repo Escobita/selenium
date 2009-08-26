@@ -1,0 +1,52 @@
+#summary Information about the Chrome Driver
+#labels WebDriver
+
+= Chrome Driver =
+
+Everything you ever wanted to know about the Chrome driver but were afraid to ask. See below for instructions on how to install the ChromeDriver.
+
+Note that ChromeDriver is more experimental than others as it has not had time in the wild.  Please report any problems through the mailing list/issue tracker.  It is in the process of being made available - if you can't see it, try again tomorrow.
+
+== Before Going Any Further ==
+
+The ChromeDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-chrome.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
+
+If you want to dig deeper, though, carry on reading!
+
+== Important System Properties ==
+
+The following system properties (read using {{{System.getProperty()}}} and set using {{{System.setProperty()}}} in Java code or the "{{{-DpropertyName=value}}}" command line flag) are used by the ChromeDriver:
+
+|| *Property* || *What it means* ||
+|| webdriver.chrome.bin || The location of the binary used to control chrome. ||
+
+Normally the Firefox binary is assumed to be in the default location for your particular operating system:
+
+|| *OS* || *Expected Location of Firefox* ||
+|| Linux || /usr/bin/google-chrome ||
+|| Mac || /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome *or* /User/[username]/[as previous] ||
+|| Windows XP || %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe ||
+|| Windows Vista || C:\Users\%USERNAME%\AppData\Local\Google\Chrome\Application\chrome.exe ||
+
+== Installing a Downloaded Binary ==
+
+The "wedriver-chrome.zip" which may be downloaded from the website, contains all the dependencies (including the common and remote libraries) required to run the ChromeDriver. In order to use it:
+
+ # Copy all the "jar" files on to your classpath.
+
+== Installing the Quick Way From Source (with Ruby) ==
+
+If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will magically copy over build/Win32/Debug/npchromedriver.dll into the extension if you're on Windows.  Make sure that this dll has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln)
+
+This assumes that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
+
+{{{System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");}}}
+
+== Pros ==
+
+ * Runs in a real browser and supports Javascript
+ * Also probably a decent test for rendering of Safari/other WebKit based browsers, though not their Javascript (as it uses its own V8 Javascript engine)
+
+== Cons ==
+ 
+ * Slower than the HtmlUnitDriver
