@@ -21,7 +21,7 @@ Switching focus in the page (i.e. element switchTo) is currently unsupported.
 
 Only one instance at a time will run.  This will be fixed when the fix to [http://code.google.com/p/chromium/issues/detail?id=11547 a bug] in Chrome is patched into the dev channel (probably 2009-09-01).
 
-File uploading using <input type="file" /> elements is currently unsupported.
+File uploading using <input type="file"> elements is currently unsupported.
 
 Additionally, on Mac and Linux:
 
