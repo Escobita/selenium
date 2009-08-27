@@ -13,7 +13,21 @@ The ChromeDriver contains everything it needs in the JAR file. If you're just in
 
 You will need the *dev channel* release of Google Chrome installed (NOT the stable or beta).  You can get on the dev channel [http://dev.chromium.org/getting-involved/dev-channel here].
 
-If you want to dig deeper, though, carry on reading!
+== Known issues ==
+
+Currently there is no support for Frames - specifically switching to them.  This is due to a bug in Chrome, and we will fix it when the bug is fixed in Chrome.
+
+Switching focus in the page (i.e. element switchTo) is currently unsupported.
+
+Only one instance at a time will run.  This will be fixed when the fix to [http://code.google.com/p/chromium/issues/detail?id=11547 a bug] in Chrome is patched into the dev channel (probably 2009-09-01).
+
+File uploading using <input type="file" /> elements is currently unsupported.
+
+Additionally, on Mac and Linux:
+
+Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.
+
+Deleting cookies is unsupported.  This is due to a bug in Chrome, and will be fixed when the fix to [http://code.google.com/p/chromium/issues/detail?id=14734 a bug] is patched into the dev channel (probably 2009-09-01).
 
 == Important System Properties ==
 
