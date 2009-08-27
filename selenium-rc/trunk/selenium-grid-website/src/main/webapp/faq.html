@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns:svg='http://www.w3.org/2000/svg' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+<head><meta content='application/xhtml+xml;charset=utf-8' http-equiv='Content-type' /><title>Selenium Grid FAQ</title><link href='stylesheets/site.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/document.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/faq.css' rel='stylesheet' type='text/css' />
+</head>
+<body><div class='header'>
+  <a href='index.html'><img src='images/selenium-grid-logo-large.png' alt='Selenium_grid_logo_large' /></a>
+  <p>FAQ</p>
+</div>
+<p class='toc'>Table Of Content:</p>
+<div class='maruku_toc'><ul style='list-style: none;'><li><a href='#general'>General</a><ul style='list-style: none;'><li><a href='#would_you_recommend_using_selenium_grid_for_performanceload_testing'>Would you recommend using Selenium Grid for performance/Load testing?</a></li></ul></li><li><a href='#installing'>Installing</a><ul style='list-style: none;'><li><a href='#do_you_have_step_by_step_assume_i_am_an_idiot_installation_instructions'>Do you have step by step, &#8220;assume I am an idiot&#8221;, installation instructions?</a></li></ul></li><li><a href='#running_the_demo'>Running the Demo</a><ul style='list-style: none;'><li><a href='#tests_are_failing_when_i_run_the_demo_how_can_i_troubleshoot_the_problem'>Tests Are Failing When I Run the Demo. How can I troubleshoot the problem?</a></li><li><a href='#running_the_demo_using_a_different_browser'>Running the Demo Using a Different Browser</a></li></ul></li><li><a href='#customizing_selenium_grid'>Customizing Selenium Grid</a><ul style='list-style: none;'><li><a href='#can_i_change_the_version_of_selenium_rc_used_by_the_grid'>Can I change the version of Selenium RC used by the Grid?</a></li></ul></li><li><a href='#analysing_failures'>Analysing Failures</a><ul style='list-style: none;'><li><a href='#when_we_test_the_application_with_selenium_grid_we_get_nondeterministic_results'>When we test the application with Selenium Grid, we get nondeterministic results</a></li></ul></li><li><a href='#managing_the_hub_and_the_remote_controls'>Managing the Hub and the Remote Controls</a><ul style='list-style: none;'><li><a href='#how_can_i_shutdown_selenium_grid_hub'>How can I shutdown Selenium Grid Hub?</a></li><li><a href='#how_can_i_pass_additional_parameters_to_the_remote_controls_when_starting_them_as_part_of_selenium_grid'>How can I pass additional parameters to the Remote Controls when starting them as part of Selenium Grid?</a></li><li><a href='#how_can_i_use_the__option'>How can I use the <code>-firefoxProfileTemplate</code> option?</a></li><li><a href='#i_need_to_run_the_hub_and_remote_control_in_background_how_can_i_do_it'>I need to run the Hub and Remote Control in background&#8230;. How can I do it?</a></li><li><a href='#when_starting_firefox_i_get_java_javalangruntimeexception_firefox_refused_shutdown_while_preparing_a_profile'>When starting Firefox I get: java java.lang.RuntimeException: Firefox refused shutdown while preparing a profile&#8221;</a></li><li><a href='#why_do_i_have_duplicate_entries_in_the_hub_after_restarting_my_remote_controls'>Why do I have duplicate entries in the Hub after restarting my Remote Controls?</a></li><li><a href='#can_i_configure_the_remote_control_to_use_a_custom_httphttps_proxy'>Can I configure the Remote Control to use a custom HTTP/HTTPS proxy?</a></li></ul></li><li><a href='#running_the_examples_included_in_selenium_grid_distribution'>Running the Examples Included in Selenium Grid Distribution</a><ul style='list-style: none;'><li><a href='#how_to_run_the_java_example'>How to run the Java example?</a></li><li><a href='#how_to_run_the_ruby_example'>How to Run the Ruby Example?</a></li><li><a href='#the_ruby_example_does_not_seem_to_work_on_windows'>The Ruby Example Does Not Seem to Work on Windows!</a></li><li><a href='#running_the_ruby_example_using_a_different_browser'>Running the Ruby Example Using a Different Browser</a></li></ul></li><li><a href='#running_your_tests_against_selenium_grid'>Running Your Tests Against Selenium Grid</a><ul style='list-style: none;'><li><a href='#i_have_some_test_cases_and_i_want_to_run_them_against_selenium_grid_what_do_i_need_to_do'>I have some test cases and I want to run them against Selenium Grid, what do I need to do?</a><ul style='list-style: none;'><li><a href='#java'>Java</a></li><li><a href='#ruby'>Ruby</a></li><li><a href='#python'>Python</a></li><li><a href='#net'>.Net</a></li><li><a href='#other'>Other</a></li></ul></li><li><a href='#is_there_a_way_to_generate_test_reports_using_selenium'>Is there a way to generate test reports using Selenium?</a></li><li><a href='#my_test_cases_are_in_html_selenese_how_can_i_run_those_against_selenium_grid_'>My test cases are in HTML (Selenese), how can I run those against Selenium Grid ?</a></li><li><a href='#my_test_is_not_working_when_i_use_https'>My test is not working when I use HTTPS!</a></li><li><a href='#how_can_i_avoid_ssl_certificate_popups'>How can I avoid SSL certificate popups?</a><ul style='list-style: none;'><li><a href='#your_ssl_certificate_is_valid'>Your SSL Certificate is Valid</a></li><li><a href='#your_ssl_certificate_is_invalid'>Your SSL Certificate is Invalid</a></li></ul></li><li><a href='#i_get_some_strange_errors_when_i_run_multiple_internet_explorer_instances_on_the_same_machine'>I get some strange errors when I run multiple Internet Explorer instances on the same machine</a></li></ul></li><li><a href='#development'>Development</a><ul style='list-style: none;'><li><a href='#where_can_i_find_selenium_grid_nightly_builds'>Where can I find Selenium Grid nightly builds?</a></li><li><a href='#where_can_i_get_feedback_selenium_grid_on_continuous_integration_builds'>Where Can I Get Feedback Selenium Grid on Continuous Integration Builds?</a></li></ul></li></ul></div>
+<h1 id='general'>General</h1>
+
+<h2 id='would_you_recommend_using_selenium_grid_for_performanceload_testing'>Would you recommend using Selenium Grid for performance/Load testing?</h2>
+
+<p>Selenium Grid is not designed for performance and load testing, but very efficient web acceptance/functional testing. The main reason for this is that conducting performance/load testing with real browser is a pretty bad idea as it is hard/expensive to scale the load and the actual load is very inconsistent.</p>
+
+<p>For load/performance testing I would advise using tools like JMeter, Grinder or httperf. What you can do though, is reuse your selenium tests to record the use cases you will use for your load testing. If you really want to conduct load testing with Selenium, check out <a href='http://browsermob.com/welcome'>Browser Mob</a>.</p>
+
+<p>To simulate 200 concurrent users for instance, you would need 200 concurrent browsers with a load testing framework based on Selenium Grid. Even if you use Firefox on Linux (so the most efficient setup) you will probably need at least 10 machines to generate that kind of load. Quite insane when JMeter/Grinder/httperf can generate the same kind of load with a single machine.</p>
+
+<h1 id='installing'>Installing</h1>
+
+<h2 id='do_you_have_step_by_step_assume_i_am_an_idiot_installation_instructions'>Do you have step by step, &#8220;assume I am an idiot&#8221;, installation instructions?</h2>
+
+<p>First if you are trying out Selenium Grid you are certainly <em>not</em> an idiot. ;-) Second, yes we do have step by step installation instructions, check out:</p>
+
+<ul>
+<li><a href='./step_by_step_installation_instructions_for_windows.html'>Step by Step Installation Instructions for Windows</a></li>
+
+<li><a href='./step_by_step_installation_instructions_for_osx.html'>Step by Step Installation Instructions for Mac OS X</a></li>
+</ul>
+
+<h1 id='running_the_demo'>Running the Demo</h1>
+
+<h2 id='tests_are_failing_when_i_run_the_demo_how_can_i_troubleshoot_the_problem'>Tests Are Failing When I Run the Demo. How can I troubleshoot the problem?</h2>
+
+<blockquote>
+<p>I started the Hub on the UNIX machine and then I&#8217;ve created 2 remote controls on a Window laptop. This part worked and I can see the Hub console listing the 2 remote controls. When I start <code>ant run-demo-in-parallel</code> on the UNIX box, however, the following error appears:</p>
+</blockquote>
+
+<pre><code>[java] ===============================================
+[java] Selenium Grid Demo In Parallel
+[java] Total tests run: 4, Failures: 4, Skips: 0
+[java] ===============================================</code></pre>
+
+<blockquote>
+<p>How can I investigate the problem?</p>
+</blockquote>
+
+<p>Here are a few things you can do to try to understand what is going on:</p>
+
+<ul>
+<li>
+<p>Look at the TestNG report under <code>target/reports/index.html</code> on the test runner machine (the UNIX one in your case), looking for the actual error messages / stack traces.</p>
+</li>
+
+<li>
+<p>Check the Hub and remote control logs under the <code>log/</code> directory</p>
+</li>
+
+<li>
+<p>Look at the Windows machine where the remote controls are running: Are the remote controls logging any command at all? Are browsers popping up at least? Take a good look at the Selenium Remote Control logs while the tests are running.</p>
+
+<p>If the remote controls on the Windows machine are not even contacted, this is most likely to be a setting/network/browser configuration problem. Check the way you launched the hub and the remote controls, as well as your network.</p>
+
+<p>If the remote controls on the windows machine are contacted but fail to run the tests properly, this is probably just a problem on the local machine. Try to run Selenium Grid demo exclusively on this machine (or any Selenium Test you have) to understand the nature of the problem in a less complex environment.</p>
+
+<p>If finding the actual problem still end up being hard, please <a href='http://clearspace.openqa.org/community/selenium/advanced'>post a message in the Selenium Grid forum</a> with precise information on:</p>
+</li>
+
+<li>
+<p>The O.S. and browser combination that you are using</p>
+</li>
+
+<li>
+<p>Whether you see browsers popping up or not</p>
+</li>
+
+<li>
+<p>A screenshot of the Hub console before you launch the tests (The console can usually be accessed at http://localhost:4444/console on the machine running the Hub)</p>
+</li>
+
+<li>
+<p>The test client side errors (TestNG reports)</p>
+</li>
+
+<li>
+<p>Selenium Grid Hub logs (<code>log/hub.log</code>)</p>
+</li>
+
+<li>
+<p>Remote Control logs (<code>log/rc-*.log</code>)</p>
+</li>
+</ul>
+
+<h2 id='running_the_demo_using_a_different_browser'>Running the Demo Using a Different Browser</h2>
+
+<blockquote>
+<p>When i run the selenium grid demo then all remote control by default launched Firefox. so how and where could I update the browser name incase of Selenium Grid.</p>
+</blockquote>
+
+<p>Here is how you would do to run the demo with the Safari web browser for instance.</p>
+
+<p>Launch the Hub the standard way:</p>
+
+<pre><code>ant launch-hub</code></pre>
+
+<p>Launch a remote control declaring that it provides the Safari environment:</p>
+
+<pre><code>ant -Denvironment=&quot;*safari&quot; launch-remote-control</code></pre>
+
+<p>Launch the other remote controls the same way:</p>
+
+<pre><code>ant -Denvironment=&quot;*safari&quot; -Dport=5556 launch-remote-control
+ant -Denvironment=&quot;*safari&quot; -Dport=5557 launch-remote-control</code></pre>
+
+<p>Launch the demo overriding the browser system property:</p>
+
+<pre><code>  ant -Dbrowser=&quot;*safari&quot; run-demo-in-parallel</code></pre>
+
+<p>Voila! you&#8217;re done!</p>
+
+<p>If you are using Ruby automation (power to you), you can also achieve the same thing easily:</p>
+
+<p>Launch the Hub the standard way:</p>
+
+<pre><code>rake hub:start</code></pre>
+
+<p>Launch the remote controls declaring that they provides the Safari environment:</p>
+
+<pre><code>rake rc:start_all ENVIRONMENT=*safari</code></pre>
+
+<p>Launch the demo overriding the browser system property:</p>
+
+<pre><code>ant -Dbrowser=&quot;*safari&quot; run-demo-in-parallel</code></pre>
+
+<h1 id='customizing_selenium_grid'>Customizing Selenium Grid</h1>
+
+<h2 id='can_i_change_the_version_of_selenium_rc_used_by_the_grid'>Can I change the version of Selenium RC used by the Grid?</h2>
+
+<p>Every remote control that you launch with <code>ant launch-remote-control</code> or <code>rake rc:start</code> is using the first Selenium Remote Control standalone jar packaged in the <code>vendor</code> directory whose name matches <code>selenium-server-*.jar</code>.</p>
+
+<p>To use your own version of Selenium Remote Control, just delete the <code>vendor/selenium-server-*.jar</code> file that comes with Selenium Grid distribution and replace it any standalone Remote Control jar that you fancy! This technique is especially useful to workaround regressions in Remote Control nightly builds&#8230;</p>
+
+<h1 id='analysing_failures'>Analysing Failures</h1>
+
+<h2 id='when_we_test_the_application_with_selenium_grid_we_get_nondeterministic_results'>When we test the application with Selenium Grid, we get nondeterministic results</h2>
+
+<blockquote>
+<p>Locally, when we test the application with Selenium Grid, we get nondeterministic results. Tests seem to fail randomly. Messing with the number of nodes in the grid seems to help, but its really annoying that we can&#8217;t seem to get consistent results.</p>
+</blockquote>
+
+<p>Most likely some tests are timing out in a non-deterministic manner because your CPU or Network is over-utilized. Monitor your CPU and Network activity on all the machines involved. Once you find the bottleneck launch fewer processes. For instance if your load average is way higher than the number of CPUs on the machine running the remote controls, cut the number of remote controls you launch by two until you get to a sustainable machine load.</p>
+
+<p>Make sure you spend some time figuring out the optimal number of concurrent test runners and remote controls to run in parallel on each machine, before deploying a Selenium Grid infrastructure your organization is going to depend on.</p>
+
+<h1 id='managing_the_hub_and_the_remote_controls'>Managing the Hub and the Remote Controls</h1>
+
+<h2 id='how_can_i_shutdown_selenium_grid_hub'>How can I shutdown Selenium Grid Hub?</h2>
+
+<p>If you are using the rake task provided with Selenium Grid you can just run:</p>
+
+<pre><code>rake hub:stop</code></pre>
+
+<p>If Rake is not an option or you want to hook your instrumentation logic you can also shutdown the Hub with a single HTTP request. You need to submit a POST request to the Hub targeting <code>/lifecycle-manager</code> with a parameter <code>action=shutdown</code>. For instance if the Hub is running on <code>localhost</code> on port <code>4444</code> you could shut it down with:</p>
+
+<pre><code>curl -d action=shutdown http://localhost:4444/lifecycle-manager</code></pre>
+
+<p>or</p>
+
+<pre><code>wget --post-data action=shutdown action=shutdown http://localhost:4444/lifecycle-manager</code></pre>
+
+<h2 id='how_can_i_pass_additional_parameters_to_the_remote_controls_when_starting_them_as_part_of_selenium_grid'>How can I pass additional parameters to the Remote Controls when starting them as part of Selenium Grid?</h2>
+
+<p>Additional parameters can be passed to Selenium remote controls at startup</p>
+
+<p>Just set the <code>seleniumArgs</code> Java property when launching the remote control. For instance, to start a remote control in multi window and debug mode you would use:</p>
+
+<pre><code>ant -DseleniumArgs=&quot;-multiWindow -debug&quot; launch-remote-control</code></pre>
+
+<p>Of course you can also achieve the same thing with the Rake task:</p>
+
+<pre><code>rake hub:start SELENIUM_ARGS=&quot;-multiWindow -debug&quot;</code></pre>
+
+<h2 id='how_can_i_use_the__option'>How can I use the <code>-firefoxProfileTemplate</code> option?</h2>
+
+<p>On OS X or UNIX, you can use a custom Firefox profile with Selenium Grid by launching the remote controls with the <code>-firefoxProfileTemplate</code> option:</p>
+
+<pre><code>ant -DseleniumArgs=&quot;-firefoxProfileTemplate /path/to/my_profile&quot; launch-remote-control</code></pre>
+
+<p>On Windows figuring out the right path to provide for your profile can be confusing espcially if you file path contains spaces (like <code>\Documents and Settings</code>). Just make sure you are providing the short filename (visible with a <code>dir /x</code>) and everything will be fine.</p>
+
+<h2 id='i_need_to_run_the_hub_and_remote_control_in_background_how_can_i_do_it'>I need to run the Hub and Remote Control in background&#8230;. How can I do it?</h2>
+
+<p>On UNIX you just add a ampersand at the end of the command line. See:</p>
+
+<ul>
+<li><a href='http://www.washington.edu/computing/unix/startdoc/shell.html'>Working with the UNIX shell</a></li>
+
+<li><a href='http://en.wikipedia.org/wiki/Nohup'><code>nohup</code></a></li>
+</ul>
+
+<p>On Windows you can use &#8220;start /wait/ /b&#8221; : Check out the <a href='http://www.ss64.com/nt/start.html'><code>start</code> command reference</a> for more details.</p>
+
+<p>This said, if you are running on a UNIX platform or Mac OS X, the easiest way to start the Hub and Remote Controls is to use the Rake tasks that come with Selenium Grid distribution. <code>cd</code> to the root of the Selenium distribution and type:</p>
+
+<pre><code>  rake hub:start BACKGROUND=true</code></pre>
+
+<p>Which will launch the hub in the background. You can then launch remote controls in the background with:</p>
+
+<pre><code>  rake rc:start PORT=4445 BACKGROUND=true</code></pre>
+
+<p>In practice, it is actually easier to launch the hub and all the remote controls in the background with a single command:</p>
+
+<pre><code>  rake all:start</code></pre>
+
+<p>Of course you can also stop them all in a similar way:</p>
+
+<pre><code>  rake all:start</code></pre>
+
+<h2 id='when_starting_firefox_i_get_java_javalangruntimeexception_firefox_refused_shutdown_while_preparing_a_profile'>When starting Firefox I get: java java.lang.RuntimeException: Firefox refused shutdown while preparing a profile&#8221;</h2>
+
+<blockquote>
+<p>Here is my log on this error: &#8230; java Caused by: org.seleniumhq.selenium.server.browserlaunchers.FirefoxChromeLauncher$FileLockRemainedException: Lock file still present! C:\DOKUME1\Semadou\LOKALE1\Temp\customProfileDir9d4a3879bb7d4ca5b75dbbb488ec30b1\parent.lock</p>
+</blockquote>
+
+<p>Sometimes Selenium Remote Control does not stop Firefox properly on Windows and things get very messy (leaving lock files behind). This does happen when you Ctrl-C while running the test suite for instance.</p>
+
+<p>If you encounter this problem, I would advise you to:</p>
+
+<ul>
+<li>Kill all running Firefox instances and make sure that there is no Firefox process in the task manager (or even better reboot)</li>
+
+<li>Delete all the directories: <code>C:\DOCUME1\&lt;your login&gt;\LOCALS1\Temp\customProfileDir*</code></li>
+
+<li>While you are at it cleanup <code>C:\DOCUME1\&lt;your login&gt;\LOCALS1\Temp as much as possible</code></li>
+
+<li>Run your tests or the demo again</li>
+</ul>
+
+<h2 id='why_do_i_have_duplicate_entries_in_the_hub_after_restarting_my_remote_controls'>Why do I have duplicate entries in the Hub after restarting my Remote Controls?</h2>
+
+<blockquote>
+<p>Say I have a hub setup with three RCs ready and waiting, and then I go and restart those RCs, my hub now shows 6 RCs even though there are actually only 3. Is this anything to worry about? Will the hub try to send requests to the &#8220;dead&#8221; entries? Do I have to restart the hub every time I need to restart and RC?</p>
+</blockquote>
+
+<p>You are probably stopping the remote controls a little too &#8220;harshly&#8221;? For instance, if you do a <code>kill -9</code> or use Windows task manager, the JVM shutdown hook does not have a chance to unregister the remote control and the Hub does not realize that the remote control is gone.</p>
+
+<p>But if you stop the remote control in a more &#8220;civil&#8221; manner everything should be fine (e.g. <code>kill</code> or using the shutdown method in selenium client api). Even better use the Rake tasks provided with Selenium Grid distribution: <code>rake rc:start_all</code> and <code>rake rc:stop_all</code> multiple times on my machine.</p>
+
+<p>If you end up in this state I do recommend that you restart the Hub which would otherwise end up in a &#8220;non predictable state&#8221;. Future releases of Selenium Grid will take care of this problem transparently, but for now a restart is safer.</p>
+
+<h2 id='can_i_configure_the_remote_control_to_use_a_custom_httphttps_proxy'>Can I configure the Remote Control to use a custom HTTP/HTTPS proxy?</h2>
+
+<p>To use custom http proxy settings set the <code>http.proxyHost</code> and the <code>http.proxyPort</code> java system properties when starting the remote controls and the hub.</p>
+
+<p>For instance:</p>
+
+<pre><code>ant -Dhttp.proxyHost=my_proxy.my_company.com -Dhttp.proxyPort=3128 launch-hub
+ant -Dhttp.proxyHost=my_proxy.my_company.com -Dhttp.proxyPort=3128 launch-remote-control</code></pre>
+
+<p>Note that the JVM use different properties for http and https proxies. So if you also want to use the same proxy for http <em>and</em> https you need to use:</p>
+
+<pre><code>  ant -Dhttp.proxyHost=my_proxy.my_company.com -Dhttp.proxyPort=3128 \
+      -Dhttps.proxyHost=my_proxy.my_company.com -Dhttps.proxyPort=3128 \
+      launch-hub
+
+  ant -Dhttp.proxyHost=my_proxy.my_company.com -Dhttp.proxyPort=3128 \
+      -Dhttps.proxyHost=my_proxy.my_company.com -Dhttps.proxyPort=3128 \
+      launch-remote-control  </code></pre>
+
+<h1 id='running_the_examples_included_in_selenium_grid_distribution'>Running the Examples Included in Selenium Grid Distribution</h1>
+
+<h2 id='how_to_run_the_java_example'>How to run the Java example?</h2>
+
+<ol>
+<li>
+<p>Go to the root directory of your Selenium Grid distribution</p>
+</li>
+
+<li>
+<p>Launch Selenium Grid Hub and 4 remote controls as explained in <a href='http://selenium-grid.seleniumhq.org/run_the_demo.html'>&#8220;Run the Demo&#8221;</a></p>
+</li>
+
+<li>
+<p>Go to the Java example directory: <code>cd ./examples/java</code></p>
+</li>
+
+<li>
+<p>Launch the tests with: <code>ant run</code></p>
+</li>
+</ol>
+
+<h2 id='how_to_run_the_ruby_example'>How to Run the Ruby Example?</h2>
+
+<ol>
+<li>
+<p>Go to the root directory of your Selenium Grid distribution</p>
+</li>
+
+<li>
+<p>(Re)start Selenium Grid Hub and the remote controls with: <code>rake all:restart</code></p>
+</li>
+
+<li>
+<p>Go to the Ruby example directory: <code>cd ./examples/ruby</code></p>
+</li>
+
+<li>
+<p>Launch the tests with: <code>rake tests:run_in_parallel</code></p>
+</li>
+</ol>
+
+<h2 id='the_ruby_example_does_not_seem_to_work_on_windows'>The Ruby Example Does Not Seem to Work on Windows!</h2>
+
+<blockquote>
+<p>When running the Ruby example on Windows I get:</p>
+
+<p><code>[DeepTest] Started DeepTest service at druby://0.0.0.0:6969
+c:/ruby/lib/ruby/gems/1.8/gems/deep_test-1.2.2/lib/deep_test.rb:15:in fork: the fork() function is unimplemented on this machine (NotImplementedError)</code></p>
+</blockquote>
+
+<p>This is expected. The Ruby example will <em>not</em> work on Windows.</p>
+
+<p>The Ruby example demonstrates best practices for high ROI in-browser web testing in Ruby. As a consequence it relies on <a href='http://deep-test.rubyforge.org'>DeepTest</a>, the best parallel and distributed test runner available for Ruby. In turns, DeepTest make extensive use of <code>Kernel.fork()</code>&#8230; which is not implemented on Windows.</p>
+
+<p>This is not really a problem as the Ruby community has widely embraced the Mac OS X and UNIX platforms which provide a far better environment to execute your tests. Besides, with Selenium Grid (or Selenium RC) it is very simple to run your tests on UNIX while driving a web browser running on Windows. So there is no need to run your tests on Windows to test a Windows&#8217; browser. Consequently I strongly advise to always run your tests on Linux or Mac OS X and just target a Selenium RC running on a Windows platform when you need to test Internet Explorer. You will also save yourself a lot of headaches as very few Ruby users run on Windows anyway&#8230;</p>
+
+<h2 id='running_the_ruby_example_using_a_different_browser'>Running the Ruby Example Using a Different Browser</h2>
+
+<p>Here is how you would do to run the Ruby example with the Safari web browser for instance.</p>
+
+<p>Launch the Hub the standard way (from the root of Selenium Grid distribution):</p>
+
+<pre><code>rake hub:start</code></pre>
+
+<p>Launch a bunch of remote controls declaring that they provides the Safari environment:</p>
+
+<pre><code>rake rc:start_all ENVIRONMENT=*safari</code></pre>
+
+<p>Launch the tests overriding the browser environment variable:</p>
+
+<pre><code>  cd examples/ruby
+  rake tests:run_in_parallel SELENIUM_RC_BROWSER=&quot;*safari&quot;</code></pre>
+
+<p>Voila! you&#8217;re done!</p>
+
+<h1 id='running_your_tests_against_selenium_grid'>Running Your Tests Against Selenium Grid</h1>
+
+<h2 id='i_have_some_test_cases_and_i_want_to_run_them_against_selenium_grid_what_do_i_need_to_do'>I have some test cases and I want to run them against Selenium Grid, what do I need to do?</h2>
+
+<p>The idea is that all you have to do to take advantage of the Selenium Grid is to point your Selenium client driver to the Hub and run your tests in parallel.</p>
+
+<h3 id='java'>Java</h3>
+
+<p>If you writing your tests using Java, the best is to run your tests with <a href='http://testng.org/doc/documentation-main.html#parallel-running'>TestNG parallel runner</a>.</p>
+
+<p>You can find a concrete example on how this can be achieved in the standard Selenium Grid distribution under the <a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/java/'><code>examples/java</code></a> directory.</p>
+
+<h3 id='ruby'>Ruby</h3>
+
+<p>If you use Ruby, the best is to use <a href='http://deep-test.rubyforge.org'>DeepTest</a> which can even distribute the test run accross multiple machines.</p>
+
+<p>You can find a concrete example (a nice test reports) on how this can be achieved in the standard Selenium Grid distribution under the <a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/ruby/'><code>examples/ruby</code></a> directory.</p>
+
+<h3 id='python'>Python</h3>
+
+<p>I have no experience in Python so I do not know what the best solution is. Nevertheless, I can give you the theory and some starting points.</p>
+
+<p>Basically you need to come up with a way to run your python tests in parallel. How exactly you achieve this usually depends on your testing framework and programming language of choice. I am not personally aware of any parallel test runner for Python but a little Googling found the following starting points that you could investigate:</p>
+
+<ul>
+<li><a href='https://codespeak.net/py/dist/test.html#automated-distributed-testing'><code>py.test</code> distributed testing section</a></li>
+
+<li><a href='http://www.parallelpython.com/'>Parallel Python</a></li>
+
+<li><a href='http://testoob.sourceforge.net/features.html'>Testoob</a></li>
+
+<li><a href='http://lists.idyll.org/pipermail/testing-in-python/2007-December/thread.html#463'>Mailing list archive on parallel testing in Python</a></li>
+</ul>
+
+<p>If none of this is helpful, worst case scenario, you can also write your own parallel test runner by launching multiple processes targeting different test file sets and checking the process exit statuses. Not the most elegant/efficient way, but that can get you started. This is actually the way I originally started with Ruby and you can find an example on how this worked in the Ruby example included in Selenium Grid distribution:</p>
+
+<p><a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/ruby/lib/multi_process_behaviour_runner.rb'><code>examples/ruby/lib/multi_process_behaviour_runner.rb</code></a></p>
+
+<p>You launch the whole thing with:</p>
+
+<pre><code>#
+# Legacy way to drive tests in parallel before DeepTest RSpec support.
+# Kept to document a simple way to run the tests in parallel for non-Ruby
+# platforms.
+#
+desc(&quot;[DEPRECATED] Run all behaviors in parallel spawing multiple
+processes. DeepTest offers a better alternative.&quot;)
+task :&#39;tests:run_in_parallel:multiprocess&#39; =&gt; :create_report_dir do
+ require File.expand_path(File.dirname(__FILE__) +
+&#39;/lib/multi_process_behaviour_runner&#39;)
+ runner = MultiProcessSpecRunner.new(10)
+ runner.run(Dir[&#39;*_spec.rb&#39;])
+end</code></pre>
+
+<p>Good luck in your quest for the ultimate Python parallel test runner. Please <a href='http://ph7spot.com/about/contact_me'>contact me</a> if you figure out the best solution for Python, I will put it in the documentation. Even better, send me an example, I will include it in Selenium Grid distribution.</p>
+
+<h3 id='net'>.Net</h3>
+
+<p>I have no expertise in .Net but <a href='http://www.gallio.org/'>Gallio</a> seems to be able to <a href='http://igorbrejc.net/development/continuous-integration/gallio-running-tests-in-parallel'>run tests in parallel</a></p>
+
+<h3 id='other'>Other</h3>
+
+<p>To take advantage of Selenium Grid power, you need to come up with a way to run your tests in parallel. How exactly you achieve this usually depends on your testing framework and programming language of choice. Try googling around for a parallel or distributed test runner for your language.</p>
+
+<p>If you cannot find any, your fallback plan is to write your own parallel test runner by launching multiple processes targeting different test file sets and checking the process exit statuses. Not the most elegant/efficient way, but that can get you started. This is actually the way I originally started with Ruby and you can find an example on how this worked in the Ruby example included in Selenium Grid distribution:</p>
+
+<p><a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/ruby/lib/multi_process_behaviour_runner.rb'><code>examples/ruby/lib/multi_process_behaviour_runner.rb</code></a></p>
+
+<p>You launch the whole thing with:</p>
+
+<pre><code>#
+# Legacy way to drive tests in parallel before DeepTest RSpec support.
+# Kept to document a simple way to run the tests in parallel for non-Ruby
+# platforms.
+#
+desc(&quot;[DEPRECATED] Run all behaviors in parallel spawing multiple
+processes. DeepTest offers a better alternative.&quot;)
+task :&#39;tests:run_in_parallel:multiprocess&#39; =&gt; :create_report_dir do
+ require File.expand_path(File.dirname(__FILE__) +
+&#39;/lib/multi_process_behaviour_runner&#39;)
+ runner = MultiProcessSpecRunner.new(10)
+ runner.run(Dir[&#39;*_spec.rb&#39;])
+end</code></pre>
+
+<p>Good luck in your quest for the ultimate parallel test runner for your favorite language. Please <a href='http://ph7spot.com/about/contact_me'>contact me</a> if you figure out the best solution for your language, I will put it in the documentation. Even better, send me an example, I will include it in Selenium Grid distribution.</p>
+
+<h2 id='is_there_a_way_to_generate_test_reports_using_selenium'>Is there a way to generate test reports using Selenium?</h2>
+
+<p>The short answer is that yes you can generate test reports with Selenium. How to achieve this (and their exact format) will however depend on the programming language and test runner you are using (for instance <code>JUnit</code>, <code>TestNG</code>, <code>Test::Unit</code> or <code>RSpec</code>).</p>
+
+<p>You can look at the <a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/ruby/'><code>examples/ruby</code></a> directory in the Selenium Grid distribution to see how you can use RSpec and Selenium to generate reports which <a href='http://ph7spot.com/examples/rspec_report/index.html'>include HTML capture and OS screenshots when a test fail</a>.</p>
+
+<h2 id='my_test_cases_are_in_html_selenese_how_can_i_run_those_against_selenium_grid_'>My test cases are in HTML (Selenese), how can I run those against Selenium Grid ?</h2>
+
+<p>You would need a parallel test runner for Selenium Grid.</p>
+
+<p>I might eventually end up working on such a parallel test runner for HTML test suites, nevertheless my time is limited and this feature is quite low in my priority list: in my experience HTML test suites are a nightmare to maintain you are better off writing and refactoring real code by the time your test suite grows big enough that it takes too long to run.</p>
+
+<p>This said, there might be hope as some guys seem to be working on it though: see <a href='http://clearspace.openqa.org/thread/11482'>this thread</a></p>
+
+<p>Here are more details on why this feature is not high on my priority list:</p>
+
+<ol>
+<li>
+<p>I write all my tests using a full-featured programming language (not HTML) because I believe that it is a far better approach to in-browser testing &#8211; especially when it come to maintenance.</p>
+</li>
+
+<li>
+<p>If you have enough tests to feel the need for Selenium Grid, then test maintenance should matter to you&#8230; and using HTML test cases is not going to help!</p>
+</li>
+
+<li>
+<p>I have limited development cycles and work on Selenium grid in my free time. There a lot of other features to work on that are more important to me and my teams.</p>
+</li>
+
+<li>
+<p>Selenium Grid is an open-source project. If this running HTML tests in parallel is important enough to a large number of users, somebody will write a patch that I will be glad to incorporate it in the codebase.</p>
+</li>
+</ol>
+
+<h2 id='my_test_is_not_working_when_i_use_https'>My test is not working when I use HTTPS!</h2>
+
+<p>Selenium and Selenium Grid support HTTPS out-of-the-box. Just make sure you are using one of the &#8220;privileged&#8221; browser modes, namely <code>*chrome</code>, <code>*hta</code> and <code>*safari</code>.</p>
+
+<h2 id='how_can_i_avoid_ssl_certificate_popups'>How can I avoid SSL certificate popups?</h2>
+
+<p>First make sure you are using a priviledged browser mode (namely <code>*chrome</code>, <code>*hta</code> or <code>*safari</code>).</p>
+
+<p>The generic solution is to accept the Certificate manually the first time and run the test again. For Firefox the solution is actually a little more involved and will depend whether your SSL certificate is valid or not:</p>
+
+<h3 id='your_ssl_certificate_is_valid'>Your SSL Certificate is Valid</h3>
+
+<ol>
+<li>
+<p>Generate a Firefox <a href='http://support.mozilla.com/en-US/kb/Profiles'>profile</a> accepting the certificate:</p>
+
+<ol>
+<li>
+<p>Start Firefox manually</p>
+</li>
+
+<li>
+<p>Go to the web page trigerring the certificate popup and accept permanently the certification.</p>
+</li>
+
+<li>
+<p>Close Firefox.</p>
+</li>
+</ol>
+</li>
+
+<li>
+<p>Copy the Firefox profile you just changed to a new directory (eg <code>seleniumFirefoxProfile</code>). You will typically find the Firefox profile under (<code>~/Library/Mozilla/Profiles/</code>, <code>~/.mozilla/firefox/</code> or <code>C:\Documents and settings\%USER%\Application Data\Mozilla\Profiles</code>).</p>
+</li>
+
+<li>
+<p>Now start the Selenium Remote Control using the profile you just copied using the <code>-firefoxProfileTemplate</code> option.</p>
+
+<p>java -jar selenium-server-1.0.jar -firefoxProfileTemplate ~/seleniumFirefoxProfile</p>
+
+<p>Or if you are using Selenium Grid:</p>
+
+<p>ant -DseleniumArgs=&#8221;-firefoxProfileTemplate ~/seleniumFirefoxProfile&#8221; launch-remote-control</p>
+</li>
+</ol>
+
+<h3 id='your_ssl_certificate_is_invalid'>Your SSL Certificate is Invalid</h3>
+
+<p>When you are running Selenium Grid against Developement or QA environments you can run into invalid SSL certificated (expired certificate for instance).</p>
+
+<p>In that case not only accept permanently the certificate but also install the &#8220;Remember Mismatch&#8221; Firefox plugin when generating the firefox profile you will use for Selenium.</p>
+
+<p>If you are desperate, there is another solution (quite brutal): When you generate the Firefox profile to use for Selenium, type about:copy in the browser address line. Then Search every <code>security.warn</code> attribute and set it to false!</p>
+
+<h2 id='i_get_some_strange_errors_when_i_run_multiple_internet_explorer_instances_on_the_same_machine'>I get some strange errors when I run multiple Internet Explorer instances on the same machine</h2>
+
+<p>Selenium Grid does not officially support running multiple Internet Explorer on a <em>single</em> Windows machine. This is mostly because:</p>
+
+<ul>
+<li>
+<p>People who know IE better than I do (Dan Fabulich) tell me that if you run 2 browsers as the same user in HTA mode they end up sharing a singleton instance in memory, which could cause problems.</p>
+</li>
+
+<li>
+<p>The <code>*iexplore</code> mode is changing the registry settings at each session start/end to have IE use a specific Remote Control as HTTP proxy. If you run multiple Remote Controls at the same time you can see the problems coming! ;-)</p>
+</li>
+</ul>
+
+<p><strong>Currently, the only robust solution for running multiple IE instances on a single machine with Selenium Grid is to use virtualization</strong> (multiple VMs, a single IE instance per VM).</p>
+
+<p>This said, I am not satisfied wit the current state of affairs and I am currently working on better support for IE in Selenium Grid 1.2.</p>
+
+<h1 id='development'>Development</h1>
+
+<h2 id='where_can_i_find_selenium_grid_nightly_builds'>Where can I find Selenium Grid nightly builds?</h2>
+
+<p>Download them from Selenium Grid <a href='http://xserve.seleniumhq.org:8080/view/Selenium%20Grid/job/Grid%20Core%20-%20Mac/lastSuccessfulBuild/artifact/trunk/target/dist/'>core build artifacts</a></p>
+
+<h2 id='where_can_i_get_feedback_selenium_grid_on_continuous_integration_builds'>Where Can I Get Feedback Selenium Grid on Continuous Integration Builds?</h2>
+
+<p>Check out latest Selenium Grid builds on <a href='http://xserve.seleniumhq.org:8080/'>http://xserve.seleniumhq.org:8080/view/Selenium%20Grid</a></p>
+</body></html>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns:svg='http://www.w3.org/2000/svg' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+<head><meta content='application/xhtml+xml;charset=utf-8' http-equiv='Content-type' /><title>Selenium Grid FAQ</title><link href='stylesheets/site.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/document.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/faq.css' rel='stylesheet' type='text/css' />
+</head>
+<body><div class='header'>
+  <a href='index.html'><img src='images/selenium-grid-logo-large.png' alt='Selenium_grid_logo_large' /></a>
+  <p>Configuring and Tuning</p>
+</div>
+<p class='toc'>Table Of Content:</p>
+<div class='maruku_toc'><ul style='list-style: none;'><li><a href='#selenium_grid_main_configuration_file'>Selenium Grid Main Configuration File</a></li><li><a href='#defining_new_environments'>Defining New Environments</a></li><li><a href='#changing_hubs_port'>Changing Hub&#8217;s Port</a></li></ul></div>
+<h1 id='selenium_grid_main_configuration_file'>Selenium Grid Main Configuration File</h1>
+
+<p>Once you have Selenium Grid up and running, you might want to tweak some of its settings.</p>
+
+<p>Most of Selenium Grid configuration is defined in the <code>grid_configuration.yml</code> file located at the root of Selenium Grid installation directory <em>on the machine where the Hub is running</em>.</p>
+
+<p>This file is in the human friendly YAML format, which should be mostly self explanatory.</p>
+
+<h1 id='defining_new_environments'>Defining New Environments</h1>
+
+<p>Selenium Grid provides predefined environments for standard browsers to get you started, however chances are than very soon you will want to define your own.</p>
+
+<p>To define a new environment, edit the <code>grid_configuration.yml</code> file located at the root of Selenium Grid installation directory <em>on the machine where the Hub is running</em>:</p>
+
+<p>Search for a section like:</p>
+
+<pre><code>hub:
+   port: 4444
+   # ...
+   environments:
+       - name:    &quot;Firefox on Windows&quot;
+         browser: &quot;*firefox&quot;
+       - name:    &quot;Firefox on OS X&quot;
+         browser: &quot;*firefox&quot;
+       - name:    &quot;IE on Windows&quot;
+         browser: &quot;*iehta&quot;</code></pre>
+
+<p>An environment is just an binding between an arbitrary string you pick (the name) and an real Selenium browser string that will be used to start the session on the actual remote control (<code>*firefox</code>, <code>safari</code>, <code>*iexplore</code>, <code>*hta</code>, &#8230;). To add a new one just add a new entry in the list, starting with a dash (<code>-</code>) and keeping the same indentation level. For instance to add a new environment called &#8220;Shinny New Environment&#8221; that will use the <code>*safari</code> mode:</p>
+
+<pre><code>  hub:
+     port: 4444
+     # ...
+     environments:
+         - name:    &quot;Firefox on Windows&quot;
+           browser: &quot;*firefox&quot;
+         - name:    &quot;Firefox on OS X&quot;
+           browser: &quot;*firefox&quot;
+         - name:    &quot;IE on Windows&quot;
+           browser: &quot;*iehta&quot;
+         - name:    &quot;Shinny New Environment&quot;
+           browser: &quot;*iehta&quot;</code></pre>
+
+<h1 id='changing_hubs_port'>Changing Hub&#8217;s Port</h1>
+
+<p>By default Selenium Grid Hub is started on port 4444, which is also Selenium RC default port (on purpose as from the test point of view, the Hub looks just like a regular RC).</p>
+
+<p>You can change the Hub port by editing the <code>grid_configuration.yml</code> file located at the root of Selenium Grid installation directory <em>on the machine where the Hub is running</em>:</p>
+
+<p>Search for a section like:</p>
+
+<pre><code>hub:
+   port: 4444	   </code></pre>
+
+<p>And change <code>4444</code> to the port number of your liking. For instance:</p>
+
+<pre><code>hub:
+     port: 1234</code></pre>
+</body></html>
