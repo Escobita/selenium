@@ -23,6 +23,8 @@ Only one instance at a time will run.  This will be fixed when the fix to [http:
 
 File uploading using <input type="file"> elements is currently unsupported.
 
+ChromeDriver.close() is currently unsupported.
+
 Additionally, on Mac and Linux:
 
 Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.
