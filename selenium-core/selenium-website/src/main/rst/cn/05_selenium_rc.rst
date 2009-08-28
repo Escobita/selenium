@@ -941,24 +941,17 @@ Selenium构架面临的主要限制是同源策略。这个安全限制被市场
 
 代理注入
 ~~~~~~~~~~~~~~~
-第一个用来跳过`同源策略`_ 的方法是代理注入。
-在这个方法里，Selenium服务器从当一个客户端配置[1]_ 的 **HTTP 
-代理** [2]_, 它站在浏览器和被测程序之间。
-After this, it is able to masks the whole AUT under a fictional URL (embedding
-Selenium-Core and the set of tests and delivering them as if they were coming
-from the same origin). 
+第一个用来避免`同源策略`_ 的方法是代理注入。在代理注入方式，Selenium服务器站在浏览器和被测程序之间，充当一个客户端配置[1]_ 的 **HTTP 
+代理** [2]_。
+这样，它能够用一个虚构的URL(嵌入Selenium-Core和一组测试，并且像它们来自同源一样的传递它们)伪装整个AUT。
 
-.. [1] The proxy is a third person in the middle that passes the ball 
-   between the two parts. In this case will act as a "web server" that 
-   delivers the AUT to the browser. Being a proxy, gives the capability
-   of "lying" about the AUT real URL.  
+.. [1] 这个代理是在两者中间传递信息的第三者。这里它充当一个“网页服务器”把AUT传递给浏览器。作为一个代理，就可以伪装AUT的真实URL。
    
-.. [2] The client browser (Firefox, IE, etc) is launched with a 
-   configuration profile that has set localhost:4444 as the HTTP proxy, this
-   is why any HTTP request that the browser does will pass through Selenium
-   server and the response will pass through it and not from the real server.
+.. [2] 客户端浏览器（Firefox，IE，等等） 启动的时候会把localhost:4444配置为它的HTTP代理，is launched with a 
+   configuration profile that has set localhost:4444 as the HTTP proxy,这就是为什么任何浏览器发送的HTTP请求会经过Selenium服务器
+并且响应信息也会经过它而不是来自于真的服务器。 
 
-Here is an architectural diagram. 
+这里是一个构架图表 
 
 .. TODO: Notice: in step 5, the AUT should pass through the HTTPProxy to go to 
    the Browser....
@@ -966,121 +959,156 @@ Here is an architectural diagram.
 .. image:: ../images/chapt5_img02_Architecture_Diagram_1.png
    :align: center
 
-As a test suite starts in your favorite language, the following happens:
+当一组测试在你喜欢的语言里开始运行的时候将会发生以下的事情：
 
-1. The client/driver establishes a connection with the selenium-RC server.
-2. Selenium-RC server launches a browser (or reuses an old one) with an URL 
-   that will load Selenium-Core in the web page.
-3. Selenium-Core gets the first instruction from the client/driver (via another 
-   HTTP request made to the Selenium-RC Server).
-4. Selenium-Core acts on that first instruction, typically opening a page of the
-   AUT.
-5. The browser receives the open request and asks for the website's content to
-   the Selenium-RC server (set as the HTTP proxy for the browser to use).
-6. Selenium-RC server communicates with the Web server asking for the page and once
-   it receives it, it sends the page to the browser masking the origin to look
-   like the page comes from the same server as Selenium-Core (this allows 
-   Selenium-Core to comply with the Same Origin Policy).
-7. The browser receives the web page and renders it in the frame/window reserved
-   for it.
+1. 客户端/驱动和selenium-RC服务器建立一个连接。
+2. Selenium-RC服务器启动一个浏览器（或重用一个旧的），打开一个URL来加载Selenium-Core到网页里。
+3. Selenium-Core从客户端/驱动取得第一条指令（通过发送到Selenium-RC服务器的另外一个HTTP请求）。
+4. Selenium-Core遵照第一条指令作出动作，通常是打开AUT的一个页面。
+5. 浏览器收到打开的请求，向Selenium-RC服务器（设置为HTTP代理供浏览器使用）请求网站的内容。
+6. Selenium-RC服务器与页面服务器通信并且请求页面，一旦它收到页面，它就把页面发送给浏览器，并假装页面来至于和Selenium-Core相同的服务器。（这就允许 
+   Selenium-Core 遵守同源策略).
+7. 浏览器接受网页并且显示在预留的框架/窗口。
    
-Heightened Privileges Browsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This workflow on this method is very similar to Proxy Injection but the main
-difference is that the browsers are launched in a special mode called *Heightened
-Privileges*, which allows websites to do things that are not commonly permitted
-(as doing XSS_, or filling file upload inputs and pretty useful stuff for 
-Selenium). By using these browser modes, Selenium Core is able to directly open
-the AUT and read/interact with its content without having to pass the whole AUT
-through the Selenium-RC server.
 
-Here is the architectural diagram. 
+提高特权的浏览器
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+这个方法的工作流程和代理注入非常相似，但是最主要的区别是浏览器工作在一个叫*提高特权*的特殊模式下，这允许网站做一些通常不被允许的事情。
+（比如运行 XSS_， 或者填写文件上传输入框，和一些对Selenium非常有用的东西。）
+通过使用这些浏览器模式，Selenium Core 可以直接打开AUT并且读取它的内容或者和它的内容交互，而不必把整个AUT 传过Selenium-RC服务器。
+
+这里是构架图表。
 
 .. image:: ../images/chapt5_img02_Architecture_Diagram_2.png
    :align: center
 
-As a test suite starts in your favorite language, the following happens:
+当一组测试在你喜欢的语言里开始运行的时候将会发生以下的事情：
 
-1. The client/driver establishes a connection with the selenium-RC server.
-2. Selenium-RC server launches a browser (or reuses an old one) with an URL 
-   that will load Selenium-Core in the web page.
-3. Selenium-Core gets the first instruction from the client/driver (via another 
-   HTTP request made to the Selenium-RC Server).
-4. Selenium-Core acts on that first instruction, typically opening a page of the
-   AUT.
-5. The browser receives the open request and asks the Web Server for the page.
-   Once the browser receives the web page, renders it in the frame/window reserved
-   for it.
+1. 客户端/驱动和selenium-RC服务器建立一个连接。
+2. Selenium-RC服务器启动一个浏览器（或重用一个旧的），打开一个URL来加载Selenium-Core到网页里。
+3. Selenium-Core从客户端/驱动取得第一条指令（通过发送到Selenium-RC服务器的另外一个HTTP请求）。
+4. Selenium-Core遵照第一条指令作出动作，通常是打开AUT的一个页面。
+5. 浏览器接受打开请求，并向网页服务器请求页面。一旦浏览器接收到页面，就把它显示在预留的框架/窗口里。
    
-Server Command Line options
----------------------------
-When the server is launched, some command line options can be used to change the
-default behaviour if it is needed.
+处理HTTPS和安全性弹出窗口
+----------------------------------
+很多应用程序当需要发送加密信息比如密码或者信用卡信息的时候，它们从HTTP转向HTTPS. 
+这个技术在现今的网页应用程序中非常普遍。Selenium-RC 支持这个。 
+为了保证HTTPS站点是真实的，浏览器将需要一个安全证书。
+否则当浏览器用HTTPS访问AUT时候，它会假设这个应用程序不是"被信任的"。
+这个时候，浏览器显示一个安全性问题弹出窗口，而Selenium-RC关闭不了这些弹出窗口。
 
-As you already know, the server is started by running the following:
+当你在Selenium-RC 测试当中处理HTTPS时候，你必须使用支持并且能够处理安全证书的运行模式。
+你可以在你测试程序初始化Selenium的时候指定运行模式。
 
+在Selenium-RC 1.0 beta 2 和以后， 使用 \*firefox 或者 \*iexplore 运行模式。
+在较早版本，包括Selenium-RC 1.0 beta 1, 使用 \*chrome 或者
+\*iehta 运行模式.使用这些模式，你将不需要安装任何特殊的安全证书；Selenium-RC会帮你处理。
+
+在1.0版本，推荐使用运行模式 \*firefox 或者 \*iexplore  
+但是，也有一些额外的运行模式，比如\*iexploreproxy 和\*firefoxproxy。
+这些只是为了向下集成，除非是遗留的测试程序需要，否则不应该使用。
+使用它们会使安全证书处理和运行多窗口（如果你的程序打开了额外的浏览器窗口）受限制。
+
+在Selenium-RC的较早版本，\*chrome 或者 \*iehta 是支持 HTTP和处理安全证书弹出窗口的运行模式。
+它们当时被认为是‘experimental模式，尽管它们已经变得非常稳定并且很多人使用了它们。
+如果你正在使用Selenium 1.0，那么你不需要也不应该这些旧的运行模式。
+
+Security Certificates Explained
+安全证书解释
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally, your browser will trust the application you are testing
+by installing a security certificate which you already own. You can 
+check this in your browser's options or internet properties (if you don't 
+know your AUT's security certificate ask you system administrator). 
+When Selenium loads your browser it injects code to intercept 
+messages between the browser and the server. The browser now thinks 
+untrusted software is trying to look like your application.  It responds by alerting you with popup messages. 
+
+.. Please, can someone verify that I explained certificates correctly?—this is 
+   an area I'm not certain I understand well yet. 
+
+To get around this, Selenium-RC, (again when using a run mode that support 
+this) will install its own security certificate, temporarily, to your 
+client machine in a place where the browser can access it. This tricks the 
+browser into thinking it's accessing a site different from your AUT and effectively suppresses the popups.  
+
+Another method used with earlier versions of Selenium was to 
+install the Cybervillians security certificate provided with your Selenium 
+installation. Most users should no longer need to do this however, if you are
+running Selenium-RC in proxy injection mode, you may need to explicitly install this
+security certificate. 
+   
+服务器选项
+--------------
+当服务被启动的时候，命令行选项可以被用来改变服务器默认行为。
+
+运行一下命令启动服务器。
 .. code-block:: bash
  
    $ java -jar selenium-server.jar
 
-If you want to see the list of all the available options, you just have to use
-the ``-h`` option:
+运行服务器加``-h``选项来查看选项列表。
 
 .. code-block:: bash
  
    $ java -jar selenium-server.jar -h
 
-You'll receive a list of all the options you can use on the server and a brief
-explanation on all of them. 
-Though, for some of those options, that short overview is not enough, so we've
-written an in deep explanation for them.
+你会看到一个列表包含所有你可以使用的选项以及每个选项的简单的描述。
+提供的描述不尽详细，因此我们为一些重要的选项提供了解释。
 
-Multi-Window Mode
+代理配置
+~~~~~~~~~~~~~~~~~~~
+如果你使用了HTTP代理并需要验证信息，那么你需要配置http.proxyHost, http.proxyPort, http.proxyUser和http.proxyPassword
+如下：
+.. code-block:: bash
+
+   $ java -jar selenium-server.jar -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080 -Dhttp.proxyUser=username -Dhttp.proxyPassword=password
+
+
+多窗口模式
 ~~~~~~~~~~~~~~~~~
-Before 1.0, Selenium by default ran the application under test in a sub frame 
-which looks like this:
+如果你在使用Selenium 1.0你可以略过这个章节，因为multiwindow模式是默认的。
+但是1.0之前的版本, Selenium默认如下图所示，在一个子框架里面运行被测试程序.
 
-.. image:: ../images/chapt5_img26_single_window_mode.png
-   :align: center
+.. image:: images/chapt5_img26_single_window_mode.png
+   :class: align-center
 
-Unfortunately, some apps don't run properly in a sub frame, preferring to be 
-loaded into the top frame of the window. That's why we made the multi Window 
-mode (the new default since Selenium 1.0). Using this you can make your 
-application under test run in a separate window rather than in the default 
-frame.
 
-.. image:: ../images/chapt5_img27_multi_window_mode.png
-   :align: center
+一些应用程序不能正确是运行在一个子框架里，必须被加载在窗口的顶端框架。
+多窗口模式允许AUT运行在一个分开的窗口的顶端框架而不是默认的框架。
 
-Older versions of Selenium however did not handle this unless you explicitly 
-told the server to run in multiwindow mode. For handling multiple windows, 
-Selenium 0.9.2 required the Server to be started with the following option:
+.. image:: images/chapt5_img27_multi_window_mode.png
+   :class: align-center
+
+那些较早的Selenium版本，你必须按照以下选项明确地指定multiwindow模式：
 
 .. code-block:: bash
 
    -multiwindow 
 
-In Selenium-RC 1.0 and later if you want to require your testing to run in a
-single frame you can explicitly state this to the Selenium Server using the
-option:
+在Selenium-RC 1.0, 如果你想你的测试运行在单一的框架里(也就是说，使用Selenium较早版本的标准) 
+你可以启动Selenium服务器加以下选项
 
 .. code-block:: bash
  
    -singlewindow 
 
-Specifying the Firefox Profile
+指定Firefox 配置信息
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO: Better describe how Selenium handles Firefox profiles (it creates,
    uses and then deletes sandbox profiles unless you specify special ones)
    
 Firefox will not run two instances simultaneously unless you specify a 
-separate profile for each instance. Later versions of Selenium-RC run in a 
-separate profile automatically, however, if you are using an older version of 
-Selenium or if you need to have a special configuration in your running browser
-(such as adding an https certificate or having some addons installed), you may 
-need to explicitly specify a separate profile. 
+separate profile for each instance. Selenium-RC 1.0 and later runs in a 
+separate profile automatically, so if you are using Selenium 1.0, you can 
+probably skip this section.  However, if you're using an older version of 
+Selenium or if you need to use a specific profile for your tests
+(such as adding an https certificate or having some addons installed), you will 
+need to explicitly specify the profile. 
 
+First, to create a separate Firefox profile, follow this procedure.
 Open the Windows Start menu, select "Run", then type and enter one of the 
 following:
 
@@ -1092,47 +1120,87 @@ following:
 
    firefox.exe -P 
 
-Create a new profile using the dialog. When you run the Selenium-RC server, 
+Create the new profile using the dialog. The when you run Selenium Server, 
 tell it to use this new Firefox profile with the server command-line option 
-*\-firefoxProfileTemplate* and specify the path to the profile:
+*\-firefoxProfileTemplate* and specify the path to the profile using it's filename 
+and directory path.
 
 .. code-block:: bash
 
    -firefoxProfileTemplate "path to the profile" 
 
-.. note:: On windows, people tend to have problems with the profiles location.
-   Try to start using a simple location like *C:\\seleniumProfile* to make it
-   work and then move the profile where you want and try to find it again.
-
-.. warning::  Be sure to put your profile in a separate new folder!!! 
+.. Warning::  Be sure to put your profile in a new folder separate from the default!!! 
    The Firefox profile manager tool will delete all files in a folder if you 
    delete a profile, regardless of whether they are profile files or not. 
    
-More information about Firefox profiles in `Mozilla's Knowledge Base`_
+More information about Firefox profiles can be found in `Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
 
 .. _html-suite:
 
-Run Selenese Tests Directly from the Server Using -htmlSuite
+Run Selenese Directly Within the Server Using -htmlSuite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To use the Selenium Server as a proxy, run your tests like this::
+You can run Selenese html files directly within the Selenium Server
+by passing the html file to the server's command line.  For instance::
 
    java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
 
-That will automatically launch your HTML suite, run all the tests and save a
-nice HTML colored report with the results.
+This will automatically launch your HTML suite, run all the tests and save a
+nice HTML report with the results.
 
-.. note::  After this command, the server will start the tests and wait for a
+.. note::  When using this option, the server will start the tests and wait for a
    specified number of seconds for the test to complete; if the test doesn't 
    complete within that amount of time, the command will exit with a non-zero 
    exit code and no results file will be generated.
 
-Note that this command line is very long and very finicky... be careful when 
-you type it in. (You can use the -htmlSuite parameter with the ``-port`` and 
-``-timeout`` options, but it is incompatible with ``-interactive``; you can't 
-do both of those at once.) Also note that it requires you to pass in an HTML 
-Selenese suite, not a single test.
+This command line is very long so be careful when 
+you type it. Note this requires you to pass in an HTML 
+Selenese suite, not a single test. Also be aware the -htmlSuite option is incompatible with ``-interactive``
+You cannot run both at the same time.
+
+Selenium Server Logging
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Server-Side Logs
+++++++++++++++++
+When launching selenium server the **-log** option can be used to record
+valuable debugging information reported by the Selenium Server to a text file.
+
+.. code-block:: bash
+
+   java -jar selenium-server.jar -log selenium.log
+   
+This log file is more verbose than the standard console logs (it includes DEBUG 
+level logging messages). The log file also includes the logger name, and the ID
+number of the thread that logged the message. For example:   
+
+.. code-block:: bash
+
+   20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
+   Browser 465828/:top frame1 posted START NEW
+   
+The message format is 
+
+.. code-block:: bash
+
+   TIMESTAMP(HH:mm:ss) LEVEL [THREAD] LOGGER - MESSAGE
+   
+This message may be multiline.
+
+Browser-Side Logs
++++++++++++++++++
+JavaScript on the browser side (Selenium Core) also logs important messages; 
+in many cases, these can be more useful to the end-user than the regular Selenium 
+Server logs. To access browser-side logs, pass the **-browserSideLog**
+argument to the Selenium Server.
+
+.. code-block:: bash
+
+   java -jar selenium-server.jar -browserSideLog
+   
+**-browserSideLog** can  be combined with the **-log** argument, to log 
+browserSideLogs (as well as all other DEBUG level logging messages) to a file.
 
 .. Selenium-IDE Generated Code
    ---------------------------
@@ -1154,9 +1222,331 @@ Selenese suite, not a single test.
    it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
    this also, but you must specify a separate profile. 
 
+
+Specifying the Path to a Specific Browser 
+-----------------------------------------
+You can specify to Selenium-RC a path to a specific browser. This is useful if 
+you have different versions of the same browser, and you wish to use a specific
+one. Also, this is used to allow your tests to run against a browser not 
+directly supported by Selenium-RC. When specifying the run mode, use the 
+\*custom specifier followed by the full path to the browser's executable::
+
+   *custom <path to browser> 
+ 
+For example 
+ 
+.. TODO:  we need to add an example here.
+  
+   
 Troubleshooting 
 ---------------
-.. Santi: must recheck if all the topics here: 
+When first getting started with Selenium-RC there's a few potential problems
+that are commonly encountered.  We present them along with their solutions here.
+
+Unable to Connect to Server 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When your test program cannot connect to the Selenium Server, an exception 
+will be thrown in your test program. It should display this message or a 
+similar one::
+
+    "Unable to connect to remote server….Inner Exception Message: No 
+    connection could be made because the target machine actively refused it…."
+    
+	(using .NET and XP Service Pack 2) 
+
+If you see a message like this, be sure you started the Selenium Server. If 
+you did, then there is some problem with the connectivity between the two 
+components. This should not normally happen when your operating system has 
+typical networking and TCP/IP settings. If you continue to have trouble, try 
+a different computer.  
+
+You can also use common networking tools like *ping*, *telnet*, *ipconfig/ifconfig*
+(on windows), etc to ensure you first have a valid network connection.  
+Also, if you're trying to 
+connect to the Selenium Server on a remote machine try running it locally first and
+verifying you can get a connection using "localhost" as your connection parameter.  
+ 
+Unable to Load the Browser 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ok, not a very friendly error, sorry, but if the Selenium Server cannot load the browser 
+you will probably see this error.
+ 
+:: 
+
+    (500) Internal Server Error 
+
+This error seems to occur when Selenium-RC cannot load the browser.
+
+::
+
+    500 Internal Server Error 
+
+(using .NET and XP Service Pack 2) 
+
+This could be caused by
+
+* Firefox (prior to Selenium 1.0) cannot start because the browser is already open and you did 
+  not specify a separate profile.   See the section on Firefox profiles under Server Options.
+* The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
+  passed to Selenium when you program opens the browser. 
+* You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
+  incorrect.  Check to be sure the path is correct.  Also check the forums to be sure there are
+  no known issues with your browser and the "\*custom" parameters.
+
+Selenium Cannot Find the AUT 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If your test program starts the browser successfully, but the browser doesn't
+display the website you're testing, the most likely cause is your test 
+program is not using the correct URL. 
+
+This can easily happen. When you use Selenium-IDE to export you script,
+it inserts a dummy URL. You must manually change the URL to the correct one
+for your application to be tested. 
+
+Firefox Refused Shutdown While Preparing a Profile 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This most often occurs when your run your Selenium-RC test program against Firefox,
+but you already have a Firefox browser session running and, you didn't specify
+a separate profile when you started the Selenium Server. The error from the 
+test program looks like this::
+
+    Error:  java.lang.RuntimeException: Firefox refused shutdown while 
+    preparing a profile 
+
+Here's the complete error msg from the server::
+
+    16:20:03.919 INFO - Preparing Firefox profile... 
+    16:20:27.822 WARN - GET /selenium-server/driver/?cmd=getNewBrowserSession&1=*fir 
+    efox&2=http%3a%2f%2fsage-webapp1.qa.idc.com HTTP/1.1 
+    java.lang.RuntimeException: Firefox refused shutdown while preparing a profile 
+            at org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
+    her.waitForFullProfileToBeCreated(FirefoxCustomProfileLauncher.java:277) 
+    ……………………. 
+    Caused by: org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
+    her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
+    ~1\Temp\customProfileDir203138\parent.lock 
+
+To resolve this, see the section on `Specifying a Separate Firefox Profile 
+<Personalizing the Firefox Profile used in the tests>`_
+
+
+Versioning Problems 
+~~~~~~~~~~~~~~~~~~~
+Make sure your version of Selenium supports the version of your browser. For
+example, Selenium-RC 0.92 does not support Firefox 3. At times you may be lucky
+(I was). But don't forget to check which
+browser versions are supported by the version of Selenium you are using. When in
+doubt, use the latest release version of Selenium with the most widely used version
+of your browser.
+
+.. Santi: Mary Ann suggested We should also mention about JRE version needed by
+   the server
+
+
+Error message: "(Unsupported major.minor version 49.0)" while starting server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This error says you're not using a correct version of Java. 
+The Selenium Server requires Java 1.5 or higher. 
+
+To check double-check your java version, run this from the command line.
+
+.. code-block:: bash
+
+   java -version
+
+You should see a message showing the Java version.
+
+.. code-block:: bash
+
+   java version "1.5.0_07"
+   Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-b03)
+   Java HotSpot(TM) Client VM (build 1.5.0_07-b03, mixed mode)
+
+If you see a lower version number, you may need to update the JRE,
+or you may simply need to add it to your PATH environment variable.
+
+404 error when running the getNewBrowserSession command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you're getting a 404 error while attempting to open a page on 
+"http://www.google.com/selenium-server/", then it must be because the Selenium
+Server was not correctly configured as a proxy. The "selenium-server" directory 
+doesn't exist on google.com; it only appears to exist when the proxy is 
+properly configured. Proxy Configuration highly depends on how the browser is 
+launched with \*firefox, \*iexplore, \*opera, or \*custom.
+
+    * \*iexplore: If the browser is launched using \*iexplore, you could be having
+	  a problem with Internet Explorer's proxy settings.  Selenium Server attempts
+	  to configure the global proxy settings in the Internet Options Control Panel. 
+	  You must make sure that those are correctly configured when Selenium Server launches 
+      the browser. Try looking at your Internet Options control panel. Click on the 
+	  "Connections" tab and click on "LAN Settings". 
+      
+          - If you need to use a proxy to access the application you want to test,
+            you'll need to start Selenium Server with "-Dhttp.proxyHost"; 
+            see the `Proxy Configuration`_ for more details.
+          - You may also try configuring your proxy manually and then launching
+            the browser with \*custom, or with \*iehta browser launcher.
+            
+    * \*custom: When using \*custom you must configure the proxy correctly
+      (manually), otherwise you'll get a 404 error. Double-check that you've
+      configured your proxy settings correctly. To check whether you've
+	  configured the proxy correctly is to attempt to intentionally configure
+	  the browser incorrectly. Try configuring the browser to use the wrong proxy server hostname, or the wrong port.
+      If you had successfully configured the browser's proxy settings incorrectly,
+      then the browser will be unable to connect to the Internet, which is one way
+      to make sure that one is adjusting the relevant settings.
+      
+    * For other browsers (\*firefox, \*opera) we automatically hard-code
+      the proxy for you, and so ther are no known issues with this functionality.
+      If you're encountering 404 errors and have followed this user guide carefully
+	  post your results to user forums for some help from the user community.
+      
+Why am I getting a permission denied error?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The most common reason for this error is that your session is attempting to violate
+the same-origin policy by crossing domain boundaries (e.g., accesses a page from 
+http://domain1 and then accesses a page from http://domain2) or switching protocols 
+(moving from http://domainX to https://domainX).
+This error can also sometimes occur when JavaScript attempts to look at objects 
+which are not yet available (before the page has completely loaded), or tries to 
+look at objects which are no longer available (after the page has started 
+to be unloaded). This is most typically encountered with AJAX pages
+which are working with sections of a page or subframes that load and/or reload 
+independently of the larger page. For this type of problem, it is common
+that the error is intermittent. Often it is impossible to reproduce the problem 
+with a debugger because the trouble stems from race conditions which 
+are not reproducable when the debugger's overhead is added to the system.
+This is covered in some detail in the tutorial. Make sure you read the section 
+about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
+
+
+Running Tests with Different Browser Configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Normally Selenium-RC automatically configures the browser, but if you launch 
+the browser using the "\*custom" run mode, you can force Selenium RC
+to launch the browser as-is, without using an automatic configuration. 
+(Note that this is also the way one launches other browsers that Selenium RC 
+doesn't yet explicitly support.)
+
+For example, you can launch Firefox with a custom configuration like this:
+
+.. code-block:: bash
+
+   cmd=getNewBrowserSession&1=*custom c:\Program Files\Mozilla Firefox\firefox.exe&2=http://www.google.com
+
+Note that when launching the browser this way, you must manually 
+configure the browser to use the Selenium Server as a proxy. Normally this just 
+means opening your browser preferences and specifying "localhost:4444" as 
+an HTTP proxy, but instructions for this can differ radically from browser to 
+browser.  Consult your browser's documentation for details.
+
+Beware that Mozilla browsers can be a little fussy about how they start and stop. 
+One may need to set the MOZ_NO_REMOTE environment variable to make Mozilla browsers 
+behave a little more predictably. Unix users should avoid launching the browser using 
+a shell script; it's generally better to use the binary executable (e.g. firefox-bin) directly.
+
+How to Block Popup Windows?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are several kinds of "Popups" that you can get during a Selenium test.
+You may not be able to close these popups by running selenium commands if 
+they are initiated by the browser as opposed to your AUT.  Therefore, you'll
+need to know how to manage these.  Each type needs to be addressed differently.
+
+    * HTTP basic authentication dialogs: These dialogs prompt for a 
+      username/password to login to the site. To login to a site that requires 
+      HTTP basic authentication, use a username and password in the URL, as 
+      described in `RFC 1738`_, like this: open("http://myusername:myuserpassword@myexample.com/blah/blah/blah").
+      
+.. _`RFC 1738`: http://tools.ietf.org/html/rfc1738#section-3.1
+
+    * SSL certificate warnings: Selenium RC automatically attempts to spoof SSL 
+      certificates when it is enabled as a proxy; see more on this 
+      in the section on HTTPS. If your browser is configured correctly,
+      you should never see SSL certificate warnings, but you may need to 
+      configure your browser to trust our dangerous "CyberVillains" SSL certificate 
+      authority. Again, refer to the HTTPS section for how to do this.
+
+    * modal JavaScript alert/confirmation/prompt dialogs: Selenium tries to conceal
+      those dialogs from you (by replacing window.alert, window.confirm and 
+      window.prompt) so they won't stop the execution of your page. If you're 
+      actually seeing an alert pop-up, it's probably because it fired during 
+      the page load process, which is usually too early for us to protect the page.
+	  Selenese contains commands for asserting or verifying alert and confirmation popups.
+	  See the sections on these topics in Chapter 4.  (Note at this time of writing
+	  we haven't written those sections, but intend to do so very soon).
+      
+      
+On Linux, why isn't my Firefox browser session closing?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
+On Unix/Linux you must invoke "firefox-bin" directly, so make sure that
+executable is on the path. If executing Firefox through a 
+shell script, when it comes time to kill the browser Selenium RC will kill
+the shell script, leaving the browser running.   You can specify the path
+to firefox-bin directly, like this.
+      
+.. code-block:: bash      
+      
+   cmd=getNewBrowserSession&1=*firefox /usr/local/firefox/firefox-bin&2=http://www.google.com
+
+Firefox \*chrome doesn't work with custom profile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Check Firefox profile folder -> prefs.js -> user_pref("browser.startup.page", 0);
+Comment this line like this: "//user_pref("browser.startup.page", 0);" and try again.
+
+How can I avoid using complex xpath expressions to my test?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If the elements in HTML (button, table, label, etc) have element IDs, 
+then one can reliably retrieve all elements without ever resorting
+to xpath. These element IDs should be explicitly created by the application.
+But non-descriptive element ID (i.e. id_147) tends to cause two problems: 
+first, each time the application is deployed, different element ids could be generated. 
+Second, a non-specific element id makes it hard for automation testers to keep 
+track of and determine which element ids are required for testing.
+
+You might consider trying the `UI-Element`_ extension in this situation.
+
+.. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
+
+
+Is it ok to load a custom pop-up as the parent page is loading (i.e., before the parent page's javascript window.onload() function runs)?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+No. Selenium relies on interceptors to determine window names as they are being loaded.
+These interceptors work best in catching new windows if the windows are loaded AFTER 
+the onload() function. Selenium may not recognize windows loaded before the onload function.
+
+
+How can I wait for an element in AJAX driven application?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In AJAX driven web applications; data is retrieved from server with out refreshing 
+the page. Usage of *waitForPageToLoad* would not work as page is not actually 
+loaded. Pausing the test execution for certain period of time is also not a good 
+approach as web element might appear late or earlier than stipulated period; leading
+to test failures. A better approach would be to wait for element for predefined 
+period and then continue execution as soon as element is found.
+
+For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
+on page (with out refreshing the page)
+This could be handled employing a for loop in selenium. 
+
+.. code-block:: bash
+   
+   // Loop initialization.
+   for (int second = 0;; second++) {
+	
+	// If loop is reached 60 seconds then break the loop.
+	if (second >= 60) break;
+	
+	// Search for element "link=ajaxLink" and if available then break loop.
+	try { if (selenium.isElementPresent("link=ajaxLink")) break; } catch (Exception e) {}
+	
+	// Pause for 1 second.
+	Thread.sleep(1000);
+	
+   } 
+
+   
+   .. Santi: must recheck if all the topics here: 
    http://seleniumhq.org/documentation/remote-control/troubleshooting.html
    are covered.
 
@@ -1229,167 +1619,10 @@ is parsed by IE. So, even if the source code is in lowercase, you should use::
 This is a problem if your test is intended to work on multiple browsers, but
 you can easily code your test to detect the situation and try the alternative
 locator that only works in IE.
+   
 
-Unable to Connect to Server 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When your test program cannot connect to the Selenium Server, an exception 
-will be thrown in your test program. It should display this message or a 
-similar one::
+Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Try our `user forums`_
 
-    "Unable to connect to remote server鈥?Inner Exception Message: No 
-    connection could be made because the target machine actively refused it鈥?"
-    (using .NET and XP Service Pack 2) 
-
-If you see a message like this, be sure you started the Selenium Server. If 
-you did, then there is some problem with the connectivity between the two 
-problems. This should not normally happen when your operating system has 
-typical networking and TCP/IP settings. If you continue to have trouble, try 
-a different computer. 
- 
-:: 
-
-    (500) Internal Server Error 
-
-This error seems to occur when Selenium-RC cannot load the browser.
-
-::
-
-    500 Internal Server Error 
-
-(using .NET and XP Service Pack 2) 
-
-* Firefox cannot start because the browser is already open and you did 
-  not specify a separate profile. 
-* The run mode you're using doesn't match any browser on your machine is this 
-  true?  I haven't tried this one as I didn't want to uninstall either of my 
-  browsers. 
-* you specified the path to the browser explicitly (see above) but the path is 
-  incorrect. 
-
-Selenium Cannot Find the AUT 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If your test program starts Selenium successfully, but the browser window 
-cannot display the website you're testing, the most likely cause is your test 
-program is not using the correct URL. 
-
-This can easily happen. When Selenium-IDE generates the native language code 
-from your script it inserts a dummy URL. It may not (in the .NET-C# format 
-this problem exists) use the base URL when it generates the code. You will 
-need to explicitly modify the URL in the generated code. 
-
-Firefox Refused Shutdown While Preparing a Profile 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This most often occurs when your run your Selenium-RC test program against Firefox,
-but you already have a Firefox browser session running and, you didn't specify
-a separate profile when you started the Selenium Server. The error from the 
-test program looks like this::
-
-    Error:  java.lang.RuntimeException: Firefox refused shutdown while 
-    preparing a profile 
-
-(using .NET and XP Service Pack 2) 
-
-Here's the complete error msg from the server::
-
-    16:20:03.919 INFO - Preparing Firefox profile... 
-    16:20:27.822 WARN - GET /selenium-server/driver/?cmd=getNewBrowserSession&1=*fir 
-    efox&2=http%3a%2f%2fsage-webapp1.qa.idc.com HTTP/1.1 
-    java.lang.RuntimeException: Firefox refused shutdown while preparing a profile 
-            at org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
-    her.waitForFullProfileToBeCreated(FirefoxCustomProfileLauncher.java:277) 
-    鈥︹€︹€︹€︹€︹€︹€︹€? 
-    Caused by: org.openqa.selenium.server.browserlaunchers.FirefoxCustomProfileLaunc 
-    her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
-    ~1\Temp\customProfileDir203138\parent.lock 
-
-To resolve this, see the section on `Specifying a Separate Firefox Profile 
-<Personalizing the Firefox Profile used in the tests>`_
-
-Handling HTTPS and Security Popups 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Many applications will switch from using HTTP to HTTPS when they need to send 
-encrypted information such as passwords or credit card information. This is 
-common with many of today's web applications. Selenium-RC supports this. 
-
-To ensure the HTTPS site is genuine, the browser will need a security 
-certificate. Otherwise, when the Selenium code is inserted between the 
-browser and the application under test, the browser will recognize this as a 
-security violation. It will assume some other site is masquerading as your 
-application. When this occurs the browser displays security popups, and these 
-popups cannot be closed using Selenium-RC. 
-
-When dealing with HTTPS you must use a run mode that supports this and handles
-the security certificate for you. You specify the run mode when you test program
-initialized Selenium. 
-
-.. TODO: copy my C# code example here. 
-
-In Selenium-RC 1.0 beta 2 and later use \*firefox or \*iexplore for the run 
-mode. In earlier versions, including Selenium-RC 1.0 beta 1, use \*chrome or 
-\*iehta, for the run mode. Using these run modes, you will not need to install
-any special security certificates to prevent your browser's security warning 
-popups. 
-
-In Selenium 1.0 beta 2 and later, the run modes \*firefox or \*iexplore are 
-recommended. There are additional run modes of \*iexploreproxy and 
-\*firefoxproxy. These are provided only for backwards compatibility and 
-should not be used unless required by legacy test programs. Their use will 
-present limitations with security certificate handling and with the running 
-of multiple windows if your application opens additional browser windows. 
-
-In earlier versions of Selenium-RC, \*chrome or \*iehta were the run modes that 
-supported HTTPS and the handling of security popups. These were 鈥榚xperimental
-modes in those versions but as of Selenium-RC 1.0 beta 2, these modes have now 
-become stable, and the \*firefox and \*iexplore run modes now translate into 
-the \*chrome and \*iehta modes. 
-
-Security Certificates Explained
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Normally, your browser will trust the application you are testing, most 
-likely by installing a security certificate which you already own. You can 
-check this in your browser's options or internet properties (if you don't 
-know your AUT's security certificate as you system administrator or lead 
-developer). When Selenium loads your browser it injects code to intercept 
-messages between the browser and the server. The browser now thinks 
-something is trying to look like your application, but really is not a 
-significant security risk. So, it responds by alerting you with popup messages. 
-
-.. Please, can someone verify that I explained certificates correctly?鈥攖his is 
-   an area I'm not certain I understand well yet. 
-
-To get around this, Selenium-RC, (again when using a run mode that support 
-this) will install its own security certificate, temporarily, onto your 
-client machine in a place where the browser can access it. This tricks the 
-browser into thinking it's accessing a different site from your application 
-under test and effectively suppresses the security popups.  
-
-Another method that has been used with earlier versions of Selenium is to 
-install the Cybervillians security certificate provided with your Selenium 
-installation. Most users should no longer need to do this however, if you are
-running Selenium-RC in proxy injection mode, you may need to explicitly install this
-security certificate to avoid the security popup. 
-
-Versioning Problems 
-~~~~~~~~~~~~~~~~~~~
-Make sure your version of Selenium supports the version of your browser. For
-example, Selenium-RC 0.92 does not support Firefox 3. At times, you may be lucky
-(I was) in that it may still work. But regardless, don't forget to check which
-browser versions are supported by the version of Selenium you are using. When in
-doubt, use the latest release version of Selenium.
-
-.. Santi: Mary Ann suggested We should also mention about JRE version needed by
-   the server
-
-Specifying the Path to a Specific Browser 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can specify to Selenium-RC a path to a specific browser. This is useful if 
-you have different versions of the same browser, and you wish to use a specific
-one. Also, this is used to allow your tests to run against a browser not 
-directly supported by Selenium-RC. When specifying the run mode, use the 
-\*custom specifier followed by the full path to the browser's executable::
-
-   *custom <path to browser> 
- 
-For example 
- 
-.. TODO:  we need to add an example here.
+.. _`user forums`: http://seleniumhq.org/support/
