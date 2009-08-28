@@ -25,11 +25,15 @@ File uploading using <input type="file"> elements is currently unsupported.
 
 ChromeDriver.close() is currently unsupported.
 
-Additionally, on Mac and Linux:
+=== Additionally, on Mac and Linux: ===
 
 Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.
 
 Deleting cookies is unsupported.  This is due to a bug in Chrome, and will be fixed when the fix to [http://code.google.com/p/chromium/issues/detail?id=14734 a bug] is patched into the dev channel (probably 2009-09-01).
+
+=== And just on Mac: ===
+
+Unfortunately, you cannot have any Chrome windows of your own open while testing.  
 
 == Important System Properties ==
 
