@@ -185,12 +185,7 @@ window.heliummodel = new PageStream( window.spy, window.rcp_checker); //create t
 	
 	function send(){
 
-		if( navigator.userAgent.indexOf('Mac') != -1 && !window.rcp_checker.isRunning() ){
-			
-			var strings = document.getElementById("he_strings");
-			alert( strings.getString("macJWSAlert") );
-		
-		}else if(  !window.rcp_checker.isRunning() ){
+		if(  !window.rcp_checker.isRunning() ){
 		
 			if(  heliummodel.getWebStartLaunchDate() == null ){
 				

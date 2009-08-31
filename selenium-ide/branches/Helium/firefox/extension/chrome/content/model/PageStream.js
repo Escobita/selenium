@@ -96,12 +96,9 @@ function PageStream( spy , rcp_checker){
 			PageStream.prototype.getWebStartLaunchDate = function(){ return this.launch_date; };
 			
 			PageStream.prototype.LaunchWebRcp = function(){  
-			
-				if( navigator.userAgent.indexOf('Mac') == -1 ){
-					
-					window.frames["webstart"].location.href="http://forge.serli.com/helium/helium.jnlp";
+				
+					window.frames["webstart"].location.href="http://release.seleniumhq.org/helium/JavaWebStart/helium.jnlp";
 					this.launch_date = new Date();
-				}
 			};
 		
 			PageStream.prototype.stopWebRcpLaunching = function(){
