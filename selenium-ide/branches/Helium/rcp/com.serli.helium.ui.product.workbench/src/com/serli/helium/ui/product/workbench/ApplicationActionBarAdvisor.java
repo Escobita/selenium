@@ -106,10 +106,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     		file.add( new Separator( IWorkbenchActionConstants.MB_ADDITIONS ) );
     		file.add( exit_item );
     		
-    		if( SWT.getPlatform() == "carbon" || SWT.getPlatform() =="cocoa"){
+    		/*if( SWT.getPlatform() == "carbon" || SWT.getPlatform() =="cocoa"){
 	    		
     			exit_item.setVisible( false );	
-    		}
+    		}*/
     		
     	
     	//EDIT MENU
@@ -139,11 +139,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	    	help.add( new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS) );
 	    	help.add( new Separator() );
 	    	
-	    		if( SWT.getPlatform() == "carbon" || SWT.getPlatform() =="cocoa"){
+	    		/*if( SWT.getPlatform() == "carbon" || SWT.getPlatform() =="cocoa"){
 	    		
 	    			about_item.setVisible( false );
 	    			pref_item.setVisible( false );	
-	    		}	
+	    		}*/	
     	
 	    	help.add( about_item );
     		

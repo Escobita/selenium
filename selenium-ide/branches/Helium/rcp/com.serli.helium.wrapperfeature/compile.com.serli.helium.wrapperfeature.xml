@@ -6,8 +6,8 @@
 		<ant antfile="build.xml" dir="../com.serli.helium.commons.logging" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.core.replayhandler" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.core.modelhandler" target="build.jars"/>
-		<ant antfile="build.xml" dir="../com.serli.helium.ui.testeditor" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.core.server" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.serli.helium.ui.testeditor" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.ui.workbench" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.ui.product.workbench" target="build.jars"/>
 		<ant antfile="build.xml" dir="../com.serli.helium.picture" target="build.jars"/>
