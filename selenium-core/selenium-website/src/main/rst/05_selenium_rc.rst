@@ -1508,7 +1508,7 @@ for your application to be tested.
 
 Firefox Refused Shutdown While Preparing a Profile 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This most often occurs when your run your Selenium-RC test program against Firefox,
+This most often occurs when you run your Selenium-RC test program against Firefox,
 but you already have a Firefox browser session running and, you didn't specify
 a separate profile when you started the Selenium Server. The error from the 
 test program looks like this::
