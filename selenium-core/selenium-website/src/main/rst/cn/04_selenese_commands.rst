@@ -5,29 +5,29 @@
 
 Selenium 命令集,通常称作 *selenese*,是运行你的测试的一组命令集合。
 这些命令的序列就是 *测试脚本*.
-现在我们详细解释一下这些命令,告诉你一些在用Selenium测试web应用的精选例子。
+现在我们详细解释一下这些命令,并向您展示许多用selenium测试web应用的精选例子。
 
 
 验证页面元素
 ------------------------
 验证页面上的 *UI元素* 或许是做自动化测试最常用到的功能.
 Selenese 允许多种方式验证UI元素。
-理解这些不同的方法是很重要的，因为这些方法定义了你真正要测试的。
+理解这些不同的方法是很重要的，因为这些方法定义了你真正要测试的是什么。
 
-例如：
+例如，你将会测试：
 
 a) 一个元素是否出现在页面中的某个地方？
-b) 某文本是否出现在页面中某个地方？
-c) 某文本是否出现在页面上特定的位置?
+b) 特定文本是否出现在页面中某个地方？
+c) 特定文本是否出现在页面上特定的位置？
 
-例如,测试一个文本的头，文本以及在这页的顶部位置或许对你的测试来说是恰当的.然而，
-如果你测试的是在主页存在的一个图片,网站设计者经常改变这个图片在这个也页面上的位置，
+例如，如果你测试文本标题，它内容和它在页面顶部的位置可能与你的测试有关。
+然而，如果你测试的是在主页存在的一个图片,网站设计者经常改变这个图片在这个也页面上的位置，
 如果你只是想测试 *一个图片*（这个图片文件）存在 *页面上的某个位置*
    
    
-判定还是验证?
+判言还是验证?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-选择使用 **assert** 还是 **verify** 取决于方便性和对case失败的管理方式.
+选择使用 **断言** 还是 **验证** 取决于方便性和对失败的管理方式.
 如果测试本章节页是正确的那页，而且当检查浏览器中显示的是你想要的那页的测试 
 已经不通过了，这种情况这两个方法差别是很小的。如果不是正确的那页
 你或许想终止这个测试， 
@@ -37,9 +37,8 @@ c) 某文本是否出现在页面上特定的位置?
 使用 **assert** 将此测试用例执行不通过并终止. 
 而 **verify** 将继续执行这个测试用例到结束，并告知这个测试用例不通过. 
 
-使用这个功能的最好办法是给你的测试命令集分组，然后按组执行一个 **assert** 紧跟着
-一个或多个 **verify** 命令集
-例如:
+使用这个功能的最好办法是给你的测试命令集分组，并且每一组以一个 **断言** 紧跟着
+一个或多个 **验证** 命令。例如:
 
 ============    ==========  ============
 open            /download/      
@@ -50,27 +49,26 @@ verifyTable     1.2.2       June 3, 2008
 verifyTable     1.2.3       1.0 beta 2      
 ============    ==========  ============
 
-上面的例子中，首先打开一个页面，然后 **asserts** 这个当前页面已经加载通过比较题目是期望的值
-只有这个通过，
-接下来的命令 **verify** 在特定的位置某个位置存在.
-这个测试用例接着 ***assert** 第一个表中第一列第二行包含期望的数值,
-只有这个通过
-那行中其它的方格将用 **verified**
+上面的例子中，首先打开一个页面，然后通过比较页面标题与期望的值来 **断言** 正确的
+页面已经加载。
+只有断言通过，接下来的命令将继续执行,即 **验证** 文本出现在特定的位置上。
+接着测试用例 **断言** 第一个表中第一列第二行包含期望的数值,
+只有断言通过，那行中剩余的方格才会被 **验证** 。
 
 
 verifyTextPresent
 ~~~~~~~~~~~~~~~~~
-命令 ``verifyTextPresent`` 用来验证*在页面上某地方存在一个特定文本*
-它包含一个参数--要验证的文本pattern.
+命令 ``verifyTextPresent`` 用来验证 *在页面上某地方存在一个特定文本* 。
+它包含一个参数--要验证的文本模式。
 例如:
 
 =================   ==================   ============
 verifyTextPresent   Marketing Analysis 
 =================   ==================   ============
 
-Selenium将寻找然后验证 "Marketing Analysis" 本文出现在当前要测也页面的某个地方.
-当你想验证某个页面上存在只存在某个文本时用``verifyTextPresent``
-当你需要测试这个文本存在页面中哪里时，不要用这个命令.
+这条命令促使Selenium寻找并验证 "Marketing Analysis" 文本出现在当前要测页面的某个地方。
+当你想验证某个页面上存在而且只存在某个文本时用 ``verifyTextPresent`` 。
+当你需要测试文本存在页面的位置时，不要用这个命令.
 
 verifyElementPresent
 ~~~~~~~~~~~~~~~~~~~~
@@ -84,11 +82,11 @@ verifyElementPresent   //div/p/img
    
 这个命令验证一个图片，<img>标签是否在某个特定页面存在
 这个标签在一个<div>标签和<p>标签后面.
-开头第一个参数是一个 *locator* 告诉Selenese命令怎么去找这个元素.
-Locators将在下部分说明.
+开头第一个参数是一个 *定位器* 告诉Selenese命令怎么去找这个元素.
+定位器将在下部分说明.
 
 ``verifyElementPresent`` 能用来检查在页面中任何HTML 标签是否存在，
-链接,段落,<div>分割等等.
+例如链接,段落,<div>分割等等.
 下面是更多的例子.
 
 ====================   ==============================   ============
@@ -100,15 +98,15 @@ verifyElementPresent   //a[2]
 verifyElementPresent   //head/title
 ====================   ==============================   ============
 
-这些例子说明了要测的各种UI元素的方法.
-再次说明,locators将在下部分说明.
+这些例子说明了测试UI元素的各种不同的方法。
+再次说明,定位器将在下部分说明.
 
 verifyText
 ~~~~~~~~~~
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
 当文本和它的UI元素都必须要测试时，使用``verifyText``.
-``verifyText`` 必须使用一个locator,如果你选择一个*XPath* 或者 *DOM* 的locator,
+``verifyText`` 必须使用一个locator,如果你选择一个 *XPath* 或者 *DOM* 的定位器,
 你可以验证在页面上某个特定位置有某个特定文本，相对于这个页面上其它的UI组件.
 
 
@@ -119,41 +117,40 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
 
 .. _locators-section:
 
-Locating Elements 
 定位元素
 -----------------
-对许多Selenium命令，一个目标是必须的.这个目标标示在web应用内容中的一个元素,
-这个目标包含这样的位置格式:``locatorType=location`` 策略.
-locator类型在许多情况下可以忽略.
-不同的locator类型将在以下例子中以此讲述.
+对许多Selenium命令，一个目标是必须的.这个目标等同于在web应用内容中的一个元素,
+它由定位策略和跟随其后的定位值组成，其形式为 ``locatorType=location`` 。
+定位器类型在许多情况下可以忽略.
+不同的定位器类型将在以下例子中以此讲述.
 
 .. Santi: I really liked how this section was taken. But I found that most of
    the locator strategies repeat the same HTML fragment over a over. Couldn't
    we put A example HTML code before starting with each strategie and then use
    that one on all of them?
 
-默认locator
+默认定位器
 ~~~~~~~~~~~~~~~~
-在以下情况下你可以选择忽略locator类型:
+在以下情况下你可以选择忽略定位器类型:
  
- - locator以 "document"开头, 将使用DOM locator策略.
-   See :ref:`locating-by-dom`.
-   参见 :说明:`通过dom定位`.
+ - 定位器以 "document"开头, 将使用DOM定位器策略.
+   参见 :ref:`通过dom定位` 。
 
- - locator 以 "//" 开头,将使用 XPath locator策略.
-   参见 : 说明:`通过xpath定位`.
+ - 定位器 以 "//" 开头,将使用XPath定位器策略.
+   参见 : ref:`通过xpath定位` 。
 
- - locator以除了以上的其它或者正确的locator类型开始,
-   将默认为用identifier locator 策略. 
-   参见 : 说明:`identifier通过定位`.
+ - 定位器以除了以上的其它或者不是以合法定位器类型开头,
+   将默认为用identifier定位器策略。
+   参见 : ref:`identifier通过定位` 。
 
 .. _通过identifier定位:
 
 通过identifier定位:
 ~~~~~~~~~~~~~~~~~~~~~~
-这或许是最常用的定位元素的方法,也是当没有被识别的locator类型使用时，默认使用的方法
-使用这种方法,第一个id属性值的相配位置的元素将被使用.
-如果没有相配的id属性,第一个name属性值的相配位置的元素将被使用.
+这或许是最常用的定位元素的方法,也是当没有被识别的定位器类型使用时，默认使用的方法
+使用这种方法，id属性值与定位值相匹配的第一个元素将被使用。
+如果没有元素拥有与之相配的id属性，那么name属性值与定位值相匹配的第一个元素
+将被使用。
 
 例如, 页面可能有如下id和name属性:
            
@@ -170,20 +167,21 @@ locator类型在许多情况下可以忽略.
    </body>
   <html>
 
-接下来的locator策略将从以上HTML片段按行号返回元素:
+接下来的定位器策略将从以上HTML片段按行号返回元素:
 
 - ``identifier=loginForm`` (3)
 - ``identifier=username`` (4)
 - ``identifier=continue`` (5)
 - ``continue`` (5)
 
-因为 ``identifier`` locator类型是默认的,  ``identifier=`` 在前三个例子中 
+因为 ``identifier`` 定位器类型是默认的,  ``identifier=`` 在前三个例子中 
 是不必要的.
 
 通过Id定位
 ~~~~~~~~~~~~~~
-这种locator类型仅局限在identifier locator类型,
-很明显当你知道一个元素的id属性时使用它.
+这种定位器类型比identifier定位器类型跟有限，但是也更加明确。
+当你知道一个元素的id属性时使用它。
+
 
 .. code-block:: html
   :linenos:
@@ -203,8 +201,8 @@ locator类型在许多情况下可以忽略.
 
 通过Name定位
 ~~~~~~~~~~~~~~~~
-name locator类型将定位与name属性相配的第一个 元素.
-如果一个name属性对应多个有相同值的元素,那么你可以用过滤器去再定义你的定位策略.
+name定位器类型将定位与name属性相配的第一个元素.
+如果一个name属性对应多个有相同值的元素,那么你可以用过滤器去进一步改善你的定位策略.
 默认的过滤器类型是vale(与value属性相配).
 
 .. code-block:: html
@@ -226,38 +224,35 @@ name locator类型将定位与name属性相配的第一个 元素.
 - ``name=continue Clear`` (7)
 - ``name=continue type=button`` (7)
 
-.. note:: Unlike some types of XPath and DOM locators, the three
-.. 注释:: 不像XPah和DOM locator类型,以上三种locator类型允许Selenium测试在
-   types of locators above allow Selenium to test a UI element independent 
-   页面上位置独立的UI元素.所以如果页面架构和组织方式改变了,这个测试
-   将仍然通过.不管你是希望还是不希望页面结构变化，你都要进行测试.
-   web设计者频繁改变页面的情况,但它的功能必须迭代测试.
-   测试通过id和name属性或者通过任何HTML属性，变得非常重要.
+.. note:: 不像XPah和DOM locator类型,以上三种定位器类型允许Selenium测试UI元素，而与它在网页上的位置不相关。
+   所以如果页面架构和组织方式改变了,不管你是否想测试页面结构的变化。
+   这个测试将仍然通过。web设计者频繁改变页面的情况,但它的功能必须回归测试。
+   通过id和name属性或者任何HTML属性测试变得非常重要。
 
-.. _locating-by-xpath:
 .. _通过xpath定位:
 
 通过XPath定位
 ~~~~~~~~~~~~~~~~~
-XPath是在XML文档中定位节点的语言.
-HTML可以作为XML(XHTML)的一个实现,Selenium用户可以借助这个有用的语言在web应用程序中
-去寻找元素.XPath扩展了通过id或者name属性定位的简单方法,它展示了所有像定位页面上第三个
-复选框之类元素的新的可能.
+XPath是在XML文档中定位节点的语言。
+HTML可以作为XML(XHTML)的一个实现,Selenium用户可以借助这个强大的语言在web应用程序中
+去寻找元素.XPath扩展了（也同样支持）通过id或者name属性定位的简单方法,
+开辟了各种新的可能性，如定位页面上的第三个复选框。
 
-.. Dave: 是否有必要指出对XPath支持的不同(本地Firefox,用Google AJAXSLT或者在IE的新方法)?
-   可能是即使需要的话也是一个高级话题，
+.. Dave: Is it worth mentioning the varying support of XPath (native in 
+   Firefox, using Google AJAXSLT or the new method in IE)? Probably an 
+   advanced topic if needed at all..?
 
-用XPath的一个主要原因是对于你想定位的元素没有一个合适的id或者name属性.
+用XPath的一个主要原因是对于你想定位的元素没有一个合适的id或者name属性。
 你可以使用XPath去定位元素用绝对路径(不推荐),或者相对于某个有id或name属性的元素
-XPath locator 还可以用在通过不是id和name属性的其它属性定位元素.
+XPath定位器还可以用在通过不是id和name属性的其它属性定位元素。
 
-绝对路径的XPath 包含所有从根(html)的所有元素,最终可以因为一个应用程序细微地方的调整而失败.
+绝对路径的XPath包含所有从根(html)开始的所有元素,最终可以因为一个应用程序细微地方的调整而失败.
 通过寻找一个相近的有id或者name属性的元素(一个父元素最好了),你可以定位你的目标元素基于它们的关系
 
-这些是很少变化的，可以使得你的测试更智能.
+这些是很少变化的，可以使得你的测试更健壮。
 
 因为只有 ``xpath`` locator 以 "//"开头,当表明一个XPath locator的时候加 ``xpath`` 标签
-是没有必要的.
+是没有必要的。
 
 .. code-block:: html
   :linenos:
@@ -274,17 +269,16 @@ XPath locator 还可以用在通过不是id和name属性的其它属性定位元
    <html>
 
 .. TODO: mam-p:  Is the fourth example below correct?
-.. TODO: mam-p:下面第四个例子正确吗?
-- ``xpath=/html/body/form[1]`` (3) - *绝对路径 (如果HTML有细微改变的时候将中断)*
+- ``xpath=/html/body/form[1]`` (3) - *绝对路径 (如果HTML有细微改变的时候将被破坏)*
 - ``//form[1]`` (3) - *在HTML中的第一个form元素*
 - ``xpath=//form[@id='loginForm']`` (3) - *id属性值是 'oginForm'的form元素*
-- ``xpath=//form[input/\@name='username']`` (4) - *有一个子元素的name属性值是username的input字段的第一个form元素*
+- ``xpath=//form[input/\@name='username']`` (4) - *第一个form元素：有一个子元素的name属性值是username的input字段*
 - ``//input[@name='username']`` (4) - *name属性值是username的input元素*
-- ``//form[@id='loginForm']/input[1]`` (4) - *id属性值为loginFomr的form元素中第一个子input字段*
+- ``//form[@id='loginForm']/input[1]`` (4) - *id属性值为loginFomr的form元素中第一个input子字段*
 - ``//input[@name='continue'][@type='button']`` (7) - *name属性值为continue,type属性值为button的Input元素*
 - ``//form[@id='loginForm']/input[4]`` (7) - *id属性值为loginForm'的form元素的第四个input*
 
-这些例子包括了一些基础,为了学习更多,推荐以下教程:
+这些例子包括了一些基础,为了学习更多,推荐以下参考:
 
 * `W3Schools XPath Tutorial <http://www.w3schools.com/Xpath/>`_ 
 * `W3C XPath Recommendation <http://www.w3.org/TR/xpath>`_
@@ -329,9 +323,9 @@ XPath locator 还可以用在通过不是id和name属性的其它属性定位元
 通过DOM定位
 ~~~~~~~~~~~~~~~
 
-文档对象模型表示能用JavaScript访问的HTML文档.
+文档对象模型表示一个HTML文档，可使用JavaScript访问。
 这种定位策略使用JavaScript计算给页面上的元素.
-它用层级点符号定位元素的位置
+它通过使用分层级的点号简化元素的定位。
 
 因为只有 ``dom`` locator 以  "document" 开头,因此当用dom locator时没有必要包含 ``dom=`` 
 标签.
@@ -358,7 +352,6 @@ XPath locator 还可以用在通过不是id和name属性的其它属性定位元
 - ``document.forms[0].elements[0]`` (4)
 - ``document.forms[0].elements[3]`` (7)
 
-You can use Selenium itself as well as other sites and extensions to explore
 你可以用Selenium或者其它的站点和扩展来捕获web应用程序的DOM.
 在 `W3Schools
 <http://www.w3schools.com/HTMLDOM/dom_reference.asp>`_  有一个不错的教程. 
@@ -367,7 +360,7 @@ You can use Selenium itself as well as other sites and extensions to explore
 ~~~~~~~~~~~~~~~
 
 CSS (Cascading Style Sheets) 是一种描述HTML和XML文档外观的语言.
-CSS使用给文档中的元素加样式属性的选择器.这些选择器被Selenium用作另一种定位策略.
+CSS使用选择器给文档中的元素加样式属性.这些选择器被Selenium用作另一种定位策略.
 
 .. code-block:: html
   :linenos:
@@ -396,8 +389,8 @@ publication <http://www.w3.org/TR/css3-selectors/>`_.  你将获得更多参考�
 .. note:: Most experienced Selenium users recommend CSS as their locating
    strategy of choice as it's considerably faster than XPath and can find the 
    most complicated objects in an intrinsic HTML document.
-.. 注释:: 有经验的Selenium用户建议使用CSS作为他们定位策略的一种选择,因为它比
-   XPath快速,而且在HTML文档中能找到很多复杂的对象.
+.. note:: 有经验的Selenium用户建议使用CSS作为他们定位策略的一种选择,因为它比
+   XPath快速,而且在HTML文档中能找到最复杂的对象.
 
 .. _模式部分:      
 
@@ -407,54 +400,54 @@ publication <http://www.w3.org/TR/css3-selectors/>`_.  你将获得更多参考�
 和定位器类似, *模式*  是Selenese命令中经常用到的一种参数类型.
 需要模式的命令有:**verifyTextPresent**, **verifyTitle**, **verifyAlert**, 
 **assertConfirmation**, **verifyText** 和 **verifyPrompt**.  
-上面提及的链接locator也可以使用模式.模式允许 *描述* ,通过使用特定的字符,
-期望的文本内容不必与指定文字完全相同.
-有三种类型的模式: *文件名替换*, *正则表达式* 和 *完全*.
+上面提及的链接定位器也可以使用模式。模式允许通过使用特定的字符 *描述* 期望的文本，
+而不是精确的指定文本.
+有三种类型的模式: *通配符*, *正则表达式* 和 *精确*.
 
-文件名替换模式
+通配符模式
 ~~~~~~~~~~~~~~~~~
 
-很多人熟悉文件名替换，因为它用在DOS或者Unix/Linux命令行的文件名扩展,像
+很多人熟悉通配符，因为它用在DOS或者Unix/Linux命令行的文件名扩展,像
 ``ls *.c`` 命令.
-在这种情况下,文件名替换被用来显示所有以 ``.c`` 扩展的所有在当前目录下的文件.
-文件名替换用处非常有限.
+在这种情况下,通配符被用来显示所有在当前目录下扩展名为.c 的文件.
+通配符处非常有限.
 只有两个特殊字符在Selenium实现中被支持:
 
-    **\*** 翻译为 "匹配所有," 如下,空,单个字符,或者多个字符.
-    **[ ]** (*字符类*) 翻译为 "匹配在方括号里面的任何单个字符.",
+    **\*** 翻译为 "匹配所有," 就是：空，单个字符，或者多个字符.
+    **[ ]** (*字符类*) 翻译为 "匹配在方括号里面的任何单个字符"。
     破折号(连字符)可以作为一种简写方式,来指定一个范围内的字符(这些字符在ASCII字符集中连续),
     以下几个例子可以清楚的说明字符类的功能.
 
-    ``[aeiou]`` 匹配任意小写的vowel字符中的一个
+    ``[aeiou]`` 匹配任意小写的元音字符
 
     ``[0-9]`` 匹配任意一个数字
 
     ``[a-zA-Z0-9]`` 匹配任意字母和数字字符
 
-在很多其它环境中,文件名替换包括第三个特殊字符 **?**.
-但Selenium 文件名替换只支持星号和字符类.
+在很多其它环境中,通配符包括第三个特殊字符 **?**.
+但Selenium 通配符只支持星号和字符类.
 
-在Selenese命令中指定文件名替换模式参数,需要加一个 **glob:** 标签前缀.
-但是，因为文件名替换模式是默认的,所以你也可以省略掉这个标签而特指模式本身.
+在Selenese命令中指定通配符模式参数,需要加一个 **glob:** 标签前缀.
+但是，因为通配符模式是默认的,所以你也可以省略掉这个标签而仅仅指定模式本身.
 
-以下例子是用文件名替换模式的两个命令.实际的在页面上被测的链接文本是 
+以下例子是用通配符模式的两个命令.实际的在页面上被测的链接文本是 
 "Film/Television Department";通过使用一个模式而不是完全的文本, **click**
 命令将起作用，即使这个文本变为 "Film & Television Department" 或者
 "Film and Television Department".
-文件名替换模式的星号将匹配在字 "Film" 和字 "Television"之间的 "任意的或空的" .
+通配符模式的星号将匹配在单词 "Film" 和单词 "Television"之间的 "任意或空" .
 
 ===========   ====================================    ========
 click         link=glob:Film*Television Department
 verifyTitle   glob:\*Film\*Television\*
 ===========   ====================================    ========
 
-通过点击链接 "De Anza Film And Television Department - Menu"得到页面标题.
+通过点击链接到达页面的实际标题是 "De Anza Film And Television Department - Menu"。
 通过一个模式而不是完全的文本,只要两个字"Film" 和 "Television"在页面标题的任何位置,
 命令 ``verifyTitle`` 将会通过.例如,当这页的标题缩短为"Film & Television Department,"
 这个测试仍然通过.用一个模式用于链接和测试链接是否工作的简单的测试
 (正如上面 ``verifyTitle`` 做的) 能有效的减少这类测试的维护成本.
 
-正则表达式
+正则表达式模式
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *正则表达* 模式是Selenese支持的三类模式中功能最强的.
@@ -464,7 +457,7 @@ Linux/Unix的命令行工具 **grep**, **sed**和**awk** 也支持.
 例如,假设你的测试需要测试确保一个特定表格内只包含数字.
 ``regexp: [0-9]+`` 是一个匹配任何长度数字的简短模式.
 
-Selenese的文件名替换模式只支持 **\*** 和 **[ ]** (字符类)功能.
+Selenese的通配符模式只支持 **\*** 和 **[ ]** (字符类)功能.
 Selenese正则表达式提供在JavaScript存在的特定字符集范围.
 以下是这些特殊字符集的一个子集.
 
@@ -487,14 +480,14 @@ Selenese正则表达式提供在JavaScript存在的特定字符集范围.
 很多例子将帮助你清晰地来了解正则表达式在Selenese是如何使用的.
 第一个或许是最经常用到的正则表达式--**.\***("星号").
 这两个字符序列翻译为 "0个或者多个字符"或者更简单的 "有或者没有"
-它和一个字符的文件名替换模式 **\** (单个星号).
+它和一个字符的通配符模式 **\** (单个星号)。
 
 ===========   =======================================    ========
 click         link=regexp:Film.*Television Department
 verifyTitle   regexp:.\*Film.\*Television.\*
 ===========   =======================================    ========
 
-上面这个例子和之前用文件名替换模式用于同一个测试的实现的功能相同.
+上面这个例子和之前用通配符模式用于同一个测试的实现的功能相同.
 唯一的不同是前缀(**regexp:** 而不是 **glob:**) 和 "有或者没有"模式(
 **.\*** 而不是 **\***).
 
@@ -515,12 +508,12 @@ verifyTextPresent   regexp:Sunrise: \*[0-9]{1,2}:[0-9]{2} [ap]m
 ``[ap]m``        "a" 或者 "p" 跟着1个 "m" (am 或者 pm)
 ==============   ====================================================
 
-完整模式
+精确模式
 ~~~~~~~~~~~~~~
 
-Selenium 模式的 **完整** 类型用处比较有限.
-它完全没有特殊字符.所以,如果想找一个真实的星号字符(这个字符对文件名替换和正则表达式
-来说是特殊的), **完整** 模式是一个办法.例如,如果想选择在下拉框中的含有 "Real \*" 
+Selenium 模式的 **精确** 类型用处比较有限.
+它完全没有特殊字符.所以,如果想找一个真实的星号字符(这个字符对通配符和正则表达式
+来说是特殊的), **精确** 模式是一个办法.例如,如果想选择在下拉框中的含有 "Real \*" 
 的一个标签,下面的代码将可以或者不可以.在 ``glob:Real *`` 模式中的星号将匹配所有或者没有.
 所以,如果在前面有个"Real Numbers,"标签的选择项.它将选择这个而不是 "Real \*"项.
 
@@ -528,7 +521,7 @@ Selenium 模式的 **完整** 类型用处比较有限.
 select        //select                                glob:Real \*
 ===========   ====================================    =============
 
-为了确保"Real \*"项被选中, ``exact:`` 前缀将被用来产生一个 **完整** 模式如下:
+为了确保"Real \*"项被选中, ``exact:`` 前缀将被用来产生一个 **精确** 模式如下:
 
 ===========   ====================================    =============
 select        //select                                exact:Real \*
@@ -540,8 +533,8 @@ select        //select                                exact:Real \*
 select        //select                                regexp:Real \\\*
 ===========   ====================================    ================
 
-大多数的测试员很少在字符集内部(文件名替换模式中的字符类)找一个星号或者一组方括号.
-因此,文件名替换模式和正则表达式模式对我们大多是人来说足够了.
+大多数的测试员很少在字符集内部(通配符模式中的字符类)找一个星号或者一组方括号.
+因此,通配符模式和正则表达式模式对我们大多是人来说足够了.
 
 
 "AndWait" 命令集
@@ -620,45 +613,34 @@ Selenium变量还可以被用在一个locator表达式中.
 
 storeElementPresent 
 ~~~~~~~~~~~~~~~~~~~
-This corresponds to verifyElementPresent.  It simply stores a boolean value--"true" 
-or "false"--depending on whether the UI element is found.
+它对应verifyElementPresent。它仅存储一个逻辑值--“是”或者 ”否“--决定于UI元素是否被找到。
 
 storeText 
 ~~~~~~~~~
-StoreText corresponds to verifyText.  It uses a locater to identify specific 
-page text.  The text, if found, is stored in the variable.  StoreText can be 
-used to extract text from the page being tested.
+StoreText对应verifyText.  它使用一个定位器来区分特定页面文本。
+对于这个文本，如果被找到, 它被存到变量中。StoreText能用来从被测页面中抽取文本。
 
 storeEval 
 ~~~~~~~~~
-This command takes a script as its 
-first parameter.  Embedding JavaScript within Selenese is covered in the next section.
-StoreEval allows the test to store the result of running the script in a variable.
+这个命令以一个脚本作为它的第一个参数。在Selenese中嵌入的Javascript在下一部分涉及。
+StorEval允许测试运行的脚本结果存储到一个变量中.
 
 
-JavaScript and Selenese Parameters
+JavaScript and Selenese参数
 ----------------------------------
-JavaScript can be used with two types of Selenese parameters--**script**
-and non-script (usually expressions).  In most cases, you'll want to access 
-and/or manipulate a test case variable inside the JavaScript snippet used as 
-a Selenese parameter.  All variables created in your test case are stored in 
-a JavaScript *associative array*.  An associative array has string indexes 
-rather than sequential numeric indexes.  The associative array containing 
-your test case's variables is named **storedVars**.  Whenever you wish to 
-access or manipulate a variable within a JavaScript snippet, you must refer 
-to it as **storedVars['yourVariableName']**.
+JavaScript能与两种类型的Selenese参数一起使用,它们是 **脚本** 和 非脚本（通常是表达式）。
+在大多数的测试中,你想使用或管理一个在Javascript代码段中的测试用例变量用做Selenese参数。
+所有的在你的测试用例中产生的变量被存储在一个Javascript *关联数组* 中。当你希望使用或管理
+一个在Javascript代码段中的变量时，你必须用 **storedVars['yourVariableName']** 指定它。
 
-JavaScript Usage with Script Parameters  
+JavaScript作为脚本参数的用法  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Several Selenese commands specify a **script** parameter including
-**assertEval**, **verifyEval**, **storeEval**, and **waitForEval**.
-These parameters require no special syntax.  A Selenium-IDE
-user would simply place a snippet of JavaScript code into
-the  appropriate field, normally the **Target** field (because
-a **script** parameter is normally the first or only parameter).
+有些Selenese命令指定一个 **脚本** 参数，包括 **assertEval**, **verifyEval**, 
+**storeEval**, 和 **waitForEval**.
+这些参数需要非特定语法。一个Selenium-IDE用户仅仅加一个Javascript代码段到一个合适的域，
+通常是 **Target** 域（因为一个 **脚本** 参数通常是第一个或者唯一一个参数）。
 
-The example below illustrates how a JavaScript snippet
-can be used to perform a simple numerical calculation:
+下面的例子阐述了怎么将一个Javascript代码段能被用来执行一个简单的数字计算:
 
 ===============    ============================================   ===========
 store              10                                             hits
@@ -666,9 +648,8 @@ storeXpathCount    //blockquote                                   blockquotes
 storeEval          storedVars['hits']-storedVars['blockquotes']   paragraphs
 ===============    ============================================   ===========
 
-This next example illustrates how a JavaScript snippet can include calls to 
-methods, in this case the JavaScript String object's ``toUpperCase`` method 
-and ``toLowerCase`` method.  
+下一个例子阐述了怎么用一个Javascript代码段包含方法的调用，在这个情况下调用的是Javascript的String对象的 ``toUpperCase`` 方法
+和 ``toLowerCase`` 方法.  
 
 ===============    ============================================   ===========
 store              Edith Wharton                                  name
@@ -676,31 +657,25 @@ storeEval          storedVars['name'].toUpperCase()               uc
 storeEval          storedVars['name'].toLowerCase()               lc
 ===============    ============================================   ===========
 
-JavaScript Usage with Non-Script Parameters  
+JavaScript 没有脚本参数的用法  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-JavaScript can also be used to help generate values for parameters, even
-when the parameter is not specified to be of type **script**.  
-However, in this case, special syntax is required--the JavaScript
-snippet must be enclosed inside curly braces and preceded by the
-label ``javascript``, as in ``javascript {*yourCodeHere*}``.
-Below is an example in which the ``type`` command's second parameter 
-``value`` is generated via JavaScript code using this special syntax:
+Javascript也能用来为参数帮助产生值，即使当参数没有被指定为 **脚本** 类型。
+然而，在这种情况下，特定语法是要求的--Javascript脚本必须在花括号包内，前面加标签
+``javascript`` ，类似 ``javascript {*yourCodeHere*}`` 。
+以下例子中， ``type`` 命令的第二个参数 ``value`` 是通过用特定语法的Javascript代码产生的。
 
 ===============    ============================================   ===========
 store              league of nations                              searchString
 type               q                                              javascript{storedVars['searchString'].toUpperCase()}
 ===============    ============================================   ===========
 
-*echo* - The Selenese Print Command
+*echo* - Selenese打印命令
 ------------------------------------
-Selenese has a simple command that allows you to print text to your test's 
-output.  This is useful for providing informational progress notes in your 
-test which display on the console as your test is running.  These notes also can be 
-used to provide context within your test result reports, which can be useful 
-for finding where a defect exists on a page in the event your test finds a 
-problem.  Finally, echo statements can be used to print the contents of 
-Selenium variables.
+Selenese有一个简单的命令，这个命令可以允许你打印文本到你的测试的输出。
+这是非常有用的，提供在测试中的报告性的进度说明，当你的测试运行的时候这些说明显示在控制台上。
+这些说明也能用来提供你的测试结果报告中的上下文，这些说明还可以帮助测试时发现问题的时候
+找到缺陷存在一个页面哪个地方。最后,echo语句可以用来打印Selenium变量的内容。
 
 =====   ========================   ========
 echo    Testing page footer now.    
@@ -715,13 +690,12 @@ Alerts, Popups, and Multiple Windows
 .. Paul: This is an important area, people are constantly asking about this 
    on the forums.
 
-AJAX and waitFor Commands
+AJAX 和waitFor命令
 -------------------------
 
 *This section is not yet developed.*
 
-Many applications use AJAX for dynamic and animated functionality making 
-testing of AJAX behavior often a basic testing requirement.
+许多应用中使用AJAX的动态和动画功能，使测试AJAX的行为往往是一个基本的测试要求。 
 
 *This section is not yet developed.*
 
