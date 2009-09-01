@@ -1435,7 +1435,7 @@ directly supported by Selenium-RC. When specifying the run mode, use the
 
    *custom <path to browser> 
  
-For example 
+.. For example 
  
 .. TODO:  we need to add an example here.
   
@@ -1600,7 +1600,7 @@ launched with \*firefox, \*iexplore, \*opera, or \*custom.
       to make sure that one is adjusting the relevant settings.
       
     * For other browsers (\*firefox, \*opera) we automatically hard-code
-      the proxy for you, and so ther are no known issues with this functionality.
+      the proxy for you, and so there are no known issues with this functionality.
       If you're encountering 404 errors and have followed this user guide carefully
       post your results to user forums for some help from the user community.
       
