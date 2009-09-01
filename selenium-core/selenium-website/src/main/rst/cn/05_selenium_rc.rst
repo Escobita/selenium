@@ -1014,16 +1014,12 @@ Selenium构架面临的主要限制是同源策略。这个安全限制被市场
 它们当时被认为是‘experimental模式，尽管它们已经变得非常稳定并且很多人使用了它们。
 如果你正在使用Selenium 1.0，那么你不需要也不应该这些旧的运行模式。
 
-Security Certificates Explained
 安全证书解释
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Normally, your browser will trust the application you are testing
-by installing a security certificate which you already own. You can 
-check this in your browser's options or internet properties (if you don't 
-know your AUT's security certificate ask you system administrator). 
-When Selenium loads your browser it injects code to intercept 
-messages between the browser and the server. The browser now thinks 
-untrusted software is trying to look like your application.  It responds by alerting you with popup messages. 
+通常，你可以安装一个你已经拥有的安全证书， 这样浏览器会信任你所测试的应用程序。
+你可以在浏览器选项或者Internet属性里检查它（如果你不知道AUT的安全证书，请问你的系统管理员）。
+当Selenium 加载你的浏览器的时候，它通过注册代码来截取浏览器和服务器之间的消息。浏览器现在认为不被信任的软件正在尝试查看你的应用程序。
+It responds by alerting you with popup messages. 
 
 .. Please, can someone verify that I explained certificates correctly?—this is 
    an area I'm not certain I understand well yet. 
@@ -1100,17 +1096,12 @@ security certificate.
 .. TODO: Better describe how Selenium handles Firefox profiles (it creates,
    uses and then deletes sandbox profiles unless you specify special ones)
    
-Firefox will not run two instances simultaneously unless you specify a 
-separate profile for each instance. Selenium-RC 1.0 and later runs in a 
-separate profile automatically, so if you are using Selenium 1.0, you can 
-probably skip this section.  However, if you're using an older version of 
-Selenium or if you need to use a specific profile for your tests
-(such as adding an https certificate or having some addons installed), you will 
-need to explicitly specify the profile. 
+Firefox 不会同时运行两个实例除非你为每个实例指定一个单独的的配置。
+Selenium-RC 1.0和以后的版本会自动运行在单独的配置下，因此如果你在用Selenium 1.0，你可能可以略过这个章节。
+但是，如果你在用一个较早的Selenium版本，你的测试需要使用一个特定的配置（比如增加一个HTTPS证书或者安装一些扩展），你需要明确的指定配置。
 
-First, to create a separate Firefox profile, follow this procedure.
-Open the Windows Start menu, select "Run", then type and enter one of the 
-following:
+首先，按照以下过程，创建一个单独的Firefox配置。
+打开Windows开始菜单，选择"Run"，然后输入下面其中一个命令然后回车:
 
 .. code-block:: bash
 
@@ -1120,39 +1111,33 @@ following:
 
    firefox.exe -P 
 
-Create the new profile using the dialog. The when you run Selenium Server, 
-tell it to use this new Firefox profile with the server command-line option 
-*\-firefoxProfileTemplate* and specify the path to the profile using it's filename 
-and directory path.
+根据对话窗口创建新的配置。然后运行Selenium服务器，告诉它使用这个新的Firefox配置信息，通过附加服务器命令行选项
+*\-firefoxProfileTemplate* 并用它的文件名和目录路径来指定这个配置信息的路径。
 
 .. code-block:: bash
 
-   -firefoxProfileTemplate "path to the profile" 
+   -firefoxProfileTemplate "配置路径" 
 
-.. Warning::  Be sure to put your profile in a new folder separate from the default!!! 
-   The Firefox profile manager tool will delete all files in a folder if you 
-   delete a profile, regardless of whether they are profile files or not. 
+.. 警告:: 确保你的配置放在不同于默认的新文件夹里。 
+   如果你删除一个配置，Firefox 配置管理工具会删除一个文件夹里的所有文件，不管他们是不是配置文件。 
    
-More information about Firefox profiles can be found in `Mozilla's Knowledge Base`_
+更多关于Firefox配置的信息，请参考`Mozilla's Knowledge Base`_
 
 .. _Mozilla's KNowledge Base: http://support.mozilla.com/zh-CN/kb/Managing+profiles
 
 .. _html-suite:
 
-Run Selenese Directly Within the Server Using -htmlSuite
+用-htmlSuite直接在服务器里运行Selenese
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can run Selenese html files directly within the Selenium Server
-by passing the html file to the server's command line.  For instance::
+你可以通过传递 HTML文件到服务器命令行，在Selenium服务器直接运行Selense。
+比如::
 
    java -jar selenium-server.jar -htmlSuite "*firefox" "http://www.google.com" "c:\absolute\path\to\my\HTMLSuite.html" "c:\absolute\path\to\my\results.html"
 
-This will automatically launch your HTML suite, run all the tests and save a
-nice HTML report with the results.
+这个会自动启动你的HTML套件，运行所有测试并保存一个非常漂亮的包含测试结果的HTML报告。
 
-.. note::  When using this option, the server will start the tests and wait for a
-   specified number of seconds for the test to complete; if the test doesn't 
-   complete within that amount of time, the command will exit with a non-zero 
-   exit code and no results file will be generated.
+.. 注释:: 当使用这个选项时候，服务器会开始测试并等待指定时间来让测试完成。
+   如果没有在这些时间内完成，这个命令就会被退出并包含一个 non-zero退出代码，而且不产生结果文件。
 
 This command line is very long so be careful when 
 you type it. Note this requires you to pass in an HTML 
