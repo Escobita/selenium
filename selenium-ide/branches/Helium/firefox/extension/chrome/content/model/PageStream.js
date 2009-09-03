@@ -97,7 +97,7 @@ function PageStream( spy , rcp_checker){
 			
 			PageStream.prototype.LaunchWebRcp = function(){  
 				
-					window.frames["webstart"].location.href="http://release.seleniumhq.org/helium/JavaWebStart/helium.jnlp";
+					window.frames["webstart"].location.href= "http://forge.serli.com/helium/helium.jnlp"; //"http://release.seleniumhq.org/helium/JavaWebStart/helium.jnlp";
 					this.launch_date = new Date();
 			};
 		
