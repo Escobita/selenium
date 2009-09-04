@@ -11,7 +11,7 @@ Note that ChromeDriver is more experimental than others as it has not had time i
 
 The ChromeDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-chrome.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
 
-You will need the *dev channel* release of Google Chrome installed (NOT the stable or beta).  You can get on the dev channel [http://dev.chromium.org/getting-involved/dev-channel here].  Currently recommended is version 4.0.203.*.  There will be several breaking changes (as well as bug fixes! Hurrah!) in the next release, so if you have a choice, stay at 4.0.203
+You will need the *dev channel* release of Google Chrome installed (NOT the stable or beta).  You can get on the dev channel [http://dev.chromium.org/getting-involved/dev-channel here].  Currently recommended is version 4.0.203.`*`.  There will be several breaking changes (as well as bug fixes! Hurrah!) in the next release, so if you have a choice, stay at 4.0.203
 
 == Known issues ==
 
