@@ -56,7 +56,7 @@ The "wedriver-chrome.zip" which may be downloaded from the website, contains all
 
 == Installing the Quick Way From Source (with Ruby) ==
 
-If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will magically copy over build/Win32/Debug/npchromedriver.dll into the extension if you're on Windows.  Make sure that this dll has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln)
+If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will magically copy over build/Win32/Debug/npchromedriver.dll into the extension if you're on Windows.  Make sure that this dll has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln).  Note that {{{rake clean}}} will delete this file, so you will need to recompile after {{{rake clean}}}ing.
 
 This assumes that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
 
