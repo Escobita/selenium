@@ -729,7 +729,6 @@ Public License instead of this License.  But first, please read
    </features>
 
    <configurations>
-      <plugin id="com.serli.helium.core.server" autoStart="false" startLevel="0" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.http.registry" autoStart="true" startLevel="0" />
    </configurations>

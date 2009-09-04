@@ -24,7 +24,7 @@
     
     <property name="osgi.configuration.area" value="@user.home/.helium/config/"/>
     <property name="osgi.instance.area" value="@user.home/.helium/instance/"/>
-    <property name="osgi.bundles" value="org.eclipse.equinox.ds@4:start, org.eclipse.equinox.http.registry@4:start, com.serli.helium.core.server@4:start"/>
+    <property name="osgi.bundles" value="org.eclipse.equinox.ds@4:start, org.eclipse.equinox.http.registry@4:start"/>
     <property name="osgi.nl" value="en"/>
     
     <property name="eclipse.application" value="com.serli.helium.ui.product.workbench.application"/>
