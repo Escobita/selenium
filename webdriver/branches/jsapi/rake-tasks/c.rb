@@ -1,5 +1,7 @@
 # C related tasks
 
+require "rake-tasks/files.rb"
+
 def dll(args)
   deps = build_deps_(args[:deps])
   
@@ -26,6 +28,7 @@ def msbuild(solution, out, prebuilt)
     if (!File.exists? out) then
       sh "MSBuild.exe #{solution} /verbosity:q /target:Rebuild /property:Configuration=Release /property:Platform=x64", :verbose => false
       sh "MSBuild.exe #{solution} /verbosity:q /target:Rebuild /property:Configuration=Release /property:Platform=Win32", :verbose => false
+      copy_to_prebuilt(out, prebuilt)
     end
   else
     copy_prebuilt(prebuilt, out)
@@ -42,11 +45,15 @@ def gcc(srcs, out, args, link_args, is_32_bit, prebuilt)
 
   mkdir_p obj_dir
 
+  is_cpp_code = false
   srcs.each do |src|
     ok = gccbuild_c(src, obj_dir, args, is_32_bit)
     if (!ok)
       copy_prebuilt(prebuilt, out)
       return
+    end
+    if (src =~ /\.cpp$/)
+      is_cpp_code = true
     end
   end
 
@@ -54,8 +61,17 @@ def gcc(srcs, out, args, link_args, is_32_bit, prebuilt)
   flags += (is_32_bit ? "-m32 " : "-m64 ")
   flags += " " + link_args + " " if link_args
 
-  # if we've made it this far, then continue
-  sh "g++ -o #{out} #{obj_dir}/*.o #{flags}", :verbose => true
+  # if we've made it this far, try to link. If link fails,
+  # copy from prebuilt.
+  linker = is_cpp_code ? "g++" : "gcc"
+  sh "#{linker} -o #{out} #{obj_dir}/*.o #{flags}", :verbose => true do |link_ok, res|
+    if (!link_ok)
+      copy_prebuilt(prebuilt, out)
+      return
+    end
+  end
+
+  copy_to_prebuilt(out, prebuilt)
 
   rm_rf "#{out}_temp"
 end
@@ -75,23 +91,3 @@ def gccbuild_c(src_file, obj_dir, args, is_32_bit)
   true
 end
 
-def copy_prebuilt(prebuilt, out)
-  dir = out.split('/')[0..-2].join('/') 
-
-  if prebuilt.nil?
-    mkdir_p dir
-    File.open(out, 'w') {|f| f.write('')}    
-  elsif File.directory? prebuilt
-    from = prebuilt + "/" + out
-    from = from.sub(/\/build\//, "/")
-    if (File.exists?(from))
-      puts "Falling back to copy of: #{out}"
-      mkdir_p dir
-      cp_r from, out
-    else
-      puts "Unable to locate prebuilt copy of #{out}"
-    end
-  else
-    puts "Unable to locate prebuilt copy of #{out}"
-  end
-end

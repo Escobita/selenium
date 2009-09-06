@@ -18,12 +18,16 @@ limitations under the License.
 package org.openqa.selenium.support.pagefactory;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ByIdOrName;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.How;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Annotations {
 
@@ -38,14 +42,61 @@ public class Annotations {
   }
 
   public By buildBy() {
-    How how = How.ID_OR_NAME;
-    String using = field.getName();
+    assertValidAnnotations();
+
+    By ans = null;
+
+    FindBys findBys = field.getAnnotation(FindBys.class);
+    if (ans == null && findBys != null) {
+      ans = buildByFromFindBys(findBys);
+    }
 
     FindBy findBy = field.getAnnotation(FindBy.class);
-    if (findBy != null) {
-      how = findBy.how();
-      using = findBy.using();
+    if (ans == null && findBy != null) {
+      ans = buildByFromFindBy(findBy);
     }
+
+    if (ans == null) {
+      ans = buildByFromDefault();
+    }
+
+    if (ans == null) {
+      throw new IllegalArgumentException("Cannot determine how to locate element " + field);
+    }
+
+    return ans;
+  }
+
+  protected By buildByFromDefault() {
+    return new ByIdOrName(field.getName());
+  }
+
+  protected By buildByFromFindBys(FindBys findBys) {
+    assertValidFindBys(findBys);
+
+    FindBy[] findByArray = findBys.value();
+    By[] byArray = new By[findByArray.length];
+    for (int i = 0; i < findByArray.length; i++) {
+      byArray[i] = buildByFromFindBy(findByArray[i]);
+    }
+
+    return new ByChained(byArray);
+  }
+
+  protected By buildByFromFindBy(FindBy findBy) {
+    assertValidFindBy(findBy);
+
+    By ans = buildByFromShortFindBy(findBy);
+    if (ans == null) {
+      ans = buildByFromLongFindBy(findBy);
+    }
+
+    return ans;
+  }
+
+  protected By buildByFromLongFindBy(FindBy findBy) {
+    How how = findBy.how();
+    String using = findBy.using();
 
     switch (how) {
       case CLASS_NAME:
@@ -73,8 +124,75 @@ public class Annotations {
         return By.xpath(using);
 
       default:
-        throw new IllegalArgumentException("Cannot determine how to locate element");
+        // Note that this shouldn't happen (eg, the above matches all
+        // possible values for the How enum)
+        throw new IllegalArgumentException("Cannot determine how to locate element " + field);
     }
   }
 
+  protected By buildByFromShortFindBy(FindBy findBy) {
+    if (!"".equals(findBy.className()))
+      return By.className(findBy.className());
+
+    if (!"".equals(findBy.id()))
+      return By.id(findBy.id());
+
+    if (!"".equals(findBy.linkText()))
+      return By.linkText(findBy.linkText());
+
+    if (!"".equals(findBy.name()))
+      return By.name(findBy.name());
+
+    if (!"".equals(findBy.partialLinkText()))
+      return By.partialLinkText(findBy.partialLinkText());
+
+    if (!"".equals(findBy.tagName()))
+      return By.tagName(findBy.tagName());
+
+    if (!"".equals(findBy.xpath()))
+      return By.xpath(findBy.xpath());
+
+    // Fall through
+    return null;
+  }
+
+  private void assertValidAnnotations() {
+    FindBys findBys = field.getAnnotation(FindBys.class);
+    FindBy findBy = field.getAnnotation(FindBy.class);
+    if (findBys != null && findBy != null) {
+      throw new IllegalArgumentException("If you use a '@FindBys' annotation, "
+          + "you must not also use a '@FindBy' annotation");
+    }
+  }
+
+  private void assertValidFindBys(FindBys findBys) {
+    for (FindBy findBy : findBys.value()) {
+      assertValidFindBy(findBy);
+    }
+  }
+
+  private void assertValidFindBy(FindBy findBy) {
+    if (findBy.how() != null) {
+      if (findBy.using() == null) {
+        throw new IllegalArgumentException("If you set the 'how' property, you must also set 'using'");
+      }
+    }
+
+    Set<String> finders = new HashSet<String>();
+    if (!"".equals(findBy.using())) finders.add("how: " + findBy.using());
+    if (!"".equals(findBy.className())) finders.add("class name:" + findBy.className());
+    if (!"".equals(findBy.id())) finders.add("id: " + findBy.id());
+    if (!"".equals(findBy.linkText())) finders.add("link text: " + findBy.linkText());
+    if (!"".equals(findBy.name())) finders.add("name: " + findBy.name());
+    if (!"".equals(findBy.partialLinkText())) finders.add("partial link text: " + findBy.partialLinkText());
+    if (!"".equals(findBy.tagName())) finders.add("tag name: " + findBy.tagName());
+    if (!"".equals(findBy.xpath())) finders.add("xpath: " + findBy.xpath());
+
+    // A zero count is okay: it means to look by name or id.
+    if (finders.size() > 1) {
+      throw new IllegalArgumentException(
+      				String.format("You must specify at most one location strategy. Number found: %d (%s)",
+      								finders.size(), finders.toString()));
+    }
+  }
 }

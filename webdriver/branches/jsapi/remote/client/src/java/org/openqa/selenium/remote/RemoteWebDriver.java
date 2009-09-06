@@ -50,9 +50,12 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
   private CommandExecutor executor;
   private Capabilities capabilities;
   private SessionId sessionId;
+  
+  protected Process clientProcess;
 
   public RemoteWebDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
     this.executor = executor;
+    startClient();
     startSession(desiredCapabilities);
   }
 
@@ -85,6 +88,14 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     sessionId = new SessionId(response.getSessionId());
   }
 
+  protected void startClient() {
+    
+  }
+  
+  protected void stopClient() {
+
+  }
+  
   public Capabilities getCapabilities() {
     return capabilities;
   }
@@ -132,6 +143,17 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     return getElementsFrom(response);
   }
 
+  public WebElement findElementByPartialLinkText(String using) {
+    Response response = execute("findElement", "partial link text", using);
+    return getElementFrom(response);
+  }
+
+  public List<WebElement> findElementsByPartialLinkText(String using) {
+    Response response = execute("findElements", "partial link text", using);
+    return getElementsFrom(response);
+  }
+
+
   public WebElement findElementByName(String using) {
     Response response = execute("findElement", "name", using);
     return getElementFrom(response);
@@ -177,6 +199,7 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       execute("quit");
     } finally {
       sessionId = null;
+      stopClient();
     }
   }
 
@@ -366,7 +389,12 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       throw runtimeException;
     }
 
-    Map rawException = (Map) response.getValue();
+    Map rawException;
+    try {
+      rawException = (Map) response.getValue();
+    } catch (ClassCastException e) {
+      throw new RuntimeException(String.valueOf(response.getValue()));
+    }
 
     String screenGrab = (String) rawException.get("screen");
     String message = (String) rawException.get("message");
@@ -408,24 +436,26 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       }
 
       List<Map> elements = (List<Map>) rawException.get("stackTrace");
-      StackTraceElement[] trace = new StackTraceElement[elements.size()];
-
-      int lastInsert = 0;
-      for (Map values : elements) {
-        // I'm so sorry.
-        Long lineNumber = (Long) values.get("lineNumber");
-        if (lineNumber == null) {
-          continue;
+      if (elements != null) {
+        StackTraceElement[] trace = new StackTraceElement[elements.size()];
+  
+        int lastInsert = 0;
+        for (Map values : elements) {
+          // I'm so sorry.
+          Long lineNumber = (Long) values.get("lineNumber");
+          if (lineNumber == null) {
+            continue;
+          }
+  
+          trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
+                  (String) values.get("methodName"),
+                  (String) values.get("fileName"),
+                  (int) (long) lineNumber);
+          }
+  
+          if (lastInsert == elements.size()) {
+          toThrow.setStackTrace(trace);
         }
-
-        trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
-                (String) values.get("methodName"),
-                (String) values.get("fileName"),
-                (int) (long) lineNumber);
-        }
-
-        if (lastInsert == elements.size()) {
-        toThrow.setStackTrace(trace);
       }
     } catch (Exception e) {
       toThrow = new WebDriverException(e);
@@ -536,13 +566,5 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       Response response = execute("getActiveElement");
       return getElementFrom(response);
     }
-  }
-
-  public WebElement findElementByPartialLinkText(String using) {
-	  throw new UnsupportedOperationException();
-  }
-	
-  public List<WebElement> findElementsByPartialLinkText(String using) {
-	  throw new UnsupportedOperationException();
   }
 }

@@ -46,12 +46,11 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("TypingFormsTest")
-        .onlyRun("TypingRichtextTest")
-        .method("testShouldBeAbleToIterateOverAllOpenWindows")
-        .exclude(ALL)
+        .onlyRun("ExecutingJavascriptTest")
+        .method("testJavascriptStringHandlingShouldWorkAsExpected")
+        .exclude(ALL)  
         .exclude(Ignore.Driver.IE)
-        .leaveRunning()
+//        .leaveRunning()
         ;  // Yeah, this look strange :)
 
     if (REMOTE.equals(driver)) {

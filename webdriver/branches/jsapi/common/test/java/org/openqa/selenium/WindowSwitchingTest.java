@@ -19,8 +19,8 @@ package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 
 import java.util.HashSet;
@@ -28,7 +28,6 @@ import java.util.Set;
 
 public class WindowSwitchingTest extends AbstractDriverTestCase {
 
-  @Ignore({IE, REMOTE})
   public void testShouldSwitchFocusToANewWindowWhenItIsOpenedAndNotStopFutureOperations() {
     driver.get(xhtmlTestPage);
     String current = driver.getWindowHandle();
@@ -44,7 +43,6 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     driver.switchTo().window(current);
   }
 
-  @Ignore({IE, REMOTE})
   public void testShouldThrowNoSuchWindowException() {
     driver.get(xhtmlTestPage);
     String current = driver.getWindowHandle();
@@ -71,14 +69,14 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     Set<String> allWindowHandles = driver.getWindowHandles();
 
     // There should be three windows. We should also see each of the window titles at least once.
-    assertEquals(3, allWindowHandles.size());
-
     Set<String> seenHandles = new HashSet<String>();
     for (String handle : allWindowHandles) {
       assertFalse(seenHandles.contains(handle));
       driver.switchTo().window(handle);
       seenHandles.add(handle);
     }
+
+    assertEquals(3, allWindowHandles.size());
   }
 
   @Ignore(IE)
@@ -96,6 +94,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
       // If we make it this far, we're all good.
     } finally {
       driver.switchTo().window(currentHandle);
+      driver.findElement(By.id("linkId"));
     }
   }
 
@@ -121,5 +120,40 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     String newHandle = driver.getWindowHandle();
 
     assertEquals(current, newHandle);
+  }
+  
+  @NeedsFreshDriver
+  @NoDriverAfterTest
+  @Ignore(IE)
+  public void testCanCloseWindowWhenMultipleWindowsAreOpen() {
+    driver.get(xhtmlTestPage);
+    driver.findElement(By.name("windowOne")).click();
+
+    sleepBecauseWindowsTakeTimeToOpen();
+
+    Set<String> allWindowHandles = driver.getWindowHandles();
+
+    // There should be two windows. We should also see each of the window titles at least once.
+    assertEquals(2, allWindowHandles.size());
+    String handle1 = (String)allWindowHandles.toArray()[1];
+    driver.switchTo().window(handle1);
+    driver.close();
+    allWindowHandles = driver.getWindowHandles();
+    assertEquals(1, allWindowHandles.size());
+  }
+
+  private void sleepBecauseWindowsTakeTimeToOpen() {
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      fail("Interrupted");
+    }
+  }
+
+  @NeedsFreshDriver
+  @NoDriverAfterTest
+  public void testClosingOnlyWindowShouldNotCauseTheBrowserToHang() {
+    driver.get(xhtmlTestPage);
+    driver.close();
   }
 }

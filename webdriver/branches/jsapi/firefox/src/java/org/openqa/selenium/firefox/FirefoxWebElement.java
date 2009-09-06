@@ -22,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -63,8 +62,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
     public String getValue() {
         try {
-            String toReturn = sendMessage(WebDriverException.class, "getElementValue");
-            return toReturn.replace("\n", Platform.getCurrent().getLineEnding());
+          return sendMessage(WebDriverException.class, "getElementValue");
         } catch (WebDriverException e) {
             return null;
         }
@@ -122,8 +120,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getText() {
-        String toReturn = sendMessage(WebDriverException.class, "getElementText");
-        return toReturn.replace("\n", Platform.getCurrent().getLineEnding());
+        return sendMessage(WebDriverException.class, "getElementText");
     }
 
   public List<WebElement> getElementsByTagName(String tagName) {
@@ -150,8 +147,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
         String result = sendMessage(WebDriverException.class, "getElementSize");
 
         String[] parts = result.split(",");
-        int x = Integer.parseInt(parts[0].trim());
-        int y = Integer.parseInt(parts[1].trim());
+        int x = Math.round(Float.parseFloat(parts[0].trim()));
+        int y = Math.round(Float.parseFloat(parts[1].trim()));
 
         return new Dimension(x, y);
     }
@@ -231,10 +228,9 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public WebElement findElementById(String id) {
-    	String response = sendMessage(WebDriverException.class, "findElementById", id);
-    	if (response.equals("-1"))
-    		throw new NoSuchElementException("Unable to find element with id" + id);
-    	return new FirefoxWebElement(parent, response);
+      String elementId =
+          sendMessage(NoSuchElementException.class, "findElementById", id);
+      return new FirefoxWebElement(parent, elementId);
     }
 
     public List<WebElement> findElementsById(String id) {

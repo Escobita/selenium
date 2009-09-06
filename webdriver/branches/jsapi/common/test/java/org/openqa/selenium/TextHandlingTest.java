@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import org.hamcrest.TypeSafeMatcher;
+import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -41,7 +42,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		newLine = Platform.getCurrent().getLineEnding();
+		newLine = "\n";
 	}
 
     public void testShouldReturnTheTextContentOfASingleElementWithNoChildren() {
@@ -184,7 +185,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     	assertThat(text, is("Some text" + newLine + "Some more text"));
     }
 
-    @Ignore({FIREFOX, HTMLUNIT, IE})
+    @Ignore({FIREFOX, HTMLUNIT, IE, CHROME})
     public void testShouldHandleNestedBlockLevelElements() {
     	driver.get(simpleTestPage);
 

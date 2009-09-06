@@ -83,15 +83,38 @@ void __stdcall IeSink::DownloadComplete()
 void IeSink::ConnectionAdvise()
 {
 	SCOPETRACER
+
+	LOG(DEBUG) << "Advising connection: " << p_Thread << "   " << p_Thread->pBody->ieThreaded << endl;
+
 	CComQIPtr<IDispatch> dispatcher(p_Thread->pBody->ieThreaded);
 	CComPtr<IUnknown> univ(dispatcher);
-	this->DispEventAdvise(univ);
+
+	if (!univ) {
+		LOG(WARN) << "No dispatcher created when attempting to connect to IE instance";
+	}
+
+	if (FAILED(this->DispEventAdvise(univ))) {
+		LOG(WARN) << "Failed to advise new connection. Restarting the IE driver is recommended.";
+	}	
 }
 
 void IeSink::ConnectionUnAdvise()
 {
 	SCOPETRACER
+
+	if (!p_Thread && p_Thread->pBody) {
+		LOG(DEBUG) << "Unable to disconnect from IE instance";
+		return;
+	}
 	CComQIPtr<IDispatch> dispatcher(p_Thread->pBody->ieThreaded);
+	if (!dispatcher) {
+		LOG(DEBUG) << "No dispatcher located for IE instance";
+		return;
+	}
 	CComPtr<IUnknown> univ(dispatcher);
+	if (!univ) {
+		LOG(DEBUG) << "Unable to unadvise the IE instance";
+		return;
+	}
 	this->DispEventUnadvise(univ);
 }

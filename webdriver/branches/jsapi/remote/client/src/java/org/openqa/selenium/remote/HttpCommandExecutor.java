@@ -137,6 +137,7 @@ public class HttpCommandExecutor implements CommandExecutor {
         "/session/:sessionId/:context/element/:id/enabled", HttpVerb.GET));
     nameToUrl.put("isElementDisplayed", new CommandInfo(
         "/session/:sessionId/:context/element/:id/displayed", HttpVerb.GET));
+    nameToUrl.put("hover", new CommandInfo("/session/:sessionId/:context/element/:id/hover", HttpVerb.POST));
     nameToUrl.put("getElementLocation", new CommandInfo(
         "/session/:sessionId/:context/element/:id/location", HttpVerb.GET));
     nameToUrl.put("getElementSize",
@@ -228,6 +229,13 @@ public class HttpCommandExecutor implements CommandExecutor {
     }
     response.setError(!(httpMethod.getStatusCode() > 199 && httpMethod.getStatusCode() < 300));
 
+    if (response.getValue() instanceof String) {
+      //We normalise to \n because Java will translate this to \r\n
+      //if this is suitable on our platform, and if we have \r\n, java will
+      //turn this into \r\r\n, which would be Bad!
+      response.setValue(((String)response.getValue()).replace("\r\n", "\n"));
+    }
+    
     return response;
   }
 

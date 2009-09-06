@@ -169,13 +169,18 @@ Utils.isDisplayed = function(element) {
         el = el.parentNode;
     }
 
+    if (!el)  {
+      return false;
+    }
+
     // Hidden input elements are, by definition, never displayed
     if (el.tagName == "input" && el.type == "hidden") {
       return false;
     }
 
+    var box = Utils.getLocationOnceScrolledIntoView(el);
     // Elements with zero width or height are never displayed
-    if (el.offsetWidth == 0 || el.offsetHeight == 0) {
+    if (box.width == 0 || box.height == 0) {
       return false;
     }
 
@@ -625,7 +630,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
           pressCode = 0;
           if (!needsShift && shiftKey && charCode > 32) {
             // If typing a lowercase character key and the shiftKey is down, the
-            // charCode should be mapped ot the shifted key value. This assumes
+            // charCode should be mapped to the shifted key value. This assumes
             // a default 104 international keyboard layout.
             if (charCode >= 97 && charCode <= 122) {
               charCode = charCode + 65 - 97;  // [a-z] -> [A-Z]
@@ -966,6 +971,21 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
   // code path on older versions of Firefox (I think!)
   var theDoc = element.ownerDocument;
   var box = theDoc.getBoxObjectFor(element);
+
+  // We've seen cases where width is 0, despite the element actually having children with width
+  // This happens particularly with GWT.
+  if (box.width == 0 || box.height == 0) {
+    // Check the child, and hope the user doesn't nest this stuff. Walk the children til we find
+    // an element. At this point, we know that width and height are a polite fiction
+    for (var i = 0; i < element.childNodes.length; i++) {
+      var c = element.childNodes[i];
+      if (c.nodeType == 1) {
+        Utils.dumpn("Width and height are ficticious values, based on child node");
+        box = theDoc.getBoxObjectFor(c);
+        break;
+      }
+    }
+  }
 
   return {
     x : box.x + 3,
