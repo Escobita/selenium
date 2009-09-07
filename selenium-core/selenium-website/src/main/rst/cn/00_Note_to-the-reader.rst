@@ -1,32 +1,14 @@
-.. _chapter00-reference:
+.. _chapter00-cn-reference:
 
-A Personal Note to the Reader
+编者按
 =============================
-Hello, and welcome to Selenium!  The Documentation Team would like to 
-welcome you, and to thank you for being interested in Selenium.
+你好，欢迎使用Selenium！文档团队欢迎你，并感谢你对Selenium感兴趣。
 
-We have worked very, very hard on this document.  Why?  We absolutely believe 
-this is the best tool for web-application testing.  We feel its extensibility 
-and flexibility, along with its tight integration with the browser, is 
-unmatched by available proprietary tools.  We are very excited to promote 
-Selenium and, hopefully, to expand its user community.  In short, we really 
-want to "get the word out" about Selenium.
+我们一直非常努力的编写这个文档。为什么呢？因为我们绝对相信这是测试网络应用的最佳工具。我们认为它的扩展性和灵活性，以及与浏览器的紧密集成度，都是目前可用的专有工具所无法比的。我们很高兴能推广Selnenium，并希望能扩大其用户群。总之，我们要“宣传”Selenium。
 
-We truly believe you will be similarly excited once you learn how Selenium 
-approaches test automation.  It's quite different from other tools.  
-Whether you are brand-new to Selenium, or have been using it for awhile, 
-we believe this documentation will truly help to spread the knowledge around.  
-Also, we have aimed to write so that those completely new to test automation 
-will be able to use this document as a stepping stone.  No doubt, 
-experienced users and "newbies" will benefit from our Selenium User's Guide. 
+一旦你了解Selenium是如何实现测试自动化的，我们确信你也会有同样的激动。它与其他的工具完全不同。无论你是刚刚接触Selenium，还是已经使用了一段时间，我们相信这个文档将真正有利于传播知识。我们写作的目的也是希望那些自动化测试的初学者能够把这个文档当作学习的基石。毫无疑问，经验丰富的用户和“新手”，都将受益于我们的Selenium用户指南。 
 
-Please realize that this document is a work in progress.  There are planned areas we
-haven't written yet.  However, we have written the beginning chapters first 
-so newcomers can get started more smoothly.  We have also already added some valuable 
-information that more experienced users will appreciate.  This document will be a 'live'
-document on the SeleniumHQ website where frequent updates will occur as we complete
-the additional planned documentation.
+请注意这篇文档还在写作过程中。有些部分虽已计划但还未写。但是我们已经写了起始章节，这样新手就可以更顺利的开始。我们还增加了一些有经验的用户看重的有价值的信息。这篇文档是SeleniumHQ网站的“活”文档，当我们有附加计划的文档时，它会频繁的更新。
 
-                    Thanks very much for reading. 
-					
-							-- the Selenium Documentation Team
+                        谢谢阅读。
+                                                      --Selenium文档团队
