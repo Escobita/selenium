@@ -1,13 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>getinnerouterhtml_test.html</title>
+  <script src="../webdriver-bootstrap.js"></script>
+  <script src="testbase.js"></script>
+  <script type="text/javascript">
+function setUpPage() {
+  openTestWindow();
+}
+
+
+function tearDownPage() {
+  closeTestWindow();
+}
+
+
+function setUp(driver) {
+  switchToTestWindow(driver);
+}
+
+
 function testShouldReportTheCurrentUrlCorrectly(driver) {
-  driver.get(TEST_PAGES.simpleTestPage);
-  assertThat(driver.getCurrentUrl(), equals(TEST_PAGES.simpleTestPage));
-  driver.get(TEST_PAGES.javascriptPage);
-  assertThat(driver.getCurrentUrl(), equals(TEST_PAGES.javascriptPage));
+  driver.get(TEST_PAGE.simpleTestPage);
+  assertThat(driver.getCurrentUrl(), equals(TEST_PAGE.simpleTestPage));
+  driver.get(TEST_PAGE.javascriptPage);
+  assertThat(driver.getCurrentUrl(), equals(TEST_PAGE.javascriptPage));
 }
 
 
 function testShouldReturnTheSourceOfAPage(driver) {
-  driver.get(TEST_PAGES.simpleTestPage);
+  driver.get(TEST_PAGE.simpleTestPage);
   var source = driver.getPageSource();
   assertThat(source, contains("<html"));
   assertThat(source, contains("</html"));
@@ -31,3 +53,8 @@ function testUsersCanOverrideSetTimeoutWithoutBreakingWebDriver(driver) {
   });
   // If this doesn't work, it will most likely result in the tests timing out.
 }
+  </script>
+</head>
+<body>
+</body>
+</html>

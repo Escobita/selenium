@@ -1,12 +1,17 @@
 package org.openqa.selenium.remote.server;
 
-import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.JavascriptExecutor;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.URL;
 import java.util.logging.Logger;
 
 /**
@@ -16,93 +21,61 @@ import java.util.logging.Logger;
  */
 public class JsApiTestSuite extends TestCase {
 
-  private static final Logger LOGGER =
+  private static final Logger LOG =
       Logger.getLogger(JsApiTestSuite.class.getName());
+  private static final String TEST_PATH = "selenium/tests";
+  private static final JsApiTestServer TEST_SERVER = new JsApiTestServer();
 
-  private static final long FIFTEEN_MINUTES = 15 * 60 * 1000;
-  private static final String IS_FINISHED_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.isFinished();";
-  private static final String NUM_PASSED_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getNumPassed();";
-  private static final String NUM_TESTS_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getNumTests();";
-  private static final String GET_REPORT_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getReport();";
-
-
-  protected JsApiTestServer testServer;
-  protected FirefoxDriver driver;
+  // NOTE(jmleyba): If we instantiate FirefoxDriver inside of suite(), the
+  // profile opens with a security error, causing tests to fail. This does not
+  // happen if we start it inside the TestSetup.
+  private static final JsApiClosure<WebDriver> DRIVER_CLOSURE =
+      new JsApiClosure<WebDriver>();
 
   public static Test suite() throws Exception {
     TestSuite suite = new TestSuite();
     suite.setName(JsApiTestSuite.class.getName());
-    suite.addTestSuite(JsApiTestSuite.class);
-    return suite;
-  }
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    testServer = new JsApiTestServer();
+    LOG.info("Searching for test files");
+    File rootDir = JsApiTestServer.getRootDirectory();
+    File testsDir = new File(rootDir, TEST_PATH);
+    for (File file : testsDir.listFiles(new TestFilenameFilter())) {
+      String path =
+          file.getAbsolutePath().replace(rootDir.getAbsolutePath() + "/", "");
+      URL url = new URL(TEST_SERVER.whereIs("/remote", path));
+      TestCase test = new JsApiTestCase(url, DRIVER_CLOSURE);
+      LOG.info("Adding test: " + test.getName());
+      suite.addTest(test);
+    }
 
-    Thread t = new Thread() {
+    return new TestSetup(suite) {
       @Override
-      public void run() {
-        testServer.start();
+      protected void setUp() throws Exception {
+        Thread t = new Thread() {
+          @Override
+          public void run() {
+          }
+        };
+        t.setDaemon(true);
+        t.start();
+        Thread.sleep(1000);
+        TEST_SERVER.start();
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setEnableNativeEvents(false);  // Native events aren't 100% yet.
+        DRIVER_CLOSURE.set(new FirefoxDriver(profile));
+      }
+
+      @Override
+      protected void tearDown() throws Exception {
+        TEST_SERVER.stop();
+        DRIVER_CLOSURE.get().quit();
       }
     };
-    t.setDaemon(true);
-    t.start();
-    Thread.sleep(1000);
-
-    FirefoxProfile profile = new FirefoxProfile();
-    profile.setEnableNativeEvents(false);  // Native events aren't 100% yet.
-    driver = new FirefoxDriver(profile);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    testServer.stop();
-    driver.quit();
+  private static class TestFilenameFilter implements FilenameFilter {
+    public boolean accept(File dir, String name) {
+      return name.endsWith("_test.html");
+    }
   }
-
-  public void testLocalCommandProcessorOnFirefox() throws Exception {
-    runJavascriptTest("selenium/tests/embedded_driver_test.html");
-  }
-
-  public void testEmbeddedDriverOnFirefox() throws Exception {
-    runJavascriptTest("selenium/tests/localcommandprocessor_testsuite.html");
-  }
-
-  public void runJavascriptTest(String filePath) throws Exception {
-    String url = testServer.whereIs("/remote", filePath);
-    driver.get(url);
-    JavascriptExecutor executor = (JavascriptExecutor) driver;
-    long start = System.currentTimeMillis();
-
-    do {
-      Thread.sleep(3 * 1000);
-      Object result = executor.executeScript(IS_FINISHED_SCRIPT);
-      if (null != result && (Boolean) result) {
-        break;
-      }
-
-      long now = System.currentTimeMillis();
-      long ellapsed = now - start;
-      if (ellapsed > FIFTEEN_MINUTES) {
-        fail("TIMEOUT: JS API tests should not take more than 15 minutes");
-      }
-    } while (true);
-
-    Object result = executor.executeScript(NUM_PASSED_SCRIPT);
-    Long numPassed = result == null ? 0: (Long) result;
-
-    result = executor.executeScript(NUM_TESTS_SCRIPT);
-    Long numTests = result == null ? 0: (Long) result;
-
-    String report = (String) executor.executeScript(GET_REPORT_SCRIPT);
-    assertEquals(report, numTests, numPassed);
-  }
-
 }

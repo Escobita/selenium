@@ -1,3 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>typing_contenteditable_test</title>
+  <script src="../webdriver-bootstrap.js"></script>
+  <script src="testbase.js"></script>
+  <script>
+    function setUpPage() {
+      openTestWindow();
+    }
+
+
+    function tearDownPage() {
+      closeTestWindow();
+    }
+
+
+    function setUp(driver) {
+      switchToTestWindow(driver);
+    }
+
+
 /**
  * @fileoverview Tests for typing on an element with contentEditable enabled.
  */
@@ -11,7 +33,7 @@ if (goog.userAgent.IE || IS_FF_3) {
     } else {
       keySequence = goog.array.slice(arguments, 2);
     }
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     var element = driver.findElement({id: 'editDiv'});
     element.sendKeys.apply(element, keySequence);
     assertThat(
@@ -80,7 +102,7 @@ if (goog.userAgent.IE || IS_FF_3) {
 
 
   function testCanStartNewlinesByTypingEnterInAContentEditableElement(driver) {
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     var element = driver.findElement({id: 'editDiv'});
     element.sendKeys('line one');
     assertThat(element.getText(), equals('line one'));
@@ -176,7 +198,7 @@ if (goog.userAgent.IE || IS_FF_3) {
 
 
   function testSelectionReplacementInAContentEditableElement(driver) {
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     var element = driver.findElement({id: 'editDiv'});
     element.sendKeys("one");
     assertThat(element.getText(), equals("one"));
@@ -223,7 +245,7 @@ if (goog.userAgent.IE || IS_FF_3) {
     var copy = key.chord(modifier, 'c');
     var paste = key.chord(modifier, 'v');
 
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     var element = driver.findElement({id: 'editDiv'});
     element.sendKeys('abc');
     assertThat(element.getText(), equals('abc'));
@@ -275,3 +297,8 @@ if (goog.userAgent.IE || IS_FF_3) {
     }
   }
 }
+  </script>
+</head>
+<body>
+</body>
+</html>

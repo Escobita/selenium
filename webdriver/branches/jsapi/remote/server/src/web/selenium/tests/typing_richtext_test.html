@@ -1,3 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>typing_richtext_test</title>
+  <script src="../webdriver-bootstrap.js"></script>
+  <script src="testbase.js"></script>
+  <script>
+    function setUpPage() {
+      openTestWindow();
+    }
+
+
+    function tearDownPage() {
+      closeTestWindow();
+    }
+
+
+    function setUp(driver) {
+      switchToTestWindow(driver);
+    }
+
+
 /**
  * @fileoverview Tests for typing on a richtext enabled document (for IE the
  * BODY element has contentEditable enabled, for W3 browsers the DOCUMENT
@@ -14,7 +36,7 @@ if (!goog.userAgent.IE) {
     } else {
       keySequence = goog.array.slice(arguments, 2);
     }
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     driver.switchToFrame('editFrame');
     var element = driver.findElement({xpath: '//body'});
     element.sendKeys.apply(element, keySequence);
@@ -84,7 +106,7 @@ if (!goog.userAgent.IE) {
 
   function testCanStartNewlinesByTypingEnterInADesignModeEnabledDocument(
       driver) {
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     driver.switchToFrame('editFrame');
     var element = driver.findElement({xpath: '//body'});
     element.sendKeys('line one');
@@ -173,7 +195,7 @@ if (!goog.userAgent.IE) {
 
 
   function testSelectionReplacementInADesignModeEnabledDocument(driver) {
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     driver.switchToFrame('editFrame');
     var element = driver.findElement({xpath: '//body'});
     element.sendKeys("one");
@@ -232,7 +254,7 @@ if (!goog.userAgent.IE) {
     var copy = key.chord(modifier, 'c');
     var paste = key.chord(modifier, 'v');
 
-    driver.get(TEST_PAGES.richtextPage);
+    driver.get(TEST_PAGE.richtextPage);
     driver.switchToFrame('editFrame');
     var element = driver.findElement({xpath: '//body'});
     element.sendKeys('abc');
@@ -282,3 +304,8 @@ if (!goog.userAgent.IE) {
     };
   }
 }
+  </script>
+</head>
+<body>
+</body>
+</html>
