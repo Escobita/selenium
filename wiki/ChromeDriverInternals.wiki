@@ -1,0 +1,42 @@
+#summary How the ChromeDriver works
+#labels WebDriver
+
+=ChromeDriver Internals=
+
+The ChromeDriver is largely written in the form of a Chrome extension [http://src.chromium.org/viewvc/chrome/trunk/src/chrome/common/extensions/docs/index.html (API details)].  The language bindings listen on a socket for the extension to initialise events, and requests and responses are sent over this port.  The extension comprises of a background page (which is loaded when the first window of the browser first opens, and remains open until the last window o the browser closes), which handles the HTTP communication.  Also, a content script, which loads in the context of every page which loads, and allows interaction with the DOM, and an NPAPI plugin, which allows for native events.
+
+==Working on the ChromeDriver code==
+
+Firstly, if you are on Windows, make sure that Win32/Debug/npchromedriver.dll has been compiled.  It is deleted when you {{{rake clean}}}.  If it is not present, compile it.
+
+Secondly, take a look at the [http://src.chromium.org/viewvc/chrome/trunk/src/chrome/common/extensions/docs/index.html Chrome Extensions pages] to get to grips with the flow of extensions.  They have a very simple and clean API (they look just like standard HTML and Javascript), but a little background is useful.  Now you should be able to get hacking.  It's best to create a test around the area of code that you're working on, and to run this using the SingleTestSuite.  To use the ChromeDriver from an IDE as opposed to from JARs, you should use the org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver rather than the org.openqa.selenium.chrome.ChromeDriver, the difference being that the latter loads its extension from a zip file in the JAR, whereas the former uses the files in chrome/src/extension.
+
+Some useful debugging information is dumped in the Chrome window itself.  To access this, stop the Chrome process from being terminated (perhaps comment out the chromeProcess.destroy(); line in org.openqa.selenium.chrome.ChromeBinary) and look at the inspector console.  For the content script, the can be found by pressing Ctrl + Shift + J on the page which is loaded.  For the background page, this can be found by navigating in a new tab to chrome://extensions and clicking on inspect, next to Background Page.  The console can be accessed by pressing the button which looks a bit like >= at the bottom.  You can use this console to execute arbitrary javascript in the relevant pages, but note that any javascript executed in the page will be executed in the page, NOT the content script.  There is currently no way of accessing the content script's context in Chrome.  You can call console.log(foo) within the content script to dump to the log, which will work for objects as well as strings.
+
+==Flow of Control: Starting Chrome==
+
+The language bindings need to listen on an arbitrary TCP port.  They should serve a minimal static HTML page in response to any GET requests, and parse any POST requests as below.  When the bindings are listening on the TCP port, they need to run an instance of Chrome, with the extension loaded and send it to the a page which will send a GET to the bindings' port.  Chrome should be launched with a new profile each run - currently this is just an empty folder with a blank text file called "First Run Dev" in it - this may change.
+
+e.g. {{{chrome.exe --load-extension="path/to/extension" --use-user-dir="path/to/profile" http://localhost:1234}}}
+
+Note: Henceforth, I will refer to TCP port if I mean the port between the language bindings and the extension, and just port if I mean a chrome extensions communication port between a content script and the background page.
+
+The following steps are performed when Chrome loads:
+
+ # The background page is loaded.  It sits listening for a content script to open a port to it.
+ # The page passed to Chrome is loaded.  When it is fully loaded, its content script opens a port to the background page.
+ # The background page grabs the URL from the content script's port and sends a POST XmlHttpRequest to that URL.  This POSTs over the TCP port.  The language bindings receive this, and interpret it as a statement of readyness for a command.
+ # The bindings are given a command to execute by the test case.  This is sent as the response to the XmlHttpRequest.
+ # The background page parses this response (containing a command), and either comes up with a response itself, or sends a message the the content script requesting action, and parses the response to this request for action into a response.  It then sends this response as the POST data of a new XmlHttpRequest.
+ # The language bindings listen for this POST, parse the POST data, return it to the test as the result of the command, and leaves the XmlHttpRequest hanging, so that it can send the next command as the response to it.
+
+Communication over the TCP port is JSON over HTTP.  Commands are of the form: {{{{request: 'findElement', by: ["id", "foo"]}}}} and responses of the form {{{{response: 'findElement', value: {statusCode: 0, elementId: "element/0"}}}}}.  The commands are loosely based on the JsonWireProtocol, and are enumerated in org.openqa.selenium.chrome.ChromeCommandExecutor.  All HTTP status codes should be 200.  In the JSON responses, a statusCode of 0 indicates success.  A non-zero statusCode indicates an exception of some kind.  Exceptions may optionally have message attributes along with them, to give debugging information.
+
+Communication between the background page and content script uses an identical protocol, with the addition of the "no-op" statusCode.  Generally, the content script sends the background page a response which is ready to be returned to the language bindings.  If more action is required from the background page (e.g. sending keys is a multi-stage process - first the background page tells the content script to focus on an element, then the content script tells the background page it has done this, and should make a native call - this response has a "no-op" statusCode, because it should not directly return to the language bindings.  Messages between the background page and content script are wrapped in an object which contains a sequence number, which is unique per invocation of the ChromeDriver: {{{request: requestObject, sequenceNumber: 0}}} and {{{{response: responseObject, sequenceNumber: 0}}}}.  The content script ignores any sequence number <= the last one it processed.
+
+==Native events==
+
+Native events are handled by an NPAPI plugin.  This plugin, with MIME-type application/x-webdriver is embedded in the background page, so loaded as soon as the browser loads.  This plugin will listen out for javascript calls on it (document.embeds[0].foo()), and reacts to them (see chrome/src/cpp/npchromedriver/npapi_hooks.h for the supported functions).  In order to interact with a page in the browser, the first time a native event is executed in a page, a plugin with MIME-type application/x-webdriver-reporter (also handled by the same NPAPI plugin) is embedded in the page, by the content script (see the handling of the "injectEmbed" command, which is called using the wrapInjectEmbedIfNecessary method in the background page).  The NPAPI plugin listens out for this embed, and when it appears present, grabs the window handle of the page it has been injected into.  All native events will be sent to that window handle, until a new application/x-webdriver-reporter is embedded, which will overwrite the old window handle in internal state.
+
+==Contact information==
+ChromeDriver was written by DanielWagnerHall as an internship project at Google.  If you feel this page is missing anything, or need any help hacking with the ChromeDriver, feel free to get in touch: dawagner-AT-gmail-DOT-com
