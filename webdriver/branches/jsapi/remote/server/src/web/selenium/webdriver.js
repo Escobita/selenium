@@ -670,11 +670,20 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
   this.addCommand(new webdriver.Command(webdriver.CommandName.EXECUTE_SCRIPT).
       setParameters(script, args).
       setSuccessCallback(function(response) {
-        if (goog.isString(response.value) &&
-            webdriver.WebElement.UUID_REGEX.test(response.value)) {
-          var id = response.value;
-          response.value = new webdriver.WebElement(this);
-          response.value.getId().setValue(id);
+        switch(response.extraData['resultType']) {
+          case 'NULL':
+            response.value = null;
+            break;
+
+          case 'ELEMENT':
+            var id = response.value;
+            response.value = new webdriver.WebElement(this);
+            response.value.getId().setValue(id);
+            break;
+
+          case 'OTHER':  // Fall-through
+          default:
+            break;
         }
         result.setValue(response.value);
       }, this));

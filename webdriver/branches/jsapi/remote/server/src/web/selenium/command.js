@@ -280,4 +280,5 @@ webdriver.Response = function(isFailure, context, value, opt_error) {
   this.context = context;
   this.value = value;
   this.errors = goog.array.slice(arguments, 3);
+  this.extraData = {};
 };

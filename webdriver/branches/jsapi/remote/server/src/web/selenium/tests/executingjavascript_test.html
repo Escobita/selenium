@@ -36,6 +36,15 @@ function testCanExecuteJavascriptThatReturnsANumber(driver) {
 }
 
 
+function testScriptsWithFalsyReturnValues(driver) {
+  assertThat('undefind', driver.executeScript('return undefined;'), equals(null));
+  assertThat('null', driver.executeScript('return null;'), equals(null));
+  assertThat('empty string', driver.executeScript('return "";'), equals(''));
+  assertThat('0', driver.executeScript('return 0;'), equals(0));
+  assertThat('false', driver.executeScript('return false;'), equals(false));
+}
+
+
 function testCanExecuteJavascriptThatReturnsAWebElement(driver) {
   driver.get(TEST_PAGE.xhtmlTestPage);
   // TODO(jmleyba): Need a way to say "when future is set, execute this command"

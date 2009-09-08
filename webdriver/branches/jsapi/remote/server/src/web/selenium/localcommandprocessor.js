@@ -163,10 +163,12 @@ webdriver.LocalCommandProcessor.LOCATOR_UNDER_ELEMENT_ = {
 webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
     command, sessionId, context) {
   var respond = goog.bind(function(rawResponse) {
-    command.setResponse(new webdriver.Response(
+    var response = new webdriver.Response(
         rawResponse['isError'],
         webdriver.Context.fromString(rawResponse['context']),
-        rawResponse['response']));
+        rawResponse['response']);
+    response.extraData['resultType'] = rawResponse['resultType'];
+    command.setResponse(response);
   }, this);
 
   var methodName;
