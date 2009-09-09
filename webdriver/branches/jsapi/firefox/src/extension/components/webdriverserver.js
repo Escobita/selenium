@@ -42,11 +42,11 @@ WebDriverServer.prototype.newDriver = function(window) {
 
 WebDriverServer.prototype.getNextId = function() {
     return this.generator.generateUUID().toString(); 
-}
+};
 
 WebDriverServer.prototype.onSocketAccepted = function(socket, transport) {
     try {
-        var socketListener = new SocketListener(this, transport);
+        var socketListener = new SocketListener(transport);
     } catch(e) {
         dump(e);
     }
