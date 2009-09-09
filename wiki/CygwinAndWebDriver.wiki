@@ -20,4 +20,4 @@ Then install rake.  Do this by: {{{gem install --remote rake}}}
 
 You may need to restart cygwin at this stage.
 
-I'm about to start making sure things like classpath are set properly for Java, if you fancy giving me a hand, do contribute!
+You should now be able to build webdriver from rake.  See DeveloperTips for more information about building from rake.
