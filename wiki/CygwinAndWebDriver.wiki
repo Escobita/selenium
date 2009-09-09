@@ -9,7 +9,7 @@ Make sure your environment variable $RUBYOPT is blank (specifically, does not co
 
 You then need to install RubyGems.  Do this by:
  # Download the RubyGems tarball from [http://rubyforge.org/projects/rubygems/ Ruby Forge]
- # Unpack the tarball (tar xvfz rubygems-*.tgz)
+ # Unpack the tarball (tar xvfz rubygems-`*`.tgz)
  # Navigate to the unpacked tarball
  # Run the following command: {{{ruby setup.rb install}}}
  # Update RubyGems by running the following: {{{gem update --system}}} (You may need to do this twice).
