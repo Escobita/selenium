@@ -1139,167 +1139,128 @@ Selenium-RC 1.0和以后的版本会自动运行在单独的配置下，因此�
 .. 注释:: 当使用这个选项时候，服务器会开始测试并等待指定时间来让测试完成。
    如果没有在这些时间内完成，这个命令就会被退出并包含一个 non-zero退出代码，而且不产生结果文件。
 
-This command line is very long so be careful when 
-you type it. Note this requires you to pass in an HTML 
-Selenese suite, not a single test. Also be aware the -htmlSuite option is incompatible with ``-interactive``
-You cannot run both at the same time.
+这个命令行非常长，因此你输入的时候要小心。注意这需要你传递一个HTML的 
+Selenese套件，而不是单独一个测试。并且要知道-htmlSuite选项和 ``-interactive`` 选项不兼容。
+你不能同时使用这两个。
 
-Selenium Server Logging
+Selenium 服务器日志
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Server-Side Logs
+服务器端日志
 ++++++++++++++++
-When launching selenium server the **-log** option can be used to record
-valuable debugging information reported by the Selenium Server to a text file.
+当你启动selenium服务器的时候，可以使用**-log**选项来让服务在文本文件里记录有用的调试信息。
+
 
 .. code-block:: bash
 
    java -jar selenium-server.jar -log selenium.log
-   
-This log file is more verbose than the standard console logs (it includes DEBUG 
-level logging messages). The log file also includes the logger name, and the ID
-number of the thread that logged the message. For example:   
+这个日志文件比标准控制台日志冗长很多。（这包括了DEBUG等级的日志消息）。
+这个日志文件同时也包含了记录器名字，和记录日志的进程ID号，比如：
 
 .. code-block:: bash
 
    20:44:25 DEBUG [12] org.openqa.selenium.server.SeleniumDriverResourceHandler - 
    Browser 465828/:top frame1 posted START NEW
    
-The message format is 
+消息的格式是 
 
 .. code-block:: bash
 
    TIMESTAMP(HH:mm:ss) LEVEL [THREAD] LOGGER - MESSAGE
    
-This message may be multiline.
+消息可能是多行的。
 
-Browser-Side Logs
+浏览器端日志
 +++++++++++++++++
-JavaScript on the browser side (Selenium Core) also logs important messages; 
-in many cases, these can be more useful to the end-user than the regular Selenium 
-Server logs. To access browser-side logs, pass the **-browserSideLog**
-argument to the Selenium Server.
+JavaScript在浏览器端（Selenium Core）同样也记录重要消息;
+在很多情况下，对终端用户来说，这些日志比普通的Selenium服务器日志有用的多。
+通过传递**-browserSideLog**参数给Selenium服务器来取得浏览器端日志。
 
 .. code-block:: bash
 
    java -jar selenium-server.jar -browserSideLog
    
-**-browserSideLog** can  be combined with the **-log** argument, to log 
-browserSideLogs (as well as all other DEBUG level logging messages) to a file.
+**-browserSideLog** 可以结合**-log** 参数来记录浏览器端日志（以及其他DEBUG级别日志消息）到一个文件里。
 
-.. Selenium-IDE Generated Code
-   ---------------------------
-   Starting the Browser 
-   --------------------
-   Specify the Host and Port::
-   localhost:4444 
-   The Selenium-RC Program's Main() 
-   --------------------------------
-   Using the Browser While Selenium is Running 
-   -------------------------------------------
-   You may want to use your browser at the same time that Selenium is also using 
-   it. Perhaps you want to run some manual tests while Selenium is running your 
-   automated tests and you wish to do this on the same machine. Or perhaps you just
-   want to use your Facebook account but Selenium is running in the background. 
-   This isn't a problem. 
-   
-   With Internet Explorer, you can simply start another browser instance and run 
-   it in parallel to the IE instance used by Selenium-RC. With Firefox, you can do
-   this also, but you must specify a separate profile. 
-
-
-Specifying the Path to a Specific Browser 
+指定特殊浏览器路径
 -----------------------------------------
-You can specify to Selenium-RC a path to a specific browser. This is useful if 
-you have different versions of the same browser, and you wish to use a specific
-one. Also, this is used to allow your tests to run against a browser not 
-directly supported by Selenium-RC. When specifying the run mode, use the 
-\*custom specifier followed by the full path to the browser's executable::
+你可以给Selenium-RC指定一个特殊浏览器的路径。如果你有同个浏览器不同版本，并且你希望使用其中某个的时候，这会非常有用。 
+并且，使用这个允许你测试运行在一个Selenium-RC不直接支持的浏览器上。
+当指定运行模式的时候，使用 
+\*custom 加一个空格和浏览器可执行文件的完全路径::
 
-   *custom <path to browser> 
+   *custom <浏览器路径> 
  
-For example 
- 
+例如 
 .. TODO:  we need to add an example here.
   
    
-Troubleshooting 
+故障诊断 
 ---------------
-When first getting started with Selenium-RC there's a few potential problems
-that are commonly encountered.  We present them along with their solutions here.
+当第一次开始使用Selenium-RC的时候，通常会遇到一些潜在的问题。
+我们把它们以及解决方案在这里提出来。
 
-Unable to Connect to Server 
+无法连接到服务器
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When your test program cannot connect to the Selenium Server, an exception 
-will be thrown in your test program. It should display this message or a 
-similar one::
+当你测试程序无法连接到VSelenium服务器，你的程序里会抛出一个异常。它会显示类似以下消息::
 
     "Unable to connect to remote server….Inner Exception Message: No 
     connection could be made because the target machine actively refused it…."
     
-	(using .NET and XP Service Pack 2) 
+	(.NET and XP Service Pack 2 上) 
 
-If you see a message like this, be sure you started the Selenium Server. If 
-you did, then there is some problem with the connectivity between the two 
-components. This should not normally happen when your operating system has 
-typical networking and TCP/IP settings. If you continue to have trouble, try 
-a different computer.  
+如果你看到一条类似的消息，请确认你启动了Selenium服务器。
+如果你确实启动了，那么可能是两个组件间的连接性有问题。
+这个情况通常不会发生,如果你的操作系统有典型的网络和TCP/IP配置。 
+如果仍然有问题，请在不同的电脑上试试。 
 
-You can also use common networking tools like *ping*, *telnet*, *ipconfig/ifconfig*
-(on windows), etc to ensure you first have a valid network connection.  
-Also, if you're trying to 
-connect to the Selenium Server on a remote machine try running it locally first and
-verifying you can get a connection using "localhost" as your connection parameter.  
- 
-Unable to Load the Browser 
+你也可以使用通用的网络工具比如*ping*, *telnet*, *ipconfig/ifconfig*(windows上),等待来确保
+你首先有一个有效的网络连接。并且，如果你要从远程的机器上连接Selenium服务器，
+请先在本机上运行，并验证你可以用"localhost"来连接成功。
+
+无法加载浏览器 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Ok, not a very friendly error, sorry, but if the Selenium Server cannot load the browser 
-you will probably see this error.
+这不是一个友好的错误，但如果你的Selenium服务器不能加载浏览器的时候或许你会看到这个错误。
  
 :: 
 
     (500) Internal Server Error 
 
-This error seems to occur when Selenium-RC cannot load the browser.
+这个错误看起来会在Selenium-RC 无法加载浏览器的时候发生。
 
 ::
 
     500 Internal Server Error 
 
-(using .NET and XP Service Pack 2) 
+(.NET 和 XP Service Pack 2上) 
 
-This could be caused by
+这个可能是因为
 
-* Firefox (prior to Selenium 1.0) cannot start because the browser is already open and you did 
-  not specify a separate profile.   See the section on Firefox profiles under Server Options.
-* The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
-  passed to Selenium when you program opens the browser. 
-* You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
-  incorrect.  Check to be sure the path is correct.  Also check the forums to be sure there are
-  no known issues with your browser and the "\*custom" parameters.
+* Firefox (Selenium 1.0之前版本)不能启动因为浏览器已经被打开而且你没有指定一个单独的配置。
+查看服务器选项里面的Firefox配置章节。
+* 你使用的运行模式和你的机器上面的任何浏览器都不匹配。
+检查当应用程序打开浏览器时候，你传递给Selenium的参数。 
+* 你明确指定了浏览器路径(用"\*custom"--查看上文)， 但是路径不正确。
+检查确保路径是正确的。并且检查论坛，确保那里没有关于你的浏览器和"\*custom"参数的已知问题。
 
-Selenium Cannot Find the AUT 
+
+Selenium无法找到AUT 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If your test program starts the browser successfully, but the browser doesn't
-display the website you're testing, the most likely cause is your test 
-program is not using the correct URL. 
+如果你的测试程序成功的启动了浏览器，但是浏览器没有显示你正在测试的网站，
+这个很可能是你的测试程序没有使用正确的URL。 
 
-This can easily happen. When you use Selenium-IDE to export you script,
-it inserts a dummy URL. You must manually change the URL to the correct one
-for your application to be tested. 
+这个很容易发生，当你用Selenium-IDE导出脚本的时候，它插入一个假的URL。你必须手动的修改
+为你要测试程序的正确URL。 
 
-Firefox Refused Shutdown While Preparing a Profile 
+当准备一个配置时，Firefox拒绝关闭。 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This most often occurs when your run your Selenium-RC test program against Firefox,
-but you already have a Firefox browser session running and, you didn't specify
-a separate profile when you started the Selenium Server. The error from the 
-test program looks like this::
+这个经常发生在你用Selenium-RC测试程序在Firefox上运行时候，但你已经有一个运行的Firefox浏览器会话，
+而且你启动Selenium服务器的时候没有指定一个单独配置。来之测试程序的错误信息看起来像这样::
 
     Error:  java.lang.RuntimeException: Firefox refused shutdown while 
     preparing a profile 
 
-Here's the complete error msg from the server::
+这是一个来自服务器的完整的错误信息::
 
     16:20:03.919 INFO - Preparing Firefox profile... 
     16:20:27.822 WARN - GET /selenium-server/driver/?cmd=getNewBrowserSession&1=*fir 
@@ -1312,35 +1273,28 @@ Here's the complete error msg from the server::
     her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
     ~1\Temp\customProfileDir203138\parent.lock 
 
-To resolve this, see the section on `Specifying a Separate Firefox Profile 
-<Personalizing the Firefox Profile used in the tests>`_
+查看 `Specifying a Separate Firefox Profile <Personalizing the Firefox Profile used in the tests>`_ 章节来解决这个问题。
 
 
-Versioning Problems 
+版本问题
 ~~~~~~~~~~~~~~~~~~~
-Make sure your version of Selenium supports the version of your browser. For
-example, Selenium-RC 0.92 does not support Firefox 3. At times you may be lucky
-(I was). But don't forget to check which
-browser versions are supported by the version of Selenium you are using. When in
-doubt, use the latest release version of Selenium with the most widely used version
-of your browser.
+确保你的Selenium版本支持你浏览器的版本。
+比如，Selenium-RC 0.92 不支持Firefox 3。 有几次你可能运气好，但是不要忘记检查你所用的Selenium版本支持哪些浏览器版本。
+如果不清楚，使用最新发布的Selenium版本，它支持的浏览器版本范围最广。
 
 .. Santi: Mary Ann suggested We should also mention about JRE version needed by
    the server
 
 
-Error message: "(Unsupported major.minor version 49.0)" while starting server
+当启动服务器时候的错误信息： "(Unsupported major.minor version 49.0)" 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This error says you're not using a correct version of Java. 
-The Selenium Server requires Java 1.5 or higher. 
+这个错误是说你没有使用正确的Java版本。Selenium服务器需要Java 1.5以上版本。
 
-To check double-check your java version, run this from the command line.
-
+从命令行运行如下命令来仔细检查你的Java版本。
 .. code-block:: bash
 
    java -version
-
-You should see a message showing the Java version.
+你会看到一条信息显示Java版本。
 
 .. code-block:: bash
 
@@ -1348,10 +1302,10 @@ You should see a message showing the Java version.
    Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-b03)
    Java HotSpot(TM) Client VM (build 1.5.0_07-b03, mixed mode)
 
-If you see a lower version number, you may need to update the JRE,
-or you may simply need to add it to your PATH environment variable.
 
-404 error when running the getNewBrowserSession command
+如果你看到一个更低的版本号，你可能需要更新JRE，或者只要把它加到你的 PATH环境变量上。
+
+当运行getNewBrowserSession命令时候，404错误
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you're getting a 404 error while attempting to open a page on 
 "http://www.google.com/selenium-server/", then it must be because the Selenium
