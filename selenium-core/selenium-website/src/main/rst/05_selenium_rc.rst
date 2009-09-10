@@ -1529,8 +1529,7 @@ Here's the complete error msg from the server::
     her$FileLockRemainedException: Lock file still present! C:\DOCUME~1\jsvec\LOCALS 
     ~1\Temp\customProfileDir203138\parent.lock 
 
-To resolve this, see the section on `Specifying a Separate Firefox Profile 
-<Personalizing the Firefox Profile used in the tests>`_
+To resolve this, see the section on `Specifying the Firefox Profile`_
 
 
 Versioning Problems 
