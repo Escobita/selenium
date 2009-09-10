@@ -150,8 +150,6 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
 
     var result = runScript(scriptSrc, parameters);
 
-    Utils.dumpn("result is: '" + result + "'");
-
     // Sophisticated.
     if (result && result['tagName']) {
       respond.setField('resultType', "ELEMENT");

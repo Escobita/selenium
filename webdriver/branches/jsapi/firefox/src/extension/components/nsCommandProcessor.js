@@ -101,11 +101,6 @@ Response.prototype = {
    */
   reportError: function(ex) {
     Utils.dump(ex);
-    var msg = ['================\nProperties:'];
-    for (var prop in ex) {
-      msg.push(prop + ': ' + ex[prop]);
-    }
-    Utils.dumpn(msg.join('\n'));
     this.response = 'Internal error: ' + JSON.stringify({
       fileName : ex.fileName,
       lineNumber : ex.lineNumber,
