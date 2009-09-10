@@ -87,6 +87,9 @@ public enum Keys implements CharSequence {
 	F10          ('\uE03A'),
 	F11          ('\uE03B'),
 	F12          ('\uE03C'),
+
+  COMMAND      ('\uE03D'),  // Apple command key
+  META         ('\uE03D')   // alias for Windows key
 	;
 
 	private Keys(char keyCode) {

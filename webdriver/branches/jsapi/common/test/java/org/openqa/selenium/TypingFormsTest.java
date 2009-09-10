@@ -6,6 +6,9 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Tests for typing on {@code INPUT} and {@code TEXTAREA} form elements.
  *
@@ -389,13 +392,9 @@ public class TypingFormsTest extends AbstractDriverTestCase {
   @Ignore(value = {HTMLUNIT, IPHONE, REMOTE}, reason = "Untested useragents")
   public void testHomeAndEndJumpToEndsInATextAreaElement() {
     runTextAreaTypingTest("line 1\nbegin middle end\nline 3\n",
-        "line 1\nline 3\n",
-        Keys.ARROW_UP,
-        "middle\n", Keys.ARROW_LEFT,
-        Keys.HOME,
-        "begin ",
-        Keys.END,
-        " end");
+        "line 1\nline 3\n", Keys.ARROW_UP, "middle\n", Keys.ARROW_LEFT,
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.HOME), "begin ",
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.END), " end");
   }
 
   @JavascriptEnabled
@@ -403,10 +402,8 @@ public class TypingFormsTest extends AbstractDriverTestCase {
   public void testPageUpDownJumpToEndsInATextAreaElement() {
     runTextAreaTypingTest("line 1\nline 2\nline 3\nline 4",
         "line 2\nline 3\n",
-        Keys.PAGE_UP,
-        "line 1\n",
-        Keys.PAGE_DOWN,
-        "line 4");
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.PAGE_UP), "line 1\n",
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.PAGE_DOWN), "line 4");
   }
 
   @JavascriptEnabled
@@ -530,35 +527,69 @@ public class TypingFormsTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IPHONE, REMOTE}, reason = "Untested useragents")
   public void testHomeSelectionInATextAreaElement() {
-    CharSequence selectToFrontChord = Keys.chord(Keys.SHIFT, Keys.HOME);
     runTextAreaTypingTest("now is",
-        "was", selectToFrontChord, "now is");
+        "was",
+        Keys.chord(Keys.SHIFT, SYSTEM_DEPENDENT_CHORDS.get(Keys.HOME)),
+        "now is");
   }
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IPHONE, REMOTE}, reason = "Untested useragents")
   public void testEndSelectionInATextAreaElement() {
-
-    CharSequence selectToEndChord = Keys.chord(Keys.SHIFT, Keys.END);
     runTextAreaTypingTest("now is",
-        "was", Keys.HOME, selectToEndChord, "now is");
+        "was",
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.HOME),
+        Keys.chord(Keys.SHIFT, SYSTEM_DEPENDENT_CHORDS.get(Keys.END)),
+        "now is");
   }
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IPHONE, REMOTE}, reason = "Untested useragents")
   public void testPageUpSelectionInATextAreaElement() {
-
-    CharSequence selectToFrontChord = Keys.chord(Keys.SHIFT, Keys.PAGE_UP);
     runTextAreaTypingTest("now is",
-        "content\nwas\n", selectToFrontChord, "now is");
+        "content\nwas\n",
+        Keys.chord(Keys.SHIFT, SYSTEM_DEPENDENT_CHORDS.get(Keys.PAGE_UP)),
+        "now is");
   }
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IPHONE, REMOTE}, reason = "Untested useragents")
   public void testPageDownSelectionInATextAreaElement() {
-
-    CharSequence selectToEndChord = Keys.chord(Keys.SHIFT, Keys.PAGE_DOWN);
     runTextAreaTypingTest("now is",
-        "content\nwas\n", Keys.PAGE_UP, selectToEndChord, "now is");
+        "content\nwas\n",
+        SYSTEM_DEPENDENT_CHORDS.get(Keys.PAGE_UP),
+        Keys.chord(Keys.SHIFT, SYSTEM_DEPENDENT_CHORDS.get(Keys.PAGE_DOWN)),
+        "now is");
+  }
+
+  private static final Map<CharSequence, CharSequence> SYSTEM_DEPENDENT_CHORDS =
+      getPlatformDependentKeyChords(
+          new Pair(Keys.PAGE_UP, Keys.UP),
+          new Pair(Keys.PAGE_DOWN, Keys.DOWN),
+          new Pair(Keys.HOME, Keys.LEFT),
+          new Pair(Keys.END, Keys.RIGHT));
+
+  private static Map<CharSequence, CharSequence> getPlatformDependentKeyChords(
+      Pair... platformKeyPairs) {
+    Map<CharSequence, CharSequence> keyChords =
+        new HashMap<CharSequence, CharSequence>();
+    for (Pair pair : platformKeyPairs) {
+      if (Platform.MAC.equals(Platform.getCurrent())) {
+        keyChords.put(pair.first, Keys.chord(Keys.COMMAND, pair.second));
+      } else {
+        keyChords.put(pair.first, pair.first);
+      }
+    }
+    return keyChords;
+  }
+
+  private static class Pair {
+    final CharSequence first;
+    final CharSequence second;
+
+    Pair(CharSequence first, CharSequence second) {
+      this.first = first;
+      this.second = second;
+    }
   }
 }
