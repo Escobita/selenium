@@ -26,6 +26,14 @@
           driver.getPageSource(),
           equals('<html><head></head><body><pre>Test</pre></body></html>'));
     }
+
+
+    function testFindingAnElementOnAPlainTextPageWillNeverWork(driver) {
+      driver.get(TEST_PAGE.textPage);
+      assertThat(driver.isElementPresent({id: 'foo'}), equals(false));
+      driver.findElement({id: 'foo'});
+      driver.catchExpectedError('This shouldn\'t work!');
+    }
   </script>
 </head>
 <body>

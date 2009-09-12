@@ -129,7 +129,7 @@
       elem.value = '';
       elem.focus();
       for (var charCode = 0; charCode != 127; ++charCode)
-        Utils.type(null, elem, String.fromCharCode(charCode));
+        Utils.type(elem, String.fromCharCode(charCode));
       return false;
       */
 
@@ -157,7 +157,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abc def\r");
+       Utils.type(elem, "abc def\r");
        if (elem.value != "abc def")
          alert("[" + elem.value + "]");
 
@@ -166,7 +166,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "ABC DEF");
+       Utils.type(elem, "ABC DEF");
        if (elem.value != "ABC DEF")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 6)
@@ -177,7 +177,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "me at eXample dot com");
+       Utils.type(elem, "me at eXample dot com");
        if (elem.value != "me at eXample dot com")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 1)
@@ -195,7 +195,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, kLeft);
+       Utils.type(elem, kLeft);
        if (elem.value != "")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 0)
@@ -206,7 +206,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "" + kDown + kUp + kLeft + kRight);
+       Utils.type(elem, "" + kDown + kUp + kLeft + kRight);
        if (elem.value != "")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 0)
@@ -222,7 +222,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abc" + kHome + "0" + kLeft +
+       Utils.type(elem, "abc" + kHome + "0" + kLeft +
          kRight + kPageUp + kPageDown + kEnd + "1" + kHome +
          "0" + kPageUp + kEnd + "111" + kHome + "00" + kEnd);
        if (elem.value != "0000abc1111")
@@ -240,7 +240,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abcdefghi" + kHome + kDelete +
+       Utils.type(elem, "abcdefghi" + kHome + kDelete +
          kEnd + kBackspace + kLeft + kLeft + kBackspace +
          kDelete + kDelete + '0' + kBackspace + kHome + '0' +
          kDelete + kBackspace + 'E' + kDelete + kHome + 'C');
@@ -258,7 +258,7 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abcd" + kSpace + "fghi" +
+       Utils.type(elem, "abcd" + kSpace + "fghi" +
          kLeft + kLeft + kHome + kEnd + kSpace + "a");
        if (elem.value != "abcd fghi a")
          alert("[" + elem.value + "]");
@@ -287,7 +287,7 @@
 
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abcd" + kMulitply + kSubtract +
+       Utils.type(elem, "abcd" + kMulitply + kSubtract +
          kAdd + kDecimal + kSepartor + kNumberPad0 + kNumberPad9 +
          kAdd + kSemiColon + kEquals + kDivide + kNumberPad3);
        if (elem.value != "abcd*-+.,09+;=/3")
@@ -295,10 +295,10 @@
 
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "FUNCTION" + kF2 + "-KEYS" + kF2);
+       Utils.type(elem, "FUNCTION" + kF2 + "-KEYS" + kF2);
        if (Utils.shiftCount != 12)
          alert("[" + elem.value + "] 12 shifts expected");
-       Utils.type(null, elem, kF2 + "-TO" + kF2 + "O");
+       Utils.type(elem, kF2 + "-TO" + kF2 + "O");
        if (elem.value != "FUNCTION-KEYS-TOO")
          alert("[" + elem.value + "]");
 
@@ -311,10 +311,10 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abcd efgh")
+       Utils.type(elem, "abcd efgh")
        if (elem.value != "abcd efgh")
          alert("[" + elem.value + "]");
-       Utils.type(null, elem, kHome + kShift + kEnd + kDelete);
+       Utils.type(elem, kHome + kShift + kEnd + kDelete);
        if (elem.value != "")
          alert("[" + elem.value + "]");
 
@@ -323,24 +323,24 @@
         */
        elem.value = '';
        elem.focus();
-       Utils.type(null, elem, "abcd efgh ijkl mnop qrst uvw xyz")
-       Utils.type(null, elem, kHome);
-       Utils.type(null, elem, kShift + kRight + kRight + kRight +
+       Utils.type(elem, "abcd efgh ijkl mnop qrst uvw xyz")
+       Utils.type(elem, kHome);
+       Utils.type(elem, kShift + kRight + kRight + kRight +
          kRight + kRight + kDelete);
        if (elem.value != "efgh ijkl mnop qrst uvw xyz")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kEnd + kShift + kLeft + kLeft +
+       Utils.type(elem, kEnd + kShift + kLeft + kLeft +
          kLeft + kLeft + kDelete);
        if (elem.value != "efgh ijkl mnop qrst uvw")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kLeft + kLeft + kLeft + kLeft +
+       Utils.type(elem, kLeft + kLeft + kLeft + kLeft +
          kShift + kEnd + kDelete);
        if (elem.value != "efgh ijkl mnop qrst")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kHome + kRight + kRight + kRight +
+       Utils.type(elem, kHome + kRight + kRight + kRight +
          kRight + kRight + kShift + kHome + kDelete);
        if (elem.value != "ijkl mnop qrst")
          alert("[" + elem.value + "]");
@@ -352,7 +352,7 @@
         */
        elem.focus();
        elem.value = '';
-       Utils.type(null, elem, "`1234567890-=[]\\;,.\'");
+       Utils.type(elem, "`1234567890-=[]\\;,.\'");
        if (elem.value != "`1234567890-=[]\\;,.\'")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 0)
@@ -363,7 +363,7 @@
         */
        elem.focus();
        elem.value = '';
-       Utils.type(null, elem, "abcdefghijklmnopqrstuvwxyz");
+       Utils.type(elem, "abcdefghijklmnopqrstuvwxyz");
        if (elem.value != "abcdefghijklmnopqrstuvwxyz")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 0)
@@ -376,7 +376,7 @@
         */
        elem.focus();
        elem.value = '';
-       Utils.type(null, elem, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+       Utils.type(elem, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
        if (elem.value != "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
          alert("[" + elem.value + "]");
        if (Utils.shiftCount != 26)
@@ -387,7 +387,7 @@
         */
        elem.focus();
        elem.value = '';
-       Utils.type(null, elem, '~!@#$%^&*()_+{}:"<>?|END~');
+       Utils.type(elem, '~!@#$%^&*()_+{}:"<>?|END~');
        if (elem.value != '~!@#$%^&*()_+{}:"<>?|END~')
          alert("[" + elem.value + "]");
        var expect = '~!@#$%^&*()_+{}:"<>?|END~'.length;
@@ -404,7 +404,7 @@
        elem.value = '';
        var printables = "!\"#$%&'()*+,-./0123456789:;<=>?@ ABCDEFG" +
          "HIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-       Utils.type(null, elem, printables);
+       Utils.type(elem, printables);
        if (elem.value != printables)
          alert("[" + elem.value + "]");
 
@@ -415,8 +415,8 @@
        /*
         * chord delete the lot: control home, shift end, delete
         */
-       Utils.type(null, elem, kControl + kHome);
-       Utils.type(null, elem, kShift + kEnd + kHome + kEnd +
+       Utils.type(elem, kControl + kHome);
+       Utils.type(elem, kShift + kEnd + kHome + kEnd +
          kHome + kEnd + kHome + kEnd);
 
        var selection = elem.selectionStart;
@@ -427,7 +427,7 @@
        if (selection != end)
          alert(selection + " expect selection end " + end);
 
-       Utils.type(null, elem, kDelete);
+       Utils.type(elem, kDelete);
        if (elem.value != "")
          alert("[" + elem.value + "]");
 
@@ -441,11 +441,11 @@
        elem.focus();
        elem.value = '';
        var paste = "!\"#$%&'()*+,-./0123456789:;<=>?@ ABCD";
-       Utils.type(null, elem, paste);
+       Utils.type(elem, paste);
        if (elem.value != paste)
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kHome + kNull + kShift + kEnd);
+       Utils.type(elem, kHome + kNull + kShift + kEnd);
        selection = elem.selectionStart;
        if (selection != 0)
          alert(selection + " expect selection start 0");
@@ -453,37 +453,37 @@
        if (selection != (end = paste.length))
          alert(selection + " expect selection end " + end);
 
-       Utils.type(null, elem, kControl + 'x');  // cut
+       Utils.type(elem, kControl + 'x');  // cut
        if (elem.value != "")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kControl + 'v');  // paste
+       Utils.type(elem, kControl + 'v');  // paste
        if (elem.value != paste)
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kLeft + kLeft + kLeft + kShift + kEnd);
-       Utils.type(null, elem, kControl + 'x' + 'v');
+       Utils.type(elem, kLeft + kLeft + kLeft + kShift + kEnd);
+       Utils.type(elem, kControl + 'x' + 'v');
        if (elem.value != paste)
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kHome + kControl + 'v');
-       Utils.type(null, elem, kHome + kControl + 'v' + 'v');
-       Utils.type(null, elem, kHome + kControl + 'v' + 'v' + 'v');
+       Utils.type(elem, kHome + kControl + 'v');
+       Utils.type(elem, kHome + kControl + 'v' + 'v');
+       Utils.type(elem, kHome + kControl + 'v' + 'v' + 'v');
        if (elem.value != "BCDBCDBCDBCDBCDBCD" + paste)
          alert("[" + elem.value + "]");
-       Utils.type(null, elem, kEnd + kBackspace + "D");
+       Utils.type(elem, kEnd + kBackspace + "D");
        if (elem.value != "BCDBCDBCDBCDBCDBCD" + paste)
          alert("[" + elem.value + "]");
 
        /*
         * chord reverse selects and deletes
         */
-       Utils.type(null, elem, kShift + kHome + kNull + kDelete);
+       Utils.type(elem, kShift + kHome + kNull + kDelete);
        if (elem.value != "")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, "done" + kHome);
-       Utils.type(null, elem, kShift + "ALL " + kHome);  // note ALL
+       Utils.type(elem, "done" + kHome);
+       Utils.type(elem, kShift + "ALL " + kHome);  // note ALL
 
        selection = elem.selectionStart;
        if (selection != 0)
@@ -492,11 +492,11 @@
        if (selection != (end = "ALL ".length))
          alert(selection + " expect selection end " + end);
 
-       Utils.type(null, elem, kDelete);
+       Utils.type(elem, kDelete);
        if (elem.value != "done")
          alert("[" + elem.value + "]");
 
-       Utils.type(null, elem, kEnd + kShift + kHome);
+       Utils.type(elem, kEnd + kShift + kHome);
        selection = elem.selectionStart;
        if (selection != 0)
          alert(selection + " expect selection start 0");
@@ -504,7 +504,7 @@
        if (selection != (end = "done".length))
          alert(selection + " expect selection end " + end);
 
-       Utils.type(null, elem, kDelete);
+       Utils.type(elem, kDelete);
        if (elem.value != "")
          alert("[" + elem.value + "]");
 

@@ -14,9 +14,10 @@ goog.require('webdriver.logging');
 
 
 
+window.IS_FF_3 = navigator.userAgent.search(/Firefox\/3\.\d+/) > -1;
+
+
 window.onload = function() {
-  goog.global.IS_FF_3 =  goog.userAgent.GECKO &&
-                         navigator.userAgent.search(/Firefox\/3\.\d+/) > -1;
 
   goog.global.whereIs = function(file) {
     return new goog.Uri(window.location.href).
@@ -70,7 +71,7 @@ window.onload = function() {
   };
 
   webdriver.logging.setLevel(webdriver.logging.Level.ERROR);
-  webdriver.logging.enableDomLogging(false);
+  webdriver.logging.enableDomLogging(true);
   webdriver.logging.enableFirebugLogging(false);
   webdriver.TestRunner.start(webdriver.factory.createLocalWebDriver);
 };

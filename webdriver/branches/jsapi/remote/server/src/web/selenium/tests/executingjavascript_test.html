@@ -159,6 +159,16 @@ function testShouldBeAbleToGrabTheBodyOfFrameOnceSwitchedTo(driver) {
     assertThat(body.getValue().getText(), equals(''));
   });
 }
+
+
+function testScriptsExecuteInSelectedFrame(driver) {
+  var script = 'return window.location.href';
+  driver.get(TEST_PAGE.framesetPage);
+  assertThat(driver.executeScript(script), equals(whereIs('page/1')));
+  driver.switchToFrame('second');
+  assertThat(driver.executeScript(script),
+             equals(decodeURIComponent(whereIs('page/2?title=Fish'))));
+}
   </script>
 </head>
 <body>

@@ -209,6 +209,7 @@ webdriver.CommandName = {
   QUIT: 'quit',
   GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
   GET_ALL_WINDOW_HANDLES: 'getAllWindowHandles',
+  GET_CURRENT_URL: 'getCurrentUrl',
   CLOSE: 'close',
   SWITCH_TO_WINDOW: 'switchToWindow',
   SWITCH_TO_FRAME: 'switchToFrame',

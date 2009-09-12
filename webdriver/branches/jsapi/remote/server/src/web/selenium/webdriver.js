@@ -733,7 +733,10 @@ webdriver.WebDriver.prototype.refresh = function() {
  * @return {webdriver.Future} The current URL in a webdriver.Future.
  */
 webdriver.WebDriver.prototype.getCurrentUrl = function() {
-  return this.executeScript('return window.location.href');
+  var url = new webdriver.Future(this);
+  this.addCommand(new webdriver.Command(webdriver.CommandName.GET_CURRENT_URL).
+      setSuccessCallback(url.setValueFromResponse, url));
+  return url;
 };
 
 

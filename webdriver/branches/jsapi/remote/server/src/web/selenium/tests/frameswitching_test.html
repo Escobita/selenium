@@ -136,7 +136,43 @@ function testShouldBeAbleToFindElementsInIframesByXPath(driver) {
 
 
 function testGetCurrentUrl(driver) {
+  driver.get(TEST_PAGE.iframePage);
+  assertThat(driver.getCurrentUrl(), equals(TEST_PAGE.iframePage));
+}
+
+
+function testGetCurrentUrlAfterNavigatingToAnotherPage(driver) {
+  driver.get(TEST_PAGE.iframePage);
+  assertThat(driver.getCurrentUrl(), equals(TEST_PAGE.iframePage));
+
+  driver.get(TEST_PAGE.javascriptPage);
+  assertThat(driver.getCurrentUrl(), equals(TEST_PAGE.javascriptPage));
+}
+
+
+function testReturnsUrlOfZeroethFrameOnAFramesetPage(driver) {
   driver.get(TEST_PAGE.framesetPage);
+  assertThat('Should automatically select first frame when page is a frameset',
+      driver.getCurrentUrl(), equals(decodeURIComponent(whereIs('page/1'))));
+}
+
+
+function testGetCurrentUrlFromASelectedFrame(driver) {
+  driver.get(TEST_PAGE.framesetPage);
+  assertThat('Should automatically select first frame when page is a frameset',
+      driver.getCurrentUrl(), equals(decodeURIComponent(whereIs('page/1'))));
+
+  driver.switchToFrame("second");
+  assertThat(driver.getCurrentUrl(),
+             equals(decodeURIComponent(whereIs('page/2?title=Fish'))));
+}
+
+
+function testGetCurrentUrlAfterNavigatingAwayWhileBeingFocusedOnASubFrame(
+    driver) {
+  driver.get(TEST_PAGE.framesetPage);
+  assertThat('Should automatically select first frame when page is a frameset',
+      driver.getCurrentUrl(), equals(decodeURIComponent(whereIs('page/1'))));
 
   driver.switchToFrame("second");
   assertThat(driver.getCurrentUrl(),
@@ -150,17 +186,6 @@ function testGetCurrentUrl(driver) {
   assertThat(driver.getCurrentUrl(),
              equals(decodeURIComponent(whereIs('formPage.html'))));
 }
-
-
-function testScriptsExecuteInSelectedFrame(driver) {
-  var script = 'return window.location.href';
-  driver.get(TEST_PAGE.framesetPage);
-  assertThat(driver.executeScript(script), equals(whereIs('page/1')));
-  driver.switchToFrame('second');
-  assertThat(driver.executeScript(script),
-             equals(decodeURIComponent(whereIs('page/2?title=Fish'))));
-}
-
   </script>
 </head>
 <body>

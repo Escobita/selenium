@@ -49,7 +49,8 @@ WebDriverServer.PORT_PREFERENCE = 'webdriver_firefox_port';
 
 
 /**
- * Creates a new FirefoxDriver for the given {@code window}.
+ * Creates a new FirefoxDriver for the given {@code window}. The driver will be
+ * accessible as the {@code fxdriver} property.
  * @param {nsIDOMWindow} window The window to create the driver for.
  * @return {FirefoxDriver} The new driver instance.
  */
@@ -65,9 +66,7 @@ WebDriverServer.prototype.newDriver = function(window) {
         prefs.getBoolPref("webdriver_enable_native_events") : false;
     Utils.dumpn('Enable native events: ' + this.enableNativeEvents);
   }
-  window.fxdriver = new FirefoxDriver(this, this.enableNativeEvents);
-  // Yuck. But it allows us to refer to it later.
-  window.fxdriver.window = window;
+  window.fxdriver = new FirefoxDriver(this, this.enableNativeEvents, window);
   return window.fxdriver;
 };
 
@@ -133,6 +132,9 @@ WebDriverServer.prototype.onStopListening = function(socket, status) {
 };
 
 
+/**
+ * @see nsISupports.QueryInterface()
+ */
 WebDriverServer.prototype.QueryInterface = function(aIID) {
     if (!aIID.equals(nsISupports))
         throw Components.results.NS_ERROR_NO_INTERFACE;

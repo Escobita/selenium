@@ -61,6 +61,7 @@ webdriver.LocalCommandProcessor.DRIVER_METHOD_NAMES_ = goog.object.transpose({
   'findActiveDriver': webdriver.CommandName.NEW_SESSION,
   'getCurrentWindowHandle': webdriver.CommandName.GET_CURRENT_WINDOW_HANDLE,
   'getAllWindowHandles': webdriver.CommandName.GET_ALL_WINDOW_HANDLES,
+  'getCurrentUrl': webdriver.CommandName.GET_CURRENT_URL,
   'get': webdriver.CommandName.GET,
   'goForward': webdriver.CommandName.FORWARD,
   'goBack': webdriver.CommandName.BACK,

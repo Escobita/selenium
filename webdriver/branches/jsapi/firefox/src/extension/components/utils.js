@@ -54,36 +54,23 @@ Utils.getServer = function() {
     return handle.wrappedJSObject;
 };
 
-Utils.getBrowser = function(context) {
-    return context.fxbrowser;
-};
-
-Utils.getDocument = function(context) {
-  if (context.frame) {
-    return context.frame.document;
-  }
-  return context.fxbrowser.contentDocument;
-};
-
-Utils.getActiveElement = function(context) {
-  var doc = Utils.getDocument(context);
+Utils.getActiveElement = function(browser, session) {
+  var doc = session.window.document;
 
   var element;
   if (doc["activeElement"]) {
     element = doc.activeElement;
   } else {
-    var commandDispatcher = Utils.getBrowser(context).ownerDocument.commandDispatcher;
-
-    doc = Utils.getDocument(context);
+    var commandDispatcher = browser.ownerDocument.commandDispatcher;
     element = commandDispatcher.focusedElement;
-
-    if (element && Utils.getDocument(context) != element.ownerDocument)
+    if (element && element.ownerDocument != doc) {
       element = null;
+    }
   }
 
   // Default to the body
   if (!element) {
-    element = Utils.getDocument(context).body;
+    element = doc.body;
   }
 
   return element;
@@ -260,8 +247,8 @@ Utils.getText = function(element) {
     return text.slice(start, end);
 };
 
-Utils.addToKnownElements = function(element, context) {
-    var doc = Utils.getDocument(context);
+Utils.addToKnownElements = function(element, session) {
+    var doc = session.window.document;
     if (!doc.fxdriver_elements) {
         doc.fxdriver_elements = {};
     }
@@ -272,8 +259,8 @@ Utils.addToKnownElements = function(element, context) {
     return id;
 };
 
-Utils.getElementAt = function(index, context) {
-  var doc = Utils.getDocument(context);
+Utils.getElementAt = function(index, session) {
+  var doc = session.window.document;
   var e = doc.fxdriver_elements ? doc.fxdriver_elements[index] : undefined;
   if (e) {
     // Is this a stale reference?
@@ -295,19 +282,17 @@ Utils.getElementAt = function(index, context) {
   return e;
 };
 
-Utils.currentDocument = function(context) {
-  if (context) {
-    return Utils.getDocument(context);
+Utils.currentDocument = function(session) {
+  if (session) {
+    return session.window.document;
   } else {
     return document;
   }
 };
 
-Utils.platform = function(context) {
+Utils.platform = function(session) {
   if (!this.userAgentPlatformLowercase) {
-    var currentWindow = Utils.currentDocument(context).defaultView;
-    this.userAgentPlatformLowercase =
-        currentWindow.navigator.platform.toLowerCase();
+    this.userAgentPlatformLowercase = session.window.navigator.platform.toLowerCase();
   }
 
   return this.userAgentPlatformLowercase;
@@ -339,7 +324,7 @@ Utils.getNodeForNativeEvents = function(element) {
   }
 };
 
-Utils.type = function(context, element, text, opt_useNativeEvents) {
+Utils.type = function(element, text, opt_useNativeEvents) {
     // Special-case file input elements. This is ugly, but should be okay
   if (element.tagName == "INPUT") {
     var inputtype = element.getAttribute("type");
@@ -396,25 +381,25 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
         if (c == '\uE000') {
           if (controlKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-            Utils.keyEvent(context, element, "keyup", kCode, 0,
+            Utils.keyEvent(element, "keyup", kCode, 0,
               controlKey = false, shiftKey, altKey, metaKey);
           }
 
           if (shiftKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-            Utils.keyEvent(context, element, "keyup", kCode, 0,
+            Utils.keyEvent(element, "keyup", kCode, 0,
               controlKey, shiftKey = false, altKey, metaKey);
           }
 
           if (altKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-            Utils.keyEvent(context, element, "keyup", kCode, 0,
+            Utils.keyEvent(element, "keyup", kCode, 0,
               controlKey, shiftKey, altKey = false, metaKey);
           }
 
           if (metaKey) {
             var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-            Utils.keyEvent(context, element, "keyup", kCode, 0,
+            Utils.keyEvent(element, "keyup", kCode, 0,
               controlKey, shiftKey, altKey, metaKey = false);
           }
 
@@ -563,13 +548,14 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
         } else if (c == '\uE03C') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_F12;
         } else if (c == '\r') {
-            if (Utils.platform(context) == "win32")
+            var platform = Utils.platform(element.ownerDocument.defaultView);
+            if (platform == 'win32')
               continue;  // skip it
-            if (/mac/.test(Utils.platform(context))) {
+            if (/mac/.test(platform)) {
               keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_RETURN;
               charCode = '\n'.charCodeAt(0);
             } else {
-              keycode = charCode = '\r'.charCodeAt(0);
+              keyCode = charCode = '\r'.charCodeAt(0);
             }
         } else if (c == '\n') {
             keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_RETURN;
@@ -606,7 +592,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
         // generate modifier key event if needed, and continue
 
         if (modifierEvent) {
-          Utils.keyEvent(context, element, modifierEvent, keyCode, 0,
+          Utils.keyEvent(element, modifierEvent, keyCode, 0,
               controlKey, shiftKey, altKey, metaKey);
           continue;
         }
@@ -620,7 +606,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
         if (needsShift && !shiftKey) {
           var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-          Utils.keyEvent(context, element, "keydown", kCode, 0,
+          Utils.keyEvent(element, "keydown", kCode, 0,
               controlKey, true, altKey, metaKey);
           Utils.shiftCount += 1;
         }
@@ -651,20 +637,20 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
         }
 
         var accepted =
-          Utils.keyEvent(context, element, "keydown", keyCode, 0,
+          Utils.keyEvent(element, "keydown", keyCode, 0,
               controlKey, needsShift || shiftKey, altKey, metaKey);
 
-        Utils.keyEvent(context, element, "keypress", pressCode, charCode,
+        Utils.keyEvent(element, "keypress", pressCode, charCode,
             controlKey, needsShift || shiftKey, altKey, metaKey, !accepted);
 
-        Utils.keyEvent(context, element, "keyup", keyCode, 0,
+        Utils.keyEvent(element, "keyup", keyCode, 0,
             controlKey, needsShift || shiftKey, altKey, metaKey);
 
         // shift up if needed
 
         if (needsShift && !shiftKey) {
           var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-          Utils.keyEvent(context, element, "keyup", kCode, 0,
+          Utils.keyEvent(element, "keyup", kCode, 0,
               controlKey, false, altKey, metaKey);
         }
     }
@@ -673,37 +659,36 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
     if (controlKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey = false, shiftKey, altKey, metaKey);
     }
 
     if (shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey = false, altKey, metaKey);
     }
 
     if (altKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey = false, metaKey);
     }
 
     if (metaKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey, metaKey = false);
     }
 };
 
-Utils.keyEvent = function(context, element, type, keyCode, charCode,
+Utils.keyEvent = function(element, type, keyCode, charCode,
     controlState, shiftState, altState, metaState, shouldPreventDefault) {
   var preventDefault = shouldPreventDefault == undefined ? false : shouldPreventDefault;
 
-  var keyboardEvent =
-     Utils.currentDocument(context).createEvent("KeyEvents");
-  var currentView =
-     Utils.currentDocument(context).defaultView;
+  var ownerDoc = element.ownerDocument;
+  var keyboardEvent = ownerDoc.createEvent('KeyEvents');
+  var currentView = ownerDoc.defaultView;
 
   keyboardEvent.initKeyEvent(
     type,         //  in DOMString typeArg,
@@ -724,7 +709,7 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
   return element.dispatchEvent(keyboardEvent);
 };
 
-Utils.fireHtmlEvent = function(context, element, eventName) {
+Utils.fireHtmlEvent = function(element, eventName) {
     var doc = element.ownerDocument;
     var e = doc.createEvent("HTMLEvents");
     e.initEvent(eventName, true, true);
@@ -755,7 +740,7 @@ Utils.findForm = function(element) {
     return undefined;
 };
 
-Utils.fireMouseEventOn = function(context, element, eventName) {
+Utils.fireMouseEventOn = function(element, eventName) {
     Utils.triggerMouseEvent(element, eventName, 0, 0);
 };
 
@@ -767,43 +752,6 @@ Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
     element.dispatchEvent(event);
 };
 
-Utils.findDocumentInFrame = function(browser, frameId) {
-    var frame = Utils.findFrame(browser, frameId);
-    return frame ? frame.document : null;
-};
-
-Utils.findFrame = function(browser, frameId) {
-    var stringId = "" + frameId;
-    var names = stringId.split(".");
-    var frame = browser.contentWindow;
-    for (var i = 0; i < names.length; i++) {
-        // Try a numerical index first
-        var index = names[i] - 0;
-        if (!isNaN(index)) {
-            frame = frame.frames[index];
-            if (frame) {
-              return frame;
-            }
-        } else {
-            // Fine. Use the name and loop
-            var found = false;
-            for (var j = 0; j < frame.frames.length; j++) {
-                var f = frame.frames[j];
-                if (f.name == names[i] || f.frameElement.id == names[i]) {
-                    frame = f;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                return null;
-            }
-        }
-    }
-
-    return frame;
-};
 
 Utils.dumpText = function(text) {
   var consoleService = Utils.getService("@mozilla.org/consoleservice;1", "nsIConsoleService");
@@ -817,35 +765,30 @@ Utils.dumpn = function(text) {
   Utils.dumpText(text + "\n");
 };
 
-Utils.dump = function(element) {
-    var dump = "=============\n";
-
-    var rows = [];
-
-    dump += "Supported interfaces: ";
+Utils.dump = function(obj) {
+    var dump = [
+      obj.toString(),
+      "=============",
+      'Supported interfaces:',
+    ];
     for (var i in Components.interfaces) {
-        try {
-            var view = element.QueryInterface(Components.interfaces[i]);
-            dump += i + ", ";
-        } catch (e) {
-            // Doesn't support the interface
-        }
+      try {
+        obj.QueryInterface(Components.interfaces[i]);
+        dump.push(i);
+      } catch (e) {
+        // Doesn't support interface
+      }
     }
-    dump += "\n------------\n";
+    dump.push('------------');
 
-    try {
-        Utils.dumpProperties(element, rows);
-    } catch (e) {
-        Utils.dumpText("caught an exception: " + e);
-    }
-
-    rows.sort();
-    for (var i in rows) {
-        dump += rows[i] + "\n";
-    }
-
-    dump += "=============\n\n\n";
-    Utils.dumpText(dump);
+//    try {
+//      Utils.dumpProperties(element, dump);
+//    } catch (e) {
+//      Utils.dumpText("caught an exception: " + e);
+//    }
+//
+   dump.push("=============");
+    Utils.dumpn(dump.join('\n'));
 };
 
 Utils.dumpProperties = function(view, rows) {
@@ -877,7 +820,7 @@ Utils.stackTrace = function() {
     Utils.dumpText(dump);
 };
 
-Utils.getElementLocation = function(element, context) {
+Utils.getElementLocation = function(element) {
     var x = element.offsetLeft;
     var y = element.offsetTop;
     var elementParent = element.offsetParent;
@@ -916,13 +859,13 @@ Utils.getElementLocation = function(element, context) {
     return location;
 };
 
-Utils.findElementsByXPath = function (xpath, contextNode, context) {
-    var doc = Utils.getDocument(context);
+Utils.findElementsByXPath = function (xpath, contextNode, session) {
+    var doc = session.window.document;
     var result = doc.evaluate(xpath, contextNode, null, Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
     var indices = [];
     var element = result.iterateNext();
     while (element) {
-        var index = Utils.addToKnownElements(element, context);
+        var index = Utils.addToKnownElements(element, session);
         indices.push(index);
         element = result.iterateNext();
     }
