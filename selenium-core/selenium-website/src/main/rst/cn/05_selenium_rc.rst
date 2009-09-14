@@ -1307,50 +1307,33 @@ Selenium无法找到AUT
 
 当运行getNewBrowserSession命令时候，404错误
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If you're getting a 404 error while attempting to open a page on 
-"http://www.google.com/selenium-server/", then it must be because the Selenium
-Server was not correctly configured as a proxy. The "selenium-server" directory 
-doesn't exist on google.com; it only appears to exist when the proxy is 
-properly configured. Proxy Configuration highly depends on how the browser is 
-launched with \*firefox, \*iexplore, \*opera, or \*custom.
+如果当你尝试在"http://www.google.com/selenium-server/"上打开一个页面的时候，碰到一个
+404 错误，那么它必定是因为Selenium服务器没有被正确的配置成一个代理。
+"selenium-server" 目录在google.com上不存在; 它仅在代理被正确的配置后显示存在。
+代理配置非常依赖于浏览器是如何启动的，用 \*firefox, \*iexplore, \*opera, 或者 \*custom.
 
-    * \*iexplore: If the browser is launched using \*iexplore, you could be having
-	  a problem with Internet Explorer's proxy settings.  Selenium Server attempts
-	  to configure the global proxy settings in the Internet Options Control Panel. 
-	  You must make sure that those are correctly configured when Selenium Server launches 
-      the browser. Try looking at your Internet Options control panel. Click on the 
-	  "Connections" tab and click on "LAN Settings". 
+    * \*iexplore: 如果浏览器用\*iexplore方式启动，你可能会有Internet Explorer代理设置的问题。
+	Selenium服务器尝试配置Internet选项控制面板上的全局代理设置。当Selenium服务器启动浏览器时，你必须确保那些配置正确。
+试着看一下你的Internet选项控制面板。 单击 "Connections" 标签，然后单击"LAN Settings". 
       
-          - If you need to use a proxy to access the application you want to test,
-            you'll need to start Selenium Server with "-Dhttp.proxyHost"; 
-            see the `Proxy Configuration`_ for more details.
-          - You may also try configuring your proxy manually and then launching
-            the browser with \*custom, or with \*iehta browser launcher.
+          - 如果你需要通过带来来访问你想要测试的程序，你需要启动Selenium服务器的时候加 "-Dhttp.proxyHost"; 
+            查看更多细节，请访问 `Proxy Configuration`_ 。
+          - 你可能同时尝试手动配置你的代理，然后用\*custom或者\*iehta 方式启动浏览器。
             
-    * \*custom: When using \*custom you must configure the proxy correctly
-      (manually), otherwise you'll get a 404 error. Double-check that you've
-      configured your proxy settings correctly. To check whether you've
-	  configured the proxy correctly is to attempt to intentionally configure
-	  the browser incorrectly. Try configuring the browser to use the wrong proxy server hostname, or the wrong port.
-      If you had successfully configured the browser's proxy settings incorrectly,
-      then the browser will be unable to connect to the Internet, which is one way
-      to make sure that one is adjusting the relevant settings.
+    * \*custom: 当用 \*custom 时，你必须手动正确配置你代理，否则你会碰到一个404错误。
+	仔细检查你正确配置的代理设置。 检查你时候正确的配置了代理就是尝试故意错误的配置浏览器。
+	尝试配置浏览器使用错误的代理服务器主机名称或者错误的端口号。
+	如果你成功的配置了错误的代理服务设置，那么你的浏览器会不能连接Internet，这是一种方法来确保这个在调整相关的设置。
       
-    * For other browsers (\*firefox, \*opera) we automatically hard-code
-      the proxy for you, and so ther are no known issues with this functionality.
-      If you're encountering 404 errors and have followed this user guide carefully
-	  post your results to user forums for some help from the user community.
+    * 使用(\*firefox, \*opera)的其他浏览器， 会自动为你设置代理，而且这里没有已知的功能性问题。
+	如果你仔细的按照这个指南做还碰到404错误的话，请把你的结果发表到用户社区的用户论坛里来需求一些帮助。
       
-Why am I getting a permission denied error?
+为什么我碰到一个permission denied 的错误？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The most common reason for this error is that your session is attempting to violate
-the same-origin policy by crossing domain boundaries (e.g., accesses a page from 
-http://domain1 and then accesses a page from http://domain2) or switching protocols 
-(moving from http://domainX to https://domainX).
-This error can also sometimes occur when JavaScript attempts to look at objects 
-which are not yet available (before the page has completely loaded), or tries to 
-look at objects which are no longer available (after the page has started 
-to be unloaded). This is most typically encountered with AJAX pages
+这个错误最常见的原因是你的会话在跨域域的边界，尝试在违反同源策略（比如，从http://domain1访问一个页面，然后从http://domain2访问另外一个页面），
+或者转换协议（从http://domainX 换到https://domainX）。
+这个错误也经常发生在JavaScript尝试访问一个不可用（当页面没完全载入完成时）的对象，
+或者尝试访问一个不再可用的对象(当页面已经开始卸载之后)。这个问题在AJAX页面最典型。 pages
 which are working with sections of a page or subframes that load and/or reload 
 independently of the larger page. For this type of problem, it is common
 that the error is intermittent. Often it is impossible to reproduce the problem 
