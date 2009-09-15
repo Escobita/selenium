@@ -109,6 +109,7 @@ public class Jetty6AppServer implements AppServer {
   }
 
   public String whereIs(String context, String relativeUrl) {
+    relativeUrl = relativeUrl.replace("\\", "/");
     return "http://" + getHostName() + ":" + port + context + "/" + relativeUrl;
   }
 
