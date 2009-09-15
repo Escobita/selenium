@@ -356,6 +356,13 @@ Utils.getNodeForNativeEvents = function(element) {
 
 
 Utils.type = function(element, text, opt_useNativeEvents) {
+
+  // For consistency between native and synthesized events, convert common
+  // escape sequences to their Key enum aliases.
+  text = text.replace(new RegExp('\b', 'g'), '\uE003').   // DOM_VK_BACK_SPACE
+      replace(/\t/g, '\uE004').                           // DOM_VK_TAB
+      replace(/(\r\n|\n|\r)/g, '\uE006');                 // DOM_VK_RETURN
+
   // Special-case file input elements. This is ugly, but should be okay
   if (element.tagName == "INPUT") {
     var inputtype = element.getAttribute("type");
@@ -581,19 +588,6 @@ Utils.type = function(element, text, opt_useNativeEvents) {
       keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_F11;
     } else if (c == '\uE03C') {
       keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_F12;
-    } else if (c == '\r') {
-      var platform = Utils.platform(element.ownerDocument.defaultView);
-      if (platform == 'win32')
-        continue;  // skip it
-      if (/mac/.test(platform)) {
-        keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_RETURN;
-        charCode = '\n'.charCodeAt(0);
-      } else {
-        keyCode = charCode = '\r'.charCodeAt(0);
-      }
-    } else if (c == '\n') {
-      keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_RETURN;
-      charCode = c.charCodeAt(0);
     } else if (c == ',' || c == '<') {
       keyCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_COMMA;
       charCode = c.charCodeAt(0);
