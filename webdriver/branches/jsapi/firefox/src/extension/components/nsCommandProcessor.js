@@ -91,8 +91,6 @@ Response.prototype = {
     if (this.statusBarLabel_) {
       this.statusBarLabel_.style.color = 'black';
     }
-    // TODO(jmleyba): Kill all client uses of context and then get rid of this.
-    this.json_.context = this.session ? this.session.getId() : '';
     if (this.callbackFn_) {
       this.callbackFn_(this.json_);
     }
@@ -276,11 +274,7 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
     throw Components.results.NS_ERROR_FAILURE;
   }
 
-  // Clients still send a context parameter that is of the form
-  // "$windowId $frameId"
-  // TODO(jmleyba): Get rid of client side sessions and change the command
-  // argument to the session ID (like RemoteWebDriver)
-  var sessionId = command.context.split(' ')[0];
+  var sessionId = command.sessionId;
   var response = new Response(command, this.sessionMap_[sessionId]);
 
   var sessions = [];
@@ -363,8 +357,6 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
       win.focus();
       if (win.top.fxdriver) {
         response.session.setDriver(win.top.fxdriver);
-        // TODO(jmleyba): We can get rid of this when the client stops tracking
-        // context and only stores session ID
         response.response = response.session.getId();
       } else {
         response.isError = true;

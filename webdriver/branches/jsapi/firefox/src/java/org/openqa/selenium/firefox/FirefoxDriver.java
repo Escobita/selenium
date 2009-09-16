@@ -81,7 +81,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS = Platform.getCurrent().is(Platform.WINDOWS);
 
     private final ExtensionConnection extension;
-    protected Context context;
+    protected String sessionId;
 
     public FirefoxDriver() {
       this(new FirefoxBinary(), null);
@@ -123,12 +123,13 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
       prepareEnvironment();
 
       extension = connectTo(binary, profile, "localhost");
+      sessionId = "";
       fixId();
     }
 
-    private FirefoxDriver(ExtensionConnection extension, Context context) {
+    private FirefoxDriver(ExtensionConnection extension, String sessionId) {
       this.extension = extension;
-      this.context = context;
+      this.sessionId = sessionId;
     }
 
     protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile, String host) {
@@ -274,28 +275,21 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
     protected WebDriver findActiveDriver() {
         String response = sendMessage(WebDriverException.class, "findActiveDriver");
-
-        Context newContext = new Context(response);
-        if (newContext.getDriverId().equals(newContext.getDriverId())) {
-            return this;
-        }
-        return new FirefoxDriver(extension, newContext);
+        return new FirefoxDriver(extension, response);
     }
 
     private String sendMessage(Class<? extends WebDriverException> throwOnFailure, String methodName, Object... parameters) {
-        return sendMessage(throwOnFailure, new Command(context, methodName, parameters));
+        return sendMessage(throwOnFailure, new Command(sessionId, methodName, parameters));
     }
 
     protected String sendMessage(Class<? extends RuntimeException> throwOnFailure, Command command) {
         Response response = extension.sendMessageAndWaitForResponse(throwOnFailure, command);
-        context = response.getContext();
         response.ifNecessaryThrow(throwOnFailure);
         return response.getResponseText();
     }
 
     private void fixId() {
-        String response = sendMessage(WebDriverException.class, "findActiveDriver");
-        this.context = new Context(response);
+        this.sessionId = sendMessage(WebDriverException.class, "findActiveDriver");
     }
 
     public void quit() {
@@ -320,9 +314,8 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
 
         Object[] convertedArgs = convertToJsObjects(args);
 
-        Command command = new Command(context, null, "executeScript", script, convertedArgs);
+        Command command = new Command(sessionId, null, "executeScript", script, convertedArgs);
     	Response response = extension.sendMessageAndWaitForResponse(WebDriverException.class, command);
-        context = response.getContext();
         response.ifNecessaryThrow(WebDriverException.class);
 
         if ("NULL".equals(response.getExtraResult("resultType")))
@@ -568,11 +561,6 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
           String response = sendMessage(NoSuchWindowException.class, "switchToWindow", String.valueOf(windowName));
             if (response == null || "No window found".equals(response)) {
                 throw new NoSuchWindowException("Cannot find window: " + windowName);
-            }
-            try {
-                FirefoxDriver.this.context = new Context(response);
-            } catch (NumberFormatException e) {
-                throw new WebDriverException("When switching to window: " + windowName + " ---- " + response);
             }
             return FirefoxDriver.this;
         }

@@ -181,7 +181,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         JSONObject json = new JSONObject();
         try {
             json.put("commandName", command.getCommandName());
-            json.put("context", String.valueOf(command.getContext()));
+            json.put("sessionId", command.getSessionId());
             json.put("elementId", command.getElementId());
 
             JSONArray params = new JSONArray();
