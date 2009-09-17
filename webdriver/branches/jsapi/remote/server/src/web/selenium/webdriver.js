@@ -532,11 +532,16 @@ webdriver.WebDriver.prototype.switchToWindow = function(name) {
  * name 'main' and hten its child 'child'.  If a frame name is a number, then it
  * will be treated as an index into the {@code window.frames} array of the
  * current window.
- * @param {string|number} name The name of the window to transfer control to.
+ * @param {string|number|webdriver.WebElement} frame Identifier for the frame
+ *     to transfer control to.
  */
-webdriver.WebDriver.prototype.switchToFrame = function(name) {
-  this.addCommand(new webdriver.Command(webdriver.CommandName.SWITCH_TO_FRAME).
-      setParameters(name));
+webdriver.WebDriver.prototype.switchToFrame = function(frame) {
+  var commandName = webdriver.CommandName.SWITCH_TO_FRAME;
+  if (goog.isString(frame) || goog.isNumber(frame)) {
+    this.addCommand(new webdriver.Command(commandName).setParameters(frame));
+  } else {
+    this.addCommand(new webdriver.Command(commandName, frame));
+  }
 };
 
 

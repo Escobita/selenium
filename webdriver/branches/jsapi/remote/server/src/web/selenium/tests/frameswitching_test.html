@@ -186,6 +186,23 @@ function testGetCurrentUrlAfterNavigatingAwayWhileBeingFocusedOnASubFrame(
   assertThat(driver.getCurrentUrl(),
              equals(decodeURIComponent(whereIs('formPage.html'))));
 }
+
+
+function testCanSwitchToAnIFrameUsingItsPreviouslyLocatedWebElement(driver) {
+  driver.get(TEST_PAGE.iframePage);
+  var iframe1 = driver.findElement({id: 'iframe1'});
+  driver.switchToFrame(iframe1);
+  driver.findElement({xpath: "//*[@id = 'changeme']"});
+}
+
+
+function testCannotSwitchToAWebElementThatIsNotARepresentAFrameElement(driver) {
+  driver.get(TEST_PAGE.iframePage);
+  var body = driver.findElement({xpath: '//body'});
+  driver.switchToFrame(body);
+  driver.catchExpectedError(
+      'Should not be able to switch to a BODY tag; it is not a frame element!');
+}
   </script>
 </head>
 <body>

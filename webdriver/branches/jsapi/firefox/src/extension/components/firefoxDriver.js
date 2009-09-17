@@ -517,7 +517,19 @@ FirefoxDriver.prototype.selectElementsUsingXPath = function(respond, xpath) {
 
 
 FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
-  var stringId = String(frameId);
+  var frame;
+  if (respond['elementId']) {
+    frame = Utils.getElementAt(respond['elementId'], respond.session);
+    if (frame.tagName != 'IFRAME' && frame.tagName != 'FRAME') {
+      respond.isError = true;
+      respond.response = 'Element is not a frame element: ' + frame.tagName;
+    } else {
+      respond.session.window = frame.contentWindow;
+    }
+    return respond.send();
+  }
+
+  var stringId = String(frameId[0]);
   var names = stringId.split('.');
 
   function findFrame(id, rootFrame) {
@@ -539,7 +551,7 @@ FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
     return null;
   }
 
-  var frame = this.browser_.contentWindow;
+  frame = this.browser_.contentWindow;
   for (var i = 0; i < names.length; i++) {
     frame = findFrame(names[i], frame);
     if (!frame) {
