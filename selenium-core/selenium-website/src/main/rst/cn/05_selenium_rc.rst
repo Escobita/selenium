@@ -1018,22 +1018,17 @@ Selenium构架面临的主要限制是同源策略。这个安全限制被市场
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 通常，你可以安装一个你已经拥有的安全证书， 这样浏览器会信任你所测试的应用程序。
 你可以在浏览器选项或者Internet属性里检查它（如果你不知道AUT的安全证书，请问你的系统管理员）。
-当Selenium 加载你的浏览器的时候，它通过注册代码来截取浏览器和服务器之间的消息。浏览器现在认为不被信任的软件正在尝试查看你的应用程序。
-It responds by alerting you with popup messages. 
-
+当Selenium 加载你的浏览器的时候，它通过注入代码来截取浏览器和服务器之间的消息。浏览器现在认为不被信任的软件正在尝试查看你的应用程序。
+它作出反应，通过弹出小心来警告你。
 .. Please, can someone verify that I explained certificates correctly?—this is 
    an area I'm not certain I understand well yet. 
 
-To get around this, Selenium-RC, (again when using a run mode that support 
-this) will install its own security certificate, temporarily, to your 
-client machine in a place where the browser can access it. This tricks the 
-browser into thinking it's accessing a site different from your AUT and effectively suppresses the popups.  
+为了应对这个，Selenium-RC(仍然是当使用一个支持这个的运行模式的时候)会临时地安装自己拥有的安全证书到你客户端机器的一个地方，
+那里你的浏览器可以访问到。
+这个欺骗浏览器认为它正在访问一个和你AUT不同的站点，并且有效的抑制了弹出窗口。
+另外一个在老一点版本里使用的方法是安装 Selenium 安装文件里提供的Cybervillians 安全证书。
+大部分用户应该不再需要做这个，但是，如果你的Selenium-RC运行在代理注入模式，你可能需要明确地安装这个安全证书。
 
-Another method used with earlier versions of Selenium was to 
-install the Cybervillians security certificate provided with your Selenium 
-installation. Most users should no longer need to do this however, if you are
-running Selenium-RC in proxy injection mode, you may need to explicitly install this
-security certificate. 
    
 服务器选项
 --------------
@@ -1364,65 +1359,53 @@ Selenium无法找到AUT
 你可能需要设置MOZ_NO_REMOTE环境变量来使Mozilla浏览器的行为更加可预见一点。 
 Unix用户需要避免使用Shell脚本启动浏览器；直接使用二进制可执行文件(比如， firefox-bin)通常会好一点。
 
-How to Block Popup Windows?
+如何阻止弹出框口？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There are several kinds of "Popups" that you can get during a Selenium test.
-You may not be able to close these popups by running selenium commands if 
-they are initiated by the browser as opposed to your AUT.  Therefore, you'll
-need to know how to manage these.  Each type needs to be addressed differently.
+在Selenium测试里你会碰到好几种 “弹出窗口”。如果那些窗口是由浏览器而不是你的AUT产生的,那么你可能无法通过使用Selenium命令来关闭他们。
+因此，你会需要知道如何去除了他们。每一类需要不同地处理。
 
-    * HTTP basic authentication dialogs: These dialogs prompt for a 
-      username/password to login to the site. To login to a site that requires 
-      HTTP basic authentication, use a username and password in the URL, as 
-      described in `RFC 1738`_, like this: open("http://myusername:myuserpassword@myexample.com/blah/blah/blah").
+    * HTTP基本的认证对话框：这些对话框提示一个用户名/密码来登录这个站点。
+	登录一个需要HTTP基本的认证的站点，可以把用户名和密码加URL上，如同在 `RFC 1738`_ 描述的，
+    比如: open("http://myusername:myuserpassword@myexample.com/blah/blah/blah").
       
 .. _`RFC 1738`: http://tools.ietf.org/html/rfc1738#section-3.1
 
-    * SSL certificate warnings: Selenium RC automatically attempts to spoof SSL 
-      certificates when it is enabled as a proxy; see more on this 
-      in the section on HTTPS. If your browser is configured correctly,
-      you should never see SSL certificate warnings, but you may need to 
-      configure your browser to trust our dangerous "CyberVillains" SSL certificate 
-      authority. Again, refer to the HTTPS section for how to do this.
+    * SSL 证书警告：当Selenium RC被当作一个代理使用的时候，它会自动尝试欺骗SSL证书;	在这个章节的HTTPS部分查看更多内容。
+	如果你的浏览器配置正确，你将永远不会看到SSL证书警告，但是你可能需要配置你的浏览器信任我们危险的 "CyberVillains" SSL 证书授权。
+	同样的，何如配置请参考HTTPS章节。
 
-    * modal JavaScript alert/confirmation/prompt dialogs: Selenium tries to conceal
-      those dialogs from you (by replacing window.alert, window.confirm and 
-      window.prompt) so they won't stop the execution of your page. If you're 
-      actually seeing an alert pop-up, it's probably because it fired during 
-      the page load process, which is usually too early for us to protect the page.
-      Selenese contains commands for asserting or verifying alert and confirmation popups.
-      See the sections on these topics in Chapter 4.  (Note at this time of writing
-      we haven't written those sections, but intend to do so very soon).
+    * 模态 JavaScript 警告/确认/提示 对话框: Selenium 尝试隐藏那些对话框（通过替代window.alert, window.confirm and 
+      window.prompt），这样它们不会停止页面的执行。如果你真的看到一个警告弹出窗口，这个可能是因为它在页面载入过程中被激发的，
+	  这个通常太早了以至于我们无法保护这个页面。
+      Selenese 包含了断言或验证警告和确认弹出框的命令。
+      在第四章查看关于这些主题的部门。
       
       
-On Linux, why isn't my Firefox browser session closing?
+
+在Linux，为什么我的Firefox浏览器会话没有被关闭？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
-On Unix/Linux you must invoke "firefox-bin" directly, so make sure that
-executable is on the path. If executing Firefox through a 
-shell script, when it comes time to kill the browser Selenium RC will kill
-the shell script, leaving the browser running.   You can specify the path
-to firefox-bin directly, like this.
+在Unix/Linux你必须直接调用"firefox-bin" ，因此确保这个可执行文件在PATH环境变量里。
+如果通过Shell脚本执行Firefox，那么当Selenium RC杀掉浏览器进程的时候会杀掉Shell脚本进程，而让浏览器继续运行。
+你可以像这样直接指定firefox-bin。
       
 .. code-block:: bash      
       
    cmd=getNewBrowserSession&1=*firefox /usr/local/firefox/firefox-bin&2=http://www.google.com
 
-Firefox \*chrome doesn't work with custom profile
+Firefox \*chrome 使用自定义配置失败
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Check Firefox profile folder -> prefs.js -> user_pref("browser.startup.page", 0);
-Comment this line like this: "//user_pref("browser.startup.page", 0);" and try again.
+检查Firefox配置目录 -> prefs.js -> user_pref("browser.startup.page", 0);
+像这样注释掉这行: "//user_pref("browser.startup.page", 0);" 然后重新试一下。
 
-How can I avoid using complex xpath expressions to my test?
+如果在我的测试中避免使用复杂XPath表达式
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If the elements in HTML (button, table, label, etc) have element IDs, 
-then one can reliably retrieve all elements without ever resorting
-to xpath. These element IDs should be explicitly created by the application.
-But non-descriptive element ID (i.e. id_147) tends to cause two problems: 
-first, each time the application is deployed, different element ids could be generated. 
-Second, a non-specific element id makes it hard for automation testers to keep 
-track of and determine which element ids are required for testing.
+如果HTML元素(button, table, label, 等等)有元素ID，那么可以可靠地取得所有元素而不依靠XPath。 
+这些元素的ID应该被应用程序明确地创建。
+但是非描述性元素ID (比如 id_147) 势必导致两个问题: 
+第一，每次应用程序被部署的时候会产生不同的元素ID。 
+第二，非特定的元素ID导致自动化测试员很难跟踪和决定哪个元素ID是测试需要的。
 
-You might consider trying the `UI-Element`_ extension in this situation.
+这种情况下你可能考虑尝试`UI-Element`_ 扩展。
 
 .. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
