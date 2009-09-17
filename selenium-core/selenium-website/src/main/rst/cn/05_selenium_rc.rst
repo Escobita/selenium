@@ -1327,46 +1327,42 @@ Selenium无法找到AUT
       
     * 使用(\*firefox, \*opera)的其他浏览器， 会自动为你设置代理，而且这里没有已知的功能性问题。
 	如果你仔细的按照这个指南做还碰到404错误的话，请把你的结果发表到用户社区的用户论坛里来需求一些帮助。
-      
+
+
 为什么我碰到一个permission denied 的错误？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 这个错误最常见的原因是你的会话在跨域域的边界，尝试在违反同源策略（比如，从http://domain1访问一个页面，然后从http://domain2访问另外一个页面），
 或者转换协议（从http://domainX 换到https://domainX）。
-这个错误也经常发生在JavaScript尝试访问一个不可用（当页面没完全载入完成时）的对象，
-或者尝试访问一个不再可用的对象(当页面已经开始卸载之后)。这个问题在AJAX页面最典型。 pages
-which are working with sections of a page or subframes that load and/or reload 
-independently of the larger page. For this type of problem, it is common
-that the error is intermittent. Often it is impossible to reproduce the problem 
-with a debugger because the trouble stems from race conditions which 
-are not reproducable when the debugger's overhead is added to the system.
-This is covered in some detail in the tutorial. Make sure you read the section 
-about the `The Same Origin Policy`_, `Proxy Injection`_ carefully. 
+如果你在使用代理注入浏览器，尝试使用 '提高权限的浏览器'_ 来解决这个问题。
+在指南里这个已经说明的非常详细了。确保你仔细地阅读了关于 `同源策略`_ 和 `代理注入`_ 章节。
 
+如果你碰到的不是之前的这些情况， 它也可能发生在JavaScript 尝试访问一个还不可用的对象（在页面完全载入之前），
+或者尝试访问一个不再可用的对象（在页面开始卸载之后）。
+这个最典型地发生在AJAX页面，一个大的页面分成几个部分或者子框架来工作，它们各自独立地载入或者重载。
+在这种情况下，错误间断出现非常普遍。经常问题不能在调试程序里重现，因为问题是起源于速度条件，
+而当调试程序的开销被加在系统里面的时候，它将不能重现。
+首先尝试添加静态暂停来确保是这个情况，然后再使用waitFor 之类的命令：
+:ref:`waitFor commands in Selenese Chapter <waitfor>` 
 
-Running Tests with Different Browser Configurations
+用不同的浏览器配置来运行测试
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Normally Selenium-RC automatically configures the browser, but if you launch 
-the browser using the "\*custom" run mode, you can force Selenium RC
-to launch the browser as-is, without using an automatic configuration. 
-(Note that this is also the way one launches other browsers that Selenium RC 
-doesn't yet explicitly support.)
+通常Selenium-RC自动配置浏览器，但是你用"\*custom" 运行方式启动浏览器的话，你可以强制Selenium RC以原先的方式启动浏览器，
+而不使用一个自动的配置。 
+(注意，这个同时是一种启动Selenium RC还没明确地支持的浏览器的方式。)
 
-For example, you can launch Firefox with a custom configuration like this:
+比如，你可以这样启动Firefox用一个自定义的配置:
 
 .. code-block:: bash
 
    cmd=getNewBrowserSession&1=*custom c:\Program Files\Mozilla Firefox\firefox.exe&2=http://www.google.com
 
-Note that when launching the browser this way, you must manually 
-configure the browser to use the Selenium Server as a proxy. Normally this just 
-means opening your browser preferences and specifying "localhost:4444" as 
-an HTTP proxy, but instructions for this can differ radically from browser to 
-browser.  Consult your browser's documentation for details.
+注意，当这样启动浏览器的时候，你必须手动的配置浏览器使用Selenium服务器当做代理。
+通常就是打开你的浏览器首选项，指定 "localhost:4444" 为一个HTTP代理，但是不同浏览器的使用说明可能根本不一样。
+详细信息请查阅你的浏览器的文档。
 
-Beware that Mozilla browsers can be a little fussy about how they start and stop. 
-One may need to set the MOZ_NO_REMOTE environment variable to make Mozilla browsers 
-behave a little more predictably. Unix users should avoid launching the browser using 
-a shell script; it's generally better to use the binary executable (e.g. firefox-bin) directly.
+注意Mozilla 浏览器对启动和停止的方式有点挑剔。
+你可能需要设置MOZ_NO_REMOTE环境变量来使Mozilla浏览器的行为更加可预见一点。 
+Unix用户需要避免使用Shell脚本启动浏览器；直接使用二进制可执行文件(比如， firefox-bin)通常会好一点。
 
 How to Block Popup Windows?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1394,9 +1390,9 @@ need to know how to manage these.  Each type needs to be addressed differently.
       window.prompt) so they won't stop the execution of your page. If you're 
       actually seeing an alert pop-up, it's probably because it fired during 
       the page load process, which is usually too early for us to protect the page.
-	  Selenese contains commands for asserting or verifying alert and confirmation popups.
-	  See the sections on these topics in Chapter 4.  (Note at this time of writing
-	  we haven't written those sections, but intend to do so very soon).
+      Selenese contains commands for asserting or verifying alert and confirmation popups.
+      See the sections on these topics in Chapter 4.  (Note at this time of writing
+      we haven't written those sections, but intend to do so very soon).
       
       
 On Linux, why isn't my Firefox browser session closing?
@@ -1430,49 +1426,13 @@ You might consider trying the `UI-Element`_ extension in this situation.
 
 .. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
-
-Is it ok to load a custom pop-up as the parent page is loading (i.e., before the parent page's javascript window.onload() function runs)?
+可以在其父页面正在加载的时候打开一个自定义弹出框口吗（也就是在父页面javascript window.onload() 里运行）？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-No. Selenium relies on interceptors to determine window names as they are being loaded.
-These interceptors work best in catching new windows if the windows are loaded AFTER 
-the onload() function. Selenium may not recognize windows loaded before the onload function.
+不行。Selenium 依赖于拦截器在窗口被加载的时候来判断他们的名字
+这些拦截器当窗口在onload()函数之后被加载时候可以正常抓取新的窗口。
+Selenium 可能不认识在onload函数之前被加载的窗口。
 
-
-How can I wait for an element in AJAX driven application?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX driven web applications; data is retrieved from server with out refreshing 
-the page. Usage of *waitForPageToLoad* would not work as page is not actually 
-loaded. Pausing the test execution for certain period of time is also not a good 
-approach as web element might appear late or earlier than stipulated period; leading
-to test failures. A better approach would be to wait for element for predefined 
-period and then continue execution as soon as element is found.
-
-For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
-on page (with out refreshing the page)
-This could be handled employing a for loop in selenium. 
-
-.. code-block:: bash
-   
-   // Loop initialization.
-   for (int second = 0;; second++) {
-	
-	// If loop is reached 60 seconds then break the loop.
-	if (second >= 60) break;
-	
-	// Search for element "link=ajaxLink" and if available then break loop.
-	try { if (selenium.isElementPresent("link=ajaxLink")) break; } catch (Exception e) {}
-	
-	// Pause for 1 second.
-	Thread.sleep(1000);
-	
-   } 
-
-   
-   .. Santi: must recheck if all the topics here: 
-   http://seleniumhq.org/documentation/remote-control/troubleshooting.html
-   are covered.
-
-Problems With Verify Commands 
+关于Verify命令的问题 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you export your tests from Selenium-IDE, you may find yourself getting
 empty verify strings from your tests (depending on the programming language
@@ -1488,7 +1448,7 @@ used).
 
 .. I'll investigate into this, I only use python and using that client it's failing
 
-Safari and MultiWindow Mode
+Safari 和 MultiWindow 模式
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *Note: This section is not yet developed.*
@@ -1497,18 +1457,16 @@ Safari and MultiWindow Mode
    http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
    http://jira.openqa.org/browse/SEL-639
 
-Firefox on Linux 
+Linux下Firefox 
 ~~~~~~~~~~~~~~~~
-On Unix/Linux, versions of Selenium before 1.0 needed to invoke "firefox-bin" 
-directly, so if you are using a previous version, make sure that the real 
-executable is on the path. 
+在Unix/Linux，Selenium 1.0以及之前版本需要直接调用"firefox-bin"，
+因此如果你使用以前的版本，确保真正可执行文件在PATH环境变量上。
 
-On most Linux distributions, the real *firefox-bin* is located on::
+在大部分Linux上，真正的*firefox-bin*在::
 
    /usr/lib/firefox-x.x.x/ 
 
-Where the x.x.x is the version number you currently have. So, to add that path 
-to the user's path. you will have to add the following to your .bashrc file:
+x.x.x是你当前的版本号。因此把这个路径加到PATH环境变量上。 你需要把以下代码添加到你的.bashrc文件：
 
 .. code-block:: bash
 
@@ -1519,32 +1477,28 @@ to the user's path. you will have to add the following to your .bashrc file:
    the browser Selenium-RC will kill the shell script, leaving the browser 
    running.  Santi: not sure if we should put this here...
 
-If necessary, you can specify the path to firefox-bin directly in your test,
-like this::
+如果有必要，可以像这样在你的测试里直接指定firefox-bin路径::
 
    "*firefox /usr/lib/firefox-x.x.x/firefox-bin"
 
-IE and Style Attributes
+IE和Style属性
 ~~~~~~~~~~~~~~~~~~~~~~~
-If you are running your tests on Internet Explorer and you are trying to locate
-elements using their `style` attribute, you're definitely in trouble.
-Probably a locator like this::
+如果你在Internet Explorer上运行你的测试，并且你正在尝试使用它们的`style` 属性来定位元素，你肯定碰到了问题。
+可能像这样一个locator::
 
     //td[@style="background-color:yellow"]
 
-Would perfectly work in Firefox, Opera or Safari but it won't work on IE. 
-That's because the keys in  `@style` are interpreted as uppercase once the page
-is parsed by IE. So, even if the source code is in lowercase, you should use::
+在Firefox, Opera 或者 Safari里工作完美，但是在IE却有问题。 
+这个是因为一旦被IE解析，`@style`里的键值全被解释为大写的。所以即使源代码是小写的
+你也要用::
 
     //td[@style="BACKGROUND-COLOR:yellow"]
+这是一个问题，当你打算在多浏览器下运行你的测试，但是你很容易写代码来检测你的情形，并修改
+locator仅用在IE上。   
 
-This is a problem if your test is intended to work on multiple browsers, but
-you can easily code your test to detect the situation and try the alternative
-locator that only works in IE.
-   
 
-Where should I go if I have questions about Selenium RC that aren't answered in this FAQ?
+我该去那里，如果我有关于Selenium RC的问题但是在这个 FAQ没有回答？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Try our `user forums`_
+试一下 `用户论坛`_
 
 .. _`user forums`: http://seleniumhq.org/support/
