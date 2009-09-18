@@ -19,8 +19,6 @@ Sometimes Chrome does not grab focus when it is launched, and hangs.  If you can
 
 Iframes which have no src attribute, i.e. <iframe src=""> or <iframe> are unsupported.  This will be fixed by [http://code.google.com/p/chromium/issues/detail?id=20773 Chrome bug 20773], but is not likely to happen until at least October 2009.
 
-Switching focus in the page (i.e. element switchTo) is currently unsupported.
-
 Only one instance at a time will run.  This is due to a bug in Chrome on Linux and Mac [http://code.google.com/p/chromium/issues/detail?id=11547 Chrome bug 11547].  On Windows, you can apply [http://selenium.googlecode.com/files/ChromeDriverMultipleInstancePatch.diff this patch] to allow multiple instances, but it will break WebDriver on Linux and Mac.
 
 File uploading using <input type="file"> elements is currently unsupported.
