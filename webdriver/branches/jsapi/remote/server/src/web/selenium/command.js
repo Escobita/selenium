@@ -277,6 +277,6 @@ webdriver.LocatorStrategy = {
 webdriver.Response = function(isFailure, value, opt_error) {
   this.isFailure = isFailure;
   this.value = value;
-  this.errors = goog.array.slice(arguments, 3);
+  this.errors = goog.array.slice(arguments, 2);
   this.extraData = {};
 };

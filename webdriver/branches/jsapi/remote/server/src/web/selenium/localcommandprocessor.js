@@ -93,7 +93,7 @@ webdriver.LocalCommandProcessor.DRIVER_METHOD_NAMES_ = goog.object.transpose({
   'getElementSize': webdriver.CommandName.GET_SIZE,
   'getElementAttribute': webdriver.CommandName.GET_ATTRIBUTE,
   'dragAndDrop': webdriver.CommandName.DRAG,
-  'getValueOfCssProperty': webdriver.CommandName.GET_CSS_PROPERTY
+  'getElementCssProperty': webdriver.CommandName.GET_CSS_PROPERTY
 });
 
 
