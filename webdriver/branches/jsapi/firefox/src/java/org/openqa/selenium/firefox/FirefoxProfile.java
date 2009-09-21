@@ -49,12 +49,14 @@ import javax.xml.xpath.XPathFactory;
 
 public class FirefoxProfile {
   private static final String EXTENSION_NAME = "fxdriver@googlecode.com";
+  private static final String EM_NAMESPACE_URI = "http://www.mozilla.org/2004/em-rdf#";
   private File profileDir;
   private File extensionsDir;
   private File userPrefs;
   private Preferences additionalPrefs = new Preferences();
   private int port;
   private boolean enableNativeEvents;
+  private boolean loadNoFocusLib;
 
   /**
    * Constructs a firefox profile from an existing, physical profile directory.
@@ -71,6 +73,7 @@ public class FirefoxProfile {
 
     port = FirefoxDriver.DEFAULT_PORT;
     enableNativeEvents = FirefoxDriver.DEFAULT_ENABLE_NATIVE_EVENTS;
+    loadNoFocusLib = false;
 
     if (!profileDir.exists()) {
       throw new WebDriverException(MessageFormat.format("Profile directory does not exist: {0}",
@@ -174,7 +177,9 @@ public class FirefoxProfile {
       xpath.setNamespaceContext(new NamespaceContext() {
         public String getNamespaceURI(String prefix) {
           if ("em".equals(prefix)) {
-            return "http://www.mozilla.org/2004/em-rdf#";
+            return EM_NAMESPACE_URI;
+          } else if ("RDF".equals(prefix)) {
+            return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
           }
 
           return XMLConstants.NULL_NS_URI;
@@ -191,12 +196,19 @@ public class FirefoxProfile {
 
       Node idNode = (Node) xpath.compile("//em:id").evaluate(doc, XPathConstants.NODE);
 
+      String id = null;
       if (idNode == null) {
-        throw new WebDriverException(
-            "Cannot locate node containing extension id: " + installRdf.getAbsolutePath());
+        Node descriptionNode =
+            (Node) xpath.compile("//RDF:Description").evaluate(doc, XPathConstants.NODE);
+        Node idAttr = descriptionNode.getAttributes().getNamedItemNS(EM_NAMESPACE_URI, "id");
+        if (idAttr == null) {
+          throw new WebDriverException(
+              "Cannot locate node containing extension id: " + installRdf.getAbsolutePath());
+        }
+        id = idAttr.getNodeValue();
+      } else {
+        id = idNode.getTextContent();
       }
-
-      String id = idNode.getTextContent();
 
       if (id == null || "".equals(id.trim())) {
         throw new FileNotFoundException("Cannot install extension with ID: " + id);
@@ -435,6 +447,26 @@ public class FirefoxProfile {
       this.enableNativeEvents = enableNativeEvents;
     }
 
+    /**
+     * Returns whether the no focus library should be loaded for Firefox
+     * profiles launched on Linux, even if native events are disabled.
+     *
+     * @return Whether the no focus library should always be loaded for Firefox
+     *     on Linux.
+     */
+    public boolean alwaysLoadNoFocusLib() {
+      return loadNoFocusLib;
+    }
+
+    /**
+     * Sets whether the no focus library should always be loaded on Linux.
+     *
+     * @param loadNoFocusLib Whether to always load the no focus library.
+     */
+    public void setAlwaysLoadNoFocusLib(boolean loadNoFocusLib) {
+      this.loadNoFocusLib = loadNoFocusLib;
+    }
+
   public boolean isRunning() {
         File macAndLinuxLockFile = new File(profileDir, ".parentlock");
         File windowsLockFile = new File(profileDir, "parent.lock");
@@ -459,6 +491,7 @@ public class FirefoxProfile {
       additionalPrefs.addTo(profile);
       profile.setPort(port);
       profile.setEnableNativeEvents(enableNativeEvents);
+      profile.setAlwaysLoadNoFocusLib(loadNoFocusLib);
       profile.updateUserPrefs();
 
       return profile;

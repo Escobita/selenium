@@ -16,6 +16,7 @@
  limitations under the License.
  */
 
+
 FirefoxDriver.prototype.click = function(respond) {
 
   var element = Utils.getElementAt(respond.elementId, respond.session);
@@ -30,13 +31,14 @@ FirefoxDriver.prototype.click = function(respond) {
 
   var nativeEvents = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
-  var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
-      .getService(Components.interfaces.nsIXULAppInfo);
+  var appInfo = Components.classes["@mozilla.org/xre/app-info;1"].
+      getService(Components.interfaces.nsIXULAppInfo);
   var versionChecker = Components.
-      classes["@mozilla.org/xpcom/version-comparator;1"]
-      .getService(Components.interfaces.nsIVersionComparator);
-  // I'm having trouble getting clicks to work on Firefox 2 on Windows.
-  // Always fall back for that
+      classes["@mozilla.org/xpcom/version-comparator;1"].
+      getService(Components.interfaces.nsIVersionComparator);
+
+  // I'm having trouble getting clicks to work on Firefox 2 on Windows. Always
+  // fall back for that
   // TODO(simon): Get native clicks working for gecko 1.8+
   var useNativeClick =
       versionChecker.compare(appInfo.platformVersion, "1.9") >= 0;
@@ -178,8 +180,8 @@ FirefoxDriver.prototype.sendKeys = function(respond, value) {
   if (tagName == "body" && element.ownerDocument.defaultView.frameElement) {
     element.ownerDocument.defaultView.focus();
 
-    // Turns out, this is what we should be using ass the target to send events
-    // to
+    // Turns out, this is what we should be using as the target
+    // to send events to
     use = element.ownerDocument.getElementsByTagName("html")[0];
   }
 
@@ -455,9 +457,9 @@ FirefoxDriver.prototype.toggleElement = function(respond) {
   }
 
   respond.isError = true;
-  respond.response = "You may only toggle an element that is either a " +
-                     "checkbox or an option in a select that allows multiple " +
-                     "selections";
+  respond.response =
+      "You may only toggle an element that is either a checkbox or an "  +
+      "option in a select that allows multiple selections";
   respond.send();
 };
 

@@ -19,7 +19,6 @@
 function StaleElementError() {
   this.isStaleElementError = true;
 }
-;
 
 
 function Utils() {
@@ -336,7 +335,8 @@ Utils.getNativeEvents = function() {
     var obj = Components.classes[cid].createInstance();
     return obj.QueryInterface(Components.interfaces.nsINativeEvents);
   } catch(e) {
-    // Unable to retrieve native events. No biggie, because we fall back to synthesis later
+    // Unable to retrieve native events. No biggie, because we fall back to
+    // synthesis later
     return undefined;
   }
 };
@@ -344,7 +344,8 @@ Utils.getNativeEvents = function() {
 
 Utils.getNodeForNativeEvents = function(element) {
   try {
-    // This stuff changes between releases. Do as much up-front work in JS as possible
+    // This stuff changes between releases.
+    // Do as much up-front work in JS as possible
     var retrieval = Utils.newInstance(
         "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
     var accessible = retrieval.getAccessibleFor(element.ownerDocument);
@@ -793,8 +794,8 @@ Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
 
 
 Utils.dumpText = function(text) {
-  var consoleService =
-      Utils.getService("@mozilla.org/consoleservice;1", "nsIConsoleService");
+  var consoleService = Utils.getService(
+      "@mozilla.org/consoleservice;1", "nsIConsoleService");
   if (consoleService)
     consoleService.logStringMessage(text);
   else
@@ -818,7 +819,7 @@ Utils.dump = function(obj) {
       obj.QueryInterface(Components.interfaces[i]);
       dump.push(i);
     } catch (e) {
-      // Doesn't support interface
+      // Doesn't support the interface
     }
   }
   dump.push('------------');
@@ -925,8 +926,8 @@ Utils.findElementsByXPath = function (xpath, contextNode, session) {
 Utils.getLocationOnceScrolledIntoView = function(element) {
   element.scrollIntoView(true);
 
-  var retrieval = Utils.newInstance("@mozilla.org/accessibleRetrieval;1",
-      "nsIAccessibleRetrieval");
+  var retrieval = Utils.newInstance(
+      "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
 
   try {
     element = element.wrappedJSObject ? element.wrappedJSObject : element;
@@ -992,3 +993,44 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
     height: box.height
   };
 };
+
+
+Utils.unwrapParameters = function(wrappedParameters, resultArray, session) {
+  while (wrappedParameters && wrappedParameters.length > 0) {
+    var t = wrappedParameters.shift();
+
+    if (t != null && t.length !== undefined && t.length != null && (t['type']
+        === undefined || t['type'] == null)) {
+      var innerArray = [];
+      Utils.unwrapParameters(t, innerArray);
+      resultArray.push(innerArray);
+      return;
+    }
+
+    if (t['type'] == "ELEMENT") {
+      var element = Utils.getElementAt(t['value'], session);
+      t['value'] = element.wrappedJSObject ? element.wrappedJSObject : element;
+    }
+
+    resultArray.push(t['value']);
+  }
+};
+
+
+Utils.wrapResult = function(result, session) {
+  // Sophisticated.
+  if (null === result || undefined === result) {
+    return {resultType: "NULL"};
+  } else if (result['tagName']) {
+    return {resultType: "ELEMENT",
+            response: Utils.addToKnownElements(result, session)};
+  } else if (result.constructor.toString().indexOf("Array") != -1) {
+    var array = [];
+    for (var i = 0; i < result.length; i++) {
+      array.push(Utils.wrapResult(result[i], session));
+    }
+    return {resultType: "ARRAY", response: array};
+  } else {
+    return {resultType: "OTHER", response: result};
+  }
+}

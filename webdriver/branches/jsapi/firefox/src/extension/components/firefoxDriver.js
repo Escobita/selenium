@@ -1,26 +1,22 @@
 /*
-Copyright 2007-2009 WebDriver committers
-Copyright 2007-2009 Google Inc.
-Portions copyright 2007 ThoughtWorks, Inc
+ Copyright 2007-2009 WebDriver committers
+ Copyright 2007-2009 Google Inc.
+ Portions copyright 2007 ThoughtWorks, Inc
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-/**
- * @param {WebDriverServer} server  The creating server.
- * @param {boolean} enableNativeEvents Whether to use native events.
- * @param {nsIDOMWindow} win The window that contains this FirefoxDriver.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
  */
+
+
 function FirefoxDriver(server, enableNativeEvents, win) {
   this.server = server;
   this.mouseSpeed = 1;
@@ -193,29 +189,19 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
     ].join('');
 
     var convert = script.shift();
-    while (convert && convert.length > 0) {
-      var t = convert.shift();
 
-      if (t['type'] == "ELEMENT") {
-        var element = Utils.getElementAt(t['value'], respond.session);
-        t['value'] =
-            element.wrappedJSObject ? element.wrappedJSObject : element;
-      }
-
-      parameters.push(t['value']);
-    }
+    Utils.unwrapParameters(convert, parameters, respond.session);
 
     var result = runScript(scriptSrc, parameters);
 
-    // Sophisticated.
-    if (result && result['tagName']) {
-      respond.setField('resultType', "ELEMENT");
-      respond.response = Utils.addToKnownElements(result, respond.session);
-    } else if (result !== undefined) {
-      respond.setField('resultType', "OTHER");
-      respond.response = result;
-    } else {
-      respond.setField('resultType', "NULL");
+    var wrappedResult = Utils.wrapResult(result, respond.session);
+
+    if (wrappedResult.resultType !== undefined) {
+      respond.setField("resultType", wrappedResult.resultType);
+    }
+
+    if (wrappedResult.response !== undefined) {
+      respond.response = wrappedResult.response;
     }
 
   } catch (e) {
@@ -338,8 +324,7 @@ FirefoxDriver.prototype.selectElementUsingClassName = function(respond, name) {
     var elements = doc.getElementsByClassName(name);
 
     if (elements.length) {
-      respond.response =
-      Utils.addToKnownElements(elements[0], respond.session);
+      respond.response = Utils.addToKnownElements(elements[0], respond.session);
     } else {
       respond.isError = true;
       respond.response =
@@ -744,6 +729,15 @@ FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
     }
   });
 
+  respond.send();
+};
+
+
+FirefoxDriver.prototype.deleteAllCookies = function(respond) {
+  var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
+  handleCookies(this.browser_, function(cookie) {
+    cm.remove(cookie.host, cookie.name, cookie.path, false);
+  });
   respond.send();
 };
 

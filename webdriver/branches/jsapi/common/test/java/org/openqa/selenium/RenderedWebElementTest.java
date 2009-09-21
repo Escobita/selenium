@@ -17,13 +17,10 @@ limitations under the License.
 package org.openqa.selenium;
 
 import static org.openqa.selenium.Ignore.Driver.CHROME;
-import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.awt.*;
 
 public class RenderedWebElementTest extends AbstractDriverTestCase {
@@ -47,19 +44,19 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @Ignore({HTMLUNIT, IE, CHROME})
   //Reason for Chrome: WebKit bug 28804
   public void testShouldHandleNonIntegerPositionAndSize() {
-      driver.get(rectanglesPage);
+    driver.get(rectanglesPage);
 
-      RenderedWebElement r2 = (RenderedWebElement) driver.findElement(By.id("r2"));
-      String left = r2.getValueOfCssProperty("left");
-      assertTrue("left (\"" + left + "\") should start with \"10.9\".", left.startsWith("10.9"));
-      String top = r2.getValueOfCssProperty("top");
-      assertTrue("top (\"" + top + "\") should start with \"10.1\".", top.startsWith("10.1"));
-      assertEquals(r2.getLocation(), new Point(11, 10));
-      String width = r2.getValueOfCssProperty("width");
-      assertTrue("width (\"" + left + "\") should start with \"48.6\".", width.startsWith("48.6"));
-      String height = r2.getValueOfCssProperty("height");
-      assertTrue("height (\"" + left + "\") should start with \"49.3\".", height.startsWith("49.3"));
-      assertEquals(r2.getSize(), new Dimension(49, 49));
+    RenderedWebElement r2 = (RenderedWebElement) driver.findElement(By.id("r2"));
+    String left = r2.getValueOfCssProperty("left");
+    assertTrue("left (\"" + left + "\") should start with \"10.9\".", left.startsWith("10.9"));
+    String top = r2.getValueOfCssProperty("top");
+    assertTrue("top (\"" + top + "\") should start with \"10.1\".", top.startsWith("10.1"));
+    assertEquals(r2.getLocation(), new Point(11, 10));
+    String width = r2.getValueOfCssProperty("width");
+    assertTrue("width (\"" + left + "\") should start with \"48.6\".", width.startsWith("48.6"));
+    String height = r2.getValueOfCssProperty("height");
+    assertTrue("height (\"" + left + "\") should start with \"49.3\".", height.startsWith("49.3"));
+    assertEquals(r2.getSize(), new Dimension(49, 49));
   }
 
   @JavascriptEnabled
@@ -74,27 +71,21 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({HTMLUNIT, IPHONE, CHROME_NON_WINDOWS})
+  @Ignore({HTMLUNIT, IPHONE, CHROME})
   public void testShouldAllowUsersToHoverOverElements() {
     driver.get(javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));
-    if (!hasHover(element)) {
-      System.out.println("Skipping hover test: no hover method");
-      return;
-    }
     if (!Platform.getCurrent().is(Platform.WINDOWS)) {
       System.out.println("Skipping hover test: needs native events");
       return;
     }
 
-
     RenderedWebElement item = (RenderedWebElement) driver.findElement(By.id("item1"));
     assertEquals("", item.getText());
 
-
     ((JavascriptExecutor) driver).executeScript("arguments[0].style.background = 'green'", element);
-    callHoverOn(element);
+    element.hover();
 
     assertEquals("Item 1", item.getText());
   }
@@ -115,16 +106,12 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
     driver.get(javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));
-    if (!hasHover(element)) {
-      System.out.println("Skipping hover test: no hover method");
-      return;
-    }
     if (!Platform.getCurrent().is(Platform.WINDOWS)) {
       System.out.println("Skipping hover test: needs native events");
       return;
     }
 
-    callHoverOn(element);
+    element.hover();
 
     RenderedWebElement target = (RenderedWebElement) driver.findElement(By.id("item1"));
     assertTrue(target.isDisplayed());
@@ -132,24 +119,5 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
 
     String text = driver.findElement(By.id("result")).getText();
     assertTrue(text.contains("item 1"));
-  }
-
-  private boolean hasHover(RenderedWebElement element) {
-    try {
-      Method hoverMethod = element.getClass().getMethod("hover");
-      return Modifier.isPublic(hoverMethod.getModifiers());
-    } catch (NoSuchMethodException e) {
-      // fine
-    }
-    return false;
-  }
-
-  private void callHoverOn(RenderedWebElement element) {
-    try {
-      Method hoverMethod = element.getClass().getMethod("hover");
-      hoverMethod.invoke(element);
-    } catch (Exception e) {
-      fail("Cannot call hover method");
-    }
   }
 }

@@ -3,17 +3,12 @@
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
   </component>
-  <component name="BlazePluginSettings" buildBeforeRefresh="true" />
+  <component name="BlazePluginSettings" buildBeforeRefresh="true" blazeTestProducers="true" />
   <component name="Build editor project-level loader">
     <settings>
       <class-settings class="com.google.devtools.intellig.configcheck.ClearOutputChecker" />
-      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker">
-        <setting name="getHeapSize" value="800" />
-      </class-settings>
-      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker">
-        <setting name="getModuleJdks" value="rO0ABXNyABFqYXZhLnV0aWwuSGFzaFNldLpEhZWWuLc0AwAAeHB3DAAAABA/QAAAAAAAAHg=" />
-        <setting name="getProjectJdk" value="/usr/local/buildtools/java/jdk1.5.0_06" />
-      </class-settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker" />
       <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
       <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
     </settings>
@@ -227,8 +222,7 @@
         <inspection_tool class="InstanceofCatchParameter" level="ERROR" enabled="true" />
         <inspection_tool class="SingleCharacterStartsWith" level="WARNING" enabled="false" />
         <inspection_tool class="ImplicitNumericConversion" level="WARNING" enabled="false">
-          <option name="ignoreWideningConversions" value="false" />
-          <option name="ignoreCharConversions" value="false" />
+          <option name="m_ignoreWideningConversions" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryInterfaceModifier" level="WARNING" enabled="true" />
         <inspection_tool class="InstanceVariableInitialization" level="WARNING" enabled="false">
@@ -481,9 +475,7 @@
           <option name="m_maxLength" value="32" />
         </inspection_tool>
         <inspection_tool class="CheckedExceptionClass" level="WARNING" enabled="false" />
-        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false">
-          <option name="ignoreIntegerCharCasts" value="false" />
-        </inspection_tool>
+        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false" />
         <inspection_tool class="SwitchStatementWithConfusingDeclaration" level="WARNING" enabled="false" />
         <inspection_tool class="EmptyTryBlock" level="ERROR" enabled="true" />
         <inspection_tool class="ManualArrayCopy" level="WARNING" enabled="false" />
@@ -494,13 +486,8 @@
         <inspection_tool class="OverlyComplexArithmeticExpression" level="WARNING" enabled="false">
           <option name="m_limit" value="6" />
         </inspection_tool>
-        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false">
-          <option name="ignoreSimpleAssignmentsAndReturns" value="false" />
-        </inspection_tool>
-        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false">
-          <option name="ignoreClarifyingParentheses" value="false" />
-          <option name="ignoreParenthesesOnConditionals" value="false" />
-        </inspection_tool>
+        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false" />
+        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false" />
         <inspection_tool class="AssignmentToMethodParameter" level="WARNING" enabled="true">
           <option name="ignoreTransformationOfOriginalParameter" value="false" />
         </inspection_tool>
@@ -533,6 +520,7 @@
         <inspection_tool class="UnusedCatchParameter" level="WARNING" enabled="false">
           <option name="m_ignoreCatchBlocksWithComments" value="false" />
           <option name="m_ignoreTestCases" value="false" />
+          <option name="m_ignoreIgnoreParameter" value="true" />
         </inspection_tool>
         <inspection_tool class="ClassInTopLevelPackage" level="WARNING" enabled="false" />
         <inspection_tool class="FieldAccessedSynchronizedAndUnsynchronized" level="ERROR" enabled="true">
@@ -584,9 +572,7 @@
           <option name="ignoreTestCases" value="false" />
         </inspection_tool>
         <inspection_tool class="ConstantDeclaredInAbstractClass" level="WARNING" enabled="false" />
-        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true">
-          <option name="onlyWarnOnRootExceptions" value="false" />
-        </inspection_tool>
+        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true" />
         <inspection_tool class="FloatingPointEquality" level="ERROR" enabled="true" />
         <inspection_tool class="ReplaceAssignmentWithOperatorAssignment" level="WARNING" enabled="true">
           <option name="ignoreLazyOperators" value="true" />
@@ -862,15 +848,11 @@
       <module fileurl="file://$PROJECT_DIR$/support/support.iml" filepath="$PROJECT_DIR$/support/support.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="JDK 6-google-v2" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/eclipse" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="SingleTestSuite" type="JUnit" factoryName="JUnit" enabled="false" merge="false" runner="emma">
-      <pattern>
-        <option name="PATTERN" value="com.googlecode.webdriver.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
+    <configuration default="false" name="SingleTestSuite" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="remote" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -916,8 +898,26 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$/remote">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://selenium.googlecode.com/svn/webdriver/webdriver" />
+                  <option value="https://selenium.googlecode.com/svn/webdriver/branches" />
+                  <option value="https://selenium.googlecode.com/svn/webdriver/javadoc" />
+                  <option value="https://selenium.googlecode.com/svn/webdriver/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://selenium.googlecode.com/svn/webdriver/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="myVersion" value="123" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />

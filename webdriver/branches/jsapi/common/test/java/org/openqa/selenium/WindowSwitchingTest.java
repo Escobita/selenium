@@ -97,6 +97,26 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
       driver.findElement(By.id("linkId"));
     }
   }
+  
+  @Ignore(IE)
+  @JavascriptEnabled
+  public void testCanCallGetWindowHandlesAfterClosingAWindow() {
+    driver.get(xhtmlTestPage);
+
+    String currentHandle = driver.getWindowHandle();
+
+    driver.findElement(By.name("windowThree")).click();
+
+    driver.switchTo().window("result");
+
+    try {
+      driver.findElement(By.id("close")).click();
+      driver.getWindowHandles();
+      // If we make it this far, we're all good.
+    } finally {
+      driver.switchTo().window(currentHandle);
+    }
+  }
 
   public void testCanObtainAWindowHandle() {
     driver.get(xhtmlTestPage);
@@ -121,7 +141,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
     assertEquals(current, newHandle);
   }
-  
+
   @NeedsFreshDriver
   @NoDriverAfterTest
   @Ignore(IE)
@@ -135,7 +155,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
     // There should be two windows. We should also see each of the window titles at least once.
     assertEquals(2, allWindowHandles.size());
-    String handle1 = (String)allWindowHandles.toArray()[1];
+    String handle1 = (String) allWindowHandles.toArray()[1];
     driver.switchTo().window(handle1);
     driver.close();
     allWindowHandles = driver.getWindowHandles();
