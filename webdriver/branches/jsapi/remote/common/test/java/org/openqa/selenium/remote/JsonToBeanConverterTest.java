@@ -133,7 +133,7 @@ public class JsonToBeanConverterTest extends TestCase {
   @SuppressWarnings("unchecked")
   public void testShouldConvertAResponseWithAnElementInIt() throws Exception {
     String json =
-        "{\"value\":{\"value\":\"\",\"text\":\"\",\"selected\":false,\"enabled\":true,\"id\":\"three\"},\"context\":\"con\",\"sessionId\":\"sess\",\"error\":false}";
+        "{\"value\":{\"value\":\"\",\"text\":\"\",\"selected\":false,\"enabled\":true,\"id\":\"three\"},\"sessionId\":\"sess\",\"error\":false}";
     Response converted = new JsonToBeanConverter().convert(Response.class, json);
 
     Map value = (Map) converted.getValue();
@@ -148,7 +148,7 @@ public class JsonToBeanConverterTest extends TestCase {
 
   public void testShouldBeAbleToCopeWithStringsThatLookLikeBooleans() throws Exception {
     String json =
-        "{\"value\":\"false\",\"context\":\"foo\",\"sessionId\":\"1210083863107\",\"error\":false}";
+        "{\"value\":\"false\",\"sessionId\":\"1210083863107\",\"error\":false}";
 
     try {
       new JsonToBeanConverter().convert(Response.class, json);
@@ -160,7 +160,7 @@ public class JsonToBeanConverterTest extends TestCase {
 
   public void testShouldBeAbleToSetAnObjectToABoolean() throws Exception {
     String json =
-        "{\"value\":true,\"context\":\"foo\",\"sessionId\":\"1210084658750\",\"error\":false}";
+        "{\"value\":true,\"sessionId\":\"1210084658750\",\"error\":false}";
 
     Response response = new JsonToBeanConverter().convert(Response.class, json);
 
@@ -172,7 +172,6 @@ public class JsonToBeanConverterTest extends TestCase {
     String[] value = {"Cheese", "Peas"};
 
     Response response = new Response();
-    response.setContext("foo");
     response.setSessionId("bar");
     response.setValue(value);
     response.setError(true);
@@ -212,22 +211,13 @@ public class JsonToBeanConverterTest extends TestCase {
     assertEquals("id", sessionId.toString());
   }
 
-  public void testShouldBeAbleToReconsituteAContext() throws Exception {
-    String json = new BeanToJsonConverter().convert(new Context("ctxt"));
-    Context context = new JsonToBeanConverter().convert(Context.class, json);
-
-    assertEquals("ctxt", context.toString());
-  }
-
   public void testShouldBeAbleToConvertACommand() throws Exception {
     SessionId sessionId = new SessionId("session id");
-    Context context = new Context("context");
-    Command original = new Command(sessionId, context, "methodName", "cheese");
+    Command original = new Command(sessionId, "methodName", "cheese");
     String raw = new BeanToJsonConverter().convert(original);
     Command converted = new JsonToBeanConverter().convert(Command.class, raw);
 
     assertEquals(sessionId.toString(), converted.getSessionId().toString());
-    assertEquals(context.toString(), converted.getContext().toString());
     assertEquals(original.getMethodName(), converted.getMethodName());
 
     assertTrue(converted.getParameters().length == 1);

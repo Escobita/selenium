@@ -26,7 +26,6 @@ class RemoteConnection(object):
 
     def __init__(self, remote_server_addr, browser_name, platform):
         self._conn = httplib.HTTPConnection(remote_server_addr)
-        self._context = "foo"
         self._session_id = ""
         resp = self.post(
             "/hub/session",
@@ -56,8 +55,7 @@ class RemoteConnection(object):
             payload = ""
 
         if not path.startswith("/hub") and not path.startswith("http://"):
-            path =  ("/hub/session/%s/%s/" %
-                     (self._session_id, self._context) + path)
+            path =  ("/hub/session/%s/" % (self._session_id) + path)
         self._conn.request(method, path,
                            body = payload, 
                            headers={"Accept":"application/json"})

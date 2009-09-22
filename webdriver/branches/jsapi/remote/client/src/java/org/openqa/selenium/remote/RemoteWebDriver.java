@@ -228,9 +228,9 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
 
     Command command;
     if (convertedArgs != null && convertedArgs.length > 0)
-      command = new Command(sessionId, new Context("foo"), "executeScript", script, convertedArgs);
+      command = new Command(sessionId, "executeScript", script, convertedArgs);
     else
-      command = new Command(sessionId, new Context("foo"), "executeScript", script);
+      command = new Command(sessionId, "executeScript", script);
     Response response;
     try {
       response = executor.execute(command);
@@ -355,7 +355,7 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
 
   @SuppressWarnings({"unchecked"})
   protected Response execute(String commandName, Object... parameters) {
-    Command command = new Command(sessionId, new Context("foo"), commandName, parameters);
+    Command command = new Command(sessionId, commandName, parameters);
 
     Response response = new Response();
 

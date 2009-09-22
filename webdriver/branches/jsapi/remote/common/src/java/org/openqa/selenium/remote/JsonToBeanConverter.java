@@ -69,22 +69,13 @@ public class JsonToBeanConverter {
       SessionId sessionId = null;
       if (rawCommand.has("sessionId"))
         sessionId = convert(SessionId.class, rawCommand.getString("sessionId"));
-      Context context = null;
-      if (rawCommand.has("context"))
-        context = convert(Context.class, rawCommand.getString("context"));
 
       if (rawCommand.has("parameters")) {
         List args = convert(ArrayList.class, rawCommand.getJSONArray("parameters"));
-        return (T) new Command(sessionId, context, rawCommand.getString("methodName"), args.toArray());
+        return (T) new Command(sessionId, rawCommand.getString("methodName"), args.toArray());
       }
 
-      return (T) new Command(sessionId, context, rawCommand.getString("methodName"));
-    }
-
-    if (Context.class.equals(clazz)) {
-      JSONObject object = new JSONObject((String) text);
-      String value = object.getString("value");
-      return (T) new Context(value);
+      return (T) new Command(sessionId, rawCommand.getString("methodName"));
     }
 
     if (SessionId.class.equals(clazz)) {
