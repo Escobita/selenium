@@ -1,53 +1,39 @@
-.. _chapter01-cn-reference:
+﻿
+.. _chapter01-cn-reference: 
 
-Introducing Selenium 
+Selenium介绍
 ====================
 
-To Automate or Not to Automate?  That is the Question!
+自动化或者不自动化？这是个问题！
 ------------------------------------------------------
 
-黄健, all you've got to do is replace the text with the chinese version,
-it should work without problems and you should find the update in the website
-after a couple of minutes... http://www.seleniumhq.org/docs/chi
+自动化是否总是有利的？什么时候人们决定自动化测试用例呢？
 
-Is automation always advantageous? When should one decide to automate
-test cases? 
+自动化测试用例并 **不** 总是有利的。有些时候手动测试可能更为恰当。
+例如，如果应用程序的用户界面在不久的将来会有相当大的改变，那么任何自动化将需要重写。
+此外，有时根本没有足够的时间来构建测试自动化。短期而言，手动测试可能会更为有效。
+如果应用程序有一个十分紧迫的截止日期，目前还没有测试自动化，
+并且它的当务之急是在这个时限内完成的测试，那么手动测试是最好的解决办法。
 
-It is **not** always advantageous to automate test cases. There are 
-times when manual testing may be more appropriate. For instance, if the 
-application's user interface will change considerably in the near future, 
-then any automation would need to be rewritten. Also, sometimes there simply 
-is not enough time to build test automation. For the short term, manual testing 
-may be more effective. If an application has a very tight deadline, there is 
-currently no test automation available, and it's imperative that the testing 
-get done within that time frame, then manual testing is the best solution. 
+然而，对于提高软件团队测试过程的长期效率，自动化有独特的优势。
+测试自动化支持：
 
-However, automation has specific advantages for 
-improving the long-term efficiency of a software team's testing processes. 
-Test automation supports:
+* 频繁的回归测试
+* 在开发过程中给开发人员快速反馈
+* 几乎无限的测试用例执行迭代
+* 可定制的应用缺陷报告
+* 支持敏捷或极限开发方法
+* 纪律的测试用例文档
+* 寻找手工测试遗漏的缺陷
 
-* Frequent regression testing 
-* Rapid feedback to developers during the development process
-* Virtually unlimited iterations of test case execution
-* Customized reporting of application defects 
-* Support for Agile and eXtreme development methodologies 
-* Disciplined documentation of test cases
-* Finding defects missed by manual testing
 
-Test Automation for Web Applications
+网络应用的测试自动化
 ------------------------------------
-Many, perhaps most, software applications today are written as web-based 
-applications to be run in an Internet browser. The  
-effectiveness of testing these applications varies widely among companies and 
-organizations. In an era of continuously improving software processes,  
-such as eXtreme programming (XP) and Agile,  
-it can be argued that disciplined testing and quality assurance practices are 
-still underdeveloped in many organizations. Software testing is often 
-conducted manually. At times, this is effective; however there are 
-alternatives to manual testing that many organizations are unaware of, or 
-lack the skills to perform.  Utilizing these alternatives would in most cases
-greatly improve the efficiency of their software development by adding 
-efficiencies to their testing. 
+多数可能是绝大多数现今的软件都是基于网络的并可用联络浏览器打开的应用程序。
+这些应用的测试效果在不同的公司或组织之间有很大的不同。在一个不断改进软件过程的时代，
+例如极限编程(XP)和敏捷，可以认为，有纪律的测试和质量保证实践在许多组织中还在不断发展。
+软件测试往往以人工方式进行。有时，这是有效的；然而许多组织忽视了手工测试的替代方法，
+或者没有技能实施。运用这些替代方法将大大提高软件开发的效率，因为他们增加了测试的效率。
 
 Test automation is often the answer. Test automation means using a tool to 
 run repeatable tests against the target application whenever necessary.
