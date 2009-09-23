@@ -1738,12 +1738,14 @@ used).
 
 Safari and MultiWindow Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are using Safari 4 to run your tests and you only get Selenium's window
+open while the second window with your AUT isn't, make sure that the "Block
+Pop-Up Windows" preference is deactivated.
 
-*Note: This section is not yet developed.*
+This can also be a problem when you use `openWindow()`
 
-.. Santi: we will have to explain the following:
-   http://clearspace.openqa.org/community/selenium/blog/2009/02/24/safari-4-beta#comment-1514
-   http://jira.openqa.org/browse/SEL-639
+More info:
+http://jira.openqa.org/browse/SEL-639#action_17735
 
 Firefox on Linux 
 ~~~~~~~~~~~~~~~~
