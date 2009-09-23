@@ -283,12 +283,12 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
   }
 
   if (!response.session &&
-      command.commandName != 'findActiveDriver' &&
+      command.commandName != 'newSession' &&
       command.commandName != 'quit') {
     response.isError = true;
     response.response =
         'Sessionless command! Sessions must be started with a ' +
-        '"findActiveDriver" command';
+        '"newSession" command';
     Utils.dumpn(response.response +
                 '\nKnown sessions:\n' + sessions.join('\n'));
     return response.send();
@@ -296,7 +296,8 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
 
   // These are used to locate a new driver, and so not having one is a fine
   // thing to do
-  if (command.commandName == 'findActiveDriver' ||
+  if (command.commandName == 'newSession' ||
+      command.commandName == 'deleteSession' ||
       command.commandName == 'switchToWindow' ||
       command.commandName == 'getAllWindowHandles' ||
       command.commandName == 'quit') {
@@ -434,30 +435,37 @@ nsCommandProcessor.prototype.searchWindows_ = function(search_criteria,
 
 
 /**
- * Locates the most recently used FirefoxDriver window.
- *
- * <p>If this request is not yet associated with a session, a new session will
- * be started.
+ * Creates a new session and sets its initial context to the most recently
+ * used FirefoxDriver window.
  *
  * @param {Response} response The response object to send the command response
  *     in.
  */
-nsCommandProcessor.prototype.findActiveDriver = function(response) {
+nsCommandProcessor.prototype.newSession = function(response) {
   var win = this.wm.getMostRecentWindow("navigator:browser");
   var driver = win.fxdriver;
   if (!driver) {
     response.isError = true;
     response.response = 'No drivers associated with the window';
   } else {
-    if (!response.session) {
-      response.session = new Session(driver);
-      this.sessionMap_[response.session.getId()] = response.session;
-    } else {
-      response.session.setDriver(driver);
-    }
+    response.session = new Session(driver);
+    this.sessionMap_[response.session.getId()] = response.session;
     response.response = response.session.getId();
   }
   response.send();
+};
+
+
+/**
+ * Deletes the session associated with the command request.
+ * @param {Array.<string>} sessionId An array whose sole element is the ID of
+ *     the session to delete.
+ */
+nsCommandProcessor.prototype.deleteSession = function(sessionId) {
+  sessionId = sessionId[0];
+  if (this.sessionMap_[sessionId]) {
+    delete this.sessionMap_[sessionId];
+  }
 };
 
 

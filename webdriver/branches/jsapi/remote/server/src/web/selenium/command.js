@@ -206,6 +206,7 @@ webdriver.CommandName = {
   WAIT: 'wait',
   PAUSE: 'pause',
   NEW_SESSION: 'newSession',
+  DELETE_SESSION: 'deleteSession',
   QUIT: 'quit',
   GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
   GET_ALL_WINDOW_HANDLES: 'getAllWindowHandles',

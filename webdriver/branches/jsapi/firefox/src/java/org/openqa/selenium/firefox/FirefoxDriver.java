@@ -276,7 +276,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
     protected WebDriver findActiveDriver() {
-        String response = sendMessage(WebDriverException.class, "findActiveDriver");
+        String response = sendMessage(WebDriverException.class, "newSession");
         return new FirefoxDriver(extension, response);
     }
 
@@ -291,7 +291,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
     private void fixId() {
-        this.sessionId = sendMessage(WebDriverException.class, "findActiveDriver");
+        this.sessionId = sendMessage(WebDriverException.class, "newSession");
     }
 
     public void quit() {

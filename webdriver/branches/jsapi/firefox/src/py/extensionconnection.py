@@ -94,7 +94,7 @@ class ExtensionConnection(object):
         """Connects to the extension and retrieves the session id."""
         self._connect()
         self.session_id = ""
-        self.session_id = self.driver_command("findActiveDriver")["response"]
+        self.session_id = self.driver_command("newSession")["response"]
 
     def _connect(self):
         """Connects to the extension."""

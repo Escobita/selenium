@@ -169,7 +169,14 @@ webdriver.WebDriver.Speed = {
 webdriver.WebDriver.prototype.dispose = function() {
   webdriver.logging.debug('disposing WebDriver');
   webdriver.timing.clearInterval(this.commandInterval_);
-  webdriver.WebDriver.superClass_.dispose.call(this);
+  // Make sure we clear resources by deleting the session used by this driver.
+  this.commandProcessor_.execute(
+      new webdriver.Command(webdriver.CommandName.DELETE_SESSION).
+          setParameters(this.sessionId_).
+          setSuccessCallback(function() {
+            this.sessionId_ = '';
+            webdriver.WebDriver.superClass_.dispose.call(this);
+          }, this));
 };
 
 
