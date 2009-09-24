@@ -29,10 +29,6 @@ Hovering and dragging and dropping are currently unsupported.
 
 Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.  This should be fixed by mid-October 2009.
 
-=== And just on Mac: ===
-
-Unfortunately, you cannot have any Chrome windows of your own open while testing.  This should be fixed by [http://code.google.com/p/chromium/issues/detail?id=20935 Chrome bug 20935]
-
 == Important System Properties ==
 
 The following system properties (read using {{{System.getProperty()}}} and set using {{{System.setProperty()}}} in Java code or the "{{{-DpropertyName=value}}}" command line flag) are used by the ChromeDriver:
