@@ -28,7 +28,7 @@ public @interface Ignore {
 
   public static enum Driver {
 
-    ALL, HTMLUNIT, IE, FIREFOX, REMOTE, IPHONE, CHROME, CHROME_NON_WINDOWS
+    ALL, HTMLUNIT, IE, FIREFOX, REMOTE, IPHONE, CHROME, CHROME_NON_WINDOWS, ANDROID
   }
 
   Driver[] value() default {Driver.ALL};

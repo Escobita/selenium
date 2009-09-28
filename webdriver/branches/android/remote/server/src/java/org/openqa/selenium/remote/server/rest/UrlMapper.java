@@ -63,4 +63,8 @@ public class UrlMapper {
       config.on(type, renderer);
     }
   }
+  
+  public Renderer getGlobalHandler(ResultType type) {
+    return globals.get(type);
+  }
 }

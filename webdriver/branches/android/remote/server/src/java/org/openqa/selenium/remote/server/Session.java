@@ -17,8 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.framework.TestCase;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -47,13 +45,14 @@ public class Session {
       public WebDriver call() throws Exception {
         EventFiringWebDriver driver =
             new EventFiringWebDriver(createNewDriverMatching(capabilities));
-        driver.register(new SnapshotScreenListener(Session.this));
+        //driver.register(new SnapshotScreenListener(Session.this));
         return driver;
       }
     });
     execute(createBrowser);
     this.driver = createBrowser.get();
 
+    
     boolean isRendered = isRenderingDriver(capabilities);
     DesiredCapabilities desiredCapabilities =
         new DesiredCapabilities(capabilities.getBrowserName(), capabilities.getVersion(),
@@ -97,6 +96,11 @@ public class Session {
       return createNewInstanceOf(browser);
     }
 
+    if (platform.is(Platform.ANDROID)) {
+      return (WebDriver) Class.forName("org.openqa.selenium.android.AndroidDriver")
+        .newInstance();
+    }
+    
     if (capabilities.isJavascriptEnabled()) {
       return (WebDriver) Class.forName("org.openqa.selenium.firefox.FirefoxDriver")
           .newInstance();
@@ -108,8 +112,9 @@ public class Session {
 
   private WebDriver createNewInstanceOf(String browser) throws Exception {
     if ("htmlunit".equals(browser)) {
-      return (WebDriver) Class.forName("org.openqa.selenium.htmlunit.HtmlUnitDriver")
+      WebDriver wd = (WebDriver) Class.forName("org.openqa.selenium.htmlunit.HtmlUnitDriver")
           .newInstance();
+      return wd;
     } else if ("firefox".equals(browser)) {
       return (WebDriver) Class.forName("org.openqa.selenium.firefox.FirefoxDriver")
           .newInstance();

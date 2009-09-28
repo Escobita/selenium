@@ -76,6 +76,7 @@ import org.openqa.selenium.remote.server.renderer.ForwardResult;
 import org.openqa.selenium.remote.server.renderer.JsonErrorExceptionResult;
 import org.openqa.selenium.remote.server.renderer.JsonResult;
 import org.openqa.selenium.remote.server.renderer.RedirectResult;
+import org.openqa.selenium.remote.server.rest.Renderer;
 import org.openqa.selenium.remote.server.rest.ResultConfig;
 import org.openqa.selenium.remote.server.rest.ResultType;
 import org.openqa.selenium.remote.server.rest.UrlMapper;
@@ -248,7 +249,12 @@ public class DriverServlet extends HttpServlet {
       throws ServletException {
     try {
       ResultConfig config = mapper.getConfig(request.getPathInfo());
-      config.handle(request.getPathInfo(), request, response);
+      if (config != null)
+        config.handle(request.getPathInfo(), request, response);
+      else {
+        Renderer r = mapper.getGlobalHandler(ResultType.EXCEPTION);
+        r.render(request, response, null);
+      }
     } catch (Exception e) {
       log("Fatal, unhandled exception: " + request.getPathInfo() + ": " + e);
       throw new ServletException(e);

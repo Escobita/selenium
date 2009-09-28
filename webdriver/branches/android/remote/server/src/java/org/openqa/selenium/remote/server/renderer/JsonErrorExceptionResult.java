@@ -24,7 +24,7 @@ import org.openqa.selenium.remote.server.rest.Handler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class JsonErrorExceptionResult extends ErrorJsonResult {
+public class JsonErrorExceptionResult extends JsonResult {
   private final String exceptionName;
 
   public JsonErrorExceptionResult(String exceptionName, String responseOn) {
@@ -40,6 +40,9 @@ public class JsonErrorExceptionResult extends ErrorJsonResult {
     res.setError(true);
 
     String raw = new BeanToJsonConverter().convert(e);
+    if (raw == null)
+      raw = "";
+      
     if (raw.startsWith("{")) {
       res.setValue(String.format("{ screen: \"%s\", %s",
                    request.getAttribute("screen"), raw.substring(1))); 

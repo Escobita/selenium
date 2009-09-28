@@ -18,6 +18,8 @@ limitations under the License.
 package org.openqa.selenium.remote.server.rest;
 
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.BeanToJsonConverter;
+import org.openqa.selenium.remote.SimplePropertyDescriptor;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.PropertyMunger;
 import org.openqa.selenium.remote.server.DriverSessions;
@@ -27,9 +29,6 @@ import org.openqa.selenium.remote.server.handler.WebDriverHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.BufferedReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -176,7 +175,7 @@ public class ResultConfig {
           return null;
         }
       });
-
+      
       ((WebDriverHandler) handler).execute(task);
       task.get();
     } else {
@@ -201,9 +200,9 @@ public class ResultConfig {
 
   protected void addHandlerAttributesToRequest(HttpServletRequest request, Handler handler)
       throws Exception {
-    BeanInfo info = Introspector.getBeanInfo(handler.getClass());
-    PropertyDescriptor[] properties = info.getPropertyDescriptors();
-    for (PropertyDescriptor property : properties) {
+    SimplePropertyDescriptor[] properties = 
+      SimplePropertyDescriptor.getPropertyDescriptors(handler.getClass());
+    for (SimplePropertyDescriptor property : properties) {
       Method readMethod = property.getReadMethod();
       if (readMethod == null) {
         continue;

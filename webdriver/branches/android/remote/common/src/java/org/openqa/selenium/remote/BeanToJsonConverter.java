@@ -24,9 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebDriverException;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -182,10 +179,9 @@ public class BeanToJsonConverter {
     if (maxDepth == 0)
         return null;
 
-    // Raw object via reflection? Nope, not needed
     JSONObject mapped = new JSONObject();
-    BeanInfo beanInfo = Introspector.getBeanInfo(toConvert.getClass());
-    for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+    for (SimplePropertyDescriptor pd : 
+	     SimplePropertyDescriptor.getPropertyDescriptors(toConvert.getClass())) {
       if ("class".equals(pd.getName())) {
         mapped.put("class", toConvert.getClass().getName());
         continue;

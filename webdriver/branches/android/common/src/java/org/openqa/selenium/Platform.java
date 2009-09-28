@@ -49,6 +49,11 @@ public enum Platform {
       return compareWith == WINDOWS || compareWith == XP;
     }
   },
+  ANDROID("linux") {
+    public String getLineEnding() {
+      return "\n";
+    }
+  },
   /**
    * For versions of Windows that "feel like" Windows Vista.
    */

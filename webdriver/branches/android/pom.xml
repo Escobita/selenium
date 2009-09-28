@@ -45,6 +45,13 @@
 				<module>jobbie</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>android</id>
+			<modules>
+				<module>android/driver</module>
+				<module>remote/server-android</module>
+			</modules>
+		</profile>
 	</profiles>
 
 	<dependencies>
