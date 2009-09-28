@@ -28,51 +28,59 @@ import org.openqa.selenium.environment.TestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
 
 public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
-	protected WebDriver driver;
-	protected String simpleTestPage;
-	protected String xhtmlTestPage;
-	protected String formPage;
-	protected String metaRedirectPage;
-	protected String redirectPage;
-	protected String javascriptEnhancedForm;
-	protected String javascriptPage;
-	protected String framesetPage;
-	protected String iframePage;
-	protected String dragAndDropPage;
-	protected String chinesePage;
-	protected String nestedPage;
-        protected String richTextPage;
+
+  protected WebDriver driver;
+
+  protected String simpleTestPage;
+  protected String xhtmlTestPage;
+  protected String formPage;
+  protected String metaRedirectPage;
+  protected String redirectPage;
+  protected String javascriptEnhancedForm;
+  protected String javascriptPage;
+  protected String framesetPage;
+  protected String iframePage;
+  protected String dragAndDropPage;
+  protected String chinesePage;
+  protected String nestedPage;
+  protected String richTextPage;
+  protected String rectanglesPage;
+  protected String childPage;
+  protected String grandchildPage;
 
   public void setDriver(WebDriver driver) {
-		this.driver = driver;
-	}
+    this.driver = driver;
+  }
 
-	@Override
-	protected void setUp() throws Exception {
-        super.setUp();
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
 
-        TestEnvironment environment = GlobalTestEnvironment.get();
+    TestEnvironment environment = GlobalTestEnvironment.get();
 
-        AppServer appServer = environment.getAppServer();
-        simpleTestPage = appServer.whereIs("simpleTest.html");
-        xhtmlTestPage = appServer.whereIs("xhtmlTest.html");
-        formPage = appServer.whereIs("formPage.html");
-        metaRedirectPage = appServer.whereIs("meta-redirect.html");
-        redirectPage = appServer.whereIs("redirect");
-        javascriptEnhancedForm = appServer.whereIs("javascriptEnhancedForm.html");
-        javascriptPage = appServer.whereIs("javascriptPage.html");
-        framesetPage = appServer.whereIs("frameset.html");
-        iframePage = appServer.whereIs("iframes.html");
-        dragAndDropPage = appServer.whereIs("dragAndDropTest.html");
-        chinesePage = appServer.whereIs("cn-test.html");
-        nestedPage = appServer.whereIs("nestedElements.html");
-        richTextPage = appServer.whereIs("rich_text.html");
+    AppServer appServer = environment.getAppServer();
+    simpleTestPage = appServer.whereIs("simpleTest.html");
+    xhtmlTestPage = appServer.whereIs("xhtmlTest.html");
+    formPage = appServer.whereIs("formPage.html");
+    metaRedirectPage = appServer.whereIs("meta-redirect.html");
+    redirectPage = appServer.whereIs("redirect");
+    javascriptEnhancedForm = appServer.whereIs("javascriptEnhancedForm.html");
+    javascriptPage = appServer.whereIs("javascriptPage.html");
+    framesetPage = appServer.whereIs("frameset.html");
+    iframePage = appServer.whereIs("iframes.html");
+    dragAndDropPage = appServer.whereIs("dragAndDropTest.html");
+    chinesePage = appServer.whereIs("cn-test.html");
+    nestedPage = appServer.whereIs("nestedElements.html");
+    richTextPage = appServer.whereIs("rich_text.html");
+    rectanglesPage = appServer.whereIs("rectangles.html");
+    childPage = appServer.whereIs("child/childPage.html");
+    grandchildPage = appServer.whereIs("child/grandchild/grandchildPage.html");
 
-        String hostName = environment.getAppServer().getHostName();
-        String alternateHostName = environment.getAppServer().getAlternateHostName();
+    String hostName = environment.getAppServer().getHostName();
+    String alternateHostName = environment.getAppServer().getAlternateHostName();
 
-        assertThat(hostName, is(not(equalTo(alternateHostName))));
-	}
+    assertThat(hostName, is(not(equalTo(alternateHostName))));
+  }
 
   protected boolean isIeDriverTimedOutException(IllegalStateException e) {
     // The IE driver may throw a timed out exception

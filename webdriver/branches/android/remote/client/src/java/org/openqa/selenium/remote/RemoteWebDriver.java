@@ -37,6 +37,7 @@ import static org.openqa.selenium.remote.MapMaker.map;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,9 +51,12 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
   private CommandExecutor executor;
   private Capabilities capabilities;
   private SessionId sessionId;
+  
+  protected Process clientProcess;
 
   public RemoteWebDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
     this.executor = executor;
+    startClient();
     startSession(desiredCapabilities);
   }
 
@@ -85,6 +89,14 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     sessionId = new SessionId(response.getSessionId());
   }
 
+  protected void startClient() {
+    
+  }
+  
+  protected void stopClient() {
+
+  }
+  
   public Capabilities getCapabilities() {
     return capabilities;
   }
@@ -132,6 +144,17 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     return getElementsFrom(response);
   }
 
+  public WebElement findElementByPartialLinkText(String using) {
+    Response response = execute("findElement", "partial link text", using);
+    return getElementFrom(response);
+  }
+
+  public List<WebElement> findElementsByPartialLinkText(String using) {
+    Response response = execute("findElements", "partial link text", using);
+    return getElementsFrom(response);
+  }
+
+
   public WebElement findElementByName(String using) {
     Response response = execute("findElement", "name", using);
     return getElementFrom(response);
@@ -177,6 +200,7 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       execute("quit");
     } finally {
       sessionId = null;
+      stopClient();
     }
   }
 
@@ -228,6 +252,9 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       element.setId(parts[parts.length - 1]);
       return element;
     } else if (result.get("value") instanceof Number) {
+      if (result.get("value") instanceof Float || result.get("value") instanceof Double) {
+        return ((Number) result.get("value")).doubleValue();
+      }
       return ((Number) result.get("value")).longValue();
     }
 
@@ -258,13 +285,29 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       converted.put("value", arg);
     } else if (arg instanceof Number) {
       converted.put("type", "NUMBER");
-      converted.put("value", ((Number) arg).longValue());
+      if (arg instanceof Float || arg instanceof Double) {
+        converted.put("value", ((Number) arg).doubleValue());
+      } else {
+        converted.put("value", ((Number) arg).longValue());
+      }
     } else if (arg instanceof Boolean) {
+      converted.put("type", "BOOLEAN");
+      converted.put("value", ((Boolean) arg).booleanValue());
+    } else if (arg.getClass() == boolean.class) {
       converted.put("type", "BOOLEAN");
       converted.put("value", arg);
     } else if (arg instanceof RemoteWebElement) {
       converted.put("type", "ELEMENT");
       converted.put("value", ((RemoteWebElement) arg).getId());
+    } else if (arg instanceof Collection<?>) {
+      Collection<?> args = ((Collection<?>)arg);
+      Object[] list = new Object[args.size()];
+      int i = 0;
+      for (Object o : args) {
+        list[i] = convertToJsObject(o);
+        i++;
+      }
+      return list;
     } else {
       throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
     }
@@ -366,7 +409,12 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       throw runtimeException;
     }
 
-    Map rawException = (Map) response.getValue();
+    Map rawException;
+    try {
+      rawException = (Map) response.getValue();
+    } catch (ClassCastException e) {
+      throw new RuntimeException(String.valueOf(response.getValue()));
+    }
 
     String screenGrab = (String) rawException.get("screen");
     String message = (String) rawException.get("message");
@@ -408,24 +456,26 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       }
 
       List<Map> elements = (List<Map>) rawException.get("stackTrace");
-      StackTraceElement[] trace = new StackTraceElement[elements.size()];
-
-      int lastInsert = 0;
-      for (Map values : elements) {
-        // I'm so sorry.
-        Long lineNumber = (Long) values.get("lineNumber");
-        if (lineNumber == null) {
-          continue;
+      if (elements != null) {
+        StackTraceElement[] trace = new StackTraceElement[elements.size()];
+  
+        int lastInsert = 0;
+        for (Map values : elements) {
+          // I'm so sorry.
+          Long lineNumber = (Long) values.get("lineNumber");
+          if (lineNumber == null) {
+            continue;
+          }
+  
+          trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
+                  (String) values.get("methodName"),
+                  (String) values.get("fileName"),
+                  (int) (long) lineNumber);
+          }
+  
+          if (lastInsert == elements.size()) {
+          toThrow.setStackTrace(trace);
         }
-
-        trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
-                (String) values.get("methodName"),
-                (String) values.get("fileName"),
-                (int) (long) lineNumber);
-        }
-
-        if (lastInsert == elements.size()) {
-        toThrow.setStackTrace(trace);
       }
     } catch (Exception e) {
       toThrow = new WebDriverException(e);
@@ -474,6 +524,16 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
         throw new WebDriverException(e);
       }
 
+    }
+
+    public Cookie getCookieNamed(String name) {
+      Set<Cookie> allCookies = getCookies();
+      for (Cookie cookie : allCookies) {
+        if (cookie.getName().equals(name)) {
+          return cookie;
+        }
+      }
+      return null;
     }
 
     public Speed getSpeed() {
@@ -536,13 +596,5 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       Response response = execute("getActiveElement");
       return getElementFrom(response);
     }
-  }
-
-  public WebElement findElementByPartialLinkText(String using) {
-	  throw new UnsupportedOperationException();
-  }
-	
-  public List<WebElement> findElementsByPartialLinkText(String using) {
-	  throw new UnsupportedOperationException();
   }
 }

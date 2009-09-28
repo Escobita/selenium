@@ -17,14 +17,32 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
+import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.DoubleByReference;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.NativeLongByReference;
+import com.sun.jna.ptr.PointerByReference;
+
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.Speed;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.NoSuchWindowException;
 import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
+import org.openqa.selenium.internal.FileHandler;
+import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.internal.TemporaryFilesystem;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.BufferedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -32,29 +50,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.Speed;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.ReturnedCookie;
-import org.openqa.selenium.internal.TemporaryFilesystem;
-import org.openqa.selenium.internal.Cleanly;
-import org.openqa.selenium.internal.FileHandler;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.NativeLongByReference;
-import com.sun.jna.ptr.PointerByReference;
 
 public class InternetExplorerDriver implements WebDriver, SearchContext, JavascriptExecutor {
     private static ExportedWebDriverFunctions lib;
@@ -89,11 +84,25 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
     }
     
     public void quit() {
-    	close();  // Not a good implementation, but better than nothing
+      for (String handle : getWindowHandles()) {
+        try {
+          switchTo().window(handle);
+          close();
+        } catch (NoSuchWindowException e) {
+          // doesn't matter one jot.
+        }
+      }
+      lib.wdFreeDriver(driver);
+      driver = null;
     }
 
   public Set<String> getWindowHandles() {
-    return Collections.singleton(getWindowHandle());
+    PointerByReference rawHandles = new PointerByReference();
+    int result = lib.wdGetAllWindowHandles(driver, rawHandles);
+
+    errors.verifyErrorCode(result, "Unable to obtain all window handles");
+
+    return new StringCollection(lib, rawHandles.getValue()).toSet();
   }
 
   public String getWindowHandle() {
@@ -180,6 +189,13 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
         errors.verifyErrorCode(result, "Cannot extract string result");
         throw new WebDriverException(new StringWrapper(lib, message).toString());
         
+      case 7:
+    	DoubleByReference doubleVal = new DoubleByReference();
+    	result = lib.wdGetDoubleScriptResult(scriptResult, doubleVal);
+    	errors.verifyErrorCode(result, "Cannot extract double result");
+    	toReturn = doubleVal.getValue();
+        break;
+        
       default:
         throw new WebDriverException("Cannot determine result type");
       }
@@ -196,6 +212,9 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
       } else if (arg instanceof Boolean) {
         Boolean param = (Boolean) arg;
         result = lib.wdAddBooleanScriptArg(scriptArgs, param == null || !param ? 0 : 1);      
+      } else if (arg instanceof Double || arg instanceof Float) {
+    	  Double number = ((Number) arg).doubleValue();
+    	  result = lib.wdAddDoubleScriptArg(scriptArgs, number);
       } else if (arg instanceof Number) {
         long number = ((Number) arg).longValue();
         result = lib.wdAddNumberScriptArg(scriptArgs, new NativeLong(number));
@@ -320,7 +339,9 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
         }
 
         public WebDriver window(String windowName) {
-          throw new NoSuchWindowException("Unable to switch to window: " + windowName);
+          int result = lib.wdSwitchToWindow(driver, new WString(windowName));
+          errors.verifyErrorCode(result, "Unable to locate window: " + windowName);
+          return InternetExplorerDriver.this;
         }
 
       public WebDriver defaultContent() {
@@ -415,7 +436,18 @@ public class InternetExplorerDriver implements WebDriver, SearchContext, Javascr
 	        return toReturn;
 		}
 
-		private String getCurrentHost() {
+      public Cookie getCookieNamed(String name) {
+        Set<Cookie> allCookies = getCookies();
+        for (Cookie cookie : allCookies) {
+          if (name.equals(cookie.getName())) {
+            return cookie;
+          }
+        }
+
+        return null;        
+      }
+
+      private String getCurrentHost() {
 			try {
 				URL url = new URL(getCurrentUrl());
 				return url.getHost();

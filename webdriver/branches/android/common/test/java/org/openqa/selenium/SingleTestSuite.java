@@ -32,7 +32,7 @@ public class SingleTestSuite extends TestCase {
   private final static String REMOTE = "org.openqa.selenium.remote.RemoteWebDriverTestSuite$RemoteWebDriverForTest";
 
   public static Test suite() throws Exception {
-    String driver = IE;
+    String driver = REMOTE;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -46,9 +46,9 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("WindowSwitchingTest")
-//        .method("testShouldAllowUsersToHoverOverElements")
-        .exclude(ALL)
+        .onlyRun("ElementAttributeTest")
+//        .method("testShouldBeAbleToAccessPagesWithAnInsecureSslCertificate")
+        .exclude(ALL)  
         .exclude(Ignore.Driver.IE)
         .leaveRunning()
         ;  // Yeah, this look strange :)

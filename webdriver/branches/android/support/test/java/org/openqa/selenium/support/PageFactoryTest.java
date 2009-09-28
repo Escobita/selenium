@@ -28,6 +28,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+import org.openqa.selenium.support.pagefactory.FieldDecorator;
 
 import java.lang.reflect.Field;
 
@@ -81,14 +82,14 @@ public class PageFactoryTest extends MockObjectTestCase {
         assertThat(driver, equalTo(page.driver));
     }
 
-    public void testShouldNotDecorateFieldsWhenTheElementLocatorFactoryReturnsNull() {
+    public void testShouldNotDecorateFieldsWhenTheFieldDecoratorReturnsNull() {
       PublicPage page = new PublicPage();
       // Assign not-null values
       WebElement q = mock(WebElement.class);
       page.q = q;
 
-      PageFactory.initElements(new ElementLocatorFactory() {
-        public ElementLocator createLocator(Field field) {
+      PageFactory.initElements(new FieldDecorator() {
+        public Object decorate(ClassLoader loader, Field field) {
           return null;
         }
       }, page);
@@ -96,7 +97,43 @@ public class PageFactoryTest extends MockObjectTestCase {
       assertThat(page.q, equalTo(q));
     }
 
+    public void testTriesToDecorateNonWebElements() {
+      NonWebElementsPage page = new NonWebElementsPage();
+      // Assign not-null values
+
+      PageFactory.initElements(new FieldDecorator() {
+        public Object decorate(ClassLoader loader, Field field) {
+          return new Integer(5);
+        }
+      }, page);
+
+      assertThat(page.num, equalTo(new Integer(5)));
+    }
+
+    public void testShouldComplainWhenMoreThanOneFindByAttributeIsSet() {
+      GrottyPage page = new GrottyPage();
+
+      try {
+        PageFactory.initElements((WebDriver) null, page);
+        fail("Should not have allowed page to be initialised");
+      } catch (IllegalArgumentException e) {
+        // this is expected
+      }
+    }
+
+    public void testShouldComplainWhenMoreThanOneFindByShortFormAttributeIsSet() {
+      GrottyPage2 page = new GrottyPage2();
+
+      try {
+        PageFactory.initElements((WebDriver) null, page);
+        fail("Should not have allowed page to be initialised");
+      } catch (IllegalArgumentException e) {
+        // this is expected
+      }
+    }
+
     public static class PublicPage {
+    		@FindBy(name = "q")
         public WebElement q;
 
         public RenderedWebElement rendered;
@@ -120,5 +157,19 @@ public class PageFactoryTest extends MockObjectTestCase {
         public WebElement getField() {
             return allMine;
         }
+    }
+
+    public static class GrottyPage {
+      @FindBy(how = How.XPATH, using = "//body", id = "cheese")
+      private WebElement one;
+    }
+
+    public static class GrottyPage2 {
+      @FindBy(xpath = "//body", id = "cheese")
+      private WebElement two;
+    }
+
+    public static class NonWebElementsPage {
+      public Integer num;
     }
 }

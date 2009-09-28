@@ -49,11 +49,14 @@ import javax.xml.xpath.XPathFactory;
 
 public class FirefoxProfile {
   private static final String EXTENSION_NAME = "fxdriver@googlecode.com";
+  private static final String EM_NAMESPACE_URI = "http://www.mozilla.org/2004/em-rdf#";
   private File profileDir;
   private File extensionsDir;
   private File userPrefs;
   private Preferences additionalPrefs = new Preferences();
   private int port;
+  private boolean enableNativeEvents;
+  private boolean loadNoFocusLib;
 
   /**
    * Constructs a firefox profile from an existing, physical profile directory.
@@ -69,6 +72,8 @@ public class FirefoxProfile {
     this.userPrefs = new File(profileDir, "user.js");
 
     port = FirefoxDriver.DEFAULT_PORT;
+    enableNativeEvents = FirefoxDriver.DEFAULT_ENABLE_NATIVE_EVENTS;
+    loadNoFocusLib = false;
 
     if (!profileDir.exists()) {
       throw new WebDriverException(MessageFormat.format("Profile directory does not exist: {0}",
@@ -172,7 +177,9 @@ public class FirefoxProfile {
       xpath.setNamespaceContext(new NamespaceContext() {
         public String getNamespaceURI(String prefix) {
           if ("em".equals(prefix)) {
-            return "http://www.mozilla.org/2004/em-rdf#";
+            return EM_NAMESPACE_URI;
+          } else if ("RDF".equals(prefix)) {
+            return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
           }
 
           return XMLConstants.NULL_NS_URI;
@@ -189,12 +196,19 @@ public class FirefoxProfile {
 
       Node idNode = (Node) xpath.compile("//em:id").evaluate(doc, XPathConstants.NODE);
 
+      String id = null;
       if (idNode == null) {
-        throw new WebDriverException(
-            "Cannot locate node containing extension id: " + installRdf.getAbsolutePath());
+        Node descriptionNode =
+            (Node) xpath.compile("//RDF:Description").evaluate(doc, XPathConstants.NODE);
+        Node idAttr = descriptionNode.getAttributes().getNamedItemNS(EM_NAMESPACE_URI, "id");
+        if (idAttr == null) {
+          throw new WebDriverException(
+              "Cannot locate node containing extension id: " + installRdf.getAbsolutePath());
+        }
+        id = idAttr.getNodeValue();
+      } else {
+        id = idNode.getTextContent();
       }
-
-      String id = idNode.getTextContent();
 
       if (id == null || "".equals(id.trim())) {
         throw new FileNotFoundException("Cannot install extension with ID: " + id);
@@ -368,6 +382,8 @@ public class FirefoxProfile {
         prefs.put("dom.disable_open_during_load", "false");
         prefs.put("extensions.update.enabled", "false");
         prefs.put("extensions.update.notifyUser", "false");
+        prefs.put("security.fileuri.origin_policy", "3");
+        prefs.put("security.fileuri.strict_origin_policy", "false");
         prefs.put("security.warn_entering_secure", "false");
         prefs.put("security.warn_submit_insecure", "false");
         prefs.put("security.warn_entering_secure.show_once", "false");
@@ -383,6 +399,10 @@ public class FirefoxProfile {
 
         // Which port should we listen on?
         prefs.put("webdriver_firefox_port", Integer.toString(port));
+
+        // Should we use native events?
+        prefs.put("webdriver_enable_native_events",
+            Boolean.toString(enableNativeEvents));
 
         // Settings to facilitate debugging the driver
         prefs.put("javascript.options.showInConsole", "true"); // Logs errors in chrome files to the Error Console.
@@ -421,7 +441,35 @@ public class FirefoxProfile {
         this.port = port;
     }
 
-    public boolean isRunning() {
+    public boolean enableNativeEvents() {
+      return enableNativeEvents;
+    }
+
+    public void setEnableNativeEvents(boolean enableNativeEvents) {
+      this.enableNativeEvents = enableNativeEvents;
+    }
+
+    /**
+     * Returns whether the no focus library should be loaded for Firefox
+     * profiles launched on Linux, even if native events are disabled.
+     *
+     * @return Whether the no focus library should always be loaded for Firefox
+     *     on Linux.
+     */
+    public boolean alwaysLoadNoFocusLib() {
+      return loadNoFocusLib;
+    }
+
+    /**
+     * Sets whether the no focus library should always be loaded on Linux.
+     *
+     * @param loadNoFocusLib Whether to always load the no focus library.
+     */
+    public void setAlwaysLoadNoFocusLib(boolean loadNoFocusLib) {
+      this.loadNoFocusLib = loadNoFocusLib;
+    }
+
+  public boolean isRunning() {
         File macAndLinuxLockFile = new File(profileDir, ".parentlock");
         File windowsLockFile = new File(profileDir, "parent.lock");
 
@@ -444,6 +492,8 @@ public class FirefoxProfile {
       FirefoxProfile profile = new FirefoxProfile(to);
       additionalPrefs.addTo(profile);
       profile.setPort(port);
+      profile.setEnableNativeEvents(enableNativeEvents);
+      profile.setAlwaysLoadNoFocusLib(loadNoFocusLib);
       profile.updateUserPrefs();
 
       return profile;

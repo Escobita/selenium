@@ -27,8 +27,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import java.io.UnsupportedEncodingException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -105,8 +103,6 @@ public class HttpCommandExecutor implements CommandExecutor {
         .put("findElement", new CommandInfo("/session/:sessionId/:context/element", HttpVerb.POST));
     nameToUrl.put("findElements",
                   new CommandInfo("/session/:sessionId/:context/elements", HttpVerb.POST));
-    nameToUrl.put("getChildrenOfType", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/children/:name", HttpVerb.POST));
     nameToUrl.put("getActiveElement", new CommandInfo("/session/:sessionId/:context/element/active", HttpVerb.POST));
 
     nameToUrl
@@ -137,6 +133,7 @@ public class HttpCommandExecutor implements CommandExecutor {
         "/session/:sessionId/:context/element/:id/enabled", HttpVerb.GET));
     nameToUrl.put("isElementDisplayed", new CommandInfo(
         "/session/:sessionId/:context/element/:id/displayed", HttpVerb.GET));
+    nameToUrl.put("hover", new CommandInfo("/session/:sessionId/:context/element/:id/hover", HttpVerb.POST));
     nameToUrl.put("getElementLocation", new CommandInfo(
         "/session/:sessionId/:context/element/:id/location", HttpVerb.GET));
     nameToUrl.put("getElementSize",
@@ -144,6 +141,7 @@ public class HttpCommandExecutor implements CommandExecutor {
 
     nameToUrl.put("getElementAttribute",
                   new CommandInfo("/session/:sessionId/:context/element/:id/attribute/:name", HttpVerb.GET));
+    nameToUrl.put("equals", new CommandInfo("/session/:sessionId/:context/element/:id/equals/:other", HttpVerb.GET));
 
     nameToUrl
         .put("getAllCookies", new CommandInfo("/session/:sessionId/:context/cookie", HttpVerb.GET));
@@ -174,7 +172,7 @@ public class HttpCommandExecutor implements CommandExecutor {
 
   public Response execute(Command command) throws Exception {
     CommandInfo info = nameToUrl.get(command.getMethodName());
-      HttpMethod httpMethod = info.getMethod(remotePath, command);
+    HttpMethod httpMethod = info.getMethod(remotePath, command);
 
     httpMethod.addRequestHeader("Accept", "application/json, image/png");
 
@@ -228,6 +226,13 @@ public class HttpCommandExecutor implements CommandExecutor {
     }
     response.setError(!(httpMethod.getStatusCode() > 199 && httpMethod.getStatusCode() < 300));
 
+    if (response.getValue() instanceof String) {
+      //We normalise to \n because Java will translate this to \r\n
+      //if this is suitable on our platform, and if we have \r\n, java will
+      //turn this into \r\r\n, which would be Bad!
+      response.setValue(((String)response.getValue()).replace("\r\n", "\n"));
+    }
+    
     return response;
   }
 

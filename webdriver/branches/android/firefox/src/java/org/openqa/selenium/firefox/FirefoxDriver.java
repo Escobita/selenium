@@ -18,6 +18,7 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Alert;
@@ -33,6 +34,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.IllegalLocatorException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.firefox.internal.ExtensionConnectionFactory;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.internal.FindsByClassName;
@@ -53,6 +55,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,6 +79,8 @@ import java.util.Set;
 public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecutor,
         FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
     public static final int DEFAULT_PORT = 7055;
+    // For now, only enable native events on Windows
+    public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS = Platform.getCurrent().is(Platform.WINDOWS);
 
     private final ExtensionConnection extension;
     protected Context context;
@@ -108,7 +113,12 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     
     public FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile) {
       if (profile == null) {
-        profile = ProfileManager.getInstance().createProfile(binary, DEFAULT_PORT);
+        String suggestedProfile = System.getProperty("webdriver.firefox.profile");
+        if (suggestedProfile != null) {
+          profile = new ProfilesIni().getProfile(suggestedProfile);
+        } else {
+          profile = ProfileManager.getInstance().createProfile(binary, DEFAULT_PORT);
+        }
       } else {
         profile.addWebDriverExtensionIfNeeded(false);
       }
@@ -302,9 +312,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     String allHandles = sendMessage(WebDriverException.class, "getAllWindowHandles");
     String[] handles = allHandles.split(",");
     HashSet<String> toReturn = new HashSet<String>();
-    for (String handle : handles) {
-      toReturn.add(handle);
-    }
+    toReturn.addAll(Arrays.asList(handles));
     return toReturn;
   }
 
@@ -319,18 +327,39 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         context = response.getContext();
         response.ifNecessaryThrow(WebDriverException.class);
 
-        if ("NULL".equals(response.getExtraResult("resultType")))
-          return null;
-
-        String resultType = (String) response.getExtraResult("resultType");
-        if ("ELEMENT".equals(resultType))
-        	return new FirefoxWebElement(this, response.getResponseText());
-
-        Object result = response.getExtraResult("response");
-        if (result instanceof Integer)
-          return new Long(response.getResponseText());
-        return result;
+        return parseJavascriptObjectFromResponse(
+            (String)response.getExtraResult("resultType"),
+            response.getExtraResult("response"));
     }
+  
+  public Object parseJavascriptObjectFromResponse(String resultType, Object response) {
+    if ("NULL".equals(resultType))
+      return null;
+    
+    if ("ARRAY".equals(resultType)) {
+      List<Object> list = new ArrayList<Object>();
+      try {
+        JSONArray array = (JSONArray)response;
+        for (int i = 0; i < array.length(); ++i) {
+          //They really should all be JSONObjects of form {resultType, response}
+          JSONObject subObject = (JSONObject)array.get(i);
+          list.add(parseJavascriptObjectFromResponse(
+              subObject.getString("resultType"), subObject.get("response")));
+        }
+      } catch (JSONException e) {
+        throw new WebDriverException(e);
+      }
+      return list;
+    }
+    if ("ELEMENT".equals(resultType)) {
+      return new FirefoxWebElement(this, (String)response);
+    }
+
+    if (response instanceof Integer) {
+      return new Long((Integer)response);
+    }
+    return response;
+  }
 
   public boolean isJavascriptEnabled() {
     return true;
@@ -354,6 +383,9 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     if (arg instanceof String) {
       converted.put("type", "STRING");
       converted.put("value", arg);
+    } else if (arg instanceof Double || arg instanceof Float) {
+      converted.put("type", "NUMBER");
+      converted.put("value", ((Number) arg).doubleValue());
     } else if (arg instanceof Number) {
       converted.put("type", "NUMBER");
       converted.put("value", ((Number) arg).longValue());
@@ -369,6 +401,15 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     } else if (arg instanceof FirefoxWebElement) {
       converted.put("type", "ELEMENT");
       converted.put("value", ((FirefoxWebElement) arg).getElementId());
+    } else if (arg instanceof Collection<?>) {
+      Collection<?> args = ((Collection<?>)arg);
+      Object[] list = new Object[args.size()];
+      int i = 0;
+      for (Object o : args) {
+        list[i] = convertToJsObject(o);
+        i++;
+      }
+      return list;
     } else {
       throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
     }
@@ -439,7 +480,17 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
             return json.toString();
         }
 
-        public Set<Cookie> getCookies() {
+      public Cookie getCookieNamed(String name) {
+        Set<Cookie> allCookies = getCookies();
+        for (Cookie cookie : allCookies) {
+          if (cookie.getName().equals(name)) {
+            return cookie;
+          }
+        }
+        return null;
+      }
+
+      public Set<Cookie> getCookies() {
             String response = sendMessage(WebDriverException.class, "getCookie").trim();
             Set<Cookie> cookies = new HashSet<Cookie>();
 
@@ -499,10 +550,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         }
 
         public void deleteAllCookies() {
-            Set<Cookie> cookies = getCookies();
-            for(Cookie c : cookies) {
-                deleteCookie(c);
-            }
+            sendMessage(WebDriverException.class, "deleteAllCookies");
         }
 
         public Speed getSpeed() {
@@ -559,7 +607,7 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
         }
 
         public WebDriver window(String windowName) {
-            String response = sendMessage(NoSuchWindowException.class, "switchToWindow", String.valueOf(windowName));
+          String response = sendMessage(NoSuchWindowException.class, "switchToWindow", String.valueOf(windowName));
             if (response == null || "No window found".equals(response)) {
                 throw new NoSuchWindowException("Cannot find window: " + windowName);
             }

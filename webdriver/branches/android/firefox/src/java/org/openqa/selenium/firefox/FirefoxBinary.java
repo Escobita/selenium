@@ -19,6 +19,7 @@ package org.openqa.selenium.firefox;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.firefox.internal.Executable;
 import org.openqa.selenium.firefox.internal.Streams;
 
@@ -28,11 +29,16 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class FirefoxBinary {
+    private static final String NO_FOCUS_LIBRARY_NAME = "x_ignore_nofocus.so";
+
     private final Map<String, String> extraEnv = new HashMap<String, String>();
     private final Executable executable;
     private Process process;
@@ -48,64 +54,118 @@ public class FirefoxBinary {
       executable = new Executable(pathToFirefoxBinary);
     }
 
-    private boolean isOnLinux() {
-      return (System.getProperty("os.name").toLowerCase().indexOf("linux") > -1);
+    protected boolean isOnLinux() {
+      return Platform.getCurrent().is(Platform.UNIX);
     }
-    
+
     public void startProfile(FirefoxProfile profile, String... commandLineFlags) throws IOException {
-        String profileAbsPath = profile.getProfileDir().getAbsolutePath();
-        setEnvironmentProperty("XRE_PROFILE_PATH", profileAbsPath);
-        setEnvironmentProperty("MOZ_NO_REMOTE", "1");
+      String profileAbsPath = profile.getProfileDir().getAbsolutePath();
+      setEnvironmentProperty("XRE_PROFILE_PATH", profileAbsPath);
+      setEnvironmentProperty("MOZ_NO_REMOTE", "1");
+
+      if (isOnLinux()
+          && (profile.enableNativeEvents() || profile.alwaysLoadNoFocusLib())) {
+        modifyLinkLibraryPath(profile);
+      }
+
+      List<String> commands = new ArrayList<String>();
+      commands.add(getExecutable().getPath());
+      commands.add("--verbose");
+      commands.addAll(Arrays.asList(commandLineFlags));
+      ProcessBuilder builder = new ProcessBuilder(commands);
+      builder.redirectErrorStream(true);
+      builder.environment().putAll(getExtraEnv());
+      getExecutable().setLibraryPath(builder, getExtraEnv());
+
+      if (stream == null) {
+        stream = getExecutable().getDefaultOutputStream();
+      }
+
+      startFirefoxProcess(builder);
+
+      copeWithTheStrangenessOfTheMac(builder);
+
+      startOutputWatcher();
+    }
+
+  protected void startFirefoxProcess(ProcessBuilder builder) throws IOException {
+    process = builder.start();
+  }
+
+  protected void startOutputWatcher() {
+    outputWatcher = new Thread(new OutputWatcher(process, stream), "Firefox output watcher");
+    outputWatcher.start();
+  }
+
+  protected Executable getExecutable() {
+    return executable;
+  }
+
+  protected Map<String, String> getExtraEnv() {
+    return extraEnv;
+  }
+
+  protected void modifyLinkLibraryPath(FirefoxProfile profile) {
+    // Extract x_ignore_nofocus.so from x86, amd64 directories inside
+    // the jar into a real place in the filesystem and change LD_LIBRARY_PATH
+    // to reflect that.
+
+    String existingLdLibPath = System.getenv("LD_LIBRARY_PATH");
+    // The returned new ld lib path is terminated with ':'
+    String newLdLibPath = extractAndCheck(profile, NO_FOCUS_LIBRARY_NAME, "x86", "amd64");
+    if (existingLdLibPath != null && !existingLdLibPath.equals("")) {
+      newLdLibPath += existingLdLibPath;
+    }
+
+    setEnvironmentProperty("LD_LIBRARY_PATH", newLdLibPath);
+    // Set LD_PRELOAD to x_ignore_nofocus.so - this will be taken automagically
+    // from the LD_LIBRARY_PATH
+    setEnvironmentProperty("LD_PRELOAD", NO_FOCUS_LIBRARY_NAME);
+  }
+
+  protected String extractAndCheck(FirefoxProfile profile, String noFocusSoName,
+      String jarPath32Bit, String jarPath64Bit) {
+    
+    // 1. Extract x86/x_ignore_nofocus.so to profile.getLibsDir32bit
+    // 2. Extract amd64/x_ignore_nofocus.so to profile.getLibsDir64bit
+    // 3. Create a new LD_LIB_PATH string to contain:
+    //   profile.getLibsDir32bit + ":" + profile.getLibsDir64bit
+
+    Set<String> pathsSet = new HashSet<String>();
+    pathsSet.add(jarPath32Bit);
+    pathsSet.add(jarPath64Bit);
+    
+    StringBuilder builtPath = new StringBuilder();
+
+    for (String path : pathsSet) {
+      try {
         
-//        if (isOnLinux()) {
-//          String preloadLib = profileAbsPath + File.separator + "x_ignore_nofocus.so";
-//
-//          try {
-//            FileHandler.copyResource(profile.getProfileDir(), getClass(), "x_ignore_nofocus.so");
-//          } catch (IOException e) {
-//            if (Boolean.getBoolean("webdriver.development")) {
-//              System.err.println("Exception unpacking required libraries, but in development mode. Continuing");
-//
-//              // TODO(eranm): A crude hack to get some tests running. Do it
-//              // in a more portable way.
-//              String cwd = System.getProperty("user.dir");
-//              System.out.println("CWD: " + cwd + " arch: " + System.getProperty("os.name"));
-//              preloadLib = cwd + "/build/jar/amd64/x_ignore_nofocus.so";
-//            } else {
-//              throw new WebDriverException(e);
-//            }
-//          }
-//
-//          File ld_file = new File(preloadLib);
-//          if (ld_file.exists() == false) {
-//            throw new WebDriverException("Could not locate " + preloadLib + ": "
-//                + "native events will not work.");
-//          }
-//          setEnvironmentProperty("LD_PRELOAD", preloadLib);
-//        }
+        FileHandler.copyResource(profile.getProfileDir(), getClass(), path +
+            File.separator + noFocusSoName);
+        
+        String outSoPath = profile.getProfileDir().getAbsolutePath() + File.separator + path;
 
-        List<String> commands = new ArrayList<String>();
-        commands.add(executable.getPath());
-        commands.add("--verbose");
-        commands.addAll(Arrays.asList(commandLineFlags));
-        ProcessBuilder builder = new ProcessBuilder(commands);
-        builder.redirectErrorStream(true);
-        builder.environment().putAll(extraEnv);
-        executable.setLibraryPath(builder, extraEnv);
-
-        if (stream == null) {
-          stream = executable.getDefaultOutputStream();
+        File file = new File(outSoPath, noFocusSoName);
+        if (!file.exists()) {
+          throw new WebDriverException("Could not locate " + path + ": "
+                                       + "native events will not work.");
         }
 
-        process = builder.start();
-
-        copeWithTheStrangenessOfTheMac(builder);
-
-        outputWatcher = new Thread(new OutputWatcher(process, stream), "Firefox output watcher");
-        outputWatcher.start();
+        builtPath.append(outSoPath).append(":");
+      } catch (IOException e) {
+        if (Boolean.getBoolean("webdriver.development")) {
+          System.err.println(
+              "Exception unpacking required library, but in development mode. Continuing");
+        } else {
+          throw new WebDriverException(e);
+        }
+      }
     }
 
-  private void copeWithTheStrangenessOfTheMac(ProcessBuilder builder) throws IOException {
+    return builtPath.toString();
+  }
+
+  protected void copeWithTheStrangenessOfTheMac(ProcessBuilder builder) throws IOException {
     if (Platform.getCurrent().is(Platform.MAC)) {
       // On the Mac, this process sometimes dies. Check for this, put in a decent sleep
       // and then attempt to restart it. If this doesn't work, then give up
@@ -121,7 +181,7 @@ public class FirefoxBinary {
         // TODO(simon): This is utterly bogus. We should do something far smarter
         sleep(10000);
 
-        process = builder.start();
+        startFirefoxProcess(builder);
       } catch (IllegalThreadStateException e) {
         // Excellent, we've not creashed.
       }
@@ -147,11 +207,13 @@ public class FirefoxBinary {
   }
 
   public void setEnvironmentProperty(String propertyName, String value) {
-        if (propertyName == null || value == null)
-            throw new WebDriverException(
-                    String.format("You must set both the property name and value: %s, %s", propertyName, value));
-        extraEnv.put(propertyName, value);
+    if (propertyName == null || value == null) {
+      throw new WebDriverException(
+          String.format("You must set both the property name and value: %s, %s", propertyName,
+                        value));
     }
+    extraEnv.put(propertyName, value);
+  }
 
     public void createProfile(String profileName) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(executable.getPath(), "--verbose", "-CreateProfile", profileName)
@@ -161,9 +223,9 @@ public class FirefoxBinary {
           stream = executable.getDefaultOutputStream();
         }
 
-        process = builder.start();
+      startFirefoxProcess(builder);
 
-        outputWatcher = new Thread(new OutputWatcher(process, stream));
+      outputWatcher = new Thread(new OutputWatcher(process, stream));
         outputWatcher.start();
     }
 

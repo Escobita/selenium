@@ -19,8 +19,11 @@ limitations under the License.
 #include "StdAfx.h"
 #include "utils.h"
 #include "InternalCustomMessage.h"
-#include "jsxpath.h"
 #include "errorcodes.h"
+#include "jsxpath.h"
+#include "logging.h"
+#include <mshtml.h>
+#include <SHLGUID.h>
 
 using namespace std;
 IeThread* g_IE_Thread = NULL;
@@ -77,12 +80,13 @@ IeThread* InternetExplorerDriver::ThreadFactory()
 void InternetExplorerDriver::close()
 {
 	SCOPETRACER
-	if (closeCalled)
+	if (closeCalled) {
 		return;
+	}
 
 	closeCalled = true;
 
-	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_QUIT_IE,)
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_CLOSEWINDOW,)
 }
 
 bool InternetExplorerDriver::getVisible()
@@ -142,6 +146,13 @@ std::wstring InternetExplorerDriver::getHandle()
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GET_HANDLE,);
 	return data.output_string_.c_str();
+}
+
+std::vector<std::wstring> InternetExplorerDriver::getAllHandles() 
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GET_HANDLES,);
+	return data.output_list_string_;
 }
 
 ElementWrapper* InternetExplorerDriver::getActiveElement()
@@ -380,6 +391,18 @@ bool InternetExplorerDriver::switchToFrame(LPCWSTR pathToFrame)
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_SWITCHTOFRAME, pathToFrame)
 	return data.output_bool_;
+}
+
+int InternetExplorerDriver::switchToWindow(LPCWSTR name)
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_SWITCHWINDOW, name)
+	
+	if (data.error_code == SUCCESS) {
+		closeCalled = false;
+	}
+
+	return data.error_code;
 }
 
 LPCWSTR InternetExplorerDriver::getCookies()

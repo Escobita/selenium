@@ -81,6 +81,8 @@ private:
 	void getDocument3(const IHTMLDOMNode* extractFrom, IHTMLDocument3** pdoc);
 	void getDocument2(const IHTMLDOMNode* extractFrom, IHTMLDocument2** pdoc);
 
+	void getAllBrowsers(std::vector<IWebBrowser2*>* browsers);
+
 	void tryNotifyNavigCompleted();
 	void tryTransferEventReleaserToNotifyNavigCompleted(CScopeCaller *pSC, bool setETNWNC=true);
 
@@ -134,6 +136,8 @@ protected:
           void OnSwitchToFrame(WPARAM, LPARAM);
           void OnExecuteScript(WPARAM, LPARAM);
           void OnGetActiveElement(WPARAM, LPARAM);
+		  void OnCloseWindow(WPARAM, LPARAM);
+		  void OnSwitchToWindow(WPARAM, LPARAM);
 
 		  void OnElementIsDisplayed(WPARAM, LPARAM);
 		  void OnElementIsEnabled(WPARAM, LPARAM);
@@ -166,6 +170,7 @@ protected:
 		  void OnGoForward(WPARAM, LPARAM);
 		  void OnGoBack(WPARAM, LPARAM);
 		  void OnGetHandle(WPARAM, LPARAM);
+		  void OnGetHandles(WPARAM, LPARAM);
 		  void OnSelectElementByXPath(WPARAM, LPARAM);
 		  void OnSelectElementsByXPath(WPARAM, LPARAM);
 		  void OnSelectElementById(WPARAM, LPARAM);
@@ -185,8 +190,6 @@ protected:
 		  void OnWaitForNavigationToFinish(WPARAM, LPARAM);
 
 		  void OnElementRelease(WPARAM, LPARAM);
-
-		  void OnQuitIE(WPARAM, LPARAM);
 
 public:
 	DataMarshaller& getCmdData() {return pBody->m_CmdData;}

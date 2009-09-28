@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 // IEThread.cpp : implementation file
-//
+
 
 #include "stdafx.h"
 #include <comdef.h>
@@ -25,7 +25,7 @@ limitations under the License.
 
 #include "errorcodes.h"
 #include "utils.h"
-
+#include "windowHandling.h"
 #include "InternalCustomMessage.h"
 
 extern wchar_t* XPATHJS[];
@@ -192,11 +192,39 @@ void IeThread::OnGetHandle(WPARAM w, LPARAM lp)
 	pBody->ieThreaded->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hwnd));
 
 	// Let's hope we fit into 8 characters
-	wchar_t* buffer = new wchar_t[9];
+	wchar_t buffer[9];
 	swprintf_s(buffer, 9, L"%08X", (long long) hwnd);
 	std::wstring& ret = data.output_string_;  
 	ret.append(buffer);
-	delete[] buffer;
+}
+
+std::wstring getWindowHandle(IWebBrowser2* browser)
+{
+	HWND hwnd;
+	browser->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hwnd));
+
+	// Let's hope we fit into 8 characters
+	wchar_t buffer[9];
+	swprintf_s(buffer, 9, L"%08X", (long long) hwnd);
+	return std::wstring(buffer);
+}
+
+void IeThread::OnGetHandles(WPARAM w, LPARAM lp)
+{
+	SCOPETRACER
+	ON_THREAD_COMMON(data)
+
+	// Iterate over all the windows
+	std::vector<IWebBrowser2*> browsers;
+	getAllBrowsers(&browsers);
+	for (vector<IWebBrowser2*>::iterator curr = browsers.begin();
+		 curr != browsers.end();
+		 curr++) {
+			 data.output_list_string_.push_back(getWindowHandle(*curr));
+			 (*curr)->Release();
+	}
+
+	data.error_code = SUCCESS;
 }
 
 void IeThread::OnGetActiveElement(WPARAM w, LPARAM lp)
@@ -536,6 +564,11 @@ void IeThread::getDocument2(const IHTMLDOMNode* extractFrom, IHTMLDocument2** pd
 	*pdoc = doc.Detach();
 }
 
+void IeThread::getAllBrowsers(std::vector<IWebBrowser2*>* browsers)
+{
+	getBrowsers(browsers);
+}
+
 bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child) 
 {
 	CComQIPtr<IHTMLElement> parent(const_cast<IHTMLDOMNode*>(root));
@@ -549,15 +582,93 @@ bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child)
 	return toReturn == VARIANT_TRUE;
 }
 
-void IeThread::OnQuitIE(WPARAM w, LPARAM lp)
+void IeThread::OnCloseWindow(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
 	NO_THREAD_COMMON
-	pBody->ieThreaded->Stop();
-	pBody->ieThreaded->Quit();
-	pBody->ieThreaded.Release();
+	if (FAILED(pBody->ieThreaded->Stop())) {
+	    LOG(INFO) << "Unable to stop IE instance";
+	}
+	if (FAILED(pBody->ieThreaded->Quit())) {
+	    LOG(WARN) << "Unable to quit IE instance.";
+	}
 }
 
+bool browserMatches(const wchar_t* name, IWebBrowser2* browser)
+{
+	CComPtr<IDispatch> dispatch;
+	HRESULT hr = browser->get_Document(&dispatch);
+	if (FAILED(hr)) {
+		return false;
+	}
+	CComQIPtr<IHTMLDocument2> doc(dispatch);
+	if (!doc) {
+		return false;
+	}
+
+	CComPtr<IHTMLWindow2> window;
+	hr = doc->get_parentWindow(&window);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+	CComBSTR windowName;
+	window->get_name(&windowName);
+
+	if (windowName == name) {
+		return true;
+	}
+
+	std::wstring handle = getWindowHandle(browser);
+
+	return handle == name;
+}
+
+void IeThread::OnSwitchToWindow(WPARAM w, LPARAM lp) 
+{
+	SCOPETRACER
+	ON_THREAD_COMMON(data)
+
+	LPCWSTR name = data.input_string_;
+
+	// Find the window
+	std::vector<IWebBrowser2*> browsers;
+	CComPtr<IWebBrowser2> instance;
+	getAllBrowsers(&browsers);
+	for (vector<IWebBrowser2*>::iterator curr = browsers.begin();
+		 curr != browsers.end();
+		 curr++) {
+			 if (!instance && browserMatches(name, *curr)) {
+				 instance = *curr;
+			 }
+			 (*curr)->Release();
+	}
+
+	if (!instance) {
+		data.error_code = ENOSUCHWINDOW;
+		return;
+	}
+
+	// Assuming we found it, release the current instance
+	pBody->mSink.ConnectionUnAdvise();
+	
+	// And attach ourselves
+	// TODO(simon): Are these next two lines doing exactly the same thing?
+	pBody->ieThreaded = instance;
+	pBody->mSink.p_Thread->pBody = pBody;
+	pBody->mSink.ConnectionAdvise();
+	if (false) {
+		LOG(WARN) << "Failed to advise new connection";
+	}
+	
+	CComQIPtr<IDispatch> dispatcher(pBody->ieThreaded);
+	if (!dispatcher) {
+		LOG(WARN) << "No dispathcer after switching";
+		return;
+	}
+
+	data.error_code = SUCCESS;
+}
 
 void IeThread::OnSwitchToFrame(WPARAM w, LPARAM lp)
 {

@@ -24,6 +24,7 @@ import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsElement;
 
 import java.awt.*;
 import java.lang.reflect.InvocationHandler;
@@ -201,7 +202,7 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
     Object[] usedArgs = new Object[args.length];
     for (int i = 0; i < args.length; i++) {
       if (args[i] instanceof EventFiringWebElement) {
-        usedArgs[i] = ((EventFiringWebElement) args[i]).getUnderlyingElement();
+        usedArgs[i] = ((EventFiringWebElement) args[i]).getWrappedElement();
       } else {
         usedArgs[i] = args[i];
       }
@@ -226,7 +227,7 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
           new EventFiringRenderedWebElement(from) : new EventFiringWebElement(from);
     }
 
-    private class EventFiringWebElement implements WebElement {
+    private class EventFiringWebElement implements WebElement, WrapsElement {
         private final WebElement element;
         private final WebElement underlyingElement;
 
@@ -330,8 +331,27 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             return result;
         }
 
-      public WebElement getUnderlyingElement() {
+      public WebElement getWrappedElement() {
         return underlyingElement;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (!(obj instanceof WebElement)) {
+          return false;
+        }
+
+        WebElement other = (WebElement) obj;
+        if (other instanceof WrapsElement) {
+          other = ((WrapsElement) other).getWrappedElement();
+        }
+
+        return underlyingElement.equals(other);
+      }
+
+      @Override
+      public int hashCode() {
+        return underlyingElement.hashCode();
       }
     }
 
@@ -345,6 +365,10 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
 
       public boolean isDisplayed() {
         return delegate.isDisplayed();
+      }
+
+      public void hover() {
+        delegate.hover();
       }
 
       public Point getLocation() {
@@ -429,7 +453,11 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             return options.getCookies();
         }
 
-        public Speed getSpeed() {
+        public Cookie getCookieNamed(String name) {
+            return options.getCookieNamed(name);  
+        }
+
+      public Speed getSpeed() {
             return options.getSpeed();
         }
 
@@ -465,5 +493,4 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor {
             return targetLocator.activeElement();
         }
     }
-
 }

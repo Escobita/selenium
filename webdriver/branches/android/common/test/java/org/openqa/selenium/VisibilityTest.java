@@ -21,6 +21,8 @@ package org.openqa.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IE;
 
 public class VisibilityTest extends AbstractDriverTestCase {
 
@@ -29,10 +31,10 @@ public class VisibilityTest extends AbstractDriverTestCase {
     driver.get(javascriptPage);
 
     assertThat(((RenderedWebElement) driver.findElement(By.id("displayed"))).isDisplayed(),
-            is(true));
+               is(true));
     assertThat(((RenderedWebElement) driver.findElement(By.id("none"))).isDisplayed(), is(false));
     assertThat(((RenderedWebElement) driver.findElement(By.id("suppressedParagraph")))
-            .isDisplayed(), is(false));
+        .isDisplayed(), is(false));
     assertThat(((RenderedWebElement) driver.findElement(By.id("hidden"))).isDisplayed(), is(false));
   }
 
@@ -133,7 +135,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore
+  @Ignore({HTMLUNIT, IE})
   public void testShouldNotAllowAnElementWithZeroHeightToBeCountedAsDisplayed() {
     driver.get(javascriptPage);
 
@@ -143,7 +145,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore
+  @Ignore({HTMLUNIT, IE})
   public void testShouldNotAllowAnElementWithZeroWidthToBeCountedAsDisplayed() {
     driver.get(javascriptPage);
 

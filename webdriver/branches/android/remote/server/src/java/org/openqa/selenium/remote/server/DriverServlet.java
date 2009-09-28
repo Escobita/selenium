@@ -17,6 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.openqa.selenium.remote.server.handler.AddCookie;
 import org.openqa.selenium.remote.server.handler.ChangeUrl;
 import org.openqa.selenium.remote.server.handler.ClearElement;
@@ -32,7 +39,6 @@ import org.openqa.selenium.remote.server.handler.FindActiveElement;
 import org.openqa.selenium.remote.server.handler.FindChildElement;
 import org.openqa.selenium.remote.server.handler.FindChildElements;
 import org.openqa.selenium.remote.server.handler.FindElement;
-import org.openqa.selenium.remote.server.handler.FindElementChildren;
 import org.openqa.selenium.remote.server.handler.FindElements;
 import org.openqa.selenium.remote.server.handler.GetAllCookies;
 import org.openqa.selenium.remote.server.handler.GetAllWindowHandles;
@@ -54,7 +60,9 @@ import org.openqa.selenium.remote.server.handler.GetTagName;
 import org.openqa.selenium.remote.server.handler.GetTitle;
 import org.openqa.selenium.remote.server.handler.GoBack;
 import org.openqa.selenium.remote.server.handler.GoForward;
+import org.openqa.selenium.remote.server.handler.HoverOverElement;
 import org.openqa.selenium.remote.server.handler.NewSession;
+import org.openqa.selenium.remote.server.handler.RefreshPage;
 import org.openqa.selenium.remote.server.handler.SendKeys;
 import org.openqa.selenium.remote.server.handler.SetElementSelected;
 import org.openqa.selenium.remote.server.handler.SetMouseSpeed;
@@ -62,7 +70,7 @@ import org.openqa.selenium.remote.server.handler.SubmitElement;
 import org.openqa.selenium.remote.server.handler.SwitchToFrame;
 import org.openqa.selenium.remote.server.handler.SwitchToWindow;
 import org.openqa.selenium.remote.server.handler.ToggleElement;
-import org.openqa.selenium.remote.server.handler.RefreshPage;
+import org.openqa.selenium.remote.server.handler.ElementEquality;
 import org.openqa.selenium.remote.server.renderer.EmptyResult;
 import org.openqa.selenium.remote.server.renderer.ForwardResult;
 import org.openqa.selenium.remote.server.renderer.JsonErrorExceptionResult;
@@ -71,12 +79,6 @@ import org.openqa.selenium.remote.server.renderer.RedirectResult;
 import org.openqa.selenium.remote.server.rest.ResultConfig;
 import org.openqa.selenium.remote.server.rest.ResultType;
 import org.openqa.selenium.remote.server.rest.UrlMapper;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class DriverServlet extends HttpServlet {
   private UrlMapper getMapper;
@@ -139,13 +141,10 @@ public class DriverServlet extends HttpServlet {
 
     postMapper.bind("/session/:sessionId/:context/element", FindElement.class).on(
         ResultType.SUCCESS, new JsonResult(":response"));
-    getMapper.bind("/session/:sessionId/:context/element/:elementId", DescribeElement.class)
+    getMapper.bind("/session/:sessionId/:context/element/:id", DescribeElement.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
     postMapper.bind("/session/:sessionId/:context/elements", FindElements.class)
-        .on(ResultType.SUCCESS, new JsonResult(":response"));
-    postMapper
-        .bind("/session/:sessionId/:context/element/:id/children/:name", FindElementChildren.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
     postMapper.
         bind("/session/:sessionId/:context/element/active", FindActiveElement.class)
@@ -190,10 +189,15 @@ public class DriverServlet extends HttpServlet {
     getMapper.bind("/session/:sessionId/:context/element/:id/css/:propertyName", GetCssProperty.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
+    postMapper.bind("/session/:sessionId/:context/element/:id/hover", HoverOverElement.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
+
     postMapper.bind("/session/:sessionId/:context/element/:id/drag", DragElement.class)
         .on(ResultType.SUCCESS, new EmptyResult());
 
     getMapper.bind("/session/:sessionId/:context/element/:id/attribute/:name", GetElementAttribute.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    getMapper.bind("/session/:sessionId/:context/element/:id/equals/:other", ElementEquality.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
     getMapper.bind("/session/:sessionId/:context/cookie", GetAllCookies.class)

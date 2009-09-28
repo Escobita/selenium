@@ -55,7 +55,7 @@ public class RemoteWebDriverTestSuite extends TestCase {
 
   public static class RemoteWebDriverForTest extends RemoteWebDriver {
     public RemoteWebDriverForTest() throws Exception {
-      super(new URL("http://localhost:6000/hub"), DesiredCapabilities.firefox());
+      super(new URL("http://localhost:6000/common/hub"), DesiredCapabilities.firefox());
     }
   }
 

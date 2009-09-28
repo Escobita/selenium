@@ -331,7 +331,7 @@ void sendKeys(WINDOW_HANDLE windowHandle, const wchar_t* value, int timePerKey)
 			scanCode = keyCode;
 			extended = true;
 		} else if (c == 0xE020U) {  // numpad6
-			keyCode = VK_NUMPAD5;
+			keyCode = VK_NUMPAD6;
 			scanCode = keyCode;
 			extended = true;
 		} else if (c == 0xE021U) {  // numpad7
@@ -514,21 +514,22 @@ LRESULT mouseMoveTo(WINDOW_HANDLE handle, long duration, long fromX, long fromY,
 	int steps = 15;
 	long sleep = duration / steps;
 
-	// Move in a straight line, and always use the same number of steps
-	int currentX = fromX;
-	int currentY = fromY;
+  LPRECT r = new RECT();
+  GetWindowRect(directInputTo, r);
 
-	int stepX = (toX - fromX) / steps;
-	int stepY = (toY - fromY) / steps;
-
-	for (int i = 0; i < steps -1; i++) {
-		SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(currentX, currentY));
-		currentX += stepX;
-		currentY += stepY;
+	for (int i = 0; i < steps; i++) {
+	  //To avoid integer division rounding and cumulative floating point errors,
+	  //calculate from scratch each time
+	  int currentX = fromX + ((toX - fromX) * ((double)i) / steps);
+		int currentY = fromY + ((toY - fromY) * ((double)i) / steps);
+	  SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(currentX, currentY));
 		wait(sleep);
 	}
+	
+	SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(toX, toY));
 
-	return SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(toX, toY));
+  delete r;
+  return 0;
 }
 
 BOOL_TYPE pending_keyboard_events()

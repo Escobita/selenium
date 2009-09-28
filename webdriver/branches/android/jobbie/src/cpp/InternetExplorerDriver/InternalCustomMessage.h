@@ -52,6 +52,7 @@ limitations under the License.
 #define _WD_GOFORWARD					WM_USER+36
 #define _WD_GOBACK						WM_USER+37
 #define _WD_GET_HANDLE					WM_USER+38
+#define _WD_GET_HANDLES					WM_USER+39
 
 #define _WD_SELELEMENTBYXPATH			WM_USER+40
 #define _WD_SELELEMENTSBYXPATH			WM_USER+41
@@ -74,9 +75,10 @@ limitations under the License.
 #define _WD_WAITFORNAVIGATIONTOFINISH	WM_USER+70
 #define _WD_ELEM_RELEASE				WM_USER+71
 
-#define _WD_QUIT_IE						WM_USER+80
+#define _WD_CLOSEWINDOW					WM_USER+80
 #define _WD_EXECUTESCRIPT				WM_USER+81
 #define _WD_GETACTIVEELEMENT			WM_USER+82
+#define _WD_SWITCHWINDOW				WM_USER+83
 
 // ==============================================================
 //     HEART BEATS

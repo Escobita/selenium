@@ -17,6 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Represents the known and supported Platforms that WebDriver runs on.
  * This is pretty close to the Operating System, but differs slightly,
@@ -32,11 +35,6 @@ public enum Platform {
    * any version of Windows.
    */
   WINDOWS("") {
-    @Override
-    public String getLineEnding() {
-      return "\r\n";
-    }
-
     public boolean is(Platform compareWith) {
       return compareWith == WINDOWS || compareWith == XP || compareWith == VISTA;
     }
@@ -47,10 +45,6 @@ public enum Platform {
    * "\\documents and settings\\username"
    */
   XP("xp", "windows") {
-    public String getLineEnding() {
-      return "\r\n";
-    }
-
     public boolean is(Platform compareWith) {
       return compareWith == WINDOWS || compareWith == XP;
     }
@@ -59,47 +53,50 @@ public enum Platform {
    * For versions of Windows that "feel like" Windows Vista.
    */
   VISTA("windows vista", "Windows Server 2008") {
-    public String getLineEnding() {
-      return "\r\n";
-    }
-
     public boolean is(Platform compareWith) {
       return compareWith == WINDOWS || compareWith == VISTA;
     }
   },
-  MAC("mac", "darwin") {
-    public String getLineEnding() {
-      return "\r";
-    }
-  },
-  UNIX("linux", "solaris", "bsd") {
-    public String getLineEnding() {
-      return "\n";
-    }
-  },
+  MAC("mac", "darwin") {},
+  UNIX("linux", "solaris", "bsd") {},
   /**
    * Never returned, but can be used to request a browser running on
    * any operating system
    */
   ANY("") {
-    public String getLineEnding() {
-      throw new UnsupportedOperationException("getLineEnding");
-    }
-
     public boolean is(Platform compareWith) {
       return true;
     }
   };
 
   private final String[] partOfOsName;
+  private final int minorVersion;
+  private final int majorVersion;
 
   private Platform(String... partOfOsName) {
     this.partOfOsName = partOfOsName;
+    
+    String version = System.getProperty("os.version", "0.0.0");
+    int major = 0;
+    int min = 0;
+    
+    Pattern pattern = Pattern.compile("^(\\d+)\\.(\\d+).*");
+    Matcher matcher = pattern.matcher(version);
+    if (matcher.matches()) {
+      try {
+        major = Integer.parseInt(matcher.group(1));
+        min = Integer.parseInt(matcher.group(2));
+      } catch (NumberFormatException e) {
+        // These things happen
+      }
+    }
+    
+    majorVersion = major;
+    minorVersion = min;
   }
 
   public static Platform getCurrent() {
     return extractFromSysProperty(System.getProperty("os.name"));
-
   }
 
   protected static Platform extractFromSysProperty(String osName) {
@@ -136,8 +133,6 @@ public enum Platform {
     return this.equals(compareWith);
   }
 
-  public abstract String getLineEnding();
-
   private boolean isCurrentPlatform(String osName, String matchAgainst) {
     return osName.indexOf(matchAgainst) != -1;
   }
@@ -146,4 +141,11 @@ public enum Platform {
     return matchAgainst.equals(osName);
   }
 
+  public int getMajorVersion() {
+    return majorVersion;
+  }
+  
+  public int getMinorVersion() {
+    return minorVersion;
+  }
 }

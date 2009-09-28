@@ -1,30 +1,4 @@
-def find_file(file) 
-  if File.exists?(file)
-    return file
-  elsif File.exists?("build/#{file}")
-    return "build/#{file}"
-  else
-    puts "Unable to locate #{file}"
-    exit -1
-  end
-end
-
-def copy_single_resource_(from, to)
-  dir = to.sub(/(.*)\/.*?$/, '\1')
-  mkdir_p "#{dir}"
-  
-  cp_r find_file(from), "#{to}"
-end
-
-def copy_resource_(from, to)
-  if !from.nil? 
-    if (from.kind_of? Hash) 
-      from.each do |key,value|
-        copy_single_resource_ key, to + "/" + value
-      end
-    end
-  end
-end
+require "rake-tasks/files.rb"
 
 def xpt(args)
   deps = build_deps_(args[:deps])
@@ -33,18 +7,36 @@ def xpt(args)
     out = "build/#{result}"
   
     file out => build_deps_(args[:src]) + deps do
-      build_xpt(args[:src], out)
+      build_xpt(args[:src], out, args[:prebuilt])
     end
     task "#{args[:name]}" => out
   end
 end
 
-def build_xpt(srcs, out)
+def build_xpt(srcs, out, prebuilt)
   if (windows?)
     gecko = "third_party\\gecko-1.9.0.11\\win32"
     srcs.each do |src|
       cmd = "#{gecko}\\bin\\xpidl.exe -w -m typelib -I#{gecko}\\idl -e #{out} #{src}"
-      sh cmd, :verbose => false
+      sh cmd, :verbose => false do |ok, res|
+        if !ok
+          copy_prebuilt(prebuilt, out)
+        else
+          copy_to_prebuilt(out, prebuilt)
+        end
+      end
+    end
+  elsif (linux? or mac?)
+    gecko = "third_party/gecko-1.9.0.11/" + (linux? ? "linux" : "mac")
+    srcs.each do |src|
+      cmd = "#{gecko}/bin/xpidl -w -m typelib -I#{gecko}/idl -e #{out} #{src}"
+      sh cmd, :verbose => false do |ok, res|
+        if !ok
+          copy_prebuilt(prebuilt, out)
+        else
+          copy_to_prebuilt(out, prebuilt)
+        end
+      end
     end
   else
     puts "Doing nothing for now. Later revisions will enable xpt building. Creating stub for #{out}"
@@ -75,7 +67,7 @@ def xpi(args)
     if (File.exists?(target)) 
       rm_rf target
     end
-    mkdir_p target
+    mkdir_p target, :verbose => false
   
     # Copy the sources into it
     args[:src].each do |src|
@@ -89,7 +81,7 @@ def xpi(args)
   
     # Package up into the output file
     rm_r Dir.glob("#{target}/**/.svn")
-    sh "cd #{target} && jar cMf ../#{args[:out]} *", :verbose => true
+    sh "cd #{target} && jar cMf ../#{args[:out]} *", :verbose => false
     rm_r target
   end
   task args[:name] => "build/#{args[:out]}"

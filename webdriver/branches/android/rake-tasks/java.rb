@@ -29,7 +29,7 @@ def jar(args)
 
   file out => build_deps_(args[:src]) + deps do
     puts "Building: #{args[:name]}"
-    mkdir_p "build"
+    mkdir_p "build", :verbose => false
 
     javac :jar => "build/#{args[:out]}",
           :sources => FileList[args[:src]],
@@ -109,7 +109,7 @@ def javac(args)
   compile_string += "-g " if debug
   compile_string += "-d #{target_dir} "
 
-  compile_string += "-cp " + classpath.join(File::PATH_SEPARATOR) + " " if classpath.length > 0
+  compile_string += "-cp \"" + classpath.join(classpath_separator?) + "\" " if classpath.length > 0
 
   sources.each do |source|
     compile_string += " #{source}"
@@ -124,13 +124,13 @@ def javac(args)
       if (res.kind_of? Hash) 
         res.each do |from, to|
           dir = to.gsub(/\/.*?$/, "")
-          mkdir_p "#{target_dir}/#{dir}"
+          mkdir_p "#{target_dir}/#{dir}", :verbose => false
           cp_r find_file(from), "#{target_dir}/#{to}"
         end
       else
         if (res.index('/'))
           dir = res.gsub(/\.*?/, "")
-          mkdir_p dir
+          mkdir_p dir, :verbose => false
         end
         cp_r find_file(res), "#{target_dir}/#{res}"
       end
@@ -148,8 +148,8 @@ def junit(args)
 
   main = args[:main] || "junit.textui.TestRunner"
 
-  test_string = 'java '
-  test_string += '-cp ' + classpath.join(File::PATH_SEPARATOR) + ' ' if classpath.length > 1
+  test_string = 'java -Xmx128m -Xms128m '
+  test_string += '-cp "' + classpath.join(classpath_separator?) + '" ' if classpath.length > 1
   test_string += main
   test_string += ' ' + args[:args] if args[:args]
 

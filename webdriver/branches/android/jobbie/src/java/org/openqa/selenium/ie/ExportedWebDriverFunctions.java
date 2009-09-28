@@ -5,6 +5,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.ByReference;
+import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -17,6 +18,7 @@ interface ExportedWebDriverFunctions extends StdCallLibrary {
   int wdFreeDriver(Pointer driver);
   int wdFreeElement(Pointer element);
   int wdFreeElementCollection(Pointer collection, int alsoFreeElements);
+  int wdFreeStringCollection(Pointer collection);
   int wdFreeScriptArgs(Pointer scriptArgs);
   int wdFreeScriptResult(Pointer scriptResult);
 
@@ -65,6 +67,7 @@ interface ExportedWebDriverFunctions extends StdCallLibrary {
   
   // Switching and navigation
   int wdSwitchToActiveElement(Pointer driver, PointerByReference result);
+  int wdSwitchToWindow(Pointer driver, WString windowName);
   int wdSwitchToFrame(Pointer driver, WString string);
   int wdGoBack(Pointer driver);
   int wdGoForward(Pointer driver);
@@ -74,8 +77,10 @@ interface ExportedWebDriverFunctions extends StdCallLibrary {
   int wdGetCookies(Pointer driver, PointerByReference wrapper);
   
   // Element collection functions
-  int wdcGetCollectionLength(Pointer collection, IntByReference length);
+  int wdcGetElementCollectionLength(Pointer collection, IntByReference length);
   int wdcGetElementAtIndex(Pointer collection, int index, PointerByReference element);
+  int wdcGetStringCollectionLength(Pointer collection, IntByReference length);
+  int wdcGetStringAtIndex(Pointer rawStrings, int i, PointerByReference rawString);
   
   // String functions
   int wdStringLength(Pointer string, IntByReference length);
@@ -87,11 +92,13 @@ interface ExportedWebDriverFunctions extends StdCallLibrary {
   int wdAddStringScriptArg(Pointer scriptArgs, WString string);
   int wdAddBooleanScriptArg(Pointer scriptArgs, int trueOrFalse);
   int wdAddNumberScriptArg(Pointer scriptArgs, NativeLong number);
+  int wdAddDoubleScriptArg(Pointer scriptArgs, double number);
   int wdAddElementScriptArg(Pointer scriptArgs, Pointer element);
   int wdExecuteScript(Pointer driver, WString script, Pointer scriptArgs, PointerByReference scriptResultRef);
   int wdGetScriptResultType(Pointer result, IntByReference type);
   int wdGetStringScriptResult(Pointer result, PointerByReference wrapper);
   int wdGetNumberScriptResult(Pointer result, NativeLongByReference value);
+  int wdGetDoubleScriptResult(Pointer result, DoubleByReference value);
   int wdGetBooleanScriptResult(Pointer result, IntByReference value);
   int wdGetElementScriptResult(Pointer result, Pointer driver, PointerByReference element);
 
@@ -100,7 +107,9 @@ interface ExportedWebDriverFunctions extends StdCallLibrary {
   int wdeMouseUpAt(HWND hwnd, NativeLong windowX, NativeLong windowY);
   int wdeMouseMoveTo(HWND hwnd, NativeLong duration, NativeLong fromX, NativeLong fromY, NativeLong toX, NativeLong toY);
 
+  int wdGetAllWindowHandles(Pointer driver, PointerByReference rawHandles);
   int wdGetCurrentWindowHandle(Pointer driver, PointerByReference handle);
+
 
   public static class HWND extends PointerType { }
   

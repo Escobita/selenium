@@ -26,12 +26,16 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
 import javax.servlet.Servlet;
 
 public class Jetty6AppServer implements AppServer {
+
+  private static final String DEFAULT_CONTEXT_PATH = "/common";
 
   private int port;
   private int securePort;
@@ -42,15 +46,33 @@ public class Jetty6AppServer implements AppServer {
   public Jetty6AppServer() {
     path = findRootOfWebApp();
 
-    context = addWebApplication("", path.getAbsolutePath());
+    context = addWebApplication(DEFAULT_CONTEXT_PATH, path.getAbsolutePath());
 
     addServlet("Redirecter", "/redirect", RedirectServlet.class);
     addServlet("InfinitePagerServer", "/page/*", PageServlet.class);
 
-    listenOn(3000);
-    listenSecurelyOn(3443);
+    listenOn(findFreePort());
+    listenSecurelyOn(findFreePort());
   }
 
+  protected int findFreePort() {
+    ServerSocket socket = null;
+    try {
+      socket = new ServerSocket(0);
+      return socket.getLocalPort();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (socket != null) {
+        try {
+          socket.close();
+        } catch (IOException e) {
+          // Throw this away
+        }
+      }
+    }
+
+  }
 
   protected File findRootOfWebApp() {
     String[] possiblePaths = {
@@ -85,15 +107,28 @@ public class Jetty6AppServer implements AppServer {
   }
 
   public String whereIs(String relativeUrl) {
-    return "http://" + getHostName() + ":" + port + "/" + relativeUrl;
+    return whereIs(DEFAULT_CONTEXT_PATH, relativeUrl);
+  }
+
+  public String whereIs(String context, String relativeUrl) {
+    return "http://" + getHostName() + ":" + port + context + "/" + relativeUrl;
   }
 
   public String whereElseIs(String relativeUrl) {
-    return "http://" + getAlternateHostName() + ":" + port + "/" + relativeUrl;
+    return whereElseIs(DEFAULT_CONTEXT_PATH, relativeUrl);
+  }
+
+  public String whereElseIs(String context, String relativeUrl) {
+    return "http://" + getAlternateHostName() + ":" + port + context + "/" + relativeUrl;
   }
 
   public String whereIsSecure(String relativeUrl) {
-    return "https://" + getHostName() + ":" + securePort + "/" + relativeUrl;
+    return whereIsSecure(DEFAULT_CONTEXT_PATH, relativeUrl);
+  }
+
+
+  public String whereIsSecure(String context, String relativeUrl) {
+    return "https://" + getHostName() + ":" + securePort + context + "/" + relativeUrl;
   }
 
   public void start() {

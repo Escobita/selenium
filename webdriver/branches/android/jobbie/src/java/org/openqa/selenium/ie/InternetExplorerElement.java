@@ -28,6 +28,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.ExportedWebDriverFunctions.HWNDByReference;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.internal.WrapsElement;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -92,11 +93,11 @@ public class InternetExplorerElement implements RenderedWebElement, SearchContex
 
     errors.verifyErrorCode(result, "get text of");
 
-    return new StringWrapper(lib, wrapper).toString();
+    return new StringWrapper(lib, wrapper).toString().replace("\r\n", "\n");
   }
 
   public String getValue() {
-    return getAttribute("value");
+    return getAttribute("value").replace("\r\n", "\n");
   }
 
   public void sendKeys(CharSequence... value) {
@@ -291,5 +292,30 @@ public class InternetExplorerElement implements RenderedWebElement, SearchContex
   
   protected int addToScriptArgs(Pointer scriptArgs) {
     return lib.wdAddElementScriptArg(scriptArgs, element);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof WebElement)) {
+      return false;
+    }
+
+    WebElement other = (WebElement) obj;
+    if (other instanceof WrapsElement) {
+      other = ((WrapsElement) obj).getWrappedElement();
+    }
+
+    if (!(other instanceof InternetExplorerElement)) {
+      return false;
+    }
+
+    Boolean result = (Boolean) parent.executeScript("return arguments[0] === arguments[1];", this, other);
+    return result != null && result;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO(simon): Implement something better
+    return element.hashCode();
   }
 }

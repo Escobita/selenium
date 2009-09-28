@@ -25,6 +25,7 @@ import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.internal.WrapsElement;
 import static org.openqa.selenium.remote.MapMaker.map;
 
 import java.util.List;
@@ -107,11 +108,6 @@ public class RemoteWebElement implements WebElement, SearchContext,
     return (String) response.getValue();
   }
 
-  public List<WebElement> getElementsByTagName(String tagName) {
-    Response response = execute("getChildrenOfType", map("id", id, "name", tagName));
-    return getElementsFrom(response);
-  }
-
   public List<WebElement> findElements(By by) {
     return by.findElements(this);
   }
@@ -171,11 +167,13 @@ public class RemoteWebElement implements WebElement, SearchContext,
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    throw new UnsupportedOperationException();
+    Response response = execute("findElementUsingElement", map("id", id, "using", "partial link text", "value", using));
+    return getElementFrom(response); 
   }
 
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    throw new UnsupportedOperationException();
+    Response response = execute("findElementsUsingElement", map("id", id, "using", "partial link text", "value", using));
+    return getElementsFrom(response);
   }
 
   protected Response execute(String commandName, Object... parameters) {
@@ -188,5 +186,30 @@ public class RemoteWebElement implements WebElement, SearchContext,
 
   protected List<WebElement> getElementsFrom(Response response) {
     return parent.getElementsFrom(response);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof WebElement)) {
+      return false;
+    }
+
+    WebElement other = (WebElement) obj;
+    if (other instanceof WrapsElement) {
+      other = ((WrapsElement) obj).getWrappedElement();
+    }
+
+    if (!(other instanceof RemoteWebElement)) {
+      return false;
+    }
+
+    Response response = execute("equals", map("id", id, "other", ((RemoteWebElement) other).id));
+    Object value = response.getValue();
+    return value != null && value instanceof Boolean && (Boolean) value;
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
   }
 }

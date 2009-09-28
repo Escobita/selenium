@@ -135,6 +135,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_GOFORWARD, OnGoForward )
 	CUSTOM_MESSAGE_MAP ( _WD_GOBACK, OnGoBack )
 	CUSTOM_MESSAGE_MAP ( _WD_GET_HANDLE, OnGetHandle )
+	CUSTOM_MESSAGE_MAP ( _WD_GET_HANDLES, OnGetHandles )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYXPATH, OnSelectElementByXPath )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYXPATH, OnSelectElementsByXPath )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYID, OnSelectElementById )
@@ -155,7 +156,8 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_WAITFORNAVIGATIONTOFINISH, OnWaitForNavigationToFinish )
 	CUSTOM_MESSAGE_MAP ( _WD_EXECUTESCRIPT, OnExecuteScript )
 	CUSTOM_MESSAGE_MAP ( _WD_GETACTIVEELEMENT, OnGetActiveElement )
-	CUSTOM_MESSAGE_MAP ( _WD_QUIT_IE, OnQuitIE )
+	CUSTOM_MESSAGE_MAP ( _WD_CLOSEWINDOW, OnCloseWindow )
+	CUSTOM_MESSAGE_MAP ( _WD_SWITCHWINDOW, OnSwitchToWindow )
 
 	 return FALSE;
 }
@@ -211,12 +213,12 @@ VOID CALLBACK NavigationCompletionTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 {
 	SCOPETRACER
 	safeIO::CoutA("g_IE_Thread =");
-	safeIO::CoutLong((long)g_IE_Thread);
+	safeIO::CoutLong((long)(LONG_PTR)g_IE_Thread);
 	if(!g_IE_Thread) return;
 	if(idEvent != g_IE_Thread->m_NavigationCompletionTimerID)
 	{
-		safeIO::CoutLong(idEvent);
-		safeIO::CoutLong(g_IE_Thread->m_NavigationCompletionTimerID);
+		safeIO::CoutLong((long)idEvent);
+		safeIO::CoutLong((long)(g_IE_Thread->m_NavigationCompletionTimerID));
 		return;
 	}
 	g_IE_Thread->waitForNavigateToFinish();
@@ -298,6 +300,12 @@ void IeThread::OnStartIE(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	NO_THREAD_COMMON
 	EventReleaser er(sync_LaunchIE);
+	if (pBody->ieThreaded) {
+		// TODO(simon): There's no way that this should be necessary.
+		// but it is when starting and quitting IE in a tight loop
+		LOG(DEBUG) << "IE instance already set. Clearing";
+		pBody->ieThreaded.Release();
+	} 
 	HRESULT hr = pBody->ieThreaded.CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER);
 
 	safeIO::CoutA("Has instanciated IE. Multithreaded version.");

@@ -20,6 +20,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "IeSink.h"
 #include "utils.h"
+#include "InternetExplorerDriver.h"
 #include "InternalCustomMessage.h"
 
 using namespace std;
@@ -43,7 +44,7 @@ VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
 };
 
 
-void IeSink::OnQuit()
+void __stdcall IeSink::OnQuit()
 {
 	SCOPETRACER
 	DataMarshaller& dataMarshaller = p_Thread->getCmdData();
@@ -64,12 +65,12 @@ void __stdcall IeSink::DocumentComplete(IDispatch *pDisp,VARIANT *URL)
 	}
 }
 
-void IeSink::DownloadBegin()
+void __stdcall IeSink::DownloadBegin()
 {
 	safeIO::CoutA("in DownloadBegin", true);
 }
 
-void IeSink::DownloadComplete()
+void __stdcall IeSink::DownloadComplete()
 {
 	SCOPETRACER
 	if(p_Thread->m_EventToNotifyWhenNavigationCompleted)
@@ -79,19 +80,41 @@ void IeSink::DownloadComplete()
 	}
 }
 
-
 void IeSink::ConnectionAdvise()
 {
 	SCOPETRACER
+
+	LOG(DEBUG) << "Advising connection: " << p_Thread << "   " << p_Thread->pBody->ieThreaded << endl;
+
 	CComQIPtr<IDispatch> dispatcher(p_Thread->pBody->ieThreaded);
 	CComPtr<IUnknown> univ(dispatcher);
-	this->DispEventAdvise(univ);
+
+	if (!univ) {
+		LOG(WARN) << "No dispatcher created when attempting to connect to IE instance";
+	}
+
+	if (FAILED(this->DispEventAdvise(univ))) {
+		LOG(WARN) << "Failed to advise new connection. Restarting the IE driver is recommended.";
+	}	
 }
 
 void IeSink::ConnectionUnAdvise()
 {
 	SCOPETRACER
+
+	if (!p_Thread && p_Thread->pBody) {
+		LOG(DEBUG) << "Unable to disconnect from IE instance";
+		return;
+	}
 	CComQIPtr<IDispatch> dispatcher(p_Thread->pBody->ieThreaded);
+	if (!dispatcher) {
+		LOG(DEBUG) << "No dispatcher located for IE instance";
+		return;
+	}
 	CComPtr<IUnknown> univ(dispatcher);
+	if (!univ) {
+		LOG(DEBUG) << "Unable to unadvise the IE instance";
+		return;
+	}
 	this->DispEventUnadvise(univ);
 }

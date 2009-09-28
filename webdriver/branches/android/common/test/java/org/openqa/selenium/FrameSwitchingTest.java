@@ -19,158 +19,223 @@ package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+import org.openqa.selenium.environment.webserver.AppServer;
 
 public class FrameSwitchingTest extends AbstractDriverTestCase {
-    public void testShouldContinueToReferToTheSameFrameOnceItHasBeenSelected() {
-        driver.get(framesetPage);
 
-        driver.switchTo().frame(2);
-        WebElement checkbox = driver.findElement(By.xpath("//input[@name='checky']"));
-        checkbox.toggle();
-        checkbox.submit();
+  public void testShouldContinueToReferToTheSameFrameOnceItHasBeenSelected() {
+    driver.get(framesetPage);
 
-        assertThat(driver.findElement(By.xpath("//p")).getText(), equalTo("Success!"));
+    driver.switchTo().frame(2);
+    WebElement checkbox = driver.findElement(By.xpath("//input[@name='checky']"));
+    checkbox.toggle();
+    checkbox.submit();
+
+    assertThat(driver.findElement(By.xpath("//p")).getText(), equalTo("Success!"));
+  }
+
+  public void testShouldAutomaticallyUseTheFirstFrameOnAPage() {
+    driver.get(framesetPage);
+
+    // Notice that we've not switched to the 0th frame
+    WebElement pageNumber = driver.findElement(By.xpath("//span[@id='pageNumber']"));
+    assertThat(pageNumber.getText().trim(), equalTo("1"));
+  }
+
+  public void testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage() {
+    driver.get(framesetPage);
+
+    driver.findElement(By.linkText("top")).click();
+
+    assertThat(driver.getTitle(), equalTo("XHTML Test Page"));
+    assertThat(driver.findElement(By.xpath("/html/head/title")).getText(),
+               equalTo("XHTML Test Page"));
+  }
+
+  public void testShouldNotAutomaticallySwitchFocusToAnIFrameWhenAPageContainingThemIsLoaded() {
+    driver.get(iframePage);
+    driver.findElement(By.id("iframe_page_heading"));
+  }
+
+  public void testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage() {
+    driver.get(iframePage);
+    driver.switchTo().frame(0);
+
+    try {
+      driver.switchTo().defaultContent();
+      driver.findElement(By.id("iframe_page_heading"));
+    } catch (Exception e) {
+      fail("Should have switched back to main content");
+    }
+  }
+
+  @Ignore(value = CHROME, reason = "Can't execute script in iframe, track crbug 20773")
+  public void testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt() {
+    driver.get(iframePage);
+    driver.switchTo().frame(0);
+
+    driver.findElement(By.id("submitButton")).click();
+    String hello = driver.findElement(By.id("greeting")).getText();
+    assertThat(hello, equalTo("Success!"));
+  }
+
+  public void testShouldBeAbleToClickInAFrame() {
+    driver.get(framesetPage);
+    driver.switchTo().frame("third");
+
+    driver.findElement(By.id("submitButton")).click();
+    String hello = driver.findElement(By.id("greeting")).getText();
+    assertThat(hello, equalTo("Success!"));
+    driver.switchTo().defaultContent();
+  }
+
+  @Ignore({CHROME, FIREFOX, HTMLUNIT, IE})
+  public void testShouldBeAbleToClickInASubFrame() {
+    driver.get(framesetPage);
+    driver.switchTo().frame("sixth.iframe1");
+
+    driver.findElement(By.id("submitButton")).click();
+    driver.switchTo().frame("sixth");
+    String hello = driver.findElement(By.id("greeting")).getText();
+    assertThat(hello, equalTo("Success!"));
+  }
+
+  public void testShouldBeAbleToSelectAFrameByName() {
+    driver.get(framesetPage);
+
+    driver.switchTo().frame("second");
+    assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("2"));
+  }
+
+  @Ignore({FIREFOX, IE, HTMLUNIT})
+  public void testShouldBeAbleToSelectAFrameByNameWhichIncludesADot() {
+    driver.get(framesetPage);
+
+    driver.switchTo().frame("seventh.withadot");
+    assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("3"));
+  }
+
+  public void testShouldSelectChildFramesByUsingADotSeparatedString() {
+    driver.get(framesetPage);
+
+    driver.switchTo().frame("fourth.child2");
+    assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
+  }
+
+  public void testShouldSwitchToChildFramesTreatingNumbersAsIndex() {
+    driver.get(framesetPage);
+
+    driver.switchTo().frame("fourth.1");
+    assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
+  }
+
+  @Ignore(FIREFOX)
+  public void testShouldSwitchToChildFramesTreatingParentAndChildNumbersAsIndex() {
+    driver.get(framesetPage);
+
+    driver.switchTo().frame("3.1");
+    assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
+  }
+
+  @Ignore({CHROME, IE})
+  public void testShouldThrowFrameNotFoundExceptionLookingUpSubFramesWithSuperFrameNames() {
+    driver.get(framesetPage);
+
+    try {
+      driver.switchTo().frame("fourth.second");
+      fail("Expected NoSuchFrameException");
+    } catch (NoSuchFrameException e) {
+      //Expected
     }
 
-    public void testShouldAutomaticallyUseTheFirstFrameOnAPage() {
-        driver.get(framesetPage);
+  }
 
-        // Notice that we've not switched to the 0th frame
-        WebElement pageNumber = driver.findElement(By.xpath("//span[@id='pageNumber']"));
-        assertThat(pageNumber.getText().trim(), equalTo("1"));
+  @NoDriverAfterTest
+  @Ignore(IPHONE)
+  public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
+    driver.get(simpleTestPage);
+    try {
+      driver.close();
+    } catch (Exception e) {
+      fail("This is not expected. " + e.getMessage());
     }
+  }
 
-    public void testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage() {
-        driver.get(framesetPage);
+  public void testShouldBeAbleToFlipToAFrameIdentifiedByItsId() {
+    driver.get(framesetPage);
 
-        driver.findElement(By.linkText("top")).click();
+    driver.switchTo().frame("fifth");
 
-        assertThat(driver.getTitle(), equalTo("XHTML Test Page"));
-        assertThat(driver.findElement(By.xpath("/html/head/title")).getText(), equalTo("XHTML Test Page"));
+    try {
+      driver.findElement(By.id("username"));
+    } catch (NoSuchElementException e) {
+      fail("Driver did not switch by frame id");
     }
+  }
 
-    public void testShouldNotAutomaticallySwitchFocusToAnIFrameWhenAPageContainingThemIsLoaded() {
-        driver.get(iframePage);
-        driver.findElement(By.id("iframe_page_heading"));
+  public void testShouldThrowAnExceptionWhenAFrameCannotBeFound() {
+    driver.get(xhtmlTestPage);
+
+    try {
+      driver.switchTo().frame("Nothing here");
+      fail("Should not have been able to switch");
+    } catch (NoSuchFrameException e) {
+      // This is expected
     }
+  }
 
-    public void testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage() {
-        driver.get(iframePage);
-        driver.switchTo().frame(0);
+  public void testShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex() {
+    driver.get(xhtmlTestPage);
 
-        try {
-            driver.switchTo().defaultContent();
-            driver.findElement(By.id("iframe_page_heading"));
-        } catch (Exception e) {
-            fail("Should have switched back to main content");
-        }
+    try {
+      driver.switchTo().frame(27);
+      fail("Should not have been able to switch");
+    } catch (NoSuchFrameException e) {
+      // This is expected
     }
+  }
 
-    public void testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt() {
-        driver.get(iframePage);
-        driver.switchTo().frame(0);
+  public void testShouldBeAbleToFindElementsInIframesByName() {
+    driver.get(iframePage);
 
-        driver.findElement(By.id("submitButton")).click();
-        String hello = driver.findElement(By.id("greeting")).getText();
-        assertThat(hello, equalTo("Success!"));
-    }
+    driver.switchTo().frame("iframe1");
+    WebElement element = driver.findElement(By.name("id-name1"));
 
-    public void testShouldBeAbleToSelectAFrameByName() {
-        driver.get(framesetPage);
+    assertNotNull(element);
+  }
 
-        driver.switchTo().frame("second");
-        assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("2"));
-    }
+  public void testShouldBeAbleToFindElementsInIframesByXPath() {
+    driver.get(iframePage);
 
-    public void testShouldSelectChildFramesByUsingADotSeparatedString() {
-        driver.get(framesetPage);
+    driver.switchTo().frame("iframe1");
 
-        driver.switchTo().frame("fourth.child2");
-        assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
-    }
+    WebElement element = driver.findElement(By.xpath("//*[@id = 'changeme']"));
 
-    public void testShouldSwitchToChildFramesTreatingNumbersAsIndex() {
-        driver.get(framesetPage);
+    assertNotNull(element);
+  }
 
-        driver.switchTo().frame("fourth.1");
-        assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
-    }
+  public void testGetCurrentUrl() {
+    AppServer appServer = GlobalTestEnvironment.get().getAppServer();
 
-    @NoDriverAfterTest
-    @Ignore(IPHONE)
-    public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
-        driver.get(simpleTestPage);
-        try {
-        	driver.close();
-        } catch (Exception e) {
-        	fail("This is not expected. " + e.getMessage());
-        }
-    }
+    driver.get(framesetPage);
 
-    public void testShouldBeAbleToFlipToAFrameIdentifiedByItsId() {
-        driver.get(framesetPage);
+    driver.switchTo().frame("second");
 
-        driver.switchTo().frame("fifth");
+    String url = appServer.whereIs("page/2");
+    assertThat(driver.getCurrentUrl(), equalTo(url + "?title=Fish"));
 
-        try {
-            driver.findElement(By.id("username"));
-        } catch (NoSuchElementException e) {
-            fail("Driver did not switch by frame id");
-        }
-    }
+    url = appServer.whereIs("iframes.html");
+    driver.get(iframePage);
+    assertThat(driver.getCurrentUrl(), equalTo(url));
 
-    public void testShouldThrowAnExceptionWhenAFrameCannotBeFound() {
-        driver.get(xhtmlTestPage);
-
-        try {
-            driver.switchTo().frame("Nothing here");
-            fail("Should not have been able to switch");
-        } catch (NoSuchFrameException e) {
-            // This is expected
-        }
-    }
-
-    public void testShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex() {
-        driver.get(xhtmlTestPage);
-
-        try {
-            driver.switchTo().frame(27);
-            fail("Should not have been able to switch");
-        } catch (NoSuchFrameException e) {
-            // This is expected
-        }
-    }
-
-    public void testShouldBeAbleToFindElementsInIframesByName() {
-        driver.get(iframePage);
-
-        driver.switchTo().frame("iframe1");
-        WebElement element = driver.findElement(By.name("id-name1"));
-
-        assertNotNull(element);
-    }
-
-    public void testShouldBeAbleToFindElementsInIframesByXPath() {
-        driver.get(iframePage);
-
-        driver.switchTo().frame("iframe1");
-
-        WebElement element = driver.findElement(By.xpath("//*[@id = 'changeme']"));
-
-        assertNotNull(element);
-    }
-
-    public void testGetCurrentUrl() {
-        driver.get(framesetPage);
-
-        driver.switchTo().frame("second");
-        assertThat(driver.getCurrentUrl(), equalTo("http://localhost:3000/page/2?title=Fish"));
-
-        driver.get(iframePage);
-        assertThat(driver.getCurrentUrl(), equalTo("http://localhost:3000/iframes.html"));
-
-        driver.switchTo().frame("iframe1");
-        assertThat(driver.getCurrentUrl(), equalTo("http://localhost:3000/formPage.html"));
-    }
+    url = appServer.whereIs("formPage.html");
+    driver.switchTo().frame("iframe1");
+    assertThat(driver.getCurrentUrl(), equalTo(url));
+  }
 }
