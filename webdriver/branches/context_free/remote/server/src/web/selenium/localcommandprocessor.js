@@ -27,7 +27,6 @@ goog.require('goog.array');
 goog.require('goog.object');
 goog.require('webdriver.AbstractCommandProcessor');
 goog.require('webdriver.CommandName');
-goog.require('webdriver.Context');
 goog.require('webdriver.Response');
 
 
@@ -58,7 +57,8 @@ goog.inherits(webdriver.LocalCommandProcessor,
  * @enum {string}
  */
 webdriver.LocalCommandProcessor.DRIVER_METHOD_NAMES_ = goog.object.transpose({
-  'findActiveDriver': webdriver.CommandName.NEW_SESSION,
+  'newSession': webdriver.CommandName.NEW_SESSION,
+  'deleteSession': webdriver.CommandName.DELETE_SESSION,
   'getCurrentWindowHandle': webdriver.CommandName.GET_CURRENT_WINDOW_HANDLE,
   'getAllWindowHandles': webdriver.CommandName.GET_ALL_WINDOW_HANDLES,
   'getCurrentUrl': webdriver.CommandName.GET_CURRENT_URL,
@@ -162,11 +162,10 @@ webdriver.LocalCommandProcessor.LOCATOR_UNDER_ELEMENT_ = {
  * @override
  */
 webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
-    command, sessionId, context) {
+    command, sessionId) {
   var respond = goog.bind(function(rawResponse) {
     var response = new webdriver.Response(
         rawResponse['isError'],
-        webdriver.Context.fromString(rawResponse['context']),
         rawResponse['response']);
     response.extraData['resultType'] = rawResponse['resultType'];
     command.setResponse(response);
@@ -200,7 +199,7 @@ webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
 
   var jsonCommand = {
     'commandName': methodName,
-    'context': context.toString(),
+    'sessionId': sessionId,
     'parameters': command.parameters,
     'callbackFn': respond
   };

@@ -79,100 +79,100 @@ public class HttpCommandExecutor implements CommandExecutor {
 
     nameToUrl.put("newSession", new CommandInfo("/session", HttpVerb.POST));
     nameToUrl.put("quit", new CommandInfo("/session/:sessionId", HttpVerb.DELETE));
-    nameToUrl.put("getCurrentWindowHandle", new CommandInfo("/session/:sessionId/:context/window_handle", HttpVerb.GET));
-    nameToUrl.put("getWindowHandles", new CommandInfo("/session/:sessionId/:context/window_handles", HttpVerb.GET));
-    nameToUrl.put("get", new CommandInfo("/session/:sessionId/:context/url", HttpVerb.POST));
+    nameToUrl.put("getCurrentWindowHandle", new CommandInfo("/session/:sessionId/window_handle", HttpVerb.GET));
+    nameToUrl.put("getWindowHandles", new CommandInfo("/session/:sessionId/window_handles", HttpVerb.GET));
+    nameToUrl.put("get", new CommandInfo("/session/:sessionId/url", HttpVerb.POST));
     nameToUrl
-        .put("forward", new CommandInfo("/session/:sessionId/:context/forward", HttpVerb.POST));
-    nameToUrl.put("back", new CommandInfo("/session/:sessionId/:context/back", HttpVerb.POST));
-    nameToUrl.put("refresh", new CommandInfo("/session/:sessionId/:context/refresh", HttpVerb.POST));
+        .put("forward", new CommandInfo("/session/:sessionId/forward", HttpVerb.POST));
+    nameToUrl.put("back", new CommandInfo("/session/:sessionId/back", HttpVerb.POST));
+    nameToUrl.put("refresh", new CommandInfo("/session/:sessionId/refresh", HttpVerb.POST));
 
-    nameToUrl.put("executeScript", new CommandInfo("/session/:sessionId/:context/execute", HttpVerb.POST));
+    nameToUrl.put("executeScript", new CommandInfo("/session/:sessionId/execute", HttpVerb.POST));
 
-    nameToUrl.put("currentUrl", new CommandInfo("/session/:sessionId/:context/url", HttpVerb.GET));
-    nameToUrl.put("getTitle", new CommandInfo("/session/:sessionId/:context/title", HttpVerb.GET));
+    nameToUrl.put("currentUrl", new CommandInfo("/session/:sessionId/url", HttpVerb.GET));
+    nameToUrl.put("getTitle", new CommandInfo("/session/:sessionId/title", HttpVerb.GET));
     nameToUrl
-        .put("pageSource", new CommandInfo("/session/:sessionId/:context/source", HttpVerb.GET));
+        .put("pageSource", new CommandInfo("/session/:sessionId/source", HttpVerb.GET));
     nameToUrl
-        .put("screenshot", new CommandInfo("/session/:sessionId/:context/screenshot", HttpVerb.GET));
+        .put("screenshot", new CommandInfo("/session/:sessionId/screenshot", HttpVerb.GET));
     nameToUrl
-        .put("setVisible", new CommandInfo("/session/:sessionId/:context/visible", HttpVerb.POST));
+        .put("setVisible", new CommandInfo("/session/:sessionId/visible", HttpVerb.POST));
     nameToUrl
-        .put("getVisible", new CommandInfo("/session/:sessionId/:context/visible", HttpVerb.GET));
+        .put("getVisible", new CommandInfo("/session/:sessionId/visible", HttpVerb.GET));
     nameToUrl
-        .put("findElement", new CommandInfo("/session/:sessionId/:context/element", HttpVerb.POST));
+        .put("findElement", new CommandInfo("/session/:sessionId/element", HttpVerb.POST));
     nameToUrl.put("findElements",
-                  new CommandInfo("/session/:sessionId/:context/elements", HttpVerb.POST));
-    nameToUrl.put("getActiveElement", new CommandInfo("/session/:sessionId/:context/element/active", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/elements", HttpVerb.POST));
+    nameToUrl.put("getActiveElement", new CommandInfo("/session/:sessionId/element/active", HttpVerb.POST));
 
     nameToUrl
-        .put("findElementUsingElement", new CommandInfo("/session/:sessionId/:context/element/:id/element/:using", HttpVerb.POST));
+        .put("findElementUsingElement", new CommandInfo("/session/:sessionId/element/:id/element/:using", HttpVerb.POST));
     nameToUrl.put("findElementsUsingElement",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/elements/:using", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/element/:id/elements/:using", HttpVerb.POST));
     nameToUrl.put("clickElement",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/click", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/element/:id/click", HttpVerb.POST));
     nameToUrl.put("clearElement",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/clear", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/element/:id/clear", HttpVerb.POST));
     nameToUrl.put("submitElement", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/submit", HttpVerb.POST));
+        "/session/:sessionId/element/:id/submit", HttpVerb.POST));
     nameToUrl.put("getElementText",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/text", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/text", HttpVerb.GET));
     nameToUrl.put("sendKeys",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/value", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/element/:id/value", HttpVerb.POST));
     nameToUrl.put("getElementValue",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/value", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/value", HttpVerb.GET));
     nameToUrl.put("getTagName",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/name", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/name", HttpVerb.GET));
     nameToUrl.put("isElementSelected", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/selected", HttpVerb.GET));
+        "/session/:sessionId/element/:id/selected", HttpVerb.GET));
     nameToUrl.put("setElementSelected", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/selected", HttpVerb.POST));
+        "/session/:sessionId/element/:id/selected", HttpVerb.POST));
     nameToUrl.put("toggleElement", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/toggle", HttpVerb.POST));
+        "/session/:sessionId/element/:id/toggle", HttpVerb.POST));
     nameToUrl.put("isElementEnabled", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/enabled", HttpVerb.GET));
+        "/session/:sessionId/element/:id/enabled", HttpVerb.GET));
     nameToUrl.put("isElementDisplayed", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/displayed", HttpVerb.GET));
-    nameToUrl.put("hover", new CommandInfo("/session/:sessionId/:context/element/:id/hover", HttpVerb.POST));
+        "/session/:sessionId/element/:id/displayed", HttpVerb.GET));
+    nameToUrl.put("hover", new CommandInfo("/session/:sessionId/element/:id/hover", HttpVerb.POST));
     nameToUrl.put("getElementLocation", new CommandInfo(
-        "/session/:sessionId/:context/element/:id/location", HttpVerb.GET));
+        "/session/:sessionId/element/:id/location", HttpVerb.GET));
     nameToUrl.put("getElementSize",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/size", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/size", HttpVerb.GET));
 
     nameToUrl.put("getElementAttribute",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/attribute/:name", HttpVerb.GET));
-    nameToUrl.put("equals", new CommandInfo("/session/:sessionId/:context/element/:id/equals/:other", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/attribute/:name", HttpVerb.GET));
+    nameToUrl.put("equals", new CommandInfo("/session/:sessionId/element/:id/equals/:other", HttpVerb.GET));
 
     nameToUrl
-        .put("getAllCookies", new CommandInfo("/session/:sessionId/:context/cookie", HttpVerb.GET));
+        .put("getAllCookies", new CommandInfo("/session/:sessionId/cookie", HttpVerb.GET));
     nameToUrl
-        .put("addCookie", new CommandInfo("/session/:sessionId/:context/cookie", HttpVerb.POST));
+        .put("addCookie", new CommandInfo("/session/:sessionId/cookie", HttpVerb.POST));
     nameToUrl.put("deleteAllCookies",
-                  new CommandInfo("/session/:sessionId/:context/cookie", HttpVerb.DELETE));
+                  new CommandInfo("/session/:sessionId/cookie", HttpVerb.DELETE));
     nameToUrl.put("deleteCookie",
-                  new CommandInfo("/session/:sessionId/:context/cookie/:name", HttpVerb.DELETE));
+                  new CommandInfo("/session/:sessionId/cookie/:name", HttpVerb.DELETE));
 
     nameToUrl.put("switchToFrame",
-                  new CommandInfo("/session/:sessionId/:context/frame/:id", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/frame/:id", HttpVerb.POST));
     nameToUrl.put("switchToWindow",
-                  new CommandInfo("/session/:sessionId/:context/window/:name", HttpVerb.POST));
-    nameToUrl.put("close", new CommandInfo("/session/:sessionId/:context/window", HttpVerb.DELETE));
+                  new CommandInfo("/session/:sessionId/window/:name", HttpVerb.POST));
+    nameToUrl.put("close", new CommandInfo("/session/:sessionId/window", HttpVerb.DELETE));
 
     nameToUrl.put("dragElement",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/drag", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/element/:id/drag", HttpVerb.POST));
 
     nameToUrl.put("getSpeed",
-                  new CommandInfo("/session/:sessionId/:context/speed", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/speed", HttpVerb.GET));
     nameToUrl.put("setSpeed",
-                  new CommandInfo("/session/:sessionId/:context/speed", HttpVerb.POST));
+                  new CommandInfo("/session/:sessionId/speed", HttpVerb.POST));
 
     nameToUrl.put("getValueOfCssProperty",
-                  new CommandInfo("/session/:sessionId/:context/element/:id/css/:propertyName", HttpVerb.GET));
+                  new CommandInfo("/session/:sessionId/element/:id/css/:propertyName", HttpVerb.GET));
   }
 
   public Response execute(Command command) throws Exception {
     CommandInfo info = nameToUrl.get(command.getMethodName());
-    HttpMethod httpMethod = info.getMethod(remotePath, command);
+      HttpMethod httpMethod = info.getMethod(remotePath, command);
 
     httpMethod.addRequestHeader("Accept", "application/json, image/png");
 
@@ -220,7 +220,6 @@ public class HttpCommandExecutor implements CommandExecutor {
         int nextSlash = uri.indexOf("/", sessionIndex);
         if (nextSlash != -1) {
           response.setSessionId(uri.substring(sessionIndex, nextSlash));
-          response.setContext("foo");
         }
       }
     }
@@ -277,9 +276,6 @@ public class HttpCommandExecutor implements CommandExecutor {
     private String get(String propertyName, Command command) {
       if ("sessionId".equals(propertyName)) {
         return command.getSessionId().toString();
-      }
-      if ("context".equals(propertyName)) {
-        return command.getContext().toString();
       }
 
       // Attempt to extract the property name from the parameters

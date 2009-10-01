@@ -26,8 +26,8 @@ const CONTRACT_ID = "@googlecode.com/webdriver/fxdriver;1";
 // Its copyrights belong to its original author.
 
 var ExternalScripts = [
-  "context.js",
   "firefoxDriver.js",
+  "session.js",
   "json2.js",
   "socketListener.js",
   "utils.js",
@@ -66,16 +66,18 @@ var ExternalScripts = [
 
 var ServerFactory = {
   createInstance: function (aOuter, aIID) {
-    if (aOuter != null)
+    if (aOuter != null) {
       throw Components.results.NS_ERROR_NO_AGGREGATION;
-    if (!this.server)
+    }
+    if (!this.server) {
       this.server = new WebDriverServer();
+    }
     return (this.server).QueryInterface(aIID);
   }
 };
 
 
-//module definition (xpcom registration)
+// module definition (xpcom registration)
 var ServerModule = {
   _firstTime: true,
 
@@ -97,11 +99,13 @@ var ServerModule = {
   },
 
   getClassObject: function(aCompMgr, aCID, aIID) {
-    if (!aIID.equals(Components.interfaces.nsIFactory))
+    if (!aIID.equals(Components.interfaces.nsIFactory)) {
       throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
+    }
 
-    if (aCID.equals(CLASS_ID))
+    if (aCID.equals(CLASS_ID)) {
       return ServerFactory;
+    }
 
     throw Components.results.NS_ERROR_NO_INTERFACE;
   },
@@ -112,7 +116,7 @@ var ServerModule = {
 };
 
 
-//module initialization
+// module initialization
 function NSGetModule(aCompMgr, aFileSpec) {
   return ServerModule;
 }

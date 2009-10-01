@@ -24,7 +24,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.remote.Capabilities;
-import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.util.concurrent.Callable;
@@ -68,7 +67,7 @@ public class Session {
     return future.get();
   }
 
-  public WebDriver getDriver(Context context) {
+  public WebDriver getDriver() {
     return driver;
   }
 

@@ -199,7 +199,6 @@ class WebDriver(object):
         if not resp or "No window found" in resp:
             raise InvalidSwitchToTargetException(
                 "Window %s not found" % window_name)
-        self._conn.context = resp
         
     def get_current_window_handle(self):
         handle = self._command("getCurrentWindowHandle")

@@ -32,7 +32,7 @@ class ExtensionConnection(object):
     """
     def __init__(self, timeout=_DEFAULT_TIMEOUT):
         LOGGER.debug("extension connection initiated")
-        self.context = "null"
+        self.session_id = "";
         self.socket = None
         self.timeout = timeout
 
@@ -43,7 +43,7 @@ class ExtensionConnection(object):
     def element_command(self, cmd, element_id, *params):
         """Element level command."""
         json_dump = simplejson.dumps({"parameters": params,
-                                      "context": self.context,
+                                      "sessionId": self.session_id,
                                       "elementId": element_id,
                                       "commandName":cmd})
         packet = 'Content-Length: %d\n\n' % len(json_dump)
@@ -80,7 +80,6 @@ class ExtensionConnection(object):
                     decoded['response'],
                     ("Error occurred when processing\n"
                      "packet:%s\nresponse:%s" % (packet, resp)))
-            self.context = decoded["context"]  #Update our context
             return decoded
         else:
             return None
@@ -92,10 +91,10 @@ class ExtensionConnection(object):
             time.sleep(1)
 
     def connect(self):
-        """Connects to the extension and retrieves the context id."""
+        """Connects to the extension and retrieves the session id."""
         self._connect()
-        self.context = "null"
-        self.context = self.driver_command("findActiveDriver")["response"]
+        self.session_id = ""
+        self.session_id = self.driver_command("newSession")["response"]
 
     def _connect(self):
         """Connects to the extension."""
@@ -109,7 +108,7 @@ class ExtensionConnection(object):
         self.quit()
 
     def is_connectable(self):
-        """Trys to connect to the extension but do not retrieve context."""
+        """Trys to connect to the extension but do not start a new session."""
         try:
             socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             socket_.settimeout(1)

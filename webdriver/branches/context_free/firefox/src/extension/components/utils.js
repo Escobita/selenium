@@ -62,39 +62,23 @@ Utils.getServer = function() {
 };
 
 
-Utils.getBrowser = function(context) {
-  return context.fxbrowser;
-};
-
-
-Utils.getDocument = function(context) {
-  if (context.frame) {
-    return context.frame.document;
-  }
-  return context.fxbrowser.contentDocument;
-};
-
-
-Utils.getActiveElement = function(context) {
-  var doc = Utils.getDocument(context);
+Utils.getActiveElement = function(browser, session) {
+  var doc = session.window.document;
 
   var element;
   if (doc["activeElement"]) {
     element = doc.activeElement;
   } else {
-    var commandDispatcher = Utils.getBrowser(context).ownerDocument.
-        commandDispatcher;
-
-    doc = Utils.getDocument(context);
+    var commandDispatcher = browser.ownerDocument.commandDispatcher;
     element = commandDispatcher.focusedElement;
-
-    if (element && Utils.getDocument(context) != element.ownerDocument)
+    if (element && element.ownerDocument != doc) {
       element = null;
+    }
   }
 
   // Default to the body
   if (!element) {
-    element = Utils.getDocument(context).body;
+    element = doc.body;
   }
 
   return element;
@@ -125,7 +109,7 @@ function getTextFromNode(node, toReturn, textSoFar) {
       if (Utils.isDisplayed(child)) {
         var textToAdd = child.nodeValue;
         textToAdd =
-        textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
+            textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
         textSoFar += textToAdd;
       }
       continue;
@@ -266,8 +250,8 @@ function getPreformattedText(node) {
 
 
 function isWhiteSpace(character) {
-  return character == '\n' || character == ' ' || character == '\t' || character
-      == '\r';
+  return character == '\n' || character == ' ' || character == '\t' ||
+         character == '\r';
 }
 
 
@@ -286,8 +270,8 @@ Utils.getText = function(element) {
 };
 
 
-Utils.addToKnownElements = function(element, context) {
-  var doc = Utils.getDocument(context);
+Utils.addToKnownElements = function(element, session) {
+  var doc = session.window.document;
   if (!doc.fxdriver_elements) {
     doc.fxdriver_elements = {};
   }
@@ -299,8 +283,8 @@ Utils.addToKnownElements = function(element, context) {
 };
 
 
-Utils.getElementAt = function(index, context) {
-  var doc = Utils.getDocument(context);
+Utils.getElementAt = function(index, session) {
+  var doc = session.window.document;
   var e = doc.fxdriver_elements ? doc.fxdriver_elements[index] : undefined;
   if (e) {
     // Is this a stale reference?
@@ -323,20 +307,19 @@ Utils.getElementAt = function(index, context) {
 };
 
 
-Utils.currentDocument = function(context) {
-  if (context) {
-    return Utils.getDocument(context);
+Utils.currentDocument = function(session) {
+  if (session) {
+    return session.window.document;
   } else {
     return document;
   }
 };
 
 
-Utils.platform = function(context) {
+Utils.platform = function(session) {
   if (!this.userAgentPlatformLowercase) {
-    var currentWindow = Utils.currentDocument(context).defaultView;
     this.userAgentPlatformLowercase =
-    currentWindow.navigator.platform.toLowerCase();
+        session.window.navigator.platform.toLowerCase();
   }
 
   return this.userAgentPlatformLowercase;
@@ -376,7 +359,7 @@ Utils.getNodeForNativeEvents = function(element) {
 };
 
 
-Utils.type = function(context, element, text, opt_useNativeEvents) {
+Utils.type = function(element, text, opt_useNativeEvents) {
 
   // For consistency between native and synthesized events, convert common
   // escape sequences to their Key enum aliases.
@@ -443,25 +426,25 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     if (c == '\uE000') {
       if (controlKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(element, "keyup", kCode, 0,
             controlKey = false, shiftKey, altKey, metaKey);
       }
 
       if (shiftKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(element, "keyup", kCode, 0,
             controlKey, shiftKey = false, altKey, metaKey);
       }
 
       if (altKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(element, "keyup", kCode, 0,
             controlKey, shiftKey, altKey = false, metaKey);
       }
 
       if (metaKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(element, "keyup", kCode, 0,
             controlKey, shiftKey, altKey, metaKey = false);
       }
 
@@ -641,7 +624,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     // generate modifier key event if needed, and continue
 
     if (modifierEvent) {
-      Utils.keyEvent(context, element, modifierEvent, keyCode, 0,
+      Utils.keyEvent(element, modifierEvent, keyCode, 0,
           controlKey, shiftKey, altKey, metaKey);
       continue;
     }
@@ -655,7 +638,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
     if (needsShift && !shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-      Utils.keyEvent(context, element, "keydown", kCode, 0,
+      Utils.keyEvent(element, "keydown", kCode, 0,
           controlKey, true, altKey, metaKey);
       Utils.shiftCount += 1;
     }
@@ -686,20 +669,20 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     }
 
     var accepted =
-        Utils.keyEvent(context, element, "keydown", keyCode, 0,
+        Utils.keyEvent(element, "keydown", keyCode, 0,
             controlKey, needsShift || shiftKey, altKey, metaKey);
 
-    Utils.keyEvent(context, element, "keypress", pressCode, charCode,
+    Utils.keyEvent(element, "keypress", pressCode, charCode,
         controlKey, needsShift || shiftKey, altKey, metaKey, !accepted);
 
-    Utils.keyEvent(context, element, "keyup", keyCode, 0,
+    Utils.keyEvent(element, "keyup", keyCode, 0,
         controlKey, needsShift || shiftKey, altKey, metaKey);
 
     // shift up if needed
 
     if (needsShift && !shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(element, "keyup", kCode, 0,
           controlKey, false, altKey, metaKey);
     }
   }
@@ -708,40 +691,39 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
   if (controlKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey = false, shiftKey, altKey, metaKey);
   }
 
   if (shiftKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey = false, altKey, metaKey);
   }
 
   if (altKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey = false, metaKey);
   }
 
   if (metaKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey, metaKey = false);
   }
 };
 
 
-Utils.keyEvent = function(context, element, type, keyCode, charCode,
-                          controlState, shiftState, altState, metaState,
+Utils.keyEvent = function(element, type, keyCode, charCode, controlState,
+                          shiftState, altState, metaState,
                           shouldPreventDefault) {
-  var preventDefault = shouldPreventDefault == undefined ? false
-      : shouldPreventDefault;
+  var preventDefault =
+      shouldPreventDefault == undefined ? false : shouldPreventDefault;
 
-  var keyboardEvent =
-      Utils.currentDocument(context).createEvent("KeyEvents");
-  var currentView =
-      Utils.currentDocument(context).defaultView;
+  var ownerDoc = element.ownerDocument;
+  var keyboardEvent = ownerDoc.createEvent('KeyEvents');
+  var currentView = ownerDoc.defaultView;
 
   keyboardEvent.initKeyEvent(
       type, //  in DOMString typeArg,
@@ -763,7 +745,7 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
 };
 
 
-Utils.fireHtmlEvent = function(context, element, eventName) {
+Utils.fireHtmlEvent = function(element, eventName) {
   var doc = element.ownerDocument;
   var e = doc.createEvent("HTMLEvents");
   e.initEvent(eventName, true, true);
@@ -797,7 +779,7 @@ Utils.findForm = function(element) {
 };
 
 
-Utils.fireMouseEventOn = function(context, element, eventName) {
+Utils.fireMouseEventOn = function(element, eventName) {
   Utils.triggerMouseEvent(element, eventName, 0, 0);
 };
 
@@ -809,46 +791,6 @@ Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
   event.initMouseEvent(eventType, true, true, view, 1, 0, 0, clientX, clientY,
       false, false, false, false, 0, element);
   element.dispatchEvent(event);
-};
-
-
-Utils.findDocumentInFrame = function(browser, frameId) {
-  var frame = Utils.findFrame(browser, frameId);
-  return frame ? frame.document : null;
-};
-
-
-Utils.findFrame = function(browser, frameId) {
-  var stringId = "" + frameId;
-  var names = stringId.split(".");
-  var frame = browser.contentWindow;
-  for (var i = 0; i < names.length; i++) {
-    // Try a numerical index first
-    var index = names[i] - 0;
-    if (!isNaN(index)) {
-      frame = frame.frames[index];
-      if (frame) {
-        return frame;
-      }
-    } else {
-      // Fine. Use the name and loop
-      var found = false;
-      for (var j = 0; j < frame.frames.length; j++) {
-        var f = frame.frames[j];
-        if (f.name == names[i] || f.frameElement.id == names[i]) {
-          frame = f;
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        return null;
-      }
-    }
-  }
-
-  return frame;
 };
 
 
@@ -867,35 +809,30 @@ Utils.dumpn = function(text) {
 };
 
 
-Utils.dump = function(element) {
-  var dump = "=============\n";
-
-  var rows = [];
-
-  dump += "Supported interfaces: ";
+Utils.dump = function(obj) {
+  var dump = [
+    obj.toString(),
+    "=============",
+    'Supported interfaces:',
+  ];
   for (var i in Components.interfaces) {
     try {
-      var view = element.QueryInterface(Components.interfaces[i]);
-      dump += i + ", ";
+      obj.QueryInterface(Components.interfaces[i]);
+      dump.push(i);
     } catch (e) {
       // Doesn't support the interface
     }
   }
-  dump += "\n------------\n";
+  dump.push('------------');
 
   try {
-    Utils.dumpProperties(element, rows);
+    Utils.dumpProperties(element, dump);
   } catch (e) {
     Utils.dumpText("caught an exception: " + e);
   }
 
-  rows.sort();
-  for (var i in rows) {
-    dump += rows[i] + "\n";
-  }
-
-  dump += "=============\n\n\n";
-  Utils.dumpText(dump);
+  dump.push("=============");
+  Utils.dumpn(dump.join('\n'));
 };
 
 
@@ -930,7 +867,7 @@ Utils.stackTrace = function() {
 };
 
 
-Utils.getElementLocation = function(element, context) {
+Utils.getElementLocation = function(element) {
   var x = element.offsetLeft;
   var y = element.offsetTop;
   var elementParent = element.offsetParent;
@@ -957,8 +894,8 @@ Utils.getElementLocation = function(element, context) {
   // is smaller than that of the element (which it shouldn't really be). If this
   // is the case, we need to exclude this element, since it will result in too
   // large a 'top' return value.
-  if (element.offsetParent && element.offsetParent.offsetHeight
-      && element.offsetParent.offsetHeight < element.offsetHeight) {
+  if (element.offsetParent && element.offsetParent.offsetHeight &&
+      element.offsetParent.offsetHeight < element.offsetHeight) {
     // skip the parent that's too small
     element = element.offsetParent.offsetParent;
   } else {
@@ -972,14 +909,14 @@ Utils.getElementLocation = function(element, context) {
 };
 
 
-Utils.findElementsByXPath = function (xpath, contextNode, context) {
-  var doc = Utils.getDocument(context);
+Utils.findElementsByXPath = function (xpath, contextNode, session) {
+  var doc = session.window.document;
   var result = doc.evaluate(xpath, contextNode, null,
       Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
   var indices = [];
   var element = result.iterateNext();
   while (element) {
-    var index = Utils.addToKnownElements(element, context);
+    var index = Utils.addToKnownElements(element, session);
     indices.push(index);
     element = result.iterateNext();
   }
@@ -1060,7 +997,7 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
 };
 
 
-Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
+Utils.unwrapParameters = function(wrappedParameters, resultArray, session) {
   while (wrappedParameters && wrappedParameters.length > 0) {
     var t = wrappedParameters.shift();
 
@@ -1073,7 +1010,7 @@ Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
     }
 
     if (t['type'] == "ELEMENT") {
-      var element = Utils.getElementAt(t['value'], context);
+      var element = Utils.getElementAt(t['value'], session);
       t['value'] = element.wrappedJSObject ? element.wrappedJSObject : element;
     }
 
@@ -1082,18 +1019,17 @@ Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
 };
 
 
-Utils.wrapResult = function(result, context) {
+Utils.wrapResult = function(result, session) {
   // Sophisticated.
   if (null === result || undefined === result) {
     return {resultType: "NULL"};
   } else if (result['tagName']) {
     return {resultType: "ELEMENT",
-            response: Utils.addToKnownElements(result, context)};
-  } else if (result !== undefined &&
-             result.constructor.toString().indexOf("Array") != -1) {
+            response: Utils.addToKnownElements(result, session)};
+  } else if (result.constructor.toString().indexOf("Array") != -1) {
     var array = [];
     for (var i = 0; i < result.length; i++) {
-      array.push(Utils.wrapResult(result[i], context));
+      array.push(Utils.wrapResult(result[i], session));
     }
     return {resultType: "ARRAY", response: array};
   } else {

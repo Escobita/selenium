@@ -127,7 +127,7 @@ class FirefoxProfile(object):
 
         if force_create or not os.path.exists(extension_dir):
             extension_source_path = utils.unzip_to_temp_dir(
-                "webdriver-extension.zip")
+                "build/webdriver-extension.zip")
 
             if (extension_source_path is None or
                 not os.path.exists(extension_source_path)):
@@ -147,7 +147,7 @@ class FirefoxProfile(object):
                     "No extension found at %s" % extension_source_path)
 
             logging.debug("extension_source_path : %s" % extension_source_path)
-            logging.info("Copying extenstion from '%s' to '%s'" 
+            logging.info("Copying extenstion from '%s' to '%s'"
                 % (extension_source_path, extension_dir))
             try:
                 if os.path.exists(extension_dir):
@@ -159,7 +159,7 @@ class FirefoxProfile(object):
                     os.makedirs(extension_dir)
                     shutil.rmtree(extension_dir) 
                 shutil.copytree(extension_source_path, extension_dir)
-                logging.info("Extenstion has been copied from '%s' to '%s'" 
+                logging.info("Extenstion has been copied from '%s' to '%s'"
                     % (extension_source_path, extension_dir))
             except OSError, err:
                 logging.info("Fail to install firefox extension. %s" % err)

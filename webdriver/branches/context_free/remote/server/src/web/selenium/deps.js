@@ -1,6 +1,6 @@
 goog.addDependency('../abstractcommandprocessor.js',
                    ['webdriver.AbstractCommandProcessor'],
-                   ['goog.array', 'webdriver.CommandName', 'webdriver.Context',
+                   ['goog.array', 'webdriver.CommandName',
                     'webdriver.Future', 'webdriver.Response',
                     'webdriver.timing']);
 goog.addDependency('../asserts.js',
@@ -14,7 +14,6 @@ goog.addDependency('../command.js',
                    ['webdriver.Command', 'webdriver.CommandName',
                     'webdriver.Response'],
                    ['goog.array']);
-goog.addDependency('../context.js', ['webdriver.Context'], []);
 goog.addDependency('../factory.js', ['webdriver.factory'],
                    ['goog.userAgent', 'webdriver.LocalCommandProcessor',
                     'webdriver.WebDriver']);
@@ -25,8 +24,7 @@ goog.addDependency('../localcommandprocessor.js',
                    ['webdriver.LocalCommandProcessor'],
                    ['goog.array', 'goog.object',
                     'webdriver.AbstractCommandProcessor',
-                    'webdriver.CommandName', 'webdriver.Context',
-                    'webdriver.Response']);
+                    'webdriver.CommandName', 'webdriver.Response']);
 goog.addDependency('../logging.js',
                    ['webdriver.logging', 'webdriver.logging.Level'],
                    ['goog.dom']);
@@ -44,7 +42,7 @@ goog.addDependency('../webdriver.js',
                    ['webdriver.WebDriver', 'webdriver.WebDriver.EventType'],
                    ['goog.events', 'goog.events.EventTarget',
                     'webdriver.Command', 'webdriver.CommandName',
-                    'webdriver.Context', 'webdriver.Future',
+                    'webdriver.Future',
                     'webdriver.Response', 'webdriver.Wait',
                     'webdriver.WebElement', 'webdriver.logging',
                     'webdriver.timing']);

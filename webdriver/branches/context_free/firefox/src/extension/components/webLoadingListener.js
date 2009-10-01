@@ -19,6 +19,13 @@
 var STATE_START = Components.interfaces.nsIWebProgressListener.STATE_START;
 var STATE_STOP = Components.interfaces.nsIWebProgressListener.STATE_STOP;
 
+/**
+ * Waits for a content document to load before calling a callback function.
+ * @param {browser|tabbrowser} browser The browser to listen to web progress on.
+ * @param {function} toCall The function to call when the browser has finished
+ *     loading the new content.
+ * @constructor
+ */
 function WebLoadingListener(browser, toCall) {
   var listener = this;
 

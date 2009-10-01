@@ -51,10 +51,6 @@ public class NewSession implements Handler, JsonParametersAware {
   public String getSessionId() {
     return sessionId.toString();
   }
-
-  public String getContext() {
-    return "context";
-  }
   
   @Override
   public String toString() {

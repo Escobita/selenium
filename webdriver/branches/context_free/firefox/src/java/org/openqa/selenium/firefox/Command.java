@@ -18,25 +18,25 @@ limitations under the License.
 package org.openqa.selenium.firefox;
 
 public class Command {
-    private final Context context;
+    private final String sessionId;
     private final String elementId;
     private final String commandName;
     private final Object[] parameters;
 
-    public Command(Context context, String commandName, Object... parameters) {
-        this(context, null, commandName, parameters);
+    public Command(String sessionId, String commandName, Object... parameters) {
+        this(sessionId, null, commandName, parameters);
     }
 
-    public Command(Context context, String elementId, String commandName, Object... parameters) {
-        this.context = context;
+    public Command(String sessionId, String elementId, String commandName, Object... parameters) {
+        this.sessionId = sessionId;
         this.elementId = elementId;
         this.commandName = commandName;
         this.parameters = parameters;
     }
 
 
-    public Context getContext() {
-        return context;
+    public String getSessionId() {
+        return sessionId;
     }
 
     public String getElementId() {

@@ -27,7 +27,6 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.TemporaryFilesystem;
 import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.SessionId;
 
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor,
@@ -118,7 +117,6 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    */
   ChromeResponse execute(String commandName, Object... parameters) {
     Command command = new Command(new SessionId("[No sessionId]"),
-                                  new Context("[No context]"),
                                   commandName,
                                   parameters);
     try {
@@ -358,7 +356,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     public Cookie getCookieNamed(String name) {
       return (Cookie)execute("getCookieNamed", name).getValue();
     }
-    
+
     public Speed getSpeed() {
       throw new UnsupportedOperationException("Not yet supported in Chrome");
     }

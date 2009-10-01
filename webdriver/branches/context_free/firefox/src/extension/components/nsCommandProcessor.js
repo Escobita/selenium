@@ -29,8 +29,8 @@
  */
 (function() {
   var scripts = [
-    'context.js',
     'json2.js',
+    'session.js',
     'utils.js'
   ];
 
@@ -53,17 +53,19 @@
 /**
  * Encapsulates the result of a command to the {@code nsCommandProcessor}.
  * @param {Object} command JSON object describing the command to execute.
+ * @param {Session} opt_session The session that sent this command.
  * @constructor
  */
-var Response = function(command) {
+var Response = function(command, opt_session) {
+  this.command = command;
+  this.session = opt_session;
   this.statusBarLabel_ = null;
   this.callbackFn_ = command.callbackFn;
   this.json_ = {
     commandName: command ? command.commandName : 'Unknown command',
     isError: false,
     response: '',
-    elementId: command.elementId,
-    context: command.context
+    elementId: command.elementId
   };
 };
 
@@ -89,7 +91,6 @@ Response.prototype = {
     if (this.statusBarLabel_) {
       this.statusBarLabel_.style.color = 'black';
     }
-    this.context = this.context.toString();
     if (this.callbackFn_) {
       this.callbackFn_(this.json_);
     }
@@ -119,9 +120,7 @@ Response.prototype = {
   set isError(error)    { this.json_.isError = error; },
   get isError()         { return this.json_.isError; },
   set response(res)     { this.json_.response = res; },
-  get response()        { return this.json_.response; },
-  set context(c)        { this.json_.context = c; },
-  get context()         { return this.json_.context; }
+  get response()        { return this.json_.response; }
 };
 
 
@@ -144,9 +143,7 @@ var DelayedCommand = function(driver, command, response, opt_sleepDelay) {
   this.onBlank_ = false;
   this.sleepDelay_ = opt_sleepDelay || DelayedCommand.DEFAULT_SLEEP_DELAY;
 
-  var activeWindow =
-      response.context.frame || response.context.fxbrowser.contentWindow;
-  this.loadGroup_ = activeWindow.
+  this.loadGroup_ = driver.getBrowser().contentWindow.
       QueryInterface(Components.interfaces.nsIInterfaceRequestor).
       getInterface(Components.interfaces.nsIWebNavigation).
       QueryInterface(Components.interfaces.nsIInterfaceRequestor).
@@ -225,10 +222,28 @@ DelayedCommand.prototype.executeInternal_ = function() {
  * @constructor
  */
 var nsCommandProcessor = function() {
+  /**
+   * A wrapped self reference for XPConnect.
+   * @type {nsCommandProcessor}
+   */
   this.wrappedJSObject = this;
+
+  /**
+   * A reference to the nsIWindowMediator service.
+   * @type {nsIWindowMediator}
+   */
   this.wm = Components.classes['@mozilla.org/appshell/window-mediator;1'].
       getService(Components.interfaces.nsIWindowMediator);
+
+  /**
+   * A map of active sessions where they keys are session UUIDs and the values
+   * are {@code Session} objects.
+   * @type {Object}
+   * @private
+   */
+  this.sessionMap_ = {};
 };
+
 
 /**
  * Flags for the {@code nsIClassInfo} interface.
@@ -236,6 +251,7 @@ var nsCommandProcessor = function() {
  */
 nsCommandProcessor.prototype.flags =
     Components.interfaces.nsIClassInfo.DOM_OBJECT;
+
 
 /**
  * Implementaiton language detail for the {@code nsIClassInfo} interface.
@@ -246,89 +262,60 @@ nsCommandProcessor.prototype.implementationLanguage =
 
 
 /**
- * Logs a message to the Console Service and then throws an error.
- * @param {String} message The message to log.
- * @throws {Components.results.NS_ERROR_FAILURE}
- */
-nsCommandProcessor.logError = function(message) {
-  // TODO(jleyba): This should log an error and not a generic message.
-  Utils.dumpn(message);
-  throw Components.results.NS_ERROR_FAILURE;
-};
-
-
-/**
  * Processes a command request for the {@code FirefoxDriver}.
  * @param {nsISupports} wrappedJsonCommand The command to
  *     execute, specified in a JSON object that is wrapped in a nsISupports
  *     instance.
  */
 nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
-  if (!(wrappedJsonCommand instanceof Components.interfaces.nsISupports)) {
-    nsCommandProcessor.logError(
-        'wrappedJsonCommand does not implement nsISupports!');
-  }
-
   var command = wrappedJsonCommand.wrappedJSObject;
   if (!command) {
-    nsCommandProcessor.logError(
-        'wrappedJsonCommand must have a wrappedJSObject property!');
+    Utils.dumpn('wrappedJsonCommand must have a wrappedJSObject property!');
+    throw Components.results.NS_ERROR_FAILURE;
   }
 
-  // TODO(jmleyba): DELETE FOR RELEASE vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  // The magic "reload" command makes us reload this script file and monkey
-  // patch it in.  Iterative development without restarting firefox everytime :)
-  if (command.commandName == 'reload') {
-    var fileProtocolHandler = Components.
-        classes['@mozilla.org/network/protocol;1?name=file'].
-        createInstance(Components.interfaces.nsIFileProtocolHandler);
-    var file = fileProtocolHandler.getURLSpecFromFile(__LOCATION__);
-    Utils.dumpn('Reloading >>> ' + file);
-    var obj = {};
-    Components.classes['@mozilla.org/moz/jssubscript-loader;1'].
-        createInstance(Components.interfaces.mozIJSSubScriptLoader).
-        loadSubScript(file, obj);
-    DelayedCommand = obj.DelayedCommand;
-    Response = obj.Response;
-    this.__proto__ = obj.nsCommandProcessor.prototype;
-    return;
-  }
-  // TODO(jmleyba): /DELETE FOR RELEASE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  var sessionId = command.sessionId;
+  var response = new Response(command, this.sessionMap_[sessionId]);
 
-  command.context = Context.fromString(command.context);
-  var response = new Response(command);
+  var sessions = [];
+  for (var id in this.sessionMap_) {
+    sessions.push(id);
+  }
+
+  if (!response.session &&
+      command.commandName != 'newSession' &&
+      command.commandName != 'quit') {
+    response.isError = true;
+    response.response =
+        'Sessionless command! Sessions must be started with a ' +
+        '"newSession" command';
+    Utils.dumpn(response.response +
+                '\nKnown sessions:\n' + sessions.join('\n'));
+    return response.send();
+  }
 
   // These are used to locate a new driver, and so not having one is a fine
   // thing to do
-  if (command.commandName == 'findActiveDriver' ||
+  if (command.commandName == 'newSession' ||
+      command.commandName == 'deleteSession' ||
       command.commandName == 'switchToWindow' ||
       command.commandName == 'getAllWindowHandles' ||
       command.commandName == 'quit') {
     return this[command.commandName](response, command.parameters);
   }
 
-  var win, fxbrowser, driver;
-  var allWindows = this.wm.getEnumerator(null);
-  while (allWindows.hasMoreElements()) {
-    win = allWindows.getNext();
-    if (win["fxdriver"] && win.fxdriver.id == response.context.windowId) {
-      fxbrowser = win.getBrowser();
-      driver = win.fxdriver;
-      break;
-    }
-  }
-
-  if (!fxbrowser) {
+  var driver = response.session.getDriver();
+  if (!driver) {
     response.isError = true;
-    response.response = 'Unable to find browser with id ' +
-                        response.context.windowId;
+    response.response = 'Session has no driver: ' + response.session.getId();
     return response.send();
   }
 
-  if (!driver) {
+  if (!response.session.window) {
     response.isError = true;
-    response.response = 'Unable to find the driver for browser with id ' +
-                        response.context.windowId;
+    response.response =
+        'The current window for session ' + response.session.getId() +
+        ' was closed or no longer exists!';
     return response.send();
   }
 
@@ -338,28 +325,7 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
     return response.send();
   }
 
-  response.context.fxbrowser = fxbrowser;
-
-  // Determine whether or not we need to care about frames.
-  var frames = fxbrowser.contentWindow.frames;
-  if ("?" == response.context.frameId) {
-    if (frames && frames.length) {
-      if ("FRAME" == frames[0].frameElement.tagName) {
-          response.context.frameId = 0;
-      } else {
-          response.context.frameId = undefined;
-      }
-    } else {
-      response.context.frameId = undefined;
-    }
-  }
-
-  if (response.context.frameId !== undefined) {
-    response.context.frame = Utils.findFrame(
-        fxbrowser, response.context.frameId);
-  }
-
-  response.startCommand(win);
+  response.startCommand(driver.window);
   new DelayedCommand(driver, command, response).execute(0);
 };
 
@@ -382,6 +348,8 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
   var matches = function(win, lookFor) {
     return !win.closed &&
            (win.content && win.content.name == lookFor) ||
+           // fxdriver is the name of the property the FirefoxDriver is stored
+           // in by the WebDriverServer.
            (win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor);
   };
 
@@ -389,7 +357,8 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
     if (matches(win, lookFor)) {
       win.focus();
       if (win.top.fxdriver) {
-        response.response = new Context(win.fxdriver.id).toString();
+        response.session.setDriver(win.top.fxdriver);
+        response.response = response.session.getId();
       } else {
         response.isError = true;
         response.response = 'No driver found attached to top window!';
@@ -466,21 +435,36 @@ nsCommandProcessor.prototype.searchWindows_ = function(search_criteria,
 
 
 /**
- * Locates the most recently used FirefoxDriver window.
+ * Creates a new session and sets its initial context to the most recently
+ * used FirefoxDriver window.
  * @param {Response} response The response object to send the command response
  *     in.
  */
-nsCommandProcessor.prototype.findActiveDriver = function(response) {
+nsCommandProcessor.prototype.newSession = function(response) {
   var win = this.wm.getMostRecentWindow("navigator:browser");
   var driver = win.fxdriver;
   if (!driver) {
     response.isError = true;
     response.response = 'No drivers associated with the window';
   } else {
-    response.context = new Context(driver.id);
-    response.response = driver.id;
+    response.session = new Session(driver);
+    this.sessionMap_[response.session.getId()] = response.session;
+    response.response = response.session.getId();
   }
   response.send();
+};
+
+
+/**
+ * Deletes the session associated with the command request.
+ * @param {Array.<string>} sessionId An array whose sole element is the ID of
+ *     the session to delete.
+ */
+nsCommandProcessor.prototype.deleteSession = function(sessionId) {
+  sessionId = sessionId[0];
+  if (this.sessionMap_[sessionId]) {
+    delete this.sessionMap_[sessionId];
+  }
 };
 
 
@@ -494,6 +478,9 @@ nsCommandProcessor.prototype.quit = function() {
 };
 
 
+/**
+ * @see nsIClassInfo.getInterfaces()
+ */
 nsCommandProcessor.prototype.getInterfaces = function(count) {
   var ifaces = [
     Components.interfaces.nsICommandProcessor,
@@ -505,6 +492,17 @@ nsCommandProcessor.prototype.getInterfaces = function(count) {
 };
 
 
+/**
+ * @see nsIClassInfo.getHelperForLanguage()
+ */
+nsCommandProcessor.prototype.getHelperForLanguage = function() {
+  return null;
+};
+
+
+/**
+ * @see nsISupports.QueryInterface()
+ */
 nsCommandProcessor.prototype.QueryInterface = function (aIID) {
   if (!aIID.equals(Components.interfaces.nsICommandProcessor) &&
       !aIID.equals(Components.interfaces.nsIClassInfo) &&
@@ -514,10 +512,6 @@ nsCommandProcessor.prototype.QueryInterface = function (aIID) {
   return this;
 };
 
-
-nsCommandProcessor.prototype.getHelperForLanguage = function() {
-  return null;
-};
 
 nsCommandProcessor.CLASS_ID =
     Components.ID('{692e5117-a4a2-4b00-99f7-0685285b4db5}');
