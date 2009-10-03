@@ -35,78 +35,53 @@ Selenium介绍
 软件测试往往以人工方式进行。有时，这是有效的；然而许多组织忽视了手工测试的替代方法，
 或者没有技能实施。运用这些替代方法将大大提高软件开发的效率，因为他们增加了测试的效率。
 
-Test automation is often the answer. Test automation means using a tool to 
-run repeatable tests against the target application whenever necessary.
+测试自动化往往就是答案。测试自动化是指使用工具对目标应用程序在必要的时候时执行可重复的测试。
   
-There are many advantages to test automation. Most are related to 
-the repeatability of the tests and the speed at which the tests can be executed.
-There are a number of commercial and open source tools available for assisting
-with the development of test automation. Selenium is possibly the most 
-widely-used open source solution. This user's guide will assist both new and 
-experienced Selenium users in learning effective techniques in building 
-test automation for web applications. 
+自动化测试有许多优点，大都和测试的重复性以及测试的执行速度有关。
+有许多商业和开源的工具可以辅助测试自动化的开发。Selenium可能是最广泛使用的开源解决方案。
+此用户的指南将协助新老Selenium用户学习有效技术，以构建网络应用的测试自动化。
 
-This guide introduces Selenium, teaches its most widely used features, and 
-provides useful advice in best practices accumulated from the Selenium 
-community. Many examples are provided. Also, technical information on the 
-internal structure of Selenium and recommended uses of Selenium are provided as 
-contributed by a consortium of experienced Selenium users. It is our hope that 
-this guide will get additional new users excited about using Selenium for test 
-automation.  We hope this guide will assist in "getting the word out" that quality
-assurance and software testing have many options beyond what is currently 
-practiced. We hope this user's guide and Selenium itself provide a valuable aid
-to boosting the reader's efficiency in his or her software testing processes. 
+本指南介绍Selenium，教授其使用最广泛的功能，并提供有用的意见，
+这些意见来自于Selenium社区积累的最佳实践。指南提供大量实例。
+此外，还提供Selenium内部结构的技术信息和Selenium的推荐用法，
+这些都是由经验丰富的用户组成的联盟供稿的。
+我们希望指南可以增加乐于使用Selenium做自动化测试的新用户。
+我们希望指南可以传达这样的信息：质量保证和软件测试有许多超越目前实际的多种选择。
+我们希望指南和Selenium本身所提供的宝贵帮助，可以提高读者在软件测试流程中的效率。
 
-Introducing Selenium 
+Selenium介绍 
 --------------------
-Selenium is a robust set of tools that supports rapid development of test 
-automation for web-based applications. Selenium provides a rich set of 
-testing functions specifically geared to the needs of testing of a web 
-application. These operations are highly flexible, allowing many options for 
-locating UI elements and comparing expected test results against actual 
-application behavior. 
-
-One of Selenium's key features is the support for executing one's tests on
-multiple browser platforms.  
-
-Selenium Components
+Selenium是个强大的工具集，支持快速开发网络应用的测试自动化。
+Selenium提供了丰富的测试函数集，尤其适合网络应用测试的需要。
+这些操作非常灵活，允许多种选择定位UI元素和比较测试的期望结果与应用程序的实际行为。
+ 
+Selenium的主要功能之一就是支持在多种浏览器平台上执行测试。
+  
+Selenium组件
 -------------------
-Selenium is composed of three major tools. Each one has a specific role in 
-aiding the development of web application test automation. 
+Selenium由三个主要的工具组成。每一个在帮助网络应用测试自动化开发上都有独特的作用。
 
 Selenium-IDE
 ~~~~~~~~~~~~
-Selenium-IDE is the Integrated Development Environment for building Selenium 
-test cases. It operates as a Firefox add-on and provides an easy-to-use 
-interface for developing and running individual test cases or entire test 
-suites. Selenium-IDE has a recording feature, which will keep account of user 
-actions as they are performed and store them as a reusable script to play back. 
-It also has a context menu (right-click) integrated with the Firefox browser, 
-which allows the user to pick from a list of assertions and verifications for 
-the selected location. Selenium-IDE also offers full editing of test cases for 
-more precision and control. 
+Selenium-IDE是构建Selenium测试用例的集成开发环境。
+它是一个Firefox插件，为开发和运行单一测试用例或者完整测试套件提供了易用的界面。
+Selenium-IDE具有录制功能，能记录用户执行的操作并保存成可复用的脚本用来回放。
+它也有一个上下文菜单（右键单击）集成到Firefox浏览器，允许用户在断言和验证列表中选择。
+Selenium-IDE还为了测试用例更加精确和便于控制提供了充分的编辑功能。
 
-Although Selenium-IDE is a Firefox only add-on, tests created in it can also be 
-run against other browsers by using Selenium-RC and specifying the name of the 
-test suite on the command line.
+虽然Selenium-IDE是一个Firefox插件，但是通过使用Selenium-RC并在命令行中指定测试套件名，
+由它创建的测试也可以运行在其他的浏览器上。
 
 Selenium-RC (Remote Control)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Selenium-RC allows the test 
-automation developer to use a programming language for maximum flexibility and
-extensibility in developing test logic. For instance, if the application under
-test returns a result set, and if the automated test program needs to run tests
-on each element in the result set, the programming language's iteration support
-can be used to iterate through the result set, calling Selenium commands to run
-tests on each item. 
+Selenium-RC允许测试自动化开发人员使用编程语言以最大的灵活性和可扩展性开发测试逻辑。
+例如，如果被测程序返回一个结果集，并且如果自动化测试程序需要在结果集的每个元素上运行测试，
+编程语言的迭代支持可以用来遍历结果集，在结果集的每一项上调用Selenium命令运行测试。
 
-Selenium-RC provides an API (Application Programming Interface)
-and library for each of its supported languages:
-HTML, Java, C#, Perl, PHP, Python, and Ruby.
-This ability to use Selenium-RC with a high-level programming language
-to develop test cases also allows the 
-automated testing to be integrated with a project's automated build 
-environment. 
+Selenium-RC为以下每种支持的语言提供API（应用程序接口）和函数库：
+HTML，Java，C#，Perl，PHP，Python和Ruby。
+使用Selenium-RC通过高级编程语言开发测试用例的能力还使得自动化测试与项目自动化构建环境相集成。
+
 
 Selenium-Grid 
 ~~~~~~~~~~~~~~
