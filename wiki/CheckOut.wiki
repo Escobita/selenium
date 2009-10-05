@@ -9,4 +9,4 @@ If you would like to be kept up to date with developments, want to know when bin
 
 = Getting the Latest WebDriver code =
 
-In order to get the latest version of the code, please follow the instructions on the project's source page on Google Code located at http://code.google.com/p/selenium/source Once you've downloaded the source, please take a look at BuildingWebDriver for instructions on how to compile everything and at the DeveloperTips for information on how to work on the code.
+In order to get the latest version of the code, please follow the instructions on the project's source page on Google Code located at http://code.google.com/p/selenium/source/ and check out {{{selenium.googlecode.com/svn/webdriver/trunk}}}. Once you've downloaded the source, please take a look at BuildingWebDriver for instructions on how to compile everything and at the DeveloperTips for information on how to work on the code.
