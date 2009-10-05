@@ -1,4 +1,5 @@
 org.openqa.selenium
+org.openqa.selenium.chrome
 org.openqa.selenium.firefox
 org.openqa.selenium.firefox.internal
 org.openqa.selenium.htmlunit
@@ -8,7 +9,6 @@ org.openqa.selenium.lift
 org.openqa.selenium.lift.find
 org.openqa.selenium.lift.match
 org.openqa.selenium.remote
-org.openqa.selenium.safari
 org.openqa.selenium.support
 org.openqa.selenium.support.events
 org.openqa.selenium.support.pagefactory
