@@ -4,18 +4,17 @@ Python Client Driver Configuration
 .. _configuring-selenium-RC-python-reference:
 
 * Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Extract the file *selenium-java-client-driver.jar*
-* Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)
-* Create a new project
-* Add to your project classpath the file *selenium-java-client-driver.jar*
-* Write your Selenium test in Java
-* Run selenium server from console
-* Execute your test from the IDE
+* Extract the file *selenium.py*
+* Either write your Selenium test in Python or export
+  a script from Selenium-IDE to a python file.
+* Add to your test's path the file *selenium.py*
+* Run Selenium server from the console
+* Execute your test from a console or your Python IDE 
 
 The following steps describe the basic installation procedure. After following 
 this, the user can start using the desired IDE, (even write tests in a text 
 processor and run them from command line!) without any extra work (at least 
-from the selenium's part).
+on the Selenium side).
 
 * Installing Python
 
