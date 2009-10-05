@@ -335,7 +335,7 @@ Running Test Cases
   
 The IDE allows many options for running your test case. You can run a test case
 all at once, stop and start it, run it one line at a time, run a single command 
-you are current developing, and you can do a batch run of an entire test suite.
+you are currently developing, and you can do a batch run of an entire test suite.
 Execution of test cases is very flexible in the IDE. 
   
 Run a Test Case
