@@ -9,7 +9,7 @@ body {
 table#topics {
   border: thin solid #444;
   background: white;
-  margin: 0 6em;
+  margin: 0 3em;
   border-spacing: 0 0;
   table-layout: fixed;
   border-collapse: collapse;
@@ -36,12 +36,23 @@ table#topics thead tr td {
 table#topics thead tr td h2 {
   padding: 0 0 .3em 0;
   margin: 0;
+  font-size: 1.1em;
+}
+
+table#topics thead tr td img {
+  float: left;
+  margin-right: .5em;
+  margin-top: .2em;
+  width: 56px;
 }
 
 table#topics thead tr td p {
+  clear: left;
   padding: 0;
   margin: 0;
   color: #444;
+  font-size: .9em;
+  font-style: italic;
 }
 
 table#topics thead tr td div.content {
