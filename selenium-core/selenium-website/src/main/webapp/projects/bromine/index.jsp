@@ -50,7 +50,7 @@
         <table border="0">            
             <tr>                
                 <td valign="top">
-                    <a href="../../download"><img src="download.gif" style='float: left; margin-right: 6px;'></a>	
+                    <a href="../../download/?ref=projects/bromine"><img src="download.gif" style='float: left; margin-right: 6px;'></a>	
                     <p>
                         <b>Bromine</b> is a web-based QA tool for selenium, that enables you to easily run selenium RC tests and view the results. It scales beatifully from the single tester that just wants to run some tests without all the hassle to the corporate solution with multiple user-groups and houndreds of testcases. 
                     </p>
