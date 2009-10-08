@@ -1,5 +1,5 @@
 #summary Using WebDriver in your project and finding the jars and required libraries
-#labels WebDriver
+#labels WebDriver,Maven
 
 = Using WebDriver =
 
@@ -14,7 +14,7 @@ If you want to use the HtmlUnitDriver, add the following dependency to your pom.
     <dependency>
         <groupId>org.seleniumhq.webdriver</groupId>
         <artifactId>webdriver-htmlunit</artifactId>
-        <version>0.9.7089</version>
+        <version>0.9.7376</version>
     </dependency>
 }}}
 If you want to use the FirefoxDriver, you need to add the following dependency to your pom.xml:
@@ -22,7 +22,7 @@ If you want to use the FirefoxDriver, you need to add the following dependency t
     <dependency>
         <groupId>org.seleniumhq.webdriver</groupId>
         <artifactId>webdriver-firefox</artifactId>
-        <version>0.9.7089</version>
+        <version>0.9.7376</version>
     </dependency>
 }}}
 If you want to use the InternetExplorerDriver, you need to add the following dependency to your pom.xml:
@@ -30,20 +30,25 @@ If you want to use the InternetExplorerDriver, you need to add the following dep
     <dependency>
         <groupId>org.seleniumhq.webdriver</groupId>
         <artifactId>webdriver-ie</artifactId>
-        <version>0.9.7089</version>
+        <version>0.9.7376</version>
     </dependency>
 }}}
-Because this artifact dependes on the jna-3.0.9.jar, which is not in the central maven repository, you also need to download this jar file from https://jna.dev.java.net/servlets/ProjectDocumentList?folderID=10145&expandFolder=10145&folderID=9501 and install it into your local maven repository via
+If you want to use the ChromeDriver, you need to add the following dependency to your pom.xml:
 {{{
-    mvn install:install-file -DgroupId=com.sun.jna -DartifactId=jna -Dversion=3.0.9 -Dpackaging=jar -Dfile=/path/to/downloaded/jna.jar
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-chrome</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
 }}}
+Hint: ChromeDriver currently only works with Chrome 4.0.x (from the dev channel).
 
 Finally, if you like to use any of our support classes, you should add the following dependency to your pom.xml:
 {{{
     <dependency>
         <groupId>org.seleniumhq.webdriver</groupId>
         <artifactId>webdriver-support</artifactId>
-        <version>0.9.7089</version>
+        <version>0.9.7376</version>
     </dependency>
 }}}
 That's it. 
