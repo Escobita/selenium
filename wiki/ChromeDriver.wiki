@@ -15,8 +15,6 @@ You will need the *dev channel* release of Google Chrome installed (NOT the stab
 
 == Known issues ==
 
-Sometimes Chrome does not grab focus when it is launched, and hangs.  If you can see this to be the case, click on the Chrome window and your tests should start running.  This will be fixed by [http://code.google.com/p/chromium/issues/detail?id=20935 Chrome bug 20935].
-
 Iframes which have no src attribute, i.e. <iframe src=""> or <iframe> are unsupported.  This will be fixed by [http://code.google.com/p/chromium/issues/detail?id=20773 Chrome bug 20773], but is not likely to happen until at least October 2009.
 
 Only one instance at a time will run.  This is due to a bug in Chrome on Linux and Mac [http://code.google.com/p/chromium/issues/detail?id=11547 Chrome bug 11547].  On Windows, you can apply [http://selenium.googlecode.com/files/ChromeDriverMultipleInstancePatch.diff this patch] to allow multiple instances, but it will break WebDriver on Linux and Mac.
