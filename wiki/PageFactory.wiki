@@ -27,7 +27,7 @@ public class GoogleSearchPage {
 } 
 }}}
 
-In order for this code to work and not through a NullPointerException because the "q" field isn't instantiated, we need to initialise the PageObject:
+In order for this code to work and not throw a NullPointerException because the "q" field isn't instantiated, we need to initialise the PageObject:
 
 {{{
 package org.openqa.selenium.example;
