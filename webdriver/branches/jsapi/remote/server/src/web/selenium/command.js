@@ -200,25 +200,28 @@ webdriver.Command.prototype.setResponse = function(response) {
  * @enum {string}
  */
 webdriver.CommandName = {
+  // Commands executed directly by the JS API. --------------------------------
   FUNCTION: 'function',
   SLEEP: 'sleep',
   WAIT: 'wait',
   PAUSE: 'pause',
+
+  // Commands dispatched to the browser driver. -------------------------------
   NEW_SESSION: 'newSession',
   DELETE_SESSION: 'deleteSession',
   QUIT: 'quit',
   GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
-  GET_ALL_WINDOW_HANDLES: 'getAllWindowHandles',
+  GET_WINDOW_HANDLES: 'getWindowHandles',
   GET_CURRENT_URL: 'getCurrentUrl',
   CLOSE: 'close',
   SWITCH_TO_WINDOW: 'switchToWindow',
   SWITCH_TO_FRAME: 'switchToFrame',
   SWITCH_TO_DEFAULT_CONTENT: 'switchToDefaultContent',
   GET: 'get',
-  FORWARD: 'forward',
-  BACK: 'back',
+  FORWARD: 'goForward',
+  BACK: 'goBack',
   REFRESH: 'refresh',
-  GET_TITLE: 'getTitle',
+  GET_TITLE: 'title',
   GET_PAGE_SOURCE: 'getPageSource',
   EXECUTE_SCRIPT: 'executeScript',
   GET_MOUSE_SPEED: 'getMouseSpeed',
@@ -245,8 +248,8 @@ webdriver.CommandName = {
   GET_LOCATION: 'getLocation',
   GET_SIZE: 'getSize',
   GET_ATTRIBUTE: 'getAttribute',
-  DRAG: 'drag',
-  GET_CSS_PROPERTY: 'getCssProperty'
+  DRAG_ELEMENT: 'dragElement',
+  GET_VALUE_OF_CSS_PROPERTY: 'getValueOfCssProperty'
 };
 
 

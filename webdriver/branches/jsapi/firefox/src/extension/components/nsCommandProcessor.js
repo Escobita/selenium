@@ -275,34 +275,14 @@ nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
         'wrappedJsonCommand must have a wrappedJSObject property!');
   }
 
-  // TODO(jmleyba): DELETE FOR RELEASE vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  // The magic "reload" command makes us reload this script file and monkey
-  // patch it in.  Iterative development without restarting firefox everytime :)
-  if (command.commandName == 'reload') {
-    var fileProtocolHandler = Components.
-        classes['@mozilla.org/network/protocol;1?name=file'].
-        createInstance(Components.interfaces.nsIFileProtocolHandler);
-    var file = fileProtocolHandler.getURLSpecFromFile(__LOCATION__);
-    Utils.dumpn('Reloading >>> ' + file);
-    var obj = {};
-    Components.classes['@mozilla.org/moz/jssubscript-loader;1'].
-        createInstance(Components.interfaces.mozIJSSubScriptLoader).
-        loadSubScript(file, obj);
-    DelayedCommand = obj.DelayedCommand;
-    Response = obj.Response;
-    this.__proto__ = obj.nsCommandProcessor.prototype;
-    return;
-  }
-  // TODO(jmleyba): /DELETE FOR RELEASE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
   command.context = Context.fromString(command.context);
   var response = new Response(command);
 
   // These are used to locate a new driver, and so not having one is a fine
   // thing to do
-  if (command.commandName == 'findActiveDriver' ||
+  if (command.commandName == 'newSession' ||
       command.commandName == 'switchToWindow' ||
-      command.commandName == 'getAllWindowHandles' ||
+      command.commandName == 'getWindowHandles' ||
       command.commandName == 'quit') {
     return this[command.commandName](response, command.parameters);
   }
@@ -426,7 +406,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
  * @param {Response} response The response object to send the command response
  *     in.
  */
-nsCommandProcessor.prototype.getAllWindowHandles = function(response) {
+nsCommandProcessor.prototype.getWindowHandles = function(response) {
   var res = [];
   this.searchWindows_('navigator:browser', function(win) {
     if (win.top && win.top.fxdriver) {
@@ -470,7 +450,7 @@ nsCommandProcessor.prototype.searchWindows_ = function(search_criteria,
  * @param {Response} response The response object to send the command response
  *     in.
  */
-nsCommandProcessor.prototype.findActiveDriver = function(response) {
+nsCommandProcessor.prototype.newSession = function(response) {
   var win = this.wm.getMostRecentWindow("navigator:browser");
   var driver = win.fxdriver;
   if (!driver) {

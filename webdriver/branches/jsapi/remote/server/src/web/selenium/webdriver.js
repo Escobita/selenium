@@ -603,7 +603,7 @@ webdriver.WebDriver.prototype.getWindowHandle = function() {
  */
 webdriver.WebDriver.prototype.getAllWindowHandles = function() {
   var command =
-      new webdriver.Command(webdriver.CommandName.GET_ALL_WINDOW_HANDLES).
+      new webdriver.Command(webdriver.CommandName.GET_WINDOW_HANDLES).
           setSuccessCallback(function(response) {
             response.value = response.value.split(',');
           });

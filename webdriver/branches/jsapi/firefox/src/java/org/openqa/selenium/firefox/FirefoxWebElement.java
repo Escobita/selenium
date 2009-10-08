@@ -61,12 +61,12 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void submit() {
-        sendMessage(WebDriverException.class, "submitElement");
+        sendMessage(WebDriverException.class, "submit");
     }
 
     public String getValue() {
         try {
-          return sendMessage(WebDriverException.class, "getElementValue");
+          return sendMessage(WebDriverException.class, "getValue");
         } catch (WebDriverException e) {
             return null;
         }
@@ -91,24 +91,24 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
   public String getAttribute(String name) {
         try {
-            return sendMessage(WebDriverException.class, "getElementAttribute", name);
+            return sendMessage(WebDriverException.class, "getAttribute", name);
         } catch (WebDriverException e) {
             return null;
         }
     }
 
     public boolean toggle() {
-        sendMessage(UnsupportedOperationException.class, "toggleElement");
+        sendMessage(UnsupportedOperationException.class, "toggle");
         return isSelected();
     }
 
     public boolean isSelected() {
-        String value = sendMessage(WebDriverException.class, "getElementSelected");
+        String value = sendMessage(WebDriverException.class, "isSelected");
         return Boolean.parseBoolean(value);
     }
 
     public void setSelected() {
-        sendMessage(UnsupportedOperationException.class, "setElementSelected");
+        sendMessage(UnsupportedOperationException.class, "setSelected");
     }
 
     public boolean isEnabled() {
@@ -117,15 +117,15 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getText() {
-        return sendMessage(WebDriverException.class, "getElementText");
+        return sendMessage(WebDriverException.class, "getText");
     }
 
   public boolean isDisplayed() {
-    return Boolean.parseBoolean(sendMessage(WebDriverException.class, "isElementDisplayed"));
+    return Boolean.parseBoolean(sendMessage(WebDriverException.class, "isDisplayed"));
     }
 
     public Point getLocation() {
-        String result = sendMessage(WebDriverException.class, "getElementLocation");
+        String result = sendMessage(WebDriverException.class, "getLocation");
 
         String[] parts = result.split(",");
         int x = Integer.parseInt(parts[0].trim());
@@ -135,7 +135,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Dimension getSize() {
-        String result = sendMessage(WebDriverException.class, "getElementSize");
+        String result = sendMessage(WebDriverException.class, "getSize");
 
         String[] parts = result.split(",");
         int x = Math.round(Float.parseFloat(parts[0].trim()));
@@ -145,7 +145,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void dragAndDropBy(int moveRight, int moveDown) {
-        sendMessage(UnsupportedOperationException.class, "dragAndDrop", moveRight, moveDown);
+        sendMessage(UnsupportedOperationException.class, "dragElement", moveRight, moveDown);
     }
 
     public void dragAndDropOn(RenderedWebElement element) {
@@ -250,7 +250,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getValueOfCssProperty(String propertyName) {
-    	return sendMessage(WebDriverException.class,"getElementCssProperty", propertyName);
+    	return sendMessage(WebDriverException.class,"getValueOfCssProperty", propertyName);
     }
 
     private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {

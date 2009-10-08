@@ -372,7 +372,7 @@ webdriver.WebElement.prototype.getTagName = function() {
  */
 webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
   var value = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_CSS_PROPERTY).
+  var command = this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
       setParameters(cssStyleProperty).
       setSuccessCallback(value.setValueFromResponse, value);
   this.driver_.addCommand(command);
@@ -494,7 +494,7 @@ webdriver.WebElement.prototype.getLocation = function() {
  */
 webdriver.WebElement.prototype.addDragAndDropCommand_ = function(
     newLocation, x, y, opt_addToFront) {
-  var command = this.createCommand_(webdriver.CommandName.DRAG).
+  var command = this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
       setParameters(x, y).
       setSuccessCallback(
           goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,

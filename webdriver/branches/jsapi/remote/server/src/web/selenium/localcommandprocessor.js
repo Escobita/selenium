@@ -51,58 +51,6 @@ goog.inherits(webdriver.LocalCommandProcessor,
 
 
 /**
- * Map of {@code webdriver.CommandName}s to the corresponding method name for a
- * local command processor.
- * TODO(jmleyba): Currently this is FF-specific. When we add other local command
- * processors, we'll need to standardize on names.
- * @enum {string}
- */
-webdriver.LocalCommandProcessor.DRIVER_METHOD_NAMES_ = goog.object.transpose({
-  'findActiveDriver': webdriver.CommandName.NEW_SESSION,
-  'getCurrentWindowHandle': webdriver.CommandName.GET_CURRENT_WINDOW_HANDLE,
-  'getAllWindowHandles': webdriver.CommandName.GET_ALL_WINDOW_HANDLES,
-  'getCurrentUrl': webdriver.CommandName.GET_CURRENT_URL,
-  'get': webdriver.CommandName.GET,
-  'goForward': webdriver.CommandName.FORWARD,
-  'goBack': webdriver.CommandName.BACK,
-  'refresh': webdriver.CommandName.REFRESH,
-  'title': webdriver.CommandName.GET_TITLE,
-  'getPageSource': webdriver.CommandName.GET_PAGE_SOURCE,
-  'close': webdriver.CommandName.CLOSE,
-  'switchToWindow': webdriver.CommandName.SWITCH_TO_WINDOW,
-  'switchToFrame': webdriver.CommandName.SWITCH_TO_FRAME,
-  'switchToDefaultContent': webdriver.CommandName.SWITCH_TO_DEFAULT_CONTENT,
-  'executeScript': webdriver.CommandName.EXECUTE_SCRIPT,
-  'getMouseSpeed': webdriver.CommandName.GET_MOUSE_SPEED,
-  'setMouseSpeed': webdriver.CommandName.SET_MOUSE_SPEED,
-  'getActiveElement': webdriver.CommandName.GET_ACTIVE_ELEMENT,
-  'getVisible': webdriver.CommandName.GET_VISIBLE,
-  'setVisible': webdriver.CommandName.SET_VISIBLE,
-  'click': webdriver.CommandName.CLICK,
-  'clear': webdriver.CommandName.CLEAR,
-  'submitElement': webdriver.CommandName.SUBMIT,
-  'getElementText': webdriver.CommandName.GET_TEXT,
-  'sendKeys': webdriver.CommandName.SEND_KEYS,
-  'getElementValue': webdriver.CommandName.GET_VALUE,
-  'getTagName': webdriver.CommandName.GET_TAG_NAME,
-  'isElementSelected': webdriver.CommandName.IS_SELECTED,
-  'setElementSelected': webdriver.CommandName.SET_SELECTED,
-  'toggleElement': webdriver.CommandName.TOGGLE,
-  'isElementEnabled': webdriver.CommandName.IS_ENABLED,
-  'isElementDisplayed': webdriver.CommandName.IS_DISPLAYED,
-  'getElementLocation': webdriver.CommandName.GET_LOCATION,
-  'getElementSize': webdriver.CommandName.GET_SIZE,
-  'getElementAttribute': webdriver.CommandName.GET_ATTRIBUTE,
-  'dragAndDrop': webdriver.CommandName.DRAG,
-  'getElementCssProperty': webdriver.CommandName.GET_CSS_PROPERTY,
-  'findElement': webdriver.CommandName.FIND_ELEMENT,
-  'findElements': webdriver.CommandName.FIND_ELEMENTS,
-  'findChildElement': webdriver.CommandName.FIND_CHILD_ELEMENT,
-  'findChildElements': webdriver.CommandName.FIND_CHILD_ELEMENTS
-});
-
-
-/**
  * @override
  */
 webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
@@ -120,25 +68,12 @@ webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
     command.setResponse(response);
   }, this);
 
-  var methodName;
-  switch (command.name) {
-    case webdriver.CommandName.SEND_KEYS:
-      command.parameters = [command.parameters.join('')];
-      // Fall-through
-
-    default:
-      methodName =
-          webdriver.LocalCommandProcessor.DRIVER_METHOD_NAMES_[command.name];
-      break;
-  }
-
-  if (!methodName) {
-    throw new Error(
-        'LocalCommandProcessor: Unsupported command, ' + command.name);
+  if (command.name == webdriver.CommandName.SEND_KEYS) {
+    command.parameters = [command.parameters.join('')];
   }
 
   var jsonCommand = {
-    'commandName': methodName,
+    'commandName': command.name,
     'context': context.toString(),
     'parameters': command.parameters,
     'callbackFn': respond
