@@ -3,7 +3,7 @@
 
 = How XPath Works in WebDriver =
 
-At a high level, WebDriver uses a browser's native XPath capabilities wherever possible. On those browsers that don't have native support for native xpath support, we have provided our own implementation. This can lead to some unexpected behaviour unless you are aware of the differences in the various xpath engines.
+At a high level, WebDriver uses a browser's native XPath capabilities wherever possible. On those browsers that don't have native XPath support, we have provided our own implementation. This can lead to some unexpected behaviour unless you are aware of the differences in the various xpath engines.
 
 || *Driver* || *Tag and Attribute Names* || *Attribute Values* || *Native XPath Support* ||
 || HtmlUnitDriver || Lower-cased || As they appear in the HTML || Yes ||
