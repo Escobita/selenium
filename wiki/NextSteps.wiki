@@ -191,4 +191,4 @@ for (Cookie loadedCookie : allCookies) {
 
 == Next, Next Steps! ==
 
-This has been a high level walkthrough of WebDriver and some of its key capabilities. You may want to look at the DesignPatterns to see get some ideas about how you can reduce the pain of maintaining your tests and how to make your code more modular.
+This has been a high level walkthrough of WebDriver and some of its key capabilities. You may want to look at the DesignPatterns to get some ideas about how you can reduce the pain of maintaining your tests and how to make your code more modular.
