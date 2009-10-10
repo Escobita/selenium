@@ -1,6 +1,6 @@
 .. _chapter00-reference:
 
-A Personal Note to the Reader
+Note to the Reader
 =============================
 Hello, and welcome to Selenium!  The Documentation Team would like to 
 welcome you, and to thank you for being interested in Selenium.
