@@ -1,10 +1,7 @@
-﻿.. _chapter03-cn-reference:
+﻿用Selenium-IDE开发测试用例
+==========================
 
-|logo| 用Selenium-IDE开发测试用例
-=================================
-
-.. |logo| image:: ../images/selenium-ide-logo.png
-   :alt:
+.. _chapter03-cn-reference:
 
 介绍 
 ----
