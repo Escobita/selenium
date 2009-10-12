@@ -18,7 +18,7 @@ public class JsApiTestCase extends TestCase {
   private static final long HALF_SECOND = 500;
   private static final long TWO_MINUTES = 2 * 60 * 1000;
   private static final String IS_FINISHED_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.isFinished();";
+      "return !!webdriver && webdriver.TestRunner.SINGLETON.isFinished();";
   private static final String NUM_PASSED_SCRIPT =
       "return webdriver.TestRunner.SINGLETON.getNumPassed();";
   private static final String NUM_TESTS_SCRIPT =
