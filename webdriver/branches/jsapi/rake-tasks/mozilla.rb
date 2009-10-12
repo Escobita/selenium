@@ -2,10 +2,10 @@ require "rake-tasks/files.rb"
 
 def xpt(args)
   deps = build_deps_(args[:deps])
-  
+
   args[:out].each do |result|
     out = "build/#{result}"
-  
+
     file out => build_deps_(args[:src]) + deps do
       build_xpt(args[:src], out, args[:prebuilt])
     end
@@ -14,34 +14,35 @@ def xpt(args)
 end
 
 def build_xpt(srcs, out, prebuilt)
+  gecko = "third_party#{File::SEPARATOR}gecko-1.9.0.11#{File::SEPARATOR}"
   if (windows?)
-    gecko = "third_party\\gecko-1.9.0.11\\win32"
-    srcs.each do |src|
-      cmd = "#{gecko}\\bin\\xpidl.exe -w -m typelib -I#{gecko}\\idl -e #{out} #{src}"
-      sh cmd, :verbose => false do |ok, res|
-        if !ok
-          copy_prebuilt(prebuilt, out)
-        else
-          copy_to_prebuilt(out, prebuilt)
-        end
-      end
-    end
+    gecko += "win32"
   elsif (linux? or mac?)
-    gecko = "third_party/gecko-1.9.0.11/" + (linux? ? "linux" : "mac")
-    srcs.each do |src|
-      cmd = "#{gecko}/bin/xpidl -w -m typelib -I#{gecko}/idl -e #{out} #{src}"
-      sh cmd, :verbose => false do |ok, res|
-        if !ok
-          copy_prebuilt(prebuilt, out)
-        else
-          copy_to_prebuilt(out, prebuilt)
-        end
-      end
-    end
+    gecko += (linux? ? "linux" : "mac")
   else
     puts "Doing nothing for now. Later revisions will enable xpt building. Creating stub for #{out}"
     File.open("#{out}", 'w') {|f| f.write("")}
+    return
   end
+
+  base_cmd = "#{gecko}#{File::SEPARATOR}bin#{File::SEPARATOR}xpidl"
+  if (windows?)
+    base_cmd += ".exe"
+  end
+  base_cmd += " -w -m typelib -I#{gecko}#{File::SEPARATOR}idl"
+
+  srcs.each do |src|
+    dir_name = File.dirname(src)
+    cmd = "#{base_cmd} -I#{dir_name} -e #{out} #{src}"
+    sh cmd, :verbose => false do |ok, res|
+      if !ok
+        copy_prebuilt(prebuilt, out)
+      else
+        copy_to_prebuilt(out, prebuilt)
+      end
+    end
+  end
+
 end
 
 def xpi(args)
@@ -51,7 +52,7 @@ def xpi(args)
   end
 
   deps = build_deps_(args[:deps])
-  
+
   # if the src arg is a directory, depend on everything in it
   args[:src].each do |src|
     if (File.directory?(src))
@@ -60,11 +61,11 @@ def xpi(args)
       deps += FileList.new(src)
     end
   end
-  
+
   file "build/#{args[:out]}" => deps do
     # Set up a temporary directory
     target = "build/#{args[:out]}.temp"
-    if (File.exists?(target)) 
+    if (File.exists?(target))
       rm_rf target
     end
     mkdir_p target, :verbose => false
