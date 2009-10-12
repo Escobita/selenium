@@ -83,7 +83,7 @@ xpt(:name => "events_xpt",
     :out  => "nsINativeEvents.xpt")
 
 xpt(:name => "commandProcessor_xpt",
-    :src => [ "firefox/src/extension/components/nsICommandProcessor.idl" ],
+    :src => [ "firefox/src/extension/idl/nsICommandProcessor.idl" ],
     :prebuilt => "firefox/prebuilt",
     :out => "nsICommandProcessor.xpt")
 
