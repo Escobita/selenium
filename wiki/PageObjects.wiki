@@ -35,7 +35,7 @@ The code presented above shows an important point: the tests, not the PageObject
 public void testMessagesAreReadOrUnread() {
     Inbox inbox = new Inbox(driver);
     inbox.assertMessageWithSubjectIsUnread("I like cheese");
-    inbox.assertMessageWithSubjectIsNotUndread("I'm not fond of tofu");
+    inbox.assertMessageWithSubjectIsNotUnread("I'm not fond of tofu");
 }
 }}}
 
