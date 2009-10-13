@@ -24,6 +24,7 @@ limitations under the License.
 goog.provide('webdriver.LocalCommandProcessor');
 
 goog.require('goog.array');
+goog.require('goog.json');
 goog.require('goog.object');
 goog.require('webdriver.AbstractCommandProcessor');
 goog.require('webdriver.CommandName');
@@ -55,19 +56,6 @@ goog.inherits(webdriver.LocalCommandProcessor,
  */
 webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
     command, sessionId, context) {
-  var respond = goog.bind(function(rawResponse) {
-    webdriver.logging.info(
-        'receiving:\n' +
-        webdriver.logging.describe(rawResponse, '  '));
-
-    var response = new webdriver.Response(
-        rawResponse['isError'],
-        webdriver.Context.fromString(rawResponse['context']),
-        rawResponse['response']);
-    response.extraData['resultType'] = rawResponse['resultType'];
-    command.setResponse(response);
-  }, this);
-
   if (command.name == webdriver.CommandName.SEND_KEYS) {
     command.parameters = [command.parameters.join('')];
   }
@@ -75,8 +63,7 @@ webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
   var jsonCommand = {
     'commandName': command.name,
     'context': context.toString(),
-    'parameters': command.parameters,
-    'callbackFn': respond
+    'parameters': command.parameters
   };
 
   if (command.element) {
@@ -87,5 +74,17 @@ webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
       'sending:\n' +
       webdriver.logging.describe(jsonCommand, '  '));
 
-  this.cp_.execute({'wrappedJSObject': jsonCommand});
+  this.cp_.execute(goog.json.serialize(jsonCommand), function(jsonResponse) {
+    var rawResponse = goog.json.parse(jsonResponse);
+    webdriver.logging.info(
+        'receiving:\n' +
+        webdriver.logging.describe(rawResponse, '  '));
+
+    var response = new webdriver.Response(
+        rawResponse['isError'],
+        webdriver.Context.fromString(rawResponse['context']),
+        rawResponse['response']);
+    response.extraData['resultType'] = rawResponse['resultType'];
+    command.setResponse(response);
+  });
 };

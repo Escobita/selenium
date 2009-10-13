@@ -30,9 +30,12 @@
 (function() {
   var scripts = [
     'context.js',
-    'json2.js',
     'utils.js'
   ];
+
+  if (!JSON) {
+    scripts.push('json2.js');
+  }
 
   var fileProtocolHandler = Components.
       classes['@mozilla.org/network/protocol;1?name=file'].
@@ -53,11 +56,13 @@
 /**
  * Encapsulates the result of a command to the {@code nsCommandProcessor}.
  * @param {Object} command JSON object describing the command to execute.
+ * @param {nsIResponseHandler} responseHandler The handler to send the response
+ *     to.
  * @constructor
  */
-var Response = function(command) {
+var Response = function(command, responseHandler) {
   this.statusBarLabel_ = null;
-  this.callbackFn_ = command.callbackFn;
+  this.responseHandler_ = responseHandler;
   this.json_ = {
     commandName: command ? command.commandName : 'Unknown command',
     isError: false,
@@ -90,9 +95,7 @@ Response.prototype = {
       this.statusBarLabel_.style.color = 'black';
     }
     this.context = this.context.toString();
-    if (this.callbackFn_) {
-      this.callbackFn_(this.json_);
-    }
+    this.responseHandler_.handleResponse(JSON.stringify(this.json_));
   },
 
   /**
@@ -259,24 +262,27 @@ nsCommandProcessor.logError = function(message) {
 
 /**
  * Processes a command request for the {@code FirefoxDriver}.
- * @param {nsISupports} wrappedJsonCommand The command to
- *     execute, specified in a JSON object that is wrapped in a nsISupports
- *     instance.
+ * @param {string} jsonCommandString The command to execute, specified in a
+ *     JSON string.
+ * @param {nsIResponseHandler} responseHandler The callback to send the response
+ *     to.
  */
-nsCommandProcessor.prototype.execute = function(wrappedJsonCommand) {
-  if (!(wrappedJsonCommand instanceof Components.interfaces.nsISupports)) {
-    nsCommandProcessor.logError(
-        'wrappedJsonCommand does not implement nsISupports!');
-  }
-
-  var command = wrappedJsonCommand.wrappedJSObject;
-  if (!command) {
-    nsCommandProcessor.logError(
-        'wrappedJsonCommand must have a wrappedJSObject property!');
+nsCommandProcessor.prototype.execute = function(jsonCommandString,
+                                                responseHandler) {
+  var command, response;
+  try {
+    command = JSON.parse(jsonCommandString);
+  } catch (ex) {
+    response = JSON.stringify({
+      'isError': true,
+      'value': 'Error parsing command: "' + jsonCommandString + '"'
+    });
+    responseHandler.handleResponse(response);
+    return;
   }
 
   command.context = Context.fromString(command.context);
-  var response = new Response(command);
+  response = new Response(command, responseHandler);
 
   // These are used to locate a new driver, and so not having one is a fine
   // thing to do

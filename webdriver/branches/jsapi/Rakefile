@@ -82,8 +82,14 @@ xpt(:name => "events_xpt",
     :prebuilt => "firefox/prebuilt",
     :out  => "nsINativeEvents.xpt")
 
+xpt(:name => "responseHandler_xpt",
+    :src => [ "firefox/src/extension/idl/nsIResponseHandler.idl" ],
+    :prebuilt => "firefox/prebuilt",
+    :out => "nsIResponseHandler.xpt")
+
 xpt(:name => "commandProcessor_xpt",
     :src => [ "firefox/src/extension/idl/nsICommandProcessor.idl" ],
+    :deps => [ :responseHandler_xpt ],
     :prebuilt => "firefox/prebuilt",
     :out => "nsICommandProcessor.xpt")
 
@@ -96,12 +102,14 @@ xpi(:name => "firefox_xpi",
     :deps => [
                :commandProcessor_xpt,
                :events_xpt,
+               :responseHandler_xpt,
                :firefox_dll,
                :libwebdriver_firefox,
              ],
     :resources => [
                     { "nsICommandProcessor.xpt" => "components/nsICommandProcessor.xpt" },
                     { "nsINativeEvents.xpt" => "components/nsINativeEvents.xpt" },
+                    { "nsIResponseHandler.xpt" => "components/nsIResponseHandler.xpt" },
                     { "Win32/Release/webdriver-firefox.dll" => "platform/WINNT_x86-msvc/components/webdriver-firefox.dll" },
                     { "linux/Release/libwebdriver-firefox.so" => "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so" },
                     { "linux64/Release/libwebdriver-firefox.so" => "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so" },

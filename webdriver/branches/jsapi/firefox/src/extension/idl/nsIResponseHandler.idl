@@ -17,22 +17,18 @@
  */
 
 #include "nsISupports.idl"
-#include "nsIResponseHandler.idl"
 
 /**
- * Defines a single method for executing commands specified as a JSON string.
+ * Defines a callback used to process the response to a command sent to the
+ * {@code nsICommandProcessor}.
  */
-[scriptable, uuid(4427729b-441e-47c3-8380-df0350cac636)]
-interface nsICommandProcessor : nsISupports {
+[scriptable, function, uuid(0539a68f-b4a8-4543-bf2a-031cef89aff1)]
+interface nsIResponseHandler : nsISupports {
 
   /**
-   * Executes the given command specified in a JSON string. When the command
-   * is fully processed, the response will be sent to the given
-   * {@code nsIResponseHandler} callback as a JSON string.
+   * Handle a response from the {@code nsICommandProcessor}.
    *
-   * @param jsonCommandString The command to execute, specified in JSON format.
-   * @param responseHandler The callback to send the command response to.
+   * @param jsonResponseString The command response as a string.
    */
-  void execute(in AUTF8String jsonCommandString,
-               in nsIResponseHandler responseHandler);
+  void handleResponse(in AUTF8String jsonResponseString);
 };
