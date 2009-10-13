@@ -85,39 +85,32 @@ HTML，Java，C#，Perl，PHP，Python和Ruby。
 
 Selenium-Grid 
 ~~~~~~~~~~~~~~
-Selenium-Grid allows the Selenium-RC solution to scale for large test suites 
-or test suites that must be run in multiple environments. With Selenium-Grid 
-multiple instances of Selenium-RC are running on various operating system and 
-browser configurations, each of these when launching register with a hub. 
-When tests are sent to the hub they are then redirected to an available 
-Selenium-RC, which will launch the browser and run the test. This allows for 
-running tests in parallel, with the entire test suite theoretically taking 
-only as long to run as the longest individual test.
- 
+Selenium-Grid允许把Selenium-RC的解决方案应用到大型测试套件或者需要多环境运行的测试套件。
+通过Selenium-Grid，多个Selenium-RC实例可以运行在不同的操作系统和浏览器配置中，
+在运行的时候每个实例都会注册到一个中心。
+当测试到达这个中心，他们会重定向到可用的Selenium-RC，然后启动浏览器运行测试。
+这就可以并行的运行测试，理论上整个测试套件的运行时间就是那个运行时间最长的单个测试的时间。
   
-Supported Browsers
+支持的浏览器
 ------------------
 
 =============  ==================================================  ===========================  =====================
-**Browser**    **Selenium-IDE**                                    **Selenium-RC**              **Operating Systems**
-Firefox 3      1.0 Beta-1 & 1.0 Beta-2: Record and playback tests  Start browser, run tests     Windows, Linux, Mac
-Firefox 2      1.0 Beta-1: Record and playback tests               Start browser, run tests     Windows, Linux, Mac
-IE 8                                                   			   Under development            Windows
-IE 7           Test execution only via Selenium-RC*                Start browser, run tests     Windows
-Safari 3       Test execution only via Selenium-RC                 Start browser, run tests     Mac
-Safari 2       Test execution only via Selenium-RC                 Start browser, run tests     Mac
-Opera 9        Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac
-Opera 8        Test execution only via Selenium-RC                 Start browser, run tests     Windows, Linux, Mac 
-Google Chrome  Test execution only via Selenium-RC(Windows)        Start browser, run tests     Windows
-Others         Test execution only via Selenium-RC                 Partial support possible**   As applicable 
+**浏览器**     **Selenium-IDE**                                    **Selenium-RC**              **操作系统**
+Firefox 3      1.0 Beta-1 & 1.0 Beta-2: 录制回放测试               启动浏览器，运行测试         Windows, Linux, Mac
+Firefox 2      1.0 Beta-1: 录制回放测试                            启动浏览器，运行测试         Windows, Linux, Mac
+IE 8                                                   	           开发中                       Windows
+IE 7           只能通过Selenium-RC执行测试*                        启动浏览器，运行测试         Windows
+Safari 3       只能通过Selenium-RC执行测试                         启动浏览器，运行测试         Mac
+Safari 2       只能通过Selenium-RC执行测试                         启动浏览器，运行测试         Mac
+Opera 9        只能通过Selenium-RC执行测试                         启动浏览器，运行测试         Windows, Linux, Mac
+Opera 8        只能通过Selenium-RC执行测试                         启动浏览器，运行测试         Windows, Linux, Mac 
+Google Chrome  只能通过Selenium-RC执行测试(Windows)                启动浏览器，运行测试         Windows
+其他           只能通过Selenium-RC执行测试                         可能部分支持**               可适用的
 =============  ==================================================  ===========================  =====================
 
-\* Tests developed on Firefox via Selenium-IDE can be executed on any other 
-supported browser via a simple Selenium-RC command line.
+\* 通过Selenium-IDE在Firefox上开发的测试只需通过Selenium-RC命令行就可以在任何其他可支持的浏览器中执行。
 
-** Selenium-RC server can start any executable, but depending on 
-browser security settings, there may be technical limitations that would limit
-certain features.
+** Selenium-RC服务器可以启动任何可执行文件，但浏览器的安全设置的不同，可能有技术上的限制，将限制某些功能。
 
 .. Santi: Should we include Selenium Core in this list???
    How about chrome and mock?? I've noticed they have a browser mod on RC and
@@ -125,54 +118,43 @@ certain features.
 
 .. TODO: Refine this list.
   
-Flexibility and Extensibility
+灵活性和扩展性
 ------------------------------
-You'll find that Selenium is highly flexible.  There are multiple ways in which
-one can add functionality to Selenium's framework to customize test 
-automation for one's specific testing needs. This is, perhaps, Selenium's 
-strongest characteristic when compared with proprietary test automation tools
-and other open source solutions. Selenium-RC support for multiple programming
-and scripting languages allows the test writer to build any logic they need
-into their automated testing and to use a preferred programming or scripting
-language of one's choice. 
-  
-Selenium-IDE allows for the addition of user-defined "user-extensions" for 
-creating additional commands customized to the user's needs. Also, it is 
-possible to re-configure how the Selenium-IDE generates its Selenium-RC code.
-This allows users to customize the generated code to fit in with their
-own test frameworks. Finally, Selenium is an Open Source project where 
-code can be modified and enhancements can be submitted for contribution.
+你会发现Selenium有非常高的灵活性。为了满足特殊的测试需求，
+有许多种方法可以为Selenium框架添加功能以定制测试自动化。
+与私有的自动化工具和其他开源解决方案比较，这或许是Selenium最大的特点。
+Selenium-RC支持多种编程和脚本语言，允许测试编写人员把任何逻辑构建到他们的自动化测试中，
+也允许测试编写人员使用他们喜欢的编程和脚本语言。
 
-About this Book
+Selenium-IDE允许添加用户定义的“用户插件”以创建额外的根据用户需求定制的命令。
+此外，还可能重新配置Selenium-IDE生成Selenium-RC代码的方式。
+这使得用户定制产生的代码符合他们自己的测试框架。
+最后，Selenium是开放源代码项目，它的代码可以修改，功能提高可以作为贡献提交。
+
+关于本书
 ---------------
-This reference documentation targets both new users of Selenium and those who 
-have been using Selenium and are seeking additional knowledge. It introduces 
-the novice to Selenium test automation. We do not assume the reader has 
-experience in testing beyond the basics.  
+该参考文档既针对Selenium的新用户，又针对一直在使用Selenium并寻求更多知识的用户。
+它向新手介绍Selenium测试自动化。我们不假设读者有高深的测试经验。
 
-The experienced Selenium user will also find this reference valuable. It compiles
-in one place a set of useful Selenium techniques and best practices by drawing 
-from the knowledge of multiple experienced Selenium QA professionals. 
+有经验的Selenium用户也能从该参考中发现价值。它收集了一系列有用的Selenium技巧和最佳实践，
+这些都来自众多经验丰富的Selenium质量保证专家的知识。
 
-The remaining chapters of the reference present:
+目前参考的其余章节：
 
-:ref:`Selenium Basics <chapter02-cn-reference>`
-    Introduces Selenium by describing how to select the Selenium component 
-    most appropriate for your testing tasks. Also provides a general 
-    description of Selenium commands and syntax. This section allows you to 
-    get a general feel for how Selenium approaches test automation and
-    helps you decide where to begin. 
+:ref:`Selenium基础 <chapter02-cn-reference>`
+    介绍Selenium，描述如何选择最适合你的测试任务的Selenium组件。
+    此外，提供Selenium命令和语法的大致描述。
+    本节将给你一个关于Selenium如何实现测试自动化的总体的感受，
+    并帮助你决定从哪里开始。
 
 :ref:`Selenium-IDE <chapter03-cn-reference>`
-    Teaches how to build test cases using the Selenium Integrated Development 
-    Environment. This chapter also describes useful techniques for making your 
-    scripts more readable when interpreting defects caught by your Selenium tests. 
-    We explain how your test script can be 
-    "exported" to the programming language of your choice. Finally, this section 
-    describes some configurations available for extending and customizing how 
-    the Selenium-IDE supports test case development. 
+    教你如何使用Selenium集成开发环境构建测试用例。
+    本章还介绍有用的技巧，使得在解释Selenium测试所捕捉的缺陷的时候，脚本更具可读性的。
+    我们还说明如何把脚本“导出”成你选择的编程语言。
+    最后，本节会介绍一些配置，便于扩展和定制Selenium-IDE以支持测试用例开发。
 
-:ref:`Selenium Commands <chapter04-cn-reference>`
+:ref:`Selenium命令 <chapter04-cn-reference>`
+    详细介绍Selenium最常用的命令。
     Describes a subset of the most useful Selenium commands in detail. This 
     chapter shows what types of actions, verifications and 
     assertions can be made against a web application. 
