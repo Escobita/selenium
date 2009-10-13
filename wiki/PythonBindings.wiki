@@ -5,7 +5,7 @@
 The python bindings for WebDriver are now available in the trunk of WebDriver and are ready for use. The work is still in progress, your feedback would be welcome.
 
 =Installation of the python bindings=
-Checkout the source code from http://code.google.com/p/webdriver/source/checkout. In the root directory of the downloaded code, run the following command from a command prompt:
+Checkout the source code from http://code.google.com/p/selenium/source/checkout. In the root directory of the downloaded code, run the following command from a command prompt:
 {{{python setup.py install}}}
 
 Set WEBDRIVER environment variable to your webdriver directory
