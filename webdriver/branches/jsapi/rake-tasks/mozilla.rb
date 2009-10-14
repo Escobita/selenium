@@ -62,6 +62,32 @@ def xpi(args)
     end
   end
 
+  # Check if any of the resources are a list of src files. If so, add a
+  # dependency on them and update the resource hash accordingly
+  expanded_resources = []
+  args[:resources].each do |res|
+    if !res.nil?
+      if (res.kind_of? Hash)
+        res.each do |key,value|
+          fl = File.directory?(key) ?
+              FileList.new(key + "**/*") : FileList.new(key)
+          if fl.existing!().length > 0
+            if (value =~ /\/$/).nil?
+              raise "File list resource must map to directory: (#{key}, #{value})"
+            end
+            deps += fl
+            fl.each do |f|
+              expanded_resources += [{f => value}]
+            end
+          else
+            expanded_resources += [{key => value}]
+          end
+        end
+      end
+    end
+  end
+  args[:resources] = expanded_resources
+
   file "build/#{args[:out]}" => deps do
     # Set up a temporary directory
     target = "build/#{args[:out]}.temp"
