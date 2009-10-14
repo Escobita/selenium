@@ -122,20 +122,13 @@ DomMessenger.prototype.onPageUnload = function(e) {
  * @param {Event} e The command event.
  */
 DomMessenger.prototype.onCommand = function(e) {
-var consoleService = Components.classes['@mozilla.org/consoleservice;1'].
-    getService(Components.interfaces.nsIConsoleService);
-consoleService.logStringMessage('received command event!');
-
   var client = e.target;
-consoleService.logStringMessage('client is: ' + client);
   var command = client.getAttribute(DomMessenger.Attribute.COMMAND);
-consoleService.logStringMessage('command is: ' + command);
 
   if (!command) {
     throw Error('No command specified');
   }
 
-consoleService.logStringMessage('executing command: ' + command);
   var self = this;  // TODO(jmleyba): bind
   this.commandProcessor_.execute(command, function(response) {
     self.dispatchResponse(client, response);
@@ -151,11 +144,6 @@ consoleService.logStringMessage('executing command: ' + command);
  * @param {string} response Response to a command as a JSON string.
  */
 DomMessenger.prototype.dispatchResponse = function(client, response) {
-var consoleService = Components.classes['@mozilla.org/consoleservice;1'].
-    getService(Components.interfaces.nsIConsoleService);
-consoleService.logStringMessage('a command response is ready!');
-consoleService.logStringMessage('response: ' + response);
-
   client.setAttribute(DomMessenger.Attribute.RESPONSE, response);
   var evt = client.ownerDocument.createEvent('Event');
   evt.initEvent(DomMessenger.EventType.RESPONSE,
