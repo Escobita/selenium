@@ -15,16 +15,8 @@ import java.net.URL;
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 public class JsApiTestCase extends TestCase {
-  private static final long HALF_SECOND = 500;
+
   private static final long TWO_MINUTES = 2 * 60 * 1000;
-  private static final String IS_FINISHED_SCRIPT =
-      "return !!webdriver && webdriver.TestRunner.SINGLETON.isFinished();";
-  private static final String NUM_PASSED_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getNumPassed();";
-  private static final String NUM_TESTS_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getNumTests();";
-  private static final String GET_REPORT_SCRIPT =
-      "return webdriver.TestRunner.SINGLETON.getReport();";
 
   private final URL testUrl;
   private final WebDriver driver;
@@ -42,7 +34,7 @@ public class JsApiTestCase extends TestCase {
     long start = System.currentTimeMillis();
 
     do {
-      Object result = executor.executeScript(IS_FINISHED_SCRIPT);
+      Object result = executor.executeScript(Query.IS_FINISHED.script);
       if (null != result && (Boolean) result) {
         break;
       }
@@ -52,14 +44,27 @@ public class JsApiTestCase extends TestCase {
       assertTrue("TIMEOUT after " + ellapsed + "ms", ellapsed <= TWO_MINUTES);
     } while (true);
 
-    Object result = executor.executeScript(NUM_PASSED_SCRIPT);
+    Object result = executor.executeScript(Query.NUM_PASSED.script);
     Long numPassed = result == null ? 0: (Long) result;
 
-    result = executor.executeScript(NUM_TESTS_SCRIPT);
+    result = executor.executeScript(Query.NUM_TESTS.script);
     Long numTests = result == null ? 0: (Long) result;
 
-    String report = (String) executor.executeScript(GET_REPORT_SCRIPT);
+    String report = (String) executor.executeScript(Query.GET_REPORT.script);
     assertEquals(report, numTests, numPassed);
     assertTrue("No tests run!", numTests >= 0);
+  }
+
+  private static enum Query {
+    IS_FINISHED("return !!wd && wd.TestRunner.SINGLETON.isFinished();"),
+    NUM_PASSED("return wd.TestRunner.SINGLETON.getNumPassed();"),
+    NUM_TESTS("return wd.TestRunner.SINGLETON.getNumTests();"),
+    GET_REPORT("return wd.TestRunner.SINGLETON.getReport();");
+
+    private final String script;
+
+    private Query(String script) {
+      this.script = "var wd = window.webdriver; " + script;
+    }
   }
 }
