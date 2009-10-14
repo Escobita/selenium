@@ -1,8 +1,8 @@
 goog.addDependency('../abstractcommandprocessor.js',
                    ['webdriver.AbstractCommandProcessor'],
-                   ['goog.array', 'webdriver.CommandName', 'webdriver.Context',
-                    'webdriver.Future', 'webdriver.Response',
-                    'webdriver.timing']);
+                   ['goog.Disposable', 'goog.array', 'webdriver.CommandName',
+                    'webdriver.Context', 'webdriver.Future',
+                    'webdriver.Response', 'webdriver.timing']);
 goog.addDependency('../asserts.js',
                    ['webdriver.asserts', 'webdriver.asserts.Matcher'],
                    ['goog.math.Coordinate', 'webdriver.Future']);
@@ -23,8 +23,8 @@ goog.addDependency('../future.js', ['webdriver.Future'],
 goog.addDependency('../key.js', ['webdriver.Key'], ['goog.array']);
 goog.addDependency('../localcommandprocessor.js',
                    ['webdriver.LocalCommandProcessor'],
-                   ['goog.array', 'goog.json', 'goog.object',
-                    'webdriver.AbstractCommandProcessor',
+                   ['goog.array', 'goog.dom', 'goog.events', 'goog.json',
+                    'goog.object', 'webdriver.AbstractCommandProcessor',
                     'webdriver.CommandName', 'webdriver.Context',
                     'webdriver.Response']);
 goog.addDependency('../logging.js',

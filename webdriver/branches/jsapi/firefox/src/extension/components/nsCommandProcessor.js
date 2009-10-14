@@ -483,7 +483,6 @@ nsCommandProcessor.prototype.quit = function() {
 nsCommandProcessor.prototype.getInterfaces = function(count) {
   var ifaces = [
     Components.interfaces.nsICommandProcessor,
-    Components.interfaces.nsIClassInfo,
     Components.interfaces.nsISupports
   ];
   count.value = ifaces.length;
@@ -493,7 +492,6 @@ nsCommandProcessor.prototype.getInterfaces = function(count) {
 
 nsCommandProcessor.prototype.QueryInterface = function (aIID) {
   if (!aIID.equals(Components.interfaces.nsICommandProcessor) &&
-      !aIID.equals(Components.interfaces.nsIClassInfo) &&
       !aIID.equals(Components.interfaces.nsISupports)) {
     throw Components.results.NS_ERROR_NO_INTERFACE;
   }
@@ -501,15 +499,11 @@ nsCommandProcessor.prototype.QueryInterface = function (aIID) {
 };
 
 
-nsCommandProcessor.prototype.getHelperForLanguage = function() {
-  return null;
-};
-
 nsCommandProcessor.CLASS_ID =
     Components.ID('{692e5117-a4a2-4b00-99f7-0685285b4db5}');
 nsCommandProcessor.CLASS_NAME = 'Firefox WebDriver CommandProcessor';
-nsCommandProcessor.CONTRACT_ID = '@googlecode.com/webdriver/command-processor;1';
-nsCommandProcessor.EXPOSED_NAME = '__webDriverCommandProcessor';
+nsCommandProcessor.CONTRACT_ID =
+    '@googlecode.com/webdriver/command-processor;1';
 
 
 /**
@@ -548,27 +542,11 @@ nsCommandProcessor.Module = {
             nsCommandProcessor.CLASS_NAME,
             nsCommandProcessor.CONTRACT_ID,
             aFileSpec, aLocation, aType);
-
-    Components.classes['@mozilla.org/categorymanager;1']
-        .getService(Components.interfaces.nsICategoryManager)
-        .addCategoryEntry(
-            'JavaScript global property',
-            nsCommandProcessor.EXPOSED_NAME,
-            nsCommandProcessor.CONTRACT_ID,
-            true,   // Persist this entry
-            true);  // Replace existing entry
   },
 
   unregisterSelf: function(aCompMgr, aLocation) {
     aCompMgr.QueryInterface(Components.interfaces.nsIComponentRegistrar).
         unregisterFactoryLocation(nsCommandProcessor.CLASS_ID, aLocation);
-    Components.classes['@mozilla.org/categorymanager;1'].
-        getService(Components.interfaces.nsICategoryManager).
-        deleteCategoryEntry(
-            'JavaScript global property',
-            nsCommandProcessor.EXPOSED_NAME,
-            nsCommandProcessor.CONTRACT_ID,
-            true);
   },
 
   getClassObject: function(aCompMgr, aCID, aIID) {

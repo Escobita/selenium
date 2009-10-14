@@ -24,6 +24,8 @@ limitations under the License.
 goog.provide('webdriver.LocalCommandProcessor');
 
 goog.require('goog.array');
+goog.require('goog.dom');
+goog.require('goog.events');
 goog.require('goog.json');
 goog.require('goog.object');
 goog.require('webdriver.AbstractCommandProcessor');
@@ -35,20 +37,109 @@ goog.require('webdriver.Response');
 /**
  * Command processor that uses a browser extension/plugin exposed to the page
  * for executing WebDriver commands.
+ * @param {goog.dom.DomHelper} opt_dom The DomHelper for this instance to use;
+ *     defaults to a DomHelper for the current document.
  * @constructor
  * @extends {webdriver.AbstractCommandProcessor}
  */
-webdriver.LocalCommandProcessor = function() {
+webdriver.LocalCommandProcessor = function(opt_dom) {
   webdriver.AbstractCommandProcessor.call(this);
   // TODO(jmleyba): IE, Chrome, et al. support
-  this.cp_ = goog.global['__webDriverCommandProcessor'];
-  if (!goog.isDef(this.cp_)) {
-    throw new Error(
+
+  /**
+   * The DomHelper for this instance to use.
+   * @type {goog.dom.DomHelper}
+   * @private
+   */
+  this.dom_ = opt_dom || goog.dom.getDomHelper();
+
+  /**
+   * The element to use for communicating with the extension.
+   * @type {Element}
+   * @private
+   */
+  this.documentElement_ = this.dom_.getDocument().documentElement;
+
+  // Verify the extension is installed by checking for the webdriver attribute
+  // on the documentElement.
+  var webdriverAttribute = this.documentElement_.getAttribute('webdriver');
+  if (!webdriverAttribute) {
+    throw Error(
         'The current browser does not support a LocalCommandProcessor');
   }
 };
 goog.inherits(webdriver.LocalCommandProcessor,
               webdriver.AbstractCommandProcessor);
+
+
+/**
+ * The custom event types used to communicate with the browser extension.
+ * @enum {string}
+ */
+webdriver.LocalCommandProcessor.EventType_ = {
+  COMMAND: 'webdriverCommand',
+  RESPONSE: 'webdriverResponse'
+};
+
+
+/**
+ * The attributes used to store information passed to the browser extension.
+ * @enum {string}
+ */
+webdriver.LocalCommandProcessor.MessageAttribute_ = {
+  COMMAND: 'command',
+  RESPONSE: 'response'
+};
+
+
+/**
+ * @override
+ */
+webdriver.LocalCommandProcessor.prototype.dispose = function() {
+  goog.events.removeAll(this.documentElement_,
+      webdriver.LocalCommandProcessor.EventType_.RESPONSE);
+  webdriver.LocalCommandProcessor.superClass_.dispose.call(this);
+};
+
+
+/**
+ * Event handler for command responses.
+ * @param {webdriver.Command} command The initiating command.
+ * @param {Event} e The response event. The target should be a node with a
+ *     {@code response} attribute.
+ */
+webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
+  // It is technically possible that the response could be for a different
+  // command, but this should be prevented by code higher in the WebDriverJS
+  // stack, so we don't do any error checking here.
+  if (e.type != webdriver.LocalCommandProcessor.EventType_.RESPONSE) {
+    throw Error('Not a response event!');
+  }
+
+  var jsonResponse = e.target.getAttribute(
+      webdriver.LocalCommandProcessor.MessageAttribute_.RESPONSE);
+  if (!jsonResponse) {
+    throw Error('Empty response!');
+  }
+
+  var rawResponse = goog.json.parse(jsonResponse);
+  webdriver.logging.info(
+      'receiving:\n' +
+      webdriver.logging.describe(rawResponse, '  '));
+
+  var response = new webdriver.Response(
+      rawResponse['isError'],
+      webdriver.Context.fromString(rawResponse['context']),
+      rawResponse['response']);
+  response.extraData['resultType'] = rawResponse['resultType'];
+
+  // Only code in this file should be dispatching command events and listening
+  // for response events, so this is safe. If someone else decided to attach a
+  // listener anyway, tough luck.
+  goog.events.removeAll(
+      e.target, webdriver.LocalCommandProcessor.EventType_.RESPONSE);
+  command.setResponse(response);
+};
 
 
 /**
@@ -74,17 +165,17 @@ webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
       'sending:\n' +
       webdriver.logging.describe(jsonCommand, '  '));
 
-  this.cp_.execute(goog.json.serialize(jsonCommand), function(jsonResponse) {
-    var rawResponse = goog.json.parse(jsonResponse);
-    webdriver.logging.info(
-        'receiving:\n' +
-        webdriver.logging.describe(rawResponse, '  '));
+  this.documentElement_.setAttribute(
+      webdriver.LocalCommandProcessor.MessageAttribute_.COMMAND,
+      goog.json.serialize(jsonCommand));
 
-    var response = new webdriver.Response(
-        rawResponse['isError'],
-        webdriver.Context.fromString(rawResponse['context']),
-        rawResponse['response']);
-    response.extraData['resultType'] = rawResponse['resultType'];
-    command.setResponse(response);
-  });
+  goog.events.listen(this.documentElement_,
+      webdriver.LocalCommandProcessor.EventType_.RESPONSE,
+      goog.bind(webdriver.LocalCommandProcessor.onResponse_, null, command));
+
+  var commandEvent = this.dom_.getDocument().createEvent('Event');
+  commandEvent.initEvent(
+      webdriver.LocalCommandProcessor.EventType_.COMMAND,
+      /*canBubble=*/true, /*cancelable=*/true);
+  this.documentElement_.dispatchEvent(commandEvent);
 };

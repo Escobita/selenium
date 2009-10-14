@@ -175,8 +175,19 @@ webdriver.WebDriver.Speed = {
  * @override
  */
 webdriver.WebDriver.prototype.dispose = function() {
-  webdriver.logging.debug('disposing WebDriver');
+  this.commandProcessor_.dispose();
   webdriver.timing.clearInterval(this.commandInterval_);
+
+  delete this.commandProcessor_;
+  delete this.pendingCommands_;
+  delete this.frames_;
+  delete this.commandHistory_;
+  delete this.isPaused_;
+  delete this.context_;
+  delete this.sessionLocked_;
+  delete this.sessionId_;
+  delete this.commandInterval_;
+
   webdriver.WebDriver.superClass_.dispose.call(this);
 };
 

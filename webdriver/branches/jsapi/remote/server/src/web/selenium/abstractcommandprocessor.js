@@ -22,6 +22,7 @@ limitations under the License.
 
 goog.provide('webdriver.AbstractCommandProcessor');
 
+goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.object');
 goog.require('webdriver.CommandName');
@@ -34,9 +35,12 @@ goog.require('webdriver.timing');
 /**
  * Base class for all WebDriver command processors.
  * @constructor
+ * @extends {goog.Disposable}
  */
 webdriver.AbstractCommandProcessor = function() {
+  goog.Disposable.call(this);
 };
+goog.inherits(webdriver.AbstractCommandProcessor, goog.Disposable);
 
 
 /**
