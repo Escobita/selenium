@@ -140,10 +140,20 @@ webdriver.WebDriver = function(commandProcessor) {
    * @type {number}
    * @private
    */
-  this.commandInterval_ =
-      webdriver.timing.setInterval(goog.bind(this.processCommands_, this), 10);
+  this.commandInterval_ = webdriver.timing.setInterval(
+      goog.bind(this.processCommands_, this),
+      webdriver.WebDriver.COMMAND_INTERVAL_LENGTH_);
 };
 goog.inherits(webdriver.WebDriver, goog.events.EventTarget);
+
+
+/**
+ * The amount of time in milliseconds between ticks of the command processing
+ * interval.
+ * @type {number}
+ * @private
+ */
+webdriver.WebDriver.COMMAND_INTERVAL_LENGTH_ = 10;
 
 
 /**
