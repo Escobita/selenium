@@ -1,18 +1,15 @@
 #summary Information about the iPhone Driver
-#labels Phase-Deploy, , WebDriver
+#labels Phase-Deploy,WebDriver
 
 = iPhone Driver =
 
-_This driver is currently experimental and not yet in the main repository. Please be patient_
-
-The iphone driver allows testing on mobile safari on the iphone. It works through the use of an iphone application running on your iphone, ipod touch or iphone simulator.
+The iphone driver allows testing on a UIWebView (a webkit browser accessible for 3rd party applications) on the iphone. It works through the use of an iphone application running on your iphone, ipod touch or iphone simulator. 
 
 == Drawbacks ==
 
- * The iphone driver does not currently support forms, input elements or cookie management.
  * You must start the iphone application manually
  * To test on a device you need the iphone SDK and a provisioning profile
- * There is a known memory leak
+ * There is a known memory leak (?)
 
 = Installing =
 
