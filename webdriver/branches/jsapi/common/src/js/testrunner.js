@@ -332,7 +332,9 @@ webdriver.TestRunner.prototype.initResultsSection_ = function() {
  * @private
  */
 webdriver.TestRunner.prototype.reportResult_ = function(result, driver) {
-  driver.dispose();
+  if (driver) {
+    driver.dispose();
+  }
   this.errorListener_ = null;
   // TODO(jmleyba): Should quit the driver for remote driver instances.
 
