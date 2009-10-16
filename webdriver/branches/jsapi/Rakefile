@@ -235,42 +235,66 @@ test_java(:name => "test_support",
                    ],
           :out  => "webdriver-support-test.jar")
 
-jar(:name => "remote_client",
-    :src  => [ "remote/client/src/java/**/*.java", "remote/common/src/java/**/*.java" ],
+jar(:name => "remote_common",
+    :src => [ "remote/common/src/java/**/*.java" ],
     :deps => [
                :common,
                "remote/common/lib/runtime/*.jar",
+             ],
+    :zip => true,
+    :out => "webdriver-remote-common.jar")
+
+jar(:name => "remote_client",
+    :src  => [ "remote/client/src/java/**/*.java" ],
+    :deps => [
+               :common,
+               :remote_common,
                "remote/client/lib/runtime/*.jar",
              ],
     :zip  => true,
     :out  => "webdriver-remote-client.jar")
 
 jar(:name => "remote_server",
-    :src  => [ "remote/server/src/java/**/*.java", "remote/common/src/java/**/*.java" ],
+    :src  => [ "remote/server/src/java/**/*.java" ],
     :deps => [
                :htmlunit,
                :ie,
                :firefox,
+               :remote_common,
                :support,
-               "remote/common/lib/runtime/*.jar",
                "remote/server/lib/runtime/*.jar"
              ],
     :out  => "webdriver-remote-server.jar")
 
-test_java(:name => "test_remote",
-          :src  => [
-                     "remote/common/test/java/**/*.java",
-                     "remote/client/test/java/**/*.java",
-                     "remote/server/test/java/**/*.java"
-                   ],
+test_java(:name => "test_remote_common",
+          :src => [ "remote/common/test/java/**/*.java" ],
           :deps => [
+                     :remote_common,
+                     :test_common
+                   ],
+          :out => "webdriver-remote-common-test.jar")
+
+test_java(:name => "test_remote_server",
+          :src => [ "remote/server/test/java/**/*.java" ],
+          :deps => [
+                     :remote_server,
                      :test_common,
+                     :test_remote_common,
+                   ],
+          :out => "webdriver-remote-server-test.jar")
+
+test_java(:name => "test_remote",
+          :src  => [ "remote/client/test/java/**/*.java" ],
+          :deps => [
                      :remote_client,
-                     :remote_server
+                     :remote_server,
+                     :test_common,
+                     :test_remote_common,
+                     :test_remote_server,
                    ],
           :out => "webdriver-remote-test.jar")
 
-task :remote => [:remote_server, :remote_client]
+task :remote => [:remote_common, :remote_server, :remote_client]
 
 dll(:name => "chrome_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "chome/src/cpp/**/*" ],
@@ -323,7 +347,19 @@ test_java(:name => "debug_jsapi",
           :main => "org.openqa.selenium.environment.webserver.Jetty6AppServer")
 
 task :build => [:common, :htmlunit, :firefox, :ie, :iphone, :support, :remote, :chrome, :selenium]
-task :test => [:test_htmlunit, :test_firefox, :test_ie, :test_iphone, :test_support, :test_remote, :test_chrome, :test_selenium]
+task :test => [
+                :test_htmlunit,
+                :test_firefox,
+                :test_ie,
+                :test_iphone,
+                :test_support,
+                :test_remote_common,
+                :test_remote_server,
+                :test_remote,
+                :test_chrome,
+                :test_selenium
+              ]
+
 
 task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :chrome] do
   mkdir_p "build/javadoc", :verbose => false

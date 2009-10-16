@@ -77,7 +77,7 @@ public class JsonToBeanConverterTest extends TestCase {
 
     Map map = new JsonToBeanConverter().convert(Map.class, toConvert.toString());
 
-    assertThat(3, is(map.get("magicNumber")));
+    assertThat(3L, is(map.get("magicNumber")));
   }
 
   @SuppressWarnings("unchecked")
