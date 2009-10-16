@@ -1,11 +1,11 @@
 #summary Getting started with WebDriver
-#labels Featured, WebDriver
+#labels Featured,WebDriver
 
 = The 5 Minute Getting Started Guide =
 
 Before you start either:
 
- * Download the latest binaries
+ * Download the latest binaries, or
  * CheckOut the latest version of the code and build it following the instructions in BuildingWebDriver.
 
 Assuming that you've built everything and the source is located at {{{$WEBDRIVER_HOME}}}, and we're only going to use the HtmlUnitDriver to start with:
