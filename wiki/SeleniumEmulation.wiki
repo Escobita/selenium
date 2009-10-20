@@ -30,7 +30,6 @@ WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWeb
   * Allows for WebDriver and Selenium to live side-by-side.
   * Provides a simple mechanism for a managed migration from the existing Selenium API to WebDriver's.
   * Does not require the standalone Selenium RC server to be run
-  * The Selenium interface is now more s
 
 == Cons ==
 
