@@ -1,9 +1,5 @@
-﻿
-|logo| Selenium-RC
-==================
-
-.. |logo| image:: ../images/selenium-rc-logo.png
-   :alt:
+﻿Selenium-RC
+===========
 
 .. _chapter05-cn-reference:
 
