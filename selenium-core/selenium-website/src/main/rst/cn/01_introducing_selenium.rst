@@ -154,82 +154,71 @@ Selenium-IDE允许添加用户定义的“用户插件”以创建额外的根�
     最后，本节会介绍一些配置，便于扩展和定制Selenium-IDE以支持测试用例开发。
 
 :ref:`Selenium命令 <chapter04-cn-reference>`
-    详细介绍Selenium最常用的命令。
-    Describes a subset of the most useful Selenium commands in detail. This 
-    chapter shows what types of actions, verifications and 
-    assertions can be made against a web application. 
+    详细介绍Selenium最常用的命令。本章介绍了为测试网络应用所用的不同类型的动作、验证和断言。
 
 :ref:`Selenium-RC <chapter05-cn-reference>`
-    Explains how to develop an automated test program using the Selenium-RC API.
-    Many examples are presented in both a programming language and a scripting 
-    language. Also, the installation and setup of Selenium-RC is covered here. 
-    The various modes, or configurations, that Selenium-RC supports are
-    described, along with their trade-offs and limitations. Architecture
-    diagrams are provided to help illustrate these points. 
-    A number of solutions to problems which are often difficult for the new user, are
-    described in this chapter. This includes handling Security Certificates,
-    https requests, pop-ups and the opening of new windows. 
+    说明了如何使用Selenium-RC API开发自动化测试程序。
+    许多例子将以编程语言和脚本语言的形式展现。
+    此外，还涵盖了Selenium-RC的安装和启动。
+    介绍了Selenium-RC支持的多种模式和配置，以及权衡和限制。
+    提供了架构图以协助说明这些问题。
+    本章还介绍了许多难题的解决方案，这些难题对初学者来说常常是很困难的。
+    这包括处理安全证书，HTTPS请求，弹出窗口和打开新窗口。 
 
-:ref:`Test Design Considerations <chapter06-cn-reference>`
-    Presents many useful techniques for using Selenium efficiently. This 
-    includes scripting techniques and programming techniques for use with 
-    Selenium-RC. We cover examples of source code showing how to report defects 
-    in the application under test. We also cover techniques commonly asked about 
-    in the user forums such as how to implement data-driven tests (tests where 
-    one can vary the data between different test passes).
+:ref:`测试设计的注意事项 <chapter06-cn-reference>`
+    展示了许多有效利用Selenium的有用技巧。
+    这包括写脚本的技巧和用Selenium-RC编程的技巧。
+    涵盖了许多源码的例子，以展示如何报告被测应用的缺陷。
+    涵盖了用户论坛上常问的技巧，例如实现数据驱动测试
+    （每一轮测试都是用不同的数据）。
 
 :ref:`Selenium-Grid <chapter07-cn-reference>`
-    *This chapter is not yet developed.*
+    *这一章还没有写*
   
-:ref:`User extensions <chapter08-cn-reference>`
-    Presents all the information required for easily extending Selenium. 
+:ref:`用户插件 <chapter08-cn-reference>`
+    介绍方便扩展Selenium所需的所有信息
+    
   
 ..  :ref:`Getting Help <chapter09-cn-reference>`
     Describes how to be a part of the Selenium community for getting help and 
     exchanging advice. Specifically this section describes the user forums as 
     an avenue for obtaining assistance. 
 
-The Documentation Team
-----------------------
+文档团队
+--------
 
-The Original Authors
-~~~~~~~~~~~~~~~~~~~~
+最初的作者
+~~~~~~~~~~
 * Dave Hunt
 * Paul Grandjean
 * Santiago Suarez Ordonez
 * Tarun Kumar
 
-The original authors who kickstarted this document are listed in alphabetical 
-order.  Each of us contributed significantly by taking a leadership role in 
-specific areas.  Each chapter originally had a primary author who kicked off 
-the intial writing, but in the end, each of us made significant contributions 
-to each chapter throughout the project.
+开始写作这篇文档的最初作者是按照字母表顺序列出的。
+每个人的最主要贡献是在特定的领域承担领导的角色。
+最初，每一章都有一个主要的作者，他们开始了最初的写作，
+但是最后，每个人对整个项目的每一章都作出了重要的贡献。
 
-Current Authors
-~~~~~~~~~~~~~~~
+当前的作者
+~~~~~~~~~~
 * Mary Ann May-Pumphrey
 * Peter Newhook
 
-In addition to the original team members who are still involved (May '09), 
-Mary Ann, and Peter have recently made major contributions.  Their reviewing 
-and editorial contributions proved invaluable.  Mary Ann is actively writing 
-new subsections and has provided editorial assistance throughout the document.
-Peter has provided assistance with restructuring our most difficult chapter 
-and has provided valuable advice on topics to include. Their enthusiasm and 
-dedication has been incredibly helpful.  We hope they continue to be involved.  
+除了最初的团队成员仍在参与（09年5月）外，Mary Ann和Peter最近也做出了主要的贡献。
+他们贡献的复查和编辑是无价的。Mary Ann积极地撰写了新的小节，并且协助编辑整篇文档。
+Peter协助重新组织最难得章节，并且对包含的题目提供有价值的建议。
+他们的热情和贡献是非常有帮助的。我们希望他们能继续参与。
 
-Acknowledgements
-~~~~~~~~~~~~~~~~
-A huge special thanks goes to Patrick Lightbody.  As an administrator of the 
-SeleniumHQ website, his support has been invaluable.  Patrick has helped us 
-understand the Selenium community--our audience. He also set us up with 
-everything we needed on the SeleniumHQ website for developing and releasing 
-this user's guide.  His enthusiasm and encouragement definitely helped drive 
-this project.  Also thanks goes to Andras Hatvani for his advice on publishing
-solutions, and to Amit Kumar for participating in our discussions and for 
-assisting with reviewing the document.
+致谢
+~~~~
+感谢Patrick Lightbody给与的极大的特殊帮助。
+作为SeleniumHQ网站的管理员，他的支持是无价的。
+他帮助我们了解Selenium社区——我们的读者。
+为了开发和发布这个用户指南，
+他还安排我们在SeleniumHQ网站上所需的一切。
+他的热情和鼓励促使这个项目得以推进。
+同样感谢Andras Hatvani在发布解决方案上给与的建议，
+感谢Amit Kumar参与我们的讨论并且协助复查文档。
 
-And of course, we must *recognize the Selenium Developers*.  They have truly 
-designed an amazing tool. Without the vision of the original designers, and 
-the continued efforts of the current developers, we would not have such a 
-great tool to pass on to you, the reader.
+当然，我们必须 *感谢Selenium的开发者*。他们的确设计出了令人惊奇的工具。
+没有最初设计者的远见和当前开发者的不懈努力，我们将无法拥有如此伟大的工具呈现给你——读者。
