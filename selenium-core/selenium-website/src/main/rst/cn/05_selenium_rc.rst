@@ -1,10 +1,11 @@
-﻿.. _chapter05-cn-reference:
-
+﻿
 |logo| Selenium-RC
 ==================
 
 .. |logo| image:: ../images/selenium-rc-logo.png
    :alt:
+
+.. _chapter05-cn-reference:
 
 引言
 ------------
