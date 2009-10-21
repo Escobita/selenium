@@ -44,8 +44,8 @@ public class Session {
 
   public Session(final Capabilities capabilities) throws Exception {
     executor = new ThreadPoolExecutor(1, 1,
-                                    5L, TimeUnit.MINUTES,
-                                    new LinkedBlockingQueue<Runnable>());
+                                      5 * 60, TimeUnit.SECONDS,
+                                      new LinkedBlockingQueue<Runnable>());
 
     // Ensure that the browser is created on the single thread.
     FutureTask<WebDriver> createBrowser = new FutureTask<WebDriver>(new Callable<WebDriver>() {

@@ -240,6 +240,7 @@ jar(:name => "remote_common",
     :deps => [
                :common,
                "remote/common/lib/runtime/*.jar",
+               "third_party/java/google-collect-1.0-rc3.jar"
              ],
     :zip => true,
     :out => "webdriver-remote-common.jar")
@@ -274,23 +275,14 @@ test_java(:name => "test_remote_common",
                    ],
           :out => "webdriver-remote-common-test.jar")
 
-test_java(:name => "test_remote_server",
-          :src => [ "remote/server/test/java/**/*.java" ],
-          :deps => [
-                     :remote_server,
-                     :test_common,
-                     :test_remote_common,
-                   ],
-          :out => "webdriver-remote-server-test.jar")
-
 test_java(:name => "test_remote",
-          :src  => [ "remote/client/test/java/**/*.java" ],
+          :src  => [ "remote/client/test/java/**/*.java",
+                     "remote/server/test/java/**/*.java" ],
           :deps => [
                      :remote_client,
                      :remote_server,
                      :test_common,
-                     :test_remote_common,
-                     :test_remote_server,
+                     :test_remote_common
                    ],
           :out => "webdriver-remote-test.jar")
 
@@ -354,7 +346,6 @@ task :test => [
                 :test_iphone,
                 :test_support,
                 :test_remote_common,
-                :test_remote_server,
                 :test_remote,
                 :test_chrome,
                 :test_selenium
@@ -420,6 +411,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_client'
   cp Dir.glob('remote/client/lib/runtime/*.jar'), 'build/dist/remote_client'
+  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_client'
 
   sh "cd build/dist && zip -r webdriver-remote-client-#{version}.zip remote_client/*"
   rm_rf "build/dist/remote_client"
@@ -432,6 +424,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_server'
   cp Dir.glob('remote/server/lib/runtime/*.jar'), 'build/dist/remote_server'
+  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_server'
 
   rm Dir.glob('build/dist/remote_server/servlet*.jar')
 
@@ -471,7 +464,8 @@ zip(:name => "all_zip",
              FileList.new("remote/client/lib/runtime/*.jar") +
              FileList.new("remote/common/lib/runtime/*.jar") +
              FileList.new("chrome/lib/runtime/*.jar") +
-             FileList.new("support/lib/runtime/*.jar"),
+             FileList.new("support/lib/runtime/*.jar") +
+             FileList.new("third_party/java/*.jar"),
       :deps => [
                  :all
                ],

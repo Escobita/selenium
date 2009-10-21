@@ -1,5 +1,22 @@
 package org.openqa.selenium.chrome;
 
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.XPathLookupException;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.DriverCommand;
+import static org.openqa.selenium.remote.DriverCommand.*;
+
+import com.google.common.collect.ImmutableMap;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
@@ -19,19 +36,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchFrameException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.XPathLookupException;
-import org.openqa.selenium.remote.Command;
-
 public class ChromeCommandExecutor {
   private final ServerSocket serverSocket;
   //Whether the listening thread should listen
@@ -41,70 +45,81 @@ public class ChromeCommandExecutor {
   //Whether a client has ever been connected
   private boolean hasClient = false;
   ListeningThread listeningThread;
-  private Map<String, JsonCommand> nameToJson = new HashMap<String, JsonCommand>();
+  private Map<DriverCommand, JsonCommand> nameToJson;
   
   /**
    * Creates a new ChromeCommandExecutor which listens on a TCP port.
    * Doesn't return until the TCP port is connected to.
    * @param port port on which to listen for the initial connection,
    * and dispatch commands
-   * @throws IOException if could not bind to port
+   * @throws WebDriverException if could not bind to port
    * TODO(danielwh): Bind to a random port (blocked on crbug.com 11547)
    */
   public ChromeCommandExecutor(int port) {
-    nameToJson.put("close", new JsonCommand("{request: 'close'}"));
-    nameToJson.put("quit", new JsonCommand("QUIT"));
-    
-    nameToJson.put("get", new JsonCommand("{request: 'url', url: ?url}"));
-    nameToJson.put("goBack", new JsonCommand("{request: 'goBack'}"));
-    nameToJson.put("goForward", new JsonCommand("{request: 'goForward'}"));
-    nameToJson.put("refresh", new JsonCommand("{request: 'refresh'}"));
-    
-    nameToJson.put("addCookie", new JsonCommand("{request: 'addCookie', cookie: ?cookie}"));
-    nameToJson.put("getCookies", new JsonCommand("{request: 'getCookies'}"));
-    nameToJson.put("getCookieNamed", new JsonCommand("{request: 'getCookieNamed', name: ?name}"));
-    nameToJson.put("deleteAllCookies", new JsonCommand("{request: 'deleteAllCookies'}"));
-    nameToJson.put("deleteCookie", new JsonCommand("{request: 'deleteCookie', name: ?name}"));
-    
-    nameToJson.put("findElement", new JsonCommand("{request: 'getElement', by: [?using, ?value]}"));
-    nameToJson.put("findElements", new JsonCommand("{request: 'getElements', by: [?using, ?value]}"));
-    nameToJson.put("findChildElement", new JsonCommand("{request: 'getElement', by: [{id: ?element, using: ?using, value: ?value}]}"));
-    nameToJson.put("findChildElements", new JsonCommand("{request: 'getElements', by: [{id: ?element, using: ?using, value: ?value}]}"));
-    
-    nameToJson.put("clearElement", new JsonCommand("{request: 'clearElement', elementId: ?elementId}"));
-    nameToJson.put("clickElement", new JsonCommand("{request: 'clickElement', elementId: ?elementId}"));
-    nameToJson.put("hoverElement", new JsonCommand("{request: 'hoverElement', elementId: ?elementId}"));
-    nameToJson.put("sendElementKeys", new JsonCommand("{request: 'sendElementKeys', elementId: ?elementId, keys: ?keys}"));
-    nameToJson.put("submitElement", new JsonCommand("{request: 'submitElement', elementId: ?elementId}"));
-    nameToJson.put("toggleElement", new JsonCommand("{request: 'toggleElement', elementId: ?elementId}"));
-    
-    nameToJson.put("getElementAttribute", new JsonCommand("{request: 'getElementAttribute', elementId: ?elementId, attribute: ?attribute}"));
-    nameToJson.put("getElementLocationOnceScrolledIntoView", new JsonCommand("{request: 'getElementLocationOnceScrolledIntoView', elementId: ?elementId}"));
-    nameToJson.put("getElementLocation", new JsonCommand("{request: 'getElementLocation', elementId: ?elementId}"));
-    nameToJson.put("getElementSize", new JsonCommand("{request: 'getElementSize', elementId: ?elementId}"));
-    nameToJson.put("getElementTagName", new JsonCommand("{request: 'getElementTagName', elementId: ?elementId}"));
-    nameToJson.put("getElementText", new JsonCommand("{request: 'getElementText', elementId: ?elementId}"));
-    nameToJson.put("getElementValue", new JsonCommand("{request: 'getElementValue', elementId: ?elementId}"));
-    nameToJson.put("getElementValueOfCssProperty", new JsonCommand("{request: 'getElementValueOfCssProperty', elementId: ?elementId, css: ?property}"));
-    nameToJson.put("isElementDisplayed", new JsonCommand("{request: 'isElementDisplayed', elementId: ?elementId}"));
-    nameToJson.put("isElementEnabled", new JsonCommand("{request: 'isElementEnabled', elementId: ?elementId}"));
-    nameToJson.put("isElementSelected", new JsonCommand("{request: 'isElementSelected', elementId: ?elementId}"));
-    nameToJson.put("setElementSelected", new JsonCommand("{request: 'setElementSelected', elementId: ?elementId}"));
-    
-    nameToJson.put("switchToActiveElement", new JsonCommand("{request: 'switchToActiveElement'}"));
-    nameToJson.put("switchToFrameByIndex", new JsonCommand("{request: 'switchToFrame', using: {index: ?index}}"));
-    nameToJson.put("switchToFrameByName", new JsonCommand("{request: 'switchToFrame', using: {name: ?name}}"));
-    nameToJson.put("switchToDefaultContent", new JsonCommand("{request: 'switchToDefaultContent'}"));
-    
-    nameToJson.put("getWindowHandle", new JsonCommand("{request: 'getWindowHandle'}"));
-    nameToJson.put("getWindowHandles", new JsonCommand("{request: 'getWindowHandles'}"));
-    nameToJson.put("switchToWindow", new JsonCommand("{request: 'switchToWindow', windowName: ?name}"));
-    
-    nameToJson.put("execute", new JsonCommand("EXECUTE")); //Dealt with specially
-    
-    nameToJson.put("getCurrentUrl", new JsonCommand("{request: 'getCurrentUrl'}"));
-    nameToJson.put("getPageSource", new JsonCommand("{request: 'getPageSource'}"));
-    nameToJson.put("getTitle", new JsonCommand("{request: 'getTitle'}"));
+    nameToJson = ImmutableMap.<DriverCommand, JsonCommand>builder()
+        .put(CLOSE, new JsonCommand("{request: 'close'}"))
+        .put(QUIT, new JsonCommand("QUIT"))
+        .put(GET, new JsonCommand("{request: 'url', url: ?url}"))
+        .put(GO_BACK, new JsonCommand("{request: 'goBack'}"))
+        .put(GO_FORWARD, new JsonCommand("{request: 'goForward'}"))
+        .put(REFRESH, new JsonCommand("{request: 'refresh'}"))
+        .put(ADD_COOKIE, new JsonCommand("{request: 'addCookie', cookie: ?cookie}"))
+        .put(GET_ALL_COOKIES, new JsonCommand("{request: 'getCookies'}"))
+        .put(GET_COOKIE, new JsonCommand("{request: 'getCookieNamed', name: ?name}"))
+        .put(DELETE_ALL_COOKIES, new JsonCommand("{request: 'deleteAllCookies'}"))
+        .put(DELETE_COOKIE, new JsonCommand("{request: 'deleteCookie', name: ?name}"))
+        .put(FIND_ELEMENT,new JsonCommand("{request: 'getElement', by: [?using, ?value]}"))
+        .put(FIND_ELEMENTS, new JsonCommand("{request: 'getElements', by: [?using, ?value]}"))
+        .put(FIND_CHILD_ELEMENT, new JsonCommand(
+            "{request: 'getElement', by: [{id: ?element, using: ?using, value: ?value}]}"))
+        .put(FIND_CHILD_ELEMENTS, new JsonCommand(
+            "{request: 'getElements', by: [{id: ?element, using: ?using, value: ?value}]}"))
+        .put(CLEAR_ELEMENT, new JsonCommand("{request: 'clearElement', elementId: ?elementId}"))
+        .put(CLICK_ELEMENT, new JsonCommand("{request: 'clickElement', elementId: ?elementId}"))
+        .put(HOVER_OVER_ELEMENT, new JsonCommand(
+            "{request: 'hoverElement', elementId: ?elementId}"))
+        .put(SEND_KEYS_TO_ELEMENT, new JsonCommand(
+            "{request: 'sendElementKeys', elementId: ?elementId, keys: ?keys}"))
+        .put(SUBMIT_ELEMENT, new JsonCommand("{request: 'submitElement', elementId: ?elementId}"))
+        .put(TOGGLE_ELEMENT, new JsonCommand("{request: 'toggleElement', elementId: ?elementId}"))
+        .put(GET_ELEMENT_ATTRIBUTE, new JsonCommand(
+            "{request: 'getElementAttribute', elementId: ?elementId, attribute: ?attribute}"))
+        .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, new JsonCommand(
+            "{request: 'getElementLocationOnceScrolledIntoView', elementId: ?elementId}"))
+        .put(GET_ELEMENT_LOCATION, new JsonCommand(
+            "{request: 'getElementLocation', elementId: ?elementId}"))
+        .put(GET_ELEMENT_SIZE, new JsonCommand(
+            "{request: 'getElementSize', elementId: ?elementId}"))
+        .put(GET_ELEMENT_TAG_NAME, new JsonCommand(
+            "{request: 'getElementTagName', elementId: ?elementId}"))
+        .put(GET_ELEMENT_TEXT, new JsonCommand(
+            "{request: 'getElementText', elementId: ?elementId}"))
+        .put(GET_ELEMENT_VALUE, new JsonCommand(
+            "{request: 'getElementValue', elementId: ?elementId}"))
+        .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY, new JsonCommand(
+            "{request: 'getElementValueOfCssProperty', elementId: ?elementId, css: ?property}"))
+        .put(IS_ELEMENT_DISPLAYED, new JsonCommand(
+            "{request: 'isElementDisplayed', elementId: ?elementId}"))
+        .put(IS_ELEMENT_ENABLED, new JsonCommand(
+            "{request: 'isElementEnabled', elementId: ?elementId}"))
+        .put(IS_ELEMENT_SELECTED, new JsonCommand(
+            "{request: 'isElementSelected', elementId: ?elementId}"))
+        .put(SET_ELEMENT_SELECTED, new JsonCommand(
+            "{request: 'setElementSelected', elementId: ?elementId}"))
+        .put(GET_ACTIVE_ELEMENT, new JsonCommand("{request: 'switchToActiveElement'}"))
+        .put(SWITCH_TO_FRAME_BY_INDEX, new JsonCommand(
+            "{request: 'switchToFrame', using: {index: ?index}}"))
+        .put(SWITCH_TO_FRAME_BY_NAME, new JsonCommand(
+            "{request: 'switchToFrame', using: {name: ?name}}"))
+        .put(SWITCH_TO_DEFAULT_CONTENT, new JsonCommand("{request: 'switchToDefaultContent'}"))
+        .put(GET_CURRENT_WINDOW_HANDLE, new JsonCommand("{request: 'getWindowHandle'}"))
+        .put(GET_WINDOW_HANDLES, new JsonCommand("{request: 'getWindowHandles'}"))
+        .put(SWITCH_TO_WINDOW, new JsonCommand("{request: 'switchToWindow', windowName: ?name}"))
+        .put(EXECUTE_SCRIPT, new JsonCommand("EXECUTE")) //Dealt with specially
+        .put(GET_CURRENT_URL, new JsonCommand("{request: 'getCurrentUrl'}"))
+        .put(GET_PAGE_SOURCE, new JsonCommand("{request: 'getPageSource'}"))
+        .put(GET_TITLE, new JsonCommand("{request: 'getTitle'}"))
+        .build();
     
     try {
       serverSocket = new ServerSocket(port);
@@ -155,10 +170,10 @@ public class ChromeCommandExecutor {
     try {
       //Respond to request with the command
       JsonCommand commandToPopulate = 
-        nameToJson.get(command.getMethodName());
+        nameToJson.get(command.getName());
       if (commandToPopulate == null) {
         throw new UnsupportedOperationException("Didn't know how to execute: " +
-            command.getMethodName());
+            command.getName());
       }
       String commandStringToSend = commandToPopulate.populate(command.getParameters());
       socket.getOutputStream().write(fillTwoHundredWithJson(commandStringToSend));

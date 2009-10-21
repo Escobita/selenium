@@ -19,7 +19,25 @@
     </orderEntry>
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="remote-common" />
-    <orderEntry type="module" module-name="remote-server" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar:///Users/jleyba/Documents/webdriver/branches/jsapi/remote/common/lib/runtime/json-20080701.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar:///Users/jleyba/Documents/webdriver/branches/jsapi/htmlunit/lib/runtime/commons-httpclient-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="third_party" />
   </component>
 </module>
 

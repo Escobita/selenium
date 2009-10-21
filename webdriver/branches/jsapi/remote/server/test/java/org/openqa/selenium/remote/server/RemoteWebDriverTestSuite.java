@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.remote;
+package org.openqa.selenium.remote.server;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -28,6 +28,8 @@ import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.environment.webserver.Jetty6AppServer;
 import org.openqa.selenium.remote.server.DriverServlet;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
 import java.net.URL;
@@ -41,6 +43,7 @@ public class RemoteWebDriverTestSuite extends TestCase {
             .addSourceDir("common")
             .addSourceDir("../common")
             .addSourceDir("remote/client")
+            .addSourceDir("remote/server")
             .keepDriverInstance()
             .includeJavascriptTests()
             .usingDriver(RemoteWebDriverForTest.class)

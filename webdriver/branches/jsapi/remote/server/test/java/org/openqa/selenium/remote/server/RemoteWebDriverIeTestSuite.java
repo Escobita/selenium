@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.remote;
+package org.openqa.selenium.remote.server;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -24,6 +24,8 @@ import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 
@@ -48,6 +50,7 @@ public class RemoteWebDriverIeTestSuite extends TestCase {
             .addSourceDir("common")
             .addSourceDir("../common")
             .addSourceDir("remote/client")
+            .addSourceDir("remote/server")
             .keepDriverInstance()
             .includeJavascriptTests()
             .usingDriver(RemoteIeWebDriverForTest.class)
