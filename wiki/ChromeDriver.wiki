@@ -23,6 +23,8 @@ File uploading using <input type="file"> elements is currently unsupported.
 
 Hovering and dragging and dropping are currently unsupported.
 
+ChromeDriver.get(url) will clear the navigating history of your session (ChromeDriver.navigate().back() and ChromeDriver.navigate().forward will stop working).
+
 === Additionally, on Mac and Linux: ===
 
 Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.  This should be fixed by mid-October 2009.
