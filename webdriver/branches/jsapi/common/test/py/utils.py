@@ -21,13 +21,13 @@ import unittest
 
 
 def run_tests(test_case, driver, webserver):
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.WARN)
 
     webserver.start()
     try:
         testLoader = unittest.TestLoader()
         testRunner = unittest.TextTestRunner()
-        test_case_name = "webdriver_common_tests.%s" % test_case
+        test_case_name = "webdriver.common_tests.%s" % test_case
         if len(sys.argv) > 1:
             testMethod = sys.argv[1]
             testRunner.run(

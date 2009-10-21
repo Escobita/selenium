@@ -24,6 +24,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="htmlunit" />
+    <orderEntry type="module" module-name="remote-common" />
+    <orderEntry type="module" module-name="remote-client" />
+    <orderEntry type="library" name="third_party-buildtime" level="project" />
   </component>
 </module>
 

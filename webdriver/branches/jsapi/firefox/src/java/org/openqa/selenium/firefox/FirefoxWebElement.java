@@ -24,7 +24,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.FindsByClassName;
@@ -43,7 +42,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
-        FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName, SearchContext {
+        FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
     private final FirefoxDriver parent;
     private final String elementId;
 
@@ -290,13 +289,11 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     if (!(other instanceof FirefoxWebElement)) {
       return false;
     }
-    Object result = parent.executeScript("return arguments[0] === arguments[1]", this, other);
-    return result != null && result instanceof Boolean && (Boolean) result;
+    return elementId.equals(((FirefoxWebElement)other).elementId);
   }
 
   @Override
   public int hashCode() {
-    // Distinctly sub-optimal
     return elementId.hashCode();
   }
 }

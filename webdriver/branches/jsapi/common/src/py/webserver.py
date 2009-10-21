@@ -26,7 +26,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
 try:
-    HTML_ROOT = os.path.join(os.getenv("WEBDRIVER"), "common/src/web")
+    HTML_ROOT = os.path.join(os.getenv("WEBDRIVER"), "common_web")
 except Exception:
     logging.error("Environment variable 'WEBDRIVER' is not set, unable to"
                  " locate the test html files.")
@@ -35,6 +35,8 @@ assert os.path.exists(HTML_ROOT), (
     "Unable to locate the test html files from %s" % HTML_ROOT)
 
 DEFAULT_PORT = 8000
+sys.stderr = open("http_stderr_log.txt",'a')
+sys.stdout = open("http_stdout_log.txt",'a')
 
 class HtmlOnlyHandler(BaseHTTPRequestHandler):
     """Http handler."""

@@ -91,7 +91,7 @@ function parsePortMessage(message) {
     response.value = deleteCookie(message.request.name);
     response.wait = false;
     break;
-  case "execute":
+  case "executeScript":
     execute(message.request.script, message.request.args);
     //Sends port message back to background page from its own callback
     break;
@@ -99,16 +99,24 @@ function parsePortMessage(message) {
     response.value = getCookies();
     response.wait = false;
     break;
-  case "getCookieNamed":
+  case "getCookie":
     response.value = getCookieNamed(message.request.name);
     response.wait = false;
     break;
-  case "getElement":
-    response.value = getElement(false, message.request.by);
+  case "findChildElement":
+    response.value = getElement(false, message.request.using, message.request.value, message.request.id);
     response.wait = false;
     break;
-  case "getElements":
-    response.value = getElement(true, message.request.by);
+  case "findChildElements":
+    response.value = getElement(true, message.request.using, message.request.value, message.request.id);
+    response.wait = false;
+    break;
+  case "findElement":
+    response.value = getElement(false, message.request.using, message.request.value);
+    response.wait = false;
+    break;
+  case "findElements":
+    response.value = getElement(true, message.request.using, message.request.value);
     response.wait = false;
     break;
   case "getElementAttribute":
@@ -169,7 +177,7 @@ function parsePortMessage(message) {
     history.forward();
     response.value = {statusCode: 0};
     break;
-  case "hoverElement":
+  case "hoverOverElement":
     response.value = hoverElement(element, message.request.elementId);
     break;
   case "injectEmbed":
@@ -191,18 +199,19 @@ function parsePortMessage(message) {
     ChromeDriverContentScript.currentDocument.location.reload(true);
     response.value = {statusCode: 0};
     break;
-  case "sendElementKeys":
+  case "sendKeysToElement":
     response.value = sendElementKeys(element, message.request.keys, message.request.elementId);
+    response.wait = false;
     break;
   case "sendElementNonNativeKeys":
     response.value = sendElementNonNativeKeys(element, message.request.keys);
+    response.wait = false;
     break;
   case "setElementSelected":
     response.value = selectElement(element);
     break;
-  case "switchToActiveElement":
-    ChromeDriverContentScript.internalElementArray.push(ChromeDriverContentScript.currentDocument.activeElement);
-    response.value = {statusCode: 0, value: ["element/" + (ChromeDriverContentScript.internalElementArray.length - 1)]};
+  case "getActiveElement":
+    response.value = {statusCode: 0, value: [addElementToInternalArray(ChromeDriverContentScript.currentDocument.activeElement).toString()]};
     response.wait = false;
     break;
   case "switchToNamedIFrameIfOneExists":
@@ -373,7 +382,7 @@ function setCookie(cookie) {
   }
   
   if (currLocation.port != 80) { currDomain += ":" + currLocation.port; }
-  if (cookie.domain != null && cookie.domain != undefined &&
+  if (cookie.domain != null && cookie.domain !== undefined &&
       currDomain.indexOf(cookie.domain) == -1) {
       // Not quite right, but close enough. (See r783)
     return {statusCode: 2, value: {
@@ -398,24 +407,18 @@ function setCookie(cookie) {
  * @param parsed array showing how to look up, e.g. ["id", "cheese"] or
  *               [{"id": 0, using: "id", value: "cheese"}]
  */
-function getElement(plural, parsed) {
+function getElement(plural, lookupBy, lookupValue, id) {
   var root = "";
-  var lookupBy = "";
-  var lookupValue = "";
   var parent = null;
-  if (parsed[0].id != null) {
+  if (id !== undefined && id != null) {
     try {
-      parent = internalGetElement(parsed[0].id);
+      parent = internalGetElement(id);
     } catch (e) {
       return e;
     }
     //Looking for children
     root = getXPathOfElement(parent);
-    lookupBy = parsed[0].using;
-    lookupValue = parsed[0].value;
   } else {
-    lookupBy = parsed[0];
-    lookupValue = parsed[1];
     parent = ChromeDriverContentScript.currentDocument;
   }
 
@@ -471,10 +474,9 @@ function getElement(plural, parsed) {
     var elementsToReturnArray = [];
     if (plural) {
       //Add all found elements to the page's elements, and push each to the array to return
-      var from = ChromeDriverContentScript.internalElementArray.length;
-      ChromeDriverContentScript.internalElementArray = ChromeDriverContentScript.internalElementArray.concat(elements);
-      for (var i = from; i < ChromeDriverContentScript.internalElementArray.length; i++) {
-        elementsToReturnArray.push('element/' + i);
+      var addedElements = addElementsToInternalArray(elements);
+      for (var addedElement in addedElements) {
+        elementsToReturnArray.push(addedElements[addedElement].toString());
       }
     } else {
       if (!elements[0]) {
@@ -482,11 +484,28 @@ function getElement(plural, parsed) {
           message: "Unable to locate element with " + lookupBy + " " + lookupValue}};
       }
       //Add the first found elements to the page's elements, and push it to the array to return
-      ChromeDriverContentScript.internalElementArray.push(elements[0]);
-      elementsToReturnArray.push('element/' + (ChromeDriverContentScript.internalElementArray.length - 1));
+      elementsToReturnArray.push(addElementToInternalArray(elements[0]).toString());
     }
     return {statusCode: 0, value: elementsToReturnArray};
   }
+}
+
+function addElementToInternalArray(element) {
+  for (var existingElement in ChromeDriverContentScript.internalElementArray) {
+    if (element == ChromeDriverContentScript.internalElementArray[existingElement]) {
+      return existingElement;
+    }
+  }
+  ChromeDriverContentScript.internalElementArray.push(element);
+  return (ChromeDriverContentScript.internalElementArray.length - 1);
+}
+
+function addElementsToInternalArray(elements) {
+  var toReturn = [];
+  for (var element in elements) {
+    toReturn.push(addElementToInternalArray(elements[element]));
+  }
+  return toReturn;
 }
 
 /**
@@ -660,6 +679,7 @@ function sendElementKeys(element, keys, elementId) {
   } catch (e) {
     return e;
   }
+  //TODO(danielwh): Fire events
   ChromeDriverContentScript.currentDocument.activeElement.blur();
   element.focus();
   return {statusCode: "no-op", keys: keys, elementId: elementId};
@@ -775,7 +795,7 @@ function parseWrappedArguments(argument) {
   switch (argument.type) {
   case "ELEMENT":
     //Wrap up as a special object with the element's canonical xpath, which the page can work out
-    var element_id = argument.value.replace("element/", "");
+    var element_id = argument.value;
     var element = null;
     try {
       element = internalGetElement(element_id);
@@ -871,8 +891,7 @@ function parseReturnValueFromScript(result) {
   if (result !== undefined && result != null && typeof(result) == "object") {
     if (result.webdriverElementXPath) {
       //If we're returning an element, turn it into an actual element object
-      ChromeDriverContentScript.internalElementArray.push(getElementsByXPath(result.webdriverElementXPath)[0]);
-      value = {value:"element/" + (ChromeDriverContentScript.internalElementArray.length - 1), type:"ELEMENT"};
+      value = {value: addElementToInternalArray(getElementsByXPath(result.webdriverElementXPath)[0]).toString(), type:"ELEMENT"};
     } else if (result.length !== undefined) {
       value = [];
       for (var i = 0; i < result.length; ++i) {

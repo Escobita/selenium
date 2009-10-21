@@ -17,22 +17,21 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
+import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.WrapsElement;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
 
-public class RemoteWebElement implements WebElement, SearchContext,
-    FindsByLinkText, FindsById, FindsByName, FindsByClassName, FindsByXPath {
+public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById, FindsByName,
+    FindsByTagName, FindsByClassName, FindsByXPath {
 
   protected String id;
   protected RemoteWebDriver parent;
@@ -183,8 +182,20 @@ public class RemoteWebElement implements WebElement, SearchContext,
     return getElementsFrom(response);
   }
 
-  protected Response execute(DriverCommand driverCommand, Object... parameters) {
-    return parent.execute(driverCommand, parameters);
+  public WebElement findElementByTagName(String using) {
+    Response response = execute(DriverCommand.FIND_CHILD_ELEMENT,
+        ImmutableMap.of("id", id, "using", "tag name", "value", using));
+    return getElementFrom(response);
+  }
+
+  public List<WebElement> findElementsByTagName(String using) {
+    Response response = execute(DriverCommand.FIND_CHILD_ELEMENTS,
+        ImmutableMap.of("id", id, "using", "tag name", "value", using));
+    return getElementsFrom(response);
+  }
+
+  protected Response execute(DriverCommand command, Object... parameters) {
+    return parent.execute(command, parameters);
   }
 
   protected WebElement getElementFrom(Response response) {

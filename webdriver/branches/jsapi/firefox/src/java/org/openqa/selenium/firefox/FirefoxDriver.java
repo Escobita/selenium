@@ -28,7 +28,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -76,11 +75,12 @@ import java.util.Set;
  * When the driver starts, it will make a copy of the profile it is using, rather than using that profile directly.
  * This allows multiple instances of firefox to be started.
  */
-public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecutor,
+public class FirefoxDriver implements WebDriver, JavascriptExecutor,
         FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
     public static final int DEFAULT_PORT = 7055;
     // For now, only enable native events on Windows
-    public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS = Platform.getCurrent().is(Platform.WINDOWS);
+    public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
+      Platform.getCurrent().is(Platform.WINDOWS);
 
     private final ExtensionConnection extension;
     protected Context context;
@@ -166,11 +166,11 @@ public class FirefoxDriver implements WebDriver, SearchContext, JavascriptExecut
     }
 
   public List<WebElement> findElements(By by) {
-    return by.findElements((SearchContext)this);
+    return by.findElements(this);
   }
 
   public WebElement findElement(By by) {
-    return by.findElement((SearchContext)this);
+    return by.findElement(this);
   }
 
   public WebElement findElementById(String using) {

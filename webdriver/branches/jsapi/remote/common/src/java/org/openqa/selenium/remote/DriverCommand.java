@@ -62,8 +62,8 @@ public enum DriverCommand {
 
   SWITCH_TO_WINDOW("switchToWindow"),
   SWITCH_TO_FRAME("switchToFrame"),
-  SWITCH_TO_FRAME_BY_INDEX("switchToFrame"),  // TODO(jleyba): standardize Chrome frame switching
-  SWITCH_TO_FRAME_BY_NAME("switchToFrame"),   //
+  SWITCH_TO_FRAME_BY_INDEX("switchToFrameByIndex"),  // TODO(jleyba): standardize Chrome frame switching
+  SWITCH_TO_FRAME_BY_NAME("switchToFrameByName"),    //
   SWITCH_TO_DEFAULT_CONTENT("switchToDefaultContent"),
   GET_ACTIVE_ELEMENT("getActiveElement"),
 

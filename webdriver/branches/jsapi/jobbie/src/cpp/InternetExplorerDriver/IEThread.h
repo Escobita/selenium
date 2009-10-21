@@ -102,7 +102,7 @@ protected:
 	void getDocument(IHTMLDocument2** pOutDoc);
 	void getDocument3(IHTMLDocument3** pOutDoc);
 
-	void executeScript(const wchar_t *script, SAFEARRAY* args, CComVariant* ref_result, bool tryAgain = true);
+	int executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT* result, bool tryAgain = true);
 	bool isCheckbox(IHTMLElement *pElement);
 	bool isRadio(IHTMLElement *pElement);
 	void getTagName(IHTMLElement *pElement, std::wstring& res);
@@ -123,7 +123,6 @@ protected:
 	void findParentForm(IHTMLElement *pElement, IHTMLFormElement **pform);
 	std::vector<ElementWrapper*>* getChildrenWithTagName(IHTMLElement *pElement, LPCWSTR tagName) ;
 	int waitForDocumentToComplete(IHTMLDocument2* doc);
-	bool addEvaluateToDocument(const IHTMLDOMNode* node, int count);
 	void findCurrentFrame(IHTMLWindow2 **result);
 	void getDefaultContentFromDoc(IHTMLWindow2 **result, IHTMLDocument2* doc);
 
@@ -171,8 +170,6 @@ protected:
 		  void OnGoBack(WPARAM, LPARAM);
 		  void OnGetHandle(WPARAM, LPARAM);
 		  void OnGetHandles(WPARAM, LPARAM);
-		  void OnSelectElementByXPath(WPARAM, LPARAM);
-		  void OnSelectElementsByXPath(WPARAM, LPARAM);
 		  void OnSelectElementById(WPARAM, LPARAM);
 		  void OnSelectElementsById(WPARAM, LPARAM);
 		  void OnSelectElementByLink(WPARAM, LPARAM);

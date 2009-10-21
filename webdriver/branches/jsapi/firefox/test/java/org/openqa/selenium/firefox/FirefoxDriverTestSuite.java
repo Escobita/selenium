@@ -17,24 +17,18 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import static org.openqa.selenium.Ignore.Driver.FIREFOX;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestListener;
-import junit.framework.AssertionFailedError;
-import junit.framework.TestSuite;
-import junit.framework.TestResult;
-import junit.extensions.TestDecorator;
-
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
-import org.openqa.selenium.internal.TemporaryFilesystem;
 import org.openqa.selenium.internal.FileHandler;
+import org.openqa.selenium.internal.TemporaryFilesystem;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FirefoxDriverTestSuite extends TestCase {
   public static Test suite() throws Exception {
@@ -77,11 +71,20 @@ public class FirefoxDriverTestSuite extends TestCase {
 
       // Copy in the native events library/libraries
       Map<String, String> fromTo = new HashMap<String, String>();
-      fromTo.put("Debug/webdriver-firefox.dll",
-          "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
+      if (Platform.getCurrent().equals(Platform.WINDOWS)) {
+        fromTo.put("Debug/webdriver-firefox.dll",
+        "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
+      } else if (Platform.getCurrent().equals(Platform.UNIX)) {
+        fromTo.put("../linux64/Release/libwebdriver-firefox.so",
+        "platform/Linux/components/libwebdriver-firefox.so");
       
-      fromTo.put("../linux64/Release/libwebdriver-firefox.so",
-          "platform/Linux/components/libwebdriver-firefox.so");
+        fromTo.put("../linux64/Release/x_ignore_nofocus.so",
+        "amd64/x_ignore_nofocus.so");
+        
+        fromTo.put("../linux/Release/x_ignore_nofocus.so",
+        "x86/x_ignore_nofocus.so");
+      }
+      
 
       // We know the location of the "from" in relation to the extension source
       for (Map.Entry<String, String> entry : fromTo.entrySet()) {
@@ -90,7 +93,12 @@ public class FirefoxDriverTestSuite extends TestCase {
           System.out.println("File does not exist. Skipping: " + source);
           continue;
         }
-        File dest = new File(extension, entry.getValue());
+        File toDir = extension;
+        if (entry.getValue().contains("x_ignore_nofocus.so")) {
+          toDir = dir;
+        }
+        
+        File dest = new File(toDir, entry.getValue());
         dest.getParentFile().mkdirs(); // Ignore the return code, cos we're about to throw an exception
         try {
           FileHandler.copy(source, dest);
@@ -99,18 +107,46 @@ public class FirefoxDriverTestSuite extends TestCase {
         }
       }
 
-      File xpt = FileHandler.locateInProject("build/nsINativeEvents.xpt");
-      File outXpt = new File(extension, "components/nsINativeEvents.xpt");
+      copyXpts(extension);
 
-      try {
-        if (xpt.exists()) {
-          FileHandler.copy(xpt, outXpt);
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      // Now delete all the .svn directories
+      deleteSvnDirectories(extension);
 
       return new FirefoxProfile(dir);
+    }
+
+    private static void copyXpts(File extension) {
+      Map<String, String> components = new HashMap<String, String>() {{
+        put("build/nsINativeEvents.xpt", "components/nsINativeEvents.xpt");
+        put("build/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt");
+      }};
+
+      for (Map.Entry<String, String> component : components.entrySet()) {
+        File xpt = FileHandler.locateInProject(component.getKey());
+        File outXpt = new File(extension, component.getValue());
+
+        try {
+          if (xpt.exists()) {
+            FileHandler.copy(xpt, outXpt);
+          }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+
+    private static void deleteSvnDirectories(File file) {
+      if (file.isDirectory()) {
+        File svn = new File(file, ".svn");
+        if (svn.exists()) {
+          FileHandler.delete(svn);
+        }
+
+        File[] allChildren = file.listFiles();
+        for (File child : allChildren) {
+          deleteSvnDirectories(child);
+        }
+      }
     }
   }
 }

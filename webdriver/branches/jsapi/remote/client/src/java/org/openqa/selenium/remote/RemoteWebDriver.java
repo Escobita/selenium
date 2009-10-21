@@ -21,7 +21,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -32,6 +31,7 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.internal.FindsByTagName;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -47,8 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExecutor,
-    FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByXPath {
+public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
+    FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
 
   private CommandExecutor executor;
   private Capabilities capabilities;
@@ -117,11 +117,11 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
   }
 
   public List<WebElement> findElements(By by) {
-    return by.findElements((SearchContext) this);
+    return by.findElements(this);
   }
 
   public WebElement findElement(By by) {
-    return by.findElement((SearchContext) this);
+    return by.findElement(this);
   }
 
 
@@ -156,6 +156,16 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
     return getElementsFrom(response);
   }
 
+  public WebElement findElementByTagName(String using) {
+    Response response = execute(DriverCommand.FIND_ELEMENT, "tag name", using);
+    return getElementFrom(response);
+  }
+
+  public List<WebElement> findElementsByTagName(String using) {
+    Response response = execute(DriverCommand.FIND_ELEMENTS, "tag name", using);
+    return getElementsFrom(response);
+
+  }
 
   public WebElement findElementByName(String using) {
     Response response = execute(DriverCommand.FIND_ELEMENT, "name", using);
@@ -419,12 +429,12 @@ public class RemoteWebDriver implements WebDriver, SearchContext, JavascriptExec
       throw new RuntimeException(String.valueOf(response.getValue()));
     }
 
-    String screenGrab = (String) rawException.get("screen");
-    String message = (String) rawException.get("message");
-    String className = (String) rawException.get("class");
-
     RuntimeException toThrow = null;
     try {
+      String screenGrab = (String) rawException.get("screen");
+      String message = (String) rawException.get("message");
+      String className = (String) rawException.get("class");
+
       Class<?> aClass;
       try {
         aClass = Class.forName(className);

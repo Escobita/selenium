@@ -121,7 +121,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
   ChromeResponse execute(DriverCommand driverCommand, Object... parameters) {
     Command command = new Command(new SessionId("[No sessionId]"),
                                   new Context("[No context]"),
-        driverCommand,
+                                  driverCommand,
                                   parameters);
     try {
       return executor.execute(command);
@@ -130,9 +130,6 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
           e instanceof FatalChromeException) {
         //These exceptions may leave the extension hung, or in an
         //inconsistent state, so we restart Chrome
-        /*if (e instanceof FatalChromeException) {
-          try { Thread.sleep(100000000); } catch (InterruptedException e2) {}
-        }*/
         stopClient();
         init();
       }
@@ -185,11 +182,11 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
   }
 
   public WebElement findElement(By by) {
-    return by.findElement((SearchContext)this);
+    return by.findElement(this);
   }
 
   public List<WebElement> findElements(By by) {
-    return by.findElements((SearchContext)this);
+    return by.findElements(this);
   }
 
   public void get(String url) {

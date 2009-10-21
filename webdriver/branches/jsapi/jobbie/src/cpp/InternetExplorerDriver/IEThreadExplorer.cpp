@@ -28,10 +28,7 @@ limitations under the License.
 #include "windowHandling.h"
 #include "InternalCustomMessage.h"
 
-extern wchar_t* XPATHJS[];
-
 using namespace std;
-
 
 void IeThread::OnGetVisible(WPARAM w, LPARAM lp)
 {
@@ -354,205 +351,20 @@ void IeThread::OnExecuteScript(WPARAM w, LPARAM lp)
 	// TODO/MAYBE
 	// the input WebElement(s) may need to have their IHTMLElement QI-converted into IHTMLDOMNode
 
-	executeScript(data.input_string_, data.input_safe_array_, &data.output_variant_);
+	CComVariant out;
+	int result = executeScript(data.input_string_, data.input_safe_array_, &out);
+	data.error_code = result;
 
-	if( VT_DISPATCH == data.output_variant_.vt )
+	if( VT_DISPATCH == out.vt )
 	{
-		CComQIPtr<IHTMLElement> element(data.output_variant_.pdispVal);
+		CComQIPtr<IHTMLElement> element(out.pdispVal);
 		if(element)
 		{
-			IHTMLElement* &pDom = * (IHTMLElement**) &(data.output_variant_.pdispVal);
+			IHTMLElement* &pDom = * (IHTMLElement**) &(out.pdispVal);
 			element.CopyTo(&pDom);
 		}
 	}
-}
-
-void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
-{
-	SCOPETRACER
-	ON_THREAD_COMMON(data)
-	int &errorKind = data.error_code;
-	IHTMLElement* &pDom = data.output_html_element_; 
-	const bool inputElementWasNull = (!data.input_html_element_);
-	CComQIPtr<IHTMLElement> inputElement(data.input_html_element_);
-
-	pDom = NULL;
-	errorKind = SUCCESS;
-
-	/// Start from root DOM by default
-	if(inputElementWasNull)
-	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
-		if (!root_doc) 
-		{
-			errorKind = ENOSUCHDOCUMENT;
-			return;
-		}
-		root_doc->get_documentElement(&inputElement);
-	} else 
-	{
-		checkValidDOM(inputElement);
-	}
-
-	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
-	{
-		errorKind = ENOSUCHELEMENT;
-		return;
-	}
-
-	////////////////////////////////////////////////////
-	bool evalToDocument = addEvaluateToDocument(node, 0);
-	if (!evalToDocument) 
-	{
-		errorKind = EUNEXPECTEDJSERROR;
-		return;
-	}
-
-
-	std::wstring expr;
-	if (!inputElementWasNull)
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res.snapshotItem(0);};})();";
-	else
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res.snapshotItem(0);};})();";
-
-	CComVariant result;
-	CComBSTR expression = CComBSTR(data.input_string_);
-
-	SAFEARRAY* args = NULL;
-	if (!inputElementWasNull) {
-		args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-		long index = 1;
-		CComQIPtr<IHTMLElement> element(const_cast<IHTMLDOMNode*>((IHTMLDOMNode*)node));
-		CComVariant dest2((IDispatch*) element);
-		SafeArrayPutElement(args, &index, &dest2);
-	} else {
-		args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-	}
-
-	long index = 0;
-	CComVariant dest(expression);   
-	SafeArrayPutElement(args, &index, &dest);
-		
-	executeScript(expr.c_str(), args, &result);
-
-	if (result.vt == VT_DISPATCH) {
-		CComQIPtr<IHTMLElement> e(result.pdispVal);
-		
-		if (e && isOrUnder(node, e))
-		{
-			e.CopyTo(&pDom);
-			return; 
-		}
-	}
-
-	errorKind = ENOSUCHELEMENT;
-}
-
-void IeThread::OnSelectElementsByXPath(WPARAM w, LPARAM lp)
-{
-	SCOPETRACER
-	ON_THREAD_COMMON(data)
-	const bool inputElementWasNull = (!data.input_html_element_);
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
-	long &errorKind = data.output_long_;
-	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
-
-	errorKind = 0;
-
-	/// Start from root DOM by default
-	if(inputElementWasNull)
-	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
-		if (!root_doc) 
-		{
-			errorKind = 1;
-			return;
-		}
-		root_doc->get_documentElement(&inputElement);
-	}
-	else
-	{
-		checkValidDOM(inputElement);
-	}
-
-	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
-	{
-		errorKind = 1;
-		return;
-	}
-
-	////////////////////////////////////////////////////
-	bool evalToDocument = addEvaluateToDocument(node, 0);
-	if (!evalToDocument) 
-	{
-		errorKind = 2;
-		return;
-	}
-
-	std::wstring expr;
-	if (!inputElementWasNull)
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res;};})();";
-	else
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res;};})();";
-
-	CComVariant result;
-	CComBSTR expression = CComBSTR(data.input_string_);
-	SAFEARRAY* args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-	
-	long index = 1;
-	CComVariant dest2((IDispatch*) inputElement);
-	SafeArrayPutElement(args, &index, &dest2);
-
-	index = 0;
-	CComVariant dest(expression);
-	SafeArrayPutElement(args, &index, &dest);
-	
-	executeScript(expr.c_str(), args, &result);
-
-	// At this point, the result should contain a JS array of nodes.
-	if (result.vt != VT_DISPATCH) {
-		errorKind = 3;
-		return;
-	}
-
-	CComPtr<IHTMLDocument2> doc;
-	getDocument2(node, &doc);
-
-	CComPtr<IDispatch> scriptEngine;
-	doc->get_Script(&scriptEngine);
-
-	CComPtr<IDispatch> jsArray = result.pdispVal;
-	DISPID shiftId;
-	OLECHAR FAR* szMember = L"iterateNext";
-	result.pdispVal->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &shiftId);
-
-	DISPID lengthId;
-	szMember = L"snapshotLength";
-	result.pdispVal->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &lengthId);
-
-	DISPPARAMS parameters = {0};
-    parameters.cArgs = 0;
-	EXCEPINFO exception;
-
-	CComVariant lengthResult;
-	result.pdispVal->Invoke(lengthId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &parameters, &lengthResult, &exception, 0);
-
-	long length = lengthResult.lVal;
-
-	for (int i = 0; i < length; i++) {
-		CComVariant shiftResult;
-		result.pdispVal->Invoke(shiftId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, &shiftResult, &exception, 0);
-		if (shiftResult.vt == VT_DISPATCH) {
-			CComQIPtr<IHTMLElement> elem(shiftResult.pdispVal);
-			IHTMLElement *pDom = NULL;
-			elem.CopyTo(&pDom);
-			allElems.push_back(pDom);
-		}
-	}
+	data.output_variant_ = out;
 }
 
 void IeThread::getDocument3(const IHTMLDOMNode* extractFrom, IHTMLDocument3** pdoc) {
@@ -598,7 +410,11 @@ bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child)
 		return true;
 
 	VARIANT_BOOL toReturn;
-	parent->contains(child, &toReturn);
+	HRESULT hr = parent->contains(child, &toReturn);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot determine if parent contains child node";
+		return false;
+	}
 
 	return toReturn == VARIANT_TRUE;
 }

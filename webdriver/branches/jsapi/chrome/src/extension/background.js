@@ -257,14 +257,14 @@ chrome.extension.onConnect.addListener(function(port) {
     }
     if (ChromeDriver.isClosingTab) {
       //We are actively closing the tab, and expect a response to this
-      sendResponseToParsedRequest("{statusCode: 0}", false);
+      sendResponseToParsedRequest({statusCode: 0}, false)
       ChromeDriver.isClosingTab = false;
     }
   });
 });
 
 //Tell the ChromeCommandExecutor that we are here
-sendResponseByXHR("", false);
+sendResponseByXHR({statusCode: 0}, false);
 
 /**
  * Sends the passed argument as the result of a command
@@ -320,7 +320,7 @@ function sendResponseToParsedRequest(toSend, wait) {
   ChromeDriver.isBlockedWaitingForResponse = false;
   ChromeDriver.lastRequestToBeSentWhichHasntBeenAnsweredYet = null;
   console.log("SENDING RESPOND TO PARSED REQUEST");
-  sendResponseByXHR(toSend, wait);
+  sendResponseByXHR(JSON.stringify(toSend), wait);
   setToolstripsBusy(false);
 }
 
@@ -334,14 +334,14 @@ function handleXmlHttpRequestReadyStateChange() {
                   ".  responseText: " + this.responseText);
     } else {
       console.log("GOT XHR RESPONSE: " + this.responseText);
-      if (this.responseText == "QUIT") {
-        //We're only allowed to send a response if we're blocked waiting for
-        // one, so pretend
+      var request = JSON.parse(this.responseText);
+      if (request.request == "quit") {
+        //We're only allowed to send a response if we're blocked waiting for one, so pretend
         console.log("SENDING QUIT XHR");
-        sendResponseByXHR("", false);
+        sendResponseByXHR(JSON.stringify({statusCode: 0}), false);
       } else {
         console.log("Got request to execute from XHR: " + this.responseText);
-        parseRequest(JSON.parse(this.responseText));
+        parseRequest(request);
       }
     }
   }
@@ -363,7 +363,7 @@ function parseRequest(request) {
   setToolstripsBusy(true);
   
   switch (request.request) {
-  case "url":
+  case "get":
     getUrl(request.url);
     break;
   case "close":
@@ -371,12 +371,11 @@ function parseRequest(request) {
     chrome.tabs.remove(ChromeDriver.activeTabId);
     ChromeDriver.isClosingTab = true;
     break;
-  case "getWindowHandle":
+  case "getCurrentWindowHandle":
     //TODO(danielwh): Get window's handle, not frame's
     var handle =
         (ChromeDriver.activePort == null ? ChromeDriver.activePort.name : "");
-    sendResponseToParsedRequest(
-        "{statusCode: 0, value: '" + handle + "'}", false);
+    sendResponseToParsedRequest({statusCode: 0, value:  handle}, false);
     break;
   case "getWindowHandles":
     sendResponseToParsedRequest(getWindowHandles(), false);
@@ -384,52 +383,55 @@ function parseRequest(request) {
   case "switchToDefaultContent":
     switchToDefaultContent();
     break;
-  case "switchToFrame":
-    switchToFrame(request.using);
+  case "switchToFrameByIndex":
+    switchToFrame(null, request.index);
+    break;
+  case "switchToFrameByName":
+    switchToFrame(request.name, null);
     break;
   case "switchToWindow":
     ChromeDriver.hasHwnd = false;
     if (typeof("request.windowName") != "undefined") {
       setActivePortByWindowName(request.windowName);
     } else {
-      sendResponseToParsedRequest(
-          "{statusCode: 3, value: {message: " +
-          "'Window to switch to was not given'}}", false);
+      sendResponseToParsedRequest({
+        statusCode: 3,
+        value: {
+          message: 'Window to switch to was not given'
+        }
+      }, false);
     }
     break;
   case "clickElement":
-  case "hoverElement":
+  case "hoverOverElement":
     // Falling through, as native events are handled the same
-  case "sendElementKeys":
+  case "sendKeysToElement":
     sendMessageOnActivePortAndAlsoKeepTrackOfIt(
         wrapInjectEmbedIfNecessary(request));
     break;
   case "getCurrentUrl":
   case "getTitle":
     if (hasNoPage()) {
-      console.log("Not got a page, but asked for string, so sending empty " +
-                  "string");
-      sendResponseToParsedRequest("{statusCode: 0, value: ''}");
+      console.log("Not got a page, but asked for string, so sending empty string");
+      sendResponseToParsedRequest({statusCode: 0, value: ''});
       break;
     }
-  // Falling through, as if we do have a page, we want to treat this like a
-  // normal request
-  case "getElement":
+    // Falling through, as if we do have a page, we want to treat this like a
+    // normal request
+  case "findElement":
+  case "findChildElement":
     if (hasNoPage()) {
-      console.log("Not got a page, but asked for element, so throwing " +
-                  "NoSuchElementException");
-      sendResponseToParsedRequest(
-          "{statusCode: 7, value: {message: " +
-          "'Was not on a page, so could not find elements'}}");
+      console.log("Not got a page, but asked for element, so throwing NoSuchElementException");
+      sendResponseToParsedRequest({statusCode: 7, value: {message: 'Was not on a page, so could not find elements'}});
       break;
     }
-  // Falling through, as if we do have a page, we want to treat this like a
-  // normal request
-  case "getElements":
+    // Falling through, as if we do have a page, we want to treat this like a
+    // normal request
+  case "findElements":
+  case "findChildElements":
     if (hasNoPage()) {
-      console.log(
-          "Not got a page, but asked for elements, so returning no elements");
-      sendResponseToParsedRequest("{statusCode: 0, value: []}");
+      console.log("Not got a page, but asked for elements, so returning no elements");
+      sendResponseToParsedRequest({statusCode: 0, value: []});
       break;
     }
   // Falling through, as if we do have a page, we want to treat this like a
@@ -437,9 +439,8 @@ function parseRequest(request) {
   case "deleteAllCookies":
   case "deleteCookie":
     if (hasNoPage()) {
-      console.log(
-          "Not got a page, but asked to delete cookies, so returning ok");
-      sendResponseToParsedRequest("{statusCode: 0}");
+      console.log("Not got a page, but asked to delete cookies, so returning ok");
+      sendResponseToParsedRequest({statusCode: 0});
       break;
     }
   // Falling through, as if we do have a page, we want to treat this like a
@@ -485,8 +486,8 @@ function parsePortMessage(message) {
     console.log("Got invalid response from the content script.");
     return;
   }
+  var toSend = {statusCode: 12};
   ChromeDriver.lastRequestToBeSentWhichHasntBeenAnsweredYet = null;
-  var toSend = "";
   switch (message.response.value.statusCode) {
   // Error codes are loosely based on native exception codes, see
   // common/src/cpp/webdriver-interactions/errorcodes.h
@@ -502,13 +503,11 @@ function parsePortMessage(message) {
   case 17: //org.openqa.selenium.WebDriverException [Bad javascript]
   case 19: //org.openqa.selenium.XPathLookupException
   case 99: //org.openqa.selenium.WebDriverException [Native event]
-    toSend = '{statusCode: ' + message.response.value.statusCode;
-    if (typeof(message.response.value) != "undefined" &&
-        message.response.value != null &&
+    toSend = {statusCode: message.response.value.statusCode, value: null};
+    if (typeof(message.response.value) != "undefined" && message.response.value != null &&
         typeof(message.response.value.value) != "undefined") {
-      toSend += ',value:' + JSON.stringify(message.response.value.value);
+      toSend.value = message.response.value.value;
     }
-    toSend += '}';
     sendResponseToParsedRequest(toSend, message.response.wait);
     break;
   case "no-op":
@@ -516,11 +515,10 @@ function parsePortMessage(message) {
     switch (message.response.response) {
     case "clickElement":
       try {
-        if (document.embeds[0].clickAt(
-            message.response.value.x, message.response.value.y)) {
-          sendResponseToParsedRequest("{statusCode: 0}", true);
+        if (document.embeds[0].clickAt(message.response.value.x, message.response.value.y)) {
+          sendResponseToParsedRequest({statusCode: 0}, true);
         } else {
-          sendResponseToParsedRequest("{statusCode: 99}", true);
+          sendResponseToParsedRequest({statusCode: 99}, true);
         }
       } catch(e) {
         console.log("Error natively clicking.  Trying non-native.");
@@ -534,22 +532,25 @@ function parsePortMessage(message) {
     case "hoverElement":
       try {
         var points = message.response.value;
-        if (document.embeds[0].mouseMoveTo(
-            15, points.oldX, points.oldY, points.newX, points.newY)) {
-          sendResponseToParsedRequest("{statusCode: 0}", true);
+        if (document.embeds[0].mouseMoveTo(15, points.oldX, points.oldY, points.newX, points.newY)) {
+          sendResponseToParsedRequest({statusCode: 0}, true);
         } else {
-          sendResponseToParsedRequest("{statusCode: 99}", true);
+          sendResponseToParsedRequest({statusCode: 99}, true);
         }
       } catch(e) {
-        sendResponseToParsedRequest("{statusCode: 99}", true);
+        sendResponseToParsedRequest({statusCode: 99}, true);
       }
       break;
-    case "sendElementKeys":
+    case "sendKeysToElement":
       try {
-        if (document.embeds[0].sendKeys(message.response.value.keys)) {
-          sendResponseToParsedRequest("{statusCode: 0}", true);
+        var keys = message.response.value.keys;
+        if (typeof(keys) == "object" && keys.length !== undefined) {
+          keys = keys.join("");
+        }
+        if (document.embeds[0].sendKeys(keys)) {
+          sendResponseToParsedRequest({statusCode: 0}, true);
         } else {
-          sendResponseToParsedRequest("{statusCode: 99}", true);
+          sendResponseToParsedRequest({statusCode: 99}, true);
         }
       } catch(e) {
         console.log("Error natively sending keys.  Trying non-native.");
@@ -639,7 +640,7 @@ function getWindowHandles() {
   for (var tab in ChromeDriver.tabs) {
     windowHandles.push(ChromeDriver.tabs[tab].windowName);
   }
-  return JSON.stringify({statusCode: 0, value: windowHandles});
+  return {statusCode: 0, value: windowHandles}
 }
 
 function resetActiveTabDetails() {
@@ -665,17 +666,17 @@ function switchToDefaultContent() {
     if (ChromeDriver.tabs[tab].tabId == ChromeDriver.activeTabId) {
       if (ChromeDriver.tabs[tab].isFrameset) {
         ChromeDriver.isBlockedWaitingForResponse = false;
-        parseRequest({request: 'switchToFrame', using: {index: 0}});
+        parseRequest({request: 'switchToFrameByIndex', index: 0});
       } else {
         ChromeDriver.activePort = ChromeDriver.tabs[tab].mainPort;
-        sendResponseToParsedRequest("{statusCode: 0}", false);
+        sendResponseToParsedRequest({statusCode: 0}, false);
       }
       return;
     }
   }
 }
 
-function switchToFrame(using) {
+function switchToFrame(name, index) {
   ChromeDriver.hasHwnd = false;
   for (var tab in ChromeDriver.tabs) {
     if (ChromeDriver.tabs[tab].tabId == ChromeDriver.activeTabId) {
@@ -683,14 +684,17 @@ function switchToFrame(using) {
       break;
     }
   }
-  if (typeof(using.name) != "undefined") {
-    switchToFrameByName(using.name);
-  } else if (typeof(using.index != "undefined")) {
-    getFrameNameFromIndex(using.index);
+  if (name !== undefined && name != null) {
+    switchToFrameByName(name);
+  } else if (index !== undefined && index != null) {
+    getFrameNameFromIndex(index);
   } else {
-    sendResponseToParsedRequest(
-        '{statusCode: 9, value: {message: ' +
-        '"Switching frames other than by name or id is unsupported"}}');
+    sendResponseToParsedRequest({
+      statusCode: 9,
+      value: {
+        message: "Switching frames other than by name or id is unsupported"
+      }
+    });
   }
 }
 
@@ -707,7 +711,7 @@ function switchToFrameByName(name) {
           ChromeDriver.activePort =
               ChromeDriver.tabs[tab].frames[frame].framePort;
           ChromeDriver.restOfCurrentFramePath = [];
-          sendResponseToParsedRequest("{statusCode: 0}", false);
+          sendResponseToParsedRequest({statusCode: 0}, false);
           return;
         }
       }
@@ -720,7 +724,7 @@ function switchToFrameByName(name) {
           names.shift();
           ChromeDriver.restOfCurrentFramePath = names;
           if (names.length == 0) {
-            sendResponseToParsedRequest("{statusCode: 0}", false);
+            sendResponseToParsedRequest({statusCode: 0}, false);
             return;
           } else {
             switchToFrameByName(names.join("."));
@@ -819,7 +823,7 @@ function getUrlCallback(tab) {
   }
   if (ChromeDriver.isGettingUrlButOnlyChangingByFragment) {
     ChromeDriver.urlBeingLoaded = null;
-    sendResponseToParsedRequest("", false);
+    sendResponseToParsedRequest({statusCode: 0}, false);
     ChromeDriver.isGettingUrlButOnlyChangingByFragment = false;
   }
 }
@@ -836,7 +840,7 @@ function sendEmptyResponseWhenTabIsLoaded(tab) {
     } else {
       if (!ChromeDriver.hasSentResponseToThisPageLoading) {
         ChromeDriver.urlBeingLoaded = null;
-        sendResponseToParsedRequest("", false);
+        sendResponseToParsedRequest({statusCode: 0}, false);
       }
     }
   } else {
@@ -866,13 +870,11 @@ function setActivePortByWindowName(handle) {
       ChromeDriver.activePort = ChromeDriver.tabs[tab].mainPort;
       chrome.tabs.get(ChromeDriver.tabs[tab].tabId, setActiveTabDetails);
       chrome.tabs.update(ChromeDriver.tabs[tab].tabId, {selected: true});
-      sendResponseToParsedRequest("{statusCode: 0}", false);
+      sendResponseToParsedRequest({statusCode: 0}, false);
       return;
     }
   }
-  sendResponseToParsedRequest(
-      "{statusCode: 3, value: {message: 'Could not find window to switch to " +
-      "by handle: " + handle + "'}}", false);
+  sendResponseToParsedRequest({statusCode: 3, value: {message: 'Could not find window to switch to by handle: ' + handle}}, false);
 }
 
 
