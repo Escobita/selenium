@@ -43,7 +43,7 @@ namespace OpenQa.Selenium
         [TestFixtureTearDown]
         public void TearDown()
         {
-            driver = EnvironmentManager.Instance.CreateFreshDriver();
+            EnvironmentManager.Instance.CloseCurrentDriver();
         }
         
         /*
