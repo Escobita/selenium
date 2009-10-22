@@ -10,87 +10,84 @@ namespace OpenQa.Selenium
     {
 
         [Test]
-        //TODO(andre.nogueira): Currently crashes when getting CurrentURL
-        public void ShouldContinueWorkingAfterSwitchingToInvalidFrame()
+        [ExpectedException(typeof(Exception))]
+        public void ShouldThrowExceptionAfterSwitchingToNonExistingFrameIndex()
         {
-            driver.Get(framesPage);
+            driver.Url = framesPage;
             driver.SwitchTo().Frame(10);
-            Assert.AreEqual(framesPage, driver.CurrentUrl);
         }
 
         [Test]
-        public void ShouldAcceptInvalidFrameIndexes()
+        [ExpectedException(typeof(Exception))]
+        public void ShouldThrowExceptionAfterSwitchingToNonExistingFrameName()
         {
-            driver.Get(framesPage);
-            driver.SwitchTo().Frame(10);
-            driver.SwitchTo().Frame(-1);
+            driver.Url = framesPage;
+            driver.SwitchTo().Frame("æ©ñµøöíúüþ®éåä²doesnotexist");
         }
 
         [Test]
-        public void ShouldAcceptInvalidFrameNames()
+        [ExpectedException(typeof(Exception))]
+        [IgnoreBrowser(Browser.IE, "Seems to crash IE after the move to VS 2008")]
+        public void ShouldThrowExceptionAfterSwitchingToNullFrameName()
         {
-            driver.Get(framesPage);
-            driver.SwitchTo().Frame("");
-            driver.SwitchTo().Frame("æ©ñµøöíúüþ®éåä²³");
+            driver.Url = framesPage;
             driver.SwitchTo().Frame(null);
         }
 
         [Test]
-        public void ShouldSwitchToDefaultContentInFramesPage()
+        public void ShouldSwitchToIframeByNameAndBackToDefaultContent()
         {
-            driver.Get(framesPage);
-            driver.SwitchTo().Frame(1);
-            driver.SwitchTo().DefaultContent();
-            Assert.AreEqual("Foo 1", driver.Title);
-        }
-
-        [Test]
-        public void ShouldSwitchToDefaultContentInIframesPage()
-        {
-            driver.Get(iframesPage);
-            driver.SwitchTo().Frame(1);
-            driver.SwitchTo().DefaultContent();
-            Assert.AreEqual(iframesPage, driver.CurrentUrl);
-        }
-
-        [Test]
-        public void ShouldSwitchToIframeByName()
-        {
-            driver.Get(iframesPage);
+            driver.Url = iframesPage;
             driver.SwitchTo().Frame("iframe1");
             Assert.AreEqual(formsTitle, driver.Title);
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual(iframesTitle, driver.Title);
         }
 
         [Test]
-        public void ShouldSwitchToIframeByIndex()
+        public void ShouldSwitchToIframeByIndexAndBackToDefaultContent()
         {
-            driver.Get(iframesPage);
+            driver.Url = iframesPage;
             driver.SwitchTo().Frame(0);
             Assert.AreEqual(formsTitle, driver.Title);
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual(iframesTitle, driver.Title);
         }
 
         [Test]
-        public void ShouldSwitchToFrameByName() 
+        public void ShouldSwitchToFrameByNameAndBackToDefaultContent() 
         {
-            driver.Get(framesPage);
+            driver.Url = framesPage;
+            
             driver.SwitchTo().Frame("first");
             Assert.AreEqual("Foo 1", driver.Title);
 
-            driver.Get(framesPage);
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual("Foo 1", driver.Title);
+
             driver.SwitchTo().Frame("second");
             Assert.AreEqual("Foo 2", driver.Title);
+
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual("Foo 1", driver.Title);
         }
 
         [Test]
-        public void ShouldSwitchToFrameByIndex()
+        public void ShouldSwitchToFrameByIndexAndBackToDefaultContent()
         {
-            driver.Get(framesPage);
+            driver.Url = framesPage;
+            
             driver.SwitchTo().Frame(0);
             Assert.AreEqual("Foo 1", driver.Title);
 
-            driver.Get(framesPage);
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual("Foo 1", driver.Title);
+
             driver.SwitchTo().Frame(1);
             Assert.AreEqual("Foo 2", driver.Title);
+
+            driver.SwitchTo().DefaultContent();
+            Assert.AreEqual("Foo 1", driver.Title);
         }
 
     }

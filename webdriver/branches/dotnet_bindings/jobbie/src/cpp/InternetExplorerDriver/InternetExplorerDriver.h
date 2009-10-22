@@ -22,6 +22,8 @@ limitations under the License.
 #include "ElementWrapper.h"
 #include "IEThread.h"
 
+extern IeThread* g_IE_Thread;
+
 class InternetExplorerDriver
 {
 public:
@@ -43,7 +45,8 @@ public:
 	void get(const wchar_t* url);
 	void goForward();
 	void goBack();
-	void GetIe(IWebBrowser2 **ppv);
+	std::wstring getHandle();
+	std::vector<std::wstring> getAllHandles();
 
 	void setSpeed(int speed);
 	int getSpeed();
@@ -56,8 +59,6 @@ public:
 
 	ElementWrapper* getActiveElement();
 
-	int selectElementByXPath(IHTMLElement *p, const wchar_t *xpath, ElementWrapper** element);
-	std::vector<ElementWrapper*>* selectElementsByXPath(IHTMLElement *p, const wchar_t *xpath);
 	int selectElementById(IHTMLElement *p, const wchar_t *elementId, ElementWrapper** element);
 	std::vector<ElementWrapper*>* selectElementsById(IHTMLElement *p, const wchar_t *elementId);
 	int selectElementByLink(IHTMLElement *p, const wchar_t *elementLink, ElementWrapper** element);
@@ -73,13 +74,14 @@ public:
 
 	void waitForNavigateToFinish();
 	bool switchToFrame(LPCWSTR pathToFrame);
+	int switchToWindow(LPCWSTR name);
 
 	LPCWSTR getCookies();
-	void addCookie(const wchar_t *cookieString);
+	int addCookie(const wchar_t *cookieString);
 
 	IeThread* p_IEthread;
 
-	CComVariant& executeScript(const wchar_t *script, SAFEARRAY* args, bool tryAgain = true);
+	int executeScript(const wchar_t *script, SAFEARRAY* args, CComVariant* result, bool tryAgain = true);
 
 private:
 

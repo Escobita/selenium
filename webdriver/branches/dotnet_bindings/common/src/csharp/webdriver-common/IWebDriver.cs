@@ -6,9 +6,10 @@ namespace OpenQa.Selenium
 {
     public interface IWebDriver : IDisposable
     {
-        string CurrentUrl
+        string Url
         {
             get;
+            set;
         }
 
         string Title
@@ -16,9 +17,9 @@ namespace OpenQa.Selenium
             get;
         }
 
-        void Get(string url);
+        IWebElement FindElement(By mechanism);
 
-        IWebElement FindOneElement(By mechanism, string locator);
+        List<IWebElement> FindElements(By mechanism);
 
         String PageSource
         {
@@ -29,12 +30,14 @@ namespace OpenQa.Selenium
 
         void Quit();
 
-        Object ExecuteScript(String script, params Object[] args);
-
         IOptions Manage();
 
         INavigation Navigate();
 
         ITargetLocator SwitchTo();
+
+        List<String> GetWindowHandles();
+
+        String GetWindowHandle();
     }
 }

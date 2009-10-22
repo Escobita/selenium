@@ -18,20 +18,17 @@ limitations under the License.
 #include "stdafx.h"
 
 #include <ctime>
+#include <string>
+#include <iostream>
 
+#include "errorcodes.h"
 #include "interactions.h"
-#include "utils.h"
+#include "logging.h"
 
-const LPCTSTR fileDialogNames[] = {
-	_T("#32770"),
-	_T("ComboBoxEx32"),
-	_T("ComboBox"),
-	_T("Edit"),
-	NULL
-};
+using namespace std;
 
 #pragma data_seg(".LISTENER")
-bool pressed = false;
+static bool pressed = false;
 static HHOOK hook = 0;
 #pragma data_seg()
 #pragma comment(linker, "/section:.LISTENER,rws")
@@ -61,7 +58,7 @@ void backgroundUnicodeKeyPress(HWND ieWindow, wchar_t c, int pause)
 }
 
 void backgroundKeyPress(HWND hwnd, HKL layout, BYTE keyboardState[256],
-		WORD keyCode, UINT scanCode, bool extended, bool printable, int pause)
+		WORD keyCode, UINT scanCode, bool extended, int pause)
 {
 	pause = pause / 3;
 
@@ -119,10 +116,10 @@ void backgroundKeyPress(HWND hwnd, HKL layout, BYTE keyboardState[256],
 
 	// Listen out for the keypress event which IE synthesizes when IE
 	// processes the keydown message. Use a time out, just in case we
-	// have not got "printable" right. :)
+	// have not got the logic right :)
 
 	clock_t maxWait = clock() + 5000;
-	while (printable && !pressed) {
+	while (!pressed) {
 		wait(5);
 		if (clock() >= maxWait) {
 			cerr << "Timeout awaiting keypress: " << keyCode << endl;
@@ -183,45 +180,11 @@ LRESULT CALLBACK GetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 extern "C"
 {
-boolean sendKeysToFileUploadAlert(HWND dialogHwnd, const wchar_t* value) 
+void sendKeys(WINDOW_HANDLE windowHandle, const wchar_t* value, int timePerKey)
 {
-    HWND editHwnd = NULL;
-    int maxWait = 10;
-    while (!editHwnd && --maxWait) {
-		wait(200);
-		editHwnd = dialogHwnd;
-		for (int i = 1; fileDialogNames[i]; ++i) {
-			editHwnd = getChildWindow(editHwnd, fileDialogNames[i]);
-		}
-    }
+	if (!windowHandle) { return; }
 
-    if (editHwnd) {
-        // Attempt to set the value, looping until we succeed.
-        const wchar_t* filename = value;
-        size_t expected = wcslen(filename);
-        size_t curr = 0;
-
-        while (expected != curr) {
-                SendMessage(editHwnd, WM_SETTEXT, 0, (LPARAM) filename);
-                wait(1000);
-                curr = SendMessage(editHwnd, WM_GETTEXTLENGTH, 0, 0);
-        }
-
-        HWND openHwnd = FindWindowExW(dialogHwnd, NULL, L"Button", L"&Open");
-        if (openHwnd) {
-                SendMessage(openHwnd, WM_LBUTTONDOWN, 0, 0);
-                SendMessage(openHwnd, WM_LBUTTONUP, 0, 0);
-        }
-
-        return true;
-    }
-
-    cout << "No edit found" << endl;
-    return false;
-}
-
-void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
-{
+	HWND directInputTo = static_cast<HWND>(windowHandle);
 	DWORD currThreadId = GetCurrentThreadId();
 	DWORD ieWinThreadId = GetWindowThreadProcessId(directInputTo, NULL);
 
@@ -248,7 +211,6 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 	for (const wchar_t *p = value; *p; ++p) {
 		const wchar_t c = *p;
 
-		bool printable = false;
 		bool extended = false;
 
 		UINT scanCode = 0;
@@ -260,7 +222,6 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		} else if (c == 0xE001U) {  // ^break
 			keyCode = VK_CANCEL;
 			scanCode = keyCode;
-			printable = true;
 			extended = true;
 		} else if (c == 0xE002U) {  // help
 			keyCode = VK_HELP;
@@ -296,11 +257,9 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		} else if (c == 0xE00CU) {  // escape
 			keyCode = VK_ESCAPE;
 			scanCode = keyCode;
-			printable = true;
 		} else if (c == 0xE00DU) {  // space
 			keyCode = VK_SPACE;
 			scanCode = keyCode;
-			printable = true;
 		} else if (c == 0xE00EU) {  // page up
 			keyCode = VK_PRIOR;
 			scanCode = keyCode;
@@ -344,11 +303,9 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		} else if (c == 0xE018U) {  // semicolon
 			keyCode = VkKeyScanExW(L';', layout);
 			scanCode = MapVirtualKeyExW(LOBYTE(keyCode), 0, layout);
-			printable = true;
 		} else if (c == 0xE019U) {  // equals
 			keyCode = VkKeyScanExW(L'=', layout);
 			scanCode = MapVirtualKeyExW(LOBYTE(keyCode), 0, layout);
-			printable = true;
 		} else if (c == 0xE01AU) {  // numpad0
 			keyCode = VK_NUMPAD0;
 			scanCode = keyCode;
@@ -374,7 +331,7 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 			scanCode = keyCode;
 			extended = true;
 		} else if (c == 0xE020U) {  // numpad6
-			keyCode = VK_NUMPAD5;
+			keyCode = VK_NUMPAD6;
 			scanCode = keyCode;
 			extended = true;
 		} else if (c == 0xE021U) {  // numpad7
@@ -400,7 +357,6 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		} else if (c == 0xE026U) {  // separator
 			keyCode = VkKeyScanExW(L',', layout);
 			scanCode = MapVirtualKeyExW(LOBYTE(keyCode), 0, layout);
-			printable = true;
 		} else if (c == 0xE027U) {  // subtract
 			keyCode = VK_SUBTRACT;
 			scanCode = keyCode;
@@ -455,7 +411,6 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		} else if (c == L'\r') {    // carriage return
 			continue;  // skip it
 		} else {
-			printable = true;
 			keyCode = VkKeyScanExW(c, layout);
 			scanCode = MapVirtualKeyExW(LOBYTE(keyCode), 0, layout);
 			if (!scanCode || (keyCode == 0xFFFFU)) {
@@ -472,9 +427,6 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		if (altKey)
 			keyCode |= static_cast<WORD>(0x0400);
 
-		if (controlKey || altKey)
-			printable = false;
-
 		int pause = timePerKey;
 
 		// Pause for control, alt, and shift generation: if we create these
@@ -487,7 +439,7 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 		}
 
 		backgroundKeyPress(directInputTo, layout, keyboardState, keyCode, scanCode,
-				extended, printable, pause);
+				extended, pause);
 	}
 
 	if (hook) {
@@ -499,23 +451,90 @@ void sendKeys(HWND directInputTo, const wchar_t* value, int timePerKey)
 	}
 }
 
-LRESULT clickAt(HWND directInputTo, long x, long y) 
+bool isSameThreadAs(HWND other) 
 {
-	LRESULT result = mouseDownAt(directInputTo, x, y);
+	DWORD currThreadId = GetCurrentThreadId();
+	DWORD winThreadId = GetWindowThreadProcessId(other, NULL);
+
+	return winThreadId == currThreadId;
+}
+
+LRESULT clickAt(WINDOW_HANDLE handle, long x, long y) 
+{
+	if (!handle) { return ENULLPOINTER; }
+
+	HWND directInputTo = (HWND) handle;
+
+	LRESULT result = mouseDownAt(handle, x, y);
     if (result != 0) {
+		LOG(WARN) << "Mouse down did not succeed whilst clicking";
 		return result;
 	}
-	return mouseUpAt(directInputTo, x, y);
+
+	return mouseUpAt(handle, x, y);
 }
 
-LRESULT mouseDownAt(HWND directInputTo, long x, long y)
+LRESULT mouseDownAt(WINDOW_HANDLE directInputTo, long x, long y)
 {
-	return SendMessage(directInputTo, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(x, y));
+	if (!directInputTo) { return ENULLPOINTER; }
+
+	if (!isSameThreadAs((HWND) directInputTo)) {
+		BOOL toReturn = PostMessage((HWND) directInputTo, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(x, y));
+
+		// Wait until we know that the previous message has been processed
+		SendMessage((HWND) directInputTo, WM_USER, 0, 0);
+		return toReturn ? 0 : 1;  // Because 0 means success.
+	} else {
+		return SendMessage((HWND) directInputTo, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(x, y));
+	}
 }
 
-LRESULT mouseUpAt(HWND directInputTo, long x, long y) 
+LRESULT mouseUpAt(WINDOW_HANDLE directInputTo, long x, long y) 
 {
-	return SendMessage(directInputTo, WM_LBUTTONUP, 0, MAKELONG(x, y));
+	if (!directInputTo) { return ENULLPOINTER; }
+
+	SendMessage((HWND) directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(x, y));
+	if (!isSameThreadAs((HWND) directInputTo)) {
+		BOOL toReturn = PostMessage((HWND) directInputTo, WM_LBUTTONUP, MK_LBUTTON, MAKELONG(x, y));
+
+		// Wait until we know that the previous message has been processed
+		SendMessage((HWND) directInputTo, WM_USER, 0, 0);
+		return toReturn ? 0 : 1;  // Because 0 means success.
+	} else {
+		return SendMessage((HWND) directInputTo, WM_LBUTTONUP, MK_LBUTTON, MAKELONG(x, y));
+	}}
+
+LRESULT mouseMoveTo(WINDOW_HANDLE handle, long duration, long fromX, long fromY, long toX, long toY)
+{
+	if (!handle) { return ENULLPOINTER; }
+
+	HWND directInputTo = (HWND) handle;
+
+	// How many steps?
+	int steps = 15;
+	long sleep = duration / steps;
+
+  LPRECT r = new RECT();
+  GetWindowRect(directInputTo, r);
+
+	for (int i = 0; i < steps; i++) {
+	  //To avoid integer division rounding and cumulative floating point errors,
+	  //calculate from scratch each time
+	  int currentX = fromX + ((toX - fromX) * ((double)i) / steps);
+		int currentY = fromY + ((toY - fromY) * ((double)i) / steps);
+	  SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(currentX, currentY));
+		wait(sleep);
+	}
+	
+	SendMessage(directInputTo, WM_MOUSEMOVE, 0, MAKELPARAM(toX, toY));
+
+  delete r;
+  return 0;
+}
+
+BOOL_TYPE pending_keyboard_events()
+{
+  return false;
 }
 
 }

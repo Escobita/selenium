@@ -18,22 +18,27 @@ limitations under the License.
 #include "stdafx.h"
 #include "webdriver.h"
 #include "finder.h"
+#include "interactions.h"
 #include "InternetExplorerDriver.h"
 #include "logging.h"
+#include "jsxpath.h"
 #include "utils.h"
 #include <stdio.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
 #define END_TRY  catch(std::wstring& m) \
 	{ \
+		if (m.find(L"TIME OUT") != std::wstring::npos) { return ETIMEOUT; } \
 		wcerr << m.c_str() << endl; \
-		return -EEXPECTEDERROR; \
+		LOG(WARN) << "Last error: " << GetLastError(); \
+		return EEXPECTEDERROR; \
 	} \
 	catch (...) \
 	{ \
 	safeIO::CoutA("CException caught in dll", true); \
-	return -EUNHANDLEDERROR; }
+	return EUNHANDLEDERROR; }
 
 
 struct WebDriver {
@@ -51,7 +56,7 @@ struct ScriptArgs {
 };
 
 struct ScriptResult {
-	VARIANT result;
+	CComVariant result;
 };
 
 struct StringWrapper {
@@ -60,6 +65,10 @@ struct StringWrapper {
 
 struct ElementCollection {
 	std::vector<ElementWrapper*>* elements;
+};
+
+struct StringCollection {
+	std::vector<std::wstring>* strings;
 };
 
 InternetExplorerDriver* openIeInstance = NULL;
@@ -89,7 +98,7 @@ int wdStringLength(StringWrapper* string, int* length)
 int wdFreeString(StringWrapper* string)
 {
 	if (!string) {
-		return  -ENOSTRING;
+		return  ENOSTRING;
 	}
 
 	if (string->text) delete[] string->text;
@@ -102,12 +111,12 @@ int wdCopyString(StringWrapper* source, int size, wchar_t* dest)
 {
 	if (!source) {
 		cerr << "No source wrapper" << endl;
-		return -ENOSTRING;
+		return ENOSTRING;
 	}
 
 	if (!source->text) {
 		cerr << "No source text" << endl;
-		return -ENOSTRING;
+		return ENOSTRING;
 	}
 
 	wcscpy_s(dest, size, source->text);
@@ -115,9 +124,9 @@ int wdCopyString(StringWrapper* source, int size, wchar_t* dest)
 }
 
 // Collection manipulation functions
-int wdcGetCollectionLength(ElementCollection* collection, int* length)
+int wdcGetElementCollectionLength(ElementCollection* collection, int* length)
 {
-	if (!collection || !collection->elements) return -ENOCOLLECTION;
+	if (!collection || !collection->elements) return ENOCOLLECTION;
 
 	*length = (int) collection->elements->size();
 
@@ -126,7 +135,8 @@ int wdcGetCollectionLength(ElementCollection* collection, int* length)
 
 int wdcGetElementAtIndex(ElementCollection* collection, int index, WebElement** result)
 {
-	if (!collection || !collection->elements) return -ENOCOLLECTION;
+	*result = NULL;
+	if (!collection || !collection->elements) return ENOCOLLECTION;
 
 	
 	std::vector<ElementWrapper*>::const_iterator cur = collection->elements->begin();
@@ -139,11 +149,37 @@ int wdcGetElementAtIndex(ElementCollection* collection, int index, WebElement** 
 	return SUCCESS;
 }
 
+int wdcGetStringCollectionLength(StringCollection* collection, int* length)
+{
+	if (!collection) return ENOCOLLECTION;
+
+	*length = (int) collection->strings->size();
+
+	return SUCCESS;
+}
+
+int wdcGetStringAtIndex(StringCollection* collection, int index, StringWrapper** result)
+{
+	*result = NULL;
+	if (!collection) return ENOCOLLECTION;
+
+	std::vector<std::wstring>::const_iterator cur = collection->strings->begin();
+	cur += index;
+
+	StringWrapper* wrapper = new StringWrapper();
+	size_t size = (*cur).length() + 1;
+	wrapper->text = new wchar_t[size];
+	wcscpy_s(wrapper->text, size, (*cur).c_str());
+	*result = wrapper;
+
+	return SUCCESS;
+}
+
 // Element manipulation functions
 int wdeFreeElement(WebElement* element)
 {
 	if (!element)
-		return -ENOSUCHDRIVER;
+		return ENOSUCHDRIVER;
 
 	if (element->element) delete element->element;
 	delete element;
@@ -154,7 +190,7 @@ int wdeFreeElement(WebElement* element)
 int wdFreeElementCollection(ElementCollection* collection, int alsoFreeElements)
 {
 	if (!collection || !collection->elements) 
-		return -ENOSUCHCOLLECTION;
+		return ENOSUCHCOLLECTION;
 
 	if (alsoFreeElements) {
 		std::vector<ElementWrapper*>::const_iterator cur = collection->elements->begin();
@@ -172,10 +208,21 @@ int wdFreeElementCollection(ElementCollection* collection, int alsoFreeElements)
 	return SUCCESS;
 }
 
+int wdFreeStringCollection(StringCollection* collection)
+{
+	if (!collection || !collection->strings) 
+		return ENOSUCHCOLLECTION;
+
+	delete collection->strings;
+	delete collection;
+
+	return SUCCESS;
+}
+
 int wdFreeScriptArgs(ScriptArgs* scriptArgs)
 {
 	if (!scriptArgs || !scriptArgs->args) 
-		return -ENOSUCHCOLLECTION;
+		return ENOSUCHCOLLECTION;
 
 	SafeArrayDestroy(scriptArgs->args);
 	delete scriptArgs;
@@ -186,7 +233,9 @@ int wdFreeScriptArgs(ScriptArgs* scriptArgs)
 int wdFreeScriptResult(ScriptResult* scriptResult)
 {
 	if (!scriptResult)
-		return -ENOCOLLECTION;
+		return ENOCOLLECTION;
+
+	VariantClear(&scriptResult->result);
 
 	delete scriptResult;
 
@@ -196,16 +245,26 @@ int wdFreeScriptResult(ScriptResult* scriptResult)
 // Driver manipulation functions
 int wdFreeDriver(WebDriver* driver)
 {
-	if (!driver || !driver->ie) return -1;
-	driver->ie->close();
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
+
+	try {
+		driver->ie->close();
+	} catch (...) {
+		// Fine. We're quitting anyway.
+	}
     delete driver->ie;
     delete driver;
+	driver = NULL;
+
+	// Let the IE COM instance fade away
+	wait(2000);
 
 	return SUCCESS;
 }
 
 int wdNewDriverInstance(WebDriver** result)
 {
+	*result = NULL;
 	TRY
 	{
 	    WebDriver *driver = new WebDriver();
@@ -221,15 +280,16 @@ int wdNewDriverInstance(WebDriver** result)
 	}
 	END_TRY
 
-	return -ENOSUCHDRIVER;
+	return ENOSUCHDRIVER;
 }
 
 int wdGet(WebDriver* driver, const wchar_t* url)
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->get(url);
+		driver->ie->waitForNavigateToFinish();
 
 		return SUCCESS;
 	} END_TRY;
@@ -237,7 +297,7 @@ int wdGet(WebDriver* driver, const wchar_t* url)
 
 int wdGoBack(WebDriver* driver)
 {
-    if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+    if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->goBack();
@@ -247,7 +307,7 @@ int wdGoBack(WebDriver* driver)
 
 int wdGoForward(WebDriver* driver) 
 {
-    if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+    if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->goForward();
@@ -257,7 +317,7 @@ int wdGoForward(WebDriver* driver)
 
 int wdClose(WebDriver* driver)
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->close();
@@ -268,7 +328,7 @@ int wdClose(WebDriver* driver)
 
 int wdGetVisible(WebDriver* driver, int* value) 
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		*value = driver->ie->getVisible() ? 1 : 0;
@@ -278,7 +338,7 @@ int wdGetVisible(WebDriver* driver, int* value)
 
 int wdSetVisible(WebDriver* driver, int value) 
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->setVisible(value != 0);
@@ -289,7 +349,8 @@ int wdSetVisible(WebDriver* driver, int value)
 
 int wdGetCurrentUrl(WebDriver* driver, StringWrapper** result)
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	*result = NULL;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		const std::wstring originalString(driver->ie->getCurrentUrl());
@@ -309,7 +370,8 @@ int wdGetCurrentUrl(WebDriver* driver, StringWrapper** result)
 
 int wdGetTitle(WebDriver* driver, StringWrapper** result)
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	*result = NULL;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		const std::wstring originalString(driver->ie->getTitle());
@@ -329,7 +391,8 @@ int wdGetTitle(WebDriver* driver, StringWrapper** result)
 
 int wdGetPageSource(WebDriver* driver, StringWrapper** result)
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	*result = NULL;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		const std::wstring originalString(driver->ie->getPageSource());
@@ -349,7 +412,8 @@ int wdGetPageSource(WebDriver* driver, StringWrapper** result)
 
 int wdGetCookies(WebDriver* driver, StringWrapper** result)
 { 
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	*result = NULL;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		const std::wstring originalString(driver->ie->getCookies());
@@ -369,45 +433,67 @@ int wdGetCookies(WebDriver* driver, StringWrapper** result)
 
 int wdAddCookie(WebDriver* driver, const wchar_t* cookie)
 {
-    if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+    if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
-		driver->ie->addCookie(cookie);
-
-		return SUCCESS;
+		return driver->ie->addCookie(cookie);
 	} END_TRY;
 }
 
 int wdSwitchToActiveElement(WebDriver* driver, WebElement** result)
 {
-        if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	*result = NULL;
+    if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
-		try {
-			ElementWrapper* element = driver->ie->getActiveElement();
+	try {
+		ElementWrapper* element = driver->ie->getActiveElement();
 
-			if (!element)
-					return -ENOSUCHELEMENT;
+		if (!element)
+				return ENOSUCHELEMENT;
 
-			WebElement* toReturn = new WebElement();
-			toReturn->element = element;
-			*result = toReturn;
+		WebElement* toReturn = new WebElement();
+		toReturn->element = element;
+		*result = toReturn;
 
-			return SUCCESS;
-		} END_TRY;
+		return SUCCESS;
+	} END_TRY;
+}
+
+int wdSwitchToWindow(WebDriver* driver, const wchar_t* name)
+{
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
+
+	try {
+		int result;
+		// It's entirely possible the window to switch to isn't here yet. 
+		// TODO(simon): Make this configurable
+		for (int i = 0; i < 8; i++) {
+			result = driver->ie->switchToWindow(name);
+			if (result == SUCCESS) { break; }
+			wait(500);
+		}
+		return result;
+	} END_TRY;
 }
 
 int wdSwitchToFrame(WebDriver* driver, const wchar_t* path)
 {
-    if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+    if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
-		return driver->ie->switchToFrame(path) ? SUCCESS : -ENOSUCHFRAME;
+		// TODO(simon): Make this configurable
+		for (int i = 0; i < 8; i++) {
+			bool result = driver->ie->switchToFrame(path);
+			if (result) { return SUCCESS; }
+			wait(500);
+		}
+		return ENOSUCHFRAME;
 	} END_TRY;
 }
 
 int wdWaitForLoadToComplete(WebDriver* driver) 
 {
-	if (!driver || !driver->ie) return -ENOSUCHDRIVER;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
 		driver->ie->waitForNavigateToFinish();
@@ -415,20 +501,77 @@ int wdWaitForLoadToComplete(WebDriver* driver)
 	} END_TRY;
 }
 
-int wdeClick(WebElement* element)
+int wdGetCurrentWindowHandle(WebDriver* driver, StringWrapper** handle)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
 
 	try {
-		int res = element->element->click();
+		const std::wstring originalString(driver->ie->getHandle());
 
+		// TODO(simon): Check that the handle is in the map of known driver instances
+
+		size_t length = originalString.length() + 1;
+		wchar_t* toReturn = new wchar_t[length];
+
+		wcscpy_s(toReturn, length, originalString.c_str());
+
+		StringWrapper* res = new StringWrapper();
+		res->text = toReturn;
+		
+		*handle = res;
+
+		return SUCCESS;
+	} END_TRY;
+}
+
+int wdGetAllWindowHandles(WebDriver* driver, StringCollection** handles)
+{
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
+
+	*handles = NULL;
+
+	try {
+		std::vector<std::wstring> rawHandles = driver->ie->getAllHandles();
+		StringCollection* collection = new StringCollection();
+		collection->strings = new std::vector<std::wstring>();
+		for (std::vector<std::wstring>::iterator curr = rawHandles.begin();
+			 curr != rawHandles.end();
+			 curr++) {
+				 collection->strings->push_back(std::wstring(*curr));
+		}
+		*handles = collection;
+
+		return SUCCESS;
+	} END_TRY;
+}
+
+int verifyFresh(WebElement* element) 
+{
+	if (!element || !element->element) { return ENOSUCHELEMENT; }
+
+	try {
+		if (!element->element->isFresh()) 
+		{
+			return EOBSOLETEELEMENT;
+		}
+	} END_TRY;
+	return SUCCESS;
+}
+
+int wdeClick(WebElement* element)
+{
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
+
+	try {
+		res = element->element->click();
 		return res;
 	} END_TRY;	
 }
 
 int wdeGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** result)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	*result = NULL;
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		const std::wstring originalString(element->element->getAttribute(name));
@@ -448,7 +591,8 @@ int wdeGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** re
 
 int wdeGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWrapper** result)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	*result = NULL;
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
         const std::wstring originalString(element->element->getValueOfCssProperty(name));
@@ -468,7 +612,8 @@ int wdeGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWra
 
 int wdeGetText(WebElement* element, StringWrapper** result)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	*result = NULL;
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		const std::wstring originalString(element->element->getText());
@@ -486,12 +631,13 @@ int wdeGetText(WebElement* element, StringWrapper** result)
 	} END_TRY;
 }
 
-int wdeGetElementName(WebElement* element, StringWrapper** result)
+int wdeGetTagName(WebElement* element, StringWrapper** result)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	*result = NULL;
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
-		const std::wstring originalString(element->element->getElementName());
+		const std::wstring originalString(element->element->getTagName());
 		size_t length = originalString.length() + 1;
 		wchar_t* toReturn = new wchar_t[length];
 
@@ -508,7 +654,7 @@ int wdeGetElementName(WebElement* element, StringWrapper** result)
 
 int wdeIsSelected(WebElement* element, int* result)
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		*result = element->element->isSelected() ? 1 : 0;
@@ -519,7 +665,7 @@ int wdeIsSelected(WebElement* element, int* result)
 
 int wdeSetSelected(WebElement* element)
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		return element->element->setSelected();
@@ -528,22 +674,22 @@ int wdeSetSelected(WebElement* element)
 
 int wdeToggle(WebElement* element, int* result)
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	*result = 0;
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		int res = element->element->toggle();
 
-		if (res != SUCCESS) {
-			return res;
+		if (res == SUCCESS) {
+			return wdeIsSelected(element, result);
 		}
-
-		return wdeIsSelected(element, result);
+		return res;
 	} END_TRY;
 }
 
 int wdeIsEnabled(WebElement* element, int* result) 
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		*result = element->element->isEnabled() ? 1 : 0;
@@ -554,7 +700,7 @@ int wdeIsEnabled(WebElement* element, int* result)
 
 int wdeIsDisplayed(WebElement* element, int* result)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		*result = element->element->isDisplayed() ? 1 : 0;
@@ -565,7 +711,7 @@ int wdeIsDisplayed(WebElement* element, int* result)
 
 int wdeSendKeys(WebElement* element, const wchar_t* text)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		return element->element->sendKeys(text);
@@ -574,7 +720,7 @@ int wdeSendKeys(WebElement* element, const wchar_t* text)
 
 int wdeClear(WebElement* element) 
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		element->element->clear();
@@ -584,7 +730,7 @@ int wdeClear(WebElement* element)
 
 int wdeSubmit(WebElement* element)
 {
-	if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
 		element->element->submit();
@@ -594,45 +740,45 @@ int wdeSubmit(WebElement* element)
 
 int wdeGetDetailsOnceScrolledOnToScreen(WebElement* element, HWND* hwnd, long* x, long* y, long* width, long* height)
 {
-    if (!element || !element->element) { return -ENOSUCHELEMENT; }
+    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
 	try {
-		element->element->getLocationWhenScrolledIntoView(hwnd, x, y);
+		element->element->getLocationWhenScrolledIntoView(hwnd, x, y, width, height);
 		return SUCCESS;
 	} END_TRY;
 }
 
 int wdeGetLocation(WebElement* element, long* x, long* y)
 {
-        if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
-		try {
-			element->element->getLocation(x, y);
+	try {
+		element->element->getLocation(x, y);
 
-			return SUCCESS;
-		} END_TRY;
+		return SUCCESS;
+	} END_TRY;
 }
 
 int wdeGetSize(WebElement* element, long* width, long* height)
 {
-        if (!element || !element->element) { return -ENOSUCHELEMENT; }
+	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
 
-		try {
-			int result = element->element->getWidth(width);
-			if (result != SUCCESS) {
-				return result;
-			}
-			result = element->element->getHeight(height);
-
+	try {
+		int result = element->element->getWidth(width);
+		if (result != SUCCESS) {
 			return result;
-		} END_TRY;
+		}
+		result = element->element->getHeight(height);
+
+		return result;
+	} END_TRY;
 }
 
 int wdFindElementById(WebDriver* driver, WebElement* element, const wchar_t* id, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
-	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
 	CComPtr<IHTMLElement> elem;
 	if (element && element->element) {
@@ -657,7 +803,8 @@ int wdFindElementById(WebDriver* driver, WebElement* element, const wchar_t* id,
 
 int wdFindElementsById(WebDriver* driver, WebElement* element, const wchar_t* id, ElementCollection** result) 
 {
-	CComPtr<IHTMLDOMNode> res;
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
 		InternetExplorerDriver* ie = driver->ie;
@@ -677,7 +824,8 @@ int wdFindElementsById(WebDriver* driver, WebElement* element, const wchar_t* id
 
 int wdFindElementByName(WebDriver* driver, WebElement* element, const wchar_t* name, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
@@ -704,8 +852,7 @@ int wdFindElementByName(WebDriver* driver, WebElement* element, const wchar_t* n
 
 int wdFindElementsByName(WebDriver* driver, WebElement* element, const wchar_t* name, ElementCollection** result)
 {
-	CComPtr<IHTMLDOMNode> res;
-
+	*result = NULL;
 	try {
 		InternetExplorerDriver* ie = driver->ie;
 		CComPtr<IHTMLElement> elem;
@@ -724,9 +871,9 @@ int wdFindElementsByName(WebDriver* driver, WebElement* element, const wchar_t* 
 
 int wdFindElementByClassName(WebDriver* driver, WebElement* element, const wchar_t* className, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
-	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
 	CComPtr<IHTMLElement> elem;
 	if (element && element->element) {
@@ -751,9 +898,8 @@ int wdFindElementByClassName(WebDriver* driver, WebElement* element, const wchar
 
 int wdFindElementsByClassName(WebDriver* driver, WebElement* element, const wchar_t* className, ElementCollection** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
-
-	CComPtr<IHTMLDOMNode> res;
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
 		InternetExplorerDriver* ie = driver->ie;
@@ -773,9 +919,9 @@ int wdFindElementsByClassName(WebDriver* driver, WebElement* element, const wcha
 
 int wdFindElementByLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
-	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
 	CComPtr<IHTMLElement> elem;
 	if (element && element->element) {
@@ -800,9 +946,8 @@ int wdFindElementByLinkText(WebDriver* driver, WebElement* element, const wchar_
 
 int wdFindElementsByLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, ElementCollection** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
-
-	CComPtr<IHTMLDOMNode> res;
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
 		InternetExplorerDriver* ie = driver->ie;
@@ -822,9 +967,9 @@ int wdFindElementsByLinkText(WebDriver* driver, WebElement* element, const wchar
 
 int wdFindElementByPartialLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
-	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
 	CComPtr<IHTMLElement> elem;
 	if (element && element->element) {
@@ -849,9 +994,8 @@ int wdFindElementByPartialLinkText(WebDriver* driver, WebElement* element, const
 
 int wdFindElementsByPartialLinkText(WebDriver* driver, WebElement* element, const wchar_t* linkText, ElementCollection** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
-
-	CComPtr<IHTMLDOMNode> res;
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
 		InternetExplorerDriver* ie = driver->ie;
@@ -871,9 +1015,9 @@ int wdFindElementsByPartialLinkText(WebDriver* driver, WebElement* element, cons
 
 int wdFindElementByTagName(WebDriver* driver, WebElement* element, const wchar_t* name, WebElement** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
-	CComPtr<IHTMLDOMNode> res;
 	InternetExplorerDriver* ie = driver->ie;
 	CComPtr<IHTMLElement> elem;
 	if (element && element->element) {
@@ -899,9 +1043,8 @@ int wdFindElementByTagName(WebDriver* driver, WebElement* element, const wchar_t
 
 int wdFindElementsByTagName(WebDriver* driver, WebElement* element, const wchar_t* name, ElementCollection** result)
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
-
-	CComPtr<IHTMLDOMNode> res;
+	*result = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
 		InternetExplorerDriver* ie = driver->ie;
@@ -919,49 +1062,174 @@ int wdFindElementsByTagName(WebDriver* driver, WebElement* element, const wchar_
 	} END_TRY;
 }
 
-int wdFindElementByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, WebElement** result)
+int injectXPathEngine(WebDriver* driver) 
 {
-	if (!driver || !driver->ie) { return -ENOSUCHDRIVER; }
-
-	CComPtr<IHTMLDOMNode> res;
-	InternetExplorerDriver* ie = driver->ie;
-	CComPtr<IHTMLElement> elem;
-	if (element && element->element) {
-		elem = element->element->getWrappedElement();
+	// Inject the XPath engine
+	std::wstring script;
+	for (int i = 0; XPATHJS[i]; i++) {
+		script += XPATHJS[i];
+	}
+	ScriptArgs* args;
+	int result = wdNewScriptArgs(&args, 0);
+	if (result != SUCCESS) {
+		return result;
 	}
 
-	try {
-		ElementWrapper* wrapper;
-		int res = ie->selectElementByXPath(elem, xpath, &wrapper);
+	ScriptResult* scriptResult = NULL;
+	result = wdExecuteScript(driver, script.c_str(), args, &scriptResult);
+	wdFreeScriptArgs(args);
+	if (scriptResult) delete scriptResult;
 
-		if (res != SUCCESS) {
-			return res;
+	return result;
+}
+
+int wdFindElementByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, WebElement** out)
+{
+	*out = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
+
+	try {
+		int result = injectXPathEngine(driver);
+		// TODO(simon): Why does the injecting sometimes fail?
+		/*
+		if (result != SUCCESS) {
+			return result;
+		}
+		*/
+
+		// Call it
+		std::wstring query;
+		if (element) {
+			query += L"(function() { return function(){var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res.snapshotItem(0) ;};})();";
+		} else {
+			query += L"(function() { return function(){var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res.snapshotLength != 0 ? res.snapshotItem(0) : undefined ;};})();";
 		}
 
-		WebElement* toReturn = new WebElement();
-		toReturn->element = wrapper;
+		ScriptArgs* queryArgs;
+		result = wdNewScriptArgs(&queryArgs, 2);
+		if (result != SUCCESS) {
+			wdFreeScriptArgs(queryArgs);
+			return result;
+		}
+		result = wdAddStringScriptArg(queryArgs, xpath);
+		if (result != SUCCESS) {
+			wdFreeScriptArgs(queryArgs);
+			return result;
+		}
+		if (element) {
+			result = wdAddElementScriptArg(queryArgs, element);
+		}
+		if (result != SUCCESS) {
+			wdFreeScriptArgs(queryArgs);
+			return result;
+		}
 
-		*result = toReturn;
-		return SUCCESS;
+		ScriptResult* queryResult;
+		result = wdExecuteScript(driver, query.c_str(), queryArgs, &queryResult);
+		wdFreeScriptArgs(queryArgs);
+
+		// And be done
+		if (result == SUCCESS) {
+			int type = 0;
+			result = wdGetScriptResultType(queryResult, &type);
+			if (type != 5) {
+				result = wdGetElementScriptResult(queryResult, driver, out);
+			} else {
+				result = ENOSUCHELEMENT;
+			}
+		}
+		wdFreeScriptResult(queryResult);
+
+		return result;
 	} END_TRY;
 }
 
-int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, ElementCollection** result)
+int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t* xpath, ElementCollection** out)
 {
-	CComPtr<IHTMLDOMNode> res;
+	*out = NULL;
+	if (!driver || !driver->ie) { return ENOSUCHDRIVER; }
 
 	try {
-		InternetExplorerDriver* ie = driver->ie;
-		CComPtr<IHTMLElement> elem;
-		if (element && element->element) {
-			elem = element->element->getWrappedElement();
+		int result = injectXPathEngine(driver);
+		if (result != SUCCESS) {
+			return result;
 		}
 
-		ElementCollection* collection = new ElementCollection();
-		collection->elements = driver->ie->selectElementsByXPath(elem, xpath);
+		// Call it
+		std::wstring query;
+		if (element)
+			query += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res;};})();";
+		else
+			query += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res;};})();";
 
-		*result = collection;
+		// We need to use the raw functions because we don't allow random objects
+		// to be returned from the executeScript method normally
+		SAFEARRAYBOUND bounds;
+		bounds.cElements = 2;
+		bounds.lLbound = 0;
+		SAFEARRAY* queryArgs = SafeArrayCreate(VT_VARIANT, 1, &bounds);
 
+		CComVariant queryArg(xpath);
+		LONG index = 0;
+		SafeArrayPutElement(queryArgs, &index, &queryArg);
+		
+		if (element) {
+			CComVariant elementArg(element->element->getWrappedElement());
+			LONG index = 1;
+			SafeArrayPutElement(queryArgs, &index, &elementArg);
+		}
+
+		CComVariant snapshot;
+		result = driver->ie->executeScript(query.c_str(), queryArgs, &snapshot);
+		SafeArrayDestroy(queryArgs);
+		if (result != SUCCESS) {
+			return result;
+		}
+
+		bounds.cElements = 1;
+		SAFEARRAY* lengthArgs = SafeArrayCreate(VT_VARIANT, 1, &bounds);
+		index = 0;
+		SafeArrayPutElement(lengthArgs, &index, &snapshot);
+		CComVariant lengthVar;
+		result = driver->ie->executeScript(L"(function(){return function() {return arguments[0].snapshotLength;}})();", lengthArgs, &lengthVar);
+		SafeArrayDestroy(lengthArgs);
+		if (result != SUCCESS) {
+			return result;
+		}
+
+		if (lengthVar.vt != VT_I4) {
+			return EUNEXPECTEDJSERROR;
+		}
+
+		long length = lengthVar.lVal;
+
+		bounds.cElements = 2;
+		SAFEARRAY* snapshotArgs = SafeArrayCreate(VT_VARIANT, 1, &bounds);
+		index = 0;
+		SafeArrayPutElement(snapshotArgs, &index, &snapshot);
+		
+		ElementCollection* elements = new ElementCollection();
+		elements->elements = new std::vector<ElementWrapper*>();
+
+		index = 1;
+		for (long i = 0; i < length; i++) {
+			ScriptArgs* getElemArgs;
+			wdNewScriptArgs(&getElemArgs, 2);
+			// Cheat
+			index = 0;
+			SafeArrayPutElement(getElemArgs->args, &index, &snapshot);
+			getElemArgs->currentIndex++;
+			wdAddNumberScriptArg(getElemArgs, i);
+
+			ScriptResult* getElemRes;
+			wdExecuteScript(driver, L"(function(){return function() {return arguments[0].iterateNext();}})();", getElemArgs, &getElemRes);
+			WebElement* e;
+			wdGetElementScriptResult(getElemRes, driver, &e);
+			elements->elements->push_back(e->element);
+		}
+		SafeArrayDestroy(queryArgs);
+
+		*out = elements;
 		return SUCCESS;
 	} END_TRY;
 }
@@ -969,6 +1237,7 @@ int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t*
 
 int wdNewScriptArgs(ScriptArgs** scriptArgs, int maxLength) 
 {
+	*scriptArgs = NULL;
 	ScriptArgs* args = new ScriptArgs();
 	args->currentIndex = 0;
 	args->maxLength = maxLength;
@@ -986,10 +1255,7 @@ int wdAddStringScriptArg(ScriptArgs* scriptArgs, const wchar_t* arg)
 {
 	std::wstring value(arg);
 
-	VARIANT dest;
-	dest.vt = VT_BSTR;
-	dest.bstrVal = SysAllocString(arg);
-
+	CComVariant dest(arg);
 	LONG index = scriptArgs->currentIndex;
 	SafeArrayPutElement(scriptArgs->args, &index, &dest);
 
@@ -1026,11 +1292,31 @@ int wdAddNumberScriptArg(ScriptArgs* scriptArgs, long number)
 	return SUCCESS;
 }
 
+int wdAddDoubleScriptArg(ScriptArgs* scriptArgs, double number)
+{
+	VARIANT dest;
+	dest.vt = VT_R8;
+	dest.dblVal = (DOUBLE) number;	
+
+	LONG index = scriptArgs->currentIndex;
+	SafeArrayPutElement(scriptArgs->args, &index, &dest);
+
+	scriptArgs->currentIndex++;
+
+	return SUCCESS;
+}
+
 int wdAddElementScriptArg(ScriptArgs* scriptArgs, WebElement* element)
 {
 	VARIANT dest;
-	dest.vt = VT_DISPATCH;
-	dest.pdispVal = element->element->getWrappedElement();
+	VariantClear(&dest);
+
+	if (!element || !element->element) {
+		dest.vt = VT_EMPTY;
+	} else {
+		dest.vt = VT_DISPATCH;
+		dest.pdispVal = element->element->getWrappedElement();
+	}
 
 	LONG index = scriptArgs->currentIndex;
 	SafeArrayPutElement(scriptArgs->args, &index, &dest);
@@ -1042,18 +1328,30 @@ int wdAddElementScriptArg(ScriptArgs* scriptArgs, WebElement* element)
 
 int wdExecuteScript(WebDriver* driver, const wchar_t* script, ScriptArgs* scriptArgs, ScriptResult** scriptResultRef) 
 {
-	VARIANT result = driver->ie->executeScript(script, scriptArgs->args);
+	try {
+		*scriptResultRef = NULL;
+		CComVariant result;
+		int res = driver->ie->executeScript(script, scriptArgs->args, &result);
+		if (res != SUCCESS) {
+			return res;
+		}
 
-	ScriptResult* toReturn = new ScriptResult();
-	toReturn->result = result;
-	*scriptResultRef = toReturn;
+		ScriptResult* toReturn = new ScriptResult();
+		HRESULT hr = VariantCopy(&(toReturn->result), &result);
+		if (!SUCCEEDED(hr) && result.vt == VT_USERDEFINED) {
+			// Special handling of the user defined path *sigh*
+			toReturn->result.vt = VT_USERDEFINED;
+			toReturn->result.bstrVal = CComBSTR(result.bstrVal);
+		}
+		*scriptResultRef = toReturn;
 
-	return SUCCESS;
+		return SUCCESS;
+	} END_TRY;
 }
 
 int wdGetScriptResultType(ScriptResult* result, int* type) 
 {
-	if (!result) { return -ENOSCRIPTRESULT; }
+	if (!result) { return ENOSCRIPTRESULT; }
 
 	switch (result->result.vt) {
 		case VT_BSTR:
@@ -1082,8 +1380,13 @@ int wdGetScriptResultType(ScriptResult* result, int* type)
 			*type = 6;
 			break;
 
+		case VT_R4:
+		case VT_R8:
+			*type = 7;
+			break;
+
 		default:
-			return -EUNKNOWNSCRIPTRESULT;
+			return EUNKNOWNSCRIPTRESULT;
 	}
 
 	return SUCCESS;
@@ -1091,7 +1394,8 @@ int wdGetScriptResultType(ScriptResult* result, int* type)
 
 int wdGetStringScriptResult(ScriptResult* result, StringWrapper** wrapper)
 {
-	if (!result) { return -ENOSCRIPTRESULT; }
+	*wrapper = NULL;
+	if (!result) { return ENOSCRIPTRESULT; }
 
 	StringWrapper* toReturn = new StringWrapper();
 
@@ -1112,16 +1416,25 @@ int wdGetStringScriptResult(ScriptResult* result, StringWrapper** wrapper)
 
 int wdGetNumberScriptResult(ScriptResult* result, long* value)
 {
-	if (!result) { return -ENOSCRIPTRESULT; }
+	if (!result) { return ENOSCRIPTRESULT; }
 
 	*value = result->result.lVal;
 
 	return SUCCESS;
 }
 
+int wdGetDoubleScriptResult(ScriptResult* result, double* value)
+{
+	if (!result) { return ENOSCRIPTRESULT; }
+
+	*value = result->result.dblVal;
+
+	return SUCCESS;
+}
+
 int wdGetBooleanScriptResult(ScriptResult* result, int* value) 
 {
-	if (!result) { return -ENOSCRIPTRESULT; }
+	if (!result) { return ENOSCRIPTRESULT; }
 
 	*value = result->result.boolVal == VARIANT_TRUE ? 1 : 0;
 
@@ -1130,7 +1443,8 @@ int wdGetBooleanScriptResult(ScriptResult* result, int* value)
 
 int wdGetElementScriptResult(ScriptResult* result, WebDriver* driver, WebElement** element)
 {
-	if (!result) { return -ENOSCRIPTRESULT; }
+	*element = NULL;
+	if (!result) { return ENOSCRIPTRESULT; }
 
 	IHTMLElement *node = (IHTMLElement*) result->result.pdispVal;
 	WebElement* toReturn = new WebElement();
@@ -1138,6 +1452,24 @@ int wdGetElementScriptResult(ScriptResult* result, WebDriver* driver, WebElement
 
 	*element = toReturn;
 
+	return SUCCESS;
+}
+
+int wdeMouseDownAt(HWND hwnd, long windowX, long windowY)
+{
+	mouseDownAt(hwnd, windowX, windowY);
+	return SUCCESS;
+}
+
+int wdeMouseUpAt(HWND hwnd, long windowX, long windowY)
+{
+	mouseUpAt(hwnd, windowX, windowY);
+	return SUCCESS;
+}
+
+int wdeMouseMoveTo(HWND hwnd, long duration, long fromX, long fromY, long toX, long toY)
+{
+	mouseMoveTo(hwnd, duration, fromX, fromY, toX, toY);
 	return SUCCESS;
 }
 

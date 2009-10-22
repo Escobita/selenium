@@ -1,14 +1,15 @@
+using System.Reflection;
 using NUnit.Core;
 using NUnit.Core.Extensibility;
-using OpenQa.Selenium;
-using System.Reflection;
+using OpenQa.Selenium.Environment;
 
 namespace OpenQa.Selenium
 {
 	[NUnitAddin(Description="Ignores a given test on a given browser")]
 	public class IgnoredBrowserTestDecorator : ITestDecorator, IAddin
 	{
-		private static readonly string IgnoreAttributeType = "OpenQa.Selenium.IgnoreBrowserAttribute";
+		private static readonly string IgnoreBrowserAttributeTypeFullName = 
+            typeof(IgnoreBrowserAttribute).FullName;
 
 		public bool Install(IExtensionHost host)
 		{
@@ -30,7 +31,7 @@ namespace OpenQa.Selenium
 				return test;
 
 			System.Attribute[] ignoreAttr = 
-                Reflect.GetAttributes( member, IgnoreAttributeType, true );
+                Reflect.GetAttributes( member, IgnoreBrowserAttributeTypeFullName, true );
 
 			if ( ignoreAttr == null )
 				return test;
@@ -48,12 +49,12 @@ namespace OpenQa.Selenium
 
                 Browser browser = (Browser)propVal;
 
-                if (browser.Equals(Environment.Instance.Browser) ||
+                if (browser.Equals(EnvironmentManager.Instance.Browser) ||
                     browser.Equals(Browser.ALL))
                 {   
                     testCase.RunState = RunState.Ignored;
                     testCase.IgnoreReason = "Ignoring browser " +
-                        Environment.Instance.Browser.ToString() + ".";
+                        EnvironmentManager.Instance.Browser.ToString() + ".";
                     
                     return testCase;
                 }

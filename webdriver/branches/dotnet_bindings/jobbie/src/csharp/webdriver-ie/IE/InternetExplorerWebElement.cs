@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace OpenQa.Selenium.IE
 {
-    class InternetExplorerWebElement : IWebElement
+    class InternetExplorerWebElement : IWebElement, ISearchContext
     {
 
         private ElementWrapper wrapper;
@@ -30,20 +30,20 @@ namespace OpenQa.Selenium.IE
         }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern int wdeGetElementName(ElementWrapper wrapper, ref StringWrapperHandle result);
-        public string ElementName
+        private static extern int wdeGetTagName(ElementWrapper wrapper, ref StringWrapperHandle result);
+        public string TagName
         {
             get
             {
                 StringWrapperHandle result = new StringWrapperHandle();
-                wdeGetElementName(wrapper, ref result);
+                wdeGetTagName(wrapper, ref result);
                 return result.Value;
             }
         }
 
         [DllImport("InternetExplorerDriver")]
         private static extern int wdeIsDisplayed(ElementWrapper handle, ref int displayed);
-        public bool Visible
+        public bool Displayed
         {
             get 
             {
@@ -75,20 +75,10 @@ namespace OpenQa.Selenium.IE
         }
 
         [DllImport("InternetExplorerDriver")]
-        private static extern int wdeGetDetailsOnceScrolledOnToScreen(ElementWrapper wrapper, ref IntPtr hwnd, ref int x, ref int y, ref int width, ref int height);
-        [DllImport("InternetExplorerDriver")]
-        private static extern void clickAt(IntPtr directInputTo, int x, int y);
+        private static extern int wdeClick(ElementWrapper wrapper);
         public void Click()
         {
-            int x = 0;
-            int y = 0;
-            int width = 0;
-            int height = 0;
-            IntPtr hwnd = new IntPtr();
-
-            wdeGetDetailsOnceScrolledOnToScreen(wrapper, ref hwnd, ref x, ref y, ref width, ref height);
-            clickAt(hwnd, x, y);
-            driver.WaitForLoadToComplete();
+            wdeClick(wrapper);
         }
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
@@ -100,7 +90,10 @@ namespace OpenQa.Selenium.IE
             return result.Value;
         }
 
-
+        public string Value
+        {
+            get { return GetAttribute("value"); }
+        }
 
 
         [DllImport("InternetExplorerDriver")]
@@ -112,14 +105,14 @@ namespace OpenQa.Selenium.IE
             get
             {
                 int selected = 0;
-                //TODO(andre.nogueira): Check return for errors
                 int result = wdeIsSelected(wrapper, ref selected);
+                ErrorHandler.VerifyErrorCode(result, "Checking if element is selected");
                 return (selected == 1);
             }
             set
             {
-                //TODO(andre.nogueira): Check return for errors
                 int result = wdeSetSelected(wrapper);
+                ErrorHandler.VerifyErrorCode(result, "(Un)selecting element");
             }
         }
 
@@ -129,21 +122,26 @@ namespace OpenQa.Selenium.IE
         {
             int toggled = 0;
             int result = wdeToggle(wrapper, ref toggled);
-            if (ErrorCodes.ENOTIMPLEMENTED.Equals(result))
-            {
-                throw new NotSupportedException("You may not toggle this element: " + ElementName);
-            }
+            ErrorHandler.VerifyErrorCode(result, "Toggling element");
             return (toggled == 1);
         }
 
         public List<IWebElement> FindElements(By by)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return by.FindElements(new Finder(driver, wrapper));
         }
 
         public IWebElement FindElement(By by)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return by.FindElement(new Finder(driver, wrapper));
         }
+
+        [DllImport("InternetExplorerDriver")]
+        private static extern int wdAddElementScriptArg(IntPtr scriptArgs, ElementWrapper handle);
+        public int AddToScriptArgs(IntPtr scriptArgs)
+        {
+            return wdAddElementScriptArg(scriptArgs, wrapper);
+        }
+
     }
 }

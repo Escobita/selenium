@@ -32,14 +32,17 @@ limitations under the License.
 #ifdef unix
  #include <sys/types.h>
  #include <unistd.h>
+ #include <stdlib.h>
 #else
  #include <io.h>
+ #include <comdef.h>
 #endif
 #include <stdio.h>
 #include <sys/timeb.h>
 #include <time.h>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 template <class _LOGGER> class Logger {
  public:
@@ -76,7 +79,7 @@ template <class _LOGGER> class Logger {
     static char severity[] = { 'F', 'E', 'W', 'I', 'D' };
     os_ << severity[level] << Time();
     if (level == logFATAL)
-      fatal_ = true, os_ << "FATAL ";
+      fatal_ = true, os_ << L"FATAL ";
     return os_;
   }
 
@@ -97,14 +100,14 @@ template <class _LOGGER> class Logger {
 
 class LOG : public Logger<LOG> {
  public:
-  static void File(const std::string& name) {
+  static void File(const std::string& name, const char* openMode = "w") {
     const std::string& file = Name(name);
     if (file == "stdout") {
-      LOG::File() = stdout;
+	  LOG::File() = stdout;
     } else if (file == "stderr") {
       LOG::File() = stderr;
     } else {
-      LOG::File() = fopen(file.c_str(), "w");
+      LOG::File() = fopen(file.c_str(), openMode);
     }
   }
 
@@ -157,8 +160,14 @@ class LOG : public Logger<LOG> {
  #pragma warning(pop)
 #endif
 
+
 #define LOG(LEVEL)                        \
   if (LOG::log ## LEVEL > LOG::Level()) ; \
-  else LOG().Stream(LOG::log ## LEVEL) /* << stuff here */
+  else LOG().Stream(LOG::log ## LEVEL) << __FILE__ << "(" << __LINE__ << ") " /* << stuff here */
+
+#ifdef _WIN32
+  #define LOGHR(LEVEL,HR) LOG( ## LEVEL) << HR<< " [" << (_bstr_t(_com_error((DWORD) HR).ErrorMessage())) << "]: "
+#endif
+
 
 #endif  // logging_h

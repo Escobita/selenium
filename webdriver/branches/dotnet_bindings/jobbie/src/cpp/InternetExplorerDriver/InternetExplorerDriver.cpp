@@ -19,13 +19,19 @@ limitations under the License.
 #include "StdAfx.h"
 #include "utils.h"
 #include "InternalCustomMessage.h"
-#include "jsxpath.h"
 #include "errorcodes.h"
+#include "logging.h"
+#include <mshtml.h>
+#include <SHLGUID.h>
 
 using namespace std;
+IeThread* g_IE_Thread = NULL;
 
 InternetExplorerDriver::InternetExplorerDriver() : p_IEthread(NULL)
 {
+	if (NULL == gSafe) {
+		gSafe = new safeIO();
+	}
 	SCOPETRACER
 	speed = 0;
 	
@@ -54,11 +60,10 @@ InternetExplorerDriver::~InternetExplorerDriver()
 IeThread* InternetExplorerDriver::ThreadFactory()
 {
 	SCOPETRACER
-	static IeThread* gThread = NULL;
-	if(!gThread) 
+	if(!g_IE_Thread) 
 	{
 		// Spawning the GUI worker thread, which will instantiate the ActiveX component
-		gThread = p_IEthread = new IeThread();
+		g_IE_Thread = p_IEthread = new IeThread();
 		p_IEthread->hThread = CreateThread (NULL, 0, (DWORD (__stdcall *)(LPVOID)) (IeThread::runProcessStatic), 
 					(void *)p_IEthread, 0, NULL);
 
@@ -68,18 +73,19 @@ IeThread* InternetExplorerDriver::ThreadFactory()
 		WaitForSingleObject(p_IEthread->sync_LaunchThread, 60000);
 	}
 
-	return gThread;
+	return g_IE_Thread;
 }
 
 void InternetExplorerDriver::close()
 {
 	SCOPETRACER
-	if (closeCalled)
+	if (closeCalled) {
 		return;
+	}
 
 	closeCalled = true;
 
-	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_QUIT_IE,)
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_CLOSEWINDOW,)
 }
 
 bool InternetExplorerDriver::getVisible()
@@ -134,42 +140,26 @@ void InternetExplorerDriver::goBack()
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GOBACK,)
 }
 
+std::wstring InternetExplorerDriver::getHandle()
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GET_HANDLE,);
+	return data.output_string_.c_str();
+}
+
+std::vector<std::wstring> InternetExplorerDriver::getAllHandles() 
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GET_HANDLES,);
+	return data.output_list_string_;
+}
+
 ElementWrapper* InternetExplorerDriver::getActiveElement()
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETACTIVEELEMENT,)
 	
 	return new ElementWrapper(this, data.output_html_element_);
-}
-
-int InternetExplorerDriver::selectElementByXPath(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element)
-{
-	SCOPETRACER
-	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTBYXPATH)
-
-	if (data.error_code != SUCCESS) { return data.error_code; };
-
-	*element = new ElementWrapper(this, data.output_html_element_);
-	return SUCCESS;
-}
-
-std::vector<ElementWrapper*>* InternetExplorerDriver::selectElementsByXPath(IHTMLElement *pElem, const wchar_t *input_string)
-{
-	SCOPETRACER
-	SEND_MESSAGE_ABOUT_ELEM(_WD_SELELEMENTSBYXPATH)
-
-	std::vector<ElementWrapper*> *toReturn = new std::vector<ElementWrapper*>();
-
-	if(data.output_long_) {std::wstring Err(L"Cannot find elements by Xpath"); throw Err;}
-
-	std::vector<IHTMLElement*>& allElems = data.output_list_html_element_;
-	std::vector<IHTMLElement*>::const_iterator cur, end = allElems.end();
-	for(cur = allElems.begin();cur < end; cur++)
-	{
-		IHTMLElement* elem = *cur;
-		toReturn->push_back(new ElementWrapper(this, elem));
-	}
-	return toReturn;
 }
 
 int InternetExplorerDriver::selectElementById(IHTMLElement *pElem, const wchar_t *input_string, ElementWrapper** element) 
@@ -372,6 +362,18 @@ bool InternetExplorerDriver::switchToFrame(LPCWSTR pathToFrame)
 	return data.output_bool_;
 }
 
+int InternetExplorerDriver::switchToWindow(LPCWSTR name)
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_SWITCHWINDOW, name)
+	
+	if (data.error_code == SUCCESS) {
+		closeCalled = false;
+	}
+
+	return data.error_code;
+}
+
 LPCWSTR InternetExplorerDriver::getCookies()
 {
 	SCOPETRACER
@@ -379,21 +381,26 @@ LPCWSTR InternetExplorerDriver::getCookies()
 	return data.output_string_.c_str();
 }
 
-void InternetExplorerDriver::addCookie(const wchar_t *cookieString)
+int InternetExplorerDriver::addCookie(const wchar_t *cookieString)
 {
 	SCOPETRACER
 	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_ADDCOOKIE, cookieString)
+
+	return data.error_code;
 }
 
 
 
-CComVariant& InternetExplorerDriver::executeScript(const wchar_t *script, SAFEARRAY* args, bool tryAgain)
+int InternetExplorerDriver::executeScript(const wchar_t *script, SAFEARRAY* args, CComVariant* result, bool tryAgain)
 {
 	SCOPETRACER
 	DataMarshaller& data = prepareCmData(script);
 	data.input_safe_array_ = args;
 	sendThreadMsg(_WD_EXECUTESCRIPT, data);
-	return data.output_variant_;
+
+	*result = data.output_variant_;
+
+	return data.error_code;
 }
 
 void InternetExplorerDriver::setSpeed(int speed)
@@ -415,13 +422,17 @@ bool InternetExplorerDriver::sendThreadMsg(UINT msg, DataMarshaller& data)
 	// NOTE(alexis.j.vuillemin): do not do here data.resetOutputs()
 	//   it has to be performed FROM the worker thread (see ON_THREAD_COMMON).
 	p_IEthread->PostThreadMessageW(msg, 0, 0);
-	DWORD res = WaitForSingleObject(data.synchronization_flag_, 60000);
+	DWORD res = WaitForSingleObject(data.synchronization_flag_, 120000);
 	data.resetInputs();
 	if(WAIT_TIMEOUT == res)
 	{
 		safeIO::CoutA("Unexpected TIME OUT.");
 		p_IEthread->m_EventToNotifyWhenNavigationCompleted = NULL;
-		std::wstring Err(L"Error: had to TIME OUT as a request to the worker thread did not complete after 1 min.");
+		std::wstring Err(L"Error: had to TIME OUT as a request to the worker thread did not complete after 2 min.");
+		if(p_IEthread->m_HeartBeatListener != NULL)
+		{
+			PostMessage(p_IEthread->m_HeartBeatListener, _WD_HB_CRASHED, 0 ,0 );
+		}
 		throw Err;
 	}
 	if(data.exception_caught_)

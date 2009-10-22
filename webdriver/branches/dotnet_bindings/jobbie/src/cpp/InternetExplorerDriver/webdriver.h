@@ -45,14 +45,17 @@ typedef struct StringWrapper StringWrapper;
 struct ElementCollection;
 typedef struct ElementCollection ElementCollection;
 
+struct StringCollection;
+typedef struct StringCollection StringCollection;
+
 // Memory management functions
 EXPORT int wdNewDriverInstance(WebDriver** result);
 EXPORT int wdFreeDriver(WebDriver* driver);
 EXPORT int wdeFreeElement(WebElement* element);
 EXPORT int wdFreeElementCollection(ElementCollection* collection, int alsoFreeElements);
+EXPORT int wdFreeStringCollection(StringCollection* collection);
 EXPORT int wdFreeScriptArgs(ScriptArgs* scriptArgs);
 EXPORT int wdFreeScriptResult(ScriptResult* scriptResult);
-
 
 // WebDriver functions
 EXPORT int wdNewDriverInstance(WebDriver** result);
@@ -73,15 +76,19 @@ EXPORT int wdGetCookies(WebDriver* driver, StringWrapper** result);
 EXPORT int wdAddCookie(WebDriver* driver, const wchar_t* cookie);
 
 EXPORT int wdSwitchToActiveElement(WebDriver* driver, WebElement** result);
+EXPORT int wdSwitchToWindow(WebDriver* driver, const wchar_t* name);
 EXPORT int wdSwitchToFrame(WebDriver* driver, const wchar_t* path);
 EXPORT int wdWaitForLoadToComplete(WebDriver* driver);
+
+EXPORT int wdGetAllWindowHandles(WebDriver* driver, StringCollection** handles);
+EXPORT int wdGetCurrentWindowHandle(WebDriver* driver, StringWrapper** handle);
 
 // Element functions
 EXPORT int wdeClick(WebElement* element);
 EXPORT int wdeGetAttribute(WebElement* element, const wchar_t* string, StringWrapper** result);
 EXPORT int wdeGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWrapper** result);
 EXPORT int wdeGetText(WebElement* element, StringWrapper** result);
-EXPORT int wdeGetElementName(WebElement* element, StringWrapper** result);
+EXPORT int wdeGetTagName(WebElement* element, StringWrapper** result);
 EXPORT int wdeIsSelected(WebElement* element, int* result);
 EXPORT int wdeSetSelected(WebElement* element);
 EXPORT int wdeToggle(WebElement* element, int* result);
@@ -121,24 +128,33 @@ EXPORT int wdNewScriptArgs(ScriptArgs** scriptArgs, int maxLength);
 EXPORT int wdAddStringScriptArg(ScriptArgs* scriptArgs, const wchar_t* arg);
 EXPORT int wdAddBooleanScriptArg(ScriptArgs* scriptArgs, int trueOrFalse);
 EXPORT int wdAddNumberScriptArg(ScriptArgs* scriptArgs, long number);
+EXPORT int wdAddDoubleScriptArg(ScriptArgs* scriptArgs, double number);
 EXPORT int wdAddElementScriptArg(ScriptArgs* scriptArgs, WebElement* element);
 EXPORT int wdExecuteScript(WebDriver* driver, const wchar_t* script, ScriptArgs* scriptArgs, ScriptResult** scriptResultRef);
 EXPORT int wdGetScriptResultType(ScriptResult* result, int* type);
 EXPORT int wdGetStringScriptResult(ScriptResult* result, StringWrapper** wrapper);
 EXPORT int wdGetNumberScriptResult(ScriptResult* result, long* value);
+EXPORT int wdGetDoubleScriptResult(ScriptResult* result, double* value);
 EXPORT int wdGetBooleanScriptResult(ScriptResult* result, int* value);
 EXPORT int wdGetElementScriptResult(ScriptResult* result, WebDriver* driver, WebElement** element);
 
 
 // Element collection functions
-EXPORT int wdcGetCollectionLength(ElementCollection* collection, int* length);
+EXPORT int wdcGetElementCollectionLength(ElementCollection* collection, int* length);
 EXPORT int wdcGetElementAtIndex(ElementCollection* collection, int index, WebElement** result);
+EXPORT int wdcGetStringCollectionLength(StringCollection* collection, int* length);
+EXPORT int wdcGetStringAtIndex(StringCollection* collection, int index, StringWrapper** result);
 
 
 // String manipulation functions
 EXPORT int wdStringLength(StringWrapper* string, int* length);
 EXPORT int wdFreeString(StringWrapper* string);
 EXPORT int wdCopyString(StringWrapper* source, int length, wchar_t* dest);
+
+// Things that should be interactions
+EXPORT int wdeMouseDownAt(HWND hwnd, long windowX, long windowY);
+EXPORT int wdeMouseUpAt(HWND hwnd, long windowX, long windowY);
+EXPORT int wdeMouseMoveTo(HWND hwnd, long duration, long fromX, long fromY, long toX, long toY);
 
 #ifdef __cplusplus
 }

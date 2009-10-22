@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 // IEThread.cpp : implementation file
-//
+
 
 #include "stdafx.h"
 #include <comdef.h>
@@ -25,13 +25,10 @@ limitations under the License.
 
 #include "errorcodes.h"
 #include "utils.h"
-
+#include "windowHandling.h"
 #include "InternalCustomMessage.h"
 
-extern wchar_t* XPATHJS[];
-
 using namespace std;
-
 
 void IeThread::OnGetVisible(WPARAM w, LPARAM lp)
 {
@@ -71,7 +68,12 @@ void IeThread::OnGetCurrentUrl(WPARAM w, LPARAM lp)
 	}
 
 	CComBSTR url;
-	doc->get_URL(&url);
+	HRESULT hr = doc->get_URL(&url);
+	if (FAILED(hr)) {
+//	HRLO(WARN, hr) << "Unable to get current URL";
+		ret = L"";
+		return;
+	}
 	ret = combstr2cw(url);
 }
 
@@ -87,21 +89,21 @@ void IeThread::OnGetUrl(WPARAM w, LPARAM lp)
 	CComVariant dummy;
 	tryTransferEventReleaserToNotifyNavigCompleted(&SC);
 	HRESULT hr = pBody->ieThreaded->Navigate2(&spec, &dummy, &dummy, &dummy, &dummy);
-
 	pBody->pathToFrame = L"";
 
 	try{
 	if(FAILED(hr))
 	{
+		_com_error e = _com_error(hr);
 		 _com_issue_error( hr );
 	}}
 	catch (_com_error &e)
 	 {
-	  cerr << "COM Error" << " J[" << hex << GetCurrentThreadId() << "]" << endl;
-	  cerr << "Message = " << e.ErrorMessage() << endl;
+	  LOG(WARN) << "COM Error" << " J[" << hex << GetCurrentThreadId() << "]" << endl;
+	  LOG(WARN) << "Message = " << e.ErrorMessage() << endl;
 
-		  if ( e.ErrorInfo() )
-			 cerr << e.Description() << endl;
+	  if ( e.ErrorInfo() )
+		 LOG(WARN) << e.Description() << endl;
 
 		tryTransferEventReleaserToNotifyNavigCompleted(&SC, false);
 	 }
@@ -124,14 +126,25 @@ void IeThread::getPageSource(std::wstring& res)
 	getDocument3(&doc);
 	
 	if (!doc) {
+		res = L"";
 		return;
 	}
 
 	CComPtr<IHTMLElement> docElement;
-	doc->get_documentElement(&docElement);
+	HRESULT hr = doc->get_documentElement(&docElement);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Unable to get document element from page";
+		res = L"";
+		return;
+	}
 	
 	CComBSTR html;
-	docElement->get_outerHTML(&html);
+	hr = docElement->get_outerHTML(&html);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Have document element but cannot read source.";
+		res = L"";
+		return;
+	}
 
 	res = combstr2cw(html);
 }
@@ -147,8 +160,20 @@ void IeThread::getTitle(std::wstring& res)
 {
 	CComPtr<IHTMLDocument2> doc;
 	getDocument(&doc);
+	
+	if (!doc) 
+	{
+		res = std::wstring(L"");
+		return;
+	}
+
 	CComBSTR title;
-	doc->get_title(&title);
+	HRESULT hr = doc->get_title(&title);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Unable to get document title";
+		res = L"";
+		return;
+	}
 	res = combstr2cw(title);
 }
 
@@ -174,6 +199,50 @@ void IeThread::OnGoBack(WPARAM w, LPARAM lp)
 	{
 		tryTransferEventReleaserToNotifyNavigCompleted(&SC, false);
 	}
+}
+
+void IeThread::OnGetHandle(WPARAM w, LPARAM lp)
+{
+	SCOPETRACER
+	ON_THREAD_COMMON(data);
+
+	HWND hwnd;
+	pBody->ieThreaded->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hwnd));
+
+	// Let's hope we fit into 8 characters
+	wchar_t buffer[9];
+	swprintf_s(buffer, 9, L"%08X", (long long) hwnd);
+	std::wstring& ret = data.output_string_;  
+	ret.append(buffer);
+}
+
+std::wstring getWindowHandle(IWebBrowser2* browser)
+{
+	HWND hwnd;
+	browser->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hwnd));
+
+	// Let's hope we fit into 8 characters
+	wchar_t buffer[9];
+	swprintf_s(buffer, 9, L"%08X", (long long) hwnd);
+	return std::wstring(buffer);
+}
+
+void IeThread::OnGetHandles(WPARAM w, LPARAM lp)
+{
+	SCOPETRACER
+	ON_THREAD_COMMON(data)
+
+	// Iterate over all the windows
+	std::vector<IWebBrowser2*> browsers;
+	getAllBrowsers(&browsers);
+	for (vector<IWebBrowser2*>::iterator curr = browsers.begin();
+		 curr != browsers.end();
+		 curr++) {
+			 data.output_list_string_.push_back(getWindowHandle(*curr));
+			 (*curr)->Release();
+	}
+
+	data.error_code = SUCCESS;
 }
 
 void IeThread::OnGetActiveElement(WPARAM w, LPARAM lp)
@@ -221,6 +290,22 @@ void IeThread::OnGetCookies(WPARAM w, LPARAM lp)
 	ret = combstr2cw(cookie); 
 }
 
+bool isHtmlPage(IHTMLDocument2* doc) 
+{
+	CComBSTR type;
+	if (!SUCCEEDED(doc->get_mimeType(&type))) 
+	{
+		return false;
+	}
+
+	if (!SUCCEEDED(type.ToLower())) 
+	{
+		return false;
+	}
+
+	return wcsstr(combstr2cw(type), L"html") != NULL;
+}
+
 void IeThread::OnAddCookie(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
@@ -230,7 +315,25 @@ void IeThread::OnAddCookie(WPARAM w, LPARAM lp)
 	CComPtr<IHTMLDocument2> doc;
 	getDocument(&doc);
 
-	doc->put_cookie(cookie);
+	if (!doc) 
+	{
+		data.output_string_ = L"Unable to locate document";
+		data.exception_caught_ = true;
+		return;
+	}
+
+	if (!isHtmlPage(doc)) 
+	{
+		data.output_string_ = L"Document is not an HTML page";
+		data.error_code = ENOSUCHDOCUMENT;
+		return;
+	}
+
+	if (!SUCCEEDED(doc->put_cookie(cookie))) 
+	{
+		data.output_string_ = L"Unable to add cookie to page";
+		data.exception_caught_ = true;
+	}
 }
 
 void IeThread::OnWaitForNavigationToFinish(WPARAM w, LPARAM lp)
@@ -248,209 +351,20 @@ void IeThread::OnExecuteScript(WPARAM w, LPARAM lp)
 	// TODO/MAYBE
 	// the input WebElement(s) may need to have their IHTMLElement QI-converted into IHTMLDOMNode
 
-	executeScript(data.input_string_, data.input_safe_array_, &(data.output_variant_));
+	CComVariant out;
+	int result = executeScript(data.input_string_, data.input_safe_array_, &out);
+	data.error_code = result;
 
-	if( VT_DISPATCH == data.output_variant_.vt )
+	if( VT_DISPATCH == out.vt )
 	{
-		CComQIPtr<IHTMLElement> element(data.output_variant_.pdispVal);
+		CComQIPtr<IHTMLElement> element(out.pdispVal);
 		if(element)
 		{
-			IHTMLElement* &pDom = * (IHTMLElement**) &(data.output_variant_.pdispVal);
+			IHTMLElement* &pDom = * (IHTMLElement**) &(out.pdispVal);
 			element.CopyTo(&pDom);
 		}
 	}
-}
-
-void IeThread::OnSelectElementByXPath(WPARAM w, LPARAM lp)
-{
-	SCOPETRACER
-	ON_THREAD_COMMON(data)
-	int &errorKind = data.error_code;
-	IHTMLElement* &pDom = data.output_html_element_; 
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
-
-	pDom = NULL;
-	errorKind = SUCCESS;
-
-	const bool inputElementWasNull = (!inputElement);
-
-	/// Start from root DOM by default
-	if(inputElementWasNull)
-	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
-		if (!root_doc) 
-		{
-			errorKind = -ENOSUCHDOCUMENT;
-			return;
-		}
-		root_doc->get_documentElement(&inputElement);
-	}
-
-	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
-	{
-		errorKind = -ENOSUCHELEMENT;
-		return;
-	}
-
-	////////////////////////////////////////////////////
-	bool evalToDocument = addEvaluateToDocument(node, 0);
-	if (!evalToDocument) 
-	{
-		errorKind = -EUNEXPECTEDJSERROR;
-		return;
-	}
-
-
-	std::wstring expr;
-	if (!inputElementWasNull)
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res.snapshotItem(0);};})();";
-	else
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res.snapshotItem(0);};})();";
-
-	CComVariant result;
-	CComBSTR expression = CComBSTR(data.input_string_);
-
-	SAFEARRAY* args = NULL;
-	if (!inputElementWasNull) {
-		args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-		long index = 1;
-		CComVariant dest2;   
-		CComQIPtr<IHTMLElement> element(const_cast<IHTMLDOMNode*>((IHTMLDOMNode*)node));
-		dest2.vt = VT_DISPATCH;
-		dest2.pdispVal = element;
-		SafeArrayPutElement(args, &index, &dest2);
-	} else {
-		args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-	}
-
-	long index = 0;
-	CComVariant dest;   
-	dest.vt = VT_BSTR;
-	dest.bstrVal = expression;
-	SafeArrayPutElement(args, &index, &dest);
-		
-	executeScript(expr.c_str(), args, &result);
-
-	if (result.vt == VT_DISPATCH) {
-		CComQIPtr<IHTMLElement> e(result.pdispVal);
-		
-		if (e && isOrUnder(node, e))
-		{
-			e.CopyTo(&pDom);
-			return; 
-		}
-	}
-
-	errorKind = -ENOSUCHELEMENT;
-}
-
-void IeThread::OnSelectElementsByXPath(WPARAM w, LPARAM lp)
-{
-	SCOPETRACER
-	ON_THREAD_COMMON(data)
-	CComPtr<IHTMLElement> inputElement(data.input_html_element_);
-	long &errorKind = data.output_long_;
-	std::vector<IHTMLElement*> &allElems = data.output_list_html_element_;
-
-	errorKind = 0;
-
-	const bool inputElementWasNull = (!inputElement);
-
-	/// Start from root DOM by default
-	if(inputElementWasNull)
-	{
-		CComPtr<IHTMLDocument3> root_doc;
-		getDocument3(&root_doc);
-		if (!root_doc) 
-		{
-			errorKind = 1;
-			return;
-		}
-		root_doc->get_documentElement(&inputElement);
-	}
-
-	CComQIPtr<IHTMLDOMNode> node(inputElement);
-	if (!node) 
-	{
-		errorKind = 1;
-		return;
-	}
-
-	////////////////////////////////////////////////////
-	bool evalToDocument = addEvaluateToDocument(node, 0);
-	if (!evalToDocument) 
-	{
-		errorKind = 2;
-		return;
-	}
-
-	std::wstring expr;
-	if (!inputElementWasNull)
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], arguments[1], null, 7, null); return res;};})();";
-	else
-		expr += L"(function() { return function() {var res = document.__webdriver_evaluate(arguments[0], document, null, 7, null); return res;};})();";
-
-	CComVariant result;
-	CComBSTR expression = CComBSTR(data.input_string_);
-	SAFEARRAY* args = SafeArrayCreateVector(VT_VARIANT, 0, 2);
-	
-	long index = 1;
-	CComVariant dest2;
-	CComQIPtr<IHTMLElement> element(const_cast<IHTMLDOMNode*>((IHTMLDOMNode*)node));
-	dest2.vt = VT_DISPATCH;
-	dest2.pdispVal = element;
-	SafeArrayPutElement(args, &index, &dest2);
-
-	index = 0;
-	CComVariant dest;
-	dest.vt = VT_BSTR;
-	dest.bstrVal = expression;
-	SafeArrayPutElement(args, &index, &dest);
-	
-	executeScript(expr.c_str(), args, &result);
-
-	// At this point, the result should contain a JS array of nodes.
-	if (result.vt != VT_DISPATCH) {
-		errorKind = 3;
-		return;
-	}
-
-	CComPtr<IHTMLDocument2> doc;
-	getDocument2(node, &doc);
-
-	CComPtr<IDispatch> scriptEngine;
-	doc->get_Script(&scriptEngine);
-
-	CComPtr<IDispatch> jsArray = result.pdispVal;
-	DISPID shiftId;
-	OLECHAR FAR* szMember = L"iterateNext";
-	result.pdispVal->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &shiftId);
-
-	DISPID lengthId;
-	szMember = L"snapshotLength";
-	result.pdispVal->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &lengthId);
-
-	DISPPARAMS parameters = {0};
-    parameters.cArgs = 0;
-	EXCEPINFO exception;
-
-	CComVariant lengthResult;
-	result.pdispVal->Invoke(lengthId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &parameters, &lengthResult, &exception, 0);
-
-	long length = lengthResult.lVal;
-
-	for (int i = 0; i < length; i++) {
-		CComVariant shiftResult;
-		result.pdispVal->Invoke(shiftId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, &shiftResult, &exception, 0);
-		if (shiftResult.vt == VT_DISPATCH) {
-			CComQIPtr<IHTMLElement> elem(shiftResult.pdispVal);
-			IHTMLElement *pDom = NULL;
-			elem.CopyTo(&pDom);
-			allElems.push_back(pDom);
-		}
-	}
+	data.output_variant_ = out;
 }
 
 void IeThread::getDocument3(const IHTMLDOMNode* extractFrom, IHTMLDocument3** pdoc) {
@@ -483,6 +397,11 @@ void IeThread::getDocument2(const IHTMLDOMNode* extractFrom, IHTMLDocument2** pd
 	*pdoc = doc.Detach();
 }
 
+void IeThread::getAllBrowsers(std::vector<IWebBrowser2*>* browsers)
+{
+	getBrowsers(browsers);
+}
+
 bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child) 
 {
 	CComQIPtr<IHTMLElement> parent(const_cast<IHTMLDOMNode*>(root));
@@ -491,20 +410,102 @@ bool IeThread::isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child)
 		return true;
 
 	VARIANT_BOOL toReturn;
-	parent->contains(child, &toReturn);
+	HRESULT hr = parent->contains(child, &toReturn);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot determine if parent contains child node";
+		return false;
+	}
 
 	return toReturn == VARIANT_TRUE;
 }
 
-void IeThread::OnQuitIE(WPARAM w, LPARAM lp)
+void IeThread::OnCloseWindow(WPARAM w, LPARAM lp)
 {
 	SCOPETRACER
 	NO_THREAD_COMMON
-	pBody->ieThreaded->Stop();
-	pBody->ieThreaded->Quit();
-	pBody->ieThreaded.Release();
+	if (FAILED(pBody->ieThreaded->Stop())) {
+	    LOG(INFO) << "Unable to stop IE instance";
+	}
+	if (FAILED(pBody->ieThreaded->Quit())) {
+	    LOG(WARN) << "Unable to quit IE instance.";
+	}
 }
 
+bool browserMatches(const wchar_t* name, IWebBrowser2* browser)
+{
+	CComPtr<IDispatch> dispatch;
+	HRESULT hr = browser->get_Document(&dispatch);
+	if (FAILED(hr)) {
+		return false;
+	}
+	CComQIPtr<IHTMLDocument2> doc(dispatch);
+	if (!doc) {
+		return false;
+	}
+
+	CComPtr<IHTMLWindow2> window;
+	hr = doc->get_parentWindow(&window);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+	CComBSTR windowName;
+	window->get_name(&windowName);
+
+	if (windowName == name) {
+		return true;
+	}
+
+	std::wstring handle = getWindowHandle(browser);
+
+	return handle == name;
+}
+
+void IeThread::OnSwitchToWindow(WPARAM w, LPARAM lp) 
+{
+	SCOPETRACER
+	ON_THREAD_COMMON(data)
+
+	LPCWSTR name = data.input_string_;
+
+	// Find the window
+	std::vector<IWebBrowser2*> browsers;
+	CComPtr<IWebBrowser2> instance;
+	getAllBrowsers(&browsers);
+	for (vector<IWebBrowser2*>::iterator curr = browsers.begin();
+		 curr != browsers.end();
+		 curr++) {
+			 if (!instance && browserMatches(name, *curr)) {
+				 instance = *curr;
+			 }
+			 (*curr)->Release();
+	}
+
+	if (!instance) {
+		data.error_code = ENOSUCHWINDOW;
+		return;
+	}
+
+	// Assuming we found it, release the current instance
+	pBody->mSink.ConnectionUnAdvise();
+	
+	// And attach ourselves
+	// TODO(simon): Are these next two lines doing exactly the same thing?
+	pBody->ieThreaded = instance;
+	pBody->mSink.p_Thread->pBody = pBody;
+	pBody->mSink.ConnectionAdvise();
+	if (false) {
+		LOG(WARN) << "Failed to advise new connection";
+	}
+	
+	CComQIPtr<IDispatch> dispatcher(pBody->ieThreaded);
+	if (!dispatcher) {
+		LOG(WARN) << "No dispathcer after switching";
+		return;
+	}
+
+	data.error_code = SUCCESS;
+}
 
 void IeThread::OnSwitchToFrame(WPARAM w, LPARAM lp)
 {

@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9,00"
 	Name="InternetExplorerDriver"
 	ProjectGUID="{0BC72326-88BE-4369-9077-74AA7B2BE15D}"
 	RootNamespace="InternetExplorerDriver"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
 			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
@@ -17,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\build"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\jobbie\build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)\jobbie\build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="1"
 			UseOfATL="1"
@@ -43,13 +47,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(JAVA_HOME)\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="false"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -70,6 +74,8 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -91,18 +97,99 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
+				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)\jobbie\build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)\jobbie\build\intermediate\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="1"
+			UseOfATL="1"
+			CharacterSet="1"
+			ManagedExtensions="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				MinimalRebuild="false"
+				ExceptionHandling="2"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				CallingConvention="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(NoInherit)"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				AssemblyDebug="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)\..&quot;"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\build"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\jobbie\build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)\jobbie\build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
+			UseOfMFC="1"
 			UseOfATL="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -124,11 +211,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(JAVA_HOME)\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				ExceptionHandling="2"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -150,6 +237,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -171,14 +260,97 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
+				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)\jobbie\build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)\jobbie\build\intermediate\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="1"
+			UseOfATL="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				ExceptionHandling="2"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(NoInherit)"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..&quot;"
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{87FA39A1-958E-478A-8AB9-6D5E5AAA3886}"
+			RelativePathToProject=".\common\src\cpp\webdriver-interactions\webdriver-interactions.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -223,10 +395,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\interactions.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\InternetExplorerDriver.cpp"
 				>
 			</File>
@@ -235,31 +403,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\utils.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\webdriver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\windowHandling.cpp"
 				>
 			</File>
 		</Filter>
@@ -274,10 +426,6 @@
 			</File>
 			<File
 				RelativePath=".\ElementWrapper.h"
-				>
-			</File>
-			<File
-				RelativePath=".\errorcodes.h"
 				>
 			</File>
 			<File
@@ -301,10 +449,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\interactions.h"
-				>
-			</File>
-			<File
 				RelativePath=".\InternalCustomMessage.h"
 				>
 			</File>
@@ -317,15 +461,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\logging.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ScopeTracer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
@@ -334,6 +470,10 @@
 			</File>
 			<File
 				RelativePath=".\webdriver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\windowHandling.h"
 				>
 			</File>
 		</Filter>

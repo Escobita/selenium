@@ -22,8 +22,9 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-
+#include "interaction_utils.h"
 #include "InternetExplorerDriver.h"
+#include "logging.h"
 
 
 // #define __VERBOSING_DLL__
@@ -45,20 +46,18 @@ limitations under the License.
 	DataMarshaller& data = prepareCmData(pElem, input_string); \
 	sendThreadMsg(message, data);
 
-void wait(long millis);
-void waitWithoutMsgPump(long millis);
-HWND getChildWindow(HWND hwnd, LPCTSTR name);
-
 struct StringWrapper;
 typedef struct StringWrapper StringWrapper;
 LPCWSTR combstr2cw(CComBSTR& from);
 LPCWSTR bstr2cw(BSTR& from);
 LPCWSTR comvariant2cw(CComVariant& toConvert);
-void wstring2string(const std::wstring& inp, std::string &out);
 void cw2string(LPCWSTR inp, std::string &out);
+void AppendValue(std::wstring& dest, long value);
+BSTR CopyBSTR(const BSTR& inp);
 
 long getLengthOf(SAFEARRAY* ary);
 
+bool checkValidDOM(IHTMLElement* r);
 
 char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn);
 void ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn, std::string &out);
@@ -77,11 +76,13 @@ class safeIO
 public:
 	safeIO();
 	CComCriticalSection m_cs_out;
-	static void CoutL(LPCWSTR str, bool showThread = false, int cc=0);
-	static void CoutA(LPCSTR str, bool showThread = false, int cc=0);
+	static void CoutL(LPCWSTR str, bool showThread = true, int cc=0);
+	static void CoutA(LPCSTR str, bool showThread = true, int cc=0);
+	static void CoutLong(long value);
+	static void CoutW(std::wstring& str, bool showThread = true, int cc=0);
 };
 
-extern safeIO gSafe;
+extern safeIO* gSafe;
 
 #endif
 

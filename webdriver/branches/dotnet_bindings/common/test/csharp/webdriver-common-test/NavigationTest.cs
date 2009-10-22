@@ -11,7 +11,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldNotHaveProblemNavigatingWithNoPagesBrowsed()
         {
-            GetFreshDriver();
+            CreateFreshDriver();
             INavigation navigation;
             navigation = driver.Navigate();
             navigation.Back();
@@ -24,8 +24,8 @@ namespace OpenQa.Selenium
             INavigation navigation;
             navigation = driver.Navigate();
 
-            driver.Get(macbethPage);
-            driver.Get(simpleTestPage);
+            driver.Url = macbethPage;
+            driver.Url = simpleTestPage;
             
             navigation.Back();
             Assert.AreEqual(driver.Title, macbethTitle);
@@ -35,14 +35,12 @@ namespace OpenQa.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE, "Crashes driver")]
         public void ShouldAcceptInvalidUrlsUsingStrings()
         {
             INavigation navigation;
             navigation = driver.Navigate();
 
             navigation.To("isidsji30342όϊώ®ιεµρ©ζ");
-            navigation.To((string)null);
             navigation.To("");
         }
 
@@ -90,9 +88,18 @@ namespace OpenQa.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.ALL)]
+        [IgnoreBrowser(Browser.IE, "Not implemented yet")]
         public void ShouldRefreshPage()
         {
+            driver.Url = javascriptPage;
+            IWebElement changedDiv = driver.FindElement(By.Id("dynamo"));
+            driver.FindElement(By.Id("updatediv")).Click();
+
+            Assert.AreEqual("Fish and chips!", changedDiv.Text);
+            driver.Navigate().Refresh();
+
+            changedDiv = driver.FindElement(By.Id("dynamo"));
+            Assert.AreEqual("What's for dinner?", changedDiv.Text);
         }
 
     }

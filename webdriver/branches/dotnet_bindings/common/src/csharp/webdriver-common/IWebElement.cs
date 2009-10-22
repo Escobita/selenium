@@ -6,7 +6,7 @@ namespace OpenQa.Selenium
 {
     public interface IWebElement
     {
-        string ElementName
+        string TagName
         {
             get;
         }
@@ -16,7 +16,12 @@ namespace OpenQa.Selenium
             get;
         }
 
-        bool Visible
+        string Value
+        {
+            get;
+        }
+
+        bool Displayed
         {
             get;
         }

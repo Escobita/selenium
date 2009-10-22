@@ -34,7 +34,6 @@ namespace OpenQa.Selenium
          *
          * @param url
          */
-        //TODO(andre.nogueira): Change URL
         void To(Uri url);
 
         /**

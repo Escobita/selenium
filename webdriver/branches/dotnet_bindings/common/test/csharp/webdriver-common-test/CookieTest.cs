@@ -1,58 +1,40 @@
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using NUnit.Framework;
+using NUnit.Framework.SyntaxHelpers;
+using OpenQa.Selenium.Internal;
 
 namespace OpenQa.Selenium
 {
     [TestFixture]
-    //TODO(andre.nogueira): refactor so we don't contact the driver for each check. (place Manage() and GetCookies() in a var)s
-    public class CookieTest : DriverTestFixture
+    public class CookieTest
     {
         [Test]
-        public void ShouldAddCookie()
+        public void CanCreateAWellFormedCookie()
         {
-            driver.Get(macbethPage);
-            Cookie cookie = new Cookie("cookie", "monster");
-            driver.Manage().AddCookie(cookie);
-            Assert.That(driver.Manage().GetCookies().ContainsKey(cookie.Name),
-                "Cookie was not added successfully");
+            new ReturnedCookie("Fish", "cod", "", "", DateTime.Now, false);
         }
 
         [Test]
-        public void ShouldDeleteCookie()
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ShouldThrowAnExceptionWhenSemiColonExistsInTheCookieAttribute()
         {
-            driver.Get(macbethPage);
-            Cookie cookieToDelete = new Cookie("chocolate", "rain");
-            Cookie cookieToKeep = new Cookie("canIHaz", "Cheeseburguer");
-            driver.Manage().AddCookie(cookieToDelete);
-            driver.Manage().AddCookie(cookieToKeep);
-            Dictionary<String, Cookie> cookies = driver.Manage().GetCookies();
-            driver.Manage().DeleteCookie(cookieToDelete);
-            cookies = driver.Manage().GetCookies();
-            Assert.IsFalse(cookies.ContainsKey(cookieToDelete.Name),
-                "Cookie was not deleted successfully");
-            Assert.IsTrue(cookies.ContainsKey(cookieToKeep.Name),
-                "Valid cookie was not returned");
+            new ReturnedCookie("hi;hi", "value", null, null, DateTime.Now, false);
         }
 
         [Test]
-        // TODO(andre.nogueira): Work not completed, still not working
-        public void ShouldDeleteCookieNamed()
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ShouldThrowAnExceptionTheNameIsNull()
         {
-            driver.Get(macbethPage);
-            Cookie cookieToDelete = new Cookie("answer", "42");
-            Cookie cookieToKeep = new Cookie("question", "dunno");
-            driver.Manage().AddCookie(cookieToDelete);
-            driver.Manage().AddCookie(cookieToKeep);
-            driver.Manage().DeleteCookieNamed(cookieToDelete.Name);
-            Dictionary<String, Cookie> cookies = driver.Manage().GetCookies();
-            Assert.IsTrue(cookies.ContainsKey(cookieToKeep.Name),
-                "Valid cookie was not returned");
-            Cookie deletedCookie;
-            cookies.TryGetValue(cookieToDelete.Name, out deletedCookie);
-            Assert.IsFalse(cookies.ContainsKey(cookieToDelete.Name),
-                "Cookie was not deleted successfully: " + deletedCookie.ToString());
+            new ReturnedCookie(null, "value", null, null, DateTime.Now, false);
+
+        }
+
+        [Test]
+        public void CookiesShouldAllowSecureToBeSet()
+        {
+            Cookie cookie = new ReturnedCookie("name", "value", "", "/", DateTime.Now, true);
+            Assert.IsTrue(cookie.Secure);
         }
     }
 }

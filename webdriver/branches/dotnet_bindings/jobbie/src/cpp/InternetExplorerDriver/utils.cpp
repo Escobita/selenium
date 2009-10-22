@@ -26,42 +26,7 @@ limitations under the License.
 
 using namespace std;
 
-safeIO gSafe;
-
-void wait(long millis)
-{
-	clock_t end = clock() + millis;
-	do {
-        MSG msg;
-		if (PeekMessage( &msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg); 
-			DispatchMessage(&msg); 
-		}
-		Sleep(0);
-	} while (clock() < end);
-}
-
-void waitWithoutMsgPump(long millis)
-{
-	Sleep(millis);
-}
-
-// "Internet Explorer_Server" + 1
-#define LONGEST_NAME 25
-
-HWND getChildWindow(HWND hwnd, LPCTSTR name)
-{
-	TCHAR pszClassName[LONGEST_NAME];
-	HWND hwndtmp = GetWindow(hwnd, GW_CHILD);
-	while (hwndtmp != NULL) {
-		::GetClassName(hwndtmp, pszClassName, LONGEST_NAME);
-		if (lstrcmp(pszClassName, name) == 0) {
-			return hwndtmp;
-		}
-		hwndtmp = GetWindow(hwndtmp, GW_HWNDNEXT);
-	}
-	return NULL;
-}
+safeIO* gSafe = NULL;
 
 LPCWSTR comvariant2cw(CComVariant& toConvert) 
 {
@@ -87,6 +52,16 @@ LPCWSTR comvariant2cw(CComVariant& toConvert)
 	}
 	return L"";
 }
+
+BSTR CopyBSTR(const BSTR& inp)
+{
+	if (inp != NULL)
+	{
+		return ::SysAllocStringByteLen((char*)inp, ::SysStringByteLen(inp));
+	}
+	return ::SysAllocStringByteLen(NULL, 0);
+}
+
 
 LPCWSTR combstr2cw(CComBSTR& from) 
 {
@@ -132,6 +107,12 @@ safeIO::safeIO()
 	m_cs_out.Init();
 	// LOG::File("C:/tmp/test.log");
 	LOG::Level("INFO");
+	LOG::Limit(10000000);
+}
+
+void safeIO::CoutW(std::wstring& str, bool showThread, int cc)
+{
+	safeIO::CoutL(str.c_str(), showThread, cc);
 }
 
 void safeIO::CoutL(LPCWSTR str, bool showThread, int cc)
@@ -145,7 +126,8 @@ void safeIO::CoutL(LPCWSTR str, bool showThread, int cc)
 void safeIO::CoutA(LPCSTR str, bool showThread, int cc)
 {
 #ifdef __VERBOSING_DLL__
-	gSafe.m_cs_out.Lock();
+	if (!gSafe) return;
+	gSafe->m_cs_out.Lock();
 	if(showThread)
 	{
 		DWORD thrID = GetCurrentThreadId();
@@ -166,9 +148,28 @@ void safeIO::CoutA(LPCSTR str, bool showThread, int cc)
 	{
 		LOG(INFO) << str;
 	}
-	gSafe.m_cs_out.Unlock();
+	gSafe->m_cs_out.Unlock();
 #endif
 }
+
+void AppendValue(std::wstring& dest, long value)
+{
+	wstringstream st;
+	st << value;
+	dest += st.str();
+}
+
+
+void safeIO::CoutLong(long value)
+{
+#ifdef __VERBOSING_DLL__
+	if (!gSafe) return;
+	gSafe->m_cs_out.Lock();
+	LOG(INFO) << value << " Hex=" << hex << value;
+	gSafe->m_cs_out.Unlock();
+#endif
+}
+
 
 char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn)
 {
@@ -189,11 +190,7 @@ char* ConvertLPCWSTRToLPSTR (LPCWSTR lpwszStrIn)
   }
   return pszOut;
 }
-
-inline void wstring2string(const std::wstring& inp, std::string &out)
-{
-	cw2string(inp.c_str(), out);
-} 
+ 
 
 void cw2string(LPCWSTR inp, std::string &out)
 {
@@ -206,3 +203,9 @@ void cw2string(LPCWSTR inp, std::string &out)
 	out = pszOut;
 	delete [] pszOut;
 } 
+
+bool checkValidDOM(IHTMLElement* r) {
+	if(r != NULL) return true;
+	safeIO::CoutA("IHTMLElement is null");
+	return false;
+}

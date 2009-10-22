@@ -21,6 +21,7 @@ limitations under the License.
 #include "stdafx.h"
 #include <comutil.h>
 
+#include "errorcodes.h"
 #include "logging.h"
 
 #include "utils.h"
@@ -29,14 +30,16 @@ limitations under the License.
 #include "windows.h"
 
 using namespace std;
-extern wchar_t* XPATHJS[];
+extern IeThread* g_IE_Thread;
 
 // IeThread
 
-IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0)
+IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0), m_HeartBeatTimerID(0),
+    m_NavigationCompletionTimerID(0)
 {
 	SCOPETRACER
 
+	m_HeartBeatListener = NULL;
 	m_EventToNotifyWhenNavigationCompleted = NULL;
 
 	HKEY key;
@@ -50,6 +53,8 @@ IeThread::IeThread() :  pBody(NULL), pIED(NULL), hThread(NULL), threadID(0)
 		 }
 	}
     RegCloseKey(key);
+
+	m_HeartBeatListener = FindWindow(NULL, L"__WebdriverHeartBeatListener__");
 }
 
 IeThread::~IeThread()
@@ -63,20 +68,24 @@ IeThread::~IeThread()
 	std::wstring& error = dataMarshaller.output_string_; \
 	try {b(pMsg->lParam, pMsg->wParam);} \
 	catch(std::wstring& content) { \
-		safeIO::CoutA("in catch1"); \
+		safeIO::CoutA("in catch1, content = "); \
 		dataMarshaller.exception_caught_ = true; \
 		error = L"Error in ["; \
 		error += L#b; \
 		error += L"] "; \
 		error += content; \
+		safeIO::CoutW(error); \
 	}\
 	catch(...) { \
 		safeIO::CoutA("in catch2"); \
 		dataMarshaller.exception_caught_ = true; \
 		error = L"Unhandled exception thrown in "; \
 		error += L#b; \
+		safeIO::CoutW(error); \
 	}\
 	return TRUE;}
+
+HWND IeThread::m_HeartBeatListener = 0;
 
 BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 {
@@ -101,7 +110,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETHEIGHT, OnElementGetHeight )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETWIDTH, OnElementGetWidth )
 
-	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETELEMENTNAME, OnElementGetElementName )
+	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETTAGNAME, OnElementGetTagName )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETATTRIBUTE, OnElementGetAttribute )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETVALUE, OnElementGetValue )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SENDKEYS, OnElementSendKeys )
@@ -115,6 +124,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SUBMIT, OnElementSubmit )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETCHILDRENWTAGNAME, OnElementGetChildrenWithTagName )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_RELEASE, OnElementRelease )
+	CUSTOM_MESSAGE_MAP ( _WD_ELEM_ISFRESH, OnIsElementFresh )
 
 	CUSTOM_MESSAGE_MAP ( _WD_GETVISIBLE, OnGetVisible )
 	CUSTOM_MESSAGE_MAP ( _WD_SETVISIBLE, OnSetVisible )
@@ -124,8 +134,8 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_GETURL, OnGetUrl )
 	CUSTOM_MESSAGE_MAP ( _WD_GOFORWARD, OnGoForward )
 	CUSTOM_MESSAGE_MAP ( _WD_GOBACK, OnGoBack )
-	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYXPATH, OnSelectElementByXPath )
-	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYXPATH, OnSelectElementsByXPath )
+	CUSTOM_MESSAGE_MAP ( _WD_GET_HANDLE, OnGetHandle )
+	CUSTOM_MESSAGE_MAP ( _WD_GET_HANDLES, OnGetHandles )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYID, OnSelectElementById )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTSBYID, OnSelectElementsById )
 	CUSTOM_MESSAGE_MAP ( _WD_SELELEMENTBYLINK, OnSelectElementByLink )
@@ -144,7 +154,8 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_WAITFORNAVIGATIONTOFINISH, OnWaitForNavigationToFinish )
 	CUSTOM_MESSAGE_MAP ( _WD_EXECUTESCRIPT, OnExecuteScript )
 	CUSTOM_MESSAGE_MAP ( _WD_GETACTIVEELEMENT, OnGetActiveElement )
-	CUSTOM_MESSAGE_MAP ( _WD_QUIT_IE, OnQuitIE )
+	CUSTOM_MESSAGE_MAP ( _WD_CLOSEWINDOW, OnCloseWindow )
+	CUSTOM_MESSAGE_MAP ( _WD_SWITCHWINDOW, OnSwitchToWindow )
 
 	 return FALSE;
 }
@@ -160,6 +171,9 @@ int IeThread::runProcess()
 	try{
 	SCOPETRACER
 	InitInstance();
+
+	// This will create the message pump
+	::PeekMessage(&curMsg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 
 	SetEvent(sync_LaunchThread);
 
@@ -185,15 +199,44 @@ int IeThread::runProcess()
 	return ExitInstance();
 }
 
+VOID CALLBACK HeartBeatTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) 
+{
+	if(IeThread::m_HeartBeatListener != NULL)
+	{
+		PostMessage(IeThread::m_HeartBeatListener, _WD_HB_BEAT, 0, 0);
+	}
+}
+
+VOID CALLBACK NavigationCompletionTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) 
+{
+	SCOPETRACER
+	safeIO::CoutA("g_IE_Thread =");
+	safeIO::CoutLong((long)(LONG_PTR)g_IE_Thread);
+	if(!g_IE_Thread) return;
+	if(idEvent != g_IE_Thread->m_NavigationCompletionTimerID)
+	{
+		safeIO::CoutLong((long)idEvent);
+		safeIO::CoutLong((long)(g_IE_Thread->m_NavigationCompletionTimerID));
+		return;
+	}
+	g_IE_Thread->waitForNavigateToFinish();
+}
+
 BOOL IeThread::InitInstance()
 {
 	SCOPETRACER
 	threadID = GetCurrentThreadId();
-	pBody = new IeThreadData;
+	pBody = new IeThreadData();
 
 	pBody->m_CmdData.output_string_.resize(5000);
 
 	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+
+	if(m_HeartBeatListener != NULL)
+	{
+		PostMessage(m_HeartBeatListener, _WD_HB_START, 0, 0);
+		m_HeartBeatTimerID = SetTimer(NULL, 0, 40000, HeartBeatTimer);
+	}
 
 	return TRUE;
 }
@@ -201,6 +244,18 @@ BOOL IeThread::InitInstance()
 int IeThread::ExitInstance()
 {
 	SCOPETRACER
+
+	if(m_HeartBeatListener != NULL)
+	{
+		if (m_HeartBeatTimerID)
+		{
+			KillTimer( NULL, m_HeartBeatTimerID);
+			m_HeartBeatListener = 0;
+		}
+		PostMessage(m_HeartBeatListener, _WD_HB_STOP, 0, 0);
+	}
+	stopNavigationCompletionTimer();
+
 	delete pBody;
 	pBody = NULL;
 	try{
@@ -243,20 +298,46 @@ void IeThread::OnStartIE(WPARAM w, LPARAM lp)
 	SCOPETRACER
 	NO_THREAD_COMMON
 	EventReleaser er(sync_LaunchIE);
+	if (pBody->ieThreaded) {
+		// TODO(simon): There's no way that this should be necessary.
+		// but it is when starting and quitting IE in a tight loop
+		LOG(DEBUG) << "IE instance already set. Clearing";
+		pBody->ieThreaded.Release();
+	} 
 	HRESULT hr = pBody->ieThreaded.CoCreateInstance(CLSID_InternetExplorer, NULL, CLSCTX_LOCAL_SERVER);
 
-	LOG(INFO) << "Has instanciated IE. Multithreaded version." ;
+	safeIO::CoutA("Has instanciated IE. Multithreaded version.");
 
 	if (!SUCCEEDED(hr))
 	{
-		std::wstring Err(L"Cannot create InternetExplorer instance");
-		throw Err;
+		std::wstring Err(L"Cannot create InternetExplorer instance, hr =");
+		AppendValue(Err, hr); 
+		safeIO::CoutW(Err, true);
+		if(m_HeartBeatListener != NULL) 
+		{
+			PostMessage(m_HeartBeatListener, _WD_HB_CRASHED, 0 ,0 );
+		}
+ 		throw Err;
 	}
 
 	pBody->mSink.p_Thread = this;
 	pBody->mSink.ConnectionAdvise();
+}
 
-	bringToFront();
+void IeThread::startNavigationCompletionTimer()
+{
+	SCOPETRACER
+	if(m_NavigationCompletionTimerID) return;
+	stopNavigationCompletionTimer();
+	m_NavigationCompletionTimerID = SetTimer(NULL, 0, 300, NavigationCompletionTimer);
+}
+
+void IeThread::stopNavigationCompletionTimer()
+{
+	SCOPETRACER
+	if(!m_NavigationCompletionTimerID) return;
+	KillTimer(NULL, m_NavigationCompletionTimerID);
+	m_NavigationCompletionTimerID = 0;
 }
 
 void IeThread::setVisible(bool isVisible)
@@ -287,41 +368,73 @@ void IeThread::getDocument(IHTMLDocument2** pdoc)
 	CComPtr<IHTMLWindow2> window;
 	findCurrentFrame(&window);
 
-	if (window)
-		window->get_document(pdoc);
+	if (window) {
+		HRESULT hr = window->get_document(pdoc);
+		if (FAILED(hr)) {
+			LOGHR(WARN, hr) << "Cannot get document";
+		}
+	}
 }
 
 void IeThread::getDefaultContentFromDoc(IHTMLWindow2 **result, IHTMLDocument2* doc)
 {
 	SCOPETRACER
 	CComQIPtr<IHTMLFramesCollection2> frames;
-	doc->get_frames(&frames);
+	HRESULT hr = doc->get_frames(&frames);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Unable to get frames from document";
+		return;
+	}
 
 	if (frames == NULL) {
-		doc->get_parentWindow(result);
+		hr = doc->get_parentWindow(result);
+		if (FAILED(hr)) 
+			LOGHR(WARN, hr) << "Unable to get parent window.";
 		return;
 	}
 
 	long length = 0;
-	frames->get_length(&length);
+	hr = frames->get_length(&length);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot determine length of frames";
+	}
 
 	if (!length) {
-		doc->get_parentWindow(result);
+		hr = doc->get_parentWindow(result);
+		if (FAILED(hr)) 
+			LOGHR(WARN, hr) << "Unable to get parent window.";
 		return;
 	}
 
-	CComQIPtr<IHTMLDocument3> doc3(doc);
+	CComPtr<IHTMLDocument3> doc3;
+	hr = doc->QueryInterface(&doc3);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Have document, but it's not the right type";
+		hr = doc->get_parentWindow(result);
+		if (FAILED(hr)) 
+			LOGHR(WARN, hr) << "Unable to get parent window.";
+		return;
+	}
 
 	CComPtr<IHTMLElementCollection> bodyTags;
 	CComBSTR bodyTagName(L"BODY");
-	doc3->getElementsByTagName(bodyTagName, &bodyTags);
+	hr = doc3->getElementsByTagName(bodyTagName, &bodyTags);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot locate body";
+		return;
+	}
 
 	long numberOfBodyTags = 0;
-	bodyTags->get_length(&numberOfBodyTags);
+	hr = bodyTags->get_length(&numberOfBodyTags);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Unable to establish number of tags seen";
+	}
 
 	if (numberOfBodyTags) {
 		// Not in a frameset. Return the current window
-		doc->get_parentWindow(result);
+		hr = doc->get_parentWindow(result);
+		if (FAILED(hr)) 
+			LOGHR(WARN, hr) << "Unable to get parent window.";
 		return;
 	}
 
@@ -330,7 +443,10 @@ void IeThread::getDefaultContentFromDoc(IHTMLWindow2 **result, IHTMLDocument2* d
 	index.lVal = 0;
 
 	CComVariant frameHolder;
-	frames->item(&index, &frameHolder);
+	hr = frames->item(&index, &frameHolder);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Unable to get frame at index 0";
+	}
 
 	frameHolder.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**) result);
 }
@@ -341,11 +457,17 @@ void IeThread::findCurrentFrame(IHTMLWindow2 **result)
 	SCOPETRACER
 	// Frame location is from _top. This is a good start
 	CComPtr<IDispatch> dispatch;
-	pBody->ieThreaded->get_Document(&dispatch);
-	if (!dispatch)
+	HRESULT hr = pBody->ieThreaded->get_Document(&dispatch);
+	if (FAILED(hr)) {
+		LOGHR(DEBUG, hr) << "Unable to get document";
 		return;
+	}
 
-	CComQIPtr<IHTMLDocument2> doc(dispatch);
+	CComPtr<IHTMLDocument2> doc;
+	hr = dispatch->QueryInterface(&doc);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Have document but cannot cast";
+	}
 
 	// If the current frame path is null or empty, find the default content
 	// The default content is either the first frame in a frameset or the body
@@ -394,8 +516,7 @@ void IeThread::findCurrentFrame(IHTMLWindow2 **result)
 			index.lVal = frameIndex;
 		} else {
 			// Alternatively, it's a name
-			index.vt = VT_BSTR;
-			index.bstrVal = frameName;
+			frameName.CopyTo(&index);
 		}
 
 		// Find the frame
@@ -429,14 +550,19 @@ void IeThread::getDocument3(IHTMLDocument3** pOutDoc)
 
 	CComPtr<IHTMLDocument2> doc2;
 	getDocument(&doc2);
+	if (!doc2) {	
+		return;
+	}
 
 	CComQIPtr<IHTMLDocument3> doc(doc2);
-	*pOutDoc = doc.Detach();
+	if (doc)
+		*pOutDoc = doc.Detach();
 }
 
 
 bool IeThread::getEval(IHTMLDocument2* doc, DISPID* evalId, bool* added)
 {
+	SCOPETRACER
 	CComPtr<IDispatch> scriptEngine;
 	doc->get_Script(&scriptEngine);
 
@@ -446,7 +572,10 @@ bool IeThread::getEval(IHTMLDocument2* doc, DISPID* evalId, bool* added)
 		*added = true;
 		// Start the script engine by adding a script tag to the page
 		CComPtr<IHTMLElement> scriptTag;
-		doc->createElement(L"<span>", &scriptTag);
+		hr = doc->createElement(L"span", &scriptTag);
+		if (FAILED(hr)) {
+			LOGHR(WARN, hr) << "Failed to create span tag";
+		}
 		CComBSTR addMe(L"<span id='__webdriver_private_span'>&nbsp;<script defer></script></span>");
 		scriptTag->put_innerHTML(addMe);
 
@@ -480,15 +609,31 @@ void IeThread::removeScript(IHTMLDocument2* doc)
 
 	CComPtr<IHTMLElement> element;
 	CComBSTR id(L"__webdriver_private_span");
-	doc3->getElementById(id, &element);
+	HRESULT hr = doc3->getElementById(id, &element);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot find the script tag. Bailing.";
+		return;
+	}
 
 	CComQIPtr<IHTMLDOMNode> elementNode(element);
 
 	if (elementNode) {
 		CComPtr<IHTMLElement> body;
-		doc->get_body(&body);
+		hr = doc->get_body(&body);
+		if (FAILED(hr)) {
+			LOGHR(WARN, hr) << "Cannot locate body of document";
+			return;
+		}
 		CComQIPtr<IHTMLDOMNode> bodyNode(body);
-		bodyNode->removeChild(elementNode, NULL);
+		if (!bodyNode) {
+			LOG(WARN) << "Cannot cast body to a standard html node";
+			return;
+		}
+		CComPtr<IHTMLDOMNode> removed;
+		hr = bodyNode->removeChild(elementNode, &removed);
+		if (FAILED(hr)) {
+			LOGHR(DEBUG, hr) << "Cannot remove child node. Shouldn't matter. Bailing";
+		}
 	}
 }
 
@@ -496,21 +641,25 @@ bool IeThread::createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, c
 {
 	CComVariant script_variant(script);
 	DISPPARAMS parameters = {0};
-    parameters.cArgs = 1;
-    parameters.rgvarg = &script_variant;
+    memset(&parameters, 0, sizeof parameters);
+	parameters.cArgs      = 1;
+	parameters.rgvarg     = &script_variant;
+	parameters.cNamedArgs = 0;
+
 	EXCEPINFO exception;
+	memset(&exception, 0, sizeof exception);
 
 	HRESULT hr = scriptEngine->Invoke(evalId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, result, &exception, 0);
 	if (FAILED(hr)) {
 	  if (DISP_E_EXCEPTION == hr) {
-		  wcerr << "Exception message was: " << exception.bstrDescription << endl;
+		  LOGHR(INFO, hr) << "Exception message was: " << _bstr_t(exception.bstrDescription) << ": " << _bstr_t(script);
 	  } else {
-		  wcerr << "Error code: " << GetLastError() << ". Failed to compile: " << script << endl;
-	  }
+		  LOGHR(DEBUG, hr) << "Failed to compile: " << script;
+	}
 
   	  if (result) {
 		  result->vt = VT_USERDEFINED;
-		  result->bstrVal = exception.bstrDescription;
+		  result->bstrVal = CopyBSTR(exception.bstrDescription);
 	  }
 
 	  return false;
@@ -520,52 +669,77 @@ bool IeThread::createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, c
 }
 
 
-void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *result, bool tryAgain)
+int IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT* result, bool tryAgain)
 {
 	SCOPETRACER
+
+	VariantClear(result);
+
 	CComPtr<IHTMLDocument2> doc;
 	getDocument(&doc);
+	if (!doc) {
+		LOG(WARN) << "Unable to get document reference";
+		return EUNEXPECTEDJSERROR;
+	}
 
 	CComPtr<IDispatch> scriptEngine;
-	doc->get_Script(&scriptEngine);
+	HRESULT hr = doc->get_Script(&scriptEngine);
+	if (FAILED(hr)) {
+		LOGHR(WARN, hr) << "Cannot obtain script engine";
+		return EUNEXPECTEDJSERROR;
+	}
 
 	DISPID evalId;
 	bool added;
 	bool ok = getEval(doc, &evalId, &added);
 
 	if (!ok) {
-		wcerr << L"Unable to locate eval method" << endl;
-		return;
+		LOG(WARN) << "Unable to locate eval method";
+		if (added) { removeScript(doc); }
+		return EUNEXPECTEDJSERROR;
 	}
 
 	CComVariant tempFunction;
 	if (!createAnonymousFunction(scriptEngine, evalId, script, &tempFunction)) {
-		wcerr << L"Cannot create anonymous function: " << script << endl;
+		// Debug level since this is normally the point we find out that 
+		// a page refresh has occured. *sigh*
+		LOG(DEBUG) << "Cannot create anonymous function: " << _bstr_t(script) << endl;
 		if (added) { removeScript(doc); }
-		return;
+		return EUNEXPECTEDJSERROR;
 	}
 
 	if (tempFunction.vt != VT_DISPATCH) {
+		// No return value that we care about
+		VariantClear(result);
+		result->vt = VT_EMPTY;
 		if (added) { removeScript(doc); }
-		return;
+		return SUCCESS;
 	}
 
 	// Grab the "call" method out of the returned function
 	DISPID callid;
 	OLECHAR FAR* szCallMember = L"call";
-    HRESULT hr3 = tempFunction.pdispVal->GetIDsOfNames(IID_NULL, &szCallMember, 1, LOCALE_USER_DEFAULT, &callid);
-	if (FAILED(hr3)) {
-		wcerr << L"Cannot locate call method on anonymous function: " << script << endl;
+    hr = tempFunction.pdispVal->GetIDsOfNames(IID_NULL, &szCallMember, 1, LOCALE_USER_DEFAULT, &callid);
+	if (FAILED(hr)) {
+		if (added) { removeScript(doc); }
+		LOGHR(DEBUG, hr) << "Cannot locate call method on anonymous function: " << _bstr_t(script) << endl;
+		return EUNEXPECTEDJSERROR;
 	}
 
 	DISPPARAMS callParameters = { 0 };
+	memset(&callParameters, 0, sizeof callParameters);
 	int nargs = getLengthOf(args);
 	callParameters.cArgs = nargs + 1;
 
 	CComPtr<IHTMLWindow2> win;
-	doc->get_parentWindow(&win);
+	hr = doc->get_parentWindow(&win);
+	if (FAILED(hr)) {
+		if (added) { removeScript(doc); }
+		LOGHR(WARN, hr) << "Cannot get parent window";
+		return EUNEXPECTEDJSERROR;
+	}
 	_variant_t *vargs = new _variant_t[nargs + 1];
-	vargs[nargs] = CComVariant(win);
+	VariantCopy(&(vargs[nargs]), &CComVariant(win));
 
 	long index;
     for (int i = 0; i < nargs; i++)
@@ -573,36 +747,44 @@ void IeThread::executeScript(const wchar_t *script, SAFEARRAY* args, VARIANT *re
 		index = i;
 		CComVariant v;
 		SafeArrayGetElement(args, &index, (void*) &v);
-		vargs[nargs - 1 - i] = new _variant_t(v);
+		VariantCopy(&(vargs[nargs - 1 - i]), &v);
     }
 
 	callParameters.rgvarg = vargs;
 
 	EXCEPINFO exception;
-	HRESULT hr4 = tempFunction.pdispVal->Invoke(callid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &callParameters, result, &exception, 0);
-	if (FAILED(hr4)) {
-	  if (DISP_E_EXCEPTION == hr4) {
-		  wcerr << L"Exception message was: " << exception.bstrDescription << endl;
+	memset(&exception, 0, sizeof exception);
+	hr = tempFunction.pdispVal->Invoke(callid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &callParameters, 
+		result,
+		&exception, 0);
+	if (FAILED(hr)) {
+	  CComBSTR errorDescription(exception.bstrDescription);
+	  if (DISP_E_EXCEPTION == hr) {
+		  LOG(INFO) << "Exception message was: " << _bstr_t(exception.bstrDescription);
 	  } else {
-		  wcerr << L"Failed to execute: " << script << endl;
+		  LOGHR(DEBUG, hr) << "Failed to execute: " << _bstr_t(script);
+		  if (added) { removeScript(doc); }
+		  return EUNEXPECTEDJSERROR;
 	  }
-
-	  if (result) {
-		  result->vt = VT_USERDEFINED;
-		  result->bstrVal = exception.bstrDescription;
-	  }
+	  
+	  VariantClear(result);
+	  result->vt = VT_USERDEFINED;
+	  result->bstrVal = CopyBSTR(exception.bstrDescription);
+	  wcout << _bstr_t(exception.bstrDescription) << endl;
 	}
 
 	if (added) { removeScript(doc); }
 
 	delete[] vargs;
+
+	return SUCCESS;
 }
 
 
 HWND IeThread::getHwnd()
 {
 	SCOPETRACER
-	HWND hWnd;
+	HWND hWnd = NULL;
 	pBody->ieThreaded->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&hWnd));
 
 	DWORD ieWinThreadId = GetWindowThreadProcessId(hWnd, NULL);
@@ -613,7 +795,6 @@ HWND IeThread::getHwnd()
     }
 
 	SetActiveWindow(hWnd);
-	SetFocus(hWnd);
 
 	if( ieWinThreadId != currThreadId )
     {
@@ -623,6 +804,16 @@ HWND IeThread::getHwnd()
 	return hWnd;
 }
 
+bool IeThread::isStillBusy()
+{
+	VARIANT_BOOL busy;
+ 
+	HRESULT hr = pBody->ieThreaded->get_Busy(&busy);
+	if (FAILED(hr)) {
+		return true;
+	}
+	return (busy == VARIANT_TRUE);
+}
 
 void IeThread::waitForNavigateToFinish()
 {
@@ -636,45 +827,72 @@ void IeThread::waitForNavigateToFinish()
 	SCOPETRACER
 	alreadyInsideWFNTF = true;
 	CScopeSetter<bool> S(&alreadyInsideWFNTF, false);
-	VARIANT_BOOL busy;
-
 
 	HRESULT hr;
 
-	pBody->ieThreaded->get_Busy(&busy);
-	if(busy == VARIANT_TRUE)
+	if (isStillBusy())
 	{
 		safeIO::CoutA("still busy", true);
+		startNavigationCompletionTimer();
 		return;
 	}
-
 
 	safeIO::CoutA("IE is not busy", true);
 
 	READYSTATE readyState;
-	pBody->ieThreaded->get_ReadyState(&readyState);
+	hr = pBody->ieThreaded->get_ReadyState(&readyState);
+	if (FAILED(hr)) {
+		LOGHR(DEBUG, hr) << "Unable to get ready state";
+		startNavigationCompletionTimer();
+		return;
+	}
 	int counter = 0;
 	if(readyState != READYSTATE_COMPLETE)
 	{
-		safeIO::CoutA("not ready yet", true);
+		safeIO::CoutLong(readyState);
+		startNavigationCompletionTimer();
 		return;
 	}
 
 	safeIO::CoutA("IE is READY", true);
 
 	CComPtr<IDispatch> dispatch;
-	pBody->ieThreaded->get_Document(&dispatch);
+	hr = pBody->ieThreaded->get_Document(&dispatch);
+	if (FAILED(hr)) {
+		LOGHR(DEBUG, hr) << "Unable to get document";
+		startNavigationCompletionTimer();
+		return;
+	}
 	CComQIPtr<IHTMLDocument2> doc(dispatch);
+	if (!doc) {
+		LOG(DEBUG) << "Document obtained but cannot cast";
+		startNavigationCompletionTimer();
+		return;
+	}
 
-	waitForDocumentToComplete(doc);
+	if (0==waitForDocumentToComplete(doc)) 
+	{
+		safeIO::CoutA("doc not complete yet", true);
+		startNavigationCompletionTimer();
+		return;
+	}
 
 	CComPtr<IHTMLFramesCollection2> frames;
 	hr = doc->get_frames(&frames);
-
+	if (FAILED(hr)) {
+		LOGHR(DEBUG, hr) << "Unable to obtain frames";
+		startNavigationCompletionTimer();
+		return;
+	}
 
 	if (frames != NULL) {
 		long framesLength = 0;
-		frames->get_length(&framesLength);
+		hr = frames->get_length(&framesLength);
+		if (FAILED(hr)) {
+			LOGHR(DEBUG, hr) << "Frame length is unknown";
+			startNavigationCompletionTimer();
+			return;
+		}
 
 		CComVariant index;
 		index.vt = VT_I4;
@@ -682,91 +900,69 @@ void IeThread::waitForNavigateToFinish()
 		for (long i = 0; i < framesLength; i++) {
 			index.lVal = i;
 			CComVariant result;
-			frames->item(&index, &result);
+			hr = frames->item(&index, &result);
+			if (FAILED(hr)) {
+				LOGHR(DEBUG, hr) << "Cannot obtain frame at index: " << i;
+				startNavigationCompletionTimer();
+				return;
+			}
 
 			CComQIPtr<IHTMLWindow2> window(result.pdispVal);
+			if (!window) {
+				LOG(DEBUG) << "Window at frame index " << i << " is not HTML. Skipping.";
+				continue;
+			}
 			CComPtr<IHTMLDocument2> frameDoc;
-			window->get_document(&frameDoc);
+			hr = window->get_document(&frameDoc);
+			if (FAILED(hr)) {
+				LOGHR(DEBUG, hr) << "No document in subframe though one expected";
+				startNavigationCompletionTimer();
+				return;
+			}
 
-			waitForDocumentToComplete(frameDoc);
+			if (0==waitForDocumentToComplete(frameDoc))
+			{
+				safeIO::CoutA("frame not complete yet", true);
+				startNavigationCompletionTimer();
+				return;
+			}
 		}
 	}
 
 	tryNotifyNavigCompleted();
 }
 
-void IeThread::waitForDocumentToComplete(IHTMLDocument2* doc)
+// returns 1 if it is complete, 0 if incomplete.
+int IeThread::waitForDocumentToComplete(IHTMLDocument2* doc)
 {
 	SCOPETRACER
 	CComBSTR state;
 
 	if (!doc) {
 		// There's no way to tell what's meant to happen. Bail
-		return;
+		return 1;
 	}
 
 	HRESULT hr = doc->get_readyState(&state);
-
-	int counter = 0;
-	while ( _wcsicmp( combstr2cw(state) , L"complete") != 0) {
-		counter++;
-		waitWithoutMsgPump(50);
-		state.Empty();
-		hr = doc->get_readyState(&state);
-		if(counter > 60 && !SUCCEEDED(hr))
-		{
-			safeIO::CoutA("Error: failed to call get_readyState", true);
-			break;
-		}
-	}
-}
-
-bool IeThread::addEvaluateToDocument(const IHTMLDOMNode* node, int count)
-{
-	SCOPETRACER
-
-	// Is there an evaluate method on the document?
-	CComPtr<IHTMLDocument2> doc;
-	getDocument2(node, &doc);
-
-	if (!doc) {
-		cerr << "No HTML document found" << endl;
-		return false;
-	}
-
-	CComPtr<IDispatch> evaluate;
-	DISPID dispid;
-	OLECHAR FAR* szMember = L"__webdriver_evaluate";
-    HRESULT hr = doc->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &dispid);
-	if (SUCCEEDED(hr)) {
-		return true;
-	}
-
-	// Create it if necessary
-	CComPtr<IHTMLWindow2> win;
-	doc->get_parentWindow(&win);
-
-	std::wstring script;
-	for (int i = 0; XPATHJS[i]; i++) {
-		script += XPATHJS[i];
-	}
-	executeScript(script.c_str(), NULL, NULL);
-
-	hr = doc->GetIDsOfNames(IID_NULL, &szMember, 1, LOCALE_USER_DEFAULT, &dispid);
+	hr = doc->get_readyState(&state);
 	if (FAILED(hr)) {
-		cerr << "After attempting to add the xpath engine, the evaluate method is still missing" << endl;
-		if (count < 1) {
-			return addEvaluateToDocument(node, ++count);
-		}
-
-		return false;
+		LOGHR(DEBUG, hr) << "Unable to obtain document's ready state";
+		return 0;
 	}
-	return true;
+	if ( _wcsicmp( combstr2cw(state) , L"complete") != 0) {
+		// Still NOT complete
+		safeIO::CoutL(combstr2cw(state), true);
+		return 0;
+	}
+
+	return 1;
 }
 
 void IeThread::tryNotifyNavigCompleted()
 {
 	SCOPETRACER
+
+	stopNavigationCompletionTimer();
 	if(m_EventToNotifyWhenNavigationCompleted)
 	{
 		HANDLE h = m_EventToNotifyWhenNavigationCompleted;
@@ -786,6 +982,5 @@ void IeThread::tryTransferEventReleaserToNotifyNavigCompleted(CScopeCaller *pSC,
 	sc.m_releaseOnDestructor = !setETNWNC;
 	m_EventToNotifyWhenNavigationCompleted = (setETNWNC) ? sc.getSync() : NULL;
 }
-
 
 
