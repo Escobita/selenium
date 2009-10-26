@@ -1438,7 +1438,7 @@ security certificate.
 Supporting Additional Browsers and Browser Configurations
 ---------------------------------------------------------
 The Selenium API supports running against multiple browsers in addition to 
-Internet Explorer and Mozilla Firefox.  The the SeleniumHQ.org website for
+Internet Explorer and Mozilla Firefox.  See the SeleniumHQ.org website for
 supported browsers.  In addition, when a browser is not directly supported,
 you may still run your Selenium tests against a browser of your choosing by
 using the "\*custom" run-mode (i.e. in place of \*firefox or \*iexplore) when 
