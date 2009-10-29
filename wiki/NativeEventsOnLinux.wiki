@@ -8,10 +8,12 @@ This page details how native events for Firefox on Linux were implemented. Basic
 Not all window managers were born equal. Specifically, because of focus stealing, some scenarios of window switching will fail with some window managers.
 == Window managers known to work ==
  * GNOME
+ * KDE
 == Window managers known not to work ==
  * Enlightment / E16 - Switching to a newly opened window is broken.
  * TWM - The same as Enlightment / E16.
- * AfterStep - Breaks on focus remaining in the original window when opening a new one.
+ * AfterStep - The same as Enlightment / E16.
+ * WindowMaker - Breaks on focus remaining in the original window when opening a new one.
 = Purpose and scope =
 == Existing State ==
 When this task started, WebDriver already has user emulation via Javascript on all platforms it was supported and support for native events on Windows for Firefox. Hence, it had all of the code for getting native code running from within a Firefox extension on windows.
