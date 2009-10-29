@@ -260,25 +260,22 @@ public class HttpCommandExecutor implements CommandExecutor {
       if ("sessionId".equals(propertyName)) {
         return command.getSessionId().toString();
       }
+
       if ("context".equals(propertyName)) {
         return command.getContext().toString();
       }
 
       // Attempt to extract the property name from the parameters
-      if (command.getParameters().length > 0 && command.getParameters()[0] instanceof Map) {
-        Object value = ((Map) command.getParameters()[0]).get(propertyName);
-        if (value != null) {
-          try {
-            return URLEncoder.encode(String.valueOf(value), "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            // Can never happen. UTF-8 ships with java
-            return String.valueOf(value);
-          }
+      Object value = command.getParameters().get(propertyName);
+      if (value != null) {
+        try {
+          return URLEncoder.encode(String.valueOf(value), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          // Can never happen. UTF-8 ships with java
+          return String.valueOf(value);
         }
-        return null;
       }
-
-      throw new IllegalArgumentException("Cannot determine property: " + propertyName);
+      return null;
     }
   }
 }

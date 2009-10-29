@@ -20,6 +20,7 @@ limitations under the License.
 package org.openqa.selenium.remote;
 
 import org.openqa.selenium.RenderedWebElement;
+import static org.openqa.selenium.remote.DriverCommand.*;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -29,13 +30,13 @@ import java.util.Map;
 
 public class RenderedRemoteWebElement extends RemoteWebElement implements RenderedWebElement {
   public boolean isDisplayed() {
-    Response response = parent.execute(DriverCommand.IS_ELEMENT_DISPLAYED, ImmutableMap.of("id", id));
+    Response response = parent.execute(IS_ELEMENT_DISPLAYED, ImmutableMap.of("id", id));
     return (Boolean) response.getValue();
   }
 
   @SuppressWarnings({"unchecked"})
   public Point getLocation() {
-    Response response = parent.execute(DriverCommand.GET_ELEMENT_LOCATION, ImmutableMap.of("id", id));
+    Response response = parent.execute(GET_ELEMENT_LOCATION, ImmutableMap.of("id", id));
     Map<String, Object> rawPoint = (Map<String, Object>) response.getValue();
     int x = ((Long) rawPoint.get("x")).intValue();
     int y = ((Long) rawPoint.get("y")).intValue();
@@ -44,7 +45,7 @@ public class RenderedRemoteWebElement extends RemoteWebElement implements Render
 
   @SuppressWarnings({"unchecked"})
   public Dimension getSize() {
-    Response response = parent.execute(DriverCommand.GET_ELEMENT_SIZE, ImmutableMap.of("id", id));
+    Response response = parent.execute(GET_ELEMENT_SIZE, ImmutableMap.of("id", id));
     Map<String, Object> rawSize = (Map<String, Object>) response.getValue();
     int width = ((Long) rawSize.get("width")).intValue();
     int height = ((Long) rawSize.get("height")).intValue();
@@ -52,11 +53,12 @@ public class RenderedRemoteWebElement extends RemoteWebElement implements Render
   }
 
   public void hover() {
-    parent.execute(DriverCommand.HOVER_OVER_ELEMENT, ImmutableMap.of("id", id));
+    parent.execute(HOVER_OVER_ELEMENT, ImmutableMap.of("id", id));
   }
 
   public void dragAndDropBy(int moveRightBy, int moveDownBy) {
-    parent.execute(DriverCommand.DRAG_ELEMENT, ImmutableMap.of("id", id), moveRightBy, moveDownBy);
+    parent.execute(DRAG_ELEMENT, ImmutableMap.of(
+        "id", id, "x", moveRightBy, "y", moveDownBy));
   }
 
   public void dragAndDropOn(RenderedWebElement element) {
@@ -66,7 +68,7 @@ public class RenderedRemoteWebElement extends RemoteWebElement implements Render
   }
 
   public String getValueOfCssProperty(String propertyName) {
-    Response response = parent.execute(DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
+    Response response = parent.execute(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
         ImmutableMap.of("id", id, "propertyName", propertyName));
     return (String) response.getValue();
   }

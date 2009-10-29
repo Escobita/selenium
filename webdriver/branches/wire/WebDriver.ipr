@@ -3,21 +3,7 @@
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
   </component>
-  <component name="BlazePluginSettings" buildBeforeRefresh="true" />
-  <component name="Build editor project-level loader">
-    <settings>
-      <class-settings class="com.google.devtools.intellig.configcheck.ClearOutputChecker" />
-      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker">
-        <setting name="getHeapSize" value="800" />
-      </class-settings>
-      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker">
-        <setting name="getModuleJdks" value="rO0ABXNyABFqYXZhLnV0aWwuSGFzaFNldLpEhZWWuLc0AwAAeHB3DAAAABA/QAAAAAAAAHg=" />
-        <setting name="getProjectJdk" value="/usr/local/buildtools/java/jdk1.5.0_06" />
-      </class-settings>
-      <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
-      <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
-    </settings>
-  </component>
+  <component name="BlazePluginSettings" buildBeforeRefresh="true" blazeTestProducers="true" updater="default" />
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
   </component>
@@ -118,15 +104,6 @@
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
-          <option name="INDENT_SIZE" value="4" />
-          <option name="CONTINUATION_INDENT_SIZE" value="8" />
-          <option name="TAB_SIZE" value="4" />
-          <option name="USE_TAB_CHARACTER" value="false" />
-          <option name="SMART_TABS" value="false" />
-          <option name="LABEL_INDENT_SIZE" value="0" />
-          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
-        </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="txt">
           <option name="INDENT_SIZE" value="4" />
           <option name="CONTINUATION_INDENT_SIZE" value="8" />
@@ -156,18 +133,7 @@
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
     </resourceExtensions>
-    <wildcardResourcePatterns>
-      <entry name="?*.properties" />
-      <entry name="?*.xml" />
-      <entry name="?*.html" />
-      <entry name="?*.dtd" />
-      <entry name="?*.tld" />
-      <entry name="?*.gif" />
-      <entry name="?*.png" />
-      <entry name="?*.jpeg" />
-      <entry name="?*.jpg" />
-      <entry name="?*.js" />
-    </wildcardResourcePatterns>
+    <wildcardResourcePatterns />
   </component>
   <component name="ContinuousBuildConfigurationComponent">
     <builds>
@@ -211,11 +177,6 @@
       <facet-type id="web">
         <modules>
           <module name="remote" />
-          <module name="remote-server">
-            <files>
-              <file url="file://$PROJECT_DIR$/remote/server/src/web/WEB-INF/web.xml" />
-            </files>
-          </module>
         </modules>
       </facet-type>
     </autodetection-disabled>
@@ -352,8 +313,7 @@
         <inspection_tool class="InstanceofCatchParameter" level="ERROR" enabled="true" />
         <inspection_tool class="SingleCharacterStartsWith" level="WARNING" enabled="false" />
         <inspection_tool class="ImplicitNumericConversion" level="WARNING" enabled="false">
-          <option name="ignoreWideningConversions" value="false" />
-          <option name="ignoreCharConversions" value="false" />
+          <option name="m_ignoreWideningConversions" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryInterfaceModifier" level="WARNING" enabled="true" />
         <inspection_tool class="InstanceVariableInitialization" level="WARNING" enabled="false">
@@ -606,9 +566,7 @@
           <option name="m_maxLength" value="32" />
         </inspection_tool>
         <inspection_tool class="CheckedExceptionClass" level="WARNING" enabled="false" />
-        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false">
-          <option name="ignoreIntegerCharCasts" value="false" />
-        </inspection_tool>
+        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false" />
         <inspection_tool class="SwitchStatementWithConfusingDeclaration" level="WARNING" enabled="false" />
         <inspection_tool class="EmptyTryBlock" level="ERROR" enabled="true" />
         <inspection_tool class="ManualArrayCopy" level="WARNING" enabled="false" />
@@ -619,13 +577,8 @@
         <inspection_tool class="OverlyComplexArithmeticExpression" level="WARNING" enabled="false">
           <option name="m_limit" value="6" />
         </inspection_tool>
-        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false">
-          <option name="ignoreSimpleAssignmentsAndReturns" value="false" />
-        </inspection_tool>
-        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false">
-          <option name="ignoreClarifyingParentheses" value="false" />
-          <option name="ignoreParenthesesOnConditionals" value="false" />
-        </inspection_tool>
+        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false" />
+        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false" />
         <inspection_tool class="AssignmentToMethodParameter" level="WARNING" enabled="true">
           <option name="ignoreTransformationOfOriginalParameter" value="false" />
         </inspection_tool>
@@ -658,6 +611,7 @@
         <inspection_tool class="UnusedCatchParameter" level="WARNING" enabled="false">
           <option name="m_ignoreCatchBlocksWithComments" value="false" />
           <option name="m_ignoreTestCases" value="false" />
+          <option name="m_ignoreIgnoreParameter" value="true" />
         </inspection_tool>
         <inspection_tool class="ClassInTopLevelPackage" level="WARNING" enabled="false" />
         <inspection_tool class="FieldAccessedSynchronizedAndUnsynchronized" level="ERROR" enabled="true">
@@ -709,9 +663,7 @@
           <option name="ignoreTestCases" value="false" />
         </inspection_tool>
         <inspection_tool class="ConstantDeclaredInAbstractClass" level="WARNING" enabled="false" />
-        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true">
-          <option name="onlyWarnOnRootExceptions" value="false" />
-        </inspection_tool>
+        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true" />
         <inspection_tool class="FloatingPointEquality" level="ERROR" enabled="true" />
         <inspection_tool class="ReplaceAssignmentWithOperatorAssignment" level="WARNING" enabled="true">
           <option name="ignoreLazyOperators" value="true" />
@@ -973,7 +925,7 @@
   </component>
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="https://selenium.googlecode.com/svn/webdriver/trunk/WebDriver.ipr" />
+    <option name="state" value="https://webdriver.googlecode.com/svn/trunk/WebDriver.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
@@ -993,8 +945,40 @@
       <module fileurl="file://$PROJECT_DIR$/third_party/third_party.iml" filepath="$PROJECT_DIR$/third_party/third_party.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/eclipse" />
+  </component>
+  <component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="SingleTestSuite" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <module name="chrome" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="org.openqa.selenium" />
+      <option name="MAIN_CLASS_NAME" value="org.openqa.selenium.SingleTestSuite" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-Dwebdriver.firefox.useExisting=true" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="62649" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
   </component>
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
@@ -1011,8 +995,25 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://selenium.googlecode.com/svn/webdriver/branches" />
+                  <option value="https://selenium.googlecode.com/svn/webdriver/javadoc" />
+                  <option value="https://selenium.googlecode.com/svn/webdriver/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://selenium.googlecode.com/svn/webdriver/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="myVersion" value="123" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />

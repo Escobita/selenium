@@ -35,6 +35,9 @@ import org.openqa.selenium.internal.FindsByTagName;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
+import com.google.common.base.Function;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -46,6 +49,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Arrays;
 
 public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
@@ -72,7 +76,8 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   @SuppressWarnings({"unchecked"})
   protected void startSession(Capabilities desiredCapabilities) {
-    Response response = execute(DriverCommand.NEW_SESSION, desiredCapabilities);
+    Response response = execute(DriverCommand.NEW_SESSION,
+        ImmutableMap.of("desiredCapabilities", desiredCapabilities));
 
     Map<String, Object> rawCapabilities = (Map<String, Object>) response.getValue();
     String browser = (String) rawCapabilities.get("browserName");
@@ -104,7 +109,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   public void get(String url) {
-    execute(DriverCommand.GET, url);
+    execute(DriverCommand.GET, ImmutableMap.of("url", url));
   }
 
   public String getTitle() {
@@ -124,77 +129,72 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return by.findElement(this);
   }
 
+  private WebElement findElement(String by, String using) {
+    Response response = execute(DriverCommand.FIND_ELEMENT,
+        ImmutableMap.of("using", by, "value", using));
+    return getElementFrom(response);
+  }
+
+  private List<WebElement> findElements(String by, String using) {
+    Response response = execute(DriverCommand.FIND_ELEMENTS,
+        ImmutableMap.of("using", by, "value", using));
+    return getElementsFrom(response);
+  }
 
   public WebElement findElementById(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "id", using);
-    return getElementFrom(response);
+    return findElement("id", using);
   }
 
   public List<WebElement> findElementsById(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "id", using);
-    return getElementsFrom(response);
+    return findElements("id", using);
   }
 
-
   public WebElement findElementByLinkText(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "link text", using);
-    return getElementFrom(response);
+    return findElement("link text", using);
   }
 
   public List<WebElement> findElementsByLinkText(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "link text", using);
-    return getElementsFrom(response);
+    return findElements("link text", using);
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "partial link text", using);
-    return getElementFrom(response);
+    return findElement("partial link text", using);
   }
 
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "partial link text", using);
-    return getElementsFrom(response);
+    return findElements("partial link text", using);
   }
 
   public WebElement findElementByTagName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "tag name", using);
-    return getElementFrom(response);
+    return findElement("tag name", using);
   }
 
   public List<WebElement> findElementsByTagName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "tag name", using);
-    return getElementsFrom(response);
-
+    return findElements("tag name", using);
   }
 
   public WebElement findElementByName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "name", using);
-    return getElementFrom(response);
+    return findElement("name", using);
   }
 
   public List<WebElement> findElementsByName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "name", using);
-    return getElementsFrom(response);
+    return findElements("name", using);
   }
 
   public WebElement findElementByClassName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "class name", using);
-    return getElementFrom(response);
+    return findElement("class name", using);
   }
 
   public List<WebElement> findElementsByClassName(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "class name", using);
-    return getElementsFrom(response);
+    return findElements("class name", using);
   }
 
   public WebElement findElementByXPath(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENT, "xpath", using);
-    return getElementFrom(response);
+    return findElement("xpath", using);
   }
 
   public List<WebElement> findElementsByXPath(String using) {
-    Response response = execute(DriverCommand.FIND_ELEMENTS, "xpath", using);
-    return getElementsFrom(response);
+    return findElements("xpath", using);
   }
 
   // Misc
@@ -236,14 +236,20 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     // Escape the quote marks
     script = script.replaceAll("\"", "\\\"");
 
-    Object[] convertedArgs = convertToJsObjects(args);
+    Iterable<Object> convertedArgs = Iterables.transform(Arrays.asList(args),
+        new Function<Object, Object>() {
+          public Object apply(Object o) {
+            return convertToJsObject(o);
+          }
+        });
 
-    Command command;
-    if (convertedArgs != null && convertedArgs.length > 0)
-      command = new Command(
-          sessionId, new Context("foo"), DriverCommand.EXECUTE_SCRIPT, script, convertedArgs);
-    else
-      command = new Command(sessionId, new Context("foo"), DriverCommand.EXECUTE_SCRIPT, script);
+    Map<String, ?> params = ImmutableMap.of(
+        "script", script,
+        "args", Lists.newArrayList(convertedArgs));
+
+    Command command =
+        new Command(sessionId, new Context("foo"), DriverCommand.EXECUTE_SCRIPT, params);
+
     Response response;
     try {
       response = executor.execute(command);
@@ -278,18 +284,6 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return capabilities.isJavascriptEnabled();
   }
 
-  private Object[] convertToJsObjects(Object[] args) {
-    if (args.length == 0)
-      return null;
-
-    Object[] converted = new Object[args.length];
-    for (int i = 0; i < args.length; i++) {
-      converted[i] = convertToJsObject(args[i]);
-    }
-
-    return converted;
-  }
-
   private Object convertToJsObject(Object arg) {
     Map<String, Object> converted = new HashMap<String, Object>();
 
@@ -314,13 +308,11 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
       converted.put("value", ((RemoteWebElement) arg).getId());
     } else if (arg instanceof Collection<?>) {
       Collection<?> args = ((Collection<?>)arg);
-      Object[] list = new Object[args.size()];
-      int i = 0;
+      List<Object> convertedArgs = Lists.newArrayListWithExpectedSize(args.size());
       for (Object o : args) {
-        list[i] = convertToJsObject(o);
-        i++;
+        convertedArgs.add(convertToJsObject(o));
       }
-      return list;
+      return convertedArgs;
     } else {
       throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
     }
@@ -374,7 +366,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   @SuppressWarnings({"unchecked"})
-  protected Response execute(DriverCommand driverCommand, Object... parameters) {
+  protected Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
     Command command = new Command(sessionId, new Context("foo"), driverCommand, parameters);
 
     Response response = new Response();
@@ -392,6 +384,11 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     }
 
     return response;
+  }
+
+  protected Response execute(DriverCommand command) {
+    Map<String, ?> noArgs = ImmutableMap.of();
+    return execute(command, noArgs);
   }
 
   private void amendElementValueIfNecessary(Response response) {
@@ -500,7 +497,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   private class RemoteWebDriverOptions implements Options {
 
     public void addCookie(Cookie cookie) {
-      execute(DriverCommand.ADD_COOKIE, cookie);
+      execute(DriverCommand.ADD_COOKIE, ImmutableMap.of("cookie", cookie));
     }
 
     public void deleteCookieNamed(String name) {
@@ -556,7 +553,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     }
 
     public void setSpeed(Speed speed) {
-      execute(DriverCommand.SET_SPEED, speed);
+      execute(DriverCommand.SET_SPEED, ImmutableMap.of("speed", speed));
     }
   }
 

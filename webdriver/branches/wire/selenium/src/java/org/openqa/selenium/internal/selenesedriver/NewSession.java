@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NewSession implements SeleneseFunction<Map<String, Object>> {
-  public Map<String, Object> apply(Selenium selenium, Object... args) {
+  public Map<String, Object> apply(Selenium selenium, Map<String, ?> args) {
     selenium.start();
-    Capabilities capabilities = (Capabilities) args[0];
+    Capabilities capabilities = (Capabilities) args.get("desiredCapabilities");
     Map<String, Object> seenCapabilities = new HashMap<String, Object>();
     seenCapabilities.put("browserName", capabilities.getBrowserName());
     seenCapabilities.put("version", capabilities.getVersion());

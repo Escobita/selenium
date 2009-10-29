@@ -78,8 +78,9 @@ public class JsonToBeanConverter {
 
       DriverCommand name = DriverCommand.fromName(rawCommand.getString("name"));
       if (rawCommand.has("parameters")) {
-        List args = convert(ArrayList.class, rawCommand.getJSONArray("parameters"));
-        return (T) new Command(sessionId, context, name, args.toArray());
+        Map<String, ?> args =
+            (Map<String, ?>) convert(HashMap.class, rawCommand.getJSONObject("parameters"));
+        return (T) new Command(sessionId, context, name, args);
       }
 
       return (T) new Command(sessionId, context, name);

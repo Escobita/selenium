@@ -20,6 +20,7 @@ package org.openqa.selenium.remote.server.handler;
 import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.BeanToJsonConverter;
 import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.rest.Handler;
@@ -38,8 +39,9 @@ public class NewSession implements Handler, JsonParametersAware {
   }
 
   @SuppressWarnings({"unchecked"})
-  public void setJsonParameters(List<Object> allParameters) throws Exception {
-    desiredCapabilities = new DesiredCapabilities((Map<String, Object>) allParameters.get(0));
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    desiredCapabilities = new DesiredCapabilities(
+        (Map<String, Object>) allParameters.get("desiredCapabilities"));
   }
 
   public ResultType handle() throws Exception {

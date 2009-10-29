@@ -40,7 +40,7 @@ public class ChromeDriverTestSuite extends TestCase {
         .addSourceDir("common")
         .addSourceDir("chrome")
         .exclude(CHROME)
-        .usingDriver(ChromeDriver.class)
+        .usingDriver(TestChromeDriver.class)
         .includeJavascriptTests()
         .keepDriverInstance();
     
@@ -73,7 +73,8 @@ public class ChromeDriverTestSuite extends TestCase {
       File dllToUse = new File(System.getProperty("webdriver.chrome.extensiondir"),
           "npchromedriver.dll");
       if (System.getProperty("webdriver.chrome.extensiondir") == null ||
-          !System.getProperty("webdriver.chrome.extensiondir").equals(extensionDstDir) ||
+          !System.getProperty("webdriver.chrome.extensiondir")
+              .equals(extensionDstDir.getAbsolutePath()) ||
           !dllToUse.exists()) {
         System.setProperty("webdriver.chrome.extensiondir", extensionDst);
         try {

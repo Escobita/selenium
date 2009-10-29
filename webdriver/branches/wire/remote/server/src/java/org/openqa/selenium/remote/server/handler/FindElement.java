@@ -26,6 +26,7 @@ import org.openqa.selenium.remote.server.rest.ResultType;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class FindElement extends WebDriverHandler implements JsonParametersAware {
   private By by;
@@ -35,9 +36,9 @@ public class FindElement extends WebDriverHandler implements JsonParametersAware
     super(sessions);
   }
 
-  public void setJsonParameters(List<Object> allParameters) throws Exception {
-    String method = (String) allParameters.get(0);
-    String selector = (String) allParameters.get(1);
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    String method = (String) allParameters.get("using");
+    String selector = (String) allParameters.get("value");
 
     by = new BySelector().pickFrom(method, selector);
   }

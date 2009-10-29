@@ -17,14 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import junit.framework.TestCase;
-
+import com.google.common.collect.ImmutableMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Platform;
+
+import junit.framework.TestCase;
 
 import java.util.Collections;
 import java.util.Date;
@@ -222,7 +223,8 @@ public class JsonToBeanConverterTest extends TestCase {
   public void testShouldBeAbleToConvertACommand() throws Exception {
     SessionId sessionId = new SessionId("session id");
     Context context = new Context("context");
-    Command original = new Command(sessionId, context, DriverCommand.NEW_SESSION, "cheese");
+    Command original = new Command(sessionId, context, DriverCommand.NEW_SESSION,
+        ImmutableMap.of("food", "cheese"));
     String raw = new BeanToJsonConverter().convert(original);
     Command converted = new JsonToBeanConverter().convert(Command.class, raw);
 
@@ -230,8 +232,8 @@ public class JsonToBeanConverterTest extends TestCase {
     assertEquals(context.toString(), converted.getContext().toString());
     assertEquals(original.getName(), converted.getName());
 
-    assertTrue(converted.getParameters().length == 1);
-    assertEquals("cheese", converted.getParameters()[0]);
+    assertEquals(1, converted.getParameters().keySet().size());
+    assertEquals("cheese", converted.getParameters().get("food"));
   }
 
   public static class SimpleBean {

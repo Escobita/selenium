@@ -192,8 +192,9 @@ public class ResultConfig {
       builder.append(line);
 
     String raw = builder.toString();
-    if (raw.startsWith("[")) {
-      List<Object> parameters = new JsonToBeanConverter().convert(List.class, builder.toString());
+    if (raw.length() > 0) {
+      Map<String, Object> parameters = (Map<String, Object>) new JsonToBeanConverter()
+          .convert(HashMap.class, builder.toString());
 
       ((JsonParametersAware) handler).setJsonParameters(parameters);
     }

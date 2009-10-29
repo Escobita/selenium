@@ -30,6 +30,7 @@ import org.openqa.selenium.remote.server.rest.ResultType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 public class FindElements extends WebDriverHandler implements JsonParametersAware {
 
@@ -40,10 +41,9 @@ public class FindElements extends WebDriverHandler implements JsonParametersAwar
     super(sessions);
   }
 
-  public void setJsonParameters(List<Object> allParameters) throws Exception {
-    JsonToBeanConverter converter = new JsonToBeanConverter();
-    String method = converter.convert(String.class, allParameters.get(0));
-    String selector = converter.convert(String.class, allParameters.get(1));
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    String method = (String) allParameters.get("using");
+    String selector = (String) allParameters.get("value");
 
     by = new BySelector().pickFrom(method, selector);
   }

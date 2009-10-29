@@ -29,9 +29,15 @@ public class DesiredCapabilities implements Capabilities {
   private boolean javascriptEnabled;
 
   public DesiredCapabilities(String browser, String version, Platform platform) {
-    this.browserName = browser;
+    this(browser, version, platform, /*javascriptEnabled=*/false);
+  }
+
+  public DesiredCapabilities(String browserName, String version, Platform platform,
+                             boolean javascriptEnabled) {
+    this.browserName = browserName;
     this.version = version;
     this.platform = platform;
+    this.javascriptEnabled = javascriptEnabled;
   }
 
   public DesiredCapabilities() {
@@ -92,26 +98,27 @@ public class DesiredCapabilities implements Capabilities {
   }
 
   public static DesiredCapabilities firefox() {
-    return new DesiredCapabilities("firefox", "", Platform.ANY);
+    return new DesiredCapabilities("firefox", "", Platform.ANY, true);
   }
 
   public static DesiredCapabilities internetExplorer() {
-    return new DesiredCapabilities("internet explorer", "", Platform.WINDOWS);
+    return new DesiredCapabilities("internet explorer", "", Platform.WINDOWS, true);
   }
 
   public static DesiredCapabilities htmlUnit() {
-    return new DesiredCapabilities("htmlunit", "", Platform.ANY);
+    return new DesiredCapabilities("htmlunit", "", Platform.ANY, false);
+  }
+
+  public static DesiredCapabilities htmlUnitWithJavascript() {
+    return new DesiredCapabilities("htmlunit", "", Platform.ANY, true);
   }
 
   public static DesiredCapabilities iphone() {
-    return new DesiredCapabilities("iphone", "", Platform.MAC);
+    return new DesiredCapabilities("iphone", "", Platform.MAC, true);
   }
   
   public static DesiredCapabilities chrome() {
-    //This is strangely inconsistent.
-    DesiredCapabilities dc = new DesiredCapabilities("chrome", "", Platform.WINDOWS);
-    dc.setJavascriptEnabled(true);
-    return dc;
+    return new DesiredCapabilities("chrome", "", Platform.WINDOWS, true);
   }
 
   

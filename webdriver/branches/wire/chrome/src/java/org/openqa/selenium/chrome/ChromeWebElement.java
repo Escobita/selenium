@@ -16,6 +16,9 @@ import org.openqa.selenium.internal.WrapsElement;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class ChromeWebElement implements RenderedWebElement, Locatable, 
 FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
@@ -31,9 +34,17 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   String getElementId() {
     return elementId;
   }
-  
-  ChromeResponse execute(DriverCommand driverCommand, Object... parameters) {
-    return parent.execute(driverCommand, parameters);
+
+  private ChromeResponse execute(DriverCommand driverCommand) {
+    return execute(driverCommand, ImmutableMap.<String, Object>of());
+  }
+
+  ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+    return parent.execute(driverCommand,
+        ImmutableMap.<String, Object>builder()
+            .put("elementId", elementId)
+            .putAll(parameters)
+            .build());
   }
   
   public void dragAndDropBy(int moveRightBy, int moveDownBy) {
@@ -45,29 +56,30 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   }
 
   public Point getLocation() {
-    return (Point)parent.execute(DriverCommand.GET_ELEMENT_LOCATION, this).getValue();
+    return (Point) execute(DriverCommand.GET_ELEMENT_LOCATION).getValue();
   }
 
   public Dimension getSize() {
-    return (Dimension)parent.execute(DriverCommand.GET_ELEMENT_SIZE, this).getValue();
+    return (Dimension) execute(DriverCommand.GET_ELEMENT_SIZE).getValue();
   }
 
   public String getValueOfCssProperty(String propertyName) {
-    return parent.execute(DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY, this, propertyName)
+    Map<String, ?> params = ImmutableMap.of("css", propertyName);
+    return execute(DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY, params)
         .getValue().toString();
   }
 
   public boolean isDisplayed() {
-    ChromeResponse r = execute(DriverCommand.IS_ELEMENT_DISPLAYED, this);
+    ChromeResponse r = execute(DriverCommand.IS_ELEMENT_DISPLAYED);
     return (Boolean)r.getValue();
   }
 
   public void clear() {
-    parent.execute(DriverCommand.CLEAR_ELEMENT, this);
+    execute(DriverCommand.CLEAR_ELEMENT);
   }
 
   public void click() {
-    parent.execute(DriverCommand.CLICK_ELEMENT, this);
+    execute(DriverCommand.CLICK_ELEMENT);
   }
 
   public WebElement findElement(By by) {
@@ -79,28 +91,29 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   }
 
   public String getAttribute(String name) {
-    Object value = execute(DriverCommand.GET_ELEMENT_ATTRIBUTE, this, name).getValue();
+    Object value = execute(DriverCommand.GET_ELEMENT_ATTRIBUTE,
+        ImmutableMap.of("attribute", name)).getValue();
     return (value == null) ? null : value.toString();
   }
 
   public String getTagName() {
-    return execute(DriverCommand.GET_ELEMENT_TAG_NAME, this).getValue().toString();
+    return execute(DriverCommand.GET_ELEMENT_TAG_NAME).getValue().toString();
   }
 
   public String getText() {
-    return execute(DriverCommand.GET_ELEMENT_TEXT, this).getValue().toString();
+    return execute(DriverCommand.GET_ELEMENT_TEXT).getValue().toString();
   }
 
   public String getValue() {
-    return execute(DriverCommand.GET_ELEMENT_VALUE, this).getValue().toString();
+    return execute(DriverCommand.GET_ELEMENT_VALUE).getValue().toString();
   }
 
   public boolean isEnabled() {
-    return Boolean.parseBoolean(execute(DriverCommand.IS_ELEMENT_ENABLED, this).getValue().toString());
+    return Boolean.parseBoolean(execute(DriverCommand.IS_ELEMENT_ENABLED).getValue().toString());
   }
 
   public boolean isSelected() {
-    return Boolean.parseBoolean(execute(DriverCommand.IS_ELEMENT_SELECTED, this)
+    return Boolean.parseBoolean(execute(DriverCommand.IS_ELEMENT_SELECTED)
         .getValue().toString());
   }
 
@@ -109,85 +122,104 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
     for (CharSequence seq : keysToSend) {
       builder.append(seq);
     }
-    execute(DriverCommand.SEND_KEYS_TO_ELEMENT, this, builder.toString());
+    execute(DriverCommand.SEND_KEYS_TO_ELEMENT, ImmutableMap.of("keys", builder.toString()));
   }
 
   public void setSelected() {
-    execute(DriverCommand.SET_ELEMENT_SELECTED, this);
+    execute(DriverCommand.SET_ELEMENT_SELECTED);
   }
 
   public void submit() {
-    execute(DriverCommand.SUBMIT_ELEMENT, this);
+    execute(DriverCommand.SUBMIT_ELEMENT);
   }
 
   public boolean toggle() {
-    return Boolean.parseBoolean(execute(DriverCommand.TOGGLE_ELEMENT, this)
+    return Boolean.parseBoolean(execute(DriverCommand.TOGGLE_ELEMENT)
         .getValue().toString());
   }
 
   public Point getLocationOnScreenOnceScrolledIntoView() {
-    return (Point)parent.execute(DriverCommand.GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, this).getValue();
+    return (Point) execute(DriverCommand.GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW)
+        .getValue();
+  }
+
+  private WebElement findElementInternal(String using, String value) {
+    ChromeResponse response = parent.execute(
+        DriverCommand.FIND_CHILD_ELEMENT,
+        ImmutableMap.of("id", elementId,
+                        "using", using,
+                        "value", value));
+    return parent.getElementFrom(response);
+  }
+
+  private List<WebElement> findElementsInternal(String using, String value) {
+    ChromeResponse response = parent.execute(
+        DriverCommand.FIND_CHILD_ELEMENTS,
+        ImmutableMap.of("id", elementId,
+                        "using", using,
+                        "value", value));
+    return parent.getElementsFrom(response);
   }
 
   public WebElement findElementByXPath(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "xpath", using));
+    return findElementInternal("xpath", using);
   }
 
   public List<WebElement> findElementsByXPath(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "xpath", using));
+    return findElementsInternal("xpath", using);
   }
 
   public WebElement findElementByLinkText(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "link text", using));
+    return findElementInternal("link text", using);
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "partial link text", using));
+    return findElementInternal("partial link text", using);
   }
 
   public List<WebElement> findElementsByLinkText(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "link text", using));
+    return findElementsInternal("link text", using);
   }
 
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "partial link text", using));
+    return findElementsInternal("partial link text", using);
   }
 
   public WebElement findElementById(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "id", using));
+    return findElementInternal("id", using);
   }
 
   public List<WebElement> findElementsById(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "id", using));
+    return findElementsInternal("id", using);
   }
 
   public WebElement findElementByName(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "name", using));
+    return findElementInternal("name", using);
   }
 
   public List<WebElement> findElementsByName(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "name", using));
+    return findElementsInternal("name", using);
   }
 
   public WebElement findElementByTagName(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "tag name", using));
+    return findElementInternal("tag name", using);
   }
 
   public List<WebElement> findElementsByTagName(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "tag name", using));
+    return findElementsInternal("tag name", using);
   }
 
   public WebElement findElementByClassName(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "class name", using));
+    return findElementInternal("class name", using);
   }
 
   public List<WebElement> findElementsByClassName(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "class name", using));
+    return findElementsInternal("class name", using);
   }
 
   public void hover() {
     //Relies on the user not moving the mouse after the hover moves it into place 
-    execute(DriverCommand.HOVER_OVER_ELEMENT, this);
+    execute(DriverCommand.HOVER_OVER_ELEMENT);
   }
 
   @Override

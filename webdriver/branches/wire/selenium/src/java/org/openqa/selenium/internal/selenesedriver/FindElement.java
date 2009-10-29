@@ -27,12 +27,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class FindElement implements SeleneseFunction<List<String>> {
 
-  public List<String> apply(Selenium selenium, Object... args) {
-    String how = (String) args[0];
-    String using = (String) args[1];
+  public List<String> apply(Selenium selenium, Map<String, ?> args) {
+    String how = (String) args.get("using");
+    String using = (String) args.get("value");
 
     String locator = null;
     if ("class name".equals(how)) {

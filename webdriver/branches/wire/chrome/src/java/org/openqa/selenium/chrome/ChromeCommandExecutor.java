@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChromeCommandExecutor {
@@ -47,8 +48,56 @@ public class ChromeCommandExecutor {
   //Whether a client has ever been connected
   private boolean hasClient = false;
   ListeningThread listeningThread;
-  private Map<DriverCommand, String[]> commands;
-  
+
+  private static final Map<DriverCommand, String[]> COMMANDS =
+      ImmutableMap.<DriverCommand, String[]> builder()
+          .put(CLOSE, NO_ARGS)
+          .put(QUIT, NO_ARGS)
+          .put(GET, new String[] {"url"})
+          .put(GO_BACK, NO_ARGS)
+          .put(GO_FORWARD, NO_ARGS)
+          .put(REFRESH, NO_ARGS)
+          .put(ADD_COOKIE, new String[] {"cookie"})
+          .put(GET_ALL_COOKIES,  NO_ARGS)
+          .put(GET_COOKIE, new String[] {"name"})
+          .put(DELETE_ALL_COOKIES, NO_ARGS)
+          .put(DELETE_COOKIE, new String[] {"name"})
+          .put(FIND_ELEMENT, new String[] {"using", "value"})
+          .put(FIND_ELEMENTS, new String[] {"using", "value"})
+          .put(FIND_CHILD_ELEMENT, new String[] {"id", "using", "value"})
+          .put(FIND_CHILD_ELEMENTS, new String[] {"id", "using", "value"})
+          .put(CLEAR_ELEMENT, ELEMENT_ID_ARG)
+          .put(CLICK_ELEMENT, ELEMENT_ID_ARG)
+          .put(HOVER_OVER_ELEMENT, ELEMENT_ID_ARG)
+          .put(SEND_KEYS_TO_ELEMENT, new String[] {"elementId", "keys"})
+          .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
+          .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_ATTRIBUTE, new String[] {"elementId", "attribute"})
+          .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_TAG_NAME, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_TEXT, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_VALUE, ELEMENT_ID_ARG)
+          .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
+               new String[] {"elementId", "css"})
+          .put(IS_ELEMENT_DISPLAYED, ELEMENT_ID_ARG)
+          .put(IS_ELEMENT_ENABLED, ELEMENT_ID_ARG)
+          .put(IS_ELEMENT_SELECTED, ELEMENT_ID_ARG)
+          .put(SET_ELEMENT_SELECTED, ELEMENT_ID_ARG)
+          .put(GET_ACTIVE_ELEMENT, NO_ARGS)
+          .put(SWITCH_TO_FRAME_BY_INDEX, new String[] {"index"})
+          .put(SWITCH_TO_FRAME_BY_NAME, new String[] {"name"})
+          .put(SWITCH_TO_DEFAULT_CONTENT, NO_ARGS)
+          .put(GET_CURRENT_WINDOW_HANDLE, NO_ARGS)
+          .put(GET_WINDOW_HANDLES, NO_ARGS)
+          .put(SWITCH_TO_WINDOW, new String[] {"windowName"})
+          .put(GET_CURRENT_URL, NO_ARGS)
+          .put(GET_PAGE_SOURCE, NO_ARGS)
+          .put(GET_TITLE, NO_ARGS)
+          .put(EXECUTE_SCRIPT, new String[] {"script", "args"})
+          .build();
+
   /**
    * Creates a new ChromeCommandExecutor which listens on a TCP port.
    * Doesn't return until the TCP port is connected to.
@@ -58,54 +107,6 @@ public class ChromeCommandExecutor {
    * TODO(danielwh): Bind to a random port (blocked on crbug.com 11547)
    */
   public ChromeCommandExecutor(int port) {
-    commands = ImmutableMap.<DriverCommand, String[]> builder()
-        .put(CLOSE, NO_ARGS)
-        .put(QUIT, NO_ARGS)
-        .put(GET, new String[] {"url"})
-        .put(GO_BACK, NO_ARGS)
-        .put(GO_FORWARD, NO_ARGS)
-        .put(REFRESH, NO_ARGS)
-        .put(ADD_COOKIE, new String[] {"cookie"})
-        .put(GET_ALL_COOKIES,  NO_ARGS)
-        .put(GET_COOKIE, new String[] {"name"})
-        .put(DELETE_ALL_COOKIES, NO_ARGS)
-        .put(DELETE_COOKIE, new String[] {"name"})
-        .put(FIND_ELEMENT, new String[] {"using", "value"})
-        .put(FIND_ELEMENTS, new String[] {"using", "value"})
-        .put(FIND_CHILD_ELEMENT, new String[] {"id", "using", "value"})
-        .put(FIND_CHILD_ELEMENTS, new String[] {"id", "using", "value"})
-        .put(CLEAR_ELEMENT, ELEMENT_ID_ARG)
-        .put(CLICK_ELEMENT, ELEMENT_ID_ARG)
-        .put(HOVER_OVER_ELEMENT, ELEMENT_ID_ARG)
-        .put(SEND_KEYS_TO_ELEMENT, new String[] {"elementId", "keys"})
-        .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
-        .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_ATTRIBUTE, new String[] {"elementId", "attribute"})
-        .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_TAG_NAME, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_TEXT, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_VALUE, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-             new String[] {"elementId", "css"})
-        .put(IS_ELEMENT_DISPLAYED, ELEMENT_ID_ARG)
-        .put(IS_ELEMENT_ENABLED, ELEMENT_ID_ARG)
-        .put(IS_ELEMENT_SELECTED, ELEMENT_ID_ARG)
-        .put(SET_ELEMENT_SELECTED, ELEMENT_ID_ARG)
-        .put(GET_ACTIVE_ELEMENT, NO_ARGS)
-        .put(SWITCH_TO_FRAME_BY_INDEX, new String[] {"index"})
-        .put(SWITCH_TO_FRAME_BY_NAME, new String[] {"name"})
-        .put(SWITCH_TO_DEFAULT_CONTENT, NO_ARGS)
-        .put(GET_CURRENT_WINDOW_HANDLE, NO_ARGS)
-        .put(GET_WINDOW_HANDLES, NO_ARGS)
-        .put(SWITCH_TO_WINDOW, new String[] {"windowName"})
-        .put(GET_CURRENT_URL, NO_ARGS)
-        .put(GET_PAGE_SOURCE, NO_ARGS)
-        .put(GET_TITLE, NO_ARGS)
-        .put(EXECUTE_SCRIPT, new String[] {"script", "args"})
-        .build();
-
     try {
       serverSocket = new ServerSocket(port);
     } catch (IOException e) {
@@ -164,22 +165,27 @@ public class ChromeCommandExecutor {
     }
   }
   
-  String fillArgs(Command command) {
-    String[] parameterNames = commands.get(command.getName());
+  static String fillArgs(Command command) {
+    String[] parameterNames = COMMANDS.get(command.getName());
     JSONObject json = new JSONObject();
-    if (parameterNames.length != command.getParameters().length) {
+    if (parameterNames.length != command.getParameters().keySet().size()) {
       throw new WebDriverException(new IllegalArgumentException(
           "Did not supply the expected number of parameters"));
     }
     try {
       json.put("request", command.getName());
-      for (int i = 0; i < parameterNames.length; ++i) {
+      for (String parameterName : parameterNames) {
         //Icky icky special case
         // TODO(jleyba): This is a temporary solution and will be going away _very_
         // soon.
         boolean isArgs = (EXECUTE_SCRIPT.equals(command.getName()) &&
-            "args".equals(parameterNames[i]));
-        json.put(parameterNames[i], convertToJsonObject(command.getParameters()[i], isArgs));
+                          "args".equals(parameterName));
+        if (!command.getParameters().containsKey(parameterName)) {
+          throw new WebDriverException(new IllegalArgumentException(
+              "Missing required parameter \"" + parameterName + "\""));
+        }
+        json.put(parameterName, convertToJsonObject(
+            command.getParameters().get(parameterName), isArgs));
       }
     } catch (JSONException e) {
       throw new WebDriverException(e);
@@ -187,10 +193,13 @@ public class ChromeCommandExecutor {
     return json.toString();
   }
   
-  Object convertToJsonObject(Object object, boolean wrapArgs) throws JSONException {
+  static Object convertToJsonObject(Object object, boolean wrapArgs) throws JSONException {
     if (object.getClass().isArray()) {
+      object = Arrays.asList((Object[]) object);
+    }
+    if (object instanceof List) {
       JSONArray array = new JSONArray();
-      for (Object o : (Object[])object) {
+      for (Object o : (List) object) {
         if (wrapArgs) {
           array.put(wrapArgumentForScriptExecution(o));
         } else {
@@ -198,8 +207,7 @@ public class ChromeCommandExecutor {
         }
       }
       return array;
-    }
-    else if (object instanceof Cookie) {
+    } else if (object instanceof Cookie) {
       Cookie cookie = (Cookie)object;
       Map<String, Object> cookieMap = new HashMap<String, Object>();
       cookieMap.put("name", cookie.getName());
@@ -511,7 +519,7 @@ public class ChromeCommandExecutor {
    * @return wrapped up value; will be either a JSONObject or a JSONArray.
    * TODO(jleyba): Remove this
    */
-  Object wrapArgumentForScriptExecution(Object argument) {
+  static Object wrapArgumentForScriptExecution(Object argument) {
     JSONObject wrappedArgument = new JSONObject();
     try {
       if (argument instanceof String) {

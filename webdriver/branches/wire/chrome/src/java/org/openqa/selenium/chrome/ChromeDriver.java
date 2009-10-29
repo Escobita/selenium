@@ -17,6 +17,7 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.internal.Cleanly;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.DriverCommand;
@@ -26,11 +27,16 @@ import org.openqa.selenium.remote.SessionId;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor,
 FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
@@ -108,6 +114,10 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
       executor = null;
     }
   }
+
+  private ChromeResponse execute(DriverCommand driverCommand) {
+    return execute(driverCommand, ImmutableMap.<String, Object>of());
+  }
   
   /**
    * Executes a passed command using the current ChromeCommandExecutor
@@ -115,7 +125,8 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    * @param parameters parameters of command being executed
    * @return response to the command (a Response wrapping a null value if none) 
    */
-  ChromeResponse execute(DriverCommand driverCommand, Object... parameters) {
+  ChromeResponse execute(DriverCommand driverCommand,
+                         Map<String, ?> parameters) {
     Command command = new Command(new SessionId("[No sessionId]"),
                                   new Context("[No context]"),
                                   driverCommand,
@@ -146,11 +157,11 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    * @throws IOException if tried to unzip extension but couldn't
    */
   protected File getExtensionDir() throws IOException {
-    File extensionDir = null;
+    File extensionDir;
     String extensionDirSystemProperty = System.getProperty(
         "webdriver.chrome.extensiondir");
     if (extensionDirSystemProperty != null &&
-        extensionDirSystemProperty != "") {
+        !"".equals(extensionDirSystemProperty)) {
       //Default to reading from the property
       extensionDir = new File(extensionDirSystemProperty);
     } else {
@@ -174,7 +185,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
   }
 
   public void get(String url) {
-    execute(GET, url);
+    execute(GET, ImmutableMap.of("url", url));
   }
 
   public String getCurrentUrl() {
@@ -224,7 +235,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
 
   public Object executeScript(String script, Object... args) {
     ChromeResponse response;
-    response = execute(EXECUTE_SCRIPT, script, args);
+    response = execute(EXECUTE_SCRIPT, ImmutableMap.of("script", script, "args", args));
     if (response.getStatusCode() == -1) {
       return new ChromeWebElement(this, response.getValue().toString());
     } else {
@@ -236,60 +247,68 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     return true;
   }
 
+  private WebElement findElementInternal(String using, String value) {
+    return getElementFrom(execute(FIND_ELEMENT, ImmutableMap.of("using", using, "value", value)));
+  }
+
+  private List<WebElement> findElementsInternal(String using, String value) {
+    return getElementsFrom(execute(FIND_ELEMENTS, ImmutableMap.of("using", using, "value", value)));
+  }
+
   public WebElement findElementById(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "id", using));
+    return findElementInternal("id", using);
   }
 
   public List<WebElement> findElementsById(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "id", using));
+    return findElementsInternal("id", using);
   }
 
   public WebElement findElementByClassName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "class name", using));
+    return findElementInternal("class name", using);
   }
 
   public List<WebElement> findElementsByClassName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "class name", using));
+    return findElementsInternal("class name", using);
   }
 
   public WebElement findElementByLinkText(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "link text", using));
+    return findElementInternal("link text", using);
   }
 
   public List<WebElement> findElementsByLinkText(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "link text", using));
+    return findElementsInternal("link text", using);
   }
 
   public WebElement findElementByName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "name", using));
+    return findElementInternal("name", using);
   }
 
   public List<WebElement> findElementsByName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "name", using));
+    return findElementsInternal("name", using);
   }
 
   public WebElement findElementByTagName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "tag name", using));
+    return findElementInternal("tag name", using);
   }
 
   public List<WebElement> findElementsByTagName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "tag name", using));
+    return findElementsInternal("tag name", using);
   }
 
   public WebElement findElementByXPath(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "xpath", using));
+    return findElementInternal("xpath", using);
   }
 
   public List<WebElement> findElementsByXPath(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "xpath", using));
+    return findElementsInternal("xpath", using);
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "partial link text", using));
+    return findElementInternal("partial link text", using);
   }
   
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "partial link text", using));
+    return findElementsInternal("partial link text", using);
   }
   
   WebElement getElementFrom(ChromeResponse response) {
@@ -307,14 +326,10 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     return elements;
   }
   
-  List<WebElement> findChildElements(ChromeWebElement parent, String by, String using) {
-    return getElementsFrom(execute(FIND_CHILD_ELEMENTS, parent, by, using));
-  }
-  
   private class ChromeOptions implements Options {
 
     public void addCookie(Cookie cookie) {
-      execute(ADD_COOKIE, cookie);
+      execute(ADD_COOKIE, ImmutableMap.of("cookie", cookie));
     }
 
     public void deleteAllCookies() {
@@ -322,11 +337,12 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     }
 
     public void deleteCookie(Cookie cookie) {
-      execute(DELETE_COOKIE, cookie.getName());
+      deleteCookieNamed(cookie.getName());
+      execute(DELETE_COOKIE, ImmutableMap.of("name", cookie.getName()));
     }
 
     public void deleteCookieNamed(String name) {
-      execute(DELETE_COOKIE, name);
+      execute(DELETE_COOKIE, ImmutableMap.of("name", name));
     }
 
     public Set<Cookie> getCookies() {
@@ -339,7 +355,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     }
 
     public Cookie getCookieNamed(String name) {
-      return (Cookie)execute(GET_COOKIE, name).getValue();
+      return (Cookie)execute(GET_COOKIE, ImmutableMap.of("name", name)).getValue();
     }
     
     public Speed getSpeed() {
@@ -384,17 +400,17 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     }
 
     public WebDriver frame(int frameIndex) {
-      execute(SWITCH_TO_FRAME_BY_INDEX, frameIndex);
+      execute(SWITCH_TO_FRAME_BY_INDEX, ImmutableMap.of("index", frameIndex));
       return ChromeDriver.this;
     }
 
     public WebDriver frame(String frameName) {
-      execute(SWITCH_TO_FRAME_BY_NAME, frameName);
+      execute(SWITCH_TO_FRAME_BY_NAME, ImmutableMap.of("name", frameName));
       return ChromeDriver.this;
     }
 
     public WebDriver window(String windowName) {
-      execute(SWITCH_TO_WINDOW, windowName);
+      execute(SWITCH_TO_WINDOW, ImmutableMap.of("windowName", windowName));
       return ChromeDriver.this;
     }
     

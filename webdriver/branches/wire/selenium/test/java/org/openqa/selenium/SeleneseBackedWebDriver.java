@@ -27,7 +27,7 @@ public class SeleneseBackedWebDriver extends RemoteWebDriver {
   private static Capabilities describeBrowser() {
     if (Platform.getCurrent().is(Platform.MAC)) {
       DesiredCapabilities caps = new DesiredCapabilities();
-      caps.setBrowserName("safari");
+      caps.setBrowserName("firefox");
       return caps;
     }
 

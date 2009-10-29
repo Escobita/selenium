@@ -39,10 +39,9 @@ public class FindChildElements extends WebElementHandler implements JsonParamete
     super(sessions);
   }
 
-  public void setJsonParameters(List<Object> allParameters) throws Exception {
-    Map<?, ?> params = (Map<?, ?>) allParameters.get(0);
-    String method = (String) params.get("using");
-    String selector = (String) params.get("value");
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    String method = (String) allParameters.get("using");
+    String selector = (String) allParameters.get("value");
     
     by = new BySelector().pickFrom(method, selector);
   }
