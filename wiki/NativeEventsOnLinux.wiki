@@ -4,6 +4,14 @@
 = Introduction =
 This page details how native events for Firefox on Linux were implemented. Basically, this feature allows better user emulation for WebDriver in Firefox on Linux. Using this implementation, it should be easily extended to any other browser with a plug-in mechanism that is implemented using GTK+.
 
+= Window Managers known to break with Native Events =
+Not all window managers were born equal. Specifically, because of focus stealing, some scenarios of window switching will fail with some window managers.
+== Window managers known to work ==
+ * GNOME
+ * AfterStep
+== Window managers known not to work ==
+ * Enlightment / E16.
+ * TWM
 = Purpose and scope =
 == Existing State ==
 When this task started, WebDriver already has user emulation via Javascript on all platforms it was supported and support for native events on Windows for Firefox. Hence, it had all of the code for getting native code running from within a Firefox extension on windows.
