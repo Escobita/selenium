@@ -43,8 +43,6 @@ public class ChromeCommandExecutor {
   private final ServerSocket serverSocket;
   //Whether the listening thread should listen
   private volatile boolean listen = false;
-  //Whether a client is currently connected
-  private boolean hadClient = false;
   //Whether a client has ever been connected
   private boolean hasClient = false;
   ListeningThread listeningThread;
@@ -143,16 +141,7 @@ public class ChromeCommandExecutor {
    * @throws IOException if couldn't write command to socket
    */
   private void sendCommand(Command command) throws IOException {
-    Socket socket;
-    //Peek, rather than poll, so that if it all goes horribly wrong,
-    //we can just close all sockets in the queue,
-    //not having to worry about the current ones
-    while ((socket = listeningThread.sockets.peek()) == null) {
-      if (hadClient && !hasClient) {
-        throw new IllegalStateException("Cannot execute command without a client");
-      }
-      Thread.yield();
-    }
+    Socket socket = getOldestSocket();
     try {
       //Respond to request with the command
       String commandStringToSend;
@@ -265,13 +254,7 @@ public class ChromeCommandExecutor {
    * @throws IOException if there are errors with the socket being used
    */
   private ChromeResponse handleResponse(Command command) throws IOException {
-    Socket socket;
-    //Peek, rather than poll, so that if it all goes horribly wrong,
-    //we can just close all sockets in the queue,
-    //not having to worry about the current ones
-    while ((socket = listeningThread.sockets.peek()) == null) {
-      Thread.yield();
-    }
+    Socket socket = getOldestSocket();
     StringBuilder resultBuilder = new StringBuilder();
     BufferedReader reader = new BufferedReader(
         new InputStreamReader(socket.getInputStream()));
@@ -290,6 +273,17 @@ public class ChromeCommandExecutor {
       }
     }
     return parseResponse(resultBuilder.toString());
+  }
+
+  private Socket getOldestSocket() {
+    Socket socket;
+    //Peek, rather than poll, so that if it all goes horribly wrong,
+    //we can just close all sockets in the queue,
+    //not having to worry about the current ones
+    while ((socket = listeningThread.sockets.peek()) == null) {
+      Thread.yield();
+    }
+    return socket;
   }
 
   /**
@@ -472,7 +466,6 @@ public class ChromeCommandExecutor {
         while (listen) {
           sockets.add(serverSocket.accept());
           hasClient = true;
-          hadClient = true;
         }
       } catch (SocketException e) {
         if (listen) {
