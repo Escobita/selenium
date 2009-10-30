@@ -13,7 +13,7 @@ Not all window managers were born equal. Specifically, because of focus stealing
  * Enlightment / E16 - Switching to a newly opened window is broken.
  * TWM - The same as Enlightment / E16.
  * AfterStep - The same as Enlightment / E16.
- * WindowMaker - Breaks on focus remaining in the original window when opening a new one.
+ * WindowMaker - Breaks on focus remaining in the original window when opening a new one. The reason: In Gnome, when a sub-window of the new window gets focus this triggers focus stealing. This does not happen in WindowMaker, due to it not having a "smart" focus policy, where new windows get focus.
 = Purpose and scope =
 == Existing State ==
 When this task started, WebDriver already has user emulation via Javascript on all platforms it was supported and support for native events on Windows for Firefox. Hence, it had all of the code for getting native code running from within a Firefox extension on windows.
