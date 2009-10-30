@@ -1,0 +1,7 @@
+#summary Ruby bindings
+
+= Introduction =
+
+Coming soon.
+
+= Details =
