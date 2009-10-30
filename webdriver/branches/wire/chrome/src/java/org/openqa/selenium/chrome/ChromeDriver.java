@@ -1,9 +1,26 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.chrome;
 
+import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
@@ -16,8 +33,6 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.TemporaryFilesystem;
-import org.openqa.selenium.internal.Cleanly;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.DriverCommand;
@@ -25,30 +40,34 @@ import static org.openqa.selenium.remote.DriverCommand.*;
 import org.openqa.selenium.remote.SessionId;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
+import java.util.Set;
 
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor,
 FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
 
   private ChromeCommandExecutor executor;
   private ChromeBinary chromeBinary = new ChromeBinary();
+
+  private final ChromeProfile profile;
+  private final ChromeExtension extension;
   
   /**
    * Starts up a new instance of Chrome, with the required extension loaded,
    * and has it connect to a new ChromeCommandExecutor on port 9700
    */
   public ChromeDriver() {
+    this(new ChromeProfile(), new ChromeExtension());
+  }
+
+  public ChromeDriver(ChromeProfile profile, ChromeExtension extension) {
+    this.profile = profile;
+    this.extension = extension;
     init();
   }
   
@@ -74,31 +93,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    */
   protected void startClient() {
     try {
-      File extensionDir = getExtensionDir();
-      if (!extensionDir.isDirectory()) {
-        throw new FileNotFoundException("Could not find extension directory" +
-            "(" + extensionDir + ").  Try setting webdriver.chrome.extensiondir."); 
-      }
-      
-      //Copy over the correct manifest file
-      if (Platform.getCurrent().is(Platform.WINDOWS)) {
-        FileHandler.copy(new File(extensionDir, "manifest-win.json"),
-                         new File(extensionDir, "manifest.json"));
-      } else {
-        FileHandler.copy(new File(extensionDir, "manifest-nonwin.json"),
-                         new File(extensionDir, "manifest.json"));
-      }
-      
-      File profileDir = TemporaryFilesystem.createTempDir("profile", "");
-      File firstRunFile = new File(profileDir, "First Run Dev");
-      firstRunFile.createNewFile();
-      //TODO(danielwh): Maybe add Local State file with window_placement
-      
-      System.setProperty("webdriver.reap_profile", "false");
-      
-      chromeBinary.start(
-          profileDir.getCanonicalFile().toString(),
-          extensionDir.getCanonicalFile().toString());
+      chromeBinary.start(profile, extension);
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
@@ -149,29 +144,6 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
     }
   }
   
-  /**
-   * Locates the directory containing the extension to load Chrome with,
-   * trying to unzip the zipped extension if no explicit extension is set using
-   * the system property webdriver.chrome.extensiondir.
-   * @return the extension directory
-   * @throws IOException if tried to unzip extension but couldn't
-   */
-  protected File getExtensionDir() throws IOException {
-    File extensionDir;
-    String extensionDirSystemProperty = System.getProperty(
-        "webdriver.chrome.extensiondir");
-    if (extensionDirSystemProperty != null &&
-        !"".equals(extensionDirSystemProperty)) {
-      //Default to reading from the property
-      extensionDir = new File(extensionDirSystemProperty);
-    } else {
-      //If property not set, try to unpack the zip from the jar
-      extensionDir = FileHandler.unzip(this.getClass().getResourceAsStream(
-          "/chrome-extension.zip"));
-    }
-    return extensionDir;
-  }
-
   public void close() {
     execute(CLOSE);
   }

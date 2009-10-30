@@ -1,3 +1,20 @@
+/*
+Copyright 2007-2009 WebDriver committers
+Copyright 2007-2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.selenium.chrome;
 
 import java.io.File;
@@ -11,22 +28,21 @@ public class ChromeBinary {
   private static int linearBackoffCoefficient = 1;
   
   Process chromeProcess = null;
-  
+
   /**
    * Starts the Chrome process for WebDriver.
-   * Assumes the passed directories exist.
-   * @param profileDir directory to use as the profile.
-   * Should contain the empty text file "First Run Dev".
-   * @param extensionDir directory which contains the WebDriver extension.
+   *
+   * @param profile The profile to use.
+   * @param extension The extension to use.
    * @throws IOException wrapped in WebDriverException if process couldn't be
-   * started.
+   *     started.
    */
-  public void start(String profileDir, String extensionDir) throws IOException {
+  public void start(ChromeProfile profile, ChromeExtension extension) throws IOException {
     try {
       chromeProcess = new ProcessBuilder(
           getChromeFile(),
-          "--user-data-dir=" + profileDir,
-          "--load-extension=" + extensionDir,
+          "--user-data-dir=" + profile.getDirectory().getAbsolutePath(),
+          "--load-extension=" + extension.getDirectory().getAbsolutePath(),
           "--activate-on-launch",
           "--disable-popup-blocking")
           .start();
