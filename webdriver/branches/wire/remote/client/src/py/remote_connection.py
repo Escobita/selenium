@@ -28,27 +28,28 @@ class RemoteConnection(object):
         self._conn = httplib.HTTPConnection(remote_server_addr)
         self._context = "foo"
         self._session_id = ""
-        resp = self.post(
-            "/hub/session",
-            {"browserName": browser_name,
-             "platform": platform,
-             "class":"org.openqa.selenium.remote.DesiredCapabilities",
-             "javascriptEnabled":False,
-             "version":""},
-            )
+        resp = self.post("/hub/session", {
+            "desiredCapabilities": {
+                "browserName": browser_name,
+                "platform": platform,
+                "class":"org.openqa.selenium.remote.DesiredCapabilities",
+                "javascriptEnabled":False,
+                "version":""
+            }
+        })
         #TODO: handle the capabilities info sent back from server
         self._session_id = resp["sessionId"]
 
-    def post(self, path, *params):
-        return self.request("POST", path, *params)
+    def post(self, path, params=None):
+        return self.request("POST", path, params)
 
-    def get(self, path, *params):
-        return self.request("GET", path, *params)
+    def get(self, path, params=None):
+        return self.request("GET", path, params)
 
     def delete(self, path):
         return self.request("DELETE", path)
 
-    def request(self, method, path, *params):
+    def request(self, method, path, params=None):
         if params:
             payload = simplejson.dumps(params)
             logging.debug("request:" + path + utils.format_json(params))

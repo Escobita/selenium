@@ -29,7 +29,7 @@ class WebDriver(object):
 
     def get(self, url):
         """Loads a web page in the current browser."""
-        self._post("url", url)
+        self._post("url", {"url": url})
 
     def get_title(self):
         """Gets the title of the current page."""
@@ -42,11 +42,7 @@ class WebDriver(object):
 
     def find_elements_by_xpath(self, xpath):
         """Finds multiple elements by xpath."""
-        resp = self._post("elements", "xpath", xpath)
-        elems = []
-        for token in resp:
-            elems.append(self._get_elem(token))
-        return elems
+        return self._find_elements_by("xpath", xpath)
 
     def find_element_by_xpath(self, xpath):
         """Finds an element by xpath."""
@@ -70,7 +66,10 @@ class WebDriver(object):
                 converted_args.append({"type": "ELEMENT", "value": arg.id})
             else:
                 converted_args.append({"type": "STRING", "value": arg})
-        resp = self._post("execute", script, converted_args)
+        resp = self._post("execute", {
+            "script": script,
+            "args": converted_args
+        })
 
         if "NULL" == resp["type"]:
             pass
@@ -142,22 +141,35 @@ class WebDriver(object):
 
     def _find_element_by(self, by, value):
         try:
-            resp = self._post("element", by, value)
+            resp = self._post("element", {
+                "using": by,
+                "value": value
+            })
             if not resp:
                 raise NoSuchElementException(resp)
             return self._get_elem(resp[0])
         except ErrorInResponseException, ex:
             utils.handle_find_element_exception(ex)
 
-    def _get(self, path, *params):
+    def _find_elements_by(self, by, value):
+        resp = self._post("elements", {
+            "using": by,
+            "value": value
+        })
+        elems = []
+        for token in resp:
+            elems.append(self._get_elem(token))
+        return elems
+
+    def _get(self, path, params=None):
         """Sends a command to the server using http GET method."""
         return utils.return_value_if_exists(
-            self._conn.get(path, *params))
+            self._conn.get(path, params))
 
-    def _post(self, path, *params):
+    def _post(self, path, params=None):
         """Sends a command to the server using http POST method."""
         return utils.return_value_if_exists(
-            self._conn.post(path, *params))
+            self._conn.post(path, params))
 
     def _delete(self, path):
         """Sends a command to the server using http DELETE method."""

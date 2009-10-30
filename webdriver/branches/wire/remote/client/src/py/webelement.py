@@ -105,17 +105,17 @@ class WebElement(object):
     def id(self):
         return self._id
 
-    def _get(self, path, *params):
+    def _get(self, path, params=None):
         """Sends the command using http GET method."""
         return utils.return_value_if_exists(
             utils.get_root_parent(self).conn.get(
-                ("element/%s/" % self.id) + path, *params))
+                ("element/%s/" % self.id) + path, params))
 
-    def _post(self, path, *params):
+    def _post(self, path, params=None):
         """Sends the command using http POST method."""
         return utils.return_value_if_exists(
             utils.get_root_parent(self).conn.post(
-                ("element/%s/" % self.id) + path, *params))
+                ("element/%s/" % self.id) + path, params))
 
     def _get_elem(self, resp_value):
         """Creates a WebElement from a response token."""
