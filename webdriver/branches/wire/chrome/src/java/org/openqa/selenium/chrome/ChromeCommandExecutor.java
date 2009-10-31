@@ -39,12 +39,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ChromeCommandExecutor {
   private static final String[] ELEMENT_ID_ARG = new String[] {"elementId"};
   private static final String[] NO_ARGS = new String[] {};
-  
-  private final ServerSocket serverSocket;
+
+  private final int port;
+
   //Whether the listening thread should listen
   private volatile boolean listen = false;
-  //Whether a client has ever been connected
-  private boolean hasClient = false;
   ListeningThread listeningThread;
 
   private static final Map<DriverCommand, String[]> COMMANDS =
@@ -97,22 +96,17 @@ public class ChromeCommandExecutor {
           .build();
 
   /**
-   * Creates a new ChromeCommandExecutor which listens on a TCP port.
-   * Doesn't return until the TCP port is connected to.
+   * Creates a new ChromeCommandExecutor which will listen on a TCP port.
+   * To start the executor, call {@link #startListening()}.
+   *
    * @param port port on which to listen for the initial connection,
-   * and dispatch commands
+   *     and dispatch commands
    * @throws WebDriverException if could not bind to port
+   * @see #startListening()
    * TODO(danielwh): Bind to a random port (blocked on crbug.com 11547)
    */
   public ChromeCommandExecutor(int port) {
-    try {
-      serverSocket = new ServerSocket(port);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    }
-    listen = true;
-    listeningThread = new ListeningThread(serverSocket);
-    listeningThread.start();
+    this.port = port;
   }
   
   /**
@@ -120,7 +114,7 @@ public class ChromeCommandExecutor {
    * @return whether an instance of Chrome is currently connected
    */
   boolean hasClient() {
-    return hasClient;
+    return listeningThread != null && listeningThread.hasClient;
   }
   
   /**
@@ -430,16 +424,29 @@ public class ChromeCommandExecutor {
   }
 
   /**
+   * Starts listening for new socket connections from Chrome.
+   * Doesn't return until the TCP port is connected to.
+   */
+  public void startListening() {
+    if (listeningThread == null) {
+      listen = true;
+      listeningThread = new ListeningThread(port);
+      listeningThread.start();
+    }
+  }
+
+  /**
    * Stops listening from for new sockets from Chrome
    */
   public void stopListening() {
+    if (listeningThread == null) {
+      return;
+    }
     listen = false;
     listeningThread.stopListening();
-    while (!serverSocket.isClosed()) {// || serverSocket.isBound()) {
-      Thread.yield();
-    }
     //TODO(danielwh): Remove this when using multiple ports (blocked on crbug.com 11547)
     try { Thread.sleep(500); } catch (InterruptedException e) {}
+    listeningThread = null;
   }
 
   /**
@@ -449,10 +456,15 @@ public class ChromeCommandExecutor {
   private class ListeningThread extends Thread {
     private boolean isListening = false;
     private Queue<Socket> sockets = new ConcurrentLinkedQueue<Socket>();
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
+    private volatile boolean hasClient = false;
     
-    public ListeningThread(ServerSocket serverSocket) {
-      this.serverSocket = serverSocket;
+    public ListeningThread(int port) {
+      try {
+        serverSocket = new ServerSocket(port);
+      } catch (IOException e) {
+        throw new WebDriverException(e);
+      }
     }
     
     public void run() {
@@ -460,6 +472,7 @@ public class ChromeCommandExecutor {
         listen();
       }
     }
+
     public void listen() {
       isListening = true;
       try {
@@ -488,17 +501,21 @@ public class ChromeCommandExecutor {
         try {
           if (!serverSocket.isClosed()) {
             serverSocket.close();
+            while (!serverSocket.isClosed()) {
+              Thread.yield();
+            }
           }
         } catch (Exception e) {
           throw new WebDriverException(e);
         }
       }
     }
+
     private void closeCurrentSockets() {
-      for (Socket socket : listeningThread.sockets) {
+      for (Socket socket : sockets) {
         try {
           socket.close();
-          listeningThread.sockets.remove(socket);
+          sockets.remove(socket);
         } catch (IOException e) {
           //Nothing we can sanely do here
         }

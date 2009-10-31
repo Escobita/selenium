@@ -26,7 +26,6 @@ import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -39,7 +38,6 @@ import org.openqa.selenium.remote.DriverCommand;
 import static org.openqa.selenium.remote.DriverCommand.*;
 import org.openqa.selenium.remote.SessionId;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,9 +49,8 @@ import java.util.Set;
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor,
 FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
 
-  private ChromeCommandExecutor executor;
-  private ChromeBinary chromeBinary = new ChromeBinary();
-
+  private final ChromeCommandExecutor executor;
+  private final ChromeBinary chromeBinary;
   private final ChromeProfile profile;
   private final ChromeExtension extension;
   
@@ -66,24 +63,19 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
   }
 
   public ChromeDriver(ChromeProfile profile, ChromeExtension extension) {
+    // TODO(danielwh): Remove explicit port (blocked on crbug.com 11547)
+    this(new ChromeCommandExecutor(9700), new ChromeBinary(), profile, extension);
+  }
+
+  private ChromeDriver(ChromeCommandExecutor executor, ChromeBinary chromeBinary,
+                       ChromeProfile profile, ChromeExtension extension) {
+    this.executor = executor;
+    this.chromeBinary = chromeBinary;
     this.profile = profile;
     this.extension = extension;
-    init();
+    startClient();
   }
-  
-  private void init() {
-    while (executor == null || !executor.hasClient()) {
-      stopClient();
-      //TODO(danielwh): Remove explicit port (blocked on crbug.com 11547)
-      this.executor = new ChromeCommandExecutor(9700);
-      startClient();
-      //In case this attempt fails, we increment how long we wait before sending a command
-      chromeBinary.incrementBackoffBy(1);
-    }
-    //The last one attempt succeeded, so we reduce back to that time
-    chromeBinary.incrementBackoffBy(-1);
-  }
-  
+
   /**
    * By default will try to load Chrome from system property
    * webdriver.chrome.bin and the extension from
@@ -92,11 +84,19 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    * hope we're in.  If these fail, throws exceptions.
    */
   protected void startClient() {
-    try {
-      chromeBinary.start(profile, extension);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
+    while (!executor.hasClient()) {
+      stopClient();
+      executor.startListening();
+      try {
+        chromeBinary.start(profile, extension);
+      } catch (IOException e) {
+        throw new WebDriverException(e);
+      }
+      //In case this attempt fails, we increment how long we wait before sending a command
+      chromeBinary.incrementBackoffBy(1);
     }
+    //The last one attempt succeeded, so we reduce back to that time
+    chromeBinary.incrementBackoffBy(-1);
   }
   
   /**
@@ -104,10 +104,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
    */
   protected void stopClient() {
     chromeBinary.kill();
-    if (executor != null) {
-      executor.stopListening();
-      executor = null;
-    }
+    executor.stopListening();
   }
 
   private ChromeResponse execute(DriverCommand driverCommand) {
@@ -134,7 +131,7 @@ FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, Finds
         //These exceptions may leave the extension hung, or in an
         //inconsistent state, so we restart Chrome
         stopClient();
-        init();
+        startClient();
       }
       if (e instanceof RuntimeException) {
         throw (RuntimeException)e;
