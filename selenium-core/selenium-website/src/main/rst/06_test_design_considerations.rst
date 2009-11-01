@@ -174,13 +174,15 @@ You might consider trying the `UI-Element`_ extension in this situation.
 Testing Ajax Applications
 -------------------------
 
+If your application under test uses AJAX technology, then you will need to know some techniques for handling AJAX implemented JI elements.  If you're not sure if you application uses AJAX then ask your developers.  Definitions and descriptions of AJAX can easily be found on the internet.
+
 How can I Pause my test app for an element in AJAX driven application?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX driven web applications; data is retrieved from server with out refreshing 
-the page. Usage of *waitForPageToLoad* would not work as page is not actually 
-loaded. Pausing the test execution for certain period of time is also not a good 
-approach as web element might appear late or earlier than stipulated period; leading
-to test failures. A better approach would be to wait for element for predefined 
+In AJAX driven web applications; information is retrieved from server with out refreshing 
+the page. The leads to UI elements within a page appearing, or being refreshed, asynchronously.  That is, these UI elements can be updated, or even created, separately from refreshing the web-page.  In this situation, using *waitForPageToLoad* would not work as page is not loaded, only the UI element itself is changed. Pausing the test execution for certain period of time is also not a good approach as web element might appear late or earlier than stipulated period; leading
+to test failures. 
+
+A better approach would be to wait for element for predefined 
 period and then continue execution as soon as element is found.
 
 For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
