@@ -26,18 +26,28 @@ import org.openqa.selenium.WebDriverException;
 public class ChromeBinary {
   
   private static int linearBackoffCoefficient = 1;
-  
-  Process chromeProcess = null;
+
+  private final ChromeProfile profile;
+  private final ChromeExtension extension;
+
+  private Process chromeProcess = null;
+
+  /**
+   * @param profile The profile to use.
+   * @param extension The extension to use.
+   */
+  public ChromeBinary(ChromeProfile profile, ChromeExtension extension) {
+    this.profile = profile;
+    this.extension = extension;
+  }
 
   /**
    * Starts the Chrome process for WebDriver.
    *
-   * @param profile The profile to use.
-   * @param extension The extension to use.
    * @throws IOException wrapped in WebDriverException if process couldn't be
    *     started.
    */
-  public void start(ChromeProfile profile, ChromeExtension extension) throws IOException {
+  public void start() throws IOException {
     try {
       chromeProcess = new ProcessBuilder(
           getChromeFile(),

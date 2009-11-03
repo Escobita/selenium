@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.RenderedRemoteWebElement;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -20,8 +21,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ChromeWebElement implements RenderedWebElement, Locatable, 
-FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
+public class ChromeWebElement extends RenderedRemoteWebElement {
 
   private final ChromeDriver parent;
   private final String elementId;
@@ -39,7 +39,8 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
     return execute(driverCommand, ImmutableMap.<String, Object>of());
   }
 
-  ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+  @Override
+  protected ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
     return parent.execute(driverCommand,
         ImmutableMap.<String, Object>builder()
             .put("elementId", elementId)
@@ -47,10 +48,12 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
             .build());
   }
   
+  @Override
   public void dragAndDropBy(int moveRightBy, int moveDownBy) {
     throw new UnsupportedOperationException("Not yet supported in Chrome");
   }
 
+  @Override
   public void dragAndDropOn(RenderedWebElement element) {
     throw new UnsupportedOperationException("Not yet supported in Chrome");
   }

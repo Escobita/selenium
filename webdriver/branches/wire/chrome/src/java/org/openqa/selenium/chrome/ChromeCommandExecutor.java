@@ -16,6 +16,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.XPathLookupException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.JsonToBeanConverter;
 import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.awt.Dimension;
@@ -36,11 +38,12 @@ import java.util.Queue;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ChromeCommandExecutor {
+public class ChromeCommandExecutor implements CommandExecutor {
   private static final String[] ELEMENT_ID_ARG = new String[] {"elementId"};
   private static final String[] NO_ARGS = new String[] {};
 
   private final int port;
+  private final ChromeBinary chromeBinary;
 
   //Whether the listening thread should listen
   private volatile boolean listen = false;
@@ -105,8 +108,9 @@ public class ChromeCommandExecutor {
    * @see #startListening()
    * TODO(danielwh): Bind to a random port (blocked on crbug.com 11547)
    */
-  public ChromeCommandExecutor(int port) {
+  public ChromeCommandExecutor(int port, ChromeBinary binary) {
     this.port = port;
+    this.chromeBinary = binary;
   }
   
   /**
@@ -289,77 +293,92 @@ public class ChromeCommandExecutor {
     if (rawJsonString.length() == 0) {
       return new ChromeResponse(0, null);
     }
+
+    ChromeResponse response;
     try {
       JSONObject jsonObject = new JSONObject(rawJsonString);
       if (!jsonObject.has("statusCode")) {
-        throw new WebDriverException("Response had no status code.  Response was: " + rawJsonString);
+        throw new WebDriverException("Response had no status code. Response was: " + rawJsonString);
       }
-      if (jsonObject.getInt("statusCode") == 0) {
-        //Success! Parse value
-        if (!jsonObject.has("value") || jsonObject.isNull("value")) {
-          return new ChromeResponse(0, null);
-        }
-        Object value = jsonObject.get("value");
+      response = new ChromeResponse(jsonObject.getInt("statusCode"),
+          jsonObject.has("value") && !jsonObject.isNull("value") ? jsonObject.get("value") : null);
+    } catch (JSONException e) {
+      throw new WebDriverException(e); 
+    }
+
+    if (response.getStatusCode() == 0) {
+      //Success! Parse value
+      if (response.getValue() == null) {
+        return response;
+      }
+      Object value = response.getValue();
+      try {
         Object parsedValue = parseJsonToObject(value);
         if (parsedValue instanceof ChromeWebElement) {
           return new ChromeResponse(-1, ((ChromeWebElement)parsedValue).getElementId());
         } else {
           return new ChromeResponse(0, parsedValue);
         }
-      } else {
-        String message = "";
-        if (jsonObject.has("value") &&
-            jsonObject.get("value") instanceof JSONObject &&
-            jsonObject.getJSONObject("value").has("message") &&
-            jsonObject.getJSONObject("value").get("message") instanceof String) {
-          message = jsonObject.getJSONObject("value").getString("message");
-        }
-        switch (jsonObject.getInt("statusCode")) {
-        //Error codes are loosely based on native exception codes,
-        //see common/src/cpp/webdriver-interactions/errorcodes.h
-        case 2:
-          //Cookie error
-          throw new WebDriverException(message);
-        case 3:
-          throw new NoSuchWindowException(message);
-        case 7:
-          throw new NoSuchElementException(message);
-        case 8:
-          throw new NoSuchFrameException(message);
-        case 9:
-          //Unknown command
-          throw new UnsupportedOperationException(message); 
-        case 10:
-          throw new StaleElementReferenceException(message);
-        case 11:
-          throw new ElementNotVisibleException(message);
-        case 12: 
-          //Invalid element state (e.g. disabled)
-          throw new UnsupportedOperationException(message);
-        case 17:
-          //Bad javascript
-          throw new WebDriverException(message);
-        case 19:
-          //Bad xpath
-          throw new XPathLookupException(message);
-        case 99:
-          throw new WebDriverException("An error occured when sending a native event");
-        case 500:
-          if (message.equals("")) {
-            message = "An error occured due to the internals of Chrome. " +
-            "This does not mean your test failed. " +
-            "Try running your test again in isolation.";
-          }
-          throw new FatalChromeException(message);
-        }
-        throw new WebDriverException("An error occured in the page");
+      } catch (Exception e) {
+        throw new WebDriverException(e);
       }
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
+    } else {
+      String message = "";
+      Object value = response.getValue();
+      if (value instanceof JSONObject) {
+        JSONObject jsonObject = (JSONObject) value;
+        try {
+          if (jsonObject.has("message") && jsonObject.get("message") instanceof String) {
+            message = jsonObject.getString("message");
+          }
+        } catch (JSONException e) {
+          throw new WebDriverException(e);
+        }
+      }
+
+      switch (response.getStatusCode()) {
+      //Error codes are loosely based on native exception codes,
+      //see common/src/cpp/webdriver-interactions/errorcodes.h
+      case 2:
+        //Cookie error
+        throw new WebDriverException(message);
+      case 3:
+        throw new NoSuchWindowException(message);
+      case 7:
+        throw new NoSuchElementException(message);
+      case 8:
+        throw new NoSuchFrameException(message);
+      case 9:
+        //Unknown command
+        throw new UnsupportedOperationException(message);
+      case 10:
+        throw new StaleElementReferenceException(message);
+      case 11:
+        throw new ElementNotVisibleException(message);
+      case 12:
+        //Invalid element state (e.g. disabled)
+        throw new UnsupportedOperationException(message);
+      case 17:
+        //Bad javascript
+        throw new WebDriverException(message);
+      case 19:
+        //Bad xpath
+        throw new XPathLookupException(message);
+      case 99:
+        throw new WebDriverException("An error occured when sending a native event");
+      case 500:
+        if (message.equals("")) {
+          message = "An error occured due to the internals of Chrome. " +
+          "This does not mean your test failed. " +
+          "Try running your test again in isolation.";
+        }
+        throw new FatalChromeException(message);
+      }
+      throw new WebDriverException("An error occured in the page");
     }
   }
   
-  private Object parseJsonToObject(Object value) throws JSONException {
+  private Object parseJsonToObject(Object value) throws Exception {
     if (value instanceof String) {
       return value;
     } else if (value instanceof Boolean) {
@@ -386,7 +405,7 @@ public class ChromeCommandExecutor {
       } else if ("VALUE".equals(object.getString("type"))) {
         Object innerValue = object.get("value");
         if (innerValue instanceof Integer) {
-          innerValue = new Long((Integer)innerValue);
+          innerValue = ((Number) innerValue).longValue();
         }
         return innerValue;
       } else if ("ELEMENT".equals(object.getString("type"))) {
@@ -409,18 +428,45 @@ public class ChromeCommandExecutor {
         }
         return new Dimension(object.getInt("width"),
                              object.getInt("height"));
-      } else if ("COOKIE".equals(object.getString("type"))) {
-        if (!object.has("name") || !object.has("value")) {
-          throw new WebDriverException("Couldn't construct Cookie " +
-              "without name and value");
-        }
-        return new Cookie(object.getString("name"), object.getString("value"));
+      } else {
+        return jsonToMap(object);
       }
     } else {
       throw new WebDriverException("Didn't know how to deal with " +
           "response value of type: " + value.getClass());
     }
-    return null;
+  }
+
+  @SuppressWarnings({"unchecked"})
+  private Map<String, Object> jsonToMap(JSONObject json) throws Exception {
+    return (Map<String, Object>) new JsonToBeanConverter().convert(Map.class, json.toString());
+  }
+
+  /**
+   * Launches Chrome and starts listening for connections from it.
+   */
+  public void start() {
+    while (!hasClient()) {
+      stop();
+      startListening();
+      try {
+        chromeBinary.start();
+      } catch (IOException e) {
+        throw new WebDriverException(e);
+      }
+      //In case this attempt fails, we increment how long we wait before sending a command
+      chromeBinary.incrementBackoffBy(1);
+    }
+    //The last one attempt succeeded, so we reduce back to that time
+    chromeBinary.incrementBackoffBy(-1);
+  }
+
+  /**
+   * Kills Chrome and closes the server socket.
+   */
+  public void stop() {
+    chromeBinary.kill();
+    stopListening();
   }
 
   /**

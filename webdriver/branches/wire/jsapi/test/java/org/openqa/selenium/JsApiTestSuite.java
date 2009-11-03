@@ -19,7 +19,6 @@ public class JsApiTestSuite extends TestCase {
     TestSuite all = new TestSuite();
     all.setName(JsApiTestSuite.class.getSimpleName());
     all.addTest(createDriverSuite(FirefoxDriver.class, Ignore.Driver.FIREFOX));
-    all.addTest(createDriverSuite(ChromeDriver.class, Ignore.Driver.CHROME));
     return all;
   }
 

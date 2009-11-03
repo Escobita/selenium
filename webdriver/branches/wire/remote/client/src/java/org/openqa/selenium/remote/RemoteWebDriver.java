@@ -74,6 +74,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     this(new HttpCommandExecutor(remoteAddress), desiredCapabilities);
   }
 
+  protected CommandExecutor getExecutor() {
+    return executor;
+  }
+
   @SuppressWarnings({"unchecked"})
   protected void startSession(Capabilities desiredCapabilities) {
     Response response = execute(DriverCommand.NEW_SESSION,
