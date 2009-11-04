@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -91,6 +92,26 @@ public class FormHandlingTest extends AbstractDriverTestCase {
     String cheesey = "Brie and cheddar";
     textarea.sendKeys(cheesey);
     assertThat(textarea.getValue(), equalTo(cheesey));
+  }
+
+  @Ignore({SELENESE, CHROME_NON_WINDOWS})
+  public void testShouldSubmitAFormUsingTheNewlineLiteral() {
+    driver.get(formPage);
+    WebElement nestedForm = driver.findElement(By.id("nested_form"));
+    WebElement input = nestedForm.findElement(By.name("x"));
+    input.sendKeys("\n");
+    assertEquals("We Arrive Here", driver.getTitle());
+    assertTrue(driver.getCurrentUrl().endsWith("?x=name"));
+  }
+
+  @Ignore({SELENESE, CHROME_NON_WINDOWS})
+  public void testShouldSubmitAFormUsingTheEnterKey() {
+    driver.get(formPage);
+    WebElement nestedForm = driver.findElement(By.id("nested_form"));
+    WebElement input = nestedForm.findElement(By.name("x"));
+    input.sendKeys(Keys.ENTER);
+    assertEquals("We Arrive Here", driver.getTitle());
+    assertTrue(driver.getCurrentUrl().endsWith("?x=name"));
   }
 
   public void testShouldEnterDataIntoFormFields() {

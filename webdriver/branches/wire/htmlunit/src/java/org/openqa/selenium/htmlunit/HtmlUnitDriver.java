@@ -24,6 +24,7 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.ScriptResult;
+import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -37,12 +38,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlInlineFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLElement;
-
 import net.sourceforge.htmlunit.corejs.javascript.Function;
 import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
 import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
 import net.sourceforge.htmlunit.corejs.javascript.Undefined;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -68,8 +67,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +74,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
                                        FindsById, FindsByLinkText, FindsByXPath, FindsByName,
@@ -88,7 +84,6 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
   private boolean enableJavascript;
   private ProxyConfig proxyConfig;
-  private AtomicLong windowNamer = new AtomicLong(System.currentTimeMillis());
   private final BrowserVersion version;
 
   public HtmlUnitDriver(BrowserVersion version) {
@@ -290,6 +285,10 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public void close() {
+    if (currentWindow != null) {
+      ((TopLevelWindow) currentWindow.getTopWindow()).close();
+    }
+    
     webClient = createWebClient(version);
   }
 
@@ -306,27 +305,14 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     List<WebWindow> allWindows = webClient.getWebWindows();
     for (WebWindow window : allWindows) {
       WebWindow top = window.getTopWindow();
-      if (top.getName() == null || "".equals(top.getName())) {
-        nameWindow(top);
-      }
-      allHandles.add(top.getName());
+      allHandles.add(String.valueOf(System.identityHashCode(top)));
     }
 
     return allHandles;
   }
 
   public String getWindowHandle() {
-    WebWindow window = webClient.getCurrentWindow();
-    if (window.getName() == null || "".equals(window.getName())) {
-      nameWindow(window);
-    }
-    return window.getName();
-  }
-
-  private String nameWindow(WebWindow window) {
-    String windowName = "webdriver" + windowNamer.incrementAndGet();
-    window.setName(windowName);
-    return windowName;
+    return String.valueOf(System.identityHashCode(currentWindow));
   }
 
   public Object executeScript(String script, Object... args) {
@@ -449,7 +435,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     return new HtmlUnitNavigation();
   }
 
-  protected synchronized Page lastPage() {
+  protected Page lastPage() {
     return currentWindow.getEnclosedPage();
   }
 
@@ -657,12 +643,22 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public WebDriver window(String windowId) {
-      WebWindow window;
       try {
-        window = webClient.getWebWindowByName(windowId);
+        WebWindow window = webClient.getWebWindowByName(windowId);
+        return finishSelecting(window);
       } catch (WebWindowNotFoundException e) {
+
+        List<WebWindow> allWindows = webClient.getWebWindows();
+        for (WebWindow current : allWindows) {
+          WebWindow top = current.getTopWindow();
+          if (String.valueOf(System.identityHashCode(top)).equals(windowId))
+            return finishSelecting(top);
+        }
         throw new NoSuchWindowException("Cannot find window: " + windowId);
       }
+    }
+
+    private WebDriver finishSelecting(WebWindow window) {
       webClient.setCurrentWindow(window);
       currentWindow = window;
       pickWindow();
