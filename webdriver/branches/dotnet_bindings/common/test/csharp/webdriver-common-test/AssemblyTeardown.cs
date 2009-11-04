@@ -3,7 +3,7 @@ using OpenQa.Selenium.Environment;
 
 [SetUpFixture]
 // Outside a namespace to affect the entire assembly
-public class MySetUpClass
+public class AssemblyTeardown
 {
 
     [TearDown]

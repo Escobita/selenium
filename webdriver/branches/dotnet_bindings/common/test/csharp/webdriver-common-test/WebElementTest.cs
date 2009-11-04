@@ -118,7 +118,7 @@ namespace OpenQa.Selenium
         {
             driver.Url = javascriptPage;
             IWebElement changedDiv = driver.FindElement(By.Id("dynamo"));
-            IWebElement link = driver.FindElement(By.Id("updatediv"));
+            IWebElement link = driver.FindElement(By.LinkText("Update a div"));
             link.Click();
             Assert.AreEqual("Fish and chips!", changedDiv.Text);
         }
