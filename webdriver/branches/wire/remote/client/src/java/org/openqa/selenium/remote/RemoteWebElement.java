@@ -214,6 +214,9 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
     return value != null && value instanceof Boolean && (Boolean) value;
   }
 
+  /**
+   * @return This element's hash code, which is a hash of its internal opaque ID.
+   */
   @Override
   public int hashCode() {
     return id.hashCode();

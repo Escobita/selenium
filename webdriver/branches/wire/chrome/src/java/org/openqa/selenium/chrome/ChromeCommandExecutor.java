@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChromeCommandExecutor implements CommandExecutor {
-  private static final String[] ELEMENT_ID_ARG = new String[] {"elementId"};
+  private static final String[] ELEMENT_ID_ARG = new String[] {"id"};
   private static final String[] NO_ARGS = new String[] {};
 
   private final int port;
@@ -69,18 +69,17 @@ public class ChromeCommandExecutor implements CommandExecutor {
           .put(CLEAR_ELEMENT, ELEMENT_ID_ARG)
           .put(CLICK_ELEMENT, ELEMENT_ID_ARG)
           .put(HOVER_OVER_ELEMENT, ELEMENT_ID_ARG)
-          .put(SEND_KEYS_TO_ELEMENT, new String[] {"elementId", "keys"})
+          .put(SEND_KEYS_TO_ELEMENT, new String[] {"id", "value"})
           .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
           .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
-          .put(GET_ELEMENT_ATTRIBUTE, new String[] {"elementId", "attribute"})
+          .put(GET_ELEMENT_ATTRIBUTE, new String[] {"id", "name"})
           .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_TAG_NAME, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_TEXT, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_VALUE, ELEMENT_ID_ARG)
-          .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-               new String[] {"elementId", "css"})
+          .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY, new String[] {"id", "propertyName"})
           .put(IS_ELEMENT_DISPLAYED, ELEMENT_ID_ARG)
           .put(IS_ELEMENT_ENABLED, ELEMENT_ID_ARG)
           .put(IS_ELEMENT_SELECTED, ELEMENT_ID_ARG)
@@ -205,7 +204,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
       cookieMap.put("expiry", cookie.getExpiry());
       return new JSONObject(cookieMap);
     } else if (object instanceof ChromeWebElement) {
-      return ((ChromeWebElement)object).getElementId();
+      return ((ChromeWebElement)object).getId();
     } else {
       return object;
     }
@@ -315,7 +314,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
       try {
         Object parsedValue = parseJsonToObject(value);
         if (parsedValue instanceof ChromeWebElement) {
-          return new ChromeResponse(-1, ((ChromeWebElement)parsedValue).getElementId());
+          return new ChromeResponse(-1, ((ChromeWebElement)parsedValue).getId());
         } else {
           return new ChromeResponse(0, parsedValue);
         }
@@ -410,24 +409,6 @@ public class ChromeCommandExecutor implements CommandExecutor {
         return innerValue;
       } else if ("ELEMENT".equals(object.getString("type"))) {
         return new ChromeWebElement(null, (String)object.get("value"));
-      } else if ("POINT".equals(object.getString("type"))) {
-        if (!object.has("x") || !object.has("y") ||
-            !(object.get("x") instanceof Number) ||
-            !(object.get("y") instanceof Number)) {
-          throw new WebDriverException("Couldn't construct Point without " +
-              "x and y coordinates");
-        }
-        return new Point(object.getInt("x"),
-                         object.getInt("y"));
-      } else if ("DIMENSION".equals(object.getString("type"))) {
-        if (!object.has("width") || !object.has("height") ||
-            !(object.get("width") instanceof Number) ||
-            !(object.get("height") instanceof Number)) {
-          throw new WebDriverException("Couldn't construct Dimension " +
-              "without width and height");
-        }
-        return new Dimension(object.getInt("width"),
-                             object.getInt("height"));
       } else {
         return jsonToMap(object);
       }
@@ -589,7 +570,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
         wrappedArgument.put("value", argument);
       } else if (argument instanceof ChromeWebElement) {
         wrappedArgument.put("type", "ELEMENT");
-        wrappedArgument.put("value", ((ChromeWebElement)argument).getElementId());
+        wrappedArgument.put("value", ((ChromeWebElement)argument).getId());
       } else if (argument instanceof Collection<?>) {
         JSONArray array = new JSONArray();
         for (Object o : (Collection<?>)argument) {

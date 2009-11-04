@@ -406,8 +406,8 @@ function parseRequest(request) {
   case "hoverOverElement":
     // Falling through, as native events are handled the same
   case "sendKeysToElement":
-    if (typeof(request.keys) == "object" && request.keys.length !== undefined) {
-      request.keys = request.keys.join("");
+    if (typeof(request.value) == "object" && request.value.length !== undefined) {
+      request.value = request.value.join("");
     }
     sendMessageOnActivePortAndAlsoKeepTrackOfIt(
         wrapInjectEmbedIfNecessary(request));
@@ -528,7 +528,7 @@ function parsePortMessage(message) {
         ChromeDriver.isBlockedWaitingForResponse = false;
         parseRequest({
           request: 'nonNativeClickElement',
-          elementId: message.response.value.elementId
+          id: message.response.value.id
         });
       }
       break;
@@ -556,7 +556,7 @@ function parsePortMessage(message) {
         ChromeDriver.isBlockedWaitingForResponse = false;
         parseRequest({
           request: 'sendElementNonNativeKeys',
-          elementId: message.response.value.elementId,
+          id: message.response.value.id,
           keys: message.response.value.keys
         });
       }
