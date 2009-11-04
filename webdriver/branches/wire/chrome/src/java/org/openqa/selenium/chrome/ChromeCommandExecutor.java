@@ -3,6 +3,7 @@
 package org.openqa.selenium.chrome;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.annotations.VisibleForTesting;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,6 +112,10 @@ public class ChromeCommandExecutor implements CommandExecutor {
     this.port = port;
     this.chromeBinary = binary;
   }
+
+  @VisibleForTesting ChromeBinary getChromeBinary() {
+    return chromeBinary;
+  }
   
   /**
    * Returns whether an instance of Chrome is currently connected
@@ -125,6 +130,8 @@ public class ChromeCommandExecutor implements CommandExecutor {
    * @param command command to execute
    * @return response to command
    * @throws IllegalStateException if no socket was present
+   * @throws DeadChromeException If Chrome unexpectedly quits, making it
+   *     impossible to complete the command.
    */
   public ChromeResponse execute(Command command) throws IOException {
     sendCommand(command);
@@ -279,6 +286,15 @@ public class ChromeCommandExecutor implements CommandExecutor {
     //not having to worry about the current ones
     while ((socket = listeningThread.sockets.peek()) == null) {
       Thread.yield();
+
+      // If Chrome is no longer alive, this loop will block indefinitely, so go
+      // ahead and throw an error to let our clients know something very bad
+      // happened.
+      if (!chromeBinary.isAlive()) {
+        // There is no longer a client to listen for, so go ahead and shutdown.
+        stop();
+        throw new DeadChromeException("Chrome has unexpectedly died.");
+      }
     }
     return socket;
   }

@@ -17,11 +17,16 @@ limitations under the License.
 
 package org.openqa.selenium.chrome;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.google.common.annotations.VisibleForTesting;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 public class ChromeBinary {
   
@@ -29,16 +34,30 @@ public class ChromeBinary {
 
   private final ChromeProfile profile;
   private final ChromeExtension extension;
+  private final ExecutorService executorService;
 
   private Process chromeProcess = null;
+  private FutureTask<Integer> babySitter = null;
 
   /**
    * @param profile The profile to use.
    * @param extension The extension to use.
    */
   public ChromeBinary(ChromeProfile profile, ChromeExtension extension) {
+    this(profile, extension, Executors.newSingleThreadExecutor());
+  }
+
+  /**
+   * @param profile The profile to use.
+   * @param extension The extension to use.
+   * @param executorService The serviced used to monitor whether the Chrome
+   *     subprocess unexpectedly dies.
+   */
+  private ChromeBinary(ChromeProfile profile, ChromeExtension extension,
+                       ExecutorService executorService) {
     this.profile = profile;
     this.extension = extension;
+    this.executorService = executorService;
   }
 
   /**
@@ -56,6 +75,12 @@ public class ChromeBinary {
           "--activate-on-launch",
           "--disable-popup-blocking")
           .start();
+
+      // Create a baby sitter to monitor whether Chrome dies before we manually
+      // kill it.
+      babySitter = createBabySitter(chromeProcess);
+      executorService.execute(babySitter);
+      
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
@@ -65,14 +90,44 @@ public class ChromeBinary {
       //Nothing sane to do here
     }
   }
+
+  private static FutureTask<Integer> createBabySitter(final Process child) {
+    return new FutureTask<Integer>(new Callable<Integer>() {
+      public Integer call() throws Exception {
+        return child.waitFor();
+      }
+    });
+  }
   
   public void kill() {
+    if (babySitter != null) {
+      babySitter.cancel(true);
+      babySitter = null;
+    }
+
     if (chromeProcess != null) {
       chromeProcess.destroy();
       chromeProcess = null;
     }
   }
-  
+
+  /**
+   * Tests whether the Chrome process is alive and running. Will return
+   * {@code false} if Chrome was never {@link #start() started}, or if
+   * Chrome was {@link #kill() killed}. Note that this only tests if the
+   * Chrome process is still running, it does not test whether it is
+   * responsive.
+   *
+   * @return Whether the Chrome process is alive.
+   */
+  public boolean isAlive() {
+    return babySitter != null && !babySitter.isDone();
+  }
+
+  @VisibleForTesting Process getChromeProcess() {
+    return chromeProcess;
+  }
+
   public void incrementBackoffBy(int diff) {
     linearBackoffCoefficient += diff;
   }

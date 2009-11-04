@@ -74,7 +74,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     this(new HttpCommandExecutor(remoteAddress), desiredCapabilities);
   }
 
-  protected CommandExecutor getExecutor() {
+  public CommandExecutor getExecutor() {
     return executor;
   }
 
