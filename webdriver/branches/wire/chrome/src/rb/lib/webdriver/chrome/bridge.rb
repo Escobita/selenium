@@ -166,87 +166,87 @@ module WebDriver
 
       def clickElement(element)
         execute :request   => 'clickElement',
-                :elementId => element
+                :id        => element
       end
 
       def getElementTagName(element)
         execute :request   => 'getElementTagName',
-                :elementId => element
+                :id        => element
       end
 
       def getElementAttribute(element, name)
-        execute :request   => 'getElementAttribute',
-                :elementId => element,
-                :attribute => name
+        execute :request  => 'getElementAttribute',
+                :id       => element,
+                :name     => name
       end
 
       def getElementValue(element)
         execute :request   => 'getElementValue',
-                :elementId => element
+                :id        => element
       end
 
       def getElementText(element)
         execute :request   => 'getElementText',
-                :elementId => element
+                :id        => element
       end
 
       def getElementLocation(element)
         data = execute :request   => 'getElementLocation',
-                       :elementId => element
+                       :id        => element
 
         Point.new data['x'], data['y']
       end
 
       def getElementSize(element)
         execute :request   => 'getElementSize',
-                :elementId => element
+                :id        => element
       end
 
       def sendKeysToElement(element, string)
         execute :request   => 'sendKeysToElement',
-                :elementId => element,
-                :keys      => string.split(//u)
+                :id        => element,
+                :value     => string.split(//u)
       end
 
       def clearElement(element)
         execute :request   => 'clearElement',
-                :elementId => element
+                :id        => element
       end
 
       def isElementEnabled(element)
         execute :request   => 'isElementEnabled',
-                :elementId => element
+                :id        => element
       end
 
       def isElementSelected(element)
         execute :request   => 'isElementSelected',
-                :elementId => element
+                :id        => element
       end
 
       def isElementDisplayed(element)
         execute :request   => 'isElementDisplayed',
-                :elementId => element
+                :id        => element
       end
 
       def submitElement(element)
         execute :request   => 'submitElement',
-                :elementId => element
+                :id        => element
       end
 
       def toggleElement(element)
         execute :request   => 'toggleElement',
-                :elementId => element
+                :id        => element
       end
 
       def setElementSelected(element)
         execute :request   => 'setElementSelected',
-                :elementId => element
+                :id        => element
       end
 
       def getElementValueOfCssProperty(element, prop)
-        execute :request   => 'getElementValueOfCssProperty',
-                :elementId => element,
-                :css       => prop
+        execute :request      => 'getElementValueOfCssProperty',
+                :id           => element,
+                :propertyName => prop
       end
 
       def getActiveElement
@@ -256,7 +256,7 @@ module WebDriver
 
       def hoverOverElement
         execute :request   => 'hoverOverElement',
-                :elementId => element
+                :id        => element
       end
 
       def dragElement(element, rigth_by, down_by)
