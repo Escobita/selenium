@@ -11,6 +11,7 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="remote-common" />
     <orderEntry type="library" name="third_party-buildtime" level="project" />
+    <orderEntry type="module" module-name="remote-client" />
     <orderEntryProperties />
   </component>
 </module>
