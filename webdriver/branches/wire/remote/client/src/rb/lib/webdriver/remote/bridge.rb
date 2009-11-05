@@ -69,13 +69,13 @@ module WebDriver
 
 
       def create_session(desired_capabilities)
-        resp  = raw_execute :newSession, {}, desired_capabilities
+        resp  = raw_execute :newSession, {}, :desiredCapabilities => desired_capabilities
         @session_id = resp['sessionId'] || raise('no sessionId in returned payload')
         Capabilities.json_create resp['value']
       end
 
       def get(url)
-        execute :get, {}, url
+        execute :get, {}, :url => url
       end
 
       def goBack
@@ -135,7 +135,7 @@ module WebDriver
       end
 
       def setSpeed(value)
-        execute :setSpeed, {}, value
+        execute :setSpeed, {}, :speed => value
       end
 
       def getSpeed
@@ -146,13 +146,13 @@ module WebDriver
         raise UnsupportedOperationError, "underlying webdriver instace does not support javascript" unless capabilities.javascript?
 
         typed_args = args.map { |arg| wrap_script_argument(arg) }
-        response   = raw_execute :executeScript, {}, script, typed_args
+        response   = raw_execute :executeScript, {}, {:script => script, :args => typed_args}
 
         unwrap_script_argument response['value']
       end
 
       def addCookie(cookie)
-        execute :addCookie, {}, cookie
+        execute :addCookie, {}, :cookie => cookie
       end
 
       def deleteCookie(name)
@@ -305,17 +305,16 @@ module WebDriver
 
       def dragElement(element, rigth_by, down_by)
         # TODO: why is element sent twice in the payload?
-        execute :dragElement, {:id => element}, element, rigth_by, down_by
+        execute :dragElement, {:id => element}, {:x => rigth_by, :y => down_by}
       end
 
       private
 
       def find_element_by(how, what, parent = nil)
         if parent
-          # TODO: why is how sent twice in the payload?
-          id = execute :findChildElement, {:id => parent, :using => how}, {:using => how, :value => what}
+          id = execute :findChildElement, {:id => parent}, {:using => how, :value => what}
         else
-          id = execute :findElement, {}, how, what
+          id = execute :findElement, {}, {:using => how, :value => what}
         end
 
         Element.new self, element_id_from(id)
@@ -323,10 +322,9 @@ module WebDriver
 
       def find_elements_by(how, what, parent = nil)
         if parent
-          # TODO: why is how sent twice in the payload?
-          ids = execute :findChildElements, {:id => parent, :using => how}, {:using => how, :value => what}
+          ids = execute :findChildElements, {:id => parent}, {:using => how, :value => what}
         else
-          ids = execute :findElements, {}, how, what
+          ids = execute :findElements, {}, {:using => how, :value => what}
         end
 
         ids.map { |id| Element.new self, element_id_from(id) }

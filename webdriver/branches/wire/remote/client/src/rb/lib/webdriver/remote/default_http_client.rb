@@ -19,7 +19,7 @@ module WebDriver
 
         if args.any?
           headers.merge!("Content-Type" => "#{CONTENT_TYPE}; charset=utf-8")
-          payload = args.to_json
+          payload = args[0].to_json
           puts "   >>> #{payload}" if DEBUG
         end
 
