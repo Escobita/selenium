@@ -1,45 +1,102 @@
-.. Santi: I'm not sure about this whole chapter. It looks like most of the content
-   should be placed on the "Advanced Selenium" chapter instead of here. Maybe we 
-   can merge both chapters, it'd keep advanced topics where anyone will expect.
-
-.. Paul: This chapter is about all the tradeoffs a person must make when 
-   building their tests.  All the decisions they will have to make.  How to 
-   choose a test for a given testing situation.  There's a lot that could go here.
 
 Test Design Considerations 
 ==========================
 
 .. _chapter06-reference:
 
-*NOTE: This chapter is not finished.  We have some content here already though.  We decided not to hold back on information just because a chapter was not ready.*
+*NOTE: This chapter is currently being developed.  We have some content here already though.  We decided not to hold back on information just because a chapter was not ready.*
 
 
+Introducing Test Design
+-----------------------
 
-Introducing Test Design Options
--------------------------------
-*This section is not yet developed.*
+In this subsection we describe a few types of different tests you can do with Selenium.  This may not
+be new to you, but we provide this as a framework for relating Selenium
+test automation to the decisions a quality assurance professional will make when deciding what tests 
+to perform, the priority for each of those tests, and whether to automate those tests or not.
 
 
-Web Page Content -- Static vs. Dynamic Pages
---------------------------------------------
-*This section is not yet developed.*
+What to Test?
+-------------
 
-.. Tarun: Any one Please go through description below for Static vs Dynamic 
-   and suggest improvement or any thing I have misunderstated.
+What elements of your application will you test?  Of course, that depends on aspects of your
+project--end-user expectations, time allowed for the project, priorities set by the project manager
+and so on.  Once the project boundaries are defined though, you the tester will of course 
+make many decisions on what aspects of the application to test.
+
+We will define some terms here to help us categorize the types of testing typical for a web-application.
+These terms are by no means standard in the industry, although the concepts we present here are typical
+for web-applications.
+
    
-.. Paul:  Actually, I've got some vision for this section, in presenting the 
-   different decisions and types of testing a person will need to consider.  
-   There's, I think, a sizable sub-section in here.  No time to think about 
-   it now though.  I'll also need to read what you guys wrote on Object 
-   Identification as that will influence my ideas on this topic.
+Content Tests
+~~~~~~~~~~~~~
+The simplest type of test for a web-application is to simply test for the existence
+of an static, non-changing, element on a particular page.  For instance
 
-This topic is explained as - Object identification for Static content and 
-Object identification for Dynamic contents. The examples described here 
-are specific to Java and must have equivalent in the language of your choice.
+- Does each page have it's expected page title?  This can be used to verify your test found an expected page after following a link.
+- Does the application's home page contain an image expected to be at the top of the page?  
+- Does each page of the website contain a footer area with links to the company contact page,
+- privacy policy, and trademarks information?  
+- Does each page begin with heading text using the <h1> tag?  And, does each page have the correct text within that header?
+
+You may or may not need content tests.  If your page content is not likely to be affected then it may be more efficient to test page content manually.  If, however, your application will be undergoing platform changes, or files will likely be moved to different locations, content tests may prove valuable.
+
+Link Tests
+~~~~~~~~~~
+A frequent source of errors for web-sites is broken links and missing pages behind those broken links.  Testing for these involves clicking each link and veryfying the expected page behind that link loads correctly.
+
+*Need to include a description of how to design this test and a simple example.  Should that go in this section or in a separate section?*  
 
 
-Object Identification for Static HTML Objects       
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Function Tests
+~~~~~~~~~~~~~~
+These would be tests of a specific function within your application, requiring some type of user input, and returning some type of results.  Often a function test will involve multiple pages with a form-based input page containing a collection of input fields, Submit and Cancel operations, and one or more response pages.  User input can be via text-input fields, checkboxes, drop-down lists, or anyother other browser-supported input.
+
+
+Dynamic Content
+~~~~~~~~~~~~~~~
+Dynamic content is a set of page elements whose identifiers, that is, characteristics used to locate the element, vary with each different instance of the page that contains them.  This is usually on a result page of some given function.  
+
+An example would be a result set of data returned to the user.  Suppose each data result, in, say for example a list of documents, had a unique identifier for each specific document.  So, for a particular search, the search results page returns a data set with one set of documents and their correponding identifiers.  Then, in a different search, the search results page returns a different data set where each document in the result set uses different identifiers.
+
+An example will help.  Dynamic content involves UI elements who identifying properties change each time you open the page 
+displaying them.  For example, ......
+
+Dynamic HTML of an object might look as:
+           
+.. code-block:: html
+
+    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
+
+This is HTML snippet for a check box. Its id and name 
+(addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
+(they will change the next time you open the application). In this case
+
+
+Ajax Tests
+~~~~~~~~~~ 
+
+Ajax is a technology which supports dynamic real-time UI elements such as animation and RSS feeds.
+In AJAX-driven web applications, data is retrieved from the application server with out refreshing 
+the page. 
+
+*NOTE - INCLUDE A GOOD DEFINITION OF AJAX OFF THE INTERNET.*
+
+Verifying Expected Results:  Assert vs. Verify?  Element vs. Actual Content?
+----------------------------------------------------------------------------
+
+Assert vs. Verify:  Which to Use?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText* 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Locating UI Elements
+--------------------
+
+Locating Static Objects       
+~~~~~~~~~~~~~~~~~~~~~~~
 
 *This section has not been reviewed or edited.*
 
@@ -50,17 +107,21 @@ Static HTML Objects might look as:
     <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm','adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
 
 This is HTML snippet for a button and its id is "adminHomeForm". This id remains
-constant within the all occurrences of page. Hence to click this button you just
-have to use the following selenium command:
+constant within all instances of this page. That is, when this page is displayed, 
+this UI element will always have this identifier.  So, for your test script to click this button you just
+have to use the following selenium command.
 
 .. code-block:: java
 
     selenium.click("adminHomeForm");
 
-Object identification with Dynamic HTML Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Identifying Dynamic Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *This section has not been reviewed or edited.*
+
+These are UI elements who identifying properties change each time you open the page 
+displaying them.  For example, ......
 
 Dynamic HTML of an object might look as:
            
@@ -146,8 +207,8 @@ element link can be achieved as following:
 
 
 
-Location Strategies
------------------------
+Location Strategy Tradeoffs
+---------------------------
   
 *This section is not yet developed.*
 
@@ -170,24 +231,27 @@ You might consider trying the `UI-Element`_ extension in this situation.
 
 .. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
+Locator Performance Considerations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Testing Ajax Applications
 -------------------------
 
-If your application under test uses AJAX technology, then you will need to know some techniques for handling AJAX implemented JI elements.  If you're not sure if you application uses AJAX then ask your developers.  Definitions and descriptions of AJAX can easily be found on the internet.
 
-How can I Pause my test app for an element in AJAX driven application?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX driven web applications; information is retrieved from server with out refreshing 
-the page. The leads to UI elements within a page appearing, or being refreshed, asynchronously.  That is, these UI elements can be updated, or even created, separately from refreshing the web-page.  In this situation, using *waitForPageToLoad* would not work as page is not loaded, only the UI element itself is changed. Pausing the test execution for certain period of time is also not a good approach as web element might appear late or earlier than stipulated period; leading
-to test failures. 
+Waiting for an AJAX Element
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In AJAX-driven web applications, using Selenium's *waitForPageToLoad* wouldn't work as 
+the page is not actually 
+loaded to refresh the AJAX element. Pausing the test execution for a specified period of time is also not a good 
+approach as web element might appear later or earlier than expected leading
+to invalid test failures (reported failures that aren't actually failures). 
+A better approach would be to wait for a predefined 
+period and then continue execution as soon as the element is found.
 
-A better approach would be to wait for element for predefined 
-period and then continue execution as soon as element is found.
-
-For ex. Consider a page which brings a link (link=ajaxLink) on click of a button 
-on page (with out refreshing the page)
-This could be handled employing a for loop in selenium. 
+For instance, consider a page which brings a link (link=ajaxLink) on click of a button 
+on page (without refreshing the page)
+This could be handled by Selenium using a *for* loop. 
 
 .. code-block:: bash
    
@@ -207,30 +271,21 @@ This could be handled employing a for loop in selenium.
 
    
    
-UI Mapping with Selenium
--------------------------
-*This section has not been reviewed or edited.*
+UI Mapping
+----------
 
+A UI map is a centralized location for an application's UI elements and then the 
+test script uses the UI Map for locating elements to be tested.
 
-.. Tarun: My understanding of UI map is to have centralized location for 
-   elements and test script uses the UI Map to locate elements.
-   Paul: Do we know how this is used in Selenium?
-   Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
-   also very well integrated with selenium IDE.
-   Dave: I'd like to look into writing some documentation here.
+.. Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
+   also very well integrated with selenium IDE.   
 
-.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
-   placed on?
-   
-
-UI Map is a repository for all Objects of test scripts.
-Advantages of using UI Maps are:
+A UI map is a repository for all test script objects.  UI maps have several advantages.
 
 - Having centralized location for UI objects instead of having them scattered 
-  through out the script.
-- Centralized location of objects makes maintenance of Tests easy.
-- Arcane HTML ids and names can be given comprehensible names and it increases 
-  readability of scripts.
+  through out the script.  This makes script maintanence easier and more efficient.
+- Cryptic HTML identifiers and names can be given more human-readable increasing the 
+  readability of test scripts.
 
 Consider following example (in java) of selenium tests for a website: 
 
@@ -268,8 +323,8 @@ as to what script does. A better script would have been:
    
 Though again there are no comments provided in the script but it is
 more comprehensible because of the keywords used in scripts. (please
-beware that UI Map is not replacement of comments) So a more comprehensible 
-script would look as following -
+beware that UI Map is not a replacement for comments!) A more comprehensible 
+script could look like this.
    
 .. code-block:: java
 
@@ -297,10 +352,10 @@ script would look as following -
    		selenium.waitForPageToLoad("30000");
    }
    
-Herein whole idea is to have centralized location for objects and using 
-comprehensible names for objects. To achieve this properties files can 
-be used in java. Properties file contains key/value pairs, where in 
-key and value both are String values.
+The whole idea is to have a centralized location for objects and using 
+comprehensible names for those objects. To achieve this, properties files can 
+be used in java. A properties file contains key/value pairs, where each 
+key and value are strings.
    
 Consider a property file *prop.properties* which has got definition of 
 HTML object used above 
@@ -313,9 +368,9 @@ HTML object used above
    admin.events.cancel = addEditEventForm:_idcancel
    admin.events.viewoldevents = adminHomeForm:_activityold
    
-Hence still our objects refer to html objects but we have introduced a layer 
-of abstraction between test script and UI elements.
-Values can be read from properties file and used in Test Class to implement UI 
+Our objects still refer to html objects, but we have introduced a layer 
+of abstraction between the test script and UI elements.
+Values can be read from the properties file and used in Test Class to implement UI 
 Map. For more on Properties files follow this URL_.
 
 .. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html
@@ -343,56 +398,16 @@ Bitmap Comparison
    placed on?
 
 
-Recovery From Failure
----------------------
-*This section has not been developed yet.*
 
-.. Tarun: Here Test attempt is re made against a website which comes up with 
-   something unexpected i.e. pop up window or unexpected page etc, I guess 
-   for selenium this largely depends on how tests are designed. Say in case 
-   of java Try Catch Block might help achieving this.
-
-.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
-   placed on?
-
-Types of Tests 
---------------
-.. Paul:  I have a lot of vision for this section.  And it is 'introductory' 
-   and probably will go towards the beginning of this chapter.  I've got some 
-   ideas here based on how we organized our tests at my work.
-
-*This section has not been developed yet.*
-
-
-* Page Rendering Tests 
-* Forms Tests 
-* Specific Function Tests - For example, if a .jsp is called from used to 
-  retrieve data based on parameter input. 
-* User Scenario Test - A Multiple Page Functional Test 
 
 Solving Common Web-App Problems 
 -------------------------------
 *This section has not been developed yet.*
 
-.. Paul:  This sub-section was my idea.  We may have some duplication here 
-   with Chapter 4.  But there's also some ideas here that are more appropriate
-   for this chapter.  I can take the lead on this sub-section and then have 
-   you guys add to it.  Unless, of course, this list is already sparking 
-   ideas in you.  If so, go ahead and add them here before I add mine and we'll reconcile.
-
-* Assert vs Verify (or possibly put this under script development) 
-* Judgement calls, when to *verifyTextPresent*, *verifyElementPresent*, or 
-  *verifyText*. 
 * Handling Login/Logout State 
 * Processing a Result Set 
 
-Interpreting Test Results
--------------------------
-*This section has not been developed yet.*
 
-.. Tarun: This topic and followed ones seem more general to me and probably 
-   can be kept under 'Test Design Considerations'. Or may be we could branch 
-   off a new index for it.
 
 Organizing Your Test Scripts 
 ----------------------------
@@ -443,10 +458,18 @@ data provider capabilities of TestNG with java client driver.
 
 .. _`Selnium RC wiki`: http://wiki.openqa.org/pages/viewpage.action?pageId=21430298
 
-Error Handling
-~~~~~~~~~~~~~~
+
+Handling Errors
+---------------
 
 *Note: This section is not yet developed.*
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+
+Recovering From Failure
+~~~~~~~~~~~~~~~~~~~~~~~
 
 A quick note though--recognize that your programming language's exception-
 handling support can be used for error handling and recovery.
@@ -459,6 +482,18 @@ handling support can be used for error handling and recovery.
 .. The idea here is to use a try-catch statement to grab a really unexpected
    error.
 
+*This section has not been developed yet.*
+
+.. Tarun: Here Test attempt is re made against a website which comes up with 
+   something unexpected i.e. pop up window or unexpected page etc, I guess 
+   for selenium this largely depends on how tests are designed. Say in case 
+   of java Try Catch Block might help achieving this.
+
+.. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
+   placed on?
+
+   
+   
 Database Validations
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -505,13 +540,3 @@ This is very simple example of data retrieval from DB in Java.
 A more complex test could be to validate that inactive users are not able
 to login to application. This wouldn't take too much work from what you've 
 already seen.
-
-
-Example Test Suites 
--------------------
-.. Paul:  This probably is not a separate section, but a sub-sub-section of '
-   Organizing Your Test Suites'.  And really?  do we want to give them a 
-   whole test suite example?  We may be able to handle this just fine with small
-   snippets.
-
-*This section has not been developed yet.*
