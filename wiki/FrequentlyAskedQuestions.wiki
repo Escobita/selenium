@@ -1,5 +1,5 @@
 ﻿#summary WebDriver FAQs
-#labels Featured, WebDriver
+#labels Featured,WebDriver
 
 = FAQ =
 
@@ -82,7 +82,7 @@ A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onch
 
 === Q: Can I run multiple instances of the WebDriver sub-classes? ===
 
-A: Each instance of HtmlUnit, FirefoxDriver and ChromeDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses) Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
+A: Each instance of HtmlUnit and FirefoxDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses).  See the ChromeDriver page for details of its concurrency (short answer: it's possible on Windows at the moment, but you need to apply a patch). Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
 
 === Q: How do I handle authentication with the HtmlUnitDriver? ===
 
