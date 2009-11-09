@@ -3,23 +3,32 @@
 
 = Chrome Driver =
 
-Everything you ever wanted to know about the Chrome driver but were afraid to ask. See below for instructions on how to install the ChromeDriver.
+See below for instructions on how to install the ChromeDriver. 
 
-Note that ChromeDriver is more experimental than others as it has not had time in the wild.  Please report any problems through the mailing list/issue tracker.  It is in the process of being made available - if you can't see it, try again tomorrow.
+Note that ChromeDriver is one of the newest drivers. Please report any problems through the mailing list/issue tracker.
 
 == Before Going Any Further ==
 
-The ChromeDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-chrome.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
+The ChromeDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-chrome.jar}}} or {{{webdriver-all.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
 
-You will need the *dev channel* release of Google Chrome installed (NOT the stable or beta).  You can get on the dev channel [http://dev.chromium.org/getting-involved/dev-channel here].  Currently recommended is version 4.0.206.`*`.  There were several breaking changes in this release, so ChromeDriver will not work in versions prior to this.
+Because the ChromeDriver is implemented as an extension, you will need the *beta* or *dev* channel release of Google Chrome installed (NOT the stable build).  You can get on the dev channel [http://dev.chromium.org/getting-involved/dev-channel here].  Currently recommended is version 4.0.206.`*`.  There were several breaking changes in this release, so ChromeDriver will not work in versions prior to this.
+
+== Pros ==
+
+ * Runs in a real browser and supports Javascript
+ * Because Chrome is a Webkit-based browser, the ChromeDriver may allow you to verify that your site works in Safari. Note that since Chrome uses its own V8 javascript engine rather than Safari's Nitro engine, javascript execution may differ.
+
+== Cons ==
+ 
+ * Slower than the HtmlUnitDriver
 
 == Known issues ==
 
 Iframes which have no src attribute, i.e. <iframe src=""> or <iframe> are unsupported.  This will be fixed by [http://code.google.com/p/chromium/issues/detail?id=20773 Chrome bug 20773], but is not likely to happen until at least October 2009.
 
-Only one instance at a time will run.  This is due to a bug in Chrome on Linux and Mac [http://code.google.com/p/chromium/issues/detail?id=11547 Chrome bug 11547].  On Windows, you can apply [http://selenium.googlecode.com/files/ChromeDriverMultipleInstancePatch.diff this patch] to allow multiple instances, but it will break WebDriver on Linux and Mac.
+Only one instance at a time will run.  This is due to a bug in Chrome on Linux and Mac [http://code.google.com/p/chromium/issues/detail?id=11547 Chrome bug 11547].  On Windows, you can apply [http://selenium.googlecode.com/files/ChromeDriverMultipleInstancePatch.diff this patch] to Chrome's source and build a custom version of Chrome to allow multiple instances, but it will break WebDriver on Linux and Mac.
 
-File uploading using <input type="file"> elements is currently unsupported.
+File uploading using <input type="file"> elements is currently unsupported. We aim to support this on Windows in the near future.
 
 Hovering and dragging and dropping are currently unsupported.
 
@@ -27,7 +36,7 @@ ChromeDriver.get(url) will clear the navigating history of your session (ChromeD
 
 === Additionally, on Mac and Linux: ===
 
-Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will work if you are only typing lower case ASCII characters, but will not fire any events.  This should be fixed by mid-October 2009.
+Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will only fire a limited range of events, and only works on TEXTAREA and INPUT elements. We aim to have this problem solved by late November (2009: there's a promise for posterity)
 
 == Important System Properties ==
 
@@ -36,7 +45,7 @@ The following system properties (read using {{{System.getProperty()}}} and set u
 || *Property* || *What it means* ||
 || webdriver.chrome.bin || The location of the binary used to control chrome. ||
 
-Normally the Firefox binary is assumed to be in the default location for your particular operating system:
+Normally the Chrome binary is assumed to be in the default location for your particular operating system:
 
 || *OS* || *Expected Location of Chrome* ||
 || Linux || /usr/bin/google-chrome ||
@@ -46,21 +55,13 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 
 == Installing a Downloaded Binary ==
 
-The "wedriver-chrome.zip" which may be downloaded from the website, contains all the dependencies (including the common and remote libraries) required to run the ChromeDriver. In order to use it, copy all the "jar" files on to your classpath.
+The "wedriver-all.zip" which may be [http://code.google.com/p/selenium/downloads/list downloaded from the website], contains all the dependencies required to run the ChromeDriver. In order to use it, copy all the "jar" files on to your CLASSPATH.
 
-== Installing the Quick Way From Source (with Ruby) ==
+== Installing the Quick Way From Source ==
 
-If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will magically copy over build/Win32/Debug/npchromedriver.dll into the extension if you're on Windows.  Make sure that this dll has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln).  Note that {{{rake clean}}} will delete this file, so you will need to recompile after {{{rake clean}}}ing.
+If you're doing development work on the ChromeDriver itself, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will automatically (automagically?) copy over {{{build/Win32/Debug/npchromedriver.dll}}} into the extension if you're on Windows.  Make sure that this DLL has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln).  Note that {{{rake clean}}} will delete this file, so you will need to recompile after {{{rake clean}}}ing.
 
-This assumes that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
+The underlying assumption is that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
 
 {{{System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");}}}
 
-== Pros ==
-
- * Runs in a real browser and supports Javascript
- * Also probably a decent test for rendering of Safari/other WebKit based browsers, though not their Javascript (as it uses its own V8 Javascript engine)
-
-== Cons ==
- 
- * Slower than the HtmlUnitDriver

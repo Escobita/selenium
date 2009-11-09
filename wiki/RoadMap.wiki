@@ -23,7 +23,7 @@ Additional changes that are required for a beta release
 || [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Not Started || Not Started ||
 || none  || Example tests |||||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings |||||||| Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings || Not Started || Started || Done || Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings |||||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=37 37]  || C# bindings |||||||| Started ||
 
 A final release will be done once the beta has been out and successfully used on a number of projects. Other drivers have been left off because none have been started.

@@ -1,0 +1,13 @@
+#summary Using Domain Driven Design with WebDriver
+#labels WebDriver
+
+= Domain Driven Design = 
+
+The best advise you can be given is to read Eric Evan's excellent "Domain Driven Design" book. However, in a nutshell there are some key points.
+
+  # Tests should be written using a "Ubiquitous Language"
+  # Make use of the "Repository" pattern to make it easier to create objects
+
+== Ubiquitous Language == 
+
+This refers to the idea that everyone on a project should attempt to speak the same language. That is, rather than referring to "load data into this table" or "click on the third column" it should be possible to use language such as "create a new account" or "order displayed results by name"

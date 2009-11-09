@@ -135,6 +135,20 @@ public class GoogleSearchPage {
 } 
 }}}
 
+=== Reducing Verbosity ===
+
+The example above is still a little verbose. A slightly cleaner way of annotating the field would be:
+
+
+{{{
+public class GoogleSearchPage {
+  @FindBy(name = "q")
+  private WebElement searchBox;
+
+  // The rest of the class is unchanged.
+}
+}}}
+
 == Notes ==
 
   * If you use the PageFactory, you can assume that the fields are initialised. If you don't use the PageFactory, then NullPointerExceptions will be thrown if you make the assumption that the fields are already initialised.

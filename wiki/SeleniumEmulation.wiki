@@ -38,3 +38,16 @@ WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWeb
   * Does also emulate Selenium Core
     * So more advanced Selenium usage (that is, using "browserbot" or other built-in Javascript methods from Selenium Core) may need work
   * Some methods may be slower due to underlying implementation differences
+
+== Backing WebDriver with Selenium == 
+
+WebDriver doesn't support as many browsers as Selenium does, so in order to provide that support while still using the webdriver API, you can make use of the {{{SeleneseCommandExecutor}}} It is done like this:
+
+{{{
+Capabilities capabilities = new DesiredCapabilities()
+capabilities.setBrowserName("safari");
+CommandExecutor executor = new SeleneseCommandExecutor("http:localhost:4444/", "http://www.google.com/", capabilities);
+WebDriver driver = new RemoteWebDriver(executor, capabilities);
+}}}
+
+There are currently some major limitations with this approach, notably that `findElements` doesn't work as expected. Also, because we're using Selenium Core for the heavy lifting of driving the browser, you are limited by the Javascript sandbox. 

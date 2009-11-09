@@ -5,8 +5,6 @@
 
 Once you've completed the GettingStarted tutorial, you may want to know more. This is the right place to look!
 
-WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that's easy to explore and understand, which will help make your tests easier to read and maintain. It's not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old "main" method. 
-
 == Which Implementation of WebDriver Should I Use? ==
 
 WebDriver is the name of the key interface against which tests should be written, but there are several implementations. These are:
@@ -15,6 +13,7 @@ WebDriver is the name of the key interface against which tests should be written
 || HtmlUnitDriver || All || org.openqa.selenium.htmlunit.HtmlUnitDriver ||
 || FirefoxDriver || All || org.openqa.selenium.firefox.FirefoxDriver ||
 || InternetExplorerDriver || Windows || org.openqa.selenium.ie.InternetExplorerDriver ||
+|| ChromeDriver || All || org.openqa.selenium.chrome.ChromeDriver ||
 
 You can find out more information about each of these by following the links in the table. Which you use depends on what you want to do. For sheer speed, the HtmlUnitDriver is great, but it's not graphical, which means that you can't watch what's happening. As a developer, you may be comfortable with this, but sometimes it's good to be able to test using a real browser, especially when you're showing a demo of your application (or running the tests) for an audience. Often, this idea is referred to as "safety", and it falls into two parts. Firstly, there's "actual safety", which refers to whether or not the tests works as they should. This can be measured and quantified. Secondly, there's "perceived safety", which refers to whether or not an observer _believes_ the tests work as they should. This varies from person to person, and will depend on their familiarity with the application under test, WebDriver and your testing framework.
 
@@ -34,14 +33,11 @@ The first thing you'll want to do with WebDriver is navigate to a page. The norm
 driver.get("http://www.google.com");
 }}}
 
-
-driver.navigate().to("http://www.google.com");
-
-WebDriver will wait until the page has fully loaded before returning control to your test or script. 
+WebDriver will wait until the page has fully loaded (that is, the "onload" event has fired) before returning control to your test or script. 
 
 == Interacting With the Page ==
 
-Just being able to go to places and move around in history isn't terribly useful. What we'd really like to do is to interact with the pages, or, more specifically, the HTML elements within a page. First of all, we need to find one. WebDriver offers a number of ways of finding elements. For example, given an element defined as:
+Just being able to go to places isn't terribly useful. What we'd really like to do is to interact with the pages, or, more specifically, the HTML elements within a page. First of all, we need to find one. WebDriver offers a number of ways of finding elements. For example, given an element defined as:
 
 {{{
 <input type="text" name="passwd" id="passwd-id" />
@@ -56,7 +52,7 @@ element = driver.findElement(By.name("passwd"));
 element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
 }}}
 
-You can also look for an link by its text, but be careful! The text must be an _exact_ match! You should also be careful when using XpathInWebDriver. If there's more than one element that matches the query, then only the first will be returned. If nothing can be found, the {{{NoSuchElementException}}} will be thrown.
+You can also look for an link by its text, but be careful! The text must be an _exact_ match! You should also be careful when using XpathInWebDriver. If there's more than one element that matches the query, then only the first will be returned. If nothing can be found, a {{{NoSuchElementException}}} will be thrown.
 
 WebDriver has an "Object-based" API; we represent all types of elements using the same interface: WebElement. This means that although you may see a lot of possible methods you could invoke when you hit your IDE's auto-complete key combination, not all of them will make sense or be valid. Don't worry! WebDriver will attempt to do the Right Thing, so if you call a method that makes no sense ("setSelected()" on a "meta" tag, for example) an exception will be thrown.
 
@@ -91,7 +87,7 @@ for (WebElement option : allOptions) {
 }
 }}}
 
-This will find the first "SELECT" element on the page, and cycle through each of it's OPTIONs in turn, printing out their values, and selecting each in turn. 
+This will find the first "SELECT" element on the page, and cycle through each of it's OPTIONs in turn, printing out their values, and selecting each in turn. As you can see, this isn't the most efficient way of dealing with SELECT elements. WebDriver's support classes come with one called "{{{Select}}}", which provides useful methods for interacting with these.
 
 Once you've finished filling out the form, you probably want to submit it. One way to do this would be to find the "submit" button and click it:
 
@@ -107,7 +103,7 @@ element.submit();
 
 == Getting Visual Information And Drag And Drop ==
 
-Sometimes you want to extract some visual information out of an element, perhaps to see if it's visible or where it is on screen. You can find out this information by casting the element:
+Sometimes you want to extract some visual information out of an element, perhaps to see if it's visible or where it is on screen. You can find out this information by casting the element to a {{{RenderedWebElement}}}:
 
 {{{
 WebElement plain = driver.findElement(By.name("q"));
@@ -137,6 +133,14 @@ All calls to driver will now be interpreted as being directed to the particular 
 <a href="somewhere.html" target="windowName">Click here to open a new window</a>
 }}}
 
+Alternatively, you can pass a "window handle" to the "switchTo().window()" method. Knowing this, it's possible to iterate over every open window like so:
+
+{{{
+for (String handle : driver.getWindowHandles()) {
+  driver.switchTo().window(handle);
+}
+}}}
+
 You can also swing from frame to frame (or into iframes):
 
 {{{
@@ -153,7 +157,7 @@ would go to the frame named "child" of the first subframe of the frame called "f
 
 == Navigation: History and Location ==
 
-Earlier, we covered navigating to a page using the "get" command ({{{driver.get("http://www.example.com")}}}) As you've seen, WebDriver has a number of smaller, task focused interfaces, and navigation is a useful task. Because loading a page is such a fundamental requirement, the method to do this lives on the main WebDriver interface, but it's simply a synonym to:
+Earlier, we covered navigating to a page using the "get" command ({{{driver.get("http://www.example.com")}}}) As you've seen, WebDriver has a number of smaller, task-focused interfaces, and navigation is a useful task. Because loading a page is such a fundamental requirement, the method to do this lives on the main WebDriver interface, but it's simply a synonym to:
 
 {{{
 driver.navigate().to("http://www.example.com");

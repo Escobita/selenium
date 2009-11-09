@@ -19,7 +19,7 @@ In addition, the InternetExplorerDriver needs some additional components and can
 
 == Building ==
 
-The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. When there are native components that must be built, the build file will attempt to construct them before falling back to prebuilt binaries. Now:
+The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver, ChromeDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. When there are native components that must be built, the build file will attempt to construct them before falling back to prebuilt binaries. Assuming you have checked out the source to {{{$WEBDRIVER_HOME}}}, now:
 
 {{{
 cd $WEBDRIVER_HOME   # Where the top level Rakefile is kept
@@ -27,6 +27,13 @@ rake
 }}}
 
 This will not only compile the source, but will also run any tests which need to be run. If these all pass, then you have successfully built WebDriver!
+
+== Implicit Targets ==
+
+Each target that builds a JAR file also has the following implicit targets:
+
+|| *Target extension* || *What it does* ||
+|| _zip || Creates a zip of the output file and all dependencies ||
 
 = Common Problems =
 
@@ -36,7 +43,7 @@ Make sure that you've got the JAVA_HOME environment setting properly set up. In 
 
 == All Firefox Tests Fail ==
 
-Occasionally we change the protocol of how the java code in the Firefox driver talks to the extension. The main reason why all the firefox tests fail is because the user has installed an older version of the WebDriver profile for Firefox. This should be deleted, and the profile packaged into the "webdriver-firefox.jar" should be used.
+Occasionally we change the protocol of how the java code in the Firefox driver talks to the extension. The main reason why all the firefox tests fail is because the user has installed a profile called "WebDriver". This should be deleted.
 
 The following trouble-shooting steps might be useful:
 
@@ -45,10 +52,14 @@ The following trouble-shooting steps might be useful:
 
 Although it was necessary in the early days of webdriver development, it is now no longer necessary to install the webdriver extension manually. Indeed, doing so is more likely to be the root of hard to track down errors. It is strongly recommended that you *do not* install the firefox extension manually
 
+== The Build Works, but It's Very Slow ==
+
+There have been reports of problems involving slow builds. Every test that runs does a DNS lookup to determine an alternative host name. If your network is not configured correctly, then this lookup might be very slow. To rectify this, modify the {{{getAlternateHostName}}} method in {{{org.openqa.selenium.environment.webserver.Jetty6AppServer}}} and hard code it to return a string that resolves to your machine that isn't "localhost"
+
 == I've Followed the Steps Above and All the Firefox Tests Still Fail ==
 
 Other things to check:
 
- * The FirefoxDriver is only compatible with Firefox 2 and above. Check that the first available version of firefox on the PATH is version 2 or 3.
+ * The FirefoxDriver is only compatible with Firefox 2 and above. Check that the first available version of firefox on the PATH is version 2 or 3.x.
  * The driver assumes that Firefox is installed in the default location for your OS. If Firefox is not in this location, then you need to set the VM property {{{webdriver.firefox.bin}}} or modify the PATH variable to include the directory with the firefox binary in it.
  * On some platforms such as Linux, Firefox is started with a shell script. There have been reports that if your installation of Firefox wraps this shell script with another one the FirefoxDriver won't work properly. Consider calling the original Firefox script.

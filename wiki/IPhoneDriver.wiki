@@ -44,7 +44,3 @@ Set your build configuration to Device / iPhone OS 2.2 / iWebDriver and click Bu
 *Q:* My build fails. It says it can't find JSON.h.
 
 *A:* This is a known issue and it will be fixed in an upcoming release. Clean then rebuild.
-
-*Q:* What to I put in the desiredCapabilities field in the IPhoneDriver constructor?
-
-*A:* This field is ignored at the moment. It will be removed from the IPhoneDriver constructor soon.

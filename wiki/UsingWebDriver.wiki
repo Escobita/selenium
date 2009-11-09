@@ -5,7 +5,7 @@
 
 == From a New Download ==
 
-Unpack the ZIP and copy all the jar files on to your project's classpath. The FirefoxDriver and InternetExplorerDriver have more detailed instructions about installing the native parts of these drivers. The "webdriver-support" package contains useful helper classes, such as the LiftStyleApi and the PageFactory.
+Unpack the "webdriver-all.zip" you can download from [http://code.google.com/p/selenium/downloads/list the site], and add all the JARs to your CLASSPATH. This will give you the ChromeDriver, FirefoxDriver, HtmlUnitDriver, InternetExplorerDriver, RemoteWebDriver client and the support packages. The support packages give you useful helper classes, such as the LiftStyleApi and the PageFactory.
 
 == With Maven ==
 
@@ -41,7 +41,7 @@ If you want to use the ChromeDriver, you need to add the following dependency to
         <version>0.9.7376</version>
     </dependency>
 }}}
-Hint: ChromeDriver currently only works with Chrome 4.0.x (from the dev channel).
+Hint: ChromeDriver currently only works with Chrome 4.0.x (from the beta and dev channels).
 
 Finally, if you like to use any of our support classes, you should add the following dependency to your pom.xml:
 {{{
@@ -51,14 +51,15 @@ Finally, if you like to use any of our support classes, you should add the follo
         <version>0.9.7376</version>
     </dependency>
 }}}
+
 That's it. 
 
 == From a Fresh CheckOut ==
 
  * Follow the instructions in CheckOut in order to get the latest version of WebDriver.
- * Run {{{rake}}} without any targets (that is, just run {{{rake}}}) This will run the unit tests too, and if that's not what you want to do, just run: {{{rake common htmlunit firefox jobbie}}}
- * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver)
- * Now, just copy the required runtime libraries and the newly built jars on to your CLASSPATH. The InternetExplorerDriver needs to have the DLLs placed on the PATH too.
+ * Run {{{rake}}} without any targets (that is, just run {{{rake}}}) This will run the unit tests too, and if that's not what you want to do, just run: {{{rake all}}}
+ * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver) The JARs for the classes in "org.openqa.selenium" are located in "build".
+ * Now, just copy the required runtime libraries and the newly built jars on to your CLASSPATH. 
 
 Perhaps that last point needs a little more explanation...
 
@@ -66,7 +67,7 @@ Perhaps that last point needs a little more explanation...
 
 If you take a look at the top level of WebDriver's trunk, you'll see a number of directories which contain the drivers you may want to use (*common* contains code needed by every driver, *firefox*, and *htmlunit* should be obvious, and *jobbie* contains the InternetExplorerDriver)
 
-Each of these top level directories is arranged in the same way. After a build, they each contain a sub-directory containing the required jar (named {{{webdriver-$DRIVER.jar}}}) called *build*. That is, the FirefoxDriver jar is located at {{{firefox/build/webdriver-firefox.jar}}} and the common jar is located at {{{common/build/webdriver-common.jar}}} and so on. These jars only contain the driver code, and not any required supporting libraries. For example, the HtmlUnitDriver requires the HtmlUnit jars, plus any libraries that _it_ needs.
+Each of these top level directories is arranged in the same way. After a build, the built binray is found at {{{build/webdriver-$DRIVER.jar}}}.. That is, the FirefoxDriver jar is located at {{{build/webdriver-firefox.jar}}} and the common jar is located at {{{build/webdriver-common.jar}}} and so on. These jars only contain the driver code, and not any required supporting libraries. For example, the HtmlUnitDriver requires the HtmlUnit jars, plus any libraries that _it_ needs.
 
 Fortunately, all the libraries required for a particular driver are located under {{{$DRIVER/lib/runtime}}} You'll need to copy those on to your CLASSPATH too.
 

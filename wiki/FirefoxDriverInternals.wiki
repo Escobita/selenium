@@ -3,7 +3,7 @@
 
 = FirefoxDriver Interals =
 
-The FirefoxDriver is largely written in the form of a Firefox extension. Language bindings control the driver by connecting over a socket and sending commands (described in the JsonWireProtocol page) in UTF-16. The extension makes use of the XPCOM primitives offered by Firefox in order to do its work. The important thing to notice is that the command names map directly on to methods exposed on the "FirefoxDriver.prototype" in the javascript code.
+The FirefoxDriver is largely written in the form of a Firefox extension. Language bindings control the driver by connecting over a socket and sending commands (described in the JsonWireProtocol page) in UTF-8. The extension makes use of the XPCOM primitives offered by Firefox in order to do its work. The important thing to notice is that the command names map directly on to methods exposed on the "FirefoxDriver.prototype" in the javascript code.
 
 = Working on the FirefoxDriver Code = 
 
@@ -12,32 +12,35 @@ Firstly, make sure that there's no old version of the FirefoxDriver installed:
   * Start firefox's profile manager: {{{firefox -ProfileManager}}}
   * Delete the existing WebDriver profile if there is one. Delete the files too (it's an option that's offered when you delete the profile in the profile manager)
 
-Secondly, take a look at the [http://developer.mozilla.org/en/docs/Extensions Mozilla Developer Center], particularly the section to do with [http://developer.mozilla.org/en/docs/Setting_up_extension_development_environment setting up an extension development environment]. You should now be ready to edit code. It's best to create a test around the area of code that you're working on, and to run this using the {{{SingleTestSuite}}}. The FirefoxDriver logs errors to Firefox's error console, so if a test fails, that's a great place to start looking.
+Secondly, take a look at the [http://developer.mozilla.org/en/docs/Extensions Mozilla Developer Center], particularly the section to do with [http://developer.mozilla.org/en/docs/Setting_up_extension_development_environment setting up an extension development environment]. You should now be ready to edit code. It's best to create a test around the area of code that you're working on, and to run this using the {{{SingleTestSuite}}}. The FirefoxDriver logs errors to Firefox's error console ("Tools->Error Console"), so if a test fails, that's a great place to start looking. 
 
-You should also ensure that the Java System property "webdriver.firefox.useExisting" is set to "true", which will cause the FirefoxDriver to reuse the instance of Firefox that's running and which has bound itself to port 7055 (the default port). Finally, to actually log information to the console, use the "{{{Utils.dumpn()}}}" method in your javascript code..
-
-If you find that you'd like to examine an object in detail, use the "{{{Utils.dump()}}}" method, which will report which interfaces an object implements, as well as outputting as much information as it can to the console..
+To actually log information to the console, use the "{{{Utils.dumpn()}}}" method in your javascript code. If you find that you'd like to examine an object in detail, use the "{{{Utils.dump()}}}" method, which will report which interfaces an object implements, as well as outputting as much information as it can to the console..
 
 == Flow of Control: Starting Firefox ==
 
 The following steps are performed when instantiating an instance of the FirefoxDriver:
 
-  # Repeatedly attempt to open a server socket on a well-known port number (normally 7055).
-  # Locate the Firefox profile to use. This is normally the one called "WebDriver" but need not be.
+  # Grab the "locking port"
+    # By default, the firefox driver attempts to use port 7055 to communicate
+    # Subtract 1 from the port (7055 - 1 = 7054) This is the *locking port*, which we use as a mutex to guarantee that only one firefox instance is started at the same time.
+    # Sit in a loop waiting for the locking port to become free.
+    # Exit the loop when we can establish a server socket (that is bind to) the locking port. This driver instance now has the mutex
+  # Find the next free port up from the locking port
+    # Identify the next free port above the locked one by attempting to bind to each of them in turn. Release the newly found port. For the first driver, this will be 7055. For the second, 7056.
+  # Locate the Firefox profile to use. This is normally an anonymous one
   # Copy the existing profile to a temporary directory, ignoring any lock files that indicate that Firefox is actually running.
   # Delete the current "extensions.cache" to force Firefox to look for newly installed extensions on start up.
-  # Identify the next free port above the locked one by attempting to bind to each of them in turn. Release the newly found port
-  # Update "user.js" with the preferences required to make WebDriver work as expected. Set the "webdriver_firefox_port" value to the one that we found in the step above this.
+  # Update "user.js" with the preferences required to make WebDriver work as expected. Set the "webdriver_firefox_port" value to the one that we found in the step 2.
   # Start Firefox with the "-silent" flag and telling it to use the freshly minted directory as the profile. This causes Firefox to start up, look at the profile and fix it up if necessary.
   # Wait until that Firefox instance has finished and the process has died.
   # Start firefox again and repeatedly attempt to connect until we're successful or too much time has passed.
-  # Release the port we grabbed in the first step.
+  # Release the locking port. The mutex has now been freed.
 
-We are using the port at the well-known address as a simple locking mechanism. The approach was chosen because it allows the same algorithm to be used by different JVMs or even languages at the same time without fear of starting multiple instances of Firefox all listening on the same port (which looks terrible, I can assure you :) The mechanism is simple enough so that most languages can be used to implement it without requiring any special libraries.
+The approach of using a socket as a mutex was chosen because it allows the same algorithm to be used by different JVMs or even languages at the same time without fear of starting multiple instances of Firefox all listening on the same port (which looks terrible, I can assure you :) The mechanism is simple enough so that most languages can be used to implement it without requiring any special libraries. 
 
 == Sending Commands to Firefox ==
 
-The basic mechanism for sending commands from the client language (such as Java) to the Firefox extension is:
+The Firefox driver is, in essence, an instance of the RemoteWebDriver running in "client" mode. The basic mechanism for sending commands from the client language (such as Java) to the Firefox extension is:
 
   # Create a new map/dictionary (whatever your favourite programming language calls it) The keys are case-sensitive and are:
     * *context* Treated as string and an opaque key by the client language. 
@@ -88,3 +91,5 @@ There are some useful Javascript functions in the "utils.js" file. These are:
 = Future Direction =
 
 The RemoteWebDriver and the FirefoxDriver are both implementations of an RPC mechanism. It would be desirable for these two drivers to share as much code as possible. In order to do this, we would have to take advantage of one of the httpd implementations which are based on XPCOM.
+
+The "context" field is also redundant, and should be removed at some point.

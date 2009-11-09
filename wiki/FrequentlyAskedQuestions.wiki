@@ -3,31 +3,33 @@
 
 = FAQ =
 
-*Q: What is WebDriver?*
+<wiki:toc max_depth="3" />
+
+=== Q: What is WebDriver? ===
 
 A: WebDriver is a tool for writing automated tests of websites. It aims to mimic the behaviour of a real user, and as such interacts with the HTML of the application.
 
-*Q: So, is it like [http://www.openqa.org/selenium-core/ Selenium]? Or [http://sahi.co.in/ Sahi]?*
+=== Q: So, is it like [http://www.openqa.org/selenium-core/ Selenium]? Or [http://sahi.co.in/ Sahi]? ===
 
 A: The aim is the same (to allow you to test your webapp), but the implementation is different. Rather than running as a Javascript application within the browser (with the limitations this brings, such as the "[http://www.openqa.org/selenium-rc/tutorial.html same origin]" problem), WebDriver controls the browser itself. This means that it can take advantage of any facilities offered by the native platform.
 
-*Q: What is Selenium 2.0?*
+=== Q: What is Selenium 2.0? ===
 
 A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver will make is its API and the native drivers. The process of rolling WebDriver into Selenium will probably take some time, so until it's complete if you'd like to use the WebDriver API then the best bet will be to use WebDriver directly. There's an introduction to this at the [http://google-opensource.blogspot.com/2009/05/introducing-webdriver.html Google Open Source blog].
 
-*Q: What's the plan for migrating WebDriver into Selenium?*
+=== Q: What's the plan for migrating WebDriver into Selenium? ===
 
 A: The process is being discussed on the [http://clearspace.openqa.org/message/48227#48227 OpenQA forum], but the current plan is that parts of WebDriver will be rolled into Selenium 1.5. For the user, the key change will be that the WebDriver interfaces will become available within the Selenium (RC) libraries. There will also be a series of changes internally, for example picking the WebDriver implementation of the Selenium interfaces where this is appropriate, and these changes will be discussed and tracked on the OpenQA site and/or the [http://groups.google.com/group/webdriver?pli=1 WebDriver mailing list].
 
-*Q: What does it mean to be "developer focused"?
+=== Q: What does it mean to be "developer focused"? ===
 
 A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
 
-*Q: How do I execute Javascript directly?*
+=== Q: How do I execute Javascript directly? ===
 
 A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
 
-We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
+We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://selenium.googlecode.com/svn/javadoc/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
 
 {{{
 WebDriver driver; // Assigned elsewhere
@@ -37,29 +39,31 @@ js.executeScript("return document.title");
 
 Other language bindings will follow a similar approach. Take a look at the UsingJavascript page for more information.
 
-*Q: Which browsers does WebDriver support?*
+=== Q: Which browsers does WebDriver support? ===
 
-A: The existing drivers are the InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
+A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
 
-*Q: My XPath finds elements in one browser, but not in others. Why is this?*
+=== Q: My XPath finds elements in one browser, but not in others. Why is this? ===
 
 A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XpathInWebDriver page.
 
-*Q: The InternetExplorerDriver does not work well on Vista. How do I get it to work as expected?*
+=== Q: The InternetExplorerDriver does not work well on Vista. How do I get it to work as expected? ===
 
 A: There are a number of solutions:
    * Add any domains the browser visits to IE's "trustworthy sites". If you use a large number of sites, this might be problematic, so think about using a wild card (though only if you don't use IE as your main browser!)
    * Run Java with Administrator rights. Note, that this is potentially a large security hole: only visit sites you trust when running in this mode.
 
-*Q: What about support for languages other than Java?*
+The second approach is required when using IE8 and Vista or above.
 
-A: Python support is already available. Support for other languages is planned, and we will be announcing these on the mailing list as they are checked in.
+=== Q: What about support for languages other than Java? ===
 
-*Q: How do I handle pop up windows?*
+A: Python and Ruby support are already available. Support for C# is planned, and we will be announcing this on the mailing list as they are checked in. There is also a Javascript API (JS API) which is available on Firefox. 
 
-A: WebDriver offers the ability to cope with multiple windows. This is done by using the "WebDriver.switchTo().window()" method to switch to a window with a known name. If the name is not known, you can use "WebDriver.getWindowHandles()" to obtain a list of known windows.
+=== Q: How do I handle pop up windows? ===
 
-*Q: Does WebDriver support Javascript alerts and prompts?*
+A: WebDriver offers the ability to cope with multiple windows. This is done by using the "WebDriver.switchTo().window()" method to switch to a window with a known name. If the name is not known, you can use "WebDriver.getWindowHandles()" to obtain a list of known windows. You may pass the handle to "switchTo().window()".
+
+=== Q: Does WebDriver support Javascript alerts and prompts? ===
 
 A: Not yet, but we plan on adding an API for this, that will look something like:
 
@@ -72,15 +76,15 @@ alert.getText();
 alert.accept();
 }}}
 
-*Q: The "onchange" event doesn't fire after a call "sendKeys"*
+=== Q: The "onchange" event doesn't fire after a call "sendKeys" ===
 
 A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onchange" event will only fire when focus leaves that element. As such, you need to move the focus, perhaps using a "click" on another element.
 
-*Q: Can I run multiple instances of the WebDriver sub-classes?*
+=== Q: Can I run multiple instances of the WebDriver sub-classes? ===
 
-A: Each instance of HtmlUnit, FirefoxDriver and (when we're done) ChromeDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses) Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
+A: Each instance of HtmlUnit, FirefoxDriver and ChromeDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses) Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
 
-*Q: How do I handle authentication with the HtmlUnitDriver?*
+=== Q: How do I handle authentication with the HtmlUnitDriver? ===
 
 A: When creating your instance of the HtmlUnitDriver, override the "modifyWebClient" method, for example:
 
@@ -101,18 +105,32 @@ WebDriver driver = new HtmlUnitDriver() {
 };
 }}}
 
-*Q: Is WebDriver thread-safe?*
+=== Q: Is WebDriver thread-safe? ===
 
 A: WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable.
 
-*Q: I'm using NX to connect to my Linux session, and the Linux firefox browser isn't starting, with an error about not being able to connect*
+=== Q: How do I type into a contentEditable iframe? ===
 
-A: The normal reason for this is that the DISPLAY and XAUTH environment variables aren't set up quite right. If you've started your NX session in headless mode, running a single command, make sure that the command starts with executing the "nxxauth" program (on my system, to start the KDE console app, I use: {{{/usr/NX/bin/nxxauth konsole}}})
+A: Assuming that the iframe is named "foo":
 
-*Q: I'd like it if WebDriver did....*
+{{{
+driver.switchTo().frame("foo");
+WebElement editable = driver.switchTo().activeElement();
+editable.sendKeys("Your text here");
+}}}
+
+Sometimes this doesn't work, and this is because the iframe doesn't have any content. On Firefox you can execute the following before "sendKeys":
+
+{{{
+((JavascriptExecutor) driver).executeScript("document.body.innerHTML = '<br>'");
+}}}
+
+This is needed because the iframe has no content by default: there's nothing to send keyboard input to. This method call inserts an empty tag, which sets everything up nicely.
+
+=== Q: I'd like it if WebDriver did.... ===
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
 
-*Q: Why Is The InternetExplorerDriver Called Jobbie?*
+=== Q: Why Is The InternetExplorerDriver Called Jobbie? ===
 
 A: It started out as a play on "[http://jacobie.sourceforge.net jacobie]". It's not terribly funny, I know, but it made sense at the time and the name has stayed.

@@ -3,11 +3,11 @@
 
 = Internet Explorer Driver =
 
-This driver has been tested with IE 6 and 7 on XP, but should also work with IE 5.5.
+This driver has been tested with IE 6, 7 and 8 on XP, but should also work with IE 5.5. It has also been successfully tested on Vista
 
 == Installing ==
 
-Simply copy the jars from the "jobbie/lib/runtime" directory on to the classpath and ensure that the internetexplorerdriver.dll is somewhere on the PATH.
+Simply add the {{{webdriver-all.jar}}} or {{{webdriver-ie.jar}}} to your CLASSPATH. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
 
 == Pros ==
 
@@ -16,4 +16,8 @@ Simply copy the jars from the "jobbie/lib/runtime" directory on to the classpath
 == Cons ==
 
  * Obviously the InternetExplorerDriver will only work on Windows!
- * Comparatively slow
+ * Comparatively slow (though still pretty snappy :)
+
+== Required Configuration ==
+
+ * Add every site you intend to visit to your "Trusted Sites" If you do not do this, then you will not be able to interact with the page.

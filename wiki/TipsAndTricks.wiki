@@ -34,7 +34,7 @@ Suppose that you wanted to modify the user agent string (as above), but you've g
 {{{
 ProfileIni allProfiles = new ProfilesIni();
 FirefoxProfile profile = allProfiles.getProfile("WebDriver");
-profile.addAdditionalPreferences(extraPrefs);
+profile.setPreferences("foo.bar", 23);
 WebDriver driver = new FirefoxDriver(profile);
 }}}
 
@@ -44,5 +44,15 @@ Alternatively, if the profile isn't already registered with Firefox:
 File profileDir = new File("path/to/top/level/of/profile");
 FirefoxProfile profile = new FirefoxProfile(profileDir);
 profile.addAdditionalPreferences(extraPrefs);
+WebDriver driver = new FirefoxDriver(profile);
+}}}
+
+== Enabling features that might not be wise to use in Firefox ==
+
+As we develop features in the FirefoxDriver, we expose the ability to use them. For example, until we feel native events are stable on Firefox for Linux, they are disabled by default. To enable them:
+
+{{{
+FirefoxProfile profile = new FirefoxProfile();
+profile.setEnableNativeEvents(true);
 WebDriver driver = new FirefoxDriver(profile);
 }}}

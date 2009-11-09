@@ -1,7 +1,11 @@
 #summary An overview of the WebDriver architecture.
 #labels WebDriver
 
-= Architectural Overview =
+= Architectural Overview and Design Principles =
+
+== Focus on the User ==
+
+The WebDriver APIs are focused on driving the browser from the user's point of view. For this reason, you won't find methods such as "fireEvent", and this is why "getText" attempts to return the text as a user would see it. This is also why it's important that installation of webdriver be as simple as possible.
 
 == Use a "Best Fit" Language ==
 
@@ -23,6 +27,7 @@ One obvious benefit to this design is that writing a language binding for WebDri
 
 More detailed information about each driver, how to write language bindings and its implementation can be found on their pages:
 
+  * ChromeDriver
   * FirefoxDriverInternals
   * HtmlUnitDriverInternals
   * InternetExplorerDriverInternals

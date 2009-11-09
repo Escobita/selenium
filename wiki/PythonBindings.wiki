@@ -2,10 +2,19 @@
 #labels Phase-Deploy,Phase-Support,WebDriver
 
 =Introduction=
+
 The python bindings for WebDriver are now available in the trunk of WebDriver and are ready for use. The work is still in progress, your feedback would be welcome.
 
-=Installation of the python bindings=
-Checkout the source code from http://code.google.com/p/selenium/source/checkout. In the root directory of the downloaded code, run the following command from a command prompt:
+== Installation of the python bindings ==
+
+{{{easy_install webdriver}}}
+
+Job done.
+
+= Installation of the python bindings from source =
+
+Checkout the source code from http://code.google.com/p/selenium/source/checkout. The subversion location is http://selenium.googlecode.com/svn/webdriver/trunk In the root directory of the downloaded code, run the following command from a command prompt:
+
 {{{python setup.py install}}}
 
 Set WEBDRIVER environment variable to your webdriver directory
@@ -14,30 +23,44 @@ And you need to have simplejson installed. Or add (webdriver_directory)/firefox/
 
 That's it :) However you may want to run some sanity tests... If so you can run {{{py_test.py}}} from the same root directory. All the tests should pass. 
 
-=Comparison with Java Bindings=
+Alternatively, you can run the tests using:
+
+{{{rake test_firefox_py}}}
+
+If you are developing webdriver itself, we recommend you do this.
+
+==Comparison with Java Bindings==
+
 Here is a summary of the major differences between the python and Java bindings.
 
-==Function names==
+=== Function names ===
+
 Function names separate compound terms with underscores, rather than using the Java camelCase e.g. {{{get_title()}}} in python vs. {{{getTitle()}}} in Java.
 
-==Flatter structures==
+=== Flatter structures ===
+
 To reflect pythonic behavior of flat object hierarchies the python bindings e.g. {{{find_element_by_xpath("//h1")}}} rather than {{{findElement(By.xpath("//h1"));}}}
 
-==No PageFactory==
+=== No PageFactory ===
+
 The PageFactory in the Java Bindings makes extensive use of Java Annotations. At this stage we don't intend to implement anything similar. 
 
-==PageObject Implementation==
+=== PageObject Implementation ===
+
 Decorators are used to provide the PageObject support. The decorator is {{{@require_loaded}}}
 
-=Browser supports=
+== Browser supports ==
+
 All the browsers supported by the Java implementation are available on the Python binding. However, that's with the help of the remote driver. Currently only the Firefox driver is natively implemented in Python. As you can see from the picture below, the python remote driver connects to the Java remote driver, which then uses Java implementations to access the browser.
 
 [http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0 http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0]
 
-==Firefox==
+=== Firefox ===
+
 There isn't any additional setup to use the firefox driver. For example usage, see http://code.google.com/p/webdriver/source/browse/trunk/common/test/py/example2.py
 
-==Other browsers via remote driver==
+=== Other browsers via remote driver ===
+
 You need to download and run a Remote driver server. [http://webdriver.googlecode.com/files/RemoteDriverServer.jar]  Put it in your webdriver directory and run {{{java -jar  emoteDriverServer.jar 8888}}} The number is the port you want the server to listen on. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
 
 {{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}

@@ -3,11 +3,20 @@
 
 = Firefox Driver =
 
-Everything you ever wanted to know about the Firefox driver but were afraid to ask. See below for instructions on how to install the FirefoxDriver.
+See below for instructions on how to install the FirefoxDriver.
+
+== Pros ==
+
+ * Runs in a real browser and supports Javascript
+ * Faster than the InternetExplorerDriver
+
+== Cons ==
+ 
+ * Slower than the HtmlUnitDriver
 
 == Before Going Any Further ==
 
-The FirefoxDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-firefox.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
+The FirefoxDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-firefox.jar}}} or {{{webdriver-all.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
 
 If you want to dig deeper, though, carry on reading!
 
@@ -18,7 +27,9 @@ The following system properties (read using {{{System.getProperty()}}} and set u
 || *Property* || *What it means* ||
 || webdriver.firefox.bin || The location of the binary used to control firefox. ||
 || webdriver.firefox.profile || The name of the profile to use when starting firefox. This defaults to webdriver creating an anonymous profile ||
-|| webdriver.firefox.useExisting || Use a running instance of firefox if one is present ||
+|| webdriver.reap_profile || Should be "true" if temporary files and profiles should not be deleted ||
+|| webdriver.firefox.useExisting || *Never use in production* Use a running instance of firefox if one is present ||
+|| webdriver.development || *Never use in production* Indicates that we're in development mode. ||
 
 Normally the Firefox binary is assumed to be in the default location for your particular operating system:
 
@@ -27,27 +38,18 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 || Mac || /Applications/Firefox.app/Contents/MacOS/firefox ||
 || Windows || %PROGRAMFILES%\Mozilla Firefox\firefox.exe ||
 
-The default profile name is *WebDriver* (the casing matters!)
+By default, the Firefox driver creates an anonymous profile
 
 == Installing a Downloaded Binary ==
 
-The "wedriver-firefox.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
+The "wedriver-all.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
 
- # Copy all the "jar" files on to your classpath.
+ # Copy all the "jar" files on to your CLASSPATH.
 
 == Installing the Quick Way From Source (with Ruby) ==
 
 If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{firefox/src/extension}}}
 
-This assumes that your installation of Firefox 2 or 3 is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the firefox driver where your Firefox binary is:
+This assumes that your installation of Firefox 2 or 3.x is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the firefox driver where your Firefox binary is:
 
 {{{System.setProperty("webdriver.firefox.bin", "d:\\apps\\mozilla firefox\\firefox");}}}
-
-== Pros ==
-
- * Runs in a real browser and supports Javascript
- * Faster than the InternetExplorerDriver
-
-== Cons ==
- 
- * Slower than the HtmlUnitDriver

@@ -7,7 +7,18 @@ This is information about using the client implementation of the RemoteWebDriver
 
 == Installing ==
 
-Copy the jars from the "remote/client/lib/runtime" directory to the classpath.
+Copy "webdriver-all.jar" and all the associated JARs to your CLASSAPATH. This will give you the remote webdriver client, which is generally what you need. Please consult the RemoteWebDriverServer for information on how to set up the server-side of the remote webdriver.
+
+== Pros ==
+ 
+  * Separates where the tests are running from where the browser is.
+  * Allows tests to be run with browsers not available on the current OS (because the browser can be elsewhere)
+  * Introduces extra latency to tests, particularly when exceptions are thrown.
+
+== Cons ==
+  
+  * Requires an external servlet container to be running
+  * You may find problems with line endings when getting text from the remote server
 
 == Using == 
 
@@ -43,13 +54,11 @@ public String extractScreenShot(WebDriverException e) {
 }
 }}}
 
-== Pros ==
- 
-  * Separates where the tests are running from where the browser is.
-  * Allows tests to be run with browsers not available on the current OS (because the browser can be elsewhere)
-  * Introduces extra latency to tests, particularly when exceptions are thrown.
+== RemoteWebDriver Modes ==
 
-== Cons ==
-  
-  * Requires an external servlet container to be running
-  * You may find problems with line endings when getting text from the remote server
+The remote webdriver comes in two flavours:
+
+  * *Client mode*: where the language bindings connect to the remote instance. This is the way that the FirefoxDriver and the RemoteWebDriver client normally work.
+  * *Server mode*: where the language bindings are responsible for setting up the server, which the driver running in the browser can connect to. The ChromeDriver works in this way.
+
+We realise that these terms are confusing, so please feel free to suggest something better!

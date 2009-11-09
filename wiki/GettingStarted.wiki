@@ -3,26 +3,16 @@
 
 = The 5 Minute Getting Started Guide =
 
-Before you start either:
+WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that's easy to explore and understand, which will help make your tests easier to read and maintain. It's not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old "main" method. This "Getting Started" guide introduces you to WebDriver's Java API and helps get you started becoming familiar with it.
 
- * Download the latest binaries, or
- * CheckOut the latest version of the code and build it following the instructions in BuildingWebDriver.
-
-Assuming that you've built everything and the source is located at {{{$WEBDRIVER_HOME}}}, and we're only going to use the HtmlUnitDriver to start with:
+Start by [http://code.google.com/p/selenium/downloads/list downloading] the latest binaries and unpack them into a directory. From now on, we'll refer to that as {{{$WEBDRIVER_HOME}}}. Now, open your favourite IDE and:
 
  * Start a new Java project in your favourite IDE
- * Add {{{$WEBDRIVER_HOME/common/build/webdriver-common.jar}}} to the {{{CLASSPATH}}}
- * Add {{{$WEBDRIVER_HOME/htmlunit/build/webdriver-htmlunit.jar}}} to the {{{CLASSPATH}}}
- * Add all the Jar files under {{{$WEBDRIVER_HOME/htmlunit/lib/runtime}}} to the {{{CLASSPATH}}}
+ * Add all the JAR files under {{{$WEBDRIVER_HOME}}} to the {{{CLASSPATH}}}
 
-If you have downloaded the binaries, then the steps you need to follow are:
+You can see that WebDriver acts just as a normal Java library does: it's entirely self-contained, and you don't need to remember to start any additional processes or run any installers before using it. 
 
-  * Start a new Java project in your favourite IDE
-  * Unzip the HtmlUnitDriver binary and copy all the JAR files to the {{{CLASSPATH}}}
-
-Whichever way you chose, you can see that WebDriver acts just as a normal Java library does: it's entirely self-contained, and you don't need to remember to start any additional processes. 
-
-You're now ready to write some code. An easy way to get started is this example, which searches for the term "Cheese" on Google and then outputs the result page's title to the console.
+You're now ready to write some code. An easy way to get started is this example, which searches for the term "Cheese" on Google and then outputs the result page's title to the console. You'll start by using the HtmlUnitDriver. This is a pure Java driver that runs entirely in-memory. Because of this, you won't see a new browser window open. 
 
 {{{
 package org.openqa.selenium.example;
@@ -60,7 +50,7 @@ public class Example  {
 
 Compile and run it. You should see a line with the title of the Google search results as output. Congratulations, you've managed to get started with WebDriver!
 
-In this next example, let's use a page that requires Javascript to work properly, such as Google Suggest. You will also be using the FirefoxDriver. The easiest way to get hold of this is to download the binary package from the website, unzip it and copy the JAR files on to your {{{CLASSPATH}}}. Alternatively, you can build from source (using {{{rake firefox}}}), copying the built JARs from {{{firefox/build}}}, {{{firefox/lib/runtime}}} and {{{common/build}}} into your {{{CLASSPATH}}} 
+In this next example, let's use a page that requires Javascript to work properly, such as Google Suggest. You will also be using the FirefoxDriver. Make sure that Firefox is installed on your machine and is in the normal location for your OS.
 
 Once that's done, create a new class called GoogleSuggest, which looks like:
 
