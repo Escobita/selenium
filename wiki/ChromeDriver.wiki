@@ -44,6 +44,7 @@ The following system properties (read using {{{System.getProperty()}}} and set u
 
 || *Property* || *What it means* ||
 || webdriver.chrome.bin || The location of the binary used to control chrome. ||
+|| webdriver.reap_profile || Should be "true" if temporary files and profiles should not be deleted ||
 
 Normally the Chrome binary is assumed to be in the default location for your particular operating system:
 
