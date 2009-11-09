@@ -1,4 +1,4 @@
-#summary Everything you ever wanted to know about the Chrome driver but were afraid to ask. 
+#summary Everything you ever wanted to know about the Chrome driver but were afraid to ask.
 #labels WebDriver
 
 = ChromeDriver Internals =
@@ -45,9 +45,11 @@ Communication over the TCP port is JSON over HTTP.  Commands are of the form:
 {{{
 {
   request: 'findElement', 
-  by: ["id", "foo"]
+  using: 'tag name',
+  value: 'div'
 }
-}}} and responses of the form:
+}}}
+and responses of the form:
 
 {{{
 {
