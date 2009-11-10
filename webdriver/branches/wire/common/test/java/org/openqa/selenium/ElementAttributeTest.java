@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -120,7 +121,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     WebElement two = options.get(1);
     assertThat(one.isSelected(), is(true));
     assertThat(two.isSelected(), is(false));
-    assertThat(one.getAttribute("selected"), equalTo("true"));
+    assertThat(one.getAttribute("selected"), anyOf(equalTo("selected"), equalTo("true")));
     assertThat(two.getAttribute("selected"), equalTo("false"));
   }
 

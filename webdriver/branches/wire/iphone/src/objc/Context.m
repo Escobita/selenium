@@ -118,7 +118,7 @@ static NSString * const CONTEXT_NAME = @"foo";
   WebDriverResource *executeScript
         = [WebDriverResource resourceWithTarget:self
                                       GETAction:NULL
-                                     POSTAction:@selector(executeScript:withArguments:)];
+                                     POSTAction:@selector(executeScript:)];
   [executeScript setAllowOptionalArguments:YES];
   [self setResource:executeScript withName:@"execute"];
 
@@ -129,7 +129,7 @@ static NSString * const CONTEXT_NAME = @"foo";
   [self setResource:elementStore_ withName:@"element"];
   [self setResource:[WebDriverResource resourceWithTarget:elementStore_
                                                 GETAction:NULL
-                                               POSTAction:@selector(findElementsByMethod:query:)]
+                                               POSTAction:@selector(findElements:)]
            withName:@"elements"];
   
   return self;

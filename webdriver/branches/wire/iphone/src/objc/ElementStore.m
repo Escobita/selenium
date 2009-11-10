@@ -24,6 +24,7 @@
 #import "WebDriverResource.h"
 #import "ElementStore+FindElement.h"
 #import "Element.h"
+#import "NSException+WebDriver.h"
 
 static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
 
@@ -46,7 +47,7 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   
   [self setIndex:[WebDriverResource resourceWithTarget:self
                                              GETAction:NULL
-                                            POSTAction:@selector(findElementByMethod:query:)]];
+                                            POSTAction:@selector(findElement:)]];
   
   document_ = [self elementFromJSObject:@"document"];
   
@@ -71,8 +72,32 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   // Sometimes the URL will change and we won't reset ELEM_CACHE[0] = document
   // again. Instead of setting it, we'll just refer to element 0 as the document
   // everywhere that it counts.
-  if ([elementId isEqualToString:@"0"])
+  if ([elementId isEqualToString:@"0"]) {
     return @"document";
+  }
+
+  // If the element is no longer attached to the DOM, remove it from the cache
+  // and throw an error.
+  NSLog(@"Verifying that element is not stale");
+  NSString *isStale = [[self viewController] jsEval:
+                   @"(function(cache, id) {\r"
+                   "  var e = cache[id];\r"
+                   "  var parent = e;\r"
+                   "  while (parent && parent != e.ownerDocument.documentElement) {\r"
+                   "    parent = parent.parentNode;\r"
+                   "  }\r"
+                   "  if (parent !== e.ownerDocument.documentElement) {\r"
+                   "    delete cache[id];\r"
+                   "    return true;\r"
+                   "  }\r"
+                   "  return false;\r"
+                   "})(%@, %@);\r", JSARRAY, elementId];
+  if ([isStale isEqualToString:@"true"]) {
+    @throw [NSException
+            webDriverExceptionWithMessage:@"Element is stale"
+            webDriverClass:@"org.openqa.selenium.StaleElementReferenceException"];
+  }
+
   return [NSString stringWithFormat:@"%@[%@]", JSARRAY, elementId];
 }
 

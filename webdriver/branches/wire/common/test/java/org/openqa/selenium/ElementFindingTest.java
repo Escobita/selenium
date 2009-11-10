@@ -360,12 +360,12 @@ public class
     driver.get(javascriptPage);
 
     RenderedWebElement toBeDeleted = (RenderedWebElement) driver.findElement(By.id("deleted"));
-    assertTrue(toBeDeleted.isDisplayed());
+    toBeDeleted.isEnabled();
 
     driver.findElement(By.id("delete")).click();
 
     try {
-      toBeDeleted.isDisplayed();
+      toBeDeleted.isEnabled();
       fail("Element should be stale at this point");
     } catch (StaleElementReferenceException e) {
       // this is expected

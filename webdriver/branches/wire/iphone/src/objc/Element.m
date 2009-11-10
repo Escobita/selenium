@@ -142,13 +142,26 @@
   // load before continuing.
   NSString *locator = [self jsLocator];
   [[self viewController] jsEvalAndBlock:
-   @"if (%@['click'])\r"
-    "%@.click();\r"
-    "var event = document.createEvent('MouseEvents');\r"
-    "event.initMouseEvent('click', true, true, null, 1, 0, 0, 0, 0, false,"
-         "false, false, false, 0, null);\r"
-    "%@.dispatchEvent(event);\r",
-                       locator, locator, locator];
+   @"(function(element) {\r"
+   "  function triggerMouseEvent(element, eventType) {\r"
+   "    var event = element.ownerDocument.createEvent('MouseEvents');\r"
+   "    var view = element.ownerDocument.defaultView;\r"
+   "    event.initMouseEvent(eventType, true, true, view, 1, 0, 0, 0, 0,\r"
+   "        false, false, false, false, 0, element);\r"
+   "    element.dispatchEvent(event);\r"
+   "  }\r"
+   "  triggerMouseEvent(element, 'mouseover');\r"
+   "  triggerMouseEvent(element, 'mousemove');\r"
+   "  triggerMouseEvent(element, 'mousedown');\r"
+   "  if (element.ownerDocument.activeElement != element) {\r"
+   "    if (element.ownerDocument.activeElement) {\r"
+   "      element.ownerDocument.activeElement.blur();\r"
+   "    }\r"
+   "    element.focus();\r"
+   "  }\r"
+   "  triggerMouseEvent(element, 'mouseup');\r"
+   "  triggerMouseEvent(element, 'click');\r"
+   "})(%@);\r", locator];
 }
 
 // This returns the pixel position of the element on the page in page
@@ -204,10 +217,17 @@
 
 - (void)clear {
   NSString *locator = [self jsLocator];
-  [[self viewController] jsEval:[NSString stringWithFormat:
-  @"if (%@['value']) { %@.value = ''; }\r"
-   "else { %@.setAttribute('value', ''); }",
-                                 locator, locator, locator]];
+  [[self viewController] jsEval:
+   [NSString stringWithFormat:
+    @"(function(elem) {\r"
+     "  if (((elem instanceof HTMLInputElement && elem.type == 'text') ||\r"
+     "       elem instanceof HTMLTextAreaElement) && elem.value) {\r"
+     "    elem.value = '';\r"
+     "    var e = elem.ownerDocument.createEvent('HTMLEvents');\r"
+     "    e.initEvent('change', true, true);\r"
+     "    elem.dispatchEvent(e);\r"
+     "  }\r"
+     "})(%@);", locator]];
 }
 
 - (void)clearWrapper:(NSDictionary *)ignored {
@@ -216,9 +236,18 @@
 
 - (void)submit {
   NSString *locator = [self jsLocator];
-  [[self viewController] jsEvalAndBlock:[NSString stringWithFormat:
-    @"if (%@ instanceof HTMLFormElement) %@.submit(); else %@.form.submit();",
-                                 locator, locator, locator]];
+  [[self viewController] jsEvalAndBlock:
+   [NSString stringWithFormat:
+    @"(function(elem) {\r"
+    "  var current = elem;\r"
+    "  while (current && current != elem.ownerDocument.body) {\r"
+    "    if (current.tagName.toLowerCase() == 'form') {\r"
+    "      current.submit();\r"
+    "      return;\r"
+    "    }\r"
+    "    current = current.parentNode;\r"
+    "  }\r"
+    "})(%@);", locator]];
 }
 - (void)submitWrapper:(NSDictionary *)ignored {
   return [self submit];
@@ -241,28 +270,70 @@
           jsEval:[NSString stringWithFormat:@"%@.value", [self jsLocator]]];
 }
 
-// This method is only valid on checkboxes and radio buttons.
-// TODO(josephg): Check that the element is a checkbox or radio button
+// This method is only valid on option elements, checkboxes and radio buttons.
 - (NSNumber *)isChecked {
-  BOOL checked = [[[self viewController]
-                   jsEval:[NSString stringWithFormat:@"%@.checked",
-                           [self jsLocator]]] isEqualToString:@"true"];
+  BOOL isSelectable = [[[self viewController]
+                        jsEval:[NSString stringWithFormat:
+                                @"var elem = %@;\r"
+                                "elem instanceof HTMLOptionElement ||\r"
+                                "(elem instanceof HTMLInputElement &&\r"
+                                " elem.type in {'checkbox':0, 'radio':0});",
+                                [self jsLocator]]] isEqualToString:@"true"];
+  if (!isSelectable) {
+    return [NSNumber numberWithBool:NO];
+  }
+
+  BOOL selected = [[[self viewController] jsEval:
+   [NSString stringWithFormat:
+    @"(function(elem) {\r"
+    "  if (elem.tagName.toLowerCase() == 'option') {\r"
+    "    return elem.selected;\r"
+    "  } else {\r"
+    "    return elem.checked;\r"
+    "  }\r"
+    "})(%@)", [self jsLocator]]] isEqualToString:@"true"];
   
-  return [NSNumber numberWithBool:checked];
+  return [NSNumber numberWithBool:selected];
 }
 
 // This method is only valid on option elements, checkboxes and radio buttons.
 - (void)setChecked:(NSNumber *)numValue {
-  NSString *locator = [self jsLocator];
+  if (![[self isEnabled] boolValue]) {
+    @throw [NSException webDriverExceptionWithMessage:@"You may not select a disabled element"
+                                       webDriverClass:@"java.lang.UnsupportedOperationException"];
+  }
   
-  [[self viewController] jsEval:[NSString stringWithFormat:
-      @"if (%@ instanceof HTMLOptionElement) {\r"
-          "%@.selected = true;\r"
-          "%@.parentNode.onchange();\r"
-       "} else {\r"
-          "%@.checked = true;\r"
-       "}",
-      locator, locator, locator, locator]];
+  BOOL isSelectable = [[[self viewController]
+                        jsEval:[NSString stringWithFormat:
+                                @"var elem = %@;\r"
+                                "elem instanceof HTMLOptionElement ||\r"
+                                "(elem instanceof HTMLInputElement &&\r"
+                                " elem.type in {'checkbox':0, 'radio':0});",
+                                [self jsLocator]]] isEqualToString:@"true"];
+  if (!isSelectable) {
+    @throw [NSException webDriverExceptionWithMessage:@"You may not select an unselectable element"
+                                       webDriverClass:@"java.lang.UnsupportedOperationException"];
+  }
+
+  [[self viewController] jsEval:
+   [NSString stringWithFormat:
+    @"(function(elem) {\r"
+     "  var changed = false;\r"
+     "  if (elem.tagName.toLowerCase() == 'option') {\r"
+     "    if (!elem.selected) {\r"
+     "      elem.selected = changed = true;\r"
+     "    }\r"
+     "  } else {\r"
+     "    if (!elem.checked) {\r"
+     "      elem.checked = changed = true;\r"
+     "    }\r"
+     "  }\r"
+     "  if (changed) {\r"
+     "    var e = elem.ownerDocument.createEvent('HTMLEvents');\r"
+     "    e.initEvent('change', true, true);\r"
+     "    elem.dispatchEvent(e);\r"
+     "  }\r"
+     "})(%@)", [self jsLocator]]];
 }
 
 // Like |checked| above, we should check that the element is valid.
@@ -304,10 +375,30 @@
 
 // Get an attribute with the given name.
 - (NSString *)attribute:(NSString *)name {
-  return [[self viewController] jsEval:
-          @"%@.getAttribute('%@')",
-          [self jsLocator],
-          name];
+  BOOL hasAttribute = [[[self viewController] jsEval:
+                        @"%@.hasAttribute('%@')", [self jsLocator], name]
+                       isEqualToString:@"true"];
+  if (hasAttribute) {
+    return [[self viewController] jsEval:
+            @"%@.getAttribute('%@')",
+            [self jsLocator],
+            name];
+  }
+  
+  if ([name isEqualToString:@"disabled"]) {
+    return [[self viewController] jsEval:@"%@.disabled", [self jsLocator]];
+  } else if (([name isEqualToString:@"checked"] || [name isEqualToString:@"selected"])
+             && [[self name] isEqualToString:@"input"]) {
+    return [[self viewController] jsEval:@"%@.checked", [self jsLocator]];
+  } else if ([name isEqualToString:@"selected"]
+             && [[self name] isEqualToString:@"option"]) {
+    return [[self viewController] jsEval:@"%@.selected", [self jsLocator]];
+  } else if ([name isEqualToString:@"index"]
+             && [[self name] isEqualToString:@"option"]) {
+    return [[self viewController] jsEval:@"%@.index", [self jsLocator]];
+  }
+  
+  return nil;
 }
 
 // Get the tag name of this element, not the value of the name attribute:
