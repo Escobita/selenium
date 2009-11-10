@@ -24,6 +24,16 @@ public class DoActionIntent extends BroadcastReceiver {
         ", SessionId: " + sessionId + ", Context: " + context + ", action: " +
         action.name());
     
+    if (sessionId <= 0) {
+      // Wrong session: definitely an error
+      Log.e("DoActionIntent:broadcast", "Error in session sending intent, id:" +
+          sessionId + ", action: " + action + " stack: ");
+      for (StackTraceElement el : Thread.currentThread().getStackTrace())
+        Log.e("DoActionIntent:broadcast", el.toString());
+      
+      return;   // Not sending 
+    }
+
     intent.putExtra("SessionId", sessionId);
     intent.putExtra("Context", context);
     intent.putExtra("Action", action.name());
@@ -38,23 +48,29 @@ public class DoActionIntent extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context ctx, Intent intent) {
-    Log.e("AndroidDriver", "Received intent: " + intent.getAction());
+    Log.d("AndroidDriver", "Received intent: " + intent.getAction());
 
     for(String s : getResultExtras(true).keySet())
-      Log.e("Intent extra", "Extra: " + s);
+      Log.d("Intent extra", "Extra: " + s);
     
     int sessId = getResultExtras(true).getInt("SessionId", -1);
     String res = getResultExtras(true).getString("Result");
     
-    Log.d("DoActionIntent", "Got result for session: " + sessId + ", result: " +
-        res);
+    if (res == null)
+      res = "";
+    
+    Log.d("DoActionIntent", "Got result for session: " + sessId +
+        ", result size: " + res.length());
     
     if (sessId == -1) {
         Log.e("AndroidDriver", "Error in received intent: " + intent.toString());
         return;
     }
 
-    strCallback.getString(res);
+    if (strCallback != null) {
+      Log.d("DoActionIntent:onReceive", "Invoking callback");
+      strCallback.getString(res);
+    }
   }
 
   public static DoActionIntent getInstance() {

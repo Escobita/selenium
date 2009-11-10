@@ -8,6 +8,7 @@
 		<artifactId>webdriver-parent</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
+  <groupId>org.seleniumhq.webdriver</groupId>
 	<artifactId>webdriver-remote-common</artifactId>
 	<name>webdriver-remote-common</name>
 

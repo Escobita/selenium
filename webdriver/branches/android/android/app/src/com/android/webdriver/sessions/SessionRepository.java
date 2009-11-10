@@ -13,7 +13,7 @@ public class SessionRepository implements Session.OnChangeListener,
 	/**
 	 * Describes what type of change occurred with the session
 	 */
-	public enum SessionChangeType {UPDATED, ADDED, REMOVED};
+	public enum SessionChangeType {UPDATED, ADDED, REMOVED, UPDATED_SYNC}
 	
 	/**
 	 * Interface definition for a callback to be invoked when any property of
@@ -112,9 +112,10 @@ public class SessionRepository implements Session.OnChangeListener,
         	mOnSessionChangeListener = null;
     }
 
-    public void onChange(Session session) {
+    public void onChange(Session session, boolean synchronous) {
     	if (mOnSessionChangeListener != null)
       	  mOnSessionChangeListener.onSessionChange(session,
+      	      synchronous ? SessionChangeType.UPDATED_SYNC :
       			  SessionChangeType.UPDATED);
 	}
 

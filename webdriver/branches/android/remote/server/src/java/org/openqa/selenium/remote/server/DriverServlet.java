@@ -82,7 +82,7 @@ import org.openqa.selenium.remote.server.rest.ResultType;
 import org.openqa.selenium.remote.server.rest.UrlMapper;
 
 public class DriverServlet extends HttpServlet {
-  private UrlMapper getMapper;
+  protected UrlMapper getMapper;
   private UrlMapper postMapper;
   private UrlMapper deleteMapper;
 
@@ -108,7 +108,7 @@ public class DriverServlet extends HttpServlet {
     postMapper.bind("/session", NewSession.class)
         .on(ResultType.SUCCESS, new RedirectResult("/session/:sessionId/:context"));
     getMapper.bind("/session/:sessionId/:context", GetSessionCapabilities.class)
-        .on(ResultType.SUCCESS, new ForwardResult("/WEB-INF/views/sessionCapabilities.jsp"))
+        //.on(ResultType.SUCCESS, new ForwardResult("/WEB-INF/views/sessionCapabilities.jsp"))
         .on(ResultType.SUCCESS, new JsonResult(":response"), "application/json");
 
     deleteMapper.bind("/session/:sessionId", DeleteSession.class)
@@ -256,6 +256,7 @@ public class DriverServlet extends HttpServlet {
         r.render(request, response, null);
       }
     } catch (Exception e) {
+      e.printStackTrace();
       log("Fatal, unhandled exception: " + request.getPathInfo() + ": " + e);
       throw new ServletException(e);
     }

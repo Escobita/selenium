@@ -35,6 +35,12 @@ limitations under the License.
 
 package org.openqa.selenium.android;
 
+import android.util.Log;
+
+import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.Attributes;
+import net.htmlparser.jericho.Element;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -49,6 +55,14 @@ public class AndroidWebElement implements WebElement,
     FindsById, FindsByLinkText, FindsByXPath, FindsByTagName, SearchContext {
 
   private String toString;
+  private AndroidDriver mDriver;
+  private By mBy;
+  private Element mElement;
+  
+  public AndroidWebElement(AndroidDriver driver, By by) {
+    mDriver = driver;
+    mBy = by;
+  }
 
   public void click() {
     // TODO(abergman): Implement
@@ -58,9 +72,17 @@ public class AndroidWebElement implements WebElement,
     // TODO(abergman): Implement
   }
 
-	public String getValue() {
-    // TODO(abergman): implement
-    return null;
+  public String getValue() {
+    // Uses extractor to fetch element from the current page source
+    this.findElement(mBy);
+    if (mElement == null)
+      return "";
+    
+    if (mElement.getStartTag().getName().equalsIgnoreCase("textarea")) {
+      return mElement.getTextExtractor().toString();
+    }
+    String value = mElement.getAttributeValue("value");
+    return (value == null) ? "" : value;
   }
 
   public void clear() {
@@ -71,19 +93,17 @@ public class AndroidWebElement implements WebElement,
     // TODO(abergman): implement
   }
 
+  @Deprecated
   public String getElementName() {
-    // TODO(abergman): implement
-    return null;
+    return mElement.getAttributeValue("name");
   }
 
   public String getTagName() {
-    // TODO Auto-generated method stub
-    return null;
+    return mElement.getStartTag().getName();
   }
 
   public String getAttribute(String name) {
-    // TODO(abergman): implement
-    return null;
+    return mElement.getAttributeValue(name);
   }
 
   public boolean toggle() {
@@ -106,8 +126,12 @@ public class AndroidWebElement implements WebElement,
   }
 
   public String getText() {
-    // TODO(abergman): implement
-    return null;
+    this.findElement(mBy);
+    if (mElement == null || mElement.getTextExtractor() == null) {
+      Log.e("AndroidWebElement:getText", "Element is Null!");
+      return "";
+    }
+    return mElement.getTextExtractor().toString();
   }
 
   public List<WebElement> getElementsByTagName(String tagName) {
@@ -116,15 +140,25 @@ public class AndroidWebElement implements WebElement,
   }
 
   public WebElement findElement(By by) {
-        return by.findElement(this);
+    return by.findElement(this);
   }
 
   public List<WebElement> findElements(By by) {
-      return by.findElements(this);
+    return by.findElements(this);
   }
 
   public WebElement findElementById(String id) {
-      return findElementByXPath(".//*[@id = '" + id + "']");
+    try {
+      // Updates mElement according to the current extracted page source
+      mElement = mDriver.extractor.getElementById(id);
+    } catch (Exception e) {
+      Log.e("AndroidWebElement:findElementById", "Element not found, id: " +
+          id + ", message: " + e.getMessage());
+      e.printStackTrace();
+      return null;
+    }
+    
+    return this;
   }
 
   public List<WebElement> findElementsById(String id) {
@@ -174,7 +208,21 @@ public class AndroidWebElement implements WebElement,
   @Override
   public String toString() {
       if (toString == null) {
-        // TODO(abergman): return meaningful description
+        StringBuilder sb = new StringBuilder();
+        sb.append('<').append(mElement.getStartTag().getName());
+        Attributes attributes = mElement.getAttributes();
+        int n = attributes.length();
+        for (int i = 0; i < n; ++i) {
+          Attribute a = attributes.get(i);
+          sb.append(' ').append(a.getName()).append("=\"")
+              .append(a.getValue().replace("\"", "&quot;")).append("\"");
+        }
+        if (!mElement.getChildElements().isEmpty()) {
+          sb.append('>');
+        } else {
+          sb.append(" />");
+        }
+        toString = sb.toString();
       }
       return toString;
   }

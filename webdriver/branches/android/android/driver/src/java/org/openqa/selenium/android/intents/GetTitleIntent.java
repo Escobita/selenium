@@ -10,10 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class AddSessionIntent extends BroadcastReceiver {
+public class GetTitleIntent extends BroadcastReceiver {
 
-  public void broadcast(String context, Context sender, Callback callback) {
-    intCallback = callback;
+  public void broadcast(int sessionId, String context,
+      Context sender, Callback callback) {
+    titleCallback = callback;
     
     Intent intent = new Intent(Intents.INTENT_ADDSESSION);
     intent.putExtra("Context", context);
@@ -26,26 +27,28 @@ public class AddSessionIntent extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
       Log.d("AndroidDriver", "Received intent: " + intent.getAction());
 
-      int sessId = getResultExtras(true).getInt("SessionId", -1);
-      if (sessId == -1) {
+      for(String s : getResultExtras(true).keySet())
+        Log.d("Intent extra", "Extra: " + s);
+      
+      String title = getResultExtras(true).getString("Title");
+      if (title == null) {
           Log.e("AndroidDriver", "Error in received intent: " + intent.toString());
           return;
       }
 
-      if (intCallback != null)
-        intCallback.getInt(sessId);
+      titleCallback.getString(title);
   }
 
-  public static AddSessionIntent getInstance() {
+  public static GetTitleIntent getInstance() {
     synchronized (syncObject_) {
       if (mInstance == null)
-        mInstance = new AddSessionIntent();
+        mInstance = new GetTitleIntent();
     }
     
     return mInstance;
   }
 
-  private Callback intCallback;
+  private Callback titleCallback;
   private static Object syncObject_ = new Object();
-  private static AddSessionIntent mInstance = null;
+  private static GetTitleIntent mInstance = null;
 }

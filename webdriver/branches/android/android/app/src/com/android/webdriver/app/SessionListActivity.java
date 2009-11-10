@@ -28,10 +28,12 @@ import com.android.webdriver.sessions.SessionRepository.SessionChangeType;
 import com.android.webdriver.sessions.intents.AddSessionIntentReceiver;
 import com.android.webdriver.sessions.intents.DeleteSessionIntentReceiver;
 import com.android.webdriver.sessions.intents.DoActionIntentReceiver;
+import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiver;
 import com.android.webdriver.sessions.intents.GetTitleIntentReceiver;
 import com.android.webdriver.sessions.intents.IntentReceiverRegistrar;
 import com.android.webdriver.sessions.intents.Intents;
 import com.android.webdriver.sessions.intents.NavigationIntentReceiver;
+import com.android.webdriver.sessions.intents.SetProxyIntentReceiver;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -65,30 +67,25 @@ public class SessionListActivity extends ListActivity
 	 			SessionRepository.OnSessionChangeListener,
 	 			SessionRepository.SessionActionRequestListener
 {
-	private SessionRepository sessionRep;
-    private ArrayList<WebView> mWebViews = new ArrayList<WebView>();
-    private IntentReceiverRegistrar mIntentReg;
-    private WebViewJSExecutor mJSExecutor = new WebViewJSExecutor();
+  private SessionRepository sessionRep;
+  private ArrayList<WebView> mWebViews = new ArrayList<WebView>();
+  private IntentReceiverRegistrar mIntentReg;
+      
+  public static final long COMMAND_TIMEOUT = 2500L; // in milliseconds
+  
+  public static final int MENU_ADD = Menu.FIRST + 1;
+  public static final int MENU_CLOSE_ALL = Menu.FIRST + 2;
+  
+  public static final int CTX_MENU_DELETE = Menu.FIRST + 11;
+  public static final int CTX_MENU_NAVIGATE = Menu.FIRST + 12;
+  
+  final Object syncNavObj = new Object();
     
-    public static final long JS_COMMAND_TIMEOUT = 60000L; // in milliseconds 
+  public SessionListActivity() {
+    sessionRep = SessionRepository.getInstance();
 
-    public static final int MENU_ADD = Menu.FIRST + 1;
-    public static final int MENU_CLOSE_ALL = Menu.FIRST + 2;
-
-    public static final int CTX_MENU_DELETE = Menu.FIRST + 11;
-    public static final int CTX_MENU_NAVIGATE = Menu.FIRST + 12;
-    
-	public SessionListActivity() {
-		sessionRep = SessionRepository.getInstance();
-
-		mIntentReg = new IntentReceiverRegistrar(this);
-
-		// Generate some data
-        // TODO: remove when well tested
-//        for (int i=0; i<3; i++) {
-//        	sessionRep.add("foo");
-//        }
-	}
+    mIntentReg = new IntentReceiverRegistrar(this);
+  }
 
     /**
      * Called with the activity is first created.
@@ -117,6 +114,10 @@ public class SessionListActivity extends ListActivity
 				Intents.INTENT_DOACTION);
 		mIntentReg.RegisterReceiver(new GetTitleIntentReceiver(),
 				Intents.INTENT_GETTITLE);
+        mIntentReg.RegisterReceiver(new SetProxyIntentReceiver(),
+            Intents.INTENT_SETPROXY);
+        mIntentReg.RegisterReceiver(new GetCurrentUrlIntentReceiver(),
+            Intents.INTENT_GETURL);
 
         Log.i("WebDriver", "Loaded.");
     }
@@ -157,7 +158,7 @@ public class SessionListActivity extends ListActivity
     	menu.add(0, CTX_MENU_NAVIGATE, 0, R.string.ctx_menu_navigate);
     	menu.add(0, CTX_MENU_DELETE, 1, R.string.ctx_menu_delete);
     	super.onCreateContextMenu(menu, v, menuInfo);
-    };
+    }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -165,6 +166,7 @@ public class SessionListActivity extends ListActivity
         	(AdapterContextMenuInfo)item.getMenuInfo();
     	
         Handler urlHandler = new Handler() {
+            @Override
             public void handleMessage(Message msg) {
             	((SessionListAdapter)getListAdapter()).collapseAll();
             	String url = (String)msg.obj;
@@ -178,13 +180,14 @@ public class SessionListActivity extends ListActivity
         };
         
         Handler confirmHandler = new Handler() {
+            @Override
             public void handleMessage(Message msg) {
             	((SessionListAdapter)getListAdapter()).collapseAll();
         		Intent intent = new Intent(Intents.INTENT_DELETESESSION);
             	intent.putExtra("SessionId",
             			sessionRep.get(i.position).getSessionId());
             	sendBroadcast(intent);
-        		mWebViews.remove(i.position);
+        		//mWebViews.remove(i.position);
             }
         };
 
@@ -207,38 +210,141 @@ public class SessionListActivity extends ListActivity
       ((SessionListAdapter)getListAdapter()).toggle(position);
     }
 
-	public void onSessionChange(Session changedSession, SessionChangeType type) {
-		Log.d("WebDriver", "Session: " + changedSession.toString() +
-				" was " + type.toString());
+  public void onSessionChange(Session changedSession, SessionChangeType type) {
+    Log.d("WebDriver", "Session: " + changedSession.toString() +
+        " was " + type.toString());
 
-		// TODO: Add operation-specific code
-		switch(type) {
-			case ADDED:
-				break;
-			case REMOVED:
-				break;
-			case UPDATED:
-				break;
-		}
-		((SessionListAdapter)this.getListAdapter()).notifyDataSetChanged();
-	}
+    switch(type) {
+      case ADDED:
+        // We might need to add new WebView(s)
+        if (mWebViews.size() + 1 == sessionRep.size())
+          //for(int i=mWebViews.size(); i<=sessionRep.size(); i++)
+          mWebViews.add(createWebView(changedSession));
+          Log.w("onSessionChange", "WebView Added");
+        break;
+      case REMOVED:
+        // Delete the WebView
+        Log.w("onSessionChange", "Removing WebView for session: " +
+            changedSession.getSessionId());
+        for(int i=0; i<mWebViews.size(); i++) {
+          Log.w("onSessionChange", "" +
+              getWebViewParam(mWebViews.get(i), "SESSION_ID"));
+          if ((Integer)getWebViewParam(mWebViews.get(i), "SESSION_ID") ==
+            changedSession.getSessionId()) {
+            mWebViews.remove(i);
+            Log.w("onSessionChange", "WebView Removed");
+            break;
+          }
+        }
+        break;
+      case UPDATED:
+        break;
+      case UPDATED_SYNC:
+        //int position = sessionRep.indexOf(changedSession);
+        //if (position < 0)
+        //  Log.e("onSessionChange", "Session: " + changedSession.toString() +
+        //      " not found. No synchronous methods available");
+        //else
+        //  setWebViewParam(mWebViews.get(position), "NAVIGATE_SYNC", true);
+        break;
+    }
+    ((SessionListAdapter)this.getListAdapter()).notifyDataSetChanged();
+    
+    if (type == SessionChangeType.UPDATED_SYNC) {
+      Log.d("WebDriver:onSessionChange", "Going to wait...");
+      int position = sessionRep.indexOf(changedSession);
+      if (position < 0) {
+        Log.e("WebDriver:onSessionChange", "Waiting error");
+        return;
+      }
+      ((NavigationExecutor)getWebViewParam(
+          mWebViews.get(position), "NAVIGATION_EXECUTOR"))
+            .waitForPageLoad(changedSession);
 
-	public Object onActionRequest(Session session, Actions action,
+//      synchronized (changedSession.syncNavObj) {
+//        try {
+//          changedSession.syncNavObj.wait(SYNC_TIMEOUT);
+//        } catch (InterruptedException e) { }
+//      }
+    }
+  }
+
+  /**
+   * Creates and returns an empty WebView view.
+   * 
+   * @return New WebView.
+   */
+  private WebView createWebView(Session s) {
+      WebView wv = new WebView(this);
+      wv.setWebViewClient(new LocalWebViewClient());
+      wv.setFocusable(false);
+      wv.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+      wv.getSettings().setBuiltInZoomControls(true);
+      wv.getSettings().setJavaScriptEnabled(true);
+      wv.setWebChromeClient(new LocalWebChromeClient());
+      CustomJavaScriptInterface script = new CustomJavaScriptInterface(wv);
+      WebViewJSExecutor executor = new WebViewJSExecutor();
+      script.setWebViewJSExecutor(executor);
+      wv.addJavascriptInterface(script, "webdriver");
+      setWebViewParam(wv, "EXECUTOR", executor);
+      NavigationExecutor navexecutor = new NavigationExecutor();
+      setWebViewParam(wv, "NAVIGATION_EXECUTOR", navexecutor);
+      setWebViewParam(wv, "SESSION_ID", s.getSessionId());
+      return wv;
+  }
+
+  class NavigationExecutor {
+    public void waitForPageLoad(Session session) {
+      int position = sessionRep.indexOf(session);
+      if (position >= 0) {
+          synchronized (this) {
+            Log.d("WaitForPageLoad", "Waiting for page load");
+            WebView wv = mWebViews.get(position);
+            try {
+              this.wait(COMMAND_TIMEOUT);
+            } catch (InterruptedException ie) {   }
+          }
+      }
+    }
+    public void pageLoaded(Session session) {
+      synchronized (this) {
+        Log.d("WaitForPageLoad", "Finished");
+        this.notifyAll();
+      }
+    }
+  }
+  
+  public Object onActionRequest(Session session, Actions action,
 			Object[] params) {
 		
-		// TODO: Add action specific code
+        int position = sessionRep.indexOf(session);
+        if (position < 0 || position >= sessionRep.size()) {
+          Log.e("ActionRequest", "Action: " + action.name() +
+              " requested for unknown session: " + session.getSessionId());
+          return null;
+        }
 		switch(action) {
 			case GET_DOM:
-				int position = sessionRep.indexOf(session);
-				if (position >= 0) {
-					return ((WebViewJSExecutor)getWebViewParam(
-						mWebViews.get(position), "EXECUTOR")).executeJS(session,
-						"window.webdriver.resultMethod"
-						+ "(document.documentElement.outerHTML);");
-				}
-				break;
+              return ((WebViewJSExecutor)getWebViewParam(
+				mWebViews.get(position), "EXECUTOR")).executeJS(session,
+				"window.webdriver.resultMethod"
+				+ "(document.documentElement.outerHTML);");
 			case ELEMENT_EXISTS:
-				break;
+			  // TODO(abergman): implement
+			  break;
+			case NAVIGATE_BACK:
+              mWebViews.get(position).goBack();
+              break;
+            case NAVIGATE_FORWARD:
+              mWebViews.get(position).goForward();
+              break;
+            case REFRESH:
+              mWebViews.get(position).reload();
+              break;
+            case EXECUTE_JAVASCRIPT:
+              return ((WebViewJSExecutor)getWebViewParam(
+                mWebViews.get(position), "EXECUTOR")).executeJS(session,
+                params[0].toString());
 		}
 		return null;
 	}
@@ -247,26 +353,37 @@ public class SessionListActivity extends ListActivity
 		public String executeJS(Session session, String jsCode) {
 			int position = sessionRep.indexOf(session);
 			if (position >= 0) {
-				syncObj = session;
-				synchronized (this) {
-					WebView wv = mWebViews.get(position);
-					wv.loadUrl("javascript:" + jsCode);
-					try {
-						this.wait(JS_COMMAND_TIMEOUT);
-					} catch (InterruptedException ie) {	}
+				synchronized (syncObj) {
+		          res = "";
+		          running = true;
+				  Log.d("WebViewJSExecutor", "Running script: " + jsCode);
+				  WebView wv = mWebViews.get(position);
+				  wv.loadUrl("javascript:" + jsCode);
+				  Log.d("WebViewJSExecutor", "waiting...");
+				  try {
+				    syncObj.wait(COMMAND_TIMEOUT);
+				  } catch (InterruptedException ie) {	}
+				  running = false;
 				}
 			}
+			if (res.length() == 0)
+			  Log.d("WebViewJSExecutor", "Returning empty result");
 			return res;
 		}
 		public void resultAvailable(Session session, String result) {
-			synchronized (this) {
-				res = result;
-				this.notifyAll();
+			synchronized (syncObj) {
+			  Log.d("WebViewJSExecutor", "Script finished");
+			  if (running) {
+	            Log.d("WebViewJSExecutor", "returning result");
+			    res = result;
+  			    syncObj.notifyAll();
+			  }
 			}
 		}
 		
-		private Object syncObj;
+		private final Object syncObj = new Object();
 		private String res = "";
+		private boolean running = false;
 	}
 	
     final class CustomJavaScriptInterface {
@@ -300,41 +417,39 @@ public class SessionListActivity extends ListActivity
 //    		if (viewPos >= 0 && sessionRep.get(viewPos) != null)
 //    			sessionRep.get(viewPos).setStatus("Loaded: " + url);
     		super.onPageFinished(view, url);
-    	};
+    	}
     	
     	@Override
     	public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
     	}
-    	
     }
     
-    final class LocalPictureListener implements WebView.PictureListener
-    {
-		public void onNewPicture(WebView view, Picture picture) {
-//    		int viewPos = mWebViews.indexOf(view);
-//    		if (viewPos >= 0 && sessionRep.get(viewPos) != null)
-//    			sessionRep.get(viewPos).setStatus("Loaded: " + 
-//    					picture.getWidth() + "x" + picture.getHeight());
-		}
-    	
-    }
-
     final class LocalWebChromeClient extends WebChromeClient {
-    	@Override
-    	public void onProgressChanged(WebView view, int newProgress) {
-    		int viewPos = mWebViews.indexOf(view);
-    		if (viewPos >= 0 && sessionRep.get(viewPos) != null)
-    			sessionRep.get(viewPos).setStatus("Loaded: " + 
-    					view.getUrl() + ", " + newProgress + "% done");
-    	};
-    	
-    	@Override
-    	public void onReceivedTitle(WebView view, String title) {
-    		sessionRep.get(mWebViews.indexOf(view)).setTitle(title);
-    		super.onReceivedTitle(view, title);
-    	}
+      @Override
+      public void onProgressChanged(WebView view, int newProgress) {
+        int viewPos = mWebViews.indexOf(view);
+        if (viewPos >= 0 && sessionRep.get(viewPos) != null) {
+          Session sess = sessionRep.get(viewPos);
+          sess.setStatus("Loaded: " + view.getUrl() + ", " +
+              newProgress + "% done");
+          if (newProgress == 100) {
+            // TODO: update session that page is fully loaded
+          }
+        }
+      }
+      
+      @Override
+      public void onReceivedTitle(WebView view, String title) {
+        if (mWebViews != null
+            && mWebViews.indexOf(view) >= 0
+            && sessionRep.get(mWebViews.indexOf(view)) != null
+            && title != null)
+          sessionRep.get(mWebViews.indexOf(view)).setTitle(title);
+
+        super.onReceivedTitle(view, title);
+      }
     }
     
     /**
@@ -345,7 +460,6 @@ public class SessionListActivity extends ListActivity
         {
             mContext = context;
         }
-
 
         /**
          * Returns the number of items in the list.
@@ -378,50 +492,28 @@ public class SessionListActivity extends ListActivity
          * @see android.widget.ListAdapter#getView(int, android.view.View, android.view.ViewGroup)
          */
         public View getView(int position, View convertView, ViewGroup parent) {
-        	if (mWebViews.size() < position + 1)
-        		for(int i=mWebViews.size(); i<=position; i++)
-        			mWebViews.add(createWebView());
-        	SessionView sv;
-            if (convertView == null) {
-                sv = new SessionView(mContext, sessionRep.get(position),
-                		mExpandedPos == position);
-            } else {
-                sv = (SessionView)convertView;
-            }
+//        	if (mWebViews.size() < position + 1)
+//        		for(int i=mWebViews.size(); i<=position; i++)
+//        			mWebViews.add(createWebView());
+          if (position >= sessionRep.size())
+            return null;
+          
+          SessionView sv;
+          if (convertView == null) {
+            sv = new SessionView(mContext, sessionRep.get(position),
+                mExpandedPos == position);
+          } else {
+            sv = (SessionView)convertView;
+          }
+          if (position < mWebViews.size())
             sv.setWebView(mWebViews.get(position));
-            sv.setTitle(sessionRep.get(position).toString());
-            sv.setUrl(sessionRep.get(position).getLastUrl());
-            sv.setStatus(sessionRep.get(position).getStatus());
+          sv.setTitle(sessionRep.get(position).toString());
+          sv.setUrl(sessionRep.get(position).getLastUrl());
+          sv.setStatus(sessionRep.get(position).getStatus());
 
-            Log.d("WebDriver", "Setting explanded for position: " + position +
-            		" to " + (mExpandedPos == position));
-            
-            sv.setExpanded(mExpandedPos == position);
-            
-            return sv;
-        }
-
-        /**
-         * Creates and returns an empty WebView view.
-         * 
-         * @return New WebView.
-         */
-        private WebView createWebView() {
-            WebView wv = new WebView(mContext);
-            wv.setWebViewClient(new LocalWebViewClient());
-            wv.setFocusable(false);
-            wv.getSettings().setBuiltInZoomControls(true);
-            wv.getSettings().setJavaScriptEnabled(true);
-            wv.setWebChromeClient(new LocalWebChromeClient());
-			CustomJavaScriptInterface script = new CustomJavaScriptInterface(wv);
-			WebViewJSExecutor executor = new WebViewJSExecutor();
-			script.setWebViewJSExecutor(executor);
-			wv.addJavascriptInterface(script, "webdriver");
-			setWebViewParam(wv, "EXECUTOR", executor);
-
-            //wv.setPictureListener(new LocalPictureListener());
-            // TODO: Enable?
-            return wv;
+          sv.setExpanded(mExpandedPos == position);
+          
+          return sv;
         }
 
         /**
@@ -506,9 +598,7 @@ public class SessionListActivity extends ListActivity
         	if (url.equals(currentUrl))
         		return;		// Same URL
         	
-            if (url.length() == 0)
-            	mWebView.loadData("Nothing loaded", "text/html", "utf-8");
-            else
+            if (url.length() > 0)
             	if (url.startsWith("http"))
             		mWebView.loadUrl(url);
             	else

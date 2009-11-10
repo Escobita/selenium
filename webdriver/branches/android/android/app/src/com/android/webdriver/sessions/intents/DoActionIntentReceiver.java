@@ -30,30 +30,43 @@ public class DoActionIntentReceiver extends BroadcastReceiver {
 			return;
 		}
 		
-		Log.d("WebDriver:DoActionIntentReceiver", "Session id: " + sessId +
-				", context: " + context + ", action: " + action +
-				", Actions.action: " + Actions.valueOf(action).name());
+		Object[] args = new Object[0];
+		if (intent.getExtras() != null && intent.getExtras().size() > 3) {
+    		args = new Object[intent.getExtras().size()-3];
+    		int argCount=0;
+    		for (String key : intent.getExtras().keySet())
+    			if (!key.equals("SessionId") && !key.equals("Context") &&
+    				!key.equals("Action"))
+    					args[argCount++] = intent.getExtras().get(key);
+		}
 		
-		Object[] args = new Object[intent.getExtras().size()-3];
-		int argCount=0;
-		for (String key : intent.getExtras().keySet())
-			if (!key.equals("SessionId") && !key.equals("Context") &&
-				!key.equals("Action"))
-					args[argCount++] = intent.getExtras().get(key);
+        Log.d("WebDriver:DoActionIntentReceiver", "Session id: " + sessId +
+            ", context: " + ctx + ", action: " + action +
+            ", Actions.action: " + Actions.valueOf(action).name() +
+            ", args #: " + args.length + 
+            ((args.length > 0) ? ", argument #1: " + args[0] : ""));
 
-		Session sess = SessionRepository.getInstance().getById(sessId);
-		String actionRes = (String)sess.PerformAction(Actions.valueOf(action),
-				args);
+		String actionRes = "";
+		try {
+          Session sess = SessionRepository.getInstance().getById(sessId);
+          if (sess != null)
+            actionRes = (String)sess.PerformAction(Actions.valueOf(action),
+        		args);
+          else
+            Log.w("WebDriver", "Can't find session with id: " + sessId);
+        } catch (Exception e) {
+          Log.e("WebDriver", "Exception while performing action: " +
+              action + ", message: " + e.getMessage());
+          e.printStackTrace();
+        }
 		
 		Log.d("WebDriver:DoActionIntentReceiver", "Action: " + action +
-				", result: " + actionRes);
+				", result length: " + actionRes.length());
 
 		// Returning the result
 		Bundle res = new Bundle();
 		res.putInt("SessionId", sessId);
 		res.putString("Result", actionRes);
-		Log.d("WebDriver", "Returning result: " + actionRes + " for action: "
-				+ action);
 		this.setResultExtras(res);
 	}
 }

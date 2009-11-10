@@ -1,12 +1,21 @@
 package com.android.webdriver.sessions;
 
+import android.util.Log;
+
 
 public class Session {
 
 	/**
 	 * Defines action codes that can be performed by a session
 	 */
-	public enum Actions {GET_DOM, ELEMENT_EXISTS};
+	public enum Actions {
+	  GET_DOM,
+	  ELEMENT_EXISTS,
+	  NAVIGATE_BACK,
+	  NAVIGATE_FORWARD,
+	  REFRESH,
+	  EXECUTE_JAVASCRIPT
+	}
 
 	/**
 	 * Interface definition for a callback to be invoked when any property of
@@ -18,7 +27,7 @@ public class Session {
 	     *
 	     * @param session Session object.
 	     */
-	    void onChange(Session session);
+	    void onChange(Session session, boolean syncronous);
 	}
 
 	/**
@@ -48,14 +57,18 @@ public class Session {
 	public void setContext(String mContext) {
 		this.mContext = mContext;
 		if (mOnChangeListener != null)
-			mOnChangeListener.onChange(this);
+			mOnChangeListener.onChange(this, false);
 	}
 
 	public String getContext() {
 		return mContext;
 	}
 
-	public void setUrl(String url) {
+    public void setUrl(String url) {
+      setUrl(url, false);
+    }
+    
+	public void setUrl(String url, boolean blocking) {
 		if (mLastUrl.equals(url))
 			return;
 		
@@ -63,7 +76,7 @@ public class Session {
 		this.mStatus = "Loading " +
 			url.substring(0, Math.min(url.length(), 40));
 		if (mOnChangeListener != null)
-			mOnChangeListener.onChange(this);
+			mOnChangeListener.onChange(this, blocking);
 	}
 
 	public String getLastUrl() {
@@ -73,7 +86,7 @@ public class Session {
 	public void setStatus(String mStatus) {
 		this.mStatus = mStatus;
 		if (mOnChangeListener != null)
-			mOnChangeListener.onChange(this);
+			mOnChangeListener.onChange(this, false);
 	}
 
 	public String getStatus() {
@@ -109,8 +122,8 @@ public class Session {
 			return (mSessionId == ((Session)o).getSessionId() &&
 					mContext.equals(((Session)o).getContext()));
 		else
-			return false;	
-	};
+			return false;
+	}
 
 	public static int generateNextSessionId() {
 		return ++lastId;
@@ -127,7 +140,7 @@ public class Session {
 	public void setPageContent(String pageContent) {
 		this.mPageContent = pageContent;
 		if (mOnChangeListener != null)
-			mOnChangeListener.onChange(this);
+			mOnChangeListener.onChange(this, false);
 	}
 
 	public String getPageContent() {
@@ -135,12 +148,20 @@ public class Session {
 	}
 
 	public Object PerformAction(Actions action, Object[] args) {
-		// Perform additional actions before raising event.
+		// Perform additional actions before calling delegate.
 		switch(action) {
 			case GET_DOM:
 				break;
 			case ELEMENT_EXISTS:
 				break;
+			case EXECUTE_JAVASCRIPT:
+			    if (args.length != 1) {
+			      Log.e("Session", "Session " + getSessionId() +
+			          ": Invalid parameters of EXECUTE_JAVASCRIPT" +
+			          args.length);
+			      return null;
+			    }
+			    break;
 		}
 		
 		Object result = null;
@@ -149,11 +170,13 @@ public class Session {
 		
 		return result;
 	}
-	
-	private static int lastId = 1000;
-	private int mSessionId;
-	private String mContext, mLastUrl, mStatus, mTitle, mPageContent;
-	private OnChangeListener mOnChangeListener;
-	private ActionRequestListener mActionRequestListener;
+
+  public final static Object syncNavObj = new Object();
+  
+  private static int lastId = 1000;
+  private int mSessionId;
+  private String mContext, mLastUrl, mStatus, mTitle, mPageContent;
+  private OnChangeListener mOnChangeListener;
+  private ActionRequestListener mActionRequestListener;
 }
 

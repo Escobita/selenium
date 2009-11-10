@@ -2,33 +2,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>org.openqa.selenium.webdriver</groupId>
+    <groupId>org.seleniumhq.webdriver</groupId>
     <artifactId>webdriver-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
+  <groupId>org.seleniumhq.webdriver</groupId>
   <artifactId>webdriver-remote-server-android</artifactId>
   <packaging>war</packaging>
   <name>webdriver-remote-server_android</name>
   
   <dependencies>
     <dependency>
-      <groupId>org.openqa.selenium.webdriver</groupId>
-      <artifactId>webdriver-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openqa.selenium.webdriver</groupId>
+      <groupId>org.seleniumhq.webdriver</groupId>
       <artifactId>webdriver-remote-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.openqa.selenium.webdriver</groupId>
-      <artifactId>webdriver-remote-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openqa.selenium.webdriver</groupId>
+      <groupId>org.seleniumhq.webdriver</groupId>
       <artifactId>webdriver-support</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -39,9 +31,35 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.openqa.selenium.webdriver</groupId>
+      <groupId>org.seleniumhq.webdriver</groupId>
+      <artifactId>webdriver-remote-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.webdriver</groupId>
       <artifactId>webdriver-android</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jericho</groupId>
+      <artifactId>jericho</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>/home/abergman/selenium_webdriver/android/driver/lib/jericho-html-3.1.jar</systemPath>
+    </dependency>    
+    <!-- Test dependencies ... -->
+    <dependency>
+      <groupId>org.seleniumhq.webdriver</groupId>
+      <artifactId>webdriver-common</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.webdriver</groupId>
+      <artifactId>webdriver-firefox</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -62,9 +80,11 @@
             </goals>
             <configuration>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-	      <includeGroupIds>org.openqa.selenium.webdriver</includeGroupIds>
+	            <includeGroupIds>org.seleniumhq.webdriver,jericho</includeGroupIds>
               <excludeArtifactIds>servlet-api,android</excludeArtifactIds>
               <excludeTransitive>true</excludeTransitive>
+              <overWriteReleases>true</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
               <outputDirectory>${project.build.directory}/generated-classes</outputDirectory>
             </configuration>
           </execution>
@@ -106,7 +126,7 @@
 	    <argument>--output=${project.build.directory}/classes.dex</argument>
 	    <argument>--positions=lines</argument>
 	    <argument>${project.build.directory}/classes/</argument>
-            <argument>${project.build.directory}/generated-classes/</argument>
+      <argument>${project.build.directory}/generated-classes/</argument>
 	  </arguments>
         </configuration>
       </plugin>

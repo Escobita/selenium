@@ -46,6 +46,9 @@ public class FindElement extends WebDriverHandler implements JsonParametersAware
     response = newResponse();
 
     WebElement element = getDriver().findElement(by);
+    if (element == null)
+      return ResultType.ERROR;
+    
     String elementId = getKnownElements().add(element);
     response.setValue(Collections.singletonList(String.format("element/%s", elementId)));
 
