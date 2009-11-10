@@ -66,13 +66,12 @@ def msbuild?
 end
 
 def iPhoneSDKPresent?
-  return false # For now
-  
   return false unless mac? && present?('xcodebuild')
+  # NOTE(jmleyba): Not sure why this next block is necessary, but without it,
+  # future invocations of xcodebuild fail.
   begin
-    sdks = sh "xcodebuild -showsdks 2>/dev/null", :verbose => false
-    !!(sdks =~ /simulator2.2/)
-    true
+    sdks = sh "xcodebuild -showsdks 1>/dev/null 2>/dev/null", :verbose => false
+    !!sdks
   rescue
     puts "Ouch"
     false

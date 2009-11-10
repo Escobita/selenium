@@ -438,8 +438,13 @@ task :test_iphone => [:test_iphone_server, :test_iphone_client, :remote_client]
 #### iPhone ####
 task :iphone_server => FileList['iphone/src/objc/**'] do
   if iPhoneSDKPresent? then
-    puts "Building iWebDriver iphone app"
-    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target iWebDriver >/dev/null", :verbose => false
+    cmd = open("|xcodebuild -showsdks 2>/dev/null")
+    sdks = cmd.readlines
+    cmd.close
+    sdk = (sdks.join "").gsub(/.*\b(iphonesimulator2.2(.\d+)*)\b.*/m, '\1')
+
+    puts "Building iWebDriver iphone app for #{sdk}"
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver >/dev/null", :verbose => false
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -448,7 +453,13 @@ end
 # This does not depend on :iphone_server because the dependancy is specified in xcode
 task :test_iphone_server do
   if iPhoneSDKPresent? then
-    sh "cd iphone && xcodebuild -sdk iphonesimulator2.2 ARCHS=i386 -target Tests"
+    cmd = open("|xcodebuild -showsdks 2>/dev/null")
+    sdks = cmd.readlines
+    cmd.close
+    sdk = (sdks.join "").gsub(/.*\b(iphonesimulator2.2(.\d+)*)\b.*/m, '\1')
+
+    puts "Building iWebDriver iphone app for #{sdk}"
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target Tests"
   else
     puts "XCode not found. Not testing the iphone driver."
   end
