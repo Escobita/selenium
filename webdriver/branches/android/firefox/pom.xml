@@ -22,14 +22,12 @@
 			<artifactId>json</artifactId>
 			<version>20080701</version>
 		</dependency>
-		<!-- Test dependencies ... -->
 		<dependency>
 			<groupId>org.seleniumhq.webdriver</groupId>
 			<artifactId>webdriver-common</artifactId>
 			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
 		</dependency>
+		<!-- Test dependencies ... -->
 	</dependencies>
 
 	<build>
