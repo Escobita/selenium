@@ -370,41 +370,7 @@ c:/ruby/lib/ruby/gems/1.8/gems/deep_test-1.2.2/lib/deep_test.rb:15:in fork: the 
 
 <h3 id='python'>Python</h3>
 
-<p>I have no experience in Python so I do not know what the best solution is. Nevertheless, I can give you the theory and some starting points.</p>
-
-<p>Basically you need to come up with a way to run your python tests in parallel. How exactly you achieve this usually depends on your testing framework and programming language of choice. I am not personally aware of any parallel test runner for Python but a little Googling found the following starting points that you could investigate:</p>
-
-<ul>
-<li><a href='https://codespeak.net/py/dist/test.html#automated-distributed-testing'><code>py.test</code> distributed testing section</a></li>
-
-<li><a href='http://www.parallelpython.com/'>Parallel Python</a></li>
-
-<li><a href='http://testoob.sourceforge.net/features.html'>Testoob</a></li>
-
-<li><a href='http://lists.idyll.org/pipermail/testing-in-python/2007-December/thread.html#463'>Mailing list archive on parallel testing in Python</a></li>
-</ul>
-
-<p>If none of this is helpful, worst case scenario, you can also write your own parallel test runner by launching multiple processes targeting different test file sets and checking the process exit statuses. Not the most elegant/efficient way, but that can get you started. This is actually the way I originally started with Ruby and you can find an example on how this worked in the Ruby example included in Selenium Grid distribution:</p>
-
-<p><a href='http://svn.openqa.org/svn/selenium-grid/trunk/examples/ruby/lib/multi_process_behaviour_runner.rb'><code>examples/ruby/lib/multi_process_behaviour_runner.rb</code></a></p>
-
-<p>You launch the whole thing with:</p>
-
-<pre><code>#
-# Legacy way to drive tests in parallel before DeepTest RSpec support.
-# Kept to document a simple way to run the tests in parallel for non-Ruby
-# platforms.
-#
-desc(&quot;[DEPRECATED] Run all behaviors in parallel spawing multiple
-processes. DeepTest offers a better alternative.&quot;)
-task :&#39;tests:run_in_parallel:multiprocess&#39; =&gt; :create_report_dir do
- require File.expand_path(File.dirname(__FILE__) +
-&#39;/lib/multi_process_behaviour_runner&#39;)
- runner = MultiProcessSpecRunner.new(10)
- runner.run(Dir[&#39;*_spec.rb&#39;])
-end</code></pre>
-
-<p>Good luck in your quest for the ultimate Python parallel test runner. Please <a href='http://ph7spot.com/about/contact_me'>contact me</a> if you figure out the best solution for Python, I will put it in the documentation. Even better, send me an example, I will include it in Selenium Grid distribution.</p>
+<p>You need to come up with a way to run your python tests in parallel. Saucelab has <a href='http://saucelabs.com/blog/index.php/2009/09/running-your-selenium-tests-in-parallel-python/'>blog post</a> that should help you start on the right track.</p>
 
 <h3 id='net'>.Net</h3>
 
