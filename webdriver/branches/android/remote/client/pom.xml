@@ -32,20 +32,16 @@
             <groupId>org.seleniumhq.webdriver</groupId>
             <artifactId>webdriver-common</artifactId>
             <version>${project.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.webdriver</groupId>
             <artifactId>webdriver-remote-server</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.webdriver</groupId>
             <artifactId>webdriver-firefox</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
