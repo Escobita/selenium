@@ -27,8 +27,6 @@
 			<groupId>org.seleniumhq.webdriver</groupId>
 			<artifactId>webdriver-common</artifactId>
 			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
