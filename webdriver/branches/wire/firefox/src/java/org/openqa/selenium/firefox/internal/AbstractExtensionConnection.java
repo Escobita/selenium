@@ -175,7 +175,6 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         message.append(converted).append("\n");
 
         try {
-          System.out.println("Sending\n" + message.toString());
             out.write(message.toString());
             out.flush();
         } catch (IOException e) {

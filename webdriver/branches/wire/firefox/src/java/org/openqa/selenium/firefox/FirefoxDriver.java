@@ -474,7 +474,6 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor,
 
       public Set<Cookie> getCookies() {
             String response = sendMessage(WebDriverException.class, GET_ALL_COOKIES).trim();
-        System.out.println("Response:\n" + response);
             Set<Cookie> cookies = new HashSet<Cookie>();
 
             if(!"".equals(response)) {
