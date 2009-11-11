@@ -70,7 +70,7 @@ window.onload = function() {
     resultPage: whereIs('resultPage.html')
   };
 
-  webdriver.logging.setLevel(webdriver.logging.Level.ERROR);
+  webdriver.logging.setLevel(webdriver.logging.Level.DEBUG);
   webdriver.logging.enableDomLogging(true);
   webdriver.logging.enableFirebugLogging(false);
   webdriver.TestRunner.start(webdriver.factory.createLocalWebDriver);

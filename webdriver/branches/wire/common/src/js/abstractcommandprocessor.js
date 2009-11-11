@@ -67,7 +67,7 @@ webdriver.AbstractCommandProcessor.resolveFutureParams_ = function(
     return obj;
   }
 
-  command.parameters = goog.array.map(command.parameters, function(param) {
+  command.parameters = goog.object.map(command.parameters, function(param) {
     if (goog.isArray(param)) {
       return goog.array.map(param, getValue);
     } else {
@@ -87,9 +87,9 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command,
                                                                 sessionId,
                                                                 context) {
   webdriver.AbstractCommandProcessor.resolveFutureParams_(command);
-  switch (command.name) {
+  switch (command.getName()) {
     case webdriver.CommandName.SLEEP:
-      var ms = command.parameters[0];
+      var ms = command.parameters['ms'];
       webdriver.timing.setTimeout(function() {
         command.setResponse(new webdriver.Response(false, context, ms));
       }, ms);
@@ -97,12 +97,12 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command,
 
     case webdriver.CommandName.WAIT:
       var callback = goog.bind(this.waitCallback_, this, command, context);
-      command.parameters[0].start(callback);
+      command.parameters['wait'].start(callback);
       break;
 
     case webdriver.CommandName.FUNCTION:
       try {
-        var result = command.parameters[0]();
+        var result = command.parameters['function']();
         command.setResponse(new webdriver.Response(false, context, result));
       } catch (ex) {
         command.setResponse(new webdriver.Response(true, context, null, ex));

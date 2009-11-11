@@ -20,6 +20,7 @@ package org.openqa.selenium.firefox.internal;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxLauncher;
@@ -91,7 +92,8 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
 
   public void quit() {
         try {
-            sendMessageAndWaitForResponse(WebDriverException.class, new Command(null, "quit"));
+            sendMessageAndWaitForResponse(WebDriverException.class,
+                new Command(null, DriverCommand.QUIT));
         } catch (Exception e) {
             // this is expected
         }

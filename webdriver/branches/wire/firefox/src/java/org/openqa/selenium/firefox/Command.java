@@ -17,17 +17,28 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import org.openqa.selenium.remote.DriverCommand;
+
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 public class Command {
     private final Context context;
     private final String elementId;
-    private final String commandName;
-    private final Object[] parameters;
+    private final DriverCommand commandName;
+    private final Map<String, ?> parameters;
 
-    public Command(Context context, String commandName, Object... parameters) {
+    public Command(Context context, DriverCommand commandName) {
+        this(context, null, commandName, ImmutableMap.<String, Object>of());
+    }
+    public Command(Context context, DriverCommand commandName, Map<String, ?> parameters) {
+
         this(context, null, commandName, parameters);
     }
 
-    public Command(Context context, String elementId, String commandName, Object... parameters) {
+    public Command(Context context, String elementId, DriverCommand commandName,
+                   Map<String, ?> parameters) {
         this.context = context;
         this.elementId = elementId;
         this.commandName = commandName;
@@ -43,11 +54,11 @@ public class Command {
         return elementId;
     }
 
-    public String getCommandName() {
+    public DriverCommand getCommandName() {
         return commandName;
     }
 
-    public Object[] getParameters() {
+    public Map<String, ?> getParameters() {
         return parameters;
     }
 }

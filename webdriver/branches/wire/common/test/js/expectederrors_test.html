@@ -30,7 +30,7 @@ function testCanHandleExpectedErrorsFromANestedCommand(driver) {
     };
     driver.addCommand(
         new webdriver.Command(webdriver.CommandName.FUNCTION).
-            setParameters(failFunc),
+            addParameter('function', failFunc),
       /*addToFront=*/true);
   });
   driver.catchExpectedError(

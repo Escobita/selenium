@@ -26,6 +26,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DriverCommand;
+import static org.openqa.selenium.remote.DriverCommand.*;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -41,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.google.common.collect.ImmutableMap;
+
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
         FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
     private final FirefoxDriver parent;
@@ -52,79 +56,80 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void click() {
-      sendMessage(UnsupportedOperationException.class, "click");
+      sendMessage(UnsupportedOperationException.class, CLICK_ELEMENT);
     }
 
     public void hover() {
-      sendMessage(WebDriverException.class, "hover");
+      sendMessage(WebDriverException.class, HOVER_OVER_ELEMENT);
     }
 
     public void submit() {
-        sendMessage(WebDriverException.class, "submit");
+        sendMessage(WebDriverException.class, SUBMIT_ELEMENT);
     }
 
     public String getValue() {
         try {
-          return sendMessage(WebDriverException.class, "getValue");
+          return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE);
         } catch (WebDriverException e) {
             return null;
         }
     }
 
     public void clear() {
-    	sendMessage(UnsupportedOperationException.class, "clear");
+    	sendMessage(UnsupportedOperationException.class, CLEAR_ELEMENT);
     }
 
     public void sendKeys(CharSequence... value) {
-    	StringBuilder builder = new StringBuilder();
-    	for (CharSequence seq : value) {
-    		builder.append(seq);
-    	}
-        sendMessage(UnsupportedOperationException.class, "sendKeys", builder.toString());
+      StringBuilder builder = new StringBuilder();
+      for (CharSequence seq : value) {
+        builder.append(seq);
+      }
+      sendMessage(UnsupportedOperationException.class, SEND_KEYS_TO_ELEMENT,
+          ImmutableMap.of("value", builder.toString()));
     }
 
     public String getTagName() {
-        String name = sendMessage(WebDriverException.class, "getTagName");
-        return name;
+      return sendMessage(WebDriverException.class, GET_ELEMENT_TAG_NAME);
     }
 
   public String getAttribute(String name) {
         try {
-            return sendMessage(WebDriverException.class, "getAttribute", name);
+            return sendMessage(WebDriverException.class, GET_ELEMENT_ATTRIBUTE,
+                ImmutableMap.of("name", name));
         } catch (WebDriverException e) {
             return null;
         }
     }
 
     public boolean toggle() {
-        sendMessage(UnsupportedOperationException.class, "toggle");
+        sendMessage(UnsupportedOperationException.class, TOGGLE_ELEMENT);
         return isSelected();
     }
 
     public boolean isSelected() {
-        String value = sendMessage(WebDriverException.class, "isSelected");
+        String value = sendMessage(WebDriverException.class, IS_ELEMENT_SELECTED);
         return Boolean.parseBoolean(value);
     }
 
     public void setSelected() {
-        sendMessage(UnsupportedOperationException.class, "setSelected");
+        sendMessage(UnsupportedOperationException.class, SET_ELEMENT_SELECTED);
     }
 
     public boolean isEnabled() {
-        String value = getAttribute("disabled");
-        return !Boolean.parseBoolean(value);
+      String value = sendMessage(WebDriverException.class, IS_ELEMENT_ENABLED);
+      return Boolean.parseBoolean(value);
     }
 
     public String getText() {
-        return sendMessage(WebDriverException.class, "getText");
+        return sendMessage(WebDriverException.class, GET_ELEMENT_TEXT);
     }
 
   public boolean isDisplayed() {
-    return Boolean.parseBoolean(sendMessage(WebDriverException.class, "isDisplayed"));
+    return Boolean.parseBoolean(sendMessage(WebDriverException.class, IS_ELEMENT_DISPLAYED));
     }
 
     public Point getLocation() {
-        String result = sendMessage(WebDriverException.class, "getLocation");
+        String result = sendMessage(WebDriverException.class, GET_ELEMENT_LOCATION);
 
         String[] parts = result.split(",");
         int x = Integer.parseInt(parts[0].trim());
@@ -134,7 +139,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Dimension getSize() {
-        String result = sendMessage(WebDriverException.class, "getSize");
+        String result = sendMessage(WebDriverException.class, GET_ELEMENT_SIZE);
 
         String[] parts = result.split(",");
         int x = Math.round(Float.parseFloat(parts[0].trim()));
@@ -144,7 +149,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void dragAndDropBy(int moveRight, int moveDown) {
-        sendMessage(UnsupportedOperationException.class, "dragElement", moveRight, moveDown);
+        sendMessage(UnsupportedOperationException.class, DRAG_ELEMENT,
+            ImmutableMap.of("x", moveRight, "y", moveDown));
     }
 
     public void dragAndDropOn(RenderedWebElement element) {
@@ -219,13 +225,13 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
     private WebElement findChildElement(String using, String value) {
       String id = sendMessage(NoSuchElementException.class,
-          "findChildElement", buildSearchParamsMap(using, value));
+          FIND_CHILD_ELEMENT, buildSearchParamsMap(using, value));
       return new FirefoxWebElement(parent, id);
     }
 
     private List<WebElement> findChildElements(String using, String value) {
       String indices = sendMessage(WebDriverException.class,
-          "findChildElements", buildSearchParamsMap(using, value));
+          FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
 
       List<WebElement> elements = new ArrayList<WebElement>();
 
@@ -249,11 +255,19 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getValueOfCssProperty(String propertyName) {
-    	return sendMessage(WebDriverException.class,"getValueOfCssProperty", propertyName);
+    	return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
+          ImmutableMap.of("propertyName", propertyName));
     }
 
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
-        return parent.sendMessage(throwOnFailure, new Command(parent.context, elementId, methodName, parameters));
+    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                               DriverCommand command) {
+      return sendMessage(throwOnFailure, command, ImmutableMap.<String, Object>of());
+    }
+
+    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                               DriverCommand command, Map<String, ?> parameters) {
+        return parent.sendMessage(throwOnFailure,
+            new Command(parent.context, elementId, command, parameters));
     }
 
     public String getElementId() {
@@ -261,7 +275,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Point getLocationOnScreenOnceScrolledIntoView() {
-        String json = sendMessage(WebDriverException.class, "getLocationOnceScrolledIntoView");
+        String json = sendMessage(WebDriverException.class,
+            GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
         if (json == null) {
             return null;
         }
@@ -286,10 +301,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
       other = ((WrapsElement) obj).getWrappedElement();
     }
 
-    if (!(other instanceof FirefoxWebElement)) {
-      return false;
-    }
-    return elementId.equals(((FirefoxWebElement)other).elementId);
+    return other instanceof FirefoxWebElement
+        && elementId.equals(((FirefoxWebElement) other).elementId);
   }
 
   @Override

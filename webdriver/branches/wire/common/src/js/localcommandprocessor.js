@@ -123,7 +123,7 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
   }
 
   var rawResponse = goog.json.parse(jsonResponse);
-  webdriver.logging.info(
+  webdriver.logging.debug(
       'receiving:\n' +
       webdriver.logging.describe(rawResponse, '  '));
 
@@ -147,27 +147,21 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
  */
 webdriver.LocalCommandProcessor.prototype.executeDriverCommand = function(
     command, sessionId, context) {
-  if (command.name == webdriver.CommandName.SEND_KEYS) {
-    command.parameters = [command.parameters.join('')];
+  webdriver.logging.info(webdriver.logging.describe(command.parameters));
+  if (command.getName() == webdriver.CommandName.SEND_KEYS) {
+    // TODO(jmleyba): Push this into the browser-driver code.
+    command.parameters['value'] = command.parameters['value'].join('');
   }
 
-  var jsonCommand = {
-    'commandName': command.name,
-    'context': context.toString(),
-    'parameters': command.parameters
-  };
-
-  if (command.element) {
-    jsonCommand['elementId'] = command.element.getId().getValue();
-  }
+  command.addParameter('context', context.toString());
 
   webdriver.logging.info(
       'sending:\n' +
-      webdriver.logging.describe(jsonCommand, '  '));
+      webdriver.logging.describe(command.parameters, '  '));
 
   this.documentElement_.setAttribute(
       webdriver.LocalCommandProcessor.MessageAttribute_.COMMAND,
-      goog.json.serialize(jsonCommand));
+      goog.json.serialize(command.parameters));
 
   goog.events.listen(this.documentElement_,
       webdriver.LocalCommandProcessor.EventType_.RESPONSE,

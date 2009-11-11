@@ -73,16 +73,16 @@ public class FirefoxDriverTestSuite extends TestCase {
       Map<String, String> fromTo = new HashMap<String, String>();
       if (Platform.getCurrent().equals(Platform.WINDOWS)) {
         fromTo.put("Debug/webdriver-firefox.dll",
-        "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
+            "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
       } else if (Platform.getCurrent().equals(Platform.UNIX)) {
         fromTo.put("../linux64/Release/libwebdriver-firefox.so",
-        "platform/Linux/components/libwebdriver-firefox.so");
+            "platform/Linux/components/libwebdriver-firefox.so");
       
         fromTo.put("../linux64/Release/x_ignore_nofocus.so",
-        "amd64/x_ignore_nofocus.so");
+            "amd64/x_ignore_nofocus.so");
         
         fromTo.put("../linux/Release/x_ignore_nofocus.so",
-        "x86/x_ignore_nofocus.so");
+            "x86/x_ignore_nofocus.so");
       }
 
       // Grab the dommessenger

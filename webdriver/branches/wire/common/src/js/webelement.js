@@ -91,7 +91,8 @@ webdriver.WebElement.findElement = function(driver, locator) {
   var webElement = new webdriver.WebElement(driver);
   locator = webdriver.By.Locator.checkLocator(locator);
   var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENT).
-      setParameters(locator.type, locator.target).
+      addParameter('using', locator.type).
+      addParameter('value', locator.target).
       setSuccessCallback(function(response) {
         webElement.getId().setValue(response.value);
       });
@@ -122,7 +123,8 @@ webdriver.WebElement.isElementPresent = function(driver, locator) {
   };
   locator = webdriver.By.Locator.checkLocator(locator);
   var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENT).
-      setParameters(locator.type, locator.target).
+      addParameter('using', locator.type).
+      addParameter('value', locator.target).
       setSuccessCallback(callback).
       setFailureCallback(callback);
   driver.addCommand(command);
@@ -142,7 +144,8 @@ webdriver.WebElement.isElementPresent = function(driver, locator) {
 webdriver.WebElement.findElements = function(driver, locator) {
   locator = webdriver.By.Locator.checkLocator(locator);
   var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENTS).
-      setParameters(locator.type, locator.target).
+      addParameter('using', locator.type).
+      addParameter('value', locator.target).
       setSuccessCallback(function(response) {
         var ids = response.value.split(',');
         var elements = [];
@@ -180,11 +183,9 @@ webdriver.WebElement.prototype.isElementPresent = function(locator) {
   };
   locator = webdriver.By.Locator.checkLocator(locator);
   var command = new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENT).
-      setParameters({
-        'id': this.getId(),
-        'using': locator.type,
-        'value': locator.target
-      }).
+      addParameter('id', this.getId()).
+      addParameter('using', locator.type).
+      addParameter('value', locator.target).
       setSuccessCallback(callback).
       setFailureCallback(callback);
   this.driver_.addCommand(command);
@@ -207,11 +208,9 @@ webdriver.WebElement.prototype.findElement = function(locator) {
   var webElement = new webdriver.WebElement(this.driver_);
   locator = webdriver.By.Locator.checkLocator(locator);
   var command = new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENT).
-      setParameters({
-        'id': this.getId(),
-        'using': locator.type,
-        'value': locator.target
-      }).
+      addParameter('id', this.getId()).
+      addParameter('using', locator.type).
+      addParameter('value', locator.target).
       setSuccessCallback(function(response) {
         webElement.getId().setValue(response.value);
       });
@@ -232,11 +231,9 @@ webdriver.WebElement.prototype.findElements = function(locator) {
   locator = webdriver.By.Locator.checkLocator(locator);
   var command =
       new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENTS).
-          setParameters({
-            'id': this.getId(),
-            'using': locator.type,
-            'value': locator.target
-          }).
+          addParameter('id', this.getId()).
+          addParameter('using', locator.type).
+          addParameter('value', locator.target).
           setSuccessCallback(function(response) {
             var ids = response.value.split(',');
             var elements = [];
@@ -278,7 +275,8 @@ webdriver.WebElement.prototype.getId = function() {
  * @private
  */
 webdriver.WebElement.prototype.createCommand_ = function(name) {
-  return new webdriver.Command(name, this);
+  return new webdriver.Command(name).
+      addParameter('id', this.getId());
 };
 
 
@@ -341,8 +339,8 @@ webdriver.WebElement.prototype.click = function() {
  *     convenience).
  */
 webdriver.WebElement.prototype.sendKeys = function(var_args) {
-  var command = this.createCommand_(webdriver.CommandName.SEND_KEYS);
-  command.setParameters.apply(command, arguments);
+  var command = this.createCommand_(webdriver.CommandName.SEND_KEYS).
+      addParameter('value', goog.array.slice(arguments, 0));
   this.driver_.addCommand(command);
 };
 
@@ -373,7 +371,7 @@ webdriver.WebElement.prototype.getTagName = function() {
 webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
   var value = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
-      setParameters(cssStyleProperty).
+      addParameter('propertyName', cssStyleProperty).
       setSuccessCallback(value.setValueFromResponse, value);
   this.driver_.addCommand(command);
   return value;
@@ -387,7 +385,7 @@ webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
 webdriver.WebElement.prototype.getAttribute = function(attributeName) {
   var value = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-      setParameters(attributeName).
+      addParameter('name', attributeName).
       setSuccessCallback(value.setValueFromResponse, value).
       // If there is an error b/c the attribute was not found, set value to null
       setFailureCallback(function(response) {
@@ -495,7 +493,8 @@ webdriver.WebElement.prototype.getLocation = function() {
 webdriver.WebElement.prototype.addDragAndDropCommand_ = function(
     newLocation, x, y, opt_addToFront) {
   var command = this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
-      setParameters(x, y).
+      addParameter('x', x).
+      addParameter('y', y).
       setSuccessCallback(
           goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,
               newLocation));
@@ -548,7 +547,7 @@ webdriver.WebElement.prototype.dragAndDropTo = function(webElement) {
 webdriver.WebElement.prototype.isEnabled = function() {
   var futureValue = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-      setParameters('disabled').
+      addParameter('name', 'disabled').
       setSuccessCallback(function(response) {
         response.value = !!!response.value;
         futureValue.setValue(response.value);
@@ -574,7 +573,7 @@ webdriver.WebElement.prototype.isCheckedOrSelected_ = function(opt_future,
         var attribute = response.value == 'input' ? 'checked' : 'selected';
         var getAttrCommand =
             this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-                setParameters(attribute).
+                addParameter('name', attribute).
                 setSuccessCallback(function(response) {
                   response.value = !!response.value;
                   value.setValue(response.value);

@@ -22,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.BeanToJsonConverter;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.ExtensionConnection;
 import org.openqa.selenium.firefox.NotConnectedException;
@@ -43,6 +45,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.Iterator;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 
 public abstract class AbstractExtensionConnection implements ExtensionConnection {
     private Socket socket;
@@ -168,6 +175,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         message.append(converted).append("\n");
 
         try {
+          System.out.println("Sending\n" + message.toString());
             out.write(message.toString());
             out.flush();
         } catch (IOException e) {
@@ -180,16 +188,18 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
     private String convert(Command command) {
         JSONObject json = new JSONObject();
         try {
-            json.put("commandName", command.getCommandName());
+            json.put("commandName", command.getCommandName().toString());
             json.put("context", String.valueOf(command.getContext()));
-            json.put("elementId", command.getElementId());
+            json.put("id", command.getElementId());
 
-            JSONArray params = new JSONArray();
-            for (Object o : command.getParameters()) {
-                params.put(o);
+            JSONObject params =
+                new JSONObject(new BeanToJsonConverter().convert(command.getParameters()));
+          @SuppressWarnings("unchecked")
+          Iterator<String> keys = params.keys();
+            while (keys.hasNext()) {
+              String key = keys.next();
+              json.put(key, params.get(key));
             }
-
-            json.put("parameters", params);
         } catch (JSONException e) {
             throw new WebDriverException(e);
         }
@@ -204,7 +214,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
       }
     }
 
-    private Response waitForResponseFor(String command) {
+    private Response waitForResponseFor(DriverCommand command) {
         try {
             return readLoop(command);
         } catch (IOException e) {
@@ -212,7 +222,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
         }
     }
 
-    private Response readLoop(String command) throws IOException {
+    private Response readLoop(DriverCommand command) throws IOException {
         Response response = nextResponse();
 
         if (command.equals(response.getCommand()))

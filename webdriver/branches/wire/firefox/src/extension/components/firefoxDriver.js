@@ -41,7 +41,14 @@ FirefoxDriver.prototype.getCurrentWindowHandle = function(respond) {
 };
 
 
-FirefoxDriver.prototype.get = function(respond, url) {
+/**
+ * Opens a URL and blocks until it has finished loading.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{url:string}} params A JSON object with the command parameters.
+ */
+FirefoxDriver.prototype.get = function(respond, params) {
+  var url = params['url'];
+
   // Check to see if the given url is the same as the current one, but
   // with a different anchor tag.
   var current = Utils.getBrowser(respond.context).contentWindow.location;
@@ -109,7 +116,16 @@ FirefoxDriver.prototype.close = function(respond) {
 };
 
 
-FirefoxDriver.prototype.executeScript = function(respond, script) {
+/**
+ * Executes a script in a sandbox and returns the result to the test client.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{script:string, args:Array.<{type:string, value:number|boolean|string}>}} params The
+ *     command parameters.
+ */
+FirefoxDriver.prototype.executeScript = function(respond, params) {
+  var script = params['script'];
+  var args = params['args'];
+
   var doc = Utils.getDocument(respond.context);
   var window = doc ? doc.defaultView :
                Utils.getBrowser(respond.context).contentWindow;
@@ -137,12 +153,10 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
   }
 
   try {
-    var scriptSrc = "var __webdriverFunc = function(){" + script.shift()
+    var scriptSrc = "var __webdriverFunc = function(){" + script
         + "};  __webdriverFunc.apply(window, __webdriverParams);";
 
-    var convert = script.shift();
-
-    Utils.unwrapParameters(convert, parameters, respond.context);
+    Utils.unwrapParameters(args, parameters, respond.context);
 
     var result = runScript(scriptSrc, parameters);
 
@@ -174,7 +188,7 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
 };
 
 
-FirefoxDriver.prototype.title = function(respond) {
+FirefoxDriver.prototype.getTitle = function(respond) {
   var browser = Utils.getBrowser(respond.context);
   respond.response = browser.contentTitle;
   respond.send();
@@ -338,12 +352,11 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
  * Finds an element on the current page. The response value will be the UUID of
  * the located element, or an error message if an element could not be found.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<string>} parameters A two-element array: the first element
- *     should be a method listen in the {@code Firefox.ElementLocator} enum, and
- *     the second should be what to search for.
+ * @param {{using:string, value:string}} parameters The command parameters in
+ *     the form of a JSON object.
  */
 FirefoxDriver.prototype.findElement = function(respond, parameters) {
-  this.findElementInternal_(respond, parameters[0], parameters[1]);
+  this.findElementInternal_(respond, parameters['using'], parameters['value']);
 };
 
 
@@ -352,17 +365,12 @@ FirefoxDriver.prototype.findElement = function(respond, parameters) {
  * search parameter. The response value will be the UUID of the located element,
  * or an error message if an element could not be found.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<{id:string, using:string, value:string}>} parameters A single
- *     element array. The array element should define what to search for with
- *     the following fields:
- *     - id: UUID of the element to base the search from.
- *     - using: A method to search with, as defined in the
- *       {@code Firefox.ElementLocator} enum.
- *     - value: What to search for.
+ * @param {{using:string, value:string, id:string}} parameters The command
+ *     parameters in the form of a JSON object.
  */
 FirefoxDriver.prototype.findChildElement = function(respond, parameters) {
-  var map = parameters[0];
-  this.findElementInternal_(respond, map.using, map.value, map.id);
+  this.findElementInternal_(respond, parameters['using'], parameters['value'],
+      parameters['id']);
 };
 
 
@@ -448,12 +456,11 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
  * Searches for multiple elements on the page. The response value will be an
  * array of UUIDs for the located elements.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<string>} parameters A two-element array: the first element
- *     should be the type of locator strategy to use, the second is the target
- *     of the search.
+ * @param {{using:string, value:string}} parameters The command parameters in
+ *     the form of a JSON object.
  */
 FirefoxDriver.prototype.findElements = function(respond, parameters) {
-  this.findElementsInternal_(respond, parameters[0], parameters[1]);
+  this.findElementsInternal_(respond, parameters['using'], parameters['value']);
 };
 
 
@@ -461,30 +468,33 @@ FirefoxDriver.prototype.findElements = function(respond, parameters) {
  * Searches for multiple elements on the page that are children of the
  * corresponding search parameter. The response value will be an array of UUIDs
  * for the located elements.
- * @param {Array.<{id:string, using:string, value:string}>} parameters A single
- *     element array. The array element should define what to search for with
- *     the following fields:
- *     - id: UUID of the element to base the search from.
- *     - using: A method to search with, as defined in the
- *       {@code Firefox.ElementLocator} enum.
- *     - value: What to search for.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{using:string, value:string, id:string}} parameters The command
+ *     parameters in the form of a JSON object.
  */
 FirefoxDriver.prototype.findChildElements = function(respond, parameters) {
-  var map = parameters[0];
-  this.findElementsInternal_(respond, map.using, map.value, map.id);
+  this.findElementsInternal_(respond, parameters['using'], parameters['value'],
+      parameters['id']);
 };
 
 
-FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
+/**
+ * Changes the current execution context to the specified frame.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{id:string|number}} parameters The command parameters in the form of
+ *     a JSON object.
+ */
+FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
+  var frameId = parameters['id'];
   var browser = Utils.getBrowser(respond.context);
-  var frameDoc = Utils.findDocumentInFrame(browser, frameId[0]);
+  var frameDoc = Utils.findDocumentInFrame(browser, frameId);
 
   if (frameDoc) {
-    respond.context = new Context(respond.context.windowId, frameId[0]);
+    respond.context = new Context(respond.context.windowId, frameId);
     respond.send();
   } else {
     respond.isError = true;
-    respond.response = "Cannot find frame with id: " + frameId.toString();
+    respond.response = "Cannot find frame with id: " + frameId;
     respond.send();
   }
 };
@@ -496,7 +506,7 @@ FirefoxDriver.prototype.switchToDefaultContent = function(respond) {
 };
 
 
-FirefoxDriver.prototype.switchToActiveElement = function(respond) {
+FirefoxDriver.prototype.getActiveElement = function(respond) {
   var element = Utils.getActiveElement(respond.context);
 
   respond.response = Utils.addToKnownElements(element, respond.context);
@@ -534,12 +544,17 @@ FirefoxDriver.prototype.refresh = function(respond) {
 };
 
 
-FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
-  var cookie;
-  cookie = eval('(' + cookieString[0] + ')');
+/**
+ * Adds a cookie to the current domain.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{cookie:Object}} parameters The command parameters in the form of
+ *     a JSON object.
+ */
+FirefoxDriver.prototype.addCookie = function(respond, parameters) {
+  var cookie = parameters['cookie'];
 
   if (cookie.expiry) {
-    cookie.expiry = new Date(cookie.expiry);
+    cookie.expiry = new Date(cookie.expiry.time);
   } else {
     var date = new Date();
     date.setYear(2030);
@@ -580,13 +595,15 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
   var cookieManager =
       Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager2");
 
-  // The signature for "add" is different in firefox 3 and 2. We should sniff
-  // the browser version and call the right version of the method, but for now
-  // we'll use brute-force.
-  try {
+  // The signature for "add" is different in firefox 3 and 2.
+  var appInfo = Components.classes['@mozilla.org/xre/app-info;1'].
+      getService(Components.interfaces.nsIXULAppInfo);
+  var versionChecker = Components.classes['@mozilla.org/xpcom/version-comparator;1'].
+      getService(Components.interfaces.nsIVersionComparator);
+  if (versionChecker.compare(appInfo.version, '3') < 0) {
     cookieManager.add(cookie.domain, cookie.path, cookie.name, cookie.value,
         cookie.secure, false, cookie.expiry);
-  } catch(e) {
+  } else {
     cookieManager.add(cookie.domain, cookie.path, cookie.name, cookie.value,
         cookie.secure, false, false, cookie.expiry);
   }
@@ -597,16 +614,14 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
 function getVisibleCookies(location) {
   var results = [];
 
-  var currentPath = location.pathname;
-  if (!currentPath) currentPath = "/";
+  var currentPath = location.pathname || '/';
   var isForCurrentPath = function(aPath) {
     return currentPath.indexOf(aPath) != -1;
   };
   var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
   var e = cm.enumerator;
   while (e.hasMoreElements()) {
-    var cookie = e.getNext().QueryInterface(Components.interfaces["nsICookie"]);
-
+    var cookie = e.getNext().QueryInterface(Components.interfaces.nsICookie);
     // Take the hostname and progressively shorten it
     var hostname = location.hostname;
     do {
@@ -622,7 +637,7 @@ function getVisibleCookies(location) {
   return results;
 };
 
-FirefoxDriver.prototype.getCookie = function(respond) {
+FirefoxDriver.prototype.getCookies = function(respond) {
   var cookieToString = function(c) {
     return c.name + "=" + c.value + ";" + "domain=" + c.host + ";"
         + "path=" + c.path + ";" + "expires=" + c.expires + ";"
@@ -630,8 +645,8 @@ FirefoxDriver.prototype.getCookie = function(respond) {
   };
 
   var toReturn = "";
-  var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
-      contentWindow.location);
+  var cookies = getVisibleCookies(
+      Utils.getBrowser(respond.context).contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     var toAdd = cookieToString(cookies[i]);
     toReturn += toAdd + "\n";
@@ -644,16 +659,15 @@ FirefoxDriver.prototype.getCookie = function(respond) {
 
 // This is damn ugly, but it turns out that just deleting a cookie from the document
 // doesn't always do The Right Thing
-FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
+FirefoxDriver.prototype.deleteCookie = function(respond, parameters) {
   var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
-  // TODO(simon): Well, this is dumb. Sorry
-  var toDelete = eval('(' + cookieString + ')');
+  var name = parameters['name'];
 
   var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i];
-    if (cookie.name == toDelete.name) {
+    if (cookie.name == name) {
       cm.remove(cookie.host, cookie.name, cookie.path, false);
     }
   }
@@ -676,19 +690,20 @@ FirefoxDriver.prototype.deleteAllCookies = function(respond) {
 };
 
 
-FirefoxDriver.prototype.setMouseSpeed = function(respond, speed) {
-  this.mouseSpeed = speed;
+FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
+  this.mouseSpeed = parameters['speed'];
   respond.send();
 };
 
 
-FirefoxDriver.prototype.getMouseSpeed = function(respond) {
+FirefoxDriver.prototype.getSpeed = function(respond) {
   respond.response = "" + this.mouseSpeed;
   respond.send();
 };
 
 
-FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
+FirefoxDriver.prototype.screenshot = function(respond, parameters) {
+  var pngFile = parameters['file'];
   var window = Utils.getBrowser(respond.context).contentWindow;
   try {
     var canvas = Screenshooter.grab(window);

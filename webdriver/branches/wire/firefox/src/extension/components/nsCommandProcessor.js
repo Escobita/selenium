@@ -202,8 +202,7 @@ DelayedCommand.prototype.executeInternal_ = function() {
     } else {
       try {
         this.response_.commandName = this.command_.commandName;
-        this.driver_[this.command_.commandName](
-            this.response_, this.command_.parameters);
+        this.driver_[this.command_.commandName](this.response_, this.command_);
       } catch (e) {
         // if (e instanceof StaleElementError) won't work here since
         // StaleElementError is defined in the utils.js subscript which is
@@ -296,7 +295,7 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
       command.commandName == 'switchToWindow' ||
       command.commandName == 'getWindowHandles' ||
       command.commandName == 'quit') {
-    return this[command.commandName](response, command.parameters);
+    return this[command.commandName](response, command);
   }
 
   var win, fxbrowser, driver;
@@ -362,15 +361,13 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
  * element of the {@code windowId} array.
  * @param {Response} response The response object to send the command response
  *     in.
- * @param {Array.<*>} windowId The parameters sent with the original command.
- *     The first element in the array must be the ID of the window to switch to.
- *     Note all other command parameters are ignored.
+ * @param {{name:string}} command The command parameters as a JSON object.
  * @param {boolean} opt_isSecondSearch Whether this is the second attempt to
  *     find the window.
  */
-nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
+nsCommandProcessor.prototype.switchToWindow = function(response, command,
                                                        opt_isSecondSearch) {
-  var lookFor = windowId[0];
+  var lookFor = command['name'];
   var matches = function(win, lookFor) {
     return !win.closed &&
            (win.content && win.content.name == lookFor) ||
@@ -411,7 +408,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
       var self = this;
       this.wm.getMostRecentWindow('navigator:browser').
           setTimeout(function() {
-            self.switchToWindow(response, windowId, true);
+            self.switchToWindow(response, command, true);
           }, 500);
     }
   }

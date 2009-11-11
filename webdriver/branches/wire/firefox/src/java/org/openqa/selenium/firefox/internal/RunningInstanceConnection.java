@@ -19,6 +19,7 @@ package org.openqa.selenium.firefox.internal;
 
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DriverCommand;
 
 import java.io.IOException;
 
@@ -34,7 +35,8 @@ public class RunningInstanceConnection extends AbstractExtensionConnection {
 
     public void quit() {
         try {
-            sendMessageAndWaitForResponse(WebDriverException.class, new Command(null, "quit"));
+            sendMessageAndWaitForResponse(WebDriverException.class,
+                new Command(null, DriverCommand.QUIT));
         } catch (Exception e) {
             // Expected
         }

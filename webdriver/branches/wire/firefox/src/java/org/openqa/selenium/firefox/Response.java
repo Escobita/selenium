@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.remote.DriverCommand;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import java.util.List;
 
 public class Response {
     private final JSONObject result;
-    private final String methodName;
+    private final DriverCommand driverCommand;
     private final Context context;
     private final String responseText;
     private boolean isError;
@@ -40,7 +41,7 @@ public class Response {
         try {
             result = new JSONObject(json.trim());
 
-            methodName = (String) result.get("commandName");
+            driverCommand = DriverCommand.fromName(result.getString("commandName"));
             String contextAsString = (String) result.get("context");
             if (contextAsString != null)
                 context = new Context(contextAsString);
@@ -54,8 +55,8 @@ public class Response {
         }
     }
 
-    public String getCommand() {
-        return methodName;
+    public DriverCommand getCommand() {
+        return driverCommand;
     }
 
     public Context getContext() {

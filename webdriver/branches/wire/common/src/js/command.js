@@ -30,32 +30,18 @@ goog.require('goog.array');
 /**
  * Describes a command to be executed by a
  * {@code webdriver.AbstractCommandProcessor}.
- * @param {string} name The name of this command.
- * @param {webdriver.WebElement} opt_element The element to perform this command
- *     on. If not defined, the command will be performed relative to the
- *     document root.
+ * @param {webdriver.CommandName} name The name of this command.
  * @constructor
  */
-webdriver.Command = function(name, opt_element) {
+webdriver.Command = function(name) {
 
   /**
-   * The name of this command.
-   * @type {string}
+   * A map of named parameters.
+   * @type {Object}
    */
-  this.name = name;
-
-  /**
-   * The element to perform this command on. If not defined, the command will be
-   * performed relative to the document root.
-   * @type {webdriver.WebElement}
-   */
-  this.element = opt_element;
-
-  /**
-   * The parameters to this command.
-   * @type {Array.<*>}
-   */
-  this.parameters = [];
+  this.parameters = {
+    'commandName': name
+  };
 
   /**
    * Callback for when the command processor successfully finishes this command.
@@ -99,12 +85,21 @@ webdriver.Command = function(name, opt_element) {
 
 
 /**
- * Set the parameters to send with this command.
- * @param {*} var_args The arguments to send to this command.
+ * @return {webdriver.CommandName} The name of this command.
+ */
+webdriver.Command.prototype.getName = function() {
+  return this.parameters['commandName'];
+};
+
+
+/**
+ * Adds a named parameter for this command.
+ * @param {string} name The name of the parameter.
+ * @param {*} value The parameter value.
  * @return {webdriver.Command} A self reference.
  */
-webdriver.Command.prototype.setParameters = function(var_args) {
-  this.parameters = goog.array.slice(arguments, 0);
+webdriver.Command.prototype.addParameter = function(name, value) {
+  this.parameters[name] = value;
   return this;
 };
 
@@ -200,6 +195,10 @@ webdriver.Command.prototype.setResponse = function(response) {
  * @enum {string}
  */
 webdriver.CommandName = {
+  /* NOTE(jmleyba): This enum should be kept in sync with
+   * org.openqa.selenium.remote.DriverCommand
+   */
+
   // Commands executed directly by the JS API. --------------------------------
   FUNCTION: 'function',
   SLEEP: 'sleep',
@@ -209,47 +208,64 @@ webdriver.CommandName = {
   // Commands dispatched to the browser driver. -------------------------------
   NEW_SESSION: 'newSession',
   DELETE_SESSION: 'deleteSession',
-  QUIT: 'quit',
-  GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
-  GET_WINDOW_HANDLES: 'getWindowHandles',
-  GET_CURRENT_URL: 'getCurrentUrl',
+
   CLOSE: 'close',
-  SWITCH_TO_WINDOW: 'switchToWindow',
-  SWITCH_TO_FRAME: 'switchToFrame',
-  SWITCH_TO_DEFAULT_CONTENT: 'switchToDefaultContent',
+  QUIT: 'quit',
+
   GET: 'get',
-  FORWARD: 'goForward',
   BACK: 'goBack',
+  FORWARD: 'goForward',
   REFRESH: 'refresh',
-  GET_TITLE: 'title',
-  GET_PAGE_SOURCE: 'getPageSource',
-  EXECUTE_SCRIPT: 'executeScript',
-  GET_MOUSE_SPEED: 'getMouseSpeed',
-  SET_MOUSE_SPEED: 'setMouseSpeed',
+
+  ADD_COOKIE: 'addCookie',
+  GET_COOKIE: 'getCookie',
+  GET_ALL_COOKIES: 'getCookies',
+  DELETE_COOKIE: 'deleteCookie',
+  DELETE_ALL_COOKIES: 'deleteAllCookies',
+
   FIND_ELEMENT: 'findElement',
   FIND_ELEMENTS: 'findElements',
   FIND_CHILD_ELEMENT: 'findChildElement',
   FIND_CHILD_ELEMENTS: 'findChildElements',
+
+  CLEAR: 'clearElement',
+  CLICK: 'clickElement',
+  HOVER: 'hoverOverElement',
+  SEND_KEYS: 'sendKeysToElement',
+  SUBMIT: 'submitElement',
+  TOGGLE: 'toggleElement',
+
+  SWITCH_TO_WINDOW: 'switchToWindow',
+  SWITCH_TO_FRAME: 'switchToFrame',
+  SWITCH_TO_DEFAULT_CONTENT: 'switchToDefaultContent',
   GET_ACTIVE_ELEMENT: 'getActiveElement',
+
+  GET_CURRENT_URL: 'getCurrentUrl',
+  GET_PAGE_SOURCE: 'getPageSource',
+  GET_TITLE: 'getTitle',
+
+  EXECUTE_SCRIPT: 'executeScript',
+
+  GET_SPEED: 'getSpeed',
+  SET_SPEED: 'setSpeed',
+
+  GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
+  GET_WINDOW_HANDLES: 'getWindowHandles',
   SET_VISIBLE: 'setVisible',
   GET_VISIBLE: 'getVisible',
-  CLICK: 'click',
-  CLEAR: 'clear',
-  SUBMIT: 'submit',
-  GET_TEXT: 'getText',
-  SEND_KEYS: 'sendKeys',
-  GET_VALUE: 'getValue',
-  GET_TAG_NAME: 'getTagName',
-  IS_SELECTED: 'isSelected',
-  SET_SELECTED: 'setSelected',
-  TOGGLE: 'toggle',
-  IS_ENABLED: 'isEnabled',
-  IS_DISPLAYED: 'isDisplayed',
-  GET_LOCATION: 'getLocation',
-  GET_SIZE: 'getSize',
-  GET_ATTRIBUTE: 'getAttribute',
+
+  GET_TEXT: 'getElementText',
+  GET_VALUE: 'getElementValue',
+  GET_TAG_NAME: 'getElementTagName',
+  SET_SELECTED: 'setElementSelected',
   DRAG_ELEMENT: 'dragElement',
-  GET_VALUE_OF_CSS_PROPERTY: 'getValueOfCssProperty'
+  IS_SELECTED: 'isElementSelected',
+  IS_ENABLED: 'isElementEnabled',
+  IS_DISPLAYED: 'isElementDisplayed',
+  GET_LOCATION: 'getElementLocation',
+  GET_SIZE: 'getElementSize',
+  GET_ATTRIBUTE: 'getElementAttribute',
+  GET_VALUE_OF_CSS_PROPERTY: 'getElementValueOfCssProperty'
 };
 
 

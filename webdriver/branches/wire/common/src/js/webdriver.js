@@ -278,7 +278,7 @@ webdriver.WebDriver.prototype.processCommands_ = function() {
   }
 
   var pendingCommand = this.getPendingCommand();
-  if (pendingCommand && webdriver.CommandName.WAIT != pendingCommand.name) {
+  if (pendingCommand && webdriver.CommandName.WAIT != pendingCommand.getName()) {
     return;
   }
 
@@ -286,9 +286,9 @@ webdriver.WebDriver.prototype.processCommands_ = function() {
   var nextCommand = currentFrame.shift();
   if (nextCommand) {
     this.pendingCommands_.push(nextCommand);
-    if (nextCommand.name == webdriver.CommandName.FUNCTION) {
+    if (nextCommand.getName() == webdriver.CommandName.FUNCTION) {
       this.frames_.push([]);
-    } else if (nextCommand.name == webdriver.CommandName.WAIT) {
+    } else if (nextCommand.getName() == webdriver.CommandName.WAIT) {
       this.waitFrame_ = [];
       this.frames_.push(this.waitFrame_);
     }
@@ -310,7 +310,7 @@ webdriver.WebDriver.prototype.processCommands_ = function() {
 webdriver.WebDriver.prototype.onCommandComplete_ = function(command) {
   this.commandHistory_.push(command);
   if (command.response.isFailure || command.response.errors.length) {
-    if (webdriver.CommandName.WAIT == command.name) {
+    if (webdriver.CommandName.WAIT == command.getName()) {
       // The wait terminated early. Abort all other commands issued inside the
       // wait condition.
       for (var i = 1; i < this.pendingCommands_.length; i++) {
@@ -321,7 +321,7 @@ webdriver.WebDriver.prototype.onCommandComplete_ = function(command) {
     this.dispatchEvent(webdriver.WebDriver.EventType.ERROR);
   } else {
     this.pendingCommands_.pop();
-    if (webdriver.CommandName.WAIT == command.name) {
+    if (webdriver.CommandName.WAIT == command.getName()) {
       this.waitFrame_ = null;
     }
   }
@@ -399,28 +399,38 @@ webdriver.WebDriver.prototype.catchExpectedError = function(opt_errorMsg,
   // Surround the last command with two new commands. The first enables our
   // error listener which cancels any errors. The second verifies that we
   // caught an error. If not, it fails the test.
-  var catchExpected = new webdriver.Command(webdriver.CommandName.FUNCTION).
-      setParameters(goog.bind(function() {
-        goog.events.listenOnce(this, webdriver.WebDriver.EventType.ERROR,
-            handleError, /*capture=*/true);
-      }, this));
+  var catchExpected = webdriver.WebDriver.createFunctionCommand_(goog.bind(function() {
+    goog.events.listenOnce(this, webdriver.WebDriver.EventType.ERROR,
+        handleError, /*capture=*/true);
+  }, this));
 
-  var cleanupCatch = new webdriver.Command(webdriver.CommandName.FUNCTION).
-      setParameters(goog.bind(function() {
-        // Need to unlisten for error events so the error below doesn't get
-        // blocked.
-        goog.events.unlisten(this, webdriver.WebDriver.EventType.ERROR,
-                             handleError, /*capture=*/true);
-        if (!caughtError) {
-          throw new Error(
-              (opt_errorMsg ? (opt_errorMsg + '\n') : '') +
-              'Expected an error but none were raised.');
-        }
-      }, this));
+  var cleanupCatch = webdriver.WebDriver.createFunctionCommand_(goog.bind(function() {
+    // Need to unlisten for error events so the error below doesn't get
+    // blocked.
+    goog.events.unlisten(this, webdriver.WebDriver.EventType.ERROR,
+                         handleError, /*capture=*/true);
+    if (!caughtError) {
+      throw new Error(
+          (opt_errorMsg ? (opt_errorMsg + '\n') : '') +
+          'Expected an error but none were raised.');
+    }
+  }, this));
 
   currentFrame.push(catchExpected);
   currentFrame.push(previousCommand);
   currentFrame.push(cleanupCatch);
+};
+
+
+/**
+ * Creates a new function command.
+ * @param {function} fn The function that the command will call.
+ * @return {webdriver.Command} The new command.
+ * @private
+ */
+webdriver.WebDriver.createFunctionCommand_ = function(fn) {
+  return new webdriver.Command(webdriver.CommandName.FUNCTION).
+      addParameter('function', fn);
 };
 
 
@@ -442,7 +452,7 @@ webdriver.WebDriver.prototype.pause = function() {
  */
 webdriver.WebDriver.prototype.sleep = function(ms) {
   this.addCommand(new webdriver.Command(webdriver.CommandName.SLEEP).
-      setParameters(ms));
+      addParameter('ms', ms));
 };
 
 
@@ -462,8 +472,7 @@ webdriver.WebDriver.prototype.callFunction = function(fn, opt_selfObj,
     args.push(lastCommand ? lastCommand.response :null);
     fn.apply(opt_selfObj, args);
   }, this);
-  this.addCommand(new webdriver.Command(webdriver.CommandName.FUNCTION).
-      setParameters(wrappedFunction));
+  this.addCommand(webdriver.WebDriver.createFunctionCommand_(wrappedFunction));
 };
 
 
@@ -487,7 +496,7 @@ webdriver.WebDriver.prototype.callFunction = function(fn, opt_selfObj,
 webdriver.WebDriver.prototype.wait = function(conditionFn, timeout, opt_self) {
   if (this.pendingCommands_.length) {
     var command = this.pendingCommands_[0];
-    if (webdriver.CommandName.WAIT == command.name) {
+    if (webdriver.CommandName.WAIT == command.getName()) {
       throw new Error('Nested waits are not supported');
     }
   }
@@ -497,7 +506,7 @@ webdriver.WebDriver.prototype.wait = function(conditionFn, timeout, opt_self) {
   }
   var waitOp = new webdriver.Wait(conditionFn, timeout);
   this.addCommand(new webdriver.Command(webdriver.CommandName.WAIT).
-      setParameters(waitOp));
+      addParameter('wait', waitOp));
 };
 
 
@@ -516,15 +525,14 @@ webdriver.WebDriver.prototype.wait = function(conditionFn, timeout, opt_self) {
  *     the {@code conditionFn}.
  * @see webdriver.Wait
  */
-webdriver.WebDriver.prototype.waitNot = function(conditionFn, timeout, opt_self,
-                                                 opt_interval) {
+webdriver.WebDriver.prototype.waitNot = function(conditionFn, timeout, opt_self) {
   if (opt_self) {
     conditionFn = goog.bind(conditionFn, opt_self);
   }
   var waitOp = new webdriver.Wait(conditionFn, timeout);
   waitOp.waitOnInverse(true);
   this.addCommand(new webdriver.Command(webdriver.CommandName.WAIT).
-      setParameters(waitOp));
+      addParameter('wait', waitOp));
 };
 
 
@@ -559,7 +567,7 @@ webdriver.WebDriver.prototype.newSession = function(lockSession) {
  */
 webdriver.WebDriver.prototype.switchToWindow = function(name) {
   this.addCommand(new webdriver.Command(webdriver.CommandName.SWITCH_TO_WINDOW).
-      setParameters(name).
+      addParameter('name', name).
       setSuccessCallback(function(response) {
         this.context_ = response.value;
       }, this));
@@ -580,7 +588,8 @@ webdriver.WebDriver.prototype.switchToFrame = function(frame) {
   var commandName = webdriver.CommandName.SWITCH_TO_FRAME;
   var command;
   if (goog.isString(frame) || goog.isNumber(frame)) {
-    command = new webdriver.Command(commandName).setParameters(frame);
+    command = new webdriver.Command(commandName).
+        addParameter('id', frame);
   } else {
     command = new webdriver.Command(commandName, frame);
   }
@@ -597,7 +606,6 @@ webdriver.WebDriver.prototype.switchToFrame = function(frame) {
 webdriver.WebDriver.prototype.switchToDefaultContent = function() {
   var command =
       new webdriver.Command(webdriver.CommandName.SWITCH_TO_DEFAULT_CONTENT).
-          setParameters(null).
           setSuccessCallback(function(response) {
             this.context_ = response.context;
           }, this);
@@ -695,7 +703,8 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
       webdriver.WebDriver.mapToExecuteScriptArgument_);
   var result = new webdriver.Future(this);
   this.addCommand(new webdriver.Command(webdriver.CommandName.EXECUTE_SCRIPT).
-      setParameters(script, args).
+      addParameter('script', script).
+      addParameter('args', args).
       setSuccessCallback(function(response) {
         switch(response.extraData['resultType']) {
           case 'NULL':
@@ -724,7 +733,7 @@ webdriver.WebDriver.prototype.executeScript = function(script, var_args) {
  */
 webdriver.WebDriver.prototype.get = function(url) {
   this.addCommand(new webdriver.Command(webdriver.CommandName.GET).
-      setParameters(url.toString()).
+      addParameter('url', url.toString()).
       setSuccessCallback(function(response) {
         this.context_ = response.context;
       }, this));
@@ -830,9 +839,9 @@ webdriver.WebDriver.prototype.findElements = function(by) {
  * Adjust the speed of the mouse for mouse related commands.
  * @param {webdriver.WebDriver.Speed} speed The new speed setting.
  */
-webdriver.WebDriver.prototype.setMouseSpeed = function(speed) {
-  this.addCommand(new webdriver.Command(webdriver.CommandName.SET_MOUSE_SPEED).
-      setParameters(speed));
+webdriver.WebDriver.prototype.setSpeed = function(speed) {
+  this.addCommand(new webdriver.Command(webdriver.CommandName.SET_SPEED).
+      addParameter('speed', speed));
 };
 
 
@@ -841,10 +850,10 @@ webdriver.WebDriver.prototype.setMouseSpeed = function(speed) {
  * @return {webdriver.Future} A Future whose value will be set by this driver
  *     when the query command completes.
  */
-webdriver.WebDriver.prototype.getMouseSpeed = function() {
+webdriver.WebDriver.prototype.getSpeed = function() {
   var speed = new webdriver.Future(this);
   this.addCommand(
-      new webdriver.Command(webdriver.CommandName.GET_MOUSE_SPEED).
+      new webdriver.Command(webdriver.CommandName.GET_SPEED).
           setSuccessCallback(function(response) {
             response.value = Number(response.value);
             speed.setValue(response.value);
