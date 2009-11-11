@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium.remote;
 
 import com.google.common.collect.Maps;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -54,5 +55,11 @@ public class Command {
 
   public Map<String, ?> getParameters() {
     return parameters;
+  }
+
+  @Override
+  public String toString() {
+    return "[" + sessionId + ", " + context + "]: " + name + " "
+           + new JSONObject(parameters).toString();
   }
 }

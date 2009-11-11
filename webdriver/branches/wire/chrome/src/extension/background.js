@@ -268,13 +268,13 @@ sendResponseByXHR({statusCode: 0}, false);
 
 /**
  * Sends the passed argument as the result of a command
- * @param result result to send
+ * @param result object encapsulating result to send
  * @param wait whether we expect this command to possibly make changes
  * we need to wait for (e.g. adding elements, opening windows) - if so,
  * we wait until we think these effects are done
  */
 function sendResponseByXHR(result, wait) {
-  console.log("Sending result by XHR: " + result);
+  console.log("Sending result by XHR: " + JSON.stringify(result));
   if (ChromeDriver.xmlHttpRequest != null) {
     ChromeDriver.xmlHttpRequest.abort();
   }
@@ -299,11 +299,12 @@ function sendResponseByXHR(result, wait) {
  * Should only EVER be called by sendResponseByXHR,
  * as it ignores things like setting up XHR and blocking,
  * and just forces the sending over an assumed open XHR
+ * @param result String to send
  */
 function sendResult(result) {
   //TODO(danielwh): Iterate over tabs checking their status
   ChromeDriver.xmlHttpRequest.send(result + "\nEOResponse\n");
-  console.log("Sent result by XHR: " + result);
+  console.log("Sent result by XHR: " + JSON.stringify(result));
 }
 
 /**

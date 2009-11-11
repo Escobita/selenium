@@ -29,7 +29,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 public class ChromeBinary {
-  
+
+  private static final int BACKOFF_INTERVAL = 2500;
+
   private static int linearBackoffCoefficient = 1;
 
   private final ChromeProfile profile;
@@ -73,19 +75,20 @@ public class ChromeBinary {
           "--user-data-dir=" + profile.getDirectory().getAbsolutePath(),
           "--load-extension=" + extension.getDirectory().getAbsolutePath(),
           "--activate-on-launch",
-          "--disable-popup-blocking")
+          "--disable-popup-blocking",
+          "--no-first-run")
           .start();
 
       // Create a baby sitter to monitor whether Chrome dies before we manually
       // kill it.
       babySitter = createBabySitter(chromeProcess);
       executorService.execute(babySitter);
-      
+
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
     try {
-      Thread.sleep(2500 * linearBackoffCoefficient);
+      Thread.sleep(BACKOFF_INTERVAL * linearBackoffCoefficient);
     } catch (InterruptedException e) {
       //Nothing sane to do here
     }
@@ -98,7 +101,7 @@ public class ChromeBinary {
       }
     });
   }
-  
+
   public void kill() {
     if (babySitter != null) {
       babySitter.cancel(true);
@@ -131,7 +134,7 @@ public class ChromeBinary {
   public void incrementBackoffBy(int diff) {
     linearBackoffCoefficient += diff;
   }
-  
+
   /**
    * Locates the Chrome executable on the current platform.
    * First looks in the webdriver.chrome.bin property, then searches
