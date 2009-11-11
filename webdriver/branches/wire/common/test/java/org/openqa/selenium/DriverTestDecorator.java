@@ -20,7 +20,12 @@ package org.openqa.selenium;
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 
+import java.util.logging.Logger;
+import static java.util.logging.Level.SEVERE;
+
 public class DriverTestDecorator extends TestSetup {
+
+  private static final Logger LOG = Logger.getLogger(DriverTestDecorator.class.getName());
 
   private final Class<? extends WebDriver> driverClass;
   private final boolean keepDriver;
@@ -41,28 +46,37 @@ public class DriverTestDecorator extends TestSetup {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+    try {
+      if (driver != null && freshDriver) {
+        driver.quit();
+        driver = null;
+      }
 
-    if (driver != null && freshDriver) {
-      driver.quit();
-      driver = null;
-    }
-
-    if (getTest() instanceof NeedsDriver) {
-      driver = instantiateDriver();
-      ((NeedsDriver) getTest()).setDriver(driver);
+      if (getTest() instanceof NeedsDriver) {
+        driver = instantiateDriver();
+        ((NeedsDriver) getTest()).setDriver(driver);
+      }
+    } catch(Exception e) {
+      LOG.log(SEVERE, "Decorator setup error", e);
+      throw e;
     }
   }
 
   @Override
   protected void tearDown() throws Exception {
-    if (!keepDriver || restartDriver) {
-      try {
-        driver.quit();
+    try {
+      if (!keepDriver || restartDriver) {
+        try {
+          driver.quit();
 
-      } catch (Exception e) {
-        // this is okay --- the driver could be quit by the test
+        } catch (Exception e) {
+          // this is okay --- the driver could be quit by the test
+        }
+        driver = null;
       }
-      driver = null;
+    } catch(Exception e) {
+      LOG.log(SEVERE, "Decorator teardown error", e);
+      throw e;
     }
     super.tearDown();
   }
