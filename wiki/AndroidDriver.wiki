@@ -79,18 +79,20 @@ import java.net.URL;
 
 public class QuickTest extends TestCase {
 
-private WebDriver driver;
-@Override
-protected void setUp() throws Exception {
-super.setUp();
-DesiredCapabilities capabilities = new DesiredCapabilities();
-capabilities.setPlatform(Platform.ANDROID);
-driver = new RemoteWebDriver(new URL("http://localhost:8080/wb/hub"),
-capabilities);
-}
-public void testGoToGoogle() {
-driver.get("http://www.google.com");
-}
+  private WebDriver driver;
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    DesiredCapabilities capabilities = new DesiredCapabilities();
+    capabilities.setPlatform(Platform.ANDROID);
+    driver = new RemoteWebDriver(new URL("http://localhost:8080/wb/hub"),
+        capabilities);
+  }
+
+  public void testGoToGoogle() {
+    driver.get("http://www.google.com");
+  }
 }
 
 }}}
