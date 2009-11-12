@@ -21,8 +21,6 @@ import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import static org.openqa.selenium.remote.DriverCommand.*;
 
-import java.awt.Dimension;
-import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,7 +72,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
           .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
           .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_ATTRIBUTE, new String[] {"id", "name"})
-          .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
+          .put(_GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
           .put(GET_ELEMENT_TAG_NAME, ELEMENT_ID_ARG)

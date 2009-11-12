@@ -46,10 +46,6 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
@@ -281,7 +277,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor,
     }
 
     protected WebDriver findActiveDriver() {
-        String response = sendMessage(WebDriverException.class, DriverCommand.NEW_SESSION);
+        String response = sendMessage(WebDriverException.class, DriverCommand._NEW_SESSION);
 
         Context newContext = new Context(response);
         if (newContext.getDriverId().equals(newContext.getDriverId())) {
@@ -309,7 +305,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor,
     }
 
     private void fixId() {
-        String response = sendMessage(WebDriverException.class, NEW_SESSION);
+        String response = sendMessage(WebDriverException.class, _NEW_SESSION);
         this.context = new Context(response);
     }
 

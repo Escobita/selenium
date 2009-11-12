@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
+import org.openqa.selenium.remote.internal.InternalCommand;
+
 import java.util.EnumSet;
 
 /**
@@ -28,9 +30,6 @@ import java.util.EnumSet;
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 public enum DriverCommand {
-  NEW_SESSION("newSession"),
-  DELETE_SESSION("deleteSession"),
-
   CLOSE("close"),
   QUIT("quit"),
 
@@ -88,13 +87,20 @@ public enum DriverCommand {
   IS_ELEMENT_ENABLED("isElementEnabled"),
   IS_ELEMENT_DISPLAYED("isElementDisplayed"),
   GET_ELEMENT_LOCATION("getElementLocation"),
-  GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW("getElementLocationOnceScrolledIntoView"),
   GET_ELEMENT_SIZE("getElementSize"),
   GET_ELEMENT_ATTRIBUTE("getElementAttribute"),
   GET_ELEMENT_VALUE_OF_CSS_PROPERTY("getElementValueOfCssProperty"),
   ELEMENT_EQUALS("elementEquals"),
 
-  SCREENSHOT("screenshot");
+  SCREENSHOT("screenshot"),
+
+  // ==============================================================================================
+  // Internal commands
+
+  @InternalCommand _NEW_SESSION("newSession"),
+  @InternalCommand _DELETE_SESSION("deleteSession"),
+  @InternalCommand _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW(
+      "getElementLocationOnceScrolledIntoView");
 
   private final String commandName;
 

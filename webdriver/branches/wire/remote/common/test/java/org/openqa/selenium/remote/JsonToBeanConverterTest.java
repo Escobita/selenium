@@ -223,7 +223,7 @@ public class JsonToBeanConverterTest extends TestCase {
   public void testShouldBeAbleToConvertACommand() throws Exception {
     SessionId sessionId = new SessionId("session id");
     Context context = new Context("context");
-    Command original = new Command(sessionId, context, DriverCommand.NEW_SESSION,
+    Command original = new Command(sessionId, context, DriverCommand._NEW_SESSION,
         ImmutableMap.of("food", "cheese"));
     String raw = new BeanToJsonConverter().convert(original);
     Command converted = new JsonToBeanConverter().convert(Command.class, raw);

@@ -80,7 +80,7 @@ public class HttpCommandExecutor implements CommandExecutor {
     client.getHostConfiguration().setHost(uri);
 
     nameToUrl = ImmutableMap.<DriverCommand, CommandInfo>builder()
-        .put(NEW_SESSION, post("/session"))
+        .put(_NEW_SESSION, post("/session"))
         .put(QUIT, delete("/session/:sessionId"))
         .put(GET_CURRENT_WINDOW_HANDLE,
              get("/session/:sessionId/:context/window_handle"))

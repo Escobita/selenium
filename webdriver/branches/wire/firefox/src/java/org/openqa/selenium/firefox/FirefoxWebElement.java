@@ -276,7 +276,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
     public Point getLocationOnScreenOnceScrolledIntoView() {
         String json = sendMessage(WebDriverException.class,
-            GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
+            _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
         if (json == null) {
             return null;
         }

@@ -80,7 +80,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   @SuppressWarnings({"unchecked"})
   protected void startSession(Capabilities desiredCapabilities) {
-    Response response = execute(DriverCommand.NEW_SESSION,
+    Response response = execute(DriverCommand._NEW_SESSION,
         ImmutableMap.of("desiredCapabilities", desiredCapabilities));
 
     Map<String, Object> rawCapabilities = (Map<String, Object>) response.getValue();

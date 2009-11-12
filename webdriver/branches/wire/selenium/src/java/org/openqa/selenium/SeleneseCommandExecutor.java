@@ -58,7 +58,6 @@ import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SeleneseCommandExecutor implements CommandExecutor {
@@ -126,7 +125,7 @@ public class SeleneseCommandExecutor implements CommandExecutor {
         .put(IS_ELEMENT_DISPLAYED, new IsElementDisplayed())
         .put(IS_ELEMENT_ENABLED, new IsElementEnabled())
         .put(IS_ELEMENT_SELECTED, new IsElementSelected())
-        .put(NEW_SESSION, new NewSession())
+        .put(_NEW_SESSION, new NewSession())
         .put(GET_PAGE_SOURCE, new GetPageSource())
         .put(SEND_KEYS_TO_ELEMENT, new SendKeys())
         .put(SET_ELEMENT_SELECTED, new SetElementSelected())
