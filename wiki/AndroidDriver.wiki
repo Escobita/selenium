@@ -27,8 +27,70 @@ Build android
 {{{$ mvn package -Dmaven.test.skip=true -Dandroid.home=/home/berrada/android_sdk/android-sdk-linux/ -Dandroid-platform=platforms/android-1.5 -P android,windows}}}
 
 
-== Installing the Android Driver ==
+== Installing the war package in ijetty ==
   * Start ijetty once you've launched it on the phone / emulator.
   * Make the {{{war}}} file available via a webserver, as ijetty needs to download the war file using http. Note: the war file  is located at {{{remote/server-android/target/}}} in the webdriver project.
-  * Install the android.war  by downloading it through ijetty and set a relative path, say /wb. 
-  * Install androidwebdriver.apk and download it on the android device or emulator. You can use the standard eclipse Android tools or the {{{adb}}} command from a command-line / terminal window.
+  * Install the android.war  by downloading it through ijetty and set a relative path, say {{{/wb}}}.
+  * Stop and Start ijetty so it loads the new path and war file. Note: you can use the web-based UI for ijetty on the device / emulator by visiting http://10.0.2.15/ 
+
+== Installing the Android Driver ==
+  * Install {{{androidwebdriver.apk}}} and download it on the android device or emulator. You can use the standard eclipse Android tools or the {{{adb}}} command from a command-line / terminal window.
+
+== Configure port forwarding on Android ==
+Port forwarding is necessary to allow incoming connections to ijetty e.g. from your webdriver tests.
+
+Note: The port number is available from the android emulator, on top of the window. The following example uses a port number of 5554
+{{{
+$ telnet localhost 5554  
+  redir add tcp:8080:8080
+  exit
+}}}
+
+If you're running the WebDriver tests on the same machine as the emulator then the URL for Android weebdriver is {{{http://localhost:8080/wb/hub}}}
+
+= Example webdriver test using the remove Android Server =
+Create a new eclipse project, e.g. called {{{webdriver-all}}}
+
+// Set up the run-time libraries (jars) for a project in eclipse:
+{{{
+mkdir ~/eclipseworkspace/webdriver/webdroid/webdriver-all/lib
+LIB=~/eclipseworkspace/webdriver/webdroid/webdriver-all/lib/
+cp build/webdriver-all.jar $LIB
+cp */lib/runtime/*.jar $LIB
+ls $LIB
+}}}
+
+Set up your eclipse project
+  * Select all the dlls under $LIB in eclipse, right click and select "Build Path"> Add to build path.
+
+Code sample: QuickTest.java
+
+{{{
+package com.google.testing.webdroid;
+
+import junit.framework.TestCase;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.URL;
+
+public class QuickTest extends TestCase {
+
+private WebDriver driver;
+@Override
+protected void setUp() throws Exception {
+super.setUp();
+DesiredCapabilities capabilities = new DesiredCapabilities();
+capabilities.setPlatform(Platform.ANDROID);
+driver = new RemoteWebDriver(new URL("http://localhost:8080/wb/hub"),
+capabilities);
+}
+public void testGoToGoogle() {
+driver.get("http://www.google.com");
+}
+}
+
+}}}
