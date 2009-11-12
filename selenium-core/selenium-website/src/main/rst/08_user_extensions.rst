@@ -130,7 +130,7 @@ User-extensions are very easy to use with the selenium IDE.
 5. Your user-extension will not yet be loaded, you must close and restart 
    Selenium-IDE.
 #. In your empty test, create a new command, your user-extension should now 
-   be an uptions in the Commands dropdown.
+   be an options in the Commands dropdown.
 
 Using User-Extensions With Selenium RC
 --------------------------------------

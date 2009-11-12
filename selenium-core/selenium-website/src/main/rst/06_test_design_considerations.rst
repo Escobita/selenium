@@ -90,7 +90,7 @@ Assert vs. Verify:  Which to Use?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText* 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Locating UI Elements
 --------------------
