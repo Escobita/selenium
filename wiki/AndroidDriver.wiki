@@ -63,7 +63,7 @@ ls $LIB
 Set up your eclipse project
   * Select all the dlls under $LIB in eclipse, right click and select "Build Path"> Add to build path.
 
-Code sample: QuickTest.java
+Code sample: {{{QuickTest.java}}}
 
 {{{
 package com.google.testing.webdroid;
