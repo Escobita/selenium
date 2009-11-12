@@ -55,7 +55,7 @@ public class PageElementExtractor {
   }
 
   public Element getElementById(String id) throws Exception {
-    String el = (String)mDriver.executeScript("document.getElementById('" +
+    String el = (String)mDriver.executeScript("return document.getElementById('" +
         id + "').outerHTML", new Object[0]);
 
     // To parse the element it has to be a valid HTML document

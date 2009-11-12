@@ -39,7 +39,6 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Picture;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -216,26 +215,13 @@ public class SessionListActivity extends ListActivity
 
     switch(type) {
       case ADDED:
-        // We might need to add new WebView(s)
-        if (mWebViews.size() + 1 == sessionRep.size())
-          //for(int i=mWebViews.size(); i<=sessionRep.size(); i++)
-          mWebViews.add(createWebView(changedSession));
+        // We might need to add new WebView
+        if (mWebViews.size() + 1 == sessionRep.size()) {
+          mWebViews.add(createWebView(/* changedSession */));
           Log.w("onSessionChange", "WebView Added");
+        }
         break;
       case REMOVED:
-        // Delete the WebView
-        Log.w("onSessionChange", "Removing WebView for session: " +
-            changedSession.getSessionId());
-        for(int i=0; i<mWebViews.size(); i++) {
-          Log.w("onSessionChange", "" +
-              getWebViewParam(mWebViews.get(i), "SESSION_ID"));
-          if ((Integer)getWebViewParam(mWebViews.get(i), "SESSION_ID") ==
-            changedSession.getSessionId()) {
-            mWebViews.remove(i);
-            Log.w("onSessionChange", "WebView Removed");
-            break;
-          }
-        }
         break;
       case UPDATED:
         break;
@@ -274,7 +260,7 @@ public class SessionListActivity extends ListActivity
    * 
    * @return New WebView.
    */
-  private WebView createWebView(Session s) {
+  private WebView createWebView(/* Session s*/) {
       WebView wv = new WebView(this);
       wv.setWebViewClient(new LocalWebViewClient());
       wv.setFocusable(false);
@@ -289,7 +275,7 @@ public class SessionListActivity extends ListActivity
       setWebViewParam(wv, "EXECUTOR", executor);
       NavigationExecutor navexecutor = new NavigationExecutor();
       setWebViewParam(wv, "NAVIGATION_EXECUTOR", navexecutor);
-      setWebViewParam(wv, "SESSION_ID", s.getSessionId());
+      //setWebViewParam(wv, "SESSION_ID", s.getSessionId());
       return wv;
   }
 
@@ -492,9 +478,9 @@ public class SessionListActivity extends ListActivity
          * @see android.widget.ListAdapter#getView(int, android.view.View, android.view.ViewGroup)
          */
         public View getView(int position, View convertView, ViewGroup parent) {
-//        	if (mWebViews.size() < position + 1)
-//        		for(int i=mWebViews.size(); i<=position; i++)
-//        			mWebViews.add(createWebView());
+        	if (mWebViews.size() < position + 1)
+        		for(int i=mWebViews.size(); i<=position; i++)
+        			mWebViews.add(createWebView());
           if (position >= sessionRep.size())
             return null;
           
@@ -505,7 +491,7 @@ public class SessionListActivity extends ListActivity
           } else {
             sv = (SessionView)convertView;
           }
-          if (position < mWebViews.size())
+          //if (position < mWebViews.size())
             sv.setWebView(mWebViews.get(position));
           sv.setTitle(sessionRep.get(position).toString());
           sv.setUrl(sessionRep.get(position).getLastUrl());

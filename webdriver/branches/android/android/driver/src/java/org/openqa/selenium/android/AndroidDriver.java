@@ -46,11 +46,7 @@ import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.android.intents.AddSessionIntent;
-import org.openqa.selenium.android.intents.DeleteSessionIntent;
-import org.openqa.selenium.android.intents.DoActionIntent;
-import org.openqa.selenium.android.intents.NavigateIntent;
-import org.openqa.selenium.android.intents.SetProxyIntent;
+import org.openqa.selenium.android.intents.*;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -76,7 +72,7 @@ public class AndroidDriver implements WebDriver, SearchContext,
   public static final long COMMAND_TIMEOUT = 3000L; // in milliseconds
   
   private int sessionId = -1;
-  private String dom = "", jsResult = "";
+  private String pageSource = "", jsResult = "", title = "", url = "";
   boolean navigateOk = false;
 
   PageElementExtractor extractor = null;
@@ -131,33 +127,6 @@ public class AndroidDriver implements WebDriver, SearchContext,
     }
   }
   
-  private String getDOM() {
-    final Object syncDomObj_ = new Object();
-    Log.d("AndroidDriver:getDOM", "Inside getDOM, session id: " + sessionId);
-    dom = "";
-    DoActionIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
-        Session.Actions.GET_DOM, null, getContext(),
-        new Callback() {
-          public void getInt(int arg0) { }
-
-          public void getString(String arg0) {
-            dom = arg0;
-            synchronized (syncDomObj_) {
-              syncDomObj_.notifyAll();
-            }
-          }
-        }
-    );
-    synchronized (syncDomObj_) {
-      while(dom.length() == 0) {
-        try {
-          syncDomObj_.wait(COMMAND_TIMEOUT);
-        } catch (InterruptedException ie) { }
-      }
-    }
-    return dom;
-  }
-  
   public void setProxy(String host, int port) {
     Log.d("AndroidDriver:setProxy", "Inside setProxy, host: " + host +
         " port:" + port);
@@ -167,13 +136,55 @@ public class AndroidDriver implements WebDriver, SearchContext,
   }
 
   public String getCurrentUrl() {
-    // TODO(abergman): implement
-    return "http://some.url.com/";
+    url = "";
+    final Object syncObj_ = new Object();
+    GetUrlIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+        getContext(), new Callback() {
+          public void getInt(int arg0) { }
+          public void getString(String arg0) {
+            synchronized (this) {
+              url = arg0;
+              synchronized (syncObj_) {
+                syncObj_.notifyAll();
+              }
+            }
+          }
+        }
+    );
+
+    synchronized (syncObj_) {
+      try {
+        syncObj_.wait(COMMAND_TIMEOUT);
+      } catch (InterruptedException ie) { }
+    }
+    
+    return url;
   }
 
   public String getTitle() {
-    // TODO(abergman): implement
-    return "This is a title";
+    title = "";
+    final Object syncObj_ = new Object();
+    GetTitleIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+        getContext(), new Callback() {
+          public void getInt(int arg0) { }
+          public void getString(String arg0) {
+            synchronized (this) {
+              title = arg0;
+              synchronized (syncObj_) {
+                syncObj_.notifyAll();
+              }
+            }
+          }
+        }
+    );
+
+    synchronized (syncObj_) {
+      try {
+        syncObj_.wait(COMMAND_TIMEOUT);
+      } catch (InterruptedException ie) { }
+    }
+    
+    return title;
   }
 
   public void get(String url) {
@@ -224,7 +235,29 @@ public class AndroidDriver implements WebDriver, SearchContext,
   public String getPageSource() {
     // TODO(abergman): change name: DOM --> pageSource!
     Log.d("AndroidDriver:getPageSource", "Inside!");
-    return getDOM();
+    final Object syncObj_ = new Object();
+    pageSource = "";
+    DoActionIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+        Session.Actions.GET_DOM, null, getContext(),
+        new Callback() {
+          public void getInt(int arg0) { }
+
+          public void getString(String arg0) {
+            pageSource = arg0;
+            synchronized (syncObj_) {
+              syncObj_.notifyAll();
+            }
+          }
+        }
+    );
+    synchronized (syncObj_) {
+      while(pageSource.length() == 0) {
+        try {
+          syncObj_.wait(COMMAND_TIMEOUT);
+        } catch (InterruptedException ie) { }
+      }
+    }
+    return pageSource;
   }
 
   public void close() {
@@ -274,9 +307,12 @@ public class AndroidDriver implements WebDriver, SearchContext,
     return null;
   }
 
-  public void executeScript(String script) {
-    String[] arguments = {"window.webdriver.resultMethod(" + script + ");"};
-    Log.d("AndroidDriver:executeScript:noParams",
+  public void executeScriptNoResults(String script) {
+    String funcName = "func_" + Math.round(Math.random() * 1000000); 
+    String scriptFunction = "var " + funcName + " = function() {" + script +
+      "}; " + funcName + "(); delete " + funcName;
+    String[] arguments = {scriptFunction};
+    Log.d("AndroidDriver:executeScriptNoResults",
         "Inside executeScript, session id: " + sessionId + ", script: " +
         (arguments.length > 0 ? arguments[0].toString() : ""));
     DoActionIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
@@ -286,7 +322,11 @@ public class AndroidDriver implements WebDriver, SearchContext,
   public Object executeScript(String script, Object... args) {
     final Object syncjsObj_ = new Object();
 
-    String[] arguments = {"window.webdriver.resultMethod(" + script + ");"};
+    String funcName = "func_" + Math.round(Math.random() * 1000000); 
+    String scriptFunction = "var " + funcName + " = function() {" + script +
+      "}; window.webdriver.resultMethod(" + funcName +
+      "()); delete " + funcName;
+    String[] arguments = {scriptFunction};
     Log.d("AndroidDriver:executeScript", "Inside executeScript, session id: " +
         sessionId + ", script: " +
         (arguments.length > 0 ? arguments[0].toString() : ""));
