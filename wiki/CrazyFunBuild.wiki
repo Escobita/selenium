@@ -1,0 +1,30 @@
+#summary What we're doing with the build file
+
+= WebDriver's Build System =
+
+WebDriver is built using Rake. Rather than being a straight series of tasks, we've layered a declarative layer on top of this. That is, rather than:
+
+{{{
+task foo => [:bar, :baz]
+}}}
+
+the webdriver Rakefile has lines such as:
+
+{{{
+java_jar(:name => "webdriver-common",
+         :srcs   => "common/src/java/**/*.java"
+}}}
+
+This boils down to a call of the method "java_jar", passing in a Hash containing the details required to build the target. Behind the scenes, this sets up a normal rake task called "webdriver-common" which depends on the file "build/webdriver-common.jar", which in turn depends on the sources. This means that at the end of the day _we're just a Rakefile_.
+
+== Implicit Targets and Outputs ==
+
+The following implicit targets and outputs are generated:
+
+|| *Method name * || * :name value* || * Called with * || *Output* || * What it does * ||
+|| java_jar || "foo" || rake foo || build/foo.jar || Builds the jar from the sources ||
+|| java_jar || "foo" || rake foo_zip || build/foo.zip || Packages the output of target, with dependencies, into a zip || 
+
+== Future Plans ==
+
+At the moment, the Rakefile is monolithic and hard to understand. We'd like to "shatter" the various pieces into subdirectories.
