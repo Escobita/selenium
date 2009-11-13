@@ -28,7 +28,7 @@ class Preferences {
     if (isStringified(value)) {
       throw new IllegalArgumentException(
           String.format("Preference values must be plain strings: %s: %s",
-                        key, value));
+              key, value));
     }
     additionalPrefs.put(key, String.format("\"%s\"", value));
   }

@@ -17,38 +17,38 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.remote.DriverCommand;
 
 import java.io.IOException;
 
 public class RunningInstanceConnection extends AbstractExtensionConnection {
-    public RunningInstanceConnection(String host, int port) throws IOException {
-        this(host, port, 500);
+  public RunningInstanceConnection(String host, int port) throws IOException {
+    this(host, port, 500);
+  }
+
+  public RunningInstanceConnection(String host, int port, long timeOut) throws IOException {
+    setAddress(host, port);
+    connectToBrowser(timeOut);
+  }
+
+  public void quit() {
+    try {
+      sendMessageAndWaitForResponse(WebDriverException.class,
+          new Command(null, DriverCommand.QUIT));
+    } catch (Exception e) {
+      // Expected
     }
 
-    public RunningInstanceConnection(String host, int port, long timeOut) throws IOException {
-        setAddress(host, port);
-        connectToBrowser(timeOut);
-    }
+    allowFirefoxToQuit();
+  }
 
-    public void quit() {
-        try {
-            sendMessageAndWaitForResponse(WebDriverException.class,
-                new Command(null, DriverCommand.QUIT));
-        } catch (Exception e) {
-            // Expected
-        }
-
-        allowFirefoxToQuit();
+  private void allowFirefoxToQuit() {
+    try {
+      Thread.sleep(250);
+    } catch (InterruptedException e) {
+      throw new WebDriverException(e);
     }
-
-    private void allowFirefoxToQuit() {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            throw new WebDriverException(e);
-        }
-    }
+  }
 }

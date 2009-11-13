@@ -18,16 +18,14 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import com.google.common.collect.ImmutableMap;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.DriverCommand;
-import static org.openqa.selenium.remote.DriverCommand.*;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -36,259 +34,260 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.remote.DriverCommand;
+import static org.openqa.selenium.remote.DriverCommand.*;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
-import com.google.common.collect.ImmutableMap;
+public class FirefoxWebElement implements RenderedWebElement, Locatable,
+    FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
+  private final FirefoxDriver parent;
+  private final String elementId;
 
-public class FirefoxWebElement implements RenderedWebElement, Locatable, 
-        FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
-    private final FirefoxDriver parent;
-    private final String elementId;
+  public FirefoxWebElement(FirefoxDriver parent, String elementId) {
+    this.parent = parent;
+    this.elementId = elementId;
+  }
 
-    public FirefoxWebElement(FirefoxDriver parent, String elementId) {
-        this.parent = parent;
-        this.elementId = elementId;
+  public void click() {
+    sendMessage(UnsupportedOperationException.class, CLICK_ELEMENT);
+  }
+
+  public void hover() {
+    sendMessage(WebDriverException.class, HOVER_OVER_ELEMENT);
+  }
+
+  public void submit() {
+    sendMessage(WebDriverException.class, SUBMIT_ELEMENT);
+  }
+
+  public String getValue() {
+    try {
+      return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE);
+    } catch (WebDriverException e) {
+      return null;
     }
+  }
 
-    public void click() {
-      sendMessage(UnsupportedOperationException.class, CLICK_ELEMENT);
-    }
+  public void clear() {
+    sendMessage(UnsupportedOperationException.class, CLEAR_ELEMENT);
+  }
 
-    public void hover() {
-      sendMessage(WebDriverException.class, HOVER_OVER_ELEMENT);
+  public void sendKeys(CharSequence... value) {
+    StringBuilder builder = new StringBuilder();
+    for (CharSequence seq : value) {
+      builder.append(seq);
     }
+    sendMessage(UnsupportedOperationException.class, SEND_KEYS_TO_ELEMENT,
+        ImmutableMap.of("value", builder.toString()));
+  }
 
-    public void submit() {
-        sendMessage(WebDriverException.class, SUBMIT_ELEMENT);
-    }
-
-    public String getValue() {
-        try {
-          return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE);
-        } catch (WebDriverException e) {
-            return null;
-        }
-    }
-
-    public void clear() {
-    	sendMessage(UnsupportedOperationException.class, CLEAR_ELEMENT);
-    }
-
-    public void sendKeys(CharSequence... value) {
-      StringBuilder builder = new StringBuilder();
-      for (CharSequence seq : value) {
-        builder.append(seq);
-      }
-      sendMessage(UnsupportedOperationException.class, SEND_KEYS_TO_ELEMENT,
-          ImmutableMap.of("value", builder.toString()));
-    }
-
-    public String getTagName() {
-      return sendMessage(WebDriverException.class, GET_ELEMENT_TAG_NAME);
-    }
+  public String getTagName() {
+    return sendMessage(WebDriverException.class, GET_ELEMENT_TAG_NAME);
+  }
 
   public String getAttribute(String name) {
-        try {
-            return sendMessage(WebDriverException.class, GET_ELEMENT_ATTRIBUTE,
-                ImmutableMap.of("name", name));
-        } catch (WebDriverException e) {
-            return null;
-        }
+    try {
+      return sendMessage(WebDriverException.class, GET_ELEMENT_ATTRIBUTE,
+          ImmutableMap.of("name", name));
+    } catch (WebDriverException e) {
+      return null;
     }
+  }
 
-    public boolean toggle() {
-        sendMessage(UnsupportedOperationException.class, TOGGLE_ELEMENT);
-        return isSelected();
-    }
+  public boolean toggle() {
+    sendMessage(UnsupportedOperationException.class, TOGGLE_ELEMENT);
+    return isSelected();
+  }
 
-    public boolean isSelected() {
-        String value = sendMessage(WebDriverException.class, IS_ELEMENT_SELECTED);
-        return Boolean.parseBoolean(value);
-    }
+  public boolean isSelected() {
+    String value = sendMessage(WebDriverException.class, IS_ELEMENT_SELECTED);
+    return Boolean.parseBoolean(value);
+  }
 
-    public void setSelected() {
-        sendMessage(UnsupportedOperationException.class, SET_ELEMENT_SELECTED);
-    }
+  public void setSelected() {
+    sendMessage(UnsupportedOperationException.class, SET_ELEMENT_SELECTED);
+  }
 
-    public boolean isEnabled() {
-      String value = sendMessage(WebDriverException.class, IS_ELEMENT_ENABLED);
-      return Boolean.parseBoolean(value);
-    }
+  public boolean isEnabled() {
+    String value = sendMessage(WebDriverException.class, IS_ELEMENT_ENABLED);
+    return Boolean.parseBoolean(value);
+  }
 
-    public String getText() {
-        return sendMessage(WebDriverException.class, GET_ELEMENT_TEXT);
-    }
+  public String getText() {
+    return sendMessage(WebDriverException.class, GET_ELEMENT_TEXT);
+  }
 
   public boolean isDisplayed() {
     return Boolean.parseBoolean(sendMessage(WebDriverException.class, IS_ELEMENT_DISPLAYED));
-    }
+  }
 
-    public Point getLocation() {
-        String result = sendMessage(WebDriverException.class, GET_ELEMENT_LOCATION);
+  public Point getLocation() {
+    String result = sendMessage(WebDriverException.class, GET_ELEMENT_LOCATION);
 
-        String[] parts = result.split(",");
-        int x = Integer.parseInt(parts[0].trim());
-        int y = Integer.parseInt(parts[1].trim());
+    String[] parts = result.split(",");
+    int x = Integer.parseInt(parts[0].trim());
+    int y = Integer.parseInt(parts[1].trim());
 
-        return new Point(x, y);
-    }
+    return new Point(x, y);
+  }
 
-    public Dimension getSize() {
-        String result = sendMessage(WebDriverException.class, GET_ELEMENT_SIZE);
+  public Dimension getSize() {
+    String result = sendMessage(WebDriverException.class, GET_ELEMENT_SIZE);
 
-        String[] parts = result.split(",");
-        int x = Math.round(Float.parseFloat(parts[0].trim()));
-        int y = Math.round(Float.parseFloat(parts[1].trim()));
+    String[] parts = result.split(",");
+    int x = Math.round(Float.parseFloat(parts[0].trim()));
+    int y = Math.round(Float.parseFloat(parts[1].trim()));
 
-        return new Dimension(x, y);
-    }
+    return new Dimension(x, y);
+  }
 
-    public void dragAndDropBy(int moveRight, int moveDown) {
-        sendMessage(UnsupportedOperationException.class, DRAG_ELEMENT,
-            ImmutableMap.of("x", moveRight, "y", moveDown));
-    }
+  public void dragAndDropBy(int moveRight, int moveDown) {
+    sendMessage(UnsupportedOperationException.class, DRAG_ELEMENT,
+        ImmutableMap.of("x", moveRight, "y", moveDown));
+  }
 
-    public void dragAndDropOn(RenderedWebElement element) {
-        Point currentLocation = getLocation();
-        Point destination = element.getLocation();
-        dragAndDropBy(destination.x - currentLocation.x, destination.y - currentLocation.y);
-    }
+  public void dragAndDropOn(RenderedWebElement element) {
+    Point currentLocation = getLocation();
+    Point destination = element.getLocation();
+    dragAndDropBy(destination.x - currentLocation.x, destination.y - currentLocation.y);
+  }
 
-    public WebElement findElement(By by) {
-        return by.findElement(this);
-    }
+  public WebElement findElement(By by) {
+    return by.findElement(this);
+  }
 
-    public List<WebElement> findElements(By by) {
-        return by.findElements(this);
-    }
+  public List<WebElement> findElements(By by) {
+    return by.findElements(this);
+  }
 
-    public WebElement findElementByXPath(String xpath) {
-      return findChildElement("xpath", xpath);
-    }
+  public WebElement findElementByXPath(String xpath) {
+    return findChildElement("xpath", xpath);
+  }
 
-    public List<WebElement> findElementsByXPath(String xpath) {
-      return findChildElements("xpath", xpath);
-    }
+  public List<WebElement> findElementsByXPath(String xpath) {
+    return findChildElements("xpath", xpath);
+  }
 
-    public WebElement findElementByLinkText(String linkText) {
-      return findChildElement("link text", linkText);
-    }
+  public WebElement findElementByLinkText(String linkText) {
+    return findChildElement("link text", linkText);
+  }
 
-    public List<WebElement> findElementsByLinkText(String linkText) {
-      return findChildElements("link text", linkText);
-    }
+  public List<WebElement> findElementsByLinkText(String linkText) {
+    return findChildElements("link text", linkText);
+  }
 
-    public WebElement findElementByPartialLinkText(String text) {
-      return findChildElement("partial link text", text);
-    }
+  public WebElement findElementByPartialLinkText(String text) {
+    return findChildElement("partial link text", text);
+  }
 
-    public List<WebElement> findElementsByPartialLinkText(String text) {
-      return findChildElements("partial link text", text);
-    }
+  public List<WebElement> findElementsByPartialLinkText(String text) {
+    return findChildElements("partial link text", text);
+  }
 
-    public WebElement findElementById(String id) {
-      return findChildElement("id", id);
-    }
+  public WebElement findElementById(String id) {
+    return findChildElement("id", id);
+  }
 
-    public List<WebElement> findElementsById(String id) {
-      return findChildElements("id", id);
-    }
+  public List<WebElement> findElementsById(String id) {
+    return findChildElements("id", id);
+  }
 
-    public WebElement findElementByName(String name) {
-      return findChildElement("name", name);
-    }
+  public WebElement findElementByName(String name) {
+    return findChildElement("name", name);
+  }
 
-    public List<WebElement> findElementsByName(String name) {
-      return findChildElements("name", name);
-    }
+  public List<WebElement> findElementsByName(String name) {
+    return findChildElements("name", name);
+  }
 
-    public WebElement findElementByTagName(String tagName) {
-      return findChildElement("tag name", tagName);
-    }
-    
-    public List<WebElement> findElementsByTagName(String tagName) {
-      return findChildElements("tag name", tagName);
-    }
-    
-    public WebElement findElementByClassName(String className) {
-      return findChildElement("class name", className);
-    }
+  public WebElement findElementByTagName(String tagName) {
+    return findChildElement("tag name", tagName);
+  }
 
-    public List<WebElement> findElementsByClassName(String className) {
-      return findChildElements("class name", className);
-    }
+  public List<WebElement> findElementsByTagName(String tagName) {
+    return findChildElements("tag name", tagName);
+  }
 
-    private WebElement findChildElement(String using, String value) {
-      String id = sendMessage(NoSuchElementException.class,
-          FIND_CHILD_ELEMENT, buildSearchParamsMap(using, value));
-      return new FirefoxWebElement(parent, id);
-    }
+  public WebElement findElementByClassName(String className) {
+    return findChildElement("class name", className);
+  }
 
-    private List<WebElement> findChildElements(String using, String value) {
-      String indices = sendMessage(WebDriverException.class,
-          FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
+  public List<WebElement> findElementsByClassName(String className) {
+    return findChildElements("class name", className);
+  }
 
-      List<WebElement> elements = new ArrayList<WebElement>();
+  private WebElement findChildElement(String using, String value) {
+    String id = sendMessage(NoSuchElementException.class,
+        FIND_CHILD_ELEMENT, buildSearchParamsMap(using, value));
+    return new FirefoxWebElement(parent, id);
+  }
 
-      if (indices.length() == 0) {
-        return elements;
-      }
+  private List<WebElement> findChildElements(String using, String value) {
+    String indices = sendMessage(WebDriverException.class,
+        FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
 
-      String[] ids = indices.split(",");
-      for (String id : ids) {
-        elements.add(new FirefoxWebElement(parent, id));
-      }
+    List<WebElement> elements = new ArrayList<WebElement>();
+
+    if (indices.length() == 0) {
       return elements;
     }
 
-    private Map<String, String> buildSearchParamsMap(String using, String value) {
-      Map<String, String> map = new HashMap<String, String>();
-      map.put("id", elementId);
-      map.put("using", using);
-      map.put("value", value);
-      return map;
+    String[] ids = indices.split(",");
+    for (String id : ids) {
+      elements.add(new FirefoxWebElement(parent, id));
+    }
+    return elements;
+  }
+
+  private Map<String, String> buildSearchParamsMap(String using, String value) {
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("id", elementId);
+    map.put("using", using);
+    map.put("value", value);
+    return map;
+  }
+
+  public String getValueOfCssProperty(String propertyName) {
+    return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
+        ImmutableMap.of("propertyName", propertyName));
+  }
+
+  private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                             DriverCommand command) {
+    return sendMessage(throwOnFailure, command, ImmutableMap.<String, Object>of());
+  }
+
+  private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                             DriverCommand command, Map<String, ?> parameters) {
+    return parent.sendMessage(throwOnFailure,
+        new Command(parent.context, elementId, command, parameters));
+  }
+
+  public String getElementId() {
+    return elementId;
+  }
+
+  public Point getLocationOnScreenOnceScrolledIntoView() {
+    String json = sendMessage(WebDriverException.class,
+        _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
+    if (json == null) {
+      return null;
     }
 
-    public String getValueOfCssProperty(String propertyName) {
-    	return sendMessage(WebDriverException.class, GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-          ImmutableMap.of("propertyName", propertyName));
+    try {
+      JSONObject mapped = new JSONObject(json);
+
+      return new Point(mapped.getInt("x"), mapped.getInt("y"));
+    } catch (JSONException e) {
+      throw new RuntimeException(e);
     }
-
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
-                               DriverCommand command) {
-      return sendMessage(throwOnFailure, command, ImmutableMap.<String, Object>of());
-    }
-
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
-                               DriverCommand command, Map<String, ?> parameters) {
-        return parent.sendMessage(throwOnFailure,
-            new Command(parent.context, elementId, command, parameters));
-    }
-
-    public String getElementId() {
-        return elementId;
-    }
-
-    public Point getLocationOnScreenOnceScrolledIntoView() {
-        String json = sendMessage(WebDriverException.class,
-            _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
-        if (json == null) {
-            return null;
-        }
-
-        try {
-            JSONObject mapped = new JSONObject(json);
-
-            return new Point(mapped.getInt("x"), mapped.getInt("y"));
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  }
 
   @Override
   public boolean equals(Object obj) {

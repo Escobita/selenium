@@ -23,23 +23,22 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implements {@link Lock} via an implementation that uses a well-known server socket.
- * 
+ *
  * @author gregory.block@gmail.com (Gregory Block)
  */
 public class SocketLock implements Lock {
   private static final long DELAY_BETWEEN_SOCKET_CHECKS = 100;
-  
+
   private final int lockPort;
   private final Socket lockSocket;
 
   /**
    * Constructs a new SocketLock.  Attempts to lock the lock will attempt to acquire the
    * specified port number, and wait for it to become free.
-   * 
+   *
    * @param lockPort the port number to lock
    */
   public SocketLock(int lockPort) {
@@ -59,8 +58,9 @@ public class SocketLock implements Lock {
     // Attempt to acquire the lock until something goes wrong or we run out of time.
     do {
       try {
-        if (isLockFree(address))
+        if (isLockFree(address)) {
           return;
+        }
         Thread.sleep(DELAY_BETWEEN_SOCKET_CHECKS);
       } catch (InterruptedException e) {
         throw new WebDriverException(e);
@@ -78,15 +78,17 @@ public class SocketLock implements Lock {
    */
   public void unlock() {
     try {
-      if (lockSocket.isBound()) lockSocket.close();
+      if (lockSocket.isBound()) {
+        lockSocket.close();
+      }
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
   }
-  
+
   /**
    * Test to see if the lock is free.  Returns instantaneously.
-   * 
+   *
    * @param address the address to attempt to bind to
    * @return true if the lock is locked; false if it is not
    * @throws IOException if something goes catastrophically wrong with the socket

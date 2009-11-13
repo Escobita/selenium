@@ -17,48 +17,47 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.remote.DriverCommand;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 public class Command {
-    private final Context context;
-    private final String elementId;
-    private final DriverCommand commandName;
-    private final Map<String, ?> parameters;
+  private final Context context;
+  private final String elementId;
+  private final DriverCommand commandName;
+  private final Map<String, ?> parameters;
 
-    public Command(Context context, DriverCommand commandName) {
-        this(context, null, commandName, ImmutableMap.<String, Object>of());
-    }
-    public Command(Context context, DriverCommand commandName, Map<String, ?> parameters) {
+  public Command(Context context, DriverCommand commandName) {
+    this(context, null, commandName, ImmutableMap.<String, Object>of());
+  }
 
-        this(context, null, commandName, parameters);
-    }
+  public Command(Context context, DriverCommand commandName, Map<String, ?> parameters) {
+    this(context, null, commandName, parameters);
+  }
 
-    public Command(Context context, String elementId, DriverCommand commandName,
-                   Map<String, ?> parameters) {
-        this.context = context;
-        this.elementId = elementId;
-        this.commandName = commandName;
-        this.parameters = parameters;
-    }
+  public Command(Context context, String elementId, DriverCommand commandName,
+                 Map<String, ?> parameters) {
+    this.context = context;
+    this.elementId = elementId;
+    this.commandName = commandName;
+    this.parameters = parameters;
+  }
 
 
-    public Context getContext() {
-        return context;
-    }
+  public Context getContext() {
+    return context;
+  }
 
-    public String getElementId() {
-        return elementId;
-    }
+  public String getElementId() {
+    return elementId;
+  }
 
-    public DriverCommand getCommandName() {
-        return commandName;
-    }
+  public DriverCommand getCommandName() {
+    return commandName;
+  }
 
-    public Map<String, ?> getParameters() {
-        return parameters;
-    }
+  public Map<String, ?> getParameters() {
+    return parameters;
+  }
 }
