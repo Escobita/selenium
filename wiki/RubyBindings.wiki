@@ -4,6 +4,8 @@
 
 The Ruby bindings are currently available as the [http://gemcutter.org/gems/selenium-webdriver selenium-webdriver] gem (on Gemcutter). The gem will be renamed to "selenium" and follow the major version numbers from the main project when Selenium 2.0 is released.
 
+The bindings support Ruby 1.8.6 through 1.9.1 + JRuby.
+
 = Details =
 
 The bindings provide a slightly rubified version of the WebDriver API:
@@ -23,4 +25,19 @@ puts driver.title
 driver.quit
 }}}
 
-The ruby bindings has drivers for Firefox, IE, Chrome and a client for the remote driver.
+The ruby bindings have drivers for Firefox, IE, Chrome + a client for the remote driver.
+
+The `WebDriver.for()` call is a shortcut for 
+
+{{{
+Selenium::WebDriver::Driver.new(Selenium::WebDriver::Firefox::Bridge.new)
+}}}
+
+Any extra arguments pass to `for()` (besides the driver symbol) will be passed to the Bridge's constructor. So to configure the remote driver:
+
+{{{
+include Selenium
+
+driver = WebDriver.for(:remote, :server_url           => "http://localhost:6000/"
+                                :desired_capabilities => WebDriver::Remote::Capabilities.firefox)
+}}}
