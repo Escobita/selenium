@@ -75,8 +75,11 @@ public class ChromeBinary {
           "--user-data-dir=" + profile.getDirectory().getAbsolutePath(),
           "--load-extension=" + extension.getDirectory().getAbsolutePath(),
           "--activate-on-launch",
+          "--no-first-run",
+          "--disable-hang-monitor",
           "--disable-popup-blocking",
-          "--no-first-run")
+          "--disable-prompt-on-repost",
+          "about:blank")
           .start();
 
       // Create a baby sitter to monitor whether Chrome dies before we manually
