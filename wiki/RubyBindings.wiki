@@ -2,6 +2,23 @@
 
 = Introduction =
 
-Coming soon.
+The Ruby bindings are currently available as the [http://gemcutter.org/gems/selenium-webdriver selenium-webdriver] gem (on Gemcutter). The gem will be renamed to "selenium" and follow the major version numbers from the main project when Selenium 2.0 is released.
 
 = Details =
+
+The bindings provide a slightly rubified version of the WebDriver API:
+
+{{{
+require "selenium-webdriver"
+
+driver = Selenium::WebDriver.for :firefox
+driver.navigate.to "http://google.com"
+
+element = driver.find_element(:name, 'q')
+element.send_keys "Hello WebDriver!"
+element.submit
+
+puts driver.title
+
+driver.quit
+}}}
