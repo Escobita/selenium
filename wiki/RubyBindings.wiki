@@ -22,3 +22,5 @@ puts driver.title
 
 driver.quit
 }}}
+
+The ruby bindings has drivers for Firefox, IE, Chrome and a client for the remote driver.
