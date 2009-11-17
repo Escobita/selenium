@@ -37,6 +37,7 @@ package org.openqa.selenium.android;
 
 import com.android.webdriver.sessions.Session;
 import com.android.webdriver.sessions.Session.Actions;
+import com.android.webdriver.sessions.SessionCookieManager.CookieActions;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -47,6 +48,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.android.intents.*;
+import org.openqa.selenium.android.Callback;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -73,7 +75,6 @@ public class AndroidDriver implements WebDriver, SearchContext,
   
   private int sessionId = -1;
   private String pageSource = "", jsResult = "", title = "", url = "";
-  boolean navigateOk = false;
 
   PageElementExtractor extractor = null;
 
@@ -108,14 +109,13 @@ public class AndroidDriver implements WebDriver, SearchContext,
     AddSessionIntent.getInstance().broadcast(DEFAULT_SESSION_CONTEXT,
         getContext(),
         new Callback() {
+          @Override
           public void getInt(int arg0) {
             sessionId = arg0;
             synchronized (syncObj_) {
               syncObj_.notifyAll();
             }
           }
-
-          public void getString(String arg0) { }
         }
     );
     synchronized (syncObj_) {
@@ -140,7 +140,7 @@ public class AndroidDriver implements WebDriver, SearchContext,
     final Object syncObj_ = new Object();
     GetUrlIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
         getContext(), new Callback() {
-          public void getInt(int arg0) { }
+          @Override
           public void getString(String arg0) {
             synchronized (this) {
               url = arg0;
@@ -166,7 +166,7 @@ public class AndroidDriver implements WebDriver, SearchContext,
     final Object syncObj_ = new Object();
     GetTitleIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
         getContext(), new Callback() {
-          public void getInt(int arg0) { }
+          @Override
           public void getString(String arg0) {
             synchronized (this) {
               title = arg0;
@@ -190,30 +190,9 @@ public class AndroidDriver implements WebDriver, SearchContext,
   public void get(String url) {
     Log.d("Navigation", "Session: " + sessionId + " to URL: " + url);
 
-    final Object syncNavObj_ = new Object();
-    navigateOk = false;
-    
-    NavigateIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
-        getContext(), url, true,
-        new Callback() {
-          public void getInt(int resultOk) {
-            synchronized (this) {
-              navigateOk = (resultOk == 1);
-              synchronized (syncNavObj_) {
-                syncNavObj_.notifyAll();
-              }
-            }
-          }
-          public void getString(String arg0) { }
-        }
-    );
+    boolean navigateOk = NavigateIntent.getInstance().broadcastSync(sessionId,
+        DEFAULT_SESSION_CONTEXT, getContext(), url, true);
 
-    synchronized (syncNavObj_) {
-      try {
-        syncNavObj_.wait(COMMAND_TIMEOUT);
-      } catch (InterruptedException ie) { }
-    }
-    
     if (!navigateOk) {
       String message = "Error navigating session: " +
           sessionId + " to URL: " + url;
@@ -233,15 +212,13 @@ public class AndroidDriver implements WebDriver, SearchContext,
   }
 
   public String getPageSource() {
-    // TODO(abergman): change name: DOM --> pageSource!
     Log.d("AndroidDriver:getPageSource", "Inside!");
     final Object syncObj_ = new Object();
     pageSource = "";
     DoActionIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
-        Session.Actions.GET_DOM, null, getContext(),
+        Session.Actions.GET_PAGESOURCE, null, getContext(),
         new Callback() {
-          public void getInt(int arg0) { }
-
+          @Override
           public void getString(String arg0) {
             pageSource = arg0;
             synchronized (syncObj_) {
@@ -274,6 +251,7 @@ public class AndroidDriver implements WebDriver, SearchContext,
     DeleteSessionIntent.getInstance().broadcast(sessionId,
       DEFAULT_SESSION_CONTEXT, getContext(),
       new Callback() {
+        @Override
         public void getInt(int resultOk) {
           synchronized (this) {
             if (resultOk == 0)
@@ -284,7 +262,6 @@ public class AndroidDriver implements WebDriver, SearchContext,
             }
           }
         }
-        public void getString(String arg0) { }
       }
     );
 
@@ -334,8 +311,7 @@ public class AndroidDriver implements WebDriver, SearchContext,
     DoActionIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
         Session.Actions.EXECUTE_JAVASCRIPT, arguments, getContext(),
         new Callback() {
-          public void getInt(int arg0) { }
-
+          @Override
           public void getString(String arg0) {
             synchronized (this) {
               jsResult = arg0;
@@ -473,24 +449,51 @@ public class AndroidDriver implements WebDriver, SearchContext,
 
   private class AndroidOptions implements Options {
     public void addCookie(Cookie cookie) {
-      // TODO(abergman): implement
+      CookiesIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+          CookieActions.ADD, new String[] {cookie.getName(), cookie.getValue()},
+          getContext(), null);
     }
 
     public void deleteCookieNamed(String name) {
-      // TODO(abergman): implement
+      CookiesIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+          CookieActions.REMOVE, new String[] { name }, getContext(), null);
     }
 
     public void deleteCookie(Cookie cookie) {
-      // TODO(abergman): implement
+      CookiesIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+          CookieActions.REMOVE, new String[] { cookie.getName() },
+          getContext(), null);
     }
 
     public void deleteAllCookies() {
-      // TODO(abergman): implement
+      CookiesIntent.getInstance().broadcast(sessionId, DEFAULT_SESSION_CONTEXT,
+          CookieActions.REMOVE_ALL, null, getContext(), null);
     }
 
     public Set<Cookie> getCookies() {
-      // TODO(abergman): implement
-      return null;
+      Set<Cookie> cookies = new HashSet<Cookie>();
+      String cookieString = CookiesIntent.getInstance().broadcastSync(sessionId,
+          DEFAULT_SESSION_CONTEXT, CookieActions.GET_ALL, null, getContext());
+
+      for(String cookie : cookieString.split(";")) {
+        String[] cookieValues = cookie.split("=");
+        if (cookieValues.length != 2)
+          throw new RuntimeException("Invalid cookie: " + cookie);
+        cookies.add(new Cookie(cookieValues[0], cookieValues[1]));
+      }
+
+      return cookies;
+    }
+
+    public Cookie getCookieNamed(String name) {
+      String cookieValue = CookiesIntent.getInstance().broadcastSync(sessionId,
+          DEFAULT_SESSION_CONTEXT, CookieActions.GET, new String[] { name },
+          getContext());
+      
+      if (cookieValue.length() > 0)
+        return new Cookie(name, cookieValue);
+      else
+        return null;
     }
 
     public Speed getSpeed() {
@@ -500,16 +503,5 @@ public class AndroidDriver implements WebDriver, SearchContext,
     public void setSpeed(Speed speed) {
         throw new UnsupportedOperationException();
     }
-
-    public Cookie getCookieNamed(String name) {
-      // TODO Auto-generated method stub
-      return null;
-    }
-  }
-
-  // Generic interface for integer callbacks
-  public interface Callback {
-    void getInt(int arg0);
-    void getString(String arg0);
   }
 }

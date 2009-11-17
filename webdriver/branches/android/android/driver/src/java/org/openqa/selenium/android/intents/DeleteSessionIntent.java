@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.android.webdriver.sessions.intents.Intents;
 
-import org.openqa.selenium.android.AndroidDriver.Callback;
+import org.openqa.selenium.android.Callback;
 
 public class DeleteSessionIntent extends BroadcastReceiver {
   public void broadcast(int sessionId, String context, Context sender,

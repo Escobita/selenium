@@ -1,39 +1,72 @@
 package org.openqa.selenium.android.intents;
 
-import com.android.webdriver.sessions.Session;
-import com.android.webdriver.sessions.intents.Intents;
-
-import org.openqa.selenium.android.Callback;
-
-import java.io.Serializable;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class DoActionIntent extends BroadcastReceiver {
+import com.android.webdriver.sessions.SessionCookieManager;
+import com.android.webdriver.sessions.SessionCookieManager.CookieActions;
+import com.android.webdriver.sessions.intents.Intents;
 
-  public void broadcast(int sessionId, String context, Session.Actions action,
+import org.openqa.selenium.android.AndroidDriver;
+import org.openqa.selenium.android.Callback;
+
+import java.io.Serializable;
+
+public class CookiesIntent extends BroadcastReceiver {
+
+  public String broadcastSync(int sessionId, String context,
+      CookieActions action, Serializable[] args, Context sender) {
+    
+    cookieValue = "";
+    final Object syncObj_ = new Object();
+    broadcast(sessionId, context, action, args, sender,
+        new Callback() {
+          @Override
+          public void getString(String arg0) {
+            synchronized (this) {
+              cookieValue = arg0;
+              synchronized (syncObj_) {
+                syncObj_.notifyAll();
+              }
+            }
+          }
+        }
+    );
+
+    synchronized (syncObj_) {
+      try {
+        syncObj_.wait(AndroidDriver.COMMAND_TIMEOUT);
+      } catch (InterruptedException ie) { }
+    }
+    
+    return cookieValue;
+  }
+  
+  
+  public void broadcast(int sessionId, String context,
+      SessionCookieManager.CookieActions action,
       Serializable[] args, Context sender, Callback callback) {
     strCallback = callback;
     
     Intent intent = new Intent(Intents.INTENT_DOACTION);
-    Log.d("DoActionIntent", "Sending intent: " + intent.getAction() +
+    Log.d("CookiesIntent", "Sending intent: " + intent.getAction() +
         ", SessionId: " + sessionId + ", Context: " + context + ", action: " +
         action.name());
     
     if (sessionId <= 0) {
       // Wrong session: definitely an error
-      Log.e("DoActionIntent:broadcast", "Error in session sending intent, id:" +
+      Log.e("CookiesIntent:broadcast", "Error in session sending intent, id:" +
           sessionId + ", action: " + action + " stack: ");
       for (StackTraceElement el : Thread.currentThread().getStackTrace())
-        Log.e("DoActionIntent:broadcast", el.toString());
+        Log.e("CookiesIntent:broadcast", el.toString());
       
       return;   // Not sending 
     }
 
+    // Packing all intent arguments
     intent.putExtra("SessionId", sessionId);
     intent.putExtra("Context", context);
     intent.putExtra("Action", action.name());
@@ -44,7 +77,6 @@ public class DoActionIntent extends BroadcastReceiver {
     sender.sendOrderedBroadcast(intent, null, this, null, Activity.RESULT_OK,
         null, null);
   }
-
 
   @Override
   public void onReceive(Context ctx, Intent intent) {
@@ -59,8 +91,8 @@ public class DoActionIntent extends BroadcastReceiver {
     if (res == null)
       res = "";
     
-    Log.d("DoActionIntent", "Got result for session: " + sessId +
-        ", result size: " + res.length());
+    Log.d("CookiesIntent", "Got result for session: " + sessId +
+        ", result: " + res);
     
     if (sessId == -1) {
         Log.e("AndroidDriver", "Error in received intent: " + intent.toString());
@@ -68,15 +100,16 @@ public class DoActionIntent extends BroadcastReceiver {
     }
 
     if (strCallback != null) {
-      Log.d("DoActionIntent:onReceive", "Invoking callback");
+      Log.d("CookiesIntent:onReceive", "Invoking callback");
       strCallback.getString(res);
     }
   }
 
-  public static DoActionIntent getInstance() {
+  
+  public static CookiesIntent getInstance() {
     synchronized (syncObject_) {
       if (mInstance == null)
-        mInstance = new DoActionIntent();
+        mInstance = new CookiesIntent();
     }
     
     return mInstance;
@@ -84,6 +117,6 @@ public class DoActionIntent extends BroadcastReceiver {
 
   private Callback strCallback;
   private static Object syncObject_ = new Object();
-  private static DoActionIntent mInstance = null;
-
+  private static CookiesIntent mInstance = null;
+  private String cookieValue = "";
 }

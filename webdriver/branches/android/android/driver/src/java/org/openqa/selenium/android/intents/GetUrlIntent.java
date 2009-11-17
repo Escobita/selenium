@@ -2,7 +2,7 @@ package org.openqa.selenium.android.intents;
 
 import com.android.webdriver.sessions.intents.Intents;
 
-import org.openqa.selenium.android.AndroidDriver.Callback;
+import org.openqa.selenium.android.Callback;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;

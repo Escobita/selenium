@@ -8,9 +8,40 @@ import android.util.Log;
 
 import com.android.webdriver.sessions.intents.Intents;
 
-import org.openqa.selenium.android.AndroidDriver.Callback;
+import org.openqa.selenium.android.AndroidDriver;
+import org.openqa.selenium.android.Callback;
 
 public class NavigateIntent extends BroadcastReceiver {
+
+  public boolean broadcastSync(int sessionId, String context,
+      Context sender, String url, boolean blocking) {
+    
+    final Object syncNavObj_ = new Object();
+    navigateOk = false;
+    
+    broadcast(sessionId, context, sender, url, blocking,
+        new Callback() {
+          @Override
+          public void getInt(int resultOk) {
+            synchronized (this) {
+              navigateOk = (resultOk == 1);
+              synchronized (syncNavObj_) {
+                syncNavObj_.notifyAll();
+              }
+            }
+          }
+        }
+    );
+
+    synchronized (syncNavObj_) {
+      try {
+        syncNavObj_.wait(AndroidDriver.COMMAND_TIMEOUT);
+      } catch (InterruptedException ie) { }
+    }
+    
+    return navigateOk;    
+  }
+  
   public void broadcast(int sessionId, String context, Context sender,
       String url, boolean blocking, Callback callback) {
     
@@ -47,4 +78,5 @@ public class NavigateIntent extends BroadcastReceiver {
   private Callback intCallback;
   private static Object syncObject_ = new Object();
   private static NavigateIntent mInstance = null;
+  private boolean navigateOk = false;
 }

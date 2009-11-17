@@ -21,4 +21,7 @@ public final class Intents {
 
     public static final String INTENT_GETURL =
       new String("com.android.webdriver.intent.GET_URL");
+    
+    public static final String INTENT_COOKIES =
+      new String("com.android.webdriver.intent.GET_COOKIES");
 }

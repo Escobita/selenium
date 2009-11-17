@@ -25,15 +25,7 @@ import com.android.webdriver.sessions.Session;
 import com.android.webdriver.sessions.SessionRepository;
 import com.android.webdriver.sessions.Session.Actions;
 import com.android.webdriver.sessions.SessionRepository.SessionChangeType;
-import com.android.webdriver.sessions.intents.AddSessionIntentReceiver;
-import com.android.webdriver.sessions.intents.DeleteSessionIntentReceiver;
-import com.android.webdriver.sessions.intents.DoActionIntentReceiver;
-import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiver;
-import com.android.webdriver.sessions.intents.GetTitleIntentReceiver;
-import com.android.webdriver.sessions.intents.IntentReceiverRegistrar;
-import com.android.webdriver.sessions.intents.Intents;
-import com.android.webdriver.sessions.intents.NavigationIntentReceiver;
-import com.android.webdriver.sessions.intents.SetProxyIntentReceiver;
+import com.android.webdriver.sessions.intents.*;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -117,6 +109,8 @@ public class SessionListActivity extends ListActivity
             Intents.INTENT_SETPROXY);
         mIntentReg.RegisterReceiver(new GetCurrentUrlIntentReceiver(),
             Intents.INTENT_GETURL);
+        mIntentReg.RegisterReceiver(new CookieIntentReceiver(),
+            Intents.INTENT_COOKIES);
 
         Log.i("WebDriver", "Loaded.");
     }
@@ -310,7 +304,7 @@ public class SessionListActivity extends ListActivity
           return null;
         }
 		switch(action) {
-			case GET_DOM:
+			case GET_PAGESOURCE:
               return ((WebViewJSExecutor)getWebViewParam(
 				mWebViews.get(position), "EXECUTOR")).executeJS(session,
 				"window.webdriver.resultMethod"
