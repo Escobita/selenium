@@ -83,24 +83,56 @@ the page.
 
 *NOTE - INCLUDE A GOOD DEFINITION OF AJAX OFF THE INTERNET.*
 
-Verifying Expected Results:  Assert vs. Verify?  Element vs. Actual Content?
-----------------------------------------------------------------------------
+Verifying Results
+-----------------
 
-Assert vs. Verify:  Which to Use?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assert or Verify
+~~~~~~~~~~~~~~~~
+
+When should you use an assert command and when should you use a verify command?  This is up to you.
+The difference is in what you want to happen when the check fails.  Do you want your test to terminate
+or continue and record that the check failed?
+
+Here's the tradeoff. If you use an assert, the test will stop at that point and not run any subsequent checks.  Sometimes, perhaps often, that is what you want.  If the test fails you will immediately know the test did not pass.  Test engines such as TestNG and JUnit have plugins for commonly used development environments (Chap 5) which conveniently flag these tests as failed tests.  The advantage:  you have an immediate visual of whether the checks (those using asserts anyway) passed.
+The disadvantage:  when a check does fail, there are other checks which were never performed, so you have no information on their status.
+
+In contrast, verify commands will not terminate the test.  If your test uses only verify commands you are guaranteed (assuming no unexpected exceptions) the test will run to completion whether the checks find defects in the AUT or not.  The disavantage:  you have to do more work to examine your test results.  That is, you won't get feedback from TestNG or JUnit.  Rather, you will need to look at the results of a console printout or a log output by your test application.  And you will need to take the time to look through this output everytime you run your test.  For Java, Logging Selenium (Chap 5) is a convenient logging utility for recording the results of verify commands, however you still need to open the logs and examine the results.  If you are running hundreds of tests, each with it's own log, this will be time-consuming. 
 
 When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText* 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Locating UI Elements
---------------------
 
-Locating Static Objects       
-~~~~~~~~~~~~~~~~~~~~~~~
+Choosing a Location Strategy
+----------------------------
+
+You know from the Selenese section there are multiple ways of selecting an object on a page.
+But what are the tradeoffs of each of these locator types?  Recall we can locate an object using
+
+- the element id
+- the element name attribute
+- an XPATH statement
+- document object model (DOM)
+
+Generally, using an Id locator is more efficient.  It also makes your test code more readable, assuming
+the Id used by the AUT's page source is a meaningful one.  Using the name attribute also has similar advantages.  Finally, these also give the best performance.  XPATH statements have been known to be slow
+in Internet Explorer due to limations of IE's XPATH processor.
+  
+Sometimes though, you must use an XPATH locator.  If the page source does not have an ID or name attribute you have no choice but to use a XPATH or DOM locator.  It appears at the time of writing that DOM locators are not commonly used now, and XPATH appears to the preferred choice, possibly because XPATH provide a rich set of possibilities for identifying an object--it is quite flexible.
+
+There is an advantage to using XPATH or DOM that locating via ID or name attributes do not have. With
+XPATH and DOM you can locate an object with respect to another object on the page.  For example, if 
+there is a link that must occur within the second paragragh within a <div> section, you can use XPATH or DOM to specify this.  With ID and name locators, you can only specify that they occur on the page--somewhere on the page.  If you must test that an image displaying the company logo appears at 
+the top of the page within a header section XPATH may be the better locator. 
+
+
+Identifying Dynamic Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *This section has not been reviewed or edited.*
 
-Static HTML Objects might look as:
+First, you must understand what a dynamic object is, and to do so, we will contrast that with a static object.  Until now, all the AUT page elements we have been considering have been static objects.  These are objects who's html page source is the same each time the page is loaded in the browser.
+
+The difference between a Static HTML Objects might look as:
            
 .. code-block:: html
 
@@ -114,11 +146,6 @@ have to use the following selenium command.
 .. code-block:: java
 
     selenium.click("adminHomeForm");
-
-Identifying Dynamic Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*This section has not been reviewed or edited.*
 
 These are UI elements who identifying properties change each time you open the page 
 displaying them.  For example, ......
@@ -205,18 +232,6 @@ element link can be achieved as following:
                    
 
 
-
-
-Location Strategy Tradeoffs
----------------------------
-  
-*This section is not yet developed.*
-
-  
-.. Dave: New suggested section. I've been documenting location strategies and 
-   it's possible in RC to add new strategies. Maybe an advanced topic but 
-   something that isn't documented elsewhere to my knowledge.
-
 How can I avoid using complex xpath expressions to my test?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If the elements in HTML (button, table, label, etc) have element IDs, 
@@ -231,8 +246,19 @@ You might consider trying the `UI-Element`_ extension in this situation.
 
 .. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
-Locator Performance Considerations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Locator Performance
+~~~~~~~~~~~~~~~~~~~
+
+Custom Locators
+~~~~~~~~~~~~~~~
+  
+*This section is not yet developed.*
+
+  
+.. Dave: New suggested section. I've been documenting location strategies and 
+   it's possible in RC to add new strategies. Maybe an advanced topic but 
+   something that isn't documented elsewhere to my knowledge.
+
 
 
 Testing Ajax Applications
@@ -280,7 +306,7 @@ test script uses the UI Map for locating elements to be tested.
 .. Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
    also very well integrated with selenium IDE.   
 
-A UI map is a repository for all test script objects.  UI maps have several advantages.
+A UI map is a repository, that is, a storage location, for all test script objects.  UI maps have several advantages.
 
 - Having centralized location for UI objects instead of having them scattered 
   through out the script.  This makes script maintanence easier and more efficient.
