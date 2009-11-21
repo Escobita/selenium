@@ -56,41 +56,34 @@ Selenium命令包含三种“口味”： **动作** ， **访问器** 和 **断
 * **访问器** 检查应用程序的状态并把结果保存在变量中，例如"storeTitle"。
   他们也常用来自动产生断言。
 
+* **断言** 类似访问器，但他们验证应用程序的状态是否符合期望。
+  例子包括“确保页面标题是X”和“验证复选框被勾选了”。
 
-* **Assertions** are like Accessors, but they verify that the state of the 
-  application conforms to what is expected. Examples include "make sure the 
-  page title is X" and "verify that this checkbox is checked". 
+  所有的Selenium断言包含三种模式： "assert"，"verify"和"waitFor"。
+  例如，你可以"assertText"，"verifyText"和"waitForText"。
+  当"assert"失败时，测试就会中止。当"verify"失败时，测试会继续进行，并记录失败。
+  这使得单一的"assert"可以确保应用程序在正确的页面上，
+  紧接着的一串"verify"断言可以检验表单字段值、标签等。
 
-  All Selenium Assertions can be used in 3 modes: "assert", "verify", and "
-  waitFor". For example, you can "assertText", "verifyText" and "waitForText". 
-  When an "assert" fails, the test is aborted. When a "verify" fails, the test 
-  will continue execution, logging the failure. This allows a single "assert" 
-  to ensure that the application is on the correct page, followed by a bunch of 
-  "verify" assertions to test form field values, labels, etc. 
-
-  "waitFor" commands wait for some condition to become true (which can be 
-  useful for testing Ajax applications). They will succeed immediately if the 
-  condition is already true. However, they will fail and halt the test if the 
-  condition does not become true within the current timeout setting (see the 
-  setTimeout action below). 
+  "waitFor"命令等待一些条件成真（可用于测试Ajax应用程序）。如果条件为真，他们会马上继续。
+  然而，如果在当前的超时时间设置内（参考下面的setTimeout动作），条件还不能为真，他们会失败并停止测试。
   
 .. Peter: setTimeout doesn't yet exist in this document. I'll assume it's 
    going in the Commonly Used Selenium Commands section. Is there somewhere
    else this should link to?
 
-Script Syntax 
-~~~~~~~~~~~~~~
-Selenium commands are simple, they consist of the command and two parameters. 
-For example:
+脚本语法 
+~~~~~~~~
+Selenium命令很简单，包括命令和两个参数。
+例如：
 
 ==========  ===========  =====
 verifyText  //div//a[2]  Login 
 ==========  ===========  =====
 
-The parameters are not always required. It depends on the command. In some 
-cases both are required, in others one parameter is required, and still in 
-others the command may take no parameters at all. Here are a couple more 
-examples:
+参数并不总是必须的，而视命令而定。有些情况两个参数都是必须的。
+有些情况一个参数是必须的，另外的情况命令根本不需要参数。
+这里有几个例子：
   
 =================  ===========   =======================
 goBackAndWait 
@@ -99,27 +92,20 @@ type               id=phone      \(555\) 666-7066
 type               id=address1   ${myVariableAddress} 
 =================  ===========   =======================
  
-The command reference describes the parameter requirements for each command. 
+命令的参考描述了每个命令的参数要求。 
   
-Parameters vary, however they are typically 
+参数不相同，但它们有代表性：
   
-* a *locator* for identifying a UI element within a page. 
-* a *text pattern* for verifying or asserting expected page content 
-* a *text pattern* or a selenium variable for entering text in an input field 
-  or for selecting an option from an option list. 
+* *定位器* 确定页面内的UI元素。
+* *文本模式* 用于验证和断言期望的页面内容
+* *文本模式* 或Selenium变量用于在输入字段内输入文字或者列表中选择一个选项。  
 
-Locators, text patterns, 
-selenium variables, and the commands themselves are described in considerable
-detail in the section on Selenium Commands. 
-  
-Selenium scripts that will be run from Selenium-IDE may be stored in an HTML
-text file format. This consists of an HTML table with three columns. The first
-column is used to identify the Selenium command, the second is a target and the
-final column contains a value. The second and third columns may not require
-values depending on the chosen Selenium command, but they should be present.
-Each table row represents a new Selenium command. Here is an example of a test
-that opens a page, asserts the page title and then verifies some content on the
-page:
+定位器、文本模式、selenium变量和命令将在Selenium命令章节有相当详细的描述。
+
+用Selenium-IDE运行的Selenium脚本可能会以HTML文件格式存储。这种格式是一个包含三列的HTML表格。
+第一列由于指定Selenium命令，第二列是目标，最后一列包含数值。第二和第三列可能不是必须的，
+这视所选择的命令而定，但是他们应该存在。每一表行代表一条新Selenium命令。这里有一个测试的例子，
+它打开一个网页，断言页面标题然后验证页面上的内容：
            
 .. code-block:: html
 
@@ -129,7 +115,7 @@ page:
        <tr><td>verifyText</td><td>//h2</td><td>Downloads</td></tr>
    </table>
 
-Rendered as a table in a browser this would look like the following:
+转换成浏览器中的表格如下：
 
 ===========  ====  ==========
 open               /download/
@@ -137,18 +123,15 @@ assertTitle        Downloads
 verifyText   //h2  Downloads
 ===========  ====  ==========
 
-The Selenese HTML syntax can be used to write and run tests without requiring 
-knowledge of a programming language.  With a basic knowledge of selenese and 
-Selenium-IDE you can quickly produce and run testcases.
+用Selenese HTML语法编写和运行测试不需要编程语言的知识。
+运用Selenese和Selenium-IDE的基础知识，你可以快速的创造和运行测试用例。
    
-Test Suites 
-------------
-A test suite is a collection of tests.  Often one will run all the tests in a
-test suite as one continuous batch-job.  
+测试套件
+--------
+测试套件是测试的集合。通常人们会把所有测试放到一个测试套件中，并作为一个连续的批处理作业。
 
-When using Selenium-IDE, test suites also can be defined using a simple HTML 
-file.  The syntax again is simple.  An HTML table defines a list of tests where
-each row defines the filesystem path to each test.  An example tells it all.
+当使用Selenium-IDE，测试套件也被定义成一个简单的HTML文件。语法也是很简单。
+一个HTML表格定义了一个测试列表，每一行定义了每个测试的文件系统路径。例子能说明一切。
 
 .. code-block:: html
 
@@ -166,51 +149,38 @@ each row defines the filesystem path to each test.  An example tells it all.
       </body> 
       </html>  
 
-A file similar to this would allow running the tests all at once, one after
-another, from the Selenium-IDE.
+像这样的文件可以一次运行所有的测试，一个接一个的通过Selenium-IDE执行。
 
-Test suites can also be maintained when using Selenium-RC.  This is done via
-programming and can be done a number of ways.  Commonly Junit is used to
-maintain a test suite if one is using Selenium-RC with Java.  Additionally, if
-C# is the chosen language, Nunit could be employed.  If using an interpreted 
-language like Python with Selenium-RC than some simple programming would be
-involved in setting up a test suite.  Since the whole reason for using Sel-RC
-is to make use of programming logic for your testing this usually isn't a
-problem.
+测试套件还可以用Selenium-RC维护。维护可以通过编程实现也有许多的方法。如果使用Selenium-RC和Java，
+Junit通常用于维护测试套件。此外，如果选择C#语言，会使用Nunit。如果使用解释语言例如Python加Selenium-RC，
+简单的编程将参与建立测试套件。使用Sel-RC的全部原因就是在你的测试中利用编程逻辑，而这通常不是一个问题。
 
-Commonly Used Selenium Commands 
---------------------------------
-To conclude our introduction of Selenium, we'll show you a few typical Selenium
-commands.  These are probably the most commonly used commands for building test.
+常用的Selenium命令
+------------------
+作为Selenium介绍的总结，我们将向你展示一些典型的Selenium命令。这些可能是构建测试最常用的命令。
 
 open
-   opens a page using a URL.
+   通过URL打开网页。
 click/clickAndWait
-   performs a click operation, and optionally waits for a new page to load.
+   执行单击操作，同时等待新页面加载。
 verifyTitle/assertTitle
-   verifies an expected page title.
+   验证期望的网页标题。
 verifyTextPresent
-   verifies expected text is somewhere on the page.
+   验证网页中有期望的文本。
 verifyElementPresent
-   verifies an expected UI element, as defined by it's HTML tag, is present on
-   the page.
+   验证通过HTML标记定义的期望UI元素在页面中存在。
 verifyText
-   verifies expected text and it's corresponding HTML tag are present on the page.
+   验证期望文本，同时它对应的HTML标记在页面中存在。
 verifyTable
-   verifies a table's expected contents.
+   验证表格期望的内容。
 waitForPageToLoad
-   pauses execution until an expected new page loads.  Called automatically when 
-   clickAndWait is used.
+   暂停执行直到期望的新页面加载完成。当clickAndWait使用时会自动调用。
 waitForElementPresent
-   pauses execution until an expected UI element, as defined by its HTML tag,
-   in present on the page. 
+   暂停执行直到通过HTML标记定义的期望UI元素在页面中存在。 
 
-
-Summary 
---------
-Now that you've seen an introduction to Selenium, you're ready to start writing
-your first scripts.  We recommend beginning with the Selenium IDE and its
-context-sensitive, right-click, menu.  This will allow you to get familiar with
-the most common Selenium commands quickly, and you can have a simple script
-done in just a minute or two.  Chapter 3 gets you started and then guides you
-through all the features of the Selenium-IDE.
+总结 
+----
+现在你已经看过了Selenium介绍，就可以开始写你的第一个脚本。
+我们建议以Selenium-IDE和它的上下文敏感的右键菜单开始。
+这将使你很快熟悉最常见的Selenium命令，你可以在一两分钟内写完一个简单的脚本。
+从第3章开始，你会熟悉Selenium-IDE的所有功能。
