@@ -142,10 +142,33 @@ is a convenient logging utility for recording the results of verify commands,
 however you still need to open the logs and examine the results.  If you are
 running hundreds of tests, each with it's own log, this will be time-consuming. 
 
-When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText* 
+When to *verify/assertTextPresent*, *verify/assertElementPresent*, or *verify/assertText* 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+You should now be familiar with these commands, and the mechanics of using them.
+If not, please refer to Chapter 4 first.  When constructing your tests, you
+will need to decide
 
+- Do I only check that the text exists on the page?
+		(*verify/assertTextPresent*)
+- Do I only check that the HTML element exists on the page?  That is, the text, image, or other content is not to be checked, only the HTML tag is what is relevant.
+		(*verify/assertElementPresent)
+- Must I test both, the element and it's text content?
+		(*verify/assertText)
+
+There is no right answer.  It depends on the requirements for your test.  Which, of course, depend on the requirements for the application you're testing.
+If in doubt, and if the requirements are not clear, you can go with your best guess
+and can always change the test later.  Most of these are easily changed in either Sel-IDE or Sel-RC.
+
+Realize that *verify/assertText* is the *most specific test*.  This can fail if either the HTML element (tag) OR the text is not what your test is expecting.
+Sometimes, for instance if HTML changes frequently by your programmers, *verifyTextPresent* makes more sense.  It can check for the content, but will pass
+the test when the programmers change the HTML used to present that text.  Alternatively,  perhaps your web-designers are frequently changing the page and you don't want your test to fail everytime they do this because the changes themeselves are expected periodically.  However, assume you still need to check that
+*something* is on the page, say a paragraph, or heading text, or an image.  In this case you can use *verify/assertElementPresent*.  It will ensure that a particular type of element exists (and if using Xpath can ensure it exists relative to other objects within the page).  But you don't care what the content is, that is, a specific image file, or specific text.  You only care that some type of image exists.
+
+Getting a feel for these types of decisions will come with time and a little experience.  They are easy concepts, and easy to change in your test, but they depend do depend on the requirements of your AUT.  For some projects the requirements are clear and therefore your tests will be clear.  For others, not so much, and you will have to give it your best guess.  The purpose of this subsection 
+is to help you anticipate your needs so you can make these decisions more efficiently.
+		
+		
 Choosing a Location Strategy
 ----------------------------
 
