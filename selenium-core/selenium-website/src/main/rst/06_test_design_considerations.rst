@@ -4,70 +4,97 @@ Test Design Considerations
 
 .. _chapter06-reference:
 
-*NOTE: This chapter is currently being developed.  We have some content here already though.  We decided not to hold back on information just because a chapter was not ready.*
-
+*NOTE: Some sections of this chapter are not yet complete.*
 
 Introducing Test Design
 -----------------------
 
-In this subsection we describe a few types of different tests you can do with Selenium.  This may not
-be new to you, but we provide this as a framework for relating Selenium
-test automation to the decisions a quality assurance professional will make when deciding what tests 
-to perform, the priority for each of those tests, and whether to automate those tests or not.
+In this subsection we describe a few types of different tests you can do with
+Selenium.  This may not be new to you, but we provide this as a framework for
+relating Selenium test automation to the decisions a quality assurance
+professional will make when deciding what tests to perform, the priority for
+each of those tests, and whether to automate those tests or not.
 
 
 What to Test?
 -------------
 
-What elements of your application will you test?  Of course, that depends on aspects of your
-project--end-user expectations, time allowed for the project, priorities set by the project manager
-and so on.  Once the project boundaries are defined though, you the tester will of course 
-make many decisions on what aspects of the application to test.
+What parts of your application should you test?  That depends on aspects of
+your project.:  user expectations, time allowed for the project, priorities
+set by the project manager and so on.  Once the project boundaries are defined
+though, you, the tester, will certainly make many decisions on what to test.
 
-We will define some terms here to help us categorize the types of testing typical for a web-application.
-These terms are by no means standard in the industry, although the concepts we present here are typical
-for web-applications.
+We will define some terms here to help us categorize the types of testing typical
+for a web-application.  These terms are by no means standard, although the concepts
+we present here are typical for web-application testing.  We've created a few
+terms here of our own for the purposes of categorizing the types of test you may
+perform on your web application.
 
    
-Content Tests
-~~~~~~~~~~~~~
-The simplest type of test for a web-application is to simply test for the existence
-of an static, non-changing, element on a particular page.  For instance
+Testing for Expected Content
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The simplest type of test, a *content test*, is a simple test for the existence
+of a static, non-changing, UI element.  For instance
 
-- Does each page have it's expected page title?  This can be used to verify your test found an expected page after following a link.
-- Does the application's home page contain an image expected to be at the top of the page?  
-- Does each page of the website contain a footer area with links to the company contact page,
+- Does each page have it's expected page title?  This can be used to verify your
+test found an expected page after following a link.
+- Does the application's home page contain an image expected to be at the top of
+the page?  
+- Does each page of the website contain a footer area with links to the company
+contact page,
 - privacy policy, and trademarks information?  
-- Does each page begin with heading text using the <h1> tag?  And, does each page have the correct text within that header?
+- Does each page begin with heading text using the <h1> tag?  And, does each page
+have the correct text within that header?
 
-You may or may not need content tests.  If your page content is not likely to be affected then it may be more efficient to test page content manually.  If, however, your application will be undergoing platform changes, or files will likely be moved to different locations, content tests may prove valuable.
+You may or may not need content tests.  If your page content is not likely to be
+affected then it may be more efficient to test page content manually.  If, however,
+your application will be undergoing platform changes, or files will likely be
+moved to different locations, content tests may prove valuable.
 
-Link Tests
-~~~~~~~~~~
-A frequent source of errors for web-sites is broken links and missing pages behind those broken links.  Testing for these involves clicking each link and veryfying the expected page behind that link loads correctly.
+Testing Links
+~~~~~~~~~~~~~
+A frequent source of errors for web-sites is broken links and missing pages
+behind those broken links.  Testing for these involves clicking each link
+and veryfying the expected page behind that link loads correctly.
 
-*Need to include a description of how to design this test and a simple example.  Should that go in this section or in a separate section?*  
+*Need to include a description of how to design this test and a simple example.
+Should that go in this section or in a separate section?*  
 
 
 Function Tests
 ~~~~~~~~~~~~~~
-These would be tests of a specific function within your application, requiring some type of user input, and returning some type of results.  Often a function test will involve multiple pages with a form-based input page containing a collection of input fields, Submit and Cancel operations, and one or more response pages.  User input can be via text-input fields, checkboxes, drop-down lists, or anyother other browser-supported input.
+These would be tests of a specific function within your application, requiring
+some type of user input, and returning some type of results.  Often a function
+test will involve multiple pages with a form-based input page containing a
+collection of input fields, Submit and Cancel operations, and one or more
+response pages.  User input can be via text-input fields, checkboxes, drop-down
+lists, or anyother other browser-supported input.
 
 
-Dynamic Content
-~~~~~~~~~~~~~~~
-Dynamic content is a set of page elements whose identifiers, that is, characteristics used to locate the element, vary with each different instance of the page that contains them.  This is usually on a result page of some given function.  
+Testing Dynamic Elements
+~~~~~~~~~~~~~~~~~~~~~~~~
+Dynamic content is a set of page elements whose identifiers, that is,
+characteristics used to locate the element, vary with each different instance
+of the page that contains them.  This is usually on a result page of some
+given function.  
 
-An example would be a result set of data returned to the user.  Suppose each data result, in, say for example a list of documents, had a unique identifier for each specific document.  So, for a particular search, the search results page returns a data set with one set of documents and their correponding identifiers.  Then, in a different search, the search results page returns a different data set where each document in the result set uses different identifiers.
+An example would be a result set of data returned to the user.  Suppose each
+data result, in, say for example a list of documents, had a unique identifier
+for each specific document.  So, for a particular search, the search results
+page returns a data set with one set of documents and their correponding
+identifiers.  Then, in a different search, the search results page returns
+a different data set where each document in the result set uses different
+identifiers.
 
-An example will help.  Dynamic content involves UI elements who identifying properties change each time you open the page 
-displaying them.  For example, ......
+An example will help.  Dynamic content involves UI elements who identifying
+properties change each time you open the page displaying them.  For example,
 
 Dynamic HTML of an object might look as:
            
 .. code-block:: html
 
-    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
+    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:
+	checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
 This is HTML snippet for a check box. Its id and name 
 (addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
@@ -77,26 +104,43 @@ This is HTML snippet for a check box. Its id and name
 Ajax Tests
 ~~~~~~~~~~ 
 
-Ajax is a technology which supports dynamic real-time UI elements such as animation and RSS feeds.
-In AJAX-driven web applications, data is retrieved from the application server with out refreshing 
-the page. 
+Ajax is a technology which supports dynamic real-time UI elements such as
+animation and RSS feeds.  In AJAX-driven web applications, data is
+retrieved from the application server with out refreshing the page. 
 
 *NOTE - INCLUDE A GOOD DEFINITION OF AJAX OFF THE INTERNET.*
 
 Verifying Results
 -----------------
 
-Assert or Verify
-~~~~~~~~~~~~~~~~
+Assert vs. Verify
+~~~~~~~~~~~~~~~~~
 
-When should you use an assert command and when should you use a verify command?  This is up to you.
-The difference is in what you want to happen when the check fails.  Do you want your test to terminate
-or continue and record that the check failed?
+When should you use an assert command and when should you use a verify command?
+This is up to you.  The difference is in what you want to happen when the check
+fails.  Do you want your test to terminate or continue and record that the check
+failed?
 
-Here's the tradeoff. If you use an assert, the test will stop at that point and not run any subsequent checks.  Sometimes, perhaps often, that is what you want.  If the test fails you will immediately know the test did not pass.  Test engines such as TestNG and JUnit have plugins for commonly used development environments (Chap 5) which conveniently flag these tests as failed tests.  The advantage:  you have an immediate visual of whether the checks (those using asserts anyway) passed.
-The disadvantage:  when a check does fail, there are other checks which were never performed, so you have no information on their status.
+Here's the tradeoff. If you use an assert, the test will stop at that point and
+not run any subsequent checks.  Sometimes, perhaps often, that is what you want.
+If the test fails you will immediately know the test did not pass.  Test engines
+such as TestNG and JUnit have plugins for commonly used development environments
+(Chap 5) which conveniently flag these tests as failed tests.  The advantage:
+you have an immediate visual of whether the checks (those using asserts anyway)
+passed.  The disadvantage:  when a check does fail, there are other checks
+which were never performed, so you have no information on their status.
 
-In contrast, verify commands will not terminate the test.  If your test uses only verify commands you are guaranteed (assuming no unexpected exceptions) the test will run to completion whether the checks find defects in the AUT or not.  The disavantage:  you have to do more work to examine your test results.  That is, you won't get feedback from TestNG or JUnit.  Rather, you will need to look at the results of a console printout or a log output by your test application.  And you will need to take the time to look through this output everytime you run your test.  For Java, Logging Selenium (Chap 5) is a convenient logging utility for recording the results of verify commands, however you still need to open the logs and examine the results.  If you are running hundreds of tests, each with it's own log, this will be time-consuming. 
+In contrast, verify commands will not terminate the test.  If your test uses
+only verify commands you are guaranteed (assuming no unexpected exceptions)
+the test will run to completion whether the checks find defects in the AUT
+or not.  The disavantage:  you have to do more work to examine your test
+results.  That is, you won't get feedback from TestNG or JUnit.  Rather,
+you will need to look at the results of a console printout or a log output
+by your test application.  And you will need to take the time to look through
+this output everytime you run your test.  For Java, Logging Selenium (Chap 5)
+is a convenient logging utility for recording the results of verify commands,
+however you still need to open the logs and examine the results.  If you are
+running hundreds of tests, each with it's own log, this will be time-consuming. 
 
 When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText* 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,68 +149,123 @@ When to *verifyTextPresent*, *verifyElementPresent*, or *verifyText*
 Choosing a Location Strategy
 ----------------------------
 
-You know from the Selenese section there are multiple ways of selecting an object on a page.
-But what are the tradeoffs of each of these locator types?  Recall we can locate an object using
+You know from the Selenese section there are multiple ways of selecting an object
+on a page.  But what are the tradeoffs of each of these locator types?  Recall
+we can locate an object using
 
 - the element id
 - the element name attribute
-- an XPATH statement
+- an Xpath statement
 - document object model (DOM)
 
-Generally, using an Id locator is more efficient.  It also makes your test code more readable, assuming
-the Id used by the AUT's page source is a meaningful one.  Using the name attribute also has similar advantages.  Finally, these also give the best performance.  XPATH statements have been known to be slow
-in Internet Explorer due to limations of IE's XPATH processor.
+Generally, using an Id locator is more efficient.  It also makes your test code
+more readable, assuming the Id used by the AUT's page source is a meaningful
+one.  Using the name attribute also has similar advantages.  Finally, these
+also give the best performance.  Xpath statements have been known to be slow
+in Internet Explorer due to limations of IE's Xpath processor.
   
-Sometimes though, you must use an XPATH locator.  If the page source does not have an ID or name attribute you have no choice but to use a XPATH or DOM locator.  It appears at the time of writing that DOM locators are not commonly used now, and XPATH appears to the preferred choice, possibly because XPATH provide a rich set of possibilities for identifying an object--it is quite flexible.
+Sometimes though, you must use an Xpath locator.  If the page source does not
+have an ID or name attribute you have no choice but to use a Xpath or DOM locator.
+It appears at the time of writing that DOM locators are not commonly used now,
+and Xpath appears to the preferred choice, possibly because Xpath provide a
+rich set of possibilities for identifying an object--it is quite flexible.
 
-There is an advantage to using XPATH or DOM that locating via ID or name attributes do not have. With
-XPATH and DOM you can locate an object with respect to another object on the page.  For example, if 
-there is a link that must occur within the second paragragh within a <div> section, you can use XPATH or DOM to specify this.  With ID and name locators, you can only specify that they occur on the page--somewhere on the page.  If you must test that an image displaying the company logo appears at 
-the top of the page within a header section XPATH may be the better locator. 
+There is an advantage to using Xpath or DOM that locating via ID or name
+attributes do not have. With Xpath and DOM you can locate an object with
+respect to another object on the page.  For example, if there is a link
+that must occur within the second paragragh within a <div> section,
+you can use Xpath or DOM to specify this.  With ID and name locators,
+you can only specify that they occur on the page--somewhere on the page.
+If you must test that an image displaying the company logo appears at 
+the top of the page within a header section Xpath may be the better locator. 
 
 
-Identifying Dynamic Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Locating Dynamic Objects
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-*This section has not been reviewed or edited.*
+First, you must understand what a dynamic object is, and to do so, we will
+contrast that with a static object.  Until now, all the AUT page elements
+we have been considering have been static objects.  These are objects who's
+html page source is the same each time the page is loaded in the browser.
 
-First, you must understand what a dynamic object is, and to do so, we will contrast that with a static object.  Until now, all the AUT page elements we have been considering have been static objects.  These are objects who's html page source is the same each time the page is loaded in the browser.
-
-The difference between a Static HTML Objects might look as:
+For example,
            
 .. code-block:: html
 
-    <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm','adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
+    <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm',
+	'adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
 
-This is HTML snippet for a button and its id is "adminHomeForm". This id remains
-constant within all instances of this page. That is, when this page is displayed, 
-this UI element will always have this identifier.  So, for your test script to click this button you just
-have to use the following selenium command.
+This is HTML anchor tag defining a button with and Id attribute of "adminHomeForm".
+It's a fairly complex anchor tag when compared to most HTML tags, but it is still
+a static tag.  The HTML will be the same each time this page is loaded in the
+browser.  Its Id remains constant within all instances of this page. That is,
+when this page is displayed, this UI element will always have this identifier.
+So, for your test script to click this button you simply need to use the following
+selenium command.
 
+.. code-block:: java
+
+    click	adminHomeForm
+
+Or, in Selenium-RC 
+	
 .. code-block:: java
 
     selenium.click("adminHomeForm");
 
-These are UI elements who identifying properties change each time you open the page 
-displaying them.  For example, ......
-
-Dynamic HTML of an object might look as:
+Your application, however, may generate HTML with Ids that are generated
+dynamically and therefore the Id itself varies upon different instances
+of the webpage under test.  For instance, HTML for a dynamic page element
+might look like this.
            
 .. code-block:: html
 
-    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
+    <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox"
+	name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
-This is HTML snippet for a check box. Its id and name 
-(addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
-(they will change the next time you open the application). In this case
-normal object identification would look like:
+This defines a checkbox. Its Id and name  attributes 
+(both addForm:_id74:_id75:0:_id79:0:checkBox) are dynamically generated values.
+In this case, using a standard locator would look something like the following.
 
+.. code-block:: java
+
+    click 	addForm:_id74:_id75:0:_id79:0:checkBox
+
+Or, again in Selelenium-RC
+	
 .. code-block:: java
 
     selenium.click("addForm:_id74:_id75:0:_id79:0:checkBox);
 
-Given the dynamic nature of id this approach would not work. The best way is 
-to capture this id dynamically from the website itself. It can be done as:
+Given the dynamically generated identifier, this approach would not work. 
+the next time this page is loaded the identifier will be a different value
+from the one used in the Selenium command and therefore, will not be found.
+The click operation will fail with an "element not found" error.
+
+To begin, a simple solution would be to just use an XPath locator rather than 
+trying to use an Id locator.  So, for the checkbox you can simply use
+
+.. code-block:: java
+
+    click 	//input
+
+Or, if it is not the first input element on the page (which it likely is not)
+try a more detailed Xpath statement.
+
+.. code-block:: java
+
+    click 	//input[3]
+
+Or
+
+.. code-block:: java
+
+    click 	//div/p[2]/input[3]
+	
+If however, you do need to use the Id to locate the element, a programmed solution
+is required.  Another solution is 
+to capture this Id from the website itself, before you need to use it in a Selenium
+command. It can be done like this.
 
 .. code-block:: java
 
@@ -179,18 +278,13 @@ to capture this id dynamically from the website itself. It can be done as:
                    }
            }
 
-.. Santi: I'm not sure if this is a good example... We can just do this by
-   using a simple CSS or XPATH locator.
-   
-.. Tarun: Please elaborate more on css locators.   
-
 This approach will work only if there is one field whose id has got the text 
 'addForm' appended to it.
 
 Consider one more example of a Dynamic object. A page with two links having the
 same name (one which appears on page) and same html name. Now if href is used 
-to click the link, it would always be clicking on first element. Click on second
-element link can be achieved as following:
+to click the link, it would always be clicking on first element. Clicking on
+the second link can be achieved as follows.
 
 .. code-block:: java
 
@@ -210,12 +304,14 @@ element link can be achieved as following:
         if(!GenericValidator.isBlankOrNull(linkID))  {
 
             // Find the inner HTML of link.
-            String editTermSectionInfo = selenium.getEval("window.document.getElementById('"+linkID+"').innerHTML");
+            String editTermSectionInfo = selenium.getEval
+			("window.document.getElementById('"+linkID+"').innerHTML");
 
             // If retrieved link is expected link.
             if(editTermSectionInfo.equalsIgnoreCase("expectedlink")) {
 
-                // If it is second appearance of link then save the link id and break the loop.
+                // If it is second appearance of link then save the link id
+				and break the loop.
                 if(isSecondInstanceLink) {
                     editInfo = linkID;
                     break;
@@ -238,16 +334,17 @@ If the elements in HTML (button, table, label, etc) have element IDs,
 then one can reliably retrieve all elements without ever resorting
 to xpath. These element IDs should be explicitly created by the application.
 But non-descriptive element ID (i.e. id_147) tends to cause two problems: 
-first, each time the application is deployed, different element ids could be generated. 
-Second, a non-specific element id makes it hard for automation testers to keep 
-track of and determine which element ids are required for testing.
+first, each time the application is deployed, different element ids could be
+generated. Second, a non-specific element id makes it hard for automation
+testers to keep track of and determine which element ids are required for testing.
 
 You might consider trying the `UI-Element`_ extension in this situation.
 
-.. _`UI-Element`: http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
+.. _`UI-Element`: http://wiki.openqa.org/display/SIDE/
+Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
-Locator Performance
-~~~~~~~~~~~~~~~~~~~
+Performance Considerations for Locators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Custom Locators
 ~~~~~~~~~~~~~~~
@@ -267,17 +364,17 @@ Testing Ajax Applications
 
 Waiting for an AJAX Element
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX-driven web applications, using Selenium's *waitForPageToLoad* wouldn't work as 
-the page is not actually 
-loaded to refresh the AJAX element. Pausing the test execution for a specified period of time is also not a good 
-approach as web element might appear later or earlier than expected leading
-to invalid test failures (reported failures that aren't actually failures). 
-A better approach would be to wait for a predefined 
-period and then continue execution as soon as the element is found.
+In AJAX-driven web applications, using Selenium's *waitForPageToLoad* wouldn't
+work as the page is not actually loaded to refresh the AJAX element. Pausing
+the test execution for a specified period of time is also not a good approach
+as web element might appear later or earlier than expected leading to invalid
+test failures (reported failures that aren't actually failures). 
+A better approach would be to wait for a predefined period and then continue
+execution as soon as the element is found.
 
-For instance, consider a page which brings a link (link=ajaxLink) on click of a button 
-on page (without refreshing the page)
-This could be handled by Selenium using a *for* loop. 
+For instance, consider a page which brings a link (link=ajaxLink) on click
+of a button on page (without refreshing the page)  This could be handled
+by Selenium using a *for* loop. 
 
 .. code-block:: bash
    
@@ -306,7 +403,8 @@ test script uses the UI Map for locating elements to be tested.
 .. Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
    also very well integrated with selenium IDE.   
 
-A UI map is a repository, that is, a storage location, for all test script objects.  UI maps have several advantages.
+A UI map is a repository, that is, a storage location, for all test script
+objects.  UI maps have several advantages.
 
 - Having centralized location for UI objects instead of having them scattered 
   through out the script.  This makes script maintanence easier and more efficient.
@@ -423,26 +521,6 @@ Bitmap Comparison
 .. Santi: Isn't the "Advanced Selenium" chapter better for this topic to be 
    placed on?
 
-
-
-
-Solving Common Web-App Problems 
--------------------------------
-*This section has not been developed yet.*
-
-* Handling Login/Logout State 
-* Processing a Result Set 
-
-
-
-Organizing Your Test Scripts 
-----------------------------
-*This section has not been developed yet.*
-
-
-Organizing Your Test Suites 
-----------------------------
-*This section has not been developed yet.*
 
 Data Driven Testing
 ~~~~~~~~~~~~~~~~~~~
