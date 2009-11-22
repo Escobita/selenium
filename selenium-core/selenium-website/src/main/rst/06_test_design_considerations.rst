@@ -31,20 +31,18 @@ terms here of our own for the purposes of categorizing the types of test you may
 perform on your web application.
 
    
+
 Testing for Expected Content
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The simplest type of test, a *content test*, is a simple test for the existence
 of a static, non-changing, UI element.  For instance
 
-- Does each page have it's expected page title?  This can be used to verify your
-test found an expected page after following a link.
-- Does the application's home page contain an image expected to be at the top of
-the page?  
-- Does each page of the website contain a footer area with links to the company
-contact page,
-- privacy policy, and trademarks information?  
-- Does each page begin with heading text using the <h1> tag?  And, does each page
-have the correct text within that header?
+- Does each page have it's expected page title?  This can be used to verify your test found an expected page after following a link.
+- Does the application's home page contain an image expected to be at the top of the page?  
+- Does each page of the website contain a footer area with links to the company contact page privacy policy, and trademarks information?  
+- Does each page begin with heading text using the <h1> tag?  And, does each page have the correct text within that header?
+
+
 
 You may or may not need content tests.  If your page content is not likely to be
 affected then it may be more efficient to test page content manually.  If, however,
@@ -142,19 +140,16 @@ is a convenient logging utility for recording the results of verify commands,
 however you still need to open the logs and examine the results.  If you are
 running hundreds of tests, each with it's own log, this will be time-consuming. 
 
-When to *verify/assertTextPresent*, *verify/assertElementPresent*, or *verify/assertText* 
+Tradeoofs: *assertTextPresent*, *assertElementPresent*, *assertText* 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You should now be familiar with these commands, and the mechanics of using them.
 If not, please refer to Chapter 4 first.  When constructing your tests, you
 will need to decide
 
-- Do I only check that the text exists on the page?
-		(*verify/assertTextPresent*)
-- Do I only check that the HTML element exists on the page?  That is, the text, image, or other content is not to be checked, only the HTML tag is what is relevant.
-		(*verify/assertElementPresent)
-- Must I test both, the element and it's text content?
-		(*verify/assertText)
+- Do I only check that the text exists on the page?  (*verify/assertTextPresent*)
+- Do I only check that the HTML element exists on the page?  That is, the text, image, or other content is not to be checked, only the HTML tag is what is relevant. (*verify/assertElementPresent*)
+- Must I test both, the element and it's text content?  (*verify/assertText*)
 
 There is no right answer.  It depends on the requirements for your test.  Which, of course, depend on the requirements for the application you're testing.
 If in doubt, and if the requirements are not clear, you can go with your best guess
@@ -363,8 +358,9 @@ testers to keep track of and determine which element ids are required for testin
 
 You might consider trying the `UI-Element`_ extension in this situation.
 
-.. _`UI-Element`: http://wiki.openqa.org/display/SIDE/
-Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
+.. _`UI-Element`:
+
+	http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
 Performance Considerations for Locators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
