@@ -91,16 +91,16 @@ public class Session {
       throw new WebDriverException("Desired operating system does not match current OS");
     }
 
+    if (platform != null && platform.is(Platform.ANDROID)) {
+      return (WebDriver) Class.forName("org.openqa.selenium.android.AndroidDriver")
+        .newInstance();
+    }
+    
     String browser = capabilities.getBrowserName();
     if (browser != null) {
       return createNewInstanceOf(browser);
     }
 
-    if (platform.is(Platform.ANDROID)) {
-      return (WebDriver) Class.forName("org.openqa.selenium.android.AndroidDriver")
-        .newInstance();
-    }
-    
     if (capabilities.isJavascriptEnabled()) {
       return (WebDriver) Class.forName("org.openqa.selenium.firefox.FirefoxDriver")
           .newInstance();

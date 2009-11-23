@@ -12,7 +12,7 @@
 
   <servlet-mapping>
     <servlet-name>WebDriver-WEBAPP</servlet-name>
-    <url-pattern>/hub/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
 </web-app>
