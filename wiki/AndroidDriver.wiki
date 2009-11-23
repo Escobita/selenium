@@ -24,14 +24,14 @@ Build the code (everything but android)
 
 Build android
 
-{{{$ mvn package -Dmaven.test.skip=true -Dandroid.home=/home/berrada/android_sdk/android-sdk-linux/ -Dandroid-platform=platforms/android-1.5 -P android,windows}}}
+{{{$ mvn package -Dmaven.test.skip=true -Dandroid.home=/path/to/android_sdk/ -Dandroid-platform=platforms/android-1.5 -P android}}}
 
 
 == Installing the war package in ijetty ==
   * Start ijetty once you've launched it on the phone / emulator.
   * Make the {{{war}}} file available via a webserver, as ijetty needs to download the war file using http. Note: the war file  is located at {{{remote/server-android/target/}}} in the webdriver project.
-  * Install the android.war  by downloading it through ijetty and set a relative path, say {{{/wb}}}.
-  * Stop and Start ijetty so it loads the new path and war file. Note: you can use the web-based UI for ijetty on the device / emulator by visiting http://10.0.2.15/ 
+  * Install the android.war by downloading it through I-Jetty and set context path to {{{/hub}}}.
+  * Stop and Start I-Jetty so it loads the new path and war file. Note: you can use the web-based UI for I-Jetty on the device / emulator by visiting http://10.0.2.15/ 
 
 == Installing the Android Driver ==
   * Install {{{androidwebdriver.apk}}} and download it on the android device or emulator. You can use the standard eclipse Android tools or the {{{adb}}} command from a command-line / terminal window.
@@ -46,7 +46,7 @@ $ telnet localhost 5554
   exit
 }}}
 
-If you're running the WebDriver tests on the same machine as the emulator then the URL for Android weebdriver is {{{http://localhost:8080/wb/hub}}}
+If you're running the WebDriver tests on the same machine as the emulator then the URL for Android weebdriver is {{{http://localhost:8080/hub}}}
 
 = Example webdriver test using the remove Android Server =
 Create a new eclipse project, e.g. called {{{webdriver-all}}}
