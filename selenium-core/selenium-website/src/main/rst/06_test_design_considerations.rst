@@ -380,18 +380,21 @@ Custom Locators
 Testing Ajax Applications
 -------------------------
 
+We introduced the special characteristics of AJAX technology earlier in this
+chapter.  Basically, a page element implemented with Ajax is an element that
+can be dynamically refreshed without having to refresh the entire page.
 
 Waiting for an AJAX Element
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In AJAX-driven web applications, using Selenium's *waitForPageToLoad* wouldn't
-work as the page is not actually loaded to refresh the AJAX element. Pausing
-the test execution for a specified period of time is also not a good approach
-as web element might appear later or earlier than expected leading to invalid
+For an AJAX elementm using Selenium's *waitForPageToLoad* wouldn't
+work since the page is not actually loaded to refresh the AJAX element. Pausing
+the test execution for a specified period of time is also not good
+because the web element might appear later than expected leading to invalid
 test failures (reported failures that aren't actually failures). 
-A better approach would be to wait for a predefined period and then continue
+A better approach is to wait for a predefined period and then continue
 execution as soon as the element is found.
 
-For instance, consider a page which brings a link (link=ajaxLink) on click
+Consider a page which brings a link (link=ajaxLink) on click
 of a button on page (without refreshing the page)  This could be handled
 by Selenium using a *for* loop. 
 
@@ -411,7 +414,9 @@ by Selenium using a *for* loop.
 	
    } 
 
-   
+This certainly isn't the only solution.  AJAX is a common topic in the forums and we
+suggest searching the forum posts to see what others have done along with the questions
+they have posted.  
    
 UI Mapping
 ----------
