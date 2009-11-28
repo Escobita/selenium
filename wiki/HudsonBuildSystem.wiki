@@ -1,0 +1,71 @@
+#summary An overview of the automated CI system for Selenium/OpenQA
+
+= Introduction =
+
+We have a very nice, dedicated 8 core XServe for our build system with Hudson installed. It is available at:
+
+http://xserve.openqa.org:8080/
+
+Several VMs are also on this machine, allowing for cross-browser and cross-operating system testing. Currently, we have the following build agents/VMs set up:
+
+ * OS X 10.5 Server (headless on the host server)
+ * OS X 10.5 Server (as a VM, *not* headless)
+ * Windows Vista
+ * Windows XP
+ * Ubuntu
+
+We are working on adding Windows 7 soon.
+
+= SSH Settings =
+
+If you wish to configure the VMs or work on Hudson itself, you'll need direct SSH access to the host server. Ask PatrickLightbody for an account, which you can use to SSH in to xserve.openqa.org. We recommend the following entry in your .ssh/config, as it'll make connecting to the VMs much easier:
+
+{{{
+Host qax
+	Hostname xserve.openqa.org
+	# xp-vm-1 Remote Desktop
+	LocalForward 3399 192.168.25.128:3389
+	# osx-vm-1 SSH (port 1122) and VNC (display port 10)
+	LocalForward 1122 192.168.25.129:22
+	LocalForward 5910 192.168.25.129:5900
+	# ubuntu-vm-1 SSH (port 1123) and VNC (display port 11)
+	LocalForward 1123 192.168.25.131:22
+	LocalForward 5911 192.168.25.131:5900
+	# vista-vm-1 Remote Desktop (port 3400)
+	LocalForward 3400 192.168.25.130:3389
+}}}
+
+= Host Details =
+
+Hudson is running on the host server as the user *builduser*. Once SSH'd in to your personal account (using the above SSH config, ideally), you can switch over to this account with the following command:
+
+{{{
+sudo su - builduser
+}}}
+
+In there, you'll find two java processes. One is the local build agent (osx-local-headless) and one is the actual Hudson web server. If you wish to restart Hudson, you should kill the processes first and then start Hudson back up:
+
+{{{
+./hudson.sh
+}}}
+
+In addition to the builduser user, there is another important user to be aware of: *admin*. This user's password is stored locally on the server at /var/root/ADMIN_PASSWORD and can be read by switching to root from your user account (ie: sudo su - ) and then reading that file.
+
+Armed with that password, if you need to interact with the actual OS X desktop, you can do so by VNC'ing in to xserve.openqa.org with the username *admin* and that password.
+
+= VM Details = 
+
+More often, you'll want to log directly in to the VMs to perform maintenance on them. Using the SSH configuration supplied above, you connect to the VMs like so:
+
+ * Windows XP VM
+ ** Remote Desktop to localhost:3399 with the username Administrator and the standard OpenQA password.
+ * Windows Vista
+ ** Remote Desktop to localhost:3400 with the username Administrator and the standard OpenQA password.
+ * OS X 10.5 Server
+ ** VNC to 5910 (display port 10) with the standard OpenQA password.
+ ** SSH to localhost port 1122 with the username openqa and the standard OpenQA password.
+ * Ubuntu
+ ** VNC to 5911 (display port 11) with the standard OpenQA password.
+ ** SSH to localhost port 1123 with the username openqa and the standard OpenQA password.
+
+Note: the "standard OpenQA password" can be obtained by talking to PatrickLightbody or any other developer who already has access.
