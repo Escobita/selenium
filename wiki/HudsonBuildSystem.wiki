@@ -58,9 +58,9 @@ Armed with that password, if you need to interact with the actual OS X desktop, 
 More often, you'll want to log directly in to the VMs to perform maintenance on them. Using the SSH configuration supplied above, you connect to the VMs like so:
 
  * Windows XP VM
-   * Remote Desktop to localhost:3399 with the username Administrator and the standard OpenQA password.
+   * Remote Desktop to localhost:3399 with the username *Administrator* and the standard OpenQA password.
  * Windows Vista
-   * Remote Desktop to localhost:3400 with the username Administrator and the standard OpenQA password.
+   * Remote Desktop to localhost:3400 with the username *openqa* and the standard OpenQA password.
  * OS X 10.5 Server
    * VNC to 5910 (display port 10) with the standard OpenQA password.
    * SSH to localhost port 1122 with the username openqa and the standard OpenQA password.
