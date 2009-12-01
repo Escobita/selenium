@@ -1,8 +1,8 @@
-.. _Getting Started:
+.. _GettingStarted:
 
 The 5 Minute Getting Started Guide
 ==================================
-
+ 
 .. _chapter09-reference:
 
 WebDriver is a tool for automating testing web applications, and in particular 
@@ -26,7 +26,7 @@ additional processes or run any installers before using it.
 
 You're now ready to write some code. An easy way to get started is this 
 example, which searches for the term "Cheese" on Google and then outputs the 
-result page's title to the console. You'll start by using the `HtmlUnitDriver`_. 
+result page's title to the console. You'll start by using the :ref:`HtmlUnitDriver`. 
 This is a pure Java driver that runs entirely in-memory. Because of this, you 
 won't see a new browser window open. 
 
@@ -68,11 +68,9 @@ results as output on the console. Congratulations, you've managed to get
 started with WebDriver!
 
 In this next example, you shall use a page that requires Javascript to work 
-properly, such as Google Suggest. You will also be using the `FirefoxDriver`_. 
-Make sure that Firefox is installed on your machine and is in the normal 
-location for your OS.
-
-.. TODO: add default locations as a note (or footnote)
+properly, such as Google Suggest. You will also be using the :ref:`FirefoxDriver`. 
+Make sure that :ref:`Firefox is installed on your machine and is in the normal 
+location for your OS <FirefoxDefaultLocations>`.
 
 Once that's done, create a new class called GoogleSuggest, which looks like:
 
@@ -124,36 +122,36 @@ Once that's done, create a new class called GoogleSuggest, which looks like:
 When you run this program, you'll see the list of suggestions being printed 
 to the console. That's all there is to using WebDriver! 
 
-Hopefully, this will have whet your appetite for more. In the following 
-`Next Steps`_ section you will learn more about how to use WebDriver for things 
+Hopefully, this will have whet your appetite for more. In the :ref:`NextSteps` 
+section you will learn more about how to use WebDriver for things 
 such as navigating forward and backward in your browser's history, and how to 
 use frames and windows. It also provides a more complete discussion of the 
-examples than has been done as you've been `Getting Started`_. If you're ready, 
-let's take the `Next Steps`_!
+examples than  :ref:`GettingStarted`. If you're ready, let's take the 
+:ref:`NextSteps`!
 
-.. _Next Steps:
+.. _NextSteps:
 
 Next Steps For Using WebDriver
 ==============================
 
 Which Implementation of WebDriver Should I Use?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 WebDriver is the name of the key interface against which tests should be 
 written, but there are several implementations. These are:
 
-==========================  ========================  =============================================
-*Name of driver*            *Available on which OS?*  *Class to instantiate*
-==========================  ========================  =============================================
-`HtmlUnitDriver`_            All                       org.openqa.selenium.htmlunit.HtmlUnitDriver
-`FirefoxDriver`_             All                       org.openqa.selenium.firefox.FirefoxDriver
-`InternetExplorerDriver`_    Windows                   org.openqa.selenium.ie.InternetExplorerDriver
-`ChromeDriver`_              All                       org.openqa.selenium.chrome.ChromeDriver
-==========================  ========================  =============================================
+=============================  ========================  =============================================
+Name of driver                 Available on which OS?    Class to instantiate
+=============================  ========================  =============================================
+:ref:`HtmlUnitDriver`          All                       org.openqa.selenium.htmlunit.HtmlUnitDriver
+:ref:`FirefoxDriver`           All                       org.openqa.selenium.firefox.FirefoxDriver
+:ref:`InternetExplorerDriver`  Windows                   org.openqa.selenium.ie.InternetExplorerDriver
+:ref:`ChromeDriver`            All                       org.openqa.selenium.chrome.ChromeDriver
+=============================  ========================  =============================================
 
 You can find out more information about each of these by following the links in 
 the table. Which you use depends on what you want to do. For sheer speed, the 
-`HtmlUnitDriver`_ is great, but it's not graphical, which means that you can't 
+:ref:`HtmlUnitDriver` is great, but it's not graphical, which means that you can't 
 watch what's happening. As a developer, you may be comfortable with this, but 
 sometimes it's good to be able to test using a real browser, especially when 
 you're showing a demo of your application (or running the tests) for an 
@@ -166,21 +164,21 @@ depend on their familiarity with the application under test, WebDriver and your
 testing framework.
 
 To support higher "perceived safety", you may wish to chose a driver such as 
-the `FirefoxDriver`_. This has the added advantage that this driver actually 
+the :ref:`FirefoxDriver`. This has the added advantage that this driver actually 
 renders content to a screen, and so can be used to detect information such 
 as the position of an element on a page, or the CSS properties that apply to 
 it. However, this additional flexibility comes at the cost of slower overall 
 speed. By writing your tests against the WebDriver interface, it is possible to 
 pick the most appropriate driver for a given test.
 
-To keep things simple, let's start with the `HtmlUnitDriver`_:
+To keep things simple, let's start with the :ref:`HtmlUnitDriver`:
 
 .. code-block:: java
     
     WebDriver driver = new HtmlUnitDriver();
 
 Navigating
-~~~~~~~~~~
+----------
 
 The first thing you'll want to do with WebDriver is navigate to a page. The 
 normal way to do this is by calling "get":
@@ -198,7 +196,7 @@ fully loaded then you can use "waits".
 .. TODO: link to a section on explicit waits in WebDriver
 
 Interacting With the Page
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 Just being able to go to places isn't terribly useful. What we'd really like 
 to do is to interact with the pages, or, more specifically, the HTML elements 
@@ -219,7 +217,7 @@ we could find it using any of:
     element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
 
 You can also look for an link by its text, but be careful! The text must be an 
-exact match! You should also be careful when using `XpathInWebDriver`_. If 
+exact match! You should also be careful when using :ref:`XpathInWebDriver`. If 
 there's more than one element that matches the query, then only the first will 
 be returned. If nothing can be found, a ``NoSuchElementException`` will be 
 thrown.
@@ -256,7 +254,7 @@ contents of a text field or textarea:
     element.clear();
 
 Filling In Forms
-~~~~~~~~~~~~~~~~
+----------------
 
 We've already seen how to enter text into a textarea or text field, but what 
 about the other elements? You can "toggle" the state of checkboxes, and you 
@@ -304,7 +302,7 @@ element isn't in a form, then the ``NoSuchElementException`` will be thrown:
     element.submit();
 
 Getting Visual Information And Drag And Drop
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 Sometimes you want to extract some visual information out of an element, 
 perhaps to see if it's visible or where it is on screen. You can find out this 
@@ -316,7 +314,7 @@ information by casting the element to a ``RenderedWebElement``:
     RenderedWebElement element = (RenderedWebElement) element;
 
 Not all drivers render their content to the screen (such as the 
-`HtmlUnitDriver`_), so it's not safe to assume that the cast will work, but if 
+:ref:`HtmlUnitDriver`), so it's not safe to assume that the cast will work, but if 
 it does you can gather additional information such as the size and location of 
 the element. In addition, you can use drag and drop, either moving an element 
 by a certain amount, or on to another element:
@@ -329,7 +327,7 @@ by a certain amount, or on to another element:
     element.dragAndDropOn(target);
 
 Moving Between Windows and Frames
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 It's rare for a modern web application not to have any frames or to be 
 constrained to a single window. WebDriver supports moving between named 
@@ -370,10 +368,10 @@ can specify the frame by its index too. That is:
     driver.switchTo().frame("frameName.0.child");
 
 would go to the frame named "child" of the first subframe of the frame called 
-"frameName". *All frames are evaluated as if from **top**.*
+"frameName". **All frames are evaluated as if from *top*.**
 
 Navigation: History and Location
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Earlier, we covered navigating to a page using the "get" command (
 ``driver.get("http://www.example.com")``) As you've seen, WebDriver has a 
@@ -400,7 +398,7 @@ browser. It's just possible that something unexpected may happen when you call
 these methods if you're used to the behaviour of one browser over another.
 
 Cookies
-~~~~~~~
+-------
 
 Before we leave these next steps, you may be interested in understanding how to 
 use cookies. First of all, you need to be on the domain that the cookie will be 
@@ -422,9 +420,285 @@ valid for:
     }
 
 Next, Next Steps!
-~~~~~~~~~~~~~~~~~
+-----------------
 
 This has been a high level walkthrough of WebDriver and some of its key 
-capabilities. You may want to look at the `DesignPatterns`_ to get some ideas 
+capabilities. You may want to look at the :ref:`DesignPatterns` to get some ideas 
 about how you can reduce the pain of maintaining your tests and how to make 
 your code more modular.
+
+WebDriver Implementations
+=========================
+
+.. _HtmlUnitDriver:
+
+HtmlUnitDriver
+--------------
+
+This is currently the fastest and most lightweight implementation of WebDriver. 
+As the name suggests, this is based on HtmlUnit.
+
+Pros
+~~~~
+
+* Fastest implementation of WebDriver
+* A pure Java solution and so it is platform independent.
+* Supports JavaScript
+
+Cons
+~~~~
+
+* Emulates other browser's JavaScript behaviour (see below)
+
+JavaScript in the HtmlUnitDriver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+None of the popular browsers uses the JavaScript engine used by HtmlUnit 
+(Rhino). If you test JavaScript using HtmlUnit the results may differ 
+significantly from those browsers.
+
+When we say "JavaScript" we actually mean "JavaScript and the DOM". Although 
+the DOM is defined by the W3C each browser out there has its own quirks and 
+differences in their implementation of the DOM and in how JavaScript interacts 
+with it. HtmlUnit has an impressively complete implementation of the DOM and 
+has good support for using JavaScript, but it is no different from any other 
+browser: it has its own quirks and differences from both the W3C standard and 
+the DOM implementations of the major browsers, despite its ability to mimic 
+other browsers.
+
+With WebDriver, we had to make a choice; do we enable HtmlUnit's JavaScript 
+capabilities and run the risk of teams running into problems that only manifest 
+themselves there, or do we leave JavaScript disabled, knowing that there are 
+more and more sites that rely on JavaScript? We took the conservative approach, 
+and by default have disabled support when we use HtmlUnit. With each release of 
+both WebDriver and HtmlUnit, we reassess this decision: we hope to enable 
+JavaScript by default on the HtmlUnit at some point.
+
+Enabling JavaScript
+~~~~~~~~~~~~~~~~~~~
+
+If you can't wait, enabling JavaScript support is very easy:
+
+.. code-block:: java
+
+    HtmlUnitDriver driver = new HtmlUnitDriver();
+    driver.setJavascriptEnabled(true);
+
+This will cause the HtmlUnitDriver to emulate Internet Explorer's JavaScript 
+handling by default.
+
+.. _FirefoxDriver:
+
+FirefoxDriver
+-------------
+
+See below for instructions on how to install the FirefoxDriver.
+
+Pros
+~~~~
+
+* Runs in a real browser and supports JavaScript
+* Faster than the :ref:`InternetExplorerDriver`
+
+Cons
+~~~~
+
+* Slower than the :ref:`HtmlUnitDriver`
+
+Before Going Any Further
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The FirefoxDriver contains everything it needs in the JAR file. If you're just 
+interested in using this driver, then all you need to do is put the 
+``webdriver-firefox.jar`` or ``webdriver-all.jar`` on your CLASSPATH, and 
+WebDriver will do everything else for you.
+
+If you want to dig deeper, though, carry on reading!
+
+Important System Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following system properties (read using ``System.getProperty()`` and set 
+using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
+command line flag) are used by the FirefoxDriver:
+
+=============================  ==============================================================================================================
+Property                       What it means
+=============================  ==============================================================================================================
+webdriver.firefox.bin          The location of the binary used to control Firefox.
+webdriver.firefox.profile      The name of the profile to use when starting Firefox. This defaults to WebDriver creating an anonymous profile
+webdriver.reap_profile         Should be "true" if temporary files and profiles should not be deleted
+webdriver.firefox.useExisting  **Never use in production** Use a running instance of Firefox if one is present
+webdriver.development          **Never use in production** Indicates that we're in development mode.
+=============================  ==============================================================================================================
+
+Normally the Firefox binary is assumed to be in the default location for your 
+particular operating system:
+
+.. _FirefoxDefaultLocations:
+
+=======  ================================================
+OS       Expected Location of Firefox
+=======  ================================================
+Linux    firefox (found using "which")
+Mac      /Applications/Firefox.app/Contents/MacOS/firefox
+Windows  %PROGRAMFILES%\Mozilla Firefox\firefox.exe
+=======  ================================================
+
+By default, the Firefox driver creates an anonymous profile
+
+Installing a Downloaded Binary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "wedriver-all.zip" which may be downloaded from the website, contains all 
+the dependencies (including the common library) required to run the 
+FirefoxDriver. In order to use it:
+
+* Copy all the "jar" files on to your CLASSPATH.
+
+Installing the Quick Way From Source (with Ruby)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're doing development work, the test suites are arranged in such a way as 
+to use the version of WebDriver found in ``firefox/src/extension``
+
+This assumes that your installation of Firefox 2 or 3.x is pretty standard. On 
+Windows, this means that it should be installed in the default location 
+("C:\Program Files\Mozilla Firefox") and on the Mac under 
+"/Applications/Firefox". On Linux, it is assumed that Firefox is available on 
+the default PATH. If your Firefox is installed in a custom location, then open 
+up the ``SingleTestSuite`` and add a system property to tell the Firefox driver 
+where your Firefox binary is:
+
+.. code-block:: ruby
+
+System.setProperty("webdriver.firefox.bin", "d:\\apps\\mozilla firefox\\firefox");
+
+.. _InternetExplorerDriver:
+
+InternetExplorerDriver
+----------------------
+
+This driver has been tested with Internet Explorer 6, 7 and 8 on XP, but should 
+also work with Internet Explorer 5.5. It has also been successfully tested on 
+Vista.
+
+Pros
+~~~~
+
+* Runs in a real browser and supports JavaScript
+
+Cons
+~~~~
+
+* Obviously the InternetExplorerDriver will only work on Windows!
+* Comparatively slow (though still pretty snappy :)
+
+Installing
+~~~~~~~~~~
+
+Simply add the ``webdriver-all.jar`` or ``webdriver-ie.jar`` to your CLASSPATH. 
+You do not need to run an installer before using the InternetExplorerDriver, 
+though some configuration is required.
+
+Required Configuration
+~~~~~~~~~~~~~~~~~~~~~~
+
+Add every site you intend to visit to your "Trusted Sites" If you do not do 
+this, then you will not be able to interact with the page.
+
+.. _ChromeDriver:
+
+ChromeDriver
+------------
+
+See below for instructions on how to install the ChromeDriver.
+
+Note that ChromeDriver is one of the newest drivers. Please report any problems 
+through the mailing list/issue tracker.
+
+Before Going Any Further
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ChromeDriver contains everything it needs in the JAR file. If you're just 
+interested in using this driver, then all you need to do is put the 
+``webdriver-chrome.jar`` or ``webdriver-all.jar`` on your CLASSPATH, and 
+WebDriver will do everything else for you.
+
+Because the ChromeDriver is implemented as an extension, you will need the 
+**beta** or **dev** channel release of Google Chrome installed (NOT the stable 
+build). You can get on the dev channel 
+`here <http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
+recommended is version 4.0.206.*+. There were several breaking changes in this 
+release, so ChromeDriver will not work in versions prior to this.
+
+Pros
+~~~~
+
+* Runs in a real browser and supports JavaScript
+* Because Chrome is a Webkit-based browser, the ChromeDriver may allow you to 
+  verify that your site works in Safari. Note that since Chrome uses its own V8 
+  JavaScript engine rather than Safari's Nitro engine, JavaScript execution may 
+  differ.
+
+Cons
+~~~~
+
+* Slower than the :ref:`HtmlUnitDriver`
+
+.. TODO: I removed the known issues section as this type of content is best in 
+         the Wiki or issue tracker. Can we add a link to all issues raised 
+         against ChromeDriver?
+
+Important System Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following system properties (read using ``System.getProperty()`` and set 
+using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
+command line flag) are used by the ChromeDriver:
+
+======================  ======================================================================
+Property                What it means
+======================  ======================================================================
+webdriver.chrome.bin    The location of the binary used to control Chrome.
+webdriver.reap_profile  Should be "true" if temporary files and profiles should not be deleted
+======================  ======================================================================
+
+Normally the Chrome binary is assumed to be in the default location for your 
+particular operating system:
+
+=============  =================================================================================================
+OS             Expected Location of Chrome
+=============  =================================================================================================
+Linux          /usr/bin/google-chrome
+Mac            /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome or /User/:username/:as_to_the_left
+Windows XP     %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe
+Windows Vista  C:\Users\%USERNAME%\AppData?\Local\Google\Chrome\Application\chrome.exe
+=============  =================================================================================================
+
+Installing a Downloaded Binary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "wedriver-all.zip" which may be downloaded from the website, contains all 
+the dependencies required to run the ChromeDriver. In order to use it, copy all 
+the "jar" files on to your CLASSPATH.
+
+Installing the Quick Way From Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're doing development work on the ChromeDriver itself, the test suites 
+are arranged in such a way as to use the version of WebDriver found in 
+``chrome/src/extension``. It will automatically copy over 
+``build/Win32/Debug/npchromedriver.dll`` into the extension if you're on 
+Windows. Make sure that this DLL has been compiled using Visual Studio/msbuild 
+(it's part of WebDriver.sln). Note that ``rake clean`` will delete this file, 
+so you will need to recompile after running ``rake clean``.
+
+The underlying assumption is that your installation of Chrome is pretty 
+standard (i.e. where the installer puts it). If your Chrome is installed in a 
+custom location, then open up the ``SingleTestSuite`` and add a system property 
+to tell the ChromeDriver where your Chrome binary is:
+
+.. code-block:: java
+
+    System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");
