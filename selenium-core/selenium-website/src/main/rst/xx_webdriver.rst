@@ -152,7 +152,7 @@ Name of driver                 Available on which OS?    Class to instantiate
 You can find out more information about each of these by following the links in 
 the table. Which you use depends on what you want to do. For sheer speed, the 
 :ref:`HtmlUnitDriver` is great, but it's not graphical, which means that you can't 
-watch what's happening. As a developer, you may be comfortable with this, but 
+watch what's happening. As a developer you may be comfortable with this, but 
 sometimes it's good to be able to test using a real browser, especially when 
 you're showing a demo of your application (or running the tests) for an 
 audience. Often, this idea is referred to as "safety", and it falls into two 
@@ -160,10 +160,10 @@ parts. Firstly, there's "actual safety", which refers to whether or not the
 tests works as they should. This can be measured and quantified. Secondly, 
 there's "perceived safety", which refers to whether or not an observer believes 
 the tests work as they should. This varies from person to person, and will 
-depend on their familiarity with the application under test, WebDriver and your 
+depend on their familiarity with the application under test, WebDriver, and your 
 testing framework.
 
-To support higher "perceived safety", you may wish to chose a driver such as 
+To support higher "perceived safety", you may wish to choose a driver such as 
 the :ref:`FirefoxDriver`. This has the added advantage that this driver actually 
 renders content to a screen, and so can be used to detect information such 
 as the position of an element on a page, or the CSS properties that apply to 
@@ -216,7 +216,7 @@ we could find it using any of:
     element = driver.findElement(By.name("passwd"));
     element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
 
-You can also look for an link by its text, but be careful! The text must be an 
+You can also look for a link by its text, but be careful! The text must be an 
 exact match! You should also be careful when using :ref:`XpathInWebDriver`. If 
 there's more than one element that matches the query, then only the first will 
 be returned. If nothing can be found, a ``NoSuchElementException`` will be 
@@ -273,7 +273,7 @@ with SELECT tags isn't too bad:
 This will find the first "SELECT" element on the page, and cycle through each 
 of it's OPTIONs in turn, printing out their values, and selecting each in turn. 
 As you can see, this isn't the most efficient way of dealing with SELECT 
-elements. WebDriver's support classes come with one called "Select", which 
+elements. WebDriver's support classes include one called "Select", which 
 provides useful methods for interacting with these.
 
 .. code-block:: java
