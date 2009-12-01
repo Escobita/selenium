@@ -1,3 +1,5 @@
+.. _Getting Started:
+
 The 5 Minute Getting Started Guide
 ==================================
 
@@ -24,7 +26,7 @@ additional processes or run any installers before using it.
 
 You're now ready to write some code. An easy way to get started is this 
 example, which searches for the term "Cheese" on Google and then outputs the 
-result page's title to the console. You'll start by using the `HtmlUnit Driver`_. 
+result page's title to the console. You'll start by using the `HtmlUnitDriver`_. 
 This is a pure Java driver that runs entirely in-memory. Because of this, you 
 won't see a new browser window open. 
 
@@ -61,14 +63,16 @@ won't see a new browser window open.
         }
     }
 
+Compile and run this. You should see a line with the title of the Google search 
+results as output on the console. Congratulations, you've managed to get 
+started with WebDriver!
 
-Compile and run it. You should see a line with the title of the Google search 
-results as output. Congratulations, you've managed to get started with WebDriver!
-
-In this next example, let's use a page that requires Javascript to work 
-properly, such as Google Suggest. You will also be using the `Firefox Driver`_. 
+In this next example, you shall use a page that requires Javascript to work 
+properly, such as Google Suggest. You will also be using the `FirefoxDriver`_. 
 Make sure that Firefox is installed on your machine and is in the normal 
 location for your OS.
+
+.. TODO: add default locations as a note (or footnote)
 
 Once that's done, create a new class called GoogleSuggest, which looks like:
 
@@ -120,18 +124,17 @@ Once that's done, create a new class called GoogleSuggest, which looks like:
 When you run this program, you'll see the list of suggestions being printed 
 to the console. That's all there is to using WebDriver! 
 
-Hopefully, this will have whet your appetite for more. In the `Next Steps`_ page, 
-you will learn how more about how to use WebDriver. It covers aspects such as 
-navigating forward and backward in your browser's history, how to use frames 
-and windows and it provides a more complete discussion of the examples than 
-has been done as you've been `Getting Started`_. If you're ready, let's take the 
-`Next Steps`_!
+Hopefully, this will have whet your appetite for more. In the following 
+`Next Steps`_ section you will learn more about how to use WebDriver for things 
+such as navigating forward and backward in your browser's history, and how to 
+use frames and windows. It also provides a more complete discussion of the 
+examples than has been done as you've been `Getting Started`_. If you're ready, 
+let's take the `Next Steps`_!
+
+.. _Next Steps:
 
 Next Steps For Using WebDriver
 ==============================
-
-Once you've completed the `GettingStarted`_ tutorial, you may want to know 
-more. This is the right place to look!
 
 Which Implementation of WebDriver Should I Use?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +190,12 @@ normal way to do this is by calling "get":
     driver.get("http://www.google.com");
 
 WebDriver will wait until the page has fully loaded (that is, the "onload" 
-event has fired) before returning control to your test or script.
+event has fired) before returning control to your test or script. It's worth
+noting that if your page uses a lot of AJAX on load then WebDriver may not
+know when it has completely loaded. If you need to ensure such pages are 
+fully loaded then you can use "waits".
+
+.. TODO: link to a section on explicit waits in WebDriver
 
 Interacting With the Page
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,7 +209,7 @@ ways of finding elements. For example, given an element defined as:
 
     <input type="text" name="passwd" id="passwd-id" />
 
-we could use any of:
+we could find it using any of:
 
 .. code-block:: java
 
@@ -217,15 +225,15 @@ be returned. If nothing can be found, a ``NoSuchElementException`` will be
 thrown.
 
 WebDriver has an "Object-based" API; we represent all types of elements using 
-the same interface: WebElement. This means that although you may see a lot of 
-possible methods you could invoke when you hit your IDE's auto-complete key 
-combination, not all of them will make sense or be valid. Don't worry! 
-WebDriver will attempt to do the Right Thing, so if you call a method that 
-makes no sense ("setSelected()" on a "meta" tag, for example) an exception 
-will be thrown.
+the same interface: `WebElement <http://selenium.googlecode.com/svn/webdriver/javadoc/org/openqa/selenium/WebElement.html>`_. 
+This means that although you may see a lot of possible methods you could invoke 
+when you hit your IDE's auto-complete key combination, not all of them will 
+make sense or be valid. Don't worry! WebDriver will attempt to do the Right 
+Thing, and if you call a method that makes no sense ("setSelected()" on a 
+"meta" tag, for example) an exception will be thrown.
 
-So, we've got an element. What can we do with it? First of all, you may want to 
-enter some text into a text field:
+So, you've got an element. What can you do with it? First of all, you may want 
+to enter some text into a text field:
 
 .. code-block:: java
 
@@ -269,6 +277,15 @@ of it's OPTIONs in turn, printing out their values, and selecting each in turn.
 As you can see, this isn't the most efficient way of dealing with SELECT 
 elements. WebDriver's support classes come with one called "Select", which 
 provides useful methods for interacting with these.
+
+.. code-block:: java
+
+    Select select = new Select(driver.findElement(By.xpath("//select")));
+    select.deselectAll();
+    select.selectByVisibleText("Edam");
+
+This will deselect all OPTIONs from the first SELECT on the page, and then 
+select the OPTION with the displayed text of "Edam".
 
 Once you've finished filling out the form, you probably want to submit it. One 
 way to do this would be to find the "submit" button and click it:
@@ -322,7 +339,7 @@ windows using the "switchTo" method:
 
     driver.switchTo().window("windowName");
 
-All calls to driver will now be interpreted as being directed to the 
+All calls to ``driver`` will now be interpreted as being directed to the 
 particular window. But how do you know the window's name? Take a look at the 
 javascript or link that opened it:
 
@@ -408,6 +425,6 @@ Next, Next Steps!
 ~~~~~~~~~~~~~~~~~
 
 This has been a high level walkthrough of WebDriver and some of its key 
-capabilities. You may want to look at the DesignPatterns to get some ideas 
+capabilities. You may want to look at the `DesignPatterns`_ to get some ideas 
 about how you can reduce the pain of maintaining your tests and how to make 
 your code more modular.
