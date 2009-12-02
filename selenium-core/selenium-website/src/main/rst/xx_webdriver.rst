@@ -207,7 +207,7 @@ ways of finding elements. For example, given an element defined as:
 
     <input type="text" name="passwd" id="passwd-id" />
 
-we could find it using any of:
+you could find it using any of:
 
 .. code-block:: java
 
@@ -492,8 +492,6 @@ handling by default.
 FirefoxDriver
 -------------
 
-See below for instructions on how to install the FirefoxDriver.
-
 Pros
 ~~~~
 
@@ -510,7 +508,7 @@ Before Going Any Further
 
 The FirefoxDriver contains everything it needs in the JAR file. If you're just 
 interested in using this driver, then all you need to do is put the 
-``webdriver-firefox.jar`` or ``webdriver-all.jar`` on your CLASSPATH, and 
+``webdriver-firefox.jar`` or ``webdriver-all.jar`` on your ``CLASSPATH``, and 
 WebDriver will do everything else for you.
 
 If you want to dig deeper, though, carry on reading!
@@ -528,8 +526,6 @@ Property                       What it means
 webdriver.firefox.bin          The location of the binary used to control Firefox.
 webdriver.firefox.profile      The name of the profile to use when starting Firefox. This defaults to WebDriver creating an anonymous profile
 webdriver.reap_profile         Should be "true" if temporary files and profiles should not be deleted
-webdriver.firefox.useExisting  **Never use in production** Use a running instance of Firefox if one is present
-webdriver.development          **Never use in production** Indicates that we're in development mode.
 =============================  ==============================================================================================================
 
 Normally the Firefox binary is assumed to be in the default location for your 
@@ -537,13 +533,14 @@ particular operating system:
 
 .. _FirefoxDefaultLocations:
 
-=======  ================================================
-OS       Expected Location of Firefox
-=======  ================================================
-Linux    firefox (found using "which")
-Mac      /Applications/Firefox.app/Contents/MacOS/firefox
-Windows  %PROGRAMFILES%\Mozilla Firefox\firefox.exe
-=======  ================================================
+=============  ===================================================
+OS             Expected Location of Firefox
+=============  ===================================================
+Linux          firefox (found using "which")
+Mac            /Applications/Firefox.app/Contents/MacOS/firefox
+Windows XP     %PROGRAMFILES%\\Mozilla Firefox\\firefox.exe
+Windows Vista  \\Program Files (x86)\\Mozilla Firefox\\firefox.exe
+=============  ===================================================
 
 By default, the Firefox driver creates an anonymous profile
 
@@ -554,34 +551,15 @@ The "wedriver-all.zip" which may be downloaded from the website, contains all
 the dependencies (including the common library) required to run the 
 FirefoxDriver. In order to use it:
 
-* Copy all the "jar" files on to your CLASSPATH.
-
-Installing the Quick Way From Source (with Ruby)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you're doing development work, the test suites are arranged in such a way as 
-to use the version of WebDriver found in ``firefox/src/extension``
-
-This assumes that your installation of Firefox 2 or 3.x is pretty standard. On 
-Windows, this means that it should be installed in the default location 
-("C:\Program Files\Mozilla Firefox") and on the Mac under 
-"/Applications/Firefox". On Linux, it is assumed that Firefox is available on 
-the default PATH. If your Firefox is installed in a custom location, then open 
-up the ``SingleTestSuite`` and add a system property to tell the Firefox driver 
-where your Firefox binary is:
-
-.. code-block:: ruby
-
-System.setProperty("webdriver.firefox.bin", "d:\\apps\\mozilla firefox\\firefox");
+* Copy all the "jar" files on to your ``CLASSPATH``.
 
 .. _InternetExplorerDriver:
 
 InternetExplorerDriver
 ----------------------
 
-This driver has been tested with Internet Explorer 6, 7 and 8 on XP, but should 
-also work with Internet Explorer 5.5. It has also been successfully tested on 
-Vista.
+This driver has been tested with Internet Explorer 6, 7 and 8 on XP. It has 
+also been successfully tested on Vista.
 
 Pros
 ~~~~
@@ -597,9 +575,9 @@ Cons
 Installing
 ~~~~~~~~~~
 
-Simply add the ``webdriver-all.jar`` or ``webdriver-ie.jar`` to your CLASSPATH. 
-You do not need to run an installer before using the InternetExplorerDriver, 
-though some configuration is required.
+Simply add ``webdriver-all.jar`` to your ``CLASSPATH``. You do not need to run 
+an installer before using the InternetExplorerDriver, though some configuration 
+is required.
 
 Required Configuration
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -615,22 +593,7 @@ ChromeDriver
 See below for instructions on how to install the ChromeDriver.
 
 Note that ChromeDriver is one of the newest drivers. Please report any problems 
-through the mailing list/issue tracker.
-
-Before Going Any Further
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ChromeDriver contains everything it needs in the JAR file. If you're just 
-interested in using this driver, then all you need to do is put the 
-``webdriver-chrome.jar`` or ``webdriver-all.jar`` on your CLASSPATH, and 
-WebDriver will do everything else for you.
-
-Because the ChromeDriver is implemented as an extension, you will need the 
-**beta** or **dev** channel release of Google Chrome installed (NOT the stable 
-build). You can get on the dev channel 
-`here <http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
-recommended is version 4.0.206.*+. There were several breaking changes in this 
-release, so ChromeDriver will not work in versions prior to this.
+through the `issue tracker <http://code.google.com/p/selenium/issues/list>`_.
 
 Pros
 ~~~~
@@ -649,6 +612,21 @@ Cons
 .. TODO: I removed the known issues section as this type of content is best in 
          the Wiki or issue tracker. Can we add a link to all issues raised 
          against ChromeDriver?
+
+Before Going Any Further
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ChromeDriver contains everything it needs in the JAR file. If you're just 
+interested in using this driver, then all you need to do is put 
+``webdriver-all.jar`` on your ``CLASSPATH``, and WebDriver will do everything 
+else for you.
+
+Because the ChromeDriver is implemented as an extension, you will need the 
+**beta** or **dev** channel release of Google Chrome installed (NOT the stable 
+build). You can get on the dev channel 
+`here <http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
+recommended is version 4.0.206.*+. There were several breaking changes in this 
+release, so ChromeDriver will not work in versions prior to this.
 
 Important System Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -671,9 +649,9 @@ particular operating system:
 OS             Expected Location of Chrome
 =============  =================================================================================================
 Linux          /usr/bin/google-chrome
-Mac            /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome or /User/:username/:as_to_the_left
-Windows XP     %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe
-Windows Vista  C:\Users\%USERNAME%\AppData?\Local\Google\Chrome\Application\chrome.exe
+Mac            /Applications/Google Chrome.app/Contents/MacOS/Google\ Chrome or /User/:username/:as_to_the_left
+Windows XP     %HOMEPATH%\\Local Settings\\Application Data\\Google\\Chrome\\Application\\chrome.exe
+Windows Vista  C:\\User\s\%USERNAME%\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe
 =============  =================================================================================================
 
 Installing a Downloaded Binary
@@ -681,24 +659,4 @@ Installing a Downloaded Binary
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
 the dependencies required to run the ChromeDriver. In order to use it, copy all 
-the "jar" files on to your CLASSPATH.
-
-Installing the Quick Way From Source
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you're doing development work on the ChromeDriver itself, the test suites 
-are arranged in such a way as to use the version of WebDriver found in 
-``chrome/src/extension``. It will automatically copy over 
-``build/Win32/Debug/npchromedriver.dll`` into the extension if you're on 
-Windows. Make sure that this DLL has been compiled using Visual Studio/msbuild 
-(it's part of WebDriver.sln). Note that ``rake clean`` will delete this file, 
-so you will need to recompile after running ``rake clean``.
-
-The underlying assumption is that your installation of Chrome is pretty 
-standard (i.e. where the installer puts it). If your Chrome is installed in a 
-custom location, then open up the ``SingleTestSuite`` and add a system property 
-to tell the ChromeDriver where your Chrome binary is:
-
-.. code-block:: java
-
-    System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");
+the "jar" files on to your ``CLASSPATH``.
