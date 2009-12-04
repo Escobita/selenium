@@ -808,9 +808,9 @@ unless you are aware of the differences in the various xpath engines.
 ======================  =======================  ==========================  ====================
 Driver                  Tag and Attribute Names	 Attribute Values            Native XPath Support
 ======================  =======================  ==========================  ====================
-HtmlUnitDriver          Lower-cased              As they appear in the HTML	 Yes
-InternetExplorerDriver  Lower-cased              As they appear in the HTML	 No
-FirefoxDriver           Case insensitive         As they appear in the HTML	 Yes
+HtmlUnitDriver          Lower-cased              As they appear in the HTML  Yes
+InternetExplorerDriver  Lower-cased              As they appear in the HTML  No
+FirefoxDriver           Case insensitive         As they appear in the HTML  Yes
 ======================  =======================  ==========================  ====================
 
 This is a little abstract, so for the following piece of HTML:
