@@ -427,6 +427,8 @@ capabilities. You may want to look at the :ref:`DesignPatterns` to get some idea
 about how you can reduce the pain of maintaining your tests and how to make 
 your code more modular.
 
+.. _WebDriverImplementations:
+
 WebDriver Implementations
 =========================
 
@@ -660,3 +662,269 @@ Installing a Downloaded Binary
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
 the dependencies required to run the ChromeDriver. In order to use it, copy all 
 the "jar" files on to your ``CLASSPATH``.
+
+.. _SeleniumRCEmulation:
+
+Emulating Selenium RC
+=====================
+
+The Java version of WebDriver provides an implementation of the Selenium RC API. 
+It is used like so:
+
+.. code-block:: java
+
+    // You may use any WebDriver implementation. Firefox is used here as an example
+    WebDriver driver = new FirefoxDriver();
+
+    // A "base url", used by selenium to resolve relative URLs
+     String baseUrl = "http://www.google.com";
+
+    // Create the Selenium implementation
+    Selenium selenium = new WebDriverBackedSelenium(driver, baseUrl);
+
+    // Perform actions with selenium
+    selenium.open("http://www.google.com");
+    selenium.type("name=q", "cheese");
+    selenium.click("name=btnG");
+
+    // And get the underlying WebDriver implementation back. This will refer to the
+    // same WebDriver instance as the "driver" variable above.
+    WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWebDriver();
+
+Pros
+----
+
+* Allows for the WebDriver and Selenium APIs to live side-by-side
+* Provides a simple mechanism for a managed migration from the Selenium RC API 
+  to WebDriver's
+* Does not require the standalone Selenium RC server to be run
+
+Cons
+----
+
+* Does not implement every method
+* More advanced Selenium usage (using "browserbot" or other built-in JavaScript 
+  methods from Selenium Core) may not work
+* Some methods may be slower due to underlying implementation differences
+
+Backing WebDriver with Selenium
+-------------------------------
+
+WebDriver doesn't support as many browsers as Selenium RC does, so in order to 
+provide that support while still using the WebDriver API, you can make use of 
+the ``SeleneseCommandExecutor`` It is done like this:
+
+.. code-block:: java
+
+    Capabilities capabilities = new DesiredCapabilities()
+    capabilities.setBrowserName("safari");
+    CommandExecutor executor = new SeleneseCommandExecutor("http:localhost:4444/", "http://www.google.com/", capabilities);
+    WebDriver driver = new RemoteWebDriver(executor, capabilities);
+
+There are currently some major limitations with this approach, notably that 
+findElements doesn't work as expected. Also, because we're using Selenium Core 
+for the heavy lifting of driving the browser, you are limited by the JavaScript 
+sandbox.
+
+.. _TipsAndTricks:
+
+Tips and Tricks
+===============
+
+Using Drag and Drop
+-------------------
+
+It may not be immediately obvious, but if you're using a browser that supports 
+it you can cast a ``WebElement`` to ``RenderedWebElement`` and then it's easy 
+to do drag and drop:
+
+.. code-block:: java
+
+    // Note the casts
+    RenderedWebElement from = (RenderedWebElement) driver.findElement(By.id("one"));
+    RenderedWebElement to = (RenderedWebElement) driver.findElement(By.id("two"));
+
+    from.dragAndDropOn(to);
+
+Currently, only the FirefoxDriver supports this, but you should also expect 
+support for the InternetExplorerDriver too.
+
+Changing the user agent
+-----------------------
+
+This is easy with the FirefoxDriver:
+
+.. code-block:: java
+
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.addAdditionalPreference("general.useragent.override", "some UA string");
+    WebDriver driver = new FirefoxDriver(profile);
+
+Tweaking an existing Firefox profile
+------------------------------------
+
+Suppose that you wanted to modify the user agent string (as above), but you've 
+got a tricked out Firefox profile that contains dozens of useful extensions. 
+There are two ways to obtain this profile. Assuming that the profile has been 
+created using Firefox's profile manager (``firefox -ProfileManager``):
+
+.. code-block:: java
+
+    ProfileIni allProfiles = new ProfilesIni();
+    FirefoxProfile profile = allProfiles.getProfile("WebDriver");
+    profile.setPreferences("foo.bar", 23);
+    WebDriver driver = new FirefoxDriver(profile);
+   
+Alternatively, if the profile isn't already registered with Firefox:
+
+.. code-block:: java
+
+    File profileDir = new File("path/to/top/level/of/profile");
+    FirefoxProfile profile = new FirefoxProfile(profileDir);
+    profile.addAdditionalPreferences(extraPrefs);
+    WebDriver driver = new FirefoxDriver(profile);
+    Enabling features that might not be wise to use in Firefox
+
+As we develop features in the FirefoxDriver, we expose the ability to use them. 
+For example, until we feel native events are stable on Firefox for Linux, they 
+are disabled by default. To enable them:
+
+.. code-block:: java
+
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.setEnableNativeEvents(true);
+    WebDriver driver = new FirefoxDriver(profile);
+
+.. _XpathInWebDriver:
+
+How XPath Works in WebDriver
+============================
+
+At a high level, WebDriver uses a browser's native XPath capabilities wherever 
+possible. On those browsers that don't have native XPath support, we have 
+provided our own implementation. This can lead to some unexpected behaviour 
+unless you are aware of the differences in the various xpath engines.
+
+======================  =======================  ==========================  ====================
+Driver                  Tag and Attribute Names	 Attribute Values            Native XPath Support
+======================  =======================  ==========================  ====================
+HtmlUnitDriver          Lower-cased              As they appear in the HTML	 Yes
+InternetExplorerDriver  Lower-cased              As they appear in the HTML	 No
+FirefoxDriver           Case insensitive         As they appear in the HTML	 Yes
+======================  =======================  ==========================  ====================
+
+This is a little abstract, so for the following piece of HTML:
+
+.. code-block:: html
+
+    <input type="text" name="example" />
+    <INPUT type="text" name="other" />
+
+The following will happen:
+
++------------------+---------------------------------------------------------+ 
+| XPath expression | Number of Matches In                                    |
+|                  +----------------+---------------+------------------------+
+|                  | HtmlUnitDriver | FirefoxDriver | InternetExplorerDriver |
++==================+================+===============+========================+
+| //input          | 1 ("example")  | 2             | 2                      |
++------------------+----------------+---------------+------------------------+
+| //INPUT          | 0              | 2             | 0                      |
++------------------+----------------+---------------+------------------------+
+
+Matching Implicit Attributes
+----------------------------
+
+Sometimes HTML elements do not need attributes to be explicitly declared 
+because they will default to known values. For example, the "input" tag does 
+not require the "type" attribute because it defaults to "text". The rule of 
+thumb when using xpath in WebDriver is that you **should not** expect to be able 
+to match against these implicit attributes.
+
+.. _UsingWebDriver:
+
+Using WebDriver
+===============
+
+From a New Download
+-------------------
+
+Unpack the "webdriver-all.zip" you can download from the site, and add all the 
+JARs to your ``CLASSPATH``. This will give you the ChromeDriver, FirefoxDriver, 
+HtmlUnitDriver, InternetExplorerDriver, RemoteWebDriver client and the support 
+packages. The support packages give you useful helper classes, such as the 
+LiftStyleApi and the PageFactory.
+
+With Maven
+----------
+
+If you want to use the HtmlUnitDriver, add the following dependency to your 
+pom.xml:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-htmlunit</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
+    
+If you want to use the FirefoxDriver, you need to add the following dependency 
+to your pom.xml:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-firefox</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
+
+If you want to use the InternetExplorerDriver, you need to add the following 
+dependency to your pom.xml:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-ie</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
+
+If you want to use the ChromeDriver, you need to add the following dependency 
+to your pom.xml:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-chrome</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
+
+Finally, if you like to use any of our support classes, you should add the 
+following dependency to your pom.xml:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>org.seleniumhq.webdriver</groupId>
+        <artifactId>webdriver-support</artifactId>
+        <version>0.9.7376</version>
+    </dependency>
+
+.. _Roadmap:
+
+Roadmap
+=======
+
+The roadmap for WebDriver 
+`is available here <http://code.google.com/p/selenium/wiki/RoadMap>`_
+
+.. _FurtherResources:
+
+Further Resources
+=================
+
+You can find further resources for WebDriver 
+`here <http://code.google.com/p/selenium/wiki/FurtherResources>`_
