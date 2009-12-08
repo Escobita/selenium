@@ -254,6 +254,13 @@ class ApiExampleTest (unittest.TestCase):
         self._loadPage("xhtmlTest")
         elem = self.driver.find_element_by_partial_link_text("new window")
         elem.click()
+        
+    def testIsElementDisplayed(self):
+        self._loadPage("javascriptPage")
+        visible = self.driver.find_element_by_id("displayed").is_displayed()
+        not_visible = self.driver.find_element_by_id("hidden").is_displayed()
+        self.assertTrue(visible, "Should be visible")
+        self.assertFalse(not_visible, "Should not be visible")
 
     @not_available_on_remote
     def testScreenshot(self):
@@ -261,7 +268,7 @@ class ApiExampleTest (unittest.TestCase):
         file_name = os.path.join(tempfile.mkdtemp(), "screenshot.png")
         self.driver.save_screenshot(file_name)
         self.assertTrue(os.path.exists(file_name))
-        shutil.rmtree(os.path.dirname(file_name))    
+        shutil.rmtree(os.path.dirname(file_name))
 
     def _loadSimplePage(self):
         self.driver.get("http://localhost:%d/simpleTest.html" % webserver.port)

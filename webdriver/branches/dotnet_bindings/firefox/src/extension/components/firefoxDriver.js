@@ -146,15 +146,7 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
 
     var result = runScript(scriptSrc, parameters);
 
-    var wrappedResult = Utils.wrapResult(result, respond.context);
-
-    if (wrappedResult.resultType !== undefined) {
-      respond.setField("resultType", wrappedResult.resultType);
-    }
-
-    if (wrappedResult.response !== undefined) {
-      respond.response = wrappedResult.response;
-    }
+    respond.response = Utils.wrapResult(result, respond.context);
 
   } catch (e) {
     respond.isError = true;
@@ -242,6 +234,7 @@ FirefoxDriver.ElementLocator = {
   ID: 'id',
   NAME: 'name',
   CLASS_NAME: 'class name',
+  CSS_SELECTOR: 'css selector',
   TAG_NAME: 'tag name',
   LINK_TEXT: 'link text',
   PARTIAL_LINK_TEXT: 'partial link text',
@@ -289,6 +282,16 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
                 this.findElementByXPath_(theDocument,           // FF 2
                     '//*[contains(concat(" ",normalize-space(@class)," ")," ' +
                     selector + ' ")]', rootNode);
+      break;
+
+    case FirefoxDriver.ElementLocator.CSS_SELECTOR:
+      if (rootNode['querySelector']) {
+        element = rootNode.querySelector(selector);
+      } else {
+        respond.isError = true;
+        respond.response = "CSS Selectors not supported natively";
+        respond.send();
+      }      
       break;
 
     case FirefoxDriver.ElementLocator.TAG_NAME:
@@ -401,6 +404,16 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
               theDocument, './/*[@name="' + selector + '"]', rootNode);
       break;
 
+    case FirefoxDriver.ElementLocator.CSS_SELECTOR:
+      if (rootNode['querySelector']) {
+        elements = rootNode.querySelectorAll(selector);
+      } else {
+        respond.isError = true;
+        respond.response = "CSS Selectors not supported natively";
+        respond.send();
+      }
+      break;
+
     case FirefoxDriver.ElementLocator.TAG_NAME:
       elements = rootNode.getElementsByTagName(selector);
       break;
@@ -439,7 +452,7 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
     elementIds.push(Utils.addToKnownElements(element, respond.context));
   }
 
-  respond.response = elementIds.join(',');
+  respond.response = elementIds;
   respond.send();
 };
 
@@ -629,12 +642,11 @@ FirefoxDriver.prototype.getCookie = function(respond) {
         + (c.isSecure ? "secure ;" : "");
   };
 
-  var toReturn = "";
+  var toReturn = [];
   var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
-    var toAdd = cookieToString(cookies[i]);
-    toReturn += toAdd + "\n";
+    toReturn.push(cookieToString(cookies[i]));
   }
 
   respond.response = toReturn;
@@ -677,13 +689,13 @@ FirefoxDriver.prototype.deleteAllCookies = function(respond) {
 
 
 FirefoxDriver.prototype.setMouseSpeed = function(respond, speed) {
-  this.mouseSpeed = speed;
+  this.mouseSpeed = speed.shift();
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getMouseSpeed = function(respond) {
-  respond.response = "" + this.mouseSpeed;
+  respond.response = this.mouseSpeed;
   respond.send();
 };
 
@@ -701,6 +713,36 @@ FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
   } catch(e) {
     respond.isError = true;
     respond.response = 'Could not take screenshot of current page - ' + e;
+  }
+  respond.send();
+};
+
+
+FirefoxDriver.prototype.getScreenshotAsBase64 = function(respond) {
+  var window = Utils.getBrowser(respond.context).contentWindow;
+  try {
+    var canvas = Screenshooter.grab(window);
+    respond.isError = false;
+    respond.response = Screenshooter.toBase64(canvas);
+  } catch (e) {
+    respond.isError = true;
+    respond.response = 'Could not take screenshot of current page - ' + e;
+  }
+  respond.send();
+};
+
+FirefoxDriver.prototype.dismissAlert = function(respond, alertText) {
+  // TODO(simon): Is there a type for alerts?
+  var wm = Utils.getService("@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator");
+  var allWindows = wm.getEnumerator("");
+  while (allWindows.hasMoreElements()) {
+    var alert = allWindows.getNext();
+    var doc = alert.document;
+    if (doc && doc.documentURI == "chrome://global/content/commonDialog.xul") {
+      var dialog = doc.getElementsByTagName("dialog")[0];
+      dialog.getButton("accept").click();
+      break;
+    }
   }
   respond.send();
 };

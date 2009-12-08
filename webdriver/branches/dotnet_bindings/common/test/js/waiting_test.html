@@ -42,14 +42,10 @@
       var clickToHide = driver.findElement({id: 'clickToHide'});
 
       clickToShow.click();
-      driver.callFunction(webdriver.logging.info, null,
-          'waiting for black box to be visible');
       driver.wait(clickToHide.isDisplayed, 4000, clickToHide);
       assertThat(clickToHide.isDisplayed(), equals(true));
 
       clickToHide.click();
-      driver.callFunction(webdriver.logging.info, null,
-          'waiting for black box to not be visible');
       driver.waitNot(clickToHide.isDisplayed, 4000, clickToHide);
       assertThat(clickToHide.isDisplayed(), equals(false));
     }
@@ -66,14 +62,7 @@
       driver.get(TEST_PAGE.javascriptPage);
       var clickToShow = driver.findElement({id: 'clickToShow'});
       driver.waitNot(clickToShow.isDisplayed, 500, clickToShow);
-      driver.catchExpectedError('Wait commmand should have timed out',
-          function(command) {
-            var response = command.response;
-            assertTrue(!!response);
-            assertTrue(response.isFailure);
-            var regex = /Timeout after \d{3}ms/;
-            assertThat(response.value, matchesRegex(regex));
-          });
+      driver.catchExpectedError('Wait commmand should have timed out');
     }
   </script>
 </head>

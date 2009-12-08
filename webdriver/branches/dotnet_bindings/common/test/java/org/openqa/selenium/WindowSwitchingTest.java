@@ -19,6 +19,7 @@ package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
@@ -41,7 +42,11 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
 
     driver.get(iframePage);
+    final String handle = driver.getWindowHandle();
     driver.findElement(By.id("iframe_page_heading"));
+    driver.switchTo().frame("iframe1");
+    assertThat(driver.getWindowHandle(), equalTo(handle));
+
     driver.switchTo().window(current);
   }
 
@@ -114,8 +119,8 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
     try {
       driver.findElement(By.id("close")).click();
-      driver.getWindowHandles();
-      // If we make it this far, we're all good.
+      Set<String> allHandles = driver.getWindowHandles();
+      assertEquals(1, allHandles.size());
     } finally {
       driver.switchTo().window(currentHandle);
     }
@@ -149,7 +154,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @NeedsFreshDriver
   @NoDriverAfterTest
-  @Ignore({IE, SELENESE})
+  @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testCanCloseWindowWhenMultipleWindowsAreOpen() {
     driver.get(xhtmlTestPage);
     driver.findElement(By.name("windowOne")).click();

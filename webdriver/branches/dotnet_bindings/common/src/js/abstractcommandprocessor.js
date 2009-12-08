@@ -26,9 +26,9 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.object');
 goog.require('webdriver.CommandName');
-goog.require('webdriver.Context');
 goog.require('webdriver.Future');
 goog.require('webdriver.Response');
+goog.require('webdriver.WebElement');
 goog.require('webdriver.timing');
 
 
@@ -57,11 +57,14 @@ webdriver.AbstractCommandProcessor.resolveFutureParams_ = function(
   function getValue(obj) {
     if (obj instanceof webdriver.Future) {
       return obj.getValue();
-    } else if (goog.isFunction(obj)) {
+    } else if (goog.isFunction(obj) ||
+               obj instanceof webdriver.WebElement) {
       return obj;
     } else if (goog.isObject(obj)) {
       goog.object.forEach(obj, function(value, key) {
-        obj[key] = getValue(value);
+        if (value instanceof webdriver.Future) {
+          obj[key] = value.getValue();
+        }
       });
     }
     return obj;
@@ -80,72 +83,44 @@ webdriver.AbstractCommandProcessor.resolveFutureParams_ = function(
 /**
  * Executes a command.
  * @param {webdriver.Command} command The command to execute.
- * @param {string} sessionId The current session ID.
- * @param {webdriver.Context} context The context to execute the command in.
  */
-webdriver.AbstractCommandProcessor.prototype.execute = function(command,
-                                                                sessionId,
-                                                                context) {
+webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
+  var driver = command.getDriver();
   webdriver.AbstractCommandProcessor.resolveFutureParams_(command);
-  switch (command.name) {
+  var parameters = command.getParameters();
+  switch (command.getName()) {
     case webdriver.CommandName.SLEEP:
-      var ms = command.parameters[0];
+      var ms = parameters[0];
       webdriver.timing.setTimeout(function() {
-        command.setResponse(new webdriver.Response(false, context, ms));
+        command.setResponse(new webdriver.Response(
+            false, driver.getContext(), ms));
       }, ms);
       break;
 
     case webdriver.CommandName.WAIT:
-      var callback = goog.bind(this.waitCallback_, this, command, context);
-      command.parameters[0].start(callback);
-      break;
-
     case webdriver.CommandName.FUNCTION:
       try {
-        var result = command.parameters[0]();
-        command.setResponse(new webdriver.Response(false, context, result));
+        var fn = parameters[0];
+        var selfObj = parameters[1];
+        var args = parameters[2];
+        var result = fn.apply(selfObj, args);
+        command.setResponse(new webdriver.Response(
+            false, driver.getContext(), result));
       } catch (ex) {
-        command.setResponse(new webdriver.Response(true, context, null, ex));
+        command.setResponse(new webdriver.Response(
+            true, driver.getContext(), null, ex));
       }
       break;
 
     default:
       try {
-        this.executeDriverCommand(command, sessionId, context);
+        this.dispatchDriverCommand(command);
       } catch (ex) {
-        command.setResponse(new webdriver.Response(true, context, null, ex));
+        command.setResponse(new webdriver.Response(
+            true, driver.getContext(), null, ex));
       }
       break;
   }
-};
-
-
-/**
- * Callback for {@code webdriver.CommandName.WAIT} commands.
- * @param {webdriver.Command} command The wait command.
- * @param {webdriver.Context} context The context the command executed in.
- * @param {boolean} isTimeout Whether the wait finished from a timeout.
- * @param {number} elapsedTime The amount of time spent waiting, in
- *     milliseconds.
- * @param {Error} opt_ex If defined, an error that caused the wait to terminate
- *     early.
- */
-webdriver.AbstractCommandProcessor.prototype.waitCallback_ = function(
-    command, context, isTimeout, elapsedTime, opt_ex) {
-  var message;
-  if (opt_ex) {
-    message = 'Error';
-  } else if (isTimeout) {
-    message = 'Timeout';
-  } else {
-    message = 'Ready';
-  }
-  var response = new webdriver.Response(isTimeout || opt_ex, context,
-      message + ' after ' + elapsedTime + 'ms');
-  if (opt_ex) {
-    response.errors.push(opt_ex);
-  }
-  command.setResponse(response);
 };
 
 
@@ -153,9 +128,7 @@ webdriver.AbstractCommandProcessor.prototype.waitCallback_ = function(
  * Sends a command to be executed by a browser driver. This method must be
  * implemented by each subclass.
  * @param {webdriver.Command} command The command to execute.
- * @param {string} sessionId The current session ID.
- * @param {webdriver.Context} context The context to execute the command in.
  * @protected
  */
-webdriver.AbstractCommandProcessor.prototype.executeDriverCommand =
+webdriver.AbstractCommandProcessor.prototype.dispatchDriverCommand =
     goog.abstractMethod;

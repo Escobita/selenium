@@ -24,6 +24,8 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.ScriptResult;
+import com.gargoylesoftware.htmlunit.SgmlPage;
+import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -37,12 +39,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlInlineFrame;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLElement;
-
 import net.sourceforge.htmlunit.corejs.javascript.Function;
 import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
 import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
 import net.sourceforge.htmlunit.corejs.javascript.Undefined;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -68,8 +68,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +75,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
                                        FindsById, FindsByLinkText, FindsByXPath, FindsByName,
@@ -88,8 +85,8 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
   private boolean enableJavascript;
   private ProxyConfig proxyConfig;
-  private AtomicLong windowNamer = new AtomicLong(System.currentTimeMillis());
   private final BrowserVersion version;
+  private Speed speed = Speed.FAST;
 
   public HtmlUnitDriver(BrowserVersion version) {
     this.version = version;
@@ -190,6 +187,12 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     proxyConfig = new ProxyConfig(host, port);
     webClient.setProxyConfig(proxyConfig);
   }
+  
+  public void setAutoProxy(String autoProxyUrl) {
+	  proxyConfig = new ProxyConfig();
+	  proxyConfig.setProxyAutoConfigUrl(autoProxyUrl);
+	  webClient.setProxyConfig(proxyConfig);
+  }
 
   public void get(String url) {
     // Prevent the malformed url exception.
@@ -285,11 +288,18 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
       return null;
     }
 
+    if (page instanceof SgmlPage) {
+    	return ((SgmlPage) page).asXml();
+    }
     WebResponse response = page.getWebResponse();
     return response.getContentAsString();
   }
 
   public void close() {
+    if (currentWindow != null) {
+      ((TopLevelWindow) currentWindow.getTopWindow()).close();
+    }
+    
     webClient = createWebClient(version);
   }
 
@@ -302,31 +312,16 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Set<String> getWindowHandles() {
-    Set<String> allHandles = new HashSet<String>();
-    List<WebWindow> allWindows = webClient.getWebWindows();
-    for (WebWindow window : allWindows) {
-      WebWindow top = window.getTopWindow();
-      if (top.getName() == null || "".equals(top.getName())) {
-        nameWindow(top);
-      }
-      allHandles.add(top.getName());
+    final Set<String> allHandles = new HashSet<String>();
+    for (final WebWindow window : webClient.getTopLevelWindows()) {
+      allHandles.add(String.valueOf(System.identityHashCode(window)));
     }
 
     return allHandles;
   }
 
   public String getWindowHandle() {
-    WebWindow window = webClient.getCurrentWindow();
-    if (window.getName() == null || "".equals(window.getName())) {
-      nameWindow(window);
-    }
-    return window.getName();
-  }
-
-  private String nameWindow(WebWindow window) {
-    String windowName = "webdriver" + windowNamer.incrementAndGet();
-    window.setName(windowName);
-    return windowName;
+    return String.valueOf(System.identityHashCode(currentWindow.getTopWindow()));
   }
 
   public Object executeScript(String script, Object... args) {
@@ -449,7 +444,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     return new HtmlUnitNavigation();
   }
 
-  protected synchronized Page lastPage() {
+  protected Page lastPage() {
     return currentWindow.getEnclosedPage();
   }
 
@@ -612,57 +607,101 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private class HtmlUnitTargetLocator implements TargetLocator {
 
     public WebDriver frame(int frameIndex) {
-      HtmlPage page = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+      WebWindow window = currentWindow.getTopWindow();
+      HtmlPage page = (HtmlPage) window.getEnclosedPage();
       try {
         currentWindow = page.getFrames().get(frameIndex);
-      } catch (IndexOutOfBoundsException e) {
+      } catch (final IndexOutOfBoundsException e) {
         throw new NoSuchFrameException("Cannot find frame: " + frameIndex);
       }
       return HtmlUnitDriver.this;
     }
 
-    public WebDriver frame(String name) {
-      HtmlPage page = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
-      WebWindow window = webClient.getCurrentWindow();
+    /**
+     * Switches to a given frame according to name or numeric ID.
+     * Since the method can receive a concatenation of identifiers (separated
+     * by a dot), it traverses the frames, each time looking for a frame with
+     * the current identifier. For eample:
+     * 
+     * frame("foo.1.bar") will switch to frame "foo", than frame number 1 under
+     * frame "foo", then frame "bar" under frame number 1.
+     * 
+     * @param name Frame index, name or a concatenation of frame identifiers
+     * that uniquely point to a specific frame.
+     * @returns This instance. 
+     */
+    public WebDriver frame(final String name) {
+      WebWindow window = currentWindow.getTopWindow();
 
-      String[] names = name.split("\\.");
-      for (String frameName : names) {
-        try {
-          int index = Integer.parseInt(frameName);
-          window = page.getFrames().get(index);
-        } catch (NumberFormatException e) {
-          window = null;
-          for (Object frame : page.getFrames()) {
-            FrameWindow frameWindow = (FrameWindow) frame;
-            if (frameName.equals(frameWindow.getFrameElement().getId())) {
+      // Walk over all parts of the frame identifier, each time looking for a frame
+      // with a name or ID matching this part of the identifier (separated by '.').
+      for (String currentFrameId : name.split("\\.")) {
+        final HtmlPage page = (HtmlPage) window.getEnclosedPage();
+        
+        if (isNumericFrameIdValid(currentFrameId, page)) {
+          window = getWindowByNumericFrameId(currentFrameId, page);
+        } else {
+          // Numeric frame ID is not valid - could be either because the identifier
+          // was numeric and not valid OR the number that was given is actually a frame
+          // name, not an index.
+          
+          boolean nextFrameFound = false;
+          for (final FrameWindow frameWindow : page.getFrames()) {
+            final String frameName = frameWindow.getName();
+            final String frameId = frameWindow.getFrameElement().getId(); 
+            if (frameName.equals(currentFrameId) || frameId.equals(currentFrameId)) {
               window = frameWindow;
-              break;
-            } else if (frameName.equals(frameWindow.getName())) {
-              window = frameWindow;
-              break;
+              nextFrameFound = true;
             }
-          }
-          if (window == null) {
+          } // End for.
+          
+          if (!nextFrameFound) {
             throw new NoSuchFrameException("Cannot find frame: " + name);
           }
-        } catch (IndexOutOfBoundsException e) {
-          throw new NoSuchFrameException("Cannot find frame: " + name);
-        }
+        } // End else
 
-        page = (HtmlPage) window.getEnclosedPage();
-      }
-
+      } // End for
+      
       currentWindow = window;
       return HtmlUnitDriver.this;
     }
 
-    public WebDriver window(String windowId) {
-      WebWindow window;
+    private boolean isNumericFrameIdValid(String currentFrameId, HtmlPage page) {
+      return getWindowByNumericFrameId(currentFrameId, page) != null;
+    }
+    
+    private WebWindow getWindowByNumericFrameId(String currentFrameId, HtmlPage page) {
       try {
-        window = webClient.getWebWindowByName(windowId);
+        final int index = Integer.parseInt(currentFrameId);
+        return page.getFrames().get(index);
+      }
+      catch (final NumberFormatException e) {
+        // nothing - fall through to returning null.
+      }
+      catch (final IndexOutOfBoundsException e) { // frames may have an int as name
+        // nothing - fall through to returning null.
+      }
+
+      return null;
+    }
+
+	public WebDriver window(String windowId) {
+      try {
+        WebWindow window = webClient.getWebWindowByName(windowId);
+        return finishSelecting(window);
       } catch (WebWindowNotFoundException e) {
+
+        List<WebWindow> allWindows = webClient.getWebWindows();
+        for (WebWindow current : allWindows) {
+          WebWindow top = current.getTopWindow();
+          if (String.valueOf(System.identityHashCode(top)).equals(windowId))
+            return finishSelecting(top);
+        }
         throw new NoSuchWindowException("Cannot find window: " + windowId);
       }
+    }
+
+    private WebDriver finishSelecting(WebWindow window) {
       webClient.setCurrentWindow(window);
       currentWindow = window;
       pickWindow();
@@ -864,11 +903,18 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public Speed getSpeed() {
-      throw new UnsupportedOperationException();
+      return HtmlUnitDriver.this.speed;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This method makes absolutely no difference to the behaviour of the htmlunit driver
+
+     * @param speed which is ignored.
+     */
     public void setSpeed(Speed speed) {
-      throw new UnsupportedOperationException();
+      HtmlUnitDriver.this.speed = speed;
     }
 
     private String getDomainForCookie() {

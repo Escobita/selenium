@@ -74,6 +74,10 @@ class WebElement(object):
         else:
             # The "disabled" attribute may not exist
             return True
+            
+    def is_displayed(self):
+        """Whether the element would be visible to a user"""
+        return self._command("isDisplayed")
 
     def find_element_by_id(self, id_):
         """Finds element by id."""
@@ -153,7 +157,7 @@ class WebElement(object):
                 raise NoSuchElementException(
                     "Unable to locate element for %s" % key)
             elems = []
-            for elem_id in resp.split(","):
+            for elem_id in resp:
                 elem = WebElement(self._parent, elem_id)
                 elems.append(elem)
             return elems

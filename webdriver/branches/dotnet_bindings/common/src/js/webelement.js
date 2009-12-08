@@ -23,11 +23,8 @@ limitations under the License.
 goog.provide('webdriver.WebElement');
 
 goog.require('goog.array');
-goog.require('goog.math.Coordinate');
-goog.require('goog.math.Size');
 goog.require('webdriver.By.Locator');
 goog.require('webdriver.By.Strategy');
-goog.require('webdriver.Command');
 goog.require('webdriver.CommandName');
 goog.require('webdriver.Future');
 
@@ -67,99 +64,6 @@ webdriver.WebElement = function(driver) {
 
 
 /**
- * Regular expression for a UUID.
- * @type {RegExp}
- * @static
- */
-webdriver.WebElement.UUID_REGEX =
-    /^{[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}}$/i;
-
-
-/**
- * Adds a command to the given {@code webdriver.WebDriver} instance to find an
- * element on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By.Locator|{*: string}} locator The locator to use for
- *     finding the element, or a short-hand object that can be converted into a
- *     locator.
- * @return {webdriver.WebElement} A WebElement that can be used to issue
- *     commands on the found element.  The element's ID will be set
- *     asynchronously once the driver successfully finds the element.
- * @see webdriver.By.Locator.createFromObj
- */
-webdriver.WebElement.findElement = function(driver, locator) {
-  var webElement = new webdriver.WebElement(driver);
-  locator = webdriver.By.Locator.checkLocator(locator);
-  var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENT).
-      setParameters(locator.type, locator.target).
-      setSuccessCallback(function(response) {
-        webElement.getId().setValue(response.value);
-      });
-  driver.addCommand(command);
-  return webElement;
-};
-
-
-/**
- * Adds a command to the given {@code webdriver.WebDriver} instance to test if
- * an element is present on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By.Locator|{*: string}} locator The locator to use for
- *     finding the element, or a short-hand object that can be converted into a
- *     locator.
- * @return {webdriver.Future} A future whose value will be set when the driver
- *     completes the search; value will be {@code true} if the element was
- *     found, false otherwise.
- * @see webdriver.By.Locator.createFromObj
- */
-webdriver.WebElement.isElementPresent = function(driver, locator) {
-  var isPresent = new webdriver.Future(driver);
-  var callback = function(response) {
-    // If returns without an error, element is present.
-    isPresent.setValue(response.value = !response.isFailure);
-    // Go ahead and clear the error.
-    response.isFailure = false;
-  };
-  locator = webdriver.By.Locator.checkLocator(locator);
-  var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENT).
-      setParameters(locator.type, locator.target).
-      setSuccessCallback(callback).
-      setFailureCallback(callback);
-  driver.addCommand(command);
-  return isPresent;
-};
-
-
-/**
- * Adds a command to the given {@code webdriver.WebDriver} instance to find
- * multiple elements on the page.
- * @param {webdriver.WebDriver} driver The driver to perform the search with.
- * @param {webdriver.By.Locator|{*: string}} locator The locator to use for
- *     finding the element, or a short-hand object that can be converted into a
- *     locator.
- * @see webdriver.By.Locator.createFromObj
- */
-webdriver.WebElement.findElements = function(driver, locator) {
-  locator = webdriver.By.Locator.checkLocator(locator);
-  var command = new webdriver.Command(webdriver.CommandName.FIND_ELEMENTS).
-      setParameters(locator.type, locator.target).
-      setSuccessCallback(function(response) {
-        var ids = response.value.split(',');
-        var elements = [];
-        for (var i = 0, id; id = ids[i]; i++) {
-          if (id) {
-            var element = new webdriver.WebElement(driver);
-            element.getId().setValue(id);
-            elements.push(element);
-          }
-        }
-        response.value = elements;
-      });
-  driver.addCommand(command);
-};
-
-
-/**
  * Adds a command to determine if an element is present under this element in
  * the DOM tree.
  * @param {webdriver.By.Locator|{*: string}} locator The locator to use for
@@ -171,24 +75,29 @@ webdriver.WebElement.findElements = function(driver, locator) {
  * @see webdriver.By.Locator.createFromObj
  */
 webdriver.WebElement.prototype.isElementPresent = function(locator) {
-  var isPresent = new webdriver.Future(this.driver_);
-  var callback = function(response) {
-    // If returns without an error, element is present.
-    isPresent.setValue(response.value = !response.isFailure);
-    // Go ahead and clear the error (if any).
-    response.isFailure = false;
-  };
   locator = webdriver.By.Locator.checkLocator(locator);
-  var command = new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENT).
-      setParameters({
-        'id': this.getId(),
-        'using': locator.type,
-        'value': locator.target
-      }).
-      setSuccessCallback(callback).
-      setFailureCallback(callback);
-  this.driver_.addCommand(command);
-  return isPresent;
+  return this.driver_.callFunction(function() {
+    var findCommand = this.driver_.
+        addCommand(webdriver.CommandName.FIND_CHILD_ELEMENT).
+        setParameters({
+          'id': this.getId(),
+          'using': locator.type,
+          'value': locator.target
+        });
+    var commandFailed = false;
+    var key = goog.events.listenOnce(findCommand,
+        webdriver.Command.ERROR_EVENT, function(e) {
+          commandFailed = true;
+          this.driver_.abortCommand(e.currentTarget);
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }, /*capture phase*/true, this);
+    return this.driver_.callFunction(function() {
+      goog.events.unlistenByKey(key);
+      return !commandFailed;
+    });
+  }, this);
 };
 
 
@@ -206,16 +115,14 @@ webdriver.WebElement.prototype.isElementPresent = function(locator) {
 webdriver.WebElement.prototype.findElement = function(locator) {
   var webElement = new webdriver.WebElement(this.driver_);
   locator = webdriver.By.Locator.checkLocator(locator);
-  var command = new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENT).
+  var command = this.driver_.
+      addCommand(webdriver.CommandName.FIND_CHILD_ELEMENT).
       setParameters({
         'id': this.getId(),
         'using': locator.type,
         'value': locator.target
-      }).
-      setSuccessCallback(function(response) {
-        webElement.getId().setValue(response.value);
       });
-  this.driver_.addCommand(command);
+  webElement.getId().setValue(command.getFutureResult());
   return webElement;
 };
 
@@ -230,26 +137,25 @@ webdriver.WebElement.prototype.findElement = function(locator) {
  */
 webdriver.WebElement.prototype.findElements = function(locator) {
   locator = webdriver.By.Locator.checkLocator(locator);
-  var command =
-      new webdriver.Command(webdriver.CommandName.FIND_CHILD_ELEMENTS).
-          setParameters({
-            'id': this.getId(),
-            'using': locator.type,
-            'value': locator.target
-          }).
-          setSuccessCallback(function(response) {
-            var ids = response.value.split(',');
-            var elements = [];
-            for (var i = 0, id; id = ids[i]; i++) {
-              if (id) {
-                var element = new webdriver.WebElement(this.driver_);
-                element.getId().setValue(id);
-                elements.push(element);
-              }
-            }
-            response.value = elements;
-          }, this);
-  this.driver_.addCommand(command);
+  this.driver_.callFunction(function() {
+    this.driver_.addCommand(webdriver.CommandName.FIND_CHILD_ELEMENTS).
+        setParameters({
+          'id': this.getId(),
+          'using': locator.type,
+          'value': locator.target
+        });
+    return this.driver_.callFunction(function(ids) {
+      var elements = [];
+      for (var i = 0; i < ids.length; i++) {
+        if (ids[i]) {
+          var element = new webdriver.WebElement(this.driver_);
+          element.getId().setValue(ids[i]);
+          elements.push(element);
+        }
+      }
+      return elements;
+    }, this);
+  }, this);
 };
 
 
@@ -278,7 +184,7 @@ webdriver.WebElement.prototype.getId = function() {
  * @private
  */
 webdriver.WebElement.prototype.createCommand_ = function(name) {
-  return new webdriver.Command(name, this);
+  return this.driver_.addCommand(name, this);
 };
 
 
@@ -286,8 +192,7 @@ webdriver.WebElement.prototype.createCommand_ = function(name) {
  * Adds a command to click on this element.
  */
 webdriver.WebElement.prototype.click = function() {
-  var command = this.createCommand_(webdriver.CommandName.CLICK);
-  this.driver_.addCommand(command);
+  this.createCommand_(webdriver.CommandName.CLICK);
 };
 
 
@@ -343,18 +248,14 @@ webdriver.WebElement.prototype.click = function() {
 webdriver.WebElement.prototype.sendKeys = function(var_args) {
   var command = this.createCommand_(webdriver.CommandName.SEND_KEYS);
   command.setParameters.apply(command, arguments);
-  this.driver_.addCommand(command);
 };
 
 /**
  * Queries for the tag/node name of this element.
  */
 webdriver.WebElement.prototype.getTagName = function() {
-  var name = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_TAG_NAME).
-      setSuccessCallback(name.setValueFromResponse, name);
-  this.driver_.addCommand(command);
-  return name;
+  return this.createCommand_(webdriver.CommandName.GET_TAG_NAME).
+      getFutureResult();
 };
 
 
@@ -371,12 +272,9 @@ webdriver.WebElement.prototype.getTagName = function() {
  *    Future.
  */
 webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
-  var value = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
+  return this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
       setParameters(cssStyleProperty).
-      setSuccessCallback(value.setValueFromResponse, value);
-  this.driver_.addCommand(command);
-  return value;
+      getFutureResult();
 };
 
 
@@ -385,22 +283,9 @@ webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
  * @param {string} attributeName The name of the attribute to query.
  */
 webdriver.WebElement.prototype.getAttribute = function(attributeName) {
-  var value = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
+  return this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
       setParameters(attributeName).
-      setSuccessCallback(value.setValueFromResponse, value).
-      // If there is an error b/c the attribute was not found, set value to null
-      setFailureCallback(function(response) {
-        // TODO(jmleyba): This error message needs to be consistent for all
-        // drivers.
-        if (response.value == 'No match') {
-          response.isFailure = false;
-          response.value = null;
-          value.setValue(null);
-        }
-      });
-  this.driver_.addCommand(command);
-  return value;
+      getFutureResult();
 };
 
 
@@ -409,11 +294,8 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
  *    this instance.
  */
 webdriver.WebElement.prototype.getValue = function() {
-  var value = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_VALUE).
-      setSuccessCallback(value.setValueFromResponse, value);
-  this.driver_.addCommand(command);
-  return value;
+  return this.createCommand_(webdriver.CommandName.GET_VALUE).
+      getFutureResult();
 };
 
 
@@ -422,11 +304,8 @@ webdriver.WebElement.prototype.getValue = function() {
  *     or trailing whitespace.
  */
 webdriver.WebElement.prototype.getText = function() {
-  var text = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_TEXT).
-      setSuccessCallback(text.setValueFromResponse, text);
-  this.driver_.addCommand(command);
-  return text;
+  return this.createCommand_(webdriver.CommandName.GET_TEXT).
+      getFutureResult();
 };
 
 
@@ -434,8 +313,7 @@ webdriver.WebElement.prototype.getText = function() {
  * Selects this element.
  */
 webdriver.WebElement.prototype.setSelected = function() {
-  var command = this.createCommand_(webdriver.CommandName.SET_SELECTED);
-  this.driver_.addCommand(command);
+  this.createCommand_(webdriver.CommandName.SET_SELECTED);
 };
 
 
@@ -443,30 +321,8 @@ webdriver.WebElement.prototype.setSelected = function() {
  * @return {webdriver.Future} The size of this element.
  */
 webdriver.WebElement.prototype.getSize = function() {
-  var size = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_SIZE).
-      setSuccessCallback(function(response) {
-        var wh = response.value.replace(/\s/g, '').split(',');
-        response.value = new goog.math.Size(wh[0], wh[1]);
-        size.setValue(response.value);
-      });
-  this.driver_.addCommand(command);
-  return size;
-};
-
-
-/**
- * Parses a response of the form "$x $y" into a {@code goog.math.Coordinate}
- * object.
- * @param {webdriver.Future} future The Future to store the parsed result in.
- * @param {webdriver.Response} response The response to parse.
- * @private
- */
-webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
-                                                               response) {
-  var xy = response.value.replace(/\s/g, '').split(',');
-  response.value = new goog.math.Coordinate(xy[0], xy[1]);
-  future.setValue(response.value);
+  return this.createCommand_(webdriver.CommandName.GET_SIZE).
+      getFutureResult();
 };
 
 
@@ -474,32 +330,8 @@ webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
  * @return {webdriver.Future} The location of this element.
  */
 webdriver.WebElement.prototype.getLocation = function() {
-  var currentLocation = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_LOCATION).
-      setSuccessCallback(
-          goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,
-              currentLocation));
-  this.driver_.addCommand(command);
-  return currentLocation;
-};
-
-
-/**
- * @param {webdriver.Future} newLocation Future to store the new location in
- *     when the command is complete.
- * @param {number} x Horizontal distance to drag this element.
- * @param {number} y Vertical distanct to drag this element.
- * @param opt_addToFront
- * @private
- */
-webdriver.WebElement.prototype.addDragAndDropCommand_ = function(
-    newLocation, x, y, opt_addToFront) {
-  var command = this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
-      setParameters(x, y).
-      setSuccessCallback(
-          goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,
-              newLocation));
-  this.driver_.addCommand(command, opt_addToFront);
+  return this.createCommand_(webdriver.CommandName.GET_LOCATION).
+      getFutureResult();
 };
 
 
@@ -510,9 +342,9 @@ webdriver.WebElement.prototype.addDragAndDropCommand_ = function(
  * @return {webdriver.Future} The new location of the element.
  */
 webdriver.WebElement.prototype.dragAndDropBy = function(x, y) {
-  var newLocation = new webdriver.Future(this.driver_);
-  this.addDragAndDropCommand_(newLocation, x, y);
-  return newLocation;
+  return this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
+      setParameters(x, y).
+      getFutureResult();
 };
 
 
@@ -531,13 +363,11 @@ webdriver.WebElement.prototype.dragAndDropTo = function(webElement) {
 
   var toLocation = webElement.getLocation();
   var thisLocation = this.getLocation();
-  var newLocation = new webdriver.Future(this.driver_);
-  this.driver_.callFunction(goog.bind(function() {
+  return this.driver_.callFunction(function() {
     var delta = goog.math.Coordinate.difference(
         toLocation.getValue(), thisLocation.getValue());
-    this.addDragAndDropCommand_(newLocation, delta.x, delta.y, true);
-  }, this));
-  return newLocation;
+    return this.dragAndDropBy(delta.x, delta.y);
+  }, this);
 };
 
 
@@ -546,15 +376,12 @@ webdriver.WebElement.prototype.dragAndDropTo = function(webElement) {
  *     enabled, as dictated by the {@code disabled} attribute.
  */
 webdriver.WebElement.prototype.isEnabled = function() {
-  var futureValue = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-      setParameters('disabled').
-      setSuccessCallback(function(response) {
-        response.value = !!!response.value;
-        futureValue.setValue(response.value);
-      });
-  this.driver_.addCommand(command);
-  return futureValue;
+  return this.driver_.callFunction(function() {
+    this.getAttribute('disabled');
+    return this.driver_.callFunction(function(value) {
+      return !!!value;
+    });
+  }, this);
 };
 
 
@@ -562,27 +389,17 @@ webdriver.WebElement.prototype.isEnabled = function() {
  * Determines if this element is checked or selected; will generate an error if
  * the DOM element represented by this instance is not an OPTION or checkbox
  * INPUT element.
- * @return {webdriver.Future} Whether this instance is currently checked or
- *    selected.
+ * @return {webdriver.Future} Whether this element is checked or selected.
  * @private
  */
-webdriver.WebElement.prototype.isCheckedOrSelected_ = function(opt_future,
-                                                               opt_addToFront) {
-  var value = opt_future ||  new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.GET_TAG_NAME).
-      setSuccessCallback(function(response) {
-        var attribute = response.value == 'input' ? 'checked' : 'selected';
-        var getAttrCommand =
-            this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-                setParameters(attribute).
-                setSuccessCallback(function(response) {
-                  response.value = !!response.value;
-                  value.setValue(response.value);
-                });
-        this.driver_.addCommand(getAttrCommand, true);
-      }, this);
-  this.driver_.addCommand(command, opt_addToFront);
-  return value;
+webdriver.WebElement.prototype.isCheckedOrSelected_ = function() {
+  return this.driver_.callFunction(function() {
+    this.createCommand_(webdriver.CommandName.GET_TAG_NAME);
+    return this.driver_.callFunction(function(prevResult) {
+      var attribute = prevResult == 'input' ? 'checked' : 'selected';
+      return this.getAttribute(attribute);
+    }, this);
+  }, this);
 };
 
 
@@ -609,13 +426,10 @@ webdriver.WebElement.prototype.isChecked = function() {
  * @return {webdriver.Future} The new checked/selected state of this element.
  */
 webdriver.WebElement.prototype.toggle = function() {
-  var toggleResult = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.TOGGLE).
-      setSuccessCallback(function() {
-        this.isCheckedOrSelected_(toggleResult, true);
-      }, this);
-  this.driver_.addCommand(command);
-  return toggleResult;
+  return this.driver_.callFunction(function() {
+    this.createCommand_(webdriver.CommandName.TOGGLE);
+    return this.isCheckedOrSelected_();
+  }, this);
 };
 
 
@@ -624,8 +438,7 @@ webdriver.WebElement.prototype.toggle = function() {
  * will that form.
  */
 webdriver.WebElement.prototype.submit = function() {
-  this.driver_.addCommand(
-      this.createCommand_(webdriver.CommandName.SUBMIT));
+  this.createCommand_(webdriver.CommandName.SUBMIT);
 };
 
 
@@ -634,8 +447,7 @@ webdriver.WebElement.prototype.submit = function() {
  * will clear its {@code value}.
  */
 webdriver.WebElement.prototype.clear = function() {
-  this.driver_.addCommand(
-      this.createCommand_(webdriver.CommandName.CLEAR));
+  this.createCommand_(webdriver.CommandName.CLEAR);
 };
 
 
@@ -643,18 +455,8 @@ webdriver.WebElement.prototype.clear = function() {
  * @return {webdriver.Future} Whether this element is currently displayed.
  */
 webdriver.WebElement.prototype.isDisplayed = function() {
-  var futureValue = new webdriver.Future(this.driver_);
-  var command = this.createCommand_(webdriver.CommandName.IS_DISPLAYED).
-      setSuccessCallback(function(response) {
-        // TODO(jmleyba): FF extension should not be returning a string here...
-        if (goog.isString(response.value)) {
-          futureValue.setValue(response.value == 'true');
-        } else {
-          futureValue.setValue(response.value);
-        }
-      });
-  this.driver_.addCommand(command);
-  return futureValue;
+  return this.createCommand_(webdriver.CommandName.IS_DISPLAYED).
+      getFutureResult();
 };
 
 

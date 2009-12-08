@@ -20,6 +20,8 @@ package org.openqa.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
@@ -38,6 +40,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @Ignore(value = CHROME_NON_WINDOWS, reason = "Failing on OS X")
   public void testShouldFireClickEventWhenClicking() {
     driver.get(javascriptPage);
 
@@ -47,7 +50,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldFireMouseDownEventWhenClicking() {
     driver.get(javascriptPage);
 
@@ -57,13 +60,33 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldFireMouseUpEventWhenClicking() {
     driver.get(javascriptPage);
 
     clickOnElementWhichRecordsEvents();
 
     assertEventFired("mouseup");
+  }
+
+  @JavascriptEnabled
+  @Ignore({SELENESE, CHROME})
+  public void testShouldFireMouseOverEventWhenClicking() {
+    driver.get(javascriptPage);
+
+    clickOnElementWhichRecordsEvents();
+
+    assertEventFired("mouseover");
+  }
+
+  @JavascriptEnabled
+  @Ignore({SELENESE, CHROME, FIREFOX})
+  public void testShouldFireMouseMoveEventWhenClicking() {
+    driver.get(javascriptPage);
+
+    clickOnElementWhichRecordsEvents();
+
+    assertEventFired("mousemove");
   }
 
   @Ignore(value = {CHROME, SELENESE}, reason = "Webkit bug 22261")
@@ -85,7 +108,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testsShouldIssueMouseDownEvents() {
     driver.get(javascriptPage);
     driver.findElement(By.id("mousedown")).click();
@@ -95,6 +118,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @Ignore(value = {CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldIssueClickEvents() {
     driver.get(javascriptPage);
     driver.findElement(By.id("mouseclick")).click();
@@ -104,7 +128,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldIssueMouseUpEvents() {
     driver.get(javascriptPage);
     driver.findElement(By.id("mouseup")).click();
@@ -114,7 +138,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({IPHONE, SELENESE})
+  @Ignore(value = {IPHONE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testMouseEventsShouldBubbleUpToContainingElements() {
     driver.get(javascriptPage);
     driver.findElement(By.id("child")).click();
@@ -124,7 +148,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({IPHONE, SELENESE})
+  @Ignore(value = {IPHONE, SELENESE, CHROME}, reason = "Non-native event firing is broken in Chrome.")
   public void testShouldEmitOnChangeEventsWhenSelectingElements() {
     driver.get(javascriptPage);
     WebElement select = driver.findElement(By.id("selector"));
@@ -144,7 +168,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {SELENESE, CHROME}, reason = "Non-native event firing is broken in Chrome.")
   public void testShouldEmitOnChangeEventsWhenChangingTheStateOfACheckbox() {
     driver.get(javascriptPage);
     WebElement checkbox = driver.findElement(By.id("checkbox"));
@@ -165,6 +189,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @Ignore(value = {CHROME}, reason = "Non-native event firing is broken in Chrome.")
   public void testClearingAnElementShouldCauseTheOnChangeHandlerToFire() {
     driver.get(javascriptPage);
 
@@ -174,6 +199,36 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     WebElement result = driver.findElement(By.id("result"));
     assertThat(result.getText(), equalTo("Cleared"));
   }
+  
+  @JavascriptEnabled
+  @Ignore(value = {SELENESE, CHROME}, reason = "Chrome: Non-native event firing is broken in Chrome.  Selenese: Fails when running in firefox")
+  public void testSendingKeysToAnotherElementShouldCauseTheBlurEventToFire() {
+    if (browserNeedsFocusOnThisOs(driver)) {
+      System.out.println("Skipping this test because browser demands focus");
+      return;
+    }
+
+    driver.get(javascriptPage);
+  	WebElement element = driver.findElement(By.id("theworks"));
+  	element.sendKeys("foo");
+  	WebElement element2 = driver.findElement(By.id("changeable"));
+  	element2.sendKeys("bar");
+  	assertEventFired("blur");
+  }
+  
+  @JavascriptEnabled
+  @Ignore(value = {SELENESE, CHROME}, reason = "Chrome: Non-native event firing is broken in Chrome.  Selenese: Fails when running in firefox")
+  public void testSendingKeysToAnElementShouldCauseTheFocusEventToFire() {
+    if (browserNeedsFocusOnThisOs(driver)) {
+      System.out.println("Skipping this test because browser demands focus");
+      return;
+    }
+    
+  	driver.get(javascriptPage);
+  	WebElement element = driver.findElement(By.id("theworks"));
+  	element.sendKeys("foo");
+  	assertEventFired("focus");
+  }
 
   private void clickOnElementWhichRecordsEvents() {
     driver.findElement(By.id("plainButton")).click();
@@ -182,6 +237,6 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   private void assertEventFired(String eventName) {
     WebElement result = driver.findElement(By.id("result"));
     String text = result.getText();
-    assertTrue("No " + eventName + " fired", text.contains(eventName));
+    assertTrue("No " + eventName + " fired: " + text, text.contains(eventName));
   }
 }

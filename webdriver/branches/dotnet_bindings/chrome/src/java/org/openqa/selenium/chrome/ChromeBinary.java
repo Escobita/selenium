@@ -8,6 +8,8 @@ import org.openqa.selenium.WebDriverException;
 
 public class ChromeBinary {
   
+  private static final int BACKOFF_INTERVAL = 2500;
+
   private static int linearBackoffCoefficient = 1;
   
   Process chromeProcess = null;
@@ -27,13 +29,20 @@ public class ChromeBinary {
           getChromeFile(),
           "--user-data-dir=" + profileDir,
           "--load-extension=" + extensionDir,
-          "--activate-on-launch")
+          "--activate-on-launch",
+          "--homepage=about:blank",
+          "--no-first-run",
+          "--disable-hang-monitor",
+          "--disable-popup-blocking",
+          "--disable-prompt-on-repost",
+          "--no-default-browser-check",
+          "about:blank")
           .start();
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
     try {
-      Thread.sleep(2500 * linearBackoffCoefficient);
+      Thread.sleep(BACKOFF_INTERVAL * linearBackoffCoefficient);
     } catch (InterruptedException e) {
       //Nothing sane to do here
     }

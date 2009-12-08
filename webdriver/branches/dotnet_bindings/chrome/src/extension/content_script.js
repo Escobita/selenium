@@ -75,11 +75,18 @@ function parsePortMessage(message) {
   case "nonNativeClickElement":
     //TODO(danielwh): Focus/blur events for non-native clicking
     element.scrollIntoView(true);
+    //TODO: Work out a way of firing events,
+    //now that synthesising them gives appendMessage errors
+    console.log("mouse downing");
     Utils.fireMouseEventOn(element, "mousedown");
+      console.log("mouse up");
     Utils.fireMouseEventOn(element, "mouseup");
+      console.log("mouse click");
     Utils.fireMouseEventOn(element, "click");
+
     if (element.click) {
-      element.click();
+      console.log("click");
+      execute("try { arguments[0].click(); } catch(e){}", {type: "ELEMENT", value: getElementId_(element)});
     }
     response.value = {statusCode: 0};
     break;
@@ -534,6 +541,23 @@ function internalGetElement(elementIdAsString) {
 }
 
 /**
+ * Given an element, returning the index that can be used to locate it
+ *
+ * @param element the element to look up the internal ID of
+ * @return A positive integer on success or -1 otherwise
+ */
+function getElementId_(element) {
+  var length = ChromeDriverContentScript.internalElementArray.length;
+  for (var i = 0; i < length; i++) {
+    if (ChromeDriverContentScript.internalElementArray[i] === element) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+/**
  * Ensures the passed element is in view, so that the native click event can be sent
  * @return object to send back to background page to trigger a native click
  */
@@ -579,6 +603,8 @@ function clearElement(element) {
   var oldValue = element.value;
   element.value = '';
   if (oldValue != '') {
+    //TODO: Work out a way of firing events,
+    //now that synthesising them gives appendMessage errors
     Utils.fireHtmlEvent(element, "change");
   }
   return {statusCode: 0};
@@ -665,6 +691,8 @@ function selectElement(element) {
     return e;
   }
   if (!oldValue) {
+    //TODO: Work out a way of firing events,
+    //now that synthesising them gives appendMessage errors
     Utils.fireHtmlEvent(element, "change");
   }
   return {statusCode: 0};
@@ -680,9 +708,15 @@ function sendElementKeys(element, keys, elementId) {
   } catch (e) {
     return e;
   }
-  //TODO(danielwh): Fire events
-  ChromeDriverContentScript.currentDocument.activeElement.blur();
-  element.focus();
+  var oldFocusedElement = ChromeDriverContentScript.currentDocument.activeElement;
+  if (oldFocusedElement != element) {
+    //TODO: Work out a way of firing events,
+    //now that synthesising them gives appendMessage errors
+    oldFocusedElement.blur();
+    Utils.fireHtmlEvent(oldFocusedElement, "blur");
+    element.focus();
+    Utils.fireHtmlEvent(element, "focus");
+  }
   return {statusCode: "no-op", keys: keys, elementId: elementId};
 }
 
@@ -751,7 +785,11 @@ function toggleElement(element) {
   } catch (e) {
     return e;
   }
+  console.log("New value: " + newValue);
+  
   if (changed) {
+    //TODO: Work out a way of firing events,
+    //now that synthesising them gives appendMessage errors
     Utils.fireHtmlEvent(element, "change");
   }
   return {statusCode: 0, value: newValue};
@@ -828,9 +866,10 @@ function parseWrappedArguments(argument) {
  * We can't share objects between content script and page, so have to wrap up arguments as JSON
  * @param script script to execute as a string
  * @param passedArgs array of arguments to pass to the script
+ * @param callback function to call when the result is returned
  */
-function execute(script, passedArgs) {
-  console.log("execing " + script + ", args: " + JSON.stringify(passedArgs));
+function execute_(script, passedArgs, callback) {
+  console.log("executing " + script + ", args: " + JSON.stringify(passedArgs));
   var func = "function(){" + script + "}";
   var args = [];
   for (var i = 0; i < passedArgs.length; ++i) {
@@ -885,9 +924,13 @@ function execute(script, passedArgs) {
                         '}' +
                         'document.getElementsByTagName("script")[document.getElementsByTagName("script").length - 1].dispatchEvent(e);' +
                         'document.getElementsByTagName("html")[0].removeChild(document.getElementsByTagName("script")[document.getElementsByTagName("script").length - 1]);';
-  scriptTag.addEventListener('DOMAttrModified', returnFromJavascriptInPage, false);
+  scriptTag.addEventListener('DOMAttrModified', callback, false);
   console.log("Injecting script element");
   ChromeDriverContentScript.currentDocument.getElementsByTagName("html")[0].appendChild(scriptTag);
+}
+
+function execute(script, passedArgs) {
+  execute_(script, passedArgs, returnFromJavascriptInPage);
 }
 
 function parseReturnValueFromScript(result) {
@@ -930,7 +973,7 @@ function returnFromJavascriptInPage(e) {
   console.log("Result was: " + e.newValue.value);
   var result = JSON.parse(e.newValue).value;
   var value = parseReturnValueFromScript(result);
-  console.log("reutrn value: " + JSON.stringify(value));
+  console.log("Return value: " + JSON.stringify(value));
   ChromeDriverContentScript.port.postMessage({sequenceNumber: ChromeDriverContentScript.currentSequenceNumber, response: {response: "execute", value: {statusCode: 0, value: value}}});
 }
 

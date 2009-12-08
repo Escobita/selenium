@@ -96,12 +96,20 @@ Response.prototype = {
    * Sends the encapsulated response to the registered callback.
    */
   send: function() {
+    if (this.responseSent_) {
+      // We shouldn't ever send the same response twice.
+      return;
+    }
     // Indicate that we are no longer executing a command.
     if (this.statusBarLabel_) {
       this.statusBarLabel_.style.color = 'black';
     }
+
     this.context = this.context.toString();
     this.responseHandler_.handleResponse(JSON.stringify(this.json_));
+
+    // Neuter ourselves
+    this.responseSent_ = true;
   },
 
   /**
@@ -202,6 +210,10 @@ DelayedCommand.prototype.executeInternal_ = function() {
     } else {
       try {
         this.response_.commandName = this.command_.commandName;
+        // TODO(simon): This is rampantly ugly, but allows an alert to kill the command
+        // TODO(simon): This is never cleared, but _should_ be okay, because send wipes itself
+        this.driver_.response_ = this.response_;
+
         this.driver_[this.command_.commandName](
             this.response_, this.command_.parameters);
       } catch (e) {
@@ -365,11 +377,11 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
  * @param {Array.<*>} windowId The parameters sent with the original command.
  *     The first element in the array must be the ID of the window to switch to.
  *     Note all other command parameters are ignored.
- * @param {boolean} opt_isSecondSearch Whether this is the second attempt to
- *     find the window.
+ * @param {number} opt_searchAttempt Which attempt this is at finding the
+ *     window to switch to.
  */
 nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
-                                                       opt_isSecondSearch) {
+                                                       opt_searchAttempt) {
   var lookFor = windowId[0];
   var matches = function(win, lookFor) {
     return !win.closed &&
@@ -401,9 +413,12 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
   // typically true for anchors with a target attribute set. This search could
   // execute before the target window has finished loaded, meaning the content
   // window won't have a name or FirefoxDriver instance yet (see matches above).
-  // If we don't find the window, set a timeout to try one more time.
+  // If we don't find the window, set a timeout and try again.
   if (!windowFound) {
-    if (opt_isSecondSearch) {
+    // TODO(jmleyba): We should be sniffing the current windows to detect if
+    // one is still loading vs. a brute force "try again"
+    var searchAttempt = opt_searchAttempt || 0;
+    if (searchAttempt > 3) {
       response.isError = true;
       response.response = 'Unable to locate window "' + lookFor + '"';
       response.send();
@@ -411,7 +426,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
       var self = this;
       this.wm.getMostRecentWindow('navigator:browser').
           setTimeout(function() {
-            self.switchToWindow(response, windowId, true);
+            self.switchToWindow(response, windowId, (searchAttempt + 1));
           }, 500);
     }
   }
@@ -430,11 +445,9 @@ nsCommandProcessor.prototype.getWindowHandles = function(response) {
       res.push(win.top.fxdriver.id);
     } else if (win.content) {
       res.push(win.content.name);
-    } else {
-      res.push('');
     }
   });
-  response.response = res.join(',');
+  response.response = res;
   response.send();
 };
 

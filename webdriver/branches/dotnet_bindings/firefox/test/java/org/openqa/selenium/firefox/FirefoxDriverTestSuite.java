@@ -71,10 +71,10 @@ public class FirefoxDriverTestSuite extends TestCase {
 
       // Copy in the native events library/libraries
       Map<String, String> fromTo = new HashMap<String, String>();
-      if (Platform.getCurrent().equals(Platform.WINDOWS)) {
+      if (Platform.getCurrent().is(Platform.WINDOWS)) {
         fromTo.put("Debug/webdriver-firefox.dll",
         "platform/WINNT_x86-msvc/components/webdriver-firefox.dll");
-      } else if (Platform.getCurrent().equals(Platform.UNIX)) {
+      } else if (Platform.getCurrent().is(Platform.UNIX)) {
         fromTo.put("../linux64/Release/libwebdriver-firefox.so",
         "platform/Linux/components/libwebdriver-firefox.so");
       
@@ -84,7 +84,15 @@ public class FirefoxDriverTestSuite extends TestCase {
         fromTo.put("../linux/Release/x_ignore_nofocus.so",
         "x86/x_ignore_nofocus.so");
       }
-      
+
+      // Grab the dommessenger
+      File domMessenger = FileHandler.locateInProject("common/src/js/extension/dommessenger.js");
+      File targetDomMessenger = new File(extension, "content/dommessenger.js");
+      try {
+        FileHandler.copy(domMessenger, targetDomMessenger);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
 
       // We know the location of the "from" in relation to the extension source
       for (Map.Entry<String, String> entry : fromTo.entrySet()) {
@@ -119,6 +127,7 @@ public class FirefoxDriverTestSuite extends TestCase {
       Map<String, String> components = new HashMap<String, String>() {{
         put("build/nsINativeEvents.xpt", "components/nsINativeEvents.xpt");
         put("build/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt");
+        put("build/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt");
       }};
 
       for (Map.Entry<String, String> component : components.entrySet()) {

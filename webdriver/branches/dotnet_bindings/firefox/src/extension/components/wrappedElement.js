@@ -72,10 +72,18 @@ FirefoxDriver.prototype.click = function(respond) {
   Utils.dumpn("Falling back to synthesized click");
   var currentlyActive = Utils.getActiveElement(respond.context);
 
+  Utils.fireMouseEventOn(respond.context, element, "mouseover");
+  Utils.fireMouseEventOn(respond.context, element, "mousemove");
   Utils.fireMouseEventOn(respond.context, element, "mousedown");
   if (element != currentlyActive) {
-    currentlyActive.blur();
-    element.focus();
+    // Some elements may not have blur, focus functions - for example,
+    // elements under an SVG element. Call those only if they exist.
+    if (typeof currentlyActive.blur == 'function') {
+      currentlyActive.blur();
+    }
+    if (typeof element.focus == 'function') {
+      element.focus();
+    }
   }
 
   Utils.fireMouseEventOn(respond.context, element, "mouseup");
@@ -250,7 +258,7 @@ FirefoxDriver.prototype.getAttribute = function(respond, value) {
     } else if (attributeName.toLowerCase() == "checked") {
       respond.response = element.checked;
     } else if (attributeName.toLowerCase() == "readonly") {
-      respond.response = element.getAttribute('readonly');
+      respond.response = element.readOnly;
     }
 
     respond.send();
@@ -279,8 +287,7 @@ FirefoxDriver.prototype.getAttribute = function(respond, value) {
     respond.send();
     return;
   }
-  respond.isError = true;
-  respond.response = "No match";
+  respond.response = null;
   respond.send();
 };
 
@@ -461,8 +468,7 @@ FirefoxDriver.prototype.toggle = function(respond) {
 
 FirefoxDriver.prototype.isDisplayed = function(respond) {
   var element = Utils.getElementAt(respond.elementId, respond.context);
-
-  respond.response = Utils.isDisplayed(element) ? "true" : "false";
+  respond.response = Utils.isDisplayed(element);
   respond.send();
 };
 
@@ -472,7 +478,10 @@ FirefoxDriver.prototype.getLocation = function(respond) {
 
   var location = Utils.getElementLocation(element, respond.context);
 
-  respond.response = location.x + ", " + location.y;
+  respond.response = {
+    x: Math.round(location.x),
+    y: Math.round(location.y)
+  };
   respond.send();
 };
 
@@ -482,7 +491,10 @@ FirefoxDriver.prototype.getSize = function(respond) {
 
   var box = Utils.getLocationOnceScrolledIntoView(element);
 
-  respond.response = box.width + ", " + box.height;
+  respond.response = {
+    width: Math.round(box.width),
+    height: Math.round(box.height)
+  };
   respond.send();
 };
 

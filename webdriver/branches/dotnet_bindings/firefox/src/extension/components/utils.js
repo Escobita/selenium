@@ -470,9 +470,11 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
       var the_window = element.ownerDocument.defaultView;
 
       var doneNativeEventWait = false;
-      
-      the_window.setTimeout(function() {
-        doneNativeEventWait = true; }, 100);
+
+      if (the_window) {
+        the_window.setTimeout(function() {
+          doneNativeEventWait = true; }, 100);
+      }
       
       // Do it as long as the timeout function has not been called and the
       // page has not been unloaded. If the page has been unloaded, there is no
@@ -1084,7 +1086,11 @@ Utils.findElementsByXPath = function (xpath, contextNode, context) {
 
 
 Utils.getLocationOnceScrolledIntoView = function(element) {
-  element.scrollIntoView(true);
+  // Some elements may not a scrollIntoView function - for example,
+  // elements under an SVG element. Call those only if they exist.
+  if (typeof element.scrollIntoView == 'function') {
+    element.scrollIntoView(true);
+  }
 
   var retrieval = Utils.newInstance(
       "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
@@ -1102,6 +1108,18 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
         width: clientRect.width,
         height: clientRect.height
       };
+    }
+
+    // Firefox 3.0.14 seems to have top, bottom attributes.
+    if (clientRect['top'] !== undefined) {
+      var retWidth = clientRect.right - clientRect.left;
+      var retHeight = clientRect.bottom - clientRect.top;
+      return {
+        x : clientRect.left,
+        y : clientRect.top,
+        width: retWidth,
+        height: retHeight
+      }
     }
 
     // Firefox 3.0
@@ -1123,6 +1141,7 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
 
   // Firefox 2.0
 
+  Utils.dumpn("Falling back to firefox2 mechanism");
   // Fallback. Use the (deprecated) method to find out where the element is in
   // the viewport. This should be fine to use because we only fall down this
   // code path on older versions of Firefox (I think!)
@@ -1181,18 +1200,18 @@ Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
 Utils.wrapResult = function(result, context) {
   // Sophisticated.
   if (null === result || undefined === result) {
-    return {resultType: "NULL"};
+    return {type: "NULL", value: null};
   } else if (result['tagName']) {
-    return {resultType: "ELEMENT",
-            response: Utils.addToKnownElements(result, context)};
+    return {type: "ELEMENT",
+            value: Utils.addToKnownElements(result, context)};
   } else if (result !== undefined &&
              result.constructor.toString().indexOf("Array") != -1) {
     var array = [];
     for (var i = 0; i < result.length; i++) {
       array.push(Utils.wrapResult(result[i], context));
     }
-    return {resultType: "ARRAY", response: array};
+    return {type: "ARRAY", value: array};
   } else {
-    return {resultType: "OTHER", response: result};
+    return {type: "OTHER", value: result};
   }
 }

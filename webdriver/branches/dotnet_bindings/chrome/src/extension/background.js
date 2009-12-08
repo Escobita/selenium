@@ -161,6 +161,32 @@ ChromeDriver.windowHandlePrefix = '__webdriver_chromedriver_windowhandle';
  */
 ChromeDriver.isBlockedWaitingForResponse = false;
 
+/**
+ * It's possible that the page has completed loading,
+ * but the content script has not yet fired.
+ * In this case, to not report that there is no page,
+ * when we are just too fast, we wait up to this amount of time.
+ * @type {number} unit: milliseconds
+ */
+ChromeDriver.timeoutUntilGiveUpOnContentScriptLoading = 5000;
+
+/**
+ * How long we are currently waiting for the content script to load
+ * after loading the page
+ * @type {number} unit: milliseconds
+ */
+ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading;
+
+//Set ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading;
+resetCurrentlyWaitingOnContentScriptTime();
+
+/**
+ * How long we wait between poling whether we have a content script,
+ * when loading a new page, up until
+ * ChromeDriver.timeoutUntilGiveUpOnContentScriptLoading
+ * @type {number} unit: milliseconds
+ */
+ChromeDriver.waitForContentScriptIncrement = 100;
 
 chrome.extension.onConnect.addListener(function(port) {
   console.log("Connected to " + port.name);
@@ -259,6 +285,13 @@ chrome.extension.onConnect.addListener(function(port) {
       //We are actively closing the tab, and expect a response to this
       sendResponseToParsedRequest({statusCode: 0}, false)
       ChromeDriver.isClosingTab = false;
+      if (ChromeDriver.tabs.length == 0) {
+        chrome.windows.getAll({}, function(windows) {
+          for (var window in windows) {
+            chrome.windows.remove(windows[window].id);
+          }
+        });
+      }
     }
   });
 });
@@ -268,13 +301,13 @@ sendResponseByXHR({statusCode: 0}, false);
 
 /**
  * Sends the passed argument as the result of a command
- * @param result result to send
+ * @param result object encapsulating result to send
  * @param wait whether we expect this command to possibly make changes
  * we need to wait for (e.g. adding elements, opening windows) - if so,
  * we wait until we think these effects are done
  */
 function sendResponseByXHR(result, wait) {
-  console.log("Sending result by XHR: " + result);
+  console.log("Sending result by XHR: " + JSON.stringify(result));
   if (ChromeDriver.xmlHttpRequest != null) {
     ChromeDriver.xmlHttpRequest.abort();
   }
@@ -299,11 +332,12 @@ function sendResponseByXHR(result, wait) {
  * Should only EVER be called by sendResponseByXHR,
  * as it ignores things like setting up XHR and blocking,
  * and just forces the sending over an assumed open XHR
+ * @param result String to send
  */
 function sendResult(result) {
   //TODO(danielwh): Iterate over tabs checking their status
   ChromeDriver.xmlHttpRequest.send(result + "\nEOResponse\n");
-  console.log("Sent result by XHR: " + result);
+  console.log("Sent result by XHR: " + JSON.stringify(result));
 }
 
 /**
@@ -321,7 +355,7 @@ function sendResponseToParsedRequest(toSend, wait) {
   ChromeDriver.lastRequestToBeSentWhichHasntBeenAnsweredYet = null;
   console.log("SENDING RESPOND TO PARSED REQUEST");
   sendResponseByXHR(JSON.stringify(toSend), wait);
-  setToolstripsBusy(false);
+  setExtensionBusyIndicator(false);
 }
 
 /**
@@ -360,7 +394,7 @@ function parseRequest(request) {
     return;
   }
   ChromeDriver.isBlockedWaitingForResponse = true;
-  setToolstripsBusy(true);
+  setExtensionBusyIndicator(true);
   
   switch (request.request) {
   case "get":
@@ -401,6 +435,9 @@ function parseRequest(request) {
         }
       }, false);
     }
+    break;
+  case "screenshot":
+    getScreenshot();
     break;
   case "clickElement":
   case "hoverOverElement":
@@ -459,6 +496,19 @@ function parseRequest(request) {
   }
 }
 
+function getScreenshot() {
+  chrome.tabs.captureVisibleTab(null, getScreenshotResult);
+}
+
+function getScreenshotResult(snapshotDataUrl) {
+  var index = snapshotDataUrl.indexOf('base64,');
+  if (index == -1) {
+    sendResponseToParsedRequest({statusCode: 99}, false);
+    return;
+  }
+  var base64 = snapshotDataUrl.substring(index + 'base64,'.length);
+  sendResponseToParsedRequest({statusCode: 0, value: base64}, false);
+}
 
 function sendMessageOnActivePortAndAlsoKeepTrackOfIt(message) {
   ChromeDriver.lastRequestToBeSentWhichHasntBeenAnsweredYet = message.request;
@@ -650,6 +700,7 @@ function resetActiveTabDetails() {
   ChromeDriver.hasSentResponseToThisPageLoading = false;
   ChromeDriver.portToUseForFrameLookups = null;
   ChromeDriver.currentUrl = null;
+  resetCurrentlyWaitingOnContentScriptTime();
 }
 
 function setActiveTabDetails(tab) {
@@ -657,6 +708,7 @@ function setActiveTabDetails(tab) {
   ChromeDriver.activeWindowId = tab.windowId;
   ChromeDriver.doFocusOnNextOpenedTab = false;
   ChromeDriver.currentUrl = tab.url;
+  resetCurrentlyWaitingOnContentScriptTime();
 }
 
 function switchToDefaultContent() {
@@ -786,8 +838,12 @@ function getUrl(url) {
       chrome.tabs.update(ChromeDriver.activeTabId, {url: url, selected: true},
           getUrlCallback);
     } else {
-      chrome.tabs.remove(ChromeDriver.activeTabId);
+      // we need to create the new tab before deleting the old one
+      // in order to avoid hanging on OS X
+      var oldId = ChromeDriver.activeTabId;
+      resetActiveTabDetails();
       chrome.tabs.create({url: url, selected: true}, getUrlCallback);
+      chrome.tabs.remove(oldId);
     }
   }
 }
@@ -815,13 +871,21 @@ function getUrlCallback(tab) {
   } else {
     ChromeDriver.getUrlRequestSequenceNumber++;
     if (ChromeDriver.activePort == null) {
-      ChromeDriver.hasNoConnectionToPage = true;
-      sendEmptyResponseWhenTabIsLoaded(tab);
+      if (ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading <= 0) {
+        ChromeDriver.hasNoConnectionToPage = true;
+        sendEmptyResponseWhenTabIsLoaded(tab);
+      } else {
+        ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading -=
+          ChromeDriver.waitForContentScriptIncrement;
+        setTimeout("getUrlCallbackById(" + tab.id + ")", ChromeDriver.waitForContentScriptIncrement);
+        return;
+      }
     }
     setActiveTabDetails(tab);
   }
   if (ChromeDriver.isGettingUrlButOnlyChangingByFragment) {
     ChromeDriver.urlBeingLoaded = null;
+    resetCurrentlyWaitingOnContentScriptTime();
     sendResponseToParsedRequest({statusCode: 0}, false);
     ChromeDriver.isGettingUrlButOnlyChangingByFragment = false;
   }
@@ -848,17 +912,11 @@ function sendEmptyResponseWhenTabIsLoaded(tab) {
 }
       
 
-function setToolstripsBusy(busy) {
-  var toolstrips = chrome.extension.getToolstrips(ChromeDriver.activeWindowId);
-  for (var toolstrip in toolstrips) {
-    if (toolstrips[toolstrip].setWebdriverToolstripBusy && 
-        toolstrips[toolstrip].setWebdriverToolstripFree) {
-      if (busy) {
-        toolstrips[toolstrip].setWebdriverToolstripBusy();
-      } else {
-        toolstrips[toolstrip].setWebdriverToolstripFree();
-      }
-    }
+function setExtensionBusyIndicator(busy) {
+  if (busy) {
+    chrome.browserAction.setIcon({path: "icons/busy.png"})
+  } else {
+    chrome.browserAction.setIcon({path: "icons/free.png"})
   }
 }
 
@@ -884,4 +942,9 @@ function hasNoPage() {
   return ChromeDriver.hasNoConnectionToPage ||
          ChromeDriver.activePort == null ||
          ChromeDriver.activeTabId == null;
+}
+
+function resetCurrentlyWaitingOnContentScriptTime() {
+  ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading =
+      ChromeDriver.timeoutUntilGiveUpOnContentScriptLoading;
 }

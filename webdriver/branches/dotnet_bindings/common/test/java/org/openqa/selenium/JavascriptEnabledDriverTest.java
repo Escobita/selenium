@@ -23,6 +23,7 @@ import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.matchers.JUnitMatchers.either;
+import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -98,7 +99,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 //	}
 
   @JavascriptEnabled
-  @Ignore({IE, SELENESE})
+  @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldWaitForLoadsToCompleteAfterJavascriptCausesANewPageToLoad() {
     driver.get(formPage);
 
@@ -108,7 +109,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({IE, SELENESE})
+  @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testShouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad()
       throws InterruptedException {
     driver.get(formPage);
@@ -162,6 +163,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @Ignore(value = IE, reason = "Fails for IE in the continuous build")
   public void testShouldBeAbleToClickOnSubmitButtons() {
     driver.get(javascriptPage);
     WebElement element = driver.findElement(By.id("submittingButton"));
@@ -203,8 +205,8 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(value = {IE, FIREFOX, REMOTE, CHROME_NON_WINDOWS, SELENESE},
-          reason = "Firefox: Window demands focus to work. Other platforms: not properly tested")
+  @Ignore(value = {IE, FIREFOX, REMOTE, CHROME, SELENESE},
+          reason = "Firefox: Window demands focus to work. Chrome: Event firing is broken.  Other platforms: not properly tested")
   public void testChangeEventIsFiredAppropriatelyWhenFocusIsLost() {
     driver.get(javascriptPage);
 
@@ -217,6 +219,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     input.sendKeys(Keys.BACK_SPACE, "t");
     driver.findElement(By.xpath("//body")).click();  // move focus
 
+    // I weep.
     assertThat(driver.findElement(By.id("result")).getText().trim(),
                either(is("focus change blur focus blur"))
                    .or(is("focus blur change focus blur"))

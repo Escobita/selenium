@@ -17,12 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.apache.commons.io.FileUtils;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
-import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,7 +32,6 @@ import java.util.List;
 public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnAString() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -46,7 +46,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnALong() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -76,7 +75,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnABoolean() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -135,7 +133,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testPassingAndReturningALongShouldReturnAWholeNumber() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -150,7 +147,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testPassingAndReturningADoubleShouldReturnADecimal() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -165,7 +161,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldThrowAnExceptionWhenTheJavascriptIsBad() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -200,7 +195,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToPassAStringAnAsArgument() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -215,7 +209,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToPassABooleanAnAsArgument() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -228,7 +221,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToPassANumberAnAsArgument() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -293,12 +285,9 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     collection.add(true);
     length = (Long) executeScript("return arguments[0].length", collection);
     assertEquals(collection.size(), length);
-
-
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldThrowAnExceptionIfAnArgumentIsNotValid() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -314,7 +303,6 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
   public void testShouldBeAbleToPassInMoreThanOneArgument() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -352,5 +340,23 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
     value = (String) executeScript("return ' '");
     assertEquals(" ", value);
+  }
+
+  @JavascriptEnabled
+  @Ignore(CHROME)
+  public void testShouldBeAbleToExecuteABigChunkOfJavascriptCode() throws IOException {
+    driver.get(javascriptPage);
+
+    File jqueryFile = new File("common/src/web/jquery-1.3.2.js");
+    if(!jqueryFile.isFile()) {
+      jqueryFile = new File("../common/src/web/jquery-1.3.2.js");
+      if(!jqueryFile.isFile()) {
+        jqueryFile = new File("../../common/src/web/jquery-1.3.2.js");
+      }
+    }
+    String jquery = FileUtils.readFileToString(jqueryFile, "US-ASCII");
+    assertTrue("The javascript code should be at least 50 KB.", jquery.length() > 50000);
+    // This should not throw an exception ...
+    executeScript(jquery);
   }
 }

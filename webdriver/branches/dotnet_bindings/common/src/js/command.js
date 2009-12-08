@@ -25,22 +25,44 @@ goog.provide('webdriver.CommandName');
 goog.provide('webdriver.Response');
 
 goog.require('goog.array');
+goog.require('goog.events.EventTarget');
+goog.require('goog.testing.stacktrace');
+goog.require('webdriver.Future');
 
 
 /**
  * Describes a command to be executed by a
  * {@code webdriver.AbstractCommandProcessor}.
- * @param {string} name The name of this command.
- * @param {webdriver.WebElement} opt_element The element to perform this command
- *     on. If not defined, the command will be performed relative to the
- *     document root.
+ * @param {webdriver.WebDriver} driver The driver that this is a command for.
+ * @param {webdriver.CommandName} name The name of this command.
+ * @param {webdriver.WebElement} opt_element The element to perform this
+ *     command on. If not defined, the command will be performed relative to
+ *     the document root.
  * @constructor
+ * @extends {goog.events.EventTarget}
  */
-webdriver.Command = function(name, opt_element) {
+webdriver.Command = function(driver, name, opt_element) {
+  goog.events.EventTarget.call(this);
+
+  /**
+   * The driver that this is a command to.
+   * @type {webdriver.WebDriver}
+   * @private
+   */
+  this.driver_ = driver;
+
+  /**
+   * A future that will be automatically updated with the value of this
+   * command's response when it is ready. If the command fails, the
+   * future's value will not be set.
+   * @type {webdriver.Future}
+   * @private
+   */
+  this.futureResult_ = new webdriver.Future(this.driver_);
 
   /**
    * The name of this command.
-   * @type {string}
+   * @type {webdriver.CommandName}
    */
   this.name = name;
 
@@ -58,43 +80,71 @@ webdriver.Command = function(name, opt_element) {
   this.parameters = [];
 
   /**
-   * Callback for when the command processor successfully finishes this command.
-   * The result of this function is included in the final result of the command.
-   * @type {?function}
-   */
-  this.onSuccessCallbackFn = null;
-  
-  /**
-   * Callback for when the command processor fails to successfully finish a
-   * command. The function should take a single argument, the
-   * {@code webdriver.Response} from the command processor. The response may be
-   * modified (for example, to turn an expect failure into a success). If the
-   * error state is cleared, the {@code onSucessCallbackFn} will still not be
-   * called.
-   * @type {?function}
-   */
-  this.onFailureCallbackFn = null;
-
-  /**
-   * Callback for when this command is completely finished, which is after the
-   * response is set and success/failure callbacks have been run. The function
-   * should take a single argument, a reference to this command.
-   * @type {?function}
-   * @private
-   */
-  this.onCompleteCallbackFn_ = null;
-
-  /**
    * The response to this command.
-   * @type {webdriver.Response}
+   * @type {?webdriver.Response}
    */
   this.response = null;
 
-  /**
-   * Whether this command was aborted.
-   * @type {boolean}
-   */
-  this.abort = false;
+};
+goog.inherits(webdriver.Command, goog.events.EventTarget);
+
+
+/**
+ * The event dispatched by a command when it fails.
+ * @type {string}
+ */
+webdriver.Command.ERROR_EVENT = 'ERROR';
+
+
+/** @override */
+webdriver.Command.prototype.disposeInternal = function() {
+  webdriver.Command.superClass_.disposeInternal.call(this);
+  this.futureResult_.dispose();
+  delete this.driver_;
+  delete this.futureResult_;
+  delete this.name;
+  delete this.element;
+  delete this.parameters;
+  delete this.response;
+};
+
+
+/** @override */
+webdriver.Command.prototype.toString = function() {
+  return this.name;
+};
+
+
+/**
+ * @return {webdriver.WebDriver} The driver that this is a command to.
+ */
+webdriver.Command.prototype.getDriver = function() {
+  return this.driver_;
+};
+
+
+/**
+ * @return {webdriver.CommandName} This command's name.
+ */
+webdriver.Command.prototype.getName = function() {
+  return this.name;
+};
+
+
+/**
+ * @return {webdriver.Future} The future result (value-only) of this command.
+ */
+webdriver.Command.prototype.getFutureResult = function() {
+  return this.futureResult_;
+};
+
+
+/**
+ * @return {boolean} Whether this command has finished; aborted commands are
+ *     never considered finished.
+ */
+webdriver.Command.prototype.isFinished = function() {
+  return !!this.response;
 };
 
 
@@ -110,50 +160,18 @@ webdriver.Command.prototype.setParameters = function(var_args) {
 
 
 /**
- * Set the function to call with the {@code webdriver.Response} when the
- * command processor successfully runs this command. This function is considered
- * part of the command and any errors will cause the command as a whole to fail.
- * @param {function} callbackFn The function to call on success.
- * @param {Object} opt_selfObj The object in whose context to execute the
- *     function.
+ * @return {Array.<*>} The parameters to send with this command.
  */
-webdriver.Command.prototype.setSuccessCallback = function(callbackFn,
-                                                          opt_selfObj) {
-  if (callbackFn) {
-    this.onSuccessCallbackFn = goog.bind(callbackFn, opt_selfObj);
-  }
-  return this;
+webdriver.Command.prototype.getParameters = function() {
+  return this.parameters;
 };
 
 
 /**
- * Set the function to call with the {@code webdriver.Response} when the
- * command processor encounters an error while executing this command.
- * @param {function} callbackFn The function to call on failure.
- * @param {Object} opt_selfObj The object in whose context to execute the
- *     function.
+ * @return {?webdriver.Response} The response to this command if it is ready.
  */
-webdriver.Command.prototype.setFailureCallback = function(callbackFn,
-                                                          opt_selfObj) {
-  if (callbackFn) {
-    this.onFailureCallbackFn = goog.bind(callbackFn, opt_selfObj);
-  }
-  return this;
-};
-
-
-/**
- * Set the function to call with this command when it is completed.
- * @param {function} callbackFn The function to call on command completion.
- * @param {Object} opt_selfObj The object in whose context to execute the
- *     function.
- */
-webdriver.Command.prototype.setCompleteCallback = function(callbackFn,
-                                                           opt_selfObj) {
-  if (callbackFn) {
-    this.onCompleteCallbackFn_ = goog.bind(callbackFn, opt_selfObj);
-  }
-  return this;
+webdriver.Command.prototype.getResponse = function() {
+  return this.response;
 };
 
 
@@ -164,32 +182,15 @@ webdriver.Command.prototype.setCompleteCallback = function(callbackFn,
  * @throws If the response was already set.
  */
 webdriver.Command.prototype.setResponse = function(response) {
-  if (this.response) {
+  if (this.isDisposed() || this.isFinished()) {
     return;
   }
   this.response = response;
-
-  var sandbox = goog.bind(function(fn) {
-    try {
-      fn.call(this, this.response);
-    } catch (ex) {
-      this.response.isFailure = true;
-      this.response.errors.push(ex);
-    }
-  }, this);
-
-  if (!this.response.errors.length) {
-    if (this.response.isFailure &&
-        goog.isFunction(this.onFailureCallbackFn)) {
-      sandbox(this.onFailureCallbackFn);
-    } else if (!this.response.isFailure &&
-               goog.isFunction(this.onSuccessCallbackFn)) {
-      sandbox(this.onSuccessCallbackFn);
-    }
-  }
-
-  if (this.onCompleteCallbackFn_) {
-    this.onCompleteCallbackFn_(this);
+  this.driver_.setContext(this.response.context);
+  if (!this.response.isFailure) {
+    this.futureResult_.setValue(this.response.value);
+  } else {
+    this.dispatchEvent(webdriver.Command.ERROR_EVENT);
   }
 };
 
@@ -259,7 +260,7 @@ webdriver.CommandName = {
  *     {@code true}, then {@code value} contains the error message.
  * @param {webdriver.Context} context The (potentially new) context resulting
  *     from the command.
- * @param {string} value The value of the response, the meaning of which depends
+ * @param {*} value The value of the response, the meaning of which depends
  *     on the command.
  * @parma {Error} opt_error An error that caused this command to fail
  *     prematurely.
@@ -270,5 +271,34 @@ webdriver.Response = function(isFailure, context, value, opt_error) {
   this.context = context;
   this.value = value;
   this.errors = goog.array.slice(arguments, 3);
-  this.extraData = {};
+};
+
+
+/**
+ * @return {?string} A formatted error message, or {@code null} if this is not a
+ *     failure response.
+ */
+webdriver.Response.prototype.getErrorMessage = function() {
+  if (!this.isFailure) {
+    return null;
+  }
+  var message = [];
+  if (goog.isString(this.value)) {
+    message.push(this.value);
+  } else if (null != this.value && goog.isDef(this.value.message)) {
+    message.push(this.value.message);
+    if (goog.isDef(this.value.fileName)) {
+      message.push(this.value.fileName + '@' + this.value.lineNumber);
+    }
+  }
+  goog.array.extend(message, goog.array.map(this.errors, function(error) {
+    if (goog.isString(error)) {
+      return error;
+    }
+    var errMsg = error.message || error.description || error.toString();
+    var stack = error.stack ?
+        goog.testing.stacktrace.canonicalize(error.stack) : error['stackTrace'];
+    return errMsg + '\n' + stack;
+  }));
+  return message.join('\n');
 };

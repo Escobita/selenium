@@ -27,8 +27,12 @@ import java.net.ServerSocket;
 
 @SuppressWarnings("unused")
 public class SingleTestSuite extends TestCase {
+  private final static String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
+  private final static String CHROME_TEST = "org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver";
 
-  private final static String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
+  private final static String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriver";
+  private final static String FIREFOX_TEST = "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
+ 
   private final static String HTML_UNIT = "org.openqa.selenium.htmlunit.HtmlUnitDriver";
   private final static String HTML_UNIT_JS = "org.openqa.selenium.htmlunit.JavascriptEnabledHtmlUnitDriverTestSuite$HtmlUnitDriverForTest";
   private final static String IE = "org.openqa.selenium.ie.InternetExplorerDriver";
@@ -36,25 +40,24 @@ public class SingleTestSuite extends TestCase {
   private final static String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = IE;
+    String driver = SELENIUM;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
     System.setProperty("webdriver.selenium.server.port", String.valueOf(findFreePort()));
 //    System.setProperty("webdriver.firefox.useExisting", "true");
 //    System.setProperty("webdriver.firefox.reap_profile", "false");
-
+                                                      
     TestSuiteBuilder builder = new TestSuiteBuilder()
-        .addSourceDir("../common")
         .addSourceDir("common")
         .addSourceDir("firefox")
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("CookieImplementationTest")
-//        .method("testClickingOnUnclickableElementsDoesNothing")
+        .onlyRun("ExecutingJavascriptTest")
+        .method("testJavascriptStringHandlingShouldWorkAsExpected")
         .exclude(ALL)
-        .exclude(Ignore.Driver.IE)
+        .exclude(Ignore.Driver.SELENESE)
         .leaveRunning()
         ;  // Yeah, this look strange :)
 

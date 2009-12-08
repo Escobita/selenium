@@ -20,16 +20,14 @@ package org.openqa.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import org.openqa.selenium.internal.FindsByCssSelector;
 
 import java.util.List;
 
-public class
-    ElementFindingTest extends AbstractDriverTestCase {
+public class ElementFindingTest extends AbstractDriverTestCase {
 
-  
   public void testShouldReturnTitleOfPageIfSet() {
     driver.get(xhtmlTestPage);
     assertThat(driver.getTitle(), equalTo(("XHTML Test Page")));
@@ -282,6 +280,7 @@ public class
     }
   }
 
+  @Ignore(SELENESE)
   public void testShouldfindAnElementBasedOnTagName() {
     driver.get(formPage);
 
@@ -328,7 +327,7 @@ public class
     assertEquals("Changed", driver.getTitle());
   }
 
-  @Ignore(HTMLUNIT)
+  @Ignore({SELENESE})
   public void testShouldNotBeAbleToFindAnElementOnABlankPage() {
     driver.get("about:blank");
 
@@ -341,7 +340,7 @@ public class
     }
   }
 
-  @Ignore({HTMLUNIT, IPHONE})
+  @Ignore({IPHONE})
   @NeedsFreshDriver
   public void testShouldNotBeAbleToLocateASingleElementOnABlankPage() {
     // Note we're on the default start page for the browser at this point.
@@ -381,4 +380,33 @@ public class
       fail("Should not have thrown an exception");
     }
   }
+
+  @JavascriptEnabled
+  public void testShouldBeAbleToFindAnElementByCssSelector() {
+    if (!supportsSelectorApi()) {
+      System.out.println("Skipping test: selector API not supported");
+      return;
+    }
+
+    driver.get(xhtmlTestPage);
+    
+    driver.findElement(By.cssSelector("div.content"));
+  }
+
+  @JavascriptEnabled
+  public void testShouldBeAbleToFindAnElementsByCssSelector() {
+    if (!supportsSelectorApi()) {
+      System.out.println("Skipping test: selector API not supported");
+      return;
+    }
+
+    driver.get(xhtmlTestPage);
+
+    driver.findElements(By.cssSelector("p"));
+  }
+
+  private Boolean supportsSelectorApi() {
+    return driver instanceof FindsByCssSelector &&
+        (Boolean) ((JavascriptExecutor) driver).executeScript(
+        "return document['querySelector'] !== undefined;");  }
 }

@@ -47,24 +47,19 @@ public class TestSuiteBuilder {
   private boolean withDriver = true;
   private boolean withEnvironment = true;
   private String onlyRun;
-  private String testMethodName;
+  private Set<String> testMethodNames = new HashSet<String>();
   private Set<String> decorators = new LinkedHashSet<String>();
   private boolean includeJsApiTests = false;
 
   public TestSuiteBuilder() {
-    String[] possiblePaths = {"common", "../common",};
-
-    for (String potential : possiblePaths) {
-      baseDir = new File(potential);
-      if (baseDir.exists()) {
-        break;
-      }
+    baseDir = new File(".");
+    while (baseDir != null && !new File(baseDir, "Rakefile").exists()) {
+      baseDir = baseDir.getParentFile();
     }
-
+    assertThat(baseDir, is(notNullValue()));
     assertThat(baseDir.exists(), is(true));
 
     baseDir = baseDir.getParentFile();
-//    exclude("all");
   }
 
   public TestSuiteBuilder addSourceDir(String dirName) {
@@ -175,6 +170,12 @@ public class TestSuiteBuilder {
       return;
     }
 
+    if (isIgnored(clazz)) {
+      System.err.println("Ignoring test class: " + clazz + ": "
+                         + clazz.getAnnotation(Ignore.class).reason());
+      return;
+    }
+
     Method[] methods = clazz.getMethods();
     for (Method method : methods) {
       if (isTestMethod(method)) {
@@ -201,8 +202,8 @@ public class TestSuiteBuilder {
   }
 
   private boolean isTestMethod(Method method) {
-    if (testMethodName != null) {
-      return method.getName().equals(testMethodName);
+    if (!testMethodNames.isEmpty()) {
+      return testMethodNames.contains(method.getName());
     }
 
     if (isIgnored(method)) {
@@ -299,7 +300,7 @@ public class TestSuiteBuilder {
   }
 
   public TestSuiteBuilder method(String testMethodName) {
-    this.testMethodName = testMethodName;
+    this.testMethodNames.add(testMethodName);
 
     return this;
   }
