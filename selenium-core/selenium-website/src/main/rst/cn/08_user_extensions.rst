@@ -1,30 +1,25 @@
 .. _chapter08-cn-reference:
 
-User-Extensions
-===============
+用户扩展
+========
 
 *NOTE:  This section is close to completion, but it has not been reviewed and 
 edited.*
 
-Introduction
-------------
-It can be quite simple to extend Selenium, adding your own actions, assertions 
-and locator-strategies. This is done with JavaScript by adding methods to the 
-Selenium object prototype, and the PageBot object prototype. On startup, 
-Selenium will automatically look through methods on these prototypes, using 
-name patterns to recognize which ones are actions, assertions and locators.
-The following examples try to give an indication of how Selenium can be 
-extended with JavaScript.
+介绍
+----
+扩展Selenium是非常容易的，它可以添加你自己的动作、断言和定位器策略。
+它的实现是通过Javascript向Selenium对象原型和PageBot对象原型添加方法。
+通过命名模型识别动作、断言和定位器，Selenium会在启动的时候自动查找这些原型的方法。
+下面的例子试着说明Selenium是如何使用Javascript扩展的。
 
-Actions
--------
+动作
+----
 
-All methods on the Selenium prototype beginning with "do" are added as actions.
-For each action foo there is also an action fooAndWait registered. An action 
-method can take up to two parameters, which will be passed the second and 
-third column values in the test.
-Example: Add a "typeRepeated" action to Selenium, which types the text twice 
-into a text box.
+所有在Selenium原型中以"do"开头的方法都作为动作添加。
+对于每一个动作，例如foo，也都有一个fooAndWait注册。
+一个命令可以有两个参数，他们将作为测试的第二列和第三列传递。
+例如：向Selenium添加"typeRepeated"动作，它将在文本框中输入文本两次。
 
 .. code-block:: javascript
 
@@ -39,17 +34,14 @@ into a text box.
             this.page().replaceText(element, valueToType);
         };
         
-Accessors/Assertions
---------------------
-All getFoo and isFoo methods on the Selenium prototype are added as accessors 
-(storeFoo.) For each accessor there is an assertFoo, verifyFooand waitForFoo 
-registered. An assert method can take up to 2 parameters, which will be 
-passed the second and third column values in the test. You can also define 
-your own assertions literally as simple "assert" methods, which will also 
-auto-generate "verify" and "waitFor" commands.
-Example: Add a valueRepeated assertion, that makes sure that the element 
-value consists of the supplied text repeated. The 2 commands that would be 
-available in tests would be assertValueRepeated and verifyValueRepeated.
+访问器/断言
+-----------
+所有在Selenium原型中的getFoo和isFoo方法都将作为访问器（storeFoo）添加。
+每一个访问器都有相应的assertFoo、verifyFoo和waitForFoo注册。
+一个断言方法有两个参数，他们将作为测试的第二列和第三列传递。
+你也可以定义你自己的断言，只需直接定义"assert"方法，他们也会自动产生"verify"和"waitFor"命令。
+例如：添加valueRepetaed断言，以确保元素值重复了所提供的文本。
+两个在测试中可用的命令将是assertValueRepeated和verifiyValueRepeated。
 
 .. code-block:: javascript
 
@@ -67,15 +59,14 @@ available in tests would be assertValueRepeated and verifyValueRepeated.
             Assert.matches(expectedValue, actualValue);
         };
 
-Automatic availability of storeFoo, assertFoo, assertNotFoo, waitForFoo and waitForNotFoo for every getFoo
+针对每条getFoo命令都自动可用的storeFoo、assertFoo、assertNotFoo、waitForFoo和waitForNotFoo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-All getFoo and isFoo methods on the Selenium prototype automatically result 
-in the availability of storeFoo, assertFoo, assertNotFoo, verifyFoo, 
-verifyNotFoo, waitForFoo, and waitForNotFoo commands.
-Example, if you add a ``getTextLength()`` method, the following commands will 
-automatically be available: ``storeTextLength``, ``assertTextLength``, 
-``assertNotTextLength``, ``verifyTextLength``, ``verifyNotTextLength``, 
-``waitForTextLength``, and ``waitForNotTextLength`` commands.
+所有在Selenium原型中的getFoo和isFoo方法都自动地使得storeFoo、assertFoo、assertNotFoo、
+verifyFoo、verifyNotFoo、waitForFoo和waitForNotFoo命令可用。
+例如，如果你添加 ``getTextLength()`` 方法，下面的命令就自动的可用： 
+``storeTextLength`` 、 ``assertTextLength`` 、``assertNotTextLength`` 、
+``verifyTextLength`` 、 ``verifyNotTextLength`` 、 ``waitForTextLength`` 
+和 ``waitForNotTextLength`` 命令。
 
 .. code-block:: javascript
 
@@ -83,19 +74,15 @@ automatically be available: ``storeTextLength``, ``assertTextLength``,
             return this.getText(locator).length;
         };
 
-Also note that the ``assertValueRepeated`` method described above could have 
-been implemented using ``isValueRepeated``, with the added benefit of also 
-automatically getting assertNotValueRepeated, storeValueRepeated, 
-waitForValueRepeated and waitForNotValueRepeated.
+还请注意上面提到的 ``assertValueRepeated`` 方法，已经通过 ``isValueRepeated`` 实现。
+而这带来的好处是assertNotValueRepeated、storeValueRepeated、waitForValueRepeated
+和waitForNotValueRepeated也会自动实现。
 
-Locator Strategies
-------------------
-All locateElementByFoo methods on the PageBot prototype are added as 
-locator-strategies. A locator strategy takes 2 parameters, the first being the 
-locator string (minus the prefix), and the second being the document in which 
-to search.
-Example: Add a "valuerepeated=" locator, that finds the first element a value 
-attribute equal to the the supplied value repeated.
+定位器策略
+----------
+所有在PageBot原型中的locateElementByFoo方法都会增加定位器策略。
+一个定位器策略有两个参数，第一个是定位器字符串（去掉前缀），第二个是搜索的文档。
+例子：增加"valuerepeated="定位器，将寻找第一个这样的元素，它的数值属性是重复了一遍的提供数值。
 
 .. code-block:: javascript
 
@@ -116,67 +103,55 @@ attribute equal to the the supplied value repeated.
             return null;
         };
 
-Using User-Extensions With Selenium-IDE
+在Selenium-IDE中使用用户扩展
 ---------------------------------------
-User-extensions are very easy to use with the selenium IDE. 
+在elenium IDE中，用户扩展非常易于使用。
+ 
+1. 建立你的用户扩展并把它保存为user-extensions.js。技术上这不是必须的，但保持一致是好的实践。
+2. 打开FireFox和Selenium-IDE
+3. 点击工具菜单，选择选项
+4. 在Selenium Core扩展窗口中，点击浏览按钮，找到user-extensions.js文件，点击确定。
+5. 你的用户扩展还没有被加载，你必须关闭并重启Selenium-IDE。
+#. 在空白的测试中，新建一条命令，你的用户扩展就应该作为选项出现在命令下拉列表中。
 
-1. Create your user extension and save it as user-extensions.js. While this 
-   name isn't technically necessary, it's good practice to keep things 
-   consistent.
-2. Open Firefox and open Selenium-IDE.
-3. Click on Tools, Options
-4. In Selenium Core Extensions click on Browse and find the user-extensions.
-   js file. Click on OK.
-5. Your user-extension will not yet be loaded, you must close and restart 
-   Selenium-IDE.
-#. In your empty test, create a new command, your user-extension should now 
-   be an uptions in the Commands dropdown.
 
-Using User-Extensions With Selenium RC
+在Selenium RC中使用用户扩展
 --------------------------------------
-If you Google "Selenium RC user-extension" ten times you will find ten 
-different approaches to using this feature. Below, is the official Selenium 
-suggested approach.
+如果你在Google上搜索"Selenium RC user-extension"十次，你将会得到十种不同的使用这个功能的方法。
+下面的是Selenium官方推荐的方法。
 
-Example
-~~~~~~~
+例子
+~~~~
 **C#**
 
-1. Place your user extension in the same directory as your Selenium Server.
-2. If you are using client code generated by the Selenium-IDE you will need 
-   to make a couple small edits. First, you will need to create an 
-   ``HttpCommandProcessor`` object with class scope (outside the SetupTest 
-   method, just below  ``private StringBuilder verificationErrors;``)
+1. 把用户扩展放到与Selenium Server相同的文件夹。
+2. 如果你的客户端代码是由Selenium-IDE产生，你需要做些小修改。
+   首先你需要在类域范围中创建一个 ``HttpCommandProcessor`` 对象
+   （在SetupTest方法外，在 ``private StringBuilder verificationErrors`` 下面）。
 
 .. code-block:: c#
 
 	HttpCommandProcessor proc;
 
-3. Next, instantiate that ``HttpCommandProcessor`` object as you would the ``DefaultSelenium`` object. This can be done in the test setup.
+3. 接下来，就像实例化 ``DefaultSelenium`` 对象那样实例化 ``HttpCommandProcessor`` 对象。
+   它的实现如下。
 
 .. code-block:: c#
 
 	proc = new HttpCommandProcessor("localhost", 4444, "*iexplore", "http://google.ca/");
 
-4. Instantiate the DefaultSelenium object using the ``HttpCommandProcessor`` object you created.
+4. 用你创建的 ``HttpCommandProcessor`` 对象实例化DefaultSelenium对象。
 
 .. code-block:: c#
 
 	selenium = new DefaultSelenium(proc);
 
-5. Within your test code, execute your user-extension by calling it with the 
-   ``DoCommand()`` method of ``HttpCommandProcessor``. This method takes two 
-   arguments: a string to identify the user-extension method you want to use 
-   and string array to pass arguments. Notice that the first letter of your 
-   function is lower case, regardless of the capitalization in your 
-   user-extension. Selenium automatically does this to keep common JavaScript 
-   naming conventions. Because JavaScript is case sensitive, your test will 
-   fail if you begin this command with a capital. inputParams is the array of 
-   arguments you want to pass to the JavaScript user-extension. In this case 
-   there is only one string in the array because there is only one parameter 
-   for our user extension, but a longer array will map each index to the 
-   corresponding user-extension parameter. Remember that user extensions 
-   designed for Selenium-IDE will only take two arguments.
+5. 在你的测试代码中，执行用户扩展是通过 ``HttpCommandProcessor`` 的 ``DoCommand()`` 方法调用的。
+   这个方法有两个参数：一个是指定你想使用的用户扩展方法的字符串，另一个是传递参数的字符串数组。
+   不管在用户扩展中函数是否首字母大写，注意你的函数的第一个字母必须是小写。因为JavaScript是大小写敏感的，
+   所以如果你的命令首字母大写，你的测试就会失败。inputParams是一个参数数组，
+   这些参数就是传递给JavaScript用户扩展的。在这个例子中，数组中只有一个字符串，因为用户扩展只有一个参数。
+   但是长数组将每个索引都映射到与用户扩展相对应的参数。请记住为Selenium-IDE设计的用户扩展只有两个参数。
 
 
 .. code-block:: c#
@@ -184,9 +159,7 @@ Example
 	string[] inputParams = {"Hello World"};
 	proc.DoCommand("alertWrapper", inputParams);
 
-
-6. Start the test server using the ``-userExtensions`` argument and pass in 
-   your ``user-extensinos.js`` file. 
+6. 用 ``-userExtensions`` 参数启动测试服务器，并把你的 ``user-extensinos.js`` 文件传递给它。
 
 .. code-block:: bash
 
