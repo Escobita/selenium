@@ -21,7 +21,7 @@ namespace OpenQa.Selenium
             get;
         }
 
-        bool Displayed
+        bool Enabled
         {
             get;
         }

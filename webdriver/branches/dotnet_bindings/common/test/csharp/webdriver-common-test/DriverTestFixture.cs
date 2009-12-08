@@ -1,12 +1,12 @@
 using NUnit.Framework;
 using OpenQa.Selenium.Environment;
+using System;
 
 namespace OpenQa.Selenium
 {
     
     public abstract class DriverTestFixture
     {
-
         public string macbethPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("macbeth.html");
         public string macbethTitle = "Macbeth: Entire Play";
 
@@ -26,11 +26,21 @@ namespace OpenQa.Selenium
 
         public string resultPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("resultPage.html");
 
-        public string nestedElementsPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("nestedElements.html");
+        public string nestedPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("nestedElements.html");
 
         public string xhtmlTestPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("xhtmlTest.html");
 
         public string richTextPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("rich_text.html");
+
+        public string dragAndDropPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("dragAndDropTest.html");
+
+        public string framesetPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("frameset.html");
+        public string iframePage = EnvironmentManager.Instance.UrlBuilder.WhereIs("iframes.html");
+        public string metaRedirectPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("meta-redirect.html");
+        public string redirectPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("redirect");
+        public string rectanglesPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("rectangles.html");
+        public string javascriptEnhancedForm = EnvironmentManager.Instance.UrlBuilder.WhereIs("javascriptEnhancedForm.html");
+        public string uploadPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("upload.html");
 
         protected IWebDriver driver;
 
@@ -54,5 +64,10 @@ namespace OpenQa.Selenium
             driver = EnvironmentManager.Instance.CreateFreshDriver();
         }
 
+        protected bool IsIeDriverTimedOutException(Exception e)
+        {
+            // The IE driver may throw a timed out exception
+            return e.GetType().Name.Contains("TimedOutException");
+        }
     }
 }

@@ -21,16 +21,26 @@ namespace OpenQa.Selenium.IE
         public static extern void wdFreeDriver(IntPtr driver);
 
         [DllImport("InternetExplorerDriver")]
-        public static extern void wdClose(IntPtr driver);
+        public static extern int wdClose(IntPtr driver);
+
+        public void CloseDriver()
+        {
+            // Need a seperate method from Close() for closing the driver.
+            // Calling Close() on the driver does not imply the same semantics
+            // as Quit(). In other words, we may want to close the driver, but
+            // not free it.
+            int result = wdClose(handle);
+            if ((ErrorCodes)result != ErrorCodes.Success)
+            {
+                throw new InvalidOperationException("Unable to close driver: " + result.ToString());
+            }
+        }
 
         protected override bool ReleaseHandle()
         {
-            wdClose(handle);
             wdFreeDriver(handle);
             // TODO(simonstewart): Are we really always successful?
             return true;
         }
-
-
     }
 }

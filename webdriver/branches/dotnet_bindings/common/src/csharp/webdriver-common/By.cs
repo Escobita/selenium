@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenQa.Selenium.Internal;
+using System.Text.RegularExpressions;
 
 namespace OpenQa.Selenium
 {
@@ -14,7 +15,13 @@ namespace OpenQa.Selenium
         findElementDelegate findElement;
         findElementsDelegate findElements;
 
-        public static By Id(string id) {
+        public static By Id(string id) 
+        {
+            if (id == null)
+            {
+                throw new ArgumentNullException("Cannot find elements with a null id attribute.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {
@@ -27,7 +34,13 @@ namespace OpenQa.Selenium
             return by;
         }
 
-        public static By LinkText(string linkText) {
+        public static By LinkText(string linkText) 
+        {
+            if (linkText == null)
+            {
+                throw new ArgumentNullException("Cannot find elements when link text is null.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {
@@ -42,6 +55,11 @@ namespace OpenQa.Selenium
 
         public static By Name(string name)
         {
+            if (name == null)
+            {
+                throw new ArgumentNullException("Cannot find elements when name text is null.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {
@@ -56,6 +74,11 @@ namespace OpenQa.Selenium
 
         public static By XPath(string xpath)
         {
+            if (xpath == null)
+            {
+                throw new ArgumentNullException("Cannot find elements when the XPath expression is null.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {
@@ -70,6 +93,16 @@ namespace OpenQa.Selenium
 
         public static By ClassName(string className)
         {
+            if (className == null)
+            {
+                throw new ArgumentNullException("Cannot find elements when the class name expression is null.");
+            }
+
+            if (new Regex(".*\\s+.*").IsMatch(className))
+            {
+                throw new IllegalLocatorException("Compound class names are not supported. Consider searching for one class name and filtering the results.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {
@@ -98,6 +131,11 @@ namespace OpenQa.Selenium
 
         public static By TagName(string tagName)
         {
+            if (tagName == null)
+            {
+                throw new ArgumentNullException("Cannot find elements when name tag name is null.");
+            }
+
             By by = new By();
             by.findElement = delegate(ISearchContext context)
             {

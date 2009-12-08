@@ -1,5 +1,5 @@
 <NUnitProject>
-	<Settings appbase="." />
+	<Settings appbase="..\..\..\..\build\x64\Release" />
 	<Config name="Default" binpathtype="Auto">
 		<assembly path="webdriver-common-test.dll" />
 		<assembly path="webdriver-ie-test.dll" />

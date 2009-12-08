@@ -118,24 +118,42 @@ namespace OpenQa.Selenium.IE
 
         public void Close()
         {
-            if (!handle.IsClosed)
-            {
-                handle.Close();
-            }
+            handle.CloseDriver();
         }
 
         public void Quit()
         {
-            Close();
-            // TODO(andre.nogueira) Needs further study... 
-            // Does Java really close all windows or when it tries to close the
-            // second it catches an exception and kaput?
-            //
-            //foreach(string handle in GetWindowHandles())
-            //{
-            //    SwitchTo().Window(handle);
-            //    Close();
-            //}
+            // This code mimics the Java implementation.
+            try 
+            {
+                List<string> closedHandleList = new List<string>();
+                List<string> handleList = GetWindowHandles();
+                foreach (string handle in handleList)
+                try 
+                {
+                    // OPTIMIZATION: Only handle windows once. If we encounter duplicate
+                    // handles in the list, skip them.
+                    if (!closedHandleList.Contains(handle))
+                    {
+                        closedHandleList.Add(handle);
+                        SwitchTo().Window(handle);
+                        Close();
+                    }
+                } 
+                catch (NoSuchWindowException e)
+                {
+                    // doesn't matter one jot.
+                }
+            }
+            catch (NotSupportedException e) 
+            {
+                // Stuff happens. Bail out
+                handle.Close();
+            }
+
+            handle.Close();
+            Dispose();
+            handle = null;
         }
 
         [DllImport("InternetExplorerDriver")]
@@ -202,7 +220,7 @@ namespace OpenQa.Selenium.IE
         private static extern int wdFreeScriptResult(IntPtr scriptArgs);
         [DllImport("InternetExplorerDriver")]
         private static extern int wdGetElementScriptResult(IntPtr scriptArgs, SafeInternetExplorerDriverHandle driver, out ElementWrapper value );
-        private Object ExtractReturnValue(IntPtr scriptResult)
+        private object ExtractReturnValue(IntPtr scriptResult)
         {
             int result;
 
@@ -213,7 +231,7 @@ namespace OpenQa.Selenium.IE
 
             try
             {
-                Object toReturn = null;
+                object toReturn = null;
                 switch (type)
                 {
                     case 1:
@@ -252,7 +270,7 @@ namespace OpenQa.Selenium.IE
                         StringWrapperHandle message = new StringWrapperHandle();
                         result = wdGetStringScriptResult(scriptResult, ref message);
                         ErrorHandler.VerifyErrorCode(result, "Cannot extract string result");
-                        throw new /*TODO:WebDriver*/Exception(message.Value);
+                        throw new WebDriverException(message.Value);
                     case 7:
                         double doubleVal;
                         result = wdGetDoubleScriptResult(scriptResult, out doubleVal);
@@ -260,7 +278,7 @@ namespace OpenQa.Selenium.IE
                         toReturn = doubleVal;
                         break;
                     default:
-                        throw new /*TODO:WebDriver*/Exception("Cannot determine result type");
+                        throw new WebDriverException("Cannot determine result type");
                 }
                 return toReturn;
             }
@@ -371,7 +389,7 @@ namespace OpenQa.Selenium.IE
 
         private class InternetExplorerOptions : IOptions
         {
-
+            private Speed internalSpeed = Speed.Fast;
             private SafeInternetExplorerDriverHandle handle;
             private InternetExplorerDriver driver;
 
@@ -380,6 +398,12 @@ namespace OpenQa.Selenium.IE
             {
                 this.handle = handle;
                 this.driver = driver;
+            }
+
+            public Speed Speed
+            {
+                get { return internalSpeed; }
+                set { internalSpeed = value; }
             }
 
             [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
@@ -420,6 +444,15 @@ namespace OpenQa.Selenium.IE
                 }
 
                 return toReturn;
+            }
+
+            public void DeleteAllCookies()
+            {
+                Dictionary<string, Cookie> allCookies = GetCookies();
+                foreach (Cookie cookieToDelete in allCookies.Values)
+                {
+                    DeleteCookie(cookieToDelete);
+                }
             }
 
             private String GetCurrentHost()

@@ -2,6 +2,14 @@ namespace OpenQa.Selenium
 {
     public enum Browser
     {
-        ALL, HTMLUNIT, IE, FIREFOX, SAFARI, CHROME, REMOTE
+        All, 
+        HtmlUnit, 
+        IE, 
+        Firefox, 
+        Safari, 
+        Chrome,
+        ChromeNonWindows,
+        Remote, 
+        IPhone
     }
 }

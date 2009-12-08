@@ -17,6 +17,13 @@ namespace OpenQa.Selenium
 
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ShouldThrowAnExceptionWhenTheDomainIsBad()
+        {
+            new ReturnedCookie("Fish", "cod", "127.0.0.-1", null, DateTime.Now, false);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void ShouldThrowAnExceptionWhenSemiColonExistsInTheCookieAttribute()
         {
             new ReturnedCookie("hi;hi", "value", null, null, DateTime.Now, false);

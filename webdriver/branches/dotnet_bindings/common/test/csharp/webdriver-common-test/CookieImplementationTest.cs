@@ -107,12 +107,14 @@ namespace OpenQa.Selenium
 
         [Test]
         //TODO(andre.nogueira): Revisit after correct exceptions are created
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void ShouldThrowExceptionWhenAddingCookieToNonExistingDomain()
         {
-            //TODO(andre.nogueira): This fails if the machine is not connected to the internet
-            //IE blocks asking if I want to work offline or not.
-            driver.Url = "www.doesnotexist.comx";
+            //TODO(jimevan): Using a URL with no suffix here on purpose. Some networks
+            //may be using something like OpenDNS or Google DNS which may automatically
+            //redirect to a search page, which will be a valid page and will allow a
+            //cookie to be created. Need to investigate further.
+            driver.Url = "doesnotexist";
             IOptions options = driver.Manage();
             Cookie cookie = new Cookie("question", "dunno");
             options.AddCookie(cookie);

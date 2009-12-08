@@ -50,7 +50,7 @@ namespace OpenQa.Selenium
                 Browser browser = (Browser)propVal;
 
                 if (browser.Equals(EnvironmentManager.Instance.Browser) ||
-                    browser.Equals(Browser.ALL))
+                    browser.Equals(Browser.All))
                 {   
                     testCase.RunState = RunState.Ignored;
                     testCase.IgnoreReason = "Ignoring browser " +

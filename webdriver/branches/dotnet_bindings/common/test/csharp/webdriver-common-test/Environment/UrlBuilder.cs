@@ -37,7 +37,7 @@ namespace OpenQa.Selenium.Environment
         public string WhereIs(string page)
         {
             // TODO(andre.nogueira): Is it a problem if folder==""?
-            return protocol + "://" + hostName + ":" + port + "/" + path + "/" + page;
+            return protocol + "://" + hostName + ":" + port + "/common/" + page;
         }
 
     }

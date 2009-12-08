@@ -30,16 +30,21 @@ namespace OpenQa.Selenium.IE
             {
                 ElementWrapper wrapper = new ElementWrapper();
                 int result = wdcGetElementAtIndex(elements, i, ref wrapper);
-                //TODO(andre.nogueira): I don't like this very much... Maybe add a ErrorHandler.IsError or something?
-                try
+                //OPTIMIZATION: Check for a success value, then run through the
+                //VerifyErrorCode which will throw the proper exception
+                if ((ErrorCodes)result != ErrorCodes.Success)
                 {
-                    ErrorHandler.VerifyErrorCode(result, "");
-                } 
-                catch (Exception)
-                {
-                    freeElements(elements);
-                    //TODO(andre.nogueira): More suitable exception
-                    throw new Exception("Could not retrieve element " + i + " from element collection");
+                    try
+                    {
+                        ErrorHandler.VerifyErrorCode(result, "");
+                    }
+                    catch (Exception e)
+                    {
+                        //We need to process the exception to free the memory.
+                        //Then we can wrap and rethrow.
+                        freeElements(elements);
+                        throw new WebDriverException("Could not retrieve element " + i + " from element collection", e);
+                    }
                 }
                 toReturn.Add(new InternetExplorerWebElement(driver, wrapper));
                 

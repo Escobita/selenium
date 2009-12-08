@@ -10,7 +10,7 @@ namespace OpenQa.Selenium
     {
 
         [Test]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void ShouldThrowExceptionAfterSwitchingToNonExistingFrameIndex()
         {
             driver.Url = framesPage;
@@ -18,7 +18,7 @@ namespace OpenQa.Selenium
         }
 
         [Test]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void ShouldThrowExceptionAfterSwitchingToNonExistingFrameName()
         {
             driver.Url = framesPage;
@@ -26,7 +26,7 @@ namespace OpenQa.Selenium
         }
 
         [Test]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidOperationException))]
         [IgnoreBrowser(Browser.IE, "Seems to crash IE after the move to VS 2008")]
         public void ShouldThrowExceptionAfterSwitchingToNullFrameName()
         {

@@ -23,7 +23,7 @@ namespace OpenQa.Selenium
 
         [Test]
         //TODO(andre.nogueira): Revisit after exception types are implemented
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(NotImplementedException))]
         public void ShouldThrowExceptionOnNonToggableElement()
         {
             driver.Url = simpleTestPage;
@@ -33,7 +33,7 @@ namespace OpenQa.Selenium
 
         [Test]
         //TODO(andre.nogueira): Revisit after exception types are implemented
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(NoSuchElementException))]
         public void ShouldThrowExceptionOnNonExistingElement()
         {
             driver.Url = simpleTestPage;
@@ -71,13 +71,13 @@ namespace OpenQa.Selenium
         {
             driver.Url = javascriptPage;
 
-            IWebElement hidden = driver.FindElement(By.Id("hidden"));
+            IRenderedWebElement hidden = (IRenderedWebElement)driver.FindElement(By.Id("hidden"));
             Assert.IsFalse(hidden.Displayed);
 
-            IWebElement none = driver.FindElement(By.Id("none"));
-            Assert.IsFalse(hidden.Displayed);
+            IRenderedWebElement none = (IRenderedWebElement)driver.FindElement(By.Id("none"));
+            Assert.IsFalse(none.Displayed);
 
-            IWebElement displayed = driver.FindElement(By.Id("displayed"));
+            IRenderedWebElement displayed = (IRenderedWebElement)driver.FindElement(By.Id("displayed"));
             Assert.IsTrue(displayed.Displayed);
         }
 

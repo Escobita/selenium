@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace OpenQa.Selenium
@@ -31,7 +32,7 @@ namespace OpenQa.Selenium
         }
 
         [Test]
-        [ExpectedException(typeof(System.Exception))]
+        [ExpectedException(typeof(NoSuchElementException))]
         public void ShouldNotHaveProblemOpeningNonExistingPage()
         {
             driver.Url = "www.doesnotexist.comx";

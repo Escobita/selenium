@@ -16,7 +16,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementById()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Id("test_id_div"));
             IWebElement child = parent.FindElement(By.Id("test_id"));
             Assert.AreEqual("inside", child.Text);
@@ -25,7 +25,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByLinkText()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("div1"));
             IWebElement child = parent.FindElement(By.PartialLinkText("hello world"));
             Assert.AreEqual("hello world", child.Text);
@@ -34,7 +34,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("div1"));
             IWebElement child = parent.FindElement(By.Name("link1"));
             Assert.AreEqual("hello world", child.Text);
@@ -43,7 +43,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByXPath()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Id("test_id_div"));
             IWebElement child = parent.FindElement(By.XPath("p"));
             Assert.AreEqual("inside", child.Text);
@@ -52,7 +52,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByClassName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
             IWebElement child = parent.FindElement(By.ClassName("oneother"));
             Assert.AreEqual("But not me", child.Text);            
@@ -61,7 +61,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByPartialLinkText()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("div1"));
             IWebElement child = parent.FindElement(By.PartialLinkText(" world"));
             Assert.AreEqual("hello world", child.Text);
@@ -70,7 +70,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementByTagName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Id("test_id_div"));
             IWebElement child = parent.FindElement(By.TagName("p"));
             Assert.AreEqual("inside", child.Text);
@@ -82,7 +82,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsById()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("form2"));
             List<IWebElement> children = parent.FindElements(By.Id("2"));
             Assert.AreEqual(2, children.Count);
@@ -91,7 +91,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByLinkText()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("div1"));
             List<IWebElement> children = parent.FindElements(By.PartialLinkText("hello world"));
             Assert.AreEqual(2, children.Count);
@@ -102,7 +102,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("form2"));
             List<IWebElement> children = parent.FindElements(By.Name("selectomatic"));
             Assert.AreEqual(2, children.Count);
@@ -111,7 +111,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByXPath()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
             List<IWebElement> children = parent.FindElements(By.XPath("span"));
             Assert.AreEqual(3, children.Count);
@@ -124,7 +124,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByClassName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
             List<IWebElement> children = parent.FindElements(By.ClassName("one"));
             Assert.AreEqual(2, children.Count);
@@ -136,7 +136,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByPartialLinkText()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("div1"));
             List<IWebElement> children = parent.FindElements(By.PartialLinkText("hello "));
             Assert.AreEqual(2, children.Count);
@@ -147,7 +147,7 @@ namespace OpenQa.Selenium
         [Test]
         public void ShouldFindElementsByTagName()
         {
-            driver.Url = nestedElementsPage;
+            driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
             List<IWebElement> children = parent.FindElements(By.TagName("span"));
             Assert.AreEqual(3, children.Count);
