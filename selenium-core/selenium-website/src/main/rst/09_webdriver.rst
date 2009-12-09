@@ -815,9 +815,9 @@ This is a little abstract, so for the following piece of HTML:
 The following will happen:
 
 +------------------+----------------------------------------------------------------------+ 
-| XPath expression | Number of Matches In                                                 |
-|                  +--------------------+-------------------+-----------------------------+
-|                  | `HtmlUnit Driver`_ | `Firefox Driver`_ | `Internet Explorer Driver`_ |
+|                  | Number of Matches In                                                 |
++------------------+--------------------+-------------------+-----------------------------+
+| XPath expression | `HtmlUnit Driver`_ | `Firefox Driver`_ | `Internet Explorer Driver`_ |
 +==================+====================+===================+=============================+
 | //input          | 1 ("example")      | 2                 | 2                           |
 +------------------+--------------------+-------------------+-----------------------------+
