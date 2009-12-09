@@ -1,7 +1,8 @@
-.. GettingStarted:
+Selenium 2.0 and WebDriver
+==========================
 
 The 5 Minute Getting Started Guide
-==================================
+----------------------------------
  
 .. _chapter09-reference:
 
@@ -132,10 +133,10 @@ take the `Next Steps`_!
 .. _`Next Steps`: `Next Steps For Using WebDriver`_
 
 Next Steps For Using WebDriver
-==============================
+------------------------------
 
 Which Implementation of WebDriver Should I Use?
------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 WebDriver is the name of the key interface against which tests should be 
 written, but there are several implementations. These are:
@@ -178,7 +179,7 @@ To keep things simple, let's start with the `HtmlUnit Driver`_:
     WebDriver driver = new HtmlUnitDriver();
 
 Navigating
-----------
+~~~~~~~~~~
 
 The first thing you'll want to do with WebDriver is navigate to a page. The 
 normal way to do this is by calling "get":
@@ -196,7 +197,7 @@ fully loaded then you can use "waits".
 .. TODO: link to a section on explicit waits in WebDriver
 
 Interacting With the Page
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Just being able to go to places isn't terribly useful. What we'd really like 
 to do is to interact with the pages, or, more specifically, the HTML elements 
@@ -257,7 +258,7 @@ contents of a text field or textarea:
     element.clear();
 
 Filling In Forms
-----------------
+-~~~~~~~~~~~~~~~
 
 We've already seen how to enter text into a textarea or text field, but what 
 about the other elements? You can "toggle" the state of checkboxes, and you 
@@ -305,7 +306,7 @@ element isn't in a form, then the ``NoSuchElementException`` will be thrown:
     element.submit();
 
 Getting Visual Information And Drag And Drop
---------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes you want to extract some visual information out of an element, 
 perhaps to see if it's visible or where it is on screen. You can find out this 
@@ -330,7 +331,7 @@ by a certain amount, or on to another element:
     element.dragAndDropOn(target);
 
 Moving Between Windows and Frames
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's rare for a modern web application not to have any frames or to be 
 constrained to a single window. WebDriver supports moving between named 
@@ -374,7 +375,7 @@ would go to the frame named "child" of the first subframe of the frame called
 "frameName". **All frames are evaluated as if from *top*.**
 
 Navigation: History and Location
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Earlier, we covered navigating to a page using the "get" command (
 ``driver.get("http://www.example.com")``) As you've seen, WebDriver has a 
@@ -401,7 +402,7 @@ browser. It's just possible that something unexpected may happen when you call
 these methods if you're used to the behaviour of one browser over another.
 
 Cookies
--------
+~~~~~~~
 
 Before we leave these next steps, you may be interested in understanding how to 
 use cookies. First of all, you need to be on the domain that the cookie will be 
@@ -423,7 +424,7 @@ valid for:
     }
 
 Next, Next Steps!
------------------
+~~~~~~~~~~~~~~~~~
 
 This has been a high level walkthrough of WebDriver and some of its key 
 capabilities. You may want to look at the :ref:`Design Patterns` to get some ideas 
@@ -431,28 +432,28 @@ about how you can reduce the pain of maintaining your tests and how to make
 your code more modular.
 
 WebDriver Implementations
-=========================
+-------------------------
 
 HtmlUnit Driver
----------------
+~~~~~~~~~~~~~~~
 
 This is currently the fastest and most lightweight implementation of WebDriver. 
 As the name suggests, this is based on HtmlUnit.
 
 Pros
-~~~~
+++++
 
 * Fastest implementation of WebDriver
 * A pure Java solution and so it is platform independent.
 * Supports JavaScript
 
 Cons
-~~~~
+++++
 
 * Emulates other browser's JavaScript behaviour (see below)
 
 JavaScript in the HtmlUnit Driver
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++
 
 None of the popular browsers uses the JavaScript engine used by HtmlUnit 
 (Rhino). If you test JavaScript using HtmlUnit the results may differ 
@@ -476,7 +477,7 @@ both WebDriver and HtmlUnit, we reassess this decision: we hope to enable
 JavaScript by default on the HtmlUnit at some point.
 
 Enabling JavaScript
-~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++
 
 If you can't wait, enabling JavaScript support is very easy:
 
@@ -489,21 +490,21 @@ This will cause the `HtmlUnit Driver`_ to emulate Internet Explorer's JavaScript
 handling by default.
 
 Firefox Driver
---------------
+~~~~~~~~~~~~~~
 
 Pros
-~~~~
+++++
 
 * Runs in a real browser and supports JavaScript
 * Faster than the `Internet Explorer Driver`_
 
 Cons
-~~~~
+++++
 
 * Slower than the `HtmlUnit Driver`_
 
 Before Going Any Further
-~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++
 
 The `Firefox Driver`_ contains everything it needs in the JAR file. If you're just 
 interested in using this driver, then all you need to do is put the 
@@ -513,7 +514,7 @@ WebDriver will do everything else for you.
 If you want to dig deeper, though, carry on reading!
 
 Important System Properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++
 
 The following system properties (read using ``System.getProperty()`` and set 
 using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
@@ -544,7 +545,7 @@ Windows Vista  \\Program Files (x86)\\Mozilla Firefox\\firefox.exe
 By default, the Firefox driver creates an anonymous profile
 
 Installing a Downloaded Binary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++++
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
 the dependencies (including the common library) required to run the 
@@ -553,37 +554,37 @@ the dependencies (including the common library) required to run the
 * Copy all the "jar" files on to your ``CLASSPATH``.
 
 Internet Explorer Driver
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 This driver has been tested with Internet Explorer 6, 7 and 8 on XP. It has 
 also been successfully tested on Vista.
 
 Pros
-~~~~
+++++
 
 * Runs in a real browser and supports JavaScript
 
 Cons
-~~~~
+++++
 
 * Obviously the `Internet Explorer Driver`_ will only work on Windows!
 * Comparatively slow (though still pretty snappy :)
 
 Installing
-~~~~~~~~~~
+++++++++++
 
 Simply add ``webdriver-all.jar`` to your ``CLASSPATH``. You do not need to run 
 an installer before using the `Internet Explorer Driver`_, though some configuration 
 is required.
 
 Required Configuration
-~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++
 
 Add every site you intend to visit to your "Trusted Sites" If you do not do 
 this, then you will not be able to interact with the page.
 
 Chrome Driver
--------------
+~~~~~~~~~~~~~
 
 See below for instructions on how to install the `Chrome Driver`_.
 
@@ -591,7 +592,7 @@ Note that `Chrome Driver`_ is one of the newest drivers. Please report any probl
 through the `issue tracker <http://code.google.com/p/selenium/issues/list>`_.
 
 Pros
-~~~~
+++++
 
 * Runs in a real browser and supports JavaScript
 * Because Chrome is a Webkit-based browser, the `Chrome Driver`_ may allow you to 
@@ -600,7 +601,7 @@ Pros
   differ.
 
 Cons
-~~~~
+++++
 
 * Slower than the `HtmlUnit Driver`_
 
@@ -609,7 +610,7 @@ Cons
          against ChromeDriver?
 
 Before Going Any Further
-~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++
 
 The `Chrome Driver`_ contains everything it needs in the JAR file. If you're just 
 interested in using this driver, then all you need to do is put 
@@ -624,7 +625,7 @@ recommended is version 4.0.206.*+. There were several breaking changes in this
 release, so `Chrome Driver`_ will not work in versions prior to this.
 
 Important System Properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++
 
 The following system properties (read using ``System.getProperty()`` and set 
 using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
@@ -650,7 +651,7 @@ Windows Vista  C:\\User\s\%USERNAME%\\AppData\\Local\\Google\\Chrome\\Applicatio
 =============  =================================================================================================
 
 Installing a Downloaded Binary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++++
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
 the dependencies required to run the `Chrome Driver`_. In order to use it, copy all 
@@ -659,7 +660,7 @@ the "jar" files on to your ``CLASSPATH``.
 .. _SeleniumRCEmulation:
 
 Emulating Selenium RC
-=====================
+---------------------
 
 The Java version of WebDriver provides an implementation of the Selenium RC API. 
 It is used like so:
@@ -685,7 +686,7 @@ It is used like so:
     WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWebDriver();
 
 Pros
-----
+~~~~
 
 * Allows for the WebDriver and Selenium APIs to live side-by-side
 * Provides a simple mechanism for a managed migration from the Selenium RC API 
@@ -693,7 +694,7 @@ Pros
 * Does not require the standalone Selenium RC server to be run
 
 Cons
-----
+~~~~
 
 * Does not implement every method
 * More advanced Selenium usage (using "browserbot" or other built-in JavaScript 
@@ -701,7 +702,7 @@ Cons
 * Some methods may be slower due to underlying implementation differences
 
 Backing WebDriver with Selenium
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 WebDriver doesn't support as many browsers as Selenium RC does, so in order to 
 provide that support while still using the WebDriver API, you can make use of 
@@ -722,10 +723,10 @@ sandbox.
 .. _TipsAndTricks:
 
 Tips and Tricks
-===============
+---------------
 
 Using Drag and Drop
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 It may not be immediately obvious, but if you're using a browser that supports 
 it you can cast a ``WebElement`` to ``RenderedWebElement`` and then it's easy 
@@ -743,7 +744,7 @@ Currently, only the `Firefox Driver`_ supports this, but you should also expect
 support for the `Internet Explorer Driver`_ too.
 
 Changing the user agent
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 This is easy with the `Firefox Driver`_:
 
@@ -754,7 +755,7 @@ This is easy with the `Firefox Driver`_:
     WebDriver driver = new FirefoxDriver(profile);
 
 Tweaking an existing Firefox profile
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Suppose that you wanted to modify the user agent string (as above), but you've 
 got a tricked out Firefox profile that contains dozens of useful extensions. 
@@ -789,7 +790,7 @@ are disabled by default. To enable them:
     WebDriver driver = new FirefoxDriver(profile);
 
 How XPATH Works in WebDriver
-============================
+----------------------------
 
 At a high level, WebDriver uses a browser's native XPath capabilities wherever 
 possible. On those browsers that don't have native XPath support, we have 
@@ -824,7 +825,7 @@ The following will happen:
 +------------------+--------------------+-------------------+-----------------------------+
 
 Matching Implicit Attributes
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes HTML elements do not need attributes to be explicitly declared 
 because they will default to known values. For example, the "input" tag does 
@@ -833,10 +834,10 @@ thumb when using xpath in WebDriver is that you **should not** expect to be able
 to match against these implicit attributes.
 
 Using WebDriver
-===============
+---------------
 
 From a New Download
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Unpack the "webdriver-all.zip" you can download from the site, and add all the 
 JARs to your ``CLASSPATH``. This will give you the `Chrome Driver`_, `Firefox Driver`_, 
@@ -845,7 +846,7 @@ packages. The support packages give you useful helper classes, such as the
 LiftStyleApi and the PageFactory.
 
 With Maven
-----------
+~~~~~~~~~~
 
 If you want to use the `HtmlUnit Driver`_, add the following dependency to your 
 pom.xml:
@@ -905,7 +906,7 @@ following dependency to your pom.xml:
 .. _Roadmap:
 
 Roadmap
-=======
+-------
 
 The roadmap for WebDriver 
 `is available here <http://code.google.com/p/selenium/wiki/RoadMap>`_
@@ -913,7 +914,7 @@ The roadmap for WebDriver
 .. _FurtherResources:
 
 Further Resources
-=================
+-----------------
 
 You can find further resources for WebDriver 
 in `WebDriver's wiki <http://code.google.com/p/selenium/wiki/FurtherResources>`_
