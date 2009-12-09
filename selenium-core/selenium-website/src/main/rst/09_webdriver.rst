@@ -427,9 +427,10 @@ Next, Next Steps!
 ~~~~~~~~~~~~~~~~~
 
 This has been a high level walkthrough of WebDriver and some of its key 
-capabilities. You may want to look at the :ref:`Design Patterns` to get some ideas 
-about how you can reduce the pain of maintaining your tests and how to make 
-your code more modular.
+capabilities. You may want to look at the
+:ref:`Test Design Considerations chapter <chapter06-reference>` to get
+some ideas about how you can reduce the pain of maintaining your tests and how
+to make your code more modular.
 
 WebDriver Implementations
 -------------------------
@@ -814,15 +815,15 @@ This is a little abstract, so for the following piece of HTML:
 
 The following will happen:
 
-+------------------+----------------------------------------------------------------------+ 
-|                  | Number of Matches In                                                 |
-+------------------+--------------------+-------------------+-----------------------------+
-| XPath expression | `HtmlUnit Driver`_ | `Firefox Driver`_ | `Internet Explorer Driver`_ |
-+==================+====================+===================+=============================+
-| //input          | 1 ("example")      | 2                 | 2                           |
-+------------------+--------------------+-------------------+-----------------------------+
-| //INPUT          | 0                  | 2                 | 0                           |
-+------------------+--------------------+-------------------+-----------------------------+
++------------------+----------------------+----------------------+-----------------------------+
+|                  | Number of Matches In | Number of Matches In |    Number of Matches In     |
+|                  |                      |                      |                             |
+| XPath expression | `HtmlUnit Driver`_   | `Firefox Driver`_    | `Internet Explorer Driver`_ |
++==================+======================+======================+=============================+
+| //input          | 1 ("example")        | 2                    | 2                           |
++------------------+----------------------+----------------------+-----------------------------+
+| //INPUT          | 0                    | 2                    | 0                           |
++------------------+----------------------+----------------------+-----------------------------+
 
 Matching Implicit Attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
