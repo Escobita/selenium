@@ -1,4 +1,4 @@
-.. _GettingStarted:
+.. GettingStarted:
 
 The 5 Minute Getting Started Guide
 ==================================
@@ -26,7 +26,7 @@ additional processes or run any installers before using it.
 
 You're now ready to write some code. An easy way to get started is this 
 example, which searches for the term "Cheese" on Google and then outputs the 
-result page's title to the console. You'll start by using the :ref:`HtmlUnitDriver`. 
+result page's title to the console. You'll start by using the `HtmlUnit Driver`_. 
 This is a pure Java driver that runs entirely in-memory. Because of this, you 
 won't see a new browser window open. 
 
@@ -68,7 +68,7 @@ results as output on the console. Congratulations, you've managed to get
 started with WebDriver!
 
 In this next example, you shall use a page that requires Javascript to work 
-properly, such as Google Suggest. You will also be using the :ref:`FirefoxDriver`. 
+properly, such as Google Suggest. You will also be using the `Firefox Driver`_. 
 Make sure that :ref:`Firefox is installed on your machine and is in the normal 
 location for your OS <FirefoxDefaultLocations>`.
 
@@ -122,14 +122,14 @@ Once that's done, create a new class called GoogleSuggest, which looks like:
 When you run this program, you'll see the list of suggestions being printed 
 to the console. That's all there is to using WebDriver! 
 
-Hopefully, this will have whet your appetite for more. In the :ref:`NextSteps` 
+Hopefully, this will have whet your appetite for more. In the `Next Steps`_
 section you will learn more about how to use WebDriver for things 
 such as navigating forward and backward in your browser's history, and how to 
 use frames and windows. It also provides a more complete discussion of the 
-examples than  :ref:`GettingStarted`. If you're ready, let's take the 
-:ref:`NextSteps`!
+examples than `The 5 Minute Getting Started Guide`_. If you're ready, let's
+take the `Next Steps`_!
 
-.. _NextSteps:
+.. _`Next Steps`: `Next Steps For Using WebDriver`_
 
 Next Steps For Using WebDriver
 ==============================
@@ -143,15 +143,15 @@ written, but there are several implementations. These are:
 =============================  ========================  =============================================
 Name of driver                 Available on which OS?    Class to instantiate
 =============================  ========================  =============================================
-:ref:`HtmlUnitDriver`          All                       org.openqa.selenium.htmlunit.HtmlUnitDriver
-:ref:`FirefoxDriver`           All                       org.openqa.selenium.firefox.FirefoxDriver
-:ref:`InternetExplorerDriver`  Windows                   org.openqa.selenium.ie.InternetExplorerDriver
-:ref:`ChromeDriver`            All                       org.openqa.selenium.chrome.ChromeDriver
+`HtmlUnit Driver`_             All                       org.openqa.selenium.htmlunit.HtmlUnitDriver
+`Firefox Driver`_              All                       org.openqa.selenium.firefox.FirefoxDriver
+`Internet Explorer Driver`_    Windows                   org.openqa.selenium.ie.InternetExplorerDriver
+`Chrome Driver`_               All                       org.openqa.selenium.chrome.ChromeDriver
 =============================  ========================  =============================================
 
 You can find out more information about each of these by following the links in 
 the table. Which you use depends on what you want to do. For sheer speed, the 
-:ref:`HtmlUnitDriver` is great, but it's not graphical, which means that you can't 
+`HtmlUnit Driver`_ is great, but it's not graphical, which means that you can't 
 watch what's happening. As a developer you may be comfortable with this, but 
 sometimes it's good to be able to test using a real browser, especially when 
 you're showing a demo of your application (or running the tests) for an 
@@ -164,14 +164,14 @@ depend on their familiarity with the application under test, WebDriver, and your
 testing framework.
 
 To support higher "perceived safety", you may wish to choose a driver such as 
-the :ref:`FirefoxDriver`. This has the added advantage that this driver actually 
+the `Firefox Driver`_. This has the added advantage that this driver actually 
 renders content to a screen, and so can be used to detect information such 
 as the position of an element on a page, or the CSS properties that apply to 
 it. However, this additional flexibility comes at the cost of slower overall 
 speed. By writing your tests against the WebDriver interface, it is possible to 
 pick the most appropriate driver for a given test.
 
-To keep things simple, let's start with the :ref:`HtmlUnitDriver`:
+To keep things simple, let's start with the `HtmlUnit Driver`_:
 
 .. code-block:: java
     
@@ -217,13 +217,16 @@ you could find it using any of:
     element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
 
 You can also look for a link by its text, but be careful! The text must be an 
-exact match! You should also be careful when using :ref:`XpathInWebDriver`. If 
+exact match! You should also be careful when using `XPATH in WebDriver`_. If 
 there's more than one element that matches the query, then only the first will 
 be returned. If nothing can be found, a ``NoSuchElementException`` will be 
 thrown.
 
+.. _`XPATH in WebDriver` : `How XPATH Works in WebDriver`_
+
 WebDriver has an "Object-based" API; we represent all types of elements using 
-the same interface: `WebElement <http://selenium.googlecode.com/svn/webdriver/javadoc/org/openqa/selenium/WebElement.html>`_. 
+the same interface:
+`Web Element <http://selenium.googlecode.com/svn/webdriver/javadoc/org/openqa/selenium/WebElement.html>`_. 
 This means that although you may see a lot of possible methods you could invoke 
 when you hit your IDE's auto-complete key combination, not all of them will 
 make sense or be valid. Don't worry! WebDriver will attempt to do the Right 
@@ -314,7 +317,7 @@ information by casting the element to a ``RenderedWebElement``:
     RenderedWebElement element = (RenderedWebElement) element;
 
 Not all drivers render their content to the screen (such as the 
-:ref:`HtmlUnitDriver`), so it's not safe to assume that the cast will work, but if 
+`HtmlUnit Driver`_), so it's not safe to assume that the cast will work, but if 
 it does you can gather additional information such as the size and location of 
 the element. In addition, you can use drag and drop, either moving an element 
 by a certain amount, or on to another element:
@@ -423,19 +426,15 @@ Next, Next Steps!
 -----------------
 
 This has been a high level walkthrough of WebDriver and some of its key 
-capabilities. You may want to look at the :ref:`DesignPatterns` to get some ideas 
+capabilities. You may want to look at the :ref:`Design Patterns` to get some ideas 
 about how you can reduce the pain of maintaining your tests and how to make 
 your code more modular.
-
-.. _WebDriverImplementations:
 
 WebDriver Implementations
 =========================
 
-.. _HtmlUnitDriver:
-
-HtmlUnitDriver
---------------
+HtmlUnit Driver
+---------------
 
 This is currently the fastest and most lightweight implementation of WebDriver. 
 As the name suggests, this is based on HtmlUnit.
@@ -452,8 +451,8 @@ Cons
 
 * Emulates other browser's JavaScript behaviour (see below)
 
-JavaScript in the HtmlUnitDriver
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+JavaScript in the HtmlUnit Driver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 None of the popular browsers uses the JavaScript engine used by HtmlUnit 
 (Rhino). If you test JavaScript using HtmlUnit the results may differ 
@@ -486,29 +485,27 @@ If you can't wait, enabling JavaScript support is very easy:
     HtmlUnitDriver driver = new HtmlUnitDriver();
     driver.setJavascriptEnabled(true);
 
-This will cause the HtmlUnitDriver to emulate Internet Explorer's JavaScript 
+This will cause the `HtmlUnit Driver`_ to emulate Internet Explorer's JavaScript 
 handling by default.
 
-.. _FirefoxDriver:
-
-FirefoxDriver
--------------
+Firefox Driver
+--------------
 
 Pros
 ~~~~
 
 * Runs in a real browser and supports JavaScript
-* Faster than the :ref:`InternetExplorerDriver`
+* Faster than the `Internet Explorer Driver`_
 
 Cons
 ~~~~
 
-* Slower than the :ref:`HtmlUnitDriver`
+* Slower than the `HtmlUnit Driver`_
 
 Before Going Any Further
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The FirefoxDriver contains everything it needs in the JAR file. If you're just 
+The `Firefox Driver`_ contains everything it needs in the JAR file. If you're just 
 interested in using this driver, then all you need to do is put the 
 ``webdriver-firefox.jar`` or ``webdriver-all.jar`` on your ``CLASSPATH``, and 
 WebDriver will do everything else for you.
@@ -520,7 +517,7 @@ Important System Properties
 
 The following system properties (read using ``System.getProperty()`` and set 
 using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
-command line flag) are used by the FirefoxDriver:
+command line flag) are used by the `Firefox Driver`_:
 
 =============================  ==============================================================================================================
 Property                       What it means
@@ -551,14 +548,12 @@ Installing a Downloaded Binary
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
 the dependencies (including the common library) required to run the 
-FirefoxDriver. In order to use it:
+`Firefox Driver`_. In order to use it:
 
 * Copy all the "jar" files on to your ``CLASSPATH``.
 
-.. _InternetExplorerDriver:
-
-InternetExplorerDriver
-----------------------
+Internet Explorer Driver
+------------------------
 
 This driver has been tested with Internet Explorer 6, 7 and 8 on XP. It has 
 also been successfully tested on Vista.
@@ -571,14 +566,14 @@ Pros
 Cons
 ~~~~
 
-* Obviously the InternetExplorerDriver will only work on Windows!
+* Obviously the `Internet Explorer Driver`_ will only work on Windows!
 * Comparatively slow (though still pretty snappy :)
 
 Installing
 ~~~~~~~~~~
 
 Simply add ``webdriver-all.jar`` to your ``CLASSPATH``. You do not need to run 
-an installer before using the InternetExplorerDriver, though some configuration 
+an installer before using the `Internet Explorer Driver`_, though some configuration 
 is required.
 
 Required Configuration
@@ -587,21 +582,19 @@ Required Configuration
 Add every site you intend to visit to your "Trusted Sites" If you do not do 
 this, then you will not be able to interact with the page.
 
-.. _ChromeDriver:
+Chrome Driver
+-------------
 
-ChromeDriver
-------------
+See below for instructions on how to install the `Chrome Driver`_.
 
-See below for instructions on how to install the ChromeDriver.
-
-Note that ChromeDriver is one of the newest drivers. Please report any problems 
+Note that `Chrome Driver`_ is one of the newest drivers. Please report any problems 
 through the `issue tracker <http://code.google.com/p/selenium/issues/list>`_.
 
 Pros
 ~~~~
 
 * Runs in a real browser and supports JavaScript
-* Because Chrome is a Webkit-based browser, the ChromeDriver may allow you to 
+* Because Chrome is a Webkit-based browser, the `Chrome Driver`_ may allow you to 
   verify that your site works in Safari. Note that since Chrome uses its own V8 
   JavaScript engine rather than Safari's Nitro engine, JavaScript execution may 
   differ.
@@ -609,7 +602,7 @@ Pros
 Cons
 ~~~~
 
-* Slower than the :ref:`HtmlUnitDriver`
+* Slower than the `HtmlUnit Driver`_
 
 .. TODO: I removed the known issues section as this type of content is best in 
          the Wiki or issue tracker. Can we add a link to all issues raised 
@@ -618,24 +611,24 @@ Cons
 Before Going Any Further
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ChromeDriver contains everything it needs in the JAR file. If you're just 
+The `Chrome Driver`_ contains everything it needs in the JAR file. If you're just 
 interested in using this driver, then all you need to do is put 
 ``webdriver-all.jar`` on your ``CLASSPATH``, and WebDriver will do everything 
 else for you.
 
-Because the ChromeDriver is implemented as an extension, you will need the 
+Because the `Chrome Driver`_ is implemented as an extension, you will need the 
 **beta** or **dev** channel release of Google Chrome installed (NOT the stable 
-build). You can get on the dev channel 
-`here <http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
+build). Here's a link to the `dev channel 
+<http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
 recommended is version 4.0.206.*+. There were several breaking changes in this 
-release, so ChromeDriver will not work in versions prior to this.
+release, so `Chrome Driver`_ will not work in versions prior to this.
 
 Important System Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following system properties (read using ``System.getProperty()`` and set 
 using ``System.setProperty()`` in Java code or the ``-DpropertyName=value`` 
-command line flag) are used by the ChromeDriver:
+command line flag) are used by the `Chrome Driver`_:
 
 ======================  ======================================================================
 Property                What it means
@@ -660,7 +653,7 @@ Installing a Downloaded Binary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all 
-the dependencies required to run the ChromeDriver. In order to use it, copy all 
+the dependencies required to run the `Chrome Driver`_. In order to use it, copy all 
 the "jar" files on to your ``CLASSPATH``.
 
 .. _SeleniumRCEmulation:
@@ -746,13 +739,13 @@ to do drag and drop:
 
     from.dragAndDropOn(to);
 
-Currently, only the FirefoxDriver supports this, but you should also expect 
-support for the InternetExplorerDriver too.
+Currently, only the `Firefox Driver`_ supports this, but you should also expect 
+support for the `Internet Explorer Driver`_ too.
 
 Changing the user agent
 -----------------------
 
-This is easy with the FirefoxDriver:
+This is easy with the `Firefox Driver`_:
 
 .. code-block:: java
 
@@ -785,7 +778,7 @@ Alternatively, if the profile isn't already registered with Firefox:
     WebDriver driver = new FirefoxDriver(profile);
     Enabling features that might not be wise to use in Firefox
 
-As we develop features in the FirefoxDriver, we expose the ability to use them. 
+As we develop features in the `Firefox Driver`_, we expose the ability to use them. 
 For example, until we feel native events are stable on Firefox for Linux, they 
 are disabled by default. To enable them:
 
@@ -795,9 +788,7 @@ are disabled by default. To enable them:
     profile.setEnableNativeEvents(true);
     WebDriver driver = new FirefoxDriver(profile);
 
-.. _XpathInWebDriver:
-
-How XPath Works in WebDriver
+How XPATH Works in WebDriver
 ============================
 
 At a high level, WebDriver uses a browser's native XPath capabilities wherever 
@@ -805,13 +796,13 @@ possible. On those browsers that don't have native XPath support, we have
 provided our own implementation. This can lead to some unexpected behaviour 
 unless you are aware of the differences in the various xpath engines.
 
-======================  =======================  ==========================  ====================
-Driver                  Tag and Attribute Names	 Attribute Values            Native XPath Support
-======================  =======================  ==========================  ====================
-HtmlUnitDriver          Lower-cased              As they appear in the HTML  Yes
-InternetExplorerDriver  Lower-cased              As they appear in the HTML  No
-FirefoxDriver           Case insensitive         As they appear in the HTML  Yes
-======================  =======================  ==========================  ====================
+===========================  =======================  ==========================  ====================
+Driver                       Tag and Attribute Name   Attribute Values            Native XPath Support
+===========================  =======================  ==========================  ====================
+`HtmlUnit Driver`_           Lower-cased              As they appear in the HTML  Yes
+`Internet Explorer Driver`_  Lower-cased              As they appear in the HTML  No
+`Firefox Driver`_            Case insensitive         As they appear in the HTML  Yes
+===========================  =======================  ==========================  ====================
 
 This is a little abstract, so for the following piece of HTML:
 
@@ -822,15 +813,15 @@ This is a little abstract, so for the following piece of HTML:
 
 The following will happen:
 
-+------------------+---------------------------------------------------------+ 
-| XPath expression | Number of Matches In                                    |
-|                  +----------------+---------------+------------------------+
-|                  | HtmlUnitDriver | FirefoxDriver | InternetExplorerDriver |
-+==================+================+===============+========================+
-| //input          | 1 ("example")  | 2             | 2                      |
-+------------------+----------------+---------------+------------------------+
-| //INPUT          | 0              | 2             | 0                      |
-+------------------+----------------+---------------+------------------------+
++------------------+----------------------------------------------------------------------+ 
+| XPath expression | Number of Matches In                                                 |
+|                  +--------------------+-------------------+-----------------------------+
+|                  | `HtmlUnit Driver`_ | `Firefox Driver`_ | `Internet Explorer Driver`_ |
++==================+====================+===================+=============================+
+| //input          | 1 ("example")      | 2                 | 2                           |
++------------------+--------------------+-------------------+-----------------------------+
+| //INPUT          | 0                  | 2                 | 0                           |
++------------------+--------------------+-------------------+-----------------------------+
 
 Matching Implicit Attributes
 ----------------------------
@@ -841,8 +832,6 @@ not require the "type" attribute because it defaults to "text". The rule of
 thumb when using xpath in WebDriver is that you **should not** expect to be able 
 to match against these implicit attributes.
 
-.. _UsingWebDriver:
-
 Using WebDriver
 ===============
 
@@ -850,15 +839,15 @@ From a New Download
 -------------------
 
 Unpack the "webdriver-all.zip" you can download from the site, and add all the 
-JARs to your ``CLASSPATH``. This will give you the ChromeDriver, FirefoxDriver, 
-HtmlUnitDriver, InternetExplorerDriver, RemoteWebDriver client and the support 
+JARs to your ``CLASSPATH``. This will give you the `Chrome Driver`_, `Firefox Driver`_, 
+`HtmlUnit Driver`_, `Internet Explorer Driver`_, RemoteWebDriver client and the support 
 packages. The support packages give you useful helper classes, such as the 
 LiftStyleApi and the PageFactory.
 
 With Maven
 ----------
 
-If you want to use the HtmlUnitDriver, add the following dependency to your 
+If you want to use the `HtmlUnit Driver`_, add the following dependency to your 
 pom.xml:
 
 .. code-block:: xml
@@ -869,7 +858,7 @@ pom.xml:
         <version>0.9.7376</version>
     </dependency>
     
-If you want to use the FirefoxDriver, you need to add the following dependency 
+If you want to use the `Firefox Driver`_, you need to add the following dependency 
 to your pom.xml:
 
 .. code-block:: xml
@@ -880,7 +869,7 @@ to your pom.xml:
         <version>0.9.7376</version>
     </dependency>
 
-If you want to use the InternetExplorerDriver, you need to add the following 
+If you want to use the `Internet Explorer Driver`_, you need to add the following 
 dependency to your pom.xml:
 
 .. code-block:: xml
@@ -891,7 +880,7 @@ dependency to your pom.xml:
         <version>0.9.7376</version>
     </dependency>
 
-If you want to use the ChromeDriver, you need to add the following dependency 
+If you want to use the `Chrome Driver`_, you need to add the following dependency 
 to your pom.xml:
 
 .. code-block:: xml
@@ -927,4 +916,4 @@ Further Resources
 =================
 
 You can find further resources for WebDriver 
-`here <http://code.google.com/p/selenium/wiki/FurtherResources>`_
+in `WebDriver's wiki <http://code.google.com/p/selenium/wiki/FurtherResources>`_
