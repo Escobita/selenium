@@ -1698,7 +1698,7 @@ Here's the complete error message from the server::
     ~1\Temp\customProfileDir203138\parent.lock 
 
 To resolve this, see the section on `Specifying a Separate Firefox Profile 
-<Personalizing the Firefox Profile used in the tests>`_
+<Specifying the Firefox Profile>`_
 
 
 Versioning Problems 
