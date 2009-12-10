@@ -3,8 +3,6 @@
 
 The official documentation for Selenium can be found at http://seleniumhq.org/docs/
 
-<wiki:toc max_depth="2" />
-
 = Getting Involved =
 
 == Basic knowledge ==
