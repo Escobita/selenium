@@ -102,10 +102,12 @@ Once that's done, create a new class called GoogleSuggest, which looks like:
             // Sleep until the div we want is visible or 5 seconds is over
             long end = System.currentTimeMillis() + 5000;
             while (System.currentTimeMillis() < end) {
-                // Browsers which render content (such as Firefox and IE) return "RenderedWebElements"
+                // Browsers which render content (such as Firefox and IE)
+                // return "RenderedWebElements"
                 RenderedWebElement resultsDiv = (RenderedWebElement) driver.findElement(By.className("gac_m"));
 
-                // If results have been returned, the results are displayed in a drop down.
+                // If results have been returned,
+                // the results are displayed in a drop down.
                 if (resultsDiv.isDisplayed()) {
                   break;
                 }
@@ -294,7 +296,8 @@ way to do this would be to find the "submit" button and click it:
 
 .. code-block:: java
 
-    driver.findElement(By.id("submit")).click();  // Assume the button has the ID "submit" :)
+    driver.findElement(By.id("submit")).click();
+    // Assume the button has the ID "submit" :)
 
 Alternatively, WebDriver has the convenience method "submit" on every element. 
 If you call this on an element within a form, WebDriver will walk up the DOM 
@@ -813,17 +816,15 @@ This is a little abstract, so for the following piece of HTML:
     <input type="text" name="example" />
     <INPUT type="text" name="other" />
 
-The following will happen:
+The following number of matches will be found
 
-+------------------+----------------------+----------------------+-----------------------------+
-|                  | Number of Matches In | Number of Matches In |    Number of Matches In     |
-|                  |                      |                      |                             |
-| XPath expression | `HtmlUnit Driver`_   | `Firefox Driver`_    | `Internet Explorer Driver`_ |
-+==================+======================+======================+=============================+
-| //input          | 1 ("example")        | 2                    | 2                           |
-+------------------+----------------------+----------------------+-----------------------------+
-| //INPUT          | 0                    | 2                    | 0                           |
-+------------------+----------------------+----------------------+-----------------------------+
+=================== ====================== ====================== =============================
+ XPath expression   `HtmlUnit Driver`_     `Firefox Driver`_      `Internet Explorer Driver`_  
+=================== ====================== ====================== =============================
+  //input            1 ("example")          2                      2                           
+
+  //INPUT            0                      2                      0                           
+=================== ====================== ====================== =============================
 
 Matching Implicit Attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
