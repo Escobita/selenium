@@ -834,17 +834,17 @@ not require the "type" attribute because it defaults to "text". The rule of
 thumb when using xpath in WebDriver is that you **should not** expect to be able 
 to match against these implicit attributes.
 
-Using WebDriver
----------------
+Getting and Using WebDriver
+---------------------------
 
 From a New Download
 ~~~~~~~~~~~~~~~~~~~
 
 Unpack the "webdriver-all.zip" you can download from the site, and add all the 
 JARs to your ``CLASSPATH``. This will give you the `Chrome Driver`_, `Firefox Driver`_, 
-`HtmlUnit Driver`_, `Internet Explorer Driver`_, RemoteWebDriver client and the support 
-packages. The support packages give you useful helper classes, such as the 
-LiftStyleApi and the PageFactory.
+`HtmlUnit Driver`_, `Internet Explorer Driver`_, Remote Web Driver client and
+the support packages. The support packages give you useful helper classes, such
+as the LiftStyleApi and the PageFactory.
 
 With Maven
 ~~~~~~~~~~
