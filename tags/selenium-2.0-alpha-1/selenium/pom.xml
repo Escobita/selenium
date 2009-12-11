@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.seleniumhq.selenium2</groupId>
+        <artifactId>selenium2-parent</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>selenium2</artifactId>
+    <name>selenium2</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium2</groupId>
+            <artifactId>selenium2-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium2</groupId>
+			<artifactId>selenium2-chrome</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium2</groupId>
+			<artifactId>selenium2-htmlunit</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium2</groupId>
+			<artifactId>selenium2-firefox</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium2</groupId>
+			<artifactId>selenium2-ie</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId> 
+			<artifactId>google-collections</artifactId> 
+			<version>1.0-rc3</version>
+		</dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium.client-drivers</groupId>
+            <artifactId>selenium-java-client-driver</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!-- Test dependencies ... -->
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium2</groupId>
+            <artifactId>selenium2-common</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium2</groupId>
+            <artifactId>selenium2-remote-server</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.8</version>
+            <classifier>jdk15</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/java</sourceDirectory>
+        <testSourceDirectory>test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/java</directory>
+                <includes>
+                    <include>**/*.js</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+</project>
