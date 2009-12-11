@@ -52,12 +52,12 @@
                 <td valign="top">
                     <a href="../../download/?ref=projects/bromine"><img src="download.gif" style='float: left; margin-right: 6px;'></a>	
                     <p>
-                        <b>Bromine</b> is a web-based QA tool for selenium, that enables you to easily run selenium RC tests and view the results. It scales beatifully from the single tester that just wants to run some tests without all the hassle to the corporate solution with multiple user-groups and houndreds of testcases. 
+                        <b>Bromine</b> is a web-based QA tool for Selenium, that enables you to easily run Selenium-RC tests and view the results. It scales beautifully from the single tester that just wants to run some tests without all the hassle to the corporate solution with multiple user-groups and hundreds of testcases. 
                     </p>
                     <p>
                         We created Bromine for 2 main reasons:
                         <ol>
-                            <li>We needed an easy way to run selenium tests and store the results for analysis and backlog</li>
+                            <li>We needed an easy way to run Selenium tests and store the results for analysis and backlog</li>
                             <li>We needed to present the results in a way our less technical minded management would understand</li>
                         </ol>
                     </p>
