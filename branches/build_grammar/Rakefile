@@ -1,0 +1,5 @@
+require 'rake-tasks/crazy-fun'
+
+task :clean do
+  rm_rf 'build'
+end
