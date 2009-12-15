@@ -160,15 +160,7 @@ FirefoxDriver.prototype.executeScript = function(respond, params) {
 
     var result = runScript(scriptSrc, parameters);
 
-    var wrappedResult = Utils.wrapResult(result, respond.context);
-
-    if (wrappedResult.resultType !== undefined) {
-      respond.setField("resultType", wrappedResult.resultType);
-    }
-
-    if (wrappedResult.response !== undefined) {
-      respond.response = wrappedResult.response;
-    }
+    respond.response = Utils.wrapResult(result, respond.context);
 
   } catch (e) {
     respond.isError = true;
@@ -468,7 +460,7 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
     elementIds.push(Utils.addToKnownElements(element, respond.context));
   }
 
-  respond.response = elementIds.join(',');
+  respond.response = elementIds;
   respond.send();
 };
 
@@ -665,12 +657,11 @@ FirefoxDriver.prototype.getCookies = function(respond) {
         + (c.isSecure ? "secure ;" : "");
   };
 
-  var toReturn = "";
-  var cookies = getVisibleCookies(
-      Utils.getBrowser(respond.context).contentWindow.location);
+  var toReturn = [];
+  var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
+      contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
-    var toAdd = cookieToString(cookies[i]);
-    toReturn += toAdd + "\n";
+    toReturn.push(cookieToString(cookies[i]));
   }
 
   respond.response = toReturn;
@@ -718,7 +709,7 @@ FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
 
 
 FirefoxDriver.prototype.getSpeed = function(respond) {
-  respond.response = "" + this.mouseSpeed;
+  respond.response = this.mouseSpeed;
   respond.send();
 };
 
@@ -732,6 +723,23 @@ FirefoxDriver.prototype.screenshot = function(respond) {
   } catch (e) {
     respond.isError = true;
     respond.response = 'Could not take screenshot of current page - ' + e;
+  }
+  respond.send();
+};
+
+FirefoxDriver.prototype.dismissAlert = function(respond, parameters) {
+  // TODO(simon): Is there a type for alerts?
+  var alertText = parameters['text'];
+  var wm = Utils.getService("@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator");
+  var allWindows = wm.getEnumerator("");
+  while (allWindows.hasMoreElements()) {
+    var alert = allWindows.getNext();
+    var doc = alert.document;
+    if (doc && doc.documentURI == "chrome://global/content/commonDialog.xul") {
+      var dialog = doc.getElementsByTagName("dialog")[0];
+      dialog.getButton("accept").click();
+      break;
+    }
   }
   respond.send();
 };

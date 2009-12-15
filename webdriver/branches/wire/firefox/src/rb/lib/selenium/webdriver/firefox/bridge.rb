@@ -4,15 +4,25 @@ module Selenium
       class Bridge
         include BridgeHelper
 
-        def initialize
+        def initialize(opts = {})
           @binary     = Binary.new
-          @launcher   = Launcher.new(@binary).launch
+          @launcher   = Launcher.new(
+            @binary,
+            opts[:port]    || DEFAULT_PORT,
+            opts[:profile] || DEFAULT_PROFILE_NAME
+          )
+
+          @launcher.launch
           @connection = @launcher.connection
           @context    = newSession
         end
 
         def browser
           :firefox
+        end
+
+        def driver_extensions
+          [DriverExtensions::TakesScreenshot]
         end
 
         def quit
@@ -26,13 +36,16 @@ module Selenium
         end
 
         def getWindowHandles
-          execute(:getWindowHandles).to_s.split(", ")
+          execute :getWindowHandles
         end
 
         def getCurrentWindowHandle
           execute :getCurrentWindowHandle
         end
 
+        def getScreenshotAsBase64
+          execute :getScreenshotAsBase64
+        end
 
         def get(url)
           execute :get,
@@ -64,8 +77,9 @@ module Selenium
           typed_args = args.map { |e| wrap_script_argument(e) }
 
           resp = raw_execute :executeScript, :parameters => [string, typed_args]
+          raise TypeError, "expected Hash" unless resp.kind_of? Hash
 
-          unwrap_script_argument resp
+          unwrap_script_argument resp["response"]
         end
 
         #
@@ -167,8 +181,7 @@ module Selenium
           # data = execute :getElementLocation, :element_id => element
           data = execute :getLocation,
                          :element_id => element
-
-          Point.new(*data.split(",").map { |e| Integer(e.strip) })
+          Point.new(data["x"], data["y"])
         end
 
         def getElementSize(element)
@@ -280,8 +293,7 @@ module Selenium
 
         def getAllCookies
           data = execute :getCookie
-
-          data.strip.split("\n").map do |c|
+          data.map do |c|
             parse_cookie_string(c) unless c.strip.empty?
           end.compact
         end
@@ -336,7 +348,7 @@ module Selenium
                                 :parameters => [how, what]
           end
 
-          id_string.split(",").map { |id| Element.new self, element_id_from(id) }
+          id_string.map { |id| Element.new self, element_id_from(id) }
         end
 
         def newSession
@@ -407,13 +419,13 @@ module Selenium
 
         def unwrap_script_argument(arg)
           raise TypeError, "expected Hash" unless arg.kind_of? Hash
-          case arg["resultType"]
+          case arg["type"]
           when "NULL"
             nil
           when "ELEMENT"
-            Element.new self, element_id_from(arg["response"])
+            Element.new self, element_id_from(arg["value"])
           when "ARRAY"
-            arg['response'].map { |e| unwrap_script_argument(e) }
+            arg['value'].map { |e| unwrap_script_argument(e) }
           # when "POINT"
           #   Point.new arg['x'], arg['y']
           # when "DIMENSION"
@@ -421,7 +433,7 @@ module Selenium
           # when "COOKIE"
           #   {:name => arg['name'], :value => arg['value']}
           else
-            arg["response"]
+            arg["value"]
           end
         end
 

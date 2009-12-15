@@ -290,8 +290,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
     respond.send();
     return;
   }
-  respond.isError = true;
-  respond.response = "No match";
+  respond.response = null;
   respond.send();
 };
 
@@ -478,8 +477,7 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
 
 FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
   var element = Utils.getElementAt(parameters['id'], respond.context);
-
-  respond.response = Utils.isDisplayed(element) ? "true" : "false";
+  respond.response = Utils.isDisplayed(element);
   respond.send();
 };
 
@@ -489,7 +487,10 @@ FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
 
   var location = Utils.getElementLocation(element, respond.context);
 
-  respond.response = location.x + ", " + location.y;
+  respond.response = {
+    x: Math.round(location.x),
+    y: Math.round(location.y)
+  };
   respond.send();
 };
 
@@ -499,7 +500,10 @@ FirefoxDriver.prototype.getElementSize = function(respond, parameters) {
 
   var box = Utils.getLocationOnceScrolledIntoView(element);
 
-  respond.response = box.width + ", " + box.height;
+  respond.response = {
+    width: Math.round(box.width),
+    height: Math.round(box.height)
+  };
   respond.send();
 };
 

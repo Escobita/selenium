@@ -17,6 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -44,5 +47,46 @@ public class AlertsTest extends AbstractDriverTestCase {
     ((JavascriptExecutor) driver).executeScript(
         "window.alert = function(msg) { document.getElementById('text').innerHTML = msg; }");
     driver.findElement(By.id("alert")).click();
+  }
+
+  @Ignore
+  public void testShouldAllowUsersToDealWithAnAlertManually() {
+    driver.get(alertPage);
+
+    driver.findElement(By.id("alert")).click();
+
+    Alert alert = switchToAlert(driver);
+    alert.dismiss();
+
+    // If we can perform any action, we're good to go
+    assertEquals("Testing Alerts", driver.getTitle());
+  }
+
+  @Ignore
+  public void testShouldThrowAnExceptionIfAnAlertHasNotBeenDealtWith() {
+    driver.get(alertPage);
+
+    driver.findElement(By.id("alert")).click();
+    try {
+      driver.getTitle();
+    } catch (UnhandledAlertException e) {
+      // this is expected
+    }
+
+    // But the next call should be good.
+    assertEquals("Testing Alerts", driver.getTitle());
+  }
+
+  private Alert switchToAlert(WebDriver driver) {
+    WebDriver.TargetLocator locator = driver.switchTo();
+
+    try {
+      Method alertMethod = locator.getClass().getMethod("alert");
+      alertMethod.setAccessible(true);
+      return (Alert) alertMethod.invoke(locator);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

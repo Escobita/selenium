@@ -10,7 +10,6 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="firefox" />
     <orderEntry type="module" module-name="chrome" />
-    <orderEntryProperties />
   </component>
 </module>
 

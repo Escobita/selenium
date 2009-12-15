@@ -18,24 +18,29 @@ limitations under the License.
 package org.openqa.selenium.chrome;
 
 import com.google.common.collect.ImmutableMap;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
-import static org.openqa.selenium.remote.DriverCommand.*;
+import static org.openqa.selenium.remote.DriverCommand.EXECUTE_SCRIPT;
+import static org.openqa.selenium.remote.DriverCommand.GET_ACTIVE_ELEMENT;
+import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
+import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_DEFAULT_CONTENT;
+import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_FRAME_BY_INDEX;
+import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_FRAME_BY_NAME;
+import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_WINDOW;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.SessionId;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
 
 public class ChromeDriver extends RemoteWebDriver {
 
@@ -148,6 +153,10 @@ public class ChromeDriver extends RemoteWebDriver {
     return elements;
   }
 
+  public <X> X getScreenshotAs(OutputType<X> target) {
+    return target.convertFromBase64Png(execute(SCREENSHOT).getValue().toString());
+  }
+  
   private class ChromeTargetLocator implements TargetLocator {
     public WebElement activeElement() {
       return getElementFrom(execute(GET_ACTIVE_ELEMENT));
