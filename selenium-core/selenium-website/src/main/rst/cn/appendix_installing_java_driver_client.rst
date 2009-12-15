@@ -5,8 +5,8 @@
 
 * 从SeleniumHQ `下载页面`_ 下载Selenium-RC
 * 启动Java IDE
-* 新建项目
-* 把selenium-java-client-driver.jar添加到项目的classpath
+* 新建工程
+* 把selenium-java-client-driver.jar添加到工程的classpath
 * 用Selenium-IDE录制你的测试并把它翻译成Java代码（Selenium-IDE有翻译功能，
   可以把测试翻译成多种语言）
 * 从控制台运行Selenium Server
@@ -31,17 +31,17 @@ Selenium-RC在Eclipse中的配置
 .. image:: ../images/chapt5_img03_Launch_Eclipse.png
    :align: center
 
-* Java>Java项目>下一步 
+* Java>Java工程>下一步 
 
 .. image:: ../images/chapt5_img04_Create_Java_Project.png
    :align: center
 
-* 命名你的项目，选择'Use a project Specific JRE'选项作为JDK（这个例子中选择JDK1.5）>点击下一步
+* 命名你的工程，选择'Use a project Specific JRE'选项作为JDK（这个例子中选择JDK1.5）>点击下一步
 
 .. image:: ../images/chapt5_img05_Create_Java_Project.png
    :align: center
 
-* 保持'Java Settings'原封不动进入下一窗口。项目特有类库将添加在这里。（在文档的后半部分详细描述。）
+* 保持'Java Settings'原封不动进入下一窗口。工程特有类库将添加在这里。（在文档的后半部分详细描述。）
 
 .. image:: ../images/chapt5_img06_Create_Java_Project.png 
    :align: center
@@ -51,7 +51,7 @@ Selenium-RC在Eclipse中的配置
 .. image:: ../images/chapt5_img07_Create_Java_Project.png 
    :align: center
 
-这样Google项目就创建在浏览器/导航面板。
+这样Google工程就创建在浏览器/导航面板。
 
 .. image:: ../images/chapt5_img08_Package_Explorer.png 
    :align: center
@@ -77,18 +77,18 @@ SelTestCase类应该放在 *core* 包内。
 
 在 *src* 文件夹内再创建一个包命名为 *testscripts* 。这将是放测试脚本的地方。
 
-*请注意这是关于项目的组织结构，它完全依赖个人选择和组织标准。将来测试脚本包可能根据项目需求被拆分。*
+*请注意这是关于工程的组织结构，它完全依赖个人选择和组织标准。将来测试脚本包可能根据工程需求被拆分。*
 
 .. image:: ../images/chapt5_img12_Create_Test_Script_Package.png 
    :align: center
 
-* 在Google项目内创建lib文件夹。右键点击项目名称>新建>文件夹。这是存放项目jar文件的地方
+* 在Google工程内创建lib文件夹。右键点击工程名称>新建>文件夹。这是存放工程jar文件的地方
   （例如Selenium client driver、Selenium server等）
 
 .. image:: ../images/chapt5_img13_Create_Library_Package.png
    :align: center
 
-这将在项目目录中创建lib文件夹。
+这将在工程目录中创建lib文件夹。
 
 .. image:: ../images/chapt5_img14_Create_Library_Package.png
    :align: center
@@ -130,12 +130,12 @@ Intellij IDEA提供了对开源开发工具的紧密集成，例如CVS、Subvers
 下面的几行说明了Selenium-RC在Intellij 6.0中的配置。
 它应该不会在高版本的intelliJ中有很大的不同。
 
-* 在IntelliJ IDEA中打开一个新项目。
+* 在IntelliJ IDEA中打开一个新工程。
 
 .. image:: ../images/chapt5_img28_Create_New_Project.png
    :align: center
      
-* 提供项目的名称和编译器。
+* 提供工程的名称和编译器。
 
 .. image:: ../images/chapt5_img28_Name_Project.png
    :align: center
@@ -150,7 +150,7 @@ Intellij IDEA提供了对开源开发工具的紧密集成，例如CVS、Subvers
 .. image:: ../images/chapt5_img30_JDK_Selection.png
    :align: center
 
-* 点击下一步，然后选择单模块项目。
+* 点击下一步，然后选择单模块工程。
 
 .. image:: ../images/chapt5_img31_Single_module.png
    :align: center
@@ -172,25 +172,25 @@ Intellij IDEA提供了对开源开发工具的紧密集成，例如CVS、Subvers
 .. image:: ../images/chapt5_img34_Src.png
    :align: center
    
-* 最后点击完成。这将启动项目面板。
+* 最后点击完成。这将启动工程面板。
 
 .. image:: ../images/chapt5_img34_Project_Pan.png
    :align: center
    
 
-**给项目添加类库:**
+**给工程添加类库:**
 
-* 点击项目工具栏上的 *设置*  按钮。
+* 点击工程工具栏上的 *设置*  按钮。
 
 .. image:: ../images/chapt5_img35_Add_Lib.png
    :align: center
 
-* 点击设置面板的 *项目结构* 。 
+* 点击设置面板的 *工程结构* 。 
 
 .. image:: ../images/chapt5_img36_Proj_Struct.png
    :align: center
    
-* 在项目组织中选择 *模块* ，然后浏览 *依赖* 标签。   
+* 在工程组织中选择 *模块* ，然后浏览 *依赖* 标签。   
 
 .. image:: ../images/chapt5_img37_Dependencies.png
    :align: center
@@ -206,14 +206,14 @@ Intellij IDEA提供了对开源开发工具的紧密集成，例如CVS、Subvers
 .. image:: ../images/chapt5_img39_Library_Files.png
    :align: center
    
-* 选择项目里的两个Jar文件，然后点击 *应用* 按钮。   
+* 选择工程里的两个Jar文件，然后点击 *应用* 按钮。   
 
 .. image:: ../images/chapt5_img40_Add_Jars.png
    :align: center
    
    
-* 现在点击项目结构面板的OK按钮，然后点击项目设置面板的关闭按钮。
-  所添加的Jar包将出现在项目类库中，如下所示。
+* 现在点击工程结构面板的OK按钮，然后点击工程设置面板的关闭按钮。
+  所添加的Jar包将出现在工程类库中，如下所示。
 
 .. image:: ../images/chapt5_img41_Added_Jars.png
    :align: center
@@ -223,7 +223,7 @@ Intellij IDEA提供了对开源开发工具的紧密集成，例如CVS、Subvers
 .. image:: ../images/chapt5_img42_Project_Directories.png 
    :align: center
    
-.. note:: 这不是硬性惯例，不同的项目可能有所变化。
+.. note:: 这不是硬性惯例，不同的工程可能有所变化。
 
 
 * 鉴于 *core* 包含了用于创建Selenium对象和启动浏览器的SelTestCase类。
