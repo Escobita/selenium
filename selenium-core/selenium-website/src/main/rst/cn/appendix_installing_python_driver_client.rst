@@ -1,31 +1,32 @@
-.. _configuring-selenium-RC-python-cn-reference:
+﻿.. _configuring-selenium-RC-python-cn-reference:
 
-Python Client Driver Configuration 
-----------------------------------
-* Download Selenium-RC from the SeleniumHQ `downloads page`_ 
-* Extract the file *selenium-java-client-driver.jar*
-* Open your desired java IDE (Eclipse, IntelliJ, Netweaver, etc.)
-* Create a new project
-* Add to your project classpath the file *selenium-java-client-driver.jar*
-* Write your Selenium test in Java
-* Run selenium server from console
-* Execute your test from the IDE
+客户端驱动在Python中的配置 
+--------------------------
+* 从 `下载页面`_ 下载Selenium-RC
+* 从 *selenium-java-client-driver.jar* 提取文件
+* 打开你喜欢的IDE (Eclipse、IntelliJ、Netweaver等)
+* 创建一个新工程
+* 把 *selenium-java-client-driver.jar* 添加到工程classpath
+* 用Java编写你的Selenium测试
+* 在控制台运行Selenium Server
+* 在IDE中执行你的测试
 
-The following steps describe the basic installation procedure. After following 
-this, the user can start using the desired IDE, (even write tests in a text 
-processor and run them from command line!) without any extra work (at least 
-from the selenium's part).
+以下步骤描述了基本的安装过程。
+此后，你可以开始使用你喜欢的IDE开发测试，
+（甚至在文本处理器中编写测试在用命令行运行他们！）
+而不需要任何额外的工作（至少是Selenium的部分）。
 
-* Installing Python
+* 安装Python
 
-    .. note:: This will cover python installation on Windows and Mac only, as 
-       in most linux distributions python is already pre-installed by default. 
 
+    .. note:: 这只涵盖python在Windows和Mac的安装，
+       因为大多数linux发行中，python已经是默认预安装的。
+ 
     * Windows
     
-      1. Download Active python's installer from ActiveState's official site: 
+      1. 从ActiveState的官方网站下载Active python的安装程序: 
          http://activestate.com/Products/activepython/index.mhtml 
-      2. Run the installer downloaded (ActivePython-x.x.x.x-win32-x86.msi)
+      2. 运行下载的安装程序 (ActivePython-x.x.x.x-win32-x86.msi)
 
 ..
 
@@ -41,30 +42,26 @@ from the selenium's part).
 
     * Mac
     
-      The latest Mac OS X version (Leopard at this time) comes with Python 
-      pre-installed. To install an extra Python, get a universal binary at 
-      http://www.pythonmac.org/ (packages for Python 2.5.x). You will get a 
-      .dmg file that you can mount. It contains a .pkg file that you can launch.
+      最新的Mac OS X版本(Leopard)已经预装Python。
+      要安装额外的Python，先从 http://www.pythonmac.org/ 
+      得到通用二进制文件(packages for Python 2.5.x)。
+      你将得到一个可以装载的.dmg文件。它包含了可以运行的.pkg文件。
 
       .. image:: ../images/chapt5_img19_Python_Mac_Install.png
          :align: center
 	
-* Installing the Selenium driver client for python 
+* 为Python安装客户端驱动
 
-    1. Download the last version of Selenium Remote Control from the 
-       `downloads page`_
-    2. Extract the content of the downloaded zip file 
-    3. Copy the module with the Selenium's driver for Python (selenium.py)
-       in the folder *C:/Python25/Lib* (this will allow you to import it 
-       directly in any script you write).
+    1. 从 `下载页面`_ 下载最新的Selenium-RC
+    2. 从下载的.zip文件中提取文件
+    3. 把适用于Python的Selenium客户端驱动(selenium.py)模块复制到文件夹 *C:/Python25/Lib* 
+       (这将使得客户端驱动可以导入到任何你编写的脚本中)。
 
-       You will find the module in the extracted folder, it's located inside 
-       *selenium-python-driver-client*.
+       你会在提取的文件夹中找到这个模块，它在 *selenium-python-driver-client* 中。
 
     .. image:: ../images/chapt5_img25_Python_Driver_Install.png
        :align: center
 
-Congratulations, you're done! Now any python script that you create can import
-selenium and start interacting with the browsers.
+恭喜你，你就大功告成了！现在，任何你创建的Python脚本，可以导入Selenium，并开始与浏览器交互。
 
-.. _`downloads page`: http://seleniumhq.org/download/
+.. _`下载页面`: http://seleniumhq.org/download/
