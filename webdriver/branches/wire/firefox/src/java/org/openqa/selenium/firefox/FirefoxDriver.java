@@ -30,13 +30,16 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.internal.ExtensionConnectionFactory;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -44,10 +47,12 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.remote.DriverCommand;
 import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,6 +67,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static org.openqa.selenium.OutputType.FILE;
+
 
 /**
  * An implementation of the {#link WebDriver} interface that drives Firefox. This works through a firefox extension,
@@ -74,11 +81,12 @@ import java.util.Set;
  * When the driver starts, it will make a copy of the profile it is using, rather than using that profile directly.
  * This allows multiple instances of firefox to be started.
  */
-public class FirefoxDriver implements WebDriver, JavascriptExecutor,
-    FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
-  public static final int DEFAULT_PORT = 7055;
-  // For now, only enable native events on Windows
-  public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
+public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreenshot,
+        FindsById, FindsByClassName, FindsByCssSelector,
+        FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
+    public static final int DEFAULT_PORT = 7055;
+    // For now, only enable native events on Windows
+    public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
       Platform.getCurrent().is(Platform.WINDOWS);
 
   private final ExtensionConnection extension;
@@ -230,6 +238,20 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor,
     }
 
     return findElement("class name", using);
+  }
+
+  public WebElement findElementByCssSelector(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
+
+    return findElement("css selector", using);
+  }
+
+  public List<WebElement> findElementsByCssSelector(String using) {
+    if (using == null)
+     throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
+
+    return findElements("css selector", using);
   }
 
   public WebElement findElementByName(String using) {
@@ -647,19 +669,37 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor,
       sendMessage(WebDriverException.class, REFRESH);
     }
   }
+    
+  public <X> X getScreenshotAs(OutputType<X> target) {
+    // Get the screenshot as base64.
+    String base64 = sendMessage(WebDriverException.class, SCREENSHOT);
+    // ... and convert it.
+    return target.convertFromBase64Png(base64);
+  }
 
   /**
    * Saves a screenshot of the current page into the given file.
+   *
+   * @param pngFile The file to store the screenshot in.
+   * @deprecated Use getScreenshotAs(file), which returns a temporary file.
    */
+  @Deprecated
   public void saveScreenshot(File pngFile) {
     if (pngFile == null) {
-      throw new IllegalArgumentException("Method parameter pngFile must not be null");
+        throw new IllegalArgumentException("Method parameter pngFile must not be null");
     }
+
+    File tmpfile = getScreenshotAs(FILE);
+
     File dir = pngFile.getParentFile();
     if (dir != null && !dir.exists() && !dir.mkdirs()) {
-      throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
+        throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
     }
-    sendMessage(WebDriverException.class, SCREENSHOT,
-        ImmutableMap.of("file", pngFile.getAbsolutePath()));
+
+    try {
+      FileHandler.copy(tmpfile, pngFile);
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
   }
 }

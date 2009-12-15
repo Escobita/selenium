@@ -327,7 +327,8 @@
         <inspection_tool class="InstanceofCatchParameter" level="ERROR" enabled="true" />
         <inspection_tool class="SingleCharacterStartsWith" level="WARNING" enabled="false" />
         <inspection_tool class="ImplicitNumericConversion" level="WARNING" enabled="false">
-          <option name="m_ignoreWideningConversions" value="false" />
+          <option name="ignoreWideningConversions" value="false" />
+          <option name="ignoreCharConversions" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryInterfaceModifier" level="WARNING" enabled="true" />
         <inspection_tool class="InstanceVariableInitialization" level="WARNING" enabled="false">
@@ -580,7 +581,9 @@
           <option name="m_maxLength" value="32" />
         </inspection_tool>
         <inspection_tool class="CheckedExceptionClass" level="WARNING" enabled="false" />
-        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false" />
+        <inspection_tool class="CastThatLosesPrecision" level="WARNING" enabled="false">
+          <option name="ignoreIntegerCharCasts" value="false" />
+        </inspection_tool>
         <inspection_tool class="SwitchStatementWithConfusingDeclaration" level="WARNING" enabled="false" />
         <inspection_tool class="EmptyTryBlock" level="ERROR" enabled="true" />
         <inspection_tool class="ManualArrayCopy" level="WARNING" enabled="false" />
@@ -591,8 +594,13 @@
         <inspection_tool class="OverlyComplexArithmeticExpression" level="WARNING" enabled="false">
           <option name="m_limit" value="6" />
         </inspection_tool>
-        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false" />
-        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false" />
+        <inspection_tool class="ConditionalExpression" level="WARNING" enabled="false">
+          <option name="ignoreSimpleAssignmentsAndReturns" value="false" />
+        </inspection_tool>
+        <inspection_tool class="UnnecessaryParentheses" level="WARNING" enabled="false">
+          <option name="ignoreClarifyingParentheses" value="false" />
+          <option name="ignoreParenthesesOnConditionals" value="false" />
+        </inspection_tool>
         <inspection_tool class="AssignmentToMethodParameter" level="WARNING" enabled="true">
           <option name="ignoreTransformationOfOriginalParameter" value="false" />
         </inspection_tool>
@@ -625,7 +633,6 @@
         <inspection_tool class="UnusedCatchParameter" level="WARNING" enabled="false">
           <option name="m_ignoreCatchBlocksWithComments" value="false" />
           <option name="m_ignoreTestCases" value="false" />
-          <option name="m_ignoreIgnoreParameter" value="true" />
         </inspection_tool>
         <inspection_tool class="ClassInTopLevelPackage" level="WARNING" enabled="false" />
         <inspection_tool class="FieldAccessedSynchronizedAndUnsynchronized" level="ERROR" enabled="true">
@@ -677,7 +684,9 @@
           <option name="ignoreTestCases" value="false" />
         </inspection_tool>
         <inspection_tool class="ConstantDeclaredInAbstractClass" level="WARNING" enabled="false" />
-        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true" />
+        <inspection_tool class="TooBroadCatch" level="WARNING" enabled="true">
+          <option name="onlyWarnOnRootExceptions" value="false" />
+        </inspection_tool>
         <inspection_tool class="FloatingPointEquality" level="ERROR" enabled="true" />
         <inspection_tool class="ReplaceAssignmentWithOperatorAssignment" level="WARNING" enabled="true">
           <option name="ignoreLazyOperators" value="true" />
@@ -959,11 +968,11 @@
       <module fileurl="file://$PROJECT_DIR$/third_party/third_party.iml" filepath="$PROJECT_DIR$/third_party/third_party.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/eclipse" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="SingleTestSuite" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+    <configuration default="false" name="SingleTestSuite" type="JUnit" factoryName="JUnit" enabled="false" merge="false" runner="emma">
       <module name="chrome" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -1028,6 +1037,7 @@
       </map>
     </option>
     <option name="myVersion" value="123" />
+    <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
@@ -1058,6 +1068,7 @@
         <root url="jar://$PROJECT_DIR$/common/lib/buildtime/slf4j-simple-1.3.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/common/lib/buildtime/servlet-api-2.5-6.1.9.jar!/" />
         <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jetty-6.1.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/commons-io-1.4.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

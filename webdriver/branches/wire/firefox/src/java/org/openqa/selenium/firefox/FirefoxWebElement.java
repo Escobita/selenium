@@ -27,6 +27,7 @@ import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -44,10 +45,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FirefoxWebElement implements RenderedWebElement, Locatable,
-    FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
-  private final FirefoxDriver parent;
-  private final String elementId;
+public class FirefoxWebElement implements RenderedWebElement, Locatable, 
+        FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,
+    FindsByName, FindsByTagName, FindsByClassName {
+    private final FirefoxDriver parent;
+    private final String elementId;
 
   public FirefoxWebElement(FirefoxDriver parent, String elementId) {
     this.parent = parent;
@@ -220,6 +222,14 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
   public List<WebElement> findElementsByClassName(String className) {
     return findChildElements("class name", className);
+  }
+
+  public WebElement findElementByCssSelector(String using) {
+    return findChildElement("css selector", using);
+  }
+
+  public List<WebElement> findElementsByCssSelector(String using) {
+    return findChildElements("css selector", using);
   }
 
   private WebElement findChildElement(String using, String value) {

@@ -76,8 +76,14 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   Utils.fireMouseEventOn(respond.context, element, "mousemove");
   Utils.fireMouseEventOn(respond.context, element, "mousedown");
   if (element != currentlyActive) {
-    currentlyActive.blur();
-    element.focus();
+    // Some elements may not have blur, focus functions - for example,
+    // elements under an SVG element. Call those only if they exist.
+    if (typeof currentlyActive.blur == 'function') {
+      currentlyActive.blur();
+    }
+    if (typeof element.focus == 'function') {
+      element.focus();
+    }
   }
 
   Utils.fireMouseEventOn(respond.context, element, "mouseup");
@@ -255,7 +261,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
     } else if (attributeName.toLowerCase() == "checked") {
       respond.response = element.checked;
     } else if (attributeName.toLowerCase() == "readonly") {
-      respond.response = element.getAttribute('readonly');
+      respond.response = element.readOnly;
     }
 
     respond.send();

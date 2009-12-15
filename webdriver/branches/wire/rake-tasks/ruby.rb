@@ -71,10 +71,15 @@ begin
 
    s.add_dependency "json_pure"
    s.add_dependency "ffi"
-   s.add_development_dependency "rspec"
-   s.add_development_dependency "rack"
+
+   if s.respond_to? :add_development_dependency
+     s.add_development_dependency "rspec"
+     s.add_development_dependency "rack"
+   end
 
    s.require_paths = []
+
+   s.files         += FileList['COPYING']
 
    # Common
    s.require_paths << 'common/src/rb/lib'
@@ -113,7 +118,7 @@ begin
     end
 
     desc 'Build and release the ruby gem to Gemcutter'
-    task :release => :gem do
+    task :release => [:clean, :gem] do
       sh "gem push build/#{GEM_SPEC.name}-#{GEM_SPEC.version}.gem"
     end
   end
