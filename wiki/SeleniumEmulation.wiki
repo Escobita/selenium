@@ -39,6 +39,11 @@ WebDriver driverInstance = ((WebDriverBackedSelenium) selenium).getUnderlyingWeb
     * So more advanced Selenium usage (that is, using "browserbot" or other built-in Javascript methods from Selenium Core) may need work
   * Some methods may be slower due to underlying implementation differences
 
+== Notes ==
+After creating a `WebDriverBackedSelenium` instance with a given Driver, one does not have to call `start()` - as the creation of the Driver already started the session. At the end of the test, `stop()` should be called *instead* of the Driver's `quit()` method.
+
+This is more similar to WebDriver's behaviour - as creating a Driver instance starts a session, yet it has to be terminated explicitly with a call to `quit()`.
+
 == Backing WebDriver with Selenium == 
 
 WebDriver doesn't support as many browsers as Selenium does, so in order to provide that support while still using the webdriver API, you can make use of the {{{SeleneseCommandExecutor}}} It is done like this:
