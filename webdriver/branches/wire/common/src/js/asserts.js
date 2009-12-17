@@ -162,7 +162,7 @@ webdriver.asserts.Matcher.isTheSameLocationAs = function(expected) {
         return goog.math.Coordinate.equals(ev, av);
       },
       function () {
-        return 'equal ' + webdriver.asserts.objToString(expected);
+        return 'equal ' + webdriver.asserts.getValueAndType_(expected);
       });
 }
 goog.exportSymbol('isTheSameLocationAs',

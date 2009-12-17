@@ -6,8 +6,6 @@ module Selenium
     #
 
     class ChildProcess
-      attr_reader :pid
-
       def initialize(*args)
         @args = args
 
@@ -18,32 +16,25 @@ module Selenium
         end
       end
 
-      def ugly_death?
-        code = exit_value()
-        # if exit_val is nil, the process is still alive
-        code && code != 0
-      end
+      def alive?
+        return false unless @pid
 
-      def exit_value
-        pid, status = Process.waitpid2(@pid, Process::WNOHANG)
-        status.exitstatus if pid
+        # TODO: check if this works on windows
+        Process.kill 0, @pid
+        true
+      rescue Errno::ESRCH
+        false
       end
 
       def start
-        @pid = fork do
-          unless $DEBUG
-            [STDOUT, STDERR].each { |io| io.reopen("/dev/null") }
-          end
-
-          exec(*@args)
-        end
+        @pid = fork { exec(*@args) }
 
         self
       end
 
       def wait
         raise "called wait with no pid" unless @pid
-        Process.waitpid2 @pid
+        Process.waitpid @pid
       end
 
       def kill
@@ -86,12 +77,6 @@ module Selenium
 
         def wait
           @process.waitFor
-        end
-
-        def exit_value
-          @process.exitValue
-        rescue java.lang.IllegalThreadStateException
-          nil
         end
       end
 

@@ -40,8 +40,7 @@ public class Jetty6AppServer implements AppServer {
   private static final String DEFAULT_CONTEXT_PATH = "/common";
   private static final String JS_SRC_CONTEXT_PATH = "/js/src";
   private static final String JS_TEST_CONTEXT_PATH = "/js/test";
-  private static final String THIRD_PARTY_JS_CONTEXT_PATH =
-      "/third_party/closure/goog";
+  private static final String THIRD_PARTY_JS_CONTEXT_PATH = "/third_party/goog";
 
   private int port;
   private int securePort;
@@ -132,9 +131,9 @@ public class Jetty6AppServer implements AppServer {
 
   private static File findThirdPartyJsWebAppRoot() {
     return findWebAppRoot(new String[] {
-        "third_party/closure/goog",
-        "../third_party/closure/goog",
-        "../../third_party/closure/goog"
+        "third_party/goog",
+        "../third_party/goog",
+        "../../third_party/goog"
     });
   }
 

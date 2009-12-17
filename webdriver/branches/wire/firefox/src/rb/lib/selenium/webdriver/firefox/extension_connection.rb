@@ -15,7 +15,7 @@ module Selenium
                 return new_socket
               rescue Errno::ECONNREFUSED, Errno::ENOTCONN => e
                 $stderr.puts "#{self} caught #{e.message}" if $DEBUG
-                sleep 0.25
+                sleep 0.250
               end
             end
           }
@@ -66,16 +66,8 @@ HTTP
             end
           end
 
-          length         = Integer(resp.split(":").last.strip)
-          json_string    = ''
-          bytes_received = 0
-
-          until bytes_received == length
-            read_string = @socket.recv(length - bytes_received)
-
-            bytes_received += read_string.length
-            json_string << read_string
-          end
+          length      = resp.split(":")[1].lstrip!.to_i
+          json_string = @socket.recv length
 
           if json_string.empty?
             raise Error::WebDriverError, "empty response from extension"

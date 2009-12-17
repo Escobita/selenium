@@ -22,14 +22,12 @@ describe "Element" do
     driver.find_element(:id, "working").send_keys("foo", "bar")
   end
 
-  not_compliant_on :browser => :chrome do
-    it "should send key presses" do
-      driver.navigate.to url_for("javascriptPage.html")
-      key_reporter = driver.find_element(:id, 'keyReporter')
+  it "should send key presses" do
+    driver.navigate.to url_for("javascriptPage.html")
+    key_reporter = driver.find_element(:id, 'keyReporter')
 
-      key_reporter.send_keys("Tet", :arrow_left, "s")
-      key_reporter.value.should == "Test"
-    end
+    key_reporter.send_keys("Tet", :arrow_left, "s")
+    key_reporter.value.should == "Test"
   end
 
   it "should get attribute value" do

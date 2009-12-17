@@ -16,10 +16,6 @@ module Selenium
           :chrome
         end
 
-        def driver_extensions
-          [DriverExtensions::TakesScreenshot]
-        end
-
         def get(url)
           execute :request => 'get',
                   :url     => url
@@ -58,7 +54,6 @@ module Selenium
         def quit
           @launcher.kill # FIXME: let chrome extension take care of this
           execute :request => 'quit'
-          @executor.close
         end
 
         def close
@@ -71,10 +66,6 @@ module Selenium
 
         def getCurrentWindowHandle
           execute :request => 'getCurrentWindowHandle'
-        end
-
-        def getScreenshotAsBase64
-          execute :request => "screenshot"
         end
 
         def setSpeed(value)

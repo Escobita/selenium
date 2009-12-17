@@ -94,8 +94,6 @@ public enum DriverCommand {
 
   SCREENSHOT("screenshot"),
 
-  DISMISS_ALERT("dismissAlert"),
-
   // ==============================================================================================
   // Internal commands
 

@@ -1,6 +1,6 @@
 task :test_remote_rb => [:test_common, :remote_server] do
   jruby :include  => [".", "common/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
-        :require  => ["third_party/jruby/json-jruby.jar", "third_party/java/google-collect-1.0-rc3.jar"],
+        :require  => ["third_party/jruby/json-jruby.jar"],
         :command  => "-S spec",
         :files    => Dir['common/test/rb/spec/**/*spec.rb']
         # :headless => true
@@ -71,15 +71,10 @@ begin
 
    s.add_dependency "json_pure"
    s.add_dependency "ffi"
-
-   if s.respond_to? :add_development_dependency
-     s.add_development_dependency "rspec"
-     s.add_development_dependency "rack"
-   end
+   s.add_development_dependency "rspec"
+   s.add_development_dependency "rack"
 
    s.require_paths = []
-
-   s.files         += FileList['COPYING']
 
    # Common
    s.require_paths << 'common/src/rb/lib'
@@ -118,7 +113,7 @@ begin
     end
 
     desc 'Build and release the ruby gem to Gemcutter'
-    task :release => [:clean, :gem] do
+    task :release => :gem do
       sh "gem push build/#{GEM_SPEC.name}-#{GEM_SPEC.version}.gem"
     end
   end

@@ -76,14 +76,8 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   Utils.fireMouseEventOn(respond.context, element, "mousemove");
   Utils.fireMouseEventOn(respond.context, element, "mousedown");
   if (element != currentlyActive) {
-    // Some elements may not have blur, focus functions - for example,
-    // elements under an SVG element. Call those only if they exist.
-    if (typeof currentlyActive.blur == 'function') {
-      currentlyActive.blur();
-    }
-    if (typeof element.focus == 'function') {
-      element.focus();
-    }
+    currentlyActive.blur();
+    element.focus();
   }
 
   Utils.fireMouseEventOn(respond.context, element, "mouseup");
@@ -261,7 +255,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
     } else if (attributeName.toLowerCase() == "checked") {
       respond.response = element.checked;
     } else if (attributeName.toLowerCase() == "readonly") {
-      respond.response = element.readOnly;
+      respond.response = element.getAttribute('readonly');
     }
 
     respond.send();
@@ -290,7 +284,8 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
     respond.send();
     return;
   }
-  respond.response = null;
+  respond.isError = true;
+  respond.response = "No match";
   respond.send();
 };
 
@@ -477,7 +472,8 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
 
 FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
   var element = Utils.getElementAt(parameters['id'], respond.context);
-  respond.response = Utils.isDisplayed(element);
+
+  respond.response = Utils.isDisplayed(element) ? "true" : "false";
   respond.send();
 };
 
@@ -487,10 +483,7 @@ FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
 
   var location = Utils.getElementLocation(element, respond.context);
 
-  respond.response = {
-    x: Math.round(location.x),
-    y: Math.round(location.y)
-  };
+  respond.response = location.x + ", " + location.y;
   respond.send();
 };
 
@@ -500,10 +493,7 @@ FirefoxDriver.prototype.getElementSize = function(respond, parameters) {
 
   var box = Utils.getLocationOnceScrolledIntoView(element);
 
-  respond.response = {
-    width: Math.round(box.width),
-    height: Math.round(box.height)
-  };
+  respond.response = box.width + ", " + box.height;
   respond.send();
 };
 

@@ -27,21 +27,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.IllegalLocatorException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.Speed;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.internal.ExtensionConnectionFactory;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -49,12 +44,10 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
-import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.remote.DriverCommand;
 import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -69,8 +62,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static org.openqa.selenium.OutputType.FILE;
-
 
 /**
  * An implementation of the {#link WebDriver} interface that drives Firefox. This works through a firefox extension,
@@ -83,26 +74,19 @@ import static org.openqa.selenium.OutputType.FILE;
  * When the driver starts, it will make a copy of the profile it is using, rather than using that profile directly.
  * This allows multiple instances of firefox to be started.
  */
-public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreenshot,
-        FindsById, FindsByClassName, FindsByCssSelector,
-        FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
-    public static final int DEFAULT_PORT = 7055;
-    // For now, only enable native events on Windows
-    public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
+public class FirefoxDriver implements WebDriver, JavascriptExecutor,
+    FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
+  public static final int DEFAULT_PORT = 7055;
+  // For now, only enable native events on Windows
+  public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
       Platform.getCurrent().is(Platform.WINDOWS);
 
-    // Commands we can execute with needing to dismiss an active alert
-    private final Set<DriverCommand> alertWhiteListedCommands = new HashSet<DriverCommand>() {{
-      add(DISMISS_ALERT);
-    }};
-
-    private final ExtensionConnection extension;
-    protected Context context;
-    private FirefoxAlert currentAlert;
+  private final ExtensionConnection extension;
+  protected Context context;
 
   public FirefoxDriver() {
-      this(new FirefoxBinary(), null);
-    }
+    this(new FirefoxBinary(), null);
+  }
 
   public FirefoxDriver(String profileName) {
     this(profileName, DEFAULT_PORT);
@@ -248,20 +232,6 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     return findElement("class name", using);
   }
 
-  public WebElement findElementByCssSelector(String using) {
-    if (using == null)
-     throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
-
-    return findElement("css selector", using);
-  }
-
-  public List<WebElement> findElementsByCssSelector(String using) {
-    if (using == null)
-     throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
-
-    return findElements("css selector", using);
-  }
-
   public WebElement findElementByName(String using) {
     return findElement("name", using);
   }
@@ -286,19 +256,18 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
 
   private List<WebElement> findElements(String method, String selector) {
-    JSONArray returnedIds = (JSONArray) executeCommand(WebDriverException.class,
+    String returnedIds = sendMessage(WebDriverException.class,
         FIND_ELEMENTS, ImmutableMap.of("using", method, "value", selector));
     List<WebElement> elements = new ArrayList<WebElement>();
 
-    try {
-      for (int i = 0; i < returnedIds.length(); i++) {
-        String id = returnedIds.getString(i);
-        elements.add(new FirefoxWebElement(this, id));
-      }
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
+    if (returnedIds.length() == 0) {
+      return elements;
     }
 
+    String[] ids = returnedIds.split(",");
+    for (String id : ids) {
+      elements.add(new FirefoxWebElement(this, id));
+    }
     return elements;
   }
 
@@ -323,7 +292,8 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
   private String sendMessage(Class<? extends WebDriverException> throwOnFailure,
                              DriverCommand driverCommand) {
-    return sendMessage(throwOnFailure, new Command(context, driverCommand));
+    Map<String, Object> noArgs = ImmutableMap.of();
+    return sendMessage(throwOnFailure, driverCommand, noArgs);
   }
 
   private String sendMessage(Class<? extends WebDriverException> throwOnFailure,
@@ -332,46 +302,10 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
 
   protected String sendMessage(Class<? extends RuntimeException> throwOnFailure, Command command) {
-    return String.valueOf(executeCommand(throwOnFailure, command));
-  }
-
-  protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                  DriverCommand driverCommand) {
-    return executeCommand(throwOnFailure, new Command(context, driverCommand));
-  }
-
-  protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                  DriverCommand driverCommand, Map<String, ?> parameters) {
-    return executeCommand(throwOnFailure, new Command(context, driverCommand, parameters));
-  }
-
-  protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                  Command command) {
-    if (currentAlert != null) {
-      if (!alertWhiteListedCommands.contains(command.getCommandName())) {
-        ((FirefoxTargetLocator) switchTo()).alert().dismiss();
-        throw new UnhandledAlertException(command.getCommandName().toString());
-      }
-    }
-
     Response response = extension.sendMessageAndWaitForResponse(throwOnFailure, command);
     context = response.getContext();
     response.ifNecessaryThrow(throwOnFailure);
-
-    Object rawResponse = response.getExtraResult("response");
-    if (rawResponse instanceof JSONObject) {
-      JSONObject jsonObject = (JSONObject) rawResponse;
-      if (jsonObject.has("__webdriverType")) {
-        // Looks like have an alert. construct it
-        try {
-          currentAlert = new FirefoxAlert(jsonObject.getString("text"));
-          return null;
-        } catch (JSONException e) {
-          // Or maybe not. Fall through
-        }
-      }
-    }
-    return rawResponse;
+    return response.getResponseText();
   }
 
   private void fixId() {
@@ -388,14 +322,10 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
 
   public Set<String> getWindowHandles() {
-    JSONArray allHandles = (JSONArray) executeCommand(WebDriverException.class, GET_WINDOW_HANDLES);
+    String allHandles = sendMessage(WebDriverException.class, GET_WINDOW_HANDLES);
+    String[] handles = allHandles.split(",");
     HashSet<String> toReturn = new HashSet<String>();
-    for (int i = 0; i < allHandles.length(); i++) {
-      String handle = allHandles.optString(i, null);
-      if (handle != null) {
-        toReturn.add(handle);
-      }
-    }
+    toReturn.addAll(Arrays.asList(handles));
     return toReturn;
   }
 
@@ -405,16 +335,15 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     Object[] convertedArgs = convertToJsObjects(args);
 
-    try {
-      JSONObject jsonResponse = (JSONObject) executeCommand(
-          WebDriverException.class, EXECUTE_SCRIPT,
-          ImmutableMap.of("script", script, "args", convertedArgs));
-      return parseJavascriptObjectFromResponse(
-          jsonResponse.getString("type"),
-          jsonResponse.get("value"));
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
-    }
+    Command command = new Command(context, null, EXECUTE_SCRIPT,
+        ImmutableMap.of("script", script, "args", convertedArgs));
+    Response response = extension.sendMessageAndWaitForResponse(WebDriverException.class, command);
+    context = response.getContext();
+    response.ifNecessaryThrow(WebDriverException.class);
+
+    return parseJavascriptObjectFromResponse(
+        (String) response.getExtraResult("resultType"),
+        response.getExtraResult("response"));
   }
 
   public Object parseJavascriptObjectFromResponse(String resultType, Object response) {
@@ -430,7 +359,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
           //They really should all be JSONObjects of form {resultType, response}
           JSONObject subObject = (JSONObject) array.get(i);
           list.add(parseJavascriptObjectFromResponse(
-              subObject.getString("type"), subObject.get("value")));
+              subObject.getString("resultType"), subObject.get("response")));
         }
       } catch (JSONException e) {
         throw new WebDriverException(e);
@@ -548,13 +477,12 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     public Set<Cookie> getCookies() {
-      JSONArray response = (JSONArray) executeCommand(WebDriverException.class, GET_ALL_COOKIES);
+      String response = sendMessage(WebDriverException.class, GET_ALL_COOKIES).trim();
       Set<Cookie> cookies = new HashSet<Cookie>();
 
-      try {
-        for (int i = 0; i < response.length(); i++) {
-          String cookieString = response.getString(i).trim();
-          if ("".equals(cookieString)) {
+      if (!"".equals(response)) {
+        for (String cookieString : response.split("\n")) {
+          if ("".equals(cookieString.trim())) {
             continue;
           }
 
@@ -567,12 +495,13 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
           attributesMap.put("secure", "false");
 
           for (String attribute : cookieString.split(";")) {
-            if(attribute.contains("=")) {
+            if (attribute.contains("=")) {
               String[] tokens = attribute.trim().split("=", 2);
-              if(attributesMap.get("name").equals("")) {
+              if (attributesMap.get("name").equals("")) {
                 attributesMap.put("name", tokens[0]);
                 attributesMap.put("value", tokens[1]);
-              } else if("domain".equals(tokens[0]) && tokens[1].trim().startsWith(".")) {
+              } else if ("domain".equals(tokens[0])
+                  && tokens[1].trim().startsWith(".")) {
                 //convert " .example.com" into "example.com" format
                 int offset = tokens[1].indexOf(".") + 1;
                 attributesMap.put("domain", tokens[1].substring(offset));
@@ -594,8 +523,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
               attributesMap.get("domain"), attributesMap.get("path"),
               expires, Boolean.parseBoolean(attributesMap.get("secure"))));
         }
-      } catch (JSONException e) {
-        throw new WebDriverException(e);
+
       }
       return cookies;
     }
@@ -694,10 +622,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     public Alert alert() {
-      if (currentAlert != null) {
-        return currentAlert;
-      }
-      throw new NoAlertPresentException();
+      throw new UnsupportedOperationException("alert");
     }
   }
 
@@ -722,57 +647,19 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       sendMessage(WebDriverException.class, REFRESH);
     }
   }
-    
-  public <X> X getScreenshotAs(OutputType<X> target) {
-    // Get the screenshot as base64.
-    String base64 = sendMessage(WebDriverException.class, SCREENSHOT);
-    // ... and convert it.
-    return target.convertFromBase64Png(base64);
-  }
 
   /**
    * Saves a screenshot of the current page into the given file.
-   *
-   * @param pngFile The file to store the screenshot in.
-   * @deprecated Use getScreenshotAs(file), which returns a temporary file.
    */
-  @Deprecated
   public void saveScreenshot(File pngFile) {
     if (pngFile == null) {
-        throw new IllegalArgumentException("Method parameter pngFile must not be null");
+      throw new IllegalArgumentException("Method parameter pngFile must not be null");
     }
-
-    File tmpfile = getScreenshotAs(FILE);
-
     File dir = pngFile.getParentFile();
     if (dir != null && !dir.exists() && !dir.mkdirs()) {
-        throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
+      throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
     }
-
-    try {
-      FileHandler.copy(tmpfile, pngFile);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    }
-  }
-
-  private class FirefoxAlert implements Alert {
-    private String text;
-
-    public FirefoxAlert(String text) {
-      this.text = text;
-    }
-
-    public void dismiss() {
-      sendMessage(WebDriverException.class, DISMISS_ALERT, ImmutableMap.of("text", text));
-      currentAlert = null;
-    }
-
-    public void accept() {
-    }
-
-    public String getText() {
-      return text;
-    }
+    sendMessage(WebDriverException.class, SCREENSHOT,
+        ImmutableMap.of("file", pngFile.getAbsolutePath()));
   }
 }

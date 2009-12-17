@@ -27,9 +27,6 @@ import java.net.ServerSocket;
 
 @SuppressWarnings("unused")
 public class SingleTestSuite extends TestCase {
-  private final static String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
-  private final static String CHROME_TEST = "org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver";
-
   private final static String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriver";
   private final static String FIREFOX_TEST = "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
  
@@ -40,7 +37,7 @@ public class SingleTestSuite extends TestCase {
   private final static String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = HTML_UNIT_JS;
+    String driver = FIREFOX;
 
 //    System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -55,11 +52,12 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("MiscTest")
+        .includeJsApiTests()
+        .onlyRun("FirefoxDriverTest")
         //.onlyRun("JavascriptEnabledDriverTest")
-        //.method("testShouldReturnTheSourceOfAPage")
+//        .method("testClickingOnUnclickableElementsDoesNothing")
         .exclude(ALL)
-        .exclude(Ignore.Driver.HTMLUNIT)
+        .exclude(Ignore.Driver.FIREFOX)
         .leaveRunning()
         ;  // Yeah, this look strange :)
 

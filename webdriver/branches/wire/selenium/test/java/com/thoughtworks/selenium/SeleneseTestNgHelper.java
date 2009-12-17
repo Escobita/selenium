@@ -1,12 +1,11 @@
 package com.thoughtworks.selenium;
 
-import java.lang.reflect.Method;
-
 import org.openqa.selenium.SeleniumTestEnvironment;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverTestSuite;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
@@ -16,18 +15,18 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
+import java.lang.reflect.Method;
+
 public class SeleneseTestNgHelper extends SeleneseTestBase
 {
     private static Selenium staticSelenium;
 
-  @BeforeClass
-  public void startWebServer() {
-    synchronized (this) {
+    @BeforeClass
+    public synchronized void startWebServer() {
       if (!GlobalTestEnvironment.isSetUp()) {
         GlobalTestEnvironment.set(new SeleniumTestEnvironment());
       }
     }
-  }
 
     @BeforeTest
     @Override
@@ -37,18 +36,13 @@ public class SeleneseTestNgHelper extends SeleneseTestBase
 
         WebDriver driver = null;
         if (browserString.contains("firefox") || browserString.contains("chrome")) {
-          if (FirefoxDriver.class.getResource("/webdriver-extension.zip") == null) {
+          if (FirefoxDriver.class.getResource("webdriver-extension.zip") == null) {
             System.setProperty("webdriver.development", "true");
-            driver = Class.forName("org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver")
-                .asSubclass(WebDriver.class).newInstance();
+            driver = new FirefoxDriverTestSuite.TestFirefoxDriver();
           } else {
             driver = new FirefoxDriver();
           }
         } else if (browserString.contains("ie") || browserString.contains("hta")) {
-//          System.setProperty("webdriver.development", "true");
-//          driver = Class.forName("org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver")
-//              .asSubclass(WebDriver.class).newInstance();
-//            driver = new FirefoxDriver();
 //          System.setProperty("webdriver.development", "true");
 //          System.setProperty("jna.library.path", "..\\build;build");
           driver = new InternetExplorerDriver();

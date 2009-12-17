@@ -36,10 +36,7 @@ module Selenium
         private
 
         def create_extension
-          # TODO: find a better way to do this
-          rm_rf tmp_extension_dir
-          mkdir_p File.dirname(tmp_extension_dir), :mode => 0700
-          cp_r ext_path, tmp_extension_dir
+          ext_files.each { |file| cp file, tmp_extension_dir }
 
           if Platform.win?
             cp linked_lib_path, tmp_extension_dir
@@ -50,7 +47,6 @@ module Selenium
         end
 
         def create_profile
-          touch "#{tmp_profile_dir}/First Run"
           touch "#{tmp_profile_dir}/First Run Dev"
         end
 
@@ -64,6 +60,10 @@ module Selenium
                                       "--disable-prompt-on-repost",
                                       "about:blank"
           @process.start
+        end
+
+        def ext_files
+          Dir["#{ext_path}/*"]
         end
 
         def ext_path
@@ -87,7 +87,7 @@ module Selenium
             dir
           end
         end
-
+        
         class WindowsLauncher < Launcher
           def linked_lib_path
             # TODO: x64

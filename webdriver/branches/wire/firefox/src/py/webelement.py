@@ -157,7 +157,7 @@ class WebElement(object):
                 raise NoSuchElementException(
                     "Unable to locate element for %s" % key)
             elems = []
-            for elem_id in resp:
+            for elem_id in resp.split(","):
                 elem = WebElement(self._parent, elem_id)
                 elems.append(elem)
             return elems

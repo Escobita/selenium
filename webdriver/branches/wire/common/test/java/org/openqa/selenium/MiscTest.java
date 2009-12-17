@@ -32,7 +32,6 @@ public class MiscTest extends AbstractDriverTestCase {
     assertThat(driver.getCurrentUrl(), equalTo(javascriptPage));
   }
 
-  @JavascriptEnabled
   @Ignore(SELENESE)
   public void testShouldReturnTheSourceOfAPage() {
     driver.get(simpleTestPage);
@@ -44,6 +43,5 @@ public class MiscTest extends AbstractDriverTestCase {
     assertThat(source.contains("an inline element"), is(true));
     assertThat(source.contains("<p id="), is(true));
     assertThat(source.contains("lotsofspaces"), is(true));
-    assertThat(source.contains("with document.write and with document.write again"), is(true));
   }
 }

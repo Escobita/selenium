@@ -21,15 +21,12 @@ package org.openqa.selenium.firefox;
 import com.google.common.collect.ImmutableMap;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
-import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -47,11 +44,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FirefoxWebElement implements RenderedWebElement, Locatable, 
-        FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,
-    FindsByName, FindsByTagName, FindsByClassName {
-    private final FirefoxDriver parent;
-    private final String elementId;
+public class FirefoxWebElement implements RenderedWebElement, Locatable,
+    FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
+  private final FirefoxDriver parent;
+  private final String elementId;
 
   public FirefoxWebElement(FirefoxDriver parent, String elementId) {
     this.parent = parent;
@@ -132,21 +128,23 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
   }
 
   public Point getLocation() {
-    JSONObject result = (JSONObject) executeCommand(WebDriverException.class, GET_ELEMENT_LOCATION);
-    try {
-      return new Point(result.getInt("x"), result.getInt("y"));
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
-    }
+    String result = sendMessage(WebDriverException.class, GET_ELEMENT_LOCATION);
+
+    String[] parts = result.split(",");
+    int x = Integer.parseInt(parts[0].trim());
+    int y = Integer.parseInt(parts[1].trim());
+
+    return new Point(x, y);
   }
 
   public Dimension getSize() {
-    JSONObject result = (JSONObject) executeCommand(WebDriverException.class, GET_ELEMENT_SIZE);
-    try {
-      return new Dimension(result.getInt("width"), result.getInt("height"));
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
-    }
+    String result = sendMessage(WebDriverException.class, GET_ELEMENT_SIZE);
+
+    String[] parts = result.split(",");
+    int x = Math.round(Float.parseFloat(parts[0].trim()));
+    int y = Math.round(Float.parseFloat(parts[1].trim()));
+
+    return new Dimension(x, y);
   }
 
   public void dragAndDropBy(int moveRight, int moveDown) {
@@ -224,14 +222,6 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     return findChildElements("class name", className);
   }
 
-  public WebElement findElementByCssSelector(String using) {
-    return findChildElement("css selector", using);
-  }
-
-  public List<WebElement> findElementsByCssSelector(String using) {
-    return findChildElements("css selector", using);
-  }
-
   private WebElement findChildElement(String using, String value) {
     String id = sendMessage(NoSuchElementException.class,
         FIND_CHILD_ELEMENT, buildSearchParamsMap(using, value));
@@ -239,16 +229,18 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
   }
 
   private List<WebElement> findChildElements(String using, String value) {
-    JSONArray ids = (JSONArray) executeCommand(WebDriverException.class,
+    String indices = sendMessage(WebDriverException.class,
         FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
 
     List<WebElement> elements = new ArrayList<WebElement>();
-    try {
-      for (int i = 0; i < ids.length(); i++) {
-        elements.add(new FirefoxWebElement(parent, ids.getString(i)));
-      }
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
+
+    if (indices.length() == 0) {
+      return elements;
+    }
+
+    String[] ids = indices.split(",");
+    for (String id : ids) {
+      elements.add(new FirefoxWebElement(parent, id));
     }
     return elements;
   }
@@ -267,25 +259,13 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
   }
 
   private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
-                             DriverCommand command, Map<String, ?> parameters) {
-    Object result = executeCommand(throwOnFailure, command, parameters);
-    return result == null ? null : String.valueOf(result);
+                             DriverCommand command) {
+    return sendMessage(throwOnFailure, command, ImmutableMap.<String, Object>of());
   }
 
   private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
-                             DriverCommand command) {
-    Object result = executeCommand(throwOnFailure, command);
-    return result == null ? null : String.valueOf(result);
-  }
-
-  private Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                DriverCommand command) {
-    return executeCommand(throwOnFailure, command, ImmutableMap.<String, Object>of());
-  }
-
-  private Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                DriverCommand command, Map<String, ?> parameters) {
-    return parent.executeCommand(throwOnFailure,
+                             DriverCommand command, Map<String, ?> parameters) {
+    return parent.sendMessage(throwOnFailure,
         new Command(parent.context, elementId, command, parameters));
   }
 
@@ -294,12 +274,18 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
   }
 
   public Point getLocationOnScreenOnceScrolledIntoView() {
+    String json = sendMessage(WebDriverException.class,
+        _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
+    if (json == null) {
+      return null;
+    }
+
     try {
-      JSONObject mapped = (JSONObject) executeCommand(
-          WebDriverException.class, _GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
+      JSONObject mapped = new JSONObject(json);
+
       return new Point(mapped.getInt("x"), mapped.getInt("y"));
     } catch (JSONException e) {
-      throw new WebDriverException(e);
+      throw new RuntimeException(e);
     }
   }
 

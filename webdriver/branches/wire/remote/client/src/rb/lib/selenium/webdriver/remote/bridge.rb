@@ -60,10 +60,6 @@ module Selenium
           @browser ||= @capabilities.browser_name.gsub(" ", "_").to_sym
         end
 
-        def driver_extensions
-          []
-        end
-
         #
         # Returns the current session ID.
         #

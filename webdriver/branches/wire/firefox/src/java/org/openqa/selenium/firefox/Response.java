@@ -80,7 +80,7 @@ public class Response {
 
   public Object getExtraResult(String fieldName) {
     try {
-      return result.isNull(fieldName) ? null : result.get(fieldName);
+      return result.get(fieldName);
     } catch (JSONException e) {
       throw new WebDriverException(e);
     }

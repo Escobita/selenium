@@ -75,12 +75,10 @@ public class ChromeBinary {
           "--user-data-dir=" + profile.getDirectory().getAbsolutePath(),
           "--load-extension=" + extension.getDirectory().getAbsolutePath(),
           "--activate-on-launch",
-          "--homepage=about:blank",
           "--no-first-run",
           "--disable-hang-monitor",
           "--disable-popup-blocking",
           "--disable-prompt-on-repost",
-          "--no-default-browser-check",
           "about:blank")
           .start();
 

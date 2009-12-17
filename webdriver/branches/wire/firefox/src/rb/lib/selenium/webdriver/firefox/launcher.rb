@@ -94,7 +94,6 @@ module Selenium
               connect
               return
             rescue Timeout::Error => e
-              puts "#{self} caught #{e.message}" if $DEBUG
               # ok
             end
           end

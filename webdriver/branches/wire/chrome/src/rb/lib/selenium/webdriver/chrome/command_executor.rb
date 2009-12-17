@@ -28,11 +28,6 @@ module Selenium
          JSON.parse read_response(@queue.pop)
        end
 
-       def close
-         @server.close
-       rescue IOError
-       end
-
        private
 
        def start_run_loop
@@ -47,8 +42,6 @@ module Selenium
 
            @accepted_any ||= true
          end
-       rescue IOError => e
-         raise e unless @server.closed?
        end
 
        def read_response(socket)

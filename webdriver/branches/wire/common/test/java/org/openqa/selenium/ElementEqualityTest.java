@@ -1,7 +1,5 @@
 package org.openqa.selenium;
 
-import java.util.List;
-
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;

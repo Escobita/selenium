@@ -23,6 +23,8 @@ limitations under the License.
 goog.provide('webdriver.WebElement');
 
 goog.require('goog.array');
+goog.require('goog.math.Coordinate');
+goog.require('goog.math.Size');
 goog.require('webdriver.By.Locator');
 goog.require('webdriver.By.Strategy');
 goog.require('webdriver.Command');
@@ -145,8 +147,9 @@ webdriver.WebElement.findElements = function(driver, locator) {
       addParameter('using', locator.type).
       addParameter('value', locator.target).
       setSuccessCallback(function(response) {
+        var ids = response.value.split(',');
         var elements = [];
-        for (var i = 0, id; id = response.value[i]; i++) {
+        for (var i = 0, id; id = ids[i]; i++) {
           if (id) {
             var element = new webdriver.WebElement(driver);
             element.getId().setValue(id);
@@ -232,8 +235,9 @@ webdriver.WebElement.prototype.findElements = function(locator) {
           addParameter('using', locator.type).
           addParameter('value', locator.target).
           setSuccessCallback(function(response) {
+            var ids = response.value.split(',');
             var elements = [];
-            for (var i = 0, id; id = response.value[i]; i++) {
+            for (var i = 0, id; id = ids[i]; i++) {
               if (id) {
                 var element = new webdriver.WebElement(this.driver_);
                 element.getId().setValue(id);
@@ -382,7 +386,17 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
   var value = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
       addParameter('name', attributeName).
-      setSuccessCallback(value.setValueFromResponse, value);
+      setSuccessCallback(value.setValueFromResponse, value).
+      // If there is an error b/c the attribute was not found, set value to null
+      setFailureCallback(function(response) {
+        // TODO(jmleyba): This error message needs to be consistent for all
+        // drivers.
+        if (response.value == 'No match') {
+          response.isFailure = false;
+          response.value = null;
+          value.setValue(null);
+        }
+      });
   this.driver_.addCommand(command);
   return value;
 };
@@ -429,9 +443,28 @@ webdriver.WebElement.prototype.setSelected = function() {
 webdriver.WebElement.prototype.getSize = function() {
   var size = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_SIZE).
-      setSuccessCallback(size.setValueFromResponse, size);
+      setSuccessCallback(function(response) {
+        var wh = response.value.replace(/\s/g, '').split(',');
+        response.value = new goog.math.Size(wh[0], wh[1]);
+        size.setValue(response.value);
+      });
   this.driver_.addCommand(command);
   return size;
+};
+
+
+/**
+ * Parses a response of the form "$x $y" into a {@code goog.math.Coordinate}
+ * object.
+ * @param {webdriver.Future} future The Future to store the parsed result in.
+ * @param {webdriver.Response} response The response to parse.
+ * @private
+ */
+webdriver.WebElement.createCoordinatesFromResponse_ = function(future,
+                                                               response) {
+  var xy = response.value.replace(/\s/g, '').split(',');
+  response.value = new goog.math.Coordinate(xy[0], xy[1]);
+  future.setValue(response.value);
 };
 
 
@@ -441,7 +474,9 @@ webdriver.WebElement.prototype.getSize = function() {
 webdriver.WebElement.prototype.getLocation = function() {
   var currentLocation = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.GET_LOCATION).
-      setSuccessCallback(currentLocation.setValueFromResponse, currentLocation);
+      setSuccessCallback(
+          goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,
+              currentLocation));
   this.driver_.addCommand(command);
   return currentLocation;
 };
@@ -460,7 +495,9 @@ webdriver.WebElement.prototype.addDragAndDropCommand_ = function(
   var command = this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
       addParameter('x', x).
       addParameter('y', y).
-      setSuccessCallback(newLocation.setValueFromResponse, newLocation);
+      setSuccessCallback(
+          goog.bind(webdriver.WebElement.createCoordinatesFromResponse_, null,
+              newLocation));
   this.driver_.addCommand(command, opt_addToFront);
 };
 
@@ -607,7 +644,14 @@ webdriver.WebElement.prototype.clear = function() {
 webdriver.WebElement.prototype.isDisplayed = function() {
   var futureValue = new webdriver.Future(this.driver_);
   var command = this.createCommand_(webdriver.CommandName.IS_DISPLAYED).
-      setSuccessCallback(futureValue.setValueFromResponse, futureValue);
+      setSuccessCallback(function(response) {
+        // TODO(jmleyba): FF extension should not be returning a string here...
+        if (goog.isString(response.value)) {
+          futureValue.setValue(response.value == 'true');
+        } else {
+          futureValue.setValue(response.value);
+        }
+      });
   this.driver_.addCommand(command);
   return futureValue;
 };
