@@ -17,12 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.framework.TestCase;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import junit.framework.TestCase;
 
 public class DriverFactoryTest extends TestCase {
   private DriverFactory factory;
@@ -88,6 +88,18 @@ public class DriverFactoryTest extends TestCase {
     Class<? extends WebDriver> result = factory.getBestMatchFor(capabilities);
 
     assertEquals(DriverTwo.class, result);
+  }
+
+  public void testShouldConsiderJavascriptCapabilities() {
+    DesiredCapabilities nojavascript = new DesiredCapabilities("browser", "v1", Platform.LINUX);
+    DesiredCapabilities javascript = new DesiredCapabilities("browser", "v1", Platform.LINUX);
+    javascript.setJavascriptEnabled(true);
+
+    factory.registerDriver(nojavascript, DriverOne.class);
+    factory.registerDriver(javascript, DriverTwo.class);
+
+    assertEquals(DriverOne.class, factory.getBestMatchFor(nojavascript));
+    assertEquals(DriverTwo.class, factory.getBestMatchFor(javascript));
   }
   
   public static abstract class DriverOne implements WebDriver {}
