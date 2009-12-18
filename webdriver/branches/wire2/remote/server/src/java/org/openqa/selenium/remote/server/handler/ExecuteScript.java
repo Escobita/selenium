@@ -39,13 +39,10 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
     super(sessions);
   }
 
-  public void setJsonParameters(List<Object> allParameters) throws Exception {
-    script = (String) allParameters.get(0);
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    script = (String) allParameters.get("script");
 
-    if (allParameters.size() == 1)
-      return;
-
-    List<?> params = (List<?>) allParameters.get(1);
+    List<?> params = (List<?>) allParameters.get("args");
 
     parseParams(params, args);
   }

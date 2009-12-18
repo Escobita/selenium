@@ -60,9 +60,10 @@
 
 // Execute the script given. Returns a dictionary with type: and value:
 // properties.
-- (NSDictionary *)executeScript:(NSString *)code
-                  withArguments:(NSArray *)arguments {
-  NSString *argsAsString = [self convertArgumentsToJavascript:arguments];
+- (NSDictionary *)executeScript:(NSDictionary *)arguments {
+  NSString *code = [arguments objectForKey:@"script"];
+  NSString *argsAsString = [self convertArgumentsToJavascript:
+                            [arguments objectForKey:@"args"]];
 
   // Execute the script and store the result in 'result'; if any errors occur,
   // store them in the 'error' variable.

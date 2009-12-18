@@ -22,7 +22,6 @@
 // This category implements the :context/execute function.
 @interface Context (ExecuteScript)
 
-- (NSDictionary *)executeScript:(NSString *)code
-                  withArguments:(NSArray *)arguments;
+- (NSDictionary *)executeScript:(NSDictionary *)arguments;
 
 @end

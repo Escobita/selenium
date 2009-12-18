@@ -17,13 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium.internal.selenesedriver;
 
-import com.thoughtworks.selenium.Selenium;
 import com.google.common.collect.Maps;
+import com.thoughtworks.selenium.Selenium;
 
+import java.util.List;
 import java.util.Map;
 
 public class ExecuteScript implements SeleneseFunction<Object> {
-  public Object apply(Selenium selenium, Object... args) {
+  public Object apply(Selenium selenium, Map<String, ?> args) {
     String script = prepareScript(args);
 
     System.out.println("script = " + script);
@@ -33,16 +34,17 @@ public class ExecuteScript implements SeleneseFunction<Object> {
     return populateReturnValue(value);
   }
 
-  private String prepareScript(Object... args) {
-    String script = String.format("(function() { %s })();", args[0])
+  private String prepareScript(Map<String, ?> parameters) {
+    String script = (String) parameters.get("script");
+    script = String.format("(function() { %s })();", script)
         .replaceAll("\\bwindow\\.", "selenium.browserbot.getCurrentWindow().")
         .replaceAll("\\bdocument\\.", "selenium.browserbot.getDocument().");
 
-    if (args.length > 1) {
-      Object[] scriptArgs = (Object[]) args[1];
-      for (int i = 0; i < scriptArgs.length; i++) {
+    List<?> args = (List<?>) parameters.get("args");
+    if (!args.isEmpty()) {
+      for (int i = 0; i < args.size(); i++) {
         script = script.replaceAll("arguments\\[\\s*" + i + "\\s*\\]",
-            getArgumentValue(scriptArgs[i]));
+            getArgumentValue(args.get(i)));
       }
     }
 

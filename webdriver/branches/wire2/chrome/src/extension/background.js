@@ -603,7 +603,7 @@ function parsePortMessage(message) {
         ChromeDriver.isBlockedWaitingForResponse = false;
         parseRequest({
           request: 'nonNativeClickElement',
-          elementId: message.response.value.elementId
+          id: message.response.value.id
         });
       }
       break;
@@ -631,7 +631,7 @@ function parsePortMessage(message) {
         ChromeDriver.isBlockedWaitingForResponse = false;
         parseRequest({
           request: 'sendElementNonNativeKeys',
-          elementId: message.response.value.elementId,
+          id: message.response.value.id,
           keys: message.response.value.keys
         });
       }

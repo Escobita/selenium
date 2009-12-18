@@ -17,8 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import static org.openqa.selenium.remote.DriverCommand.*;
-
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -28,6 +26,7 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -255,7 +254,6 @@ public class HttpCommandExecutor implements CommandExecutor {
       return verb.createMethod(urlBuilder.toString());
     }
 
-    @SuppressWarnings("unchecked")
     private String get(String propertyName, Command command) {
       if ("sessionId".equals(propertyName)) {
         return command.getSessionId().toString();
@@ -265,20 +263,16 @@ public class HttpCommandExecutor implements CommandExecutor {
       }
 
       // Attempt to extract the property name from the parameters
-      if (command.getParameters().length > 0 && command.getParameters()[0] instanceof Map) {
-        Object value = ((Map) command.getParameters()[0]).get(propertyName);
-        if (value != null) {
-          try {
-            return URLEncoder.encode(String.valueOf(value), "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            // Can never happen. UTF-8 ships with java
-            return String.valueOf(value);
-          }
+      Object value = command.getParameters().get(propertyName);
+      if (value != null) {
+        try {
+          return URLEncoder.encode(String.valueOf(value), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          // Can never happen. UTF-8 ships with java
+          return String.valueOf(value);
         }
-        return null;
       }
-
-      throw new IllegalArgumentException("Cannot determine property: " + propertyName);
+      return null;
     }
   }
 }

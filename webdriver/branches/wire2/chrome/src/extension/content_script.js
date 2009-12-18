@@ -51,10 +51,10 @@ function parsePortMessage(message) {
   console.log("Received request: " + JSON.stringify(message) + " (" + window.name + ")");
   //wait indicates whether this is a potentially page-changing change (see background.js's sendResponseByXHR)
   var response = {response: message.request.request, value: null, wait: true};
-  if (message.request.elementId !== undefined && message.request.elementId != null) {
-    //If it seems an elementId has been passed, try to resolve that to an element
+  if (message.request.id !== undefined && message.request.id != null) {
+    //If it seems an id has been passed, try to resolve that to an element
     try {
-      var element = internalGetElement(message.request.elementId);
+      var element = internalGetElement(message.request.id);
     } catch(e) {
       response.value = e;
       ChromeDriverContentScript.port.postMessage({response: response, sequenceNumber: message.sequenceNumber});
@@ -71,7 +71,7 @@ function parsePortMessage(message) {
       response.value = clearElement(element);
       break;
     case "clickElement":
-      response.value = clickElement(element, message.request.elementId);
+      response.value = clickElement(element, message.request.id);
       break;
     case "nonNativeClickElement":
       //TODO(danielwh): Focus/blur events for non-native clicking
@@ -186,7 +186,7 @@ function parsePortMessage(message) {
       response.value = {statusCode: 0};
       break;
     case "hoverOverElement":
-      response.value = hoverElement(element, message.request.elementId);
+      response.value = hoverElement(element, message.request.id);
       break;
     case "injectEmbed":
       injectEmbed();
@@ -208,7 +208,7 @@ function parsePortMessage(message) {
       response.value = {statusCode: 0};
       break;
     case "sendKeysToElement":
-      response.value = sendElementKeys(element, message.request.keys, message.request.elementId);
+      response.value = sendElementKeys(element, message.request.keys, message.request.id);
       response.wait = false;
       break;
     case "sendElementNonNativeKeys":
@@ -575,7 +575,7 @@ function clickElement(element, elementId) {
   element.scrollIntoView(true);
   var size = getOffsetSizeFromSubElements(element);
   var coords = getElementCoords(element);
-  return {statusCode: "no-op", elementId: elementId,
+  return {statusCode: "no-op", id: elementId,
           x: parseInt(coords[0] - ChromeDriverContentScript.currentDocument.body.scrollLeft + (size.width ? size.width / 2 : 0)),
           y: parseInt(coords[1] - ChromeDriverContentScript.currentDocument.body.scrollTop + (size.height ? size.height / 2 : 0))};
 }
@@ -594,7 +594,7 @@ function hoverElement(element, elementId) {
   var size = getOffsetSizeFromSubElements(element)
   var coords = getElementCoords(element);
   console.log("element.clientX: " + element.clientX);
-  return {statusCode: "no-op", elementId: elementId,
+  return {statusCode: "no-op", id: elementId,
       oldX: 0,
       oldY: 0,
       newX: coords[0] - ChromeDriverContentScript.currentDocument.body.scrollLeft + (size.width ? size.width / 2 : 0),
@@ -722,7 +722,7 @@ function sendElementKeys(element, keys, elementId) {
     element.focus();
     Utils.fireHtmlEvent(element, "focus");
   }
-  return {statusCode: "no-op", keys: keys, elementId: elementId};
+  return {statusCode: "no-op", keys: keys, id: elementId};
 }
 
 /**

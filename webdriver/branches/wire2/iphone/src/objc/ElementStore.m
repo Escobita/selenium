@@ -47,7 +47,7 @@ static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
   
   [self setIndex:[WebDriverResource resourceWithTarget:self
                                              GETAction:NULL
-                                            POSTAction:@selector(findElementByMethod:query:)]];
+                                            POSTAction:@selector(findElement:)]];
   
   document_ = [self elementFromJSObject:@"document"];
   

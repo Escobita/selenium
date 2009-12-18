@@ -36,7 +36,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChromeCommandExecutor {
-  private static final String[] ELEMENT_ID_ARG = new String[] {"elementId"};
+  private static final String[] ELEMENT_ID_ARG = new String[] {"id"};
   private static final String[] NO_ARGS = new String[] {};
   
   private final ServerSocket serverSocket;
@@ -77,10 +77,10 @@ public class ChromeCommandExecutor {
         .put(CLEAR_ELEMENT, ELEMENT_ID_ARG)
         .put(CLICK_ELEMENT, ELEMENT_ID_ARG)
         .put(HOVER_OVER_ELEMENT, ELEMENT_ID_ARG)
-        .put(SEND_KEYS_TO_ELEMENT, new String[] {"elementId", "keys"})
+        .put(SEND_KEYS_TO_ELEMENT, new String[] {"id", "keys"})
         .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
         .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_ATTRIBUTE, new String[] {"elementId", "attribute"})
+        .put(GET_ELEMENT_ATTRIBUTE, new String[] {"id", "attribute"})
         .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
@@ -88,7 +88,7 @@ public class ChromeCommandExecutor {
         .put(GET_ELEMENT_TEXT, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_VALUE, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-             new String[] {"elementId", "css"})
+             new String[] {"id", "css"})
         .put(IS_ELEMENT_DISPLAYED, ELEMENT_ID_ARG)
         .put(IS_ELEMENT_ENABLED, ELEMENT_ID_ARG)
         .put(IS_ELEMENT_SELECTED, ELEMENT_ID_ARG)
@@ -168,19 +168,23 @@ public class ChromeCommandExecutor {
   String fillArgs(Command command) {
     String[] parameterNames = commands.get(command.getName());
     JSONObject json = new JSONObject();
-    if (parameterNames.length != command.getParameters().length) {
+    if (parameterNames.length != command.getParameters().size()) {
       throw new WebDriverException(new IllegalArgumentException(
           "Did not supply the expected number of parameters"));
     }
     try {
       json.put("request", command.getName());
-      for (int i = 0; i < parameterNames.length; ++i) {
+      for (String parameterName : parameterNames) {
         //Icky icky special case
         // TODO(jleyba): This is a temporary solution and will be going away _very_
         // soon.
         boolean isArgs = (EXECUTE_SCRIPT.equals(command.getName()) &&
-            "args".equals(parameterNames[i]));
-        json.put(parameterNames[i], convertToJsonObject(command.getParameters()[i], isArgs));
+            "args".equals(parameterName));
+        if (!command.getParameters().containsKey(parameterName)) {
+          throw new WebDriverException("Missing required parameter \"" + parameterName + "\"");
+        }
+        json.put(parameterName, convertToJsonObject(
+            command.getParameters().get(parameterName), isArgs));
       }
     } catch (JSONException e) {
       throw new WebDriverException(e);

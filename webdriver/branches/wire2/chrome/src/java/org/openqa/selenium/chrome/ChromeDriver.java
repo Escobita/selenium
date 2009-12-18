@@ -1,5 +1,6 @@
 package org.openqa.selenium.chrome;
 
+import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
@@ -32,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecutor, TakesScreenshot,
@@ -125,7 +127,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
    * @param parameters parameters of command being executed
    * @return response to the command (a Response wrapping a null value if none) 
    */
-  ChromeResponse execute(DriverCommand driverCommand, Object... parameters) {
+  ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
     Command command = new Command(new SessionId("[No sessionId]"),
                                   new Context("[No context]"),
                                   driverCommand,
@@ -146,6 +148,15 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
         throw new WebDriverException(e);
       }
     }
+  }
+
+  /**
+   * @param driverCommand The command to execute.
+   * @return The command response.
+   * @see #execute(DriverCommand, Map)
+   */
+  ChromeResponse execute(DriverCommand driverCommand) {
+    return execute(driverCommand, ImmutableMap.<String, Object>of());
   }
   
   /**
@@ -184,7 +195,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   }
 
   public void get(String url) {
-    execute(GET, url);
+    execute(GET, ImmutableMap.of("url", url));
   }
 
   public String getCurrentUrl() {
@@ -234,7 +245,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
 
   public Object executeScript(String script, Object... args) {
     ChromeResponse response;
-    response = execute(EXECUTE_SCRIPT, script, args);
+    response = execute(EXECUTE_SCRIPT, ImmutableMap.of("script", script, "args", args));
     if (response.getStatusCode() == -1) {
       return new ChromeWebElement(this, response.getValue().toString());
     } else {
@@ -247,61 +258,74 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   }
 
   public WebElement findElementById(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "id", using));
+    return findElement("id", using);
   }
 
   public List<WebElement> findElementsById(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "id", using));
+    return findElements("id", using);
   }
 
   public WebElement findElementByClassName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "class name", using));
+    return findElement("class name", using);
   }
 
   public List<WebElement> findElementsByClassName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "class name", using));
+    return findElements("class name", using);
   }
 
   public WebElement findElementByLinkText(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "link text", using));
+    return findElement("link text", using);
   }
 
   public List<WebElement> findElementsByLinkText(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "link text", using));
+    return findElements("link text", using);
   }
 
   public WebElement findElementByName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "name", using));
+    return findElement("name", using);
   }
 
   public List<WebElement> findElementsByName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "name", using));
+    return findElements("name", using);
   }
 
   public WebElement findElementByTagName(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "tag name", using));
+    return findElement("tag name", using);
   }
 
   public List<WebElement> findElementsByTagName(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "tag name", using));
+    return findElements("tag name", using);
   }
 
   public WebElement findElementByXPath(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "xpath", using));
+    return findElement("xpath", using);
   }
 
   public List<WebElement> findElementsByXPath(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "xpath", using));
+    return findElements("xpath", using);
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    return getElementFrom(execute(FIND_ELEMENT, "partial link text", using));
+    return findElement("partial link text", using);
   }
-  
+
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    return getElementsFrom(execute(FIND_ELEMENTS, "partial link text", using));
+    return findElements("partial link text", using);
   }
-  
+
+  private WebElement findElement(String by, String using) {
+    ChromeResponse response = execute(DriverCommand.FIND_ELEMENT,
+        ImmutableMap.of("using", by, "value", using));
+    return getElementFrom(response);
+  }
+
+  private List<WebElement> findElements(String by, String using) {
+    ChromeResponse response = execute(DriverCommand.FIND_ELEMENTS,
+        ImmutableMap.of("using", by, "value", using));
+    return getElementsFrom(response);
+  }
+
+
   WebElement getElementFrom(ChromeResponse response) {
     Object result = response.getValue();
     List<?> elements = (List<?>)result;
@@ -317,10 +341,6 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     return elements;
   }
   
-  List<WebElement> findChildElements(ChromeWebElement parent, String by, String using) {
-    return getElementsFrom(execute(FIND_CHILD_ELEMENTS, parent, by, using));
-  }
-
   public <X> X getScreenshotAs(OutputType<X> target) {
     return target.convertFromBase64Png(execute(SCREENSHOT).getValue().toString());
   }
@@ -328,7 +348,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   private class ChromeOptions implements Options {
 
     public void addCookie(Cookie cookie) {
-      execute(ADD_COOKIE, cookie);
+      execute(ADD_COOKIE, ImmutableMap.of("cookie", cookie));
     }
 
     public void deleteAllCookies() {
@@ -336,11 +356,11 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     }
 
     public void deleteCookie(Cookie cookie) {
-      execute(DELETE_COOKIE, cookie.getName());
+      deleteCookieNamed(cookie.getName());
     }
 
     public void deleteCookieNamed(String name) {
-      execute(DELETE_COOKIE, name);
+      execute(DELETE_COOKIE, ImmutableMap.of("name", name));
     }
 
     public Set<Cookie> getCookies() {
@@ -353,7 +373,13 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     }
 
     public Cookie getCookieNamed(String name) {
-      return (Cookie)execute(GET_COOKIE, name).getValue();
+      Set<Cookie> allCookies = getCookies();
+      for (Cookie cookie : allCookies) {
+        if (name.equals(cookie.getName())) {
+          return cookie;
+        }
+      }
+      return null;
     }
     
     public Speed getSpeed() {
@@ -398,17 +424,17 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     }
 
     public WebDriver frame(int frameIndex) {
-      execute(SWITCH_TO_FRAME_BY_INDEX, frameIndex);
+      execute(SWITCH_TO_FRAME_BY_INDEX, ImmutableMap.of("index", frameIndex));
       return ChromeDriver.this;
     }
 
     public WebDriver frame(String frameName) {
-      execute(SWITCH_TO_FRAME_BY_NAME, frameName);
+      execute(SWITCH_TO_FRAME_BY_NAME, ImmutableMap.of("name", frameName));
       return ChromeDriver.this;
     }
 
     public WebDriver window(String windowName) {
-      execute(SWITCH_TO_WINDOW, windowName);
+      execute(SWITCH_TO_WINDOW, ImmutableMap.of("windowName", windowName));
       return ChromeDriver.this;
     }
     
