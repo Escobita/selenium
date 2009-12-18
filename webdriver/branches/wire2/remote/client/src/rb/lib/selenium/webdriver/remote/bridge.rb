@@ -1,7 +1,6 @@
 module Selenium
   module WebDriver
     module Remote
-      DEBUG = $VERBOSE == true
 
       COMMANDS = {}
 
@@ -16,7 +15,7 @@ module Selenium
         include BridgeHelper
 
         DEFAULT_OPTIONS = {
-          :server_url           => "http://localhost:7055/",
+          :url                  => "http://localhost:7055/",
           :http_client          => DefaultHttpClient,
           :desired_capabilities => Capabilities.firefox
         }
@@ -46,14 +45,27 @@ module Selenium
         #
         # Initializes the bridge with the given server URL.
         #
-        # @param server_url [String] base URL for all commands.  FIXME: Note that a trailing '/' is very important!
+        # @param url         [String] url for the remote server
+        # @param http_client [Class] an HTTP client class that implements the same interface as DefaultHttpClient
+        # @param desired_capabilities [Capabilities] an instance of Remote::Capabilities describing the capabilities you want
         #
 
         def initialize(opts = {})
-          opts          = DEFAULT_OPTIONS.merge(opts)
+          opts                 = DEFAULT_OPTIONS.merge(opts)
+          http_client_class    = opts.delete(:http_client)
+          desired_capabilities = opts.delete(:desired_capabilities)
+          url                  = opts.delete(:url)
+
+          unless opts.empty?
+            raise ArgumentError, "unknown option#{'s' if opts.size != 1}: #{opts.inspect}"
+          end
+
+          uri = URI.parse(url)
+          uri.path += "/" unless uri.path =~ /\/$/
+
           @context      = "context"
-          @http         = opts[:http_client].new URI.parse(opts[:server_url])
-          @capabilities = create_session opts[:desired_capabilities]
+          @http         = http_client_class.new uri
+          @capabilities = create_session(desired_capabilities)
         end
 
         def browser
@@ -69,13 +81,13 @@ module Selenium
         #
 
         def session_id
-          @session_id || raise(StandardError, "no current session exists")
+          @session_id || raise(Error::WebDriverError, "no current session exists")
         end
 
 
         def create_session(desired_capabilities)
-          resp  = raw_execute :newSession, {}, desired_capabilities
-          @session_id = resp['sessionId'] || raise('no sessionId in returned payload')
+          resp = raw_execute :newSession, {}, desired_capabilities
+          @session_id = resp['sessionId'] || raise(Error::WebDriverError, 'no sessionId in returned payload')
           Capabilities.json_create resp['value']
         end
 
@@ -148,7 +160,9 @@ module Selenium
         end
 
         def executeScript(script, *args)
-          raise UnsupportedOperationError, "underlying webdriver instace does not support javascript" unless capabilities.javascript?
+          unless capabilities.javascript?
+            raise Error::UnsupportedOperationError, "underlying webdriver instance does not support javascript"
+          end
 
           typed_args = args.map { |arg| wrap_script_argument(arg) }
           response   = raw_execute :executeScript, {}, script, typed_args
@@ -358,19 +372,19 @@ module Selenium
         #
 
         def raw_execute(command, opts = {}, *args)
-          verb, path = COMMANDS[command] || raise("Unknown command #{command.inspect}")
+          verb, path = COMMANDS[command] || raise("unknown command #{command.inspect}")
           path       = path.dup
 
           path[':session_id'] = @session_id if path.include?(":session_id")
           path[':context']    = @context if path.include?(":context")
 
           begin
-            opts.each { |key, value| path[key.inspect] = value }
+            opts.each { |key, value| path[key.inspect] = URI.escape(value.to_s) }
           rescue IndexError
             raise ArgumentError, "#{opts.inspect} invalid for #{command.inspect}"
           end
 
-          puts "-> #{verb.to_s.upcase} #{path}" if DEBUG
+          puts "-> #{verb.to_s.upcase} #{path}" if $DEBUG
           http.call verb, path, *args
         end
 

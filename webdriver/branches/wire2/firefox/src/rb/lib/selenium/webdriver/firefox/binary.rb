@@ -44,7 +44,7 @@ module Selenium
           # ensure we're ok
           sleep 0.3
           if @process.ugly_death?
-            raise Error::WebDriverError, "unable to start Firefox cleanly, args: #{args.inspect}, status: #{status.inspect}"
+            raise Error::WebDriverError, "unable to start Firefox cleanly, args: #{args.inspect}"
           end
         end
 
@@ -63,16 +63,16 @@ module Selenium
         private
 
         def path
-          @path ||=  case Platform.os
-                            when :macosx
-                              "/Applications/Firefox.app/Contents/MacOS/firefox-bin"
-                            when :windows
-                              windows_path
-                            when :linux, :unix
-                              "/usr/bin/firefox"
-                            else
-                              raise "Unknown platform: #{Platform.os}"
-                            end
+          @path ||= case Platform.os
+                    when :macosx
+                      "/Applications/Firefox.app/Contents/MacOS/firefox-bin"
+                    when :windows
+                      windows_path
+                    when :linux, :unix
+                      "/usr/bin/firefox"
+                    else
+                      raise "Unknown platform: #{Platform.os}"
+                    end
         end
 
         def check_binary_exists

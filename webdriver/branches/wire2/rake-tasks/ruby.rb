@@ -2,7 +2,7 @@ task :test_remote_rb => [:test_common, :remote_server] do
   jruby :include  => [".", "common/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
         :require  => ["third_party/jruby/json-jruby.jar", "third_party/java/google-collect-1.0-rc3.jar"],
         :command  => "-S spec",
-        :files    => Dir['common/test/rb/spec/**/*spec.rb']
+        :files    => Dir['{common,remote/client}/test/rb/spec/**/*spec.rb']
         # :headless => true
 end
 
@@ -24,7 +24,7 @@ task :test_firefox_rb => :test_common do
   jruby :include => [".", "common/src/rb/lib", "firefox/src/rb/lib", "common/test/rb/lib"],
         :require => ["third_party/jruby/json-jruby.jar"],
         :command => '-S spec',
-        :files   => Dir['common/test/rb/spec/**/*spec.rb']
+        :files   => Dir['{common,firefox}/test/rb/spec/**/*spec.rb']
 end
 
 task :test_selenium_rb => %w[selenium-server-standalone] do
@@ -85,6 +85,7 @@ begin
   require "rubygems"
   require "rake/gempackagetask"
 
+  PKG_DIR     = "build/gem"
   GEM_VERSION = ENV['VERSION'] ||= '0.0.0'
   GEM_SPEC    = Gem::Specification.new do |s|
    s.name          = 'selenium-webdriver'
@@ -136,16 +137,16 @@ begin
 
   namespace :gem do
     Rake::GemPackageTask.new(GEM_SPEC) do |pkg|
-      pkg.package_dir = "build"
+      pkg.package_dir = PKG_DIR
     end
 
     task :clean do
-      Dir['build/*.gem'].each { |file| rm file }
+      rm_rf PKG_DIR
     end
 
     desc 'Build and release the ruby gem to Gemcutter'
     task :release => [:clean, :gem] do
-      sh "gem push build/#{GEM_SPEC.name}-#{GEM_SPEC.version}.gem"
+      sh "gem push #{PKG_DIR}/#{GEM_SPEC.name}-#{GEM_SPEC.version}.gem"
     end
   end
 

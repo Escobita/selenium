@@ -4,8 +4,8 @@ module Selenium
   module WebDriver
     module Remote
       class DefaultHttpClient
-        CONTENT_TYPE = "application/json"
-        DEBUG        = $VERBOSE == true
+        CONTENT_TYPE    = "application/json"
+        DEFAULT_HEADERS = { "Accept" => CONTENT_TYPE }
 
         class RetryException < StandardError; end
 
@@ -16,12 +16,12 @@ module Selenium
         def call(verb, url, *args)
           response = nil
           url      = @server_url.merge(url) unless url.kind_of?(URI)
-          headers  = { "Accept" => CONTENT_TYPE }
+          headers  = DEFAULT_HEADERS.dup
 
           if args.any?
             headers.merge!("Content-Type" => "#{CONTENT_TYPE}; charset=utf-8")
             payload = args.to_json
-            puts "   >>> #{payload}" if DEBUG
+            puts "   >>> #{payload}" if $DEBUG
           end
 
           begin
@@ -52,7 +52,7 @@ module Selenium
         end
 
         def create_response(res)
-          puts "<- #{res.body}\n" if DEBUG
+          puts "<- #{res.body}\n" if $DEBUG
           if res.content_type == CONTENT_TYPE
             Response.new do |r|
               r.code         = res.code.to_i
