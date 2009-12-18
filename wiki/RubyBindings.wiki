@@ -4,7 +4,7 @@
 
 The Ruby bindings are currently available as the [http://gemcutter.org/gems/selenium-webdriver selenium-webdriver] gem (on Gemcutter). The gem will be renamed to "selenium" and follow the major version numbers from the main project when Selenium 2.0 is released.
 
-The bindings support Ruby 1.8.6 through 1.9.1 + JRuby.
+The bindings support Ruby 1.8.6 through 1.9.1 + JRuby. [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html API docs] are available.
 
 = Details =
 
