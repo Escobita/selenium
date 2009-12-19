@@ -1,5 +1,5 @@
-Selenese Selenium Commands 
-==========================
+Selenium Commands 
+=================
 
 .. _chapter04-reference:
 
