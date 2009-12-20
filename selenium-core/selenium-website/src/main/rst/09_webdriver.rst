@@ -1,11 +1,63 @@
 Selenium 2.0 and WebDriver
 ==========================
 
+.. _chapter09-reference:
+
+The Selenium developers are working towards a Selenium 2.0 release.  The primary new feature
+will be the integration of the WebDriver API into Selenium-RC.  This will address
+a number of Selenium 1.0 limitations along with providing an alternative programming
+interface.  The goal is to develop a standardized Selenium API that provides additional
+support for a larger number of browsers along with improved support for 
+advanced web-app testing problems.
+
+The best explanation for why WebDriver and Selenium are merging was detailed by Simon Stewart, the creator of WebDriver, in a joint email to the WebDriver and Selenium community on August 6, 2009.
+
+	"Why are the projects merging?  Partly because webdriver addresses some shortcomings in 
+	selenium (by being able to bypass the JS sandbox, for example. And we've got a gorgeous API),
+	partly because selenium addresses some shortcomings in webdriver (such as supporting a broader
+	range of browsers) and partly because the main selenium contributors and I felt that it was the
+	best way to offer users the best possible framework."
+
+*PLEASE NOTE:  Selenium 2.0 is currently under development.  The WebDriver integration is
+currently undergoing testing. We encourage advanced Selenium users to try it out.  Users new to Selenium, should wait until Selenium 2.0 is officially released.*
+
+
+What is WebDriver?
+------------------
+
+WebDriver uses a different underlying framework from Selenium's javascript Selenium-Core.  
+It also provides an alternative API with functionality not
+supported in Selenium-RC.  WebDriver does not depend on a javascript core embedded
+within the browser, therefore it is able to avoid some long-running Selenium limitations. 
+
+WebDriver's goal is to provide an API that establishes 
+
+- A well-designed standard programming interface for web-app testing.
+- Improved consistency between browsers.
+- Additional functionality addressing testing problems not well-supported in Selenium 1.0.
+
+The Selenium developers strive to continuously improve Selenium.  Integrating
+WebDriver is another step in that process.  The developers of Selenium
+and of WebDriver felt they could make significant gains for the Open Source
+test automation community be combining forces and merging their ideas and technologies.
+Integrating WebDriver into Selenium is the current result of those efforts.
+
+
+When to Use WebDriver?
+----------------------
+
+One should use WebDriver when requiring improved support for  
+
+* Mult-browser testing including improved functionality for browsers not well-supported by Selenium-1.0.
+* Handling multiple frames, multiple browser windows, popups, and alerts.
+* Page navigation.
+* Drag-and-drop.
+* AJAX-based UI elements.
+
+
 The 5 Minute Getting Started Guide
 ----------------------------------
  
-.. _chapter09-reference:
-
 WebDriver is a tool for automating testing web applications, and in particular 
 to verify that they work as expected. It aims to provide a friendly API that's
 easy to explore and understand, which will help make your tests easier to 
