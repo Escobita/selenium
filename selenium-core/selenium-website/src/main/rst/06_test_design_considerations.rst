@@ -20,7 +20,7 @@ What to Test?
 -------------
 
 What parts of your application should you test?  That depends on aspects of
-your project.:  user expectations, time allowed for the project, priorities
+your project:  user expectations, time allowed for the project, priorities
 set by the project manager and so on.  Once the project boundaries are defined
 though, you, the tester, will certainly make many decisions on what to test.
 
@@ -53,7 +53,7 @@ Testing Links
 ~~~~~~~~~~~~~
 A frequent source of errors for web-sites is broken links and missing pages
 behind those broken links.  Testing for these involves clicking each link
-and veryfying the expected page behind that link loads correctly.
+and verifying the expected page behind that link loads correctly.
 
 *Need to include a description of how to design this test and a simple example.
 Should that go in this section or in a separate section?*  
@@ -66,7 +66,7 @@ some type of user input, and returning some type of results.  Often a function
 test will involve multiple pages with a form-based input page containing a
 collection of input fields, Submit and Cancel operations, and one or more
 response pages.  User input can be via text-input fields, checkboxes, drop-down
-lists, or anyother other browser-supported input.
+lists, or any other browser-supported input.
 
 
 Testing Dynamic Elements
