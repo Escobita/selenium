@@ -15,9 +15,9 @@ You may also run your scripts from the Selenium-IDE. It's
 simple to use and is recommended for less-technical users. The IDE allows 
 developing and running tests without the need for programming skills as
 required by Selenium-RC. The Selenium-IDE can serve as an excellent way to 
-train junior-level employees in test automation. If one has an understanding 
-of how to conduct manual testing of a website they can easily transition to 
-using the Selenium-IDE for both, running and developing tests. 
+train junior-level employees in test automation. Anyone who understands how to
+conduct manual testing of a website can easily transition to 
+using the Selenium-IDE for running and developing tests. 
 
 Some testing tasks are too complex though for the Selenium-IDE. When 
 programming logic is required Selenium-RC must be used. For example, 
@@ -27,11 +27,11 @@ language. Selenium-IDE does not support iteration or condition statements.
 
 Finally, Selenium-Core is another way of running tests. One can run test 
 scripts from a web-browser using the HTML interface *TestRunner.html*. This is 
-the original method for running Selenium commands. It has limitations though.
-Similar to Selenium-IDE, it does not support iteration.
+the original method for running Selenium commands. It has limitations though; 
+similar to Selenium-IDE, it does not support iteration.
 
 Selenium-Core also cannot switch between http and https protocols. Since the 
-development of Selenium-IDE and Selenium-RC, more are using these 
+development of Selenium-IDE and Selenium-RC, more people are using these 
 tools rather than Selenium-Core. At the time of writing (April 09) it 
 is still available and may be convenient for some. However, the Selenium 
 community is encouraging the use Selenium-IDE and RC and discouraging the use 
@@ -101,8 +101,8 @@ For example:
 verifyText  //div//a[2]  Login 
 ==========  ===========  =====
 
-The parameters are not always required. It depends on the command. In some 
-cases both are required, in others one parameter is required, and still in 
+The parameters are not always required; it depends on the command. In some 
+cases both are required, in others one parameter is required, and in still 
 others the command may take no parameters at all. Here are a couple more 
 examples:
   
@@ -128,7 +128,7 @@ detail in the section on Selenium Commands.
   
 Selenium scripts that will be run from Selenium-IDE may be stored in an HTML
 text file format. This consists of an HTML table with three columns. The first
-column is used to identify the Selenium command, the second is a target and the
+column identifies the Selenium command, the second is a target, and the
 final column contains a value. The second and third columns may not require
 values depending on the chosen Selenium command, but they should be present.
 Each table row represents a new Selenium command. Here is an example of a test
@@ -206,7 +206,7 @@ verifyTitle/assertTitle
 verifyTextPresent
    verifies expected text is somewhere on the page.
 verifyElementPresent
-   verifies an expected UI element, as defined by it's HTML tag, is present on
+   verifies an expected UI element, as defined by its HTML tag, is present on
    the page.
 verifyText
    verifies expected text and it's corresponding HTML tag are present on the page.
@@ -217,7 +217,7 @@ waitForPageToLoad
    clickAndWait is used.
 waitForElementPresent
    pauses execution until an expected UI element, as defined by its HTML tag,
-   in present on the page. 
+   is present on the page. 
 
 
 Summary 
