@@ -421,21 +421,28 @@ they have posted.
 UI Mapping
 ----------
 
-A UI map is a centralized location for an application's UI elements and then the 
-test script uses the UI Map for locating elements to be tested.
+A UI map is a mechanism that stores identifiers, or in our case, locators, for
+an application's UI elements.  The test script then uses the UI Map for locating
+the elements to be tested.  Basically, a UI map is a repository of test script objects
+that correspond to UI elements of the application being tested.
 
 .. Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
    also very well integrated with selenium IDE.   
 
-A UI map is a repository, that is, a storage location, for all test script
-objects.  UI maps have several advantages.
+What makes a UI map heplful?  It's primary purpose for making test script management
+much easier.  When a locator needs to be edited, there is a central location for easily
+finding that object, rather than having to search through test script code.  Also, it allows
+changing the identifer in a single place, rather than having to make the change in multiple
+places within a test script, or for that matter, in multiple test scripts.
 
-- Having centralized location for UI objects instead of having them scattered 
-  through out the script.  This makes script maintanence easier and more efficient.
-- Cryptic HTML identifiers and names can be given more human-readable increasing the 
+To summarize, a UI map has two significant advantages.
+
+- Using a centralized location for UI objects instead of having them scattered 
+  through out the script.  This makes script maintanence more efficient.
+- Cryptic HTML identifiers and names can be given more human-readable names improving the 
   readability of test scripts.
 
-Consider following example (in java) of selenium tests for a website: 
+Consider the following example (in java) of selenium tests for a website: 
 
 .. code-block:: java
 
@@ -451,9 +458,9 @@ Consider following example (in java) of selenium tests for a website:
    		selenium.waitForPageToLoad("30000");
    } 
    
-There is hardly any thing comprehensible from script. 
-Even the regular users of application would not be able to figure out 
-as to what script does. A better script would have been:
+This script is incomprehisible to anyone other than those high familier with the
+AUT's page source. Even regular users of application would have difficulty understanding 
+what script does. A better script would be
    
 .. code-block:: java
 
@@ -469,10 +476,11 @@ as to what script does. A better script would have been:
    		selenium.waitForPageToLoad("30000");
    }
    
-Though again there are no comments provided in the script but it is
+There are no comments provided but it is
 more comprehensible because of the keywords used in scripts. (please
-beware that UI Map is not a replacement for comments!) A more comprehensible 
-script could look like this.
+be aware that UI Map is NOT a replacement for comments!  Comments are still
+important for documenting automated test.) An even better test script could
+look like this.
    
 .. code-block:: java
 
@@ -500,13 +508,13 @@ script could look like this.
    		selenium.waitForPageToLoad("30000");
    }
    
-The whole idea is to have a centralized location for objects and using 
+The idea is to have a centralized location for objects and using 
 comprehensible names for those objects. To achieve this, properties files can 
 be used in java. A properties file contains key/value pairs, where each 
 key and value are strings.
    
-Consider a property file *prop.properties* which has got definition of 
-HTML object used above 
+Consider a property file *prop.properties* which assigns as 'aliases' easily
+understood identifiers for the HTML objects used earlier. 
    
 .. code-block:: java
    
@@ -516,10 +524,10 @@ HTML object used above
    admin.events.cancel = addEditEventForm:_idcancel
    admin.events.viewoldevents = adminHomeForm:_activityold
    
-Our objects still refer to html objects, but we have introduced a layer 
-of abstraction between the test script and UI elements.
-Values can be read from the properties file and used in Test Class to implement UI 
-Map. For more on Properties files follow this URL_.
+The locators will still refer to html objects, but we have introduced a layer 
+of abstraction between the test script and the UI elements.
+Values are read from the properties file and used in Test Class to implement UI 
+Map. For more on Properties files refer to the following link.
 
 .. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html
 
