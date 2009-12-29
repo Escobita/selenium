@@ -189,7 +189,12 @@ public class WebDriverCommandProcessor implements CommandProcessor {
   }
 
   public String doCommand(String commandName, String[] args) {
-    return (String) execute(commandName, args);
+    Object val = execute(commandName, args);
+    if (val == null) {
+      return null;
+    }
+
+    return val.toString();
   }
 
   public void setExtensionJs(String s) {
@@ -277,6 +282,14 @@ public class WebDriverCommandProcessor implements CommandProcessor {
         return command.apply(driver, args);
       }
     });
+  }
+
+  public boolean isMethodAvailable(String methodName) {
+    return seleneseMethods.containsKey(methodName);
+  }
+
+  public void addMethod(String methodName, SeleneseCommand command) {
+    seleneseMethods.put(methodName, command);
   }
 
   private void setUpMethodMap() {

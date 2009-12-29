@@ -87,7 +87,7 @@ function parsePortMessage(message) {
 
       if (element.click) {
         console.log("click");
-        execute("try { arguments[0].click(); } catch(e){}", {type: "ELEMENT", value: getElementId_(element)});
+        execute("try { arguments[0].click(); } catch(e){}", {type: "ELEMENT", value: addElementToInternalArray(element)});
       }
       response.value = {statusCode: 0};
       break;
@@ -502,6 +502,10 @@ function getElement(plural, lookupBy, lookupValue, id) {
   }
 }
 
+/**
+ * Adds the element to the internal element store, if it isn't already there.
+ * @return index of element in the array
+ */
 function addElementToInternalArray(element) {
   for (var existingElement in ChromeDriverContentScript.internalElementArray) {
     if (element == ChromeDriverContentScript.internalElementArray[existingElement]) {
@@ -543,23 +547,6 @@ function internalGetElement(elementIdAsString) {
   } else {
     throw {statusCode: 10, value: {message: "Element is obsolete"}};
   }
-}
-
-/**
- * Given an element, returning the index that can be used to locate it
- *
- * @param element the element to look up the internal ID of
- * @return A positive integer on success or -1 otherwise
- */
-function getElementId_(element) {
-  var length = ChromeDriverContentScript.internalElementArray.length;
-  for (var i = 0; i < length; i++) {
-    if (ChromeDriverContentScript.internalElementArray[i] === element) {
-      return i;
-    }
-  }
-
-  return -1;
 }
 
 /**
@@ -698,6 +685,18 @@ function selectElement(element) {
   if (!oldValue) {
     //TODO: Work out a way of firing events,
     //now that synthesising them gives appendMessage errors
+    if (tagName == "option") {
+      var select = element;
+      while (select.parentNode != null && select.tagName.toLowerCase() != "select") {
+        select = select.parentNode;
+      }
+      if (select.tagName.toLowerCase() == "select") {
+        element = select;
+      } else {
+        //If we're not within a select element, fire the event from the option, and hope that it bubbles up
+        console.log("Falling back to event firing from option, not select element");
+      }
+    }
     Utils.fireHtmlEvent(element, "change");
   }
   return {statusCode: 0};
@@ -745,7 +744,7 @@ function submitElement(element) {
       element.submit();
       return {statusCode: 0};
     }
-    element = element.parentElement;
+    element = element.parentNode;
   }
   return {statusCode: 12, value: {message: "Cannot submit an element not in a form"}};
 }
@@ -765,7 +764,7 @@ function toggleElement(element) {
     if (tagName == "option") {
       var parent = element;
       while (parent != null && parent.tagName.toLowerCase() != "select") {
-        parent = parent.parentElement;
+        parent = parent.parentNode;
       }
       if (parent == null) {
         throw {statusCode: 12, value: {message: "option tag had no select tag parent"}};
@@ -878,12 +877,12 @@ function execute_(script, passedArgs, callback) {
   var func = "function(){" + script + "}";
   var args = [];
   for (var i = 0; i < passedArgs.length; ++i) {
-    console.log("Parsing: " + passedArgs[i]);
+    console.log("Parsing: " + JSON.stringify(passedArgs[i]));
     var value = parseWrappedArguments(passedArgs[i]);
     if (value.success) {
       args.push(value.value);
     } else {
-      ChromeDriverContentScript.port.postMessage(value.value);
+      ChromeDriverContentScript.port.postMessage({response: value.value, sequenceNumber: ChromeDriverContentScript.currentSequenceNumber});
       return;
     }
   }
