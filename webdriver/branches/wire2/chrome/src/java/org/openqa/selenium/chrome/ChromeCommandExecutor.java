@@ -14,6 +14,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.XPathLookupException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.Response;
+
 import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.awt.Dimension;
@@ -145,7 +147,7 @@ public class ChromeCommandExecutor {
    * @return response to command
    * @throws IllegalStateException if no socket was present
    */
-  public ChromeResponse execute(Command command) throws IOException {
+  public Response execute(Command command) throws IOException {
     sendCommand(command);
     return handleResponse(command);
   }
@@ -275,7 +277,7 @@ public class ChromeCommandExecutor {
    * @return response to the command.
    * @throws IOException if there are errors with the socket being used
    */
-  private ChromeResponse handleResponse(Command command) throws IOException {
+  private Response handleResponse(Command command) throws IOException {
     Socket socket;
     //Peek, rather than poll, so that if it all goes horribly wrong,
     //we can just close all sockets in the queue,
@@ -308,27 +310,33 @@ public class ChromeCommandExecutor {
    * @param rawJsonString JSON string encapsulating the response.
    * @return the parsed response.
    */
-  private ChromeResponse parseResponse(String rawJsonString) {
+  private Response parseResponse(String rawJsonString) {
     if (rawJsonString.length() == 0) {
-      return new ChromeResponse(0, null);
+      return new Response();
     }
+
     try {
+      Response response = new Response();
       JSONObject jsonObject = new JSONObject(rawJsonString);
       if (!jsonObject.has("statusCode")) {
         throw new WebDriverException("Response had no status code.  Response was: " + rawJsonString);
       }
-      if (jsonObject.getInt("statusCode") == 0) {
+      response.setStatus(jsonObject.getInt("statusCode"));
+      if (response.getStatus() == 0) {
         //Success! Parse value
         if (!jsonObject.has("value") || jsonObject.isNull("value")) {
-          return new ChromeResponse(0, null);
+          response.setValue(null);
+          return response;
         }
         Object value = jsonObject.get("value");
         Object parsedValue = parseJsonToObject(value);
         if (parsedValue instanceof ChromeWebElement) {
-          return new ChromeResponse(-1, ((ChromeWebElement)parsedValue).getElementId());
+          response.setStatus(-1);
+          response.setValue(((ChromeWebElement)parsedValue).getElementId());
         } else {
-          return new ChromeResponse(0, parsedValue);
+          response.setValue(parsedValue);
         }
+        return response;
       } else {
         String message = "";
         if (jsonObject.has("value") &&
@@ -532,7 +540,7 @@ public class ChromeCommandExecutor {
             serverSocket.close();
           }
         } catch (Exception e) {
-          throw new WebDriverException(e);
+          e.printStackTrace();
         }
       }
     }

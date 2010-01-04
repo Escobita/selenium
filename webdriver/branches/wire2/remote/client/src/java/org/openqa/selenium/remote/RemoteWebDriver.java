@@ -52,6 +52,8 @@ import java.util.Set;
 public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
 
+  private final ErrorHandler errorHandler = new ErrorHandler();
+
   private CommandExecutor executor;
   private Capabilities capabilities;
   private SessionId sessionId;
@@ -256,17 +258,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
         "script", script,
         "args", Lists.newArrayList(convertedArgs));
 
-    Command command =
-        new Command(sessionId, new Context("foo"), DriverCommand.EXECUTE_SCRIPT, params);
-
-    Response response;
-    try {
-      response = executor.execute(command);
-    } catch (Exception e) {
-      throw new WebDriverException(e);
-    }
-    if (response.isError())
-      throwIfResponseFailed(response);
+    Response response = execute(DriverCommand.EXECUTE_SCRIPT, params);
 
     @SuppressWarnings({"unchecked"})
     Map<String, Object> result = (Map<String, Object>) response.getValue();
@@ -384,16 +376,13 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     try {
       response = executor.execute(command);
       amendElementValueIfNecessary(response);
+    } catch (WebDriverException e) {
+      throw e;
     } catch (Exception e) {
-      response.setError(true);
-      response.setValue(e.getStackTrace());
+      throw new WebDriverException(e);
     }
 
-    if (response.isError()) {
-      return throwIfResponseFailed(response);
-    }
-
-    return response;
+    return errorHandler.throwIfResponseFailed(response);
   }
 
   protected Response execute(DriverCommand command) {
@@ -419,88 +408,6 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     replacement.setParent(this);
 
     response.setValue(replacement);
-  }
-
-  private Response throwIfResponseFailed(Response response) {
-    if (response.getValue() instanceof StackTraceElement[]) {
-      WebDriverException runtimeException = new WebDriverException();
-      runtimeException.setStackTrace((StackTraceElement[]) response.getValue());
-      throw runtimeException;
-    }
-
-    Map rawException;
-    try {
-      rawException = (Map) response.getValue();
-    } catch (ClassCastException e) {
-      throw new RuntimeException(String.valueOf(response.getValue()));
-    }
-
-    RuntimeException toThrow = null;
-    try {
-      String screenGrab = (String) rawException.get("screen");
-      String message = (String) rawException.get("message");
-      String className = (String) rawException.get("class");
-
-      Class<?> aClass;
-      try {
-        aClass = Class.forName(className);
-        if (!RuntimeException.class.isAssignableFrom(aClass)) {
-          aClass = WebDriverException.class;
-        }
-      } catch (ClassNotFoundException e) {
-        aClass = WebDriverException.class;
-      }
-
-      if (screenGrab != null) {
-        try {
-          Constructor<? extends RuntimeException> constructor =
-              (Constructor<? extends RuntimeException>) aClass
-                  .getConstructor(String.class, Throwable.class);
-          toThrow = constructor.newInstance(message, new ScreenshotException(screenGrab));
-        } catch (NoSuchMethodException e) {
-          // Fine. Fall through
-        } catch (OutOfMemoryError e) {
-          // It can happens sometimes. Fall through
-        }
-      }
-
-      if (toThrow == null) {
-      try {
-        Constructor<? extends RuntimeException> constructor =
-            (Constructor<? extends RuntimeException>) aClass.getConstructor(String.class);
-        toThrow = constructor.newInstance(message);
-      } catch (NoSuchMethodException e) {
-        toThrow = (WebDriverException) aClass.newInstance();
-      }
-      }
-
-      List<Map> elements = (List<Map>) rawException.get("stackTrace");
-      if (elements != null) {
-        StackTraceElement[] trace = new StackTraceElement[elements.size()];
-  
-        int lastInsert = 0;
-        for (Map values : elements) {
-          // I'm so sorry.
-          Long lineNumber = (Long) values.get("lineNumber");
-          if (lineNumber == null) {
-            continue;
-          }
-  
-          trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
-                  (String) values.get("methodName"),
-                  (String) values.get("fileName"),
-                  lineNumber.intValue());
-          }
-  
-          if (lastInsert == elements.size()) {
-          toThrow.setStackTrace(trace);
-        }
-      }
-    } catch (Exception e) {
-      toThrow = new WebDriverException(e);
-    }
-
-    throw toThrow;
   }
 
   private class RemoteWebDriverOptions implements Options {

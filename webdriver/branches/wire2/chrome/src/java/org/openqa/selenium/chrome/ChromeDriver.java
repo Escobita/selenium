@@ -23,7 +23,10 @@ import org.openqa.selenium.internal.TemporaryFilesystem;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Context;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.ErrorHandler;
 import static org.openqa.selenium.remote.DriverCommand.*;
+
+import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.SessionId;
 
 import java.io.File;
@@ -42,6 +45,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   private final static int MAX_START_RETRIES = 5;
   private ChromeCommandExecutor executor;
   private ChromeBinary chromeBinary = new ChromeBinary();
+  private final ErrorHandler errorHandler = new ErrorHandler();
   
   /**
    * Starts up a new instance of Chrome, with the required extension loaded,
@@ -127,7 +131,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
    * @param parameters parameters of command being executed
    * @return response to the command (a Response wrapping a null value if none) 
    */
-  ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+  Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
     Command command = new Command(new SessionId("[No sessionId]"),
                                   new Context("[No context]"),
                                   driverCommand,
@@ -155,7 +159,7 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
    * @return The command response.
    * @see #execute(DriverCommand, Map)
    */
-  ChromeResponse execute(DriverCommand driverCommand) {
+  Response execute(DriverCommand driverCommand) {
     return execute(driverCommand, ImmutableMap.<String, Object>of());
   }
   
@@ -252,9 +256,9 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   }
 
   public Object executeScript(String script, Object... args) {
-    ChromeResponse response;
+    Response response;
     response = execute(EXECUTE_SCRIPT, ImmutableMap.of("script", script, "args", args));
-    if (response.getStatusCode() == -1) {
+    if (response.getStatus() == -1) {
       return new ChromeWebElement(this, response.getValue().toString());
     } else {
       return response.getValue();
@@ -322,25 +326,23 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
   }
 
   private WebElement findElement(String by, String using) {
-    ChromeResponse response = execute(DriverCommand.FIND_ELEMENT,
-        ImmutableMap.of("using", by, "value", using));
+    Response response = execute(FIND_ELEMENT, ImmutableMap.of("using", by, "value", using));
     return getElementFrom(response);
   }
 
   private List<WebElement> findElements(String by, String using) {
-    ChromeResponse response = execute(DriverCommand.FIND_ELEMENTS,
-        ImmutableMap.of("using", by, "value", using));
+    Response response = execute(FIND_ELEMENTS, ImmutableMap.of("using", by, "value", using));
     return getElementsFrom(response);
   }
 
 
-  WebElement getElementFrom(ChromeResponse response) {
+  WebElement getElementFrom(Response response) {
     Object result = response.getValue();
     List<?> elements = (List<?>)result;
     return new ChromeWebElement(this, (String)elements.get(0));
   }
 
-  List<WebElement> getElementsFrom(ChromeResponse response) {
+  List<WebElement> getElementsFrom(Response response) {
     Object result = response.getValue();
     List<WebElement> elements = new ArrayList<WebElement>();
     for (Object element : (List<?>)result) {

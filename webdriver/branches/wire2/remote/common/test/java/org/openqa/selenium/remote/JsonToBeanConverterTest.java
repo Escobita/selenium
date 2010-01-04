@@ -176,13 +176,15 @@ public class JsonToBeanConverterTest extends TestCase {
     response.setContext("foo");
     response.setSessionId("bar");
     response.setValue(value);
-    response.setError(true);
+    response.setStatus(1512);
 
     String json = new BeanToJsonConverter().convert(response);
     Response converted = new JsonToBeanConverter().convert(Response.class, json);
 
+    assertEquals("foo", response.getContext());
+    assertEquals("bar", response.getSessionId());
     assertEquals(2, ((List) converted.getValue()).size());
-    assertTrue(converted.isError());
+    assertEquals(1512, response.getStatus());
   }
 
   public void testShouldConvertObjectsInArraysToMaps() throws Exception {

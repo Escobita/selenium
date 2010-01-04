@@ -13,6 +13,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.Response;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -34,7 +35,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
     return elementId;
   }
   
-  ChromeResponse execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+  Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
     return parent.execute(driverCommand,
         ImmutableMap.<String, Object>builder()
             .putAll(parameters)
@@ -42,7 +43,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
             .build());
   }
   
-  ChromeResponse execute(DriverCommand driverCommand) {
+  Response execute(DriverCommand driverCommand) {
     return execute(driverCommand, ImmutableMap.<String, Object>of());
   }
 
@@ -68,7 +69,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   }
 
   public boolean isDisplayed() {
-    ChromeResponse r = execute(DriverCommand.IS_ELEMENT_DISPLAYED);
+    Response r = execute(DriverCommand.IS_ELEMENT_DISPLAYED);
     return (Boolean)r.getValue();
   }
 
@@ -141,13 +142,13 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   }
 
   private WebElement findElement(String using, String value) {
-    ChromeResponse response = execute(DriverCommand.FIND_CHILD_ELEMENT,
+    Response response = execute(DriverCommand.FIND_CHILD_ELEMENT,
         ImmutableMap.of("using", using, "value", value));
     return parent.getElementFrom(response);
   }
 
   private List<WebElement> findElements(String using, String value) {
-    ChromeResponse response = execute(DriverCommand.FIND_CHILD_ELEMENTS,
+    Response response = execute(DriverCommand.FIND_CHILD_ELEMENTS,
         ImmutableMap.of("using", using, "value", value));
     return parent.getElementsFrom(response);
   }

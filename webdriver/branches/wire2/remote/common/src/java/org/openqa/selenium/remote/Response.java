@@ -19,10 +19,10 @@ package org.openqa.selenium.remote;
 
 public class Response {
 
-  private boolean isError;
   private Object value;
   private String sessionId;
   private String context;
+  private int status;
 
   public Response() {
   }
@@ -32,12 +32,12 @@ public class Response {
     this.context = String.valueOf(context);
   }
 
-  public void setError(boolean isError) {
-    this.isError = isError;
+  public int getStatus() {
+    return status;
   }
 
-  public boolean isError() {
-    return isError;
+  public void setStatus(int status) {
+    this.status = status;
   }
 
   public void setValue(Object value) {
@@ -65,6 +65,6 @@ public class Response {
   }
 
   public String toString() {
-    return String.format("(%s %s %s: %s)", getSessionId(), getContext(), isError(), getValue());
+    return String.format("(%s %s %s: %s)", getSessionId(), getContext(), getStatus(), getValue());
   }
 }

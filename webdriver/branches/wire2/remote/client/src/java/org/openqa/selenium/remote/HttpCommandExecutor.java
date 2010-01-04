@@ -193,7 +193,22 @@ public class HttpCommandExecutor implements CommandExecutor {
         }
       }
     }
-    response.setError(!(httpMethod.getStatusCode() > 199 && httpMethod.getStatusCode() < 300));
+
+    if (!(httpMethod.getStatusCode() > 199 && httpMethod.getStatusCode() < 300)) {
+      // 4xx represents an unknown command or a bad request.
+      if (httpMethod.getStatusCode() > 399 && httpMethod.getStatusCode() < 500) {
+        response.setStatus(ErrorCodes.UNKNOWN_COMMAND);
+      } else if (httpMethod.getStatusCode() > 499 && httpMethod.getStatusCode() < 600) {
+        // 5xx represents an internal server error. The response status should already be set, but
+        // if not, set it to a general error code.
+        if (response.getStatus() == ErrorCodes.SUCCESS) {
+          response.setStatus(ErrorCodes.UNHANDLED_ERROR);
+        }
+      } else {
+        response.setStatus(ErrorCodes.UNHANDLED_ERROR);
+      }
+    }
+
 
     if (response.getValue() instanceof String) {
       //We normalise to \n because Java will translate this to \r\n

@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.server.handler.AddConfig;
 import org.openqa.selenium.remote.server.handler.AddCookie;
 import org.openqa.selenium.remote.server.handler.ChangeUrl;
@@ -268,7 +269,11 @@ public class DriverServlet extends HttpServlet {
       throws ServletException {
     try {
       ResultConfig config = mapper.getConfig(request.getPathInfo());
-      config.handle(request.getPathInfo(), request, response);
+      if (config == null) {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      } else {
+        config.handle(request.getPathInfo(), request, response);
+      }
     } catch (Exception e) {
       log("Fatal, unhandled exception: " + request.getPathInfo() + ": " + e);
       throw new ServletException(e);
