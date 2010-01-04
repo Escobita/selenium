@@ -9,7 +9,7 @@ public class IntentReceiverRegistrar {
 		mContext = context;
 	}
 	
-	public void RegisterReceiver(BroadcastReceiver receiver, String action) {
+	public void registerReceiver(BroadcastReceiver receiver, String action) {
 		mContext.registerReceiver(receiver, new IntentFilter(action));
 	}
 	

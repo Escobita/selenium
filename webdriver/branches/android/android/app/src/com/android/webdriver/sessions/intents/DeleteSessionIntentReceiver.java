@@ -17,11 +17,10 @@ public class DeleteSessionIntentReceiver extends BroadcastReceiver {
     int sessionId = intent.getIntExtra("SessionId", -1);
     if (sessionId <= 0) {
       Log.e("WebDriver", "Error in received intent: " + intent.toString());
-      return;
+    } else {
+      SessionRepository.getInstance().removeById(sessionId);
     }
-
-    SessionRepository.getInstance().removeById(sessionId);
-
+    
     // Return status
     Bundle res = new Bundle();
     res.putBoolean("OK", true);

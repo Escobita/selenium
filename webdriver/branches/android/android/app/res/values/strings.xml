@@ -25,4 +25,7 @@
 <string name="ctx_menu_delete">Delete session</string>
 
 <string name="ctx_menu_navigate">Navigate to URL ...</string>
+<string name="default_session_id_text">0000/context</string>
+<string name="default_session_status">Ready.</string>
+
 </resources>

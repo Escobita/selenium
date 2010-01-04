@@ -10,7 +10,6 @@ public class Session {
    */
   public enum Actions {
     GET_PAGESOURCE,
-    ELEMENT_EXISTS,
     NAVIGATE_BACK,
     NAVIGATE_FORWARD,
     REFRESH,
@@ -149,8 +148,6 @@ public class Session {
   public Object PerformAction(Actions action, Object[] args) {
     switch(action) {
       case GET_PAGESOURCE:
-        break;
-      case ELEMENT_EXISTS:
         break;
       case EXECUTE_JAVASCRIPT:
         if (args.length != 1) {

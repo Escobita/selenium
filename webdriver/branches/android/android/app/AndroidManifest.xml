@@ -19,16 +19,40 @@
      supplies a unique name for the application.  When writing your
      own application, the package name must be changed from "com.example.*"
      to come from a domain that you own or have control over. -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.android.webdriver.app">
-    <application android:label="WebDriver">
-        <activity android:label="WebDriver" android:icon="@drawable/selenium_icon" android:name="SessionListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        
-</activity>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.webdriver.app">
+    
+    <application android:label="WebDriverApplication"
+      android:name="WebDriverApplication"
+      android:icon="@drawable/selenium_icon">
+    
+        <activity android:name=".WebDriver"
+          android:label="WebDriver">
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.LAUNCHER"/>
+          </intent-filter>
+        </activity>
+
+        <activity android:name=".SessionListActivity"
+          android:label="Multi-Session Android WebDriver Client">
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.SAMPLE_CODE" />
+          </intent-filter>
+        </activity>
+
+        <activity android:name=".SingleSessionActivity"
+          android:label="Single-Session Android WebDriver Client">
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.SAMPLE_CODE" />
+          </intent-filter>
+        </activity>
+
     </application>
 
-<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+  <uses-permission android:name="android.permission.INTERNET"/>
+
 </manifest>

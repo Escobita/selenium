@@ -95,21 +95,21 @@ public class SessionListActivity extends ListActivity
 		sessionRep.setSessionActionRequestListener(this);
 		
 		// Registering all intent receivers
-		mIntentReg.RegisterReceiver(new NavigationIntentReceiver(),
+		mIntentReg.registerReceiver(new NavigationIntentReceiver(),
 				Intents.INTENT_NAVIGATE);
-		mIntentReg.RegisterReceiver(new AddSessionIntentReceiver(),
+		mIntentReg.registerReceiver(new AddSessionIntentReceiver(),
 				Intents.INTENT_ADDSESSION);
-		mIntentReg.RegisterReceiver(new DeleteSessionIntentReceiver(),
+		mIntentReg.registerReceiver(new DeleteSessionIntentReceiver(),
 				Intents.INTENT_DELETESESSION);
-		mIntentReg.RegisterReceiver(new DoActionIntentReceiver(),
+		mIntentReg.registerReceiver(new DoActionIntentReceiver(),
 				Intents.INTENT_DOACTION);
-		mIntentReg.RegisterReceiver(new GetTitleIntentReceiver(),
+		mIntentReg.registerReceiver(new GetTitleIntentReceiver(),
 				Intents.INTENT_GETTITLE);
-        mIntentReg.RegisterReceiver(new SetProxyIntentReceiver(),
+        mIntentReg.registerReceiver(new SetProxyIntentReceiver(),
             Intents.INTENT_SETPROXY);
-        mIntentReg.RegisterReceiver(new GetCurrentUrlIntentReceiver(),
+        mIntentReg.registerReceiver(new GetCurrentUrlIntentReceiver(),
             Intents.INTENT_GETURL);
-        mIntentReg.RegisterReceiver(new CookieIntentReceiver(),
+        mIntentReg.registerReceiver(new CookieIntentReceiver(),
             Intents.INTENT_COOKIES);
 
         Log.i("WebDriver", "Loaded.");
@@ -309,9 +309,6 @@ public class SessionListActivity extends ListActivity
 				mWebViews.get(position), "EXECUTOR")).executeJS(session,
 				"window.webdriver.resultMethod"
 				+ "(document.documentElement.outerHTML);");
-			case ELEMENT_EXISTS:
-			  // TODO(abergman): implement
-			  break;
 			case NAVIGATE_BACK:
               mWebViews.get(position).goBack();
               break;
