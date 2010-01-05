@@ -211,11 +211,11 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
   }
   
   public WebElement findElementByCssSelector(String using) {
-    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "css", using));
+    return findElement("css", using);
   }
 
   public List<WebElement> findElementsByCssSelector(String using) {
-    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "css", using));
+    return findElements("css", using);
   }
 
   public void hover() {
