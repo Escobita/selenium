@@ -138,3 +138,16 @@ guint32 get_last_event_time();
 }}}
 
 Which returns the time-stamp associated with the last event that was created. This is needed for another native call, _pending_keyboard_events()_ which will be called from the javascript code *after* sendKeys has returned, to make sure all of the events were handled and removed from the queue. That is the only way to make sure that the javascript code that does the sendKeys call will not return too soon (before all key press / release events have arrived to the window). See _utils.js_ for more details.
+
+= Some troubleshooting tips =
+The first step when suspecting native events do not work is to verify the libraries needed are loaded (both for focus stealing and for the library itself). The following command should be executed when there's a Firefox instance that was started by WebDriver:
+{{{
+[user@host:~,1]$ for i in `pidof firefox`; do cat /proc/${i}//maps |grep "libwebd\|ignore"; done
+7f53791f3000-7f537920d000 r-xp 00000000 08:01 2551370                    /tmp/webdriver8142511255007268151profile/extensions/fxdriver@googlecode.com/platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so
+7f537920d000-7f537940c000 ---p 0001a000 08:01 2551370                    /tmp/webdriver8142511255007268151profile/extensions/fxdriver@googlecode.com/platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so
+7f537940c000-7f537940e000 rw-p 00019000 08:01 2551370                    /tmp/webdriver8142511255007268151profile/extensions/fxdriver@googlecode.com/platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so
+7f538c00b000-7f538c012000 r-xp 00000000 08:01 2551405                    /tmp/webdriver8142511255007268151profile/amd64/x_ignore_nofocus.so
+7f538c012000-7f538c212000 ---p 00007000 08:01 2551405                    /tmp/webdriver8142511255007268151profile/amd64/x_ignore_nofocus.so
+7f538c212000-7f538c213000 rw-p 00007000 08:01 2551405                    /tmp/webdriver8142511255007268151profile/amd64/x_ignore_nofocus.so
+}}}
+Note that *both* x_ignore_nofocus and libwebdriver-firefox should appear on the output. If one (or both) are missing, then native events will not function correctly (or at all).
