@@ -82,8 +82,8 @@ verifyElementPresent   //div/p/img
    
 这个命令验证一个图片，<img>标签是否在某个特定页面存在
 这个标签在一个<div>标签和<p>标签后面.
-开头第一个参数是一个 *定位器* 告诉Selenese命令怎么去找这个元素.
-定位器将在下部分说明.
+开头第一个参数是一个 *定位符* 告诉Selenese命令怎么去找这个元素.
+定位符将在下部分说明.
 
 ``verifyElementPresent`` 能用来检查在页面中任何HTML 标签是否存在，
 例如链接,段落,<div>分割等等.
@@ -99,14 +99,14 @@ verifyElementPresent   //head/title
 ====================   ==============================   ============
 
 这些例子说明了测试UI元素的各种不同的方法。
-再次说明,定位器将在下部分说明.
+再次说明,定位符将在下部分说明.
 
 verifyText
 ~~~~~~~~~~
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
 当文本和它的UI元素都必须要测试时，使用``verifyText``.
-``verifyText`` 必须使用一个locator,如果你选择一个 *XPath* 或者 *DOM* 的定位器,
+``verifyText`` 必须使用一个locator,如果你选择一个 *XPath* 或者 *DOM* 的定位符,
 你可以验证在页面上某个特定位置有某个特定文本，相对于这个页面上其它的UI组件.
 
 
@@ -121,33 +121,33 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
 -----------------
 对许多Selenium命令，一个目标是必须的.这个目标等同于在web应用内容中的一个元素,
 它由定位策略和跟随其后的定位值组成，其形式为 ``locatorType=location`` 。
-定位器类型在许多情况下可以忽略.
-不同的定位器类型将在以下例子中以此讲述.
+定位符类型在许多情况下可以忽略.
+不同的定位符类型将在以下例子中以此讲述.
 
 .. Santi: I really liked how this section was taken. But I found that most of
    the locator strategies repeat the same HTML fragment over a over. Couldn't
    we put A example HTML code before starting with each strategie and then use
    that one on all of them?
 
-默认定位器
+默认定位符
 ~~~~~~~~~~~~~~~~
-在以下情况下你可以选择忽略定位器类型:
+在以下情况下你可以选择忽略定位符类型:
  
- - 定位器以 "document"开头, 将使用DOM定位器策略.
+ - 定位符以 "document"开头, 将使用DOM定位符策略.
    参见 :ref:`通过dom定位` 。
 
- - 定位器 以 "//" 开头,将使用XPath定位器策略.
+ - 定位符 以 "//" 开头,将使用XPath定位符策略.
    参见 : ref:`通过xpath定位` 。
 
- - 定位器以除了以上的其它或者不是以合法定位器类型开头,
-   将默认为用identifier定位器策略。
+ - 定位符以除了以上的其它或者不是以合法定位符类型开头,
+   将默认为用identifier定位符策略。
    参见 : ref:`identifier通过定位` 。
 
 .. _通过identifier定位:
 
 通过identifier定位:
 ~~~~~~~~~~~~~~~~~~~~~~
-这或许是最常用的定位元素的方法,也是当没有被识别的定位器类型使用时，默认使用的方法
+这或许是最常用的定位元素的方法,也是当没有被识别的定位符类型使用时，默认使用的方法
 使用这种方法，id属性值与定位值相匹配的第一个元素将被使用。
 如果没有元素拥有与之相配的id属性，那么name属性值与定位值相匹配的第一个元素
 将被使用。
@@ -167,19 +167,19 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
    </body>
   <html>
 
-接下来的定位器策略将从以上HTML片段按行号返回元素:
+接下来的定位符策略将从以上HTML片段按行号返回元素:
 
 - ``identifier=loginForm`` (3)
 - ``identifier=username`` (4)
 - ``identifier=continue`` (5)
 - ``continue`` (5)
 
-因为 ``identifier`` 定位器类型是默认的,  ``identifier=`` 在前三个例子中 
+因为 ``identifier`` 定位符类型是默认的,  ``identifier=`` 在前三个例子中 
 是不必要的.
 
 通过Id定位
 ~~~~~~~~~~~~~~
-这种定位器类型比identifier定位器类型跟有限，但是也更加明确。
+这种定位符类型比identifier定位符类型更有限，但是也更加明确。
 当你知道一个元素的id属性时使用它。
 
 
@@ -201,7 +201,7 @@ verifyText   //table/tr/td/div/p    This is my text and it occurs right after th
 
 通过Name定位
 ~~~~~~~~~~~~~~~~
-name定位器类型将定位与name属性相配的第一个元素.
+name定位符类型将定位与name属性相配的第一个元素.
 如果一个name属性对应多个有相同值的元素,那么你可以用过滤器去进一步改善你的定位策略.
 默认的过滤器类型是vale(与value属性相配).
 
@@ -224,7 +224,7 @@ name定位器类型将定位与name属性相配的第一个元素.
 - ``name=continue Clear`` (7)
 - ``name=continue type=button`` (7)
 
-.. note:: 不像XPah和DOM locator类型,以上三种定位器类型允许Selenium测试UI元素，而与它在网页上的位置不相关。
+.. note:: 不像XPah和DOM locator类型,以上三种定位符类型允许Selenium测试UI元素，而与它在网页上的位置不相关。
    所以如果页面架构和组织方式改变了,不管你是否想测试页面结构的变化。
    这个测试将仍然通过。web设计者频繁改变页面的情况,但它的功能必须回归测试。
    通过id和name属性或者任何HTML属性测试变得非常重要。
@@ -244,7 +244,7 @@ HTML可以作为XML(XHTML)的一个实现,Selenium用户可以借助这个强大
 
 用XPath的一个主要原因是对于你想定位的元素没有一个合适的id或者name属性。
 你可以使用XPath去定位元素用绝对路径(不推荐),或者相对于某个有id或name属性的元素
-XPath定位器还可以用在通过不是id和name属性的其它属性定位元素。
+XPath定位符还可以用在通过不是id和name属性的其它属性定位元素。
 
 绝对路径的XPath包含所有从根(html)开始的所有元素,最终可以因为一个应用程序细微地方的调整而失败.
 通过寻找一个相近的有id或者name属性的元素(一个父元素最好了),你可以定位你的目标元素基于它们的关系
@@ -397,10 +397,10 @@ publication <http://www.w3.org/TR/css3-selectors/>`_.  你将获得更多参考�
 文本模式匹配
 ----------------------
 
-和定位器类似, *模式*  是Selenese命令中经常用到的一种参数类型.
+和定位符类似, *模式*  是Selenese命令中经常用到的一种参数类型.
 需要模式的命令有:**verifyTextPresent**, **verifyTitle**, **verifyAlert**, 
 **assertConfirmation**, **verifyText** 和 **verifyPrompt**.  
-上面提及的链接定位器也可以使用模式。模式允许通过使用特定的字符 *描述* 期望的文本，
+上面提及的链接定位符也可以使用模式。模式允许通过使用特定的字符 *描述* 期望的文本，
 而不是精确的指定文本.
 有三种类型的模式: *通配符*, *正则表达式* 和 *精确*.
 
@@ -614,7 +614,7 @@ storeElementPresent
 
 storeText 
 ~~~~~~~~~
-StoreText对应verifyText。它使用一个定位器来确定具体的网页文字。
+StoreText对应verifyText。它使用一个定位符来确定具体的网页文字。
 对于这个文本，如果被找到, 就被存到变量中。StoreText能用来从被测页面中抽取文本。
 
 storeEval 
