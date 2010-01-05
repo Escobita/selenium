@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
@@ -233,6 +234,31 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   	assertEventFired("focus");
   }
 
+  @Ignore(IE)
+  public void testSubmittingFormFromFormElementShouldFireOnSubmitForThatForm() {
+    driver.get(javascriptPage);
+    WebElement formElement = driver.findElement(By.id("submitListeningForm"));
+    formElement.submit();
+    assertEventFired("form-onsubmit");
+  }
+  
+  @Ignore(IE)
+  public void testSubmittingFormFromFormInputSubmitElementShouldFireOnSubmitForThatForm() {
+    driver.get(javascriptPage);
+    WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));
+    submit.submit();
+    assertEventFired("form-onsubmit");
+  }
+  
+  @Ignore(IE)
+  public void testSubmittingFormFromFormInputTextElementShouldFireOnSubmitForThatFormAndNotClickOnThatInput() {
+    driver.get(javascriptPage);
+    WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));
+    submit.submit();
+    assertEventFired("form-onsubmit");
+    assertEventNotFired("text-onclick");
+  }
+
   private void clickOnElementWhichRecordsEvents() {
     driver.findElement(By.id("plainButton")).click();
   }
@@ -241,5 +267,11 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     WebElement result = driver.findElement(By.id("result"));
     String text = result.getText();
     assertTrue("No " + eventName + " fired: " + text, text.contains(eventName));
+  }
+  
+  private void assertEventNotFired(String eventName) {
+    WebElement result = driver.findElement(By.id("result"));
+    String text = result.getText();
+    assertFalse(eventName + " fired: " + text, text.contains(eventName));
   }
 }

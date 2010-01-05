@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ChromeWebElement implements RenderedWebElement, Locatable, 
-FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName {
+FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName, FindsByCssSelector {
 
   private final ChromeDriver parent;
   private final String elementId;
@@ -207,6 +208,14 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
 
   public List<WebElement> findElementsByClassName(String using) {
     return findElements("class name", using);
+  }
+  
+  public WebElement findElementByCssSelector(String using) {
+    return parent.getElementFrom(execute(DriverCommand.FIND_CHILD_ELEMENT, this, "css", using));
+  }
+
+  public List<WebElement> findElementsByCssSelector(String using) {
+    return parent.getElementsFrom(execute(DriverCommand.FIND_CHILD_ELEMENTS, this, "css", using));
   }
 
   public void hover() {

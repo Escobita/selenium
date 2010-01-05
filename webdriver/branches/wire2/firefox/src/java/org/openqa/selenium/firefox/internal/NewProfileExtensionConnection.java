@@ -23,11 +23,9 @@ import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxLauncher;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
 public class NewProfileExtensionConnection extends AbstractExtensionConnection {
@@ -35,18 +33,28 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
   private FirefoxProfile profile;
   private int bufferSize = 4096;
 
-  public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile, String host) throws IOException {
-    lock.lock(binary.getTimeout());
+  public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile, String host)
+      throws IOException {
+    this.profile = profile;
+    if (binary == null) {
+      this.process = new FirefoxBinary();
+    } else {
+      this.process = binary;
+    }
+
+    lock.lock(this.process.getTimeout());
     try {
       int portToUse = determineNextFreePort(host, profile.getPort());
 
-      binary.setOutputWatcher(new CircularOutputStream(bufferSize));
-      process = new FirefoxLauncher(binary).startProfile(profile, portToUse);
-      this.profile = process.getProfile();
+      this.process.setOutputWatcher(new CircularOutputStream(bufferSize));
+      profile.setPort(portToUse);
+      profile.updateUserPrefs();
+      this.process.clean(profile);
+      this.process.startProfile(profile);
 
       setAddress(host, portToUse);
 
-      connectToBrowser(binary.getTimeout());
+      connectToBrowser(this.process.getTimeout());
     } finally {
       lock.unlock();
     }
@@ -58,11 +66,11 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
       super.connectToBrowser(timeToWaitInMilliSeconds);
     } catch (IOException e) {
       throw new WebDriverException(
-          String.format("Failed to connect to binary %s on port %d; process output follows: \n%s", 
+          String.format("Failed to connect to binary %s on port %d; process output follows: \n%s",
               process.toString(), profile.getPort(), process.getConsoleOutput()), e);
     } catch (WebDriverException e) {
       throw new WebDriverException(
-          String.format("Failed to connect to binary %s on port %d; process output follows: \n%s", 
+          String.format("Failed to connect to binary %s on port %d; process output follows: \n%s",
               process.toString(), profile.getPort(), process.getConsoleOutput()), e);
     }
   }
@@ -86,41 +94,19 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
       }
     }
 
-    throw new WebDriverException(String.format("Cannot find free port in the range %d to %d ", port, newport));
+    throw new WebDriverException(
+        String.format("Cannot find free port in the range %d to %d ", port, newport));
   }
 
   public void quit() {
-        try {
-            sendMessageAndWaitForResponse(WebDriverException.class, new Command(null, "quit"));
-        } catch (Exception e) {
-            // this is expected
-        }
-
-        if (Platform.getCurrent().is(Platform.WINDOWS)) {
-            quitOnWindows();
-        } else {
-            quitOnOtherPlatforms();
-        }
-
-        profile.clean();    
-    }
-
-  private void quitOnOtherPlatforms() {
-    // Wait for process to die and return
     try {
-      process.waitFor();
-    } catch (InterruptedException e) {
-      throw new WebDriverException(e);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
+      sendMessage(new Command(null, "quit"));
+    } catch (Exception e) {
+      // this is expected
     }
-  }
 
-  private void quitOnWindows() {
-    try {
-      Thread.sleep(200);
-    } catch (InterruptedException e) {
-      throw new WebDriverException(e);
-    }
+    process.quit();
+
+    profile.clean();
   }
 }

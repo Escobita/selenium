@@ -38,14 +38,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ChromeCommandExecutor {
   private static final String[] ELEMENT_ID_ARG = new String[] {"id"};
   private static final String[] NO_ARGS = new String[] {};
-  
-  private final ServerSocket serverSocket;
+
+  private final int port;
   //Whether the listening thread should listen
   private volatile boolean listen = false;
-  //Whether a client is currently connected
-  private boolean hadClient = false;
-  //Whether a client has ever been connected
-  private boolean hasClient = false;
   ListeningThread listeningThread;
   private Map<DriverCommand, String[]> commands;
   
@@ -57,7 +53,7 @@ public class ChromeCommandExecutor {
   public ChromeCommandExecutor() {
     this(0);
   }
-  
+
   /**
    * Creates a new ChromeCommandExecutor which listens on the passed TCP port.
    * Doesn't return until the TCP port is connected to.
@@ -66,6 +62,7 @@ public class ChromeCommandExecutor {
    * @throws WebDriverException if could not bind to port
    */
   public ChromeCommandExecutor(int port) {
+    this.port = port;
     commands = ImmutableMap.<DriverCommand, String[]> builder()
         .put(CLOSE, NO_ARGS)
         .put(QUIT, NO_ARGS)
@@ -114,23 +111,14 @@ public class ChromeCommandExecutor {
         .put(EXECUTE_SCRIPT, new String[] {"script", "args"})
         .put(SCREENSHOT, NO_ARGS)
         .build();
-
-    try {
-      serverSocket = new ServerSocket(port);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    }
-    listen = true;
-    listeningThread = new ListeningThread(serverSocket);
-    listeningThread.start();
   }
-  
+
   /**
    * Returns whether an instance of Chrome is currently connected
    * @return whether an instance of Chrome is currently connected
    */
   boolean hasClient() {
-    return hasClient;
+    return listeningThread != null && listeningThread.hasClient;
   }
   
   /**
@@ -138,7 +126,7 @@ public class ChromeCommandExecutor {
    * @return the port being listened on
    */
   public int getPort() {
-    return serverSocket.getLocalPort();
+    return listeningThread == null ? -1 : listeningThread.serverSocket.getLocalPort();
   }
   
   /**
@@ -159,16 +147,10 @@ public class ChromeCommandExecutor {
    * @throws IOException if couldn't write command to socket
    */
   private void sendCommand(Command command) throws IOException {
-    Socket socket;
-    //Peek, rather than poll, so that if it all goes horribly wrong,
-    //we can just close all sockets in the queue,
-    //not having to worry about the current ones
-    while ((socket = listeningThread.sockets.peek()) == null) {
-      if (hadClient && !hasClient) {
-        throw new IllegalStateException("Cannot execute command without a client");
-      }
-      Thread.yield();
+    if (!hasClient()) {
+      throw new IllegalStateException("Cannot execute command without a client");
     }
+    Socket socket = getOldestSocket();
     try {
       //Respond to request with the command
       String commandStringToSend;
@@ -278,13 +260,7 @@ public class ChromeCommandExecutor {
    * @throws IOException if there are errors with the socket being used
    */
   private Response handleResponse(Command command) throws IOException {
-    Socket socket;
-    //Peek, rather than poll, so that if it all goes horribly wrong,
-    //we can just close all sockets in the queue,
-    //not having to worry about the current ones
-    while ((socket = listeningThread.sockets.peek()) == null) {
-      Thread.yield();
-    }
+    Socket socket = getOldestSocket();
     StringBuilder resultBuilder = new StringBuilder();
     BufferedReader reader = new BufferedReader(
         new InputStreamReader(socket.getInputStream()));
@@ -303,6 +279,17 @@ public class ChromeCommandExecutor {
       }
     }
     return parseResponse(resultBuilder.toString());
+  }
+
+  private Socket getOldestSocket() {
+    Socket socket;
+    // Peek, rather than poll, so that if it all goes horribly wrong, we can
+    // just close all sockets in the queue, not having to worry about the
+    // current ones.
+    while ((socket = listeningThread.sockets.peek()) == null) {
+      Thread.yield();
+    }
+    return socket;
   }
 
   /**
@@ -458,13 +445,29 @@ public class ChromeCommandExecutor {
   }
 
   /**
+   * Starts listening for new socket connections from Chrome. Does not return
+   * until the TCP port is connected to.
+   */
+  public void startListening() {
+    ServerSocket serverSocket;
+    try {
+      serverSocket = new ServerSocket(port);
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
+    listen = true;
+    listeningThread = new ListeningThread(serverSocket);
+    listeningThread.start();
+  }
+
+  /**
    * Stops listening from for new sockets from Chrome
    */
   public void stopListening() {
     listen = false;
-    listeningThread.stopListening();
-    while (!serverSocket.isClosed()) {// || serverSocket.isBound()) {
-      Thread.yield();
+    if (listeningThread != null) {
+      listeningThread.stopListening();
+      listeningThread = null;
     }
   }
 
@@ -476,11 +479,13 @@ public class ChromeCommandExecutor {
     private boolean isListening = false;
     private Queue<Socket> sockets = new ConcurrentLinkedQueue<Socket>();
     private ServerSocket serverSocket;
-    
+    private volatile boolean hasClient = false;
+
     public ListeningThread(ServerSocket serverSocket) {
       this.serverSocket = serverSocket;
     }
-    
+
+    @Override
     public void run() {
       if (!isListening) {
         listen();
@@ -489,7 +494,7 @@ public class ChromeCommandExecutor {
     public void listen() {
       isListening = true;
       try {
-        while (listen) {
+        while (listen && !serverSocket.isClosed()) {
           Socket acceptedSocket = serverSocket.accept();
           int r = acceptedSocket.getInputStream().read();
           if (r != 'G') {
@@ -499,7 +504,6 @@ public class ChromeCommandExecutor {
             //which we assume to be POSTs from the extension
             sockets.add(acceptedSocket);
             hasClient = true;
-            hadClient = true;
           } else {
             //The browser, rather than extension, is visiting the page
             //Because the extension always uses POST
@@ -508,11 +512,7 @@ public class ChromeCommandExecutor {
           }
         }
       } catch (SocketException e) {
-        if (listen) {
-          throw new WebDriverException(e);
-        } else {
-          //We are shutting down sockets manually
-        }
+        //We are shutting down sockets manually
       } catch (IOException e) {
         isListening = false;
         throw new WebDriverException(e);
@@ -538,17 +538,21 @@ public class ChromeCommandExecutor {
         try {
           if (!serverSocket.isClosed()) {
             serverSocket.close();
+            while (!serverSocket.isClosed()) {
+              Thread.yield();
+            }
           }
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
     }
+
     private void closeCurrentSockets() {
-      for (Socket socket : listeningThread.sockets) {
+      for (Socket socket : sockets) {
         try {
           socket.close();
-          listeningThread.sockets.remove(socket);
+          sockets.remove(socket);
         } catch (IOException e) {
           //Nothing we can sanely do here
         }

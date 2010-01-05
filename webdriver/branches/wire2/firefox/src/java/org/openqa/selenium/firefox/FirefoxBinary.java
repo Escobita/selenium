@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.ProcessUtils;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.internal.Executable;
 import org.openqa.selenium.firefox.internal.Streams;
@@ -60,7 +61,6 @@ public class FirefoxBinary {
   }
 
   public void startProfile(FirefoxProfile profile, String... commandLineFlags) throws IOException {
-    this.profile = profile;
     String profileAbsPath = profile.getProfileDir().getAbsolutePath();
     setEnvironmentProperty("XRE_PROFILE_PATH", profileAbsPath);
     setEnvironmentProperty("MOZ_NO_REMOTE", "1");
@@ -303,8 +303,8 @@ public class FirefoxBinary {
     this.stream = stream;
   }
 
-  public FirefoxProfile getProfile() {
-    return profile;
+  public void quit() {
+    ProcessUtils.killProcess(process);
   }
 
   private static class OutputWatcher implements Runnable {
