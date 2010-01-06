@@ -38,6 +38,6 @@ Any extra arguments pass to `for()` (besides the driver symbol) will be passed t
 {{{
 include Selenium
 
-driver = WebDriver.for(:remote, :server_url           => "http://localhost:6000/"
+driver = WebDriver.for(:remote, :url                  => "http://localhost:6000/"
                                 :desired_capabilities => WebDriver::Remote::Capabilities.firefox)
 }}}
