@@ -63,11 +63,11 @@ namespace OpenQA.Selenium.IE
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
         internal static extern WebDriverResult wdGetCookies(SafeInternetExplorerDriverHandle handle, ref SafeStringWrapperHandle cookies);
  
-        [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
-        internal static extern WebDriverResult wdAddCookie(SafeInternetExplorerDriverHandle handle, string cookie);
+        //[DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
+        //internal static extern WebDriverResult wdAddCookie(SafeInternetExplorerDriverHandle handle, string cookie);
 
         [DllImport("InternetExplorerDriver")]
-        internal static extern WebDriverResult wdSwitchToActiveElement(SafeInternetExplorerDriverHandle driver, ref IntPtr result);
+        internal static extern WebDriverResult wdSwitchToActiveElement(SafeInternetExplorerDriverHandle driver, ref SafeInternetExplorerWebElementHandle result);
 
         [DllImport("InternetExplorerDriver", CharSet = CharSet.Unicode)]
         internal static extern WebDriverResult wdSwitchToWindow(SafeInternetExplorerDriverHandle handle, string windowName);

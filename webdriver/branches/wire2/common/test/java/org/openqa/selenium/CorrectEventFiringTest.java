@@ -20,12 +20,13 @@ package org.openqa.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
-import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
@@ -234,6 +235,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   	assertEventFired("focus");
   }
 
+  @JavascriptEnabled
   @Ignore(IE)
   public void testSubmittingFormFromFormElementShouldFireOnSubmitForThatForm() {
     driver.get(javascriptPage);
@@ -241,7 +243,8 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     formElement.submit();
     assertEventFired("form-onsubmit");
   }
-  
+
+  @JavascriptEnabled
   @Ignore(IE)
   public void testSubmittingFormFromFormInputSubmitElementShouldFireOnSubmitForThatForm() {
     driver.get(javascriptPage);
@@ -249,7 +252,8 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     submit.submit();
     assertEventFired("form-onsubmit");
   }
-  
+
+  @JavascriptEnabled 
   @Ignore(IE)
   public void testSubmittingFormFromFormInputTextElementShouldFireOnSubmitForThatFormAndNotClickOnThatInput() {
     driver.get(javascriptPage);
@@ -257,6 +261,25 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     submit.submit();
     assertEventFired("form-onsubmit");
     assertEventNotFired("text-onclick");
+  }
+
+  @JavascriptEnabled 
+  @Ignore(value = {CHROME, SELENESE, IPHONE},
+      reason = "Does not yet support file uploads")
+  public void testUploadingFileShouldFireOnChangeEvent() throws IOException {
+    driver.get(formPage);
+    WebElement uploadElement = driver.findElement(By.id("upload"));
+    WebElement result = driver.findElement(By.id("fileResults"));
+    assertThat(result.getText(), equalTo(""));
+
+    File file = File.createTempFile("test", "txt");
+    file.deleteOnExit();
+
+    uploadElement.sendKeys(file.getAbsolutePath());
+    // Shift focus to something else because send key doesn't make the focus leave
+    driver.findElement(By.tagName("body")).click();
+
+    assertThat(result.getText(), equalTo("changed"));
   }
 
   private void clickOnElementWhichRecordsEvents() {
