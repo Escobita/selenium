@@ -127,6 +127,23 @@ Sometimes this doesn't work, and this is because the iframe doesn't have any con
 
 This is needed because the iframe has no content by default: there's nothing to send keyboard input to. This method call inserts an empty tag, which sets everything up nicely.
 
+=== Q: WebDriver fails to start Firefox on Linux due to java.net.SocketException ===
+If, when running WebDriver on Linux, Firefox fails to start and the error looks like:
+{{{
+Caused by: java.net.SocketException: Invalid argument
+        at java.net.PlainSocketImpl.socketBind(Native Method)
+        at java.net.PlainSocketImpl.bind(PlainSocketImpl.java:365)
+        at java.net.Socket.bind(Socket.java:571)
+        at org.openqa.selenium.firefox.internal.SocketLock.isLockFree(SocketLock.java:99)
+        at org.openqa.selenium.firefox.internal.SocketLock.lock(SocketLock.java:63)
+}}}
+It may be caused due to IPv6 settings on the machine. Execute:
+{{{
+sudo sysctl net.ipv6.bindv6only=0
+}}}
+To get the socket to bind both to IPv6 and IPv4 addresses of the host with the same calls.
+More permanent solution is disabling this behaviour by editing /etc/sysctl.d/bindv6only.conf
+
 === Q: I'd like it if WebDriver did.... ===
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
