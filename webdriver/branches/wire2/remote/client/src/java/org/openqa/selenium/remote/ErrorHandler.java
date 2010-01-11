@@ -2,6 +2,7 @@ package org.openqa.selenium.remote;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +35,15 @@ public class ErrorHandler {
 
     RuntimeException toThrow = null;
     Map rawErrorData;
-    try {
-      rawErrorData =  (Map) response.getValue();
-    } catch (ClassCastException e) {
-      throw new WebDriverException(String.valueOf(response.getValue()));
+
+    if (response.getValue() == null) {
+      rawErrorData = new HashMap<String, Object>();
+    } else {
+      try {
+        rawErrorData =  (Map) response.getValue();
+      } catch (ClassCastException e) {
+        throw new WebDriverException(String.valueOf(response.getValue()));
+      }
     }
 
     try {
