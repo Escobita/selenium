@@ -1,7 +1,7 @@
-﻿.. _chapter02-cn-reference:
-
-Selenium基础 
+﻿Selenium基础 
 ============
+
+.. _chapter02-cn-reference:
 
 从这里开始 -- 选择你的Selenium工具
 -----------------------------------------------

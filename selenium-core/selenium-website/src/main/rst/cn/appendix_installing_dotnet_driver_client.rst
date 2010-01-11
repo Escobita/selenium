@@ -1,7 +1,8 @@
-﻿.. _configuring-selenium-RC-NET-cn-reference:
-
-客户端驱动在.NET环境中的配置
+﻿客户端驱动在.NET环境中的配置
 ----------------------------
+
+.. _configuring-selenium-RC-NET-cn-reference:
+
 .NET客户端驱动是用于Microsoft Visual Studio的。
 在Visual Studio中的配置如下：
 

@@ -1,335 +1,292 @@
-﻿
-Test Design Considerations 
-==========================
+﻿测试设计的注意事项
+=====================
 
 .. _chapter06-cn-reference:
 
 *NOTE: Some sections of this chapter are not yet complete.*
 
-Introducing Test Design
------------------------
+测试设计介绍
+------------
 
-In this subsection we describe a few types of different tests you can do with
-Selenium.  This may not be new to you, but we provide this as a framework for
-relating Selenium test automation to the decisions a quality assurance
-professional will make when deciding what tests to perform, the priority for
-each of those tests, and whether to automate those tests or not.
+在本小结，我们将介绍一些可用Selenium实现的不同类型的测试。
+这些测试对你可能已不再新鲜，但是把我们它作为Selenium自动化测试的框架提供给你。
+借助这个框架，质量保证的专业人员可以决定什么时间执行什么样的测试，每个测试的优先级是什么，以及是否自动化这些测试。
 
 
-What to Test?
+哪些需要测试？
 -------------
 
-What parts of your application should you test?  That depends on aspects of
-your project.:  user expectations, time allowed for the project, priorities
-set by the project manager and so on.  Once the project boundaries are defined
-though, you, the tester, will certainly make many decisions on what to test.
+你的应用程序的哪些部分需要测试？这将取决于项目的不同方面：用户期待、允许时间、
+产品经理设置的优先级等等。一旦项目边界被确定，测试人员一定会决定哪些需要测试。
 
-We will define some terms here to help us categorize the types of testing typical
-for a web-application.  These terms are by no means standard, although the concepts
-we present here are typical for web-application testing.  We've created a few
-terms here of our own for the purposes of categorizing the types of test you may
-perform on your web application.
+为了帮助我们分类网络应用测试类型我们将定义一些术语。
+虽然这些术语并不标准，但是我们表达的概念针对网络应用测试有很强的代表性。
+为了分类可能应用在你的网络应用程序的测试类型，我们在这里已经创建了一些我们自己术语。
 
-   
-
-Testing for Expected Content
+期望内容的测试
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The simplest type of test, a *content test*, is a simple test for the existence
-of a static, non-changing, UI element.  For instance
+最简单的测试类型， *内容测试* ，是对静态的不变化的UI元素的存在行的简单测试。例如
 
-- Does each page have it's expected page title?  This can be used to verify your test found an expected page after following a link.
-- Does the application's home page contain an image expected to be at the top of the page?  
-- Does each page of the website contain a footer area with links to the company contact page privacy policy, and trademarks information?  
-- Does each page begin with heading text using the <h1> tag?  And, does each page have the correct text within that header?
-
+- 每个网页都有期望的网页标题么？这可以用来验证点击一个链接之后你的测试找到了期望的网页。
+- 应用程序的主页是否在页首包含期望的图片？  
+- 网站的每个页面是否包含有页脚区，那里有公司联系方法、隐私政策和商标信息的链接？  
+- 每个有标题的网页都是否使用了<h1>标签？并且每个网页的标题都包含正确的文字？
 
 
-You may or may not need content tests.  If your page content is not likely to be
-affected then it may be more efficient to test page content manually.  If, however,
-your application will be undergoing platform changes, or files will likely be
-moved to different locations, content tests may prove valuable.
 
-Testing Links
+你可能需要内容测试，也可能不需要。如果页面内容不可能受到影响，那么手工测试网页内容可能更有效率。
+然而如果你的应用程序正在改变平台，或者可能移动到不同的地方，内容测试就显得更有价值。
+
+测试链接
 ~~~~~~~~~~~~~
-A frequent source of errors for web-sites is broken links and missing pages
-behind those broken links.  Testing for these involves clicking each link
-and veryfying the expected page behind that link loads correctly.
+网站频繁错误的根源是坏链接和在坏链接导致的缺页。
+对他们的测试包括点击每个链接并验证链接正确加载后的期望页面。
 
 *Need to include a description of how to design this test and a simple example.
 Should that go in this section or in a separate section?*  
 
 
-Function Tests
+功能测试
 ~~~~~~~~~~~~~~
-These would be tests of a specific function within your application, requiring
-some type of user input, and returning some type of results.  Often a function
-test will involve multiple pages with a form-based input page containing a
-collection of input fields, Submit and Cancel operations, and one or more
-response pages.  User input can be via text-input fields, checkboxes, drop-down
-lists, or anyother other browser-supported input.
+这将测试你的应用程序的具体的功能，需要一些用户输入然后返回某种类型的结果。
+通常一个功能测试包括多个页面，其中有一个包含输入域集合以及提交和取消操作的表单输入页，以及一个或多个应答页。
+用户输入包括文字输入域、复选框、下拉列表，以及其他的浏览器支持的输入。
 
 
-Testing Dynamic Elements
+测试动态元素
 ~~~~~~~~~~~~~~~~~~~~~~~~
-Dynamic content is a set of page elements whose identifiers, that is,
-characteristics used to locate the element, vary with each different instance
-of the page that contains them.  This is usually on a result page of some
-given function.  
+动态内容是一组页面元素，它的标示符，即定位元素的特征，
+会随着包含他们的页面实例的不同产生变化。
+这通常是特定函数的结果页。
 
-An example would be a result set of data returned to the user.  Suppose each
-data result, in, say for example a list of documents, had a unique identifier
-for each specific document.  So, for a particular search, the search results
-page returns a data set with one set of documents and their correponding
-identifiers.  Then, in a different search, the search results page returns
-a different data set where each document in the result set uses different
-identifiers.
+一个例子是返回给用户的数据结果集。
+假设每一个数据结果，例如一个文件列表，它的每个特定文件都有唯一的标示符。
+那么对于具体的搜索，搜索结果页将返回包含文档和相应标示符的数据结果集。
+于是，对于不同的搜索，其搜索结果页返回不同的数据集，在这个数据集中，
+每个文件都有不同的标示符。
 
-An example will help.  Dynamic content involves UI elements who identifying
-properties change each time you open the page displaying them.  For example,
+举个例子，动态内容包含这样的UI元素，它的属性会在每次打开页显示时都发生改变。例如，
 
-Dynamic HTML of an object might look as:
+一个动态对象的HTML大概像这样：
            
 .. code-block:: html
 
     <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:
 	checkBox" name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
-This is HTML snippet for a check box. Its id and name 
-(addForm:_id74:_id75:0:_id79:0:checkBox) both are same and both are dynamic 
-(they will change the next time you open the application). In this case
+这是一个复选框HTML代码片段。它的id和名字（addForm:_id74:_id75:0:_id79:0:checkBox）
+都是一样的，也都是动态的（下一次再打开时，他们会改变）。
 
 
-Ajax Tests
+Ajax测试
 ~~~~~~~~~~ 
-
-Ajax is a technology which supports dynamic real-time UI elements such as
-animation and RSS feeds.  In AJAX-driven web applications, data is
-retrieved from the application server with out refreshing the page. 
+Ajax是一种支持动态实时UI元素的技术，例如动画和RSS订阅。
+AJAX驱动的网络应用程序，从应用服务器段提取数据是无需页面刷新的。 
 
 *NOTE - INCLUDE A GOOD DEFINITION OF AJAX OFF THE INTERNET.*
 
-Verifying Results
+验证结果
 -----------------
 
-Assert vs. Verify
+断言 vs. 验证
 ~~~~~~~~~~~~~~~~~
+什么时候该用断言命令，什么时候该用验证命令？这全由你决定。
+他们的区别是当检查失败时你想要什么样的反应。
+你想终止你的测试，或者继续测试并记录下这个错误的检查？
 
-When should you use an assert command and when should you use a verify command?
-This is up to you.  The difference is in what you want to happen when the check
-fails.  Do you want your test to terminate or continue and record that the check
-failed?
+他们的利弊权衡是这样的。如果你用断言，测试将在那一点停止，接下来的检查将不会进行。
+有时，也许是经常，这就是你想要的。如果测试失败，你将立即知道测试没有通过。
+像TestNG和JUnit这样的测试引擎在常用的开发环境（第五章）下都有插件，可以方便的标示错误的测试。
+这样的优点是：你将立即看到（使用断言命令的）检查是否通过。
+它的缺点是：如果检查失败，其他的检查将无法执行，因此你就不能得到他们的状态信息。
 
-Here's the tradeoff. If you use an assert, the test will stop at that point and
-not run any subsequent checks.  Sometimes, perhaps often, that is what you want.
-If the test fails you will immediately know the test did not pass.  Test engines
-such as TestNG and JUnit have plugins for commonly used development environments
-(Chap 5) which conveniently flag these tests as failed tests.  The advantage:
-you have an immediate visual of whether the checks (those using asserts anyway)
-passed.  The disadvantage:  when a check does fail, there are other checks
-which were never performed, so you have no information on their status.
+相反，验证命令不会终止测试。如果你的测试只使用验证命令，（假设没有未知异常）
+你的测试将确保完整的执行，不论检查是否在被测应用程序中发现缺陷。
+缺点：你将不得不做更多的工作以检查测试结果。因为你无法从TestNG或JUnit得到反馈信息。
+所以你必须查看你的测试应用程序的控制台打印输出结果或者日志输出结果。
+而且每次运行你的测试，你都必须花时间检查这些输出。
+对于Java，虽然Logging Selenium（第五章）是一个非常方便的日志工具，
+它可以记录验证命令的结果，但是你仍然需要打开日志检查结果。
+如果你运行成百的测试，每个测试都有各自的日志，这样做是非常耗费时间的。
 
-In contrast, verify commands will not terminate the test.  If your test uses
-only verify commands you are guaranteed (assuming no unexpected exceptions)
-the test will run to completion whether the checks find defects in the AUT
-or not.  The disavantage:  you have to do more work to examine your test
-results.  That is, you won't get feedback from TestNG or JUnit.  Rather,
-you will need to look at the results of a console printout or a log output
-by your test application.  And you will need to take the time to look through
-this output everytime you run your test.  For Java, Logging Selenium (Chap 5)
-is a convenient logging utility for recording the results of verify commands,
-however you still need to open the logs and examine the results.  If you are
-running hundreds of tests, each with it's own log, this will be time-consuming. 
-
-Tradeoofs: *assertTextPresent*, *assertElementPresent*, *assertText* 
+权衡： *assertTextPresent*, *assertElementPresent*, *assertText* 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+现在你应该熟悉这些命令和他们的使用技巧。如果不熟悉，请先参考第四章。
+当构思你的测试时，你需要决定
 
-You should now be familiar with these commands, and the mechanics of using them.
-If not, please refer to Chapter 4 first.  When constructing your tests, you
-will need to decide
+- 我需要检查文本是否在网页上存在？ (*verify/assertTextPresent*)
+- 我只需检查HTML元素是否在网页上存在？也就是说文本、图片或者其他内容不进行检查，只检查相关的HTML标记。(*verify/assertElementPresent*)
+- 我需要测试两者，元素和其文本内容？(*verify/assertText*)
 
-- Do I only check that the text exists on the page?  (*verify/assertTextPresent*)
-- Do I only check that the HTML element exists on the page?  That is, the text, image, or other content is not to be checked, only the HTML tag is what is relevant. (*verify/assertElementPresent*)
-- Must I test both, the element and it's text content?  (*verify/assertText*)
+没有正确的答案。这取决于你的测试要求。当然也取决于你测试的应用程序的要求。
+如果有疑问，并且要求不明确，你可以使用你最佳的猜测并且以后随时可以更改测试。
+这些大多可以非常容易的使用Sel-IDE或者Sel-RC修改。
 
-There is no right answer.  It depends on the requirements for your test.  Which, of course, depend on the requirements for the application you're testing.
-If in doubt, and if the requirements are not clear, you can go with your best guess
-and can always change the test later.  Most of these are easily changed in either Sel-IDE or Sel-RC.
+要知道 *verify/assertText* 是 *最特殊* 的测试。
+如果HTML元素(标记)或者文本不是你期望的，那么测试将失败。
+有时，例如如果HTML频繁的变化，*verifyTextPresent* 会更有意义。
+它只检查内容，当程序员只修改用于呈现文本的HTML时，将通过测试。
+或者，可能你的网页设计师经常修改页面，并且当预期的变化是定期的时候，
+你不希望每次他们修改，你的测试都失败。
+然而假设你依旧需要检查页面上的 *某些东西* ，例如段落、标题或者图片。
+这种情况下，你可以使用 *verify/assertElementPresent* 。
+它将确保特定类型的元素存在（如果使用Xpath，它可以确保元素相对于页面的其他对象存在）。
+你可以不关心内容是什么，即一个具体的图像文件，或者特定的文本。
+你只关心某种图像存在。
 
-Realize that *verify/assertText* is the *most specific test*.  This can fail if either the HTML element (tag) OR the text is not what your test is expecting.
-Sometimes, for instance if HTML changes frequently by your programmers, *verifyTextPresent* makes more sense.  It can check for the content, but will pass
-the test when the programmers change the HTML used to present that text.  Alternatively,  perhaps your web-designers are frequently changing the page and you don't want your test to fail everytime they do this because the changes themeselves are expected periodically.  However, assume you still need to check that
-*something* is on the page, say a paragraph, or heading text, or an image.  In this case you can use *verify/assertElementPresent*.  It will ensure that a particular type of element exists (and if using Xpath can ensure it exists relative to other objects within the page).  But you don't care what the content is, that is, a specific image file, or specific text.  You only care that some type of image exists.
+要得到决定这些类型某种感觉需要时间和一点经验。
+虽然他们是些简单的概念，在你的测试中易于修改，但是他们依赖于你的AUT的需求。
+对于某些项目，需求是明确的，因此你的测试也将是明确的。
+对于其他项目，需求不是那样明确，你将不得不给出你最佳的猜测。
+本节的目的是帮助你预测你所需要的，以便你可以更有效的做出决定。
 
-Getting a feel for these types of decisions will come with time and a little experience.  They are easy concepts, and easy to change in your test, but they depend do depend on the requirements of your AUT.  For some projects the requirements are clear and therefore your tests will be clear.  For others, not so much, and you will have to give it your best guess.  The purpose of this subsection 
-is to help you anticipate your needs so you can make these decisions more efficiently.
-		
-		
-Choosing a Location Strategy
-----------------------------
+选择定位策略
+------------
+从Selenium章节你知道有许多方式可以选择页面上的对象。
+但是每种定位符类型的利弊权衡是什么？
+回忆一下我们定位一个对象可以用
 
-You know from the Selenese section there are multiple ways of selecting an object
-on a page.  But what are the tradeoffs of each of these locator types?  Recall
-we can locate an object using
+- 元素的id
+- 元素的name属性
+- Xpath语句
+- 文档对象模型(DOM)
 
-- the element id
-- the element name attribute
-- an Xpath statement
-- document object model (DOM)
+通常使用Id定位符更有效率。它还可以使你的测试代码更具可读性，假设AUT网页源码使用的Id是有意义的。
+使用name属性也有相似的优点，也最终能给出最佳的性能。总所周知，Xpath语句在Internet Explorer中很慢，
+这是由于IE的Xpath处理器的缺陷造成的。
 
-Generally, using an Id locator is more efficient.  It also makes your test code
-more readable, assuming the Id used by the AUT's page source is a meaningful
-one.  Using the name attribute also has similar advantages.  Finally, these
-also give the best performance.  Xpath statements have been known to be slow
-in Internet Explorer due to limations of IE's Xpath processor.
-  
-Sometimes though, you must use an Xpath locator.  If the page source does not
-have an ID or name attribute you have no choice but to use a Xpath or DOM locator.
-It appears at the time of writing that DOM locators are not commonly used now,
-and Xpath appears to the preferred choice, possibly because Xpath provide a
-rich set of possibilities for identifying an object--it is quite flexible.
+然而有时你必须使用Xpath定位符。
+如果网页源码没有ID或者name属性，你将不得不使用Xpath或者DOM定位符。
+在写作本文之时，DOM看起来不是很常用，Xpath似乎是个更好的选择。
+这可能是因为Xpath为识别对象提供了非常丰富的可能性——它非常灵活。
 
-There is an advantage to using Xpath or DOM that locating via ID or name
-attributes do not have. With Xpath and DOM you can locate an object with
-respect to another object on the page.  For example, if there is a link
-that must occur within the second paragragh within a <div> section,
-you can use Xpath or DOM to specify this.  With ID and name locators,
-you can only specify that they occur on the page--somewhere on the page.
-If you must test that an image displaying the company logo appears at 
-the top of the page within a header section Xpath may be the better locator. 
+在使用Xpath或DOM定位时，有一个优势是IE或name属性所没有的。
+用Xpath或DOM，你可以相对于页面上的其他对象定位某个对象。
+例如，一个链接必须出现在第二段的<div>部分中。
+你可以使用Xpath或DOM指定它。
+用ID或者name属性，你只能指定它出现在页面上——页面中的某处。
+如果你必须测试显示公司商标的图片出现在页面顶端的标题部分中，
+Xpath可能是更理想的定位符。
 
+定位动态对象
+~~~~~~~~~~~~~
+首先，你必须理解什么是动态对象，为了理解它，我们将对比静态对象。
+目前为止，我们提到的所有AUT页面元素都是静态对象。
+每次浏览器加载页面时，对象的html页面源码都是一样的。
 
-Locating Dynamic Objects
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-First, you must understand what a dynamic object is, and to do so, we will
-contrast that with a static object.  Until now, all the AUT page elements
-we have been considering have been static objects.  These are objects who's
-html page source is the same each time the page is loaded in the browser.
-
-For example,
+例如，
            
 .. code-block:: html
 
     <a class="button" id="adminHomeForm" onclick="return oamSubmitForm('adminHomeForm',
 	'adminHomeForm:_id38');" href="#">View Archived Allocation Events</a>
 
-This is HTML anchor tag defining a button with and Id attribute of "adminHomeForm".
-It's a fairly complex anchor tag when compared to most HTML tags, but it is still
-a static tag.  The HTML will be the same each time this page is loaded in the
-browser.  Its Id remains constant within all instances of this page. That is,
-when this page is displayed, this UI element will always have this identifier.
-So, for your test script to click this button you simply need to use the following
-selenium command.
+这是一个HTML锚标记，它定义了一个按钮，它的Id属性是“adminHomeFor“。
+和大多数HTML标记比较，这是一个相当复杂的锚标记，但是它仍然是一个静态标记。
+每次浏览器加载这个页面时，它的HTML都是相同的。
+锚标记在这个页面的所有实例中都保持不变。
+这意味着，每当这个页面显示时，这个UI元素总是有相同的标识符。
+因此，如果你的测试脚本需要点击这个按钮，你只需要使用下面的selenium命令。
 
 .. code-block:: java
 
     click	adminHomeForm
 
-Or, in Selenium-RC 
+或者, 在Selenium-RC中 
 	
 .. code-block:: java
 
     selenium.click("adminHomeForm");
 
-Your application, however, may generate HTML with Ids that are generated
-dynamically and therefore the Id itself varies upon different instances
-of the webpage under test.  For instance, HTML for a dynamic page element
-might look like this.
+然而你的应用程序可能在生成HTML时，它的Id是动态产生的。
+因此在被测网页的不同实例中，Id是变化的。
+例如，一个动态网页元素的HTML可能看起来像这样。
            
 .. code-block:: html
 
     <input type="checkbox" value="true" id="addForm:_id74:_id75:0:_id79:0:checkBox"
 	name="addForm:_id74:_id75:0:_id79:0:checkBox"/>
 
-This defines a checkbox. Its Id and name  attributes 
-(both addForm:_id74:_id75:0:_id79:0:checkBox) are dynamically generated values.
-In this case, using a standard locator would look something like the following.
+这里定义了一个复选框。它的Id和name属性（都是addForm:_id74:_id75:0:_id79:0:checkBox）是动态产生的数值。
+在这个例子中，使用标准的定位符将看起来像下面这样。
 
 .. code-block:: java
 
     click 	addForm:_id74:_id75:0:_id79:0:checkBox
 
-Or, again in Selelenium-RC
+或者，在Selelenium-RC中
 	
 .. code-block:: java
 
     selenium.click("addForm:_id74:_id75:0:_id79:0:checkBox);
 
-Given the dynamically generated identifier, this approach would not work. 
-the next time this page is loaded the identifier will be a different value
-from the one used in the Selenium command and therefore, will not be found.
-The click operation will fail with an "element not found" error.
+考虑到标识符是动态产生的，以上的方法将不能奏效。
+当这个页面再次加载时，标识符将是一个另外的数值，与Selenium命令使用的数值不同。
+因此，这个标示符将无法找到。点击操作也将失败，同时返回一个“元素没有找到”的错误。
 
-To begin, a simple solution would be to just use an XPath locator rather than 
-trying to use an Id locator.  So, for the checkbox you can simply use
+首先，一个简单的解决方法是只用XPath定位符，而不是尝试使用Id定位符。
+因此，对于这个复选框，你可以简单地使用
 
 .. code-block:: java
 
     click 	//input
 
-Or, if it is not the first input element on the page (which it likely is not)
-try a more detailed Xpath statement.
+或者，如果它不是页面上的第一个input元素（很有可能不是），就试试更详细的Xpath语句。
 
 .. code-block:: java
 
     click 	//input[3]
 
-Or
+或者
 
 .. code-block:: java
 
     click 	//div/p[2]/input[3]
 	
-If however, you do need to use the Id to locate the element, a programmed solution
-is required.  Another solution is 
-to capture this Id from the website itself, before you need to use it in a Selenium
-command. It can be done like this.
+可是如果你确实需要使用Id定位元素，编程的解决方法就是必须的。
+另外的解决方法是在你的Selenium命令使用Id之前，先从网站中抓取到它。
 
 .. code-block:: java
 
-   String[] checkboxIds  = selenium.getAllFields(); // Collect all input ids on page.
-   if(!GenericValidator.IsBlankOrNull(checkboxIds[i])) // If collected id is not null.
+   String[] checkboxIds  = selenium.getAllFields(); // 集中页面中的所有input元素的id
+   if(!GenericValidator.IsBlankOrNull(checkboxIds[i])) // 如果id集合不为空
           {
-                   // If the id starts with addForm
+                   // 如果id的开头是addForm
                    if(checkboxIds[i].indexOf("addForm") > -1) {                       
                        selenium.check(checkboxIds[i]);                    
                    }
            }
 
-This approach will work only if there is one field whose id has got the text 
-'addForm' appended to it.
+这个方法只工作在只有一个输入域的id是以'addForm'开头的情况。
 
-Consider one more example of a Dynamic object. A page with two links having the
-same name (one which appears on page) and same html name. Now if href is used 
-to click the link, it would always be clicking on first element. Clicking on
-the second link can be achieved as follows.
+考虑更多的动态对象的例子。一个页面有两个链接（其中的一个显示在页面上），他们有相同的名字和相同的html名字。
+现在如果href用于点击链接，那么总是第一个元素被点中。点击第二个链接可以用以下方法实现。
 
 .. code-block:: java
 
-    // Flag for second appearance of link.
+    // 第二个链接出现的标志.
     boolean isSecondInstanceLink = false;
     
-    // Desired link.
+    // 需要的链接.
     String editInfo = null;
 
-    // Collect all links.
+    // 收集所有链接.
     String[] links = selenium.getAllLinks();
 
-    // Loop through collected links.
+    // 循环所有收集的链接.
     for(String linkID: links) {
 
-        // If retrieved link is not null
+        // 如果获得的链接不为空
         if(!GenericValidator.isBlankOrNull(linkID))  {
 
-            // Find the inner HTML of link.
+            // 找到这个链接的inner HTML.
             String editTermSectionInfo = selenium.getEval
 			("window.document.getElementById('"+linkID+"').innerHTML");
 
-            // If retrieved link is expected link.
+            // 如果获得的链接是所期望的链接.
             if(editTermSectionInfo.equalsIgnoreCase("expectedlink")) {
 
-                // If it is second appearance of link then save the link id
-				and break the loop.
+                // 如果这是链接的第二次出现，就保存链接的id并跳出循环.
                 if(isSecondInstanceLink) {
                     editInfo = linkID;
                     break;
@@ -341,31 +298,28 @@ the second link can be achieved as follows.
         }
     }
     
-    // Click on link.
+    // 点击链接.
     selenium.click(editInfo);
                    
 
-
-How can I avoid using complex xpath expressions to my test?
+如何避免在我的测试中使用复杂的xpath表达式？
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If the elements in HTML (button, table, label, etc) have element IDs, 
-then one can reliably retrieve all elements without ever resorting
-to xpath. These element IDs should be explicitly created by the application.
-But non-descriptive element ID (i.e. id_147) tends to cause two problems: 
-first, each time the application is deployed, different element ids could be
-generated. Second, a non-specific element id makes it hard for automation
-testers to keep track of and determine which element ids are required for testing.
+如果HTML元素（按钮、表格、标签等）有元素ID，那么所有元素可以可靠地获取而不需要凭借xpath。
+这些元素的ID是由应用程序明确创建的。
+但是非描述性元素ID（例如id_147）易于导致两个问题：
+第一，每次部署应用程序都产生不同的元素id。
+第二，自动化测试人员很难跟踪不明确的元素id，也很难确定哪个id是测试需要的。
 
-You might consider trying the `UI-Element`_ extension in this situation.
+在这种情况下，你可以考虑试试 `UI-Element`_ 扩展。
 
 .. _`UI-Element`:
 
 	http://wiki.openqa.org/display/SIDE/Contributed+Extensions+and+Formats#ContributedExtensionsandFormats-UIElementLocator
 
-Performance Considerations for Locators
+定位符的性能注意事项
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Custom Locators
+自定义定位符
 ~~~~~~~~~~~~~~~
   
 *This section is not yet developed.*
@@ -377,65 +331,53 @@ Custom Locators
 
 
 
-Testing Ajax Applications
+测试Ajax应用
 -------------------------
+在本章的开头我们已经介绍了AJAX的特性。
+基本上，实现了Ajax的页面元素可以动态刷新，而无需刷新整个页面。
 
-We introduced the special characteristics of AJAX technology earlier in this
-chapter.  Basically, a page element implemented with Ajax is an element that
-can be dynamically refreshed without having to refresh the entire page.
-
-Waiting for an AJAX Element
+等待AJAX元素
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For an AJAX elementm using Selenium's *waitForPageToLoad* wouldn't
-work since the page is not actually loaded to refresh the AJAX element. Pausing
-the test execution for a specified period of time is also not good
-because the web element might appear later than expected leading to invalid
-test failures (reported failures that aren't actually failures). 
-A better approach is to wait for a predefined period and then continue
-execution as soon as the element is found.
+对AJAX元素使用 *waitForPageToLoad* 是无效的，因为在刷新AJAX元素时页面实际上没有加载。
+测试执行暂停一段特定的时间也是不太好，因为网页元素可能晚于期望的时间出现，这将导致无效的测试失败
+（报告失败但事实上并为失败）。
+较好的方法是等待一段时间预先确定的时间，然后元素一出现就继续执行。
 
-Consider a page which brings a link (link=ajaxLink) on click
-of a button on page (without refreshing the page)  This could be handled
-by Selenium using a *for* loop. 
+考虑点击页面按钮（没有刷新页面），页面出现一个链接(link=ajaxLink)。
+Selenium将使用 *for* 循环处理这种情况。 
 
 .. code-block:: bash
    
-   // Loop initialization.
+   // 循环初始化。
    for (int second = 0;; second++) {
 	
-	// If loop is reached 60 seconds then break the loop.
+	// 如果循环到达60秒就退出循环。
 	if (second >= 60) break;
 	
-	// Search for element "link=ajaxLink" and if available then break loop.
+	// 搜索元素"link=ajaxLink"，如果找到退出循环。
 	try { if (selenium.isElementPresent("link=ajaxLink")) break; } catch (Exception e) {}
 	
-	// Pause for 1 second.
+	// 暂停1秒。
 	Thread.sleep(1000);
 	
    } 
 
-This certainly isn't the only solution.  AJAX is a common topic in the forums and we
-suggest searching the forum posts to see what others have done along with the questions
-they have posted.  
-   
-UI Mapping
-----------
+这当然不是唯一的解决方法。在论坛中，AJAX是一个寻常的话题，
+我们建议搜索论坛中的帖子，看看其他人是如何处理已经贴出的问题的。
 
-A UI map is a centralized location for an application's UI elements and then the 
-test script uses the UI Map for locating elements to be tested.
+UI映射
+----------
+UI映射是集中应用程序的UI元素的定位符，然后测试脚本使用UI映射定位被测元素。
 
 .. Santi: Yeah, there's a pretty used extension for this (UI-element), it's 
    also very well integrated with selenium IDE.   
 
-A UI map is a repository, that is, a storage location, for all test script
-objects.  UI maps have several advantages.
+UI映射是一个仓库，是所有脚本对象的存储地点。UI映射有以下几点优势。
 
-- Having centralized location for UI objects instead of having them scattered 
-  through out the script.  This makes script maintanence easier and more efficient.
-- Cryptic HTML identifiers and names can be given more human-readable increasing the 
-  readability of test scripts.
+- 对UI对象有集中的定位，而不是分散到各个脚本。这使得脚本维护起来更容易且更有效率。
+- 隐藏HTML标识符和名字使它更易于阅读，也增加了测试脚本的可阅读性。
 
-Consider following example (in java) of selenium tests for a website: 
+考虑下面的例子（java语言)，他们是一个网站的selenium测试：
 
 .. code-block:: java
 
@@ -450,10 +392,10 @@ Consider following example (in java) of selenium tests for a website:
    		selenium.click("adminHomeForm:_activityold");
    		selenium.waitForPageToLoad("30000");
    } 
-   
-There is hardly any thing comprehensible from script. 
-Even the regular users of application would not be able to figure out 
-as to what script does. A better script would have been:
+
+脚本中几乎没有东西可以理解。
+即使是应用程序的经常使用者都无法弄清这段脚本是干什么的。
+一个更好的脚本将是这样：
    
 .. code-block:: java
 
@@ -468,45 +410,42 @@ as to what script does. A better script would have been:
    		selenium.click(admin.events.viewoldevents);
    		selenium.waitForPageToLoad("30000");
    }
-   
-Though again there are no comments provided in the script but it is
-more comprehensible because of the keywords used in scripts. (please
-beware that UI Map is not a replacement for comments!) A more comprehensible 
-script could look like this.
+
+虽然脚本没有提供注释，但是它更易理解，因为脚本使用了关键字。
+（请注意UI映射不是注释的替代！）
+一个更易于理解的脚本应该看起来这样。
    
 .. code-block:: java
 
    public void testNew() throws Exception {
 
-		// Open app url.
+		// 打开应用程序地址
    		selenium.open("http://www.test.com");
    		
-   		// Provide admin username.
+   		// 提供管理员用户名
    		selenium.type(admin.username, "xxxxxxxx");
    		
-   		// Click on Login button.
+   		// 点击登录按钮。
    		selenium.click(admin.loginbutton);
    		
-   		// Click on Create New Event button.
+   		// 点击创建新事件按钮。
    		selenium.click(admin.events.createnewevent);
    		selenium.waitForPageToLoad("30000");
    		
-   		// Click on Cancel button.
+   		// 点击取消按钮。
    		selenium.click(admin.events.cancel);
    		selenium.waitForPageToLoad("30000");
    		
-   		// Click on View Old Events button.
+   		// 点击显示旧事件按钮。
    		selenium.click(admin.events.viewoldevents);
    		selenium.waitForPageToLoad("30000");
    }
-   
-The whole idea is to have a centralized location for objects and using 
-comprehensible names for those objects. To achieve this, properties files can 
-be used in java. A properties file contains key/value pairs, where each 
-key and value are strings.
-   
-Consider a property file *prop.properties* which has got definition of 
-HTML object used above 
+
+整个想法是集中对象的定位并给他们使用可理解的名字。
+为了达到这个目的，在Java中可以使用属性文件。
+属性文件包含键/值对，键和值都是字符串。
+
+考虑一个属性文件 *prop.properties* 的例子，它包含上面用到的HTML对象的定义。
    
 .. code-block:: java
    
@@ -515,15 +454,13 @@ HTML object used above
    admin.events.createnewevent = adminHomeForm:_activitynew
    admin.events.cancel = addEditEventForm:_idcancel
    admin.events.viewoldevents = adminHomeForm:_activityold
-   
-Our objects still refer to html objects, but we have introduced a layer 
-of abstraction between the test script and UI elements.
-Values can be read from the properties file and used in Test Class to implement UI 
-Map. For more on Properties files follow this URL_.
+
+虽然我们的对象还是引用了html的对象，但是我们在测试脚本和UI元素之间引入了一个抽象层。
+属性文件中的数值可以用于测试类中实现UI映射。了解更多熟悉文件点击这个 URL_ 。
 
 .. _URL: http://java.sun.com/docs/books/tutorial/essential/environment/properties.html
 
-Bitmap Comparison
+位图比较
 ------------------
 *This section has not been developed yet.*
 
@@ -546,7 +483,7 @@ Bitmap Comparison
    placed on?
 
 
-Data Driven Testing
+数据驱动测试
 ~~~~~~~~~~~~~~~~~~~
 *This section needs an introduction and it has not been completed yet.*
 
@@ -566,23 +503,21 @@ Data Driven Testing
        sel.waitForPageToLoad("30000")
        self.failUnless(sel.is_text_present("Results * for " + search))
 
-Why would we want a separate file with data in it for our tests?  One 
-important method of testing concerns running the same test repetetively with 
-differnt data values.  This is called *Data Driven Testing* and is a very 
-common testing task.  Test automation tools, Selenium included, generally 
-handle this as it's often a common reason for building test automation to 
-support manual testing methods.
+为什么我们想把数据从我们的测试中分离出来？
+测试的重要方法之一就是用不同的数值重复的运行相同的测试。
+这就是 *数据驱动测试* 也是非常常见的测试任务。
+自动化工具，包括Selenium在内，通常处理这个任务，
+因为它常常是构建测试自动化以支持手动测试的普遍原因。
 
-The Python script above opens a text file.  This file contains a different search
-string on each line. The code then saves this in an array of strings, and at last,
-it's iterating over the strings array and doing the search and assert on each.
+上面的Python脚本打开了一个文本文件。
+文件的每一行包含不同的搜索字符串。
+然后代码把所有字符串保存到一个字符串数组中。
+最后，枚举字符串数组并按照每个字符串搜索和断言。
 
-This is a very basic example of what you can do, but the idea is to show you
-things that can easily be done with either a programming or scripting 
-language when they're difficult or even impossible to do using Selenium-IDE.
+这是你可以做的最简单的例子，但是它的目的是告诉你无论用编程还是脚本，
+数据驱动都是很容易实现的，尽管用Selenium-IDE实现起来非常困难甚至是不可能的。
 
-Refer to `Selnium RC wiki`_ for examples on reading data from spread sheet or using
-data provider capabilities of TestNG with java client driver.
+Java客户端驱动从电子表格读取数据或使用TestNG的数据提供者能力，可以参考 `Selnium RC wiki`_ 。
 
 .. _`Selnium RC wiki`: http://wiki.openqa.org/pages/viewpage.action?pageId=21430298
 
@@ -622,49 +557,45 @@ handling support can be used for error handling and recovery.
 
    
    
-Database Validations
+数据库验证
 ~~~~~~~~~~~~~~~~~~~~~
+因为你可以使用你喜欢的语言做数据库查询，假设你有数据库支持函数，
+为什么不使用他们对被测应用程序做数据验证/提取呢？
 
-Since you can also do database queries from your favorite programming 
-language, assuming you have database support functions, why not using them
-for some data validations/retrieval on the Application Under Test?
-
-Consider example of Registration process where in registered email address
-is to be retrieved from database. Specific cases of establishing DB connection 
-and retrieving data from DB would be:
+考虑一个注册过程的例子，被注册的邮件地址来自于数据库。
+下面是建立数据库链接和从DB中提取数据的例子：
 
 **In Java:**
 
 .. code-block:: java
 
-   // Load Microsoft SQL Server JDBC driver.   
+   // 加载Microsoft SQL Server JDBC驱动.   
    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
       
-   // Prepare connection url.
+   // 准备连接url.
    String url = "jdbc:sqlserver://192.168.1.180:1433;DatabaseName=TEST_DB";
    
-   // Get connection to DB.
+   // 获得DB的连接.
    public static Connection con = 
    DriverManager.getConnection(url, "username", "password");
    
-   // Create statement object which would be used in writing DDL and DML 
-   // SQL statement.
+   // 创建语句对象，用于写入DDL和DML 
+   // SQL语句.
    public static Statement stmt = con.createStatement();
    
-   // Send SQL SELECT statements to the database via the Statement.executeQuery
-   // method which returns the requested information as rows of data in a 
-   // ResultSet object.
+   // 通过Statement.executeQuery方法向数据库发送SQL SELECT语句
+   // 该方法返回请求信息，它返回一个行数据的结果集对象 
+   
    
    ResultSet result =  stmt.executeQuery
    ("select top 1 email_address from user_register_table");
    
-   // Fetch value of "email_address" from "result" object.
+   // 从“结果”对象中获取 *email_address* 的数值.
    String emailaddress = result.getString("email_address");
    
-   // Use the fetched value to login to application.
+   // 使用获取的数值登录应用程序.
    selenium.type("userid", emailaddress);
-   
-This is very simple example of data retrieval from DB in Java.
-A more complex test could be to validate that inactive users are not able
-to login to application. This wouldn't take too much work from what you've 
-already seen.
+
+这是一个用Java从DB中获取数据的简单的例子。
+一个更复杂的测试可以是验证无效用户不能登录到应用程序。
+根据你的所见，这将费不了太多功夫。

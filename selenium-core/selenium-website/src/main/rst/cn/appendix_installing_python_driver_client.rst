@@ -1,7 +1,8 @@
-﻿.. _configuring-selenium-RC-python-cn-reference:
-
-客户端驱动在Python中的配置 
+﻿客户端驱动在Python中的配置 
 --------------------------
+
+.. _configuring-selenium-RC-python-cn-reference:
+
 * 从 `下载页面`_ 下载Selenium-RC
 * 从 *selenium-java-client-driver.jar* 提取文件
 * 打开你喜欢的IDE (Eclipse、IntelliJ、Netweaver等)
