@@ -7,11 +7,11 @@ Selenium commands, often called *selenese*, are the set of commands that run
 your tests.  A sequence of these commands is a *test script*.  Here we explain 
 those commands in detail, and we present the many choices you have in testing 
 your web application when using Selenium.
-
+ 
 
 Verifying Page Elements
 ------------------------
-Verifying *UI elements* on a web page is probably the most common feature of 
+Verifying UI elements on a web page is probably the most common feature of 
 your automated tests.  Selenese allows multiple ways of checking for UI 
 elements.  It is important that you understand these different methods because
 these methods define what you are actually testing.
@@ -32,7 +32,7 @@ specific image file) exists *somewhere on the page*.
    
 Assertion or Verification? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Choosing between **assert** and **verify** comes down to convenience and 
+Choosing between "assert" and "verify" comes down to convenience and 
 management of failures. There's very little point checking that the first 
 paragraph on the page is the correct one if your test has already failed when 
 checking that the browser is displaying the expected page. If you're not on 
@@ -40,14 +40,16 @@ the correct page, you'll probably want to abort your test case so that you can
 investigate the cause and fix the issue(s) promptly. On the other hand, you 
 may want to check many attributes of a page without aborting the test case on 
 the first failure as this will allow you to review all failures on the page 
-and take the appropriate action. Effectively an **assert** will fail the test 
-and abort the current test case, whereas a **verify** will fail the test and 
+and take the appropriate action. Effectively an "assert" will fail the test 
+and abort the current test case, whereas a "verify" will fail the test and 
 continue to run the test case. 
 
 The best use of this feature is to logically group your test commands, and 
-start each group with an **assert** followed by one or more **verify** test 
+start each group with an "assert" followed by one or more "verify" test 
 commands. An example follows:
 
+============    ==========  ============
+**Command**     **Target**  **Value**
 ============    ==========  ============
 open            /download/      
 assertTitle     Downloads       
@@ -57,12 +59,12 @@ verifyTable     1.2.2       June 3, 2008
 verifyTable     1.2.3       1.0 beta 2      
 ============    ==========  ============
 
-The above example first opens a page and then **asserts** that the correct page 
+The above example first opens a page and then "asserts" that the correct page 
 is loaded by comparing the title with the expected value. Only if this passes 
-will the following command run and **verify** that the text is present in the 
-expected location. The test case then **asserts** the first column in the second
+will the following command run and "verify" that the text is present in the 
+expected location. The test case then "asserts" the first column in the second
 row of the first table contains the expected value, and only if this passed will 
-the remaining cells in that row be **verified**.
+the remaining cells in that row be "verified".
 
 
 verifyTextPresent
@@ -71,6 +73,8 @@ The command ``verifyTextPresent`` is used to verify *specific text exists
 somewhere on the page*.  It takes a single argument--the text pattern to be 
 verified.  For example:
 
+=================   ==================   ============
+**Command**         **Target**           **Value**
 =================   ==================   ============
 verifyTextPresent   Marketing Analysis 
 =================   ==================   ============
@@ -88,6 +92,8 @@ element, rather then its content.  This verification does not check the text,
 only the HTML tag.  One common use is to check for the presence of an image. 
 
 ====================   ==================   ============
+**Command**            **Target**           **Value**
+====================   ==================   ============
 verifyElementPresent   //div/p/img               
 ====================   ==================   ============
    
@@ -97,9 +103,11 @@ The first (and only) parameter is a *locator* for telling the Selenese command h
 find the element.  Locators are explained in the next section.  
 
 ``verifyElementPresent`` can be used to check the existence of any HTML tag 
-within the page. One can check the existence of links, paragraphs, divisions 
+within the page. You can check the existence of links, paragraphs, divisions 
 <div>, etc.  Here are a few more examples.  
 
+====================   ==============================	============
+**Command**            **Target**           		**Value**
 ====================   ==============================   ============
 verifyElementPresent   //div/p 
 verifyElementPresent   //div/a               
@@ -117,13 +125,15 @@ verifyText
 .. TODO mam-p:  Why the parenthetical limitation on locator type below?  The locator could also be name=, id=, identifier=, etc.
 
 Use ``verifyText`` when both the text and its UI element must be tested.
-``verifyText`` must use a locator.  If one chooses an *XPath* or *DOM*
-locator, one can verify that specific text appears at a specific location on the
+``verifyText`` must use a locator.  If you choose an *XPath* or *DOM*
+locator, you can verify that specific text appears at a specific location on the
 page relative to other UI components on the page.
 
-==========   ===================    ===================================================================
+===========  ===================    ===================================================================
+**Command**  **Target**  	    **Value**
+===========  ===================    ===================================================================
 verifyText   //table/tr/td/div/p    This is my text and it occurs right after the div inside the table.
-==========   ===================    ===================================================================
+===========  ===================    ===================================================================
 
 
 .. _locators-section:
@@ -161,14 +171,14 @@ Locating by Identifier
 This is probably the most common method of locating elements and is the 
 catch-all default when no recognised locator type is used. With this strategy,
 the first element with the id attribute value matching the location will be used. If
-no element has a matching id attribute, then the first element with an name 
+no element has a matching id attribute, then the first element with a name 
 attribute matching the location will be used.
 
 For instance, your page source could have id and name attributes 
 as follows:
            
 .. code-block:: html
-  :linenos:
+  :linenos: 
 
   <html>
    <body>
@@ -242,7 +252,7 @@ filter type is value (matching the value attribute).
    types of locators above allow Selenium to test a UI element independent 
    of its location on 
    the page.  So if the page structure and organization is altered, the test 
-   will still pass.  One may or may not want to also test whether the page 
+   will still pass.  You may or may not want to also test whether the page 
    structure changes.  In the case where web designers frequently alter the 
    page, but its functionality must be regression tested, testing via id and 
    name attributes, or really via any HTML property, becomes very important.
@@ -294,17 +304,17 @@ the ``xpath=`` label when specifying an XPath locator.
 - ``xpath=/html/body/form[1]`` (3) - *Absolute path (would break if the HTML was 
   changed only slightly)*
 - ``//form[1]`` (3) - *First form element in the HTML*
-- ``xpath=//form[@id='loginForm']`` (3) - *The form element with @id of 'loginForm'*
+- ``xpath=//form[@id='loginForm']`` (3) - *The form element with attribute named 'id' and the value 'loginForm'*
 - ``xpath=//form[input/\@name='username']`` (4) - *First form element with an input child
-  element with @name of 'username'*
-- ``//input[@name='username']`` (4) - *First input element with @name of 
+  element with attribute named 'name' and the value 'username'*
+- ``//input[@name='username']`` (4) - *First input element with attribute named 'name' and the value 
   'username'*
 - ``//form[@id='loginForm']/input[1]`` (4) - *First input child element of the 
-  form element with @id of 'loginForm'*
-- ``//input[@name='continue'][@type='button']`` (7) - *Input with @name 'continue'
-  and @type of 'button'*
+  form element with attribute named 'id' and the value 'loginForm'*
+- ``//input[@name='continue'][@type='button']`` (7) - *Input with attribute named 'name' and the value 'continue'
+  and attribute named 'type' and the value 'button'*
 - ``//form[@id='loginForm']/input[4]`` (7) - *Fourth input child element of the 
-  form element with @id of 'loginForm'*
+  form element with attribute named 'id' and value 'loginForm'*
 
 These examples cover some basics, but in order to learn more, the 
 following references are recommended:
@@ -357,7 +367,7 @@ an element on the page, which can be simply the element's location using the
 hierarchical dotted notation.
 
 Since only ``dom`` locators start with "document", it is not necessary to include
-the ``dom=`` label when specifying a dom locator.
+the ``dom=`` label when specifying a DOM locator.
 
 .. code-block:: html
   :linenos:
@@ -429,7 +439,7 @@ Like locators, *patterns* are a type of parameter frequently required by Selenes
 commands.  Examples of commands which require patterns are **verifyTextPresent**,
 **verifyTitle**, **verifyAlert**, **assertConfirmation**, **verifyText**, and 
 **verifyPrompt**.  And as has been mentioned above, link locators can utilize 
-a pattern.  Patterns allow one to *describe*, via the use of special characters,
+a pattern.  Patterns allow you to *describe*, via the use of special characters,
 what text is expected rather than having to specify that text exactly.
 
 There are three types of patterns: *globbing*, *regular expressions*, and *exact*.
@@ -459,9 +469,9 @@ In most other contexts, globbing includes a third special character, the **?**.
 However, Selenium globbing patterns only support the asterisk and character
 class.
 
-To specify a globbing pattern parameter for a Selenese command, one can
+To specify a globbing pattern parameter for a Selenese command, you can
 prefix the pattern with a **glob:** label.  However, because globbing
-patterns are the default, one can also omit the label and specify just the
+patterns are the default, you can also omit the label and specify just the
 pattern itself.
 
 Below is an example of two commands that use globbing patterns.  The
@@ -472,10 +482,12 @@ link text is changed to "Film & Television Department" or "Film and Television
 Department".  The glob pattern's asterisk will match "anything or nothing"
 between the word "Film" and the word "Television".
 
-===========   ====================================    ========
+===========   ====================================    =========
+**Command**   **Target**                              **Value**
+===========   ====================================    =========
 click         link=glob:Film*Television Department
 verifyTitle   glob:\*Film\*Television\*
-===========   ====================================    ========
+===========   ====================================    =========
 
 The actual title of the page reached by clicking on the link was "De Anza Film And
 Television Department - Menu".  By using a pattern rather than the exact
@@ -530,10 +542,12 @@ two-character sequence can be translated as "0 or more occurrences of
 any character" or more simply, "anything or nothing."  It is the
 equivalent of the one-character globbing pattern **\*** (a single asterisk).
 
-===========   =======================================    ========
+===========   =======================================    =========
+**Command**   **Target**                                 **Value**
+===========   =======================================    =========
 click         link=regexp:Film.*Television Department
 verifyTitle   regexp:.\*Film.\*Television.\*
-===========   =======================================    ========
+===========   =======================================    =========
 
 The example above is functionally equivalent to the earlier example
 that used globbing patterns for this same test.  The only differences
@@ -543,10 +557,12 @@ or nothing" pattern (**.\*** instead of just **\***).
 The more complex example below tests that the Yahoo!
 Weather page for Anchorage, Alaska contains info on the sunrise time:
 
-==================  ===============================================    ========
+==================  ===============================================    =========
+**Command**         **Target**                                         **Value**
+==================  ===============================================    =========
 open                http://weather.yahoo.com/forecast/USAK0012.html
 verifyTextPresent   regexp:Sunrise: \*[0-9]{1,2}:[0-9]{2} [ap]m
-==================  ===============================================    ========
+==================  ===============================================    =========
 
 Let's examine the regular expression above one part at a time:
 
@@ -561,10 +577,10 @@ Let's examine the regular expression above one part at a time:
 Exact Patterns
 ~~~~~~~~~~~~~~
 The **exact** type of Selenium pattern is of marginal usefulness.
-It uses no special characters at all.  So, if one needed to look for
+It uses no special characters at all.  So, if you needed to look for
 an actual asterisk character (which is special for both globbing and
 regular expression patterns), the **exact** pattern would be one way
-to do that.  For example, if one wanted to select an item labeled
+to do that.  For example, if you wanted to select an item labeled
 "Real \*" from a dropdown, the following code might work or it might not.
 The asterisk in the ``glob:Real *`` pattern will match anything or nothing.
 So, if there was an earlier select option labeled "Real Numbers," it would
@@ -619,18 +635,19 @@ exception.
 
 The waitFor Commands in AJAX applications
 -----------------------------------------
-In AJAX driven web applications; data is retrieved from server without 
+In AJAX driven web applications, data is retrieved from server without 
 refreshing the page. Using *andWait* commands will not work as the page is not 
-actually refreshed. Pausing the test execution for certain period of time is 
+actually refreshed. Pausing the test execution for a certain period of time is 
 also not a good approach as web element might appear later or earlier than the 
 stipulated period depending on the system's responsiveness, load or other 
-uncontrolled factors of the moment; leading to test failures. The best approach 
+uncontrolled factors of the moment, leading to test failures. The best approach 
 would be to wait for the needed element in a dynamic period and then continue 
-the execution as soon as element is found.
+the execution as soon as the element is found.
 
 This is done using *waitFor* commands, as *waitForElementPresent* or
 *waitForVisible*, which wait dynamically, checking for the desired condition
-every second and stop as soon as the condition is met.
+every second and continuing to the next command in the script as soon as the 
+condition is met.
 
 Sequence of Evaluation and Flow Control
 ---------------------------------------
@@ -657,7 +674,7 @@ lacking). If this is your case, consider a JavaScript snippet or the goto_sel_id
  
 Store Commands and Selenium Variables
 -------------------------------------
-One can use Selenium variables to store constants at the 
+You can use Selenium variables to store constants at the 
 beginning of a script.  Also, when combined with a data-driven test design 
 (discussed in a later section), Selenium variables can be used to store values 
 passed to your test program from the command-line, from another program, or from
@@ -672,23 +689,29 @@ choosing a name for your variable.
 .. TODO: mam-p:  Why are we telling them the last sentence above?  Any 
    JavaScript identifiershould be okay, no?
 
-=====   ===============   ========
-store   paul@mysite.org   userName               
-=====   ===============   ========
+============   ===============	 =========
+**Command**    **Target**        **Value**
+============   ===============   =========
+store          paul@mysite.org   userName               
+============   ===============   =========
 
 Later in your script, you'll want to use the stored value of your 
 variable.  To access the value of a variable, enclose the variable in 
 curly brackets ({}) and precede it with a dollar sign like this.
 
-==========  =======     ===========
-verifyText  //div/p     ${userName}               
-==========  =======     ===========
+============  ==========  ===========
+**Command**   **Target**  **Value**
+============  ==========  ===========
+verifyText    //div/p     ${userName}               
+============  ==========  ===========
 
 A common use of variables is for storing input for an input field.
 
-====    ========     ===========
-type    id=login     ${userName}               
-====    ========     ===========
+============  ==========   ===========
+**Command**   **Target**   **Value**
+============  ==========   ===========
+type	      id=login     ${userName}               
+============  ==========   ===========
 
 Selenium variables can be used in either the first or second parameter and 
 are interpreted by Selenium prior to any other operations performed by the 
@@ -740,6 +763,8 @@ The example below illustrates how a JavaScript snippet
 can be used to perform a simple numerical calculation:
 
 ===============    ============================================   ===========
+**Command**        **Target**                                     **Value**
+===============    ============================================   ===========
 store              10                                             hits
 storeXpathCount    //blockquote                                   blockquotes
 storeEval          storedVars['hits']-storedVars['blockquotes']   paragraphs
@@ -749,6 +774,8 @@ This next example illustrates how a JavaScript snippet can include calls to
 methods, in this case the JavaScript String object's ``toUpperCase`` method 
 and ``toLowerCase`` method.  
 
+===============    ============================================   ===========
+**Command**        **Target**                                     **Value**
 ===============    ============================================   ===========
 store              Edith Wharton                                  name
 storeEval          storedVars['name'].toUpperCase()               uc
@@ -767,6 +794,8 @@ Below is an example in which the ``type`` command's second parameter
 ``value`` is generated via JavaScript code using this special syntax:
 
 ===============    ============================================   ===========
+**Command**        **Target**                                     **Value**
+===============    ============================================   ===========
 store              league of nations                              searchString
 type               q                                              javascript{storedVars['searchString'].toUpperCase()}
 ===============    ============================================   ===========
@@ -781,10 +810,12 @@ for finding where a defect exists on a page in the event your test finds a
 problem.  Finally, echo statements can be used to print the contents of 
 Selenium variables.
 
-=====   ========================   ========
-echo    Testing page footer now.    
-echo    Username is ${userName}                 
-=====   ========================   ========
+============       ========================   =========
+**Command**        **Target**                 **Value**
+============   	   ========================   =========
+echo    	   Testing page footer now.    
+echo    	   Username is ${userName}                 
+============   	   ========================   =========
 
 
 Alerts, Popups, and Multiple Windows
