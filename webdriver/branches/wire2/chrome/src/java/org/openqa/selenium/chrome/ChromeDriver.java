@@ -1,6 +1,7 @@
 package org.openqa.selenium.chrome;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
@@ -388,22 +389,24 @@ public class ChromeDriver implements WebDriver, SearchContext, JavascriptExecuto
     }
 
     public WebDriver defaultContent() {
-      execute(SWITCH_TO_DEFAULT_CONTENT);
+      Map<String, Object> frameId = Maps.newHashMapWithExpectedSize(1);
+      frameId.put("id", null);
+      execute(SWITCH_TO_FRAME, frameId);
       return ChromeDriver.this;
     }
 
     public WebDriver frame(int frameIndex) {
-      execute(SWITCH_TO_FRAME_BY_INDEX, ImmutableMap.of("index", frameIndex));
+      execute(SWITCH_TO_FRAME, ImmutableMap.of("id", frameIndex));
       return ChromeDriver.this;
     }
 
     public WebDriver frame(String frameName) {
-      execute(SWITCH_TO_FRAME_BY_NAME, ImmutableMap.of("name", frameName));
+      execute(SWITCH_TO_FRAME, ImmutableMap.of("id", frameName));
       return ChromeDriver.this;
     }
 
     public WebDriver window(String windowName) {
-      execute(SWITCH_TO_WINDOW, ImmutableMap.of("windowName", windowName));
+      execute(SWITCH_TO_WINDOW, ImmutableMap.of("name", windowName));
       return ChromeDriver.this;
     }
     

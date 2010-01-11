@@ -66,7 +66,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
 
   public String getValueOfCssProperty(String propertyName) {
     return execute(DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-        ImmutableMap.of("css", propertyName)).getValue().toString();
+        ImmutableMap.of("propertyName", propertyName)).getValue().toString();
   }
 
   public boolean isDisplayed() {
@@ -92,7 +92,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
 
   public String getAttribute(String name) {
     Object value = execute(DriverCommand.GET_ELEMENT_ATTRIBUTE,
-        ImmutableMap.of("attribute", name)).getValue();
+        ImmutableMap.of("name", name)).getValue();
     return (value == null) ? null : value.toString();
   }
 
@@ -122,7 +122,7 @@ FindsByXPath, FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByCl
     for (CharSequence seq : keysToSend) {
       builder.append(seq);
     }
-    execute(DriverCommand.SEND_KEYS_TO_ELEMENT, ImmutableMap.of("keys", builder.toString()));
+    execute(DriverCommand.SEND_KEYS_TO_ELEMENT, ImmutableMap.of("value", builder.toString()));
   }
 
   public void setSelected() {

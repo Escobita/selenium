@@ -128,11 +128,11 @@ function parsePortMessage(message) {
       response.wait = false;
       break;
     case "getElementAttribute":
-      response.value = getElementAttribute(element, message.request.attribute);
+      response.value = getElementAttribute(element, message.request.name);
       response.wait = false;
       break;
     case "getElementValueOfCssProperty":
-      response.value = {statusCode: 0, value: getStyle(element, message.request.css)};
+      response.value = {statusCode: 0, value: getStyle(element, message.request.propertyName)};
       response.wait = false;
       break;
     case "getElementLocation":
@@ -208,7 +208,7 @@ function parsePortMessage(message) {
       response.value = {statusCode: 0};
       break;
     case "sendKeysToElement":
-      response.value = sendElementKeys(element, message.request.keys, message.request.id);
+      response.value = sendElementKeys(element, message.request.value, message.request.id);
       response.wait = false;
       break;
     case "sendElementNonNativeKeys":

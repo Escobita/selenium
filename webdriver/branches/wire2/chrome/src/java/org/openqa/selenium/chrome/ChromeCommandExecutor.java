@@ -82,29 +82,26 @@ public class ChromeCommandExecutor {
         .put(CLEAR_ELEMENT, ELEMENT_ID_ARG)
         .put(CLICK_ELEMENT, ELEMENT_ID_ARG)
         .put(HOVER_OVER_ELEMENT, ELEMENT_ID_ARG)
-        .put(SEND_KEYS_TO_ELEMENT, new String[] {"id", "keys"})
+        .put(SEND_KEYS_TO_ELEMENT, new String[] {"id", "value"})
         .put(SUBMIT_ELEMENT, ELEMENT_ID_ARG)
         .put(TOGGLE_ELEMENT, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_ATTRIBUTE, new String[] {"id", "attribute"})
+        .put(GET_ELEMENT_ATTRIBUTE, new String[] {"id", "name"})
         .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_LOCATION, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_SIZE, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_TAG_NAME, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_TEXT, ELEMENT_ID_ARG)
         .put(GET_ELEMENT_VALUE, ELEMENT_ID_ARG)
-        .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-             new String[] {"id", "css"})
+        .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY, new String[] {"id", "propertyName"})
         .put(IS_ELEMENT_DISPLAYED, ELEMENT_ID_ARG)
         .put(IS_ELEMENT_ENABLED, ELEMENT_ID_ARG)
         .put(IS_ELEMENT_SELECTED, ELEMENT_ID_ARG)
         .put(SET_ELEMENT_SELECTED, ELEMENT_ID_ARG)
         .put(GET_ACTIVE_ELEMENT, NO_ARGS)
-        .put(SWITCH_TO_FRAME_BY_INDEX, new String[] {"index"})
-        .put(SWITCH_TO_FRAME_BY_NAME, new String[] {"name"})
-        .put(SWITCH_TO_DEFAULT_CONTENT, NO_ARGS)
+        .put(SWITCH_TO_FRAME, new String[] {"id"})
         .put(GET_CURRENT_WINDOW_HANDLE, NO_ARGS)
         .put(GET_WINDOW_HANDLES, NO_ARGS)
-        .put(SWITCH_TO_WINDOW, new String[] {"windowName"})
+        .put(SWITCH_TO_WINDOW, new String[] {"name"})
         .put(GET_CURRENT_URL, NO_ARGS)
         .put(GET_PAGE_SOURCE, NO_ARGS)
         .put(GET_TITLE, NO_ARGS)
@@ -193,7 +190,9 @@ public class ChromeCommandExecutor {
   }
   
   Object convertToJsonObject(Object object, boolean wrapArgs) throws JSONException {
-    if (object.getClass().isArray()) {
+    if (object == null) {
+      return JSONObject.NULL;
+    } else if (object.getClass().isArray()) {
       JSONArray array = new JSONArray();
       for (Object o : (Object[])object) {
         if (wrapArgs) {
@@ -307,10 +306,10 @@ public class ChromeCommandExecutor {
     try {
       Response response = new Response();
       JSONObject jsonObject = new JSONObject(rawJsonString);
-      if (!jsonObject.has("statusCode")) {
+      if (!jsonObject.has("status")) {
         throw new WebDriverException("Response had no status code.  Response was: " + rawJsonString);
       }
-      response.setStatus(jsonObject.getInt("statusCode"));
+      response.setStatus(jsonObject.getInt("status"));
       if (response.getStatus() == 0) {
         //Success! Parse value
         if (!jsonObject.has("value") || jsonObject.isNull("value")) {
@@ -334,7 +333,7 @@ public class ChromeCommandExecutor {
             jsonObject.getJSONObject("value").get("message") instanceof String) {
           message = jsonObject.getJSONObject("value").getString("message");
         }
-        switch (jsonObject.getInt("statusCode")) {
+        switch (jsonObject.getInt("status")) {
         //Error codes are loosely based on native exception codes,
         //see common/src/cpp/webdriver-interactions/errorcodes.h
         case 2:
