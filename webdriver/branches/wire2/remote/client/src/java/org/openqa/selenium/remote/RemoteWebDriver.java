@@ -140,13 +140,13 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return by.findElement(this);
   }
 
-  private WebElement findElement(String by, String using) {
+  protected WebElement findElement(String by, String using) {
     Response response = execute(DriverCommand.FIND_ELEMENT,
         ImmutableMap.of("using", by, "value", using));
     return getElementFrom(response);
   }
 
-  private List<WebElement> findElements(String by, String using) {
+  protected List<WebElement> findElements(String by, String using) {
     Response response = execute(DriverCommand.FIND_ELEMENTS,
         ImmutableMap.of("using", by, "value", using));
     return getElementsFrom(response);
@@ -236,7 +236,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   public String getWindowHandle() {
-    return (String) execute(DriverCommand.GET_CURRENT_WINDOW_HANDLE).getValue();
+    return String.valueOf(execute(DriverCommand.GET_CURRENT_WINDOW_HANDLE).getValue());
   }
 
   public Object executeScript(String script, Object... args) {
@@ -340,7 +340,14 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return elements.get(0);
   }
 
-  private RemoteWebElement newRemoteWebElement() {
+  /**
+   * Creates a new {@link RemoteWebElement} that is a child of this instance.
+   * Subtypes should override this method to customize the type of
+   * RemoteWebElement returned.
+   *
+   * @return A new RemoteWebElement that is a child of this instance.
+   */
+  protected RemoteWebElement newRemoteWebElement() {
     RemoteWebElement toReturn;
     if (capabilities.isJavascriptEnabled()) {
       toReturn = new RenderedRemoteWebElement();

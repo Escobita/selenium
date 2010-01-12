@@ -111,13 +111,13 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
     return by.findElement(this);
   }
 
-  private WebElement findElement(String using, String value) {
+  protected WebElement findElement(String using, String value) {
     Response response = execute(DriverCommand.FIND_CHILD_ELEMENT,
         ImmutableMap.of("id", id, "using", using, "value", value));
     return getElementFrom(response);
   }
 
-  private List<WebElement> findElements(String using, String value) {
+  protected List<WebElement> findElements(String using, String value) {
     Response response = execute(DriverCommand.FIND_CHILD_ELEMENTS,
         ImmutableMap.of("id", id, "using", using, "value", value));
     return getElementsFrom(response);

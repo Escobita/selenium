@@ -208,6 +208,11 @@ function parsePortMessage(message) {
       response.value = {statusCode: 0};
       break;
     case "sendKeysToElement":
+      if (typeof message.request.value.splice == 'function' &&
+          typeof message.request.value.join == 'function') {
+        // Looks like we were given an array of strings. Join them together.
+        message.request.value = message.request.value.join('');
+      }
       response.value = sendElementKeys(element, message.request.value, message.request.id);
       response.wait = false;
       break;
