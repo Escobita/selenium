@@ -26,10 +26,10 @@ namespace OpenQA.Selenium.Remote
         {
             // Recursively processes a token. This is required for elements that next other elements.
             object processedObject = null;
-            if (reader.TokenType == Newtonsoft.Json.JsonToken.StartObject)
+            if (reader.TokenType == JsonToken.StartObject)
             {
                 Dictionary<string, object> dictionaryValue = new Dictionary<string, object>();
-                while (reader.Read() && reader.TokenType != Newtonsoft.Json.JsonToken.EndObject)
+                while (reader.Read() && reader.TokenType != JsonToken.EndObject)
                 {
                     string elementKey = reader.Value.ToString();
                     reader.Read();
@@ -37,10 +37,10 @@ namespace OpenQA.Selenium.Remote
                 }
                 processedObject = dictionaryValue;
             }
-            else if (reader.TokenType == Newtonsoft.Json.JsonToken.StartArray)
+            else if (reader.TokenType == JsonToken.StartArray)
             {
                 List<object> arrayValue = new List<object>();
-                while (reader.Read() && reader.TokenType != Newtonsoft.Json.JsonToken.EndArray)
+                while (reader.Read() && reader.TokenType != JsonToken.EndArray)
                 {
                     arrayValue.Add(ProcessToken(reader));
                 }

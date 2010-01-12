@@ -180,7 +180,33 @@ dotnet_library(:name => "build/x64/Release/webdriver-ie-test.dll",
                :project => "webdriver-ie-test",
                :arch => "x64",
                :prebuilt => "jobbie/prebuilt")
+dotnet_library(:name => "build/Win32/Release/WebDriver.Firefox.dll",
+               :srcs => [ "firefox/src/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox",
+               :arch => "Win32",
+               :prebuilt => "firefox/prebuilt")
 
+dotnet_library(:name => "build/x64/Release/WebDriver.Firefox.dll",
+               :srcs => [ "firefox/src/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox",
+               :arch => "x64",
+               :prebuilt => "firefox/prebuilt")
+
+dotnet_library(:name => "build/Win32/Release/webdriver-firefox-test.dll",
+               :srcs => [ "firefox/test/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox-test",
+               :arch => "Win32",
+               :prebuilt => "firefox/prebuilt")
+
+dotnet_library(:name => "build/x64/Release/webdriver-firefox-test.dll",
+               :srcs => [ "firefox/test/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox-test",
+               :arch => "x64",
+               :prebuilt => "firefox/prebuilt")
 dotnet_library(:name => "build/Win32/Release/WebDriver.Remote.dll",
                :srcs => [ "remote/client/src/csharp/**/*.cs" ],
                :solution => "WebDriver.sln",
@@ -207,6 +233,8 @@ dotnet_library(:name => "build/x64/Release/webdriver-remote-test.dll",
 
 task :dotnet => [ :'build/x64/Release/webdriver-ie-test.dll', :'build/Win32/Release/webdriver-ie-test.dll',
                   :'build/x64/Release/Webdriver.Ie.dll', :'build/Win32/Release/Webdriver.Ie.dll',
+                  :'build/x64/Release/webdriver-firefox-test.dll', :'build/Win32/Release/webdriver-firefox-test.dll',
+                  :'build/x64/Release/Webdriver.Firefox.dll', :'build/Win32/Release/Webdriver.Firefox.dll',
                   :'build/x64/Release/webdriver-remote-test.dll', :'build/Win32/Release/webdriver-remote-test.dll',
                   :'build/x64/Release/Webdriver.Remote.dll', :'build/Win32/Release/Webdriver.Remote.dll',
                   :'build/x64/Release/webdriver-common-test.dll', :'build/Win32/Release/webdriver-common-test.dll',
@@ -296,7 +324,7 @@ dll(:name => "libwebdriver_firefox_so",
              FileList.new('firefox/src/cpp/webdriver-firefox/*.cpp'),
     :arch => "i386",
     :args => " -DXPCOM_GLUE  -DXPCOM_GLUE_USE_NSPR -I common/src/cpp/webdriver-interactions -I #{gecko_sdk}include -I /usr/include/nspr " + "`pkg-config gtk+-2.0 --cflags`",
-    :link_args => "-fno-rtti -fno-exceptions -shared  -fPIC -L/usr/lib32 -L#{gecko_sdk}lib -L#{gecko_sdk}bin -Wl,-rpath-link,#{gecko_sdk}bin -lxpcomglue_s -lxpcom -lnspr4 -lrt " + "`pkg-config gtk+-2.0 --libs`",
+    :link_args => "-fno-rtti -fno-exceptions -shared  -fPIC -L#{gecko_sdk}lib -L#{gecko_sdk}bin -Wl,-rpath-link,#{gecko_sdk}bin -lxpcomglue_s -lxpcom -lnspr4 -lrt ",
     :prebuilt => "firefox/prebuilt",
     :out  => "linux/Release/libwebdriver-firefox.so")
 
@@ -350,7 +378,7 @@ java_jar(:name => "webdriver-support",
     :deps => [
                :common,
                "support/lib/runtime/*.jar",
-               "third_party/java/google-collect-1.0-rc3.jar",
+               "third_party/java/google-collect-1.0.jar",
              ])
 
 java_test(:name => "webdriver-support-test",
@@ -365,7 +393,7 @@ java_jar(:name => "webdriver-remote-common",
          :deps => [
                :common,
                "remote/common/lib/runtime/*.jar",
-               "third_party/java/google-collect-1.0-rc3.jar",
+               "third_party/java/google-collect-1.0.jar",
              ])
 
 java_jar(:name => "webdriver-remote-client",
@@ -642,7 +670,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_client'
   cp Dir.glob('remote/client/lib/runtime/*.jar'), 'build/dist/remote_client'
-  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_client'
+  cp 'third_party/java/google-collect-1.0.jar', 'build/dist/remote_client'
 
   sh "cd build/dist && zip -r webdriver-remote-client-#{version}.zip remote_client/*"
   rm_rf "build/dist/remote_client", :verbose => false
@@ -655,7 +683,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_server'
   cp Dir.glob('remote/server/lib/runtime/*.jar'), 'build/dist/remote_server'
-  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_server'
+  cp 'third_party/java/google-collect-1.0.jar', 'build/dist/remote_server'
 
   rm Dir.glob('build/dist/remote_server/servlet*.jar')
 
