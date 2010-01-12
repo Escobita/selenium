@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -16,10 +18,34 @@ public class SingleSessionActivity extends Activity {
   
   public static final int SINGLE_SESSION_ID = 1000;  // We have only one session
 
+  public static final int MENU_MULTI_SESSION = Menu.FIRST + 3;
+  
 
   public SingleSessionActivity() {
     mIntentReg = new IntentReceiverRegistrar(this);
   }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+      menu.add(0, MENU_MULTI_SESSION, 0, R.string.menu_multiple_session)
+        .setIcon(R.drawable.ic_menu_share);
+  
+      return super.onCreateOptionsMenu(menu);
+  }
+  
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+      switch (item.getItemId()) {
+          case MENU_MULTI_SESSION:
+            PreferencesRepository.getInstance().setMode(false);
+            this.setResult(WebDriver.RESULT_SWITCH_MODE);
+            this.finish();
+            return true;
+      }
+
+      return super.onOptionsItemSelected(item);
+  }
+  
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {

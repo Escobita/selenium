@@ -19,12 +19,15 @@
     
 
 <string name="main_title">Android WebDriver Client</string>
+
 <string name="menu_add_session">New Session</string>
 <string name="close_all_sessions">Close All</string>
+<string name="menu_single_session">Switch to Simple Mode</string>
+<string name="menu_multiple_session">Switch to Advanced Mode</string>
 
 <string name="ctx_menu_delete">Delete session</string>
-
 <string name="ctx_menu_navigate">Navigate to URL ...</string>
+
 <string name="default_session_id_text">0000/context</string>
 <string name="default_session_status">Ready.</string>
 

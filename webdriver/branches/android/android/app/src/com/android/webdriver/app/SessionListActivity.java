@@ -66,12 +66,13 @@ public class SessionListActivity extends ListActivity
   
   public static final int MENU_ADD = Menu.FIRST + 1;
   public static final int MENU_CLOSE_ALL = Menu.FIRST + 2;
+  public static final int MENU_SINGLE_SESSION = Menu.FIRST + 3;
   
   public static final int CTX_MENU_DELETE = Menu.FIRST + 11;
   public static final int CTX_MENU_NAVIGATE = Menu.FIRST + 12;
   
   final Object syncNavObj = new Object();
-    
+
   public SessionListActivity() {
     sessionRep = SessionRepository.getInstance();
 
@@ -117,13 +118,15 @@ public class SessionListActivity extends ListActivity
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuItem add = menu.add(0, MENU_ADD, 0, R.string.menu_add_session);
-    	add.setIcon(R.drawable.ic_menu_add);
+    	menu.add(0, MENU_ADD, 0, R.string.menu_add_session)
+    	  .setIcon(R.drawable.ic_menu_add);
     	
-        MenuItem close = menu.add(0, MENU_CLOSE_ALL, 0,
-        		R.string.close_all_sessions);
-        close.setIcon(R.drawable.ic_menu_delete);
+        menu.add(0, MENU_CLOSE_ALL, 0, R.string.close_all_sessions)
+          .setIcon(R.drawable.ic_menu_delete);
         
+        menu.add(0, MENU_SINGLE_SESSION, 0, R.string.menu_single_session)
+          .setIcon(R.drawable.ic_menu_share);
+    
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -131,11 +134,17 @@ public class SessionListActivity extends ListActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_ADD:
-            	sessionRep.add("bar");
-                return true;
+              sessionRep.add("bar");
+              return true;
             case MENU_CLOSE_ALL:
-            	sessionRep.removeAll();
-                return true;
+              sessionRep.removeAll();
+              return true;
+            case MENU_SINGLE_SESSION:
+              sessionRep.removeAll();
+              PreferencesRepository.getInstance().setMode(true);
+              this.setResult(WebDriver.RESULT_SWITCH_MODE);
+              this.finish();
+              return true;
         }
 
         return super.onOptionsItemSelected(item);

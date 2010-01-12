@@ -110,4 +110,11 @@ public class Alerts {
         })
         .create().show();
 	}
+	
+	public static void Message(Context context, String message) {
+      new AlertDialog.Builder(context)
+      .setIcon(R.drawable.alert_dialog_icon)
+      .setMessage(message)
+      .create().show();
+	}
 }
