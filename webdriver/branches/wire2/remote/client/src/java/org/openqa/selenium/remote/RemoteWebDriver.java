@@ -376,7 +376,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   @SuppressWarnings({"unchecked"})
   protected Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
-    Command command = new Command(sessionId, new Context("foo"), driverCommand, parameters);
+    Command command = new Command(sessionId, driverCommand, parameters);
 
     Response response = new Response();
 

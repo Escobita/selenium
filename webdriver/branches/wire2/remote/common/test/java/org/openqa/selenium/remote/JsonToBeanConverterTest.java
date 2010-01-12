@@ -184,7 +184,6 @@ public class JsonToBeanConverterTest extends TestCase {
     String[] value = {"Cheese", "Peas"};
 
     Response response = new Response();
-    response.setContext("foo");
     response.setSessionId("bar");
     response.setValue(value);
     response.setStatus(1512);
@@ -192,7 +191,6 @@ public class JsonToBeanConverterTest extends TestCase {
     String json = new BeanToJsonConverter().convert(response);
     Response converted = new JsonToBeanConverter().convert(Response.class, json);
 
-    assertEquals("foo", response.getContext());
     assertEquals("bar", response.getSessionId());
     assertEquals(2, ((List) converted.getValue()).size());
     assertEquals(1512, response.getStatus());
@@ -226,23 +224,14 @@ public class JsonToBeanConverterTest extends TestCase {
     assertEquals("id", sessionId.toString());
   }
 
-  public void testShouldBeAbleToReconsituteAContext() throws Exception {
-    String json = new BeanToJsonConverter().convert(new Context("ctxt"));
-    Context context = new JsonToBeanConverter().convert(Context.class, json);
-
-    assertEquals("ctxt", context.toString());
-  }
-
   public void testShouldBeAbleToConvertACommand() throws Exception {
     SessionId sessionId = new SessionId("session id");
-    Context context = new Context("context");
-    Command original = new Command(sessionId, context, DriverCommand.NEW_SESSION,
+    Command original = new Command(sessionId, DriverCommand.NEW_SESSION,
         new HashMap<String, String>(){{put("food", "cheese");}});
     String raw = new BeanToJsonConverter().convert(original);
     Command converted = new JsonToBeanConverter().convert(Command.class, raw);
 
     assertEquals(sessionId.toString(), converted.getSessionId().toString());
-    assertEquals(context.toString(), converted.getContext().toString());
     assertEquals(original.getName(), converted.getName());
 
     assertEquals(1, converted.getParameters().keySet().size());

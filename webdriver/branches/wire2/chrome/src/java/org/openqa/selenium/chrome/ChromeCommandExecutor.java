@@ -1,17 +1,6 @@
 package org.openqa.selenium.chrome;
 
-import com.google.common.collect.ImmutableMap;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchFrameException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.XPathLookupException;
 import org.openqa.selenium.remote.BeanToJsonConverter;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -20,10 +9,11 @@ import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.Response;
 
+import com.google.common.collect.ImmutableMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 import static org.openqa.selenium.remote.DriverCommand.*;
 
-import java.awt.Dimension;
-import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,10 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -164,7 +150,6 @@ public class ChromeCommandExecutor implements CommandExecutor {
   private Response createCannedNewSessionResponse() {
     Response response = new Response();
     response.setSessionId("[no session]");
-    response.setContext("[no context]");
 
     // This is dumb, but temporary until we add sessions to the ChromeDriver
     DesiredCapabilities capabilities = DesiredCapabilities.chrome();

@@ -81,61 +81,53 @@ public class HttpCommandExecutor implements CommandExecutor {
     nameToUrl = ImmutableMap.<DriverCommand, CommandInfo>builder()
         .put(NEW_SESSION, post("/session"))
         .put(QUIT, delete("/session/:sessionId"))
-        .put(GET_CURRENT_WINDOW_HANDLE,
-             get("/session/:sessionId/:context/window_handle"))
-        .put(GET_WINDOW_HANDLES,
-             get("/session/:sessionId/:context/window_handles"))
-        .put(GET, post("/session/:sessionId/:context/url"))
-        .put(GO_FORWARD, post("/session/:sessionId/:context/forward"))
-        .put(GO_BACK, post("/session/:sessionId/:context/back"))
-        .put(REFRESH, post("/session/:sessionId/:context/refresh"))
-        .put(EXECUTE_SCRIPT, post("/session/:sessionId/:context/execute"))
-        .put(GET_CURRENT_URL, get("/session/:sessionId/:context/url"))
-        .put(GET_TITLE, get("/session/:sessionId/:context/title"))
-        .put(GET_PAGE_SOURCE, get("/session/:sessionId/:context/source"))
-        .put(SCREENSHOT, get("/session/:sessionId/:context/screenshot"))
-        .put(SET_BROWSER_VISIBLE, post("/session/:sessionId/:context/visible"))
-        .put(IS_BROWSER_VISIBLE, get("/session/:sessionId/:context/visible"))
-        .put(FIND_ELEMENT, post("/session/:sessionId/:context/element"))
-        .put(FIND_ELEMENTS, post("/session/:sessionId/:context/elements"))
-        .put(GET_ACTIVE_ELEMENT,
-             post("/session/:sessionId/:context/element/active"))
-        .put(FIND_CHILD_ELEMENT,
-             post("/session/:sessionId/:context/element/:id/element/:using"))
-        .put(FIND_CHILD_ELEMENTS,
-             post("/session/:sessionId/:context/element/:id/elements/:using"))
-        .put(CLICK_ELEMENT, post("/session/:sessionId/:context/element/:id/click"))
-        .put(CLEAR_ELEMENT, post("/session/:sessionId/:context/element/:id/clear"))
-        .put(SUBMIT_ELEMENT, post("/session/:sessionId/:context/element/:id/submit"))
-        .put(GET_ELEMENT_TEXT, get("/session/:sessionId/:context/element/:id/text"))
-        .put(SEND_KEYS_TO_ELEMENT, post("/session/:sessionId/:context/element/:id/value"))
-        .put(GET_ELEMENT_VALUE, get("/session/:sessionId/:context/element/:id/value"))
-        .put(GET_ELEMENT_TAG_NAME, get("/session/:sessionId/:context/element/:id/name"))
-        .put(IS_ELEMENT_SELECTED, get("/session/:sessionId/:context/element/:id/selected"))
-        .put(SET_ELEMENT_SELECTED, post("/session/:sessionId/:context/element/:id/selected"))
-        .put(TOGGLE_ELEMENT, post("/session/:sessionId/:context/element/:id/toggle"))
-        .put(IS_ELEMENT_ENABLED, get("/session/:sessionId/:context/element/:id/enabled"))
-        .put(IS_ELEMENT_DISPLAYED, get("/session/:sessionId/:context/element/:id/displayed"))
-        .put(HOVER_OVER_ELEMENT, post("/session/:sessionId/:context/element/:id/hover"))
-        .put(GET_ELEMENT_LOCATION, get("/session/:sessionId/:context/element/:id/location"))
-        .put(GET_ELEMENT_SIZE, get("/session/:sessionId/:context/element/:id/size"))
-        .put(GET_ELEMENT_ATTRIBUTE,
-             get("/session/:sessionId/:context/element/:id/attribute/:name"))
-        .put(ELEMENT_EQUALS, get("/session/:sessionId/:context/element/:id/equals/:other"))
-        .put(GET_ALL_COOKIES, get("/session/:sessionId/:context/cookie"))
-        .put(ADD_COOKIE, post("/session/:sessionId/:context/cookie"))
-        .put(DELETE_ALL_COOKIES, delete("/session/:sessionId/:context/cookie"))
-        .put(DELETE_COOKIE, delete("/session/:sessionId/:context/cookie/:name"))
-        .put(SWITCH_TO_FRAME, post("/session/:sessionId/:context/frame/:id"))
-        .put(SWITCH_TO_WINDOW,
-             post("/session/:sessionId/:context/window/:name"))
-        .put(CLOSE, delete("/session/:sessionId/:context/window"))
-        .put(DRAG_ELEMENT,
-             post("/session/:sessionId/:context/element/:id/drag"))
-        .put(GET_SPEED, get("/session/:sessionId/:context/speed"))
-        .put(SET_SPEED, post("/session/:sessionId/:context/speed"))
+        .put(GET_CURRENT_WINDOW_HANDLE, get("/session/:sessionId/window_handle"))
+        .put(GET_WINDOW_HANDLES, get("/session/:sessionId/window_handles"))
+        .put(GET, post("/session/:sessionId/url"))
+        .put(GO_FORWARD, post("/session/:sessionId/forward"))
+        .put(GO_BACK, post("/session/:sessionId/back"))
+        .put(REFRESH, post("/session/:sessionId/refresh"))
+        .put(EXECUTE_SCRIPT, post("/session/:sessionId/execute"))
+        .put(GET_CURRENT_URL, get("/session/:sessionId/url"))
+        .put(GET_TITLE, get("/session/:sessionId/title"))
+        .put(GET_PAGE_SOURCE, get("/session/:sessionId/source"))
+        .put(SCREENSHOT, get("/session/:sessionId/screenshot"))
+        .put(SET_BROWSER_VISIBLE, post("/session/:sessionId/visible"))
+        .put(IS_BROWSER_VISIBLE, get("/session/:sessionId/visible"))
+        .put(FIND_ELEMENT, post("/session/:sessionId/element"))
+        .put(FIND_ELEMENTS, post("/session/:sessionId/elements"))
+        .put(GET_ACTIVE_ELEMENT, post("/session/:sessionId/element/active"))
+        .put(FIND_CHILD_ELEMENT, post("/session/:sessionId/element/:id/element/:using"))
+        .put(FIND_CHILD_ELEMENTS, post("/session/:sessionId/element/:id/elements/:using"))
+        .put(CLICK_ELEMENT, post("/session/:sessionId/element/:id/click"))
+        .put(CLEAR_ELEMENT, post("/session/:sessionId/element/:id/clear"))
+        .put(SUBMIT_ELEMENT, post("/session/:sessionId/element/:id/submit"))
+        .put(GET_ELEMENT_TEXT, get("/session/:sessionId/element/:id/text"))
+        .put(SEND_KEYS_TO_ELEMENT, post("/session/:sessionId/element/:id/value"))
+        .put(GET_ELEMENT_VALUE, get("/session/:sessionId/element/:id/value"))
+        .put(GET_ELEMENT_TAG_NAME, get("/session/:sessionId/element/:id/name"))
+        .put(IS_ELEMENT_SELECTED, get("/session/:sessionId/element/:id/selected"))
+        .put(SET_ELEMENT_SELECTED, post("/session/:sessionId/element/:id/selected"))
+        .put(TOGGLE_ELEMENT, post("/session/:sessionId/element/:id/toggle"))
+        .put(IS_ELEMENT_ENABLED, get("/session/:sessionId/element/:id/enabled"))
+        .put(IS_ELEMENT_DISPLAYED, get("/session/:sessionId/element/:id/displayed"))
+        .put(HOVER_OVER_ELEMENT, post("/session/:sessionId/element/:id/hover"))
+        .put(GET_ELEMENT_LOCATION, get("/session/:sessionId/element/:id/location"))
+        .put(GET_ELEMENT_SIZE, get("/session/:sessionId/element/:id/size"))
+        .put(GET_ELEMENT_ATTRIBUTE, get("/session/:sessionId/element/:id/attribute/:name"))
+        .put(ELEMENT_EQUALS, get("/session/:sessionId/element/:id/equals/:other"))
+        .put(GET_ALL_COOKIES, get("/session/:sessionId/cookie"))
+        .put(ADD_COOKIE, post("/session/:sessionId/cookie"))
+        .put(DELETE_ALL_COOKIES, delete("/session/:sessionId/cookie"))
+        .put(DELETE_COOKIE, delete("/session/:sessionId/cookie/:name"))
+        .put(SWITCH_TO_FRAME, post("/session/:sessionId/frame/:id"))
+        .put(SWITCH_TO_WINDOW, post("/session/:sessionId/window/:name"))
+        .put(CLOSE, delete("/session/:sessionId/window"))
+        .put(DRAG_ELEMENT, post("/session/:sessionId/element/:id/drag"))
+        .put(GET_SPEED, get("/session/:sessionId/speed"))
+        .put(SET_SPEED, post("/session/:sessionId/speed"))
         .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
-             get("/session/:sessionId/:context/element/:id/css/:propertyName"))
+             get("/session/:sessionId/element/:id/css/:propertyName"))
         .build();
   }
 
@@ -189,7 +181,6 @@ public class HttpCommandExecutor implements CommandExecutor {
         int nextSlash = uri.indexOf("/", sessionIndex);
         if (nextSlash != -1) {
           response.setSessionId(uri.substring(sessionIndex, nextSlash));
-          response.setContext("foo");
         }
       }
     }
@@ -272,9 +263,6 @@ public class HttpCommandExecutor implements CommandExecutor {
     private String get(String propertyName, Command command) {
       if ("sessionId".equals(propertyName)) {
         return command.getSessionId().toString();
-      }
-      if ("context".equals(propertyName)) {
-        return command.getContext().toString();
       }
 
       // Attempt to extract the property name from the parameters

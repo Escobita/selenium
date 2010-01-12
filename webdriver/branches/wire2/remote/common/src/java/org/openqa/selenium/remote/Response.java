@@ -21,15 +21,13 @@ public class Response {
 
   private Object value;
   private String sessionId;
-  private String context;
   private int status;
 
   public Response() {
   }
 
-  public Response(SessionId sessionId, Context context) {
+  public Response(SessionId sessionId) {
     this.sessionId = String.valueOf(sessionId);
-    this.context = String.valueOf(context);
   }
 
   public int getStatus() {
@@ -56,15 +54,7 @@ public class Response {
     return sessionId;
   }
 
-  public void setContext(String context) {
-    this.context = context;
-  }
-
-  public String getContext() {
-    return context;
-  }
-
   public String toString() {
-    return String.format("(%s %s %s: %s)", getSessionId(), getContext(), getStatus(), getValue());
+    return String.format("(%s %s %s: %s)", getSessionId(), getStatus(), getValue());
   }
 }
