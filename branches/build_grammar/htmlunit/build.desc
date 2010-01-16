@@ -1,12 +1,12 @@
-java_library(:name => 'htmlunit',
-  :srcs => [ 'src/java/**/*.java' ],
+java_jar(:name => "htmlunit",
+  :srcs => [ "src/java/**/*.java" ],
   :deps => [
-    '//common',
-    '//third_party/java:htmlunit'
+    "//common:common",
+    "//third_party/java:htmlunit"
   ])
   
-java_library(:name => 'tests',
-  :srcs => [ 'test/java/**/*.java' ],
+java_test(:name => "tests",
+  :srcs => [ "test/java/**/*.java" ],
   :deps => [
     :htmlunit,
     "//common:tests"
