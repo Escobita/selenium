@@ -47,6 +47,7 @@ end
 task :common => "//common"
 
 task :firefox => "//firefox"
+task :test_firefox => "//firefox:tests:run"
 
 task :htmlunit => "//htmlunit"
 task :test_htmlunit => "//htmlunit:tests:run"

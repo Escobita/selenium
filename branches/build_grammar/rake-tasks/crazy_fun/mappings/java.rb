@@ -110,30 +110,6 @@ class AddDepedencies < BaseJava
     add_dependencies(target, dir, args[:srcs])
     add_dependencies(target, dir, args[:resources])    
   end
-  
-  def add_dependencies(target, dir, all_deps)
-    return if all_deps.nil?
-    
-    all_deps.each do |dep|
-      target.enhance dep_type(dir, dep)
-    end
-  end
-  
-  def dep_type(dir, dep)
-    if dep.is_a? String
-      if (dep.start_with? "//")
-        return [ dep ]
-      else
-        return FileList["#{dir}/#{dep}"]
-      end
-    end
-  
-    if dep.is_a? Symbol
-      return [ task_name(dir, dep) ]
-    end
-    
-    throw "Unmatched dependency type"
-  end
 end
 
 class TidyTempDir < BaseJava
@@ -205,15 +181,11 @@ end
 class Jar < BaseJava
   def handle(fun, dir, args)
     return if args[:srcs].nil?
-    
+
     jar = jar_name(dir, args[:name])
-    out_dir = temp_dir(dir, args[:name])    
-    
+
     file jar do
-      dir_name = File.expand_path(".")
-      
-      cmd = "cd \"#{out_dir}\" && jar cMf \"#{dir_name}#{Platform.dir_separator}#{jar}\" *"
-      sh cmd
+      zip(temp_dir(dir, args[:name]), jar)
     end
   end
 end
