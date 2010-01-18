@@ -156,7 +156,6 @@ class Build < BaseXpi
 
       copy_all(dir, { args[:chrome] => "chrome.manifest" }, temp) unless args[:chrome].nil?
       copy_all(dir, { args[:install] => "install.rdf"}, temp) unless args[:install].nil?
-      puts "Content: #{args[:content]}"
       copy_all(dir, args[:content], temp + Platform.dir_separator + "content") unless args[:content].nil?
       copy_all(dir, args[:components], temp + Platform.dir_separator + "components") unless args[:components].nil?
 

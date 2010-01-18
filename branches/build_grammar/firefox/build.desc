@@ -8,9 +8,38 @@ mozilla_xpt(:name => "command_processor_xpt",
 mozilla_xpt(:name => "response_handler_xpt",
   :srcs => [ "src/extension/idl/nsIResponseHandler.idl" ])
 
+js_library(:name => "utils",
+  :srcs => [
+    "src/extension/components/context.js",
+    "src/extension/components/utils.js"
+  ])
+
 js_library(:name => "firefox_driver",
-  :srcs => [ "src/extension/components/*.js" ],
-  :deps => [ "//common/src/js:extension_library" ])
+  :srcs => [
+    "src/extension/components/driver-component.js",
+    "src/extension/components/firefoxDriver.js",
+    "src/extension/components/json2.js",
+    "src/extension/components/screenshooter.js",
+    "src/extension/components/socketListener.js",
+    "src/extension/components/webdriverserver.js",
+    "src/extension/components/webLoadingListener.js",
+    "src/extension/components/wrappedElement.js"
+  ],
+  :deps => [
+    :utils,
+    "//common/src/js:extension_library"
+  ])
+
+js_library(:name => "bad_cert_listener",
+  :srcs => [ "src/extension/components/badCertListener.js" ])
+
+js_library(:name => "command_processor",
+  :srcs => [ "src/extension/components/nsCommandProcessor.js" ],
+  :deps => [ :utils ])
+
+js_library(:name => "prompt_service",
+  :srcs => [ "src/extension/components/promptService.js" ],
+  :deps => [ :utils ])
 
 mozilla_xpi(:name => "webdriver",
   :content => [ "src/extension/content/**" ],
@@ -18,7 +47,10 @@ mozilla_xpi(:name => "webdriver",
     :native_events_xpt,
 	  :command_processor_xpt,
 	  :response_handler_xpt,
-	  :firefox_driver
+	  :bad_cert_listener,
+	  :command_processor,
+	  :firefox_driver,
+	  :prompt_service
   ],
   :chrome => "src/extension/chrome.manifest",
   :install => "src/extension/install.rdf"
