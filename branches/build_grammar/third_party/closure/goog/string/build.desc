@@ -1,0 +1,14 @@
+
+js_library(:name => "base_string",
+  :srcs => [ "string.js" ],
+  :deps => [ "//third_party/closure:base" ])
+
+js_library(:name => "string",
+  :srcs => [
+    "stringbuffer.js",
+    "stringformat.js"
+  ],
+  :deps => [
+    :base_string,
+    "//third_party/closure/goog/useragent:jscript"
+  ])

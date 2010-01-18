@@ -23,10 +23,13 @@
  * of them.
  */
 
-const CC = Components.classes;
-const CI = Components.interfaces;
+/** @const */
+var CC = Components.classes;
+/** @const */
+var CI = Components.interfaces;
 
-const CONSOLE = CC["@mozilla.org/consoleservice;1"].
+/** @const */
+var CONSOLE = CC["@mozilla.org/consoleservice;1"].
                   getService(CI["nsIConsoleService"]);
 
 function localdump(message) {
@@ -120,9 +123,11 @@ WdCertOverrideService.prototype.rememberValidityOverride = function(
 };
 
 // Service contract ID which we override
-const CERTOVERRIDE_CONTRACT_ID = "@mozilla.org/security/certoverride;1";
+/** @const */
+var CERTOVERRIDE_CONTRACT_ID = "@mozilla.org/security/certoverride;1";
 // UUID for this instance specifically.
-const DUMMY_BADCERT_SERVICE_CLASS_ID =
+/** @const */
+var DUMMY_BADCERT_SERVICE_CLASS_ID =
   Components.ID('{c8fffaba-9b7a-41aa-872d-7e7366c16715}');
 
 var service = undefined;

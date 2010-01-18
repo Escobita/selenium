@@ -1,5 +1,52 @@
 
+# Modify String to add start_with and end_with methods
+if (!"".methods.include? :start_with)
+  class String
+    def start_with? (start)
+      str = start.to_s
+      self[0, str.length] == str
+    end
+
+    def end_with? (end_str)
+      str = end_str.to_s
+      self[-str.length, str.length] == str
+    end
+  end
+end
+
+module Platform
+  def Platform.windows?
+    RUBY_PLATFORM.downcase.include?("win32")
+  end
+
+  def windows?
+   Platform.windows?
+  end
+
+  def mac?
+    RUBY_PLATFORM.downcase.include?("darwin")
+  end
+
+  def linux?
+    RUBY_PLATFORM.downcase.include?("linux")
+  end
+
+  def cygwin?
+    RUBY_PLATFORM.downcase.include?("cygwin")
+  end
+
+  def Platform.dir_separator
+    windows? ? "\\" : "/"
+  end
+
+  def Platform.env_separator
+    windows? ? ";" : ":"
+  end
+end
+
 class Tasks
+  include Platform
+
   def task_name(dir, name)
     # Strip any leading ".", "./" or ".\\"
     # I am ashamed
@@ -43,13 +90,20 @@ class Tasks
     
     sh "cd #{src} && jar cMf #{out} *"
   end
-  
+
+  def to_filelist(dir, src)
+    str = dir + "/" + src
+    FileList[str].collect do |file|
+      file.gsub("/", Platform.dir_separator)
+    end
+  end
+
   private
   def copy_string(dir, src, dest)
     if Rake::Task.task_defined? src
       from = Rake::Task[src].out
     else
-      from = FileList[dir + Platform.dir_separator + src]
+      from = to_filelist(dir, src)
     end
     
     cp_r from, to_dir(dest)
@@ -96,7 +150,7 @@ class Tasks
       if (dep.start_with? "//")
         return [ dep ]
       else
-        return FileList["#{dir}/#{dep}"]
+        return to_filelist(dir, dep)
       end
     end
   
@@ -105,31 +159,5 @@ class Tasks
     end
     
     throw "Unmatched dependency type"
-  end
-end
-
-module Platform
-  def windows?
-    RUBY_PLATFORM.downcase.include?("win32")
-  end
-
-  def mac?
-    RUBY_PLATFORM.downcase.include?("darwin")
-  end
-
-  def linux?
-    RUBY_PLATFORM.downcase.include?("linux")
-  end
-
-  def cygwin?
-    RUBY_PLATFORM.downcase.include?("cygwin")
-  end
-  
-  def Platform.dir_separator
-    Rake::Win32.windows? ? "\\" : "/"
-  end
-  
-  def Platform.env_separator
-    Rake::Win32.windows? ? ";" : ":"
   end
 end

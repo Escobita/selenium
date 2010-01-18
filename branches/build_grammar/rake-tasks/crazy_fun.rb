@@ -1,4 +1,5 @@
 require 'rake-tasks/crazy_fun/main.rb'
+require 'rake-tasks/crazy_fun/main.rb'
 
 module Rake
   class Task

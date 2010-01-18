@@ -1,0 +1,21 @@
+
+js_library(:name => "closure",
+  :deps => [
+    :array,
+    :string
+  ])
+
+js_library(:name => "base", 
+  :srcs => [
+    "goog/base.js",
+    "goog/deps.js"
+  ]
+)
+
+js_library(:name => "array",
+  :srcs => [ "goog/array/**/*.js"],
+  :deps => [ :base ])
+
+js_library(:name => "string",
+  :deps => [ "//third_party/closure/goog/string" ]
+)

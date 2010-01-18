@@ -386,7 +386,7 @@ Utils.shiftCount = 0;
 
 Utils.getNativeEvents = function() {
   try {
-    const cid = "@openqa.org/nativeevents;1";
+    /**@const */ var cid = "@openqa.org/nativeevents;1";
     var obj = Components.classes[cid].createInstance();
     return obj.QueryInterface(Components.interfaces.nsINativeEvents);
   } catch(e) {
@@ -433,7 +433,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
   var obj = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
-  const thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
+  /**@const */ var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
 
   if (opt_useNativeEvents && obj && node && thmgr_cls) {
 
@@ -1200,13 +1200,12 @@ Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
 Utils.isArray_ = function(obj) {
   return (obj !== undefined &&
     obj.constructor.toString().indexOf("Array") != -1);
-}
-
+};
 
 Utils.isHtmlCollection_ = function(obj) {
   return (obj !== undefined && obj['length'] &&
     obj['item'] && obj['namedItem']); 
-}
+};
 
 
 Utils.wrapResult = function(result, context) {

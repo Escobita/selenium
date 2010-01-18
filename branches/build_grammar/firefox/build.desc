@@ -8,13 +8,17 @@ mozilla_xpt(:name => "command_processor_xpt",
 mozilla_xpt(:name => "response_handler_xpt",
   :srcs => [ "src/extension/idl/nsIResponseHandler.idl" ])
 
+js_library(:name => "firefox_driver",
+  :srcs => [ "src/extension/components/*.js" ],
+  :deps => [ "//common/src/js:extension_library" ])
+
 mozilla_xpi(:name => "webdriver",
-  :content => ["src/extension/content/*"],
+  :content => [ "src/extension/content/**" ],
   :components => [
     :native_events_xpt,
-	:command_processor_xpt,
-	:response_handler_xpt,
-	"src/extension/components/*"
+	  :command_processor_xpt,
+	  :response_handler_xpt,
+	  :firefox_driver
   ],
   :chrome => "src/extension/chrome.manifest",
   :install => "src/extension/install.rdf"

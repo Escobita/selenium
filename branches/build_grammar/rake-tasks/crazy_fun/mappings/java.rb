@@ -89,7 +89,7 @@ class CreateShortNameTask < BaseJava
   def handle(fun, dir, args)
     name = task_name(dir, args[:name])
     
-    if (name.end_with? "#{Platform.dir_separator}#{args[:name]}:#{args[:name]}")
+    if (name.end_with? "#{args[:name]}:#{args[:name]}")
       name = name.sub(/:.*$/, "")
       task name => task_name(dir, args[:name])
       
@@ -139,11 +139,12 @@ class Javac < BaseJava
       cmd = "javac -target 5 -source 5 "
       cmd << "-d #{out_dir} "
       cmd << "-cp " + cp.to_s + " " unless cp.empty?
+
       args[:srcs].each do |src|
-        cmd << FileList[dir + Platform.dir_separator + src].join(" ")
+        cmd << to_filelist(dir, src).join(" ")
         cmd << " "
       end
-      
+
       sh cmd
     end
     
@@ -201,7 +202,7 @@ class RunTests < BaseJava
       # Find the list of tests
       tests = [] 
       args[:srcs].each do |src|
-        srcs = FileList[dir + Platform.dir_separator + src].each do |f|
+        srcs = to_filelist(dir, src).each do |f|
           tests.push f if f.to_s =~ /TestSuite\.java$/
         end
       end

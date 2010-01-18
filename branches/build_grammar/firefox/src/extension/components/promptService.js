@@ -1,10 +1,10 @@
 // Spoof the prompt service. Interesting thread on mozillazine:
 // http://www.mail-archive.com/dev-tech-xpcom@lists.mozilla.org/msg00193.html
 
-const CC = Components.classes;
-const CI = Components.interfaces;
+/**@const */ var CC = Components.classes;
+/**@const */ var CI = Components.interfaces;
 
-const CONSOLE = CC["@mozilla.org/consoleservice;1"].getService(CI["nsIConsoleService"]);
+/**@const */ var CONSOLE = CC["@mozilla.org/consoleservice;1"].getService(CI["nsIConsoleService"]);
 
 function dumpn(message) {
   try {
@@ -152,8 +152,8 @@ function(aParent, aDialogTitle, aText, aCount, aSelectList, aOutSelection) {
   return this.originalPromptService_.select(aParent, aDialogTitle, aText, aCount, aSelectList, aOutSelection);
 };
 
-const PROMPT_CONTRACT_ID = "@mozilla.org/embedcomp/prompt-service;1";
-const DRIVEN_PROMPT_SERVICE_CLASS_ID = Components.ID('{e26dbdcd-d3ba-4ded-88c3-6cb07ee3e9e0}');
+/**@const */ var PROMPT_CONTRACT_ID = "@mozilla.org/embedcomp/prompt-service;1";
+/**@const */ var DRIVEN_PROMPT_SERVICE_CLASS_ID = Components.ID('{e26dbdcd-d3ba-4ded-88c3-6cb07ee3e9e0}');
 
 var service = undefined;
 

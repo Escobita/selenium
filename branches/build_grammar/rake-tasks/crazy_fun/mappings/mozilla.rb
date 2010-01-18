@@ -45,13 +45,10 @@ end
   
 class CreateTask < BaseXpt
   def handle(fun, dir, args) 
-    dep = dir + "/" + args[:srcs][0]
-    dep = dep.gsub "/", Platform.dir_separator
-    
     xpt = xpt_name(dir, args)
     task_name = task_name(dir, args[:name])
     
-    file xpt => FileList[dep]
+    file xpt => to_filelist(dir, args[:srcs][0])
     
     desc "Build an xpt from #{args[:srcs][0]}"
     task task_name => xpt
@@ -63,7 +60,7 @@ end
 class Compile < BaseXpt
   def handle(fun, dir, args)
     xpt = xpt_name(dir, args)
-    src = args[:srcs][0]
+
     
     file xpt do
       puts "Building: #{task_name(dir, args[:name])} as #{xpt}"
@@ -83,7 +80,12 @@ class Compile < BaseXpt
       end
       base_cmd += " -w -m typelib -I#{gecko}#{Platform.dir_separator}idl"
 
-      dir_name = File.dirname(args[:srcs][0])
+      src = dir + "/" + args[:srcs][0].gsub("/", Platform.dir_separator)
+
+      out_dir = File.dirname(xpt)
+      mkdir_p out_dir unless File.exists? out_dir
+
+      dir_name = File.dirname(src)
       cmd = "#{base_cmd} -I#{dir_name} -e #{xpt} #{src}"
       sh cmd do |ok, res|
         if !ok
@@ -154,6 +156,7 @@ class Build < BaseXpi
 
       copy_all(dir, { args[:chrome] => "chrome.manifest" }, temp) unless args[:chrome].nil?
       copy_all(dir, { args[:install] => "install.rdf"}, temp) unless args[:install].nil?
+      puts "Content: #{args[:content]}"
       copy_all(dir, args[:content], temp + Platform.dir_separator + "content") unless args[:content].nil?
       copy_all(dir, args[:components], temp + Platform.dir_separator + "components") unless args[:components].nil?
 
