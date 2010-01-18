@@ -92,8 +92,7 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
     case webdriver.CommandName.SLEEP:
       var ms = parameters[0];
       webdriver.timing.setTimeout(function() {
-        command.setResponse(new webdriver.Response(
-            false, driver.getContext(), ms));
+        command.setResponse(new webdriver.Response(false, ms));
       }, ms);
       break;
 
@@ -104,11 +103,9 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
         var selfObj = parameters[1];
         var args = parameters[2];
         var result = fn.apply(selfObj, args);
-        command.setResponse(new webdriver.Response(
-            false, driver.getContext(), result));
+        command.setResponse(new webdriver.Response(false, result));
       } catch (ex) {
-        command.setResponse(new webdriver.Response(
-            true, driver.getContext(), null, ex));
+        command.setResponse(new webdriver.Response(true, null, ex));
       }
       break;
 
@@ -116,8 +113,7 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
       try {
         this.dispatchDriverCommand(command);
       } catch (ex) {
-        command.setResponse(new webdriver.Response(
-            true, driver.getContext(), null, ex));
+        command.setResponse(new webdriver.Response(true, null, ex));
       }
       break;
   }

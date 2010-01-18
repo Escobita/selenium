@@ -32,7 +32,6 @@ import java.util.List;
 public class Response {
     private final JSONObject result;
     private final String methodName;
-    private final Context context;
     private final String responseText;
     private boolean isError;
 
@@ -41,11 +40,6 @@ public class Response {
             result = new JSONObject(json.trim());
 
             methodName = (String) result.get("commandName");
-            String contextAsString = (String) result.get("context");
-            if (contextAsString != null)
-                context = new Context(contextAsString);
-            else
-                context = null;
             responseText = String.valueOf(result.get("response"));
 
             isError = (Boolean) result.get("isError");
@@ -56,10 +50,6 @@ public class Response {
 
     public String getCommand() {
         return methodName;
-    }
-
-    public Context getContext() {
-        return context;
     }
 
     public String getResponseText() {

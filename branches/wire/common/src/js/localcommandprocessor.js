@@ -31,7 +31,6 @@ goog.require('goog.json');
 goog.require('goog.object');
 goog.require('webdriver.AbstractCommandProcessor');
 goog.require('webdriver.CommandName');
-goog.require('webdriver.Context');
 goog.require('webdriver.Response');
 
 
@@ -129,7 +128,6 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
 
   var response = new webdriver.Response(
       rawResponse['isError'],
-      webdriver.Context.fromString(rawResponse['context']),
       rawResponse['response']);
 
   // Only code in this file should be dispatching command events and listening
@@ -152,7 +150,7 @@ webdriver.LocalCommandProcessor.prototype.dispatchDriverCommand = function(
 
   var jsonCommand = {
     'commandName': command.getName(),
-    'context': command.getDriver().getContext().toString(),
+    'sessionId': command.getDriver().getSessionId(),
     'parameters': command.getParameters()
   };
 

@@ -17,10 +17,11 @@
  */
 
 
-function FirefoxDriver(server, enableNativeEvents) {
+function FirefoxDriver(server, enableNativeEvents, win) {
   this.server = server;
   this.mouseSpeed = 1;
   this.enableNativeEvents = enableNativeEvents;
+  this.window = win;
 
   this.currentX = 0;
   this.currentY = 0;
@@ -44,7 +45,7 @@ FirefoxDriver.prototype.getCurrentWindowHandle = function(respond) {
 FirefoxDriver.prototype.get = function(respond, url) {
   // Check to see if the given url is the same as the current one, but
   // with a different anchor tag.
-  var current = Utils.getBrowser(respond.context).contentWindow.location;
+  var current = respond.session.getWindow().location;
   var ioService =
       Utils.getService("@mozilla.org/network/io-service;1", "nsIIOService");
   var currentUri = ioService.newURI(current, "", null);
@@ -62,16 +63,17 @@ FirefoxDriver.prototype.get = function(respond, url) {
   }
 
   if (loadEventExpected) {
-    new WebLoadingListener(Utils.getBrowser(respond.context), function() {
+    new WebLoadingListener(respond.session.getBrowser(), function() {
       // TODO: Rescue the URI and response code from the event
       var responseText = "";
-      respond.context.frameId = "?";
+      // Focus on the top window.
+      respond.session.setWindow(respond.session.getBrowser().contentWindow);
       respond.response = responseText;
       respond.send();
     });
   }
 
-  Utils.getBrowser(respond.context).loadURI(url);
+  respond.session.getBrowser().loadURI(url);
 
   if (!loadEventExpected) {
     respond.send();
@@ -89,7 +91,7 @@ FirefoxDriver.prototype.close = function(respond) {
 
   // Here we go!
   try {
-    var browser = Utils.getBrowser(respond.context);
+    var browser = respond.session.getBrowser();
     createSwitchFile("close:" + browser.id);
     browser.contentWindow.close();
   } catch(e) {
@@ -110,9 +112,8 @@ FirefoxDriver.prototype.close = function(respond) {
 
 
 FirefoxDriver.prototype.executeScript = function(respond, script) {
-  var doc = Utils.getDocument(respond.context);
-  var window = doc ? doc.defaultView :
-               Utils.getBrowser(respond.context).contentWindow;
+  var window = respond.session.getWindow();
+  var doc = window.document;
 
   var parameters = new Array();
   var runScript;
@@ -142,11 +143,11 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
 
     var convert = script.shift();
 
-    Utils.unwrapParameters(convert, parameters, respond.context);
+    Utils.unwrapParameters(convert, parameters, respond.session.getDocument());
 
     var result = runScript(scriptSrc, parameters);
 
-    respond.response = Utils.wrapResult(result, respond.context);
+    respond.response = Utils.wrapResult(result, respond.session.getDocument());
 
   } catch (e) {
     respond.isError = true;
@@ -157,9 +158,9 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
 
 
 FirefoxDriver.prototype.getCurrentUrl = function(respond) {
-  var url = Utils.getDocument(respond.context).defaultView.location;
+  var url = respond.session.getWindow().location;
   if (!url) {
-    url = Utils.getBrowser(respond.context).contentWindow.location;
+    url = respond.session.getBrowser().contentWindow.location;
   }
   respond.response = "" + url;
   respond.send();
@@ -167,14 +168,13 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
 
 
 FirefoxDriver.prototype.title = function(respond) {
-  var browser = Utils.getBrowser(respond.context);
-  respond.response = browser.contentTitle;
+  respond.response = respond.session.getBrowser().contentTitle;
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getPageSource = function(respond) {
-  var source = Utils.getDocument(respond.context).
+  var source = respond.session.getDocument().
       getElementsByTagName("html")[0].innerHTML;
 
   respond.response = "<html>" + source + "</html>";
@@ -270,9 +270,9 @@ FirefoxDriver.ElementLocator = {
 FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
                                                         selector,
                                                         opt_parentElementId) {
-  var theDocument = Utils.getDocument(respond.context);
+  var theDocument = respond.session.getDocument();
   var rootNode = typeof opt_parentElementId == 'string' ?
-      Utils.getElementAt(opt_parentElementId, respond.context) : theDocument;
+      Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
 
   var element;
   switch (method) {
@@ -339,7 +339,7 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
   }
 
   if (element) {
-    respond.response = Utils.addToKnownElements(element, respond.context);
+    respond.response = Utils.addToKnownElements(element, respond.session.getDocument());
   } else {
     respond.response = 'Unable to locate element: ' + JSON.stringify({
       method: method,
@@ -397,9 +397,9 @@ FirefoxDriver.prototype.findChildElement = function(respond, parameters) {
 FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
                                                          selector,
                                                          opt_parentElementId) {
-  var theDocument = Utils.getDocument(respond.context);
+  var theDocument = respond.session.getDocument();
   var rootNode = typeof opt_parentElementId == 'string' ?
-      Utils.getElementAt(opt_parentElementId, respond.context) : theDocument;
+      Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
 
   var elements;
   switch (method) {
@@ -463,7 +463,7 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
   var elementIds = [];
   for (var j = 0; j < elements.length; j++) {
     var element = elements[j];
-    elementIds.push(Utils.addToKnownElements(element, respond.context));
+    elementIds.push(Utils.addToKnownElements(element, respond.session.getDocument()));
   }
 
   respond.response = elementIds;
@@ -503,11 +503,11 @@ FirefoxDriver.prototype.findChildElements = function(respond, parameters) {
 
 
 FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
-  var browser = Utils.getBrowser(respond.context);
+  var browser = respond.session.getBrowser();
   var frameDoc = Utils.findDocumentInFrame(browser, frameId[0]);
 
   if (frameDoc) {
-    respond.context = new Context(respond.context.windowId, frameId[0]);
+    respond.session.setWindow(frameDoc.defaultView);
     respond.send();
   } else {
     respond.isError = true;
@@ -518,21 +518,21 @@ FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
 
 
 FirefoxDriver.prototype.switchToDefaultContent = function(respond) {
-  respond.context.frameId = "?";
+  respond.session.setWindow(respond.session.getBrowser().contentWindow);
   respond.send();
 };
 
 
 FirefoxDriver.prototype.switchToActiveElement = function(respond) {
-  var element = Utils.getActiveElement(respond.context);
+  var element = Utils.getActiveElement(respond.session.getDocument());
 
-  respond.response = Utils.addToKnownElements(element, respond.context);
+  respond.response = Utils.addToKnownElements(element, respond.session.getDocument());
   respond.send();
 };
 
 
 FirefoxDriver.prototype.goBack = function(respond) {
-  var browser = Utils.getBrowser(respond.context);
+  var browser = respond.session.getBrowser();
 
   if (browser.canGoBack) {
     browser.goBack();
@@ -543,7 +543,7 @@ FirefoxDriver.prototype.goBack = function(respond) {
 
 
 FirefoxDriver.prototype.goForward = function(respond) {
-  var browser = Utils.getBrowser(respond.context);
+  var browser = respond.session.getBrowser();
 
   if (browser.canGoForward) {
     browser.goForward();
@@ -554,10 +554,14 @@ FirefoxDriver.prototype.goForward = function(respond) {
 
 
 FirefoxDriver.prototype.refresh = function(respond) {
-  var browser = Utils.getBrowser(respond.context);
+  var browser = respond.session.getBrowser();
   browser.contentWindow.location.reload(true);
-
-  respond.send();
+  // Wait for the reload to finish before sending the response.
+  new WebLoadingListener(respond.session.getBrowser(), function() {
+    // Reset to the top window.
+    respond.session.setWindow(browser.contentWindow);
+    respond.send();
+  });
 };
 
 
@@ -576,10 +580,10 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
   cookie.expiry = cookie.expiry.getTime() / 1000; // Stored in seconds
 
   if (!cookie.domain) {
-    var location = Utils.getBrowser(respond.context).contentWindow.location;
+    var location = respond.session.getBrowser().contentWindow.location;
     cookie.domain = location.hostname;
   } else {
-    var currLocation = Utils.getBrowser(respond.context).contentWindow.location;
+    var currLocation = respond.session.getBrowser().contentWindow.location;
     var currDomain = currLocation.host;
     if (currDomain.indexOf(cookie.domain) == -1) {  // Not quite right, but close enough
       respond.isError = true;
@@ -596,7 +600,7 @@ FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
     cookie.domain = cookie.domain.replace(/:\d+$/, "");
   }
 
-  var document = Utils.getDocument(respond.context);
+  var document = respond.session.getDocument();
   if (!document || !document.contentType.match(/html/i)) {
     respond.isError = true;
     respond.response = "You may only set cookies on html documents";
@@ -657,7 +661,7 @@ FirefoxDriver.prototype.getCookie = function(respond) {
   };
 
   var toReturn = [];
-  var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
+  var cookies = getVisibleCookies(respond.session.getBrowser().
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     toReturn.push(cookieToString(cookies[i]));
@@ -675,7 +679,7 @@ FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
   // TODO(simon): Well, this is dumb. Sorry
   var toDelete = eval('(' + cookieString + ')');
 
-  var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
+  var cookies = getVisibleCookies(respond.session.getBrowser().
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i];
@@ -690,7 +694,7 @@ FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
 
 FirefoxDriver.prototype.deleteAllCookies = function(respond) {
   var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
-  var cookies = getVisibleCookies(Utils.getBrowser(respond.context).
+  var cookies = getVisibleCookies(respond.session.getBrowser().
       contentWindow.location);
 
   for (var i = 0; i < cookies.length; i++) {
@@ -715,7 +719,7 @@ FirefoxDriver.prototype.getMouseSpeed = function(respond) {
 
 
 FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
-  var window = Utils.getBrowser(respond.context).contentWindow;
+  var window = respond.session.getBrowser().contentWindow;
   try {
     var canvas = Screenshooter.grab(window);
     try {
@@ -733,7 +737,7 @@ FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
 
 
 FirefoxDriver.prototype.getScreenshotAsBase64 = function(respond) {
-  var window = Utils.getBrowser(respond.context).contentWindow;
+  var window = respond.session.getBrowser().contentWindow;
   try {
     var canvas = Screenshooter.grab(window);
     respond.isError = false;

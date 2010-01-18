@@ -99,7 +99,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       add("dismissAlert");
     }};
     private final ExtensionConnection extension;
-    protected Context context;
+    protected String sessionId;
     private FirefoxAlert currentAlert;
 
   public FirefoxDriver() {
@@ -127,9 +127,9 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     fixId();
   }
 
-    private FirefoxDriver(ExtensionConnection extension, Context context) {
+    private FirefoxDriver(ExtensionConnection extension, String sessionId) {
       this.extension = extension;
-      this.context = context;
+      this.sessionId = sessionId;
     }
 
     protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile, String host) {
@@ -293,16 +293,11 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     protected WebDriver findActiveDriver() {
         String response = sendMessage(WebDriverException.class, "newSession");
-
-        Context newContext = new Context(response);
-        if (newContext.getDriverId().equals(newContext.getDriverId())) {
-            return this;
-        }
-        return new FirefoxDriver(extension, newContext);
+        return new FirefoxDriver(extension, response);
     }
 
     private String sendMessage(Class<? extends WebDriverException> throwOnFailure, String methodName, Object... parameters) {
-        return sendMessage(throwOnFailure, new Command(context, methodName, parameters));
+        return sendMessage(throwOnFailure, new Command(sessionId, methodName, parameters));
     }
 
     protected String sendMessage(Class<? extends RuntimeException> throwOnFailure, Command command) {
@@ -311,7 +306,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
                                     String methodName, Object... parameters) {
-      return executeCommand(throwOnFailure, new Command(context, methodName, parameters));
+      return executeCommand(throwOnFailure, new Command(sessionId, methodName, parameters));
     }
 
     protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
@@ -324,7 +319,6 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       }
 
       Response response = extension.sendMessageAndWaitForResponse(throwOnFailure, command);
-      context = response.getContext();
       response.ifNecessaryThrow(throwOnFailure);
 
       Object rawResponse = response.getExtraResult("response");
@@ -344,8 +338,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     private void fixId() {
-        String response = sendMessage(WebDriverException.class, "newSession");
-        this.context = new Context(response);
+        this.sessionId = sendMessage(WebDriverException.class, "newSession");
     }
 
     public void quit() {
@@ -668,11 +661,6 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
           String response = sendMessage(NoSuchWindowException.class, "switchToWindow", String.valueOf(windowName));
             if (response == null || "No window found".equals(response)) {
                 throw new NoSuchWindowException("Cannot find window: " + windowName);
-            }
-            try {
-                FirefoxDriver.this.context = new Context(response);
-            } catch (NumberFormatException e) {
-                throw new WebDriverException("When switching to window: " + windowName + " ---- " + response);
             }
             return FirefoxDriver.this;
         }

@@ -186,7 +186,6 @@ webdriver.Command.prototype.setResponse = function(response) {
     return;
   }
   this.response = response;
-  this.driver_.setContext(this.response.context);
   if (!this.response.isFailure) {
     this.futureResult_.setValue(this.response.value);
   } else {
@@ -258,17 +257,14 @@ webdriver.CommandName = {
  * Encapsulates a response to a {@code webdriver.Command}.
  * @param {boolean} isFailure Whether the command resulted in an error. If
  *     {@code true}, then {@code value} contains the error message.
- * @param {webdriver.Context} context The (potentially new) context resulting
- *     from the command.
  * @param {*} value The value of the response, the meaning of which depends
  *     on the command.
  * @parma {Error} opt_error An error that caused this command to fail
  *     prematurely.
  * @constructor
  */
-webdriver.Response = function(isFailure, context, value, opt_error) {
+webdriver.Response = function(isFailure, value, opt_error) {
   this.isFailure = isFailure;
-  this.context = context;
   this.value = value;
   this.errors = goog.array.slice(arguments, 3);
 };

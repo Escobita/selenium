@@ -29,7 +29,6 @@
  */
 (function() {
   var scripts = [
-    'context.js',
     'utils.js'
   ];
 
@@ -74,8 +73,8 @@ var Response = function(command, responseHandler) {
     isError: false,
     response: '',
     elementId: command.elementId,
-    context: command.context
   };
+  this.session = null;
 };
 
 Response.prototype = {
@@ -105,7 +104,6 @@ Response.prototype = {
       this.statusBarLabel_.style.color = 'black';
     }
 
-    this.context = this.context.toString();
     this.responseHandler_.handleResponse(JSON.stringify(this.json_));
 
     // Neuter ourselves
@@ -137,8 +135,6 @@ Response.prototype = {
   get isError()         { return this.json_.isError; },
   set response(res)     { this.json_.response = res; },
   get response()        { return this.json_.response; },
-  set context(c)        { this.json_.context = c; },
-  get context()         { return this.json_.context; }
 };
 
 
@@ -161,8 +157,7 @@ var DelayedCommand = function(driver, command, response, opt_sleepDelay) {
   this.onBlank_ = false;
   this.sleepDelay_ = opt_sleepDelay || DelayedCommand.DEFAULT_SLEEP_DELAY;
 
-  var activeWindow =
-      response.context.frame || response.context.fxbrowser.contentWindow;
+  var activeWindow = response.session.getWindow();
   this.loadGroup_ = activeWindow.
       QueryInterface(Components.interfaces.nsIInterfaceRequestor).
       getInterface(Components.interfaces.nsIWebNavigation).
@@ -343,40 +338,40 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
     return;
   }
 
-  command.context = Context.fromString(command.context);
   response = new Response(command, responseHandler);
 
-  // These are used to locate a new driver, and so not having one is a fine
-  // thing to do
+  // These commands do not require a session.
   if (command.commandName == 'newSession' ||
-      command.commandName == 'switchToWindow' ||
-      command.commandName == 'getWindowHandles' ||
-      command.commandName == 'quit') {
+      command.commandName == 'quit' ||
+      command.commandName == 'getWindowHandles') {
     return this[command.commandName](response, command.parameters);
   }
 
-  var win, fxbrowser, driver;
-  var allWindows = this.wm.getEnumerator(null);
-  while (allWindows.hasMoreElements()) {
-    win = allWindows.getNext();
-    if (win["fxdriver"] && win.fxdriver.id == response.context.windowId) {
-      fxbrowser = win.getBrowser();
-      driver = win.fxdriver;
-      break;
-    }
-  }
-
-  if (!fxbrowser) {
+  var sessionId = command.sessionId;
+  try {
+    response.session = Components.
+      classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
+      getService(Components.interfaces.nsISupports).
+      wrappedJSObject.
+      getSession(sessionId).
+      wrappedJSObject;
+  } catch (ex) {
     response.isError = true;
-    response.response = 'Unable to find browser with id ' +
-                        response.context.windowId;
-    return response.send();
+    response.response = 'Session not found: ' + sessionId + '\n  ' + ex;
+    response.send();
+    return;
   }
 
+  if (command.commandName == 'deleteSession' ||
+      command.commandName == 'switchToWindow') {
+    return this[command.commandName](response, command.parameters);
+  }
+
+  var sessionWindow = response.session.getChromeWindow();
+  var driver = sessionWindow.fxdriver;  // TODO(jmleyba): We only need to store an ID on the window!
   if (!driver) {
     response.isError = true;
-    response.response = 'Unable to find the driver for browser with id ' +
-                        response.context.windowId;
+    response.response = 'Session has no driver: ' + response.session.getId();
     return response.send();
   }
 
@@ -386,28 +381,7 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
     return response.send();
   }
 
-  response.context.fxbrowser = fxbrowser;
-
-  // Determine whether or not we need to care about frames.
-  var frames = fxbrowser.contentWindow.frames;
-  if ("?" == response.context.frameId) {
-    if (frames && frames.length) {
-      if ("FRAME" == frames[0].frameElement.tagName) {
-          response.context.frameId = 0;
-      } else {
-          response.context.frameId = undefined;
-      }
-    } else {
-      response.context.frameId = undefined;
-    }
-  }
-
-  if (response.context.frameId !== undefined) {
-    response.context.frame = Utils.findFrame(
-        fxbrowser, response.context.frameId);
-  }
-
-  response.startCommand(win);
+  response.startCommand(sessionWindow);
   new DelayedCommand(driver, command, response).execute(0);
 };
 
@@ -442,7 +416,8 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
 
       win.focus();
       if (win.top.fxdriver) {
-        response.response = new Context(win.fxdriver.id).toString();
+        response.session.setChromeWindow(win.top);
+        response.response = response.session.getId();
       } else {
         response.isError = true;
         response.response = 'No driver found attached to top window!';
@@ -531,10 +506,29 @@ nsCommandProcessor.prototype.newSession = function(response) {
     response.isError = true;
     response.response = 'No drivers associated with the window';
   } else {
-    response.context = new Context(driver.id);
-    response.response = driver.id;
+    var sessionStore = Components.
+        classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
+        getService(Components.interfaces.nsISupports);
+
+    var session = sessionStore.wrappedJSObject.createSession();
+    session = session.wrappedJSObject;  // XPConnect...
+    session.setChromeWindow(win);
+
+    response.session = session;
+    response.response = session.getId();
   }
   response.send();
+};
+
+
+/**
+ * Deletes the session associated with the current request.
+ */
+nsCommandProcessor.prototype.deleteSession = function(response) {
+  var sessionStore = Components.
+      classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
+      getService(Components.interfaces.nsISupports);
+  sessionStore.wrappedJSObject.deleteSession(response.session.getId());
 };
 
 

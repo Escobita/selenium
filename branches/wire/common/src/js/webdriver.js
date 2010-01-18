@@ -30,7 +30,6 @@ goog.require('goog.events.EventTarget');
 goog.require('webdriver.By.Locator');
 goog.require('webdriver.Command');
 goog.require('webdriver.CommandName');
-goog.require('webdriver.Context');
 goog.require('webdriver.Response');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.timing');
@@ -111,13 +110,6 @@ webdriver.WebDriver = function(commandProcessor) {
   this.isPaused_ = false;
 
   /**
-   * This instances current context (window and frame ID).
-   * @type {webdriver.Context}
-   * @private
-   */
-  this.context_ = new webdriver.Context();
-
-  /**
    * This instance's current session ID.  Set with the
    * {@code webdriver.WebDriver.prototype.newSession} command.
    * @type {?string}
@@ -191,7 +183,6 @@ webdriver.WebDriver.prototype.disposeInternal = function() {
   delete this.pendingCommands_;
   delete this.queuedCommands_;
   delete this.isPaused_;
-  delete this.context_;
   delete this.sessionLocked_;
   delete this.sessionId_;
   delete this.commandInterval_;
@@ -330,23 +321,6 @@ webdriver.WebDriver.prototype.processCommands_ = function() {
  */
 webdriver.WebDriver.prototype.getSessionId = function() {
   return this.sessionId_;
-};
-
-
-/**
- * @return {webdriver.Context} This instance's current context.
- */
-webdriver.WebDriver.prototype.getContext = function() {
-  return this.context_;
-};
-
-
-/**
- * Sets this driver's context.
- * @param {webdriver.Context} context The new context.
- */
-webdriver.WebDriver.prototype.setContext = function(context) {
-  return this.context_ = context;
 };
 
 
@@ -576,7 +550,6 @@ webdriver.WebDriver.prototype.switchToWindow = function(name) {
   this.callFunction(function() {
     this.addCommand(webdriver.CommandName.SWITCH_TO_WINDOW).
         setParameters(name);
-    this.callFunction(this.setContext, this);
   }, this);
 };
 

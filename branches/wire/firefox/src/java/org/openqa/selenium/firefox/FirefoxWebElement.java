@@ -261,7 +261,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     private Object executeCommand(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
-      return parent.executeCommand(throwOnFailure, new Command(parent.context, elementId, methodName, parameters));
+      return parent.executeCommand(throwOnFailure, new Command(parent.sessionId, elementId, methodName, parameters));
     }
 
     public String getElementId() {
