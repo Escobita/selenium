@@ -17,8 +17,9 @@
  */
 
 
-FirefoxDriver.prototype.click = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.click = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -130,8 +131,9 @@ FirefoxDriver.prototype.click = function(respond) {
 };
 
 
-FirefoxDriver.prototype.getText = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getText = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (element.tagName == "TITLE") {
     respond.response = respond.session.getBrowser().contentTitle;
@@ -143,8 +145,9 @@ FirefoxDriver.prototype.getText = function(respond) {
 };
 
 
-FirefoxDriver.prototype.getValue = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getValue = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (element["value"] !== undefined) {
     respond.response = element.value;
@@ -164,8 +167,9 @@ FirefoxDriver.prototype.getValue = function(respond) {
 };
 
 
-FirefoxDriver.prototype.sendKeys = function(respond, value) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.sendKeys = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -192,14 +196,15 @@ FirefoxDriver.prototype.sendKeys = function(respond, value) {
     use = element.ownerDocument.getElementsByTagName("html")[0];
   }
 
-  Utils.type(respond.session.getDocument(), use, value[0], this.enableNativeEvents);
+  Utils.type(respond.session.getDocument(), use, parameters.value.join(''), this.enableNativeEvents);
 
   respond.send();
 };
 
 
-FirefoxDriver.prototype.clear = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.clear = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -238,18 +243,20 @@ FirefoxDriver.prototype.clear = function(respond) {
 };
 
 
-FirefoxDriver.prototype.getTagName = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getTagName = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   respond.response = element.tagName.toLowerCase();
   respond.send();
 };
 
 
-FirefoxDriver.prototype.getAttribute = function(respond, value) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getAttribute = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
-  var attributeName = value[0];
+  var attributeName = parameters.name;
 
   if (element.hasAttribute(attributeName)) {
     respond.response = element.getAttribute(attributeName);
@@ -295,8 +302,9 @@ FirefoxDriver.prototype.getAttribute = function(respond, value) {
 };
 
 
-FirefoxDriver.prototype.hover = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.hover = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   var events = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
@@ -318,8 +326,9 @@ FirefoxDriver.prototype.hover = function(respond) {
   respond.send();
 };
 
-FirefoxDriver.prototype.submit = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.submit = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (element) {
     while (element.parentNode != null && element.tagName.toLowerCase() != "form") {
@@ -349,8 +358,9 @@ FirefoxDriver.prototype.submit = function(respond) {
   }
 };
 
-FirefoxDriver.prototype.isSelected = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.isSelected = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   var selected = false;
 
@@ -375,8 +385,9 @@ FirefoxDriver.prototype.isSelected = function(respond) {
 };
 
 
-FirefoxDriver.prototype.setSelected = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.setSelected = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -442,8 +453,9 @@ FirefoxDriver.prototype.setSelected = function(respond) {
 };
 
 
-FirefoxDriver.prototype.toggle = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.toggle = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -492,15 +504,17 @@ FirefoxDriver.prototype.toggle = function(respond) {
 };
 
 
-FirefoxDriver.prototype.isDisplayed = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.isDisplayed = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
   respond.response = Utils.isDisplayed(element);
   respond.send();
 };
 
 
-FirefoxDriver.prototype.getLocation = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getLocation = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   var location = Utils.getElementLocation(element);
 
@@ -512,8 +526,9 @@ FirefoxDriver.prototype.getLocation = function(respond) {
 };
 
 
-FirefoxDriver.prototype.getSize = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getSize = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   var box = Utils.getLocationOnceScrolledIntoView(element);
 
@@ -525,8 +540,9 @@ FirefoxDriver.prototype.getSize = function(respond) {
 };
 
 
-FirefoxDriver.prototype.dragElement = function(respond, movementString) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.dragElement = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
     respond.isError = true;
@@ -544,8 +560,8 @@ FirefoxDriver.prototype.dragElement = function(respond, movementString) {
   var clientStartX = clientStartXY.x;
   var clientStartY = clientStartXY.y;
 
-  var movementX = movementString[0];
-  var movementY = movementString[1];
+  var movementX = parameters.x;
+  var movementY = parameters.y;
 
   var clientFinishX = ((clientStartX + movementX) < 0) ? 0 : (clientStartX
       + movementX);
@@ -592,17 +608,18 @@ FirefoxDriver.prototype.dragElement = function(respond, movementString) {
 };
 
 
-FirefoxDriver.prototype.getValueOfCssProperty = function(respond,
-                                                         propertyName) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
-
-  respond.response = Utils.getStyleProperty(element, propertyName); // Coeerce to a string
+FirefoxDriver.prototype.getValueOfCssProperty = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
+  respond.response = Utils.getStyleProperty(element, parameters.propertyName); // Coeerce to a string
   respond.send();
 };
 
 
-FirefoxDriver.prototype.getLocationOnceScrolledIntoView = function(respond) {
-  var element = Utils.getElementAt(respond.elementId, respond.session.getDocument());
+FirefoxDriver.prototype.getLocationOnceScrolledIntoView = function(
+    respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
 
   if (!Utils.isDisplayed(element)) {
     respond.response = undefined;

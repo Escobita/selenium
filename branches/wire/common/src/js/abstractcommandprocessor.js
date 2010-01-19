@@ -63,14 +63,14 @@ webdriver.AbstractCommandProcessor.resolveFutureParams_ = function(
     } else if (goog.isObject(obj)) {
       goog.object.forEach(obj, function(value, key) {
         if (value instanceof webdriver.Future) {
-          obj[key] = value.getValue();
+          obj[key] = getValue(value);
         }
       });
     }
     return obj;
   }
 
-  command.parameters = goog.array.map(command.parameters, function(param) {
+  command.parameters = goog.object.map(command.parameters, function(param) {
     if (goog.isArray(param)) {
       return goog.array.map(param, getValue);
     } else {
@@ -90,7 +90,7 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
   var parameters = command.getParameters();
   switch (command.getName()) {
     case webdriver.CommandName.SLEEP:
-      var ms = parameters[0];
+      var ms = parameters['ms'];
       webdriver.timing.setTimeout(function() {
         command.setResponse(new webdriver.Response(false, ms));
       }, ms);
@@ -99,10 +99,7 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
     case webdriver.CommandName.WAIT:
     case webdriver.CommandName.FUNCTION:
       try {
-        var fn = parameters[0];
-        var selfObj = parameters[1];
-        var args = parameters[2];
-        var result = fn.apply(selfObj, args);
+        var result = parameters['function'].apply(null, parameters['args']);
         command.setResponse(new webdriver.Response(false, result));
       } catch (ex) {
         command.setResponse(new webdriver.Response(true, null, ex));

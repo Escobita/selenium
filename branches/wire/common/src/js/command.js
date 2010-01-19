@@ -35,13 +35,10 @@ goog.require('webdriver.Future');
  * {@code webdriver.AbstractCommandProcessor}.
  * @param {webdriver.WebDriver} driver The driver that this is a command for.
  * @param {webdriver.CommandName} name The name of this command.
- * @param {webdriver.WebElement} opt_element The element to perform this
- *     command on. If not defined, the command will be performed relative to
- *     the document root.
  * @constructor
  * @extends {goog.events.EventTarget}
  */
-webdriver.Command = function(driver, name, opt_element) {
+webdriver.Command = function(driver, name) {
   goog.events.EventTarget.call(this);
 
   /**
@@ -67,17 +64,10 @@ webdriver.Command = function(driver, name, opt_element) {
   this.name = name;
 
   /**
-   * The element to perform this command on. If not defined, the command will be
-   * performed relative to the document root.
-   * @type {webdriver.WebElement}
-   */
-  this.element = opt_element;
-
-  /**
    * The parameters to this command.
-   * @type {Array.<*>}
+   * @type {Object}
    */
-  this.parameters = [];
+  this.parameters = {};
 
   /**
    * The response to this command.
@@ -103,7 +93,6 @@ webdriver.Command.prototype.disposeInternal = function() {
   delete this.driver_;
   delete this.futureResult_;
   delete this.name;
-  delete this.element;
   delete this.parameters;
   delete this.response;
 };
@@ -149,18 +138,19 @@ webdriver.Command.prototype.isFinished = function() {
 
 
 /**
- * Set the parameters to send with this command.
- * @param {*} var_args The arguments to send to this command.
+ * Sets a parameter to send with this command.
+ * @param {string} name The parameter name.
+ * @param {*} var_args The parameter value.
  * @return {webdriver.Command} A self reference.
  */
-webdriver.Command.prototype.setParameters = function(var_args) {
-  this.parameters = goog.array.slice(arguments, 0);
+webdriver.Command.prototype.setParameter = function(name, value) {
+  this.parameters[name] = value;
   return this;
 };
 
 
 /**
- * @return {Array.<*>} The parameters to send with this command.
+ * @return {Object} The parameters to send with this command.
  */
 webdriver.Command.prototype.getParameters = function() {
   return this.parameters;

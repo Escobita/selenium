@@ -42,7 +42,8 @@ FirefoxDriver.prototype.getCurrentWindowHandle = function(respond) {
 };
 
 
-FirefoxDriver.prototype.get = function(respond, url) {
+FirefoxDriver.prototype.get = function(respond, parameters) {
+  var url = parameters.url;
   // Check to see if the given url is the same as the current one, but
   // with a different anchor tag.
   var current = respond.session.getWindow().location;
@@ -111,11 +112,10 @@ FirefoxDriver.prototype.close = function(respond) {
 };
 
 
-FirefoxDriver.prototype.executeScript = function(respond, script) {
+FirefoxDriver.prototype.executeScript = function(respond, parameters) {
   var window = respond.session.getWindow();
   var doc = window.document;
 
-  var parameters = new Array();
   var runScript;
 
   // Pre 2.0.0.15
@@ -124,11 +124,11 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
       return window.eval(scriptSrc);
     };
   } else {
-    runScript = function(scriptSrc) {
+    runScript = function(scriptSrc, args) {
       window = window.wrappedJSObject;
       var sandbox = new Components.utils.Sandbox(window);
       sandbox.window = window;
-      sandbox.__webdriverParams = parameters;
+      sandbox.__webdriverParams = args;
       sandbox.document = window.document;
       sandbox.unsafeWindow = window;
       sandbox.__proto__ = window;
@@ -138,14 +138,13 @@ FirefoxDriver.prototype.executeScript = function(respond, script) {
   }
 
   try {
-    var scriptSrc = "var __webdriverFunc = function(){" + script.shift()
+    var scriptSrc = "var __webdriverFunc = function(){" + parameters.script
         + "};  __webdriverFunc.apply(window, __webdriverParams);";
 
-    var convert = script.shift();
+    var converted = [];
+    Utils.unwrapParameters(parameters.args, converted, respond.session.getDocument());
 
-    Utils.unwrapParameters(convert, parameters, respond.session.getDocument());
-
-    var result = runScript(scriptSrc, parameters);
+    var result = runScript(scriptSrc, converted);
 
     respond.response = Utils.wrapResult(result, respond.session.getDocument());
 
@@ -355,12 +354,14 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
  * Finds an element on the current page. The response value will be the UUID of
  * the located element, or an error message if an element could not be found.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<string>} parameters A two-element array: the first element
- *     should be a method listen in the {@code Firefox.ElementLocator} enum, and
- *     the second should be what to search for.
+ * @param {{using: string, value: string}} parameters A JSON object
+ *     specifying the search parameters:
+ *     - using: A method to search with, as defined in the
+ *       {@code Firefox.ElementLocator} enum.
+ *     - value: What to search for.
  */
 FirefoxDriver.prototype.findElement = function(respond, parameters) {
-  this.findElementInternal_(respond, parameters[0], parameters[1]);
+  this.findElementInternal_(respond, parameters.using, parameters.value);
 };
 
 
@@ -369,17 +370,15 @@ FirefoxDriver.prototype.findElement = function(respond, parameters) {
  * search parameter. The response value will be the UUID of the located element,
  * or an error message if an element could not be found.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<{id:string, using:string, value:string}>} parameters A single
- *     element array. The array element should define what to search for with
- *     the following fields:
+ * @param {{id: string, using: string, value: string}} parameters A JSON object
+ *     specifying the search parameters:
  *     - id: UUID of the element to base the search from.
  *     - using: A method to search with, as defined in the
  *       {@code Firefox.ElementLocator} enum.
  *     - value: What to search for.
  */
 FirefoxDriver.prototype.findChildElement = function(respond, parameters) {
-  var map = parameters[0];
-  this.findElementInternal_(respond, map.using, map.value, map.id);
+  this.findElementInternal_(respond, parameters.using, parameters.value, parameters.id);
 };
 
 
@@ -475,12 +474,14 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
  * Searches for multiple elements on the page. The response value will be an
  * array of UUIDs for the located elements.
  * @param {Response} respond Object to send the command response with.
- * @param {Array.<string>} parameters A two-element array: the first element
- *     should be the type of locator strategy to use, the second is the target
- *     of the search.
+ * @param {{using: string, value: string}} parameters A JSON object
+ *     specifying the search parameters:
+ *     - using: A method to search with, as defined in the
+ *       {@code Firefox.ElementLocator} enum.
+ *     - value: What to search for.
  */
 FirefoxDriver.prototype.findElements = function(respond, parameters) {
-  this.findElementsInternal_(respond, parameters[0], parameters[1]);
+  this.findElementsInternal_(respond, parameters.using, parameters.value);
 };
 
 
@@ -488,30 +489,28 @@ FirefoxDriver.prototype.findElements = function(respond, parameters) {
  * Searches for multiple elements on the page that are children of the
  * corresponding search parameter. The response value will be an array of UUIDs
  * for the located elements.
- * @param {Array.<{id:string, using:string, value:string}>} parameters A single
- *     element array. The array element should define what to search for with
- *     the following fields:
+ * @param {{id: string, using: string, value: string}} parameters A JSON object
+ *     specifying the search parameters:
  *     - id: UUID of the element to base the search from.
  *     - using: A method to search with, as defined in the
  *       {@code Firefox.ElementLocator} enum.
  *     - value: What to search for.
  */
 FirefoxDriver.prototype.findChildElements = function(respond, parameters) {
-  var map = parameters[0];
-  this.findElementsInternal_(respond, map.using, map.value, map.id);
+  this.findElementsInternal_(respond, parameters.using, parameters.value, parameters.id);
 };
 
 
-FirefoxDriver.prototype.switchToFrame = function(respond, frameId) {
+FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
   var browser = respond.session.getBrowser();
-  var frameDoc = Utils.findDocumentInFrame(browser, frameId[0]);
+  var frameDoc = Utils.findDocumentInFrame(browser, parameters.id);
 
   if (frameDoc) {
     respond.session.setWindow(frameDoc.defaultView);
     respond.send();
   } else {
     respond.isError = true;
-    respond.response = "Cannot find frame with id: " + frameId.toString();
+    respond.response = "Cannot find frame with id: " + parameters.id;
     respond.send();
   }
 };
@@ -565,12 +564,11 @@ FirefoxDriver.prototype.refresh = function(respond) {
 };
 
 
-FirefoxDriver.prototype.addCookie = function(respond, cookieString) {
-  var cookie;
-  cookie = eval('(' + cookieString[0] + ')');
+FirefoxDriver.prototype.addCookie = function(respond, parameters) {
+  var cookie = parameters.cookie;
 
   if (cookie.expiry) {
-    cookie.expiry = new Date(cookie.expiry);
+    cookie.expiry = new Date(cookie.expiry.time);
   } else {
     var date = new Date();
     date.setYear(2030);
@@ -674,16 +672,15 @@ FirefoxDriver.prototype.getCookie = function(respond) {
 
 // This is damn ugly, but it turns out that just deleting a cookie from the document
 // doesn't always do The Right Thing
-FirefoxDriver.prototype.deleteCookie = function(respond, cookieString) {
+FirefoxDriver.prototype.deleteCookie = function(respond, parameters) {
+  var toDelete = parameters.name;
   var cm = Utils.getService("@mozilla.org/cookiemanager;1", "nsICookieManager");
-  // TODO(simon): Well, this is dumb. Sorry
-  var toDelete = eval('(' + cookieString + ')');
 
   var cookies = getVisibleCookies(respond.session.getBrowser().
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i];
-    if (cookie.name == toDelete.name) {
+    if (cookie.name == toDelete) {
       cm.remove(cookie.host, cookie.name, cookie.path, false);
     }
   }
@@ -706,8 +703,8 @@ FirefoxDriver.prototype.deleteAllCookies = function(respond) {
 };
 
 
-FirefoxDriver.prototype.setMouseSpeed = function(respond, speed) {
-  this.mouseSpeed = speed.shift();
+FirefoxDriver.prototype.setMouseSpeed = function(respond, parameters) {
+  this.mouseSpeed = parameters.speed;
   respond.send();
 };
 
@@ -749,7 +746,8 @@ FirefoxDriver.prototype.getScreenshotAsBase64 = function(respond) {
   respond.send();
 };
 
-FirefoxDriver.prototype.dismissAlert = function(respond, alertText) {
+FirefoxDriver.prototype.dismissAlert = function(respond, parameters) {
+  var alertText = parameters.text;
   // TODO(simon): Is there a type for alerts?
   var wm = Utils.getService("@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator");
   var allWindows = wm.getEnumerator("");

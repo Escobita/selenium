@@ -128,17 +128,18 @@ wdSession.prototype.getChromeWindow = function() {
 
 /** @return {?nsIDOMWindow} This session's current window. */
 wdSession.prototype.getWindow = function() {
+  if (!this.window_.document) {
+    // Uh-oh, we lost our DOM! Try to recover by changing focus to the
+    // main content window.
+    this.setWindow(this.chromeWindow_.getBrowser().contentWindow);
+  }
   return this.window_;
 };
 
 
 /** @return {nsIDOMDocument} This session's current document. */
 wdSession.prototype.getDocument = function() {
-  if (!this.window_.document) {
-    // Uh-oh, we lost our DOM! Try to recover by changing focus to the
-    // main content window.
-    this.setWindow(this.chromeWindow_.getBrowser().contentWindow);
-  }
+  return this.getWindow().document;
   return this.window_.document;
 };
 

@@ -71,8 +71,7 @@ var Response = function(command, responseHandler) {
   this.json_ = {
     commandName: command ? command.commandName : 'Unknown command',
     isError: false,
-    response: '',
-    elementId: command.elementId,
+    response: ''
   };
   this.session = null;
 };
@@ -129,8 +128,6 @@ Response.prototype = {
   setField: function(name, value) { this.json_[name] = value; },
   set commandName(name) { this.json_.commandName = name; },
   get commandName()     { return this.json_.commandName; },
-  set elementId(id)     { this.json_.elementId = id; },
-  get elementId()       { return this.json_.elementId; },
   set isError(error)    { this.json_.isError = error; },
   get isError()         { return this.json_.isError; },
   set response(res)     { this.json_.response = res; },
@@ -158,11 +155,23 @@ var DelayedCommand = function(driver, command, response, opt_sleepDelay) {
   this.sleepDelay_ = opt_sleepDelay || DelayedCommand.DEFAULT_SLEEP_DELAY;
 
   var activeWindow = response.session.getWindow();
-  this.loadGroup_ = activeWindow.
-      QueryInterface(Components.interfaces.nsIInterfaceRequestor).
-      getInterface(Components.interfaces.nsIWebNavigation).
-      QueryInterface(Components.interfaces.nsIInterfaceRequestor).
-      getInterface(Components.interfaces.nsILoadGroup);
+  try {
+    var webNav = activeWindow.
+        QueryInterface(Components.interfaces.nsIInterfaceRequestor).
+        getInterface(Components.interfaces.nsIWebNavigation);
+    this.loadGroup_ = webNav.
+        QueryInterface(Components.interfaces.nsIInterfaceRequestor).
+        getInterface(Components.interfaces.nsILoadGroup);
+  } catch (ex) {
+    // Well this sucks. This can happen if the DOM gets trashed or if the window
+    // is unexpectedly closed. We need to report this error to the user so they
+    // can let us (webdriver-eng) know that the FirefoxDriver is busted.
+    response.isError = true;
+    response.response = ex.toString();
+    response.send();
+    // Re-throw the error so the command will be aborted.
+    throw ex;
+  }
 };
 
 
@@ -388,19 +397,16 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
 
 
 /**
- * Changes the context of the caller to the window specified by the first
- * element of the {@code windowId} array.
+ * Changes the context of the caller to the specified window.
  * @param {Response} response The response object to send the command response
  *     in.
- * @param {Array.<*>} windowId The parameters sent with the original command.
- *     The first element in the array must be the ID of the window to switch to.
- *     Note all other command parameters are ignored.
+ * @param {{name: string}} parameters The command parameters.
  * @param {number} opt_searchAttempt Which attempt this is at finding the
  *     window to switch to.
  */
-nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
+nsCommandProcessor.prototype.switchToWindow = function(response, parameters,
                                                        opt_searchAttempt) {
-  var lookFor = windowId[0];
+  var lookFor = parameters.name;
   var matches = function(win, lookFor) {
     return !win.closed &&
            (win.content && win.content.name == lookFor) ||
@@ -445,7 +451,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, windowId,
       var self = this;
       this.wm.getMostRecentWindow('navigator:browser').
           setTimeout(function() {
-            self.switchToWindow(response, windowId, (searchAttempt + 1));
+            self.switchToWindow(response, parameters, (searchAttempt + 1));
           }, 500);
     }
   }

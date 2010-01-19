@@ -34,15 +34,13 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.ExtensionConnection;
 import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.firefox.Response;
+import org.openqa.selenium.remote.BeanToJsonConverter;
 
 public abstract class AbstractExtensionConnection implements ExtensionConnection {
   private Socket socket;
@@ -182,25 +180,11 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
   }
 
   private String convert(Command command) {
-    JSONObject json = new JSONObject();
-    try {
-      json.put("commandName", command.getCommandName());
-      json.put("sessionId", command.getSessionId());
-      json.put("elementId", command.getElementId());
-
-      JSONArray params = new JSONArray();
-      for (Object o : command.getParameters()) {
-        params.put(o);
-      }
-
-      json.put("parameters", params);
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
-    }
+    String commandAsJson = new BeanToJsonConverter().convert(command);
 
     try {
       // Force encoding as UTF-8.
-      byte[] bytes = json.toString().getBytes("UTF-8");
+      byte[] bytes = commandAsJson.getBytes("UTF-8");
       return new String(bytes, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       // If UTF-8 is missing from Java, we've got problems

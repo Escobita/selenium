@@ -144,24 +144,11 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
  */
 webdriver.LocalCommandProcessor.prototype.dispatchDriverCommand = function(
     command) {
-  if (command.getName() == webdriver.CommandName.SEND_KEYS) {
-    command.setParameters(command.getParameters().join(''));
-  }
-
   var jsonCommand = {
     'commandName': command.getName(),
     'sessionId': command.getDriver().getSessionId(),
     'parameters': command.getParameters()
   };
-
-  if (command.element) {
-    try {
-      jsonCommand['elementId'] = command.element.getId().getValue();
-    } catch (ex) {
-      window.console.dir(command);
-      throw ex;
-    }
-  }
 
   jsonCommand = goog.json.serialize(jsonCommand);
   goog.debug.Logger.getLogger('webdriver.LocalCommandProcessor').fine(

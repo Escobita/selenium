@@ -18,15 +18,21 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByClassName;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
@@ -36,12 +42,6 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
         FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,
@@ -79,11 +79,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void sendKeys(CharSequence... value) {
-    	StringBuilder builder = new StringBuilder();
-    	for (CharSequence seq : value) {
-    		builder.append(seq);
-    	}
-        sendMessage(UnsupportedOperationException.class, "sendKeys", builder.toString());
+        sendMessage(UnsupportedOperationException.class, "sendKeys",
+            ImmutableMap.of("value", value));
     }
 
     public String getTagName() {
@@ -92,7 +89,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
   public String getAttribute(String name) {
-        return sendMessage(WebDriverException.class, "getAttribute", name);
+        return sendMessage(WebDriverException.class, "getAttribute", ImmutableMap.of("name", name));
     }
 
     public boolean toggle() {
@@ -141,7 +138,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void dragAndDropBy(int moveRight, int moveDown) {
-        sendMessage(UnsupportedOperationException.class, "dragElement", moveRight, moveDown);
+        sendMessage(UnsupportedOperationException.class, "dragElement",
+            ImmutableMap.of("x", moveRight, "y", moveDown));
     }
 
     public void dragAndDropOn(RenderedWebElement element) {
@@ -244,24 +242,36 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     private Map<String, String> buildSearchParamsMap(String using, String value) {
-      Map<String, String> map = new HashMap<String, String>();
-      map.put("id", elementId);
-      map.put("using", using);
-      map.put("value", value);
-      return map;
+      return ImmutableMap.of("using", using, "value", value);
     }
 
     public String getValueOfCssProperty(String propertyName) {
-      return sendMessage(WebDriverException.class,"getValueOfCssProperty", propertyName);
+      return sendMessage(WebDriverException.class, "getValueOfCssProperty",
+          ImmutableMap.of("propertyName", propertyName));
     }
 
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
+    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                               String methodName) {
+      return sendMessage(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
+    }
+
+    private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName,
+                               Map<String, ?> parameters) {
       Object result = executeCommand(throwOnFailure, methodName, parameters);
       return result == null ? null : String.valueOf(result);
     }
 
-    private Object executeCommand(Class<? extends RuntimeException> throwOnFailure, String methodName, Object... parameters) {
-      return parent.executeCommand(throwOnFailure, new Command(parent.sessionId, elementId, methodName, parameters));
+    private Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
+                                  String methodName, Map<String, ?> parameters) {
+      return parent.executeCommand(throwOnFailure, new Command(parent.sessionId, methodName,
+          ImmutableMap.<String, Object>builder()
+              .putAll(parameters)
+              .put("id", elementId)
+              .build()));
+    }
+
+    private Object executeCommand(Class<? extends RuntimeException> throwOnFailure, String methodName) {
+      return executeCommand(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
     }
 
     public String getElementId() {

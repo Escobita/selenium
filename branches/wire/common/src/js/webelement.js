@@ -77,13 +77,10 @@ webdriver.WebElement = function(driver) {
 webdriver.WebElement.prototype.isElementPresent = function(locator) {
   locator = webdriver.By.Locator.checkLocator(locator);
   return this.driver_.callFunction(function() {
-    var findCommand = this.driver_.
-        addCommand(webdriver.CommandName.FIND_CHILD_ELEMENT).
-        setParameters({
-          'id': this.getId(),
-          'using': locator.type,
-          'value': locator.target
-        });
+    var findCommand = this.
+        createCommand_(webdriver.CommandName.FIND_CHILD_ELEMENT).
+        setParameter('using', locator.type).
+        setParameter('value', locator.target);
     var commandFailed = false;
     var key = goog.events.listenOnce(findCommand,
         webdriver.Command.ERROR_EVENT, function(e) {
@@ -115,13 +112,10 @@ webdriver.WebElement.prototype.isElementPresent = function(locator) {
 webdriver.WebElement.prototype.findElement = function(locator) {
   var webElement = new webdriver.WebElement(this.driver_);
   locator = webdriver.By.Locator.checkLocator(locator);
-  var command = this.driver_.
-      addCommand(webdriver.CommandName.FIND_CHILD_ELEMENT).
-      setParameters({
-        'id': this.getId(),
-        'using': locator.type,
-        'value': locator.target
-      });
+  var command = this.
+      createCommand_(webdriver.CommandName.FIND_CHILD_ELEMENT).
+      setParameter('using', locator.type).
+      setParameter('value', locator.target);
   webElement.getId().setValue(command.getFutureResult());
   return webElement;
 };
@@ -138,12 +132,9 @@ webdriver.WebElement.prototype.findElement = function(locator) {
 webdriver.WebElement.prototype.findElements = function(locator) {
   locator = webdriver.By.Locator.checkLocator(locator);
   this.driver_.callFunction(function() {
-    this.driver_.addCommand(webdriver.CommandName.FIND_CHILD_ELEMENTS).
-        setParameters({
-          'id': this.getId(),
-          'using': locator.type,
-          'value': locator.target
-        });
+    this.createCommand_(webdriver.CommandName.FIND_CHILD_ELEMENTS).
+        setParameter('using', locator.type).
+        setParameter('value', locator.target);
     return this.driver_.callFunction(function(ids) {
       var elements = [];
       for (var i = 0; i < ids.length; i++) {
@@ -184,7 +175,7 @@ webdriver.WebElement.prototype.getId = function() {
  * @private
  */
 webdriver.WebElement.prototype.createCommand_ = function(name) {
-  return this.driver_.addCommand(name, this);
+  return this.driver_.addCommand(name).setParameter('id', this.getId());
 };
 
 
@@ -247,7 +238,7 @@ webdriver.WebElement.prototype.click = function() {
  */
 webdriver.WebElement.prototype.sendKeys = function(var_args) {
   var command = this.createCommand_(webdriver.CommandName.SEND_KEYS);
-  command.setParameters.apply(command, arguments);
+  command.setParameter('value', goog.array.slice(arguments, 0));
 };
 
 /**
@@ -273,7 +264,7 @@ webdriver.WebElement.prototype.getTagName = function() {
  */
 webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
   return this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
-      setParameters(cssStyleProperty).
+      setParameter('propertyName', cssStyleProperty).
       getFutureResult();
 };
 
@@ -284,7 +275,7 @@ webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
  */
 webdriver.WebElement.prototype.getAttribute = function(attributeName) {
   return this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
-      setParameters(attributeName).
+      setParameter('name', attributeName).
       getFutureResult();
 };
 
@@ -343,7 +334,8 @@ webdriver.WebElement.prototype.getLocation = function() {
  */
 webdriver.WebElement.prototype.dragAndDropBy = function(x, y) {
   return this.createCommand_(webdriver.CommandName.DRAG_ELEMENT).
-      setParameters(x, y).
+      setParameter('x', x).
+      setParameter('y', y).
       getFutureResult();
 };
 

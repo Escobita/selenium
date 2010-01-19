@@ -17,19 +17,20 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Command {
     private final String sessionId;
-    private final String elementId;
     private final String commandName;
-    private final Object[] parameters;
+    private final Map<String, ?> parameters;
 
-    public Command(String sessionId, String commandName, Object... parameters) {
-        this(sessionId, null, commandName, parameters);
+    public Command(String sessionId, String commandName) {
+      this(sessionId, commandName, new HashMap<String, Object>());
     }
 
-    public Command(String sessionId, String elementId, String commandName, Object... parameters) {
+    public Command(String sessionId, String commandName, Map<String, ?> parameters) {
         this.sessionId = sessionId;
-        this.elementId = elementId;
         this.commandName = commandName;
         this.parameters = parameters;
     }
@@ -39,15 +40,11 @@ public class Command {
       return sessionId;
     }
 
-    public String getElementId() {
-        return elementId;
-    }
-
     public String getCommandName() {
         return commandName;
     }
 
-    public Object[] getParameters() {
+    public Map<String, ?> getParameters() {
         return parameters;
     }
 }
