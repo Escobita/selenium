@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<overlay id="fxdriver-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script src="server.js" />
-  <script src="fxdriver.js"/>
-  <script src="status-listener.js"/>
-  <script src="utils.js"/>
-  <script src="typing.js"/>
-</overlay>
