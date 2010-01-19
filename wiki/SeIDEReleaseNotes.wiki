@@ -1,0 +1,25 @@
+#labels ide,releasenotes
+=Selenium IDE - Release Notes=
+
+==1.0.4==
+
+Selenium IDE 1.0.4 marks a resurgence in the project with releases planned for the middle of each month. Here are the changes that have happened between versions 1.0.2 and 1.0.4 of Selenium IDE. (Don't ask what happened to version 1.0.3)
+
+  * BUG - Supported Firefox version increased to include the 3.6 series (Santiago Suarez Ordoñez)
+  * BUG - Removed the Ruby formatter that was flagged as 'deprecated' (Adam Goucher)
+  * NEW - Ruby formatter updated to use the selenium-client gem ( http://selenium-client.rubyforge.org/ ) (Adam Goucher)
+  * NEW - Ability to add custom user-extensions to extend the Selenium API through plugins to Selenium IDE (Adam Goucher)
+  * NEW - Ability to add custom formatters to extend which languages are available to users through plugins to Selenium IDE (Adam Goucher)
+  * NEW - Can now load changes to user extensions without having to restart Selenium IDE (Jérémy Hérault)
+  * NEW - RSpec formatter
+
+===Acknowledgements===
+
+Version 1.0.4 would not have happened without the following assistance
+  * Sauce Labs' sponsoring of Adam Goucher to work on it
+  * Jérémy Hérault and the SERLI team for their Helium plugin (which was the proof an API could / should be developed for Se-IDE)
+  * Dave Hunt for his feedback on pre-release versions
+
+For issues with this release or features you would like to see in future releases, please log them in the Google Code Issue tracker (http://code.google.com/p/selenium/issues/list).
+
+-adam
