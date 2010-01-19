@@ -20,6 +20,6 @@ Version 1.0.4 would not have happened without the following assistance
   * Jérémy Hérault and the SERLI team for their Helium plugin (which was the proof an API could / should be developed for Se-IDE)
   * Dave Hunt for his feedback on pre-release versions
 
-For issues with this release or features you would like to see in future releases, please log them in the Google Code Issue tracker (http://code.google.com/p/selenium/issues/list).
+For issues with this release or features you would like to see in future releases, please log them in the Google Code Issue tracker (http://code.google.com/p/selenium/issues/list) using the _ide_ label so they don't get lost.
 
 -adam
