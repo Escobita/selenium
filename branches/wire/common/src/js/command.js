@@ -199,47 +199,71 @@ webdriver.CommandName = {
   // Commands dispatched to the browser driver. -------------------------------
   NEW_SESSION: 'newSession',
   DELETE_SESSION: 'deleteSession',
-  QUIT: 'quit',
-  GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
-  GET_WINDOW_HANDLES: 'getWindowHandles',
-  GET_CURRENT_URL: 'getCurrentUrl',
+
   CLOSE: 'close',
-  SWITCH_TO_WINDOW: 'switchToWindow',
-  SWITCH_TO_FRAME: 'switchToFrame',
-  SWITCH_TO_DEFAULT_CONTENT: 'switchToDefaultContent',
+  QUIT: 'quit',
+
   GET: 'get',
-  FORWARD: 'goForward',
-  BACK: 'goBack',
+  GO_BACK: 'goBack',
+  GO_FORWARD: 'goForward',
   REFRESH: 'refresh',
-  GET_TITLE: 'title',
-  GET_PAGE_SOURCE: 'getPageSource',
-  EXECUTE_SCRIPT: 'executeScript',
-  GET_MOUSE_SPEED: 'getMouseSpeed',
-  SET_MOUSE_SPEED: 'setMouseSpeed',
+
+  ADD_COOKIE: 'addCookie',
+  GET_COOKIE: 'getCookie',
+  GET_ALL_COOKIES: 'getCookies',
+  DELETE_COOKIE: 'deleteCookie',
+  DELETE_ALL_COOKIES: 'deleteAllCookies',
+
   FIND_ELEMENT: 'findElement',
   FIND_ELEMENTS: 'findElements',
   FIND_CHILD_ELEMENT: 'findChildElement',
   FIND_CHILD_ELEMENTS: 'findChildElements',
+
+  CLEAR_ELEMENT: 'clearElement',
+  CLICK_ELEMENT: 'clickElement',
+  HOVER_OVER_ELEMNET: 'hoverOverElement',
+  SEND_KEYS_TO_ELEMENT: 'sendKeysToElement',
+  SUBMIT_ELEMENT: 'submitElement',
+  TOGGLE_ELEMENT: 'toggleElement',
+
+  GET_CURRENT_WINDOW_HANDLE: 'getCurrentWindowHandle',
+  GET_WINDOW_HANDLES: 'getWindowHandles',
+
+  SWITCH_TO_WINDOW: 'switchToWindow',
+  SWITCH_TO_FRAME: 'switchToFrame',
+  SWITCH_TO_DEFAULT_CONTENT: 'switchToDefaultContent',
   GET_ACTIVE_ELEMENT: 'getActiveElement',
-  SET_VISIBLE: 'setVisible',
-  GET_VISIBLE: 'getVisible',
-  CLICK: 'click',
-  CLEAR: 'clear',
-  SUBMIT: 'submit',
-  GET_TEXT: 'getText',
-  SEND_KEYS: 'sendKeys',
-  GET_VALUE: 'getValue',
-  GET_TAG_NAME: 'getTagName',
-  IS_SELECTED: 'isSelected',
-  SET_SELECTED: 'setSelected',
-  TOGGLE: 'toggle',
-  IS_ENABLED: 'isEnabled',
-  IS_DISPLAYED: 'isDisplayed',
-  GET_LOCATION: 'getLocation',
-  GET_SIZE: 'getSize',
-  GET_ATTRIBUTE: 'getAttribute',
+
+  GET_CURRENT_URL: 'getCurrentUrl',
+  GET_PAGE_SOURCE: 'getPageSource',
+  GET_TITLE: 'getTitle',
+
+  EXECUTE_SCRIPT: 'executeScript',
+
+  GET_SPEED: 'getSpeed',
+  SET_SPEED: 'setSpeed',
+
+  SET_BROWSE_VISIBLE: 'setBrowserVisible',
+  IS_BROWSER_VISIBLE: 'isBrowserVisible',
+
+  GET_ELEMENT_TEXT: 'getElementText',
+  GET_ELEMENT_VALUE: 'getElementValue',
+  GET_ELEMENT_TAG_NAME: 'getElementTagName',
+  SET_ELEMENT_SELECTED: 'setElementSelected',
   DRAG_ELEMENT: 'dragElement',
-  GET_VALUE_OF_CSS_PROPERTY: 'getValueOfCssProperty'
+  IS_ELEMENT_SELECTED: 'isElementSelected',
+  IS_ELEMENT_ENABLED: 'isElementEnabled',
+  IS_ELEMENT_DISPLAYED: 'isElementDisplayed',
+  GET_ELEMENT_LOCATION: 'getElementLocation',
+  GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW:
+      'getElementLocationOnceScrolledIntoView',
+  GET_ELEMENT_SIZE: 'getElementSize',
+  GET_ELEMENT_ATTRIBUTE: 'getElementAttribute',
+  GET_ELEMENT_VALUE_OF_CSS_PROPERTY: 'getElementValueOfCssProperty',
+  ELEMENT_EQUALS: 'elementEquals',
+
+  SCREENSHOT: 'screenshot',
+  DIMISS_ALERT: 'dimissAlert'
 };
 
 

@@ -20,16 +20,18 @@ package org.openqa.selenium.firefox;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openqa.selenium.remote.DriverCommand;
+
 public class Command {
     private final String sessionId;
-    private final String commandName;
+    private final DriverCommand commandName;
     private final Map<String, ?> parameters;
 
-    public Command(String sessionId, String commandName) {
+    public Command(String sessionId, DriverCommand commandName) {
       this(sessionId, commandName, new HashMap<String, Object>());
     }
 
-    public Command(String sessionId, String commandName, Map<String, ?> parameters) {
+    public Command(String sessionId, DriverCommand commandName, Map<String, ?> parameters) {
         this.sessionId = sessionId;
         this.commandName = commandName;
         this.parameters = parameters;
@@ -40,7 +42,7 @@ public class Command {
       return sessionId;
     }
 
-    public String getCommandName() {
+    public DriverCommand getCommandName() {
         return commandName;
     }
 

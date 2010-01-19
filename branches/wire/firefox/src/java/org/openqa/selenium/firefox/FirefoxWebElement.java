@@ -42,6 +42,7 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.remote.DriverCommand;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
         FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,
@@ -55,55 +56,56 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void click() {
-      sendMessage(UnsupportedOperationException.class, "click");
+      sendMessage(UnsupportedOperationException.class, DriverCommand.CLICK_ELEMENT);
     }
 
     public void hover() {
-      sendMessage(WebDriverException.class, "hover");
+      sendMessage(WebDriverException.class, DriverCommand.HOVER_OVER_ELEMENT);
     }
 
     public void submit() {
-        sendMessage(WebDriverException.class, "submit");
+        sendMessage(WebDriverException.class, DriverCommand.SUBMIT_ELEMENT);
     }
 
     public String getValue() {
         try {
-          return sendMessage(WebDriverException.class, "getValue");
+          return sendMessage(WebDriverException.class, DriverCommand.GET_ELEMENT_VALUE);
         } catch (WebDriverException e) {
             return null;
         }
     }
 
     public void clear() {
-    	sendMessage(UnsupportedOperationException.class, "clear");
+    	sendMessage(UnsupportedOperationException.class, DriverCommand.CLEAR_ELEMENT);
     }
 
     public void sendKeys(CharSequence... value) {
-        sendMessage(UnsupportedOperationException.class, "sendKeys",
+        sendMessage(UnsupportedOperationException.class, DriverCommand.SEND_KEYS_TO_ELEMENT,
             ImmutableMap.of("value", value));
     }
 
     public String getTagName() {
-        String name = sendMessage(WebDriverException.class, "getTagName");
+        String name = sendMessage(WebDriverException.class, DriverCommand.GET_ELEMENT_TAG_NAME);
         return name;
     }
 
   public String getAttribute(String name) {
-        return sendMessage(WebDriverException.class, "getAttribute", ImmutableMap.of("name", name));
+        return sendMessage(WebDriverException.class, DriverCommand.GET_ELEMENT_ATTRIBUTE,
+            ImmutableMap.of("name", name));
     }
 
     public boolean toggle() {
-        sendMessage(UnsupportedOperationException.class, "toggle");
+        sendMessage(UnsupportedOperationException.class, DriverCommand.TOGGLE_ELEMENT);
         return isSelected();
     }
 
     public boolean isSelected() {
-        String value = sendMessage(WebDriverException.class, "isSelected");
+        String value = sendMessage(WebDriverException.class, DriverCommand.IS_ELEMENT_SELECTED);
         return Boolean.parseBoolean(value);
     }
 
     public void setSelected() {
-        sendMessage(UnsupportedOperationException.class, "setSelected");
+        sendMessage(UnsupportedOperationException.class, DriverCommand.SET_ELEMENT_SELECTED);
     }
 
     public boolean isEnabled() {
@@ -112,15 +114,17 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getText() {
-        return sendMessage(WebDriverException.class, "getText");
+        return sendMessage(WebDriverException.class, DriverCommand.GET_ELEMENT_TEXT);
     }
 
   public boolean isDisplayed() {
-    return Boolean.parseBoolean(sendMessage(WebDriverException.class, "isDisplayed"));
+    return Boolean.parseBoolean(sendMessage(WebDriverException.class,
+        DriverCommand.IS_ELEMENT_DISPLAYED));
     }
 
     public Point getLocation() {
-        JSONObject result = (JSONObject) executeCommand(WebDriverException.class, "getLocation");
+        JSONObject result = (JSONObject) executeCommand(WebDriverException.class,
+            DriverCommand.GET_ELEMENT_LOCATION);
         try {
           return new Point(result.getInt("x"), result.getInt("y"));
         } catch (JSONException e) {
@@ -129,7 +133,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Dimension getSize() {
-        JSONObject result = (JSONObject) executeCommand(WebDriverException.class, "getSize");
+        JSONObject result = (JSONObject) executeCommand(WebDriverException.class,
+            DriverCommand.GET_ELEMENT_SIZE);
         try {
           return new Dimension(result.getInt("width"), result.getInt("height"));
         } catch (JSONException e) {
@@ -138,7 +143,7 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public void dragAndDropBy(int moveRight, int moveDown) {
-        sendMessage(UnsupportedOperationException.class, "dragElement",
+        sendMessage(UnsupportedOperationException.class, DriverCommand.DRAG_ELEMENT,
             ImmutableMap.of("x", moveRight, "y", moveDown));
     }
 
@@ -222,13 +227,13 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
   private WebElement findChildElement(String using, String value) {
       String id = sendMessage(NoSuchElementException.class,
-          "findChildElement", buildSearchParamsMap(using, value));
+          DriverCommand.FIND_CHILD_ELEMENT, buildSearchParamsMap(using, value));
       return new FirefoxWebElement(parent, id);
     }
 
     private List<WebElement> findChildElements(String using, String value) {
       JSONArray ids = (JSONArray) executeCommand(WebDriverException.class,
-          "findChildElements", buildSearchParamsMap(using, value));
+          DriverCommand.FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
 
       List<WebElement> elements = new ArrayList<WebElement>();
       try {
@@ -246,23 +251,23 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public String getValueOfCssProperty(String propertyName) {
-      return sendMessage(WebDriverException.class, "getValueOfCssProperty",
+      return sendMessage(WebDriverException.class, DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
           ImmutableMap.of("propertyName", propertyName));
     }
 
     private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
-                               String methodName) {
+                               DriverCommand methodName) {
       return sendMessage(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
     }
 
-    private String sendMessage(Class<? extends RuntimeException> throwOnFailure, String methodName,
-                               Map<String, ?> parameters) {
+    private String sendMessage(Class<? extends RuntimeException> throwOnFailure,
+                               DriverCommand methodName, Map<String, ?> parameters) {
       Object result = executeCommand(throwOnFailure, methodName, parameters);
       return result == null ? null : String.valueOf(result);
     }
 
     private Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                  String methodName, Map<String, ?> parameters) {
+                                  DriverCommand methodName, Map<String, ?> parameters) {
       return parent.executeCommand(throwOnFailure, new Command(parent.sessionId, methodName,
           ImmutableMap.<String, Object>builder()
               .putAll(parameters)
@@ -270,7 +275,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
               .build()));
     }
 
-    private Object executeCommand(Class<? extends RuntimeException> throwOnFailure, String methodName) {
+    private Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
+                                  DriverCommand methodName) {
       return executeCommand(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
     }
 
@@ -280,8 +286,8 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
 
     public Point getLocationOnScreenOnceScrolledIntoView() {
         try {
-            JSONObject mapped = (JSONObject) executeCommand(
-                WebDriverException.class, "getLocationOnceScrolledIntoView");
+            JSONObject mapped = (JSONObject) executeCommand(WebDriverException.class,
+                DriverCommand.GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
 
             return new Point(mapped.getInt("x"), mapped.getInt("y"));
         } catch (JSONException e) {

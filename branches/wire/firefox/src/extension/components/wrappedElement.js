@@ -17,7 +17,7 @@
  */
 
 
-FirefoxDriver.prototype.click = function(respond, parameters) {
+FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -131,7 +131,7 @@ FirefoxDriver.prototype.click = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getText = function(respond, parameters) {
+FirefoxDriver.prototype.getElementText = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -145,7 +145,7 @@ FirefoxDriver.prototype.getText = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getValue = function(respond, parameters) {
+FirefoxDriver.prototype.getElementValue = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -167,7 +167,7 @@ FirefoxDriver.prototype.getValue = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.sendKeys = function(respond, parameters) {
+FirefoxDriver.prototype.sendKeysToElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -202,7 +202,7 @@ FirefoxDriver.prototype.sendKeys = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.clear = function(respond, parameters) {
+FirefoxDriver.prototype.clearElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -243,7 +243,7 @@ FirefoxDriver.prototype.clear = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getTagName = function(respond, parameters) {
+FirefoxDriver.prototype.getElementTagName = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -252,7 +252,7 @@ FirefoxDriver.prototype.getTagName = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getAttribute = function(respond, parameters) {
+FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -302,7 +302,7 @@ FirefoxDriver.prototype.getAttribute = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.hover = function(respond, parameters) {
+FirefoxDriver.prototype.hoverOverElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -326,7 +326,7 @@ FirefoxDriver.prototype.hover = function(respond, parameters) {
   respond.send();
 };
 
-FirefoxDriver.prototype.submit = function(respond, parameters) {
+FirefoxDriver.prototype.submitElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -358,7 +358,7 @@ FirefoxDriver.prototype.submit = function(respond, parameters) {
   }
 };
 
-FirefoxDriver.prototype.isSelected = function(respond, parameters) {
+FirefoxDriver.prototype.isElementSelected = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -385,7 +385,7 @@ FirefoxDriver.prototype.isSelected = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.setSelected = function(respond, parameters) {
+FirefoxDriver.prototype.setElementSelected = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -453,7 +453,7 @@ FirefoxDriver.prototype.setSelected = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.toggle = function(respond, parameters) {
+FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -504,7 +504,7 @@ FirefoxDriver.prototype.toggle = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.isDisplayed = function(respond, parameters) {
+FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
   respond.response = Utils.isDisplayed(element);
@@ -512,7 +512,7 @@ FirefoxDriver.prototype.isDisplayed = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getLocation = function(respond, parameters) {
+FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -526,7 +526,7 @@ FirefoxDriver.prototype.getLocation = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getSize = function(respond, parameters) {
+FirefoxDriver.prototype.getElementSize = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
@@ -608,7 +608,8 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getValueOfCssProperty = function(respond, parameters) {
+FirefoxDriver.prototype.getElementValueOfCssProperty = function(respond,
+                                                                parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
   respond.response = Utils.getStyleProperty(element, parameters.propertyName); // Coeerce to a string
@@ -616,7 +617,7 @@ FirefoxDriver.prototype.getValueOfCssProperty = function(respond, parameters) {
 };
 
 
-FirefoxDriver.prototype.getLocationOnceScrolledIntoView = function(
+FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
     respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());

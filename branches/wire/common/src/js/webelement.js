@@ -183,7 +183,7 @@ webdriver.WebElement.prototype.createCommand_ = function(name) {
  * Adds a command to click on this element.
  */
 webdriver.WebElement.prototype.click = function() {
-  this.createCommand_(webdriver.CommandName.CLICK);
+  this.createCommand_(webdriver.CommandName.CLICK_ELEMENT);
 };
 
 
@@ -237,7 +237,8 @@ webdriver.WebElement.prototype.click = function() {
  *     convenience).
  */
 webdriver.WebElement.prototype.sendKeys = function(var_args) {
-  var command = this.createCommand_(webdriver.CommandName.SEND_KEYS);
+  var command = this.createCommand_(
+      webdriver.CommandName.SEND_KEYS_TO_ELEMENT);
   command.setParameter('value', goog.array.slice(arguments, 0));
 };
 
@@ -245,7 +246,7 @@ webdriver.WebElement.prototype.sendKeys = function(var_args) {
  * Queries for the tag/node name of this element.
  */
 webdriver.WebElement.prototype.getTagName = function() {
-  return this.createCommand_(webdriver.CommandName.GET_TAG_NAME).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_TAG_NAME).
       getFutureResult();
 };
 
@@ -263,7 +264,8 @@ webdriver.WebElement.prototype.getTagName = function() {
  *    Future.
  */
 webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
-  return this.createCommand_(webdriver.CommandName.GET_VALUE_OF_CSS_PROPERTY).
+  return this.createCommand_(
+      webdriver.CommandName.GET_ELEMENT_VALUE_OF_CSS_PROPERTY).
       setParameter('propertyName', cssStyleProperty).
       getFutureResult();
 };
@@ -274,7 +276,7 @@ webdriver.WebElement.prototype.getComputedStyle = function(cssStyleProperty) {
  * @param {string} attributeName The name of the attribute to query.
  */
 webdriver.WebElement.prototype.getAttribute = function(attributeName) {
-  return this.createCommand_(webdriver.CommandName.GET_ATTRIBUTE).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_ATTRIBUTE).
       setParameter('name', attributeName).
       getFutureResult();
 };
@@ -285,7 +287,7 @@ webdriver.WebElement.prototype.getAttribute = function(attributeName) {
  *    this instance.
  */
 webdriver.WebElement.prototype.getValue = function() {
-  return this.createCommand_(webdriver.CommandName.GET_VALUE).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_VALUE).
       getFutureResult();
 };
 
@@ -295,7 +297,7 @@ webdriver.WebElement.prototype.getValue = function() {
  *     or trailing whitespace.
  */
 webdriver.WebElement.prototype.getText = function() {
-  return this.createCommand_(webdriver.CommandName.GET_TEXT).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_TEXT).
       getFutureResult();
 };
 
@@ -304,7 +306,7 @@ webdriver.WebElement.prototype.getText = function() {
  * Selects this element.
  */
 webdriver.WebElement.prototype.setSelected = function() {
-  this.createCommand_(webdriver.CommandName.SET_SELECTED);
+  this.createCommand_(webdriver.CommandName.SET_ELEMENT_SELECTED);
 };
 
 
@@ -312,7 +314,7 @@ webdriver.WebElement.prototype.setSelected = function() {
  * @return {webdriver.Future} The size of this element.
  */
 webdriver.WebElement.prototype.getSize = function() {
-  return this.createCommand_(webdriver.CommandName.GET_SIZE).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_SIZE).
       getFutureResult();
 };
 
@@ -321,7 +323,7 @@ webdriver.WebElement.prototype.getSize = function() {
  * @return {webdriver.Future} The location of this element.
  */
 webdriver.WebElement.prototype.getLocation = function() {
-  return this.createCommand_(webdriver.CommandName.GET_LOCATION).
+  return this.createCommand_(webdriver.CommandName.GET_ELEMENT_LOCATION).
       getFutureResult();
 };
 
@@ -386,7 +388,7 @@ webdriver.WebElement.prototype.isEnabled = function() {
  */
 webdriver.WebElement.prototype.isCheckedOrSelected_ = function() {
   return this.driver_.callFunction(function() {
-    this.createCommand_(webdriver.CommandName.GET_TAG_NAME);
+    this.createCommand_(webdriver.CommandName.GET_ELEMENT_TAG_NAME);
     return this.driver_.callFunction(function(prevResult) {
       var attribute = prevResult == 'input' ? 'checked' : 'selected';
       return this.getAttribute(attribute);
@@ -419,7 +421,7 @@ webdriver.WebElement.prototype.isChecked = function() {
  */
 webdriver.WebElement.prototype.toggle = function() {
   return this.driver_.callFunction(function() {
-    this.createCommand_(webdriver.CommandName.TOGGLE);
+    this.createCommand_(webdriver.CommandName.TOGGLE_ELEMENT);
     return this.isCheckedOrSelected_();
   }, this);
 };
@@ -430,7 +432,7 @@ webdriver.WebElement.prototype.toggle = function() {
  * will that form.
  */
 webdriver.WebElement.prototype.submit = function() {
-  this.createCommand_(webdriver.CommandName.SUBMIT);
+  this.createCommand_(webdriver.CommandName.SUBMIT_ELEMENT);
 };
 
 
@@ -439,7 +441,7 @@ webdriver.WebElement.prototype.submit = function() {
  * will clear its {@code value}.
  */
 webdriver.WebElement.prototype.clear = function() {
-  this.createCommand_(webdriver.CommandName.CLEAR);
+  this.createCommand_(webdriver.CommandName.CLEAR_ELEMENT);
 };
 
 
@@ -447,7 +449,7 @@ webdriver.WebElement.prototype.clear = function() {
  * @return {webdriver.Future} Whether this element is currently displayed.
  */
 webdriver.WebElement.prototype.isDisplayed = function() {
-  return this.createCommand_(webdriver.CommandName.IS_DISPLAYED).
+  return this.createCommand_(webdriver.CommandName.IS_ELEMENT_DISPLAYED).
       getFutureResult();
 };
 

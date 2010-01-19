@@ -157,7 +157,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
                                                 Command command) {
     sendMessage(command);
 
-    return waitForResponseFor(command.getCommandName());
+    return waitForResponseFor(command.getCommandName().toString());
   }
 
   protected void sendMessage(Command command) {

@@ -151,10 +151,10 @@ webdriver.WebDriver.EventType = {
 
 
 /**
- * Enumeration of the supported mouse speeds.
+ * Enumeration of the supported input speeds.
  * @enum {number}
- * @see webdriver.WebDriver.prototype.setMouseSpeed
- * @see webdriver.WebDriver.prototype.getMouseSpeed
+ * @see webdriver.WebDriver.prototype.setSpeed
+ * @see webdriver.WebDriver.prototype.getSpeed
  */
 webdriver.WebDriver.Speed = {
   SLOW: 1,
@@ -577,9 +577,7 @@ webdriver.WebDriver.prototype.switchToFrame = function(frame) {
  * contains iframes.
  */
 webdriver.WebDriver.prototype.switchToDefaultContent = function() {
-  this.callFunction(function() {
-    this.addCommand(webdriver.CommandName.SWITCH_TO_DEFAULT_CONTENT);
-  }, this);
+  return this.switchToFrame(null);
 };
 
 
@@ -713,7 +711,7 @@ webdriver.WebDriver.prototype.get = function(url) {
  * Navigate backwards in the current browser window's history.
  */
 webdriver.WebDriver.prototype.back = function() {
-  this.addCommand(webdriver.CommandName.BACK);
+  this.addCommand(webdriver.CommandName.GO_BACK);
 };
 
 
@@ -721,7 +719,7 @@ webdriver.WebDriver.prototype.back = function() {
  * Navigate forwards in the current browser window's history.
  */
 webdriver.WebDriver.prototype.forward = function() {
-  this.addCommand(webdriver.CommandName.FORWARD);
+  this.addCommand(webdriver.CommandName.GO_FORWARD);
 };
 
 
@@ -841,21 +839,21 @@ webdriver.WebDriver.prototype.findElements = function(by) {
 
 
 /**
- * Adjust the speed of the mouse for mouse related commands.
+ * Adjust the speed of user input.
  * @param {webdriver.WebDriver.Speed} speed The new speed setting.
  */
-webdriver.WebDriver.prototype.setMouseSpeed = function(speed) {
-  this.addCommand(webdriver.CommandName.SET_MOUSE_SPEED).
+webdriver.WebDriver.prototype.setSpeed = function(speed) {
+  this.addCommand(webdriver.CommandName.SET_SPEED).
       setParameter("speed", speed);
 };
 
 
 /**
- * Fetch the current mouse speed.
+ * Fetch the current user input speed.
  * @return {webdriver.Future} A Future whose value will be set by this driver
  *     when the query command completes.
  */
-webdriver.WebDriver.prototype.getMouseSpeed = function() {
-  return this.addCommand(webdriver.CommandName.GET_MOUSE_SPEED).
+webdriver.WebDriver.prototype.getSpeed = function() {
+  return this.addCommand(webdriver.CommandName.GET_SPEED).
       getFutureResult();
 };

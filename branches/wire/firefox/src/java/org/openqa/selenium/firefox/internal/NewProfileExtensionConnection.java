@@ -27,6 +27,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.DriverCommand;
 
 public class NewProfileExtensionConnection extends AbstractExtensionConnection {
   private FirefoxBinary process;
@@ -100,7 +101,7 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
 
   public void quit() {
     try {
-      sendMessage(new Command(null, "quit"));
+      sendMessage(new Command(null, DriverCommand.QUIT));
     } catch (Exception e) {
       // this is expected
     }

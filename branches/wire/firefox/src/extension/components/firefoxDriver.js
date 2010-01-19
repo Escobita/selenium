@@ -166,7 +166,7 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
 };
 
 
-FirefoxDriver.prototype.title = function(respond) {
+FirefoxDriver.prototype.getTitle = function(respond) {
   respond.response = respond.session.getBrowser().contentTitle;
   respond.send();
 };
@@ -503,26 +503,22 @@ FirefoxDriver.prototype.findChildElements = function(respond, parameters) {
 
 FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
   var browser = respond.session.getBrowser();
-  var frameDoc = Utils.findDocumentInFrame(browser, parameters.id);
-
-  if (frameDoc) {
-    respond.session.setWindow(frameDoc.defaultView);
-    respond.send();
+  if (parameters.id == null) {
+    respond.session.setWindow(respond.session.getBrowser().contentWindow);
   } else {
-    respond.isError = true;
-    respond.response = "Cannot find frame with id: " + parameters.id;
-    respond.send();
+    var frameDoc = Utils.findDocumentInFrame(browser, parameters.id);
+    if (frameDoc) {
+      respond.session.setWindow(frameDoc.defaultView);
+    } else {
+      respond.isError = true;
+      respond.response = "Cannot find frame with id: " + parameters.id;
+    }
   }
-};
-
-
-FirefoxDriver.prototype.switchToDefaultContent = function(respond) {
-  respond.session.setWindow(respond.session.getBrowser().contentWindow);
   respond.send();
 };
 
 
-FirefoxDriver.prototype.switchToActiveElement = function(respond) {
+FirefoxDriver.prototype.getActiveElement = function(respond) {
   var element = Utils.getActiveElement(respond.session.getDocument());
 
   respond.response = Utils.addToKnownElements(element, respond.session.getDocument());
@@ -703,13 +699,13 @@ FirefoxDriver.prototype.deleteAllCookies = function(respond) {
 };
 
 
-FirefoxDriver.prototype.setMouseSpeed = function(respond, parameters) {
+FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
   this.mouseSpeed = parameters.speed;
   respond.send();
 };
 
 
-FirefoxDriver.prototype.getMouseSpeed = function(respond) {
+FirefoxDriver.prototype.getSpeed = function(respond) {
   respond.response = this.mouseSpeed;
   respond.send();
 };
@@ -733,7 +729,7 @@ FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
 };
 
 
-FirefoxDriver.prototype.getScreenshotAsBase64 = function(respond) {
+FirefoxDriver.prototype.screenshot = function(respond) {
   var window = respond.session.getBrowser().contentWindow;
   try {
     var canvas = Screenshooter.grab(window);
