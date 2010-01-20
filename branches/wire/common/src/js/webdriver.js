@@ -218,7 +218,7 @@ webdriver.WebDriver.prototype.isIdle = function() {
   // not process any more commands, so we consider this idle.
   var pendingCommand = goog.array.peek(this.pendingCommands_);
   if (pendingCommand && pendingCommand.isFinished() &&
-      pendingCommand.getResponse().isFailure) {
+      !pendingCommand.getResponse().isSuccess()) {
     return true;
   }
   return !pendingCommand && this.queuedCommands_.length == 1 &&
@@ -286,7 +286,7 @@ webdriver.WebDriver.prototype.processCommands_ = function() {
     return;
   }
 
-  if (pendingCommand && pendingCommand.getResponse().isFailure) {
+  if (pendingCommand && !pendingCommand.getResponse().isSuccess()) {
     // Or should we be throwing this to be caught by window.onerror?
     this.logger_.severe(
         'Unhandled command failure; halting command processing:\n' +

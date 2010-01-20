@@ -1,14 +1,14 @@
 package org.openqa.selenium.remote;
 
+import org.openqa.selenium.WebDriverException;
+
+import static org.openqa.selenium.remote.ErrorCodes.SUCCESS;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.openqa.selenium.WebDriverException;
-
-import static org.openqa.selenium.remote.ErrorCodes.SUCCESS;
 
 /**
  * Maps exceptions to status codes for sending over the wire.
@@ -106,10 +106,18 @@ public class ErrorHandler {
             continue;
           }
 
-          trace[lastInsert++] = new StackTraceElement((String) values.get("className"),
-              (String) values.get("methodName"),
-              (String) values.get("fileName"),
-              lineNumber.intValue());
+          // Gracefully handle remote servers that don't (or can't) send back
+          // complete stack trace info. At least some of this information should
+          // be included...
+          String className = values.containsKey("className")
+              ? String.valueOf(values.get("className")) : "<class not specified>";
+          String methodName = values.containsKey("methodName")
+              ? String.valueOf(values.get("methodName")) : "<method not specified>";
+          String fileName = values.containsKey("fileName")
+              ? String.valueOf(values.get("fileName")) : "<file not specfied>";
+
+          trace[lastInsert++] = new StackTraceElement(
+              className, methodName, fileName, lineNumber.intValue());
           }
 
           if (lastInsert == elements.size()) {
@@ -117,7 +125,7 @@ public class ErrorHandler {
         }
       }
     } catch (Exception e) {
-      toThrow = new WebDriverException();
+      toThrow = new WebDriverException(e);
     }
 
     throw toThrow;

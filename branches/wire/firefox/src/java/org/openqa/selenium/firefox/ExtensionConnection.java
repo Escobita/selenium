@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import org.openqa.selenium.remote.Response;
+
 public interface ExtensionConnection {
     boolean isConnected();
     Response sendMessageAndWaitForResponse(Class<? extends RuntimeException> throwOnFailure, Command command);

@@ -17,6 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.Command;
+import org.openqa.selenium.firefox.ExtensionConnection;
+import org.openqa.selenium.firefox.NotConnectedException;
+import org.openqa.selenium.remote.BeanToJsonConverter;
+import org.openqa.selenium.remote.JsonToBeanConverter;
+import org.openqa.selenium.remote.Response;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -33,14 +42,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.Command;
-import org.openqa.selenium.firefox.ExtensionConnection;
-import org.openqa.selenium.firefox.NotConnectedException;
-import org.openqa.selenium.firefox.Response;
-import org.openqa.selenium.remote.BeanToJsonConverter;
 
 public abstract class AbstractExtensionConnection implements ExtensionConnection {
   private Socket socket;
@@ -157,7 +158,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
                                                 Command command) {
     sendMessage(command);
 
-    return waitForResponseFor(command.getCommandName().toString());
+    return waitForResponse();
   }
 
   protected void sendMessage(Command command) {
@@ -192,26 +193,15 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
     }
   }
 
-  private Response waitForResponseFor(String command) {
+  private Response waitForResponse() {
     try {
-      return readLoop(command);
-    } catch (IOException e) {
+      return nextResponse();
+    } catch (Exception e) {
       throw new WebDriverException(e);
     }
   }
 
-  private Response readLoop(String command) throws IOException {
-    Response response = nextResponse();
-
-    if (command.equals(response.getCommand())) {
-      return response;
-    }
-    throw new WebDriverException(
-        "Expected response to " + command + " but actually got: " + response.getCommand() + " ("
-        + response.getCommand() + ")");
-  }
-
-  private Response nextResponse() throws IOException {
+  private Response nextResponse() throws Exception {
     String line = readLine();
 
     // Expected input will be of the form:
@@ -239,7 +229,8 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
       remaining[i] = (byte) in.read();
     }
 
-    return new Response(new String(remaining, "UTF-8"));
+    return new JsonToBeanConverter().convert(Response.class,
+        new String(remaining, "UTF-8"));
   }
 
   private String readLine() throws IOException {

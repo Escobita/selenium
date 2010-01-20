@@ -56,9 +56,8 @@ goog.inherits(webdriver.FakeCommandProcessor,
  *     non-null, the response will automatically be a failure.
  */
 webdriver.FakeCommandProcessor.prototype.setCannedResponse = function(
-    commandName,  isFailure, value, opt_error) {
-  isFailure = isFailure || goog.isDef(opt_error);
-  var response = new webdriver.Response(isFailure, value, opt_error);
+    commandName, code, value) {
+  var response = new webdriver.Response(code, value);
   this.cannedResponses_.set(commandName, response);
 };
 
@@ -81,7 +80,8 @@ webdriver.FakeCommandProcessor.prototype.dispatchDriverCommand = function(
     command) {
   var cannedResponse = this.cannedResponses_.get(command.name, null);
   if (!cannedResponse) {
-    cannedResponse = new webdriver.Response(true, null, null,
+    cannedResponse = new webdriver.Response(
+        webdriver.Response.Code.UNKNOWN_COMMAND,
         Error('Unexpected command: ' + command.name));
   }
   command.setResponse(cannedResponse);

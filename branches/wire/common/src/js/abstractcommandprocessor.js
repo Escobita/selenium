@@ -28,6 +28,7 @@ goog.require('goog.object');
 goog.require('webdriver.CommandName');
 goog.require('webdriver.Future');
 goog.require('webdriver.Response');
+goog.require('webdriver.Response.Code');
 goog.require('webdriver.WebElement');
 goog.require('webdriver.timing');
 
@@ -92,7 +93,8 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
     case webdriver.CommandName.SLEEP:
       var ms = parameters['ms'];
       webdriver.timing.setTimeout(function() {
-        command.setResponse(new webdriver.Response(false, ms));
+        command.setResponse(new webdriver.Response(
+            webdriver.Response.Code.SUCCESS, ms));
       }, ms);
       break;
 
@@ -100,9 +102,11 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
     case webdriver.CommandName.FUNCTION:
       try {
         var result = parameters['function'].apply(null, parameters['args']);
-        command.setResponse(new webdriver.Response(false, result));
+        command.setResponse(new webdriver.Response(
+            webdriver.Response.Code.SUCCESS, result));
       } catch (ex) {
-        command.setResponse(new webdriver.Response(true, null, ex));
+        command.setResponse(new webdriver.Response(
+            webdriver.Response.Code.UNHANDLED_ERROR, ex));
       }
       break;
 
@@ -110,7 +114,8 @@ webdriver.AbstractCommandProcessor.prototype.execute = function(command) {
       try {
         this.dispatchDriverCommand(command);
       } catch (ex) {
-        command.setResponse(new webdriver.Response(true, null, ex));
+        command.setResponse(new webdriver.Response(
+            webdriver.Response.Code.UNHANDLED_ERROR, ex));
       }
       break;
   }

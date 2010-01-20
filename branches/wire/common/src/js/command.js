@@ -23,6 +23,7 @@ limitations under the License.
 goog.provide('webdriver.Command');
 goog.provide('webdriver.CommandName');
 goog.provide('webdriver.Response');
+goog.provide('webdriver.Response.Code');
 
 goog.require('goog.array');
 goog.require('goog.events.EventTarget');
@@ -176,8 +177,8 @@ webdriver.Command.prototype.setResponse = function(response) {
     return;
   }
   this.response = response;
-  if (!this.response.isFailure) {
-    this.futureResult_.setValue(this.response.value);
+  if (this.response.getStatus() == webdriver.Response.Code.SUCCESS) {
+    this.futureResult_.setValue(this.response.getValue());
   } else {
     this.dispatchEvent(webdriver.Command.ERROR_EVENT);
   }
@@ -269,18 +270,44 @@ webdriver.CommandName = {
 
 /**
  * Encapsulates a response to a {@code webdriver.Command}.
- * @param {boolean} isFailure Whether the command resulted in an error. If
- *     {@code true}, then {@code value} contains the error message.
+ * @param {webdriver.Response.Code} status The status code for this response.
  * @param {*} value The value of the response, the meaning of which depends
  *     on the command.
- * @parma {Error} opt_error An error that caused this command to fail
- *     prematurely.
  * @constructor
  */
-webdriver.Response = function(isFailure, value, opt_error) {
-  this.isFailure = isFailure;
-  this.value = value;
-  this.errors = goog.array.slice(arguments, 3);
+webdriver.Response = function(status, value) {
+
+  /**
+   * The status code for this response.
+   * @type {webdriver.Response.Code}
+   * @private
+   */
+  this.status_ = status;
+
+  /**
+   * The value for this response.
+   * @type {*}
+   * @private
+   */
+  this.value_ = value;
+};
+
+
+/** @return {webdriver.Response.Code} The status code for this response. */
+webdriver.Response.prototype.getStatus = function() {
+  return this.status_;
+};
+
+
+/** @return {*} The value of this response. */
+webdriver.Response.prototype.getValue = function() {
+  return this.value_;
+};
+
+
+/** @return {!boolean} Whether this is a response to a successful command. */
+webdriver.Response.prototype.isSuccess = function() {
+  return this.status_ == webdriver.Response.Code.SUCCESS;
 };
 
 
@@ -289,26 +316,65 @@ webdriver.Response = function(isFailure, value, opt_error) {
  *     failure response.
  */
 webdriver.Response.prototype.getErrorMessage = function() {
-  if (!this.isFailure) {
+  if (this.status_ == webdriver.Response.Code.SUCCESS) {
     return null;
   }
-  var message = [];
-  if (goog.isString(this.value)) {
-    message.push(this.value);
-  } else if (null != this.value && goog.isDef(this.value.message)) {
-    message.push(this.value.message);
-    if (goog.isDef(this.value.fileName)) {
-      message.push(this.value.fileName + '@' + this.value.lineNumber);
-    }
+
+  if (!this.value_) {
+    return 'Unknown error';  // Really should never happen
   }
-  goog.array.extend(message, goog.array.map(this.errors, function(error) {
-    if (goog.isString(error)) {
-      return error;
+
+  if (goog.isDef(this.value_['message'])) {
+    var message = [this.value_['message']];
+
+    var stackTrace = this.value_['stackTrace'];
+    if (goog.isArray(stackTrace)) {
+      goog.array.extend(message, goog.array.map(this.value_['stackTrace'],
+          function(frame) {
+            var buffer = [];
+
+            // className is provided by remote java servers
+            var className = frame['className'];
+            if (goog.isDef(className)) {
+              buffer.push(className + '.');
+            }
+            buffer.push(frame['methodName'] || '<anonymous function>');
+            buffer.push('() at ');
+            // fileName will be undefined if the method call was to an XPCOM
+            // interface.
+            buffer.push(frame['fileName'] || '<unknown file>');
+            buffer.push(':');
+            buffer.push(frame['lineNumber']);
+            return buffer.join('');
+          }));
+    } else if (goog.isDef(stackTrace)) {
+      message.push(stackTrace);
+    } else if (goog.isDef(this.value_.stack)) {
+      message.push(goog.testing.stacktrace.canonicalize(this.value_.stack));
     }
-    var errMsg = error.message || error.description || error.toString();
-    var stack = error.stack ?
-        goog.testing.stacktrace.canonicalize(error.stack) : error['stackTrace'];
-    return errMsg + '\n' + stack;
-  }));
-  return message.join('\n');
+    return message.join('\n');
+  } else {
+    return this.value_.toString();
+  }
+};
+
+
+/**
+ * Error codes used by the wire protocol.
+ * @enum {number}
+ */
+webdriver.Response.Code = {
+  /* keep in sync with codes in org.openqa.selenium.remote.ErrorCodes */
+  SUCCESS: 0,
+  COOKIE_ERROR: 2,
+  NO_SUCH_WINDOW: 3,
+  NO_SUCH_ELEMENT: 7,
+  NO_SUCH_FRAME: 8,
+  UNKNOWN_COMMAND: 9,
+  STALE_ELEMENT_REFERENCE: 10,
+  ELEMENT_NOT_VISIBLE: 11,
+  INVALID_ELEMENT_STATE: 12,
+  UNHANDLED_ERROR: 13,
+  UNEXPECTED_JAVASCRIPT_ERROR: 17,
+  XPATH_LOOKUP_ERROR: 19
 };

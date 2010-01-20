@@ -16,9 +16,54 @@
  limitations under the License.
  */
 
-function StaleElementError() {
-  this.isStaleElementError = true;
+
+/**
+ * A WebDriver error.
+ * @param {!number} code The error code.
+ * @param {!string|Error} messageOrError The error message, or another Error to
+ *     propagate.
+ * @constructor
+ */
+function WebDriverError(code, messageOrError) {
+
+  var message;
+  var stack;
+  if (messageOrError instanceof Error) {
+    message = messageOrError.message;
+    stack = messageOrError.stack;
+  } else {
+    message = messageOrError.toString();
+    stack = Error(message).stack.split('\n');
+    stack.shift();
+    stack = stack.join('\n');
+  }
+
+  /**
+   * This error's status code.
+   * @type {!number}
+   */
+  this.code = code;
+
+  /**
+   * This error's message.
+   * @type {string}
+   */
+  this.message = message;
+
+  /**
+   * Captures a stack trace for when this error was thrown.
+   * @type {string}
+   */
+  this.stack = stack;
+
+  /**
+   * Used to identify this class since instanceof will not work across
+   * component boundaries.
+   * @type {!boolean}
+   */
+  this.isWebDriverError = true;
 }
+
 
 function createSwitchFile(file_content) {
   var filename = "/tmp/switch_window_started";
@@ -334,11 +379,12 @@ Utils.getElementAt = function(index, doc) {
     if (parent !== e.ownerDocument.documentElement) {
       // Remove from the cache
       delete doc.fxdriver_elements[index];
-
-      throw new StaleElementError();
+      throw new WebDriverError(ErrorCode.STALE_ELEMENT_REFERENCE,
+          'Element is no longer attached to the DOM');
     }
   } else {
-    throw new StaleElementError();
+    throw new WebDriverError(ErrorCode.STALE_ELEMENT_REFERENCE,
+          'Element no longer exists');
   }
 
   return e;

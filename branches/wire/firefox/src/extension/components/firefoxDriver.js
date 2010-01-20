@@ -37,7 +37,7 @@ FirefoxDriver.prototype.__defineGetter__("id", function() {
 
 
 FirefoxDriver.prototype.getCurrentWindowHandle = function(respond) {
-  respond.response = this.id;
+  respond.value = this.id;
   respond.send();
 };
 
@@ -69,7 +69,7 @@ FirefoxDriver.prototype.get = function(respond, parameters) {
       var responseText = "";
       // Focus on the top window.
       respond.session.setWindow(respond.session.getBrowser().contentWindow);
-      respond.response = responseText;
+      respond.value = responseText;
       respond.send();
     });
   }
@@ -146,13 +146,11 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
 
     var result = runScript(scriptSrc, converted);
 
-    respond.response = Utils.wrapResult(result, respond.session.getDocument());
-
+    respond.value = Utils.wrapResult(result, respond.session.getDocument());
+    respond.send();
   } catch (e) {
-    respond.isError = true;
-    respond.response = e;
+    throw new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR, e);
   }
-  respond.send();
 };
 
 
@@ -161,13 +159,13 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
   if (!url) {
     url = respond.session.getBrowser().contentWindow.location;
   }
-  respond.response = "" + url;
+  respond.value = "" + url;
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getTitle = function(respond) {
-  respond.response = respond.session.getBrowser().contentTitle;
+  respond.value = respond.session.getBrowser().contentTitle;
   respond.send();
 };
 
@@ -176,7 +174,7 @@ FirefoxDriver.prototype.getPageSource = function(respond) {
   var source = respond.session.getDocument().
       getElementsByTagName("html")[0].innerHTML;
 
-  respond.response = "<html>" + source + "</html>";
+  respond.value = "<html>" + source + "</html>";
   respond.send();
 };
 
@@ -301,10 +299,9 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
       if (rootNode['querySelector']) {
         element = rootNode.querySelector(selector);
       } else {
-        respond.isError = true;
-        respond.response = "CSS Selectors not supported natively";
-        respond.send();
-      }      
+        throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
+            "CSS Selectors not supported natively");
+      }
       break;
 
     case FirefoxDriver.ElementLocator.TAG_NAME:
@@ -331,22 +328,21 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
       break;
 
     default:
-      respond.response = 'Unsupported element locator method: ' + method;
-      respond.isError = true;
-      respond.send();
+      throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
+          'Unsupported element locator method: ' + method);
       return;
   }
 
   if (element) {
-    respond.response = Utils.addToKnownElements(element, respond.session.getDocument());
+    respond.value = Utils.addToKnownElements(element, respond.session.getDocument());
+    respond.send();
   } else {
-    respond.response = 'Unable to locate element: ' + JSON.stringify({
-      method: method,
-      selector: selector
-    });
-    respond.isError = true;
+    throw new WebDriverError(ErrorCode.NO_SUCH_ELEMENT,
+        'Unable to locate element: ' + JSON.stringify({
+            method: method,
+            selector: selector
+        }));
   }
-  respond.send();
 };
 
 
@@ -421,9 +417,8 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
       if (rootNode['querySelector']) {
         elements = rootNode.querySelectorAll(selector);
       } else {
-        respond.isError = true;
-        respond.response = "CSS Selectors not supported natively";
-        respond.send();
+        throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
+            "CSS Selectors not supported natively");
       }
       break;
 
@@ -453,9 +448,8 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
       break;
 
     default:
-      respond.response = 'Unsupported element locator method: ' + method;
-      respond.isError = true;
-      respond.send();
+      throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
+          'Unsupported element locator method: ' + method);
       return;
   }
 
@@ -465,7 +459,7 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
     elementIds.push(Utils.addToKnownElements(element, respond.session.getDocument()));
   }
 
-  respond.response = elementIds;
+  respond.value = elementIds;
   respond.send();
 };
 
@@ -510,8 +504,8 @@ FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
     if (frameDoc) {
       respond.session.setWindow(frameDoc.defaultView);
     } else {
-      respond.isError = true;
-      respond.response = "Cannot find frame with id: " + parameters.id;
+      throw new WebDriverError(ErrorCode.NO_SUCH_FRAME,
+          "Cannot find frame with id: " + parameters.id);
     }
   }
   respond.send();
@@ -521,7 +515,7 @@ FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
 FirefoxDriver.prototype.getActiveElement = function(respond) {
   var element = Utils.getActiveElement(respond.session.getDocument());
 
-  respond.response = Utils.addToKnownElements(element, respond.session.getDocument());
+  respond.value = Utils.addToKnownElements(element, respond.session.getDocument());
   respond.send();
 };
 
@@ -580,10 +574,8 @@ FirefoxDriver.prototype.addCookie = function(respond, parameters) {
     var currLocation = respond.session.getBrowser().contentWindow.location;
     var currDomain = currLocation.host;
     if (currDomain.indexOf(cookie.domain) == -1) {  // Not quite right, but close enough
-      respond.isError = true;
-      respond.response = "You may only set cookies for the current domain";
-      respond.send();
-      return;
+      throw new WebDriverError(ErrorCode.COOKIE_ERROR,
+          "You may only set cookies for the current domain");
     }
   }
 
@@ -596,10 +588,8 @@ FirefoxDriver.prototype.addCookie = function(respond, parameters) {
 
   var document = respond.session.getDocument();
   if (!document || !document.contentType.match(/html/i)) {
-    respond.isError = true;
-    respond.response = "You may only set cookies on html documents";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.COOKIE_ERROR,
+        "You may only set cookies on html documents");
   }
 
   var cookieManager =
@@ -661,7 +651,7 @@ FirefoxDriver.prototype.getCookie = function(respond) {
     toReturn.push(cookieToString(cookies[i]));
   }
 
-  respond.response = toReturn;
+  respond.value = toReturn;
   respond.send();
 };
 
@@ -706,7 +696,7 @@ FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
 
 
 FirefoxDriver.prototype.getSpeed = function(respond) {
-  respond.response = this.mouseSpeed;
+  respond.value = this.mouseSpeed;
   respond.send();
 };
 
@@ -718,12 +708,12 @@ FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
     try {
       Screenshooter.save(canvas, pngFile);
     } catch(e) {
-      respond.isError = true;
-      respond.response = 'Could not save screenshot to ' + pngFile + ' - ' + e;
+      throw new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+          'Could not save screenshot to ' + pngFile + ' - ' + e);
     }
   } catch(e) {
-    respond.isError = true;
-    respond.response = 'Could not take screenshot of current page - ' + e;
+    throw new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'Could not take screenshot of current page - ' + e);
   }
   respond.send();
 };
@@ -733,11 +723,10 @@ FirefoxDriver.prototype.screenshot = function(respond) {
   var window = respond.session.getBrowser().contentWindow;
   try {
     var canvas = Screenshooter.grab(window);
-    respond.isError = false;
-    respond.response = Screenshooter.toBase64(canvas);
+    respond.value = Screenshooter.toBase64(canvas);
   } catch (e) {
-    respond.isError = true;
-    respond.response = 'Could not take screenshot of current page - ' + e;
+    throw new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'Could not take screenshot of current page - ' + e);
   }
   respond.send();
 };

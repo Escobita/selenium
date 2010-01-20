@@ -22,11 +22,8 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be clicked";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be clicked");
   }
 
   var nativeEvents = Utils.getNativeEvents();
@@ -60,10 +57,7 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
       // implemented.
 
       if (e.name != "NS_ERROR_NOT_IMPLEMENTED") {
-        respond.isError = true;
-        respond.response = e.toString();
-        respond.send();
-        return;
+        throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE, e);
       }
 
       // Fall through to the synthesized click code.
@@ -136,9 +130,9 @@ FirefoxDriver.prototype.getElementText = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (element.tagName == "TITLE") {
-    respond.response = respond.session.getBrowser().contentTitle;
+    respond.value = respond.session.getBrowser().contentTitle;
   } else {
-    respond.response = Utils.getText(element, true);
+    respond.value = Utils.getText(element, true);
   }
 
   respond.send();
@@ -150,20 +144,19 @@ FirefoxDriver.prototype.getElementValue = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (element["value"] !== undefined) {
-    respond.response = element.value;
+    respond.value = element.value;
     respond.send();
     return;
   }
 
   if (element.hasAttribute("value")) {
-    respond.response = element.getAttribute("value");
+    respond.value = element.getAttribute("value");
     respond.send();
     return;
   }
 
-  respond.isError = true;
-  respond.response = "No match";
-  respond.send();
+  throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
+      'Element does not have a value attribute');
 };
 
 
@@ -172,11 +165,8 @@ FirefoxDriver.prototype.sendKeysToElement = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be used for typing";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be used for typing");
   }
 
   var currentlyActive = Utils.getActiveElement(respond.session.getDocument());
@@ -207,11 +197,8 @@ FirefoxDriver.prototype.clearElement = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be cleared";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be cleared");
   }
 
   var isTextField = element["value"] !== undefined;
@@ -247,7 +234,7 @@ FirefoxDriver.prototype.getElementTagName = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
-  respond.response = element.tagName.toLowerCase();
+  respond.value = element.tagName.toLowerCase();
   respond.send();
 };
 
@@ -259,16 +246,16 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
   var attributeName = parameters.name;
 
   if (element.hasAttribute(attributeName)) {
-    respond.response = element.getAttribute(attributeName);
+    respond.value = element.getAttribute(attributeName);
     // Is this block necessary?
     if (attributeName.toLowerCase() == "disabled") {
-      respond.response = element.disabled;
+      respond.value = element.disabled;
     } else if (attributeName.toLowerCase() == "selected") {
-      respond.response = element.selected;
+      respond.value = element.selected;
     } else if (attributeName.toLowerCase() == "checked") {
-      respond.response = element.checked;
+      respond.value = element.checked;
     } else if (attributeName.toLowerCase() == "readonly") {
-      respond.response = element.readOnly;
+      respond.value = element.readOnly;
     }
 
     respond.send();
@@ -278,26 +265,26 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
   attributeName = attributeName.toLowerCase();
 
   if (attributeName == "disabled") {
-    respond.response = (element.disabled === undefined ? false : element.disabled);
+    respond.value = (element.disabled === undefined ? false : element.disabled);
     respond.send();
     return;
   } else if ((attributeName == "checked" || attributeName == "selected") &&
              element.tagName.toLowerCase() == "input") {
-    respond.response = element.checked;
+    respond.value = element.checked;
     respond.send();
     return;
   } else if (attributeName == "selected" && element.tagName.toLowerCase()
       == "option") {
-    respond.response = element.selected;
+    respond.value = element.selected;
     respond.send();
     return;
   } else if (attributeName == "index" && element.tagName.toLowerCase()
       == "option") {
-    respond.response = element.index;
+    respond.value = element.index;
     respond.send();
     return;
   }
-  respond.response = null;
+  respond.value = null;
   respond.send();
 };
 
@@ -319,8 +306,9 @@ FirefoxDriver.prototype.hoverOverElement = function(respond, parameters) {
     this.currentX = x;
     this.currentY = y;
   } else {
-    respond.isError = true;
-    respond.response = "Unable to hover over element";
+    // TODO: use the correct error type here.
+    throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
+        "Unable to hover over element");
   }
 
   respond.send();
@@ -347,10 +335,8 @@ FirefoxDriver.prototype.submitElement = function(respond, parameters) {
         return;
       }
     } else {
-      respond.isError = true;
-      respond.response = "Element was not in a form so couldn't submit";
-      respond.send();
-      return;
+      throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
+          "Element was not in a form so couldn't submit");
     }
   } else {
     respond.send();
@@ -380,7 +366,7 @@ FirefoxDriver.prototype.isElementSelected = function(respond, parameters) {
   } catch(e) {
   }
 
-  respond.response = selected;
+  respond.value = selected;
   respond.send();
 };
 
@@ -390,66 +376,67 @@ FirefoxDriver.prototype.setElementSelected = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be selected";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be selected");
   }
 
-  var wasSet = "You may not select an unselectable element";
-  respond.isError = true;
-
-  try {
-    var inputElement =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
-    if (inputElement.disabled) {
-      respond.response = "You may not select a disabled element";
-      respond.send();
-      return;
+  function safeQueryInterface(element, queryFor) {
+    try {
+      return element.QueryInterface(queryFor);
+    } catch (ignored) {
+      return null;
     }
-  } catch(e) {
   }
 
-  try {
-    var option =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement);
+  var option = safeQueryInterface(
+      element, Components.interfaces.nsIDOMHTMLOptionElement);
+  if (option) {
     var select = element;
-    while (select.parentNode != null && select.tagName.toLowerCase() != "select") {
+    while (select.parentNode && select.tagName.toLowerCase() != 'select') {
       select = select.parentNode;
     }
-    if (select.tagName.toLowerCase() == "select") {
-      select = select.QueryInterface(Components.interfaces.nsIDOMHTMLSelectElement);
-    } else {
+    select = safeQueryInterface(
+        select, Components.interfaces.nsIDOMHTMLSelectElement);
+    if (!select) {
       //If we're not within a select element, fire the event from the option, and hope that it bubbles up
       Utils.dumpn("Falling back to event firing from option, not select element");
       select = option;
     }
-    respond.isError = false;
+
     if (!option.selected) {
       option.selected = true;
-      Utils.fireHtmlEvent(select, "change");
+      Utils.fireHtmlEvent(select, 'change');
     }
-    wasSet = "";
-  } catch(e) {
+
+    respond.status = ErrorCode.SUCCESS;
+    respond.value = '';
+    respond.send();
+    return;
   }
 
-  try {
-    var checkbox =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
-    respond.isError = false;
-    if (checkbox.type == "checkbox" || checkbox.type == "radio") {
-      if (!checkbox.checked) {
-        checkbox.checked = true;
-        Utils.fireHtmlEvent(checkbox, "change");
+  var inputElement = safeQueryInterface(
+      element, Components.interfaces.nsIDOMHTMLInputElement);
+  if (inputElement) {
+    if (inputElement.disabled) {
+      throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
+          "You may not select a disabled element");
+    }
+
+    if (inputElement.type == 'checkbox' || inputElement.type == 'radio') {
+      if (!inputElement.checked) {
+        inputElement.checked = true;
+        Utils.fireHtmlEvent(inputElement, 'change');
       }
-      wasSet = "";
+
+      respond.status = ErrorCode.SUCCESS;
+      respond.value = '';
+      respond.send();
+      return;
     }
-  } catch(e) {
   }
 
-  respond.response = wasSet;
-  respond.send();
+  throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
+      'You may not select an unselectable element');
 };
 
 
@@ -458,11 +445,8 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be toggled";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be toggled");
   }
 
   try {
@@ -496,18 +480,16 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
   } catch(e) {
   }
 
-  respond.isError = true;
-  respond.response =
+    throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
       "You may only toggle an element that is either a checkbox or an "  +
-      "option in a select that allows multiple selections";
-  respond.send();
+      "option in a select that allows multiple selections");
 };
 
 
 FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-  respond.response = Utils.isDisplayed(element);
+  respond.value = Utils.isDisplayed(element);
   respond.send();
 };
 
@@ -518,7 +500,7 @@ FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
 
   var location = Utils.getElementLocation(element);
 
-  respond.response = {
+  respond.value = {
     x: Math.round(location.x),
     y: Math.round(location.y)
   };
@@ -532,7 +514,7 @@ FirefoxDriver.prototype.getElementSize = function(respond, parameters) {
 
   var box = Utils.getLocationOnceScrolledIntoView(element);
 
-  respond.response = {
+  respond.value = {
     width: Math.round(box.width),
     height: Math.round(box.height)
   };
@@ -545,11 +527,9 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    respond.isError = true;
-    respond.response =
-    "Element is not currently visible and so may not be used for drag and drop";
-    respond.send();
-    return;
+    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
+        "Element is not currently visible and so may not be used for " +
+        "drag and drop");
   }
 
   // Scroll the first element into view
@@ -603,7 +583,7 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
 
   var finalLoc = Utils.getElementLocation(element);
 
-  respond.response = finalLoc.x + "," + finalLoc.y;
+  respond.value = finalLoc.x + "," + finalLoc.y;
   respond.send();
 };
 
@@ -612,7 +592,7 @@ FirefoxDriver.prototype.getElementValueOfCssProperty = function(respond,
                                                                 parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-  respond.response = Utils.getStyleProperty(element, parameters.propertyName); // Coeerce to a string
+  respond.value = Utils.getStyleProperty(element, parameters.propertyName); // Coeerce to a string
   respond.send();
 };
 
@@ -623,7 +603,7 @@ FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
                                    respond.session.getDocument());
 
   if (!Utils.isDisplayed(element)) {
-    respond.response = undefined;
+    respond.value = undefined;
     respond.send();
     return;
   }
@@ -639,7 +619,7 @@ FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
     var x = {}, y = {}, width = {}, height = {};
     accessible.getBounds(x, y, width, height);
 
-    respond.response = {
+    respond.value = {
       x : x.value,
       y : y.value
     };
@@ -655,7 +635,7 @@ FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
   var theDoc = respond.session.getDocument();
   var box = theDoc.getBoxObjectFor(element);
 
-  respond.response = {
+  respond.value = {
     x : box.screenX,
     y : box.screenY
   };

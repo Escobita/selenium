@@ -349,6 +349,7 @@ java_jar(:name => "webdriver-firefox",
     :srcs  => [ "firefox/src/java/**/*.java" ],
     :deps => [
                :common,
+               :remote_client,
                :remote_common,
                :firefox_xpi,
                :libnoblur,

@@ -29,6 +29,7 @@
  */
 (function() {
   var scripts = [
+    'errorcode.js',
     'utils.js'
   ];
 
@@ -70,8 +71,8 @@ var Response = function(command, responseHandler) {
   this.responseHandler_ = responseHandler;
   this.json_ = {
     commandName: command ? command.commandName : 'Unknown command',
-    isError: false,
-    response: ''
+    status: ErrorCode.SUCCESS,
+    value: ''
   };
   this.session = null;
 };
@@ -110,28 +111,25 @@ Response.prototype = {
   },
 
   /**
-   * Helper function for reporting internal errors to the client.
-   * @param {Error} ex The internal error to report to the client.
+   * Sends a WebDriver error response.
+   * @param {WebDriverError} e The error to send.
    */
-  reportError: function(ex) {
-    Utils.dump(ex);
-    this.response = 'Internal error: ' + JSON.stringify({
-      fileName : ex.fileName,
-      lineNumber : ex.lineNumber,
-      message : ex.message,
-      name : ex.name
-    });
-    this.isError = true;
+  sendError: function(e) {
+    // if (e instanceof WebDriverError) won't work here since
+    // WebDriverError is defined in the utils.js subscript which is
+    // loaded independently in this component and in the main driver
+    // component.
+    this.status = e.isWebDriverError ? e.code : ErrorCode.UNHANDLED_ERROR;
+    this.value = ErrorCode.toJSON(e);
     this.send();
   },
 
-  setField: function(name, value) { this.json_[name] = value; },
   set commandName(name) { this.json_.commandName = name; },
   get commandName()     { return this.json_.commandName; },
-  set isError(error)    { this.json_.isError = error; },
-  get isError()         { return this.json_.isError; },
-  set response(res)     { this.json_.response = res; },
-  get response()        { return this.json_.response; },
+  set status(newStatus) { this.json_.status = newStatus; },
+  get status()          { return this.json_.status; },
+  set value(val)     { this.json_.value = val; },
+  get value()        { return this.json_.value; },
 };
 
 
@@ -166,9 +164,7 @@ var DelayedCommand = function(driver, command, response, opt_sleepDelay) {
     // Well this sucks. This can happen if the DOM gets trashed or if the window
     // is unexpectedly closed. We need to report this error to the user so they
     // can let us (webdriver-eng) know that the FirefoxDriver is busted.
-    response.isError = true;
-    response.response = ex.toString();
-    response.send();
+    response.sendError(ex);
     // Re-throw the error so the command will be aborted.
     throw ex;
   }
@@ -266,22 +262,12 @@ DelayedCommand.prototype.executeInternal_ = function() {
       this.driver_[this.command_.commandName](
           this.response_, this.command_.parameters);
     } catch (e) {
-      // if (e instanceof StaleElementError) won't work here since
-      // StaleElementError is defined in the utils.js subscript which is
-      // loaded independently in this component and in the main driver
-      // component.
-      // TODO(jmleyba): Continue cleaning up the extension and replacing the
-      // subscripts with proper components.
-      if (e.isStaleElementError) {
-        this.response_.isError = true;
-        this.response_.response = 'element is obsolete';
-        this.response_.send();
-      } else {
+      if (!e.isWebDriverError) {
         Utils.dumpn(
             'Exception caught by driver: ' + this.command_.commandName +
             '(' + this.command_.parameters + ')\n' + e);
-        this.response_.reportError(e);
       }
+      this.response_.sendError(e);
     }
   }
 };
@@ -340,7 +326,7 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
     command = JSON.parse(jsonCommandString);
   } catch (ex) {
     response = JSON.stringify({
-      'isError': true,
+      'status': ErrorCode.UNHANDLED_ERROR,
       'value': 'Error parsing command: "' + jsonCommandString + '"'
     });
     responseHandler.handleResponse(response);
@@ -365,9 +351,8 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
       getSession(sessionId).
       wrappedJSObject;
   } catch (ex) {
-    response.isError = true;
-    response.response = 'Session not found: ' + sessionId + '\n  ' + ex;
-    response.send();
+    response.sendError(new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'Session not found: ' + sessionId));
     return;
   }
 
@@ -379,21 +364,20 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   var sessionWindow = response.session.getChromeWindow();
   var driver = sessionWindow.fxdriver;  // TODO(jmleyba): We only need to store an ID on the window!
   if (!driver) {
-    response.isError = true;
-    response.response = 'Session has no driver: ' + response.session.getId();
-    return response.send();
+    response.sendError(new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'Session has no driver: ' + response.session.getId()));
+    return;
   }
 
   if (typeof driver[command.commandName] != 'function') {
-    response.isError = true;
-    response.response = 'Unrecognised command: ' + command.commandName;
-    return response.send();
+    response.sendError(new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
+        'Unrecognised command: ' + command.commandName));
+    return;
   }
 
   response.startCommand(sessionWindow);
   new DelayedCommand(driver, command, response).execute(0);
 };
-
 
 
 /**
@@ -423,12 +407,12 @@ nsCommandProcessor.prototype.switchToWindow = function(response, parameters,
       win.focus();
       if (win.top.fxdriver) {
         response.session.setChromeWindow(win.top);
-        response.response = response.session.getId();
+        response.value = response.session.getId();
+        response.send();
       } else {
-        response.isError = true;
-        response.response = 'No driver found attached to top window!';
+        response.sendError(new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+            'No driver found attached to top window!'));
       }
-      response.send();
       // Found the desired window, stop the search.
       return true;
     }
@@ -444,9 +428,8 @@ nsCommandProcessor.prototype.switchToWindow = function(response, parameters,
     // one is still loading vs. a brute force "try again"
     var searchAttempt = opt_searchAttempt || 0;
     if (searchAttempt > 3) {
-      response.isError = true;
-      response.response = 'Unable to locate window "' + lookFor + '"';
-      response.send();
+      response.sendError(new WebDriverError(ErrorCode.NO_SUCH_WINDOW,
+          'Unable to locate window "' + lookFor + '"'));
     } else {
       var self = this;
       this.wm.getMostRecentWindow('navigator:browser').
@@ -472,7 +455,7 @@ nsCommandProcessor.prototype.getWindowHandles = function(response) {
       res.push(win.content.name);
     }
   });
-  response.response = res;
+  response.value = res;
   response.send();
 };
 
@@ -509,8 +492,8 @@ nsCommandProcessor.prototype.newSession = function(response) {
   var win = this.wm.getMostRecentWindow("navigator:browser");
   var driver = win.fxdriver;
   if (!driver) {
-    response.isError = true;
-    response.response = 'No drivers associated with the window';
+    response.sendError(new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'No drivers associated with the window'));
   } else {
     var sessionStore = Components.
         classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
@@ -521,7 +504,7 @@ nsCommandProcessor.prototype.newSession = function(response) {
     session.setChromeWindow(win);
 
     response.session = session;
-    response.response = session.getId();
+    response.value = session.getId();
   }
   response.send();
 };

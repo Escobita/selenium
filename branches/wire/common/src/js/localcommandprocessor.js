@@ -127,8 +127,7 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
       'receiving:\n' + jsonResponse);
 
   var response = new webdriver.Response(
-      rawResponse['isError'],
-      rawResponse['response']);
+      rawResponse['status'], rawResponse['value']);
 
   // Only code in this file should be dispatching command events and listening
   // for response events, so this is safe. If someone else decided to attach a

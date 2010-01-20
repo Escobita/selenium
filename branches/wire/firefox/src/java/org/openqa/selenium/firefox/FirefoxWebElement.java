@@ -18,16 +18,6 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
@@ -43,6 +33,14 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.remote.DriverCommand;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+
+import java.awt.Dimension;
+import java.awt.Point;
+import java.util.List;
+import java.util.Map;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
         FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,
@@ -123,23 +121,17 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Point getLocation() {
-        JSONObject result = (JSONObject) executeCommand(WebDriverException.class,
+        @SuppressWarnings("unchecked")
+        Map<String, Number> result = (Map<String, Number>) executeCommand(WebDriverException.class,
             DriverCommand.GET_ELEMENT_LOCATION);
-        try {
-          return new Point(result.getInt("x"), result.getInt("y"));
-        } catch (JSONException e) {
-          throw new WebDriverException(e);
-        }
+        return new Point(result.get("x").intValue(), result.get("y").intValue());
     }
 
     public Dimension getSize() {
-        JSONObject result = (JSONObject) executeCommand(WebDriverException.class,
+        @SuppressWarnings("unchecked")
+        Map<String, Number> result = (Map<String, Number>) executeCommand(WebDriverException.class,
             DriverCommand.GET_ELEMENT_SIZE);
-        try {
-          return new Dimension(result.getInt("width"), result.getInt("height"));
-        } catch (JSONException e) {
-          throw new WebDriverException(e);
-        }
+        return new Dimension(result.get("width").intValue(), result.get("height").intValue());
     }
 
     public void dragAndDropBy(int moveRight, int moveDown) {
@@ -232,16 +224,14 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     private List<WebElement> findChildElements(String using, String value) {
-      JSONArray ids = (JSONArray) executeCommand(WebDriverException.class,
+      @SuppressWarnings("unchecked")
+      List<String> ids = (List<String>) executeCommand(WebDriverException.class,
           DriverCommand.FIND_CHILD_ELEMENTS, buildSearchParamsMap(using, value));
 
-      List<WebElement> elements = new ArrayList<WebElement>();
-      try {
-        for (int i = 0; i < ids.length(); i++) {
-          elements.add(new FirefoxWebElement(parent, ids.getString(i)));
-        }
-      } catch (JSONException e) {
-        throw new WebDriverException(e);
+      List<WebElement> elements = Lists.newArrayListWithExpectedSize(ids.size());
+
+      for (String id : ids) {
+        elements.add(new FirefoxWebElement(parent, id));
       }
       return elements;
     }
@@ -285,14 +275,11 @@ public class FirefoxWebElement implements RenderedWebElement, Locatable,
     }
 
     public Point getLocationOnScreenOnceScrolledIntoView() {
-        try {
-            JSONObject mapped = (JSONObject) executeCommand(WebDriverException.class,
+            @SuppressWarnings("unchecked")
+            Map<String, Number> mapped = (Map<String, Number>) executeCommand(WebDriverException.class,
                 DriverCommand.GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW);
 
-            return new Point(mapped.getInt("x"), mapped.getInt("y"));
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+            return new Point(mapped.get("x").intValue(), mapped.get("y").intValue());
     }
 
   @Override

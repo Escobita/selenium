@@ -18,30 +18,6 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -71,8 +47,31 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.ErrorHandler;
+import org.openqa.selenium.remote.Response;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import static org.openqa.selenium.OutputType.FILE;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -100,6 +99,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     private final Set<String> alertWhiteListedCommands = new HashSet<String>() {{
       add("dismissAlert");
     }};
+    private final ErrorHandler errorHandler = new ErrorHandler();
     private final ExtensionConnection extension;
     protected String sessionId;
     private FirefoxAlert currentAlert;
@@ -268,18 +268,15 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
 
   private List<WebElement> findElements(String method, String selector) {
-    JSONArray returnedIds = (JSONArray) executeCommand(
+    @SuppressWarnings("unchecked")
+    List<String> returnedIds = (List<String>) executeCommand(
         WebDriverException.class, DriverCommand.FIND_ELEMENTS,
         ImmutableMap.of("using", method, "value", selector));
-    List<WebElement> elements = new ArrayList<WebElement>();
 
-    try {
-      for (int i = 0; i < returnedIds.length(); i++) {
-        String id = returnedIds.getString(i);
-        elements.add(new FirefoxWebElement(this, id));
-      }
-    } catch (JSONException e) {
-      throw new WebDriverException(e);
+    List<WebElement> elements = Lists.newArrayListWithExpectedSize(returnedIds.size());
+
+    for (String id : returnedIds) {
+      elements.add(new FirefoxWebElement(this, id));
     }
 
     return elements;
@@ -333,19 +330,15 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       }
 
       Response response = extension.sendMessageAndWaitForResponse(throwOnFailure, command);
-      response.ifNecessaryThrow(throwOnFailure);
+      errorHandler.throwIfResponseFailed(response);
 
-      Object rawResponse = response.getExtraResult("response");
-      if (rawResponse instanceof JSONObject) {
-        JSONObject jsonObject = (JSONObject) rawResponse;
-        if (jsonObject.has("__webdriverType")) {
+      Object rawResponse = response.getValue();
+      if (rawResponse instanceof Map) {
+        Map map = (Map) rawResponse;
+        if (map.containsKey("__webdriverType")) {
           // Looks like have an alert. construct it
-          try {
-            currentAlert = new FirefoxAlert(jsonObject.getString("text"));
-            return null;
-          } catch (JSONException e) {
-            // Or maybe not. Fall through
-          }
+          currentAlert = new FirefoxAlert((String) map.get("text"));
+          return null;
         }
       }
       return rawResponse;
@@ -364,11 +357,11 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
 
   public Set<String> getWindowHandles() {
-    JSONArray allHandles = (JSONArray) executeCommand(WebDriverException.class,
+    @SuppressWarnings("unchecked")
+    List<String> allHandles = (List<String>) executeCommand(WebDriverException.class,
         DriverCommand.GET_WINDOW_HANDLES);
-    HashSet<String> toReturn = new HashSet<String>();
-    for (int i = 0; i < allHandles.length(); i++) {
-      String handle = allHandles.optString(i, null);
+    Set<String> toReturn = Sets.newHashSetWithExpectedSize(allHandles.size());
+    for (String handle : allHandles) {
       if (handle != null) {
         toReturn.add(handle);
       }
@@ -392,44 +385,43 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
             "script", script,
             "args", Lists.newArrayList(convertedArgs));
 
-        try {
-          JSONObject jsonResponse = (JSONObject) executeCommand(
-              WebDriverException.class, DriverCommand.EXECUTE_SCRIPT, params);
-          return parseJavascriptObjectFromResponse(
-              jsonResponse.getString("type"),
-              jsonResponse.get("value"));
-        } catch (JSONException e) {
-          throw new WebDriverException(e);
-        }
+        Map rawResponse = (Map) executeCommand(
+            WebDriverException.class, DriverCommand.EXECUTE_SCRIPT, params);
+        return parseJavascriptObjectFromResponse(
+            String.valueOf(rawResponse.get("type")),
+            rawResponse.get("value"));
   }
   
   public Object parseJavascriptObjectFromResponse(String resultType, Object response) {
-    if ("NULL".equals(resultType) || JSONObject.NULL.equals(response)) {
+    if ("NULL".equals(resultType) || response == null) {
       return null;
     }
 
-    if ("ARRAY".equals(resultType)) {
-      List<Object> list = new ArrayList<Object>();
-      try {
-        JSONArray array = (JSONArray)response;
-        for (int i = 0; i < array.length(); ++i) {
-          //They really should all be JSONObjects of form {resultType, response}
-          JSONObject subObject = (JSONObject)array.get(i);
-          list.add(parseJavascriptObjectFromResponse(
-              subObject.getString("type"), subObject.get("value")));
-        }
-      } catch (JSONException e) {
-        throw new WebDriverException(e);
-      }
-      return list;
+    if (response instanceof Iterable) {
+      List<?> responseAsList = Lists.newArrayList((Iterable<?>) response);
+      return Lists.newArrayList(Iterables.transform(
+          responseAsList, new Function<Object, Object>() {
+            public Object apply(Object value) {
+              Map subObject = (Map) value;
+              return parseJavascriptObjectFromResponse(
+                  String.valueOf(subObject.get("type")),
+                  subObject.get("value"));
+            }
+          }));
     }
+
     if ("ELEMENT".equals(resultType)) {
       return new FirefoxWebElement(this, (String)response);
     }
 
-    if (response instanceof Integer) {
-      return new Long((Integer)response);
+    if (response instanceof Double || response instanceof Float) {
+      return ((Number) response).doubleValue();
     }
+
+    if (response instanceof Number) {
+      return ((Number) response).longValue();
+    }
+
     return response;
   }
 
@@ -527,13 +519,13 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       }
 
       public Set<Cookie> getCookies() {
-            JSONArray response = (JSONArray) executeCommand(WebDriverException.class,
+            @SuppressWarnings("unchecked")
+            List<String> response = (List<String>) executeCommand(WebDriverException.class,
                 DriverCommand.GET_COOKIE);
             Set<Cookie> cookies = new HashSet<Cookie>();
 
-            try {
-              for (int i = 0; i < response.length(); i++) {
-                String cookieString = response.getString(i).trim();
+              for (String cookieString : response) {
+                cookieString = cookieString.trim();
                 if ("".equals(cookieString)) {
                   continue;
                 }
@@ -574,9 +566,6 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
                         attributesMap.get("domain"), attributesMap.get("path"),
                         expires, Boolean.parseBoolean(attributesMap.get("secure")), getCurrentUrl()));
               }
-            } catch (JSONException e) {
-              throw new WebDriverException(e);
-            }
 
           return cookies;
         }
@@ -595,12 +584,12 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
         }
 
         public Speed getSpeed() {
-            int pixelSpeed = (Integer) executeCommand(WebDriverException.class,
+            Number pixelSpeed = (Number) executeCommand(WebDriverException.class,
                 DriverCommand.GET_SPEED);
             Speed speed;
 
             // TODO: simon 2007-02-01; Delegate to the enum
-            switch (pixelSpeed) {
+            switch (pixelSpeed.intValue()) {
                 case SLOW_SPEED:
                     speed = Speed.SLOW;
                     break;
