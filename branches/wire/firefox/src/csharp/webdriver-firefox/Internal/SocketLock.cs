@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.IO;
+using System.Globalization;
 
 namespace OpenQA.Selenium.Firefox.Internal
 {
@@ -24,7 +25,7 @@ namespace OpenQA.Selenium.Firefox.Internal
         public SocketLock(int lockPort)
         {
             this.lockPort = lockPort;
-            lockSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            lockSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Icmp);
         }
 
         /**
@@ -43,7 +44,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             {
                 try
                 {
-                    if (isLockFree(address))
+                    if (IsLockFree(address))
                         return;
                     Thread.Sleep(DelayBetweenSocketChecks);
                 }
@@ -58,7 +59,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             } while (DateTime.Now < maxWait);
 
             throw new WebDriverException(
-                string.Format("Unable to bind to locking port {0} within {1} ms", lockPort, timeoutInMilliseconds));
+                string.Format(CultureInfo.InvariantCulture, "Unable to bind to locking port {0} within {1} ms", lockPort, timeoutInMilliseconds));
         }
 
         /**
@@ -68,16 +69,26 @@ namespace OpenQA.Selenium.Firefox.Internal
         {
             try
             {
-                if (lockSocket.IsBound)
-                {
-                    lockSocket.Close();
-                }
+                lockSocket.Close();
             }
             catch (IOException e)
             {
                 throw new WebDriverException("An error occured unlocking the object", e);
             }
         }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (lockSocket != null && lockSocket.Connected)
+            {
+                lockSocket.Close();
+            }
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
 
         /**
          * Test to see if the lock is free.  Returns instantaneously.
@@ -86,7 +97,7 @@ namespace OpenQA.Selenium.Firefox.Internal
          * @return true if the lock is locked; false if it is not
          * @throws IOException if something goes catastrophically wrong with the socket
          */
-        private bool isLockFree(IPEndPoint address)
+        private bool IsLockFree(IPEndPoint address)
         {
             try
             {

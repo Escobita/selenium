@@ -4,15 +4,20 @@ using System.Text;
 
 namespace OpenQA.Selenium.Firefox.Internal
 {
-    internal class ExtensionConnectionFactory
+    internal static class ExtensionConnectionFactory
     {
         public static ExtensionConnection ConnectTo(FirefoxBinary binary, FirefoxProfile profile, String host)
         {
             int profilePort = profile.Port;
             try
             {
-                ILock lockObject = new SocketLock(profilePort - 1);
-                return new ExtensionConnection(lockObject, binary, profile, host);
+                ExtensionConnection connection = null;
+                using (ILock lockObject = new SocketLock(profilePort - 1))
+                {
+                    connection = new ExtensionConnection(lockObject, binary, profile, host);
+                }
+
+                return connection;
             }
             catch (Exception e)
             {

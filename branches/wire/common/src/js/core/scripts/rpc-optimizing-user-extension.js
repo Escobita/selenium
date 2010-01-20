@@ -4417,15 +4417,13 @@ function BoundedCache(newMaxSize) {
             
             if (size > maxSize) {
                 // remove the least recently used item
-                var first = true;
-                var minUsage = 0;
+                var minUsage = counter;
                 var keyToRemove;
             
                 for (var key in map) {
-                    if (first || map[key].usage < minUsage) {
+                    if (map[key].usage < minUsage) {
                         minUsage = map[key].usage;
                         keyToRemove = key;
-                        first = false;
                     }
                 }
                 
@@ -4440,7 +4438,7 @@ function BoundedCache(newMaxSize) {
     this.get = function(key) {
         if (map[key]) {
             map[key].usage = ++counter;
-            return map[key].optimized;
+            return map[key].value;
         }
         
         return null;
@@ -4597,15 +4595,69 @@ function XPathBuilder(newDocument) {
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * @param newEngine             the XPath engine used to navigate this document
+ * Similar to XPathBuilder, except this builds and returns closures that take
+ * a document and return a node.
  */
-function MirroredDocument(newEngine) {
+function FinderBuilder(newDocument) {
 // private
-    var engine = newEngine;
+    var doc = newDocument;
+    
+    function buildIdFinder(e) {
+        if (e.id) {
+            var id = e.id;
+            
+            return (function(targetDoc) {
+                return targetDoc.getElementById(id);
+            });
+        }
+        
+        return null;
+    }
+    
+    function buildTagNameFinder(e) {
+        var elements = doc.getElementsByTagName(e.tagName);
+        
+        for (var i = 0, n = elements.length; i < n; ++i) {
+            if (elements[i] === e) {
+                // both the descendant axis and getElementsByTagName() should
+                // return elements in document order; hence the following index
+                // operation is possible
+                return (function(targetDoc) {
+                    return targetDoc.getElementsByTagName(e.tagName)[i];
+                });
+            }
+        }
+        
+        return null;
+    }
+    
+// public
+    this.setDocument = function(newDocument) {
+        doc = newDocument;
+        return this;
+    };
+    
+    this.build = function(e) {
+        return (
+            buildIdFinder(e) ||
+            buildTagNameFinder(e)
+        );
+    };
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @param newEngine  the XPath engine used to navigate this document
+ */
+function MirroredDocument() {
+// private
     var originalDoc;
     var reflectionDoc;
     var namespaceResolver;
-    var xpathBuilder = new XPathBuilder();
+    var finderBuilder = new FinderBuilder();
+    var pastReflections = new BoundedCache();
 
     /**
      * Appends elements represented by the given HTML to the given parent
@@ -4613,6 +4665,14 @@ function MirroredDocument(newEngine) {
      */
     function appendHTML(html, parentNode) {
         var scripts = jQuery.clean([ html ], null, parentNode);
+    }
+    
+    function getHeadHtml(doc) {
+        return doc.getElementsByTagName('head')[0].innerHTML;
+    }
+    
+    function getBodyHtml(doc) {
+        return doc.body.innerHTML;
     }
     
     /**
@@ -4689,12 +4749,29 @@ function MirroredDocument(newEngine) {
      * object.
      */
     this.reflect = function() {
-        var headHtml = originalDoc.getElementsByTagName('head')[0].innerHTML;
-        var bodyHtml = originalDoc.body.innerHTML;
+        if (reflectionDoc == originalDoc) {
+            // the reflection and the original are one and the same
+            return this;
+        }
+        
+        var originalHtml = originalDoc.documentElement.innerHTML;
+        var pastReflectionHtml = pastReflections.get(originalHtml);
+        
+        if (pastReflectionHtml != null &&
+            pastReflectionHtml == reflectionDoc.documentElement.innerHTML) {
+            // the reflection is already accurate
+            return this;
+        }
+    
+        var headHtml = getHeadHtml(originalDoc);
+        var bodyHtml = getBodyHtml(originalDoc);
         
         try {
             copyHead(headHtml, reflectionDoc);
             copyBody(bodyHtml, reflectionDoc);
+            
+            pastReflections.put(originalHtml,
+                reflectionDoc.documentElement.innerHTML);
         }
         catch (e) {
             safe_log('warn', 'Document reflection failed: ' + e.message);
@@ -4708,17 +4785,65 @@ function MirroredDocument(newEngine) {
      * original document. Returns null if the reflected node can't be found.
      */
     this.getReflectedNode = function(originalNode) {
+        if (reflectionDoc == originalDoc) {
+            // the reflection and the original are one and the same
+            return originalNode;
+        }
+    
         if (originalNode == originalDoc) {
             return reflectionDoc;
         }
     
-        var xpath = xpathBuilder.setDocument(originalDoc).build(originalNode);
+        var finder = finderBuilder.setDocument(originalDoc).build(originalNode);
         
-        if (! xpath) {
-            return null;
+        return finder(reflectionDoc) || null;
+    };
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+function XPathOptimizationCache(newMaxSize) {
+// private
+    var cache = new BoundedCache(newMaxSize);
+
+// public
+    /**
+     * Returns the optimized item by document markup and XPath, or null if
+     * it is not found in the cache. Never calls put() on the underlying cache.
+     */
+    this.get = function(html, xpath) {
+        var byHtml = cache.get(html);
+        
+        return byHtml ? byHtml[xpath] : null;
+    };
+
+    /**
+     * Returns the optimization item by document markup and XPath. Returns an
+     * empty map object that has been added to the cache if the item did not
+     * exist previously. Never returns null.
+     */
+    this.getOrCreate = function(html, xpath) {
+        var byHtml = cache.get(html);
+        
+        if (byHtml == null) {
+            var result = {};
+            var optimizations = {};
+            
+            optimizations[xpath] = result;
+            cache.put(html, optimizations);
+            return result;
         }
         
-        return engine.selectSingleNode(xpath, null, namespaceResolver);
+        var item = byHtml[xpath];
+        
+        if (item == null) {
+            var result = {};
+            
+            byHtml[xpath] = result;
+            return result;
+        }
+        
+        return item;
     };
 }
 
@@ -4728,9 +4853,22 @@ function XPathOptimizer(newEngine) {
 // private
     var engine = newEngine;
     var namespaceResolver;
-    var mirror = new MirroredDocument(engine, namespaceResolver);
-    var cache = new BoundedCache(100);
-    var xpathBuilder = new XPathBuilder();
+    var mirror = new MirroredDocument(namespaceResolver);
+    var finderBuilder = new FinderBuilder();
+    
+    // keys are full document HTML strings, and values are mappings from
+    // XPath's to objects which the following fields:
+    //
+    //   - finder       the equivalent finder function for the XPath, for
+    //                  single node selection
+    //   - nodeCount    the node count for the XPath with respect to the given
+    //                  document content
+    //   - node         the actual, potentially invalidated, node
+    //   - sourceIndex  the value of the sourceIndex attribute of the node at
+    //                  time of addition to the cache; this can be used to
+    //                  determine if the node has since changed positions
+    //
+    var knownOptimizations = new XPathOptimizationCache(100);
     
     /**
      * Returns whether this optimizer is capable of optimizing XPath's for the
@@ -4777,50 +4915,72 @@ function XPathOptimizer(newEngine) {
      * result of the given XPath, when evaluated on the currently set document.
      * If optimization fails, returns the original XPath.
      */
-    this.optimize = function(xpath, contextNode) {
+    this.getOptimizedFinder = function(xpath, contextNode) {
+        var originalHtml = mirror.getOriginal().documentElement.innerHTML;
+        var optimization = knownOptimizations.get(originalHtml, xpath);
+        
+        if (optimization) {
+            var finder =  optimization.finder;
+            
+            if (finder) {
+                // the optimized finder for this document content was found in
+                // the cache!
+                safe_log('info', 'Found cached optimized finder for ' + xpath);
+                return finder;
+            }
+        }
+        
         mirror.reflect();
     
         if (contextNode) {
             contextNode = mirror.getReflectedNode(contextNode);
         }
-    
+        
         var firstResult = engine.setDocument(mirror.getReflection())
             .selectSingleNode(xpath, contextNode, namespaceResolver);
         
         if (! firstResult) {
             // either the element doesn't exist, or there was a failure to
-            // reflect the document accurately. Return the original xpath.
-            return xpath;
+            // reflect the document accurately
+            return null;
         }
         
         if (isOptimizable(firstResult)) {
-            var cached = cache.get(xpath);
-            
-            if (cached) {
-                if (isXPathValid(cached, firstResult)) {
-                    return cached;
-                }
-                else {
-                    cache.remove(xpath);
-                }
-            }
-            
-            var optimized = xpathBuilder.setDocument(mirror.getReflection())
+            var finder = finderBuilder.setDocument(mirror.getReflection())
                 .build(firstResult);
             
-            if (optimized) {
-                if (isXPathValid(optimized, firstResult)) {
-                    safe_log('info', 'Using optimized path: ' + optimized);
-                    cache.put(xpath, optimized);
-                    return optimized;
+            if (finder) {
+                safe_log('info', 'Found optimized finder: ' + finder);
+                
+                if (! optimization) {
+                    optimization = knownOptimizations
+                        .getOrCreate(originalHtml, xpath);
                 }
+                
+                optimization.finder = finder;
+                
+                return finder;
             }
         }
         
-        return xpath;
+        return null;
     };
     
     this.countNodes = function(xpath, contextNode) {
+        var originalHtml = mirror.getOriginal().documentElement.innerHTML;
+        var optimization = knownOptimizations.get(originalHtml, xpath);
+        
+        if (optimization) {
+            var nodeCount = optimization.nodeCount;
+            
+            if (nodeCount != null) {
+                // the node count for the XPath for this document content was
+                // found in the cache!
+                safe_log('info', 'Found cached node count for ' + xpath);
+                return nodeCount;
+            }
+        }
+        
         mirror.reflect();
         
         if (contextNode) {
@@ -4829,8 +4989,20 @@ function XPathOptimizer(newEngine) {
         
         // count the nodes using the test document, and circumvent
         // window RPC altogether
-        return engine.setDocument(mirror.getReflection())
+        var nodeCount = engine.setDocument(mirror.getReflection())
             .countNodes(xpath, contextNode, namespaceResolver);
+        
+        if (! optimization) {
+            optimization = knownOptimizations.getOrCreate(originalHtml, xpath);
+        }
+        
+        optimization.nodeCount = nodeCount;
+        
+        return nodeCount;
+    };
+    
+    this.getKnownOptimizations = function() {
+        return knownOptimizations;
     };
 }
 
@@ -4853,6 +5025,8 @@ function XPathOptimizer(newEngine) {
  */
 function MultiWindowRPCOptimizingEngine(newFrameName, newDelegateEngine) {
 // private
+    var NO_RESULT = '__NO_NODE_RESULT';
+    
     var frameName = newFrameName;
     var engine = newDelegateEngine || new JavascriptXPathEngine();
     var optimizer = new XPathOptimizer(engine);
@@ -4870,19 +5044,31 @@ function MultiWindowRPCOptimizingEngine(newFrameName, newDelegateEngine) {
         }
     }
     
-    /**
-     * Returns the "local" document as a frame in the Selenium runner document,
-     * creating it if it doesn't exist.
-     */
-    function getTestDocument() {
-        return window.frames[frameName].document;
-    };
-    
-    function isOptimizing() {
+    function isMultiWindowMode() {
         return (typeof(runOptions) != 'undefined' &&
             runOptions &&
             runOptions.isMultiWindowMode());
     };
+    
+    /**
+     * Returns whether a node is detached from any live documents. Detached
+     * nodes should be considered invalidated and evicted from any caches.
+     */
+    function isDetached(node) {
+        while (node = node.parentNode) {
+            if (node.nodeType == 11) {
+                // it's a document fragment; we're detached (IE)
+                return true;
+            }
+            else if (node.nodeType == 9) {
+                // it's a normal document; we're attached
+                return false;
+            }
+        }
+        
+        // we didn't find a document; we're detached (most other browsers)
+        return true;
+    }
     
 // public
     // Override
@@ -4911,25 +5097,58 @@ function MultiWindowRPCOptimizingEngine(newFrameName, newDelegateEngine) {
     
     // Override
     this.selectSingleNode = function(xpath, contextNode, namespaceResolver) {
-        if (isOptimizing()) {
-            return optimizer.setNamespaceResolver(namespaceResolver)
-                .setTestDocument(getTestDocument())
-                .optimize(xpath, contextNode);
+        var html = this.doc.documentElement.innerHTML;
+        var knownOptimizations = optimizer.getKnownOptimizations();
+        var optimization = knownOptimizations.get(html, xpath);
+        
+        if (optimization) {
+            var node = optimization.node;
+            var sourceIndex = optimization.sourceIndex;
+            
+            if (node == NO_RESULT) {
+                return null;
+            }
+            
+            // node is still valid? (test ok even if sourceIndex is null)
+            if (! isDetached(node) && node.sourceIndex == sourceIndex) {
+                safe_log('info', 'Found cached node for ' + xpath);
+                return node;
+            }
         }
         
-        return engine.selectSingleNode(xpath, contextNode, namespaceResolver);
+        var node;
+        var finder = optimizer.setNamespaceResolver(namespaceResolver)
+            .setTestDocument(this.getTestDocument())
+            .getOptimizedFinder(xpath, contextNode);
+        
+        if (finder) {
+            node = finder(this.doc);
+        }
+        else {
+            node = engine.selectSingleNode(xpath, contextNode,
+                namespaceResolver);
+        }
+        
+        if (! optimization) {
+            optimization = knownOptimizations.getOrCreate(html, xpath);
+        }
+        
+        if (node) {
+            optimization.node = node;
+            optimization.sourceIndex = node.sourceIndex;
+        }
+        else {
+            optimization.node = NO_RESULT;
+        }
+        
+        return node;
     };
     
     // Override
     this.countNodes = function(xpath, contextNode, namespaceResolver) {
-        if (isOptimizing()) {
-            return optimizer.setNamespaceResolver(namespaceResolver)
-                .setTestDocument(getTestDocument())
-                .countNodes(xpath, contextNode);
-        }
-
-        return engine.setDocument(this.doc)
-            .countNodes(xpath, contextNode, namespaceResolver);
+        return optimizer.setNamespaceResolver(namespaceResolver)
+            .setTestDocument(this.getTestDocument())
+            .countNodes(xpath, contextNode);
     };
     
     // Override
@@ -4938,11 +5157,30 @@ function MultiWindowRPCOptimizingEngine(newFrameName, newDelegateEngine) {
         return this;
     };
     
+    /**
+     * Returns the "local" document as a frame in the Selenium runner document.
+     */
+    this.getTestDocument = function() {
+        // made this a public method, because apparently private methods can't
+        // access "this" of the instance.
+        return (isMultiWindowMode()
+            ? window.frames[frameName].document
+            : this.doc);
+    };
+    
 // initialization
 
     // creating the frame and the document it contains is not a synchronous
     // operation (at least not for IE), so we should create it eagerly
-    createTestDocument();
+    if (isMultiWindowMode()) {
+        createTestDocument();
+    }
 }
 
 MultiWindowRPCOptimizingEngine.prototype = new XPathEngine();
+
+XPathEvaluator.prototype.init = function() {
+    this.registerEngine('rpc-optimizing', new MultiWindowRPCOptimizingEngine(
+        'test-doc-frame', new JavascriptXPathEngine()));
+    this.setCurrentEngine('rpc-optimizing');
+};

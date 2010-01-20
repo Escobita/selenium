@@ -6,6 +6,7 @@ using System.Reflection;
 using Ionic.Zip;
 using System.Xml;
 using System.Xml.XPath;
+using System.Globalization;
 
 namespace OpenQA.Selenium.Firefox
 {
@@ -13,6 +14,8 @@ namespace OpenQA.Selenium.Firefox
     {
         private const string ExtensionName = "fxdriver@googlecode.com";
         private const string EmNamespaceUri = "http://www.mozilla.org/2004/em-rdf#";
+
+        private static Random tempFileGenerator = new Random();
 
         private int profilePort;
         private string profileDir;
@@ -22,13 +25,19 @@ namespace OpenQA.Selenium.Firefox
         private bool loadNoFocusLibrary;
         private bool acceptUntrustedCerts;
         private Preferences profileAdditionalPrefs = new Preferences();
+        private bool isNamedProfile;
 
         public FirefoxProfile()
-            : this(Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "webdriver.profile")).FullName)
+            : this(Directory.CreateDirectory(FirefoxProfile.GenerateProfileDirectoryName()).FullName)
         {
         }
 
         public FirefoxProfile(string profileDirectory)
+            : this(profileDirectory, false)
+        {
+        }
+
+        internal FirefoxProfile(string profileDirectory, bool profileIsNamed)
         {
             profileDir = profileDirectory;
             extensionsDir = Path.Combine(profileDir, "extensions");
@@ -36,13 +45,14 @@ namespace OpenQA.Selenium.Firefox
 
             profilePort = FirefoxDriver.DefaultPort;
             enableNativeEvents = FirefoxDriver.DefaultEnableNativeEvents;
-            loadNoFocusLibrary = false;
             acceptUntrustedCerts = FirefoxDriver.AcceptUntrustedCertificates;
 
             if (!Directory.Exists(profileDir))
             {
-                throw new WebDriverException(string.Format("Profile directory does not exist: {0}", profileDir));
+                throw new WebDriverException(string.Format(CultureInfo.InvariantCulture, "Profile directory does not exist: {0}", profileDir));
             }
+
+            isNamedProfile = profileIsNamed;
         }
 
         public int Port
@@ -91,13 +101,19 @@ namespace OpenQA.Selenium.Firefox
             {
                 Directory.Delete(tempFileName, true);
             }
-
+            
             Directory.CreateDirectory(tempFileName);
-            using (ZipFile extensionZipFile = new ZipFile(extensionZipPath))
+            Stream zipFileStream = new FileStream(extensionZipPath, FileMode.Open, FileAccess.Read);
+            using (ZipFile extensionZipFile = ZipFile.Read(zipFileStream))
             {
                 extensionZipFile.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
                 extensionZipFile.ExtractAll(tempFileName);
             }
+            //using (ZipFile extensionZipFile = new ZipFile(extensionZipPath))
+            //{
+            //    extensionZipFile.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
+            //    extensionZipFile.ExtractAll(tempFileName);
+            //}
 
             string id = ReadIdFromInstallRdf(tempFileName);
             string extensionDirectory = Path.Combine(extensionsDir, id);
@@ -141,7 +157,7 @@ namespace OpenQA.Selenium.Firefox
             return copyComplete;
         }
 
-        private string ReadIdFromInstallRdf(string root)
+        private static string ReadIdFromInstallRdf(string root)
         {
             string id = null;
             try
@@ -182,22 +198,25 @@ namespace OpenQA.Selenium.Firefox
         }
 
         //Assumes that we only really care about the preferences, not the comments
-        private Dictionary<string, string> ReadExistingPrefs(string userPrefsFilePath)
+        private Dictionary<string, string> ReadExistingPreferences()
         {
             Dictionary<string, string> prefs = new Dictionary<string, string>();
 
             try
             {
-                string[] fileLines = File.ReadAllLines(userPrefsFilePath);
-                foreach (string line in fileLines)
+                if (File.Exists(userPrefs))
                 {
-                    if (line.StartsWith("user_pref(\""))
+                    string[] fileLines = File.ReadAllLines(userPrefs);
+                    foreach (string line in fileLines)
                     {
-                        string parsedLine = line.Substring("user_pref(\"".Length);
-                        parsedLine = parsedLine.Substring(0, parsedLine.Length - ");".Length);
-                        string[] parts = line.Split(new string[] { "," }, StringSplitOptions.None);
-                        parts[0] = parts[0].Substring(0, parts[0].Length - 1);
-                        prefs.Add(parts[0].Trim(), parts[1].Trim());
+                        if (line.StartsWith("user_pref(\"", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string parsedLine = line.Substring("user_pref(\"".Length);
+                            parsedLine = parsedLine.Substring(0, parsedLine.Length - ");".Length);
+                            string[] parts = line.Split(new string[] { "," }, StringSplitOptions.None);
+                            parts[0] = parts[0].Substring(0, parts[0].Length - 1);
+                            prefs.Add(parts[0].Trim(), parts[1].Trim());
+                        }
                     }
                 }
             }
@@ -216,26 +235,25 @@ namespace OpenQA.Selenium.Firefox
 
         public void SetPreference(string name, int value)
         {
-            profileAdditionalPrefs.SetPreference(name, value.ToString());
+            profileAdditionalPrefs.SetPreference(name, value);
         }
 
         public void SetPreference(string name, bool value)
         {
-            profileAdditionalPrefs.SetPreference(name, value.ToString());
+            profileAdditionalPrefs.SetPreference(name, value);
         }
 
-        public void updateUserPrefs()
+        public void UpdateUserPreferences()
         {
             if (profilePort == 0)
             {
                 throw new WebDriverException("You must set the port to listen on before updating user.js");
             }
 
-            Dictionary<string, string> prefs = new Dictionary<string, string>();
+            Dictionary<string, string> prefs = ReadExistingPreferences();
 
             if (File.Exists(userPrefs))
             {
-                prefs = ReadExistingPrefs(userPrefs);
                 try
                 {
                     File.Delete(userPrefs);
@@ -249,51 +267,61 @@ namespace OpenQA.Selenium.Firefox
             profileAdditionalPrefs.AppendPreferencesTo(prefs);
 
             // Normal settings to facilitate testing
-            prefs.Add("app.update.auto", "false");
-            prefs.Add("app.update.enabled", "false");
-            prefs.Add("browser.download.manager.showWhenStarting", "false");
-            prefs.Add("browser.EULA.override", "true");
-            prefs.Add("browser.EULA.3.accepted", "true");
-            prefs.Add("browser.link.open_external", "2");
-            prefs.Add("browser.link.open_newwindow", "2");
-            prefs.Add("browser.safebrowsing.enabled", "false");
-            prefs.Add("browser.search.update", "false");
-            prefs.Add("browser.sessionstore.resume_from_crash", "false");
-            prefs.Add("browser.shell.checkDefaultBrowser", "false");
-            prefs.Add("browser.startup.page", "0");
-            prefs.Add("browser.tabs.warnOnClose", "false");
-            prefs.Add("browser.tabs.warnOnOpen", "false");
-            prefs.Add("dom.disable_open_during_load", "false");
-            prefs.Add("extensions.update.enabled", "false");
-            prefs.Add("extensions.update.notifyUser", "false");
-            prefs.Add("security.fileuri.origin_policy", "3");
-            prefs.Add("security.fileuri.strict_origin_policy", "false");
-            prefs.Add("security.warn_entering_secure", "false");
-            prefs.Add("security.warn_submit_insecure", "false");
-            prefs.Add("security.warn_entering_secure.show_once", "false");
-            prefs.Add("security.warn_entering_weak", "false");
-            prefs.Add("security.warn_entering_weak.show_once", "false");
-            prefs.Add("security.warn_leaving_secure", "false");
-            prefs.Add("security.warn_leaving_secure.show_once", "false");
-            prefs.Add("security.warn_viewing_mixed", "false");
-            prefs.Add("security.warn_viewing_mixed.show_once", "false");
-            prefs.Add("signon.rememberSignons", "false");
-            prefs.Add("startup.homepage_welcome_url", "\"about:blank\"");
+            AddDefaultPreference(prefs, "app.update.auto", "false");
+            AddDefaultPreference(prefs, "app.update.enabled", "false");
+            AddDefaultPreference(prefs, "browser.download.manager.showWhenStarting", "false");
+            AddDefaultPreference(prefs, "browser.EULA.override", "true");
+            AddDefaultPreference(prefs, "browser.EULA.3.accepted", "true");
+            AddDefaultPreference(prefs, "browser.link.open_external", "2");
+            AddDefaultPreference(prefs, "browser.link.open_newwindow", "2");
+            AddDefaultPreference(prefs, "browser.safebrowsing.enabled", "false");
+            AddDefaultPreference(prefs, "browser.search.update", "false");
+            AddDefaultPreference(prefs, "browser.sessionstore.resume_from_crash", "false");
+            AddDefaultPreference(prefs, "browser.shell.checkDefaultBrowser", "false");
+            AddDefaultPreference(prefs, "browser.startup.page", "0");
+            AddDefaultPreference(prefs, "browser.tabs.warnOnClose", "false");
+            AddDefaultPreference(prefs, "browser.tabs.warnOnOpen", "false");
+            AddDefaultPreference(prefs, "dom.disable_open_during_load", "false");
+            AddDefaultPreference(prefs, "extensions.update.enabled", "false");
+            AddDefaultPreference(prefs, "extensions.update.notifyUser", "false");
+            AddDefaultPreference(prefs, "security.fileuri.origin_policy", "3");
+            AddDefaultPreference(prefs, "security.fileuri.strict_origin_policy", "false");
+            AddDefaultPreference(prefs, "security.warn_entering_secure", "false");
+            AddDefaultPreference(prefs, "security.warn_submit_insecure", "false");
+            AddDefaultPreference(prefs, "security.warn_entering_secure.show_once", "false");
+            AddDefaultPreference(prefs, "security.warn_entering_weak", "false");
+            AddDefaultPreference(prefs, "security.warn_entering_weak.show_once", "false");
+            AddDefaultPreference(prefs, "security.warn_leaving_secure", "false");
+            AddDefaultPreference(prefs, "security.warn_leaving_secure.show_once", "false");
+            AddDefaultPreference(prefs, "security.warn_viewing_mixed", "false");
+            AddDefaultPreference(prefs, "security.warn_viewing_mixed.show_once", "false");
+            AddDefaultPreference(prefs, "signon.rememberSignons", "false");
+            AddDefaultPreference(prefs, "startup.homepage_welcome_url", "\"about:blank\"");
 
             // Which port should we listen on?
-            prefs.Add("webdriver_firefox_port", profilePort.ToString());
+            AddDefaultPreference(prefs, "webdriver_firefox_port", profilePort.ToString(CultureInfo.InvariantCulture));
 
             // Should we use native events?
-            prefs.Add("webdriver_enable_native_events", enableNativeEvents.ToString());
+            AddDefaultPreference(prefs, "webdriver_enable_native_events", enableNativeEvents.ToString().ToLowerInvariant());
 
             // Should we accept untrusted certificates or not?
-            prefs.Add("webdriver_accept_untrusted_certs", acceptUntrustedCerts.ToString());
+            AddDefaultPreference(prefs, "webdriver_accept_untrusted_certs", acceptUntrustedCerts.ToString().ToLowerInvariant());
 
             // Settings to facilitate debugging the driver
-            prefs.Add("javascript.options.showInConsole", "true"); // Logs errors in chrome files to the Error Console.
-            prefs.Add("browser.dom.window.dump.enabled", "true");  // Enables the use of the dump() statement
+            AddDefaultPreference(prefs, "javascript.options.showInConsole", "true"); // Logs errors in chrome files to the Error Console.
+            AddDefaultPreference(prefs, "browser.dom.window.dump.enabled", "true");  // Enables the use of the dump() statement
 
-            WriteNewPrefs(prefs);
+            WriteNewPreferences(prefs);
+        }
+
+        private static void AddDefaultPreference(Dictionary<string, string> preferences, string name, string value)
+        {
+            // The user must be able to override the default preferences in the profile,
+            // so only add them if they don't already exist.
+            if (!preferences.ContainsKey(name))
+            {
+                preferences.Add(name, value);
+            }
         }
 
         public void DeleteExtensionsCacheIfItExists()
@@ -306,13 +334,13 @@ namespace OpenQA.Selenium.Firefox
             }
         }
 
-        protected void WriteNewPrefs(Dictionary<string, string> prefs)
+        protected void WriteNewPreferences(Dictionary<string, string> preferences)
         {
             using (TextWriter writer = File.CreateText(userPrefs))
             {
-                foreach (string prefKey in prefs.Keys)
+                foreach (string prefKey in preferences.Keys)
                 {
-                    writer.WriteLine(string.Format("user_pref(\"{0}\", {1});", prefKey, prefs[prefKey]));
+                    writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "user_pref(\"{0}\", {1});", prefKey, preferences[prefKey]));
                 }
             }
         }
@@ -348,7 +376,46 @@ namespace OpenQA.Selenium.Firefox
 
         public void Clean()
         {
-            Directory.Delete(profileDir, true);
+            // To clean the profile, if it existed before we start, just 
+            // remove the extension. Otherwise, kill the profile.
+            string directoryToDelete = string.Empty;
+            if (isNamedProfile)
+            {
+                directoryToDelete = extensionsDir;
+            }
+            else
+            {
+                directoryToDelete = profileDir;
+            }
+
+            int numberOfRetries = 0;
+            while (Directory.Exists(directoryToDelete) && numberOfRetries < 10)
+            {
+                try
+                {
+                    Directory.Delete(directoryToDelete, true);
+                }
+                catch (IOException ex)
+                {
+                    // If we hit an exception (like file still in use), wait a half second
+                    // and try again. If we still hit an exception, go ahead and let it through.
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Exception found deleting '" + directoryToDelete 
+                        + "' on retry " + numberOfRetries + ": " + ex.Message);
+                }
+                finally
+                {
+                    numberOfRetries++;
+                }
+            }
+        }
+
+        private static string GenerateProfileDirectoryName()
+        {
+            string randomNumber = tempFileGenerator.Next().ToString(CultureInfo.InvariantCulture);
+            string directoryName = string.Format(CultureInfo.InvariantCulture, "webdriver{0}.profile", randomNumber);
+            string directoryPath = Path.Combine(Path.GetTempPath(), directoryName);
+            return directoryPath;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using OpenQA.Selenium.Firefox.Internal;
+using System.Globalization;
 
 namespace OpenQA.Selenium.Firefox
 {
@@ -15,10 +16,8 @@ namespace OpenQA.Selenium.Firefox
         private Dictionary<string, string> extraEnv = new Dictionary<string, string>();
         private Executable executable;
         private Process process;
-        private long timeoutInMilliseconds = 4500;
+        private long timeoutInMilliseconds = 45000;
         private StreamReader stream;
-        //private Thread outputWatcher;
-        //private FirefoxProfile profile;
 
         public FirefoxBinary() :
             this(null)
@@ -29,33 +28,31 @@ namespace OpenQA.Selenium.Firefox
             executable = new Executable(pathToFirefoxBinary);
         }
 
-        protected bool isOnLinux()
+        protected static bool IsOnLinux
         {
-            return Platform.CurrentPlatform.IsPlatformType(PlatformType.Linux);
+            get { return Platform.CurrentPlatform.IsPlatformType(PlatformType.Linux); }
         }
 
-        public void StartProfile(FirefoxProfile profile, string[] commandLineFlags)
+        public void StartProfile(FirefoxProfile profile, string[] commandLineArguments)
         {
-            if (commandLineFlags == null)
+            if (commandLineArguments == null)
             {
-                commandLineFlags = new string[] { };
+                commandLineArguments = new string[] { };
             }
             string profileAbsPath = profile.ProfileDirectory;
             SetEnvironmentProperty("XRE_PROFILE_PATH", profileAbsPath);
             SetEnvironmentProperty("MOZ_NO_REMOTE", "1");
 
-            if (isOnLinux()
-                && (profile.EnableNativeEvents || profile.AlwaysLoadNoFocusLibrary))
+            if (IsOnLinux && (profile.EnableNativeEvents || profile.AlwaysLoadNoFocusLibrary))
             {
                 ModifyLinkLibraryPath(profile);
             }
             StringBuilder commandLineArgs = new StringBuilder("--verbose");
-            foreach (string commandLineArg in commandLineFlags)
+            foreach (string commandLineArg in commandLineArguments)
             {
                 commandLineArgs.Append(" ").Append(commandLineArg);
             }
             Process builder = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo();
             builder.StartInfo.FileName = BinaryExecutable.ExecutablePath;
             builder.StartInfo.Arguments = commandLineArgs.ToString();
             builder.StartInfo.UseShellExecute = false;
@@ -85,17 +82,9 @@ namespace OpenQA.Selenium.Firefox
             }
         }
 
-        //protected void StartOutputWatcher() {
-        //  outputWatcher = new Thread(new OutputWatcher(process, stream), "Firefox output watcher");
-        //  outputWatcher.start();
-        //}
-
         internal Executable BinaryExecutable
         {
-            get
-            {
-                return executable;
-            }
+            get { return executable; }
         }
 
         protected Dictionary<string, string> ExtraEnvironmentVariables
@@ -123,8 +112,8 @@ namespace OpenQA.Selenium.Firefox
             SetEnvironmentProperty("LD_PRELOAD", NoFocusLibraryName);
         }
 
-        protected string ExtractAndCheck(FirefoxProfile profile, string noFocusSoName,
-                                         string jarPath32Bit, string jarPath64Bit)
+        protected static string ExtractAndCheck(FirefoxProfile profile, string noFocusSoName,
+                                         string libraryPath32Bit, string libraryPath64Bit)
         {
 
             // 1. Extract x86/x_ignore_nofocus.so to profile.getLibsDir32bit
@@ -133,8 +122,8 @@ namespace OpenQA.Selenium.Firefox
             //   profile.getLibsDir32bit + ":" + profile.getLibsDir64bit
 
             List<string> pathsSet = new List<string>();
-            pathsSet.Add(jarPath32Bit);
-            pathsSet.Add(jarPath64Bit);
+            pathsSet.Add(libraryPath32Bit);
+            pathsSet.Add(libraryPath64Bit);
 
             StringBuilder builtPath = new StringBuilder();
 
@@ -170,7 +159,7 @@ namespace OpenQA.Selenium.Firefox
             return builtPath.ToString();
         }
 
-        protected void CopeWithTheStrangenessOfTheMac(Process builder)
+        private void CopeWithTheStrangenessOfTheMac(Process builder)
         {
             if (Platform.CurrentPlatform.IsPlatformType(PlatformType.MacOSX))
             {
@@ -200,7 +189,7 @@ namespace OpenQA.Selenium.Firefox
                 // Ensure we're okay
                 try
                 {
-                    sleep(300);
+                    Sleep(300);
 
                     if (process.ExitCode == 0)
                     {
@@ -208,8 +197,8 @@ namespace OpenQA.Selenium.Firefox
                     }
 
                     StringBuilder message = new StringBuilder("Unable to start firefox cleanly.\n");
-                    message.Append(getConsoleOutput()).Append("\n");
-                    message.Append("Exit value: ").Append(process.ExitCode.ToString()).Append("\n");
+                    message.Append(ConsoleOutput).Append("\n");
+                    message.Append("Exit value: ").Append(process.ExitCode.ToString(CultureInfo.InvariantCulture)).Append("\n");
                     message.Append("Ran from: ").Append(builder.StartInfo.FileName).Append("\n");
                     throw new WebDriverException(message.ToString());
                 }
@@ -220,12 +209,12 @@ namespace OpenQA.Selenium.Firefox
             }
         }
 
-        public void SetEnvironmentProperty(String propertyName, String value)
+        public void SetEnvironmentProperty(string propertyName, string value)
         {
             if (string.IsNullOrEmpty(propertyName) || value == null)
             {
                 throw new WebDriverException(
-                    String.Format("You must set both the property name and value: {0}, {1}", propertyName,
+                    string.Format(CultureInfo.InvariantCulture, "You must set both the property name and value: {0}, {1}", propertyName,
                         value));
             }
             if (extraEnv.ContainsKey(propertyName))
@@ -238,11 +227,11 @@ namespace OpenQA.Selenium.Firefox
             }
         }
 
-        public void CreateProfile(String profileName)
+        public void CreateProfile(string profileName)
         {
             Process builder = new Process();
             builder.StartInfo.FileName = executable.ExecutablePath;
-            builder.StartInfo.Arguments = "--verbose -CreateProfile" + profileName;
+            builder.StartInfo.Arguments = "--verbose -CreateProfile " + profileName;
             builder.StartInfo.RedirectStandardError = true;
             builder.StartInfo.EnvironmentVariables.Add("MOZ_NO_REMOTE", "1");
             if (stream == null)
@@ -251,9 +240,6 @@ namespace OpenQA.Selenium.Firefox
             }
 
             StartFirefoxProcess(builder);
-
-            //outputWatcher = new Thread(new OutputWatcher(process, stream));
-            //outputWatcher.start();
         }
 
         /**
@@ -262,7 +248,7 @@ namespace OpenQA.Selenium.Firefox
          * @throws InterruptedException if we are interrupted while waiting for the process to launch
          * @throws IOException          if there is a problem with reading the input stream of the launching process
          */
-        public void waitFor()
+        public void WaitForProcessExit()
         {
             process.WaitForExit();
         }
@@ -274,17 +260,20 @@ namespace OpenQA.Selenium.Firefox
          * @return the console output of the executed binary.
          * @throws IOException
          */
-        public string getConsoleOutput()
+        public string ConsoleOutput
         {
-            if (process == null)
+            get
             {
-                return null;
-            }
+                if (process == null)
+                {
+                    return null;
+                }
 
-            return stream.ReadToEnd();
+                return stream.ReadToEnd();
+            }
         }
 
-        private void sleep(int timeInMillis)
+        private static void Sleep(int timeInMillis)
         {
             try
             {
@@ -301,7 +290,7 @@ namespace OpenQA.Selenium.Firefox
             StartProfile(profile, new string[] { "-silent" });
             try
             {
-                waitFor();
+                WaitForProcessExit();
             }
             catch (ThreadInterruptedException e)
             {
@@ -312,12 +301,12 @@ namespace OpenQA.Selenium.Firefox
             {
                 while (profile.IsRunning)
                 {
-                    sleep(500);
+                    Sleep(500);
                 }
 
                 do
                 {
-                    sleep(500);
+                    Sleep(500);
                 } while (profile.IsRunning);
             }
         }
@@ -332,11 +321,6 @@ namespace OpenQA.Selenium.Firefox
         {
             return "FirefoxBinary(" + executable.ExecutablePath + ")";
         }
-
-        //public void setOutputWatcher(OutputStream stream)
-        //{
-        //    this.stream = stream;
-        //}
 
         public void Quit()
         {
@@ -354,27 +338,5 @@ namespace OpenQA.Selenium.Firefox
                 process.Kill();
             }
         }
-
-        //private static class OutputWatcher  {
-        //  private Process process;
-        //  private Stream stream;
-
-        //  public OutputWatcher(Process process, Stream stream) {
-        //    this.process = process;
-        //    this.stream = stream;
-        //  }
-
-        //  public void Run() {
-        //    int in = 0;
-        //    while (in != -1) {
-        //      try {
-        //        in = process.getInputStream().read();
-        //        stream.Write(in);
-        //      } catch (IOException e) {
-        //        System.err.println(e);
-        //      }
-        //    }
-        //  }
-        //}
     }
 }

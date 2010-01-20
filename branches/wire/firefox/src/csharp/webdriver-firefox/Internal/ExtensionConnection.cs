@@ -6,14 +6,13 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Globalization;
 
 namespace OpenQA.Selenium.Firefox.Internal
 {
     internal class ExtensionConnection : IExtensionConnection
     {
         private Socket extensionSocket;
-        //private NetworkStream socketStream;
-        //private NetworkStream inputStream;
         private List<IPEndPoint> addresses = new List<IPEndPoint>();
         FirefoxProfile profile;
         FirefoxBinary process;
@@ -35,9 +34,8 @@ namespace OpenQA.Selenium.Firefox.Internal
             {
                 int portToUse = DetermineNextFreePort(host, profile.Port);
 
-                //this.process.setOutputWatcher(new CircularOutputStream(bufferSize));
                 profile.Port = portToUse;
-                profile.updateUserPrefs();
+                profile.UpdateUserPreferences();
                 this.process.Clean(profile);
                 this.process.StartProfile(profile, null);
 
@@ -51,7 +49,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             }
         }
 
-        protected int DetermineNextFreePort(String host, int port)
+        protected static int DetermineNextFreePort(string host, int port)
         {
             // Attempt to connect to the given port on the host
             // If we can't connect, then we're good to use it
@@ -60,6 +58,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             for (newport = port; newport < port + 200; newport++)
             {
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
                 IPHostEntry hostEntry = Dns.GetHostEntry(host);
                 IPEndPoint address = new IPEndPoint(hostEntry.AddressList[0], newport);
 
@@ -79,12 +78,12 @@ namespace OpenQA.Selenium.Firefox.Internal
             }
 
             throw new WebDriverException(
-                String.Format("Cannot find free port in the range {0} to {0} ", port, newport));
+                string.Format(CultureInfo.InvariantCulture, "Cannot find free port in the range {0} to {0} ", port, newport));
         }
 
         protected void SetAddress(string host, int port)
         {
-            if (string.Compare("localhost", host, true) == 0)
+            if (string.Compare("localhost", host, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 addresses = ObtainLoopbackAddresses(port);
             }
@@ -96,7 +95,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             }
         }
 
-        private List<IPEndPoint> ObtainLoopbackAddresses(int port)
+        private static List<IPEndPoint> ObtainLoopbackAddresses(int port)
         {
             List<IPEndPoint> endpoints = new List<IPEndPoint>();
 
@@ -137,7 +136,7 @@ namespace OpenQA.Selenium.Firefox.Internal
             {
                 SendMessage(new Command(null, "quit", null));
             }
-            catch (Exception)
+            catch (WebDriverException)
             {
                 // this is expected
             }
@@ -154,8 +153,6 @@ namespace OpenQA.Selenium.Firefox.Internal
             extensionSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             extensionSocket.Connect(addr);
-            // inputStream = new NetworkStream(extensionSocket);
-            // socketStream = new NetworkStream(extensionSocket, true);
         }
 
         protected void ConnectToBrowser(long timeToWaitInMilliSeconds)
@@ -172,14 +169,7 @@ namespace OpenQA.Selenium.Firefox.Internal
                     }
                     catch (SocketException)
                     {
-                        try
-                        {
-                            System.Threading.Thread.Sleep(250);
-                        }
-                        catch (Exception ie)
-                        {
-                            throw new WebDriverException("Unexpected error connection to browser", ie);
-                        }
+                        System.Threading.Thread.Sleep(250);
                     }
                 }
             }
@@ -188,13 +178,13 @@ namespace OpenQA.Selenium.Firefox.Internal
             {
                 if (extensionSocket == null || extensionSocket.RemoteEndPoint == null)
                 {
-                    throw new WebDriverException(string.Format("Failed to start up socket within {0}", timeToWaitInMilliSeconds));
+                    throw new WebDriverException(string.Format(CultureInfo.InvariantCulture, "Failed to start up socket within {0}", timeToWaitInMilliSeconds));
                 }
                 else
                 {
                     IPEndPoint endPoint = (IPEndPoint)extensionSocket.RemoteEndPoint;
-                    throw new WebDriverException(string.Format("Unable to connect to host {0} on port {1} after {2} ms",
-                        endPoint.Address.ToString(), endPoint.Port.ToString(), timeToWaitInMilliSeconds));
+                    throw new WebDriverException(string.Format(CultureInfo.InvariantCulture, "Unable to connect to host {0} on port {1} after {2} ms",
+                        endPoint.Address.ToString(), endPoint.Port.ToString(CultureInfo.InvariantCulture), timeToWaitInMilliSeconds));
                 }
             }
         }
@@ -214,7 +204,6 @@ namespace OpenQA.Selenium.Firefox.Internal
             try
             {
                 byte[] messageBuffer = Encoding.UTF8.GetBytes(message.ToString());
-                //extensionSocket.Send(messageBuffer);
                 using (NetworkStream socketStream = new NetworkStream(extensionSocket))
                 {
                     socketStream.Write(messageBuffer, 0, messageBuffer.Length);
@@ -266,9 +255,9 @@ namespace OpenQA.Selenium.Firefox.Internal
             // Read headers
             int count = 0;
             string[] parts = line.Split(new string[] { ":" }, 2, StringSplitOptions.None);
-            if (string.Compare(parts[0], "Length", true) == 0)
+            if (string.Compare(parts[0], "Length", StringComparison.OrdinalIgnoreCase) == 0)
             {
-                count = int.Parse(parts[1].Trim());
+                count = int.Parse(parts[1].Trim(), CultureInfo.InvariantCulture);
             }
 
             // Wait for the blank line
@@ -321,5 +310,18 @@ namespace OpenQA.Selenium.Firefox.Internal
             string returnedLine = Encoding.UTF8.GetString(raw, 0, count);
             return returnedLine;
         }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (extensionSocket != null && extensionSocket.Connected)
+            {
+                extensionSocket.Close();
+            }
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }

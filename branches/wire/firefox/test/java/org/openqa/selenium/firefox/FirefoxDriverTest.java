@@ -273,4 +273,18 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       }
     }
   }
+
+  public void testShouldAllowUserToSuccessfullyOverrideTheHomePage() {
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.setPreference("browser.startup.page", "1");
+    profile.setPreference("browser.startup.homepage", javascriptPage);
+
+    WebDriver driver2 = new FirefoxDriver(profile);
+
+    try {
+      assertEquals(javascriptPage, driver2.getCurrentUrl());
+    } finally {
+      driver2.quit();
+    }
+  }
 }

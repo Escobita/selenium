@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace OpenQA.Selenium.Firefox
 {
-    public class FirefoxDriver : IWebDriver, ISearchContext, IFindsById, IFindsByClassName, IFindsByLinkText, IFindsByName, IFindsByTagName, IFindsByXPath, IFindsByPartialLinkText, IJavaScriptExecutor
+    public class FirefoxDriver : IWebDriver, ISearchContext, IFindsById, IFindsByClassName, IFindsByLinkText, IFindsByName, IFindsByTagName, IFindsByXPath, IFindsByPartialLinkText, IFindsByCssSelector, IJavaScriptExecutor, ITakesScreenshot
     {
         public static readonly int DefaultPort = 7055;
         public static readonly bool DefaultEnableNativeEvents = Platform.CurrentPlatform.IsPlatformType(PlatformType.Windows);
@@ -47,24 +47,18 @@ namespace OpenQA.Selenium.Firefox
             {
                 profileToUse.AddExtension(false);
             }
-            prepareEnvironment();
+            PrepareEnvironment();
 
             extension = ConnectTo(binary, profileToUse, "localhost");
-            FixId();
+            FixSessionId();
         }
 
-        private FirefoxDriver(ExtensionConnection extension, Context context)
-        {
-            this.extension = extension;
-            this.context = context;
-        }
-
-        internal ExtensionConnection ConnectTo(FirefoxBinary binary, FirefoxProfile profile, String host)
+        internal static ExtensionConnection ConnectTo(FirefoxBinary binary, FirefoxProfile profile, string host)
         {
             return ExtensionConnectionFactory.ConnectTo(binary, profile, host);
         }
 
-        protected void prepareEnvironment()
+        protected void PrepareEnvironment()
         {
             // Does nothing, but provides a hook for subclasses to do "stuff"
         }
@@ -123,15 +117,20 @@ namespace OpenQA.Selenium.Firefox
             {
                 SendMessage(typeof(WebDriverException), "close");
             }
-            catch (Exception)
+            catch (WebDriverException)
             {
                 // All good
+            }
+            catch (NullReferenceException)
+            {
+                // Still good
             }
         }
 
         public void Quit()
         {
             extension.Quit();
+            Dispose();
         }
 
         public ReadOnlyCollection<string> GetWindowHandles()
@@ -291,6 +290,20 @@ namespace OpenQA.Selenium.Firefox
 
         #endregion
 
+        #region IFindsByCssSelector Members
+
+        public IWebElement FindElementByCssSelector(string cssSelector)
+        {
+            return FindElement("css selector", cssSelector);
+        }
+
+        public ReadOnlyCollection<IWebElement> FindElementsByCssSelector(string cssSelector)
+        {
+            return FindElements("css selector", cssSelector);
+        }
+
+        #endregion
+
         #region IJavaScriptExecutor Members
 
         public object ExecuteScript(string script, params object[] args)
@@ -305,11 +318,31 @@ namespace OpenQA.Selenium.Firefox
         }
         #endregion
 
+        #region ITakesScreenshot Members
+        public Screenshot GetScreenshot()
+        {
+            // Get the screenshot as base64.
+            string base64 = SendMessage(typeof(WebDriverException), "getScreenshotAsBase64");
+            // ... and convert it.
+            return new Screenshot(base64);
+
+        }
+        #endregion
+
         #region IDisposable Members
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                extension.Dispose();
+            }
         }
 
         #endregion
@@ -343,7 +376,7 @@ namespace OpenQA.Selenium.Firefox
             return new ReadOnlyCollection<IWebElement>(elements);
         }
 
-        private void FixId()
+        private void FixSessionId()
         {
             string response = SendMessage(typeof(WebDriverException), "newSession");
             this.context = new Context(response);
@@ -383,17 +416,18 @@ namespace OpenQA.Selenium.Firefox
             response.IfNecessaryThrow(throwOnFailure);
 
             object rawResponse = response.ResponseValue;
-            if (rawResponse is string)
+            string rawResponseAsString = rawResponse as string;
+            if (rawResponseAsString != null)
             {
                 // First, collapse all \r\n pairs to \n, then replace all \n with
                 // System.Environment.NewLine. This ensures the consistency of 
                 // the values.
-                rawResponse = (((string)rawResponse).Replace("\r\n", "\n").Replace("\n", System.Environment.NewLine));
+                rawResponse = (rawResponseAsString.Replace("\r\n", "\n").Replace("\n", System.Environment.NewLine));
             }
             return rawResponse;
         }
 
-        private object[] ConvertToJsObjects(object[] args)
+        private static object[] ConvertToJsObjects(object[] args)
         {
             for (int i = 0; i < args.Length; i++)
             {
@@ -567,7 +601,7 @@ namespace OpenQA.Selenium.Firefox
                 get
                 {
                     string response = driver.SendMessage(typeof(WebDriverException), "getMouseSpeed");
-                    int speedValue = int.Parse(response);
+                    int speedValue = int.Parse(response, CultureInfo.InvariantCulture);
                     string speedDescription = string.Empty;
                     switch (speedValue)
                     {
@@ -599,7 +633,7 @@ namespace OpenQA.Selenium.Firefox
                             pixelSpeed = FastSpeed;
                             break;
                         default:
-                            throw new ArgumentException();
+                            throw new ArgumentException("value must be a predefined Speed", "value");
                     }
                     driver.SendMessage(typeof(WebDriverException), "setMouseSpeed", new object[] { pixelSpeed });
                 }
@@ -640,9 +674,9 @@ namespace OpenQA.Selenium.Firefox
                                         cookieAttributes.Add("name", attributeTokens[0]);
                                         cookieAttributes.Add("value", attributeTokens[1]);
                                     }
-                                    else if (attributeTokens[0] == "domain" && attributeTokens[1].Trim().StartsWith("."))
+                                    else if (attributeTokens[0] == "domain" && attributeTokens[1].Trim().StartsWith(".", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        int offset = attributeTokens[1].IndexOf(".") + 1;
+                                        int offset = attributeTokens[1].IndexOf(".", StringComparison.OrdinalIgnoreCase) + 1;
                                         cookieAttributes.Add("domain", attributeTokens[1].Substring(offset));
                                     }
                                     else if (attributeTokens.Length > 1)
@@ -661,7 +695,7 @@ namespace OpenQA.Selenium.Firefox
                             if (!string.IsNullOrEmpty(expiry) && expiry != "0")
                             {
                                 //firefox stores expiry as number of seconds
-                                expires = new DateTime(long.Parse(cookieAttributes["expires"]) * 10000);
+                                expires = new DateTime(long.Parse(cookieAttributes["expires"], CultureInfo.InvariantCulture) * 10000);
                             }
 
                             string name = cookieAttributes["name"];
@@ -669,7 +703,7 @@ namespace OpenQA.Selenium.Firefox
                             string path = cookieAttributes["path"];
                             string domain = cookieAttributes["domain"];
                             bool secure = bool.Parse(cookieAttributes["secure"]);
-                            toReturn.Add(new ReturnedCookie(name, value, domain, path, null, secure, new Uri(driver.Url)));
+                            toReturn.Add(new ReturnedCookie(name, value, domain, path, expires, secure, new Uri(driver.Url)));
                         }
                     }
 

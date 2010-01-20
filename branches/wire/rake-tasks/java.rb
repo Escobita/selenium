@@ -64,9 +64,21 @@ class JavaGen < BaseGenerator
           path if path.to_s =~ /.jar$/
         end
 
-        # Compile
-        cmd = "javac -cp #{classpath.join(classpath_separator?)} -g -source 5 -target 5 -d #{temp} #{FileList[args[:srcs]]} " 
-        sh cmd, :verbose => false 
+        # avoid hitting Windows' command line argument limit by putting
+        # the source list in a file
+        src_file = "src.txt"
+        File.open(src_file, "w") do |file|
+          file << FileList[args[:srcs]].join(" ")
+        end
+
+        begin
+          # Compile
+          cmd = "javac -cp #{classpath.join(classpath_separator?)} -g -source 5 -target 5 -d #{temp} @#{src_file}"
+          sh cmd, :verbose => false
+        ensure
+          # Delete the temporary file
+          File.delete src_file
+        end
       end
       
       # TODO(simon): make copy_resource_ handle this for us
@@ -192,10 +204,16 @@ class JavaGen < BaseGenerator
       temp = "#{out}_temp"
       mkdir_p temp, :verbose => false
       
-      all = build_uberlist_(args[:deps], args[:standalone])
-      all.each do |dep|
-        sh "cd #{temp} && jar xf ../../#{dep}", :verbose => false
+      all = []
+      args[:deps].each do |d|
+        all += build_classpath_(d)
       end
+      all = all.sort.uniq.collect
+      
+      all.each do |dep|
+        next unless dep.to_s =~ /\.jar$/
+        sh "cd #{temp} && jar xf ../../#{dep}", :verbose => false
+      end      
 
       excludes = args[:exclude] || []
       excludes.each do |to_exclude|
