@@ -25,10 +25,12 @@ import com.android.webdriver.sessions.Session.Actions;
 public class SessionRepository implements Session.OnChangeListener,
                                           Session.ActionRequestListener {
 	
+  public static final int SINGLE_SESSION_ID = 1000;  // For single-session mode
+
 	/**
 	 * Describes what type of change occurred with the session
 	 */
-	public enum SessionChangeType {UPDATED, ADDED, REMOVED, UPDATED_SYNC}
+	public enum SessionChangeType {UPDATED, ADDED, REMOVED}
 	
 	/**
 	 * Interface definition for a callback to be invoked when any property of
@@ -127,12 +129,11 @@ public class SessionRepository implements Session.OnChangeListener,
         	mOnSessionChangeListener = null;
     }
 
-    public void onChange(Session session, boolean synchronous) {
-    	if (mOnSessionChangeListener != null)
-      	  mOnSessionChangeListener.onSessionChange(session,
-      	      synchronous ? SessionChangeType.UPDATED_SYNC :
-      			  SessionChangeType.UPDATED);
-	}
+  public void onChange(Session session) {
+    if (mOnSessionChangeListener != null)
+      mOnSessionChangeListener.onSessionChange(session,
+          SessionChangeType.UPDATED);
+  }
 
 	public void setSessionActionRequestListener(
 			SessionActionRequestListener listener) {

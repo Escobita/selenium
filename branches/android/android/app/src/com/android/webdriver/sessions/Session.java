@@ -42,7 +42,7 @@ public class Session {
      *
      * @param session Session object.
      */
-    void onChange(Session session, boolean syncronous);
+    void onChange(Session session);
   }
 
   /**
@@ -72,7 +72,7 @@ public class Session {
   public void setContext(String mContext) {
     this.mContext = mContext;
     if (mOnChangeListener != null)
-      mOnChangeListener.onChange(this, false);
+      mOnChangeListener.onChange(this);
   }
 
   public String getContext() {
@@ -80,17 +80,13 @@ public class Session {
   }
 
   public void setUrl(String url) {
-    setUrl(url, false);
-  }
-
-  public void setUrl(String url, boolean blocking) {
     if (mLastUrl.equals(url))
       return;
 
     this.mLastUrl = url;
     this.mStatus = "Loading " + url.substring(0, Math.min(url.length(), 40));
     if (mOnChangeListener != null)
-      mOnChangeListener.onChange(this, blocking);
+      mOnChangeListener.onChange(this);
   }
 
   public String getLastUrl() {
@@ -100,7 +96,7 @@ public class Session {
   public void setStatus(String mStatus) {
     this.mStatus = mStatus;
     if (mOnChangeListener != null)
-      mOnChangeListener.onChange(this, false);
+      mOnChangeListener.onChange(this);
   }
 
   public String getStatus() {
@@ -154,7 +150,7 @@ public class Session {
   public void setPageContent(String pageContent) {
     this.mPageContent = pageContent;
     if (mOnChangeListener != null)
-      mOnChangeListener.onChange(this, false);
+      mOnChangeListener.onChange(this);
   }
 
   public String getPageContent() {

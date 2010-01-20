@@ -16,8 +16,6 @@
 
 package com.android.webdriver.sessions.intents;
 
-import com.android.webdriver.app.SingleSessionActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,17 +24,42 @@ import android.util.Log;
 
 public class NavigationIntentReceiverLite extends BroadcastReceiver {
 
+  /**
+   * Interface definition for a callback to be invoked when any navigation
+   * is requested.
+   */
+  public interface NavigateRequestListener {
+      /**
+       * Request to navigate the WebView to a given URL.
+       *
+       * @param url URL to navigate to.
+       */
+      void onNavigateRequest(String url);
+  }
+  
+  public void setNavigateRequestListener(NavigateRequestListener listener) {
+    mNavigateRequestListener = listener;
+  }
+
+  public void removeNavigateRequestListener(NavigateRequestListener listener) {
+    if (listener == mNavigateRequestListener)
+      mNavigateRequestListener = null;
+  }
+  
   @Override
   public void onReceive(Context context, Intent intent) {
     Log.d("WebDriverLite", "Received intent: " + intent.getAction());
 
     String url = intent.getExtras().getString("URL");
     
-    ((SingleSessionActivity)context).navigateTo(url);
-
+    if (mNavigateRequestListener != null)
+      mNavigateRequestListener.onNavigateRequest(url);
+    
     Bundle res = new Bundle();
     res.putBoolean("OK", true);
     Log.d("WebDriver", "Navigated OK");
     this.setResultExtras(res);
   }
+
+  private NavigateRequestListener mNavigateRequestListener;
 }

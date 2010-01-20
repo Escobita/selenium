@@ -37,7 +37,7 @@ public class NavigationIntentReceiver extends BroadcastReceiver {
       resultOk = false;
     } else {
       try {
-        SessionRepository.getInstance().getById(sessionId).setUrl(url, false);
+        SessionRepository.getInstance().getById(sessionId).setUrl(url);
       } catch(Exception e) {
         Log.e("WebDriver", "Exception while navigating to URL: " +
             url + ", message: " + e.getMessage());

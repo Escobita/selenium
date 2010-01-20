@@ -21,6 +21,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Main activity.
+ * 
+ * Loads program configuration and starts the UI
+ * according to the working mode.
+ */
 public class WebDriver extends Activity {
 
   public static final int DEFAULT_REQUEST_CODE = 1001;

@@ -1,6 +1,26 @@
+/* Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.android.webdriver.app;
 
+import com.android.webdriver.sessions.Session.Actions;
 import com.android.webdriver.sessions.intents.*;
+import com.android.webdriver.sessions.intents.DoActionIntentReceiverLite.ActionRequestListener;
+import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiverLite.UrlRequestListener;
+import com.android.webdriver.sessions.intents.GetTitleIntentReceiverLite.TitleRequestListener;
+import com.android.webdriver.sessions.intents.NavigationIntentReceiverLite.NavigateRequestListener;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -14,10 +34,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-public class SingleSessionActivity extends Activity {
+public class SingleSessionActivity extends Activity
+                                   implements ActionRequestListener,
+                                              TitleRequestListener,
+                                              NavigateRequestListener,
+                                              UrlRequestListener {
   
-  public static final int SINGLE_SESSION_ID = 1000;  // We have only one session
-
   public static final int MENU_MULTI_SESSION = Menu.FIRST + 3;
   
 
@@ -72,20 +94,31 @@ public class SingleSessionActivity extends Activity {
           "webdriver");
 
       // Registering all intent receivers
-      mIntentReg.registerReceiver(new NavigationIntentReceiverLite(),
-          Intents.INTENT_NAVIGATE);
+      NavigationIntentReceiverLite navIR = new NavigationIntentReceiverLite();
+      navIR.setNavigateRequestListener(this);
+      mIntentReg.registerReceiver(navIR, Intents.INTENT_NAVIGATE);
+      
       mIntentReg.registerReceiver(new AddSessionIntentReceiverLite(),
           Intents.INTENT_ADDSESSION);
       mIntentReg.registerReceiver(new DeleteSessionIntentReceiverLite(),
           Intents.INTENT_DELETESESSION);
-      mIntentReg.registerReceiver(new DoActionIntentReceiverLite(),
-          Intents.INTENT_DOACTION);
-      mIntentReg.registerReceiver(new GetTitleIntentReceiverLite(),
-          Intents.INTENT_GETTITLE);
+      
+      DoActionIntentReceiverLite doActIR = new DoActionIntentReceiverLite();
+      doActIR.setActionRequestListener(this);
+      mIntentReg.registerReceiver(doActIR, Intents.INTENT_DOACTION);
+      
+      GetTitleIntentReceiverLite titleIR = new GetTitleIntentReceiverLite();
+      titleIR.setTitleRequestListener(this);
+      mIntentReg.registerReceiver(titleIR, Intents.INTENT_GETTITLE);
+      
       mIntentReg.registerReceiver(new SetProxyIntentReceiver(),
           Intents.INTENT_SETPROXY);
-      mIntentReg.registerReceiver(new GetCurrentUrlIntentReceiverLite(),
-          Intents.INTENT_GETURL);
+      
+      GetCurrentUrlIntentReceiverLite urlIR =
+        new GetCurrentUrlIntentReceiverLite();
+      urlIR.setUrlRequestListener(this);
+      mIntentReg.registerReceiver(urlIR, Intents.INTENT_GETURL);
+      
 //      mIntentReg.RegisterReceiver(new CookieIntentReceiver(),
 //          Intents.INTENT_COOKIES);
 
@@ -202,9 +235,54 @@ public class SingleSessionActivity extends Activity {
     }
   }
 
-
   private String currentUrl = "";
   private WebView mWebView = null;
   private IntentReceiverRegistrar mIntentReg;
   private SimpleWebViewJSExecutor jsExecutor = new SimpleWebViewJSExecutor();
+
+
+  @Override
+  public Object onActionRequest(Actions action, Object[] args) {
+    String actionRes = "";
+    
+    switch(action) {
+      case EXECUTE_JAVASCRIPT:
+        if (args.length == 1)
+          actionRes = this.executeJS(args[0].toString());
+        else
+          Log.w("WebDriverLite:ExecuteJavaScript",
+              "Incorrect arguments for action: " + action.toString());
+        break;
+      case GET_PAGESOURCE:
+        actionRes = this.executeJS(
+        "window.webdriver.resultMethod(document.documentElement.outerHTML);");        
+        break;
+      case NAVIGATE_BACK:
+        this.navigateBackOrForward(-1);
+        break;
+      case NAVIGATE_FORWARD:
+        this.navigateBackOrForward(1);
+        break;
+      case REFRESH:
+        this.reload();
+        break;
+    }
+    return actionRes;
+  }
+
+  @Override
+  public String onTitleRequest() {
+    return this.getWebViewTitle();
+  }
+
+  @Override
+  public void onNavigateRequest(String url) {
+    this.navigateTo(url);
+  }
+
+  @Override
+  public String onUrlRequest() {
+    return this.getLastUrl();
+  }
+  
 }

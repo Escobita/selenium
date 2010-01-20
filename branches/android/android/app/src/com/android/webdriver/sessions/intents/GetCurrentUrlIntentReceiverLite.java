@@ -16,8 +16,6 @@
 
 package com.android.webdriver.sessions.intents;
 
-import com.android.webdriver.app.SingleSessionActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,15 +24,40 @@ import android.util.Log;
 
 public class GetCurrentUrlIntentReceiverLite extends BroadcastReceiver {
 
+  /**
+   * Interface definition for a callback to be invoked when URL is required.
+   */
+  public interface UrlRequestListener {
+      /**
+       * Returns current URL of the WebView.
+       *
+       * @return URL of current web page loaded in the WebView.
+       */
+      String onUrlRequest();
+  }
+
+  public void setUrlRequestListener(UrlRequestListener listener) {
+    mUrlRequestListener = listener;
+  }
+
+  public void removeUrlRequestListener(UrlRequestListener listener) {
+    if (listener == mUrlRequestListener)
+      mUrlRequestListener = null;
+  }
+
   @Override
   public void onReceive(Context context, Intent intent) {
     Log.d("WebDriver", "Received intent: " + intent.getAction());
 
-    String url = ((SingleSessionActivity)context).getLastUrl();
+    String url = "";
+    if (mUrlRequestListener != null)
+      url = mUrlRequestListener.onUrlRequest();
 
     Bundle res = new Bundle();
     res.putString("URL", url);
     Log.d("WebDriverLite", "Returning URL: " + url);
     this.setResultExtras(res);
   }
+
+  private UrlRequestListener mUrlRequestListener;
 }

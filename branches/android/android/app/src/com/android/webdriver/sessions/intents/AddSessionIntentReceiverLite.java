@@ -16,7 +16,7 @@
 
 package com.android.webdriver.sessions.intents;
 
-import com.android.webdriver.app.SingleSessionActivity;
+import com.android.webdriver.sessions.SessionRepository;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,7 +31,7 @@ public class AddSessionIntentReceiverLite extends BroadcastReceiver {
       Log.d("WebDriverLite", "Received intent: " + intent.getAction());
 
       Bundle res = new Bundle();
-      res.putInt("SessionId", SingleSessionActivity.SINGLE_SESSION_ID);
+      res.putInt("SessionId", SessionRepository.SINGLE_SESSION_ID);
       Log.d("WebDriver", "Returning default session id: 1000");
       this.setResultExtras(res);
   }

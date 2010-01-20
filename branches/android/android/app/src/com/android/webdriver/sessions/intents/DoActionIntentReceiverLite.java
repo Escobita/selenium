@@ -16,7 +16,7 @@
 
 package com.android.webdriver.sessions.intents;
 
-import com.android.webdriver.app.SingleSessionActivity;
+import com.android.webdriver.sessions.SessionRepository;
 import com.android.webdriver.sessions.Session.Actions;
 
 import android.content.BroadcastReceiver;
@@ -27,6 +27,30 @@ import android.util.Log;
 
 public class DoActionIntentReceiverLite extends BroadcastReceiver {
 
+  /**
+   * Interface definition for a callback to be invoked when any property of
+   * the session is changed.
+   */
+  public interface ActionRequestListener {
+      /**
+       * Request to perform an action
+       *
+       * @param action Action to perform.
+       * @param params Argument of an action.
+       * @return Result of the action or null if no result was returned.
+       */
+      Object onActionRequest(Actions action, Object[] params);
+  }
+  
+  public void setActionRequestListener(ActionRequestListener listener) {
+    mActionRequestListener = listener;
+  }
+
+  public void removeActionRequestListener(ActionRequestListener listener) {
+    if (listener == mActionRequestListener)
+      mActionRequestListener = null;
+  }
+  
   @Override
   public void onReceive(Context context, Intent intent) {
     Log.d("WebDriverLite", "Received intent: " + intent.getAction());
@@ -54,38 +78,23 @@ public class DoActionIntentReceiverLite extends BroadcastReceiver {
         ((args.length > 0) ? ", argument #1: " + args[0] : ""));
 
     String actionRes = "";
+    
+    Object result = null;
+    if (mActionRequestListener != null)
+      result = mActionRequestListener.onActionRequest(Actions.valueOf(action),
+          args);
 
-    switch(Actions.valueOf(action)) {
-      case EXECUTE_JAVASCRIPT:
-        if (args.length == 1)
-          actionRes =
-            ((SingleSessionActivity)context).executeJS(args[0].toString());
-        else
-          Log.w("WebDriverLite:ExecuteJavaScript",
-              "Incorrect arguments for intent: " + intent.getAction());
-        break;
-      case GET_PAGESOURCE:
-        actionRes = ((SingleSessionActivity)context).executeJS(
-          "window.webdriver.resultMethod(document.documentElement.outerHTML);");        
-        break;
-      case NAVIGATE_BACK:
-        ((SingleSessionActivity)context).navigateBackOrForward(-1);
-        break;
-      case NAVIGATE_FORWARD:
-        ((SingleSessionActivity)context).navigateBackOrForward(1);
-        break;
-      case REFRESH:
-        ((SingleSessionActivity)context).reload();
-        break;
-    }
-
+    actionRes = result != null ? result.toString() : "";
+    
     Log.d("WebDriverLite:DoActionIntentReceiver", "Action: " + action +
         ", result length: " + actionRes.length());
 
     // Returning the result
     Bundle res = new Bundle();
-    res.putInt("SessionId", SingleSessionActivity.SINGLE_SESSION_ID);
+    res.putInt("SessionId", SessionRepository.SINGLE_SESSION_ID);
     res.putString("Result", actionRes);
     this.setResultExtras(res);
   }
+
+  private ActionRequestListener mActionRequestListener;
 }

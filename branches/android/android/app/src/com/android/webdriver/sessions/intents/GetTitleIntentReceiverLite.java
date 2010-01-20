@@ -16,8 +16,6 @@
 
 package com.android.webdriver.sessions.intents;
 
-import com.android.webdriver.app.SingleSessionActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,16 +24,41 @@ import android.util.Log;
 
 public class GetTitleIntentReceiverLite extends BroadcastReceiver {
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		Log.d("WebDriverLite", "Received intent: " + intent.getAction());
+  /**
+   * Interface definition for a callback to be invoked when title is requested.
+   */
+  public interface TitleRequestListener {
+      /**
+       * Returns current title of the WebView's content.
+       *
+       * @return Title of current web page loaded in the WebView.
+       */
+      String onTitleRequest();
+  }
 
-		String title = ((SingleSessionActivity)context).getWebViewTitle();
-		
-		Bundle res = new Bundle();
-		res.putString("Title", title);
-		Log.d("WebDriverLite", "Returning title: " + title);
-		this.setResultExtras(res);
-	}
+  public void setTitleRequestListener(TitleRequestListener listener) {
+    mTitleRequestListener = listener;
+  }
 
+  public void removeTitleRequestListener(TitleRequestListener listener) {
+    if (listener == mTitleRequestListener)
+      mTitleRequestListener = null;
+  }
+  
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    Log.d("WebDriverLite", "Received intent: " + intent.getAction());
+
+    String title = "";
+    
+    if (mTitleRequestListener != null)
+      title = mTitleRequestListener.onTitleRequest();
+    
+    Bundle res = new Bundle();
+    res.putString("Title", title);
+    Log.d("WebDriverLite", "Returning title: " + title);
+    this.setResultExtras(res);
+  }
+
+  private TitleRequestListener mTitleRequestListener;
 }
