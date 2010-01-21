@@ -179,7 +179,7 @@ SocketListener.prototype.executeCommand_ = function() {
 
     // Something has gone seriously wrong. Quit the browser.
     this.commandProcessor_.execute(
-        JSON.stringify({'commandName': 'quit'}),
+        JSON.stringify({'name': 'quit'}),
         function() {});
   }
 };

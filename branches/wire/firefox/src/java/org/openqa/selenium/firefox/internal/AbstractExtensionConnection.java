@@ -17,15 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.Command;
-import org.openqa.selenium.firefox.ExtensionConnection;
-import org.openqa.selenium.firefox.NotConnectedException;
-import org.openqa.selenium.remote.BeanToJsonConverter;
-import org.openqa.selenium.remote.JsonToBeanConverter;
-import org.openqa.selenium.remote.Response;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -42,6 +33,15 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.ExtensionConnection;
+import org.openqa.selenium.firefox.NotConnectedException;
+import org.openqa.selenium.remote.BeanToJsonConverter;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.JsonToBeanConverter;
+import org.openqa.selenium.remote.Response;
 
 public abstract class AbstractExtensionConnection implements ExtensionConnection {
   private Socket socket;

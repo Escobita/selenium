@@ -24,9 +24,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.Command;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
 
 public class NewProfileExtensionConnection extends AbstractExtensionConnection {

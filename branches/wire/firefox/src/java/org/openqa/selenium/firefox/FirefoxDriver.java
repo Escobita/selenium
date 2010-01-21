@@ -18,6 +18,27 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -46,32 +67,13 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.ErrorHandler;
 import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.SessionId;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import static org.openqa.selenium.OutputType.FILE;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -99,12 +101,13 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     public static final boolean ASSUME_UNTRUSTED_ISSUER = true;
 
     // Commands we can execute with needing to dismiss an active alert
-    private final Set<String> alertWhiteListedCommands = new HashSet<String>() {{
-      add("dismissAlert");
+    private final Set<DriverCommand> alertWhiteListedCommands = new HashSet<DriverCommand>() {{
+      add(DriverCommand.DISMISS_ALERT);
     }};
+
     private final ErrorHandler errorHandler = new ErrorHandler();
     private final ExtensionConnection extension;
-    protected String sessionId;
+    protected SessionId sessionId;
     private FirefoxAlert currentAlert;
 
   public FirefoxDriver() {
@@ -132,7 +135,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     fixId();
   }
 
-    private FirefoxDriver(ExtensionConnection extension, String sessionId) {
+    private FirefoxDriver(ExtensionConnection extension, SessionId sessionId) {
       this.extension = extension;
       this.sessionId = sessionId;
     }
@@ -296,7 +299,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     protected WebDriver findActiveDriver() {
         String response = sendMessage(WebDriverException.class, DriverCommand.NEW_SESSION);
-        return new FirefoxDriver(extension, response);
+        return new FirefoxDriver(extension, new SessionId(response));
     }
 
     private String sendMessage(Class<? extends WebDriverException> throwOnFailure,
@@ -326,9 +329,9 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
                                     Command command) {
       if (currentAlert != null) {
-        if (!alertWhiteListedCommands.contains(command.getCommandName())) {
+        if (!alertWhiteListedCommands.contains(command.getName())) {
           ((FirefoxTargetLocator) switchTo()).alert().dismiss();
-          throw new UnhandledAlertException(command.getCommandName().toString());
+          throw new UnhandledAlertException(command.getName().toString());
         }
       }
 
@@ -348,7 +351,8 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     private void fixId() {
-        this.sessionId = sendMessage(WebDriverException.class, DriverCommand.NEW_SESSION);
+        this.sessionId = new SessionId(
+            String.valueOf(executeCommand(WebDriverException.class, DriverCommand.NEW_SESSION)));
     }
 
     public void quit() {

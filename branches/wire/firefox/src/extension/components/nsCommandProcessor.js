@@ -70,7 +70,7 @@ var Response = function(command, responseHandler) {
   this.statusBarLabel_ = null;
   this.responseHandler_ = responseHandler;
   this.json_ = {
-    commandName: command ? command.commandName : 'Unknown command',
+    name: command ? command.name : 'Unknown command',
     status: ErrorCode.SUCCESS,
     value: ''
   };
@@ -124,8 +124,8 @@ Response.prototype = {
     this.send();
   },
 
-  set commandName(name) { this.json_.commandName = name; },
-  get commandName()     { return this.json_.commandName; },
+  set name(name) { this.json_.name = name; },
+  get name()     { return this.json_.name; },
   set status(newStatus) { this.json_.status = newStatus; },
   get status()          { return this.json_.status; },
   set value(val)     { this.json_.value = val; },
@@ -254,17 +254,17 @@ DelayedCommand.prototype.executeInternal_ = function() {
     return this.execute(this.sleepDelay_);
   } else {
     try {
-      this.response_.commandName = this.command_.commandName;
+      this.response_.name = this.command_.name;
       // TODO(simon): This is rampantly ugly, but allows an alert to kill the command
       // TODO(simon): This is never cleared, but _should_ be okay, because send wipes itself
       this.driver_.response_ = this.response_;
 
-      this.driver_[this.command_.commandName](
+      this.driver_[this.command_.name](
           this.response_, this.command_.parameters);
     } catch (e) {
       if (!e.isWebDriverError) {
         Utils.dumpn(
-            'Exception caught by driver: ' + this.command_.commandName +
+            'Exception caught by driver: ' + this.command_.name +
             '(' + this.command_.parameters + ')\n' + e);
       }
       this.response_.sendError(e);
@@ -336,13 +336,20 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   response = new Response(command, responseHandler);
 
   // These commands do not require a session.
-  if (command.commandName == 'newSession' ||
-      command.commandName == 'quit' ||
-      command.commandName == 'getWindowHandles') {
-    return this[command.commandName](response, command.parameters);
+  if (command.name == 'newSession' ||
+      command.name == 'quit' ||
+      command.name == 'getWindowHandles') {
+    return this[command.name](response, command.parameters);
   }
 
   var sessionId = command.sessionId;
+  if (!sessionId) {
+    response.sendError(new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'No session ID specified'));
+    return;
+  }
+
+  sessionId = sessionId.value;
   try {
     response.session = Components.
       classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
@@ -356,9 +363,9 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
     return;
   }
 
-  if (command.commandName == 'deleteSession' ||
-      command.commandName == 'switchToWindow') {
-    return this[command.commandName](response, command.parameters);
+  if (command.name == 'deleteSession' ||
+      command.name == 'switchToWindow') {
+    return this[command.name](response, command.parameters);
   }
 
   var sessionWindow = response.session.getChromeWindow();
@@ -369,9 +376,9 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
     return;
   }
 
-  if (typeof driver[command.commandName] != 'function') {
+  if (typeof driver[command.name] != 'function') {
     response.sendError(new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
-        'Unrecognised command: ' + command.commandName));
+        'Unrecognised command: ' + command.name));
     return;
   }
 

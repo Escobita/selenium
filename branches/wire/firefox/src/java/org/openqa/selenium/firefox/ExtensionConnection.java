@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Response;
 
 public interface ExtensionConnection {

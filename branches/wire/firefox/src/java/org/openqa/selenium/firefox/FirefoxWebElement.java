@@ -18,6 +18,13 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
@@ -32,15 +39,8 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.util.List;
-import java.util.Map;
 
 public class FirefoxWebElement implements RenderedWebElement, Locatable, 
         FindsByXPath, FindsByLinkText, FindsById, FindsByCssSelector,

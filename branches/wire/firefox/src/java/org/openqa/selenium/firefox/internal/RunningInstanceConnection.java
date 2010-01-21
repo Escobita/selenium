@@ -20,7 +20,7 @@ package org.openqa.selenium.firefox.internal;
 import java.io.IOException;
 
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.Command;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
 
 public class RunningInstanceConnection extends AbstractExtensionConnection {

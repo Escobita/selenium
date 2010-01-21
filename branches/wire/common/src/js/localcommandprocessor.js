@@ -144,8 +144,10 @@ webdriver.LocalCommandProcessor.onResponse_ = function(command, e) {
 webdriver.LocalCommandProcessor.prototype.dispatchDriverCommand = function(
     command) {
   var jsonCommand = {
-    'commandName': command.getName(),
-    'sessionId': command.getDriver().getSessionId(),
+    'name': command.getName(),
+    'sessionId': {
+      'value': command.getDriver().getSessionId()
+    },
     'parameters': command.getParameters()
   };
 
