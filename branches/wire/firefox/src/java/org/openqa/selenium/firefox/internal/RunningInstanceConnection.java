@@ -35,8 +35,7 @@ public class RunningInstanceConnection extends AbstractExtensionConnection {
 
     public void quit() {
         try {
-            sendMessageAndWaitForResponse(WebDriverException.class,
-                new Command(null, DriverCommand.QUIT));
+            execute(new Command(null, DriverCommand.QUIT));
         } catch (Exception e) {
             // Expected
         }

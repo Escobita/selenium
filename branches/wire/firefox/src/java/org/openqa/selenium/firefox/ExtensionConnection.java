@@ -22,6 +22,6 @@ import org.openqa.selenium.remote.Response;
 
 public interface ExtensionConnection {
     boolean isConnected();
-    Response sendMessageAndWaitForResponse(Class<? extends RuntimeException> throwOnFailure, Command command);
+    Response execute(Command command);
     void quit();
 }

@@ -45,8 +45,6 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.IllegalLocatorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
@@ -150,26 +148,26 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     public void close() {
         try {
-            sendMessage(WebDriverException.class, DriverCommand.CLOSE);
+            sendMessage(DriverCommand.CLOSE);
         } catch (Exception e) {
             // All good
         }
     }
 
     public String getPageSource() {
-        return sendMessage(WebDriverException.class, DriverCommand.GET_PAGE_SOURCE);
+        return sendMessage(DriverCommand.GET_PAGE_SOURCE);
     }
 
     public void get(String url) {
-        sendMessage(WebDriverException.class, DriverCommand.GET, ImmutableMap.of("url", url));
+        sendMessage(DriverCommand.GET, ImmutableMap.of("url", url));
     }
 
     public String getCurrentUrl() {
-        return sendMessage(WebDriverException.class, DriverCommand.GET_CURRENT_URL);
+        return sendMessage(DriverCommand.GET_CURRENT_URL);
     }
 
     public String getTitle() {
-        return sendMessage(WebDriverException.class, DriverCommand.GET_TITLE);
+        return sendMessage(DriverCommand.GET_TITLE);
     }
 
   public List<WebElement> findElements(By by) {
@@ -267,8 +265,8 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   }
   
   private WebElement findElement(String method, String selector) {
-    String elementId = sendMessage(NoSuchElementException.class,
-        DriverCommand.FIND_ELEMENT, ImmutableMap.of("using", method, "value", selector));
+    String elementId = sendMessage(DriverCommand.FIND_ELEMENT,
+        ImmutableMap.of("using", method, "value", selector));
 
     return new FirefoxWebElement(this, elementId);
   }
@@ -276,8 +274,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
   private List<WebElement> findElements(String method, String selector) {
     @SuppressWarnings("unchecked")
     List<String> returnedIds = (List<String>) executeCommand(
-        WebDriverException.class, DriverCommand.FIND_ELEMENTS,
-        ImmutableMap.of("using", method, "value", selector));
+        DriverCommand.FIND_ELEMENTS, ImmutableMap.of("using", method, "value", selector));
 
     List<WebElement> elements = Lists.newArrayListWithExpectedSize(returnedIds.size());
 
@@ -298,36 +295,31 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     protected WebDriver findActiveDriver() {
-        String response = sendMessage(WebDriverException.class, DriverCommand.NEW_SESSION);
+        String response = sendMessage(DriverCommand.NEW_SESSION);
         return new FirefoxDriver(extension, new SessionId(response));
     }
 
-    private String sendMessage(Class<? extends WebDriverException> throwOnFailure,
-                               DriverCommand methodName) {
-      return sendMessage(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
+    private String sendMessage(DriverCommand methodName) {
+      return sendMessage(methodName, ImmutableMap.<String, Object>of());
     }
 
-    private String sendMessage(Class<? extends WebDriverException> throwOnFailure,
-                               DriverCommand methodName, Map<String, ?> parameters) {
-        return sendMessage(throwOnFailure, new Command(sessionId, methodName, parameters));
+    private String sendMessage(DriverCommand methodName, Map<String, ?> parameters) {
+        return sendMessage(new Command(sessionId, methodName, parameters));
     }
 
-    protected String sendMessage(Class<? extends RuntimeException> throwOnFailure, Command command) {
-      return String.valueOf(executeCommand(throwOnFailure, command));
+    protected String sendMessage(Command command) {
+      return String.valueOf(executeCommand(command));
     }
 
-    protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                    DriverCommand methodName) {
-      return executeCommand(throwOnFailure, methodName, ImmutableMap.<String, Object>of());
+    protected Object executeCommand(DriverCommand methodName) {
+      return executeCommand(methodName, ImmutableMap.<String, Object>of());
     }
 
-    protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                    DriverCommand methodName, Map<String, ?> parameters) {
-      return executeCommand(throwOnFailure, new Command(sessionId, methodName, parameters));
+    protected Object executeCommand(DriverCommand methodName, Map<String, ?> parameters) {
+      return executeCommand(new Command(sessionId, methodName, parameters));
     }
 
-    protected Object executeCommand(Class<? extends RuntimeException> throwOnFailure,
-                                    Command command) {
+    protected Object executeCommand(Command command) {
       if (currentAlert != null) {
         if (!alertWhiteListedCommands.contains(command.getName())) {
           ((FirefoxTargetLocator) switchTo()).alert().dismiss();
@@ -335,7 +327,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
         }
       }
 
-      Response response = extension.sendMessageAndWaitForResponse(throwOnFailure, command);
+      Response response = extension.execute(command);
       errorHandler.throwIfResponseFailed(response);
 
       Object rawResponse = response.getValue();
@@ -352,7 +344,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     private void fixId() {
         this.sessionId = new SessionId(
-            String.valueOf(executeCommand(WebDriverException.class, DriverCommand.NEW_SESSION)));
+            String.valueOf(executeCommand(DriverCommand.NEW_SESSION)));
     }
 
     public void quit() {
@@ -360,13 +352,12 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
   public String getWindowHandle() {
-    return sendMessage(WebDriverException.class, DriverCommand.GET_CURRENT_WINDOW_HANDLE);
+    return sendMessage(DriverCommand.GET_CURRENT_WINDOW_HANDLE);
   }
 
   public Set<String> getWindowHandles() {
     @SuppressWarnings("unchecked")
-    List<String> allHandles = (List<String>) executeCommand(WebDriverException.class,
-        DriverCommand.GET_WINDOW_HANDLES);
+    List<String> allHandles = (List<String>) executeCommand(DriverCommand.GET_WINDOW_HANDLES);
     Set<String> toReturn = Sets.newHashSetWithExpectedSize(allHandles.size());
     for (String handle : allHandles) {
       if (handle != null) {
@@ -392,8 +383,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
             "script", script,
             "args", Lists.newArrayList(convertedArgs));
 
-        Map rawResponse = (Map) executeCommand(
-            WebDriverException.class, DriverCommand.EXECUTE_SCRIPT, params);
+        Map rawResponse = (Map) executeCommand(DriverCommand.EXECUTE_SCRIPT, params);
         return parseJavascriptObjectFromResponse(
             String.valueOf(rawResponse.get("type")),
             rawResponse.get("value"));
@@ -512,7 +502,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
         private final int FAST_SPEED = 100;
 
         public void addCookie(Cookie cookie) {
-            sendMessage(WebDriverException.class, DriverCommand.ADD_COOKIE, ImmutableMap.of("cookie", cookie));
+            sendMessage(DriverCommand.ADD_COOKIE, ImmutableMap.of("cookie", cookie));
         }
 
       public Cookie getCookieNamed(String name) {
@@ -527,8 +517,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
       public Set<Cookie> getCookies() {
             @SuppressWarnings("unchecked")
-            List<String> response = (List<String>) executeCommand(WebDriverException.class,
-                DriverCommand.GET_COOKIE);
+            List<String> response = (List<String>) executeCommand(DriverCommand.GET_COOKIE);
             Set<Cookie> cookies = new HashSet<Cookie>();
 
               for (String cookieString : response) {
@@ -578,8 +567,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
         }
 
         public void deleteCookieNamed(String name) {
-            sendMessage(WebDriverException.class, DriverCommand.DELETE_COOKIE,
-                ImmutableMap.of("name", name));
+            sendMessage(DriverCommand.DELETE_COOKIE, ImmutableMap.of("name", name));
         }
 
         public void deleteCookie(Cookie cookie) {
@@ -587,12 +575,11 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
         }
 
         public void deleteAllCookies() {
-            sendMessage(WebDriverException.class, DriverCommand.DELETE_ALL_COOKIES);
+            sendMessage(DriverCommand.DELETE_ALL_COOKIES);
         }
 
         public Speed getSpeed() {
-            Number pixelSpeed = (Number) executeCommand(WebDriverException.class,
-                DriverCommand.GET_SPEED);
+            Number pixelSpeed = (Number) executeCommand(DriverCommand.GET_SPEED);
             Speed speed;
 
             // TODO: simon 2007-02-01; Delegate to the enum
@@ -630,27 +617,25 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
                 default:
                     throw new IllegalArgumentException();
             }
-            sendMessage(WebDriverException.class, DriverCommand.SET_SPEED,
-                ImmutableMap.of("speed", pixelSpeed));
+            sendMessage(DriverCommand.SET_SPEED, ImmutableMap.of("speed", pixelSpeed));
         }
     }
 
     private class FirefoxTargetLocator implements TargetLocator {
         public WebDriver frame(int frameIndex) {
-            sendMessage(NoSuchFrameException.class, DriverCommand.SWITCH_TO_FRAME,
-                ImmutableMap.of("id", frameIndex));
+            sendMessage(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", frameIndex));
             return FirefoxDriver.this;
         }
 
         public WebDriver frame(String frameName) {
             Map<String, Object> frameId = Maps.newHashMap();
             frameId.put("id", frameName);
-            sendMessage(NoSuchFrameException.class, DriverCommand.SWITCH_TO_FRAME, frameId);
+            sendMessage(DriverCommand.SWITCH_TO_FRAME, frameId);
             return FirefoxDriver.this;
         }
 
         public WebDriver window(String windowName) {
-          String response = sendMessage(NoSuchWindowException.class, DriverCommand.SWITCH_TO_WINDOW,
+          String response = sendMessage(DriverCommand.SWITCH_TO_WINDOW,
               ImmutableMap.of("name", windowName));
             if (response == null || "No window found".equals(response)) {
                 throw new NoSuchWindowException("Cannot find window: " + windowName);
@@ -664,8 +649,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
 
         public WebElement activeElement() {
-          String elementId = sendMessage(NoSuchElementException.class,
-              DriverCommand.GET_ACTIVE_ELEMENT);
+          String elementId = sendMessage(DriverCommand.GET_ACTIVE_ELEMENT);
           return new FirefoxWebElement(FirefoxDriver.this, elementId);
         }
 
@@ -680,11 +664,11 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
 
     private class FirefoxNavigation implements Navigation {
       public void back() {
-        sendMessage(WebDriverException.class, DriverCommand.GO_BACK);
+        sendMessage(DriverCommand.GO_BACK);
       }
 
       public void forward() {
-        sendMessage(WebDriverException.class, DriverCommand.GO_FORWARD);
+        sendMessage(DriverCommand.GO_FORWARD);
       }
 
       public void to(String url) {
@@ -696,13 +680,13 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
       }
 
       public void refresh() {
-        sendMessage(WebDriverException.class, DriverCommand.REFRESH);
+        sendMessage(DriverCommand.REFRESH);
       }
     }
     
     public <X> X getScreenshotAs(OutputType<X> target) {
       // Get the screenshot as base64.
-      String base64 = sendMessage(WebDriverException.class, DriverCommand.SCREENSHOT);
+      String base64 = sendMessage(DriverCommand.SCREENSHOT);
       // ... and convert it.
       return target.convertFromBase64Png(base64);
     }
@@ -740,8 +724,7 @@ public class FirefoxDriver implements WebDriver, JavascriptExecutor, TakesScreen
     }
 
     public void dismiss() {
-      sendMessage(WebDriverException.class, DriverCommand.DISMISS_ALERT,
-         ImmutableMap.of("text", text));
+      sendMessage(DriverCommand.DISMISS_ALERT, ImmutableMap.of("text", text));
       currentAlert = null;
     }
 

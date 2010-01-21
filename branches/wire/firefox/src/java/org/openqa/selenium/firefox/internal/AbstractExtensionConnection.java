@@ -154,8 +154,7 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
     return socket != null && socket.isConnected();
   }
 
-  public Response sendMessageAndWaitForResponse(Class<? extends RuntimeException> throwOnFailure,
-                                                Command command) {
+  public Response execute(Command command) {
     sendMessage(command);
 
     return waitForResponse();
