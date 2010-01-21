@@ -17,11 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.CommandExecutor;
 
-public interface ExtensionConnection {
+public interface ExtensionConnection extends CommandExecutor {
     boolean isConnected();
-    Response execute(Command command);
     void quit();
 }
