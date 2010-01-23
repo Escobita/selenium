@@ -19,7 +19,6 @@
 
 function FirefoxDriver(server, enableNativeEvents, win) {
   this.server = server;
-  this.mouseSpeed = FirefoxDriver.Speed.SLOW;
   this.enableNativeEvents = enableNativeEvents;
   this.window = win;
 
@@ -712,14 +711,15 @@ FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
         'Speed value expected to be one of ' + JSON.stringify(validSpeeds) +
         ', but was "' + parameters.speed + '"');
   }
-  this.mouseSpeed = FirefoxDriver.Speed[parameters.speed];
+  respond.session.setInputSpeed(FirefoxDriver.Speed[parameters.speed]);
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getSpeed = function(respond) {
+  var speed = respond.session.getInputSpeed();
   for (var prop in FirefoxDriver.Speed) {
-    if (FirefoxDriver.Speed[prop] == this.mouseSpeed) {
+    if (FirefoxDriver.Speed[prop] == speed) {
       respond.value = prop;
     }
   }

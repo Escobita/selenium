@@ -87,6 +87,14 @@ wdSession.prototype.chromeWindow_ = null;
 wdSession.prototype.window_ = null;
 
 
+/**
+ * The current user input speed setting for this session.
+ * @type {number}
+ * @private
+ */
+wdSession.prototype.inputSpeed_ = 1;
+
+
 /** @see nsISupports.QueryInterface */
 wdSession.prototype.QueryInterface = function(aIID) {
   if (aIID.equals(Components.interfaces.nsISupports)) {
@@ -169,7 +177,21 @@ wdSession.prototype.setWindow = function(win) {
 };
 
 
+/**
+ * @return {number} The user input speed for this session.
+ */
+wdSession.prototype.getInputSpeed = function() {
+  return this.inputSpeed_;
+};
 
+
+/**
+ * Sets the user input speed for this session.
+ * @param {number} speed The new input speed.
+ */
+wdSession.prototype.setInputSpeed = function(speed) {
+  this.inputSpeed_ = speed;
+};
 
 
 ///////////////////////////////////////////////////////////////////
