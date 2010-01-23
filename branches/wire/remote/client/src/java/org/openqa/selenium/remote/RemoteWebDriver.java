@@ -17,6 +17,16 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -37,17 +47,6 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.ReturnedCookie;
-
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath {
@@ -336,8 +335,17 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   protected WebElement getElementFrom(Response response) {
-    List<WebElement> elements = getElementsFrom(response);
-    return elements.get(0);
+    // This is a temporary hack; the wire protocol dictates a list be returned even when searching
+    // for a single element, it should return a single element.
+    // TODO: fix
+    Object value = response.getValue();
+    if (value instanceof List) {
+      return getElementsFrom(response).get(0);
+    } else {
+      RemoteWebElement element = newRemoteWebElement();
+      element.setId(String.valueOf(value));
+      return element;
+    }
   }
 
   /**
@@ -504,7 +512,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     }
   }
 
-  private class RemoteTargetLocator implements TargetLocator {
+  protected class RemoteTargetLocator implements TargetLocator {
 
     public WebDriver frame(int frameIndex) {
       execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", frameIndex));

@@ -371,6 +371,7 @@ Utils.addToKnownElements = function(element, doc) {
 
 
 Utils.getElementAt = function(index, doc) {
+  Utils.dumpn('Finding element at ' + index + ', in ' + doc + '.');
   var e = doc.fxdriver_elements ? doc.fxdriver_elements[index] : undefined;
   if (e) {
     // Is this a stale reference?
@@ -1056,6 +1057,7 @@ Utils.getElementLocation = function(element) {
   var y = element.offsetTop;
   var elementParent = element.offsetParent;
   while (elementParent != null) {
+    Utils.dumpn('looping: ' + elementParent.tagName);
     if (elementParent.tagName == "TABLE") {
       var parentBorder = parseInt(elementParent.border);
       if (isNaN(parentBorder)) {
@@ -1203,6 +1205,7 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
 
 
 Utils.unwrapParameters = function(wrappedParameters, resultArray, doc) {
+  Utils.dumpn('Unwrapping: ' + JSON.stringify(wrappedParameters));
   while (wrappedParameters && wrappedParameters.length > 0) {
     var t = wrappedParameters.shift();
 

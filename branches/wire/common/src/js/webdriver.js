@@ -157,9 +157,9 @@ webdriver.WebDriver.EventType = {
  * @see webdriver.WebDriver.prototype.getSpeed
  */
 webdriver.WebDriver.Speed = {
-  SLOW: 1,
-  MEDIUM: 10,
-  FAST: 100
+  SLOW: 'SLOW',
+  MEDIUM: 'MEDIUM',
+  FAST: 'FAST'
 };
 
 

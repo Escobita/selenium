@@ -32,6 +32,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.openqa.selenium.Platform;
@@ -40,6 +41,8 @@ import org.openqa.selenium.firefox.ExtensionConnection;
 import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.remote.BeanToJsonConverter;
 import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.Response;
 
@@ -156,8 +159,29 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
 
   public Response execute(Command command) {
     sendMessage(command);
+    Response response = waitForResponse();
 
-    return waitForResponse();
+    // This is an unfortunate necessity since the FirefoxDriver does not handle the NEW_SESSION
+    // command according to the wire protocol yet. The final response should be a map of the
+    // session capabilites. This is temporary and will go away soon.
+    // TODO: fix me
+    if (DriverCommand.NEW_SESSION.equals(command.getName())) {
+      response.setSessionId(String.valueOf(response.getValue()));
+
+      DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+      capabilities.setJavascriptEnabled(true);
+      String rawJson = new BeanToJsonConverter().convert(capabilities);
+      try {
+        Object converted = new JsonToBeanConverter().convert(Map.class, rawJson);
+        response.setValue(converted);
+      } catch (WebDriverException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new WebDriverException(e);
+      }
+    }
+
+    return response;
   }
 
   protected void sendMessage(Command command) {
@@ -228,8 +252,14 @@ public abstract class AbstractExtensionConnection implements ExtensionConnection
       remaining[i] = (byte) in.read();
     }
 
-    return new JsonToBeanConverter().convert(Response.class,
-        new String(remaining, "UTF-8"));
+    String json = new String(remaining, "UTF-8");
+
+    // We don't get anything back after executing a quit (b/c Firefox quits...)
+    if ("".equals(json)) {
+      return new Response();
+    }
+
+    return new JsonToBeanConverter().convert(Response.class, json);
   }
 
   private String readLine() throws IOException {

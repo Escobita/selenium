@@ -19,13 +19,25 @@
 
 function FirefoxDriver(server, enableNativeEvents, win) {
   this.server = server;
-  this.mouseSpeed = 1;
+  this.mouseSpeed = FirefoxDriver.Speed.SLOW;
   this.enableNativeEvents = enableNativeEvents;
   this.window = win;
 
   this.currentX = 0;
   this.currentY = 0;
 }
+
+
+/**
+ * Enumeration of supported speed values.
+ * @enum {number}
+ */
+FirefoxDriver.Speed = {
+  SLOW: 1,
+  MEDIUM: 10,
+  FAST: 100
+};
+
 
 FirefoxDriver.prototype.__defineGetter__("id", function() {
   if (!this.id_) {
@@ -137,20 +149,20 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
     };
   }
 
+  var converted = [];
+  Utils.unwrapParameters(parameters.args, converted, respond.session.getDocument());
+
   try {
     var scriptSrc = "var __webdriverFunc = function(){" + parameters.script
         + "};  __webdriverFunc.apply(window, __webdriverParams);";
-
-    var converted = [];
-    Utils.unwrapParameters(parameters.args, converted, respond.session.getDocument());
-
     var result = runScript(scriptSrc, converted);
-
-    respond.value = Utils.wrapResult(result, respond.session.getDocument());
-    respond.send();
   } catch (e) {
+    Utils.dumpn(JSON.stringify(e));
     throw new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR, e);
   }
+
+  respond.value = Utils.wrapResult(result, respond.session.getDocument());
+  respond.send();
 };
 
 
@@ -637,18 +649,19 @@ function getVisibleCookies(location) {
   return results;
 };
 
-FirefoxDriver.prototype.getCookie = function(respond) {
-  var cookieToString = function(c) {
-    return c.name + "=" + c.value + ";" + "domain=" + c.host + ";"
-        + "path=" + c.path + ";" + "expires=" + c.expires + ";"
-        + (c.isSecure ? "secure ;" : "");
-  };
-
+FirefoxDriver.prototype.getCookies = function(respond) {
   var toReturn = [];
   var cookies = getVisibleCookies(respond.session.getBrowser().
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
-    toReturn.push(cookieToString(cookies[i]));
+    var cookie = cookies[i];
+    toReturn.push({
+      'name': cookie.name,
+      'value': cookie.value,
+      'path': cookie.path,
+      'domain': cookie.host,
+      'secure': cookie.isSecure
+    });
   }
 
   respond.value = toReturn;
@@ -690,13 +703,26 @@ FirefoxDriver.prototype.deleteAllCookies = function(respond) {
 
 
 FirefoxDriver.prototype.setSpeed = function(respond, parameters) {
-  this.mouseSpeed = parameters.speed;
+  if (!(parameters.speed in FirefoxDriver.Speed)) {
+    var validSpeeds = [];
+    for (var prop in FirefoxDriver.Speed) {
+      validSpeeds.push(prop);
+    }
+    throw new WebDriverError(ErrorCode.UNHANDLED_ERROR,
+        'Speed value expected to be one of ' + JSON.stringify(validSpeeds) +
+        ', but was "' + parameters.speed + '"');
+  }
+  this.mouseSpeed = FirefoxDriver.Speed[parameters.speed];
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getSpeed = function(respond) {
-  respond.value = this.mouseSpeed;
+  for (var prop in FirefoxDriver.Speed) {
+    if (FirefoxDriver.Speed[prop] == this.mouseSpeed) {
+      respond.value = prop;
+    }
+  }
   respond.send();
 };
 

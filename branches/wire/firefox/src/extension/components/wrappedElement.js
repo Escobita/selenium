@@ -289,6 +289,14 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
 };
 
 
+FirefoxDriver.prototype.isElementEnabled = function(respond, parameters) {
+  var element = Utils.getElementAt(parameters.id,
+                                   respond.session.getDocument());
+  respond.value = !!!element.disabled;
+  respond.send();
+};
+
+
 FirefoxDriver.prototype.hoverOverElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
@@ -455,6 +463,7 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
     if (checkbox.type == "checkbox") {
       checkbox.checked = !checkbox.checked;
       Utils.fireHtmlEvent(checkbox, "change");
+      respond.value = checkbox.checked;
       respond.send();
       return;
     }
@@ -474,6 +483,7 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
     if (select && select.multiple) {
       option.selected = !option.selected;
       Utils.fireHtmlEvent(option, "change");
+      respond.value = option.selected;
       respond.send();
       return;
     }
@@ -498,12 +508,15 @@ FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
+  Utils.dumpn('finding element location');
   var location = Utils.getElementLocation(element);
 
   respond.value = {
     x: Math.round(location.x),
     y: Math.round(location.y)
   };
+
+  Utils.dumpn('Found: ' + JSON.stringify(respond.value));
   respond.send();
 };
 
@@ -535,8 +548,10 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
   // Scroll the first element into view
   //  element.scrollIntoView(true);
 
+  Utils.dumpn('draging element ---------------------------');
   var clientStartXY = Utils.getElementLocation(element);
 
+  Utils.dumpn('starting at ' + JSON.stringify(clientStartXY));
   var clientStartX = clientStartXY.x;
   var clientStartY = clientStartXY.y;
 
@@ -556,6 +571,13 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
   if (clientFinishY > body.scrollHeight)
     clientFinishY = body.scrollHeight;
 
+  Utils.dumpn('finishing at ' + JSON.stringify({
+    x: clientFinishX,
+    y: clientFinishY
+  }));
+
+  Utils.dumpn('speed: ' + this.mouseSpeed);
+
   var mouseSpeed = this.mouseSpeed;
   var move = function(current, dest) {
     if (current == dest) return current;
@@ -571,6 +593,10 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
   while ((clientX != clientFinishX) || (clientY != clientFinishY)) {
     clientX = move(clientX, clientFinishX);
     clientY = move(clientY, clientFinishY);
+//    Utils.dumpn('now at: ' + JSON.stringify({
+//      x: clientX,
+//      y: clientY
+//    }));
 
     Utils.triggerMouseEvent(element, 'mousemove', clientX, clientY);
   }
