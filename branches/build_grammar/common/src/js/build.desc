@@ -4,5 +4,5 @@ js_library(:name => "extension_library",
     "*.js",
     "extension/*.js"
   ],
-  :deps => [ "//third_party/closure"]
+  :deps => [ "//third_party/closure" ]
 )

@@ -12,6 +12,11 @@ class Sortable < Hash
   def js_files(task)
     files = []
     deps = build_graph(task, self)
+
+    deps.keys.each do |k|
+#      puts "#{k} => #{deps[k].join(', ')}"
+    end
+    
     deps.tsort.each do |dep|
       if dep.to_s =~ /\.js$/ 
         if dep.to_s =~ /^build\//
@@ -31,8 +36,10 @@ class Sortable < Hash
   
   def build_graph(task, graph)
     task.prerequisites.each do |dep|
+      deps = graph[task.name] || []
+      deps.push dep unless deps.include? dep
+      graph[task.name] = deps
       deps = graph[dep] || []
-      deps.push dep
       graph[dep] = deps
       
       if Rake::Task.task_defined? dep
@@ -126,12 +133,12 @@ module Javascript
       output = js_name(dir, args[:name])
       
       file output do
-#        puts "Storing: #{task_name(dir, args[:name])} as #{output}"
-                        
         mkdir_p File.dirname(output)
         
         t = Rake::Task[task_name(dir, args[:name])]
         deps = Sortable.new.js_files(t)
+        
+#        puts "\n\n\nDeps: #{deps.join(", ")}"
         
         touch output
       end
@@ -158,7 +165,7 @@ module Javascript
         cmd << "--js "
         cmd << deps.join(" --js ")
         
-        sh cmd do |ok, res|
+        sh cmd, :verbose => true do |ok, res|
           if !ok
             rm_f output, :verbose => false
           end
