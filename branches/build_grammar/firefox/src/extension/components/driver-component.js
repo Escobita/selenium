@@ -56,7 +56,7 @@ var ExternalScripts = [
   var versionChecker = Components.classes['@mozilla.org/xpcom/version-comparator;1'].
       getService(Components.interfaces.nsIVersionComparator);
   if (versionChecker.compare(appInfo.version, '3.5') < 0) {
-    ExternalScripts.push('json2.js');
+    ExternalScripts.push('json.js');
   }
 
   for (var index in ExternalScripts) {

@@ -48,6 +48,10 @@ class Tasks
   include Platform
 
   def task_name(dir, name)
+    if name.to_s.start_with? "//"
+      return name
+    end
+
     # Strip any leading ".", "./" or ".\\"
     # I am ashamed
     use = dir.gsub /\\/, '/'

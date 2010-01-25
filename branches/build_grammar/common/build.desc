@@ -12,3 +12,6 @@ java_jar(:name => "tests",
               "//third_party/java:junit",
               "//third_party/java:servlet-api"
     ])
+
+js_library(:name => "driver_predefs",
+  :srcs => [ "src/js/spoof_header.js" ])

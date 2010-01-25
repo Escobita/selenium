@@ -29,8 +29,8 @@
  */
 (function() {
   var scripts = [
-    'context.js',
-    'utils.js'
+//    'context.js',
+//    'utils.js'
   ];
 
   // Firefox 3.5+ has native JSON support; prefer that over our script from
@@ -40,7 +40,7 @@
   var versionChecker = Components.classes['@mozilla.org/xpcom/version-comparator;1'].
       getService(Components.interfaces.nsIVersionComparator);
   if (versionChecker.compare(appInfo.version, '3.5') < 0) {
-    scripts.push('json2.js');
+    scripts.push('json.js');
   }
 
   var fileProtocolHandler = Components.

@@ -39,7 +39,8 @@ js_library(:name => "goog_async_delay",
   :deps => [ :goog_delay ])
 
 js_library(:name => "goog",
-  :srcs => [ "goog/base.js"])
+  :srcs => [ "goog/base.js"],
+  :deps => [ "//common:driver_predefs" ])
 
 js_library(:name => "goog_color_alpha",
   :srcs => [ "goog/color/alpha.js"],

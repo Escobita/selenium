@@ -125,6 +125,22 @@ module Javascript
       task = Rake::Task[js_name(dir, args[:name])]
       add_dependencies(task, dir, args[:deps])
       add_dependencies(task, dir, args[:srcs])
+
+      # Implicitly, every src file has a dependency on the deps
+      # Expand the deps to file tasks
+      all_deps = []
+      (args[:deps] || []).each do |dep|
+        task_name = task_name(dir, dep)
+	if !Rake::Task.task_defined? task_name
+	  file task_name
+	end
+	all_deps.push(task_name)
+      end
+      (args[:srcs] || []).each do |src|
+	to_filelist(dir, src.to_s).each do |s|
+	  file s => all_deps
+	end
+      end
     end
   end
   
@@ -153,7 +169,12 @@ module Javascript
         puts "Compiling: #{task_name(dir, args[:name])} as #{output}"
         
         t = Rake::Task[task_name(dir, args[:name])]
+
+	puts "  Calculating dependencies"
+
         deps = Sortable.new.js_files(t)
+
+        puts "  Creating directory #{output}"
         
         mkdir_p File.dirname(output)
       
@@ -165,6 +186,8 @@ module Javascript
         cmd << "--js "
         cmd << deps.join(" --js ")
         
+	puts "  Building now"
+
         sh cmd, :verbose => true do |ok, res|
           if !ok
             rm_f output, :verbose => false

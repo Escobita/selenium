@@ -1,7 +1,20 @@
 
 js_library(:name => "extension_library",
   :srcs => [ 
-    "*.js",
+    "abstractcommandprocessor.js",
+    "by.js",
+    "context.js",
+    "future.js",
+    "key.js",
+    "timing.js",
+    "webelement.js",
+    "asserts.js",
+    "command.js",
+    "factory.js",
+    "jsunit.js",
+    "localcommandprocessor.js",
+    "testcase.js",
+    "webdriver.js",
     "extension/*.js"
   ],
   :deps => [ "//third_party/closure" ]

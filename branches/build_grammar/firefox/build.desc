@@ -18,7 +18,6 @@ js_binary(:name => "firefox_driver",
   :srcs => [
     "src/extension/components/driver-component.js",
     "src/extension/components/firefoxDriver.js",
-    "src/extension/components/json2.js",
     "src/extension/components/screenshooter.js",
     "src/extension/components/socketListener.js",
     "src/extension/components/webdriverserver.js",
@@ -44,13 +43,14 @@ js_binary(:name => "prompt_service",
 mozilla_xpi(:name => "webdriver",
   :content => [ "src/extension/content/**" ],
   :components => [
+    "src/extension/components/json2.js",
     :native_events_xpt,
-	  :command_processor_xpt,
-	  :response_handler_xpt,
-	  :bad_cert_listener,
-	  :command_processor,
-	  :firefox_driver,
-	  :prompt_service
+    :command_processor_xpt,
+    :response_handler_xpt,
+    :bad_cert_listener,
+    :command_processor,
+    :firefox_driver,
+    :prompt_service
   ],
   :chrome => "src/extension/chrome.manifest",
   :install => "src/extension/install.rdf"
