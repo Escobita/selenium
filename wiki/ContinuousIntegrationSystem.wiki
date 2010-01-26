@@ -2,9 +2,9 @@
 
 = Introduction =
 
-We have a very nice, dedicated 8 core XServe for our build system with Hudson installed. It is available at:
+We have a very nice, dedicated 8 core XServe for our build system with Atlassian Bamboo installed. It is available at:
 
-http://xserve.openqa.org:8080/
+http://xserve.openqa.org:8085/
 
 Several VMs are also on this machine, allowing for cross-browser and cross-operating system testing. Currently, we have the following build agents/VMs set up:
 
