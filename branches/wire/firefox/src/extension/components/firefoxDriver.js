@@ -110,6 +110,10 @@ FirefoxDriver.prototype.close = function(respond) {
     dump(e);
   }
 
+  // Send the response so the client doesn't get a connection refused socket
+  // error.
+  respond.send();
+
   // If we're on a Mac we might have closed all the windows but not quit, so
   // ensure that we do actually quit :)
   var allWindows = wm.getEnumerator("navigator:browser");
@@ -117,9 +121,6 @@ FirefoxDriver.prototype.close = function(respond) {
     appService.quit(forceQuit);
     return;  // The client should catch the fact that the socket suddenly closes
   }
-
-  // If we're still running, return
-  respond.send();
 };
 
 

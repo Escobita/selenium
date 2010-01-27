@@ -81,11 +81,18 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     Map<String, Object> rawCapabilities = (Map<String, Object>) response.getValue();
     String browser = (String) rawCapabilities.get("browserName");
     String version = (String) rawCapabilities.get("version");
+
+    String platformString = rawCapabilities.containsKey("operatingSystem")
+        ? (String) rawCapabilities.get("operatingSystem")
+        : (String) rawCapabilities.get("platform");
+
     Platform platform;
-    if (rawCapabilities.containsKey("operatingSystem")) {
-      platform = Platform.valueOf((String) rawCapabilities.get("operatingSystem"));
-    } else {
-      platform = Platform.valueOf((String) rawCapabilities.get("platform"));
+    try {
+      platform = Platform.valueOf(platformString);
+    } catch (IllegalArgumentException e) {
+      // The server probably responded with a name matching the os.name
+      // system property. Try to recover and parse this.
+      platform = Platform.extractFromSysProperty(platformString);
     }
 
 

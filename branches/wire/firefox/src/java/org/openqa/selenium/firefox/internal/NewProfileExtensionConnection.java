@@ -18,53 +18,42 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxBinary;
+import org.openqa.selenium.firefox.FirefoxProfile;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.DriverCommand;
-
 public class NewProfileExtensionConnection extends AbstractExtensionConnection {
-  private FirefoxBinary process;
-  private FirefoxProfile profile;
-  private int bufferSize = 4096;
 
-  public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile, String host)
-      throws IOException {
+  private final FirefoxBinary process;
+  private final FirefoxProfile profile;
+  private final Lock lock;
+  private final int bufferSize = 4096;
+
+  public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile,
+                                       String host) throws Exception {
+    super(host, determineNextFreePort(host, profile.getPort()), binary.getTimeout());
+    this.lock = lock;
     this.profile = profile;
-    if (binary == null) {
-      this.process = new FirefoxBinary();
-    } else {
-      this.process = binary;
-    }
+    this.process = binary;
+  }
 
-    lock.lock(this.process.getTimeout());
+  public void start() throws IOException {
+    lock.lock(getConnectTimeout());
     try {
-      int portToUse = determineNextFreePort(host, profile.getPort());
-
       this.process.setOutputWatcher(new CircularOutputStream(bufferSize));
-      profile.setPort(portToUse);
+
+      profile.setPort(getDelegate().getAddressOfRemoteServer().getPort());
       profile.updateUserPrefs();
+
       this.process.clean(profile);
       this.process.startProfile(profile);
 
-      setAddress(host, portToUse);
-
-      connectToBrowser(this.process.getTimeout());
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  protected void connectToBrowser(long timeToWaitInMilliSeconds) throws IOException {
-    try {
-      super.connectToBrowser(timeToWaitInMilliSeconds);
+      super.start();
     } catch (IOException e) {
       throw new WebDriverException(
           String.format("Failed to connect to binary %s on port %d; process output follows: \n%s",
@@ -73,10 +62,12 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
       throw new WebDriverException(
           String.format("Failed to connect to binary %s on port %d; process output follows: \n%s",
               process.toString(), profile.getPort(), process.getConsoleOutput()), e);
+    } finally {
+      lock.unlock();
     }
   }
 
-  protected int determineNextFreePort(String host, int port) throws IOException {
+  protected static int determineNextFreePort(String host, int port) throws IOException {
     // Attempt to connect to the given port on the host
     // If we can't connect, then we're good to use it
     int newport;
@@ -100,14 +91,9 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
   }
 
   public void quit() {
-    try {
-      sendMessage(new Command(null, DriverCommand.QUIT));
-    } catch (Exception e) {
-      // this is expected
-    }
-
+    // This should only be called after the QUIT command has been sent,
+    // so go ahead and clean up our process and profile.
     process.quit();
-
     profile.clean();
   }
 }

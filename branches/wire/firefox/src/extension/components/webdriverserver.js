@@ -29,6 +29,13 @@ function WebDriverServer() {
   // loaded and cause a "too deep recursion" error.
   var overrideService = Components.classes["@mozilla.org/security/certoverride;1"]
       .getService(Components.interfaces.nsICertOverrideService);
+
+  /**
+   * This server's request dispatcher.
+   * @type {Dispatcher}
+   * @private
+   */
+  this.dispatcher_ = new Dispatcher();
 }
 
 
@@ -56,7 +63,7 @@ WebDriverServer.prototype.getNextId = function() {
 
 WebDriverServer.prototype.onSocketAccepted = function(socket, transport) {
   try {
-    var socketListener = new SocketListener(transport);
+    var socketListener = new SocketListener(this.dispatcher_, transport);
   } catch(e) {
     dump(e);
   }

@@ -17,37 +17,27 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-import java.io.IOException;
-
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.DriverCommand;
 
 public class RunningInstanceConnection extends AbstractExtensionConnection {
-    public RunningInstanceConnection(String host, int port) throws IOException {
-        this(host, port, 500);
+
+    public static final long DEFAULT_CONNECT_TIMEOUT = 500;
+
+    public RunningInstanceConnection(String host, int port) throws Exception {
+        this(host, port, DEFAULT_CONNECT_TIMEOUT);
     }
 
-    public RunningInstanceConnection(String host, int port, long timeOut) throws IOException {
-        setAddress(host, port);
-        connectToBrowser(timeOut);
+    public RunningInstanceConnection(String host, int port, long timeOut) throws Exception {
+      super(host, port, timeOut);
     }
 
     public void quit() {
-        try {
-            execute(new Command(null, DriverCommand.QUIT));
-        } catch (Exception e) {
-            // Expected
-        }
-
-        allowFirefoxToQuit();
-    }
-
-    private void allowFirefoxToQuit() {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            throw new WebDriverException(e);
-        }
+      // This should only be called after the QUIT command has been sent,
+      // so just pause momentarily to give Firefox time to shutdown.
+      try {
+        Thread.sleep(250);
+      } catch (InterruptedException e) {
+        throw new WebDriverException(e);
+      }
     }
 }

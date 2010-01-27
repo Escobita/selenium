@@ -19,7 +19,26 @@ package org.openqa.selenium.firefox;
 
 import org.openqa.selenium.remote.CommandExecutor;
 
+import java.io.IOException;
+
+/**
+ * Represents a connection with the FirefoxDriver browser extension.
+ */
 public interface ExtensionConnection extends CommandExecutor {
-    boolean isConnected();
-    void quit();
+
+  /**
+   * Establishes a connection to the extension.
+   * @throws IOException If an I/O error occurs.
+   */
+  void start() throws IOException;
+
+  /**
+   * @return Whether the extension is reachable and accepting requests.
+   */
+  boolean isConnected();
+
+  /**
+   * Terminates the connection.
+   */
+  void quit();
 }

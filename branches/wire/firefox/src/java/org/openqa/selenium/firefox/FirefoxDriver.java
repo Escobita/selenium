@@ -113,14 +113,16 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
 
   @Override
   protected void startClient() {
-    // TODO: start Firefox in here, not upon instantiation
-    super.startClient();
+    try {
+      ((ExtensionConnection) this.getCommandExecutor()).start();
+    } catch (IOException e) {
+      throw new WebDriverException("An error occurred while connecting to Firefox", e);
+    }
   }
 
   @Override
   protected void stopClient() {
-    // TODO: stop Firefox in here
-    super.stopClient();
+    ((ExtensionConnection) this.getCommandExecutor()).quit();
   }
 
   @Override

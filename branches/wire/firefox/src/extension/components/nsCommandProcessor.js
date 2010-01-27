@@ -71,9 +71,13 @@ var Response = function(command, responseHandler) {
   this.responseHandler_ = responseHandler;
   this.json_ = {
     name: command ? command.name : 'Unknown command',
+    sessionId: command['sessionId'],
     status: ErrorCode.SUCCESS,
     value: ''
   };
+  if (this.json_['sessionId'] && this.json_['sessionId']['value']) {
+    this.json_['sessionId'] = this.json_['sessionId']['value'];
+  }
   this.session = null;
 };
 
@@ -364,6 +368,7 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   }
 
   if (command.name == 'deleteSession' ||
+      command.name == 'getSessionCapabilities' ||
       command.name == 'switchToWindow') {
     return this[command.name](response, command.parameters);
   }
@@ -492,8 +497,7 @@ nsCommandProcessor.prototype.searchWindows_ = function(search_criteria,
 
 /**
  * Locates the most recently used FirefoxDriver window.
- * @param {Response} response The response object to send the command response
- *     in.
+ * @param {Response} response The object to send the command response in.
  */
 nsCommandProcessor.prototype.newSession = function(response) {
   var win = this.wm.getMostRecentWindow("navigator:browser");
@@ -518,26 +522,67 @@ nsCommandProcessor.prototype.newSession = function(response) {
 
 
 /**
+ * Describes a session.
+ * @param {Response} response The object to send the command response in.
+ */
+nsCommandProcessor.prototype.getSessionCapabilities = function(response) {
+  var appInfo = Components.classes['@mozilla.org/xre/app-info;1'].
+      getService(Components.interfaces.nsIXULAppInfo);
+  var xulRuntime = Components.classes['@mozilla.org/xre/app-info;1'].
+      getService(Components.interfaces.nsIXULRuntime);
+  response.value = {
+    'browserName': 'firefox',
+    'version': appInfo.version,
+    'javascriptEnabled': true,
+    // TODO: standardize on which one?
+    'operatingSystem': xulRuntime.OS,  // same as System.getProperty("os.name")?
+    'platform': xulRuntime.OS          // same as Platform.valueOf("name");
+  };
+  response.send();
+};
+
+
+/**
  * Deletes the session associated with the current request.
+ * @param {Response} response The object to send the command response in.
  */
 nsCommandProcessor.prototype.deleteSession = function(response) {
   var sessionStore = Components.
       classes['@googlecode.com/webdriver/wdsessionstoreservice;1'].
       getService(Components.interfaces.nsISupports);
   sessionStore.wrappedJSObject.deleteSession(response.session.getId());
+  response.send();
 };
 
 
 /**
  * Forcefully shuts down the Firefox application.
+ * @param {Response} response The object to send the command response in.
  */
-nsCommandProcessor.prototype.quit = function() {
-  // Create a switch file so the native events library will
-  // let all events through in case of a close.
-  createSwitchFile("close:<ALL>");
-  Components.classes['@mozilla.org/toolkit/app-startup;1'].
-      getService(Components.interfaces.nsIAppStartup).
-      quit(Components.interfaces.nsIAppStartup.eForceQuit);
+nsCommandProcessor.prototype.quit = function(response) {
+  // Go ahead and responsd to the command request to acknowledge that we are
+  // shutting down. We do this because once we force a quit, there's no way
+  // to respond.  Clients will just have to trust that this shutdown didn't
+  // fail.  Or they could monitor the PID. Either way, not much we can do about
+  // it in here.
+  response.send();
+
+  // Use an nsITimer to give the response time to go out.
+  var event = {
+    notify: function(timer) {
+      // Create a switch file so the native events library will
+      // let all events through in case of a close.
+      createSwitchFile("close:<ALL>");
+      Components.classes['@mozilla.org/toolkit/app-startup;1'].
+          getService(Components.interfaces.nsIAppStartup).
+          quit(Components.interfaces.nsIAppStartup.eForceQuit);
+    }
+  };
+
+  var timer = Components.classes['@mozilla.org/timer;1'].
+      createInstance(Components.interfaces.nsITimer);
+  timer.initWithCallback(event, 500,  // milliseconds
+      Components.interfaces.nsITimer.TYPE_ONE_SHOT);
 };
 
 

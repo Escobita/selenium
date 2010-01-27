@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
+import org.openqa.selenium.WebDriverException;
+
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -32,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -116,6 +119,8 @@ public class HttpCommandExecutor implements CommandExecutor {
         .put(IS_ELEMENT_DISPLAYED, get("/session/:sessionId/element/:id/displayed"))
         .put(HOVER_OVER_ELEMENT, post("/session/:sessionId/element/:id/hover"))
         .put(GET_ELEMENT_LOCATION, get("/session/:sessionId/element/:id/location"))
+        .put(GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW,
+            get("/session/:sessionId/element/:id/location_in_view"))
         .put(GET_ELEMENT_SIZE, get("/session/:sessionId/element/:id/size"))
         .put(GET_ELEMENT_ATTRIBUTE, get("/session/:sessionId/element/:id/attribute/:name"))
         .put(ELEMENT_EQUALS, get("/session/:sessionId/element/:id/equals/:other"))
@@ -132,6 +137,15 @@ public class HttpCommandExecutor implements CommandExecutor {
         .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
              get("/session/:sessionId/element/:id/css/:propertyName"))
         .build();
+  }
+
+  public URL getAddressOfRemoteServer() {
+    try {
+      return new URL(client.getHostConfiguration().getHostURL());
+    } catch (MalformedURLException e) {
+      // This really should never happen.
+      throw new WebDriverException(e);
+    }
   }
 
   public Response execute(Command command) throws Exception {
