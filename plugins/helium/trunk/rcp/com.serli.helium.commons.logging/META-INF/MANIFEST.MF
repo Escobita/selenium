@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Logging
+Bundle-SymbolicName: com.serli.helium.commons.logging
+Bundle-Version: 1.0.0.beta
+Bundle-Activator: com.serli.helium.commons.logging.LoggingPlugin
+Bundle-Vendor: SERLI
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/logger.xml
+Export-Package: com.serli.helium.commons.logging.constants,
+ com.serli.helium.commons.logging.service

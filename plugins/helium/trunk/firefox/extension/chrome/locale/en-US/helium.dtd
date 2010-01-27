@@ -1,0 +1,5 @@
+<!--en-US-->
+<!ENTITY sendLabel "Send to test creator">
+<!ENTITY sendTooltipText "Send the selected stream to the Eclipse RCP application.">
+<!ENTITY pageLoadedLabel "Page Loaded">
+<!ENTITY pageLoadingLabel "Page Loading...">

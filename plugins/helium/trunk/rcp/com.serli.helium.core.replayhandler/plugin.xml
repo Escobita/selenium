@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="streamTesters" name="StreamTesters" schema="schema/streamTesters.exsd"/>
+   <extension
+         point="org.eclipse.equinox.http.registry.servlets">
+      <servlet
+            alias="/replay"
+            class="com.serli.helium.core.replayhandler.internal.ReplayServlet">
+      </servlet>
+   </extension>
+
+</plugin>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<project default="packaging" basedir="./extension">
+
+	<property name="name" value="helium" /> <!-- Project name -->
+
+	<target name="packaging" >
+
+	<!-- Delete and create the xpi directory if inexistent -->
+
+		<delete dir="../xpi" />
+		<mkdir dir="../xpi" />	
+
+	<!--Copy all file to the xpi directory-->
+
+		<copy todir="../xpi">
+			<fileset dir="${basedir}" includes="**/*"/>
+		</copy>	
+
+	<!-- Package all file in a zip -->
+
+		<zip destfile="../xpi/${name}.zip">
+			<zipfileset dir="../xpi" includes="**/*" />
+		</zip>
+
+		<move file="../xpi/${name}.zip" tofile="../xpi/${name}.xpi" />
+
+	<!-- Remove copy file -->
+
+		<delete includeemptydirs="true" >
+			<fileset dir="../xpi" includes="**/*" excludes="*.xpi"/>
+		</delete>
+
+	</target>
+
+</project>

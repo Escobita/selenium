@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Workbench
+Bundle-SymbolicName: com.serli.helium.ui.workbench;singleton:=true
+Bundle-Version: 1.0.0.beta
+Bundle-Activator: com.serli.helium.ui.workbench.JWTGenWorkbenchActivator
+Bundle-Vendor: SERLI
+Require-Bundle: org.eclipse.ui,
+ com.serli.helium.ui.testeditor;bundle-version="1.0.0",
+ org.eclipse.core.runtime,
+ com.serli.helium.core.server;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: com.serli.helium.ui.workbench.constants
