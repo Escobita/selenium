@@ -387,7 +387,7 @@ Utils.getElementAt = function(index, doc) {
     }
   } else {
     throw new WebDriverError(ErrorCode.STALE_ELEMENT_REFERENCE,
-          'Element no longer exists');
+        'Element not found in the cache');
   }
 
   return e;
