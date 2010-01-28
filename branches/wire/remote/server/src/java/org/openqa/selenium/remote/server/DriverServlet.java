@@ -158,9 +158,9 @@ public class DriverServlet extends HttpServlet {
     postMapper.bind("/session/:sessionId/element/active", FindActiveElement.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
-    postMapper.bind("/session/:sessionId/element/:id/element/:using", FindChildElement.class)
+    postMapper.bind("/session/:sessionId/element/:id/element", FindChildElement.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
-    postMapper.bind("/session/:sessionId/element/:id/elements/:using", FindChildElements.class)
+    postMapper.bind("/session/:sessionId/element/:id/elements", FindChildElements.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
 
 

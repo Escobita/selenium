@@ -170,10 +170,9 @@ Dispatcher.prototype.init_ = function() {
       // TODO: implement
       on(Request.Method.GET, Dispatcher.notImplemented);
 
-  // TODO: drop redundant :using attribute
-  this.bind_('/session/:sessionId/element/:id/element/:using').
+  this.bind_('/session/:sessionId/element/:id/element').
       on(Request.Method.POST, Dispatcher.translateTo('findChildElement'));
-  this.bind_('/session/:sessionId/element/:id/elements/:using').
+  this.bind_('/session/:sessionId/element/:id/elements').
       on(Request.Method.POST, Dispatcher.translateTo('findChildElements'));
 
   this.bind_('/session/:sessionId/element/:id/click').
