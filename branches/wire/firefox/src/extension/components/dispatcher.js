@@ -215,9 +215,8 @@ Dispatcher.prototype.init_ = function() {
          Dispatcher.translateTo('getElementValueOfCssProperty'));
   this.bind_('/session/:sessionId/element/:id/attribute/:name').
       on(Request.Method.GET, Dispatcher.translateTo('getElementAttribute'));
-  // TODO: implement
   this.bind_('/session/:sessionId/element/:id/equals/:other').
-      on(Request.Method.GET, Dispatcher.notImplemented);
+      on(Request.Method.GET, Dispatcher.translateTo('elementEquals'));
 
   this.bind_('/session/:sessionId/element/:id/toggle').
       on(Request.Method.POST, Dispatcher.translateTo('toggleElement'));

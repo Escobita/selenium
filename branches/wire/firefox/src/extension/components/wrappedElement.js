@@ -17,6 +17,16 @@
  */
 
 
+FirefoxDriver.prototype.elementEquals = function(respond, parameters) {
+  var elementA = Utils.getElementAt(parameters.id,
+                                    respond.session.getDocument());
+  var elementB = Utils.getElementAt(parameters.other,
+                                    respond.session.getDocument());
+  respond.value = elementA == elementB;
+  respond.send();
+};
+
+
 FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
