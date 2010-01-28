@@ -40,12 +40,12 @@ Dispatcher.notImplemented = function(request, response) {
 
 /**
  * Returns a function that translates a WebDriver HTTP request to a legacy
- * nsICommandProcessor.
+ * command.
  * @param {string} name The legacy command name.
  * @return {function(Request, Response)} The translation function.
  * @private
  */
-Dispatcher.translateTo = function(name) {
+Dispatcher.executeAs = function(name) {
   return function(request, response) {
     var json = {
       'name': name,
@@ -127,119 +127,119 @@ Dispatcher.prototype.init_ = function() {
       on(Request.Method.POST, Dispatcher.translateNewSession());
 
   this.bind_('/session/:sessionId').
-      on(Request.Method.GET, Dispatcher.translateTo('getSessionCapabilities')).
-      on(Request.Method.DELETE, Dispatcher.translateTo('quit'));
+      on(Request.Method.GET, Dispatcher.executeAs('getSessionCapabilities')).
+      on(Request.Method.DELETE, Dispatcher.executeAs('quit'));
 
   this.bind_('/session/:sessionId/window_handle').
-      on(Request.Method.GET, Dispatcher.translateTo('getCurrentWindowHandle'));
+      on(Request.Method.GET, Dispatcher.executeAs('getCurrentWindowHandle'));
   this.bind_('/session/:sessionId/window_handles').
-      on(Request.Method.GET, Dispatcher.translateTo('getWindowHandles'));
+      on(Request.Method.GET, Dispatcher.executeAs('getWindowHandles'));
 
   this.bind_('/session/:sessionId/speed').
-      on(Request.Method.GET, Dispatcher.translateTo('getSpeed')).
-      on(Request.Method.POST, Dispatcher.translateTo('setSpeed'));
+      on(Request.Method.GET, Dispatcher.executeAs('getSpeed')).
+      on(Request.Method.POST, Dispatcher.executeAs('setSpeed'));
 
   this.bind_('/session/:sessionId/url').
-      on(Request.Method.GET, Dispatcher.translateTo('getCurrentUrl')).
-      on(Request.Method.POST, Dispatcher.translateTo('get'));
+      on(Request.Method.GET, Dispatcher.executeAs('getCurrentUrl')).
+      on(Request.Method.POST, Dispatcher.executeAs('get'));
 
   this.bind_('/session/:sessionId/forward').
-      on(Request.Method.POST, Dispatcher.translateTo('goForward'));
+      on(Request.Method.POST, Dispatcher.executeAs('goForward'));
   this.bind_('/session/:sessionId/back').
-      on(Request.Method.POST, Dispatcher.translateTo('goBack'));
+      on(Request.Method.POST, Dispatcher.executeAs('goBack'));
   this.bind_('/session/:sessionId/refresh').
-      on(Request.Method.POST, Dispatcher.translateTo('refresh'));
+      on(Request.Method.POST, Dispatcher.executeAs('refresh'));
 
   this.bind_('/session/:sessionId/execute').
-      on(Request.Method.POST, Dispatcher.translateTo('executeScript'));
+      on(Request.Method.POST, Dispatcher.executeAs('executeScript'));
 
   this.bind_('/session/:sessionId/source').
-      on(Request.Method.GET, Dispatcher.translateTo('getPageSource'));
+      on(Request.Method.GET, Dispatcher.executeAs('getPageSource'));
   this.bind_('/session/:sessionId/title').
-      on(Request.Method.GET, Dispatcher.translateTo('getTitle'));
+      on(Request.Method.GET, Dispatcher.executeAs('getTitle'));
 
   this.bind_('/session/:sessionId/element').
-      on(Request.Method.POST, Dispatcher.translateTo('findElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('findElement'));
   this.bind_('/session/:sessionId/elements').
-      on(Request.Method.POST, Dispatcher.translateTo('findElements'));
+      on(Request.Method.POST, Dispatcher.executeAs('findElements'));
   this.bind_('/session/:sessionId/element/active').
-      on(Request.Method.POST, Dispatcher.translateTo('getActiveElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('getActiveElement'));
 
   this.bind_('/session/:sessionId/element/:id').
       // TODO: implement
       on(Request.Method.GET, Dispatcher.notImplemented);
 
   this.bind_('/session/:sessionId/element/:id/element').
-      on(Request.Method.POST, Dispatcher.translateTo('findChildElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('findChildElement'));
   this.bind_('/session/:sessionId/element/:id/elements').
-      on(Request.Method.POST, Dispatcher.translateTo('findChildElements'));
+      on(Request.Method.POST, Dispatcher.executeAs('findChildElements'));
 
   this.bind_('/session/:sessionId/element/:id/click').
-      on(Request.Method.POST, Dispatcher.translateTo('clickElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('clickElement'));
   this.bind_('/session/:sessionId/element/:id/text').
-      on(Request.Method.GET, Dispatcher.translateTo('getElementText'));
+      on(Request.Method.GET, Dispatcher.executeAs('getElementText'));
   this.bind_('/session/:sessionId/element/:id/submit').
-      on(Request.Method.POST, Dispatcher.translateTo('submitElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('submitElement'));
 
   this.bind_('/session/:sessionId/element/:id/value').
-      on(Request.Method.POST, Dispatcher.translateTo('sendKeysToElement')).
-      on(Request.Method.GET, Dispatcher.translateTo('getElementValue'));
+      on(Request.Method.POST, Dispatcher.executeAs('sendKeysToElement')).
+      on(Request.Method.GET, Dispatcher.executeAs('getElementValue'));
 
   this.bind_('/session/:sessionId/element/:id/name').
-      on(Request.Method.GET, Dispatcher.translateTo('getElementTagName'));
+      on(Request.Method.GET, Dispatcher.executeAs('getElementTagName'));
 
   this.bind_('/session/:sessionId/element/:id/clear').
-      on(Request.Method.POST, Dispatcher.translateTo('clearElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('clearElement'));
 
   this.bind_('/session/:sessionId/element/:id/selected').
-      on(Request.Method.GET, Dispatcher.translateTo('isElementSelected')).
-      on(Request.Method.POST, Dispatcher.translateTo('setElementSelected'));
+      on(Request.Method.GET, Dispatcher.executeAs('isElementSelected')).
+      on(Request.Method.POST, Dispatcher.executeAs('setElementSelected'));
 
   this.bind_('/session/:sessionId/element/:id/enabled').
-      on(Request.Method.GET, Dispatcher.translateTo('isElementEnabled'));
+      on(Request.Method.GET, Dispatcher.executeAs('isElementEnabled'));
   this.bind_('/session/:sessionId/element/:id/displayed').
-      on(Request.Method.GET, Dispatcher.translateTo('isElementDisplayed'));
+      on(Request.Method.GET, Dispatcher.executeAs('isElementDisplayed'));
 
   this.bind_('/session/:sessionId/element/:id/location').
-      on(Request.Method.GET, Dispatcher.translateTo('getElementLocation'));
+      on(Request.Method.GET, Dispatcher.executeAs('getElementLocation'));
   this.bind_('/session/:sessionId/element/:id/location_in_view').
-      on(Request.Method.GET, Dispatcher.translateTo(
+      on(Request.Method.GET, Dispatcher.executeAs(
           'getElementLocationOnceScrolledIntoView'));
 
   this.bind_('/session/:sessionId/element/:id/size').
-      on(Request.Method.GET, Dispatcher.translateTo('getElementSize'));
+      on(Request.Method.GET, Dispatcher.executeAs('getElementSize'));
 
   this.bind_('/session/:sessionId/element/:id/css/:propertyName').
       on(Request.Method.GET,
-         Dispatcher.translateTo('getElementValueOfCssProperty'));
+         Dispatcher.executeAs('getElementValueOfCssProperty'));
   this.bind_('/session/:sessionId/element/:id/attribute/:name').
-      on(Request.Method.GET, Dispatcher.translateTo('getElementAttribute'));
+      on(Request.Method.GET, Dispatcher.executeAs('getElementAttribute'));
   this.bind_('/session/:sessionId/element/:id/equals/:other').
-      on(Request.Method.GET, Dispatcher.translateTo('elementEquals'));
+      on(Request.Method.GET, Dispatcher.executeAs('elementEquals'));
 
   this.bind_('/session/:sessionId/element/:id/toggle').
-      on(Request.Method.POST, Dispatcher.translateTo('toggleElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('toggleElement'));
   this.bind_('/session/:sessionId/element/:id/hover').
-      on(Request.Method.POST, Dispatcher.translateTo('hoverOverElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('hoverOverElement'));
   this.bind_('/session/:sessionId/element/:id/drag').
-      on(Request.Method.POST, Dispatcher.translateTo('dragElement'));
+      on(Request.Method.POST, Dispatcher.executeAs('dragElement'));
 
   this.bind_('/session/:sessionId/cookie').
-      on(Request.Method.GET, Dispatcher.translateTo('getCookies')).
-      on(Request.Method.POST, Dispatcher.translateTo('addCookie')).
-      on(Request.Method.DELETE, Dispatcher.translateTo('deleteAllCookies'));
+      on(Request.Method.GET, Dispatcher.executeAs('getCookies')).
+      on(Request.Method.POST, Dispatcher.executeAs('addCookie')).
+      on(Request.Method.DELETE, Dispatcher.executeAs('deleteAllCookies'));
 
   this.bind_('/session/:sessionId/cookie/:name').
-      on(Request.Method.DELETE, Dispatcher.translateTo('deleteCookie'));
+      on(Request.Method.DELETE, Dispatcher.executeAs('deleteCookie'));
 
   this.bind_('/session/:sessionId/frame').
-      on(Request.Method.POST, Dispatcher.translateTo('switchToFrame'));
+      on(Request.Method.POST, Dispatcher.executeAs('switchToFrame'));
   this.bind_('/session/:sessionId/window').
-      on(Request.Method.POST, Dispatcher.translateTo('switchToWindow')).
-      on(Request.Method.DELETE, Dispatcher.translateTo('close'));
+      on(Request.Method.POST, Dispatcher.executeAs('switchToWindow')).
+      on(Request.Method.DELETE, Dispatcher.executeAs('close'));
 
   this.bind_('/session/:sessionId/screenshot').
-      on(Request.Method.GET, Dispatcher.translateTo('screenshot'));
+      on(Request.Method.GET, Dispatcher.executeAs('screenshot'));
 };
 
 
