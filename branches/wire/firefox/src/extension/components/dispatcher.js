@@ -68,7 +68,7 @@ Dispatcher.executeAs = function(name) {
     var callback = function(jsonResponseString) {
       var jsonResponse = JSON.parse(jsonResponseString);
       // Going to need more granularity here I think.
-      if (jsonResponse.status != 0) {
+      if (jsonResponse.status != ErrorCode.SUCCESS) {
         response.setStatus(Response.INTERNAL_ERROR);
       }
 
