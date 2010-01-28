@@ -219,9 +219,7 @@ public class DriverServlet extends HttpServlet {
 
     postMapper.bind("/session/:sessionId/frame", SwitchToFrame.class)
         .on(ResultType.SUCCESS, new EmptyResult());
-    postMapper.bind("/session/:sessionId/frame/:id", SwitchToFrame.class)
-        .on(ResultType.SUCCESS, new EmptyResult());
-    postMapper.bind("/session/:sessionId/window/:name", SwitchToWindow.class)
+    postMapper.bind("/session/:sessionId/window", SwitchToWindow.class)
         .on(ResultType.SUCCESS, new EmptyResult());
     deleteMapper.bind("/session/:sessionId/window", CloseWindow.class)
         .on(ResultType.SUCCESS, new EmptyResult());

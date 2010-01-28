@@ -235,11 +235,8 @@ Dispatcher.prototype.init_ = function() {
 
   this.bind_('/session/:sessionId/frame').
       on(Request.Method.POST, Dispatcher.translateTo('switchToFrame'));
-  this.bind_('/session/:sessionId/frame/:id').  // TODO: zap
-      on(Request.Method.POST, Dispatcher.translateTo('switchToFrame'));
-  this.bind_('/session/:sessionId/window/:name').  // TODO: zap
-      on(Request.Method.POST, Dispatcher.translateTo('switchToWindow'));
-  this.bind_('/session/:sessionId/window').  // TODO: zap
+  this.bind_('/session/:sessionId/window').
+      on(Request.Method.POST, Dispatcher.translateTo('switchToWindow')).
       on(Request.Method.DELETE, Dispatcher.translateTo('close'));
 
   this.bind_('/session/:sessionId/screenshot').
