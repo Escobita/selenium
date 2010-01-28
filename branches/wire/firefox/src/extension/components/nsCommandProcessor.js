@@ -560,7 +560,7 @@ nsCommandProcessor.prototype.deleteSession = function(response) {
  * @param {Response} response The object to send the command response in.
  */
 nsCommandProcessor.prototype.quit = function(response) {
-  // Go ahead and responsd to the command request to acknowledge that we are
+  // Go ahead and respond to the command request to acknowledge that we are
   // shutting down. We do this because once we force a quit, there's no way
   // to respond.  Clients will just have to trust that this shutdown didn't
   // fail.  Or they could monitor the PID. Either way, not much we can do about

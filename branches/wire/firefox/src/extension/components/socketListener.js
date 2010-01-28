@@ -103,21 +103,6 @@ SocketListener.CHARSET = 'UTF-8';
 
 
 /**
- * The set of valid HTTP methods.
- * @enum {string}
- */
-SocketListener.HTTP_METHODS = {
-  'DELETE': 'DELETE',
-  'GET': 'GET',
-  'HEAD': 'HEAD',
-  'OPTIONS': 'OPTIONS',
-  'POST': 'POST',
-  'PUT': 'PUT',
-  'TRACE': 'TRACE'
-};
-
-
-/**
  * Signals the start of a request. Each request lasts for the life of the
  * underlying socket connection and represents a session with a FirefoxDriver
  * client. 
@@ -153,6 +138,9 @@ SocketListener.prototype.onDataAvailable = function(request, context,
   // This will blow up if we get an HTTPS request.  Oh well.
   var incoming = {};
 
+  // Our nsIConverterInputStream will not handle HTTPS connections, so if this
+  // is an HTTPS request, we'll blow up and the socket will be closed.
+  // TODO: support HTTPS?
   var bytesRead = this.inputStream_.readString(count, incoming);
   if (!bytesRead) {
     // Well...just close the connection.
@@ -198,12 +186,14 @@ SocketListener.prototype.parseRequest_ = function(data) {
   var path = requestLine.shift();
   var protocol = requestLine.shift().toUpperCase();
 
+  // We don't support HTTPS requests. If we get one, an error will occur above,
+  // causing the socket to close.
   if (protocol.indexOf('HTTP') != 0) {
     throw 'Not an HTTP request: <' + protocol + '>';
   }
 
   // Make sure we were given a valid HTTP method.
-  if (typeof SocketListener.HTTP_METHODS[method] == 'undefined') {
+  if (typeof Request.Method[method] == 'undefined') {
     throw 'Invalid HTTP method: "' + method + '"';
   }
 
@@ -231,8 +221,7 @@ SocketListener.prototype.parseRequest_ = function(data) {
 
   // See if we need to parse the request body.
   var body = null;
-  if (method == SocketListener.HTTP_METHODS.POST ||
-      method == SocketListener.HTTP_METHODS.PUT) {
+  if (method == Request.Method.POST || method == Request.Method.PUT) {
     body = lines.shift() || '';
   }
 

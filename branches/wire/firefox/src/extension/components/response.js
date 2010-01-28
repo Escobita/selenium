@@ -159,7 +159,9 @@ Response.prototype.getHeader = function(name) {
 
 /**
  * Sets this response's message body, overwriting any previously saved content.
+ * The message body will be converted to UTF-8 before the response is committed.
  * @param {string} body The new message body.
+ * @see Response.prototype.commit
  */
 Response.prototype.setBody = function(body) {
   this.body_ = body.toString();
@@ -207,7 +209,15 @@ Response.prototype.sendError = function(code, opt_message, opt_contentType) {
  */
 Response.prototype.commit = function() {
   if (this.committed_) {
-    Components.utils.reportError('Response already committed');
+    Components.utils.reportError([
+        'Response already committed',
+        'request: ' + this.request_.getMethod() + ' ' +
+            this.request_.getRequestUrl().path,
+        '         ' + this.request_.getBody(),
+        'response: ' + this.status_ + ' ' +
+            Response.StatusMessage_[this.status_],
+        '          ' + this.body_
+    ].join('\n  '));
     return;
   }
 

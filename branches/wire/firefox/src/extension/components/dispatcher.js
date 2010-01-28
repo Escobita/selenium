@@ -421,12 +421,18 @@ Resource.prototype.setRequestAttributes = function(request) {
 
 
 /**
- * Handles a request to this resource. Behavior is undefined if the request does
- * not map to this resource.
+ * Handles a request to this resource. Will return a 405 if this resource does
+ * not permit the HTTP method used for the request.
  * @param {Request} request The request to handle.
  * @param {Response} response For sending the response.
+ * @throws If this resource cannot handle the request.
  */
 Resource.prototype.handle = function(request, response) {
+  if (!this.isResourceFor(request.getPathInfo())) {
+    throw Error('Request does not map to this resource:' +
+        '\n  requestPath:  ' + request.getPathInfo() +
+        '\n  resourcePath: ' + this.path_);;
+  }
   var handlerFn = this.handlers_[request.getMethod()];
   if (handlerFn) {
     handlerFn(request, response);
