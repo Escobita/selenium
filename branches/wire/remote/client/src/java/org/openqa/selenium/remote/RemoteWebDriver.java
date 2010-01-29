@@ -265,27 +265,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
         "args", Lists.newArrayList(convertedArgs));
 
     Response response = execute(DriverCommand.EXECUTE_SCRIPT, params);
-
-    @SuppressWarnings({"unchecked"})
-    Map<String, Object> result = (Map<String, Object>) response.getValue();
-
-    String type = (String) result.get("type");
-    if ("NULL".equals(type))
-      return null;
-
-    if ("ELEMENT".equals(type)) {
-      String[] parts = ((String) result.get("value")).split("/");
-      RemoteWebElement element = newRemoteWebElement();
-      element.setId(parts[parts.length - 1]);
-      return element;
-    } else if (result.get("value") instanceof Number) {
-      if (result.get("value") instanceof Float || result.get("value") instanceof Double) {
-        return ((Number) result.get("value")).doubleValue();
-      }
-      return ((Number) result.get("value")).longValue();
-    }
-
-    return result.get("value");
+    return convertFromJsObject(response.getValue());
   }
 
   public boolean isJavascriptEnabled() {
@@ -326,6 +306,37 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     }
 
     return converted;
+  }
+
+  private Object convertFromJsObject(Object result) {
+    if (result instanceof List) {
+      @SuppressWarnings("unchecked")
+      List<Object> resultAsList = (List<Object>) result;
+      return Lists.newArrayList(Iterables.transform(resultAsList,
+          new Function<Object, Object>() {
+            public Object apply(Object listItem) {
+              return convertFromJsObject(listItem);
+            }
+          }));
+    }
+
+    // We currently only support one map type: {"ELEMENT"=id}
+    if (result instanceof Map) {
+      @SuppressWarnings("unchecked")
+      Map<String, String> resultAsMap = (Map<String, String>) result;
+      RemoteWebElement element = newRemoteWebElement();
+      element.setId(resultAsMap.get("ELEMENT"));
+      return element;
+    }
+
+    if (result instanceof Number) {
+      if (result instanceof Float || result instanceof Double) {
+        return ((Number) result).doubleValue();
+      }
+      return ((Number) result).longValue();
+    }
+
+    return result;
   }
 
 

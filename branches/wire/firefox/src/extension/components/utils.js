@@ -1239,18 +1239,17 @@ Utils.isHtmlCollection_ = function(obj) {
 Utils.wrapResult = function(result, doc) {
   // Sophisticated.
   if (null === result || undefined === result) {
-    return {type: "NULL", value: null};
+    return null;
   } else if (result['tagName']) {
-    return {type: "ELEMENT",
-            value: Utils.addToKnownElements(result, doc)};
+    return {'ELEMENT': Utils.addToKnownElements(result, doc)};
   } else if (Utils.isArray_(result) || Utils.isHtmlCollection_(result)) {
     var array = [];
     for (var i = 0; i < result.length; i++) {
       array.push(Utils.wrapResult(result[i], doc));
     }
-    return {type: "ARRAY", value: array};
+    return array;
   } else {
-    return {type: "OTHER", value: result};
+    return result;
   }
 }
 

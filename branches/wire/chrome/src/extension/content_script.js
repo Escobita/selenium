@@ -946,11 +946,12 @@ function execute(script, passedArgs) {
 
 function parseReturnValueFromScript(result) {
   console.log("Parsing: " + JSON.stringify(result));
-  var value = {"type":"NULL"};
+  var value = null;
   if (result !== undefined && result != null && typeof(result) == "object") {
     if (result.webdriverElementXPath) {
       //If we're returning an element, turn it into an actual element object
-      value = {value: addElementToInternalArray(getElementsByXPath(result.webdriverElementXPath)[0]).toString(), type:"ELEMENT"};
+      var element = getElementsByXPath(result.webdriverElementXPath)[0];
+      value = {'ELEMENT': addElementToInternalArray(element).toString()};
     } else if (result.length !== undefined) {
       value = [];
       for (var i = 0; i < result.length; ++i) {
@@ -963,7 +964,7 @@ function parseReturnValueFromScript(result) {
     case "string":
     case "number":
     case "boolean":
-      value = {value: result, type: "VALUE"};
+      value = result;
       break;
     }
   }

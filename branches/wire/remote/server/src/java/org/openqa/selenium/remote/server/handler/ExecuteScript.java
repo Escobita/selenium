@@ -25,6 +25,11 @@ import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.KnownElements;
 import org.openqa.selenium.remote.server.rest.ResultType;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,19 +80,8 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
     } else {
       value = ((JavascriptExecutor) getDriver()).executeScript(script);
     }
-    Map<String, Object> result = new HashMap<String, Object>();
 
-    if (value == null) {
-      result.put("type", "NULL");
-    } else if (value instanceof WebElement) {
-      String elementId = getKnownElements().add((WebElement) value);
-      result.put("type", "ELEMENT");
-      result.put("value", String.format("element/%s", elementId));
-    } else {
-      result.put("type", "VALUE");
-      result.put("value", value);
-    }
-
+    Object result = new ResultConverter().apply(value);
     response.setValue(result);
     
     return ResultType.SUCCESS;
@@ -100,5 +94,25 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
   @Override
   public String toString() {
     return String.format("[execute script: %s, %s]", script, args);
+  }
+
+  /**
+   * Converts an object to be sent as JSON according to the wire protocol.
+   */
+  private class ResultConverter implements Function<Object, Object> {
+    public Object apply(Object result) {
+      if (result instanceof WebElement) {
+        String elementId = getKnownElements().add((WebElement) result);
+        return ImmutableMap.of("ELEMENT", elementId);
+      }
+
+      if (result instanceof List) {
+        @SuppressWarnings("unchecked")
+        List<Object> resultAsList = (List<Object>) result;
+        return Lists.newArrayList(Iterables.transform(resultAsList, this));
+      }
+
+      return result;
+    }
   }
 }

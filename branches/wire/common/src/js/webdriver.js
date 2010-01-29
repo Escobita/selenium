@@ -656,19 +656,17 @@ webdriver.WebDriver.wrapScriptArgument_ = function(arg) {
  * @private
  */
 webdriver.WebDriver.prototype.unwrapScriptResult_ = function(result) {
-  switch (result.type) {
-    case 'ELEMENT':
-      var element = new webdriver.WebElement(this);
-      element.getId().setValue(result.value);
-      return element;
-
-    case 'ARRAY':
-      return goog.array.map(result.value, goog.bind(
-          this.unwrapScriptResult_, this));
-
-    default:
-      return result.value;
+  if (goog.isArray(result)) {
+    return goog.array.map(result, goog.bind(this.unwrapScriptResult_, this));
   }
+
+  if (result != null && goog.isObject(result) && 'ELEMENT' in result) {
+    var element = new webdriver.WebElement(this);
+    element.getId().setValue(result['ELEMENT']);
+    return element;
+  }
+
+  return result;
 };
 
 

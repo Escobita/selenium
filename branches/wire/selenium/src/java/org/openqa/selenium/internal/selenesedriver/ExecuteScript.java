@@ -63,27 +63,18 @@ public class ExecuteScript implements SeleneseFunction<Object> {
     return null;
   }
 
-  private Map<String, Object> populateReturnValue(String value) {
-    Map<String, Object> toReturn = Maps.newHashMap();
-
+  private Object populateReturnValue(String value) {
     if ("__undefined__".equals(value)) {
-      toReturn.put("type", "STRING");
-      toReturn.put("value", null);
+      return null;
     } else if (value.matches("^\\d+$")) {
-      toReturn.put("type", "NUMBER");
-      toReturn.put("value", Long.parseLong(value));
+      return Long.parseLong(value);
     } else if (value.matches("^\\d+\\.\\d+$")) {
-      toReturn.put("type", "NUMBER");
-      toReturn.put("value", Double.parseDouble(value));
+      return Double.parseDouble(value);
     } else if ("true".equals(value) || "false".equals(value)) {
-      toReturn.put("type", "BOOLEAN");
-      toReturn.put("value", Boolean.parseBoolean(value));
+      return Boolean.parseBoolean(value);
     } else {
       // Falll back to a string
-      toReturn.put("type", "STRING");
-      toReturn.put("value", value);
+      return value;
     }
-    
-    return toReturn;
   }
 }
