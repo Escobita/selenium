@@ -18,9 +18,12 @@ limitations under the License.
 package org.openqa.selenium.remote.server.handler;
 
 import org.openqa.selenium.remote.server.DriverSessions;
+import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.rest.ResultType;
 
-public class SwitchToFrame extends WebDriverHandler {
+import java.util.Map;
+
+public class SwitchToFrame extends WebDriverHandler implements JsonParametersAware {
 
   private String id;
 
@@ -30,6 +33,10 @@ public class SwitchToFrame extends WebDriverHandler {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public void setJsonParameters(Map<String, Object> allParameters) throws Exception {
+    setId((String) allParameters.get("id"));
   }
 
   public ResultType call() throws Exception {
