@@ -433,12 +433,52 @@ Resource.prototype.handle = function(request, response) {
         '\n  requestPath:  ' + request.getPathInfo() +
         '\n  resourcePath: ' + this.path_);;
   }
-  var handlerFn = this.handlers_[request.getMethod()];
+
+  var requestMethod = request.getMethod();
+
+  if (requestMethod == Request.Method.OPTIONS) {
+    response.setHeader('Allow', this.getAllowedMethods_());
+    response.setStatus(Response.OK);
+    response.setBody('');
+    response.commit();
+    return;
+  }
+
+  if (requestMethod == Request.Method.HEAD) {
+    requestMethod = Request.Method.GET;
+  }
+
+  var handlerFn = this.handlers_[requestMethod];
   if (handlerFn) {
     handlerFn(request, response);
   } else {
+    response.setHeader('Allow', this.getAllowedMethods_());
+    response.setContentType('text/plain');
     response.sendError(Response.METHOD_NOT_ALLOWED,
         'Method "' + request.getMethod() + '" not allowed for command ' +
-        '"' + this.path_ + '"');
+            '"' + this.path_ + '"');
   }
+};
+
+
+/**
+ * @return {string} A comma-delimitted list of HTTP methods allowed by this
+ *     resource.
+ * @private
+ */
+Resource.prototype.getAllowedMethods_ = function() {
+  var allowed = [];
+  for (var method in this.handlers_) {
+    allowed.push(method);
+  }
+
+  // We always respond to OPTIONS
+  allowed.push(Request.Method.OPTIONS);
+
+  // If we respond to GET, then we respond to HEAD.
+  if (Request.Method.GET in this.handlers_) {
+    allowed.push(Request.Method.HEAD);
+  }
+
+  return allowed.join(',');
 };

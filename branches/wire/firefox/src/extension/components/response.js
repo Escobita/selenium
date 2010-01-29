@@ -244,10 +244,11 @@ Response.prototype.commit = function() {
   var toSend = statusLine + headers + Response.CRLF;
   this.outputStream_.write(toSend, toSend.length);
 
-  // Send the body.
-  // TODO: shouldn't always be sending a body.
-  var byteStream = converter.convertToInputStream(this.body_);
-  this.outputStream_.writeFrom(byteStream, bytes.length);
+  // If necessary, send the body.
+  if (this.request_.getMethod() != Request.Method.HEAD) {
+    var byteStream = converter.convertToInputStream(this.body_);
+    this.outputStream_.writeFrom(byteStream, bytes.length);
+  }
 
   // Finish things up: flush and close the stream.
   this.outputStream_.flush();
