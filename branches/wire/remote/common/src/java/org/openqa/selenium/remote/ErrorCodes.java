@@ -34,6 +34,9 @@ public class ErrorCodes {
   public static final int UNHANDLED_ERROR = 13;
   public static final int XPATH_LOOKUP_ERROR = 19;
 
+  // The following error codes are derived straight from HTTP return codes.
+  public static final int METHOD_NOT_ALLOWED = 405;
+
   /**
    * Returns the exception type that corresponds to the given
    * {@code statusCode}. All unrecognized status codes will be mapped to
@@ -56,6 +59,7 @@ public class ErrorCodes {
       case NO_SUCH_FRAME:
         return NoSuchFrameException.class;
       case UNKNOWN_COMMAND:
+      case METHOD_NOT_ALLOWED:
         return UnsupportedOperationException.class;
       case STALE_ELEMENT_REFERENCE:
         return StaleElementReferenceException.class;
