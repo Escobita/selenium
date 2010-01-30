@@ -29,6 +29,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
 
 /**
@@ -43,6 +45,7 @@ public class ErrorHandlerTest extends TestCase {
   @Override
   protected void setUp() {
     handler = new ErrorHandler();
+    handler.setIncludeServerErrors(true);
   }
 
   public void testShouldNotThrowIfResponseWasASuccess() {
@@ -252,6 +255,50 @@ public class ErrorHandlerTest extends TestCase {
           cause.getMessage());
 
       assertStackTracesEqual(expectedTrace, cause.getStackTrace());
+    }
+  }
+
+  @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
+  public void testShouldNotIncludeTheServerSideExceptionAsACauseIfServerSideErrorsAreDisabled()
+      throws Exception {
+    RuntimeException serverError = new RuntimeException("foo bar baz!");
+
+    handler.setIncludeServerErrors(false);
+
+    try {
+      handler.throwIfResponseFailed(createResponse(
+          ErrorCodes.UNHANDLED_ERROR, toMap(serverError)));
+      fail("Should have thrown!");
+    } catch (WebDriverException expected) {
+      assertEquals(new WebDriverException(serverError.getMessage()).getMessage(),
+          expected.getMessage());
+      assertNull(expected.getCause());
+    }
+  }
+
+  @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
+  public void testShouldStillIncludeScreenshotEvenIfServerSideExceptionsAreDisabled()
+      throws Exception {
+    RuntimeException serverError = new RuntimeException("foo bar baz!");
+    Map<String, Object> data = toMap(serverError);
+    data.put("screen", "screenGrabText");
+
+    handler.setIncludeServerErrors(false);
+
+    try {
+      handler.throwIfResponseFailed(createResponse(
+          ErrorCodes.UNHANDLED_ERROR, data));
+      fail("Should have thrown!");
+    } catch (WebDriverException expected) {
+      assertEquals(new WebDriverException(serverError.getMessage()).getMessage(),
+          expected.getMessage());
+
+      Throwable cause = expected.getCause();
+      assertNotNull(cause);
+      assertEquals(ScreenshotException.class, cause.getClass());
+      assertEquals("screenGrabText", ((ScreenshotException) cause).getBase64EncodedScreenshot());
+
+      assertNull(cause.getCause());
     }
   }
 

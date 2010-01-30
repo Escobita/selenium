@@ -117,6 +117,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   protected void stopClient() {
   }
 
+  public ErrorHandler getErrorHandler() {
+    return errorHandler;
+  }
+
   public CommandExecutor getCommandExecutor() {
     return executor;
   }

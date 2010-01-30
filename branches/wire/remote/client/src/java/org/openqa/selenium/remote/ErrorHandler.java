@@ -33,6 +33,28 @@ public class ErrorHandler {
 
   private final ErrorCodes errorCodes = new ErrorCodes();
 
+  private boolean includeServerErrors;
+
+  public ErrorHandler() {
+    this(false);
+  }
+
+  /**
+   * @param includeServerErrors Whether to include server-side details in thrown
+   *     exceptions if the information is available.
+   */
+  public ErrorHandler(boolean includeServerErrors) {
+    this.includeServerErrors = includeServerErrors;
+  }
+
+  public boolean isIncludeServerErrors() {
+    return includeServerErrors;
+  }
+
+  public void setIncludeServerErrors(boolean includeServerErrors) {
+    this.includeServerErrors = includeServerErrors;
+  }
+
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
   public Response throwIfResponseFailed(Response response) throws RuntimeException {
     if (response.getStatus() == SUCCESS) {
@@ -53,7 +75,9 @@ public class ErrorHandler {
       try {
         rawErrorData =  (Map<String, Object>) response.getValue();
         message = (String) rawErrorData.get(MESSAGE);
-        cause = rebuildServerError(rawErrorData);
+        if (includeServerErrors) {
+          cause = rebuildServerError(rawErrorData);
+        }
         if (rawErrorData.containsKey(SCREEN_SHOT)) {
           cause = new ScreenshotException((String) rawErrorData.get(SCREEN_SHOT), cause);
         }
