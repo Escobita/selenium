@@ -97,7 +97,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
-    // The element is now looked up using an XPath expression
+    // The element is now looked up using the name attribute
     @FindBy(how = How.NAME, using = "q")
     private WebElement searchBox;
 
@@ -121,7 +121,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
-    // The element is now looked up using an XPath expression,
+    // The element is now looked up using the name attribute,
     // and we never look it up once it has been used the first time
     @FindBy(how = How.NAME, using = "q")
     @CacheLookup
