@@ -52,15 +52,13 @@ public class ExecuteScript implements SeleneseFunction<Object> {
   }
 
   private String getArgumentValue(Object arg) {
-    if (arg instanceof Map) {
-      Map<String, Object> raw = (Map<String, Object>) arg;
-      if ("STRING".equals(raw.get("type"))) {
-        return String.format("'%s'", ((String) raw.get("value")).replaceAll("'", "\\'"));
-      }
-      return String.valueOf(raw.get("value"));
+    if (arg == null) {
+      return null;
+    } else if (arg instanceof String) {
+      return String.format("'%s'", ((String) arg).replaceAll("'", "\\'"));
+    } else {
+      return String.valueOf(arg);
     }
-
-    return null;
   }
 
   private Object populateReturnValue(String value) {

@@ -20,6 +20,7 @@ package org.openqa.selenium.remote;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -277,60 +279,71 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   private Object convertToJsObject(Object arg) {
-    Map<String, Object> converted = new HashMap<String, Object>();
-
-    if (arg instanceof String) {
-      converted.put("type", "STRING");
-      converted.put("value", arg);
-    } else if (arg instanceof Number) {
-      converted.put("type", "NUMBER");
-      if (arg instanceof Float || arg instanceof Double) {
-        converted.put("value", ((Number) arg).doubleValue());
-      } else {
-        converted.put("value", ((Number) arg).longValue());
-      }
-    } else if (arg instanceof Boolean) {
-      converted.put("type", "BOOLEAN");
-      converted.put("value", ((Boolean) arg).booleanValue());
-    } else if (arg.getClass() == boolean.class) {
-      converted.put("type", "BOOLEAN");
-      converted.put("value", arg);
-    } else if (arg instanceof RemoteWebElement) {
-      converted.put("type", "ELEMENT");
-      converted.put("value", ((RemoteWebElement) arg).getId());
-    } else if (arg instanceof Collection<?>) {
-      Collection<?> args = ((Collection<?>)arg);
-      List<Object> convertedArgs = Lists.newArrayListWithExpectedSize(args.size());
-      for (Object o : args) {
-        convertedArgs.add(convertToJsObject(o));
-      }
-      return convertedArgs;
-    } else {
-      throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
+    if (arg == null || arg instanceof String || arg instanceof Boolean) {
+      return arg;
     }
 
-    return converted;
+    if (arg instanceof Number) {
+      if (arg instanceof Float || arg instanceof Double) {
+        return ((Number) arg).doubleValue();
+      } else {
+        return ((Number) arg).longValue();
+      }
+    }
+
+    if (arg instanceof RemoteWebElement) {
+      return ImmutableMap.of("ELEMENT", ((RemoteWebElement) arg).getId());
+    }
+
+    if (arg instanceof Collection<?>) {
+      Collection<?> args = (Collection<?>) arg;
+      return Collections2.transform(args, new Function<Object, Object>() {
+        public Object apply(Object value) {
+          return convertToJsObject(value);
+        }
+      });
+    }
+
+    if (arg instanceof Map<?, ?>) {
+      Map<?, ?> args = (Map<?, ?>) arg;
+      Map<String, Object> converted = Maps.newHashMapWithExpectedSize(args.size());
+      for (Map.Entry<?, ?> entry : args.entrySet()) {
+        Object key = entry.getKey();
+        if (!(key instanceof String)) {
+          throw new IllegalArgumentException(
+              "All keys in Map script arguments must be strings: " + key.getClass().getName());
+        }
+        converted.put((String) key, convertToJsObject(entry.getValue()));
+      }
+      return converted;
+    }
+
+    throw new IllegalArgumentException("Argument is of an illegal type: " + arg);
   }
 
   private Object convertFromJsObject(Object result) {
-    if (result instanceof List) {
-      @SuppressWarnings("unchecked")
-      List<Object> resultAsList = (List<Object>) result;
-      return Lists.newArrayList(Iterables.transform(resultAsList,
-          new Function<Object, Object>() {
-            public Object apply(Object listItem) {
-              return convertFromJsObject(listItem);
-            }
-          }));
+    if (result instanceof Collection<?>) {
+      Collection<?> results = (Collection<?>) result;
+      return Lists.newArrayList(Iterables.transform(results, new Function<Object, Object>() {
+        public Object apply(Object result) {
+          return convertFromJsObject(result);
+        }
+      }));
     }
 
-    // We currently only support one map type: {"ELEMENT"=id}
-    if (result instanceof Map) {
-      @SuppressWarnings("unchecked")
-      Map<String, String> resultAsMap = (Map<String, String>) result;
-      RemoteWebElement element = newRemoteWebElement();
-      element.setId(resultAsMap.get("ELEMENT"));
-      return element;
+    if (result instanceof Map<?, ?>) {
+      Map<?, ?> resultAsMap = (Map<?, ?>) result;
+      if (resultAsMap.containsKey("ELEMENT")) {
+        RemoteWebElement element = newRemoteWebElement();
+        element.setId(String.valueOf(resultAsMap.get("ELEMENT")));
+        return element;
+      } else {
+        return Maps.transformValues(resultAsMap, new Function<Object, Object>() {
+          public Object apply(Object value) {
+            return convertFromJsObject(value);
+          }
+        });
+      }
     }
 
     if (result instanceof Number) {

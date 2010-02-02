@@ -149,8 +149,8 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
     };
   }
 
-  var converted = [];
-  Utils.unwrapParameters(parameters.args, converted, respond.session.getDocument());
+  var converted = Utils.unwrapParameters(
+      parameters.args, respond.session.getDocument());
 
   try {
     var scriptSrc = "var __webdriverFunc = function(){" + parameters.script

@@ -87,7 +87,9 @@ function parsePortMessage(message) {
 
       if (element.click) {
         console.log("click");
-        execute("try { arguments[0].click(); } catch(e){}", {type: "ELEMENT", value: addElementToInternalArray(element)});
+        execute("try { arguments[0].click(); } catch(e){}", [{
+          type: "ELEMENT", value: addElementToInternalArray(element)
+        }]);
       }
       response.value = {statusCode: 0};
       break;
@@ -835,38 +837,60 @@ function sniffForMetaRedirects() {
   return {statusCode: "no-op", value: false};
 }
 
-function parseWrappedArguments(argument) {
-  //Parse the arguments into actual values (which are wrapped up in JSON)
-  if (argument.length !== undefined) {
-    var array = [];
-    for (var i = 0; i < argument.length; ++i) {
-      array.push(parseWrappedArguments(argument[i]));
+function parseWrappedArguments(wrappedArguments) {
+  var converted = [];
+  while (wrappedArguments && wrappedArguments.length > 0) {
+    var t = wrappedArguments.shift();
+    switch (typeof t) {
+      case 'number':
+      case 'string':
+      case 'boolean':
+        converted.push(t);
+        break;
+
+      case 'object':
+        if (t == null) {
+          converted.push(null);
+
+        } else if (typeof t.length === 'number' &&
+            !(t.propertyIsEnumerable('length'))) {
+          converted.push(parseWrappedArguments(t));
+
+        } else if (typeof t['ELEMENT'] === 'string' ||
+                   typeof t['ELEMENT'] === 'number') {
+          //Wrap up as a special object with the element's canonical xpath,
+          // which the page can work out
+          var element_id = t['ELEMENT'];
+          var element = null;
+          try {
+            element = internalGetElement(element_id);
+          } catch (e) {
+            throw {
+              statusCode: 10,
+              message:'Tried to use obsolete element as a JavaScript argument.'
+            };
+          }
+          converted.push({
+            webdriverElementXPath: getXPathOfElement(element)
+          });
+
+        } else {
+          var convertedObj = {};
+          for (var prop in t) {
+            convertedObj[prop] = parseWrappedArguments(t[prop]);
+          }
+          converted.push(convertedObj);
+        }
+        break;
+
+      default:
+        throw {
+          statusCode: 17,
+          message: 'Bad javascript argument: ' + (typeof t)
+        };
     }
-    return {success: true, value: array};
   }
-  switch (argument.type) {
-  case "ELEMENT":
-    //Wrap up as a special object with the element's canonical xpath, which the page can work out
-    var element_id = argument.value;
-    var element = null;
-    try {
-      element = internalGetElement(element_id);
-    } catch (e) {
-      return {success: false, value: {response: "execute", value:
-          {statusCode: 10,
-           message: "Tried use obsolete element as argument when executing javascript."}}};
-    }
-    return {success: true, value: {webdriverElementXPath: getXPathOfElement(element)}};
-    break;
-  //Intentional falling through because Javascript will parse things properly
-  case "STRING":
-  case "BOOLEAN":
-  case "NUMBER":
-    return {success: true, value: argument.value};
-    break;
-  }
-  return {success: false, value: {statusCode: 17,
-        message: "Bad argument to javascript."}}
+  return converted;
 }
 
 /**
@@ -874,70 +898,137 @@ function parseWrappedArguments(argument) {
  * Returns by callback to returnFromJavascriptInPage.
  * Yes, this is *horribly* hacky.
  * We can't share objects between content script and page, so have to wrap up arguments as JSON
- * @param script script to execute as a string
- * @param passedArgs array of arguments to pass to the script
+ * @param {string} script The javascript snippet to execute in the current page.
+ * @param {Array.<*>} passedArgs An array of JSON arguments to pass to the
+ *     injected script. DOMElements should be specified as JSON objects of the
+ *     form {ELEMENT: string}.
  * @param callback function to call when the result is returned.  Passed a DOMAttrModified event which should be parsed as returnFromJavascriptInPage
  * TODO: Make the callback be passed the parsed result.
  */
 function execute_(script, passedArgs, callback) {
   console.log("executing " + script + ", args: " + JSON.stringify(passedArgs));
   var func = "function(){" + script + "}";
-  var args = [];
-  for (var i = 0; i < passedArgs.length; ++i) {
-    console.log("Parsing: " + JSON.stringify(passedArgs[i]));
-    var value = parseWrappedArguments(passedArgs[i]);
-    if (value.success) {
-      args.push(value.value);
-    } else {
-      ChromeDriverContentScript.port.postMessage({response: value.value, sequenceNumber: ChromeDriverContentScript.currentSequenceNumber});
-      return;
-    }
+  var args;
+  try {
+    args = parseWrappedArguments(passedArgs);
+  } catch (ex) {
+    ChromeDriverContentScript.port.postMessage({
+      response: {
+        statusCode: (ex.statusCode || 17),
+        message: (ex.message || ex.toString())
+      },
+      sequenceNumber: ChromeDriverContentScript.currentSequenceNumber
+    });
+    return;
   }
+
   //Add a script tag to the page, containing the script we wish to execute
   var scriptTag = ChromeDriverContentScript.currentDocument.createElement('script');
   var argsString = JSON.stringify(args).replace(/"/g, "\\\"");
-  scriptTag.innerText = 'var e = document.createEvent("MutationEvent");' +
-                        //Dump our arguments in an array
-                        'var args = JSON.parse("' + argsString + '");' +
-                        'var element = null;' +
-                        'for (var i = 0; i < args.length; ++i) {' +
-                          'if (args[i] && typeof(args[i]) == "object" && args[i].webdriverElementXPath) {' +
-                            //If this is an element (because it has the proper xpath), turn it into an actual element object
-                            'args[i] = document.evaluate(args[i].webdriverElementXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;' +
-                          '}' +
-                        '}' +
-                        'try {' +
-                          'var val = eval(' + func + ').apply(window, args);' +
-                          'if (typeof(val) == "string") { val = JSON.stringify(val); }' +
-                          //TODO(danielwh): Deal with the undefined != null case better
-                          'else if (val === undefined) { val = null; }' +
-                          'else if (typeof(val) == "object" && val && val.nodeType == 1) {' +
-                            //If we're returning an element, turn it into a special xpath-containing object
-                            'var path = "";' +
-                            'for (; val && val.nodeType == 1; val = val.parentNode) {' +
-                              'var index = 1;' +
-                              'for (var sibling = val.previousSibling; sibling; sibling = sibling.previousSibling) {' +
-                                'if (sibling.nodeType == 1 && sibling.tagName && sibling.tagName == val.tagName) {' +
-                                  'index++;' +
-                                '}' +
-                              '}' +
-                              'path = "/" + val.tagName + "[" + index + "]" + path;' +
-                            '}' +
-                            'val = JSON.stringify({webdriverElementXPath: path});' +
-                          '} else {' +
-                            'val = JSON.stringify(val);' +
-                          '}' +
-                          //Fire mutation event with newValue set to the JSON of our return value
-                          'e.initMutationEvent("DOMAttrModified", true, false, null, null, "{value: " + val + "}", null, 0);' +
-                        '} catch (exn) {' +
-                          //Fire mutation event with prevValue set to EXCEPTION to indicate an error in the script
-                          'e.initMutationEvent("DOMAttrModified", true, false, null, "EXCEPTION", null, null, 0);' +
-                        '}' +
-                        'document.getElementsByTagName("script")[document.getElementsByTagName("script").length - 1].dispatchEvent(e);' +
-                        'document.getElementsByTagName("html")[0].removeChild(document.getElementsByTagName("script")[document.getElementsByTagName("script").length - 1]);';
+
+  // We use the fact that Function.prototype.toString() will decompile this to
+  // its source code so we can inject it into the page in a SCRIPT tag.
+  function executeInjectedScript(fn, argsAsString) {
+    var e = document.createEvent("MutationEvent");
+    var args = JSON.parse(argsAsString);
+    var element = null;
+    for (var i = 0; i < args.length; i++) {
+      if (args[i] && typeof args[i] == 'object' &&
+          args[i].webdriverElementXPath) {
+        //If this is an element (because it has the proper xpath), turn it into
+        //an actual element object
+        args[i] = document.evaluate(args[i].webdriverElementXPath, document,
+            null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      }
+    }
+    try {
+      var val = fn.apply(window, args);
+
+      // prepares the injected script result to be converted to json to be sent
+      // back to the content script.
+      function convertResultToJson(result) {
+        switch (typeof result) {
+          case 'string':
+          case 'number':
+          case 'boolean':
+            return result;
+          case 'undefined':
+            return null;
+          case 'object':
+            if (result == null) {
+              return result;
+            }
+            // Result was an array.
+            if (typeof result.length === 'number' &&
+                !(result.propertyIsEnumerable('length'))) {
+              var converted = [];
+              for (var i = 0; i < result.length; i++) {
+                converted.push(convertResultToJson(result[i]));
+              }
+              return converted;
+            }
+            // Result is a DOMNode; make sure it's a DOMElement
+            if (typeof result.nodeType == 'number') {
+              if (result.nodeType != 1) {
+                // Non-valid JSON value; we'll fail over when trying to
+                // stringify this, so fail early.
+                throw Error('Invalid script return type: result.nodeType == ' +
+                    result.nodeType);
+              }
+              var path = '';
+              for (; result && result.nodeType == 1;
+                  result = result.parentNode) {
+                var index = 1;
+                for (var sibling = result.previousSibling; sibling;
+                    sibling = sibling.previousSibling) {
+                  if (sibling.nodeType == 1 && sibling.tagName &&
+                      sibling.tagName == result.tagName) {
+                    index++;
+                  }
+                }
+                path = '/' + result.tagName + '[' + index + ']' + path;
+              }
+              return {webdriverElementXPath: path};
+            }
+            // Result is an object; convert each property.
+            var converted = {};
+            for (var prop in result) {
+              converted[prop] = convertResultToJson(result[prop]);
+            }
+            return converted;
+
+          case 'function':
+          default:
+            throw Error('Invalid script return type: ' + (typeof result));
+        }  // switch
+      }
+
+      val = JSON.stringify({
+        value: convertResultToJson(val)
+      });
+      console.info('returning from injected script: ' + val);
+      //Fire mutation event with newValue set to the JSON of our return value
+      e.initMutationEvent(
+          "DOMAttrModified", true, false, null, null, val, null, 0);
+    } catch (ex) {
+      //Fire mutation event with prevValue set to EXCEPTION to indicate an error
+      //in the script
+      console.error('injected script failed: ' + ex.toString());
+      e.initMutationEvent("DOMAttrModified", true, false, null, "EXCEPTION",
+          null, null, 0);
+    }
+    var scriptTags = document.getElementsByTagName("script");
+    var scriptTag = scriptTags[scriptTags.length - 1];
+    scriptTag.dispatchEvent(e);
+    document.documentElement.removeChild(scriptTag);
+  }
+
+  scriptTag.innerHTML =
+      '(' + executeInjectedScript + ')(' + func + ', "' + argsString + '");';
+
   scriptTag.addEventListener('DOMAttrModified', callback, false);
-  console.log("Injecting script element");
-  ChromeDriverContentScript.currentDocument.getElementsByTagName("html")[0].appendChild(scriptTag);
+  ChromeDriverContentScript.currentDocument.documentElement.
+      appendChild(scriptTag);
 }
 
 function execute(script, passedArgs) {
@@ -945,30 +1036,49 @@ function execute(script, passedArgs) {
 }
 
 function parseReturnValueFromScript(result) {
-  console.log("Parsing: " + JSON.stringify(result));
-  var value = null;
-  if (result !== undefined && result != null && typeof(result) == "object") {
-    if (result.webdriverElementXPath) {
-      //If we're returning an element, turn it into an actual element object
-      var element = getElementsByXPath(result.webdriverElementXPath)[0];
-      value = {'ELEMENT': addElementToInternalArray(element).toString()};
-    } else if (result.length !== undefined) {
-      value = [];
-      for (var i = 0; i < result.length; ++i) {
-        value.push(parseReturnValueFromScript(result[i]));
+  switch (typeof result) {
+    case 'string':
+    case 'number':
+    case 'boolean':
+      return result;
+
+    case 'object':
+      if (result == null) {
+        return result;
       }
-    }
-  } else if (result !== undefined && result != null) {
-    switch (typeof(result)) {
-    //Intentional falling through because we treat all "VALUE"s the same
-    case "string":
-    case "number":
-    case "boolean":
-      value = result;
-      break;
-    }
+
+      // Received an array, parse each element.
+      if (typeof result.length === 'number' &&
+          !(result.propertyIsEnumerable('length'))) {
+        var converted = [];
+        for (var i = 0; i < result.length; i++) {
+          converted.push(parseReturnValueFromScript(result[i]));
+        }
+        return converted;
+      }
+
+      // Script returned an element; return it's cached ID.
+      if (typeof result.webdriverElementXPath === 'string') {
+        //If we're returning an element, turn it into an actual element object
+        var element = getElementsByXPath(result.webdriverElementXPath)[0];
+        return {'ELEMENT': addElementToInternalArray(element).toString()};
+      }
+
+      // We were given a plain-old JSON object. Parse each property.
+      var convertedObj = {};
+      for (var prop in result) {
+        convertedObj[prop] = parseReturnValueFromScript(result[prop]);
+      }
+      return convertedObj;
+
+    // The script we inject to the page should never give us a result of type
+    // 'function' or 'undefined', so we do not need to check for those, but
+    // just go ahead and return null for completeness.
+    case 'function':
+    case 'undefined':
+    default:
+      return null;
   }
-  return value;
 }
 
 /**
@@ -982,7 +1092,7 @@ function returnFromJavascriptInPage(e) {
     return;
   }
   console.log("Got result");
-  console.log("Result was: " + e.newValue.value);
+  console.log("Result was: " + e.newValue);
   var result = JSON.parse(e.newValue).value;
   var value = parseReturnValueFromScript(result);
   console.log("Return value: " + JSON.stringify(value));

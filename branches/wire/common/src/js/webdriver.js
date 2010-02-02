@@ -624,27 +624,26 @@ webdriver.WebDriver.prototype.close = function() {
  * Helper function for converting an argument to a script into a parameter
  * object to send with the {@code webdriver.Command}.
  * @param {*} arg The value to convert.
- * @return {Object} A JSON object with "type" and "value" properties.
+ * @return {*} The converted value.
  * @see {webdriver.WebDriver.prototype.executeScript}
  * @private
  */
 webdriver.WebDriver.wrapScriptArgument_ = function(arg) {
-  var type, value;
   if (arg instanceof webdriver.WebElement) {
-    type = 'ELEMENT';
-    value = arg.getId();
+    return {'ELEMENT': arg.getId()};
+  } else if (arg == null || !goog.isDef(arg)) {
+    return null;
   } else if (goog.isBoolean(arg) ||
              goog.isNumber(arg) ||
              goog.isString(arg)) {
-    type = goog.typeOf(arg).toUpperCase();
-    value = arg;
+    return arg;
   } else if (goog.isArray(arg)) {
-    type = goog.typeOf(arg).toUpperCase();
-    value = goog.array.map(arg, webdriver.WebDriver.wrapScriptArgument_);
-  } else {
+    return goog.array.map(arg, webdriver.WebDriver.wrapScriptArgument_);
+  } else if (goog.isFunction(arg)) {
     throw new Error('Invalid script argument type: ' + goog.typeOf(arg));
+  } else {
+    return goog.object.map(arg, webdriver.WebDriver.wrapScriptArgument_);
   }
-  return {'type': type, 'value': value};
 };
 
 

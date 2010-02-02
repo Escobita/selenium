@@ -29,9 +29,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,28 +49,9 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
 
     List<?> params = (List<?>) allParameters.get("args");
 
-    parseParams(params, args);
+    args = Lists.newArrayList(Iterables.transform(params, new ArgumentConverter()));
   }
   
-  private void parseParams(List<?> params, List<Object> args) {
-    for (Object param : params) {
-      if (param instanceof Map) {
-        Map<String, Object> paramAsMap = (Map<String, Object>)param;
-        String type = (String) paramAsMap.get("type");
-        if ("ELEMENT".equals(type)) {
-          KnownElements.ProxiedElement element = (KnownElements.ProxiedElement) getKnownElements().get((String) paramAsMap.get("value"));
-          args.add(element.getWrappedElement());
-        } else {
-          args.add(paramAsMap.get("value"));
-        }
-      } else if (param instanceof List) {
-        List<Object> sublist = new ArrayList<Object>();
-        parseParams((List<?>)param, sublist);
-        args.add(sublist);
-      }
-    }
-  }
-
   public ResultType call() throws Exception {
     response = newResponse();
 
@@ -96,6 +77,32 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
     return String.format("[execute script: %s, %s]", script, args);
   }
 
+  private class ArgumentConverter implements Function<Object, Object> {
+    public Object apply(Object arg) {
+      if (arg instanceof Map) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> paramAsMap = (Map<String, Object>)arg;
+        if (paramAsMap.containsKey("ELEMENT")) {
+          KnownElements.ProxiedElement element = (KnownElements.ProxiedElement) getKnownElements()
+              .get((String) paramAsMap.get("ELEMENT"));
+          return element.getWrappedElement();
+        }
+
+        Map<String, Object> converted = Maps.newHashMapWithExpectedSize(paramAsMap.size());
+        for (Map.Entry<String, Object> entry : paramAsMap.entrySet()) {
+          converted.put(entry.getKey(), apply(entry.getValue()));
+        }
+        return converted;
+      }
+
+      if (arg instanceof List<?>) {
+        return Lists.newArrayList(Iterables.transform((List<?>) arg, this));
+      }
+
+      return arg;
+    }
+  }
+
   /**
    * Converts an object to be sent as JSON according to the wire protocol.
    */
@@ -110,6 +117,15 @@ public class ExecuteScript extends WebDriverHandler implements JsonParametersAwa
         @SuppressWarnings("unchecked")
         List<Object> resultAsList = (List<Object>) result;
         return Lists.newArrayList(Iterables.transform(resultAsList, this));
+      }
+
+      if (result instanceof Map<?, ?>) {
+        Map<?, ?> resultAsMap = (Map<?, ?>) result;
+        Map<Object, Object> converted = Maps.newHashMapWithExpectedSize(resultAsMap.size());
+        for (Map.Entry<?, ?> entry : resultAsMap.entrySet()) {
+          converted.put(entry.getKey(), apply(entry.getValue()));
+        }
+        return converted;
       }
 
       return result;

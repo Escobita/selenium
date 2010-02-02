@@ -1202,25 +1202,37 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
 };
 
 
-Utils.unwrapParameters = function(wrappedParameters, resultArray, doc) {
+Utils.unwrapParameters = function(wrappedParameters, doc) {
+  var converted = [];
   while (wrappedParameters && wrappedParameters.length > 0) {
     var t = wrappedParameters.shift();
-
-    if (t != null && t.length !== undefined && t.length != null && (t['type']
-        === undefined || t['type'] == null)) {
-      var innerArray = [];
-      Utils.unwrapParameters(t, innerArray);
-      resultArray.push(innerArray);
-      return;
+    switch (typeof t) {
+      case 'number':
+      case 'string':
+      case 'boolean':
+        converted.push(t);
+        break;
+      case 'object':
+        if (t == null) {
+          converted.push(null);
+        } else if (typeof t.length === 'number' &&
+            !(t.propertyIsEnumerable('length'))) {
+          converted.push(Utils.unwrapParameters(t, doc));
+        } else if (typeof t['ELEMENT'] === 'string') {
+          var element = Utils.getElementAt(t['ELEMENT'], doc);
+          element = element.wrappedJSObject ? element.wrappedJSObject : element;
+          converted.push(element);
+        } else {
+          var convertedObj = {};
+          for (var prop in t) {
+            convertedObj[prop] = Utils.unwrapParameters(t[prop], doc);
+          }
+          converted.push(convertedObj);
+        }
+        break;
     }
-
-    if (t['type'] == "ELEMENT") {
-      var element = Utils.getElementAt(t['value'], doc);
-      t['value'] = element.wrappedJSObject ? element.wrappedJSObject : element;
-    }
-
-    resultArray.push(t['value']);
   }
+  return converted;
 };
 
 
@@ -1238,18 +1250,45 @@ Utils.isHtmlCollection_ = function(obj) {
 
 Utils.wrapResult = function(result, doc) {
   // Sophisticated.
-  if (null === result || undefined === result) {
-    return null;
-  } else if (result['tagName']) {
-    return {'ELEMENT': Utils.addToKnownElements(result, doc)};
-  } else if (Utils.isArray_(result) || Utils.isHtmlCollection_(result)) {
-    var array = [];
-    for (var i = 0; i < result.length; i++) {
-      array.push(Utils.wrapResult(result[i], doc));
-    }
-    return array;
-  } else {
-    return result;
+  switch (typeof result) {
+    case 'string':
+    case 'number':
+    case 'boolean':
+      return result;
+
+    case 'function':
+      return result.toString();
+
+    case 'undefined':
+      return null;
+
+    case 'object':
+      if (result == null) {
+        return null;
+      }
+
+      // There's got to be a more intelligent way of detecting this.
+      if (result['tagName']) {
+        return {'ELEMENT': Utils.addToKnownElements(result, doc)};
+      }
+
+      if (typeof result.length === 'number' &&
+          !(result.propertyIsEnumerable('length'))) {
+        var array = [];
+        for (var i = 0; i < result.length; i++) {
+          array.push(Utils.wrapResult(result[i], doc));
+        }
+        return array;
+      }
+
+      var convertedObj = {};
+      for (var prop in result) {
+        convertedObj[prop] = Utils.wrapResult(result[prop], doc);
+      }
+      return convertedObj;
+
+    default:
+      return result;
   }
 }
 
