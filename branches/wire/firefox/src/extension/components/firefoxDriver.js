@@ -590,7 +590,7 @@ FirefoxDriver.prototype.addCookie = function(respond, parameters) {
     var currLocation = respond.session.getBrowser().contentWindow.location;
     var currDomain = currLocation.host;
     if (currDomain.indexOf(cookie.domain) == -1) {  // Not quite right, but close enough
-      throw new WebDriverError(ErrorCode.COOKIE_ERROR,
+      throw new WebDriverError(ErrorCode.INVALID_COOKIE_DOMAIN,
           "You may only set cookies for the current domain");
     }
   }
@@ -604,7 +604,7 @@ FirefoxDriver.prototype.addCookie = function(respond, parameters) {
 
   var document = respond.session.getDocument();
   if (!document || !document.contentType.match(/html/i)) {
-    throw new WebDriverError(ErrorCode.COOKIE_ERROR,
+    throw new WebDriverError(ErrorCode.UNABLE_TO_SET_COOKIE,
         "You may only set cookies on html documents");
   }
 

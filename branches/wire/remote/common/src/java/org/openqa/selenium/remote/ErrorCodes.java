@@ -1,14 +1,12 @@
 package org.openqa.selenium.remote;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
-
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.InvalidCookieDomainException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.UnableToSetCookieException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.XPathLookupException;
 
@@ -23,7 +21,6 @@ public class ErrorCodes {
   // TODO(jmleyba): Clean up error codes?
 
   public static final int SUCCESS = 0;
-  public static final int COOKIE_ERROR = 2;
   public static final int NO_SUCH_WINDOW = 3;
   public static final int NO_SUCH_ELEMENT = 7;
   public static final int NO_SUCH_FRAME = 8;
@@ -33,6 +30,8 @@ public class ErrorCodes {
   public static final int INVALID_ELEMENT_STATE = 12;
   public static final int UNHANDLED_ERROR = 13;
   public static final int XPATH_LOOKUP_ERROR = 19;
+  public static final int INVALID_COOKIE_DOMAIN = 24;
+  public static final int UNABLE_TO_SET_COOKIE = 25;
 
   // The following error codes are derived straight from HTTP return codes.
   public static final int METHOD_NOT_ALLOWED = 405;
@@ -50,8 +49,10 @@ public class ErrorCodes {
     switch (statusCode) {
       case SUCCESS:
         return null;
-      case COOKIE_ERROR:
+      case INVALID_COOKIE_DOMAIN:
         return InvalidCookieDomainException.class;
+      case UNABLE_TO_SET_COOKIE:
+        return UnableToSetCookieException.class;
       case NO_SUCH_WINDOW:
         return NoSuchWindowException.class;
       case NO_SUCH_ELEMENT:
@@ -85,7 +86,9 @@ public class ErrorCodes {
     if (thrown == null) {
       return SUCCESS; 
     } else if (thrown instanceof InvalidCookieDomainException) {
-      return COOKIE_ERROR;
+      return INVALID_COOKIE_DOMAIN;
+    } else if (thrown instanceof UnableToSetCookieException) {
+      return UNABLE_TO_SET_COOKIE;
     } else if (thrown instanceof NoSuchWindowException) {
       return NO_SUCH_WINDOW;
     } else if (thrown instanceof NoSuchElementException) {

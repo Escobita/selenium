@@ -25,7 +25,6 @@ var ErrorCode = {
   // Keep in sync with codes in org.openqa.selenium.remote.ErrorCodes
 
   SUCCESS: 0,
-  COOKIE_ERROR: 2,
   NO_SUCH_WINDOW: 3,
   NO_SUCH_ELEMENT: 7,
   NO_SUCH_FRAME: 8,
@@ -35,7 +34,9 @@ var ErrorCode = {
   INVALID_ELEMENT_STATE: 12,
   UNHANDLED_ERROR: 13,
   UNEXPECTED_JAVASCRIPT_ERROR: 17,
-  XPATH_LOOKUP_ERROR: 19
+  XPATH_LOOKUP_ERROR: 19,
+  INVALID_COOKIE_DOMAIN: 24,
+  UNABLE_TO_SET_COOKIE: 25
 };
 
 

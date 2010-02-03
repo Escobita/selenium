@@ -404,10 +404,10 @@ function setCookie(cookie) {
   if (cookie.domain != null && cookie.domain !== undefined &&
       currDomain.indexOf(cookie.domain) == -1) {
       // Not quite right, but close enough. (See r783)
-    return {statusCode: 2, value: {
+    return {statusCode: 24, value: {
             message: "You may only set cookies for the current domain"}};
   } else if (guessPageType() != "html") {
-    return {statusCode: 2, value: {
+    return {statusCode: 25, value: {
             message: "You may only set cookies on html documents"}};
   } else {
     cookieDocument.cookie = cookie.name + '=' + escape(cookie.value) +
