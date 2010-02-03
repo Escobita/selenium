@@ -21,7 +21,6 @@ public class ErrorCodes {
   // TODO(jmleyba): Clean up error codes?
 
   public static final int SUCCESS = 0;
-  public static final int NO_SUCH_WINDOW = 3;
   public static final int NO_SUCH_ELEMENT = 7;
   public static final int NO_SUCH_FRAME = 8;
   public static final int UNKNOWN_COMMAND = 9;
@@ -30,6 +29,7 @@ public class ErrorCodes {
   public static final int INVALID_ELEMENT_STATE = 12;
   public static final int UNHANDLED_ERROR = 13;
   public static final int XPATH_LOOKUP_ERROR = 19;
+  public static final int NO_SUCH_WINDOW = 23;
   public static final int INVALID_COOKIE_DOMAIN = 24;
   public static final int UNABLE_TO_SET_COOKIE = 25;
 

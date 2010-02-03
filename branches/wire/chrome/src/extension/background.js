@@ -466,7 +466,7 @@ function parseRequest(request) {
       setActivePortByWindowName(request.name);
     } else {
       sendResponseToParsedRequest({
-        status: 3,
+        status: 23,
         value: {
           message: 'Window to switch to was not given'
         }
@@ -590,8 +590,6 @@ function parsePortMessage(message) {
   // Error codes are loosely based on native exception codes, see
   // common/src/cpp/webdriver-interactions/errorcodes.h
   case 0:
-  case 2: //org.openqa.selenium.WebDriverException [Cookies]
-  case 3: //org.openqa.selenium.NoSuchWindowException
   case 7: //org.openqa.selenium.NoSuchElementException
   case 8: //org.openqa.selenium.NoSuchFrameException
   case 9: //java.lang.UnsupportedOperationException [Unknown command]
@@ -601,6 +599,9 @@ function parsePortMessage(message) {
   case 13: //org.openqa.selenium.WebDriverException [Unhandled error]
   case 17: //org.openqa.selenium.WebDriverException [Bad javascript]
   case 19: //org.openqa.selenium.XPathLookupException
+  case 23: //org.openqa.selenium.NoSuchWindowException
+  case 24: //org.openqa.selenium.InvalidCookieDomainException
+  case 25: //org.openqa.selenium.UnableToSetCookieException
   case 99: //org.openqa.selenium.WebDriverException [Native event]
     toSend = {status: message.response.value.statusCode, value: null};
     if (message.response.value !== undefined && message.response.value != null &&
@@ -978,7 +979,7 @@ function setActivePortByWindowName(handle) {
       return;
     }
   }
-  sendResponseToParsedRequest({status: 3, value: {message: 'Could not find window to switch to by handle: ' + handle}}, false);
+  sendResponseToParsedRequest({status: 23, value: {message: 'Could not find window to switch to by handle: ' + handle}}, false);
 }
 
 
