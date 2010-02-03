@@ -759,10 +759,14 @@ webdriver.WebDriver.prototype.getTitle = function() {
 webdriver.WebDriver.prototype.findElement = function(by) {
   var webElement = new webdriver.WebElement(this);
   var locator = webdriver.By.Locator.checkLocator(by);
-  var command = this.addCommand(webdriver.CommandName.FIND_ELEMENT).
-      setParameter("using", locator.type).
-      setParameter("value", locator.target);
-  webElement.getId().setValue(command.getFutureResult());
+  this.callFunction(function() {
+    var command = this.addCommand(webdriver.CommandName.FIND_ELEMENT).
+        setParameter("using", locator.type).
+        setParameter("value", locator.target);
+    this.callFunction(function(id) {
+      webElement.getId().setValue(id['ELEMENT']);
+    });
+  }, this);
   return webElement;
 };
 
@@ -825,7 +829,7 @@ webdriver.WebDriver.prototype.findElements = function(by) {
       for (var i = 0; i < ids.length; i++) {
         if (ids[i]) {
           var element = new webdriver.WebElement(this);
-          element.getId().setValue(ids[i]);
+          element.getId().setValue(ids[i]['ELEMENT']);
           elements.push(element);
         }
       }

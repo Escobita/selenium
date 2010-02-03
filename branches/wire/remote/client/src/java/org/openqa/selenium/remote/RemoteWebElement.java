@@ -114,13 +114,14 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
   protected WebElement findElement(String using, String value) {
     Response response = execute(DriverCommand.FIND_CHILD_ELEMENT,
         ImmutableMap.of("id", id, "using", using, "value", value));
-    return getElementFrom(response);
+    return (WebElement) response.getValue();
   }
 
+  @SuppressWarnings("unchecked")
   protected List<WebElement> findElements(String using, String value) {
     Response response = execute(DriverCommand.FIND_CHILD_ELEMENTS,
         ImmutableMap.of("id", id, "using", using, "value", value));
-    return getElementsFrom(response);
+    return (List<WebElement>) response.getValue();
   }
 
  public WebElement findElementById(String using) {
@@ -181,14 +182,6 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 
   protected Response execute(DriverCommand command, Map<String, ?> parameters) {
     return parent.execute(command, parameters);
-  }
-
-  protected WebElement getElementFrom(Response response) {
-    return parent.getElementFrom(response);
-  }
-
-  protected List<WebElement> getElementsFrom(Response response) {
-    return parent.getElementsFrom(response);
   }
 
   @Override

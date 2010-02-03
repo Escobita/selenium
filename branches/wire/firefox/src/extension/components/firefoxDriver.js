@@ -346,7 +346,8 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
   }
 
   if (element) {
-    respond.value = Utils.addToKnownElements(element, respond.session.getDocument());
+    var id = Utils.addToKnownElements(element, respond.session.getDocument());
+    respond.value = {'ELEMENT': id};
     respond.send();
   } else {
     throw new WebDriverError(ErrorCode.NO_SUCH_ELEMENT,
@@ -468,7 +469,9 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
   var elementIds = [];
   for (var j = 0; j < elements.length; j++) {
     var element = elements[j];
-    elementIds.push(Utils.addToKnownElements(element, respond.session.getDocument()));
+    var elementId = Utils.addToKnownElements(
+        element, respond.session.getDocument());
+    elementIds.push({'ELEMENT': elementId});
   }
 
   respond.value = elementIds;
@@ -526,8 +529,9 @@ FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
 
 FirefoxDriver.prototype.getActiveElement = function(respond) {
   var element = Utils.getActiveElement(respond.session.getDocument());
+  var id = Utils.addToKnownElements(element, respond.session.getDocument());
 
-  respond.value = Utils.addToKnownElements(element, respond.session.getDocument());
+  respond.value = {'ELEMENT':id};
   respond.send();
 };
 

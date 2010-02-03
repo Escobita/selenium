@@ -226,7 +226,7 @@ function parsePortMessage(message) {
       response.value = selectElement(element);
       break;
     case "getActiveElement":
-      response.value = {statusCode: 0, value: [addElementToInternalArray(ChromeDriverContentScript.currentDocument.activeElement).toString()]};
+      response.value = {statusCode: 0, value: {'ELEMENT':addElementToInternalArray(ChromeDriverContentScript.currentDocument.activeElement).toString()}};
       response.wait = false;
       break;
     case "switchToNamedIFrameIfOneExists":
@@ -493,12 +493,15 @@ function getElement(plural, lookupBy, lookupValue, id) {
           message: "Unable to find element with " + lookupBy + " " + lookupValue}};
     }
   } else {
-    var elementsToReturnArray = [];
+    var toReturn;
     if (plural) {
+      toReturn = [];
       //Add all found elements to the page's elements, and push each to the array to return
       var addedElements = addElementsToInternalArray(elements);
       for (var addedElement in addedElements) {
-        elementsToReturnArray.push(addedElements[addedElement].toString());
+        toReturn.push({
+          'ELEMENT': addedElements[addedElement].toString()
+        });
       }
     } else {
       if (!elements[0]) {
@@ -506,9 +509,11 @@ function getElement(plural, lookupBy, lookupValue, id) {
           message: "Unable to find element with " + lookupBy + " " + lookupValue}};
       }
       //Add the first found elements to the page's elements, and push it to the array to return
-      elementsToReturnArray.push(addElementToInternalArray(elements[0]).toString());
+      toReturn = {
+        'ELEMENT': addElementToInternalArray(elements[0]).toString()
+      };
     }
-    return {statusCode: 0, value: elementsToReturnArray};
+    return {statusCode: 0, value: toReturn};
   }
 }
 

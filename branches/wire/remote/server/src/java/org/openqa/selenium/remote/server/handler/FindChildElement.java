@@ -26,7 +26,8 @@ import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.rest.ResultType;
 
-import java.util.Collections;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 
 public class FindChildElement extends WebElementHandler implements JsonParametersAware {
@@ -51,7 +52,7 @@ public class FindChildElement extends WebElementHandler implements JsonParameter
     WebElement element = getElement().findElement(by);
     String elementId = getKnownElements().add(element);
 
-    response.setValue(Collections.singletonList(String.format("element/%s", elementId)));
+    response.setValue(ImmutableMap.of("ELEMENT", elementId));
 
     return ResultType.SUCCESS;
   }

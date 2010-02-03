@@ -112,11 +112,15 @@ webdriver.WebElement.prototype.isElementPresent = function(locator) {
 webdriver.WebElement.prototype.findElement = function(locator) {
   var webElement = new webdriver.WebElement(this.driver_);
   locator = webdriver.By.Locator.checkLocator(locator);
-  var command = this.
-      createCommand_(webdriver.CommandName.FIND_CHILD_ELEMENT).
-      setParameter('using', locator.type).
-      setParameter('value', locator.target);
-  webElement.getId().setValue(command.getFutureResult());
+  this.driver_.callFunction(function() {
+    var command = this.
+        createCommand_(webdriver.CommandName.FIND_CHILD_ELEMENT).
+        setParameter('using', locator.type).
+        setParameter('value', locator.target);
+    this.driver_.callFunction(function(id) {
+      webElement.getId().setValue(id['ELEMENT']);
+    });
+  }, this);
   return webElement;
 };
 
@@ -140,7 +144,7 @@ webdriver.WebElement.prototype.findElements = function(locator) {
       for (var i = 0; i < ids.length; i++) {
         if (ids[i]) {
           var element = new webdriver.WebElement(this.driver_);
-          element.getId().setValue(ids[i]);
+          element.getId().setValue(ids[i]['ELEMENT']);
           elements.push(element);
         }
       }

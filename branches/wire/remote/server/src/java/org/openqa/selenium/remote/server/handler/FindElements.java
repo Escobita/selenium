@@ -26,7 +26,11 @@ import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.rest.ResultType;
 
-import java.util.LinkedHashSet;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,16 +54,15 @@ public class FindElements extends WebDriverHandler implements JsonParametersAwar
   public ResultType call() throws Exception {
     response = newResponse();
 
-    Set<String> urls = new LinkedHashSet<String>();
     List<WebElement> elements = getDriver().findElements(by);
-    for (WebElement element : elements) {
-      String elementId = getKnownElements().add(element);
+    Set<Map<String, String>> elementIds = Sets.newLinkedHashSet(
+        Iterables.transform(elements, new Function<WebElement, Map<String, String>>() {
+          public Map<String, String> apply(WebElement element) {
+            return ImmutableMap.of("ELEMENT", getKnownElements().add(element));
+          }
+        }));
 
-      // URL will be relative to the current one.
-      urls.add(String.format("element/%s", elementId));
-    }
-
-    response.setValue(urls);
+    response.setValue(elementIds);
     return ResultType.SUCCESS;
   }
 
