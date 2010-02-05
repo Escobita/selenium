@@ -17,6 +17,7 @@
 //  limitations under the License.
 
 #import "Session.h"
+#import "SessionRoot.h"
 #import "JSONRESTResource.h"
 #import "Context.h"
 #import "HTTPRedirectResponse.h"
@@ -24,71 +25,6 @@
 #import "WebDriverResource.h"
 #import "WebDriverUtilities.h"
 #import "HTTPVirtualDirectory+Remove.h"
-
-@implementation SessionRoot
-
-- (id)init {
-  if (![super init])
-    return nil;
-
-  // Sessions are created by POSTing to /hub/session with
-  // a set of |DesiredCapabilities|.
-  [self setIndex:[JSONRESTResource
-                  JSONResourceWithTarget:self 
-															action:@selector(createSessionWithData:method:)]];
-
-  // Session IDs start at 1001.
-  nextId_ = 1001;
-	
-	return self;
-}
-
-// TODO (josephg): We really only support one session. Error (or ignore the
-// request) if the session is already created. When the session exists, change
-// the service we advertise using zeroconf.
-
-// Create a session. This method is bound to the index of /hub/session/
-- (NSObject<HTTPResponse> *)createSessionWithData:(id)desiredCapabilities
-                                           method:(NSString *)method {
-
-  if (![method isEqualToString:@"POST"] && ![method isEqualToString:@"GET"])
-		 return nil;
-	
-  int sessionId = nextId_++;
-  
-  NSLog(@"session %d created", sessionId);
-
-  // Sessions don't really mean anything on the iphone. There's only one
-  // browser, only one session and only one context.
-
-  // But we would like to give a clean status by cleaning up application data,
-  // in particular, cookies, cache and HTML5 client-side storage.  
-  Session* session = [[[Session alloc]
-                       initWithSessionRootAndSessionId:self
-                       sessionId:sessionId] autorelease];
-	
-  NSString *sessionIdStr = [NSString stringWithFormat:@"%d", sessionId];
-  [self setResource:session withName:sessionIdStr];
-
-  return [HTTPRedirectResponse redirectToURL:
-          [NSString stringWithFormat:@"session/%d/%@/", sessionId,
-           [Context contextName]]];
-}
-  
-- (void) deleteSessionWithId:(int)sessionId {
-  NSString *sessionIdStr = [NSString stringWithFormat:@"%d", sessionId];
-  [self setResource:nil withName:sessionIdStr];
-  NSLog(@"session %d deleted", sessionId);
-  if (sessionId == nextId_ - 1) {
-    nextId_--;
-  }
-}
-
-- (void)dealloc {
-  [super dealloc];
-}
-
-@end
 
 @implementation Session
   

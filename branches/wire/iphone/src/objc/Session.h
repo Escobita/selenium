@@ -20,18 +20,7 @@
 #import "HTTPVirtualDirectory.h"
 
 @class Context;
-
-// This |HTTPVirtualDirectory| matches the /session directory that serves as the
-// root of the WebDriver REST service.
-@interface SessionRoot : HTTPVirtualDirectory {
-  int nextId_;
-}
-
-- (NSObject<HTTPResponse> *)createSessionWithData:(id)desiredCapabilities
-                                           method:(NSString*)method;
-- (void)deleteSessionWithId:(int)sessionId;
-
-@end;
+@class SessionRoot;
 
 // This |HTTPVirtualDirectory| matches the /:session directory which WebDriver
 // expects. All the interesting stuff is in the :session/:context subdirectory
