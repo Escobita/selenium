@@ -442,7 +442,7 @@ function parseRequest(request) {
       });
     } else {
       // Wow. I can't see this being error prone in the slightest
-      var handle = ChromeDriver.activePort.sender.tab.id;
+      var handle = ChromeDriver.windowHandlePrefix + "_" + ChromeDriver.activePort.sender.tab.id;
       sendResponseToParsedRequest({status: 0, value:  handle}, false);
     };
     break;
@@ -577,7 +577,7 @@ function parsePortMessage(message) {
       "Received response from content script: " + JSON.stringify(message));
   if (!message || !message.response || !message.response.value ||
       message.response.value.statusCode === undefined ||
-      message.response.value.statusCode == null ||
+      message.response.value.statusCode === null ||
       message.sequenceNumber === undefined || message.sequenceNumber < ChromeDriver.lastReceivedSequenceNumber) {
     // Should only ever happen if we sent a bad request,
     // or the content script is broken
@@ -604,7 +604,7 @@ function parsePortMessage(message) {
   case 25: //org.openqa.selenium.UnableToSetCookieException
   case 99: //org.openqa.selenium.WebDriverException [Native event]
     toSend = {status: message.response.value.statusCode, value: null};
-    if (message.response.value !== undefined && message.response.value != null &&
+    if (message.response.value !== undefined && message.response.value !== null &&
         message.response.value.value !== undefined) {
       toSend.value = message.response.value.value;
     }

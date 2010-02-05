@@ -46,8 +46,7 @@ namespace OpenQA.Selenium
             string[] hostNameParts = hostName.Split(new char[] { '.' });
             if (hostNameParts.Length < 3)
             {
-                Console.WriteLine("Cookies can only be set on fully-qualified domain names. Skipping.");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
             driver.Url = macbethPage;
             IOptions options = driver.Manage();
@@ -75,13 +74,13 @@ namespace OpenQA.Selenium
         {
             driver.Url = macbethPage;
             IOptions options = driver.Manage();
-            Cookie cookie = new Cookie("Lisa", "Simpson", EnvironmentManager.Instance.UrlBuilder.HostName, EnvironmentManager.Instance.UrlBuilder.Path + "IDoNotExist", null);
+            Cookie cookie = new Cookie("Lisa", "Simpson", EnvironmentManager.Instance.UrlBuilder.HostName, "/" + EnvironmentManager.Instance.UrlBuilder.Path + "IDoNotExist", null);
             options.AddCookie(cookie);
             ReadOnlyCollection<Cookie> cookies = options.GetCookies();
             Assert.IsFalse(cookies.Contains(cookie), "Invalid cookie was returned");
         }
 
-        // TODO(jimevan): Disabling this test for now. If your network is using
+        // TODO(JimEvans): Disabling this test for now. If your network is using
         // something like OpenDNS or Google DNS which you may be automatically
         // redirected to a search page, which will be a valid page and will allow a
         // cookie to be created. Need to investigate further.
@@ -298,8 +297,7 @@ namespace OpenQA.Selenium
             string name = GotoValidDomainAndClearCookies();
             if (name == null || nameRegex.IsMatch(name))
             {
-                Console.WriteLine("Skipping test: unable to find domain name to use");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
 
             Assert.IsNull(driver.Manage().GetCookieNamed("name"));
@@ -325,8 +323,7 @@ namespace OpenQA.Selenium
             string name = GotoValidDomainAndClearCookies();
             if (name == null || nameRegex.IsMatch(name))
             {
-                Console.WriteLine("Skipping test: unable to find domain name to use");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
             driver.Manage().DeleteAllCookies();
 

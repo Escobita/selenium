@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Security.Permissions;
 
 namespace OpenQA.Selenium.IE
 {
     /// <summary>
-    /// Class to handle
+    /// Create and manage collections of strings
     /// </summary>
     /// TODO(andre.nogueira): StringCollection, ElementCollection and StringWrapperHandle should be consistent among them
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
@@ -16,7 +15,7 @@ namespace OpenQA.Selenium.IE
         private SafeStringCollectionHandle handle;
 
         /// <summary>
-        /// Initializes a new instance of StringCollection class.
+        /// Initializes a new instance of the StringCollection class.
         /// </summary>
         /// <param name="elementCollectionHandle">element collection handler</param>
         public StringCollection(SafeStringCollectionHandle elementCollectionHandle)

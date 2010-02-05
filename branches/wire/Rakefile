@@ -13,7 +13,7 @@ require 'rake-tasks/selenium'
 require 'rake-tasks/mozilla'
 require 'rake-tasks/ruby'
 
-version = "2.0a1"
+version = "2.0a2"
 
 task :default => [:test]
 
@@ -453,7 +453,8 @@ java_uberjar(:name => "selenium-server",
              :exclude => [
                            "META-INF/BCKEY.*"
                          ],
-             :main => "org.openqa.selenium.server.SeleniumServer")
+             :main => "org.openqa.selenium.server.SeleniumServer",
+             :no_libs => true)
              
 task :'selenium-server_zip' do
   temp = "build/selenium-server_zip"
@@ -539,7 +540,7 @@ java_test(:name => "webdriver-selenium-test",
           :deps => [
                      :test_common,
                      :htmlunit,
-                     :'selenium-server',
+                     :'selenium-server-standalone',
                      "selenium/lib/buildtime/*.jar",
                    ],
           :main => "org.testng.TestNG",
@@ -550,7 +551,7 @@ java_test(:name => "webdriver-selenese-test",
           :deps => [
                      :test_common,
                      :htmlunit,
-                     :'selenium-server',
+                     :'selenium-server-standalone',
                      "selenium/lib/buildtime/*.jar",
                    ])
 
@@ -594,14 +595,14 @@ java_test(:name => "debug_jsapi",
           :deps => [ :firefox, :test_common ],
           :main => "org.openqa.selenium.environment.webserver.Jetty6AppServer")
 
-task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :chrome] do
+task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :chrome, :selenium] do
   mkdir_p "build/javadoc", :verbose => false
    sourcepath = ""
    classpath = "support/lib/runtime/hamcrest-all-1.1.jar"
-   %w(common firefox jobbie htmlunit support remote/common remote/client chrome).each do |m|
+   %w(common firefox jobbie htmlunit support remote/common remote/client chrome selenium).each do |m|
      sourcepath += ":#{m}/src/java"
    end
-   cmd = "javadoc -d build/javadoc -sourcepath #{sourcepath} -classpath #{classpath} -subpackages org.openqa.selenium"
+   cmd = "javadoc -d build/javadoc -sourcepath #{sourcepath} -classpath #{classpath} -subpackages org.openqa.selenium -subpackages com.thoughtworks"
    if (windows?) 
      cmd = cmd.gsub(/\//, "\\").gsub(/:/, ";") 
    end
@@ -640,7 +641,7 @@ iphone_test(:name => "webdriver-iphone-client-test",
 
 
 #### iPhone ####
-task :iphone_server => FileList['iphone/src/objc/**'] do
+task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
     puts "Building iWebDriver iphone app"
@@ -703,7 +704,8 @@ java_uberjar(:name => "selenium-java",
                     :remote_client,
                     :selenium,
                     :support
-                  ])
+                  ],
+              :no_libs => true)
 
 task :release => [:'all_zip', :'selenium-server-standalone', :'selenium-server_zip'] do
   cp "build/selenium-server-standalone.jar", "build/selenium-server-standalone-#{version}.jar"

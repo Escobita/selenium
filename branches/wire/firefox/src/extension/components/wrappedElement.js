@@ -46,14 +46,37 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
 
   // I'm having trouble getting clicks to work on Firefox 2 on Windows. Always
   // fall back for that
-  // TODO(simon): Get native clicks working for gecko 1.8+
   var useNativeClick =
       versionChecker.compare(appInfo.platformVersion, "1.9") >= 0;
 
   if (this.enableNativeEvents && nativeEvents && node && useNativeClick) {
+    Utils.dumpn("Using native events for click");
     var loc = Utils.getLocationOnceScrolledIntoView(element);
     var x = loc.x + (loc.width ? loc.width / 2 : 0);
     var y = loc.y + (loc.height ? loc.height / 2 : 0);
+
+    // In Firefox 3.6 and above, there's a shared window handle. We need to calculate an offset
+    // to add to the x and y locations.
+
+    var appInfo = Components.classes['@mozilla.org/xre/app-info;1'].
+        getService(Components.interfaces.nsIXULAppInfo);
+    var versionChecker = Components.classes['@mozilla.org/xpcom/version-comparator;1'].
+        getService(Components.interfaces.nsIVersionComparator);
+    if (versionChecker.compare(appInfo.version, '3.6') >= 0) {
+      // Get the ultimate parent frame
+      var current = element.ownerDocument.defaultView;
+      var ultimateParent = element.ownerDocument.defaultView.parent;
+      while (ultimateParent != current) {
+        current = ultimateParent;
+        ultimateParent = current.parent;
+      }
+      var offX = element.ownerDocument.defaultView.mozInnerScreenX - ultimateParent.mozInnerScreenX;
+      var offY = element.ownerDocument.defaultView.mozInnerScreenY - ultimateParent.mozInnerScreenY;
+
+      x += offX;
+      y += offY;
+    }
+
     try {
       nativeEvents.mouseMove(node, this.currentX, this.currentY, x, y);
       nativeEvents.click(node, x, y);
@@ -65,6 +88,8 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
       // Make sure that we only fall through only if
       // the error returned from the native call indicates it's not
       // implemented.
+
+      Utils.dumpn("Detected error when clicking: " + e.name);
 
       if (e.name != "NS_ERROR_NOT_IMPLEMENTED") {
         throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE, e);
@@ -629,7 +654,8 @@ FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
     return;
   }
 
-  element.ownerDocument.body.focus();
+  var theDoc = element.ownerDocument;
+  theDoc.body.focus();
   element.scrollIntoView(true);
 
   var retrieval = Utils.newInstance(
@@ -647,18 +673,34 @@ FirefoxDriver.prototype.getElementLocationOnceScrolledIntoView = function(
     respond.send();
     return;
   } catch(e) {
-    // Element doesn't have an accessibility node
+    // Element doesn't have an accessibility node. Fall through
   }
 
-  // Fallback. Use the (deprecated) method to find out where the element is in
-  // the viewport. This should be fine to use because we only fall down this
-  // code path on older versions of Firefox (I think!)
+  // If we have the box object (which is deprecated) we could try using it
   var theDoc = respond.session.getDocument();
-  var box = theDoc.getBoxObjectFor(element);
+  if (theDoc.getBoxObjectFor) {
+    // Fallback. Use the (deprecated) method to find out where the element is in
+    // the viewport. This should be fine to use because we only fall down this
+    // code path on older versions of Firefox (I think!)
 
+    var box = theDoc.getBoxObjectFor(element);
+
+    respond.value = {
+      x : box.screenX,
+      y : box.screenY
+    };
+    respond.send();
+  }
+
+  // Fine. Come up with a good guess. This should be the element location
+  // added to the current window location. It'll probably be off
+  var x = theDoc.defaultView.screenX;
+  var y = theDoc.defaultView.screenY;
+
+  var rect = element.getBoundingClientRect()
   respond.value = {
-    x : box.screenX,
-    y : box.screenY
-  };
+    x : x + rect.left,
+    y : y + rect.top  
+  }
   respond.send();
 };

@@ -22,6 +22,7 @@ limitations under the License.
 #include "InternetExplorerDriver.h"
 #include "logging.h"
 #include "jsxpath.h"
+#include "cookies.h"
 #include "utils.h"
 #include <stdio.h>
 #include <iostream>
@@ -454,6 +455,30 @@ int wdAddCookie(WebDriver* driver, const wchar_t* cookie)
 	} END_TRY;
 }
 
+int wdDeleteCookie(WebDriver* driver, const wchar_t* cookieName)
+{
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
+
+	// Inject the XPath engine
+	std::wstring script;
+	for (int i = 0; DELETECOOKIES[i]; i++) {
+		script += DELETECOOKIES[i];
+	}
+	ScriptArgs* args;
+	int result = wdNewScriptArgs(&args, 1);
+	if (result != SUCCESS) {
+		return result;
+	}
+	wdAddStringScriptArg(args, cookieName);
+
+	ScriptResult* scriptResult = NULL;
+	result = wdExecuteScript(driver, script.c_str(), args, &scriptResult);
+	wdFreeScriptArgs(args);
+	if (scriptResult) delete scriptResult;
+
+	return result;
+}
+
 int wdSwitchToActiveElement(WebDriver* driver, WebElement** result)
 {
 	*result = NULL;
@@ -590,10 +615,10 @@ int wdeGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** re
 	try {
 		std::wstring script(L"(function() { return function(){ ");
 		script += L"var e = arguments[0]; var attr = arguments[1]; var lattr = attr.toLowerCase(); ";
-		script += L"if (lattr == 'class') { attr = 'className' }; ";
-		script += L"if (lattr == 'readonly') { attr = 'readOnly' }; ";
+		script += L"if ('class' == lattr) { attr = 'className' }; ";
+		script += L"if ('readonly' == lattr) { attr = 'readOnly' }; ";
 		script += L"if ('style' == lattr) { return ''; } ";
-		script += L"  if ('disabled' == lattr) { return e.disabled ? 'true' : 'false'; } ";
+		script += L"if ('disabled' == lattr) { return e.disabled ? 'true' : 'false'; } ";
 		script += L"if (e.tagName.toLowerCase() == 'input') { ";
         script += L"  var type = e.type.toLowerCase(); ";
 		script += L"  if (type == 'radio' && lattr == 'selected') { return e.checked == '' || e.checked == undefined ? 'false' : 'true' ; } ";

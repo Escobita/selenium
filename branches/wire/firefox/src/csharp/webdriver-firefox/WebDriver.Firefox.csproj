@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\build\cli\Release\WebDriver.Firefox.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.1, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
@@ -64,6 +65,7 @@
     <Compile Include="FirefoxProfileManager.cs" />
     <Compile Include="Internal\ILock.cs" />
     <Compile Include="Internal\IniFileReader.cs" />
+    <Compile Include="Internal\NativeMethods.cs" />
     <Compile Include="Internal\ResponseValueJsonConverter.cs" />
     <Compile Include="Preferences.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

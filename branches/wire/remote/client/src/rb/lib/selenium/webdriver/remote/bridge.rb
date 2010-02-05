@@ -15,7 +15,7 @@ module Selenium
         include BridgeHelper
 
         DEFAULT_OPTIONS = {
-          :url                  => "http://localhost:7055/",
+          :url                  => "http://localhost:4444/wd/hub",
           :http_client          => DefaultHttpClient,
           :desired_capabilities => Capabilities.firefox
         }
@@ -60,6 +60,14 @@ module Selenium
             raise ArgumentError, "unknown option#{'s' if opts.size != 1}: #{opts.inspect}"
           end
 
+          if desired_capabilities.kind_of?(Symbol)
+            unless Capabilities.respond_to?(desired_capabilities)
+              raise Error::WebDriverError, "invalid desired capability: #{desired_capabilities.inspect}"
+            end
+
+            desired_capabilities = Capabilities.send(desired_capabilities)
+          end
+
           uri = URI.parse(url)
           uri.path += "/" unless uri.path =~ /\/$/
 
@@ -88,6 +96,8 @@ module Selenium
         def create_session(desired_capabilities)
           resp = raw_execute :newSession, {}, desired_capabilities
           @session_id = resp['sessionId'] || raise(Error::WebDriverError, 'no sessionId in returned payload')
+          @context    = resp['context']
+
           Capabilities.json_create resp['value']
         end
 

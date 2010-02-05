@@ -42,6 +42,8 @@ public class FindElement implements SeleneseFunction<Map<String, String>> {
       locator = "link=" + using; 
     } else if ("name".equals(how)) {
       locator = "name=" + using;
+    } else if ("tag name".equals(how)) {
+      locator = "xpath=//" + using;
     } else if ("xpath".equals(how)) {
       locator = "xpath=" + using;
     } else {

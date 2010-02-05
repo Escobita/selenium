@@ -144,7 +144,7 @@ class JavaGen < BaseGenerator
 
     if args[:system_properties] then
       args[:system_properties].each do |prop|
-        test_string += '-D#{prop} '
+        test_string += "-D#{prop} "
       end
     end
 
@@ -212,6 +212,7 @@ class JavaGen < BaseGenerator
       
       all.each do |dep|
         next unless dep.to_s =~ /\.jar$/
+        next if (dep.to_s =~ /\lib\// or dep.to_s =~ /^third_party\//) and args[:no_libs] == true
         sh "cd #{temp} && jar xf ../../#{dep}", :verbose => false
       end      
 

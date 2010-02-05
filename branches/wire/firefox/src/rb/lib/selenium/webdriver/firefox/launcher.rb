@@ -6,20 +6,27 @@ module Selenium
       class Launcher
 
         attr_reader :binary, :connection
+        SOCKET_LOCK_TIMEOUT = 45
+
 
         def initialize(binary, port = DEFAULT_PORT, profile_name = DEFAULT_PROFILE_NAME)
           @binary       = binary
           @port         = port.to_i
           @profile_name = profile_name
-
           @profile      = nil
-          @host         = "localhost"
+
+          # need to be really specific about what port to use
+          #
+          # on os x, "localhost" will resolve to 3 different addresses (see /etc/hosts)
+          # Ruby will loop over these and happily bind to the same port on each one,
+          # making it completely unusable for our purposes.
+          #
+          @host = "127.0.0.1"
         end
 
         def launch
           with_lock do
             find_free_port
-            connect_and_kill
             create_profile
             start_silent_and_wait
             start
@@ -30,10 +37,23 @@ module Selenium
         end
 
         def with_lock
-          socket_lock = TCPServer.new(@host, @port - 1)
-          socket_lock.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC) if defined? Fcntl::FD_CLOEXEC
+          max_time = Time.now + SOCKET_LOCK_TIMEOUT
+          locking_port = @port - 1
 
-          yield
+          until Time.now > max_time
+            begin
+              socket_lock = TCPServer.new(@host, locking_port)
+              socket_lock.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC) if defined? Fcntl::FD_CLOEXEC
+
+              yield
+              return
+            rescue SocketError, Errno::EADDRINUSE
+              sleep 0.1
+            end
+          end
+
+          raise Error::WebDriverError,
+            "Unable to bind to locking port #{locking_port} within #{SOCKET_LOCK_TIMEOUT} seconds"
         ensure
           socket_lock.close if socket_lock
         end
@@ -51,11 +71,11 @@ module Selenium
         def create_profile
           fetch_profile
 
-          @profile.delete_extensions_cache
-
           if @profile.nil?
             raise Error, WebDriverError, "could not find or create profile: #{profile.inspect}"
           end
+
+          @profile.delete_extensions_cache
 
           @profile.port = @port
           @profile.add_extension(true)
@@ -71,14 +91,6 @@ module Selenium
           assert_profile
           @binary.start_with @profile, "--silent"
           @binary.wait
-        end
-
-        def connect_and_kill
-          connection = ExtensionConnection.new(@host, @port)
-          connection.connect(1)
-          connection.quit
-        rescue Errno::ECONNREFUSED, Errno::ENOTCONN, Timeout::Error => e
-          # ok
         end
 
         def connect
@@ -110,7 +122,7 @@ module Selenium
           s = TCPServer.new(@host, port)
           s.close
           true
-        rescue
+        rescue SocketError, Errno::EADDRINUSE
           false
         end
 
