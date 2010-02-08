@@ -29,6 +29,7 @@
 #import "WebViewController.h"
 #import "NSString+SBJSON.h"
 #import "NSException+WebDriver.h"
+#import "errorcodes.h"
 
 @implementation Element
 
@@ -312,14 +313,14 @@
     @throw [NSException
             webDriverExceptionWithMessage:@"You may not select an unselectable "
                                            "element"
-            webDriverClass:@"java.lang.UnsupportedOperationException"];
+            andStatusCode:EELEMENTNOTSELECTED];
   }
 
   if ([self isEnabled] == [NSNumber numberWithBool:NO]) {
     @throw [NSException
             webDriverExceptionWithMessage:@"You may not select a disabled "
                                            "element"
-            webDriverClass:@"java.lang.UnsupportedOperationException"];
+            andStatusCode:EELEMENTNOTENABLED];
   }
 
   NSString* locator = [self jsLocator];
@@ -331,7 +332,7 @@
       @throw [NSException
               webDriverExceptionWithMessage:@"You may not select an "
                                              "unselectable element"
-              webDriverClass:@"java.lang.UnsupportedOperationException"];
+              andStatusCode:EELEMENTNOTSELECTED];
     }
   }
   
@@ -419,7 +420,7 @@
   if ([self isDisplayed] == [NSNumber numberWithBool:NO]) {
     @throw [NSException
             webDriverExceptionWithMessage:@"Element is not visible"
-            webDriverClass:@"org.openqa.selenium.ElementNotVisibleException"];
+            andStatusCode:EELEMENTNOTDISPLAYED];
   }
 }
 

@@ -20,6 +20,7 @@
 #import "WebDriverResponse.h"
 #import "NSString+SBJSON.h"
 #import "MainViewController.h"
+#import "errorcodes.h"
 
 @implementation WebDriverResource
 
@@ -202,9 +203,15 @@
   WebDriverResponse *response = nil;
 
   if (methodSignature == nil) {
+    // Return a "405 Method Not Allowed" message. We should be setting an
+    // "Allowed" header whose value is the list of methods supported by this
+    // resource, but the CocoaHTTPServer framework we're using doesn't seem to
+    // support it.
+    // TODO: patch the server for headers
     response = [WebDriverResponse responseWithError:
-                [NSString stringWithFormat:@"Invalid method for resource: %@",
-                 method]];
+                [NSString stringWithFormat:
+                 @"Invalid method for resource: %@ %@", method, query]];
+    [response setStatus:405];
     [self configureWebDriverResponse:response];
     return response;
   }

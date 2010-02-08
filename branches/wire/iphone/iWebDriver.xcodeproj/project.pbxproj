@@ -418,10 +418,6 @@
 				838B349D0F14630E00F72BC4 /* Element+FindElement.m */,
 				839049330F1ACEFD001A79B6 /* Attribute.h */,
 				839049340F1ACEFD001A79B6 /* Attribute.m */,
-				64D8AA4D1120B995001649CC /* NSURLRequest+IgnoreSSL.h */,
-				64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */,
-				8331047E0F1EB2F7000A38DB /* NSException+WebDriver.h */,
-				8331047F0F1EB2F7000A38DB /* NSException+WebDriver.m */,
 			);
 			name = "REST Service";
 			sourceTree = "<group>";
@@ -429,7 +425,6 @@
 		839986AC0EE3AA720074D106 /* Web server extensions */ = {
 			isa = PBXGroup;
 			children = (
-				838B332C0F1422F600F72BC4 /* REST Service */,
 				64D8AA9F1120BAF9001649CC /* errorcodes.h */,
 				FD61E6970FE150E5006E1274 /* WebDriverUtilities.h */,
 				FD61E6980FE150E5006E1274 /* WebDriverUtilities.m */,
@@ -443,10 +438,15 @@
 				839986A20EE3AA5E0074D106 /* HTTPServerController.m */,
 				64D8AA601120B9EC001649CC /* HTTPVirtualDirectory+Remove.h */,
 				64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */,
+				64D8AA4D1120B995001649CC /* NSURLRequest+IgnoreSSL.h */,
+				64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */,
+				8331047E0F1EB2F7000A38DB /* NSException+WebDriver.h */,
+				8331047F0F1EB2F7000A38DB /* NSException+WebDriver.m */,
+				83E5B30D0EFF6749004AA772 /* HTTP + JSON */,
 				17D715530FE1078C00CC479E /* HTTP + PNG */,
 				83169E840EE8DE0100FE869C /* HTTP Server configuration */,
-				83E5B30D0EFF6749004AA772 /* HTTP + JSON */,
 				839988600EE515B50074D106 /* REST Mapping */,
+				838B332C0F1422F600F72BC4 /* REST Service */,
 			);
 			name = "Web server extensions";
 			path = src/objc;

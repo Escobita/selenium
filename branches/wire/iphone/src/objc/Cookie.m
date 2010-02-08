@@ -24,6 +24,7 @@
 #import "NSString+SBJSON.h"
 #import "WebDriverResponse.h"
 #import "WebViewController.h"
+#import "errorcodes.h"
 
 @implementation Cookie
 
@@ -104,8 +105,7 @@
               [NSString stringWithFormat:
                @"You may only set cookies for the current domain:"
                " Expected <%@>, but was <%@>", [currentUrl host], domain]
-                                         webDriverClass:
-              @"java.lang.IllegalArgumentException"];
+                                          andStatusCode:EINVALIDCOOKIEDOMAIN];
     }
   }
   

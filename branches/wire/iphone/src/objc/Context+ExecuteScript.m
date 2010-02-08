@@ -23,6 +23,7 @@
 #import "NSException+WebDriver.h"
 #import "Element.h"
 #import "ElementStore.h"
+#import "errorcodes.h"
 
 @implementation Context (ExecuteScript)
 
@@ -39,8 +40,7 @@
      @throw([NSException webDriverExceptionWithMessage:
              [NSString stringWithFormat:@"Could not parse argument %@",
               element]
-                                        webDriverClass:
-             @"org.openqa.selenium.WebDriverException"]);
+                                         andStatusCode:EUNHANDLEDERROR]);
     } else {
       NSDictionary *arg = (NSDictionary *)element;
       id value = [arg objectForKey:@"value"];
@@ -85,8 +85,7 @@
     NSString *error = [[self viewController] jsEval:@"error.message || error"];
     @throw([NSException webDriverExceptionWithMessage:
             [NSString stringWithFormat:@"JS ERROR: %@", error]
-                                       webDriverClass:
-            @"org.openqa.selenium.WebDriverException"]);
+                                        andStatusCode:EUNHANDLEDERROR]);
   }
 
   // We need to know what the result type was so we can send the proper value

@@ -22,6 +22,7 @@
 #import "WebDriverResource.h"
 #import "NSException+WebDriver.h"
 #import "WebViewController.h"
+#import "errorcodes.h"
 
 @implementation Element (FindElement)
 
@@ -102,7 +103,7 @@
   if ([[self viewController] jsElementIsNullOrUndefined:container]) {
     @throw [NSException webDriverExceptionWithMessage:
             [NSString stringWithFormat:@"Invalid xpath expression: %@", xpath]
-                                       webDriverClass:nil];
+                                        andStatusCode:EUNEXPECTEDJSERROR];
   }
   
   return [elementStore_ elementsFromJSArray:container];
@@ -255,6 +256,6 @@
   else
     @throw([NSException
             webDriverExceptionWithMessage:@"Unable to locate element"
-                           webDriverClass:@"org.openqa.selenium.NoSuchElementException"]);
+            andStatusCode:ENOSUCHELEMENT]);
 }
 @end

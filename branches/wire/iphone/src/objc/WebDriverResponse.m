@@ -19,6 +19,7 @@
 #import "WebDriverResponse.h"
 #import "HTTPJSONResponse.h"
 #import "HTTPPNGResponse.h"
+#import "NSException+WebDriver.h"
 #import "errorcodes.h"
 
 @implementation WebDriverResponse
@@ -41,12 +42,28 @@
 }
 
 - (id)initWithError:(id)error {
-  id value = [error isKindOfClass:[NSException class]] ? [error userInfo]
-                                                       : error;
-  if (![self initWithValue:value])
-    return nil;
+  NSLog(@"Creating WebDriverResponse with:\n%@", [error description]);
+  if (![error isKindOfClass:[NSException class]]) {
+    if (![self initWithValue:error]) {
+      return nil;
+    }
+  } else {
+    NSDictionary* errorData = [error userInfo];
+    if ([error name] == [NSException webdriverExceptionName]) {
+      if (![self initWithValue:[errorData objectForKey:@"value"]]) {
+        return nil;
+      }
+      status_ = [[errorData objectForKey:@"status"] intValue];
+    } else if (![self initWithValue:errorData]) {
+      return nil;
+    }
+  }
   
-  [self setIsError:YES];
+  // If we didn't set a status above, go ahead and use a generic now.
+  if (status_ == SUCCESS) {
+    status_ = EUNHANDLEDERROR;
+  }
+
   return self;
 }
 
@@ -136,6 +153,16 @@
 - (NSString *)description {
   return [NSString stringWithFormat:@"{ status: %d, value:%@ }",
           status_, value_];
+}
+
+- (int)errorStatusCode {
+  if (status_ == SUCCESS) {
+    return 200;
+  } else if (status_ > 399 && status_ < 500) {
+    return status_;
+  } else {
+    return 500;
+  }
 }
 
 #pragma mark Properties
