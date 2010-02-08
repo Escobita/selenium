@@ -30,6 +30,12 @@
 		649EDC8610C5989200E66D06 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FD61E69D0FE151A4006E1274 /* libsqlite3.dylib */; };
 		64CF265310D190820029D641 /* Cookie.m in Sources */ = {isa = PBXBuildFile; fileRef = 64CF265210D190820029D641 /* Cookie.m */; };
 		64CF265410D190820029D641 /* Cookie.m in Sources */ = {isa = PBXBuildFile; fileRef = 64CF265210D190820029D641 /* Cookie.m */; };
+		64D8AA431120B94D001649CC /* SessionRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA421120B94D001649CC /* SessionRoot.m */; };
+		64D8AA441120B94D001649CC /* SessionRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA421120B94D001649CC /* SessionRoot.m */; };
+		64D8AA4F1120B995001649CC /* NSURLRequest+IgnoreSSL.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */; };
+		64D8AA501120B995001649CC /* NSURLRequest+IgnoreSSL.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */; };
+		64D8AA691120B9EC001649CC /* HTTPVirtualDirectory+Remove.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */; };
+		64D8AA711120B9EC001649CC /* HTTPVirtualDirectory+Remove.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */; };
 		8301250C0EFF044900BA9BE6 /* Session.m in Sources */ = {isa = PBXBuildFile; fileRef = 839988650EE515C90074D106 /* Session.m */; };
 		8311AB7A0F44EF0500921B78 /* selenium-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8311AB790F44EF0500921B78 /* selenium-icon.png */; };
 		8316A1BF0EECCCA300FE869C /* Context.m in Sources */ = {isa = PBXBuildFile; fileRef = 8316A1BE0EECCCA300FE869C /* Context.m */; };
@@ -146,6 +152,12 @@
 		644F14EC10AB4EF400858ECA /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		64CF265110D190820029D641 /* Cookie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cookie.h; sourceTree = "<group>"; };
 		64CF265210D190820029D641 /* Cookie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Cookie.m; sourceTree = "<group>"; };
+		64D8AA411120B94D001649CC /* SessionRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionRoot.h; sourceTree = "<group>"; };
+		64D8AA421120B94D001649CC /* SessionRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionRoot.m; sourceTree = "<group>"; };
+		64D8AA4D1120B995001649CC /* NSURLRequest+IgnoreSSL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+IgnoreSSL.h"; sourceTree = "<group>"; };
+		64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+IgnoreSSL.m"; sourceTree = "<group>"; };
+		64D8AA601120B9EC001649CC /* HTTPVirtualDirectory+Remove.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPVirtualDirectory+Remove.h"; sourceTree = "<group>"; };
+		64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HTTPVirtualDirectory+Remove.m"; sourceTree = "<group>"; };
 		8311AB790F44EF0500921B78 /* selenium-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selenium-icon.png"; sourceTree = "<group>"; };
 		8316A1BD0EECCCA300FE869C /* Context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Context.h; sourceTree = "<group>"; };
 		8316A1BE0EECCCA300FE869C /* Context.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Context.m; sourceTree = "<group>"; };
@@ -385,6 +397,8 @@
 		838B332C0F1422F600F72BC4 /* REST Service */ = {
 			isa = PBXGroup;
 			children = (
+				64D8AA411120B94D001649CC /* SessionRoot.h */,
+				64D8AA421120B94D001649CC /* SessionRoot.m */,
 				839988640EE515C90074D106 /* Session.h */,
 				839988650EE515C90074D106 /* Session.m */,
 				8316A1BD0EECCCA300FE869C /* Context.h */,
@@ -403,6 +417,8 @@
 				838B349D0F14630E00F72BC4 /* Element+FindElement.m */,
 				839049330F1ACEFD001A79B6 /* Attribute.h */,
 				839049340F1ACEFD001A79B6 /* Attribute.m */,
+				64D8AA4D1120B995001649CC /* NSURLRequest+IgnoreSSL.h */,
+				64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */,
 				8331047E0F1EB2F7000A38DB /* NSException+WebDriver.h */,
 				8331047F0F1EB2F7000A38DB /* NSException+WebDriver.m */,
 			);
@@ -413,18 +429,20 @@
 			isa = PBXGroup;
 			children = (
 				838B332C0F1422F600F72BC4 /* REST Service */,
-				17D715530FE1078C00CC479E /* HTTP + PNG */,
 				FD61E6970FE150E5006E1274 /* WebDriverUtilities.h */,
 				FD61E6980FE150E5006E1274 /* WebDriverUtilities.m */,
 				FD61E6A50FE151D2006E1274 /* WebDriverPreferences.h */,
 				FD61E6A60FE151D2006E1274 /* WebDriverPreferences.m */,
 				FD61E6A70FE151D2006E1274 /* WebDriverRequestFetcher.h */,
 				FD61E6A80FE151D2006E1274 /* WebDriverRequestFetcher.m */,
-				839986A10EE3AA5E0074D106 /* HTTPServerController.h */,
-				839986A20EE3AA5E0074D106 /* HTTPServerController.m */,
-				83169E840EE8DE0100FE869C /* HTTP Server configuration */,
 				8316A2100EECE0F700FE869C /* HTTPResponse+Utility.h */,
 				8316A2110EECE0F700FE869C /* HTTPResponse+Utility.m */,
+				839986A10EE3AA5E0074D106 /* HTTPServerController.h */,
+				839986A20EE3AA5E0074D106 /* HTTPServerController.m */,
+				64D8AA601120B9EC001649CC /* HTTPVirtualDirectory+Remove.h */,
+				64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */,
+				17D715530FE1078C00CC479E /* HTTP + PNG */,
+				83169E840EE8DE0100FE869C /* HTTP Server configuration */,
 				83E5B30D0EFF6749004AA772 /* HTTP + JSON */,
 				839988600EE515B50074D106 /* REST Mapping */,
 			);
@@ -666,6 +684,9 @@
 				FD90B65A111690D500BE94EA /* SBJsonBase.m in Sources */,
 				FD90B65B111690D500BE94EA /* SBJsonParser.m in Sources */,
 				FD90B65C111690D500BE94EA /* SBJsonWriter.m in Sources */,
+				64D8AA431120B94D001649CC /* SessionRoot.m in Sources */,
+				64D8AA4F1120B995001649CC /* NSURLRequest+IgnoreSSL.m in Sources */,
+				64D8AA691120B9EC001649CC /* HTTPVirtualDirectory+Remove.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -706,6 +727,9 @@
 				839D645F0F2EB4CC009645BF /* MainViewController.m in Sources */,
 				839D64600F2EB4D0009645BF /* UIResponder+SimulateTouch.m in Sources */,
 				64CF265410D190820029D641 /* Cookie.m in Sources */,
+				64D8AA441120B94D001649CC /* SessionRoot.m in Sources */,
+				64D8AA501120B995001649CC /* NSURLRequest+IgnoreSSL.m in Sources */,
+				64D8AA711120B9EC001649CC /* HTTPVirtualDirectory+Remove.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
