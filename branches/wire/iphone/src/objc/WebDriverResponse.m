@@ -19,12 +19,13 @@
 #import "WebDriverResponse.h"
 #import "HTTPJSONResponse.h"
 #import "HTTPPNGResponse.h"
+#import "errorcodes.h"
 
 @implementation WebDriverResponse
 
 // These need to be dynamic so we can make sure to clear the cached response
 // if it exists when these are changed.
-@dynamic isError, value, sessionId, context;
+@dynamic status, value, sessionId, context;
 
 - (id)initWithValue:(id)theValue {
   if (![super init])
@@ -73,7 +74,7 @@
   [dict setValue:value_ forKey:@"value"];
   [dict setValue:sessionId_ forKey:@"sessionId"];
   [dict setValue:context_ forKey:@"context"];
-  [dict setValue:[NSNumber numberWithBool:isError_] forKey:@"error"];
+  [dict setValue:[NSNumber numberWithInt:status_] forKey:@"status"];
   return dict;
 }
 
@@ -133,17 +134,26 @@
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"{ value:%@ error:%d }", value_, isError_];
+  return [NSString stringWithFormat:@"{ status: %d, value:%@ }",
+          status_, value_];
 }
 
 #pragma mark Properties
 
 - (BOOL)isError {
-  return isError_;
+  return status_ != SUCCESS;
 }
 
 - (void)setIsError:(BOOL)newIsError {
-  isError_ = newIsError;
+  [self setStatus:(newIsError ? EUNHANDLEDERROR : SUCCESS)];
+}
+
+- (int)status {
+  return status_;
+}
+
+- (void)setStatus:(int)newStatus {
+  status_ = newStatus;
   [self setResponseDirty];
 }
 

@@ -158,6 +158,7 @@
 		64D8AA4E1120B995001649CC /* NSURLRequest+IgnoreSSL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+IgnoreSSL.m"; sourceTree = "<group>"; };
 		64D8AA601120B9EC001649CC /* HTTPVirtualDirectory+Remove.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPVirtualDirectory+Remove.h"; sourceTree = "<group>"; };
 		64D8AA611120B9EC001649CC /* HTTPVirtualDirectory+Remove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HTTPVirtualDirectory+Remove.m"; sourceTree = "<group>"; };
+		64D8AA9F1120BAF9001649CC /* errorcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errorcodes.h; path = "../common/src/cpp/webdriver-interactions/errorcodes.h"; sourceTree = SOURCE_ROOT; };
 		8311AB790F44EF0500921B78 /* selenium-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selenium-icon.png"; sourceTree = "<group>"; };
 		8316A1BD0EECCCA300FE869C /* Context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Context.h; sourceTree = "<group>"; };
 		8316A1BE0EECCCA300FE869C /* Context.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Context.m; sourceTree = "<group>"; };
@@ -429,6 +430,7 @@
 			isa = PBXGroup;
 			children = (
 				838B332C0F1422F600F72BC4 /* REST Service */,
+				64D8AA9F1120BAF9001649CC /* errorcodes.h */,
 				FD61E6970FE150E5006E1274 /* WebDriverUtilities.h */,
 				FD61E6980FE150E5006E1274 /* WebDriverUtilities.m */,
 				FD61E6A50FE151D2006E1274 /* WebDriverPreferences.h */,
