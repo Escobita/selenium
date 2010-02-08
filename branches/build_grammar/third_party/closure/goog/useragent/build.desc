@@ -1,7 +1,0 @@
-
-js_library(:name => "jscript",
-  :srcs => [ "jscript.js" ],
-  :deps => [
-    "//third_party/closure:base",
-    "//third_party/closure/goog/string:base_string"
-  ])

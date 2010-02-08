@@ -3,7 +3,7 @@ require 'rake-tasks/crazy_fun/mappings/java'
 require 'rake-tasks/crazy_fun/mappings/javascript'
 require 'rake-tasks/crazy_fun/mappings/mozilla'
 
-verbose true
+verbose false
 
 # The build system used by webdriver is layered on top of rake, and we call it
 # "crazy fun" for no readily apparent reason.

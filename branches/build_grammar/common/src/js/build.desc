@@ -1,5 +1,5 @@
 
-js_library(:name => "extension_library",
+js_library(:name => "js_api",
   :srcs => [ 
     "abstractcommandprocessor.js",
     "by.js",
@@ -14,8 +14,10 @@ js_library(:name => "extension_library",
     "jsunit.js",
     "localcommandprocessor.js",
     "testcase.js",
-    "webdriver.js",
-    "extension/*.js"
-  ],
-  :deps => [ "//third_party/closure" ]
-)
+    "webdriver.js"
+  ])
+
+js_library(:name => "extension",
+  :srcs => [
+    "extension/dommessenger.js"
+  ])

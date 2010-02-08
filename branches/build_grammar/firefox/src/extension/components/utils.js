@@ -1224,4 +1224,5 @@ Utils.wrapResult = function(result, context) {
   } else {
     return {type: "OTHER", value: result};
   }
-}
+};
+

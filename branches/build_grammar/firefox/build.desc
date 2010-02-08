@@ -14,7 +14,7 @@ js_library(:name => "utils",
     "src/extension/components/utils.js"
   ])
 
-js_binary(:name => "firefox_driver",
+closure_binary(:name => "firefox_driver",
   :srcs => [
     "src/extension/components/driver-component.js",
     "src/extension/components/firefoxDriver.js",
@@ -25,18 +25,17 @@ js_binary(:name => "firefox_driver",
     "src/extension/components/wrappedElement.js"
   ],
   :deps => [
-    :utils,
-    "//common/src/js:extension_library"
+    :utils
   ])
 
-js_binary(:name => "bad_cert_listener",
+js_library(:name => "bad_cert_listener",
   :srcs => [ "src/extension/components/badCertListener.js" ])
 
-js_binary(:name => "command_processor",
+js_library(:name => "command_processor",
   :srcs => [ "src/extension/components/nsCommandProcessor.js" ],
   :deps => [ :utils ])
 
-js_binary(:name => "prompt_service",
+js_library(:name => "prompt_service",
   :srcs => [ "src/extension/components/promptService.js" ],
   :deps => [ :utils ])
 

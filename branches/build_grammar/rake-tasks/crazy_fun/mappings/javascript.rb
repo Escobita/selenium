@@ -1,57 +1,5 @@
 
-require 'tsort'
 require 'rake-tasks/crazy_fun/mappings/common'
-
-class Sortable < Hash
-  include TSort
-  alias tsort_each_node each_key
-  def tsort_each_child(node, &block)
-    fetch(node).each(&block)
-  end
-  
-  def js_files(task)
-    files = []
-    deps = build_graph(task, self)
-
-    deps.keys.each do |k|
-#      puts "#{k} => #{deps[k].join(', ')}"
-    end
-    
-    deps.tsort.each do |dep|
-      if dep.to_s =~ /\.js$/ 
-        if dep.to_s =~ /^build\//
-          next
-        end
-        
-        if !File.exists? dep and dep != output
-          raise StandardError, "#{dep} does not exist" 
-        end
-        
-        files.push dep
-      end
-    end
-    
-    files
-  end
-  
-  def build_graph(task, graph)
-    task.prerequisites.each do |dep|
-      deps = graph[task.name] || []
-      deps.push dep unless deps.include? dep
-      graph[task.name] = deps
-      deps = graph[dep] || []
-      graph[dep] = deps
-      
-      if Rake::Task.task_defined? dep
-        graph = build_graph(Rake::Task[dep], graph)
-      end
-    end
-    
-    graph
-  end
-  
-end
-
 
 class JavascriptMappings
   def add_all(fun)
@@ -59,13 +7,13 @@ class JavascriptMappings
     fun.add_mapping("js_library", Javascript::CreateTask.new)
     fun.add_mapping("js_library", Javascript::CreateTaskShortName.new)
     fun.add_mapping("js_library", Javascript::AddDependencies.new)
-    fun.add_mapping("js_library", Javascript::SpoofCompilation.new)
+    fun.add_mapping("js_library", Javascript::Concatenate.new)
     
-    fun.add_mapping("js_binary", Javascript::CheckPreconditions.new)
-    fun.add_mapping("js_binary", Javascript::CreateTask.new)
-    fun.add_mapping("js_binary", Javascript::CreateTaskShortName.new)
-    fun.add_mapping("js_binary", Javascript::AddDependencies.new)
-    fun.add_mapping("js_binary", Javascript::Compile.new)
+    fun.add_mapping("closure_binary", Javascript::CheckPreconditions.new)
+    fun.add_mapping("closure_binary", Javascript::CreateTask.new)
+    fun.add_mapping("closure_binary", Javascript::CreateTaskShortName.new)
+    fun.add_mapping("closure_binary", Javascript::AddDependencies.new)
+    fun.add_mapping("closure_binary", Javascript::Compile.new)
   end
 end
 
@@ -78,6 +26,20 @@ module Javascript
       js << ".js"
 
       js.gsub("/", Platform.dir_separator)
+    end
+    
+    def build_deps(ignore, task, deps)
+      prereqs = task.prerequisites
+      prereqs.each do |p| 
+        if (File.exists?(p) and p.to_s =~ /\.js/)
+          deps.push p.to_s unless p.to_s == ignore or p.to_s =~ /^build/
+        end
+        if Rake::Task.task_defined? p
+          build_deps ignore, Rake::Task[p], deps
+        end
+      end
+      
+      deps
     end
   end
 
@@ -125,38 +87,28 @@ module Javascript
       task = Rake::Task[js_name(dir, args[:name])]
       add_dependencies(task, dir, args[:deps])
       add_dependencies(task, dir, args[:srcs])
-
-      # Implicitly, every src file has a dependency on the deps
-      # Expand the deps to file tasks
-      all_deps = []
-      (args[:deps] || []).each do |dep|
-        task_name = task_name(dir, dep)
-	if !Rake::Task.task_defined? task_name
-	  file task_name
-	end
-	all_deps.push(task_name)
-      end
-      (args[:srcs] || []).each do |src|
-	to_filelist(dir, src.to_s).each do |s|
-	  file s => all_deps
-	end
-      end
     end
   end
   
-  class SpoofCompilation < BaseJs
+  class Concatenate < BaseJs
     def handle(fun, dir, args)
+      # Cat all the deps together
       output = js_name(dir, args[:name])
       
       file output do
-        mkdir_p File.dirname(output)
+        puts "Concatenating: #{task_name(dir, args[:name])} as #{output}"
         
         t = Rake::Task[task_name(dir, args[:name])]
-        deps = Sortable.new.js_files(t)
         
-#        puts "\n\n\nDeps: #{deps.join(", ")}"
+        js_files = build_deps(output, Rake::Task[output], []).uniq
         
-        touch output
+        mkdir_p File.dirname(output)
+        f = File.new(output, 'w')
+        js_files.each do |js|
+          f << IO.read(js)
+        end
+        
+        f.close
       end
     end
   end
@@ -169,30 +121,29 @@ module Javascript
         puts "Compiling: #{task_name(dir, args[:name])} as #{output}"
         
         t = Rake::Task[task_name(dir, args[:name])]
-
-	puts "  Calculating dependencies"
-
-        deps = Sortable.new.js_files(t)
-
-        puts "  Creating directory #{output}"
         
-        mkdir_p File.dirname(output)
-      
-        cmd = "java -Xmx128m -Xms128m -jar third_party/closure/bin/compiler-2009-12-17.jar --js_output_file "
-        cmd << output + " "
-        cmd << "--third_party true "
-        cmd << "--compilation_level WHITESPACE_ONLY "
-        cmd << "--formatting PRETTY_PRINT "
-        cmd << "--js "
-        cmd << deps.join(" --js ")
+        js_files = build_deps(output, Rake::Task[output], []).uniq
         
-	puts "  Building now"
-
-        sh cmd, :verbose => true do |ok, res|
-          if !ok
-            rm_f output, :verbose => false
-          end
+        dirs = {} 
+        js_files.each do |js|
+          dirs[File.dirname(js)] = 1 
         end
+        dirs = dirs.keys
+
+        cmd = "third_party/closure/bin/calcdeps.py -c third_party/closure/bin/compiler-2009-12-17.jar "
+        cmd << "-o compiled "
+        cmd << '-f "--third_party=true" '
+        cmd << '-f "--compilation_level=WHITESPACE_ONLY" '
+        cmd << '-f "--formatting=PRETTY_PRINT" '
+        cmd << "-f \"--js_output_file=#{output}\" "
+        cmd << "-i "
+        cmd << js_files.join(" -i ")
+        cmd << " -p third_party/closure/goog -p "
+        cmd << dirs.join(" -p ")
+#        cmd << " > #{output}"
+
+        mkdir_p File.dirname(output)
+        sh cmd
       end
     end    
   end
