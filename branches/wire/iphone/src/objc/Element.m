@@ -131,7 +131,7 @@
   }
 }
 
-// Get the element's URL relative to the context.
+// Get the element's URL relative to the session.
 - (NSString *)url {
   return [NSString stringWithFormat:@"element/%@", [self elementId]];
 }

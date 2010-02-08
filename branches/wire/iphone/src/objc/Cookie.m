@@ -17,7 +17,6 @@
 //  limitations under the License.
 
 #import "Cookie.h"
-#import "Context.h"
 #import "HTTPStaticResource.h"
 #import "HTTPVirtualDirectory+AccessViewController.h"
 #import "NSException+WebDriver.h"
@@ -163,9 +162,9 @@
 - (id<HTTPResponse,NSObject>)httpResponseForQuery:(NSString *)query
                                            method:(NSString *)method
                                          withData:(NSData *)theData {
-  // Check the query. It should match /session/:session/:context/cookie. If
+  // Check the query. It should match /session/:session/cookie. If
   // the method is DELETE, then it may match
-  // /session/:session/:context/cookie/:name, where :name is the name of the
+  // /session/:session/cookie/:name, where :name is the name of the
   // cookie to delete.
   WebDriverResponse* response = nil;
   id result = nil;
@@ -178,13 +177,13 @@
       [self addCookie:cookieData];
     } else if ([method isEqualToString:@"DELETE"]) {
       // Check the query to see what type of delete to do. If the query is just
-      // /hub/session/:session/:context/cookie, delete everything. Otherwise, it
-      // should be /hub/session/:session/:context/cookie/:name, where :name is
+      // /hub/session/:session/cookie, delete everything. Otherwise, it
+      // should be /hub/session/:session/cookie/:name, where :name is
       // the cookie to delete.
       NSArray* parts = [query componentsSeparatedByString:@"/"];
-      if ([parts count] == 6) {
+      if ([parts count] == 5) {
         [self deleteAllCookies];
-      } else if ([parts count] == 7) {
+      } else if ([parts count] == 6) {
         [self deleteCookie:[parts lastObject]];
       } else {
         return nil;  // Query we can't handle.
@@ -205,7 +204,6 @@
   }
   
   [response setSessionId:[NSString stringWithFormat:@"%d", sessionId_]];
-  [response setContext:[Context contextName]];
   return response;
 }
 

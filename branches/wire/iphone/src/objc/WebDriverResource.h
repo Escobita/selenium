@@ -36,7 +36,6 @@
 // return value back into JSON and wraps it in a |WebDriverResponse|:
 // {
 //   value:["element/1"],
-//   context:"foo",
 //   sessionId:"1001",
 //   error:false
 // }
@@ -55,15 +54,13 @@
   
   // These two fields are needed for when we make |WebDriverResponse|s.
   // Due to the architecture of |VirtualDirectory|, we have to cache the
-  // session and context like this.
+  // session like this.
   NSString *session_;
-  NSString *context_;
   
   BOOL allowOptionalArguments_;
 }
 
 @property (nonatomic, copy) NSString *session;
-@property (nonatomic, copy) NSString *context;
 
 // Allow some of the method's arguments to be optional. If optional arguments
 // are not specified, nil is passed in in their place.

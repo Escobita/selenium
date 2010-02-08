@@ -20,7 +20,7 @@
 #import "ElementStore.h"
 
 // This category implements the findElement[s] methods accessable on
-// :context/element and :context/elements.
+// :session/element and :session/elements.
 // The methods simply forward the requests to the document |Element|'s
 // findElement methods.
 @interface ElementStore (FindElement)

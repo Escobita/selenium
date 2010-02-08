@@ -1,5 +1,5 @@
 //
-//  Context+ExecuteScript.m
+//  Session+ExecuteScript.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -16,7 +16,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import "Context+ExecuteScript.h"
+#import "Session+ExecuteScript.h"
 #import "HTTPVirtualDirectory+AccessViewController.h"
 #import "NSObject+SBJSON.h"
 #import "WebViewController.h"
@@ -25,7 +25,7 @@
 #import "ElementStore.h"
 #import "errorcodes.h"
 
-@implementation Context (ExecuteScript)
+@implementation Session (ExecuteScript)
 
 // The arguments passed to executeScript look like [{value:123 type:"NUMBER"}]
 - (NSString *)convertArgumentsToJavascript:(NSArray *)arguments {

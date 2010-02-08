@@ -25,7 +25,6 @@
 @implementation WebDriverResource
 
 @synthesize session = session_,
-  context = context_,
   allowOptionalArguments = allowOptionalArguments_;
 
 - (id)initWithTarget:(id)target
@@ -89,7 +88,6 @@
   [target_ release];
   [methodActions_ release];
   [self setSession:nil];
-  [self setContext:nil];
   
   [super dealloc];
 }
@@ -97,10 +95,9 @@
 
 #pragma mark Creating a response
 
-// Set the response's session and context
+// Set the response's session
 - (void)configureWebDriverResponse:(WebDriverResponse *)response {
   [response setSessionId:session_];
-  [response setContext:context_];
 }
 
 // Make an dictionary of objects containing the method arguments. Return nil on

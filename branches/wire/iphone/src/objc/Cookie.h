@@ -21,7 +21,7 @@
 
 @class WebDriverResponse;
 
-// This |HTTPVirtualDirectory| matches the /hub/:session/:context/cookie
+// This |HTTPVirtualDirectory| matches the /hub/:session/cookie
 // directory in the WebDriver REST service.
 @interface Cookie : HTTPVirtualDirectory {
   int sessionId_;

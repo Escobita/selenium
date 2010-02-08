@@ -17,7 +17,6 @@
 //  limitations under the License.
 
 #import "SessionRoot.h"
-#import "Context.h"
 #import "HTTPRedirectResponse.h"
 #import "JSONRESTResource.h"
 #import "Session.h"
@@ -56,7 +55,7 @@
   NSLog(@"session %d created", sessionId);
 
   // Sessions don't really mean anything on the iphone. There's only one
-  // browser, only one session and only one context.
+  // browser and only one session.
 
   // But we would like to give a clean status by cleaning up application data,
   // in particular, cookies, cache and HTML5 client-side storage.  
@@ -68,8 +67,7 @@
   [self setResource:session withName:sessionIdStr];
 
   return [HTTPRedirectResponse redirectToURL:
-          [NSString stringWithFormat:@"session/%d/%@/", sessionId,
-           [Context contextName]]];
+          [NSString stringWithFormat:@"session/%d/", sessionId]];
 }
 
 - (void) deleteSessionWithId:(int)sessionId {

@@ -1,5 +1,5 @@
 //
-//  Context+ExecuteScript.h
+//  Session+ExecuteScript.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -17,10 +17,10 @@
 //  limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import "Context.h"
+#import "Session.h"
 
 // This category implements the :context/execute function.
-@interface Context (ExecuteScript)
+@interface Session (ExecuteScript)
 
 - (NSDictionary *)executeScript:(NSDictionary *)arguments;
 

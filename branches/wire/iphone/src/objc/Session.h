@@ -19,17 +19,19 @@
 #import <Foundation/Foundation.h>
 #import "HTTPVirtualDirectory.h"
 
-@class Context;
+@class ElementStore;
 @class SessionRoot;
 
 // This |HTTPVirtualDirectory| matches the /:session directory which WebDriver
-// expects. All the interesting stuff is in the :session/:context subdirectory
-// (Matched by the |Context| class).
+// expects.
 @interface Session : HTTPVirtualDirectory {
   SessionRoot* sessionRoot_;
   int sessionId_;
-  Context* context_;
+  ElementStore* elementStore_;
 }
+
+@property (nonatomic, readonly) ElementStore* elementStore;
+@property (nonatomic) int sessionId;
 
 - (id) initWithSessionRootAndSessionId:(SessionRoot*)root
                              sessionId:(int)sessionId;
@@ -40,7 +42,7 @@
 // in between sessions than sessions become nondeterministic.
 - (void)deleteAllCookies;
 
-// Deletes a session. Recursively destroys all inherited subtree of context,
+// Deletes a session. Recursively destroys all inherited subtree of
 // elements, etc.
 - (void)deleteSession;
 

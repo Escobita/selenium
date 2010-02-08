@@ -44,8 +44,6 @@
   
   // The active session
   NSString *sessionId_;
-  // The active context
-  NSString *context_;
 
   // We're a proxy around this response.
   HTTPDataResponse *response_;
@@ -55,7 +53,6 @@
 @property (nonatomic) int status;
 @property (nonatomic, retain) id value;
 @property (nonatomic, copy) NSString *sessionId;
-@property (nonatomic, copy) NSString *context;
 
 - (id)initWithValue:(id)value;
 - (id)initWithError:(id)error;

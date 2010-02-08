@@ -26,7 +26,7 @@
 
 // These need to be dynamic so we can make sure to clear the cached response
 // if it exists when these are changed.
-@dynamic status, value, sessionId, context;
+@dynamic status, value, sessionId;
 
 - (id)initWithValue:(id)theValue {
   if (![super init])
@@ -34,8 +34,7 @@
   
   [self setValue:theValue];
 
-  // The sessionId and context are automatically set by |Context|.
-  [self setContext:@"unknown"];
+  // The sessionId is set automatically by |Session|.
   [self setSessionId:@"unknown"];
 
   return self;
@@ -81,7 +80,6 @@
   // an exception.
   [value_ release];
   [sessionId_ release];
-  [context_ release];
   [response_ release];
   [super dealloc];
 }
@@ -90,7 +88,6 @@
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   [dict setValue:value_ forKey:@"value"];
   [dict setValue:sessionId_ forKey:@"sessionId"];
-  [dict setValue:context_ forKey:@"context"];
   [dict setValue:[NSNumber numberWithInt:status_] forKey:@"status"];
   return dict;
 }
@@ -203,16 +200,6 @@
 - (void)setSessionId:(NSString *)newSessionId {
   [sessionId_ release];
   sessionId_ = [newSessionId copy];
-  [self setResponseDirty];
-}
-
-- (NSString *)context {
-  return [[context_ retain] autorelease];
-}
-
-- (void)setContext:(NSString *)newContext {
-  [context_ release];
-  context_ = [newContext copy];
   [self setResponseDirty];
 }
 
