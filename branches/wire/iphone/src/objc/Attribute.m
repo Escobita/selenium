@@ -42,17 +42,49 @@
 
 - (id<HTTPResource>)elementWithQuery:(NSString *)query {
   NSString *queriedAttribute = [query substringFromIndex:1];
-  id<HTTPResource> resource;
-  @try {
-    NSString *attribute = [element_ attribute:queriedAttribute];
-    resource = [HTTPStaticResource resourceWithResponse:
-                [WebDriverResponse responseWithValue:attribute]];
+  id<HTTPResource> resource = [contents objectForKey:queriedAttribute];
+  if (resource == nil) {
+    NSLog(@"First request for %@", queriedAttribute);
+    resource = [NamedAttribute
+                namedAttributeDirectoryForElement:element_
+                andName:queriedAttribute];
+    resource = [WebDriverResource resourceWithTarget:resource
+                                           GETAction:@selector(getAttribute)
+                                          POSTAction:NULL];
+    [self setResource:resource withName:queriedAttribute];
+  } else {
+    NSLog(@"...repeat request for %@", queriedAttribute);
   }
-  @catch (NSException* e) {
-    resource = [HTTPStaticResource resourceWithResponse:
-                [WebDriverResponse responseWithError:e]];
-  }
-  return resource;
+  // Need to delegate back to |super| so |Session| can set the session ID on
+  // the response.
+  return [super elementWithQuery:query];
 }
 
 @end
+
+@implementation NamedAttribute
+
+- (id) initForElement:(Element *)element
+              andName:(NSString *)name {
+  if (![super init]) {
+    return nil;
+  }
+  // Not retained as per delegate pattern - avoids circular dependancies.
+  element_ = element;
+  name_ = name;
+  return self;
+}
+
++ (NamedAttribute *)namedAttributeDirectoryForElement:(Element *)element
+                                              andName:(NSString *)name {
+  return [[[NamedAttribute alloc] initForElement:element andName:name]
+          autorelease];
+}
+
+- (NSString *)getAttribute {
+  return [element_ attribute:name_];
+}
+
+@end
+
+
