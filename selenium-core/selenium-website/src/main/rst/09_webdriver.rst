@@ -673,12 +673,7 @@ interested in using this driver, then all you need to do is put
 ``webdriver-all.jar`` on your ``CLASSPATH``, and WebDriver will do everything 
 else for you.
 
-Because the `Chrome Driver`_ is implemented as an extension, you will need the 
-**beta** or **dev** channel release of Google Chrome installed (NOT the stable 
-build). Here's a link to the `dev channel 
-<http://dev.chromium.org/getting-involved/dev-channel>`_. Currently 
-recommended is version 4.0.206.*+. There were several breaking changes in this 
-release, so `Chrome Driver`_ will not work in versions prior to this.
+The `Chrome Driver_` works with Google Chrome version 4.0 and above.
 
 Important System Properties
 +++++++++++++++++++++++++++
