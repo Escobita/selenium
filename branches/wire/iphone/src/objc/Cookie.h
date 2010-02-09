@@ -35,6 +35,22 @@
 - (NSArray *)getCookies;
 - (void)addCookie:(NSDictionary *)cookie;
 - (void)deleteAllCookies;
-- (void)deleteCookie:(NSString *)name;
+
+@end
+
+// This |HTTPVirtualDirectory| matches the /hub/:session/cookie/:name directory
+// in the WebDriver REST service.
+@interface NamedCookie : HTTPVirtualDirectory {
+  @private
+  NSString* name_;
+}
+
++ (NamedCookie *)namedCookie:(NSString *)name;
+
+- (id)initWithName:(NSString *)name;
+
+- (NSDictionary *)getCookie;
+
+- (void)deleteCookie;
 
 @end

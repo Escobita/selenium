@@ -41,19 +41,15 @@
 }
 
 - (id<HTTPResource>)elementWithQuery:(NSString *)query {
-  NSString *queriedAttribute = [query substringFromIndex:1];
-  id<HTTPResource> resource = [contents objectForKey:queriedAttribute];
-  if (resource == nil) {
-    NSLog(@"First request for %@", queriedAttribute);
-    resource = [NamedAttribute
-                namedAttributeDirectoryForElement:element_
-                andName:queriedAttribute];
-    resource = [WebDriverResource resourceWithTarget:resource
-                                           GETAction:@selector(getAttribute)
-                                          POSTAction:NULL];
-    [self setResource:resource withName:queriedAttribute];
-  } else {
-    NSLog(@"...repeat request for %@", queriedAttribute);
+  if ([query length] > 0) {
+    NSString *queriedAttribute = [query substringFromIndex:1];
+    id<HTTPResource> resource = [contents objectForKey:queriedAttribute];
+    if (resource == nil) {
+      resource = [NamedAttribute
+                  namedAttributeDirectoryForElement:element_
+                  andName:queriedAttribute];
+      [self setResource:resource withName:queriedAttribute];
+    }
   }
   // Need to delegate back to |super| so |Session| can set the session ID on
   // the response.
@@ -72,6 +68,13 @@
   // Not retained as per delegate pattern - avoids circular dependancies.
   element_ = element;
   name_ = name;
+  
+  [self setIndex:
+   [WebDriverResource resourceWithTarget:self
+                               GETAction:@selector(getAttribute)
+                              POSTAction:NULL
+                               PUTAction:NULL
+                            DELETEAction:NULL]];
   return self;
 }
 
