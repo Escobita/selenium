@@ -1,0 +1,18 @@
+There are two different ways you can interact with the Selenium-IDE (Se-IDE) from a development perspective
+
+= Development =
+
+Most of the time people reading this will want to use it in a 'development' mode. Working this way means you don't have to restart Firefox all the time to see changes; you just need to reload the bit of xul that had the overlay applied to it.
+
+In order to do this you need to...
+
+  # configure your Firefox profile along the lines of https://developer.mozilla.org/en/Setting_up_extension_development_environment
+  # move code around in your local copy to be 'proxy' friendly. To do this you can use the _ se_ide:setup_proxy _ rake task
+  # in your profile's extension directory, create a file called {a6fd85ed-e919-4a43-a5af-8da18bda539f} and in it put the complete path to the trunk/ide/src/extension directory
+  # restart firefox
+
+*DO NOT* aggressively do an _svn add_ when running in the proxy mode and commit. It will make people cranky. A good habit is to do an _ se_ide:remove_proxy _ and then _svn status_ and _svn add_.
+
+= Release =
+
+When you need to ship your / the changes and need an actual xpi file, you will want to do use the _ide_ rake task. It will leave an xpi in trunk/build
