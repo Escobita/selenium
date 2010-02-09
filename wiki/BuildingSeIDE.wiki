@@ -1,3 +1,4 @@
+#labels ide
 There are two different ways you can interact with the Selenium-IDE (Se-IDE) from a development perspective
 
 = Development =
