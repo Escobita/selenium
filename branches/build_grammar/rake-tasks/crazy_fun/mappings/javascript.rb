@@ -133,7 +133,7 @@ module Javascript
         cmd = "third_party/closure/bin/calcdeps.py -c third_party/closure/bin/compiler-2009-12-17.jar "
         cmd << "-o compiled "
         cmd << '-f "--third_party=true" '
-        cmd << '-f "--compilation_level=WHITESPACE_ONLY" '
+#        cmd << '-f "--compilation_level=WHITESPACE_ONLY" '
         cmd << '-f "--formatting=PRETTY_PRINT" '
         cmd << "-f \"--js_output_file=#{output}\" "
         cmd << "-i "
