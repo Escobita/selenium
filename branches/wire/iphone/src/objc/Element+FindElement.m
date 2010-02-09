@@ -68,7 +68,7 @@
   
   NSMutableArray *output = [NSMutableArray arrayWithCapacity:[array count]];
   for (Element *elem in array) {
-    [output addObject:[elem url]];
+    [output addObject:[elem idDictionary]];
   }
   return output;
 }
@@ -252,7 +252,7 @@
 - (NSArray *)findElementUsing:(NSDictionary *)dict {
   NSArray *results = [self findElementsUsing:dict];
   if (results && [results count] > 0)
-    return [NSArray arrayWithObject:[results objectAtIndex:0]];
+    return [results objectAtIndex:0];
   else
     @throw([NSException
             webDriverExceptionWithMessage:@"Unable to locate element"

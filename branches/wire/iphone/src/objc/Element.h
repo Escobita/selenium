@@ -49,6 +49,10 @@
 // Same as |elementFromJSObject:inStore:| above, but using the element's store.
 - (Element *)elementFromJSObject:(NSString *)object;
 
+// Get the JSON dictionary with this element's ID for transmission
+// over the wire: |{"ELEMENT": "elementId"}|.
+- (NSDictionary *)idDictionary;
+
 // Get the relative URL for this element (relative to the session).
 - (NSString *)url;
 
