@@ -103,10 +103,8 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
       profileToUse = new ProfilesIni().getProfile(suggestedProfile);
     } else if (profileToUse == null) {
       profileToUse = new FirefoxProfile();
-      profileToUse.addWebDriverExtensionIfNeeded(false);
-    } else {
-      profileToUse.addWebDriverExtensionIfNeeded(false);
     }
+    profileToUse.addWebDriverExtensionIfNeeded(false);
 
     return ExtensionConnectionFactory.connectTo(binary, profileToUse, "localhost");
   }
