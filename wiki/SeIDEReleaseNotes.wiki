@@ -1,6 +1,24 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.5==
+
+(This is as yet unreleased, but while I think of it I'll start the release notes)
+
+One thing that does not really fit the BUG or NEW label is that the code for Se-IDE is now in the main repo rather than tucked away in a somewhat hidden location.
+
+  * BUG - user formats were not appearing in the list (Adam Goucher)
+  * BUG - constrained how iframes were loaded; which is why AMO was unhappy (Adam Goucher)
+  * BUG - a whole bunch of tweaks to the existing formats (Dave Hunt)
+  * BUG - a bunch of French translation fixes / additions (Jérémy Hérault)
+  * BUG - the reload user extensions button only shows up if you have the developer tool checkbox checked (Jérémy Hérault)
+  * NEW - self hosting of updates to avoid delays at AMO (Adam Goucher)
+  * NEW - the version of se-ide is now in the title bar (Adam Goucher)
+  * NEW - added some Se-IDE specific icons here and there (Adam Goucher, Dave Hunt)
+  * NEW - preferences can now be Bool's as well (Adam Goucher)
+  * NEW - added addPlugin(id) to the plugin API
+  * NEW - added a new panel to the Options screen around plugins. It doesn't do much now other than list the plugins that registered themselves through addPlugin, but should do more for 1.0.6
+
 ==1.0.4==
 
 Selenium IDE 1.0.4 marks a resurgence in the project with releases planned for the middle of each month. Here are the changes that have happened between versions 1.0.2 and 1.0.4 of Selenium IDE. (Don't ask what happened to version 1.0.3)
