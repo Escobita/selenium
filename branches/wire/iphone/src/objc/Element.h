@@ -49,6 +49,10 @@
 // Same as |elementFromJSObject:inStore:| above, but using the element's store.
 - (Element *)elementFromJSObject:(NSString *)object;
 
+// Returns the key for the element ID in the dictionary returned by
+// |idDictionary|.
++ (NSString *)elementIdKey;
+
 // Get the JSON dictionary with this element's ID for transmission
 // over the wire: |{"ELEMENT": "elementId"}|.
 - (NSDictionary *)idDictionary;

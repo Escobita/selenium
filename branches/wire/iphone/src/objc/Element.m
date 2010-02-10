@@ -31,6 +31,8 @@
 #import "NSException+WebDriver.h"
 #import "errorcodes.h"
 
+static NSString* const ELEMENT_ID_KEY = @"ELEMENT";
+
 @implementation Element
 
 @synthesize elementId = elementId_;
@@ -109,6 +111,11 @@
   return [store elementFromJSObject:object];
 }
 
++ (NSString *)elementIdKey {
+  return ELEMENT_ID_KEY;
+}
+
+
 // Same as |elementFromJSObject:inStore:| above, but using the element's store.
 - (Element *)elementFromJSObject:(NSString *)object {
   return [Element elementFromJSObject:object inStore:elementStore_];
@@ -133,7 +140,7 @@
 
 - (NSDictionary *)idDictionary {
   return [NSDictionary dictionaryWithObjectsAndKeys:
-          [self elementId], @"ELEMENT",
+          [self elementId], [Element elementIdKey],
           nil];
 }
 

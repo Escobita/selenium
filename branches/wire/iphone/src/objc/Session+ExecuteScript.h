@@ -22,6 +22,10 @@
 // This category implements the :context/execute function.
 @interface Session (ExecuteScript)
 
+- (NSString *)convertValueToJavascript:(id)value;
+- (NSString *)convertArrayToJavascript:(NSArray *)array;
+- (NSString *)convertDictionaryToJavascript:(NSDictionary *)dictionary;
+
 - (NSDictionary *)executeScript:(NSDictionary *)arguments;
 
 @end
