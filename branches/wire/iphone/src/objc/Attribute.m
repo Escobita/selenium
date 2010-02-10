@@ -85,6 +85,11 @@
 }
 
 - (NSString *)getAttribute {
+  if ([name_ isEqualToString:@"disabled"]) {
+    return [[self viewController]
+            jsEval:[NSString stringWithFormat:@"!!%@.disabled",
+                    [element_ jsLocator]]];
+  }
   return [element_ attribute:name_];
 }
 

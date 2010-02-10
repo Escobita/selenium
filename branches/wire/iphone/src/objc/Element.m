@@ -253,7 +253,11 @@
     "  var current = elem;\n"
     "  while (current && current != elem.ownerDocument.body) {\n"
     "    if (current.tagName.toLowerCase() == 'form') {\n"
-    "      current.submit();\n"
+    "      var e = current.ownerDocument.createEvent('HTMLEvents');\n"
+    "      e.initEvent('submit', true, true);\n"
+    "      if (current.dispatchEvent(e)) {\n"
+    "        current.submit();\n"
+    "      }\n"
     "      return;\n"
     "    }\n"
     "    current = current.parentNode;\n"
@@ -374,7 +378,7 @@
 
 - (NSNumber *)isEnabled {
   BOOL enabled = [[[self viewController]
-                  jsEval:[NSString stringWithFormat:@"%@.disabled",
+                  jsEval:[NSString stringWithFormat:@"!!%@.disabled",
                           [self jsLocator]]] isEqualToString:@"false"];
   
   return [NSNumber numberWithBool:enabled];
