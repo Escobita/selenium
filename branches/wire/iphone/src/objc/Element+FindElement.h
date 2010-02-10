@@ -43,5 +43,5 @@
 - (NSArray *)findElementsUsing:(NSDictionary *)dict;
 
 // As |findElementsUsing:| above, but only returns one argument.
-- (NSArray *)findElementUsing:(NSDictionary *)dict;
+- (NSDictionary *)findElementUsing:(NSDictionary *)dict;
 @end
