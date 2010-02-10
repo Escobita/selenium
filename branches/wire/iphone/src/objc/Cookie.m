@@ -88,6 +88,7 @@
 }
 
 - (void)addCookie:(NSDictionary *)cookie {
+  cookie = [cookie objectForKey:@"cookie"];
   NSURL* currentUrl = [self currentUrl];
   NSString* domain = [cookie objectForKey:@"domain"];
   
