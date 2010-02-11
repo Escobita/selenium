@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 
 namespace OpenQA.Selenium.Remote
 {
@@ -11,7 +12,6 @@ namespace OpenQA.Selenium.Remote
         private string className;
         private int lineNumber;
         private string methodName;
-        private bool nativeMethod;
 
         /// <summary>
         /// Gets or sets the value of the filename in the stack
@@ -54,13 +54,12 @@ namespace OpenQA.Selenium.Remote
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether it was a native method
+        /// Gets a string representation of the object.
         /// </summary>
-        [JsonProperty("nativeMethod")]
-        public bool NativeMethod
+        /// <returns>A string representation of the object.</returns>
+        public override string ToString()
         {
-            get { return nativeMethod; }
-            set { nativeMethod = value; }
+            return string.Format(CultureInfo.InvariantCulture, "at {0}.{1} ({2), {3}", className, methodName, fileName, lineNumber);
         }
     }
 }

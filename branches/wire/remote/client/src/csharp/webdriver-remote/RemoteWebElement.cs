@@ -11,29 +11,23 @@ namespace OpenQA.Selenium.Remote
     /// <seealso cref="ILocatable"/>
     public class RemoteWebElement : IWebElement, IFindsByLinkText, IFindsById, IFindsByName, IFindsByTagName, IFindsByClassName, IFindsByXPath, IFindsByPartialLinkText
     {
+        #region Private members
         private RemoteWebDriver parentDriver;
         private string elementId;
+        #endregion
 
+        #region Constructor
         /// <summary>
-        /// Gets or sets the ID of the element
+        /// Initializes a new instance of the <see cref="RemoteWebElement"/> class.
         /// </summary>
-        public string Id
+        /// <param name="id">The ID assigned to the element.</param>
+        internal RemoteWebElement(string id)
         {
-            get { return elementId; }
-            set { elementId = value; }
+            elementId = id;
         }
+        #endregion
 
-        /// <summary>
-        /// Gets or sets the RemoteWebDriver used to find the element
-        /// </summary>
-        public RemoteWebDriver Parent
-        {
-            get { return parentDriver; }
-            set { parentDriver = value; }
-        }
-
-        #region IWebElement Members
-
+        #region IWebElement properties
         /// <summary>
         /// Gets the DOM Tag of element
         /// </summary>
@@ -43,7 +37,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementTagName, new object[] { parameters });
+                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementTagName, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -57,7 +51,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementText, new object[] { parameters });
+                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementText, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -71,7 +65,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementValue, new object[] { parameters });
+                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementValue, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -85,7 +79,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementEnabled, new object[] { parameters });
+                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementEnabled, parameters);
                 return (bool)commandResponse.Value;
             }
         }
@@ -99,11 +93,32 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementSelected, new object[] { parameters });
+                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementSelected, parameters);
                 return (bool)commandResponse.Value;
             }
         }
+        #endregion
 
+        #region Internal properties
+        /// <summary>
+        /// Gets the ID of the element
+        /// </summary>
+        internal string Id
+        {
+            get { return elementId; }
+        }
+
+        /// <summary>
+        /// Gets or sets the RemoteWebDriver used to find the element
+        /// </summary>
+        internal RemoteWebDriver Parent
+        {
+            get { return parentDriver; }
+            set { parentDriver = value; }
+        }
+        #endregion
+
+        #region IWebElement methods
         /// <summary>
         /// Select or unselect element. This operation only applies to input elements such as checkboxes, options in a select and radio buttons.
         /// </summary>
@@ -111,7 +126,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.SetElementSelected, new object[] { parameters });
+            parentDriver.Execute(DriverCommand.SetElementSelected, parameters);
         }
 
         /// <summary>
@@ -121,7 +136,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.ClearElement, new object[] { parameters });
+            parentDriver.Execute(DriverCommand.ClearElement, parameters);
         }
 
         /// <summary>
@@ -137,7 +152,7 @@ namespace OpenQA.Selenium.Remote
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
             parameters.Add("value", text.ToCharArray());
-            parentDriver.Execute(DriverCommand.SendKeysToElement, new object[] { parameters });
+            parentDriver.Execute(DriverCommand.SendKeysToElement, parameters);
         }
 
         /// <summary>
@@ -148,7 +163,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.SubmitElement, new object[] { parameters });
+            parentDriver.Execute(DriverCommand.SubmitElement, parameters);
         }
 
         /// <summary>
@@ -160,7 +175,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.ClickElement, new object[] { parameters });
+            parentDriver.Execute(DriverCommand.ClickElement, parameters);
         }
 
         /// <summary>
@@ -173,7 +188,7 @@ namespace OpenQA.Selenium.Remote
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
             parameters.Add("name", attributeName);
-            Response commandResponse = parentDriver.Execute(DriverCommand.GetElementAttribute, new object[] { parameters });
+            Response commandResponse = parentDriver.Execute(DriverCommand.GetElementAttribute, parameters);
             string attributeValue = string.Empty;
             if (commandResponse.Value == null)
             {
@@ -195,7 +210,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            Response commandResponse = parentDriver.Execute(DriverCommand.ToggleElement, new object[] { parameters });
+            Response commandResponse = parentDriver.Execute(DriverCommand.ToggleElement, parameters);
             return (bool)commandResponse.Value;
         }
 
@@ -218,7 +233,6 @@ namespace OpenQA.Selenium.Remote
         {
             return by.FindElement(this);
         }
-
         #endregion
 
         #region IFindsByLinkText Members
@@ -235,12 +249,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByLinkText(string linkText)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "link text");
-            parameters.Add("value", linkText);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("link text", linkText);
         }
 
         /// <summary>
@@ -256,12 +265,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByLinkText(string linkText)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "link text");
-            parameters.Add("value", linkText);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("link text", linkText);
         }
 
         #endregion
@@ -280,12 +284,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementById(string id)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "id");
-            parameters.Add("value", id);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("id", id);
         }
 
         /// <summary>
@@ -301,12 +300,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsById(string id)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "id");
-            parameters.Add("value", id);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("id", id);
         }
 
         #endregion
@@ -325,12 +319,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByName(string name)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "name");
-            parameters.Add("value", name);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("name", name);
         }
 
         /// <summary>
@@ -346,18 +335,12 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByName(string name)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "name");
-            parameters.Add("value", name);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("name", name);
         }
 
         #endregion
 
         #region IFindsByTagName Members
-
         /// <summary>
         /// Finds the first of elements that match the DOM Tag supplied
         /// </summary>
@@ -371,12 +354,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByTagName(string tagName)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "tag name");
-            parameters.Add("value", tagName);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("tag name", tagName);
         }
 
         /// <summary>
@@ -392,14 +370,8 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByTagName(string tagName)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "tag name");
-            parameters.Add("value", tagName);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("tag name", tagName);
         }
-
         #endregion
 
         #region IFindsByClassName Members
@@ -416,12 +388,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByClassName(string className)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "class name");
-            parameters.Add("value", className);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("class name", className);
         }
 
         /// <summary>
@@ -437,18 +404,11 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByClassName(string className)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "class name");
-            parameters.Add("value", className);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("class name", className);
         }
-
         #endregion
 
         #region IFindsByXPath Members
-
         /// <summary>
         /// Finds the first of elements that match the XPath supplied
         /// </summary>
@@ -462,12 +422,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByXPath(string xpath)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "xpath");
-            parameters.Add("value", xpath);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("xpath", xpath);
         }
 
         /// <summary>
@@ -483,18 +438,11 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByXPath(string xpath)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "xpath");
-            parameters.Add("value", xpath);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("xpath", xpath);
         }
-
         #endregion
 
         #region IFindsByPartialLinkText Members
-
         /// <summary>
         /// Finds the first of elements that match the part of the link text supplied
         /// </summary>
@@ -508,12 +456,7 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public IWebElement FindElementByPartialLinkText(string partialLinkText)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "partial link text");
-            parameters.Add("value", partialLinkText);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, new object[] { parameters });
-            return parentDriver.GetElementFromResponse(commandResponse);
+            return FindElement("partial link text", partialLinkText);
         }
 
         /// <summary>
@@ -529,15 +472,11 @@ namespace OpenQA.Selenium.Remote
         /// </example>
         public ReadOnlyCollection<IWebElement> FindElementsByPartialLinkText(string partialLinkText)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("id", elementId);
-            parameters.Add("using", "partial link text");
-            parameters.Add("value", partialLinkText);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, new object[] { parameters });
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            return FindElements("partial link text", partialLinkText);
         }
-
         #endregion
+
+        #region Overrides
         /// <summary>
         /// Method to get the hash code of the element
         /// </summary>
@@ -576,9 +515,44 @@ namespace OpenQA.Selenium.Remote
             parameters.Add("id", elementId);
             parameters.Add("other", otherAsElement.Id);
 
-            Response response = parentDriver.Execute(DriverCommand.ElementEquals, new object[] { parameters });
+            Response response = parentDriver.Execute(DriverCommand.ElementEquals, parameters);
             object value = response.Value;
             return value != null && value is bool && (bool)value;
         }
+        #endregion
+
+        #region Protected and private support methods
+        /// <summary>
+        /// Finds a child element matching the given mechanism and value.
+        /// </summary>
+        /// <param name="mechanism">The mechanism by which to find the element.</param>
+        /// <param name="value">The value to use to search for the element.</param>
+        /// <returns>The first <see cref="IWebElement"/> matching the given criteria.</returns>
+        protected IWebElement FindElement(string mechanism, string value)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", elementId);
+            parameters.Add("using", mechanism);
+            parameters.Add("value", value);
+            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, parameters);
+            return parentDriver.GetElementFromResponse(commandResponse);
+        }
+
+        /// <summary>
+        /// Finds all child elements matching the given mechanism and value.
+        /// </summary>
+        /// <param name="mechanism">The mechanism by which to find the elements.</param>
+        /// <param name="value">The value to use to search for the elements.</param>
+        /// <returns>A collection of all of the <see cref="IWebElement">IWebElements</see> matchings the given criteria.</returns>
+        protected ReadOnlyCollection<IWebElement> FindElements(string mechanism, string value)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", elementId);
+            parameters.Add("using", mechanism);
+            parameters.Add("value", value);
+            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, parameters);
+            return parentDriver.GetElementsFromResponse(commandResponse);
+        }
+        #endregion
     }
 }

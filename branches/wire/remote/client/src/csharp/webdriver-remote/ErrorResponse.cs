@@ -8,20 +8,9 @@ namespace OpenQA.Selenium.Remote
     public class ErrorResponse
     {
         private StackTraceElement[] stackTrace;
-        private string localizedMessage;
         private string message;
         private string className;
         private string screenshot;
-
-        /// <summary>
-        /// Gets or sets the message in a localized message
-        /// </summary>
-        [JsonProperty("localizedMessage")]
-        public string LocalizedMessage
-        {
-            get { return localizedMessage; }
-            set { localizedMessage = value; }
-        }
 
         /// <summary>
         /// Gets or sets the message from the reponse

@@ -6,6 +6,11 @@
     public enum DriverCommand
     {
         /// <summary>
+        /// Represents the Define Driver Mapping command
+        /// </summary>
+        DefineDriverMapping,
+
+        /// <summary>
         /// Represents a New Session command
         /// </summary>
         NewSession,
@@ -15,6 +20,11 @@
         /// </summary>
         DeleteSession,
         
+        /// <summary>
+        /// Represents the Get Session Capabilities command
+        /// </summary>
+        GetSessionCapabilities,
+
         /// <summary>
         /// Represents a Browser close command
         /// </summary>
