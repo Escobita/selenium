@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.TemporaryFilesystem;
 import org.openqa.selenium.remote.internal.SubProcess;
@@ -31,7 +32,7 @@ import org.openqa.selenium.remote.internal.SubProcess;
  * 
  * @author jmleyba@gmail.com (Jason Leyba)
  */
-public class IPhoneSimulatorBinary {
+public class IPhoneSimulatorBinary extends SubProcess {
   /* TODO: Figure out how to launch iWebDriver on the simulator in a non-headless mode.
    * (Without using the private iPhoneSimulatorRemoteClient.framework)
    */
@@ -58,16 +59,10 @@ public class IPhoneSimulatorBinary {
       TemporaryFilesystem.createTempDir("webdriver", "iWebDriver");
 
   /**
-   * Manages the script that launches iWebDriver. Once launched, will monitor
-   * the state of the process to detect if it dies unexpectedly.
-   */
-  private final SubProcess runScript;
-
-  /**
    * Utility script used to kill the iWebDriver process when
    * {@link #shutdown()} is called. This is necessary since
-   * {@link Process#destroy()} sends a {@code SIGKILL} to {@link #runScript},
-   * so we cannot trap it and explicitly kill iWebDriver.
+   * {@link Process#destroy()} sends a {@code SIGKILL} to this binary's
+   * sub process so we cannot trap it and explicitly kill iWebDriver.
    */
   private final ProcessBuilder killScript;
 
@@ -82,12 +77,10 @@ public class IPhoneSimulatorBinary {
    * @throws IOException If an I/O error occurs.
    */
   public IPhoneSimulatorBinary(File iWebDriverApp) throws IOException {
+    super(new ProcessBuilder("/bin/bash", createRunScript(iWebDriverApp).getAbsolutePath()));
+
     File killScriptFile = createKillScript(iWebDriverApp.getName());
     this.killScript = new ProcessBuilder("/bin/bash", killScriptFile.getAbsolutePath());
-
-    File runScriptFile = createRunScript(iWebDriverApp);
-    ProcessBuilder builder = new ProcessBuilder("/bin/bash", runScriptFile.getAbsolutePath());
-    this.runScript = new SubProcess(builder);
   }
 
   private static File createRunScript(File executable) throws IOException {
@@ -116,9 +109,9 @@ public class IPhoneSimulatorBinary {
         .append("trap \"shutdown\" SIGINT SIGTERM\n")
         .append(String.format("\"%s\" -RegisterForSystemEvents &\n", exe))
         .append("iwebdriver_pid=$!\n")
-        .append("echo \"Waiting on iWebDriver (pid=$iwebdriver_pid)\"\n")
+        .append("echo \"Waiting on iWebDriver (pid=$iwebdriver_pid)\"...\n")
         .append("wait $iwebdriver_pid\n")
-        .append("echo \"All done\"\n")
+        .append("echo \"Finished running iWebDriver (pid=$iwebdriver_pid)\"!\n")
         .toString();
 
     return writeScript(scriptText);
@@ -129,7 +122,9 @@ public class IPhoneSimulatorBinary {
     // TODO: write an AppleScript to test if Xcode is running the simulator and to make it stop.
     String scriptText = new StringBuilder()
         .append("#!/bin/bash\n")
+        .append("echo \"killing ").append(appName).append("...\"\n")
         .append("/usr/bin/killall \"").append(appName).append("\" || :\n")
+        .append("echo \"killing iPhone Simulator...\"\n")
         .append("/usr/bin/killall \"iPhone Simulator\" || :\n")
         .toString();
     return writeScript(scriptText);
@@ -137,7 +132,7 @@ public class IPhoneSimulatorBinary {
 
   private static File writeScript(String scriptText) throws IOException {
     File scriptFile = File.createTempFile("iWebDriver.", ".script", SCRIPT_DIRECTORY);
-    LOG.info(String.format("%s:\n----------------------------------------------\n%s\n\n",
+    LOG.fine(String.format("%s:\n----------------------------------------------\n%s\n\n",
         scriptFile.getAbsolutePath(), scriptText));
     FileWriter writer = new FileWriter(scriptFile);
     writer.write(scriptText);
@@ -146,13 +141,8 @@ public class IPhoneSimulatorBinary {
     return scriptFile.getCanonicalFile();
   }
 
-  /**
-   * Launches iWebDriver on the iPhone Simulator.
-   *
-   * @see SubProcess#launch()
-   */
-  public void launch() {
-    runScript.launch();
+  @VisibleForTesting ProcessBuilder getKillScript() {
+    return killScript;
   }
 
   /**
@@ -160,6 +150,7 @@ public class IPhoneSimulatorBinary {
    *
    * @see SubProcess#shutdown()
    */
+  @Override
   public void shutdown() {
     // This will kill iWebDriver, which will in turn terminate our run script.
     try {
@@ -170,17 +161,6 @@ public class IPhoneSimulatorBinary {
       throw new WebDriverException(e);
     }
 
-    // Reset both subprocess for the the next launch.
-    runScript.shutdown();
-  }
-
-  /**
-   * Returns the current state of the iWebDriver subprocess.
-   *
-   * @return The current state of the iWebdriver subprocess.
-   * @see SubProcess#getState()
-   */
-  public SubProcess.State getState() {
-    return runScript.getState();
+    super.shutdown();
   }
 }

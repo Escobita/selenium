@@ -1,5 +1,6 @@
 package org.openqa.selenium.iphone;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -8,8 +9,12 @@ import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.internal.SubProcess;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A {@link CommandExecutor} that communicates with an iPhone Simulator
@@ -22,6 +27,9 @@ import java.net.URL;
  */
 public class IPhoneSimulatorCommandExecutor implements CommandExecutor {
 
+  private static final Logger LOG =
+      Logger.getLogger(IPhoneSimulatorCommandExecutor.class.getName());
+
   private final CommandExecutor delegate;
   private final IPhoneSimulatorBinary binary;
   private final URL appUrl;
@@ -30,6 +38,10 @@ public class IPhoneSimulatorCommandExecutor implements CommandExecutor {
     this.delegate = new HttpCommandExecutor(url);
     this.binary = binary;
     this.appUrl = url;
+  }
+
+  @VisibleForTesting IPhoneSimulatorBinary getBinary() {
+    return binary;
   }
 
   public void startClient() {
@@ -48,6 +60,8 @@ public class IPhoneSimulatorCommandExecutor implements CommandExecutor {
         connection.setRequestMethod("TRACE");
         connection.connect();
         responding = true;
+      } catch (ProtocolException e) {
+        responding = false;
       } catch (IOException e) {
         responding = false;
       } finally {
@@ -68,12 +82,31 @@ public class IPhoneSimulatorCommandExecutor implements CommandExecutor {
     } else if (binary.getState().equals(SubProcess.State.NOT_RUNNING)) {
       throw new IPhoneSimulatorNotStartedException();
     }
-    return delegate.execute(command);
+
+    try {
+      return delegate.execute(command);
+    } catch (ConnectException e) {
+      LOG.log(Level.WARNING, "Connection refused? State is: " + binary.getState(), e);
+      if (binary.getState().equals(SubProcess.State.FINISHED)) {
+        throw new IPhoneSimulatorDiedException(e);
+      }
+      throw e;
+    }
   }
 
   public static class IPhoneSimulatorDiedException extends WebDriverException {
+    public IPhoneSimulatorDiedException() {
+      super("The iPhone Simulator has died!");
+    }
+
+    public IPhoneSimulatorDiedException(Throwable cause) {
+      super("The iPhone Simulator has died!", cause);
+    }
   }
 
   public static class IPhoneSimulatorNotStartedException extends WebDriverException {
+    public IPhoneSimulatorNotStartedException() {
+      super("The iPhone Simulator has not been started yet");
+    }
   }
 }
