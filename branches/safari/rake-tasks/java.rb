@@ -136,6 +136,10 @@ class JavaGen < BaseGenerator
       end
     end
 
+    if ENV['JVM_ARGS'] then
+      test_string += ENV['JVM_ARGS']+" "
+    end  
+
     test_string += main
     test_string += ' ' + args[:args] if args[:args]
 
