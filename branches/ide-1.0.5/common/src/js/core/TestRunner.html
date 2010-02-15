@@ -48,15 +48,6 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
         <script language="JavaScript" type="text/javascript" src="xpath/xpath.js"></script>
         <script language="JavaScript" type="text/javascript" src="xpath/javascript-xpath-0.1.11.js"></script>
         <script language="JavaScript" type="text/javascript" src="scripts/user-extensions.js"></script>
-        <script language="JavaScript" type="text/javascript">
-            function openDomViewer() {
-                var autFrame = document.getElementById('selenium_myiframe');
-                var autFrameDocument = new SeleniumFrame(autFrame).getDocument();
-                this.rootDocument = autFrameDocument;
-                var domViewer = window.open(getDocumentBase(document) + 'domviewer/domviewer.html');
-                return false;
-            }
-        </script>
 </head>
 
 <body onLoad="onSeleniumLoad();">
@@ -147,9 +138,6 @@ to work-around a bug in IE on Win2K whereby the HTA application doesn't function
                 <fieldset>
                     <legend>Tools</legend>
 
-                    <button type="button" id="domViewer1" onClick="openDomViewer();">
-                        View DOM
-                    </button>
                     <button type="button" onClick="LOG.show();">
                         Show Log
                     </button>
