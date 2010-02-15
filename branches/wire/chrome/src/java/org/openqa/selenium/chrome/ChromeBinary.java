@@ -2,20 +2,32 @@ package org.openqa.selenium.chrome;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.internal.SubProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 
 public class ChromeBinary {
   
   private static final int BACKOFF_INTERVAL = 2500;
 
-  private static int linearBackoffCoefficient = 1;
+  private volatile int linearBackoffCoefficient = 1;
 
   private final ChromeProfile profile;
   private final ChromeExtension extension;
-  
-  Process chromeProcess = null;
+  private final int port;
+  private final SubProcess chromeProcess;
+
+  /**
+   * @param profile The Chrome profile to use.
+   * @param extension The extension to launch Chrome with.
+   * @throws WebDriverException If an error occurs locating the Chrome executable.
+   * @see ChromeBinary(ChromeProfile, ChromeExtension, int)
+   */
+  public ChromeBinary(ChromeProfile profile, ChromeExtension extension) {
+    this(profile, extension, 0);
+  }
 
   /**
    * Creates a new instance for managing an instance of Chrome using the given
@@ -23,23 +35,23 @@ public class ChromeBinary {
    *
    * @param profile The Chrome profile to use.
    * @param extension The extension to launch Chrome with.
+   * @param port Which port to start Chrome on, or 0 for any free port.
+   * @throws WebDriverException If an error occurs locating the Chrome executable.
    */
-  public ChromeBinary(ChromeProfile profile, ChromeExtension extension) {
+  public ChromeBinary(ChromeProfile profile, ChromeExtension extension, int port) {
     this.profile = profile;
     this.extension = extension;
-  }
+    this.port = port == 0 ? findFreePort() : port;
 
-  /**
-   * Starts the Chrome process for WebDriver.
-   * Assumes the passed directories exist.
-   * @param serverUrl URL from which commands should be requested
-   * @throws IOException wrapped in WebDriverException if process couldn't be
-   * started.
-   */
-  public void start(String serverUrl) throws IOException {
+    String chromeFile;
     try {
-      chromeProcess = new ProcessBuilder(
-          getChromeFile(),
+      chromeFile = getChromeFile();
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
+
+    ProcessBuilder builder = new ProcessBuilder(
+          chromeFile,
           "--user-data-dir=" + profile.getDirectory().getAbsolutePath(),
           "--load-extension=" + extension.getDirectory().getAbsolutePath(),
           "--activate-on-launch",
@@ -49,23 +61,65 @@ public class ChromeBinary {
           "--disable-popup-blocking",
           "--disable-prompt-on-repost",
           "--no-default-browser-check",
-          serverUrl)
-          .start();
+          String.format("http://localhost:%d/chromeCommandExecutor", this.port));
+    this.chromeProcess = new SubProcess(builder);
+  }
+
+  private static int findFreePort() {
+    ServerSocket serverSocket = null;
+    try {
+      serverSocket = new ServerSocket(0);
+      return serverSocket.getLocalPort();
     } catch (IOException e) {
       throw new WebDriverException(e);
+    } finally {
+      if (serverSocket != null) {
+        try {
+          serverSocket.close();
+        } catch (IOException ignored) {
+          // Oh well
+        }
+      }
     }
+  }
+
+  public ChromeProfile getProfile() {
+    return profile;
+  }
+
+  public ChromeExtension getExtension() {
+    return extension;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  /**
+   * Starts the Chrome process for WebDriver.
+   */
+  public void start() {
+    chromeProcess.launch();
     try {
       Thread.sleep(BACKOFF_INTERVAL * linearBackoffCoefficient);
     } catch (InterruptedException e) {
       //Nothing sane to do here
     }
   }
-  
+
+  /**
+   * @return Whether the Chrome process managed by this instance is still
+   *     running.
+   */
+  public boolean isRunning() {
+    return chromeProcess.isRunning();
+  }
+
+  /**
+   * Kills the Chrome process managed by this instance.
+   */
   public void kill() {
-    if (chromeProcess != null) {
-      chromeProcess.destroy();
-      chromeProcess = null;
-    }
+    chromeProcess.shutdown();
   }
   
   public void incrementBackoffBy(int diff) {

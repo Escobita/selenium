@@ -24,15 +24,18 @@ import java.net.SocketException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ChromeCommandExecutor implements CommandExecutor {
+
+  private static final Logger LOG = Logger.getLogger(ChromeCommandExecutor.class.getName());
 
   private static final int MAX_START_RETRIES = 5;
   private static final String[] ELEMENT_ID_ARG = new String[] {"id"};
   private static final String[] NO_ARGS = new String[] {};
 
   private final ChromeBinary binary;
-  private final int port;
 
   //Whether the listening thread should listen
   private volatile boolean listen = false;
@@ -45,22 +48,8 @@ public class ChromeCommandExecutor implements CommandExecutor {
    *
    * @param binary The binary to use when {@link #start() starting} a new Chrome
    *     instance.
-   * @see ChromeCommandExecutor(int, ChromeBinary)
    */
   public ChromeCommandExecutor(ChromeBinary binary) {
-    this(0, binary);
-  }
-
-  /**
-   * Creates a new ChromeCommandExecutor which listens on the passed TCP port.
-   * 
-   * @param port port on which to listen for the initial connection,
-   *     and dispatch commands.
-   * @param binary The binary to use when {@link #start() starting} a new Chrome
-   *     instance.
-   */
-  public ChromeCommandExecutor(int port, ChromeBinary binary) {
-    this.port = port;
     this.binary = binary;
     this.commands = ImmutableMap.<DriverCommand, String[]> builder()
         .put(CLOSE, NO_ARGS)
@@ -109,6 +98,10 @@ public class ChromeCommandExecutor implements CommandExecutor {
         .build();
   }
 
+  public ChromeBinary getBinary() {
+    return binary;
+  }
+
   /**
    * Returns whether an instance of Chrome is currently connected
    * @return whether an instance of Chrome is currently connected
@@ -137,7 +130,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
       return createCannedNewSessionResponse();
     } else {
       sendCommand(command);
-      return handleResponse(command);
+      return handleResponse();
     }
   }
 
@@ -252,11 +245,10 @@ public class ChromeCommandExecutor implements CommandExecutor {
    * Expects the response to be an HTTP request, which ends in the line:
    * EOResponse
    * Responds by sending a 200 response containing QUIT
-   * @param command command we are expecting a response to
    * @return response to the command.
    * @throws IOException if there are errors with the socket being used
    */
-  private Response handleResponse(Command command) throws IOException {
+  private Response handleResponse() throws IOException {
     Socket socket = getOldestSocket();
     StringBuilder resultBuilder = new StringBuilder();
     BufferedReader reader = new BufferedReader(
@@ -291,6 +283,9 @@ public class ChromeCommandExecutor implements CommandExecutor {
     // just close all sockets in the queue, not having to worry about the
     // current ones.
     while ((socket = listeningThread.sockets.peek()) == null) {
+      if (!binary.isRunning()) {
+        throw new ChromeNotRunningException("Chrome is no longer running!");
+      }
       Thread.yield();
     }
     return socket;
@@ -302,12 +297,8 @@ public class ChromeCommandExecutor implements CommandExecutor {
   public void start() {
     for (int retries = MAX_START_RETRIES; !hasClient() && retries > 0; retries--) {
       stop();
-      try {
-        startListening();
-        binary.start(String.format("http://localhost:%d/chromeCommandExecutor", getPort()));
-      } catch (IOException e) {
-        throw new WebDriverException(e);
-      }
+      startListening();
+      binary.start();
       //In case this attempt fails, we increment how long we wait before sending a command
       binary.incrementBackoffBy(1);
     }
@@ -327,7 +318,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
   private void startListening() {
     ServerSocket serverSocket;
     try {
-      serverSocket = new ServerSocket(port);
+      serverSocket = new ServerSocket(binary.getPort());
     } catch (IOException e) {
       throw new WebDriverException(e);
     }
@@ -359,7 +350,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
     private ServerSocket serverSocket;
     private volatile boolean hasClient = false;
 
-    public ListeningThread(ServerSocket serverSocket) {
+    ListeningThread(ServerSocket serverSocket) {
       this.serverSocket = serverSocket;
     }
 
@@ -420,8 +411,8 @@ public class ChromeCommandExecutor implements CommandExecutor {
               Thread.yield();
             }
           }
-        } catch (Exception e) {
-          e.printStackTrace();
+        } catch (IOException e) {
+          LOG.log(Level.FINE, "I/O error while closing the server socket", e);
         }
       }
     }

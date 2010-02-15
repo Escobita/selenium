@@ -41,8 +41,8 @@ public class IPhoneSimulatorCommandExecutorTest extends AbstractDriverTestCase {
     try {
       driver.get(simpleTestPage);
       fail("Should have thrown a " +
-           IPhoneSimulatorCommandExecutor.IPhoneSimulatorDiedException.class.getName());
-    } catch (IPhoneSimulatorCommandExecutor.IPhoneSimulatorDiedException expected) {
+           IPhoneSimulatorCommandExecutor.IPhoneSimulatorNotRunningException.class.getName());
+    } catch (IPhoneSimulatorCommandExecutor.IPhoneSimulatorNotRunningException expected) {
       // Do nothing
     }
   }
