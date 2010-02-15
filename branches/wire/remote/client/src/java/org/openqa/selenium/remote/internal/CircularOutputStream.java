@@ -15,15 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.firefox.internal;
+package org.openqa.selenium.remote.internal;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 
 /**
  * Captures the last N bytes of output.
@@ -36,20 +34,19 @@ public class CircularOutputStream extends OutputStream {
   private byte[] buffer;
   private FileOutputStream out_log;
 
-  public CircularOutputStream(int maxSize) {
+  public CircularOutputStream(File outputFile, int maxSize) {
     buffer = new byte[maxSize];
-    String firefoxLogFile = System.getProperty("webdriver.firefox.logfile");
-    if (firefoxLogFile != null) {
+    if (outputFile != null) {
       try {
-        out_log = new FileOutputStream(new File(firefoxLogFile));
+        out_log = new FileOutputStream(outputFile);
       } catch (FileNotFoundException e) {
         out_log = null;
       }
     }
   }
 
-  public CircularOutputStream() {
-    this(DEFAULT_SIZE);
+  public CircularOutputStream(File outputFile) {
+    this(outputFile, DEFAULT_SIZE);
   }
 
   @Override

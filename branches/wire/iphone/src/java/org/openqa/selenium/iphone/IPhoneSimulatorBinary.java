@@ -11,11 +11,13 @@ package org.openqa.selenium.iphone;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.remote.internal.CircularOutputStream;
 import org.openqa.selenium.remote.internal.SubProcess;
 
 /**
@@ -38,6 +40,8 @@ public class IPhoneSimulatorBinary extends SubProcess {
    */
 
   private static final Logger LOG = Logger.getLogger(IPhoneSimulatorBinary.class.getName());
+
+  private static final String IPHONE_LOG_FILE_PROPERTY = "webdriver.iphone.logFile";
 
   /**
    * System property used to specificy which iPhone SDK to run the
@@ -77,10 +81,17 @@ public class IPhoneSimulatorBinary extends SubProcess {
    * @throws IOException If an I/O error occurs.
    */
   public IPhoneSimulatorBinary(File iWebDriverApp) throws IOException {
-    super(new ProcessBuilder("/bin/bash", createRunScript(iWebDriverApp).getAbsolutePath()));
+    super(new ProcessBuilder("/bin/bash", createRunScript(iWebDriverApp).getAbsolutePath()),
+        createOutputStream());
 
     File killScriptFile = createKillScript(iWebDriverApp.getName());
     this.killScript = new ProcessBuilder("/bin/bash", killScriptFile.getAbsolutePath());
+  }
+
+  private static OutputStream createOutputStream() {
+    String logFileString = System.getProperty(IPHONE_LOG_FILE_PROPERTY);
+    File logFile = logFileString == null ? null : new File(logFileString);
+    return new CircularOutputStream(logFile);
   }
 
   private static File createRunScript(File executable) throws IOException {

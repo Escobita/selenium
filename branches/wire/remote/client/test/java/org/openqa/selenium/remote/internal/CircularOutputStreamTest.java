@@ -16,11 +16,10 @@ limitations under the License.
 */
 
 
-package org.openqa.selenium.firefox.internal;
+package org.openqa.selenium.remote.internal;
 
 import junit.framework.TestCase;
 
-import java.nio.charset.Charset;
 import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 

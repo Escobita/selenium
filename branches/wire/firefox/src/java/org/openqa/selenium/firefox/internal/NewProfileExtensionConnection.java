@@ -21,7 +21,9 @@ package org.openqa.selenium.firefox.internal;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.internal.CircularOutputStream;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
@@ -45,7 +47,9 @@ public class NewProfileExtensionConnection extends AbstractExtensionConnection {
   public void start() throws IOException {
     lock.lock(getConnectTimeout());
     try {
-      this.process.setOutputWatcher(new CircularOutputStream(bufferSize));
+      String firefoxLogFile = System.getProperty("webdriver.firefox.logfile");
+      File logFile = firefoxLogFile == null ? null : new File(firefoxLogFile);
+      this.process.setOutputWatcher(new CircularOutputStream(logFile, bufferSize));
 
       profile.setPort(getDelegate().getAddressOfRemoteServer().getPort());
       profile.updateUserPrefs();

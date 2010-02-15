@@ -2,6 +2,7 @@ package org.openqa.selenium.chrome;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.internal.CircularOutputStream;
 import org.openqa.selenium.remote.internal.SubProcess;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.net.ServerSocket;
 
 public class ChromeBinary {
   
+  private static final String CHROME_LOG_FILE_PROPERTY = "webdriver.chrome.logFile";
   private static final int BACKOFF_INTERVAL = 2500;
 
   private volatile int linearBackoffCoefficient = 1;
@@ -62,7 +64,16 @@ public class ChromeBinary {
           "--disable-prompt-on-repost",
           "--no-default-browser-check",
           String.format("http://localhost:%d/chromeCommandExecutor", this.port));
-    this.chromeProcess = new SubProcess(builder);
+
+    File logFile = getLogFile();
+    this.chromeProcess = logFile == null
+        ? new SubProcess(builder)
+        : new SubProcess(builder, new CircularOutputStream(logFile));
+  }
+
+  private static File getLogFile() {
+    String logFile = System.getProperty(CHROME_LOG_FILE_PROPERTY);
+    return logFile == null ? null : new File(logFile);
   }
 
   private static int findFreePort() {

@@ -34,7 +34,7 @@ public class SubProcess {
    * @see SubProcess(ProcessBuilder, OutputStream)
    */
   public SubProcess(ProcessBuilder processBuilder) {
-    this(processBuilder, System.out);
+    this(processBuilder, nullOutputStream());
   }
 
   /**
@@ -121,5 +121,14 @@ public class SubProcess {
         ProcessUtils.killProcess(currentProcess);
       }
     }
+  }
+
+  private static OutputStream nullOutputStream() {
+    return new OutputStream() {
+      @Override
+      public void write(int i) throws IOException {
+        // Do nothing
+      }
+    };
   }
 }
