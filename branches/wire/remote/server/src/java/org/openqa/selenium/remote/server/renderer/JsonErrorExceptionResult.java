@@ -47,7 +47,7 @@ public class JsonErrorExceptionResult extends ErrorJsonResult {
       String raw = new BeanToJsonConverter().convert(e);
       JSONObject error = new JSONObject(raw);
       error.put("screen", request.getAttribute("screen"));
-      res.setValue(error.toString());
+      res.setValue(error);
     }
 
     request.setAttribute(propertyName, res);
