@@ -92,6 +92,12 @@ function SocketListener(dispatcher, transport) {
       createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
 
   this.converter_.charset = SocketListener.CHARSET;
+
+  this.method_ = '';
+  this.requestUrl_ = '';
+  this.headers_ = {};
+  this.body_ = '';
+  this.contentLengthRemaining_ = 0;
 }
 
 
@@ -109,6 +115,11 @@ SocketListener.CHARSET = 'UTF-8';
  * @see {nsIRequestObserver#onStartRequest}
  */
 SocketListener.prototype.onStartRequest = function(request, context) {
+  this.method_ = '';
+  this.requestUrl_ = '';
+  this.headers_ = {};
+  this.body_ = '';
+  this.contentLengthRemaining_ = 0;
 };
 
 
@@ -141,16 +152,39 @@ SocketListener.prototype.onDataAvailable = function(request, context,
   // Our nsIConverterInputStream will not handle HTTPS connections, so if this
   // is an HTTPS request, we'll blow up and the socket will be closed.
   // TODO: support HTTPS?
-  var bytesRead = this.inputStream_.readString(count, incoming);
-  if (!bytesRead) {
+  var charCountRead = this.inputStream_.readString(count, incoming);
+  if (!charCountRead) {
     // Well...just close the connection.
     this.transport_.close(0);
     return;
   }
 
-  var request;
   try {
-    request = this.parseRequest_(incoming.value);
+    if (this.contentLengthRemaining_ == 0) {
+      this.parseRequest_(incoming.value);
+    }
+    else {
+      this.body_ += incoming.value;
+
+      // This rigmarole is because readString returns the number
+      // of characters read, but we need the number of bytes
+      // to tell if we're done reading the stream.
+      var escaped = encodeURIComponent(incoming.value);
+      var escapedCharCount = 0;
+      if (escaped.indexOf('%', 0) != -1) {
+        escapedCharCount = escaped.split('%').length - 1;
+      }
+      var bytesRead = escaped.length - (2 * escapedCharCount);
+            
+      // If we read more data than the Content-Length header specified, then too
+      // much data was sent by the client, and we consider this a malformed
+      // request.
+      // N.B. This algorithm isn't the best, and could stand to be refined.
+      if (this.contentLengthRemaining_ - bytesRead < 0) {
+        throw 'POST or PUT request body is longer than Content-Length header';
+      }
+      this.contentLengthRemaining_ -= bytesRead;
+    }
   } catch (ex) {
     var description = (typeof ex == 'string') ? '400 Bad Request' :
                                                 '500 Internal Server Error';
@@ -161,8 +195,13 @@ SocketListener.prototype.onDataAvailable = function(request, context,
     this.transport_.close(0);
   }
 
-  var response = new Response(request, this.outputStream_);
-  this.dispatcher_.dispatch(request, response);
+  if (this.contentLengthRemaining_ <= 0) {
+    // We're done.
+    this.inputStream_.close();
+    var clientRequest = new Request(this.method_, this.requestUrl_, this.headers_, this.body_);
+    var clientResponse = new Response(clientRequest, this.outputStream_);
+    this.dispatcher_.dispatch(clientRequest, clientResponse);
+  }
 };
 
 
@@ -181,8 +220,8 @@ SocketListener.prototype.parseRequest_ = function(data) {
   if (requestLine.length < 3) {
     throw 'Error parsing request line';
   }
-
-  var method = requestLine.shift().toUpperCase();
+  
+  this.method_ = requestLine.shift().toUpperCase();
   var path = requestLine.shift();
   var protocol = requestLine.shift().toUpperCase();
 
@@ -193,39 +232,46 @@ SocketListener.prototype.parseRequest_ = function(data) {
   }
 
   // Make sure we were given a valid HTTP method.
-  if (typeof Request.Method[method] == 'undefined') {
-    throw 'Invalid HTTP method: "' + method + '"';
+  if (typeof Request.Method[this.method_] == 'undefined') {
+    throw 'Invalid HTTP method: "' + this.method_ + '"';
   }
 
-  var headers = {};
-  for (var line; line = lines.shift();) {
+  this.headers_ = {};
+  for (var line; line = lines.shift(); ) {
     var parts = trim(line).match(/([^:\s]*)\s*:\s*([^\s]*)/);
-    headers[parts[1].toLowerCase()] = parts[2];
+    this.headers_[parts[1].toLowerCase()] = parts[2];
   }
 
   // Make sure the host was specified. We need this for correct redirects.
-  if (typeof headers['host'] == 'undefined') {
+  if (typeof this.headers_['host'] == 'undefined') {
     throw 'No "Host" header specified';
   }
 
   // Reconstitute the original request URL.
-  var requestUrl = 'http://' + headers['host'] + path;
+  this.requestUrl_ = 'http://' + this.headers_['host'] + path;
   try {
-    requestUrl = Components.classes["@mozilla.org/network/io-service;1"].
-      getService(Components.interfaces.nsIIOService).
-      newURI('http://' + headers['host'] + path, null, null).
-      QueryInterface(Components.interfaces.nsIURL);
+    this.requestUrl_ = Components.classes["@mozilla.org/network/io-service;1"].
+        getService(Components.interfaces.nsIIOService).
+        newURI('http://' + this.headers_['host'] + path, null, null).
+        QueryInterface(Components.interfaces.nsIURL);
   } catch (ex) {
-    throw 'Error parsing request URL: ' + requestUrl;
+    throw 'Error parsing request URL: ' + this.requestUrl_;
   }
 
-  // See if we need to parse the request body.
-  var body = null;
-  if (method == Request.Method.POST || method == Request.Method.PUT) {
-    body = lines.shift() || '';
+  if (this.method_ == Request.Method.POST || this.method_ == Request.Method.PUT) {
+    // POST and PUT requests must send a Content-Length header.
+    if (typeof this.headers_['content-length'] == 'undefined') {
+      throw 'No "Content-Length" header specified for POST or PUT request';
+    }
+    // If the headers and body are sent in a single socket write, it is expected
+    // that the entire body is sent in the request, and there is no further body
+    // to process. Otherwise, we capture how much data we expect to be sent.
+    var body = lines.shift() || '';
+    if (body.length > 0) {
+      this.body_ = body;
+    }
+    else {
+      this.contentLengthRemaining_ = parseInt(this.headers_['content-length']);
+    }
   }
-
-  // We're done.
-  this.inputStream_.close();
-  return new Request(method, requestUrl, headers, body);
 };
