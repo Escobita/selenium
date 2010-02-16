@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace OpenQA.Selenium.Remote
@@ -12,6 +14,40 @@ namespace OpenQA.Selenium.Remote
         private string className;
         private int lineNumber;
         private string methodName;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StackTraceElement"/> class.
+        /// </summary>
+        public StackTraceElement()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StackTraceElement"/> class using the given property values.
+        /// </summary>
+        /// <param name="elementAttributes">A <see cref="Dictionary{K, V}"/> containing the names and values for the properties of this <see cref="StackTraceElement"/>.</param>
+        public StackTraceElement(Dictionary<string, object> elementAttributes)
+        {
+            if (elementAttributes.ContainsKey("className"))
+            {
+                className = elementAttributes["className"].ToString();
+            }
+
+            if (elementAttributes.ContainsKey("methodName"))
+            {
+                methodName = elementAttributes["methodName"].ToString();
+            }
+
+            if (elementAttributes.ContainsKey("lineNumber"))
+            {
+                lineNumber = Convert.ToInt32(elementAttributes["lineNumber"], CultureInfo.InvariantCulture);
+            }
+
+            if (elementAttributes.ContainsKey("fileName"))
+            {
+                fileName = elementAttributes["fileName"].ToString();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the value of the filename in the stack

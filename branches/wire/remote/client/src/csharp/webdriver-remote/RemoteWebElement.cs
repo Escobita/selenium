@@ -12,7 +12,7 @@ namespace OpenQA.Selenium.Remote
     public class RemoteWebElement : IWebElement, IFindsByLinkText, IFindsById, IFindsByName, IFindsByTagName, IFindsByClassName, IFindsByXPath, IFindsByPartialLinkText
     {
         #region Private members
-        private RemoteWebDriver parentDriver;
+        private RemoteWebDriver driver;
         private string elementId;
         #endregion
 
@@ -20,9 +20,11 @@ namespace OpenQA.Selenium.Remote
         /// <summary>
         /// Initializes a new instance of the <see cref="RemoteWebElement"/> class.
         /// </summary>
+        /// <param name="parentDriver">The <see cref="RemoteWebDriver"/> instance hosting this element.</param>
         /// <param name="id">The ID assigned to the element.</param>
-        internal RemoteWebElement(string id)
+        internal RemoteWebElement(RemoteWebDriver parentDriver, string id)
         {
+            driver = parentDriver;
             elementId = id;
         }
         #endregion
@@ -37,7 +39,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementTagName, parameters);
+                Response commandResponse = Execute(DriverCommand.GetElementTagName, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -51,7 +53,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementText, parameters);
+                Response commandResponse = Execute(DriverCommand.GetElementText, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -65,7 +67,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.GetElementValue, parameters);
+                Response commandResponse = Execute(DriverCommand.GetElementValue, parameters);
                 return commandResponse.Value.ToString();
             }
         }
@@ -79,7 +81,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementEnabled, parameters);
+                Response commandResponse = Execute(DriverCommand.IsElementEnabled, parameters);
                 return (bool)commandResponse.Value;
             }
         }
@@ -93,7 +95,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", elementId);
-                Response commandResponse = parentDriver.Execute(DriverCommand.IsElementSelected, parameters);
+                Response commandResponse = Execute(DriverCommand.IsElementSelected, parameters);
                 return (bool)commandResponse.Value;
             }
         }
@@ -101,20 +103,35 @@ namespace OpenQA.Selenium.Remote
 
         #region Internal properties
         /// <summary>
-        /// Gets the ID of the element
+        /// Gets the ID of the element.
         /// </summary>
-        internal string Id
+        /// <remarks>This property is internal to the WebDriver instance, and is
+        /// not intended to be used in your code. The element's ID has no meaning
+        /// outside of internal WebDriver usage, so it would be improper to scope
+        /// it as public. However, both subclasses of <see cref="RemoteWebElement"/>
+        /// and the parent driver hosting the element have a need to access the
+        /// internal element ID. Therefore, we have two properties returning the
+        /// same value, one scoped as internal, the other as protected.</remarks>
+        internal string InternalElementId
         {
             get { return elementId; }
         }
+        #endregion
 
+        #region Protected properties
         /// <summary>
-        /// Gets or sets the RemoteWebDriver used to find the element
+        /// Gets the ID of the element
         /// </summary>
-        internal RemoteWebDriver Parent
+        /// <remarks>This property is internal to the WebDriver instance, and is
+        /// not intended to be used in your code. The element's ID has no meaning
+        /// outside of internal WebDriver usage, so it would be improper to scope
+        /// it as public. However, both subclasses of <see cref="RemoteWebElement"/>
+        /// and the parent driver hosting the element have a need to access the
+        /// internal element ID. Therefore, we have two properties returning the
+        /// same value, one scoped as internal, the other as protected.</remarks>
+        protected string Id
         {
-            get { return parentDriver; }
-            set { parentDriver = value; }
+            get { return elementId; }
         }
         #endregion
 
@@ -126,7 +143,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.SetElementSelected, parameters);
+            Execute(DriverCommand.SetElementSelected, parameters);
         }
 
         /// <summary>
@@ -136,7 +153,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.ClearElement, parameters);
+            Execute(DriverCommand.ClearElement, parameters);
         }
 
         /// <summary>
@@ -152,7 +169,7 @@ namespace OpenQA.Selenium.Remote
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
             parameters.Add("value", text.ToCharArray());
-            parentDriver.Execute(DriverCommand.SendKeysToElement, parameters);
+            Execute(DriverCommand.SendKeysToElement, parameters);
         }
 
         /// <summary>
@@ -163,7 +180,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.SubmitElement, parameters);
+            Execute(DriverCommand.SubmitElement, parameters);
         }
 
         /// <summary>
@@ -175,7 +192,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            parentDriver.Execute(DriverCommand.ClickElement, parameters);
+            Execute(DriverCommand.ClickElement, parameters);
         }
 
         /// <summary>
@@ -188,7 +205,7 @@ namespace OpenQA.Selenium.Remote
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
             parameters.Add("name", attributeName);
-            Response commandResponse = parentDriver.Execute(DriverCommand.GetElementAttribute, parameters);
+            Response commandResponse = Execute(DriverCommand.GetElementAttribute, parameters);
             string attributeValue = string.Empty;
             if (commandResponse.Value == null)
             {
@@ -197,6 +214,12 @@ namespace OpenQA.Selenium.Remote
             else
             {
                 attributeValue = commandResponse.Value.ToString();
+
+                // Normalize string values of boolean results as lowercase.
+                if (commandResponse.Value is bool)
+                {
+                    attributeValue = attributeValue.ToLowerInvariant();
+                }
             }
 
             return attributeValue;
@@ -210,7 +233,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", elementId);
-            Response commandResponse = parentDriver.Execute(DriverCommand.ToggleElement, parameters);
+            Response commandResponse = Execute(DriverCommand.ToggleElement, parameters);
             return (bool)commandResponse.Value;
         }
 
@@ -515,13 +538,13 @@ namespace OpenQA.Selenium.Remote
             parameters.Add("id", elementId);
             parameters.Add("other", otherAsElement.Id);
 
-            Response response = parentDriver.Execute(DriverCommand.ElementEquals, parameters);
+            Response response = Execute(DriverCommand.ElementEquals, parameters);
             object value = response.Value;
             return value != null && value is bool && (bool)value;
         }
         #endregion
 
-        #region Protected and private support methods
+        #region Protected support methods
         /// <summary>
         /// Finds a child element matching the given mechanism and value.
         /// </summary>
@@ -534,8 +557,8 @@ namespace OpenQA.Selenium.Remote
             parameters.Add("id", elementId);
             parameters.Add("using", mechanism);
             parameters.Add("value", value);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElement, parameters);
-            return parentDriver.GetElementFromResponse(commandResponse);
+            Response commandResponse = Execute(DriverCommand.FindChildElement, parameters);
+            return driver.GetElementFromResponse(commandResponse);
         }
 
         /// <summary>
@@ -550,8 +573,19 @@ namespace OpenQA.Selenium.Remote
             parameters.Add("id", elementId);
             parameters.Add("using", mechanism);
             parameters.Add("value", value);
-            Response commandResponse = parentDriver.Execute(DriverCommand.FindChildElements, parameters);
-            return parentDriver.GetElementsFromResponse(commandResponse);
+            Response commandResponse = Execute(DriverCommand.FindChildElements, parameters);
+            return driver.GetElementsFromResponse(commandResponse);
+        }
+
+        /// <summary>
+        /// Executes a command on this element using the specified parameters.
+        /// </summary>
+        /// <param name="commandToExecute">The <see cref="DriverCommand"/> to execute against this element.</param>
+        /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing names and values of the parameters for the command.</param>
+        /// <returns>The <see cref="Response"/> object containing the result of the command execution.</returns>
+        protected Response Execute(DriverCommand commandToExecute, Dictionary<string, object> parameters)
+        {
+            return driver.InternalExecute(commandToExecute, parameters);
         }
         #endregion
     }

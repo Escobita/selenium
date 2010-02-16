@@ -8,14 +8,15 @@ namespace OpenQA.Selenium.Remote
     /// <summary>
     /// Provides a mechanism to find Rendered Elements on the page
     /// </summary>
-    internal class RenderedRemoteWebElement : RemoteWebElement, IRenderedWebElement
+    public class RenderedRemoteWebElement : RemoteWebElement, IRenderedWebElement
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderedRemoteWebElement"/> class.
         /// </summary>
+        /// <param name="parent">The <see cref="RemoteWebDriver"/> instance hosting this element.</param>
         /// <param name="id">The ID assigned to the element.</param>
-        internal RenderedRemoteWebElement(string id)
-            : base(id)
+        public RenderedRemoteWebElement(RemoteWebDriver parent, string id)
+            : base(parent, id)
         {
         }
 
@@ -29,7 +30,7 @@ namespace OpenQA.Selenium.Remote
             { 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", Id);
-                Response commandResponse = Parent.Execute(DriverCommand.GetElementLocation, parameters);
+                Response commandResponse = Execute(DriverCommand.GetElementLocation, parameters);
                 Dictionary<string, object> rawPoint = (Dictionary<string, object>)commandResponse.Value;
                 int x = Convert.ToInt32(rawPoint["x"], CultureInfo.InvariantCulture);
                 int y = Convert.ToInt32(rawPoint["y"], CultureInfo.InvariantCulture);
@@ -46,7 +47,7 @@ namespace OpenQA.Selenium.Remote
             { 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", Id);
-                Response commandResponse = Parent.Execute(DriverCommand.GetElementSize, parameters);
+                Response commandResponse = Execute(DriverCommand.GetElementSize, parameters);
                 Dictionary<string, object> rawSize = (Dictionary<string, object>)commandResponse.Value;
                 int width = Convert.ToInt32(rawSize["width"], CultureInfo.InvariantCulture);
                 int height = Convert.ToInt32(rawSize["height"], CultureInfo.InvariantCulture);
@@ -63,7 +64,7 @@ namespace OpenQA.Selenium.Remote
             {
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", Id);
-                Response commandResponse = Parent.Execute(DriverCommand.IsElementDisplayed, parameters);
+                Response commandResponse = Execute(DriverCommand.IsElementDisplayed, parameters);
                 return (bool)commandResponse.Value;
             }
         }
@@ -78,7 +79,7 @@ namespace OpenQA.Selenium.Remote
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", Id);
             parameters.Add("propertyName", propertyName);
-            Response commandResponse = Parent.Execute(DriverCommand.GetElementValueOfCssProperty, parameters);
+            Response commandResponse = Execute(DriverCommand.GetElementValueOfCssProperty, parameters);
             return commandResponse.Value.ToString();
         }
 
@@ -89,7 +90,7 @@ namespace OpenQA.Selenium.Remote
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", Id);
-            Parent.Execute(DriverCommand.HoverOverElement, parameters);
+            Execute(DriverCommand.HoverOverElement, parameters);
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace OpenQA.Selenium.Remote
             parameters.Add("id", Id);
             parameters.Add("x", moveRightBy);
             parameters.Add("y", moveDownBy);
-            Parent.Execute(DriverCommand.DragElement, parameters);
+            Execute(DriverCommand.DragElement, parameters);
         }
 
         /// <summary>

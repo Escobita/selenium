@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace OpenQA.Selenium.Remote
 {
@@ -11,6 +12,52 @@ namespace OpenQA.Selenium.Remote
         private string message;
         private string className;
         private string screenshot;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorResponse"/> class.
+        /// </summary>
+        public ErrorResponse()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorResponse"/> class using the specified values.
+        /// </summary>
+        /// <param name="responseValue">A <see cref="Dictionary{K, V}"/> containing names and values of
+        /// the properties of this <see cref="ErrorResponse"/>.</param>
+        public ErrorResponse(Dictionary<string, object> responseValue)
+        {
+            message = responseValue["message"].ToString();
+
+            if (responseValue.ContainsKey("screen"))
+            {
+                screenshot = responseValue["screen"].ToString();
+            }
+
+            if (responseValue.ContainsKey("class"))
+            {
+                className = responseValue["class"].ToString();
+            }
+
+            if (responseValue.ContainsKey("stackTrace"))
+            {
+                object[] stackTraceArray = responseValue["stackTrace"] as object[];
+                if (stackTraceArray != null)
+                {
+                    List<StackTraceElement> stackTraceList = new List<StackTraceElement>();
+                    foreach (object rawStackTraceElement in stackTraceArray)
+                    {
+                        Dictionary<string, object> elementAsDictionary = rawStackTraceElement as Dictionary<string, object>;
+                        if (elementAsDictionary != null)
+                        {
+                            stackTraceList.Add(new StackTraceElement(elementAsDictionary));
+                        }
+                    }
+
+                    stackTrace = stackTraceList.ToArray();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the message from the reponse
