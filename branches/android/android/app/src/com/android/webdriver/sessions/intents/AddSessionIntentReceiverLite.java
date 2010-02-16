@@ -24,12 +24,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Intent receiver for handling addition of a new session.
+ * When working in single-session mode, no actual session is created,  
+ * and the returned session id is always the same.
+ */
 public class AddSessionIntentReceiverLite extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
       Log.d("WebDriverLite", "Received intent: " + intent.getAction());
 
+      // Returning a default session id.
       Bundle res = new Bundle();
       res.putInt("SessionId", SessionRepository.SINGLE_SESSION_ID);
       Log.d("WebDriver", "Returning default session id: 1000");

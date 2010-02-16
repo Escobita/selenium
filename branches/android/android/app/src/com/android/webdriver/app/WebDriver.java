@@ -45,15 +45,32 @@ public class WebDriver extends Activity {
     startMainScreen();
   }
 
+  /**
+   * This event is invoked when activity exits current view. This can
+   * happen as a result of working mode change or due to an exception.
+   * In any way the view that corresponds to the working mode should
+   * be reloaded.
+   * 
+   * @param requestCode The original request code that the view had been
+   *    initialized with. If view exited as a result of a working mode change
+   *    this should be equal to {@link #DEFAULT_REQUEST_CODE}.
+   * @param resultCode When requesting working mode switch this code is
+   *    equal to the {@link #RESULT_SWITCH_MODE}.
+   */
   @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+  protected void onActivityResult(int requestCode,
+      int resultCode, Intent data) {
     if (requestCode != DEFAULT_REQUEST_CODE || resultCode != RESULT_SWITCH_MODE)
       return;
 
-    // Mode switching required -- re-launch main activity in a new mode 
+    // Mode switching requested -- re-launch main activity in a new mode 
     startMainScreen();
   }
   
+  /**
+   * Re-launches view activity which is appropriate for the selected
+   * working mode (either single-session or multi-session).
+   */
   private void startMainScreen() {
     // Reading working mode from preferences
     boolean mode = PreferencesRepository.getInstance().getMode();
@@ -63,5 +80,4 @@ public class WebDriver extends Activity {
         mode ? SingleSessionActivity.class : SessionListActivity.class);
     this.startActivityForResult(i, DEFAULT_REQUEST_CODE);
   }
-  
 }

@@ -23,6 +23,10 @@ import android.webkit.CookieSyncManager;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * A singleton class that manages all cookies defined in Android browser. 
+ * Maintains collection of {@link Cookie} objects.
+ */
 public class SessionCookieManager {
 
   /** Actions that are supported by Cookie Manager */

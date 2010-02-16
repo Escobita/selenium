@@ -24,6 +24,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Intent receiver for handling deletion of a session.
+ * Deletes a session with given session id through the session repository. 
+ */
 public class DeleteSessionIntentReceiver extends BroadcastReceiver {
 
   @Override

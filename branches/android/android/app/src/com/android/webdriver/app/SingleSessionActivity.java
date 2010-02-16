@@ -34,12 +34,17 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-public class SingleSessionActivity extends Activity
-                                   implements ActionRequestListener,
-                                              TitleRequestListener,
-                                              NavigateRequestListener,
-                                              UrlRequestListener {
+/**
+ * Main view of a single-session application mode. 
+ */
+public class SingleSessionActivity
+    extends Activity
+    implements ActionRequestListener,
+      TitleRequestListener,
+      NavigateRequestListener,
+      UrlRequestListener {
   
+  // Keys for options menu items
   public static final int MENU_MULTI_SESSION = Menu.FIRST + 3;
   
 
@@ -49,26 +54,27 @@ public class SingleSessionActivity extends Activity
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-      menu.add(0, MENU_MULTI_SESSION, 0, R.string.menu_multiple_session)
-        .setIcon(R.drawable.ic_menu_share);
-  
-      return super.onCreateOptionsMenu(menu);
+    menu.add(0, MENU_MULTI_SESSION, 0, R.string.menu_multiple_session)
+      .setIcon(R.drawable.ic_menu_share);
+
+    return super.onCreateOptionsMenu(menu);
   }
   
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-          case MENU_MULTI_SESSION:
-            PreferencesRepository.getInstance().setMode(false);
-            this.setResult(WebDriver.RESULT_SWITCH_MODE);
-            this.finish();
-            return true;
-      }
+    switch (item.getItemId()) {
+      case MENU_MULTI_SESSION:
+        // Save new mode setting and exit this view to allow loading
+        // the multi-session view.
+        PreferencesRepository.getInstance().setMode(false);
+        this.setResult(WebDriver.RESULT_SWITCH_MODE);
+        this.finish();
+        return true;
+    }
 
-      return super.onOptionsItemSelected(item);
+    return super.onOptionsItemSelected(item);
   }
-  
-  
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -122,50 +128,97 @@ public class SingleSessionActivity extends Activity
 //      mIntentReg.RegisterReceiver(new CookieIntentReceiver(),
 //          Intents.INTENT_COOKIES);
 
-      Log.i("WebDriver Lite", "Loaded.");
+      Log.i("WebDriver", "Single-session mode loaded.");
   }
-  
+
+  /**
+   * Navigates WebView to a new URL.
+   * @param url URL to navigate to.
+   */
   public void navigateTo(String url) {
     if (url == null)
       return;
-  
+
     if (url.equals(currentUrl))
-        return;     // Same URL
-    
+      return;     // Same URL - nothing to do.
+
     if (url.length() > 0)
-        if (url.startsWith("http"))
-          mWebView.loadUrl(url);
-        else
-          mWebView.loadData(url, "text/html", "utf-8");
-    
+      if (url.startsWith("http"))
+        mWebView.loadUrl(url);  // This is a URL
+      else
+        mWebView.loadData(url, "text/html", "utf-8"); // This is HTML
+
     currentUrl = url;
   }
 
+  /**
+   * Returns the URL/HTML that was loaded into WebView last.
+   * @return URL or HTML string as appeared in {@link #navigateTo(String)}.
+   */
   public String getLastUrl() {
     return currentUrl;
   }
-  
+
+  /**
+   * Returns an active title from the WebView.
+   * @return Title string.
+   */
   public String getWebViewTitle() {
     return mWebView.getTitle();
   }
-  
+
+  /**
+   * Executed a given JavaScript code and returns string result.
+   * 
+   * @param script JavaScript code to execute.
+   * @return String result (if available) or an empty string.
+   */
   public String executeJS(String script) {
     return jsExecutor.executeJS(script);
   }
-  
+
+  /**
+   * Navigates back or forward within browser's history.
+   * 
+   * @param steps How many steps to go (use negative numbers for navigation
+   *    back in the history).
+   */
   public void navigateBackOrForward(int steps) {
     mWebView.goBackOrForward(steps);
   }
-  
+
+  /**
+   * Reload the current page in the WebView.
+   */
   public void reload() {
     mWebView.reload();
   }
-  
+
+  /**
+   * Sets status message of the single-mode view.
+   * @param status Status message to set.
+   */
   public void setStatus(String status) {
     ((TextView)findViewById(R.id.status)).setText(status);
   }
   
+  /**
+   * Class that wraps synchronization housekeeping of
+   * execution of JavaScript code within WebView.
+   */
   class SimpleWebViewJSExecutor {
+
+    /**
+     * Executes a given JavaScript code within WebView 
+     * and returns execution result.
+     * <p>
+     * Note: execution is limited in time to
+     *      {@link SessionListActivity.COMMAND_TIMEOUT}
+     *      to prevent "application not responding" alerts.
+     * 
+     * @param jsCode JavaScript code to execute.
+     * @return Results (if returned) or an empty string.
+     */
     public String executeJS(String jsCode) {
       synchronized (syncObj) {
         res = "";
@@ -182,7 +235,12 @@ public class SingleSessionActivity extends Activity
         Log.d("WebViewJSExecutor", "Returning empty result");
       return res;
     }
-    
+
+    /**
+     * Callback to report results of JavaScript code execution.
+     * 
+     * @param result Results (if returned) or an empty string.
+     */
     public void resultAvailable(String result) {
       synchronized (syncObj) {
         Log.d("WebViewJSExecutor", "Script finished");
@@ -198,7 +256,12 @@ public class SingleSessionActivity extends Activity
     private String res = "";
     private boolean running = false;
   }
-  
+
+  /**
+   * This class overrides WebView default behavior when loading new URL. 
+   * It makes sure that the URL is always loaded by the WebView and
+   * updates progress bar according to the page loading progress.
+   */
   final class LocalWebViewClient extends WebViewClient
   {
     @Override
@@ -221,6 +284,10 @@ public class SingleSessionActivity extends Activity
     }
   }
 
+  /**
+   * Subscriber class to be notified when the underlying
+   * WebView loads new content or changes title. 
+   */
   final class LocalWebChromeClient extends WebChromeClient {
     @Override
     public void onProgressChanged(WebView view, int newProgress) {
@@ -229,18 +296,28 @@ public class SingleSessionActivity extends Activity
     }
   }
 
+  /**
+   * Custom module that is added to the WebView's JavaScript engine
+   * to enable callbacks to java code.
+   * This is required since WebView doesn't expose the underlying DOM.
+   */
   final class CustomJavaScriptInterface {
+
+    /**
+     * A callback from JavaScript to Java that passes
+     * execution result as a parameter.
+     * <p>
+     * This method is accessible from WebView's JS DOM as
+     * windows.webdriver.resultMethod().
+     *
+     * @param result Result that should be returned to Java code from WebView. 
+     */
     public void resultMethod(String result) {
       jsExecutor.resultAvailable(result);
     }
   }
 
-  private String currentUrl = "";
-  private WebView mWebView = null;
-  private IntentReceiverRegistrar mIntentReg;
-  private SimpleWebViewJSExecutor jsExecutor = new SimpleWebViewJSExecutor();
-
-
+  
   @Override
   public Object onActionRequest(Actions action, Object[] args) {
     String actionRes = "";
@@ -284,5 +361,12 @@ public class SingleSessionActivity extends Activity
   public String onUrlRequest() {
     return this.getLastUrl();
   }
+  
+  private String currentUrl = "";
+  private WebView mWebView = null;
+  private IntentReceiverRegistrar mIntentReg;
+  private SimpleWebViewJSExecutor jsExecutor = new SimpleWebViewJSExecutor();
+
+
   
 }

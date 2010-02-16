@@ -16,24 +16,53 @@
 
 package com.android.webdriver.sessions;
 
+/**
+ * Class that represents a single cookie.
+ * {@link SessionCookieManager} maintains a collection of cookies available
+ * per in the Android browser. 
+ */
 public class Cookie {
-   public Cookie(String domain, String name, String value) {
-     mDomain = domain;
-     mName = name;
-     mValue = value;
-   }
-   
-   public String getDomain() {
-     return mDomain;
-   }
-   
-   public String getName() {
-     return mName;
-   }
-   
-   public String getValue() {
-     return mValue;
-   }
-   
-   String mDomain, mName, mValue;
+
+  /**
+   * Constructor that creates the cookie based on the provided data.
+   * 
+   * @param domain Cookie domain.
+   * @param name Cookie name.
+   * @param value Cookie value.
+   */
+  public Cookie(String domain, String name, String value) {
+    mDomain = domain;
+    mName = name;
+    mValue = value;
+  }
+
+  /**
+   * Returns cookie domain name.
+   * 
+   * @return Cookie domain name string.
+   */
+  public String getDomain() {
+    return mDomain;
+  }
+
+  /**
+   * Returns cookie name.
+   * 
+   * @return Name of the cookie.
+   */
+  public String getName() {
+    return mName;
+  }
+
+  /**
+   * Returns cookie value.
+   * 
+   * @return Value of the cookie.
+   */
+  public String getValue() {
+    return mValue;
+  }
+  
+  // Private members
+  String mDomain, mName, mValue;
 }

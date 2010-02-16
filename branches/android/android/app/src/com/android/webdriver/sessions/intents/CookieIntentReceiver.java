@@ -30,6 +30,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Intent receiver for handling cookie-related requests.
+ * Passes the request to the {@link SessionCookieManager} to be processed.
+ */
 public class CookieIntentReceiver extends BroadcastReceiver {
 
   @Override

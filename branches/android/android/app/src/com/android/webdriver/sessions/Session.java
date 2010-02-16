@@ -18,7 +18,9 @@ package com.android.webdriver.sessions;
 
 import android.util.Log;
 
-
+/**
+ * Class that represents a single WebDriver session. 
+ */
 public class Session {
 
   /**
@@ -58,6 +60,11 @@ public class Session {
     Object onActionRequest(Session session, Actions action, Object[] params);
   }
 
+  /**
+   * Constructor that creates a session for the given WebDriver context.
+   *  
+   * @param contextId WebDriver context string.
+   */
   public Session(String contextId) {
     mSessionId = generateNextSessionId();
     mContext = contextId;
@@ -65,20 +72,43 @@ public class Session {
     mStatus = "Ready.";
   }
 
+  /**
+   * Returns unique session id.
+   * 
+   * @return Unique session id.
+   */
   public int getSessionId() {
     return mSessionId;
   }
 
+  /**
+   * Set the WebDriver context name to use.
+   * @param mContext WebDriver context string.
+   */
   public void setContext(String mContext) {
     this.mContext = mContext;
     if (mOnChangeListener != null)
       mOnChangeListener.onChange(this);
   }
 
+  /**
+   * Return the current WebDriver context string.
+   * @return Current WebDriver context string.
+   */
   public String getContext() {
     return mContext;
   }
 
+  /**
+   * Set the new value of currently loaded URL.
+   * Call to this function triggers request to UI subscriber to navigate to
+   * the given URL.
+   * <p>
+   * Note: if given URL is equal to the currently loaded URL, the page
+   * won't be reloaded.
+   * 
+   * @param url The new URL that this session should navigate to.
+   */
   public void setUrl(String url) {
     if (mLastUrl.equals(url))
       return;
@@ -89,36 +119,51 @@ public class Session {
       mOnChangeListener.onChange(this);
   }
 
+  /**
+   * Returns last URL that was passed to {@link #setUrl(String)}.
+   *  
+   * @return Last URL that was passed to {@link #setUrl(String)}.
+   */
   public String getLastUrl() {
     return mLastUrl;
   }
 
-  public void setStatus(String mStatus) {
-    this.mStatus = mStatus;
+  /**
+   * Set session status description.
+   * 
+   * @param status String that represent a status of the session.
+   */
+  public void setStatus(String status) {
+    this.mStatus = status;
     if (mOnChangeListener != null)
       mOnChangeListener.onChange(this);
   }
 
+  /**
+   * Returns the current status of the session.
+   * 
+   * @return Status of the session.
+   */
   public String getStatus() {
     return mStatus;
   }
 
+  /**
+   * Set a callback listener for notifying on any change in session properties.
+   * 
+   * @param listener Callback listener.
+   */
   public void setOnChangeListener(OnChangeListener listener) {
     mOnChangeListener = listener;
   }
 
-  public void removeOnChangeListener(OnChangeListener listener) {
-    if (listener == mOnChangeListener)
-      mOnChangeListener = null;
-  }
-
+  /**
+   * Set listener to be notified when session requests a UI service to perform.
+   * 
+   * @param listener Callback listener.
+   */
   public void setActionRequestListener(ActionRequestListener listener) {
     mActionRequestListener = listener;
-  }
-
-  public void removeActionRequestListener(ActionRequestListener listener) {
-    if (listener == mActionRequestListener)
-      mActionRequestListener = null;
   }
 
   @Override
@@ -126,6 +171,9 @@ public class Session {
     return Integer.toString(mSessionId) + "/" + mContext; 
   }
 
+  /**
+   * Returns true if sessions have the same Session Id and same Context.
+   */
   @Override
   public boolean equals(Object o) {
     if (o instanceof Session)
@@ -135,28 +183,63 @@ public class Session {
       return false;
   }
 
+  /**
+   * Returns the next unused session id to assign to a newly created session.
+   * 
+   * @return Unique auto-incrementing session id.
+   */
   public static int generateNextSessionId() {
     return ++lastId;
   }
 
+  /**
+   * Set title of currently loaded web page. This method is invoked by the UI
+   * to notify the session regarding the title change.
+   * 
+   * @param title String title to set as web page title associated with
+   *    this session.
+   */
   public void setTitle(String title) {
     this.mTitle = title;
   }
 
+  /**
+   * Get title of currently loaded web page.
+   * 
+   * @return Title of currently loaded web page.
+   */
   public String getTitle() {
     return mTitle;
   }
 
+  /**
+   * Update session about the content of the web page. This method is invoked
+   * by the UI to notify the session regarding the web page content change.
+   *   
+   * @param pageContent Source of the session web page as a string. 
+   */
   public void setPageContent(String pageContent) {
     this.mPageContent = pageContent;
     if (mOnChangeListener != null)
       mOnChangeListener.onChange(this);
   }
 
+  /**
+   * Returns the source of the web page loaded in the UI.
+   *  
+   * @return Source of the session web page as a string.
+   */
   public String getPageContent() {
     return mPageContent;
   }
 
+  /**
+   * Initiate session-related actions (see {@link Actions}.
+   * 
+   * @param action Action to perform.
+   * @param args Arguments of the action.
+   * @return Any value returns as a result of action execution or null.
+   */
   public Object PerformAction(Actions action, Object[] args) {
     switch(action) {
       case GET_PAGESOURCE:

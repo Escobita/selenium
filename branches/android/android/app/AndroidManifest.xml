@@ -17,8 +17,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.webdriver.app">
     
-    <application android:label="WebDriverApplication"
-      android:name="WebDriverApplication"
+    <application android:label="WebDriver Client"
       android:icon="@drawable/selenium_icon">
     
         <activity android:name=".WebDriver"

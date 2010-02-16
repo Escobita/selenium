@@ -22,6 +22,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Intent receiver for handling deletion of a session.
+ * When working in single-session mode, no actual session is deleted,  
+ * and the returned status is always 'OK'.
+ */
 public class DeleteSessionIntentReceiverLite extends BroadcastReceiver {
 
   @Override

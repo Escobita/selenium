@@ -25,23 +25,31 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Intent receiver for handling addition of a new session.
+ * Creates a new session with assistance of the session repository 
+ * and returns session id as a result.
+ */
 public class AddSessionIntentReceiver extends BroadcastReceiver {
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		Log.d("WebDriver", "Received intent: " + intent.getAction());
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    Log.d("WebDriver", "Received intent: " + intent.getAction());
 
-		String ctx = intent.getExtras().getString("Context");
-		if (ctx == null || ctx.length() <= 0) {
-			Log.e("WebDriver", "Error in received intent: " + intent.toString());
-			return;
-		}
+    // Extracting the WebDriver context from intent's arguments.
+    String ctx = intent.getExtras().getString("Context");
+    if (ctx == null || ctx.length() <= 0) {
+      Log.e("WebDriver", "Error in received intent: " + intent.toString());
+      return;
+    }
 
-		Session sess = SessionRepository.getInstance().add(ctx);
-		Bundle res = new Bundle();
-		res.putInt("SessionId", sess.getSessionId());
-		Log.d("WebDriver", "Session created with Id: " + sess.getSessionId());
-		this.setResultExtras(res);
-	}
-	
+    // Creating a new session. 
+    Session sess = SessionRepository.getInstance().add(ctx);
+    
+    // Returning the session id.
+    Bundle res = new Bundle();
+    res.putInt("SessionId", sess.getSessionId());
+    Log.d("WebDriver", "Session created with Id: " + sess.getSessionId());
+    this.setResultExtras(res);
+  }
 }
