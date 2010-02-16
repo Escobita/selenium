@@ -265,13 +265,17 @@ SocketListener.prototype.parseRequest_ = function(data) {
     }
     // If the headers and body are sent in a single socket write, it is expected
     // that the entire body is sent in the request, and there is no further body
-    // to process. Otherwise, we capture how much data we expect to be sent.
+    // to process. Otherwise, we capture how much data we expect to be sent and
+    // send a 100-Continue response.
     var body = lines.shift() || '';
     if (body.length > 0) {
       this.body_ = body;
     }
     else {
       this.contentLengthRemaining_ = parseInt(this.headers_['content-length']);
+      var continueMessage = 'HTTP/1.1 100 Continue\r\n\r\n';
+      this.outputStream_.write(continueMessage, continueMessage.length);
+      this.outputStream_.flush();
     }
   }
 };
