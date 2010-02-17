@@ -1,4 +1,4 @@
-﻿/* Copyright notice and license
+﻿﻿/* Copyright notice and license
 Copyright 2007-2010 WebDriver committers
 Copyright 2007-2010 Google Inc.
 Portions copyright 2007 ThoughtWorks, Inc

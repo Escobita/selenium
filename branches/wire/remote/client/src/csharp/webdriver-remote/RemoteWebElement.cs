@@ -9,7 +9,7 @@ namespace OpenQA.Selenium.Remote
     /// </summary>
     /// <seealso cref="IRenderedWebElement"/>
     /// <seealso cref="ILocatable"/>
-    public class RemoteWebElement : IWebElement, IFindsByLinkText, IFindsById, IFindsByName, IFindsByTagName, IFindsByClassName, IFindsByXPath, IFindsByPartialLinkText
+    public class RemoteWebElement : IWebElement, IFindsByLinkText, IFindsById, IFindsByName, IFindsByTagName, IFindsByClassName, IFindsByXPath, IFindsByPartialLinkText, IWrapsDriver
     {
         #region Private members
         private RemoteWebDriver driver;
@@ -26,6 +26,16 @@ namespace OpenQA.Selenium.Remote
         {
             driver = parentDriver;
             elementId = id;
+        }
+        #endregion
+
+        #region IWrapsDriver Members
+        /// <summary>
+        /// Gets the <see cref="IWebDriver"/> used to find this element.
+        /// </summary>
+        public IWebDriver WrappedDriver
+        {
+            get { return parentDriver; }
         }
         #endregion
 
@@ -101,7 +111,7 @@ namespace OpenQA.Selenium.Remote
         }
         #endregion
 
-        #region Internal properties
+        #region Internal Properties
         /// <summary>
         /// Gets the ID of the element.
         /// </summary>

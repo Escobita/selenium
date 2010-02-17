@@ -1,7 +1,7 @@
 # Platform checks
 
 def windows?
-  RUBY_PLATFORM.downcase.include?("win32")
+  RUBY_PLATFORM.downcase.include?("win32") || RUBY_PLATFORM.downcase.include?("mingw32")
 end
 
 def mac?
@@ -14,6 +14,10 @@ end
 
 def cygwin?
   RUBY_PLATFORM.downcase.include?("cygwin")
+end
+
+def unix?
+  linux? or mac?
 end
 
 def classpath_separator?

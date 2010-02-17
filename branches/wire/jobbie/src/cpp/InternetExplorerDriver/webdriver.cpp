@@ -1304,6 +1304,7 @@ int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t*
 			WebElement* e;
 			wdGetElementScriptResult(getElemRes, driver, &e);
 			elements->elements->push_back(e->element);
+			//TODO(eranm): Probably missing wdFreeScriptArgs
 		}
 		SafeArrayDestroy(queryArgs);
 
@@ -1446,9 +1447,10 @@ int wdGetScriptResultType(ScriptResult* result, int* type)
 			break;
 
 		case VT_DISPATCH:
-			*type = 4;
+			{
+				*type = 4;
+			}
 			break;
-			// Fall through
 
 		case VT_EMPTY:
 			*type = 5;
@@ -1549,6 +1551,26 @@ int wdeMouseMoveTo(HWND hwnd, long duration, long fromX, long fromY, long toX, l
 {
 	mouseMoveTo(hwnd, duration, fromX, fromY, toX, toY);
 	return SUCCESS;
+}
+
+int wdCaptureScreenshotAsBase64(WebDriver* driver, StringWrapper** result) {
+	*result = NULL;
+	if (!driver || !driver->ie) return ENOSUCHDRIVER;
+
+	try {
+		const std::wstring originalString(driver->ie->captureScreenshotAsBase64());
+		size_t length = originalString.length() + 1;
+		wchar_t* toReturn = new wchar_t[length];
+
+		wcscpy_s(toReturn, length, originalString.c_str());
+
+		StringWrapper* res = new StringWrapper();
+		res->text = toReturn;
+		
+		*result = res;
+
+		return SUCCESS;
+	} END_TRY;
 }
 
 }
