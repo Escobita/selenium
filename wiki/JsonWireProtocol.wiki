@@ -1,116 +1,1648 @@
 #summary A description of the protocol used by WebDriver to communicate with remote instances
 #labels WebDriver
 
-= The Wire Protocol =
+<font size=6>*The !WebDriver Wire Protocol*</font>
 
-It is planned that all implementations of WebDriver will understand a
-common wire protocol. The plan is to base this on
-[http://www.json.org/ JSON] because this is a widely understood, easy
-to parse format that has implementations already available in many different
-languages. 
+<font size=3>*Status:* _DRAFT_</font>
 
-The expected protocol that will be used for transferring the JSON objects will be HTTP.
+<wiki:toc max_depth="3" />
 
-== Basic Concepts and Terms ==
+= Introduction =
 
-In order to make sure that there is as little confusion as possible,
-the following terms are going to be used:
+All implementations of WebDriver that communicate with the browser, or a RemoteWebDriver server shall use a common wire protocol. This wire protocol defines a [http://www.google.com?q=RESTful+web+service RESTful web service] using [http://www.json.org JSON] over HTTP.
 
-  * *Client* means the local machine, on which the WebDriver API is being used.
-  * *Server* means the remote machine, which is running the RemoteWebDriver. This also refers to drivers that implement the wire protocol directly, such as a future version of the Firefox extension used in the FirefoxDriver
+The protocol will assume that the WebDriver API has been "flattened", but there is an expectation that client implementations will take a more Object-Oriented approach, as demonstrated in the existing Java API. The wire protocol is implemented in request/response pairs of "commands" and "responses".
 
-The protocol will assume that the WebDriver API has been "flattened",
-but there is an expectation that client implementations will take a
-more Object-based approach, as demonstrated in the existing Java
-API. It can be thought of request/response pairs of "commands" and
-"responses" that look like:
+== Basic Concepts And Terms ==
 
-=== Command ===
+<dl>
+<dt>*Client*</dt>
+<dd>The machine on which the WebDriver API is being used.
 
-|| *Key* || *Type* || *Represents* ||
-|| sessionId || String ||  An opaque handle, used by the driver to determine where to route the command to ||
-|| context || String || An opaque handle, used by the driver to determine where to route the command to ||
-|| commandName || String || The name of the method to invoke ||
-|| parameters || Array || The parameters required for the command. The type of the parameters depends on the command ||
+</dd>
+<dt>*Server*</dt>
+<dd>The machine running the RemoteWebDriver. This term may also refer to a specific browser that implements the wire protocol directly, such as the FirefoxDriver or IPhoneDriver.
 
-In order for commands to be understood directly, the "context" and "sessionId" should
-be treated as an opaque handle by the client.
+</dd>
+<dt>*Session*</dt>
+<dd>The server should maintain one browser per session. Commands sent to a session will be directed to the corresponding browser.
 
-=== Response ===
+</dd>
+<dt>*!WebElement*</dt>
+<dd>An object in the WebDriver API that represents a DOM element on the page.
 
-|| *Key* || *Type* || *Represents* ||
-|| sessionId || String ||  An opaque handle, used by the driver to determine where to route the command to. Pass back with the next command. ||
-|| context || String || An opaque handle, used by the driver to determine where to route the command to. Pass back with the next command. ||
-|| isError || Boolean || Should the response be interpreted as being an error or did the command complete successfully ||
-|| value || Depends on the command being executed command || If `isError` is true, then this represents the error message, otherwise the response is to be interpreted depending on the command ||
+</dd>
+<dt>*!WebElement JSON Object*</dt>
+<dd>The JSON representation of a WebElement for transmission over the wire. This object will have the following properties:
 
-== Allowed Types and Conversions ==
+|| *Key* || *Type* || *Description* ||
+|| ELEMENT || string || The opaque ID assigned to the element by the server. This ID should be used in all subsequent commands issued against the element. ||
 
-The following types may be sent between the client and server:
+</dd>
+</dl>
 
-  * Strings
-  * Numbers
-  * Booleans
-  * DOM elements
-  * Arrays of the above.
+= Messages =
 
-The standard JSON mechanisms for encoding the primitive types (including arrays) are to be used. 
+== Commands ==
 
-A DOM element will be sent back from the client as a String representing a relative URL that can be used to access the element. Later versions of this document will require that the element URL be sent back to the server when referencing a particular element, but for now be aware that the final path part of the relative URL contains the element's ID. This should be treated as an opaque string.
+!WebDriver command messages should conform to the [http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 HTTP/1.1 request specification]. Although the server may be extended to respond to other content-types, the wire protocol dictates that all commands accept a content-type of `application/json;charset=UTF-8`. Likewise, the message bodies for POST and PUT request must use an `application/json;charset=UTF-8` content-type.
 
-== List of Commands ==
+Each command in the WebDriver service will be mapped to an HTTP method at a specific path. Path segments prefixed with a colon (:) indicate that segment is a variable used to further identify the underlying resource. For example, consider an arbitrary resource mapped as:
+{{{
+GET /favorite/color/:name
+}}}
+Given this mapping, the server should respond to GET requests sent to "/favorite/color/Jack" and "/favorite/color/Jill", with the variable `:name` set to "Jack" and "Jill", respectively.
 
-The server should understand the following commands. This list is
-currently incomplete. For example, it does not currently explain _how_
-to set up the initial connection, and it lacks "house keeping" methods
-which are probably necessary.
+== Responses ==
 
-=== Session Management and Exception Handling ===
+Command responses shall be sent as [http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6 HTTP/1.1 response messages]. If the remote server must return a 4xx response, the response body shall have a Content-Type of text/plain and the message body shall be a descriptive message of the bad request. For all other cases, if a response includes a message body, it must have a Content-Type of application/json;charset=UTF-8 and will be a JSON object with the following properties:
 
-Methods used to create and manage webdriver sessions. A session can be thought of a new instance of a particular driver.
+|| *Key* || *Type* || *Description* ||
+|| sessionId || string|null || An opaque handle used by the server to determine where to route session-specific commands. This ID should be included in all future session-commands in place of the :sessionId path segment variable. ||
+|| status || number || A status code summarizing the result of the command. A non-zero value indicates that the command failed. ||
+|| value || `*` || The response JSON value. ||
 
-|| *URL* || *HTTP Method* || *Argument* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session || POST || An object with the fields: "browserName", "platform", "javascriptEnabled", "version" || A redirect to a URL desribing the newly created driver || Create a new session. Equivalent to "new Driver()" || N/A || 
-|| /session/:sessionId/:context || GET || none || An object with the same fields as for "/session" || This desribes the driver created by the call to "/session" || N/A ||
-|| /session/:sessionId || DELETE || none || Ignored || Delete an existing session. This will allow the server to release any resources held for the driver, and consequently there is an expectation that users will call this method to allow this clean up || N/A ||
+=== Response Status Codes ===
+
+The wire protocol will inherit its status codes from those used by the InternetExplorerDriver:
+
+|| *Code* || *Summary* || *Detail* ||
+|| 0 || Success || The command executed successfully. ||
+|| 7 || No such element || An element could not be located on the page using the given search parameters. ||
+|| 8 || No such frame || A request to switch to a frame could not be satisfied because the frame could not be found. ||
+|| 9 || Unknown command || The requested resource could not be found, or a request was received using an HTTP method that is not supported by the mapped resource. ||
+|| 10 || Stale element reference || An element command failed because the referenced element is no longer attached to the DOM. ||
+|| 11 || Element not visible || An element command could not be completed because the element is not visible on the page. ||
+|| 12 || Invalid element state || An element command could not be completed because the element is in an invalid state (e.g. attempting to click a disabled element). ||
+|| 13 || Unknown error || An unknown server-side error occurred while processing the command. ||
+|| 15 || Element is not selectable || An attempt was made to select an element that cannot be selected. ||
+|| 19 || XPath look up error || An error occurred while searching for an element by XPath. ||
+|| 23 || No such window || A request to switch to a different window could not be satisfied because the window could not be found. ||
+|| 24 || Invalid cookie domain || An illegal attempt was made to set a cookie under a different domain than the current page. ||
+|| 25 || Unable to set cookie || A request to set a cookie's value could not be satisfied. ||
+
+The client should interpret a 404 Not Found response from the server as an "Unknown command" response. All other 4xx and 5xx responses from the server that do not define a status field should be interpreted as "Unknown error" responses.
+
+== Error Handling ==
+
+There are two levels of error handling specified by the wire protocol: invalid requests and failed commands.
+
+=== Invalid Requests ===
+
+All invalid requests should result in the server returning a 4xx HTTP response. The response Content-Type should be set to text/plain and the message body should be a descriptive error message. The categories of invalid requests are as follows:
+
+<dl>
+<dt>*Unknown Commands*</dt>
+<dd>If the server receives a command request whose path is not mapped to a resource in the REST service, it should respond with a `404 Not Found` message.
+
+</dd>
+<dt>*Unimplemented Commands*</dt>
+<dd>Every server implementing the WebDriver wire protocol must respond to every defined command. If an individual command has not been implemented on the server, the server should respond with a `501 Not Implemented` error message. Note this is the only error in the Invalid Request category that does not return a `4xx` status code.
+
+</dd>
+<dt>*Variable Resource Not Found*</dt>
+<dd>If a request path maps to a variable resource, but that resource does not exist, then the server should respond with a `404 Not Found`. For example, if ID `my-session` is not a valid session ID on the server, and a command is sent to `GET /session/my-session HTTP/1.1`, then the server should gracefully return a `404`.
+
+</dd>
+<dt>*Invalid Command Method*</dt>
+<dd>If a request path maps to a valid resource, but that resource does not respond to the request method, the server should respond with a `405 Method Not Allowed`. The response must include an Allows header with a list of the allowed methods for the requested resource.
+
+</dd>
+<dt>*Missing Command Parameters*</dt>
+<dd>If a POST/PUT command maps to a resource that expects a set of JSON parameters, and the response body does not include one of those parameters, the server should respond with a `400 Bad Request`. The response body should list the missing parameters.
+
+</dd>
+</dl>
+
+=== Failed Commands ===
+
+If a request maps to a valid command and contains all of the expected parameters in the request body, yet fails to execute successfully, then the server should send a 500 Internal Server Error. This response should have a Content-Type of `application/json;charset=UTF-8` and the response body should be a well formed JSON response object.
+
+The response status should be one of the defined status codes and the response value should be another JSON object with detailed information for the failing command:
+
+|| Key || Type || Description ||
+|| message || string || A descriptive message for the command failure. ||
+|| screen || string || (Optional) If included, a screenshot of the current page as a base64 encoded string. ||
+|| class || string || (Optional) If included, specifies the fully qualified class name for the exception that was thrown when the command failed. ||
+|| stackTrace || array || (Optional) If included, specifies an array of JSON objects describing the stack trace for the exception that was thrown when the command failed. The zeroeth element of the array represents the top of the stack. ||
+
+Each JSON object in the stackTrace array must contain the following properties:
+
+|| *Key* || *Type* || *Description* ||
+|| fileName || string || The name of the source file containing the line represented by this frame. ||
+|| className || string || The fully qualified class name for the class active in this frame. If the class name cannot be determined, or is not applicable for the language the server is implemented in, then this property should be set to the empty string. ||
+|| methodName || string || The name of the method active in this frame, or the empty string if unknown/not applicable. ||
+|| lineNumber || number || The line number in the original source file for the frame, or 0 if unknown. ||
+
+= Resource Mapping =
+
+Resources in the WebDriver REST service are mapped to individual URL patterns. Each resource may respond to one or more HTTP request methods. If a resource responds to a GET request, then it should also respond to HEAD requests. All resources should respond to OPTIONS requests with an `Allow` header field, whose value is a list of all methods that resource responds to.
+
+If a resource is mapped to a URL containing a variable path segment name, that path segment should be used to further route the request. Variable path segments are indicated in the resource mapping by a colon-prefix. For example, consider the following:
+{{{
+/favorite/color/:person
+}}}
+A resource mapped to this URL should parse the value of the `:person` path segment to further determine how to respond to the request. If this resource received a request for `/favorite/color/Jack`, then it should return Jack's favorite color. Likewise, the server should return Jill's favorite color for any requests to `/favorite/color/Jill`.
+
+Two resources may only be mapped to the same URL pattern if one of those resources' patterns contains variable path segments, and the other does not. In these cases, the server should always route requests to the resource whose path is the best match for the request. Consider the following two resource paths:
+
+  # `/session/:sessionId/element/active`
+  # `/session/:sessionId/element/:id`
+
+Given these mappings, the server should always route requests whose final path segment is active to the first resource. All other requests should be routed to second.
+
+= Command Reference =
+
+== Command Summary ==
+
+|| *HTTP Method* || *Path* || *Summary* || *Java Equivalent* ||
+|| POST || /session || Create a new session. || _N/A_ ||
+|| GET || /session/:sessionId || Retrieve the capabilities of the specified session. || _N/A_ ||
+|| DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
+|| GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
+|| GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
+|| GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
+|| POST || /session/:sessionId/url || Navigate to a new URL. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)] ||
+|| POST || /session/:sessionId/forward || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
+|| POST || /session/:sessionId/back || Navigate backwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#back() WebDriver.Navigation#back()] ||
+|| POST || /session/:sessionId/refresh || Refresh the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#refresh() WebDriver.Navigation#refresh()] ||
+|| POST || /session/:sessionId/execute || Inject a snippet of !JavaScript into the page and return its result. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
+|| GET || /session/:sessionId/screenshot || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
+|| POST || /session/:sessionId/frame || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
+|| POST || /session/:sessionId/window || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
+|| GET || /session/:sessionId/speed || Get the current user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()] ||
+|| POST || /session/:sessionId/speed || Set the user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)] ||
+|| GET || /session/:sessionId/cookie || Retrieve all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()] ||
+|| POST || /session/:sessionId/cookie || Set a cookie. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options#addCookie(Cookie)] ||
+|| DELETE || /session/:sessionId/cookie || Delete all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()] ||
+|| DELETE || /session/:sessionId/cookie/:name || Delete the cookie with the given name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookieNamed(java.lang.String) WebDriver.Options#deleteCookieNamed(String)] ||
+|| GET || /session/:sessionId/source || Get the current page source. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getPageSource() WebDriver#getPageSource()] ||
+|| GET || /session/:sessionId/title || Get the current page title. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getTitle() WebDriver#getTitle()] ||
+|| POST || /session/:sessionId/element || Search for an element on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.#findElement(By)] ||
+|| POST || /session/:sessionId/elements || Search for multiple elements on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.#findElements(By)] ||
+|| POST || /session/:sessionId/element/active || Get the element on the page that currently has focus. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#activeElement() WebDriver.TargetLocator#activeElement()] ||
+|| GET || /session/:sessionId/element/:id || Describe the identified element. || _N/A_ ||
+|| POST || /session/:sessionId/element/:id/element || Search for an element on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)] ||
+|| POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
+|| POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
+|| POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
+|| GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
+|| POST || /session/:sessionId/element/:id/value || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
+|| GET || /session/:sessionId/element/:id/name || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
+|| POST || /session/:sessionId/element/:id/clear || Clear a `TEXTAREA` or `text INPUT` element's value. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear() WebElement#clear()] ||
+|| GET || /session/:sessionId/element/:id/selected || Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isSelected() WebElement#isSelected()] ||
+|| POST || /session/:sessionId/element/:id/selected || Select an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton`. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#setSelected() WebElement#setSelected()] ||
+|| POST || /session/:sessionId/element/:id/toggle || Toggle whether an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#toggle() WebElement#toggle()] ||
+|| GET || /session/:sessionId/element/:id/enabled || Determine if an element is currently enabled. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isEnabled() WebElement#isEnabled()] ||
+|| GET || /session/:sessionId/element/:id/attribute/:name || Get the value of an element's attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement#getAttribute(String)] ||
+|| GET || /session/:sessionId/element/:id/equals/:other || Test if two element IDs refer to the same DOM element. || _N/A_ ||
+|| GET || /session/:sessionId/element/:id/displayed || Determine if an element is currently displayed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#isDisplayed() RenderedWebElement#isDisplayed()] ||
+|| GET || /session/:sessionId/element/:id/location || Determine an element's location on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getLocation() RenderedWebElement#getLocation()] ||
+|| GET || /session/:sessionId/element/:id/location_in_view || Determine an element's location on the screen once it has been scrolled into view. || _N/A_ ||
+|| GET || /session/:sessionId/element/:id/size || Determine an element's size in pixels. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()] ||
+|| GET || /session/:sessionId/element/:id/css/:propertyName || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
+|| POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
+|| POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
 
 
-=== Element Finding Mechanisms ===
+== Command Detail ==
 
-The list of mechanisms that can be used to locate an element or elements. Currently the element finding methods accept a list of parameters, but they should (and later will) take an object that looks like:
+=== /session ===
 
-|| *List Index* || *Putative Field Name* || *Possible values* || *Meaning* ||
-|| 0 || method || "class name", "id", "link text", "name", "xpath" || The mechanism used to locate the element. Equivalent to the same named fields from By.java ||
-|| 1 || selector || Any string || What to search for ||
+<dl>
+<dd>*POST /session*</dd>
+<dd>
+<dl>
+<dd>
+Create a new session. The desired capabilities should be specified in a JSON
+object with the following properties:
 
-Given this information, the following methods can be used to locate an element
+|| *Key* || *Type* || *Description* ||
+|| browserName || string || The name of the browser to use; should be one of `{iphone|firefox|internet explorer|htmlunit|iphone|chrome}`||
+|| version || string || The desired browser version. ||
+|| javascriptEnabled || boolean || Whether the session should support !JavaScript. ||
+|| platform || string || A key specifying the desired platform to launch the browser on. Should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}` ||
 
-|| *URL* || *HTTP Method* || *Argument* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session/:sessionId/:context/element || POST || See above || A single relative URL, representing the found element || Find an element on the page || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.findElement] ||
-|| /session/:sessionId/:context/elements || POST || See above || An array of relative URLs || Find all element matching the given arguments || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.findElements] ||
-|| /session/:sessionId/:context/element/:id/element/:using || POST || See above || A single relative URL, representing the found element || Find an element on the page which is a child of the element this resource points to || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement.findElement] ||
-|| /session/:sessionId/:context/element/:id/elements/:using || POST || See above || An array of relative URLs || Find all elements on the page which are children of the element this resource points to || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement.findElements] ||
+The server should attempt to create a session that most closely matches the desired capabilities.</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`desiredCapabilities` - `{object}` A JSON object describing the desired capabilities for the new session.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>A `303 See Other` redirect to `/session/:sessionId`, where `:sessionId` is the ID of the newly created session.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
 
-=== WebDriver Methods ===
+----
 
-|| *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session/:sessionId/:context/url || POST || A single argument: a string || none || Go to the specified URL and wait until the page has completely loaded || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver.get] || 
-|| /session/:sessionId/:context/title || GET || none || String || Get the title of the page, as it would be displayed by the browser || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getTitle() WebDriver.getTitle] ||
-|| /session/:sessionId/:context/source || GET || none || String || Get the source of the page (full HTML if an HTML page, full text content if a text file) || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.html#getPageSource() WebDriver.getPageSource] ||
+=== /session/:sessionId ===
 
-=== Element Specific Methods ===
+<dl>
+<dd>*GET /session/:sessionId*</dd>
+<dd>
+<dl>
+<dd>Retrieve the capabilities of the specified session. The session's capabilities
+will be returned in a JSON object with the following properties:
 
-|| *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session/:sessionId/:context/element/:id/click || POST || none || none || Clicks the specified element and waits for a page to finish loading before returning || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#click() WebElement.click] || 
-|| /session/:sessionId/:context/element/:id/clear || POST || none || none || Clears the contents of elements that a user would normally type into, such as INPUT or TEXTAREA || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#clear() WebElement.clear] || 
-||session/:sessionId/:context/element/:id/value || POST || Array of strings of characters to type || none || Simulates sending keyboard input to the specified element. Can be used to set an element's value || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement.sendKeys] ||
-||session/:sessionId/:context/element/:id/attribute/:attribute || GET || none || String || Gets the element's value of :attribute || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement.getAtribute] ||
-||session/:sessionId/:context/element/:id/value || GET || none || String || Gets the element's value attribute (alias of session/:sessionId/:context/element/:id/attribute/value) || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebElement.html#getValue() WebElement.getValue] ||
+|| *Key* || *Type* || *Description* ||
+|| browserName || string || The name of the browser to use; should be one of `{iphone|firefox|internet explorer|htmlunit|iphone|chrome}`||
+|| version || string || The desired browser version. ||
+|| javascriptEnabled || boolean || Whether the session should support !JavaScript. ||
+|| platform || string || A key specifying the desired platform to launch the browser on. Should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}` ||
 
-=== Cookie Methods ===
+</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{object}` A JSON object with the session capabilities.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
 
-|| *URL* || *HTTP Method* || *Paramter Name:Type* || *Return Type* || *Meaning* || *Javadoc for Equivalent Method* || 
-|| /session/:sessionId/:context/cookie || GET || none || Array of org.openqa.selenium.Cookie objects wrapped up in a JSON object || Gets all currently set cookies || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options.getCookies] ||
-|| /session/:sessionId/:context/cookie || POST || A single org.openqa.selenium.Cookie wrapped up in a JSON object || none || Creates a new cookie || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options.addCookie] ||
-|| /session/:session/:context/cookie || DELETE || none || none || Deletes all cookies || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options.deleteAllCookies] ||
-|| /session/:session/:context/cookie/:cookieName || DELETE || none || none || Deletes cookie named :cookieName || [http://webdriver.googlecode.com/svn/javadoc/org/openqa/selenium/WebDriver.Options.html#deleteCookieNamed(java.lang.String) WebDriver.Options.deleteCookieNamed] ||
+<dl>
+<dd>*DELETE /session/:sessionId*</dd>
+<dd>
+<dl>
+<dd>Delete the session.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window_handle ===
+
+<dl>
+<dd>*GET /session/:sessionId/window_handle*</dd>
+<dd>
+<dl>
+<dd>Retrieve the current window handle.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current window handle.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window_handles ===
+
+<dl>
+<dd>*GET /session/:sessionId/window_handles*</dd>
+<dd>
+<dl>
+<dd>Retrieve the list of all window handles available to the session.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<string>}` A list of window handles.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/url ===
+
+<dl>
+<dd>*GET /session/:sessionId/url*</dd>
+<dd>
+<dl>
+<dd>Retrieve the URL of the current page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current URL.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/url*</dd>
+<dd>
+<dl>
+<dd>Navigate to a new URL.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`url` - `{string}` The URL to navigate to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/forward ===
+
+<dl>
+<dd>*POST /session/:sessionId/forward*</dd>
+<dd>
+<dl>
+<dd>Navigate forwards in the browser history, if possible.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/back ===
+
+<dl>
+<dd>*POST /session/:sessionId/back*</dd>
+<dd>
+<dl>
+<dd>Navigate backwards in the browser history, if possible.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#back() WebDriver.Navigation#back()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/refresh ===
+
+<dl>
+<dd>*POST /session/:sessionId/refresh*</dd>
+<dd>
+<dl>
+<dd>Refresh the current page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#refresh() WebDriver.Navigation#refresh()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/execute ===
+
+<dl>
+<dd>*POST /session/:sessionId/execute*</dd>
+<dd>
+<dl>
+<dd>
+Inject a snippet of !JavaScript into the page and return its result.  WebElements that should be
+passed to the script as an argument should be specified in the arguments array as WebElement JSON
+arguments. Likewise, any !WebElements in the script result will be returned to the client as
+!WebElement JSON objects.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`script` - `{string}` The script to execute.</dd>
+<dd>`args` - `{Array.<*>}` The script arguments.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{*}` The script result.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/screenshot ===
+
+<dl>
+<dd>*GET /session/:sessionId/screenshot*</dd>
+<dd>
+<dl>
+<dd>Take a screenshot of the current page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The screenshot as a base64 encoded PNG.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/frame ===
+
+<dl>
+<dd>*POST /session/:sessionId/frame*</dd>
+<dd>
+<dl>
+<dd>Change focus to another frame on the page. If the frame ID is `null`, the server
+should switch to the page's default content.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`id` - `{string|number|null}` Identifier for the frame to change focus to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window ===
+
+<dl>
+<dd>*POST /session/:sessionId/window*</dd>
+<dd>
+<dl>
+<dd>Change focus to another window. The window to change focus to may be specified by its
+server assigned window handle, or by the value of its `name` attribute.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`name` - `{string}` The window to change focus to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/speed ===
+
+<dl>
+<dd>*GET /session/:sessionId/speed*</dd>
+<dd>
+<dl>
+<dd>Get the current user input speed. The server should return one of
+`{SLOW|MEDIUM|FAST}`. How these constants map to actual input speed is still browser specific and
+not covered by the wire protocol.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current input speed mapped to one of `{SLOW|MEDIUM|FAST}`.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/speed*</dd>
+<dd>
+<dl>
+<dd>Set the user input speed. The speed should be specified as one of
+`{SLOW|MEDIUM|FAST}`. How these constants map to actual input speed is still browser specific and
+not covered by the wire protocol.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`speed` - `{string}` The new user input speed mapped to one of `{SLOW|MEDIUM|FAST}`.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/cookie ===
+
+<dl>
+<dd>*GET /session/:sessionId/cookie*</dd>
+<dd>
+<dl>
+<dd>Retrieve all cookies visible to the current page. Each cookie will be returned as a
+JSON object with the following properties:
+
+|| *Key* || *Type* || *Description* ||
+|| name || string || The name of the cookie. ||
+|| value || string || The cookie value. ||
+|| path || string || The cookie path. ||
+|| domain || string || The domain the cookie is visible to. ||
+|| secure || boolean || Whether the cookie is a secure cookie. ||
+
+</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<object>}` A list of cookies.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/cookie*</dd>
+<dd>
+<dl>
+<dd>Set a cookie.  The cookie should be specified as a JSON object with the following
+properties:
+
+|| *Key* || *Type* || *Description* ||
+|| name || string || The name of the cookie. ||
+|| value || string || The cookie value. ||
+|| path || string || The cookie path. ||
+|| domain || string || The domain the cookie is visible to. ||
+|| secure || boolean || Whether the cookie is a secure cookie. ||
+
+</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`cookie` - `{object}` A JSON object defining the cookie to add.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options#addCookie(Cookie)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*DELETE /session/:sessionId/cookie*</dd>
+<dd>
+<dl>
+<dd>Delete all cookies visible to the current page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/cookie/:name ===
+
+<dl>
+<dd>*DELETE /session/:sessionId/cookie/:name*</dd>
+<dd>
+<dl>
+<dd>Delete the cookie with the given name. This command should be a no-op if there is no
+such cookie visible to the current page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:name` - The name of the cookie to delete.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookieNamed(java.lang.String) WebDriver.Options#deleteCookieNamed(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/source ===
+
+<dl>
+<dd>*GET /session/:sessionId/source*</dd>
+<dd>
+<dl>
+<dd>Get the current page source.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current page source.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getPageSource() WebDriver#getPageSource()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/title ===
+
+<dl>
+<dd>*GET /session/:sessionId/title*</dd>
+<dd>
+<dl>
+<dd>Get the current page title.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current page title.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getTitle() WebDriver#getTitle()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element ===
+
+<dl>
+<dd>*POST /session/:sessionId/element*</dd>
+<dd>
+<dl>
+<dd>Search for an element on the page, starting from the document root. The located element will be returned as a WebElement JSON object.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`using` - `{string}` The locator strategy to use.</dd>
+<dd>`value` - `{string}` The The search target.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{ELEMENT:string}` A WebElement JSON object for the located element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.#findElement(By)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/elements ===
+
+<dl>
+<dd>*POST /session/:sessionId/elements*</dd>
+<dd>
+<dl>
+<dd>Search for multiple elements on the page, starting from the document root. The located elements will be returned as a WebElement JSON objects.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`using` - `{string}` The locator strategy to use.</dd>
+<dd>`value` - `{string}` The The search target.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<{ELEMENT:string}>}` A list of WebElement JSON objects for the located elements.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.#findElements(By)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/active ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/active*</dd>
+<dd>
+<dl>
+<dd>Get the element on the page that currently has focus. The element will be returned as a WebElement JSON object.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{ELEMENT:string}` A WebElement JSON object for the active element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#activeElement() WebDriver.TargetLocator#activeElement()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id*</dd>
+<dd>
+<dl>
+<dd>Describe the identified element.
+
+*Note:* This command is reserved for future use; its return type is currently undefined.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to describe.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/element ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/element*</dd>
+<dd>
+<dl>
+<dd>Search for an element on the page, starting from the identified element. The located element will be returned as a WebElement JSON object.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to search under.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`using` - `{string}` The locator strategy to use.</dd>
+<dd>`value` - `{string}` The The search target.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{ELEMENT:string}` A WebElement JSON object for the located element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/elements ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/elements*</dd>
+<dd>
+<dl>
+<dd>Search for multiple elements on the page, starting from the identified element. The located elements will be returned as a WebElement JSON objects.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to search under.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`using` - `{string}` The locator strategy to use.</dd>
+<dd>`value` - `{string}` The The search target.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<{ELEMENT:string}>}` A list of WebElement JSON objects for the located elements.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/click ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/click*</dd>
+<dd>
+<dl>
+<dd>Click on an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/submit ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/submit*</dd>
+<dd>
+<dl>
+<dd>Submit a `FORM` element. The submit command may also be applied to any element that is a descendant of a `FORM` element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/value ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/value*</dd>
+<dd>
+<dl>
+<dd>Query for the value of an element, as determined by its `value` attribute.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string|null}` The element's value, or `null` if it does not have a `value` attribute.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/value*</dd>
+<dd>
+<dl>
+<dd>Send a sequence of key strokes to an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`value` - `{Array.<string>|string}` The sequence of keys to type. If an array is provided, the server should flatten it to a single string to be typed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/name ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/name*</dd>
+<dd>
+<dl>
+<dd>Query for an element's tag name.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The element's tag name, as a lowercase string.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/clear ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/clear*</dd>
+<dd>
+<dl>
+<dd>Clear a `TEXTAREA` or `text INPUT` element's value.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear() WebElement#clear()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/selected ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/selected*</dd>
+<dd>
+<dl>
+<dd>Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` Whether the element is selected.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isSelected() WebElement#isSelected()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/selected*</dd>
+<dd>
+<dl>
+<dd>Select an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton`.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#setSelected() WebElement#setSelected()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/toggle ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/toggle*</dd>
+<dd>
+<dl>
+<dd>Toggle whether an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` Whether the element is selected after toggling its state.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#toggle() WebElement#toggle()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/enabled ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/enabled*</dd>
+<dd>
+<dl>
+<dd>Determine if an element is currently enabled.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` Whether the element is enabled.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isEnabled() WebElement#isEnabled()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/attribute/:name ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/attribute/:name*</dd>
+<dd>
+<dl>
+<dd>Get the value of an element's attribute.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string|null}` The value of the attribute, or null if it is not set on the element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement#getAttribute(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/equals/:other ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/equals/:other*</dd>
+<dd>
+<dl>
+<dd>Test if two element IDs refer to the same DOM element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - First element ID to test in the pair</dd>
+<dd>`:other` - Second element ID to test in the pair</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` Whether the two IDs refer to the same element.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/displayed ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/displayed*</dd>
+<dd>
+<dl>
+<dd>Determine if an element is currently displayed.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` Whether the element is displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#isDisplayed() RenderedWebElement#isDisplayed()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/location ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/location*</dd>
+<dd>
+<dl>
+<dd>Determine an element's location on the page. The point `(0, 0)` refers to the upper-left corner of the page. The element's coordinates are returned as a JSON object with `x` and `y` properties.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{x:number, y:number}` The X and Y coordinates for the element on the page.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getLocation() RenderedWebElement#getLocation()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/location_in_view ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/location_in_view*</dd>
+<dd>
+<dl>
+<dd>Determine an element's location on the screen once it has been scrolled into view.
+
+*Note:* This is considered an internal command and should *only* be used to determine an element's
+location for correctly generating native events.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{x:number, y:number}` The X and Y coordinates for the element.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/size ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/size*</dd>
+<dd>
+<dl>
+<dd>Determine an element's size in pixels. The size will be returned as a JSON object  with `width` and `height` properties.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{width:number, height:number}` The width and height of the element, in pixels.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/css/:propertyName ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/css/:propertyName*</dd>
+<dd>
+<dl>
+<dd>Query the value of an element's computed CSS property. The CSS property to query should be specified using the CSS property name, *not* the !JavaScript property name (e.g. `background-color` instead of `backgroundColor`).</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The value of the specified CSS property.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/hover ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/hover*</dd>
+<dd>
+<dl>
+<dd>Move the mouse over an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/drag ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/drag*</dd>
+<dd>
+<dl>
+<dd>Drag and drop an element. The distance to drag an element should be specified relative to the upper-left corner of the page.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to query.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`x` - `{number}` The number of pixels to drag the element in the horizontal direction. A positive value indicates the element should be dragged to the right, while a negative value indicates that it should be dragged to the left.</dd>
+<dd>`y` - `{number}` The number of pixels to drag the element in the vertical direction. A positive value indicates the element should be dragged down towards the bottom of the screen, while a negative value indicates that it should be dragged towards the top of the screen.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
