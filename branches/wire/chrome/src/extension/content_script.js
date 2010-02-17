@@ -172,7 +172,7 @@ function parsePortMessage(message) {
       response.wait = false;
       break;
     case "getTitle":
-      response.value = {statusCode: 0, value: ChromeDriverContentScript.currentDocument.title};
+      response.value = {statusCode: 0, value: Utils.trim(ChromeDriverContentScript.currentDocument.title)};
       response.wait = false;
       break;
     case "getCurrentUrl":
@@ -1093,7 +1093,7 @@ function returnFromJavascriptInPage(e) {
   if (e.prevValue == "EXCEPTION") {
     ChromeDriverContentScript.port.postMessage({sequenceNumber: ChromeDriverContentScript.currentSequenceNumber,
         response: {response: "execute", value: {statusCode: 17,
-        message: "Tried to execute bad javascript."}}});
+        value: {message: "Tried to execute bad javascript."}}}});
     return;
   }
   console.log("Got result");
@@ -1134,7 +1134,7 @@ function returnFromGetFrameNameFromIndexJavascriptInPage(e) {
   if (e.prevValue == "EXCEPTION") {
     ChromeDriverContentScript.port.postMessage({sequenceNumber: ChromeDriverContentScript.currentSequenceNumber,
         response: {response: "getFrameNameFromIndex", value: {statusCode: 8,
-        message: "No such frame"}}});
+        value: {message: "No such frame"}}}});
   } else {
     ChromeDriverContentScript.port.postMessage({sequenceNumber: ChromeDriverContentScript.currentSequenceNumber,
         response: {response: "getFrameNameFromIndex", value: {statusCode: "no-op",
