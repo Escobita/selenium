@@ -10,7 +10,7 @@ namespace OpenQA.Selenium.Remote
     {
         private SessionId commandSessionId;
         private DriverCommand commandName;
-        private Dictionary<string, object> commandParameters;
+        private Dictionary<string, object> commandParameters = new Dictionary<string, object>();
 
         /// <summary>
         /// Initializes a new instance of the Command class
@@ -51,6 +51,23 @@ namespace OpenQA.Selenium.Remote
         public Dictionary<string, object> Parameters
         {
             get { return commandParameters; }
+        }
+
+        /// <summary>
+        /// Gets the parameters of the command as a JSON-encoded string.
+        /// </summary>
+        public string ParametersAsJsonString
+        {
+            get
+            {
+                string parametersString = string.Empty;
+                if (commandParameters != null && commandParameters.Count > 0)
+                {
+                    parametersString = JsonConvert.SerializeObject(commandParameters, new JsonConverter[] { new PlatformJsonConverter(), new CookieJsonConverter(), new CharArrayJsonConverter() });
+                }
+
+                return parametersString;
+            }
         }
         
         /// <summary>

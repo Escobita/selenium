@@ -98,7 +98,7 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="moveRightBy">Integer to move it left or right</param>
         /// <param name="moveDownBy">Integer to move it up or down</param>
-        public void DragAndDropBy(int moveRightBy, int moveDownBy)
+        public virtual void DragAndDropBy(int moveRightBy, int moveDownBy)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", Id);
@@ -111,7 +111,7 @@ namespace OpenQA.Selenium.Remote
         /// Drag and Drop an element to another element
         /// </summary>
         /// <param name="element">Element you wish to drop on</param>
-        public void DragAndDropOn(IRenderedWebElement element)
+        public virtual void DragAndDropOn(IRenderedWebElement element)
         {
             Point currentLocation = Location;
             Point destination = element.Location;

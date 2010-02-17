@@ -622,6 +622,11 @@ namespace OpenQA.Selenium.Remote
         /// <returns>Element from the page</returns>
         internal IWebElement GetElementFromResponse(Response response)
         {
+            if (response == null)
+            {
+                throw new NoSuchElementException();
+            }
+
             RemoteWebElement element = null;
             Dictionary<string, object> elementDictionary = response.Value as Dictionary<string, object>;
             if (elementDictionary != null)
@@ -703,7 +708,7 @@ namespace OpenQA.Selenium.Remote
         /// <param name="driverCommandToExecute">A <see cref="DriverCommand"/> value representing the command to execute.</param>
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing the names and values of the parameters of the command.</param>
         /// <returns>A <see cref="Response"/> containing information about the success or failure of the command and any data returned by the command.</returns>
-        protected Response Execute(DriverCommand driverCommandToExecute, Dictionary<string, object> parameters)
+        protected virtual Response Execute(DriverCommand driverCommandToExecute, Dictionary<string, object> parameters)
         {
             Command commandToExecute = new Command(sessionId, driverCommandToExecute, parameters);
 
@@ -854,7 +859,7 @@ namespace OpenQA.Selenium.Remote
                             throw new ElementNotVisibleException(errorMessage);
 
                         case WebDriverResult.ElementNotEnabled:
-                            if (errorMessage.Contains("toggle"))
+                            if (errorMessage.Contains("toggle") || errorMessage.Contains("single element"))
                             {
                                 throw new NotImplementedException(errorMessage);
                             }
@@ -1084,8 +1089,19 @@ namespace OpenQA.Selenium.Remote
                             {
                                 string name = cookie["name"].ToString();
                                 string value = cookie["value"].ToString();
-                                string path = cookie["path"].ToString();
-                                string domain = cookie["domain"].ToString();
+
+                                string path = "/";
+                                if (cookie.ContainsKey("path"))
+                                {
+                                    path = cookie["path"].ToString();
+                                }
+
+                                string domain = string.Empty;
+                                if (cookie.ContainsKey("domain"))
+                                {
+                                    domain = cookie["domain"].ToString();
+                                }
+
                                 bool secure = bool.Parse(cookie["secure"].ToString());
                                 toReturn.Add(new ReturnedCookie(name, value, domain, path, null, secure, new Uri(driver.Url)));
                             }

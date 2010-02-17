@@ -46,12 +46,7 @@ namespace OpenQA.Selenium.Remote
             request.Accept = "application/json, image/png";
             if (request.Method == CommandInfo.PostCommand)
             {
-                string payload = string.Empty;
-                if (commandToExecute.Parameters != null && commandToExecute.Parameters.Count > 0)
-                {
-                    payload = JsonConvert.SerializeObject(commandToExecute.Parameters, new JsonConverter[] { new PlatformJsonConverter(), new CookieJsonConverter(), new CharArrayJsonConverter() });
-                }
-
+                string payload = commandToExecute.ParametersAsJsonString;
                 byte[] data = Encoding.UTF8.GetBytes(payload);
                 request.ContentType = "application/json";
                 System.IO.Stream requestStream = request.GetRequestStream();
