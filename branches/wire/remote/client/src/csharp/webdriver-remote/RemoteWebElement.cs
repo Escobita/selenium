@@ -35,7 +35,7 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         public IWebDriver WrappedDriver
         {
-            get { return parentDriver; }
+            get { return driver; }
         }
         #endregion
 
