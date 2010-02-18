@@ -13,14 +13,14 @@ module Selenium
           @server_url = url
         end
 
-        def call(verb, url, *args)
+        def call(verb, url, command_hash)
           response = nil
           url      = @server_url.merge(url) unless url.kind_of?(URI)
           headers  = DEFAULT_HEADERS.dup
 
-          if args.any?
+          if command_hash
             headers.merge!("Content-Type" => "#{CONTENT_TYPE}; charset=utf-8")
-            payload = args.to_json
+            payload = command_hash.to_json
             puts "   >>> #{payload}" if $DEBUG
           end
 

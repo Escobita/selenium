@@ -14,12 +14,6 @@ module Selenium
         include Find
         include BridgeHelper
 
-        DEFAULT_OPTIONS = {
-          :url                  => "http://localhost:4444/wd/hub",
-          :http_client          => DefaultHttpClient,
-          :desired_capabilities => Capabilities.firefox
-        }
-
         #
         # Defines a wrapper method for a command, which ultimately calls #execute.
         #
@@ -27,10 +21,7 @@ module Selenium
         #   name of the resulting method
         # @param url [String]
         #   a URL template, which can include some arguments, much like the definitions on the server.
-        #   the :session_id and :context parameters are implicitly handled, but the remainder will become
-        #   required method arguments.
-        #   e.g., "session/:session_id/:context/element/:id/text" will define a method that takes id
-        #   as it's first argument.
+        #   the :session_id parameter is implicitly handled, but the remainder will become required method arguments.
         # @param verb [Symbol]
         #   the appropriate http verb, such as :get, :post, or :delete
         #
@@ -51,7 +42,7 @@ module Selenium
         #
 
         def initialize(opts = {})
-          opts                 = DEFAULT_OPTIONS.merge(opts)
+          opts                 = default_options.merge(opts)
           http_client_class    = opts.delete(:http_client)
           desired_capabilities = opts.delete(:desired_capabilities)
           url                  = opts.delete(:url)
@@ -71,7 +62,6 @@ module Selenium
           uri = URI.parse(url)
           uri.path += "/" unless uri.path =~ /\/$/
 
-          @context      = "context"
           @http         = http_client_class.new uri
           @capabilities = create_session(desired_capabilities)
         end
@@ -94,15 +84,15 @@ module Selenium
 
 
         def create_session(desired_capabilities)
-          resp = raw_execute :newSession, {}, desired_capabilities
+          resp = raw_execute :newSession, {}, :desiredCapabilities => desired_capabilities
+
           @session_id = resp['sessionId'] || raise(Error::WebDriverError, 'no sessionId in returned payload')
-          @context    = resp['context']
 
           Capabilities.json_create resp['value']
         end
 
         def get(url)
-          execute :get, {}, url
+          execute :get, {}, :url => url
         end
 
         def goBack
@@ -179,7 +169,7 @@ module Selenium
           end
 
           typed_args = args.map { |arg| wrap_script_argument(arg) }
-          response   = raw_execute :executeScript, {}, script, typed_args
+          response   = raw_execute :executeScript, {}, :script => script, :args => args
 
           unwrap_script_argument response['value']
         end
@@ -343,6 +333,10 @@ module Selenium
           execute :dragElement, {:id => element}, element, rigth_by, down_by
         end
 
+        def getCapabilities
+          Capabilities.json_create execute(:getCapabilities)
+        end
+
         private
 
         def find_element_by(how, what, parent = nil)
@@ -385,12 +379,11 @@ module Selenium
         # Returns a WebDriver::Remote::Response instance
         #
 
-        def raw_execute(command, opts = {}, *args)
+        def raw_execute(command, opts = {}, command_hash = nil)
           verb, path = COMMANDS[command] || raise("unknown command #{command.inspect}")
           path       = path.dup
 
           path[':session_id'] = @session_id if path.include?(":session_id")
-          path[':context']    = @context if path.include?(":context")
 
           begin
             opts.each { |key, value| path[key.inspect] = URI.escape(value.to_s) }
@@ -399,7 +392,15 @@ module Selenium
           end
 
           puts "-> #{verb.to_s.upcase} #{path}" if $DEBUG
-          http.call verb, path, *args
+          http.call verb, path, command_hash
+        end
+
+        def default_options
+          {
+            :url                  => "http://localhost:4444/wd/hub",
+            :http_client          => DefaultHttpClient,
+            :desired_capabilities => Capabilities.firefox
+          }
         end
 
       end # Bridge
