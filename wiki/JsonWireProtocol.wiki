@@ -161,6 +161,7 @@ Given these mappings, the server should always route requests whose final path s
 || DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
 || GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
 || GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
+|| DELETE || /session/:sessionId/window || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
 || GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
 || POST || /session/:sessionId/url || Navigate to a new URL. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)] ||
 || POST || /session/:sessionId/forward || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
@@ -351,6 +352,31 @@ will be returned in a JSON object with the following properties:
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window ===
+
+<dl>
+<dd>*DELETE /session/:sessionId/window*</dd>
+<dd>
+<dl>
+<dd>Close the current window.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()]</dd>
 </dl>
 </dd>
 </dl>
