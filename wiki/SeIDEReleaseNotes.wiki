@@ -3,8 +3,6 @@
 
 ==1.0.5==
 
-(This is as yet unreleased, but while I think of it I'll start the release notes)
-
 One thing that does not really fit the BUG or NEW label is that the code for Se-IDE is now in the main repo rather than tucked away in a somewhat hidden location.
 
   * BUG - user formats were not appearing in the list (Adam Goucher)
