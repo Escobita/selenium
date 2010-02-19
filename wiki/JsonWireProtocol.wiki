@@ -161,7 +161,6 @@ Given these mappings, the server should always route requests whose final path s
 || DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
 || GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
 || GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
-|| DELETE || /session/:sessionId/window || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
 || GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
 || POST || /session/:sessionId/url || Navigate to a new URL. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)] ||
 || POST || /session/:sessionId/forward || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
@@ -171,6 +170,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId/screenshot || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
 || POST || /session/:sessionId/frame || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
 || POST || /session/:sessionId/window || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
+|| DELETE || /session/:sessionId/window || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
 || GET || /session/:sessionId/speed || Get the current user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()] ||
 || POST || /session/:sessionId/speed || Set the user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)] ||
 || GET || /session/:sessionId/cookie || Retrieve all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()] ||
@@ -187,6 +187,7 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
 || POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
 || POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
+|| GET || /session/:sessionId/element/:id/text || Get the `innerText` of the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
 || GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
 || POST || /session/:sessionId/element/:id/value || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
 || GET || /session/:sessionId/element/:id/name || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
@@ -352,31 +353,6 @@ will be returned in a JSON object with the following properties:
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/window ===
-
-<dl>
-<dd>*DELETE /session/:sessionId/window*</dd>
-<dd>
-<dl>
-<dd>Close the current window.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()]</dd>
 </dl>
 </dd>
 </dl>
@@ -647,6 +623,27 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*DELETE /session/:sessionId/window*</dd>
+<dd>
+<dl>
+<dd>Close the current window.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()]</dd>
 </dl>
 </dd>
 </dl>
@@ -1164,6 +1161,32 @@ such cookie visible to the current page.</dd>
 
 ----
 
+=== /session/:sessionId/element/:id/text ===
+
+<dl>
+<dd>*GET /session/:sessionId/element/:id/text*</dd>
+<dd>
+<dl>
+<dd>Get the `innerText` of the element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to manipulate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
 === /session/:sessionId/element/:id/value ===
 
 <dl>
@@ -1672,3 +1695,6 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
+
+
+
