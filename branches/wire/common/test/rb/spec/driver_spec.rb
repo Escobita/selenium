@@ -193,11 +193,6 @@ describe "Driver" do
       driver.execute_script("arguments[0]['flibble'] = arguments[0].getAttribute('id'); return arguments[0]['flibble'];", button).should == "plainButton"
     end
 
-    it "should raise an exception if arguments are invalid" do
-      driver.navigate.to url_for("javascriptPage.html")
-      lambda { driver.execute_script("arguments[0]", Object.new) }.should raise_error(TypeError, /Parameter is not of recognized type:/)
-    end
-
     it "should be able to pass in multiple arguments" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.execute_script("return arguments[0] + arguments[1];", "one", "two").should == "onetwo"

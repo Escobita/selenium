@@ -124,15 +124,15 @@ module Selenium
         end
 
         def switchToWindow(name)
-          execute :switchToWindow, :name => name
+          execute :switchToWindow, {}, :name => name
         end
 
         def switchToFrame(id)
-          execute :switchToFrame, :id => id
+          execute :switchToFrame, {}, :id => id
         end
 
         def switchToDefaultContent
-          execute :switchToFrame, :id => nil
+          execute :switchToFrame, {}, :id => nil
         end
 
         def quit
@@ -156,7 +156,7 @@ module Selenium
         end
 
         def setSpeed(value)
-          execute :setSpeed, {}, value
+          execute :setSpeed, {}, :speed => value
         end
 
         def getSpeed
@@ -168,18 +168,16 @@ module Selenium
             raise Error::UnsupportedOperationError, "underlying webdriver instance does not support javascript"
           end
 
-          typed_args = args.map { |arg| wrap_script_argument(arg) }
-          response   = raw_execute :executeScript, {}, :script => script, :args => args
-
-          unwrap_script_argument response['value']
+          result = execute :executeScript, {}, :script => script, :args => args
+          unwrap_script_result result
         end
 
         def addCookie(cookie)
-          execute :addCookie, {}, cookie
+          execute :addCookie, {}, :cookie => cookie
         end
 
         def deleteCookie(name)
-          execute :deleteCookie, :name => name
+          execute :deleteCookieNamed, :name => name
         end
 
         def getAllCookies
@@ -329,8 +327,7 @@ module Selenium
         end
 
         def dragElement(element, rigth_by, down_by)
-          # TODO: why is element sent twice in the payload?
-          execute :dragElement, {:id => element}, element, rigth_by, down_by
+          execute :dragElement, {:id => element}, :x => rigth_by, :y => down_by
         end
 
         def getCapabilities
@@ -341,10 +338,9 @@ module Selenium
 
         def find_element_by(how, what, parent = nil)
           if parent
-            # TODO: why is how sent twice in the payload?
-            id = execute :findChildElement, {:id => parent, :using => how}, {:using => how, :value => what}
+            id = execute :findChildElement, {:id => parent}, {:using => how, :value => what}
           else
-            id = execute :findElement, {}, how, what
+            id = execute :findElement, {}, {:using => how, :value => what}
           end
 
           Element.new self, element_id_from(id)
@@ -353,9 +349,9 @@ module Selenium
         def find_elements_by(how, what, parent = nil)
           if parent
             # TODO: why is how sent twice in the payload?
-            ids = execute :findChildElements, {:id => parent, :using => how}, {:using => how, :value => what}
+            ids = execute :findChildElements, {:id => parent}, {:using => how, :value => what}
           else
-            ids = execute :findElements, {}, how, what
+            ids = execute :findElements, {}, {:using => how, :value => what}
           end
 
           ids.map { |id| Element.new self, element_id_from(id) }
@@ -386,7 +382,7 @@ module Selenium
           path[':session_id'] = @session_id if path.include?(":session_id")
 
           begin
-            opts.each { |key, value| path[key.inspect] = URI.escape(value.to_s) }
+            opts.each { |key, value| path[key.inspect] = URI.escape(value.to_s)}
           rescue IndexError
             raise ArgumentError, "#{opts.inspect} invalid for #{command.inspect}"
           end
