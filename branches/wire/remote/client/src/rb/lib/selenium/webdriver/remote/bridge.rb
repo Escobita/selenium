@@ -85,7 +85,6 @@ module Selenium
 
         def create_session(desired_capabilities)
           resp = raw_execute :newSession, {}, :desiredCapabilities => desired_capabilities
-
           @session_id = resp['sessionId'] || raise(Error::WebDriverError, 'no sessionId in returned payload')
 
           Capabilities.json_create resp['value']
@@ -394,9 +393,17 @@ module Selenium
         def default_options
           {
             :url                  => "http://localhost:4444/wd/hub",
-            :http_client          => DefaultHttpClient,
+            :http_client          => http_client_class, # TODO: use patron if available
             :desired_capabilities => Capabilities.firefox
           }
+        end
+
+        def http_client_class
+          require "selenium/webdriver/remote/patron_http_client"
+          PatronHttpClient
+        rescue LoadError
+          # patron not available
+          DefaultHttpClient
         end
 
       end # Bridge

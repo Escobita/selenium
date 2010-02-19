@@ -1,4 +1,5 @@
 task :test_remote_rb => [:test_common, :remote_server] do
+  ENV['WD_SPEC_DRIVER'] = 'remote'
   jruby :include  => [".", "common/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
         :require  => ["third_party/jruby/json-jruby.jar", Dir["third_party/java/google-collect-*.jar"].first],
         :command  => "-S spec",
@@ -7,6 +8,7 @@ task :test_remote_rb => [:test_common, :remote_server] do
 end
 
 task :test_ie_rb => :test_common do
+  ENV['WD_SPEC_DRIVER'] = 'ie'
   jruby :include => [".", "common/src/rb/lib", "jobbie/src/rb/lib", "common/test/rb/lib"],
         :require => ["third_party/jruby/json-jruby.jar"],
         :command => "-X+O -S spec", # needs ObjectSpace
@@ -14,6 +16,7 @@ task :test_ie_rb => :test_common do
 end
 
 task :test_chrome_rb => :test_common do
+  ENV['WD_SPEC_DRIVER'] = 'chrome'
   jruby :include => [".", "common/src/rb/lib", "chrome/src/rb/lib", "common/test/rb/lib"],
         :require => ["third_party/jruby/json-jruby.jar"],
         :command => "-S spec",
@@ -21,15 +24,11 @@ task :test_chrome_rb => :test_common do
 end
 
 task :test_firefox_rb => :test_common do
-  jruby :include => [".", "common/src/rb/lib", "firefox/src/rb/lib", "common/test/rb/lib"],
+  ENV['WD_SPEC_DRIVER'] = 'firefox'
+  jruby :include => [".", "common/src/rb/lib", "firefox/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
         :require => ["third_party/jruby/json-jruby.jar"],
         :command => '-S spec',
         :files   => Dir['{common,firefox}/test/rb/spec/**/*spec.rb']
-end
-
-task :test_selenium_rb => %w[selenium-server-standalone] do
-  jruby :include => ["selenium/src/rb/lib"],
-        :command => "-S rake -f selenium/src/rb/Rakefile ci:integration --trace"
 end
 
 #
@@ -37,23 +36,27 @@ end
 #
 
 task :test_remote_chrome_rb => :test_common do
-  ENV['REMOTE_BROWSER_VERSION'] = 'chrome'
-  Rake::Task[:test_remote_rb].invoke # bad
+  ENV['WD_SPEC_DRIVER'] = 'remote'
+  ENV['WD_REMOTE_BROWSER'] = 'chrome'
+  Rake::Task[:test_remote_rb].invoke
 end
 
 task :test_remote_firefox_rb => :firefox do
-  ENV['REMOTE_BROWSER_VERSION'] = 'firefox'
-  Rake::Task[:test_remote_rb].invoke # bad
+  ENV['WD_SPEC_DRIVER'] = 'remote'
+  ENV['WD_REMOTE_BROWSER'] = 'firefox'
+  Rake::Task[:test_remote_rb].invoke
 end
 
 task :test_remote_ie_rb => :ie do
-  ENV['REMOTE_BROWSER_VERSION'] = 'internet_explorer'
-  Rake::Task[:test_remote_rb].invoke # bad
+  ENV['WD_SPEC_DRIVER'] = 'remote'
+  ENV['WD_REMOTE_BROWSER'] = 'internet_explorer'
+  Rake::Task[:test_remote_rb].invoke
 end
 
 task :test_remote_chrome_rb => :chrome do
-  ENV['REMOTE_BROWSER_VERSION'] = 'chrome'
-  Rake::Task[:test_remote_rb].invoke # bad
+  ENV['WD_SPEC_DRIVER'] = 'remote'
+  ENV['WD_REMOTE_BROWSER'] = 'chrome'
+  Rake::Task[:test_remote_rb].invoke
 end
 
 #
