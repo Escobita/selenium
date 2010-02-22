@@ -227,7 +227,7 @@ The remaining chapters of the reference present:
     includes scripting techniques and programming techniques for use with 
     Selenium-RC. We cover examples of source code showing how to report defects 
     in the application under test. We also cover techniques commonly asked about 
-    in the user forums such as how to implement data-driven tests (tests where 
+    in the user group such as how to implement data-driven tests (tests where
     one can vary the data between different test passes).
 
 :ref:`Selenium-Grid <chapter07-reference>`
@@ -238,7 +238,7 @@ The remaining chapters of the reference present:
   
 ..  :ref:`Getting Help <chapter09-reference>`
     Describes how to be a part of the Selenium community for getting help and 
-    exchanging advice. Specifically this section describes the user forums as 
+    exchanging advice. Specifically this section describes the user group as 
     an avenue for obtaining assistance. 
 
 The Documentation Team

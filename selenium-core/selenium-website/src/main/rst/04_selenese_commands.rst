@@ -823,5 +823,5 @@ Alerts, Popups, and Multiple Windows
 *This section is not yet developed.*
 
 .. Paul: This is an important area, people are constantly asking about this 
-   on the forums.
+   on the user group.
 

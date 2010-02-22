@@ -414,8 +414,8 @@ by Selenium using a *for* loop.
 	
    } 
 
-This certainly isn't the only solution.  AJAX is a common topic in the forums and we
-suggest searching the forum posts to see what others have done along with the questions
+This certainly isn't the only solution.  AJAX is a common topic in the user group and we
+suggest searching previous discussions to see what others have done along with the questions
 they have posted.  
    
 UI Mapping

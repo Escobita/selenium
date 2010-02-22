@@ -1661,7 +1661,7 @@ This could be caused by
 * The run mode you're using doesn't match any browser on your machine.  Check the parameters you 
   passed to Selenium when you program opens the browser. 
 * You specified the path to the browser explicitly (using "\*custom"--see above) but the path is 
-  incorrect.  Check to be sure the path is correct.  Also check the forums to be sure there are
+  incorrect.  Check to be sure the path is correct.  Also check the user group to be sure there are
   no known issues with your browser and the "\*custom" parameters.
 
 Selenium Cannot Find the AUT 
@@ -1773,7 +1773,7 @@ launched with \*firefox, \*iexplore, \*opera, or \*custom.
     * For other browsers (\*firefox, \*opera) we automatically hard-code
       the proxy for you, and so ther are no known issues with this functionality.
       If you're encountering 404 errors and have followed this user guide carefully 
-      post your results to user forums for some help from the user community.
+      post your results to user group for some help from the user community.
       
 Permission Denied Error
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1927,6 +1927,6 @@ locator that only works in IE.
 
 Where can I Ask Questions that Aren't Answered Here?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Try our `user forums`_
+Try our `user group`_
 
-.. _`user forums`: http://seleniumhq.org/support/
+.. _`user group`: http://seleniumhq.org/support/

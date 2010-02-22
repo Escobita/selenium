@@ -92,7 +92,7 @@
                     <ul>
                         <li><a href="http://bromine.seleniumhq.org/brscreencast/brscreencast.html">Screencast</a></li>
                         <li><a href="http://wiki.openqa.org/display/BR/Home">Documentation</a></li>
-                        <li><a href="http://clearspace.openqa.org/community/selenium/bromine">Forums</a></li>		                         
+                        <li><a href="http://forum.brominefoundation.org/">Forums</a></li>		                         
                         <li><a href="http://jira.openqa.org/browse/BR">Bug tracker</a></li>		                         		                         
                     </ul>
                 </td>                

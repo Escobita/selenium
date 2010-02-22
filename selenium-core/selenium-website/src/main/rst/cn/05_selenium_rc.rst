@@ -1481,4 +1481,4 @@ locator仅用在IE上。
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 试一下 `用户论坛`_
 
-.. _`user forums`: http://seleniumhq.org/support/
+.. _`user group`: http://seleniumhq.org/support/

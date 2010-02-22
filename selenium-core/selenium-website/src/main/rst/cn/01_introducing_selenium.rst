@@ -180,7 +180,7 @@ Selenium-IDE允许添加用户定义的“用户插件”以创建额外的根�
   
 ..  :ref:`Getting Help <chapter09-cn-reference>`
     Describes how to be a part of the Selenium community for getting help and 
-    exchanging advice. Specifically this section describes the user forums as 
+    exchanging advice. Specifically this section describes the user group as 
     an avenue for obtaining assistance. 
 
 文档团队

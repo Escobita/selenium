@@ -34,9 +34,6 @@
     </form>
 
 </div>
-<div id="userStatus">
-    Note: To use the OpenQA <a href="http://clearspace.openqa.org/community/selenium">forums</a>, <a href="http://jira.openqa.org">bug tracker</a>, and <a href="http://wiki.openqa.org">wiki</a> you need an <a id="create_account" href="http://openqa.org/sass/index.action">OpenQA account</a>.
-</div>
 <div id="mBody">
     <%
         if ("sectionAbout".equals(p.getProperty("body.class"))) {
@@ -174,7 +171,7 @@
         </li>
         <li><a href="/support/">Support</a>
             <ul>
-                <li><a href="http://clearspace.openqa.org/community/selenium">Forums</a></li>
+                <li><a href="http://groups.google.com/group/selenium-users">User Group</a></li>
                 <li><a href="http://jira.openqa.org/">Bug Tracker</a></li>
                 <li><a href="/support/index.html#CommercialSupport">Commercial Support</a></li>
                 <li><a href="/support/index.html#IRC">IRC</a></li>
@@ -188,7 +185,6 @@
                 <li><a href="/about/news.jsp">News/Blogs</a></li>
                 <li><a href="/about/roadmap.html">Roadmap</a></li>
                 <li><a href="/about/getting-involved.html">Getting Involved</a></li>
-                <li><a href="http://clearspace.openqa.org/community/jobs_board">Jobs Board</a></li>
             </ul>
         </li>
         <li><a href="http://openqa.org/">OpenQA.org</a>
