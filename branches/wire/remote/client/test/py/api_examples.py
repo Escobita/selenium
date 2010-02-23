@@ -24,24 +24,25 @@ from webdriver.common_tests import api_examples
 from webdriver.remote.webdriver import WebDriver
 
 SERVER_ADDR = "localhost"
-DEFAULT_PORT = 6001
+DEFAULT_PORT = 4444
 
 if __name__ == "__main__":
     _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_proc = None
     try:
         _socket.connect((SERVER_ADDR, DEFAULT_PORT))
-        logging.info("The remote driver server is already running or something else"
-                     "is using port %d, continuing..." % DEFAULT_PORT)
+        print ("The remote driver server is already running or something else"
+               "is using port %d, continuing..." % DEFAULT_PORT)
     except:
-        logging.info("Starting the remote driver server")
+        print ("Starting the remote driver server")
         server_proc = subprocess.Popen(
-            "java -jar RemoteDriverServer.jar %d" % DEFAULT_PORT,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            "java -jar selenium-server-standalone.jar",
             shell=True)
-    time.sleep(5)
+        time.sleep(5)
+        print "Server should be online"
     try:
-        api_examples.run_tests(WebDriver("%s:%d" % (SERVER_ADDR, DEFAULT_PORT), "firefox", "ANY"))
+        url = "http://%s:%d/wd/hub" % (SERVER_ADDR, DEFAULT_PORT)
+        api_examples.run_tests(WebDriver(url, "firefox", "ANY"))
     finally:
         try:
             os.kill(server_proc.pid, 9)

@@ -13,12 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    from ..common.exceptions import RemoteDriverServerException
-except (ImportError, ValueError):
-    class RemoteDriverServerException(Exception):
-        pass
+from __future__ import with_statement
 
+from ..common.exceptions import RemoteDriverServerException
+from ..remote import utils
 from subprocess import Popen
 import httplib
 from BaseHTTPServer import HTTPServer
@@ -139,8 +137,18 @@ def chrome_exe():
 def touch(filename):
     with open(filename, "ab"):
         pass
-
+        
 def create_extension_dir():
+    extension_dir = utils.unzip_to_temp_dir("chrome-extension.zip")
+    if extension_dir:
+        if platform == "win32":
+            manifest = "manifest-win.json"
+        else:
+            manifest = "manifest-nonwin.json"
+        copy(join(extension_dir, manifest),
+             join(extension_dir, "manifest.json"))
+        return extension_dir
+
     path = mkdtemp()
 
     # FIXME: Copied manually
@@ -196,7 +204,7 @@ def run_server(timeout=10):
     server.command_queue = Queue()
     server.result_queue = Queue()
     t = Thread(target=server.serve_forever)
-    t.daemon = 1
+    t.daemon = True
     t.start()
 
     start = time()
@@ -223,7 +231,7 @@ class ChromeDriver:
         self._extension_dir = create_extension_dir()
         self._profile_dir = create_profile_dir()
         self._chrome = run_chrome(self._extension_dir, self._profile_dir,
-                                 self._server.server_port)
+                                  self._server.server_port)
 
     def stop(self):
         if self._chrome:
@@ -243,7 +251,9 @@ class ChromeDriver:
             except IOError:
                 pass
 
-    def execute(self, command):
-        self._server.command_queue.put(command)
+    def execute(self, command, params):
+        to_send = params.copy()
+        to_send["request"] = command
+        self._server.command_queue.put(to_send)
         return self._server.result_queue.get()
 

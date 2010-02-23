@@ -645,10 +645,24 @@ task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :ch
    sh cmd
 end
 
+task :test_chrome_py => :chrome do
+  if python? then
+    sh "python setup.py build", :verbose => true
+    sh "cd build && python lib/webdriver/py_test.py --driver=chrome", :verbose => true
+  end
+end
+
 task :test_firefox_py => :firefox do
   if python? then
     sh "python setup.py build", :verbose => true
-    sh "python build/lib/webdriver/py_test.py", :verbose => true
+    sh "cd build && python lib/webdriver/py_test.py --driver=firefox", :verbose => true
+  end
+end
+
+task :test_remote_py => [:remote_client, :'selenium-server-standalone'] do
+  if python? then
+    sh "python setup.py build", :verbose => true
+    sh "cd build && python lib/webdriver/py_test.py -d remote", :verbose => true
   end
 end
 
