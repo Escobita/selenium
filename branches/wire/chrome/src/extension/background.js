@@ -365,6 +365,7 @@ function sendResponseToParsedRequest(toSend, wait) {
   ChromeDriver.isBlockedWaitingForResponse = false;
   ChromeDriver.lastRequestToBeSentWhichHasntBeenAnsweredYet = null;
   console.log("SENDING RESPOND TO PARSED REQUEST");
+  toSend['sessionId'] = 'static_session_id';  
   sendResponseByXHR(JSON.stringify(toSend), wait);
   setExtensionBusyIndicator(false);
 }
@@ -408,6 +409,17 @@ function parseRequest(request) {
   setExtensionBusyIndicator(true);
   
   switch (request.request) {
+  case "newSession":
+    sendResponseToParsedRequest({
+      status: 0,
+      value: {
+        'browserName': 'chrome',
+        'version': navigator.appVersion.replace(/.*Chrome\/(\d(\.\d+)*\b).*/, "$1"),
+        'platform': navigator.platform,
+        'javascriptEnabled': true,
+      }
+    });
+    break;
   case "get":
     getUrl(request.url);
     break;
@@ -993,6 +1005,7 @@ function hasNoPage() {
 }
 
 function resetCurrentlyWaitingOnContentScriptTime() {
+  console.log('resetting current content script wait time');
   ChromeDriver.currentlyWaitingUntilGiveUpOnContentScriptLoading =
       ChromeDriver.timeoutUntilGiveUpOnContentScriptLoading;
 }
