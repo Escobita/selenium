@@ -17,9 +17,9 @@ end
 
 task :test_chrome_rb => :test_common do
   ENV['WD_SPEC_DRIVER'] = 'chrome'
-  jruby :include => [".", "common/src/rb/lib", "chrome/src/rb/lib", "common/test/rb/lib"],
+  jruby :include => [".", "common/src/rb/lib", "chrome/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
         :require => ["third_party/jruby/json-jruby.jar"],
-        :command => "-S spec",
+        :command => "-d -S spec -fs",
         :files   => Dir['common/test/rb/spec/**/*spec.rb']
 end
 

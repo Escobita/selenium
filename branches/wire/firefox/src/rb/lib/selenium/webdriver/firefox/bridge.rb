@@ -46,7 +46,6 @@ module Selenium
           find_elements_by 'css selector', selector, parent
         end
 
-
       end # Bridge
     end # Firefox
   end # WebDriver

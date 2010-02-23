@@ -82,7 +82,6 @@ module Selenium
           @session_id || raise(Error::WebDriverError, "no current session exists")
         end
 
-
         def create_session(desired_capabilities)
           resp = raw_execute :newSession, {}, :desiredCapabilities => desired_capabilities
           @session_id = resp['sessionId'] || raise(Error::WebDriverError, 'no sessionId in returned payload')
