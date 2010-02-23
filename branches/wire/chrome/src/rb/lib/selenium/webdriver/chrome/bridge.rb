@@ -22,6 +22,16 @@ module Selenium
           @capabilities ||= Remote::Capabilities.chrome
         end
 
+        def quit
+          begin
+            super
+          rescue IOError
+          end
+
+          @launcher.kill
+          @executor.close
+        end
+
         def getScreenshot
           execute :screenshot
         end
