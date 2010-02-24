@@ -78,6 +78,10 @@ describe "Driver" do
 
     not_compliant_on :driver => [:ie, :remote] do
       it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
         driver.navigate.to url_for("xhtmlTest.html")
         driver.find_element(:css, "div.content")
       end
@@ -125,6 +129,10 @@ describe "Driver" do
 
     not_compliant_on :driver => [:ie, :remote] do
       it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
         driver.navigate.to url_for("xhtmlTest.html")
         driver.find_elements(:css, 'p')
       end
