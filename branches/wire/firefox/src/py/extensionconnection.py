@@ -26,7 +26,7 @@ except ImportError: # Python < 2.6
     import simplejson as json
 from ..common.exceptions import ErrorInResponseException
 
-from ..remote import command
+from ..remote.command import Command
 from ..remote.remote_connection import RemoteConnection
 
 _DEFAULT_TIMEOUT = 20
@@ -50,7 +50,7 @@ class ExtensionConnection(RemoteConnection):
 
     def connect(self):
         """Connects to the extension and retrieves the context id."""
-        self.execute(command.NEW_SESSION, {'desiredCapabilities':{
+        self.execute(Command.NEW_SESSION, {'desiredCapabilities':{
             'browserName': 'firefox',
             'platform': 'ANY',
             'version': '',
