@@ -974,12 +974,24 @@ Utils.findFrame = function(browser, frameId) {
 
 
 Utils.dumpText = function(text) {
+  if (!Utils.dumpText.isLoggingInit_) {
+    var prefs =
+        Utils.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
+    Utils.dumpText.isLoggingInit_ = true;
+    Utils.dumpText.logToConsole_ =
+        prefs.prefHasUserValue("webdriver_log_to_console") &&
+        prefs.getBoolPref("webdriver_log_to_console");
+  }
   var consoleService = Utils.getService(
       "@mozilla.org/consoleservice;1", "nsIConsoleService");
-  if (consoleService)
+  if (consoleService) {
     consoleService.logStringMessage(text);
-  else
+    if (Utils.dumpText.logToConsole_) {
+      dump(text);
+    }
+  } else {
     dump(text);
+  }
 };
 
 
