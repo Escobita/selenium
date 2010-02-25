@@ -15,6 +15,7 @@
 
 import base64
 from datetime import datetime
+import httplib
 from ..common.exceptions import ErrorInResponseException
 from ..common.exceptions import InvalidSwitchToTargetException
 from ..remote.command import Command
@@ -74,7 +75,12 @@ class WebDriver(RemoteWebDriver):
 
     def quit(self):
         """Quits the driver and close every associated window."""
-        RemoteWebDriver.quit(self)
+        try:
+          RemoteWebDriver.quit(self)
+        except httplib.BadStatusLine:
+          # Happens if Firefox shutsdown before we've read the response from
+          # the socket.
+          pass
         self.browser.kill()
 
     def save_screenshot(self, png_file):

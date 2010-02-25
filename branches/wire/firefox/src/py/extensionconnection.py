@@ -42,15 +42,15 @@ class ExtensionConnection(RemoteConnection):
         LOGGER.debug("extension connection initiated")
         self.timeout = timeout
 
-    def quit(self):
-        self.execute(command.QUIT)
+    def quit(self, sessionId=None):
+        self.execute(Command.QUIT, {'sessionId':sessionId})
         while self.is_connectable():
             logging.info("waiting to quit")
             time.sleep(1)
 
     def connect(self):
-        """Connects to the extension and retrieves the context id."""
-        self.execute(Command.NEW_SESSION, {'desiredCapabilities':{
+        """Connects to the extension and retrieves the session id."""
+        return self.execute(Command.NEW_SESSION, {'desiredCapabilities':{
             'browserName': 'firefox',
             'platform': 'ANY',
             'version': '',
@@ -58,8 +58,8 @@ class ExtensionConnection(RemoteConnection):
 
     def connect_and_quit(self):
         """Connects to an running browser and quit immediately."""
-        self.connect()
-        self.quit()
+        response = self.connect()
+        self.quit(response['sessionId'])
 
     def is_connectable(self):
         """Trys to connect to the extension but do not retrieve context."""
