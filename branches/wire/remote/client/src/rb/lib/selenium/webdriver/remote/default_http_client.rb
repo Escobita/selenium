@@ -20,7 +20,7 @@ module Selenium
 
           if command_hash
             payload = command_hash.to_json
-            headers["Content-Type"] = "#{CONTENT_TYPE}; charset=utf-8;"
+            headers["Content-Type"] = "#{CONTENT_TYPE}; charset=utf-8"
             headers["Content-Length"] = payload.bytesize.to_s if [:post, :put].include?(verb)
 
             if $DEBUG
