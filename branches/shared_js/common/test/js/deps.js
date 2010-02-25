@@ -13,8 +13,16 @@ goog.addDependency('../../../js/src/testcase.js', ['webdriver.TestCase', 'webdri
 goog.addDependency('../../../js/src/timing.js', ['webdriver.timing'], ['goog.userAgent']);
 goog.addDependency('../../../js/src/webdriver.js', ['webdriver.WebDriver', 'webdriver.WebDriver.EventType', 'webdriver.WebDriver.Speed'], ['goog.debug.Logger', 'goog.events', 'goog.events.EventTarget', 'webdriver.By.Locator', 'webdriver.Command', 'webdriver.CommandName', 'webdriver.Context', 'webdriver.Response', 'webdriver.WebElement', 'webdriver.timing']);
 goog.addDependency('../../../js/src/webelement.js', ['webdriver.WebElement'], ['goog.array', 'webdriver.By.Locator', 'webdriver.By.Strategy', 'webdriver.CommandName', 'webdriver.Future']);
-goog.addDependency('../../../js/src/extension/dommessenger.js', [], []);
+goog.addDependency('../../../js/src/bot/bot.js', ['bot'], []);
+goog.addDependency('../../../js/src/bot/events.js', ['bot.events'], ['goog.events.EventType']);
+goog.addDependency('../../../js/src/bot/locators/locators.js', ['bot.locators'], ['bot', 'bot.locators.strategies']);
+goog.addDependency('../../../js/src/bot/locators/strategies/classname.js', ['bot.locators.strategies.className'], ['goog.dom', 'goog.string']);
+goog.addDependency('../../../js/src/bot/locators/strategies/id.js', ['bot.locators.strategies.id'], []);
+goog.addDependency('../../../js/src/bot/locators/strategies/name.js', ['bot.locators.strategies.name'], []);
+goog.addDependency('../../../js/src/bot/locators/strategies/strategies.js', ['bot.locators.strategies'], ['bot.locators.strategies.id', 'bot.locators.strategies.name', 'bot.locators.strategies.className', 'goog.object']);
+
 goog.addDependency('../../../js/test/deps.js', [], []);
 goog.addDependency('../../../js/test/fakecommandprocessor.js', ['webdriver.FakeCommandProcessor'], ['goog.structs.Map', 'goog.testing.asserts', 'webdriver.AbstractCommandProcessor', 'webdriver.Context']);
 goog.addDependency('../../../js/test/testbase.js', [], ['goog.Uri', 'goog.dom', 'goog.events', 'goog.math.Coordinate', 'goog.math.Size', 'goog.string', 'goog.userAgent', 'webdriver.Key', 'webdriver.WebElement', 'webdriver.asserts', 'webdriver.factory', 'webdriver.jsunit']);
 goog.addDependency('../../../js/test/webdriver-bootstrap.js', [], []);
+goog.addDependency('../../../js/test/bot/bot-bootstrap.js', [], []);

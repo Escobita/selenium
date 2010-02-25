@@ -3,6 +3,7 @@ goog.provide('bot.locators.strategies');
 
 goog.require('bot.locators.strategies.id');
 goog.require('bot.locators.strategies.name');
+goog.require('bot.locators.strategies.className');
 goog.require('goog.object');
 
 bot.locators.strategies.known_ = {};
@@ -13,7 +14,7 @@ bot.locators.strategies.lookup = function(target) {
   if (key) {
     var strategy = 'by_' + key;
 
-    if (strategy in bot.locators.strategies) {
+    if (goog.isFunction(bot.locators.strategies[strategy])) {
       return function find() {
         return bot.locators.strategies[strategy].call(undefined, bot.window_, target[key]);
       }
