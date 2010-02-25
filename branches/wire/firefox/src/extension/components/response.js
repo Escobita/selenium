@@ -17,7 +17,8 @@
 
 /**
  * Encapsulates the information for a HTTP response.
- * @param {!Request} request The request this is a response to.
+ * @param {?Request} request The request this is a response to. May be null if
+ *     this response is to a malformed request that could not be fully parsed.
  * @param {nsIOutputStream} outputStream The stream to write responses to.
  * @constructor
  */
@@ -25,7 +26,7 @@ function Response(request, outputStream) {
 
   /**
    * The request this is a response to.
-   * @type {!Request}
+   * @type {?Request}
    * @private
    */
   this.request_ = request;
@@ -53,12 +54,14 @@ function Response(request, outputStream) {
 }
 
 
+Response.CONTINUE = 100;
 Response.OK = 200;
 Response.NO_CONTENT = 204;
 Response.SEE_OTHER = 303;
 Response.BAD_REQUEST = 400;
 Response.NOT_FOUND = 404;
 Response.METHOD_NOT_ALLOWED = 405;
+Response.LENGTH_REQUIRED = 411;
 Response.INTERNAL_ERROR = 500;
 Response.NOT_IMPLEMENTED = 501;
 Response.HTTP_VERSION_NOT_SUPPORTED = 505;
@@ -73,12 +76,14 @@ Response.APPLICATION_JSON = 'application/json';
  * @enum {string}
  */
 Response.StatusMessage_ = {
+  100: 'Continue',
   200: 'OK',
   204: 'No Content',
   303: 'See Other',
   400: 'Bad Request',
   404: 'Not Found',
   405: 'Method Not Allowed',
+  411: 'Length Required',
   500: 'Internal Server Error',
   501: 'Not Implemented',
   505: 'HTTP Version Not Supported'
@@ -209,17 +214,21 @@ Response.prototype.sendError = function(code, opt_message, opt_contentType) {
  */
 Response.prototype.commit = function() {
   if (this.committed_) {
-    Components.utils.reportError([
-        'Response already committed',
-        'request: ' + this.request_.getMethod() + ' ' +
-            this.request_.getRequestUrl().path,
-        '         ' + this.request_.getBody(),
-        'response: ' + this.status_ + ' ' +
-            Response.StatusMessage_[this.status_],
-        '          ' + this.body_
-    ].join('\n  '));
+    var info = ['Response already committed'];
+    if (this.request_) {
+      info.push('request: ' + this.request_.getMethod() + ' ' +
+                this.request_.getRequestUrl().path);
+      info.push('         ' + this.request_.getBody())
+    }
+    info.push('response: ' + this.status_ + ' ' +
+              Response.StatusMessage_[this.status_]);
+    info.push('          ' + this.body_);
+    Components.utils.reportError(info.join('\n  '));
     return;
   }
+  
+  var statusCanHaveBody = (this.status_ < 100 || this.status_ > 199) &&
+                          this.status_ != 204 && this.status_ != 304;
 
   var converter = Components.
       classes['@mozilla.org/intl/scriptableunicodeconverter'].
@@ -231,9 +240,13 @@ Response.prototype.commit = function() {
   var statusLine = 'HTTP/1.1 ' + this.status_ + ' ' +
       Response.StatusMessage_[this.status_] + Response.CRLF;
 
-  this.setHeader('Connection', 'close');
   this.setHeader('Date', new Date().toUTCString());
-  this.setHeader('Content-Length', bytes.length);
+  if (this.status_ < 100 || this.status_ > 199) {
+    this.setHeader('Connection', 'close');
+  }
+  if (statusCanHaveBody) {
+    this.setHeader('Content-Length', bytes.length);
+  }
 
   var headers = '';
   for (var name in this.headers_) {
@@ -245,13 +258,19 @@ Response.prototype.commit = function() {
   this.outputStream_.write(toSend, toSend.length);
 
   // If necessary, send the body.
-  if (this.request_.getMethod() != Request.Method.HEAD) {
+  if (statusCanHaveBody &&
+      ((this.status_ > 399 && this.status_ < 600) ||
+       (this.request_.getMethod() != Request.Method.HEAD))) {
     var byteStream = converter.convertToInputStream(this.body_);
     this.outputStream_.writeFrom(byteStream, bytes.length);
   }
 
-  // Finish things up: flush and close the stream.
+  // Finish things up: flush and close the stream; don't close the stream if
+  // this is a 1xx response as there should be a final response sent (in another
+  // instance using the same stream).
   this.outputStream_.flush();
-  this.outputStream_.close();
+  if (this.status_ < 100 || this.status_ > 199) {
+    this.outputStream_.close();
+  }
   this.committed_ = true;
 };

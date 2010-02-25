@@ -61,6 +61,9 @@ function Request(method, requestUrl, headers, body) {
    * @private
    */
   this.headers_ = {};
+  for (var name in headers) {
+    this.headers_[name] = headers[name]
+  }
 
   /**
    * The request body, if there was one.
@@ -197,4 +200,20 @@ Request.prototype.setAttribute = function(name, value) {
   } else {
     this.attributes_[name] = value;
   }
+};
+
+
+/**
+ * @return {string} This request as a string for debugging.
+ */
+Request.prototype.toDebugString = function() {
+  var message = this.method_ + ' ' + this.requestUrl_.path + ' HTTP/1.1\r\n';
+  for (var name in this.headers_) {
+    message += name + ':' + this.headers_[name] + '\r\n';
+  }
+  message += '\r\n';
+  if (this.body_) {
+    message += this.body_;
+  }
+  return message;
 };
