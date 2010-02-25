@@ -39,6 +39,7 @@ public class InProcessTestEnvironment implements TestEnvironment {
   }
 
   public static void main(String[] args) {
-    new InProcessTestEnvironment();
+    TestEnvironment env = new InProcessTestEnvironment();
+    System.out.println(env.getAppServer().whereIs("/"));
   }
 }

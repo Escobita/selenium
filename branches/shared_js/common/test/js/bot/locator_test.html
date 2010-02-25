@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>locator_test.html</title>
+  <script src="bot-bootstrap.js"></script>
+  <script>
+    goog.require('goog.testing.jsunit');
+    goog.require('goog.events.EventType');
+    goog.require('bot.locators');
+  </script>
+
+  <script>
+    function testCanFindById() {
+      var e = bot.locators.findElement({id: 'x'});
+
+      assertEquals('para', e.getAttribute('name'));
+    }
+
+    function testCanFindByIdWhenElementIsAfterOneWithSameName() {
+      var e = bot.locators.findElement({id: 'after'});
+
+      assertEquals('right', e.getAttribute('name'));
+    }
+
+    function testCanFindByName() {
+      var e = bot.locators.findElement({name: 'para'});
+
+      assertEquals('x', e.getAttribute('id'));
+    }
+  </script>
+</head>
+<body>
+  <p id="x" name="para">Para</p>
+
+  <div name="after" id="wrong">nope</div>
+  <div name="right" id="after">yup</div>
+</body>
+</html>

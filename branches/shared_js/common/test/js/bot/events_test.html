@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>locator_test.html</title>
+  <script src="bot-bootstrap.js"></script>
+  <script>
+    goog.require('goog.testing.jsunit');
+    goog.require('goog.events.EventType');
+    goog.require('bot.events');
+    goog.require('bot.locators');
+  </script>
+
+  <script>
+    function testCanFireMoveEvent() {
+      var e = bot.locators.findElement({id: 'x'});
+
+      bot.events.fire(e, goog.events.EventType.MOUSEMOVE);
+    }
+  </script>
+
+  <script>
+    var MESSAGES = [];
+
+    function log(message) {
+      MESSAGES.push(message);
+    }
+  </script>
+</head>
+<body>
+  <p id="x" onmousemove="log('move');">Move</p>
+</body>
+</html>
