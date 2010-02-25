@@ -36,6 +36,8 @@ module Selenium
               if res.kind_of? Net::HTTPRedirection
                 verb, payload = :get, nil
                 url           = URI.parse(res["Location"])
+                headers       = DEFAULT_HEADERS.dup
+
                 raise RetryException
               else
                 response = create_response(res)
