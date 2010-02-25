@@ -343,7 +343,12 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   if (command.name == 'newSession' ||
       command.name == 'quit' ||
       command.name == 'getWindowHandles') {
-    return this[command.name](response, command.parameters);
+    try {
+      this[command.name](response, command.parameters);
+    } catch (ex) {
+      response.sendError(ex);
+    }
+    return;
   }
 
   var sessionId = command.sessionId;
