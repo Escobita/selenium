@@ -392,7 +392,8 @@ module Selenium
         def default_options
           {
             :url                  => "http://localhost:4444/wd/hub",
-            :http_client          => http_client_class, # TODO: use patron if available
+            # TODO(jari): enable Patron when http://github.com/toland/patron/issues/issue/13 is fixed
+            :http_client          => DefaultHttpClient,
             :desired_capabilities => Capabilities.firefox
           }
         end
