@@ -582,7 +582,8 @@ FirefoxDriver.prototype.addCookie = function(respond, parameters) {
   var cookie = parameters.cookie;
 
   if (cookie.expiry) {
-    cookie.expiry = new Date(cookie.expiry);
+    cookie.expiry = cookie.expiry.time ? new Date(cookie.expiry.time) :
+                                         new Date(cookie.expiry);
   } else {
     var date = new Date();
     date.setYear(2030);
