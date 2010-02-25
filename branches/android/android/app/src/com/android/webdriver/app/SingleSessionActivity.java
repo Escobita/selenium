@@ -1,4 +1,22 @@
-/* Copyright (C) 2009 The Android Open Source Project
+/*
+Copyright 2007-2010 WebDriver committers
+
+Copyright 2007-2010 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +33,6 @@
 
 package com.android.webdriver.app;
 
-import com.android.webdriver.sessions.Session.Actions;
-import com.android.webdriver.sessions.intents.*;
-import com.android.webdriver.sessions.intents.DoActionIntentReceiverLite.ActionRequestListener;
-import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiverLite.UrlRequestListener;
-import com.android.webdriver.sessions.intents.GetTitleIntentReceiverLite.TitleRequestListener;
-import com.android.webdriver.sessions.intents.NavigationIntentReceiverLite.NavigateRequestListener;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -33,6 +44,21 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
+
+import com.android.webdriver.sessions.Session.Actions;
+import com.android.webdriver.sessions.intents.AddSessionIntentReceiverLite;
+import com.android.webdriver.sessions.intents.DeleteSessionIntentReceiverLite;
+import com.android.webdriver.sessions.intents.DoActionIntentReceiverLite;
+import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiverLite;
+import com.android.webdriver.sessions.intents.GetTitleIntentReceiverLite;
+import com.android.webdriver.sessions.intents.IntentReceiverRegistrar;
+import com.android.webdriver.sessions.intents.Intents;
+import com.android.webdriver.sessions.intents.NavigationIntentReceiverLite;
+import com.android.webdriver.sessions.intents.SetProxyIntentReceiver;
+import com.android.webdriver.sessions.intents.DoActionIntentReceiverLite.ActionRequestListener;
+import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiverLite.UrlRequestListener;
+import com.android.webdriver.sessions.intents.GetTitleIntentReceiverLite.TitleRequestListener;
+import com.android.webdriver.sessions.intents.NavigationIntentReceiverLite.NavigateRequestListener;
 
 /**
  * Main view of a single-session application mode. 
@@ -367,6 +393,4 @@ public class SingleSessionActivity
   private IntentReceiverRegistrar mIntentReg;
   private SimpleWebViewJSExecutor jsExecutor = new SimpleWebViewJSExecutor();
 
-
-  
 }

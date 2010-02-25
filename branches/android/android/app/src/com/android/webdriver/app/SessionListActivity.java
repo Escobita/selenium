@@ -1,5 +1,23 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+Copyright 2007-2010 WebDriver committers
+
+Copyright 2007-2010 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*
+ * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +33,6 @@
  */
 
 package com.android.webdriver.app;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import com.android.webdriver.app.R;
-import com.android.webdriver.sessions.Session;
-import com.android.webdriver.sessions.SessionRepository;
-import com.android.webdriver.sessions.Session.Actions;
-import com.android.webdriver.sessions.SessionRepository.SessionChangeType;
-import com.android.webdriver.sessions.intents.AddSessionIntentReceiver;
-import com.android.webdriver.sessions.intents.CookieIntentReceiver;
-import com.android.webdriver.sessions.intents.DeleteSessionIntentReceiver;
-import com.android.webdriver.sessions.intents.DoActionIntentReceiver;
-import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiver;
-import com.android.webdriver.sessions.intents.GetTitleIntentReceiver;
-import com.android.webdriver.sessions.intents.IntentReceiverRegistrar;
-import com.android.webdriver.sessions.intents.Intents;
-import com.android.webdriver.sessions.intents.NavigationIntentReceiver;
-import com.android.webdriver.sessions.intents.SetProxyIntentReceiver;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -56,6 +55,24 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+
+import com.android.webdriver.sessions.Session;
+import com.android.webdriver.sessions.SessionRepository;
+import com.android.webdriver.sessions.Session.Actions;
+import com.android.webdriver.sessions.SessionRepository.SessionChangeType;
+import com.android.webdriver.sessions.intents.AddSessionIntentReceiver;
+import com.android.webdriver.sessions.intents.CookieIntentReceiver;
+import com.android.webdriver.sessions.intents.DeleteSessionIntentReceiver;
+import com.android.webdriver.sessions.intents.DoActionIntentReceiver;
+import com.android.webdriver.sessions.intents.GetCurrentUrlIntentReceiver;
+import com.android.webdriver.sessions.intents.GetTitleIntentReceiver;
+import com.android.webdriver.sessions.intents.IntentReceiverRegistrar;
+import com.android.webdriver.sessions.intents.Intents;
+import com.android.webdriver.sessions.intents.NavigationIntentReceiver;
+import com.android.webdriver.sessions.intents.SetProxyIntentReceiver;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * A multi-session view of the application.
@@ -259,6 +276,7 @@ public class SessionListActivity extends ListActivity
     wv.setFocusable(false);
     wv.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
     wv.getSettings().setBuiltInZoomControls(true);
+    wv.getSettings().setAllowFileAccess(true);
     wv.getSettings().setJavaScriptEnabled(true);
     wv.setWebChromeClient(new LocalWebChromeClient());
     CustomJavaScriptInterface script = new CustomJavaScriptInterface(wv);
@@ -338,7 +356,7 @@ public class SessionListActivity extends ListActivity
           try {
             syncObj.wait(COMMAND_TIMEOUT);
           } catch (InterruptedException ie) {	}
-          running = false;
+            running = false;
         }
       }
       if (res.length() == 0)

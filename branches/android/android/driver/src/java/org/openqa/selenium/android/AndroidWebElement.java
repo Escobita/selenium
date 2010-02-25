@@ -1,6 +1,6 @@
 /*
-Copyright 2007-2009 WebDriver committers
-Copyright 2007-2009 Google Inc.
+Copyright 2007-2010 WebDriver committers
+Copyright 2007-2010 Google Inc.
 Portions copyright 2007 ThoughtWorks, Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,8 +41,6 @@ import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Element;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -50,6 +48,9 @@ import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidWebElement implements WebElement,
     FindsById, FindsByLinkText, FindsByXPath, FindsByTagName, SearchContext {
@@ -148,63 +149,100 @@ public class AndroidWebElement implements WebElement,
   }
 
   public WebElement findElementById(String id) {
-    try {
-      // Updates mElement according to the current extracted page source
-      mElement = mDriver.extractor.getElementById(id);
-    } catch (Exception e) {
-      Log.e("AndroidWebElement:findElementById", "Element not found, id: " +
-          id + ", message: " + e.getMessage());
-      e.printStackTrace();
-      return null;
-    }
-    
+    // Updates mElement according to the current extracted page source
+    mElement = mDriver.getExtractor().getElementById(id);
     return this;
   }
 
   public List<WebElement> findElementsById(String id) {
-      return findElementsByXPath(".//*[@id = '" + id + "']");
+      return findElementsByXPath(".//*[@id = \\'" + id + "\\']");
   }
 
   public WebElement findElementByXPath(String xpathExpr) {
-    // TODO(abergman): implement
-    return null;
+    mElement = mDriver.getExtractor().getElementByXPath(xpathExpr);
+    return this;
   }
 
   public List<WebElement> findElementsByXPath(String xpathExpr) {
-    // TODO(abergman): implement
-    return null;
+    List<Element> elements = mDriver.getExtractor().getElementsByXpath(xpathExpr);
+    AndroidWebElement androidElement = null;
+    List<WebElement> androidElements = new ArrayList<WebElement>();
+    for (Element el : elements) {
+      androidElement = new AndroidWebElement(mDriver, By.xpath(xpathExpr));
+      androidElement.mElement = el;
+      androidElements.add(androidElement);
+    }
+    return androidElements;
   }
 
-  public WebElement findElementByLinkText(String linkText) {
-    // TODO(abergman): implement
-    return null;
+  public WebElement findElementByLinkText(String using) {
+    mElement = mDriver.getExtractor().getElementByLinkText(using);
+    return this;
   }
 
-  public List<WebElement> findElementsByLinkText(String linkText) {
-    // TODO(abergman): implement
-    return null;
+  public List<WebElement> findElementsByLinkText(String using) {
+    List<Element> elements = mDriver.getExtractor().getElementsByLinkText(using);
+    List<WebElement> result = new ArrayList<WebElement>();
+    AndroidWebElement androidElement = null;
+    for (Element el : elements) {
+      androidElement = new AndroidWebElement(mDriver, By.linkText(using));
+      androidElement.mElement = el;
+      result.add(androidElement);
+    }
+    return result;
   }
 
-  public WebElement findElementByPartialLinkText(String linkText) {
-    // TODO(abergman): implement
-    return null;
+  public WebElement findElementByPartialLinkText(String using) {
+    mElement = mDriver.getExtractor().getElementByPartialLinkText(using);
+    return this;
   }
 
-  public List<WebElement> findElementsByPartialLinkText(String linkText) {
-    // TODO(abergman): implement
-    return null;
+  public List<WebElement> findElementsByPartialLinkText(String using) {
+    List<Element> elements = mDriver.getExtractor().getElementsByPartialLinkText(using);
+    List<WebElement> result = new ArrayList<WebElement>();
+    AndroidWebElement androidElement = null;
+    for (Element el : elements) {
+      androidElement = new AndroidWebElement(mDriver, By.linkText(using));
+      androidElement.mElement = el;
+      result.add(androidElement);
+    }
+    return result;
   }
 
   public WebElement findElementByTagName(String name) {
-    // TODO(abergman): implement
-    return null;
+    mElement = mDriver.getExtractor().getElementByTagName(name);
+    return this;
   }
 
-  public List<WebElement> findElementsByTagName(String name) {
-    // TODO(abergman): implement
-    return null;
+  public List<WebElement> findElementsByTagName(String using) {
+    List<Element> elements = mDriver.getExtractor().getElementsByTagName(using);
+    List<WebElement> result = new ArrayList<WebElement>();
+    AndroidWebElement androidElement = null;
+    for (Element el : elements) {
+      androidElement = new AndroidWebElement(mDriver, By.linkText(using));
+      androidElement.mElement = el;
+      result.add(androidElement);
+    }
+    return result;
+  }
+  
+  public WebElement findElementByName(String using) {
+    mElement = mDriver.getExtractor().getElementByName(using);
+    return this;
   }
 
+  public List<WebElement> findElementsByName(String using) {
+    List<Element> elements = mDriver.getExtractor().getElementsByName(using);
+    List<WebElement> result = new ArrayList<WebElement>();
+    AndroidWebElement androidElement = null;
+    for (Element el : elements) {
+      androidElement = new AndroidWebElement(mDriver, By.linkText(using));
+      androidElement.mElement = el;
+      result.add(androidElement);
+    }
+    return result;
+  }
+  
   @Override
   public String toString() {
       if (toString == null) {
