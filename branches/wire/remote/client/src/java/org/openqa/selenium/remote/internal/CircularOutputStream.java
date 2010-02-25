@@ -20,8 +20,8 @@ package org.openqa.selenium.remote.internal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Captures the last N bytes of output.
@@ -47,6 +47,10 @@ public class CircularOutputStream extends OutputStream {
 
   public CircularOutputStream(File outputFile) {
     this(outputFile, DEFAULT_SIZE);
+  }
+
+  public CircularOutputStream(int maxSize) {
+    this(null, maxSize);
   }
 
   @Override
@@ -78,8 +82,13 @@ public class CircularOutputStream extends OutputStream {
       return new String(toReturn);
     }
 
-    System.arraycopy(buffer, start, toReturn, 0, buffer.length - start);
-    System.arraycopy(buffer, 0, toReturn, buffer.length - start, end);
+    int copyStart = buffer.length - start;
+    if (copyStart == buffer.length) {
+      copyStart = 0;
+    }
+
+    System.arraycopy(buffer, start, toReturn, 0, copyStart);
+    System.arraycopy(buffer, 0, toReturn, copyStart, end);
     return new String(toReturn);
   }
 }
