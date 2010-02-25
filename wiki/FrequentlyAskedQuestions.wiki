@@ -144,6 +144,31 @@ sudo sysctl net.ipv6.bindv6only=0
 To get the socket to bind both to IPv6 and IPv4 addresses of the host with the same calls.
 More permanent solution is disabling this behaviour by editing /etc/sysctl.d/bindv6only.conf
 
+=== Q: WebDriver fails to find elements / Does not block on page loads ===
+This problem can manifest itself in various ways:
+ * Using WebDriver.findElement(...) throws ElementNotFoundException, but the element is clearly there - inspecting the DOM (using Firebug, etc) clearly shows it. 
+ * Calling Driver.get returns once the HTML has been loaded - but Javascript called triggered by the onload event was not done, so the page is incomplete and some elements cannot be found.
+ * Clicking on an element / link triggers an operation that creates new element. However, calling findElement(s) after click returns does not find it. Isn't click supposed to be blocking?
+ * How do I know when a page has finished loading?
+
+Explanation:
+WebDriver has a blocking API, generally. However, under some conditions it is impossible to return before the page has finished loading. The classic example is Javascript starting to run after the page has loaded (onload). Browsers (e.g. Firefox) will notify when the basic HTML content has been loaded, which is when WebDriver returns. It's difficult (if not impossible) to know when Javascript has finished executing, since JS code may schedule functions to be called in the future, depend on server response, etc. This is also true for clicking - when the platform supports native events (Windows, Linux) clicking is done by sending a mouse click event with the element's coordinates at the OS level - WebDriver cannot track the exact sequence of operations this click creates. For this reason, the blocking API is imperfect - WebDriver cannot wait for all conditions to be met before the test proceeds because it does not know them. Usually, the important matter is whether the element involved in the next interaction is present and ready.
+
+Solution:
+Use the Wait class to wait for a specific element to appear. This class simply calls findElement over and over, discarding the NoSuchElementException each time, until the element is found (or a timeout has expired). Since this is the behaviour desired by default for many users, we're working on implicitly-waiting classes - See issue [http://code.google.com/p/selenium/issues/detail?id=26 26].
+
+=== Q: How can I trigger arbitrary events on the page? ===
+WebDriver aims to emulate user interaction - so the API reflects the ways a user can interact with various elements. 
+
+Triggering a specific event cannot be achieved directly using the API, but one can use the Javascript execution abilities to call methods on an element.
+
+=== Q: Why is it not possible to interact with hidden elements? ===
+Since a user cannot read text in a hidden element, WebDriver will not allow access to it as well.
+
+However, it is possible to use Javascript execution abilities to call getText directly from the element:
+((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", ...)
+
+
 === Q: I'd like it if WebDriver did.... ===
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
