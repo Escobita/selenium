@@ -14,11 +14,6 @@
         /// Represents a New Session command
         /// </summary>
         NewSession,
-
-        /// <summary>
-        /// Represents Delete Session command
-        /// </summary>
-        DeleteSession,
         
         /// <summary>
         /// Represents the Get Session Capabilities command
@@ -61,11 +56,6 @@
         AddCookie,
 
         /// <summary>
-        /// Represents getting a cookie command
-        /// </summary>
-        GetCookie,
-
-        /// <summary>
         /// Represents getting all cookies command
         /// </summary>
         GetAllCookies,
@@ -99,6 +89,11 @@
         /// Represents findchildelements command
         /// </summary>
         FindChildElements,
+
+        /// <summary>
+        /// Describes an element
+        /// </summary>
+        DescribeElement,
 
         /// <summary>
         /// Represents clearelements command
@@ -149,16 +144,6 @@
         /// Represents SwitchToFrame command
         /// </summary>
         SwitchToFrame,
-
-        /// <summary>
-        /// Represents SwitchToFrameByIndex command
-        /// </summary>
-        SwitchToFrameByIndex,
-
-        /// <summary>
-        /// Represents SwitchToFrameByName command
-        /// </summary>
-        SwitchToFrameByName,
 
         /// <summary>
         /// Represents SwitchToDefaultContent command

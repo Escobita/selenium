@@ -859,7 +859,7 @@ namespace OpenQA.Selenium.Remote
                             throw new ElementNotVisibleException(errorMessage);
 
                         case WebDriverResult.ElementNotEnabled:
-                            if (errorMessage.Contains("toggle") || errorMessage.Contains("single element"))
+                            if (errorMessage.ToLowerInvariant().Contains("toggle") || errorMessage.Contains("single element"))
                             {
                                 throw new NotImplementedException(errorMessage);
                             }

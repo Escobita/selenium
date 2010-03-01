@@ -352,7 +352,6 @@ namespace OpenQA.Selenium.Chrome
         {
             commandNameMap = new Dictionary<DriverCommand, string>();
             commandNameMap.Add(DriverCommand.NewSession, "newSession");
-            commandNameMap.Add(DriverCommand.DeleteSession, "deleteSession");
 
             commandNameMap.Add(DriverCommand.Close, "close");
             commandNameMap.Add(DriverCommand.Quit, "quit");
@@ -363,7 +362,6 @@ namespace OpenQA.Selenium.Chrome
             commandNameMap.Add(DriverCommand.Refresh, "refresh");
 
             commandNameMap.Add(DriverCommand.AddCookie, "addCookie");
-            commandNameMap.Add(DriverCommand.GetCookie, "getCookie");
             commandNameMap.Add(DriverCommand.GetAllCookies, "getCookies");
             commandNameMap.Add(DriverCommand.DeleteCookie, "deleteCookie");
             commandNameMap.Add(DriverCommand.DeleteAllCookies, "deleteAllCookies");
@@ -385,8 +383,6 @@ namespace OpenQA.Selenium.Chrome
 
             commandNameMap.Add(DriverCommand.SwitchToWindow, "switchToWindow");
             commandNameMap.Add(DriverCommand.SwitchToFrame, "switchToFrame");
-            commandNameMap.Add(DriverCommand.SwitchToFrameByIndex, "switchToFrameByIndex");
-            commandNameMap.Add(DriverCommand.SwitchToFrameByName, "switchToFrameByName");
             commandNameMap.Add(DriverCommand.SwitchToDefaultContent, "switchToDefaultContent");
             commandNameMap.Add(DriverCommand.GetActiveElement, "getActiveElement");
 
