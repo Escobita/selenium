@@ -315,10 +315,15 @@ function loadPluginList() {
     }
     
     var plugins = this.Preferences.getString("plugins").split(",");
-    
+
+    var extman = Components.classes["@mozilla.org/extensions/manager;1"].createInstance(Components.interfaces.nsIExtensionManager);
+    var p;
     for (var i = 0; i < plugins.length; i++) {
-        list.appendItem(plugins[i]);
+        p = extman.getItemForID(plugins[i]);
+        list.appendItem(p.name, p.id); 
     }
+    
+    list.selectItem(list.getItemAtIndex(0));
 }
 
 function updatePluginOptions() {
@@ -326,5 +331,16 @@ function updatePluginOptions() {
 }
 
 function updatePluginSelection() {
-    
+  var selected = document.getElementById("plugin-list").value;
+  
+  var dir = Components.classes["@mozilla.org/file/directory_service;1"].  
+                       getService(Components.interfaces.nsIProperties).  
+                       get("ProfD", Components.interfaces.nsIFile);
+  dir.append("extensions");
+  dir.append(selected);
+
+  var extman = Components.classes["@mozilla.org/extensions/manager;1"].createInstance(Components.interfaces.nsIExtensionManager);
+  var p = extman.getItemForID(selected);
+  
+  document.getElementById("plugin-name").value = p.name;
 }
