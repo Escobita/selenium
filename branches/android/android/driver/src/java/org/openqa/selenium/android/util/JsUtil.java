@@ -15,7 +15,7 @@
  * the License.
  */
 
-package org.openqa.selenium.android;
+package org.openqa.selenium.android.util;
 
 /**
  * Utility class for Javascript handling.
@@ -39,7 +39,7 @@ public class JsUtil {
       throw new IllegalArgumentException("Argument must be a number, " +
           "a boolean, or a string: " + arg + " is of type " + arg.getClass());
     }
-    return escapeQuotes((String)arg);
+    return escapeQuotes(arg.toString());
   }
   
   /**
@@ -53,11 +53,15 @@ public class JsUtil {
   public static String escapeQuotes(String toEscape) {
     // Convert strings with both quotes and ticks into: foo'"bar -> "foo'" + '"' + "bar"
     if (toEscape.indexOf("\"") > -1 && toEscape.indexOf("'") > -1) {
+      boolean quotedIsLast = false;
+      if (toEscape.indexOf("\"") == toEscape.length() - 1) {
+        quotedIsLast = true;
+      }
       String[] substrings = toEscape.split("\"");
       StringBuilder quoted = new StringBuilder("");
       for (int i = 0; i < substrings.length; i++) {
-        quoted.append("\"").append(substrings[i]).append("\" + '\"'");
-        quoted.append(((i == substrings.length -1) ? "" : "+"));
+        quoted.append("\"").append(substrings[i]).append("\"");
+        quoted.append(((i == substrings.length -1) ? (quotedIsLast ? " + '\"'" : "") : " + '\"' + "));
       }
       quoted.trimToSize();
       return quoted.toString();
