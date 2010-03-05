@@ -16,6 +16,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 
 import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
+import com.google.common.collect.ImmutableMap;
 
 public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, FindsByCssSelector {
 
@@ -35,7 +36,7 @@ public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, F
    * Starts up a new instance of Chrome, with the required extension loaded,
    * and has it connect to a new ChromeCommandExecutor on its port
    *
-   * @see ChromeDriver(ChromeProfile, ChromeExtension)
+   * @see #ChromeDriver(ChromeProfile, ChromeExtension)
    */
   public ChromeDriver() {
     this(new ChromeProfile(), new ChromeExtension());
@@ -108,6 +109,7 @@ public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, F
   }
 
   public <X> X getScreenshotAs(OutputType<X> target) {
-    return target.convertFromBase64Png(execute(SCREENSHOT).getValue().toString());
+    return target.convertFromBase64Png(execute(SCREENSHOT, ImmutableMap.<String, Object>of())
+        .getValue().toString());
   }
 }

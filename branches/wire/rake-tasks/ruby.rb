@@ -1,7 +1,7 @@
 task :test_remote_rb => [:test_common, :remote_server] do
   ENV['WD_SPEC_DRIVER'] = 'remote'
   jruby :include  => [".", "common/src/rb/lib", "remote/client/src/rb/lib", "common/test/rb/lib"],
-        :require  => ["third_party/jruby/json-jruby.jar", Dir["third_party/java/google-collect-*.jar"].first],
+        :require  => ["third_party/jruby/json-jruby.jar", Dir["third_party/java/google-collect-*.jar"].first, "remote/client/lib/runtime/commons-httpclient-3.1.jar"],
         :command  => "-S spec",
         :files    => Dir['{common,remote/client}/test/rb/spec/**/*spec.rb']
         # :headless => true

@@ -240,6 +240,14 @@ Dispatcher.prototype.init_ = function() {
 
   this.bind_('/session/:sessionId/screenshot').
       on(Request.Method.GET, Dispatcher.executeAs('screenshot'));
+
+
+  // --------------------------------------------------------------------------
+  // Firefox extensions to the wire protocol.
+  // --------------------------------------------------------------------------
+
+  this.bind_('/extensions/firefox/quit').
+      on(Request.Method.POST, Dispatcher.executeAs('quit'));
 };
 
 

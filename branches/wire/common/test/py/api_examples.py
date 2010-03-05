@@ -16,30 +16,21 @@
 # limitations under the License.
 
 
-import datetime
-import logging
 import os
 import re
 import tempfile
 import time
 import shutil
-import socket
-import sys
 import unittest
-from wsgiref.handlers import format_date_time
-from webdriver.common.exceptions import *
-from webdriver.common.webserver import SimpleWebServer
-import webdriver.remote.webdriver
-import webdriver.common_tests
-from webdriver.common_tests import utils
-
-webserver = None
-driver = None
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ErrorInResponseException
+import selenium.remote.webdriver
 
 
 def not_available_on_remote(func):
+
     def testMethod(self):
-        if type(self.driver) == webdriver.remote.webdriver.WebDriver:
+        if type(self.driver) == selenium.remote.webdriver.WebDriver:
             return lambda x: None
         else:
             return func(self)
@@ -47,12 +38,6 @@ def not_available_on_remote(func):
 
 
 class ApiExampleTest (unittest.TestCase):
-
-    def setUp(self):
-        self.driver = driver
-
-    def tearDown(self):
-        pass
 
     def testGetTitle(self):
         self._loadSimplePage()
@@ -63,13 +48,13 @@ class ApiExampleTest (unittest.TestCase):
         self._loadSimplePage()
         url = self.driver.get_current_url()
         self.assertEquals("http://localhost:%d/simpleTest.html"
-                          % webserver.port, url)
+                          % self.webserver.port, url)
 
     def testFindElementsByXPath(self):
         self._loadSimplePage()
         elem = self.driver.find_element_by_xpath("//h1")
         self.assertEquals("Heading", elem.get_text())
-        
+
     def testFindElementByXpathThrowNoSuchElementException(self):
         self._loadSimplePage()
         try:
@@ -174,7 +159,7 @@ class ApiExampleTest (unittest.TestCase):
         checkbox = self.driver.find_element_by_id("checky")
         checkbox.toggle()
         checkbox.submit()
-  
+
     def testSwitchFrameByName(self):
         self._loadPage("frameset")
         self.driver.switch_to_frame("third");
@@ -246,7 +231,7 @@ class ApiExampleTest (unittest.TestCase):
         self._loadPage("xhtmlTest")
         result = self.driver.execute_script("return arguments[0] == 'fish' ? 'fish' : 'not fish';", "fish")
         self.assertEquals("fish", result)
-        
+
     def testExecuteScriptWithMultipleArgs(self):
         self._loadPage("xhtmlTest")
         result = self.driver.execute_script(
@@ -263,7 +248,7 @@ class ApiExampleTest (unittest.TestCase):
         self._loadPage("xhtmlTest")
         elem = self.driver.find_element_by_partial_link_text("new window")
         elem.click()
-        
+
     def testIsElementDisplayed(self):
         self._loadPage("javascriptPage")
         visible = self.driver.find_element_by_id("displayed").is_displayed()
@@ -280,16 +265,10 @@ class ApiExampleTest (unittest.TestCase):
         shutil.rmtree(os.path.dirname(file_name))
 
     def _pageURL(self, name):
-        return "http://localhost:%d/%s.html" % (webserver.port, name)
+        return "http://localhost:%d/%s.html" % (self.webserver.port, name)
 
     def _loadSimplePage(self):
         self._loadPage("simpleTest")
 
     def _loadPage(self, name):
         self.driver.get(self._pageURL(name))
-
-def run_tests(driver_):
-    global driver, webserver
-    webserver = SimpleWebServer()
-    driver = driver_
-    utils.run_tests("api_examples.ApiExampleTest", driver, webserver)

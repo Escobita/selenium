@@ -155,6 +155,7 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_CLOSEWINDOW, OnCloseWindow )
 	CUSTOM_MESSAGE_MAP ( _WD_SWITCHWINDOW, OnSwitchToWindow )
 	CUSTOM_MESSAGE_MAP ( _WD_CAPTURESCREENSHOT, OnCaptureScreenshot )
+	CUSTOM_MESSAGE_MAP ( _WD_GETSCRIPTRESULTOBJECTTYPE, OnGetScriptResultObjectType)
 
 	 return FALSE;
 }
@@ -520,10 +521,12 @@ void IeThread::findCurrentFrame(IHTMLWindow2 **result)
 
 		// Find the frame
 		CComVariant frameHolder;
-		frames->item(&index, &frameHolder);
+		hr = frames->item(&index, &frameHolder);
 
 		interimResult.Release();
-		interimResult = frameHolder.pdispVal;
+		if (!FAILED(hr)) {
+			interimResult = frameHolder.pdispVal;
+		}
 
 		if (!interimResult) { break; } // pathToFrame does not match. Exit.
 

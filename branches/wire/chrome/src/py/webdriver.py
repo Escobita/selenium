@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import with_statement
 
 from __future__ import with_statement
 
@@ -29,10 +30,10 @@ class WebDriver(RemoteWebDriver):
             command_executor=ChromeDriver(),
             browser_name='chrome', platform='ANY', version='',
             javascript_enabled=True)
-            
+
     def start_client(self):
         self.command_executor.start()
-    
+
     def stop_client(self):
         self.command_executor.stop()
 

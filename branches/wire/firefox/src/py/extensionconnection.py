@@ -58,8 +58,7 @@ class ExtensionConnection(RemoteConnection):
 
     def connect_and_quit(self):
         """Connects to an running browser and quit immediately."""
-        response = self.connect()
-        self.quit(response['sessionId'])
+        self._request('%s/extensions/firefox/quit' % self._url)
 
     def is_connectable(self):
         """Trys to connect to the extension but do not retrieve context."""

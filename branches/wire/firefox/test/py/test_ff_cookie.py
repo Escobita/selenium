@@ -1,7 +1,6 @@
 #!/usr/bin/python
 #
 # Copyright 2008-2009 WebDriver committers
-# Copyright 2008-2009 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +13,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from selenium.firefox.webdriver import WebDriver
+from selenium.common_tests import cookie_tests
+from selenium.common.webserver import SimpleWebServer
 
 
-import logging
-from webdriver.common_tests import api_examples
-from webdriver.firefox.webdriver import WebDriver
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    FirefoxCookieTest.webserver = webserver
+    FirefoxCookieTest.driver = WebDriver()
 
-if __name__ == "__main__":
-    api_examples.run_tests(WebDriver())
+
+class FirefoxCookieTest(cookie_tests.CookieTest):
+    pass
+
+
+def teardown_module(module):
+    FirefoxCookieTest.driver.quit()
+    FirefoxCookieTest.webserver.stop()

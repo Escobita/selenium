@@ -61,7 +61,6 @@ public class JsonToBeanConverterTest extends TestCase {
     assertNull(converted.get("foo"));
   }
 
-  @SuppressWarnings("unchecked")
   public void testCanPopulateASimpleBean() throws Exception {
     JSONObject toConvert = new JSONObject();
     toConvert.put("value", "time");
@@ -71,7 +70,6 @@ public class JsonToBeanConverterTest extends TestCase {
     assertThat(bean.getValue(), is("time"));
   }
 
-  @SuppressWarnings("unchecked")
   public void testWillSilentlyDiscardUnusedFieldsWhenPopulatingABean() throws Exception {
     JSONObject toConvert = new JSONObject();
     toConvert.put("value", "time");
@@ -92,7 +90,6 @@ public class JsonToBeanConverterTest extends TestCase {
     assertThat(3L, is(map.get("magicNumber")));
   }
 
-  @SuppressWarnings("unchecked")
   public void testShouldPopulateFieldsOnNestedBeans() throws Exception {
     JSONObject toConvert = new JSONObject();
     toConvert.put("name", "frank");
@@ -119,7 +116,6 @@ public class JsonToBeanConverterTest extends TestCase {
     assertEquals(capabilities, readCapabilities);
   }
 
-  @SuppressWarnings("unchecked")
   public void testShouldBeAbleToInstantiateBooleans() throws Exception {
     JSONArray array = new JSONArray();
     array.put(true);

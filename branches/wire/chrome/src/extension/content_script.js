@@ -291,7 +291,7 @@ function deleteCookie(cookieName) {
     var fullpath = cookieDocument.location.pathname;
   }
   var hostParts = cookieDocument.location.hostname.split(".");
-  
+
   fullpath = fullpath.split('/');
   fullpath.pop(); //Get rid of the file
   //TODO(danielwh): Tidy up these loops and this repeated code
@@ -304,17 +304,17 @@ function deleteCookie(cookieName) {
     cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path;
     //Delete cookie without trailing /
     cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1);
-    
+
     var domain = "";
     for (var i = hostParts.length - 1; i >= 0; --i) {
       domain = "." + hostParts[i] + domain;
       //Delete cookie with trailing /
       cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path + ";domain=" + domain;
-      
+
       cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path + ";domain=" + domain;
       //Delete cookie without trailing /
       cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1) + ";domain=" + domain;
-      
+
       cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1) + ";domain=" + domain.substring(1);
     }
   }
@@ -399,7 +399,7 @@ function setCookie(cookie) {
     var currLocation = ChromeDriverContentScript.currentDocument.location;
     var currDomain = currLocation.host;
   }
-  
+
   if (currLocation.port != 80) { currDomain += ":" + currLocation.port; }
   if (cookie.domain != null && cookie.domain !== undefined &&
       currDomain.indexOf(cookie.domain) == -1) {
@@ -803,7 +803,7 @@ function toggleElement(element) {
     return e;
   }
   console.log("New value: " + newValue);
-  
+
   if (changed) {
     //TODO: Work out a way of firing events,
     //now that synthesising them gives appendMessage errors

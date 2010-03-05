@@ -14,68 +14,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from glob import glob
-import os
 from setuptools import setup
-
-TEST_WEB_DIR = 'common/src/web'
-
-def get_extensions_list(in_dir):
-    files_list = []
-    for dirname, subdirs, filenames in os.walk(in_dir):
-        if (dirname.find('.svn') == -1):
-            files_list.extend(filenames)
-    return set([t.split('.')[-1] for t in files_list if len(t.split('.')) > 0])
-
-def get_dirs_list(in_dir):
-    ret_list = []
-    for dirname, subdirs, filenames in os.walk(in_dir):
-        if (dirname.find('.svn') == -1):
-            ret_list.append(dirname.replace(TEST_WEB_DIR + '/', ''))
-    return ret_list
-
-test_web_dirs = get_dirs_list(TEST_WEB_DIR)
-test_web_extensions = get_extensions_list(TEST_WEB_DIR)
-
-all_dirs_and_extensions = []
-for dir in test_web_dirs:
-    for ext in test_web_extensions:
-        all_dirs_and_extensions.append(dir + '/*.' + ext)
+from setuptools.command.install import install
 
 setup(
-   name='webdriver',
-   version="0.7",
+   cmdclass={'install': install},
+   name='selenium',
+   version="2.0-dev",
    description='Python bindings for WebDriver',
    url='http://code.google.com/p/selenium/',
    package_dir={
-                'webdriver':'.',
-                'webdriver.ie': 'jobbie/src/py',
-                'webdriver.firefox': 'firefox/src/py',
-                'webdriver.chrome' : 'chrome/src/py',
-                'webdriver.chrome_tests': 'chrome/test/py',
-                'webdriver.common': 'common/src/py',
-                'webdriver.remote': 'remote/client/src/py',
-                'webdriver.common_tests': 'common/test/py',
-                'webdriver.common_web': 'common/src/web',
-                'webdriver.firefox_tests': 'firefox/test/py',
-                'webdriver.ie_tests': 'jobbie/test/py',
-                'webdriver.remote_tests': 'remote/client/test/py',
+                'selenium':'.',
+                'selenium.ie': 'jobbie/src/py',
+                'selenium.firefox': 'firefox/src/py',
+                'selenium.chrome' : 'chrome/src/py',
+                'selenium.chrome_tests': 'chrome/test/py',
+                'selenium.common': 'common/src/py',
+                'selenium.remote': 'remote/client/src/py',
+                'selenium.common_tests': 'common/test/py',
+                'selenium.common_web': 'common/src/web',
+                'selenium.firefox_tests': 'firefox/test/py',
+                'selenium.ie_tests': 'jobbie/test/py',
+                'selenium.remote_tests': 'remote/client/test/py',
                 },
-   packages=['webdriver',
-             'webdriver.common',
-             'webdriver.firefox',
-             'webdriver.ie',
-             'webdriver.chrome',
-             'webdriver.remote',
-             'webdriver.common_tests',
-             'webdriver.common_web',
-             'webdriver.firefox_tests',
-             'webdriver.ie_tests',
-             'webdriver.chrome_tests',
-             'webdriver.remote_tests'],
+   packages=['selenium',
+             'selenium.common',
+             'selenium.firefox',
+             'selenium.ie',
+             'selenium.chrome',
+             'selenium.remote',
+             'selenium.common_tests',
+             'selenium.common_web',
+             'selenium.firefox_tests',
+             'selenium.ie_tests',
+             'selenium.chrome_tests',
+             'selenium.remote_tests'],
    include_package_data=True,
-   package_data={'': ['*.' + t for t in test_web_extensions], 
-                'webdriver.common_web':all_dirs_and_extensions}
+   install_requires=['distribute'],
 )
 
 # FIXME: Do manually

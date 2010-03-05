@@ -55,7 +55,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   private CommandExecutor executor;
   private Capabilities capabilities;
   private SessionId sessionId;
-  
+
   protected Process clientProcess;
 
   public RemoteWebDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
@@ -105,7 +105,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
    * Method called before
    * {@link #startSession(Capabilities) starting a new session}.  The default
    * implementation is a no-op, but subtypes should override this method to
-   * define custom behavior. 
+   * define custom behavior.
    */
   protected void startClient() {
   }
@@ -123,7 +123,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   public CommandExecutor getCommandExecutor() {
     return executor;
   }
-  
+
   public Capabilities getCapabilities() {
     return capabilities;
   }

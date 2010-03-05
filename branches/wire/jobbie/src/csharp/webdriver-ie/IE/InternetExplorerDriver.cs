@@ -235,6 +235,34 @@ namespace OpenQA.Selenium.IE
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="args">The arguments to the script.</param>
         /// <returns>The value returned by the script.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="ExecuteScript"/>method executes JavaScript in the context of 
+        /// the currently selected frame or window. This means that "document" will refer 
+        /// to the current document. If the script has a return value, then the following 
+        /// steps will be taken:
+        /// </para>
+        /// <para>
+        /// <list type="bullet">
+        /// <item><description>For an HTML element, this method returns a <see cref="IWebElement"/></description></item>
+        /// <item><description>For a number, a <see cref="System.Int64"/> is returned</description></item>
+        /// <item><description>For a boolean, a <see cref="System.Boolean"/> is returned</description></item>
+        /// <item><description>For all other cases a <see cref="System.String"/> is returned.</description></item>
+        /// <item><description>For an array,we check the first element, and attempt to return a 
+        /// <see cref="List{T}"/> of that type, following the rules above. Nested lists are not
+        /// supported.</description></item>
+        /// <item><description>If the value is null or there is no return value,
+        /// <see langword="null"/> is returned.</description></item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// Arguments must be a number (which will be converted to a <see cref="System.Int64"/>),
+        /// a <see cref="System.Boolean"/>, a <see cref="System.String"/> or a <see cref="IWebElement"/>.
+        /// An exception will be thrown if the arguments do not meet these criteria. 
+        /// The arguments will be made available to the JavaScript via the "arguments" magic 
+        /// variable, as if the function were called via "Function.apply" 
+        /// </para>
+        /// </remarks>
         public object ExecuteScript(string script, params object[] args)
         {
             object toReturn = null;
@@ -252,14 +280,9 @@ namespace OpenQA.Selenium.IE
                 result = NativeMethods.wdExecuteScript(handle, script, scriptArgsHandle, ref scriptResultHandle);
 
                 ResultHandler.VerifyResultCode(result, "Cannot execute script");
-                try
-                {
-                    toReturn = ExtractReturnValue(scriptResultHandle);
-                }
-                finally
-                {
-                    scriptResultHandle.Dispose();
-                }
+
+                // Note that ExtractReturnValue frees the memory for the script result.
+                toReturn = ExtractReturnValue(scriptResultHandle);
             }
             finally
             {
@@ -528,70 +551,125 @@ namespace OpenQA.Selenium.IE
             WebDriverResult result;
 
             int type;
-            result = NativeMethods.wdGetScriptResultType(scriptResult, out type);
+            result = NativeMethods.wdGetScriptResultType(handle, scriptResult, out type);
 
             ResultHandler.VerifyResultCode(result, "Cannot determine result type");
 
             object toReturn = null;
-            switch (type)
+            try
             {
-                case 1:
-                    SafeStringWrapperHandle stringHandle = new SafeStringWrapperHandle();
-                    result = NativeMethods.wdGetStringScriptResult(scriptResult, ref stringHandle);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract string result");
-                    using (StringWrapper wrapper = new StringWrapper(stringHandle))
-                    {
-                        toReturn = wrapper.Value;
-                    }
+                switch (type)
+                {
+                    case 1:
+                        SafeStringWrapperHandle stringHandle = new SafeStringWrapperHandle();
+                        result = NativeMethods.wdGetStringScriptResult(scriptResult, ref stringHandle);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract string result");
+                        using (StringWrapper wrapper = new StringWrapper(stringHandle))
+                        {
+                            toReturn = wrapper.Value;
+                        }
 
-                    break;
+                        break;
 
-                case 2:
-                    long longVal;
-                    result = NativeMethods.wdGetNumberScriptResult(scriptResult, out longVal);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract number result");
-                    toReturn = longVal;
-                    break;
+                    case 2:
+                        long longVal;
+                        result = NativeMethods.wdGetNumberScriptResult(scriptResult, out longVal);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract number result");
+                        toReturn = longVal;
+                        break;
 
-                case 3:
-                    int boolVal;
-                    result = NativeMethods.wdGetBooleanScriptResult(scriptResult, out boolVal);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract boolean result");
-                    toReturn = boolVal == 1 ? true : false;
-                    break;
+                    case 3:
+                        int boolVal;
+                        result = NativeMethods.wdGetBooleanScriptResult(scriptResult, out boolVal);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract boolean result");
+                        toReturn = boolVal == 1 ? true : false;
+                        break;
 
-                case 4:
-                    SafeInternetExplorerWebElementHandle element;
-                    result = NativeMethods.wdGetElementScriptResult(scriptResult, handle, out element);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract element result");
-                    toReturn = new InternetExplorerWebElement(this, element);
-                    break;
+                    case 4:
+                        SafeInternetExplorerWebElementHandle element;
+                        result = NativeMethods.wdGetElementScriptResult(scriptResult, handle, out element);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract element result");
+                        toReturn = new InternetExplorerWebElement(this, element);
+                        break;
 
-                case 5:
-                    toReturn = null;
-                    break;
+                    case 5:
+                        toReturn = null;
+                        break;
 
-                case 6:
-                    SafeStringWrapperHandle messageHandle = new SafeStringWrapperHandle();
-                    result = NativeMethods.wdGetStringScriptResult(scriptResult, ref messageHandle);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract string result");
-                    string message = string.Empty;
-                    using (StringWrapper wrapper = new StringWrapper(messageHandle))
-                    {
-                        message = wrapper.Value;
-                    }
+                    case 6:
+                        SafeStringWrapperHandle messageHandle = new SafeStringWrapperHandle();
+                        result = NativeMethods.wdGetStringScriptResult(scriptResult, ref messageHandle);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract string result");
+                        string message = string.Empty;
+                        using (StringWrapper wrapper = new StringWrapper(messageHandle))
+                        {
+                            message = wrapper.Value;
+                        }
 
-                    throw new WebDriverException(message);
+                        throw new WebDriverException(message);
 
-                case 7:
-                    double doubleVal;
-                    result = NativeMethods.wdGetDoubleScriptResult(scriptResult, out doubleVal);
-                    ResultHandler.VerifyResultCode(result, "Cannot extract number result");
-                    toReturn = doubleVal;
-                    break;
+                    case 7:
+                        double doubleVal;
+                        result = NativeMethods.wdGetDoubleScriptResult(scriptResult, out doubleVal);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract number result");
+                        toReturn = doubleVal;
+                        break;
 
-                default:
-                    throw new WebDriverException("Cannot determine result type");
+                    case 8:
+                        bool allArrayItemsAreElements = true;
+                        int arrayLength = 0;
+                        result = NativeMethods.wdGetArrayLengthScriptResult(handle, scriptResult, out arrayLength);
+                        ResultHandler.VerifyResultCode(result, "Cannot extract array length."); 
+                        List<object> list = new List<object>();
+                        for (int i = 0; i < arrayLength; i++) 
+                        {         
+                            // Get reference to object
+                            SafeScriptResultHandle currItemHandle = new SafeScriptResultHandle();
+                            WebDriverResult getItemResult = NativeMethods.wdGetArrayItemFromScriptResult(handle, scriptResult, i, out currItemHandle);
+                            if (getItemResult != WebDriverResult.Success)
+                            {
+                                // Note about memory management: Usually memory for this item
+                                // will be released during the recursive call to
+                                // ExtractReturnValue. It is freed explicitly here since a
+                                // recursive call will not happen.
+                                currItemHandle.Dispose();
+                                throw new WebDriverException(string.Format("Cannot extract element from collection at index: {0} ({1})", i, result));
+                            }
+
+                            object arrayItem = ExtractReturnValue(currItemHandle);
+                            if (allArrayItemsAreElements && !(arrayItem is IWebElement))
+                            {
+                                allArrayItemsAreElements = false;
+                            }
+
+                            // Call ExtractReturnValue with the fetched item (recursive)
+                            list.Add(arrayItem);
+                        }
+
+                        if (allArrayItemsAreElements)
+                        {
+                            List<IWebElement> elementList = new List<IWebElement>();
+                            foreach (object item in list)
+                            {
+                                elementList.Add((IWebElement)item);
+                            }
+
+                            toReturn = elementList;
+                        }
+                        else
+                        {
+                            toReturn = list;
+                        }
+
+                        break; 
+
+                    default:
+                        throw new WebDriverException("Cannot determine result type");
+                }
+            }
+            finally
+            {
+                scriptResult.Dispose();
             }
 
             return toReturn;
