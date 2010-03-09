@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns:svg='http://www.w3.org/2000/svg' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+<head><meta content='application/xhtml+xml;charset=utf-8' http-equiv='Content-type' /><title>Selenium Grid Self-Healing</title><link href='stylesheets/site.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/document.css' rel='stylesheet' type='text/css' />
+<link href='stylesheets/faq.css' rel='stylesheet' type='text/css' />
+</head>
+<body><div class='header'>
+  <a href='index.html'><img src='images/selenium-grid-logo-large.png' alt='Selenium_grid_logo_large' /></a>
+  <p>Self-Healing</p>
+</div>
+<p class='toc'>Table Of Content:</p>
+<div class='maruku_toc'><ul style='list-style: none;'><li><a href='#heartbeat_mechanism'>Heartbeat Mechanism</a></li><li><a href='#hub_automatic_unregistering_of_unresponsive_remote_controls'>Hub: Automatic Unregistering of Unresponsive Remote Controls</a></li><li><a href='#remote_control_automatic_reregistering_to_the_hub'>Remote Control: Automatic Re-registering to the Hub</a></li></ul></div>
+<h1 id='heartbeat_mechanism'>Heartbeat Mechanism</h1>
+
+<p>To ease the maintenance of a Selenium Grid deployment:</p>
+
+<ul>
+<li>
+<p>Selenium Grid Hub sends periodic heartbeat messages to all registered Remote Controls to make sure that they are still up-and-running.</p>
+</li>
+
+<li>
+<p>Selenium Grid Remote Controls send periodic heartbeat messages to the Hub to check that it still considers them as registered.</p>
+</li>
+</ul>
+
+<p>Keep in mind that <strong>there is obviously a performance tradeoff in how often these heartbeat messages are sent</strong>:</p>
+
+<ul>
+<li>
+<p>If you send them too often they will use most of your network bandwidth for heartbeat management messages as opposed to actual testing commands.</p>
+</li>
+
+<li>
+<p>If you wait too long to send heartbeat messages, it might take longer for the Hub and the Remote Controls to automatically unregister or reconnect.</p>
+</li>
+</ul>
+
+<h1 id='hub_automatic_unregistering_of_unresponsive_remote_controls'>Hub: Automatic Unregistering of Unresponsive Remote Controls</h1>
+
+<p>Remote Controls sometimes die, are killed or just hang. To better cope with these situations, Selenium Grid Hub checks the status of registered Remote Controls. It will automatically unregister:</p>
+
+<ul>
+<li>
+<p>A Remote Control detected as <strong>unavailable when reserving it to start a new test session</strong></p>
+</li>
+
+<li>
+<p>A Remote Control that <strong>does not respond to a heartbeat message request</strong> (periodic poll every <code>remoteControlPollingIntervalInSeconds</code> seconds, default is 2 minutes)</p>
+</li>
+
+<li>
+<p>A <em>reserved</em> Remote Control whose <strong>testing session has been idle for more than <code>sessionMaxIdleTimeInSeconds</code> seconds</strong> (3 minutes by default). Sessions are checked every <code>remoteControlPollingIntervalInSeconds</code> seconds (at the same time heartbeat messages are sent).</p>
+</li>
+</ul>
+
+<p><code>remoteControlPollingIntervalInSeconds</code> and <code>sessionMaxIdleTimeInSeconds</code> are configuration parameters that can be set in <code>grid_configuration.yml</code>. For instance:</p>
+
+<pre><code>hub:
+   port: 4444
+   remoteControlPollingIntervalInSeconds: 180
+   sessionMaxIdleTimeInSeconds: 300
+   environments:
+       - name:    &quot;Firefox on Windows&quot;
+         browser: &quot;*firefox&quot;</code></pre>
+
+<h1 id='remote_control_automatic_reregistering_to_the_hub'>Remote Control: Automatic Re-registering to the Hub</h1>
+
+<p>Sometimes you might want to restart Selenium Grid Hub without restarting all the Remote Controls that were previously registered. Or the Hub might temporarily get disconnected from the remote controls. To better cope with these situations, the Remote Controls periodically poll the Hub (every <code>hubPollerIntervalInSeconds</code> seconds, default is 3 minutes).</p>
+
+<p>If the Hub can be contacted but does not have any registered Remote Control matching the information sent by the Remote Control submitting the heartbeat request, <strong>the Remote Control will re-register itself to the Hub automatically</strong>.</p>
+
+<p>You can specify <code>hubPollerIntervalInSeconds</code> when starting the Remote Controls. For instance:</p>
+
+<pre><code>ant -DhubPollerIntervalInSeconds=120 launch-hub  </code></pre>
+</body></html>
