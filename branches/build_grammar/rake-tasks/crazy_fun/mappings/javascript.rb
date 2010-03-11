@@ -130,7 +130,8 @@ module Javascript
         end
         dirs = dirs.keys
 
-        cmd = "third_party/closure/bin/calcdeps.py -c third_party/closure/bin/compiler-2009-12-17.jar "
+        cmd = "java -jar third_party/py/jython.jar "
+        cmd << "third_party/closure/bin/calcdeps.py -c third_party/closure/bin/compiler-2009-12-17.jar "
         cmd << "-o compiled "
         cmd << '-f "--third_party=true" '
 #        cmd << '-f "--compilation_level=WHITESPACE_ONLY" '
