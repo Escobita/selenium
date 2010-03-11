@@ -39,8 +39,15 @@ js_library(:name => "prompt_service",
   :srcs => [ "src/extension/components/promptService.js" ],
   :deps => [ :utils ])
 
+js_library(:name => "server",
+  :srcs => [ "src/extension/content/**"],
+  :deps => [ "//common/src/js:extension" ])
+
 mozilla_xpi(:name => "webdriver",
-  :content => [ "src/extension/content/**" ],
+  :content => [ 
+	:server,
+	"src/extension/content/fxdriver.xul"
+  ],
   :components => [
     "src/extension/components/json2.js",
     :native_events_xpt,

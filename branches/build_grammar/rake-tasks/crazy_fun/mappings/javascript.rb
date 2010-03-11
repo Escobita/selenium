@@ -141,7 +141,6 @@ module Javascript
         cmd << js_files.join(" -i ")
         cmd << " -p third_party/closure/goog -p "
         cmd << dirs.join(" -p ")
-#        cmd << " > #{output}"
 
         mkdir_p File.dirname(output)
         sh cmd

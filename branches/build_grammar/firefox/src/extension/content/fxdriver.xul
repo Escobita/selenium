@@ -18,7 +18,6 @@ limitations under the License.
 -->
 
 <overlay id="fxdriver-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <script src="dommessenger.js" />
     <script src="server.js" />
     <statusbar id="status-bar">
         <statusbarpanel>

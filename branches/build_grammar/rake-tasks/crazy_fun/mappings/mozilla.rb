@@ -151,6 +151,7 @@ class Build < BaseXpi
     xpi = xpi_name(dir, args[:name])
     
     file xpi do 
+      puts "Preparing: #{task_name(dir, args[:name])} as #{xpi}"
       temp = xpi + "_temp"
       mkdir_p temp
 
