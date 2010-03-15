@@ -61,6 +61,7 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.android.util.JsUtil;
 
 import java.net.URL;
 import java.util.HashSet;
