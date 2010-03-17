@@ -11,7 +11,7 @@ goog.require('goog.string');
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  */
-bot.locators.strategies.by_className = function(win, target) {
+bot.locators.strategies.className = function(win, target) {
   if (!target) {
     throw Error('No class name specified');
   }
@@ -29,5 +29,5 @@ bot.locators.strategies.by_className = function(win, target) {
   }
   return null;
 };
-goog.exportProperty(bot.locators.strategies, 'by_className',
-                    bot.locators.strategies.by_className);
+goog.exportProperty(bot.locators.strategies, 'className',
+                    bot.locators.strategies.className);

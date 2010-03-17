@@ -1,7 +1,7 @@
 
 goog.provide('bot.locators.strategies.id');
 
-bot.locators.strategies.by_id = function(win, target) {
+bot.locators.strategies.id = function(win, target) {
   var doc = win.document;
 
   var e = doc.getElementById(target);
@@ -33,3 +33,5 @@ bot.locators.strategies.by_id = function(win, target) {
 
   return undefined;
 };
+goog.exportProperty(bot.locators.strategies, 'id',
+                    bot.locators.strategies.id);

@@ -2,7 +2,7 @@
 goog.provide('bot.locators.strategies.name');
 
 
-bot.locators.strategies.by_name = function(win, name) {
+bot.locators.strategies.name = function(win, name) {
   var doc = win.document;
 
   if (doc['getElementsByName']) {
@@ -18,3 +18,6 @@ bot.locators.strategies.by_name = function(win, name) {
 
   return undefined;  
 };
+
+goog.exportProperty(bot.locators.strategies, 'name',
+                    bot.locators.strategies.name);
