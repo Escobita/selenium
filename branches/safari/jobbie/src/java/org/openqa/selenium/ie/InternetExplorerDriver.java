@@ -17,32 +17,23 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
-import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Speed;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -50,9 +41,17 @@ import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.ReturnedCookie;
 import org.openqa.selenium.internal.TemporaryFilesystem;
 
-import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
+public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, TakesScreenshot {
 
   private static ExportedWebDriverFunctions lib;
   private Pointer driver;
@@ -161,7 +160,7 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
       result = lib.wdExecuteScript(driver, new WString(script), scriptArgs, scriptResultRef);
 
       errors.verifyErrorCode(result, "Cannot execute script");
-      return extractReturnValue(scriptResultRef);
+      return new JavascriptResultCollection(lib, this).extractReturnValue(scriptResultRef);
     } finally {
       lib.wdFreeScriptArgs(scriptArgs);
     }
@@ -169,72 +168,6 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
 
   public boolean isJavascriptEnabled() {
     return true;
-  }
-
-  private Object extractReturnValue(PointerByReference scriptResultRef) {
-    int result;
-    Pointer scriptResult = scriptResultRef.getValue();
-
-    IntByReference type = new IntByReference();
-    result = lib.wdGetScriptResultType(scriptResult, type);
-
-    errors.verifyErrorCode(result, "Cannot determine result type");
-
-    try {
-      Object toReturn;
-      switch (type.getValue()) {
-        case 1:
-          PointerByReference wrapper = new PointerByReference();
-          result = lib.wdGetStringScriptResult(scriptResult, wrapper);
-          errors.verifyErrorCode(result, "Cannot extract string result");
-          toReturn = new StringWrapper(lib, wrapper).toString();
-          break;
-
-        case 2:
-          NativeLongByReference value = new NativeLongByReference();
-          result = lib.wdGetNumberScriptResult(scriptResult, value);
-          errors.verifyErrorCode(result, "Cannot extract number result");
-          toReturn = value.getValue().longValue();
-          break;
-
-        case 3:
-          IntByReference boolVal = new IntByReference();
-          result = lib.wdGetBooleanScriptResult(scriptResult, boolVal);
-          errors.verifyErrorCode(result, "Cannot extract boolean result");
-          toReturn = boolVal.getValue() == 1 ? Boolean.TRUE : Boolean.FALSE;
-          break;
-
-        case 4:
-          PointerByReference element = new PointerByReference();
-          result = lib.wdGetElementScriptResult(scriptResult, driver, element);
-          errors.verifyErrorCode(result, "Cannot extract element result");
-          toReturn = new InternetExplorerElement(lib, this, element.getValue());
-          break;
-
-        case 5:
-          toReturn = null;
-          break;
-
-        case 6:
-          PointerByReference message = new PointerByReference();
-          result = lib.wdGetStringScriptResult(scriptResult, message);
-          errors.verifyErrorCode(result, "Cannot extract string result");
-          throw new WebDriverException(new StringWrapper(lib, message).toString());
-
-        case 7:
-          DoubleByReference doubleVal = new DoubleByReference();
-          result = lib.wdGetDoubleScriptResult(scriptResult, doubleVal);
-          errors.verifyErrorCode(result, "Cannot extract double result");
-          toReturn = doubleVal.getValue();
-          break;
-
-        default:
-          throw new WebDriverException("Cannot determine result type");
-      }
-      return toReturn;
-    } finally {
-      lib.wdFreeScriptResult(scriptResult);
-    }
   }
 
   private int populateArguments(int result, Pointer scriptArgs, Object... args) {
@@ -261,7 +194,6 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
     return result;
   }
 
-
   public void get(String url) {
     int result = lib.wdGet(driver, new WString(url));
     if (result != SUCCESS) {
@@ -283,7 +215,7 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
     PointerByReference ptr = new PointerByReference();
     int result = lib.wdGetTitle(driver, ptr);
     if (result != SUCCESS) {
-      throw new IllegalStateException("Unable to get current URL: " + result);
+      throw new IllegalStateException("Unable to get title: " + result);
     }
 
     return new StringWrapper(lib, ptr).toString();
@@ -342,6 +274,21 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
 
   protected void waitForLoadToComplete() {
     lib.wdWaitForLoadToComplete(driver);
+  }
+  
+  public Pointer getDriverPointer() {
+    return driver;
+  }
+
+  public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+	// Get the screenshot as base64.
+	PointerByReference ptr = new PointerByReference();
+	int result = lib.wdCaptureScreenshotAsBase64(driver, ptr);
+	if (result != SUCCESS) {
+	  throw new IllegalStateException("Unable to capture screenshot: " + result);
+    }
+    // ... and convert it.
+    return target.convertFromBase64Png(new StringWrapper(lib, ptr).toString());
   }
 
   @Override
@@ -458,74 +405,16 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor {
         throw new WebDriverException("Cookie to delete cannot be null");
       }
 
-      String currentUrl = getCurrentUrl();
-      try {
-        URI uri = new URI(currentUrl);
-
-        Cookie toDelete = new NullPathCookie(cookie.getName(), cookie.getValue(), uri.getHost(),
-                                             uri.getPath(), new Date(0));
-
-        deleteCookieByPath(toDelete);
-      } catch (URISyntaxException e) {
-        throw new WebDriverException("Cannot delete cookie: " + e.getMessage());
-      }
-    }
-
-    private void deleteCookieByPath(Cookie cookie) {
-      String path = cookie.getPath();
-
-      if (path != null) {
-        String[] segments = cookie.getPath().split("/");
-        StringBuilder currentPath = new StringBuilder();
-        for (String segment : segments) {
-          if ("".equals(segment)) continue;
-
-          currentPath.append("/").append(segment);
-
-          Cookie toDelete = new NullPathCookie(cookie.getName(), cookie.getValue(),
-                                               cookie.getDomain(), currentPath.toString(),
-                                               new Date(0));
-
-          recursivelyDeleteCookieByDomain(toDelete);
-        }
-      }
-      Cookie toDelete = new NullPathCookie(cookie.getName(), cookie.getValue(),
-                                               cookie.getDomain(), "/",
-                                               new Date(0));
-      recursivelyDeleteCookieByDomain(toDelete);
-
-      toDelete = new NullPathCookie(cookie.getName(), cookie.getValue(),
-                                               cookie.getDomain(), null,
-                                               new Date(0));
-      recursivelyDeleteCookieByDomain(toDelete);
-    }
-
-    private void recursivelyDeleteCookieByDomain(Cookie cookie) {
-      addCookie(cookie);
-
-      int dotIndex = cookie.getDomain().indexOf('.');
-      if (dotIndex == 0) {
-        String domain = cookie.getDomain().substring(1);
-        Cookie toDelete =
-          new NullPathCookie(cookie.getName(), cookie.getValue(), domain,
-                             cookie.getPath(), new Date(0));
-        recursivelyDeleteCookieByDomain(toDelete);
-      } else if (dotIndex != -1) {
-        String domain = cookie.getDomain().substring(dotIndex);
-        Cookie toDelete =
-          new NullPathCookie(cookie.getName(), cookie.getValue(), domain,
-                             cookie.getPath(), new Date(0));
-        recursivelyDeleteCookieByDomain(toDelete);
-      } else {
-        Cookie toDelete =
-          new NullPathCookie(cookie.getName(), cookie.getValue(), "",
-                             cookie.getPath(), new Date(0));
-        addCookie(toDelete);
-      }
+      deleteCookieNamed(cookie.getName());
     }
 
     public void deleteCookieNamed(String name) {
-      deleteCookie(getCookieNamed(name));
+      if (name == null) {
+        throw new WebDriverException("Cookie to delete cannot be null");
+      }
+
+      int result = lib.wdDeleteCookie(driver, new WString(name));
+      errors.verifyErrorCode(result, "Cannot delete cookie " + name);
     }
 
     public Set<Cookie> getCookies() {

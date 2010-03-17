@@ -1,6 +1,11 @@
 module Selenium
   module WebDriver
     module IE
+
+      #
+      # @private
+      #
+
       module Util
         CP_ACP         = 0
         CP_OEMCP       = 1
@@ -62,6 +67,7 @@ module Selenium
 
         def extract_string_from(string_ptr_ref)
           string_ptr = string_ptr_ref.get_pointer(0)
+          return if string_ptr.null? # getElementAttribute()
 
           length_ptr = FFI::MemoryPointer.new :int
 
@@ -78,7 +84,7 @@ module Selenium
 
           wstring_to_bytestring raw_string
         ensure
-          Lib.wdFreeString(string_ptr)
+          Lib.wdFreeString(string_ptr) unless string_ptr.null?
           string_ptr_ref.free
         end
 
@@ -87,7 +93,7 @@ module Selenium
           length_ptr   = FFI::MemoryPointer.new :int
 
           check_error_code Lib.wdcGetElementCollectionLength(elements_ptr, length_ptr),
-          "Cannot extract elements from collection"
+                           "Cannot extract elements from collection"
 
           arr = []
 

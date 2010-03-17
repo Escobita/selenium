@@ -46,8 +46,7 @@ namespace OpenQA.Selenium
             string[] hostNameParts = hostName.Split(new char[] { '.' });
             if (hostNameParts.Length < 3)
             {
-                Console.WriteLine("Cookies can only be set on fully-qualified domain names. Skipping.");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
             driver.Url = macbethPage;
             IOptions options = driver.Manage();
@@ -58,6 +57,8 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [IgnoreBrowser(Browser.IE, "Add cookie to unrelated domain silently fails for IE.")]
+        [ExpectedException(typeof(WebDriverException))]
         public void ShouldNotShowCookieAddedToDifferentDomain()
         {
             driver.Url = macbethPage;
@@ -73,21 +74,22 @@ namespace OpenQA.Selenium
         {
             driver.Url = macbethPage;
             IOptions options = driver.Manage();
-            Cookie cookie = new Cookie("Lisa", "Simpson", EnvironmentManager.Instance.UrlBuilder.HostName, EnvironmentManager.Instance.UrlBuilder.Path + "IDoNotExist", null);
+            Cookie cookie = new Cookie("Lisa", "Simpson", EnvironmentManager.Instance.UrlBuilder.HostName, "/" + EnvironmentManager.Instance.UrlBuilder.Path + "IDoNotExist", null);
             options.AddCookie(cookie);
             ReadOnlyCollection<Cookie> cookies = options.GetCookies();
             Assert.IsFalse(cookies.Contains(cookie), "Invalid cookie was returned");
         }
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        // TODO(JimEvans): Disabling this test for now. If your network is using
+        // something like OpenDNS or Google DNS which you may be automatically
+        // redirected to a search page, which will be a valid page and will allow a
+        // cookie to be created. Need to investigate further.
+        // [Test]
+        // [ExpectedException(typeof(InvalidOperationException))]
         public void ShouldThrowExceptionWhenAddingCookieToNonExistingDomain()
         {
-            //TODO(jimevan): Using a URL with no suffix here on purpose. Some networks
-            //may be using something like OpenDNS or Google DNS which may automatically
-            //redirect to a search page, which will be a valid page and will allow a
-            //cookie to be created. Need to investigate further.
-            driver.Url = "doesnotexist";
+            driver.Url = macbethPage;
+            driver.Url = "doesnot.noireallyreallyreallydontexist.com";
             IOptions options = driver.Manage();
             Cookie cookie = new Cookie("question", "dunno");
             options.AddCookie(cookie);
@@ -285,7 +287,6 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
         public void ShouldBeAbleToAddToADomainWhichIsRelatedToTheCurrentDomain()
         {
             driver.Url = simpleTestPage;
@@ -295,8 +296,7 @@ namespace OpenQA.Selenium
             string name = GotoValidDomainAndClearCookies();
             if (name == null || nameRegex.IsMatch(name))
             {
-                Console.WriteLine("Skipping test: unable to find domain name to use");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
 
             Assert.IsNull(driver.Manage().GetCookieNamed("name"));
@@ -311,8 +311,6 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        [IgnoreBrowser(Browser.Remote)]
         public void ShouldBeAbleToIncludeLeadingPeriodInDomainName()
         {
             driver.Url = simpleTestPage;
@@ -322,8 +320,7 @@ namespace OpenQA.Selenium
             string name = GotoValidDomainAndClearCookies();
             if (name == null || nameRegex.IsMatch(name))
             {
-                Console.WriteLine("Skipping test: unable to find domain name to use");
-                return;
+                Assert.Ignore("Skipping test: Cookies can only be set on fully-qualified domain names.");
             }
             driver.Manage().DeleteAllCookies();
 
@@ -357,13 +354,16 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "IE cookies do not conform to RFC, so setting cookie on domain fails.")]
         public void ShouldBeAbleToSetDomainToTheCurrentDomain()
         {
+            driver.Url = simpleTestPage;
+            driver.Manage().DeleteAllCookies();
+
             Uri url = new Uri(driver.Url);
             String host = url.Host + ":" + url.Port.ToString();
 
-            Cookie cookie1 = new Cookie("fish", "cod", "/", host, null);
+            Cookie cookie1 = new Cookie("fish", "cod", host, "/", null);
             IOptions options = driver.Manage();
             options.AddCookie(cookie1);
 
@@ -413,21 +413,23 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "IE cookies do not conform to RFC, so setting cookie on domain fails.")]
         public void ShouldIgnoreThePortNumberOfTheHostWhenSettingTheCookie()
         {
+            driver.Url = simpleTestPage;
+            driver.Manage().DeleteAllCookies();
+
             Uri uri = new Uri(driver.Url);
             String host = string.Format("{0}:{1}", uri.Host, uri.Port);
 
             Assert.IsNull(driver.Manage().GetCookieNamed("name"));
-            Cookie cookie = new Cookie("name", "value", "/", host, null);
+            Cookie cookie = new Cookie("name", "value", host, "/", null);
             driver.Manage().AddCookie(cookie);
 
             Assert.IsNotNull(driver.Manage().GetCookieNamed("name"));
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
         public void CookieIntegrity()
         {
             string url = EnvironmentManager.Instance.UrlBuilder.WhereElseIs("animals");
@@ -436,7 +438,7 @@ namespace OpenQA.Selenium
             driver.Manage().DeleteAllCookies();
 
             DateTime time = DateTime.Now.AddDays(1);
-            Cookie cookie1 = new Cookie("fish", "cod", "/common/animals", null, time);
+            Cookie cookie1 = new Cookie("fish", "cod", null, "/common/animals", time);
             IOptions options = driver.Manage();
             options.AddCookie(cookie1);
 

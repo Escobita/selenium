@@ -21,8 +21,6 @@ namespace OpenQA.Selenium
         public void ShouldFollowRedirectsSentInTheHttpResponseHeaders()
         {
             driver.Url = redirectPage;
-            //TODO (jimevan): this is an ugly sleep. Remove when implicit waiting is implemented.
-            System.Threading.Thread.Sleep(500);
             Assert.AreEqual(driver.Title, "We Arrive Here");
         }
 
@@ -30,8 +28,6 @@ namespace OpenQA.Selenium
         public void ShouldFollowMetaRedirects()
         {
             driver.Url = metaRedirectPage;
-            //TODO (jimevan): this is an ugly sleep. Remove when implicit waiting is implemented.
-            System.Threading.Thread.Sleep(500);
             Assert.AreEqual(driver.Title, "We Arrive Here");
         }
 
@@ -85,11 +81,10 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true)]
         [IgnoreBrowser(Browser.IPhone)]
         public void ShouldDoNothingIfThereIsNothingToGoBackTo()
         {
-            driver.Close();
-            CreateFreshDriver();
             string originalTitle = driver.Title;
             driver.Url = formsPage;
 
@@ -165,7 +160,7 @@ namespace OpenQA.Selenium
         //}
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "Refresh does not work properly for IE.")]
         public void ShouldBeAbleToRefreshAPage()
         {
             driver.Url = xhtmlTestPage;

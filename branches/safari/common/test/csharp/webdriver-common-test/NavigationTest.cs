@@ -9,9 +9,9 @@ namespace OpenQA.Selenium
     {
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true)]
         public void ShouldNotHaveProblemNavigatingWithNoPagesBrowsed()
         {
-            CreateFreshDriver();
             INavigation navigation;
             navigation = driver.Navigate();
             navigation.Back();
@@ -19,6 +19,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [IgnoreBrowser(Browser.Chrome, "Driver opens a new window for every navigation, rendering back/forward useless for Chrome.")]
         public void ShouldGoBackAndForward()
         {
             INavigation navigation;
@@ -28,10 +29,10 @@ namespace OpenQA.Selenium
             driver.Url = simpleTestPage;
             
             navigation.Back();
-            Assert.AreEqual(driver.Title, macbethTitle);
+            Assert.AreEqual(macbethTitle, driver.Title);
 
             navigation.Forward();
-            Assert.AreEqual(driver.Title, simpleTestTitle);
+            Assert.AreEqual(simpleTestTitle, driver.Title);
         }
 
         [Test]
@@ -62,12 +63,12 @@ namespace OpenQA.Selenium
             navigation = driver.Navigate();
 
             navigation.GoToUrl(macbethPage);
-            Assert.AreEqual(driver.Title, macbethTitle);
+            Assert.AreEqual(macbethTitle, driver.Title);
 
             // We go to two pages to ensure that the browser wasn't
             // already at the desired page through a previous test.
             navigation.GoToUrl(simpleTestPage);
-            Assert.AreEqual(driver.Title, simpleTestTitle);
+            Assert.AreEqual(simpleTestTitle, driver.Title);
         }
 
         [Test]
@@ -84,11 +85,11 @@ namespace OpenQA.Selenium
             // We go to two pages to ensure that the browser wasn't
             // already at the desired page through a previous test.
             navigation.GoToUrl(simpleTest);
-            Assert.AreEqual(driver.Title, simpleTestTitle);
+            Assert.AreEqual(simpleTestTitle, driver.Title);
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE, "Not implemented yet")]
+        [IgnoreBrowser(Browser.IE, "Refresh does not work for IE")]
         public void ShouldRefreshPage()
         {
             driver.Url = javascriptPage;

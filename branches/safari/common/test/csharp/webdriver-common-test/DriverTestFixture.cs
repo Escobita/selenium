@@ -44,8 +44,16 @@ namespace OpenQA.Selenium
         public string childPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("child/childPage.html");
         public string grandchildPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("child/grandchild/grandchildPage.html");
         public string documentWrite = EnvironmentManager.Instance.UrlBuilder.WhereElseIs("document_write_in_onload.html");
+        public string chinesePage = EnvironmentManager.Instance.UrlBuilder.WhereIs("cn-test.html");
+        public string svgPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("svgPiechart.xhtml");
 
         protected IWebDriver driver;
+
+        public IWebDriver DriverInstance
+        {
+            get { return driver; }
+            set { driver = value; }
+        }
 
         [TestFixtureSetUp]
         public void SetUp()
@@ -56,7 +64,7 @@ namespace OpenQA.Selenium
         [TestFixtureTearDown]
         public void TearDown()
         {
-            EnvironmentManager.Instance.CloseCurrentDriver();
+            // EnvironmentManager.Instance.CloseCurrentDriver();
         }
         
         /*

@@ -20,7 +20,8 @@ namespace OpenQA.Selenium
             Assert.AreEqual("XHTML Test Page", driver.Title);
 
             //TODO (jimevan): this is an ugly sleep. Remove when implicit waiting is implemented.
-            System.Threading.Thread.Sleep(500);
+            SleepBecauseWindowsTakeTimeToOpen();
+
             driver.SwitchTo().Window("result");
             Assert.AreEqual("We Arrive Here", driver.Title);
 
@@ -29,6 +30,7 @@ namespace OpenQA.Selenium
             driver.FindElement(By.Id("iframe_page_heading"));
             driver.SwitchTo().Frame("iframe1");
             Assert.AreEqual(driver.GetWindowHandle(), handle);
+            driver.Close();
 
             driver.SwitchTo().Window(current);
             //Assert.AreEqual("XHTML Test Page", driver.Title);
@@ -54,11 +56,14 @@ namespace OpenQA.Selenium
 
             // Some (semi-)clean up..
             driver.Url = macbethPage;
+            driver.SwitchTo().Window(handle2);
+            driver.Close();
             driver.SwitchTo().Window(handle1);
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE,"Can't close handle and use it afterwards in IE driver")]
+        [NeedsFreshDriver(AfterTest = true)]
+        //[IgnoreBrowser(Browser.IE, "Can't close handle and use it afterwards in IE driver")]
         public void CloseShouldCloseCurrentHandleOnly()
         {
             driver.Url = xhtmlTestPage;
@@ -71,15 +76,13 @@ namespace OpenQA.Selenium
             handle2 = driver.GetWindowHandle();
            
             driver.Close();
-            // TODO(andre.nogueira): IE: Safe handles don't allow this, as the
-            // handle has already been closed! (Throws exception)
+
+            SleepBecauseWindowsTakeTimeToOpen();
+
             ReadOnlyCollection<string> handles = driver.GetWindowHandles();
 
             Assert.IsFalse(handles.Contains(handle2), "Invalid handle still in handle list");
             Assert.IsTrue(handles.Contains(handle1), "Valid handle not in handle list");
-
-            // Clean up after ourselves
-            EnvironmentManager.Instance.CreateFreshDriver();
         }
 
         [Test]
@@ -100,16 +103,15 @@ namespace OpenQA.Selenium
 
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        [IgnoreBrowser(Browser.Firefox)]
-        [IgnoreBrowser(Browser.Remote)]
+        [NeedsFreshDriver(BeforeTest = true, AfterTest = true)]
+        //[IgnoreBrowser(Browser.Firefox)]
         public void ShouldBeAbleToIterateOverAllOpenWindows()
         {
-            CreateFreshDriver();
-
             driver.Url = xhtmlTestPage;
             driver.FindElement(By.Name("windowOne")).Click();
+            SleepBecauseWindowsTakeTimeToOpen();
             driver.FindElement(By.Name("windowTwo")).Click();
+            SleepBecauseWindowsTakeTimeToOpen();
 
             ReadOnlyCollection<string> allWindowHandles = driver.GetWindowHandles();
 
@@ -123,11 +125,10 @@ namespace OpenQA.Selenium
             }
 
             Assert.AreEqual(3, allWindowHandles.Count);
-            CreateFreshDriver();
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "IE prompts with an alert when closing. Revisit when alert handling is done")]
         public void ClickingOnAButtonThatClosesAnOpenWindowDoesNotCauseTheBrowserToHang()
         {
             driver.Url = xhtmlTestPage;
@@ -152,7 +153,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [Category("Javascript")]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "IE prompts with an alert when closing. Revisit when alert handling is done")]
         public void CanCallGetWindowHandlesAfterClosingAWindow()
         {
             driver.Url = xhtmlTestPage;
@@ -207,11 +208,10 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true, AfterTest = true)]
         [IgnoreBrowser(Browser.ChromeNonWindows, "Chrome failing on OS X")]
-        [IgnoreBrowser(Browser.IE)]
         public void CanCloseWindowWhenMultipleWindowsAreOpen()
         {
-            CreateFreshDriver();
             driver.Url = xhtmlTestPage;
             driver.FindElement(By.Name("windowOne")).Click();
 
@@ -224,18 +224,19 @@ namespace OpenQA.Selenium
             string handle1 = allWindowHandles[1];
             driver.SwitchTo().Window(handle1);
             driver.Close();
+
+            SleepBecauseWindowsTakeTimeToOpen();
+            
             allWindowHandles = driver.GetWindowHandles();
             Assert.AreEqual(1, allWindowHandles.Count);
-            CreateFreshDriver();
         }
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true, AfterTest = true)]
         public void ClosingOnlyWindowShouldNotCauseTheBrowserToHang()
         {
-            CreateFreshDriver();
             driver.Url = xhtmlTestPage;
             driver.Close();
-            CreateFreshDriver();
         }
 
         private void SleepBecauseWindowsTakeTimeToOpen()

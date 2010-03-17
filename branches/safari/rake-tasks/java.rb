@@ -64,9 +64,21 @@ class JavaGen < BaseGenerator
           path if path.to_s =~ /.jar$/
         end
 
-        # Compile
-        cmd = "javac -cp #{classpath.join(classpath_separator?)} -g -source 5 -target 5 -d #{temp} #{FileList[args[:srcs]]} " 
-        sh cmd, :verbose => false 
+        # avoid hitting Windows' command line argument limit by putting
+        # the source list in a file
+        src_file = "src.txt"
+        File.open(src_file, "w") do |file|
+          file << FileList[args[:srcs]].join(" ")
+        end
+
+        begin
+          # Compile
+          cmd = "javac -cp #{classpath.join(classpath_separator?)} -g -source 5 -target 5 -d #{temp} @#{src_file}"
+          sh cmd, :verbose => false
+        ensure
+          # Delete the temporary file
+          File.delete src_file
+        end
       end
       
       # TODO(simon): make copy_resource_ handle this for us
@@ -79,9 +91,19 @@ class JavaGen < BaseGenerator
         
         if (res.kind_of? Hash) 
           res.each do |from, to|
+            Dir["#{temp}/#{to}/**.svn"].each { |file| rm_rf file }
             dir = to.gsub(/\/.*?$/, "")
             mkdir_p "#{temp}/#{dir}", :verbose => false
-            cp_r find_file(from), "#{temp}/#{to}"
+            
+            begin
+              if File.directory? from
+                mkdir_p "#{temp}/#{to}"
+              end
+              cp_r find_file(from), "#{temp}/#{to}"
+            rescue
+              Dir["#{temp}/**/.svn"].each { |file| rm_rf file }
+              cp_r find_file(from), "#{temp}/#{to}"
+            end
           end
         else
           target = res.gsub(/build\//, '')
@@ -132,13 +154,17 @@ class JavaGen < BaseGenerator
 
     if args[:system_properties] then
       args[:system_properties].each do |prop|
-        test_string += '-D#{prop} '
+        test_string += "-D#{prop} "
       end
     end
 
     if ENV['JVM_ARGS'] then
       test_string += ENV['JVM_ARGS']+" "
     end  
+
+    if ENV['REMOTE_JAVA_DEBUG_PORT'] then
+      test_string += "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=#{ENV['REMOTE_JAVA_DEBUG_PORT']} "
+    end
 
     test_string += main
     test_string += ' ' + args[:args] if args[:args]
@@ -192,10 +218,17 @@ class JavaGen < BaseGenerator
       temp = "#{out}_temp"
       mkdir_p temp, :verbose => false
       
-      all = build_uberlist_(args[:deps], args[:standalone])
-      all.each do |dep|
-        sh "cd #{temp} && jar xf ../../#{dep}", :verbose => false
+      all = []
+      args[:deps].each do |d|
+        all += build_classpath_(d)
       end
+      all = all.sort.uniq.collect
+      
+      all.each do |dep|
+        next unless dep.to_s =~ /\.jar$/
+        next if (dep.to_s =~ /\lib\// or dep.to_s =~ /^third_party\//) and args[:no_libs] == true
+        sh "cd #{temp} && jar xf ../../#{dep}", :verbose => false
+      end      
 
       excludes = args[:exclude] || []
       excludes.each do |to_exclude|

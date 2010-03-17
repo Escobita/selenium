@@ -1,6 +1,8 @@
 module Selenium
   module WebDriver
     module Remote
+
+      # @private
       class Response
 
         attr_accessor :code
@@ -12,9 +14,11 @@ module Selenium
         end
 
         def error
-          if payload['error']
-            JSON.parse(payload['value'])
-          end
+          Error.for_code(payload['status'])
+        end
+
+        def error_message
+          payload['value']['message']
         end
 
         def [](key)
@@ -28,14 +32,11 @@ module Selenium
         private
 
         def assert_ok
-          if @code.nil? || @code > 400
+          if @code.nil? || @code >= 400
             if e = error()
-              raise(
-                Error.for_remote_class(e['class']),
-                e['message'] || self
-              )
+              raise(e, error_message)
             else
-              raise ServerError, self
+              raise Error::ServerError, self
             end
           end
         end

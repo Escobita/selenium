@@ -57,6 +57,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [Category("Javascript")]
+        [IgnoreBrowser(Browser.IE, "Dragging too far in IE causes the element not to move, instead of moving to 0,0.")]
         [IgnoreBrowser(Browser.HtmlUnit)]
         [IgnoreBrowser(Browser.Chrome)]
         public void DragTooFar()
@@ -66,7 +67,7 @@ namespace OpenQA.Selenium
 
             // Dragging too far left and up does not move the element. It will be at 
             // its original location after the drag.
-            Point originalLocation = img.Location;
+            Point originalLocation = new Point(0, 0);
             img.DragAndDropBy(int.MinValue, int.MinValue);
             Assert.AreEqual(originalLocation, img.Location);
 
@@ -78,7 +79,6 @@ namespace OpenQA.Selenium
         [Test]
         [Category("Javascript")]
         [IgnoreBrowser(Browser.HtmlUnit)]
-        [IgnoreBrowser(Browser.IE)]
         [IgnoreBrowser(Browser.Chrome)]
         public void MouseSpeed()
         {
@@ -94,15 +94,15 @@ namespace OpenQA.Selenium
         [Test]
         [Category("Javascript")]
         [IgnoreBrowser(Browser.HtmlUnit)]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "Location property not taking scroll position into account")]
         [IgnoreBrowser(Browser.Chrome)]
         public void ShouldAllowUsersToDragAndDropToElementsOffTheCurrentViewPort()
         {
             driver.Url = dragAndDropPage;
 
             IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
-            int height = (int)js.ExecuteScript("return window.outerHeight;");
-            int width = (int)js.ExecuteScript("return window.outerWidth;");
+            int height = Convert.ToInt32(js.ExecuteScript("return window.outerHeight;"));
+            int width = Convert.ToInt32(js.ExecuteScript("return window.outerWidth;"));
             js.ExecuteScript("window.resizeTo(300, 300);");
 
             try

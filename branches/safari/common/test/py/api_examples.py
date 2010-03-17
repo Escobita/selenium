@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Copyright 2008-2009 WebDriver committers
 # Copyright 2008-2009 Google Inc.
 #
@@ -13,32 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/usr/bin/python
 
-import datetime
-import logging
 import os
 import re
 import tempfile
 import time
 import shutil
-import simplejson
-import socket
-import sys
 import unittest
-from wsgiref.handlers import format_date_time
-from webdriver.common.exceptions import *
-from webdriver.common.webserver import SimpleWebServer
-import webdriver.remote.webdriver
-import webdriver.common_tests
-from webdriver.common_tests import utils
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ErrorInResponseException
+import selenium.remote.webdriver
 
-webserver = SimpleWebServer()
-driver = None
 
 def not_available_on_remote(func):
+
     def testMethod(self):
-        if type(self.driver) == webdriver.remote.webdriver.WebDriver:
+        if type(self.driver) == selenium.remote.webdriver.WebDriver:
             return lambda x: None
         else:
             return func(self)
@@ -46,12 +38,6 @@ def not_available_on_remote(func):
 
 
 class ApiExampleTest (unittest.TestCase):
-
-    def setUp(self):
-        self.driver = driver
-
-    def tearDown(self):
-        pass
 
     def testGetTitle(self):
         self._loadSimplePage()
@@ -62,13 +48,13 @@ class ApiExampleTest (unittest.TestCase):
         self._loadSimplePage()
         url = self.driver.get_current_url()
         self.assertEquals("http://localhost:%d/simpleTest.html"
-                          % webserver.port, url)
+                          % self.webserver.port, url)
 
     def testFindElementsByXPath(self):
         self._loadSimplePage()
         elem = self.driver.find_element_by_xpath("//h1")
         self.assertEquals("Heading", elem.get_text())
-        
+
     def testFindElementByXpathThrowNoSuchElementException(self):
         self._loadSimplePage()
         try:
@@ -76,7 +62,6 @@ class ApiExampleTest (unittest.TestCase):
         except NoSuchElementException:
             pass
 
-    @not_available_on_remote #TODO: the remote driver is still giving NSE
     def testFindElementByXpathThrowErrorInResponseExceptionForInvalidXPath(self):
         self._loadSimplePage()
         try:
@@ -138,7 +123,6 @@ class ApiExampleTest (unittest.TestCase):
         elem = self.driver.find_element_by_xpath("//form[@name='someForm']/input[@id='username']")
         self.assertEquals("some text", elem.get_value())
 
-    @not_available_on_remote
     def testFindElementByTagName(self):
         self._loadPage("simpleTest")
         elems = self.driver.find_elements_by_tag_name("div")
@@ -147,7 +131,6 @@ class ApiExampleTest (unittest.TestCase):
         elems = self.driver.find_elements_by_tag_name("iframe")
         self.assertEquals(0, len(elems))
 
-    @not_available_on_remote
     def testFindElementByTagNameWithinElement(self):
         self._loadPage("simpleTest")
         div = self.driver.find_element_by_id("multiline")
@@ -176,7 +159,7 @@ class ApiExampleTest (unittest.TestCase):
         checkbox = self.driver.find_element_by_id("checky")
         checkbox.toggle()
         checkbox.submit()
-  
+
     def testSwitchFrameByName(self):
         self._loadPage("frameset")
         self.driver.switch_to_frame("third");
@@ -187,7 +170,8 @@ class ApiExampleTest (unittest.TestCase):
     def testGetPageSource(self):
         self._loadSimplePage()
         source = self.driver.get_page_source()
-        self.assertTrue(len(re.findall(r'<html>.*</html>', source, re.DOTALL)) > 0)
+        matches = re.findall(r'<html>.*</html>', source, re.DOTALL|re.I)
+        self.assertTrue(len(matches) > 0)
 
     def testIsEnabled(self):
         self._loadPage("formPage")
@@ -217,15 +201,21 @@ class ApiExampleTest (unittest.TestCase):
         self.assertEquals("We Arrive Here", self.driver.get_title())
 
     def testGetAttribute(self):
-        self._loadPage("xhtmlTest")
+        page = "xhtmlTest"
+        self._loadPage(page)
         elem = self.driver.find_element_by_id("id1")
-        self.assertEquals("#", elem.get_attribute("href"))
+        attr = elem.get_attribute("href")
+        # IE returns full URL
+        if self.driver.name == "IE":
+            attr = attr[len(self._pageURL(page)):]
+        self.assertEquals("#", attr)
 
     def testGetImplicitAttribute(self):
         self._loadPage("nestedElements")
         elems = self.driver.find_elements_by_xpath("//option")
-        for i in range(3):
-            self.assertEquals(i, int(elems[i].get_attribute("index")))
+        self.assert_(len(elems) >= 3)
+        for i, elem in enumerate(elems[:3]):
+            self.assertEquals(i, elem.get_attribute("index"))
 
     def testExecuteSimpleScript(self):
         self._loadPage("xhtmlTest")
@@ -242,19 +232,23 @@ class ApiExampleTest (unittest.TestCase):
         result = self.driver.execute_script("return arguments[0] == 'fish' ? 'fish' : 'not fish';", "fish")
         self.assertEquals("fish", result)
 
+    def testExecuteScriptWithMultipleArgs(self):
+        self._loadPage("xhtmlTest")
+        result = self.driver.execute_script(
+            "return arguments[0] + arguments[1]", 1, 2)
+        self.assertEquals(3, result)
+
     def testExecuteScriptWithElementArgs(self):
         self._loadPage("javascriptPage")
         button = self.driver.find_element_by_id("plainButton")
         result = self.driver.execute_script("arguments[0]['flibble'] = arguments[0].getAttribute('id'); return arguments[0]['flibble'];", button)
         self.assertEquals("plainButton", result)
 
-    @not_available_on_remote
     def testFindElementsByPartialLinkText(self):
-        """PartialLink match is not yet implemented on Remote Driver"""
         self._loadPage("xhtmlTest")
         elem = self.driver.find_element_by_partial_link_text("new window")
         elem.click()
-        
+
     def testIsElementDisplayed(self):
         self._loadPage("javascriptPage")
         visible = self.driver.find_element_by_id("displayed").is_displayed()
@@ -270,13 +264,11 @@ class ApiExampleTest (unittest.TestCase):
         self.assertTrue(os.path.exists(file_name))
         shutil.rmtree(os.path.dirname(file_name))
 
+    def _pageURL(self, name):
+        return "http://localhost:%d/%s.html" % (self.webserver.port, name)
+
     def _loadSimplePage(self):
-        self.driver.get("http://localhost:%d/simpleTest.html" % webserver.port)
+        self._loadPage("simpleTest")
 
     def _loadPage(self, name):
-        self.driver.get("http://localhost:%d/%s.html" % (webserver.port, name))
-
-def run_tests(driver_):
-    global driver
-    driver = driver_
-    utils.run_tests("api_examples.ApiExampleTest", driver, webserver)
+        self.driver.get(self._pageURL(name))

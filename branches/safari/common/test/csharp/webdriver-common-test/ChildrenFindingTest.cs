@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using System.Collections.ObjectModel;
+using OpenQA.Selenium.Internal;
 
 namespace OpenQA.Selenium
 {
@@ -20,7 +21,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [ExpectedException(typeof(NoSuchElementException))]
-        public void FindElementByXPathWhenNoMatch() 
+        public void FindElementByXPathWhenNoMatch()
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
@@ -49,7 +50,6 @@ namespace OpenQA.Selenium
 
         [Test]
         [IgnoreBrowser(Browser.IE, "Multiple items of ID 1 exist in the page, returns subelements of *all* of them, not the one we selected. See issue 278.")]
-        [IgnoreBrowser(Browser.Remote, "Multiple items of ID 1 exist in the page, returns subelements of *all* of them, not the one we selected. See issue 278.")]
         [IgnoreBrowser(Browser.HtmlUnit, "Multiple items of ID 1 exist in the page, returns subelements of *all* of them, not the one we selected. See issue 278.")]
         public void FindElementsByXPathWithMultipleParentElementsOfSameId()
         {
@@ -61,7 +61,6 @@ namespace OpenQA.Selenium
 
         [Test]
         [IgnoreBrowser(Browser.IE, "Issue 278.")]
-        [IgnoreBrowser(Browser.Remote, "Issue 278.")]
         [IgnoreBrowser(Browser.HtmlUnit, "Issue 278.")]
         public void FindsSubElementNotTopLevelElementWhenLookingUpSubElementByXPath()
         {
@@ -141,7 +140,7 @@ namespace OpenQA.Selenium
 
 
         [Test]
-        public void FindElementsByLinkTest() 
+        public void FindElementsByLinkTest()
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("div1"));
@@ -163,8 +162,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        public void ShouldFindChildElementsByClassName() 
+        public void ShouldFindChildElementsByClassName()
         {
             driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
@@ -175,8 +173,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        public void ShouldFindChildrenByClassName() 
+        public void ShouldFindChildrenByClassName()
         {
             driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Name("classes"));
@@ -210,42 +207,47 @@ namespace OpenQA.Selenium
             Assert.AreEqual(2, elements.Count);
         }
 
-        //TODO (jimevan): Implement CSS Selector
-        //[Test]
-        //public void ShouldBeAbleToFindAnElementByCssSelector() {
-        //  if (!supportsSelectorApi()) {
-        //    System.out.println("Skipping test: selector API not supported");
-        //    return;
-        //  }
+        [Test]
+        [Category("Javascript")]
+        public void ShouldBeAbleToFindAnElementByCssSelector()
+        {
+            driver.Url = nestedPage;
+            if (!SupportsSelectorApi())
+            {
+                Assert.Ignore("Skipping test: selector API not supported");
+            }
 
-        //  driver.Url = nestedPage;
-        //  IWebElement parent = driver.FindElement(By.Name("form2"));
+            IWebElement parent = driver.FindElement(By.Name("form2"));
 
-        //  IWebElement element = parent.FindElement(By.cssSelector("*[name=\"selectomatic\"]"));
+            IWebElement element = parent.FindElement(By.CssSelector("*[name=\"selectomatic\"]"));
 
-        //  Assert.AreEqual("2", element.GetAttribute("id"));
-        //}
+            Assert.AreEqual("2", element.GetAttribute("id"));
+        }
 
-        //[Test]
-        //[Category("Javascript")]
-        //public void ShouldBeAbleToFindAnElementsByCssSelector() {
-        //  if (!supportsSelectorApi()) {
-        //    System.out.println("Skipping test: selector API not supported");
-        //    return;
-        //  }
+        [Test]
+        [Category("Javascript")]
+        [IgnoreBrowser(Browser.Chrome, "Chrome doesn't handle the many-pages situation well")]
+        public void ShouldBeAbleToFindAnElementsByCssSelector()
+        {
+            driver.Url = nestedPage;
+            if (!SupportsSelectorApi())
+            {
+                Assert.Ignore("Skipping test: selector API not supported");
+            }
 
-        //  driver.Url = nestedPage;
-        //  IWebElement parent = driver.FindElement(By.Name("form2"));
+            IWebElement parent = driver.FindElement(By.Name("form2"));
 
-        //  List<IWebElement> elements = parent.FindElements(By.cssSelector("*[name=\"selectomatic\"]"));
+            ReadOnlyCollection<IWebElement> elements = parent.FindElements(By.CssSelector("*[name=\"selectomatic\"]"));
 
-        //  Assert.AreEqual(2, elements.size());
-        //}
+            Assert.AreEqual(2, elements.Count);
+        }
 
-        //private Boolean supportsSelectorApi() {
-        //  return driver instanceof FindsByCssSelector &&
-        //      (Boolean) ((JavascriptExecutor) driver).executeScript(
-        //      "return document['querySelector'] !== undefined;");
-        //}
+        private bool SupportsSelectorApi()
+        {
+            IJavaScriptExecutor javascriptDriver = driver as IJavaScriptExecutor;
+            IFindsByCssSelector cssSelectorDriver = driver as IFindsByCssSelector;
+
+            return (cssSelectorDriver != null) && (javascriptDriver != null) && ((bool)javascriptDriver.ExecuteScript("return document['querySelector'] !== undefined;"));
+        }
     }
 }

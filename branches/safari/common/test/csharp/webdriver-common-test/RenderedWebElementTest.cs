@@ -29,7 +29,7 @@ namespace OpenQA.Selenium
         [Test]
         [Category("Javascript")]
         [IgnoreBrowser(Browser.Chrome, "WebKit bug 28804")]
-        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.IE, "Position and size are always integer in IE")]
         public void ShouldHandleNonIntegerPositionAndSize()
         {
             driver.Url = rectanglesPage;
@@ -69,10 +69,9 @@ namespace OpenQA.Selenium
             driver.Url = javascriptPage;
 
             IRenderedWebElement element = (IRenderedWebElement)driver.FindElement(By.Id("menu1"));
-            if (System.Environment.OSVersion.Platform != PlatformID.Win32Windows)
+            if (!Platform.CurrentPlatform.IsPlatformType(PlatformType.Windows))
             {
-                Console.WriteLine("Skipping hover test: needs native events");
-                return;
+                Assert.Ignore("Skipping test: Simulating hover needs native events");
             }
 
             IRenderedWebElement item = (IRenderedWebElement)driver.FindElement(By.Id("item1"));
@@ -81,6 +80,7 @@ namespace OpenQA.Selenium
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].style.background = 'green'", element);
             element.Hover();
 
+            item = (IRenderedWebElement)driver.FindElement(By.Id("item1"));
             Assert.AreEqual("Item 1", item.Text);
         }
 
@@ -96,18 +96,17 @@ namespace OpenQA.Selenium
             Assert.IsTrue(size.Height > 0, "Height expected to be greater than 0");
         }
 
-        [Test]
-        [Category("Javascript")]
-        [Ignore]
+        //[Test]
+        //[Category("Javascript")]
+        //[Ignore]
         public void CanClickOnSuckerFishMenuItem()
         {
             driver.Url = javascriptPage;
 
             IRenderedWebElement element = (IRenderedWebElement)driver.FindElement(By.Id("menu1"));
-            if (System.Environment.OSVersion.Platform != PlatformID.Win32Windows)
+            if (!Platform.CurrentPlatform.IsPlatformType(PlatformType.Windows))
             {
-                Console.WriteLine("Skipping hover test: needs native events");
-                return;
+                Assert.Ignore("Skipping test: Simulating hover needs native events");
             }
 
             element.Hover();

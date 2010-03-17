@@ -413,6 +413,19 @@ int InternetExplorerDriver::getSpeed()
 	return speed;
 }
 
+LPCWSTR InternetExplorerDriver::captureScreenshotAsBase64()
+{
+	SCOPETRACER
+	SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_CAPTURESCREENSHOT,)
+	return data.output_string_.c_str();
+}
+
+LPCWSTR InternetExplorerDriver::getScriptResultType(CComVariant* result)
+{
+  SCOPETRACER
+  SEND_MESSAGE_WITH_MARSHALLED_DATA(_WD_GETSCRIPTRESULTOBJECTTYPE, result)
+  return data.output_string_.c_str();
+}
 
 /////////////////////////////////////////////////////////////
 
@@ -471,3 +484,9 @@ DataMarshaller& InternetExplorerDriver::prepareCmData(int v)
 	return data;
 }
 
+DataMarshaller& InternetExplorerDriver::prepareCmData(CComVariant *pDispatch)
+{
+  DataMarshaller& data = prepareCmData();
+  data.input_variant_ = pDispatch;
+  return data;
+}

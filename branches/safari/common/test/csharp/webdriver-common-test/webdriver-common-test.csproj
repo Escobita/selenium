@@ -51,21 +51,21 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.core, Version=2.4.5.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.core, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\third_party\nunit\NUnit-2.4.5-net-2.0\bin\nunit.core.dll</HintPath>
+      <HintPath>..\..\..\..\third_party\csharp\nunit-2.4.8\bin\nunit.core.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.core.interfaces, Version=2.4.5.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.core.interfaces, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\third_party\nunit\NUnit-2.4.5-net-2.0\bin\nunit.core.interfaces.dll</HintPath>
+      <HintPath>..\..\..\..\third_party\csharp\nunit-2.4.8\bin\nunit.core.interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.4.5.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\third_party\nunit\NUnit-2.4.5-net-2.0\bin\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\third_party\csharp\nunit-2.4.8\bin\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.mocks, Version=2.4.5.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.mocks, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\third_party\nunit\NUnit-2.4.5-net-2.0\bin\nunit.mocks.dll</HintPath>
+      <HintPath>..\..\..\..\third_party\csharp\nunit-2.4.8\bin\nunit.mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -94,11 +94,14 @@
     <Compile Include="ExecutingJavascriptTest.cs" />
     <Compile Include="FormHandlingTests.cs" />
     <Compile Include="FrameSwitchingTest.cs" />
-    <Compile Include="IgnoreBrowserAttribute.cs" />
-    <Compile Include="IgnoredBrowserTestDecorator.cs" />
+    <Compile Include="I18Test.cs" />
+    <Compile Include="CustomTestAttributes\IgnoreBrowserAttribute.cs" />
     <Compile Include="JavascriptEnabledBrowserTest.cs" />
     <Compile Include="MiscTest.cs" />
     <Compile Include="NavigationTest.cs" />
+    <Compile Include="CustomTestAttributes\NeedsFreshDriverAttribute.cs" />
+    <Compile Include="CustomTestAttributes\WebDriverTestDecorator.cs" />
+    <Compile Include="CustomTestAttributes\WebDriverTestMethod.cs" />
     <Compile Include="ObjectStateAssumptionsTest.cs" />
     <Compile Include="PageLoadingTest.cs" />
     <Compile Include="PartialLinkTextMatchTest.cs" />
@@ -107,6 +110,7 @@
     <Compile Include="SelectElementHandlingTest.cs" />
     <Compile Include="StaleElementReferenceTest.cs" />
     <Compile Include="TagNameTest.cs" />
+    <Compile Include="TakesScreenshotTest.cs" />
     <Compile Include="TargetLocatorTest.cs" />
     <Compile Include="TextHandlingTest.cs" />
     <Compile Include="TextPagesTest.cs" />

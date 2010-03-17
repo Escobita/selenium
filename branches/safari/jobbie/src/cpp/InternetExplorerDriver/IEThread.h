@@ -106,7 +106,6 @@ protected:
 	bool isCheckbox(IHTMLElement *pElement);
 	bool isRadio(IHTMLElement *pElement);
 	void getTagName(IHTMLElement *pElement, std::wstring& res);
-	void getAttribute(IHTMLElement *pElement, LPCWSTR name, std::wstring& res);
 	bool isSelected(IHTMLElement *pElement);
 	static int isNodeDisplayed(IHTMLDOMNode *element, bool* displayed);
 	static int isDisplayed(IHTMLElement *element, bool* displayed);
@@ -114,7 +113,6 @@ protected:
 	bool isEnabled(IHTMLElement *pElement);
 	int getLocationWhenScrolledIntoView(IHTMLElement *pElement, HWND* hwnd, long *x, long *y, long *w, long *h);
 	int click(IHTMLElement *pElement, CScopeCaller *pSC=NULL);
-	void getValue(IHTMLElement *pElement, std::wstring& res);
 	void getValueOfCssProperty(IHTMLElement *pElement, LPCWSTR propertyName, std::wstring& res);
 	void getText(IHTMLElement *pElement, std::wstring& res);
 	void getPageSource(std::wstring& res);
@@ -129,6 +127,8 @@ protected:
 	bool getEval(IHTMLDocument2* doc, DISPID* evalId, bool* added);
 	void removeScript(IHTMLDocument2* doc);
 	bool createAnonymousFunction(IDispatch* scriptEngine, DISPID evalId, const wchar_t *script, VARIANT* result);
+  void captureScreenshot(std::wstring& res);
+  std::wstring getStriptResultObjectType(CComVariant* scriptResult);
 
           void OnStartIE(WPARAM, LPARAM);
           void OnGetFramesCollection(WPARAM, LPARAM);
@@ -147,8 +147,6 @@ protected:
 
 		  void OnIsElementFresh(WPARAM, LPARAM);
 		  void OnElementGetTagName(WPARAM, LPARAM);
-		  void OnElementGetAttribute(WPARAM, LPARAM);
-		  void OnElementGetValue(WPARAM, LPARAM);
 		  void OnElementSendKeys(WPARAM, LPARAM);
 		  void OnElementClear(WPARAM, LPARAM);
 		  void OnElementIsSelected(WPARAM, LPARAM);
@@ -185,6 +183,8 @@ protected:
 		  void OnGetCookies(WPARAM, LPARAM);
 		  void OnAddCookie(WPARAM, LPARAM);
 		  void OnWaitForNavigationToFinish(WPARAM, LPARAM);
+      void OnCaptureScreenshot(WPARAM, LPARAM);
+      void OnGetScriptResultObjectType(WPARAM, LPARAM);
 
 		  void OnElementRelease(WPARAM, LPARAM);
 

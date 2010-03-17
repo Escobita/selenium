@@ -214,8 +214,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        [IgnoreBrowser(Browser.Firefox)]
+        [IgnoreBrowser(Browser.IE, "IE allows toggling of an option not in a multiselect")]
         [ExpectedException(typeof(NotImplementedException))]
         public void TogglingAnOptionShouldThrowAnExceptionIfTheOptionIsNotInAMultiSelect()
         {
@@ -227,8 +226,6 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [IgnoreBrowser(Browser.IE)]
-        [IgnoreBrowser(Browser.Firefox)]
         public void TogglingAnOptionShouldToggleOptionsInAMultiSelect()
         {
             driver.Url = formsPage;

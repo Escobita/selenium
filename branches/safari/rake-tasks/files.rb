@@ -1,4 +1,5 @@
 def find_file(file)
+  puts "Copying #{file}"
   if file.is_a? Symbol
     # Grab the "out" of the task represented by this symbol
     t = Rake::Task[file]
@@ -6,7 +7,7 @@ def find_file(file)
   end
   
   if (file.is_a? Symbol)
-    puts "Symbol! #{file}"
+    file = file.to_s
   end
   
   if File.exists?(file)
@@ -36,10 +37,10 @@ def copy_single_resource_(from, to)
   from = find_file(from)
   if from.kind_of? FileList
     from.each do |f|
-      cp_r f, "#{to}", :verbose => false
+      cp_r f, "#{to}", :verbose => false, :remove_destination => true 
     end
   else
-    cp_r from, "#{to}", :verbose => false
+    cp_r from, "#{to}", :verbose => false, :remove_destination => true 
   end
 end
 

@@ -32,10 +32,10 @@ module Selenium
         ]
 
         attr_reader :name, :directory
-        attr_accessor :port, :secure_ssl, :native_events, :load_no_focus_lib
+        attr_writer :secure_ssl, :native_events, :load_no_focus_lib
+        attr_accessor :port
 
         class << self
-
           def ini
             @ini ||= ProfilesIni.new
           end
@@ -43,21 +43,57 @@ module Selenium
           def from_name(name)
             ini[name]
           end
-
         end
 
-        def initialize(directory = nil)
-          if directory
-            @directory = directory
-          else
-            @directory = Dir.mktmpdir("webdriver-profile")
-          end
+        #
+        # Create a new Profile instance
+        #
+        # @example User configured profile
+        #
+        #   profile = Selenium::WebDriver::Firefox::Profile.new
+        #   profile['network.proxy.http'] = 'localhost'
+        #   profile['network.proxy.http_port'] = 9090
+        #
+        #   driver = Selenium::WebDriver.for :firefox, :profile => profile
+        #
 
-          unless File.directory?(@directory)
+        def initialize(directory = nil)
+          @directory = directory ? create_tmp_copy(directory) : Dir.mktmpdir("webdriver-profile")
+
+          unless File.directory? @directory
             raise Error::WebDriverError, "Profile directory does not exist: #{@directory.inspect}"
           end
 
-          @extension_source = DEFAULT_EXTENSION_SOURCE # make configurable?
+          # TODO: replace constants with options hash
+          @port              = DEFAULT_PORT
+          @extension_source  = DEFAULT_EXTENSION_SOURCE
+          @native_events     = DEFAULT_ENABLE_NATIVE_EVENTS
+          @secure_ssl        = DEFAULT_SECURE_SSL
+          @load_no_focus_lib = DEFAULT_LOAD_NO_FOCUS_LIB
+
+          @additional_prefs  = {}
+        end
+
+        #
+        # Set a preference for this particular profile.
+        # @see http://preferential.mozdev.org/preferences.html
+        #
+
+        def []=(key, value)
+          case value
+          when String
+            if Util.stringified?(value)
+              raise ArgumentError, "preference values must be plain strings: #{key.inspect} => #{value.inspect}"
+            end
+
+            value = %{"#{value}"}
+          when TrueClass, FalseClass, Integer, Float
+            value = value.to_s
+          else
+            raise TypeError, "invalid preference: #{value.inspect}:#{value.class}"
+          end
+
+          @additional_prefs[key.to_s] = value
         end
 
         def absolute_path
@@ -69,19 +105,25 @@ module Selenium
         end
 
         def update_user_prefs
-          prefs = existing_user_prefs.merge DEFAULT_PREFERENCES
-          prefs['webdriver_firefox_port'] = @port
-          prefs['webdriver_accept_untrusted_certs'] = 'true' unless @secure_ssl == true
-          prefs['webdriver_enable_native_events'] = 'true' if native_events?
+          prefs = current_user_prefs
+
+          prefs.merge! OVERRIDABLE_PREFERENCES
+          prefs.merge! @additional_prefs
+          prefs.merge! DEFAULT_PREFERENCES
+
+          prefs['webdriver_firefox_port']           = @port
+          prefs['webdriver_accept_untrusted_certs'] = 'true' unless secure_ssl?
+          prefs['webdriver_enable_native_events']   = 'true' if native_events?
+          prefs["startup.homepage_welcome_url"]     = prefs["browser.startup.homepage"] # If the user sets the home page, we should also start up there
 
           write_prefs prefs
         end
 
-        def add_extension(force = false)
+        def add_webdriver_extension(force_creation = false)
           ext_path = File.join(extensions_dir, EXTENSION_NAME)
 
           if File.exists?(ext_path)
-            return unless force
+            return unless force_creation
           end
 
           FileUtils.rm_rf ext_path
@@ -103,7 +145,7 @@ module Selenium
             end
           end
 
-          if Platform.os == :linux || load_no_focus_lib?
+          if load_no_focus_lib?
             from_to += NO_FOCUS
             modify_link_library_path(NO_FOCUS.map { |source, dest| File.join(ext_path, File.dirname(dest)) })
           end
@@ -117,27 +159,14 @@ module Selenium
           delete_extensions_cache
         end
 
-        def create_copy
-          tmp_directory = Dir.mktmpdir("webdriver-rb-profilecopy")
-
-          # TODO: must be a better way..
-          FileUtils.rm_rf tmp_directory
-          FileUtils.mkdir_p File.dirname(tmp_directory), :mode => 0700
-          FileUtils.cp_r @directory, tmp_directory
-
-          Profile.new(tmp_directory)
-        end
-
-        def port
-          @port ||= Firefox::DEFAULT_PORT
-        end
+        # TODO: add_extension
 
         def extensions_dir
           @extensions_dir ||= File.join(directory, "extensions")
         end
 
         def user_prefs_path
-          @user_prefs_js ||= File.join(directory, "user.js")
+          @user_prefs_path ||= File.join(directory, "user.js")
         end
 
         def delete_extensions_cache
@@ -157,17 +186,32 @@ module Selenium
         end
 
         def native_events?
-          !!(@native_events ||= Firefox::DEFAULT_ENABLE_NATIVE_EVENTS)
+          @native_events == true
         end
 
         def load_no_focus_lib?
-          !!(@load_no_focus_lib ||= false)
+          @load_no_focus_lib == true
         end
 
+        def secure_ssl?
+          @secure_ssl == true
+        end
 
         private
 
-        def existing_user_prefs
+        def create_tmp_copy(directory)
+          tmp_directory = Dir.mktmpdir("webdriver-rb-profilecopy")
+
+          # TODO: must be a better way..
+          FileUtils.rm_rf tmp_directory
+          FileUtils.mkdir_p File.dirname(tmp_directory), :mode => 0700
+          FileUtils.cp_r directory, tmp_directory
+
+          tmp_directory
+        end
+
+
+        def current_user_prefs
           return {} unless File.exist?(user_prefs_path)
 
           prefs = {}
@@ -184,10 +228,16 @@ module Selenium
         def write_prefs(prefs)
           File.open(user_prefs_path, "w") do |file|
             prefs.each do |key, value|
-              file.puts "user_pref(#{key.inspect}, #{value});"
+              p key => value if $DEBUG
+              file.puts %{user_pref("#{key}", #{value});}
             end
           end
         end
+
+        OVERRIDABLE_PREFERENCES = {
+          "browser.startup.page"     => '0',
+          "browser.startup.homepage" => '"about:blank"'
+        }.freeze
 
         DEFAULT_PREFERENCES = {
           "app.update.auto"                           => 'false',
@@ -201,7 +251,6 @@ module Selenium
           "browser.search.update"                     => 'false',
           "browser.sessionstore.resume_from_crash"    => 'false',
           "browser.shell.checkDefaultBrowser"         => 'false',
-          "browser.startup.page"                      => '0',
           "browser.tabs.warnOnClose"                  => 'false',
           "browser.tabs.warnOnOpen"                   => 'false',
           "dom.disable_open_during_load"              => 'false',
@@ -218,10 +267,9 @@ module Selenium
           "security.warn_viewing_mixed"               => 'false',
           "security.warn_viewing_mixed.show_once"     => 'false',
           "signon.rememberSignons"                    => 'false',
-          "startup.homepage_welcome_url"              => '"about:blank"',
           "javascript.options.showInConsole"          => 'true',
           "browser.dom.window.dump.enabled"           => 'true'
-        }
+        }.freeze
 
       end # Profile
     end # Firefox

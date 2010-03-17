@@ -31,7 +31,7 @@ import java.util.List;
 
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
-  @Ignore(value = CHROME, reason = "Webkit bug 22261")
+  @Ignore(value = {CHROME, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
   public void testShouldFireFocusEventWhenClicking() {
     driver.get(javascriptPage);
@@ -90,7 +90,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     assertEventFired("mousemove");
   }
 
-  @Ignore(value = {CHROME, SELENESE}, reason = "Webkit bug 22261")
+  @Ignore(value = {CHROME, SELENESE, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
   public void testShouldFireEventsInTheRightOrder() {
     driver.get(javascriptPage);
@@ -236,7 +236,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(IE)
+  @Ignore({IE, SELENESE})
   public void testSubmittingFormFromFormElementShouldFireOnSubmitForThatForm() {
     driver.get(javascriptPage);
     WebElement formElement = driver.findElement(By.id("submitListeningForm"));
@@ -245,7 +245,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(IE)
+  @Ignore({IE, SELENESE})
   public void testSubmittingFormFromFormInputSubmitElementShouldFireOnSubmitForThatForm() {
     driver.get(javascriptPage);
     WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));
@@ -254,7 +254,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled 
-  @Ignore(IE)
+  @Ignore({IE, SELENESE})
   public void testSubmittingFormFromFormInputTextElementShouldFireOnSubmitForThatFormAndNotClickOnThatInput() {
     driver.get(javascriptPage);
     WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));

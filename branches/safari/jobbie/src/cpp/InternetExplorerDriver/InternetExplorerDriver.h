@@ -56,6 +56,7 @@ public:
 	DataMarshaller& prepareCmData(LPCWSTR str);
 	DataMarshaller& prepareCmData(int v);
 	DataMarshaller& prepareCmData(IHTMLElement *pElem, LPCWSTR str);
+	DataMarshaller& prepareCmData(CComVariant *pDispatch);
 
 	ElementWrapper* getActiveElement();
 
@@ -82,6 +83,9 @@ public:
 	IeThread* p_IEthread;
 
 	int executeScript(const wchar_t *script, SAFEARRAY* args, CComVariant* result, bool tryAgain = true);
+
+  LPCWSTR captureScreenshotAsBase64();
+  LPCWSTR getScriptResultType(CComVariant* result);
 
 private:
 

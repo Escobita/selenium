@@ -27,15 +27,18 @@ import com.sun.jna.ptr.PointerByReference;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.RenderedWebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.ExportedWebDriverFunctions.HWNDByReference;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
 
 import java.awt.*;
 import java.util.List;
 
-public class InternetExplorerElement implements RenderedWebElement, Locatable {
+public class InternetExplorerElement implements RenderedWebElement, Locatable,
+  WrapsDriver {
 
   private final ExportedWebDriverFunctions lib;
   private final InternetExplorerDriver parent;
@@ -71,11 +74,12 @@ public class InternetExplorerElement implements RenderedWebElement, Locatable {
 
   public String getAttribute(String name) {
     PointerByReference wrapper = new PointerByReference();
-    int result = lib.wdeGetAttribute(element, new WString(name), wrapper);
+    int result = lib.wdeGetAttribute(
+        parent.getDriverPointer(), element, new WString(name), wrapper);
 
     errors.verifyErrorCode(result, "get attribute of");
 
-    return new StringWrapper(lib, wrapper).toString();
+    return wrapper.getValue() == null ? null : new StringWrapper(lib, wrapper).toString();
   }
 
   public String getText() {
@@ -319,5 +323,12 @@ public class InternetExplorerElement implements RenderedWebElement, Locatable {
   public int hashCode() {
     // TODO(simon): Implement something better
     return element.hashCode();
+  }
+
+  /* (non-Javadoc)
+   * @see org.openqa.selenium.internal.WrapsDriver#getContainingDriver()
+   */
+  public WebDriver getWrappedDriver() {
+    return parent;
   }
 }

@@ -111,8 +111,6 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETWIDTH, OnElementGetWidth )
 
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETTAGNAME, OnElementGetTagName )
-	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETATTRIBUTE, OnElementGetAttribute )
-	CUSTOM_MESSAGE_MAP ( _WD_ELEM_GETVALUE, OnElementGetValue )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_SENDKEYS, OnElementSendKeys )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_CLEAR, OnElementClear )
 	CUSTOM_MESSAGE_MAP ( _WD_ELEM_ISSELECTED, OnElementIsSelected )
@@ -156,6 +154,8 @@ BOOL IeThread::DispatchThreadMessageEx(MSG* pMsg)
 	CUSTOM_MESSAGE_MAP ( _WD_GETACTIVEELEMENT, OnGetActiveElement )
 	CUSTOM_MESSAGE_MAP ( _WD_CLOSEWINDOW, OnCloseWindow )
 	CUSTOM_MESSAGE_MAP ( _WD_SWITCHWINDOW, OnSwitchToWindow )
+	CUSTOM_MESSAGE_MAP ( _WD_CAPTURESCREENSHOT, OnCaptureScreenshot )
+	CUSTOM_MESSAGE_MAP ( _WD_GETSCRIPTRESULTOBJECTTYPE, OnGetScriptResultObjectType)
 
 	 return FALSE;
 }
@@ -521,10 +521,12 @@ void IeThread::findCurrentFrame(IHTMLWindow2 **result)
 
 		// Find the frame
 		CComVariant frameHolder;
-		frames->item(&index, &frameHolder);
+		hr = frames->item(&index, &frameHolder);
 
 		interimResult.Release();
-		interimResult = frameHolder.pdispVal;
+		if (!FAILED(hr)) {
+			interimResult = frameHolder.pdispVal;
+		}
 
 		if (!interimResult) { break; } // pathToFrame does not match. Exit.
 

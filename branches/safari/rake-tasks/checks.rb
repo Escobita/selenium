@@ -1,7 +1,7 @@
 # Platform checks
 
 def windows?
-  RUBY_PLATFORM.downcase.include?("win32")
+  RUBY_PLATFORM.downcase.include?("win32") || RUBY_PLATFORM.downcase.include?("mingw32")
 end
 
 def mac?
@@ -14,6 +14,10 @@ end
 
 def cygwin?
   RUBY_PLATFORM.downcase.include?("cygwin")
+end
+
+def unix?
+  linux? or mac?
 end
 
 def classpath_separator?
@@ -71,29 +75,32 @@ end
 
 def iPhoneSDKPresent?
   return false unless xcode?
-  sdks = sh "xcodebuild -showsdks 1>/dev/null 2>/dev/null", :verbose => false
+  sdks = `xcodebuild -showsdks 2>&1`
+  return false unless $?.success?
   !!(sdks =~ /iphonesimulator/)
-  return true
 end
 
 def iPhoneSDK?
   return nil unless iPhoneSDKPresent?
   if $iPhoneSDK == nil then
     cmd = open("|xcodebuild -showsdks | grep iphonesimulator | awk '{print $7}'")
-    sdks = cmd.readlines.map {|x| x.gsub(/\b(.*)\b.*/m, '\1')}
+    sdks = cmd.readlines.map {|x| x.gsub(/\b(.*)\b.*/m, '\1').chomp}
     cmd.close
-    if ENV['IPHONE_SDK_VERSION'] == nil then
-      puts "No SDK specified, using #{sdks[0]}"
-      $iPhoneSDK = sdks[0]
-    else
+
+    if ENV['IPHONE_SDK_VERSION'] != nil then
       $iPhoneSDK = "iphonesimulator#{ENV['IPHONE_SDK_VERSION']}"
       puts "Testing for SDK #{$iPhoneSDK}"
-      if sdks.index($iPhoneSDK) == nil then
-        puts "...#{$iPhoneSDK} not found; Defaulting to #{sdks[0]}"
-        $iPhoneSDK = sdks[0]
+      unless sdks.include?($iPhoneSDK) then
+        puts "...#{$iPhoneSDK} not found."
+        $iPhoneSDK = nil
       end
     end
-    puts "Using iPhoneSDK: #{$iPhoneSDK}"
+
+    if $iPhoneSDK == nil then
+      $iPhoneSDK = sdks.last
+    end
+
+    puts "Using iPhoneSDK: '#{$iPhoneSDK}'"
   end
   $iPhoneSDK
 end

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using System.Collections.ObjectModel;
+using OpenQA.Selenium.Internal;
 
 namespace OpenQA.Selenium
 {
@@ -80,7 +81,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [ExpectedException(typeof(NoSuchElementException))]
-        public void ShouldNotBeAbleTofindElementsBasedOnIdIfTheElementIsNotThere()
+        public void ShouldNotBeAbleToFindElementsBasedOnIdIfTheElementIsNotThere()
         {
             driver.Url = formsPage;
 
@@ -151,6 +152,25 @@ namespace OpenQA.Selenium
 
             IWebElement element = driver.FindElement(By.ClassName("nameBnoise"));
             Assert.AreEqual(element.Text, "An H2 title");
+        }
+
+        [Test]
+        public void ShouldFindElementByClassWhenItsNameIsSurroundedByWhitespace()
+        {
+            driver.Url = xhtmlTestPage;
+
+            IWebElement element = driver.FindElement(By.ClassName("spaceAround"));
+            Assert.AreEqual("Spaced out", element.Text);
+        }
+
+        [Test]
+        public void ShouldFindElementsByClassWhenItsNameIsSurroundedByWhitespace()
+        {
+            driver.Url = xhtmlTestPage;
+
+            ReadOnlyCollection<IWebElement> elements = driver.FindElements(By.ClassName("spaceAround"));
+            Assert.AreEqual(1, elements.Count);
+            Assert.AreEqual("Spaced out", elements[0].Text);
         }
 
         [Test]
@@ -284,7 +304,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void ShouldfindAnElementBasedOnTagName()
+        public void ShouldFindAnElementBasedOnTagName()
         {
             driver.Url = formsPage;
 
@@ -341,11 +361,11 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true)]
         [ExpectedException(typeof(NoSuchElementException))]
         public void ShouldNotBeAbleToLocateASingleElementOnABlankPage()
         {
             // Note we're on the default start page for the browser at this point.
-            CreateFreshDriver();
             driver.FindElement(By.Id("nonExistantButton"));
         }
 
@@ -373,42 +393,38 @@ namespace OpenQA.Selenium
             driver.FindElement(By.XPath("//a[contains(.,'hello world')]"));
         }
 
-        //TODO (jimevan): Implement CSS Selection interfaces.
-        //[Test]
-        //[Category("Javascript")]
-        //public void ShouldBeAbleToFindAnElementByCssSelector()
-        //{
-        //    if (!SupportsSelectorApi())
-        //    {
-        //        Console.WriteLine("Skipping test: selector API not supported");
-        //        return;
-        //    }
+        [Test]
+        [Category("Javascript")]
+        public void ShouldBeAbleToFindAnElementByCssSelector()
+        {
+            if (!SupportsSelectorApi())
+            {
+                Assert.Ignore("Skipping test: selector API not supported");
+            }
 
-        //    driver.Url = xhtmlTestPage;
+            driver.Url = xhtmlTestPage;
 
-        //    driver.FindElement(By.cssSelector("div.content"));
-        //}
+            driver.FindElement(By.CssSelector("div.content"));
+        }
 
-        //[Test]
-        //[Category("Javascript")]
-        //public void ShouldBeAbleToFindAnElementsByCssSelector()
-        //{
-        //    if (!SupportsSelectorApi())
-        //    {
-        //        Console.WriteLine("Skipping test: selector API not supported");
-        //        return;
-        //    }
+        [Test]
+        [Category("Javascript")]
+        public void ShouldBeAbleToFindAnElementsByCssSelector()
+        {
+            if (!SupportsSelectorApi())
+            {
+                Assert.Ignore("Skipping test: selector API not supported");
+            }
 
-        //    driver.Url = xhtmlTestPage;
+            driver.Url = xhtmlTestPage;
 
-        //    driver.FindElements(By.cssSelector("p"));
-        //}
+            driver.FindElements(By.CssSelector("p"));
+        }
 
-        //private bool SupportsSelectorApi()
-        //{
-        //    return driver is FindsByCssSelector &&
-        //        (bool)((JavascriptExecutor)driver).executeScript(
-        //        "return document['querySelector'] !== undefined;");
-        //}
+        private bool SupportsSelectorApi()
+        {
+            return driver is IFindsByCssSelector &&
+                (bool)((IJavaScriptExecutor)driver).ExecuteScript("return document['querySelector'] !== undefined;");
+        }
     }
 }

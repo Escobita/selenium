@@ -16,9 +16,54 @@
  limitations under the License.
  */
 
-function StaleElementError() {
-  this.isStaleElementError = true;
+
+/**
+ * A WebDriver error.
+ * @param {!number} code The error code.
+ * @param {!string|Error} messageOrError The error message, or another Error to
+ *     propagate.
+ * @constructor
+ */
+function WebDriverError(code, messageOrError) {
+
+  var message;
+  var stack;
+  if (messageOrError instanceof Error) {
+    message = messageOrError.message;
+    stack = messageOrError.stack;
+  } else {
+    message = messageOrError.toString();
+    stack = Error(message).stack.split('\n');
+    stack.shift();
+    stack = stack.join('\n');
+  }
+
+  /**
+   * This error's status code.
+   * @type {!number}
+   */
+  this.code = code;
+
+  /**
+   * This error's message.
+   * @type {string}
+   */
+  this.message = message;
+
+  /**
+   * Captures a stack trace for when this error was thrown.
+   * @type {string}
+   */
+  this.stack = stack;
+
+  /**
+   * Used to identify this class since instanceof will not work across
+   * component boundaries.
+   * @type {!boolean}
+   */
+  this.isWebDriverError = true;
 }
+
 
 function createSwitchFile(file_content) {
   var filename = "/tmp/switch_window_started";
@@ -94,39 +139,25 @@ Utils.getServer = function() {
 };
 
 
-Utils.getBrowser = function(context) {
-  return context.fxbrowser;
-};
-
-
-Utils.getDocument = function(context) {
-  if (context.frame) {
-    return context.frame.document;
-  }
-  return context.fxbrowser.contentDocument;
-};
-
-
-Utils.getActiveElement = function(context) {
-  var doc = Utils.getDocument(context);
+Utils.getActiveElement = function(doc) {
 
   var element;
   if (doc["activeElement"]) {
     element = doc.activeElement;
   } else {
-    var commandDispatcher = Utils.getBrowser(context).ownerDocument.
+    var topWindow = doc.defaultView.top;
+    var commandDispatcher = topWindow.getBrowser().ownerDocument.
         commandDispatcher;
 
-    doc = Utils.getDocument(context);
     element = commandDispatcher.focusedElement;
 
-    if (element && Utils.getDocument(context) != element.ownerDocument)
+    if (element && doc != element.ownerDocument)
       element = null;
   }
 
   // Default to the body
   if (!element) {
-    element = Utils.getDocument(context).body;
+    element = doc.body;
   }
 
   return element;
@@ -154,7 +185,7 @@ function getTextFromNode(node, toReturn, textSoFar) {
 
     // Or is this just plain text?
     if (child.nodeName == "#text") {
-      if (Utils.isDisplayed(child)) {
+      if (Utils.isDisplayed(child, false)) {
         var textToAdd = child.nodeValue;
         textToAdd =
         textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
@@ -211,7 +242,10 @@ Utils.isInHead = function(element) {
 };
 
 
-Utils.isDisplayed = function(element) {
+/**
+ * Checks that the element is not hidden by dimensions or CSS
+ */
+Utils.isDisplayed = function(element, scrollIfNecessary) {
   // Ensure that we're dealing with an element.
   var el = element;
   while (el.nodeType != 1 && !(el.nodeType >= 9 && el.nodeType <= 11)) {
@@ -227,7 +261,7 @@ Utils.isDisplayed = function(element) {
     return false;
   }
 
-  var box = Utils.getLocationOnceScrolledIntoView(el);
+  var box = scrollIfNecessary ? Utils.getLocationOnceScrolledIntoView(el) : Utils.getLocation(el);
   // Elements with zero width or height are never displayed
   if (box.width == 0 || box.height == 0) {
     return false;
@@ -318,8 +352,7 @@ Utils.getText = function(element) {
 };
 
 
-Utils.addToKnownElements = function(element, context) {
-  var doc = Utils.getDocument(context);
+Utils.addToKnownElements = function(element, doc) {
   if (!doc.fxdriver_elements) {
     doc.fxdriver_elements = {};
   }
@@ -337,8 +370,7 @@ Utils.addToKnownElements = function(element, context) {
 };
 
 
-Utils.getElementAt = function(index, context) {
-  var doc = Utils.getDocument(context);
+Utils.getElementAt = function(index, doc) {
   var e = doc.fxdriver_elements ? doc.fxdriver_elements[index] : undefined;
   if (e) {
     // Is this a stale reference?
@@ -350,29 +382,21 @@ Utils.getElementAt = function(index, context) {
     if (parent !== e.ownerDocument.documentElement) {
       // Remove from the cache
       delete doc.fxdriver_elements[index];
-
-      throw new StaleElementError();
+      throw new WebDriverError(ErrorCode.STALE_ELEMENT_REFERENCE,
+          'Element is no longer attached to the DOM');
     }
   } else {
-    throw new StaleElementError();
+    throw new WebDriverError(ErrorCode.STALE_ELEMENT_REFERENCE,
+        'Element not found in the cache');
   }
 
   return e;
 };
 
 
-Utils.currentDocument = function(context) {
-  if (context) {
-    return Utils.getDocument(context);
-  } else {
-    return document;
-  }
-};
-
-
-Utils.platform = function(context) {
+Utils.platform = function(doc) {
   if (!this.userAgentPlatformLowercase) {
-    var currentWindow = Utils.currentDocument(context).defaultView;
+    var currentWindow = doc.defaultView;
     this.userAgentPlatformLowercase =
     currentWindow.navigator.platform.toLowerCase();
   }
@@ -414,7 +438,7 @@ Utils.getNodeForNativeEvents = function(element) {
 };
 
 
-Utils.type = function(context, element, text, opt_useNativeEvents) {
+Utils.type = function(doc, element, text, opt_useNativeEvents) {
 
   // For consistency between native and synthesized events, convert common
   // escape sequences to their Key enum aliases.
@@ -427,7 +451,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     var inputtype = element.getAttribute("type");
     if (inputtype && inputtype.toLowerCase() == "file") {
       element.value = text;
-      Utils.fireHtmlEvent(context, element, "change");
+      Utils.fireHtmlEvent(element, "change");
       return;
     }
   }
@@ -542,25 +566,25 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     if (c == '\uE000') {
       if (controlKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(doc, element, "keyup", kCode, 0,
             controlKey = false, shiftKey, altKey, metaKey);
       }
 
       if (shiftKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(doc, element, "keyup", kCode, 0,
             controlKey, shiftKey = false, altKey, metaKey);
       }
 
       if (altKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(doc, element, "keyup", kCode, 0,
             controlKey, shiftKey, altKey = false, metaKey);
       }
 
       if (metaKey) {
         var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-        Utils.keyEvent(context, element, "keyup", kCode, 0,
+        Utils.keyEvent(doc, element, "keyup", kCode, 0,
             controlKey, shiftKey, altKey, metaKey = false);
       }
 
@@ -740,7 +764,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     // generate modifier key event if needed, and continue
 
     if (modifierEvent) {
-      Utils.keyEvent(context, element, modifierEvent, keyCode, 0,
+      Utils.keyEvent(doc, element, modifierEvent, keyCode, 0,
           controlKey, shiftKey, altKey, metaKey);
       continue;
     }
@@ -754,7 +778,7 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
     if (needsShift && !shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-      Utils.keyEvent(context, element, "keydown", kCode, 0,
+      Utils.keyEvent(doc, element, "keydown", kCode, 0,
           controlKey, true, altKey, metaKey);
       Utils.shiftCount += 1;
     }
@@ -785,20 +809,20 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
     }
 
     var accepted =
-        Utils.keyEvent(context, element, "keydown", keyCode, 0,
+        Utils.keyEvent(doc, element, "keydown", keyCode, 0,
             controlKey, needsShift || shiftKey, altKey, metaKey);
 
-    Utils.keyEvent(context, element, "keypress", pressCode, charCode,
+    Utils.keyEvent(doc, element, "keypress", pressCode, charCode,
         controlKey, needsShift || shiftKey, altKey, metaKey, !accepted);
 
-    Utils.keyEvent(context, element, "keyup", keyCode, 0,
+    Utils.keyEvent(doc, element, "keyup", keyCode, 0,
         controlKey, needsShift || shiftKey, altKey, metaKey);
 
     // shift up if needed
 
     if (needsShift && !shiftKey) {
       var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-      Utils.keyEvent(context, element, "keyup", kCode, 0,
+      Utils.keyEvent(doc, element, "keyup", kCode, 0,
           controlKey, false, altKey, metaKey);
     }
   }
@@ -807,40 +831,38 @@ Utils.type = function(context, element, text, opt_useNativeEvents) {
 
   if (controlKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_CONTROL;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(doc, element, "keyup", kCode, 0,
         controlKey = false, shiftKey, altKey, metaKey);
   }
 
   if (shiftKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_SHIFT;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(doc, element, "keyup", kCode, 0,
         controlKey, shiftKey = false, altKey, metaKey);
   }
 
   if (altKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_ALT;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(doc, element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey = false, metaKey);
   }
 
   if (metaKey) {
     var kCode = Components.interfaces.nsIDOMKeyEvent.DOM_VK_META;
-    Utils.keyEvent(context, element, "keyup", kCode, 0,
+    Utils.keyEvent(doc, element, "keyup", kCode, 0,
         controlKey, shiftKey, altKey, metaKey = false);
   }
 };
 
 
-Utils.keyEvent = function(context, element, type, keyCode, charCode,
+Utils.keyEvent = function(doc, element, type, keyCode, charCode,
                           controlState, shiftState, altState, metaState,
                           shouldPreventDefault) {
   var preventDefault = shouldPreventDefault == undefined ? false
       : shouldPreventDefault;
 
-  var keyboardEvent =
-      Utils.currentDocument(context).createEvent("KeyEvents");
-  var currentView =
-      Utils.currentDocument(context).defaultView;
+  var keyboardEvent = doc.createEvent("KeyEvents");
+  var currentView = doc.defaultView;
 
   keyboardEvent.initKeyEvent(
       type, //  in DOMString typeArg,
@@ -862,7 +884,7 @@ Utils.keyEvent = function(context, element, type, keyCode, charCode,
 };
 
 
-Utils.fireHtmlEvent = function(context, element, eventName) {
+Utils.fireHtmlEvent = function(element, eventName) {
   var doc = element.ownerDocument;
   var e = doc.createEvent("HTMLEvents");
   e.initEvent(eventName, true, true);
@@ -896,7 +918,7 @@ Utils.findForm = function(element) {
 };
 
 
-Utils.fireMouseEventOn = function(context, element, eventName) {
+Utils.fireMouseEventOn = function(element, eventName) {
   Utils.triggerMouseEvent(element, eventName, 0, 0);
 };
 
@@ -952,12 +974,24 @@ Utils.findFrame = function(browser, frameId) {
 
 
 Utils.dumpText = function(text) {
+  if (!Utils.dumpText.isLoggingInit_) {
+    var prefs =
+        Utils.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
+    Utils.dumpText.isLoggingInit_ = true;
+    Utils.dumpText.logToConsole_ =
+        prefs.prefHasUserValue("webdriver_log_to_console") &&
+        prefs.getBoolPref("webdriver_log_to_console");
+  }
   var consoleService = Utils.getService(
       "@mozilla.org/consoleservice;1", "nsIConsoleService");
-  if (consoleService)
+  if (consoleService) {
     consoleService.logStringMessage(text);
-  else
+    if (Utils.dumpText.logToConsole_) {
+      dump(text);
+    }
+  } else {
     dump(text);
+  }
 };
 
 
@@ -1029,7 +1063,7 @@ Utils.stackTrace = function() {
 };
 
 
-Utils.getElementLocation = function(element, context) {
+Utils.getElementLocation = function(element) {
   var x = element.offsetLeft;
   var y = element.offsetTop;
   var elementParent = element.offsetParent;
@@ -1071,14 +1105,13 @@ Utils.getElementLocation = function(element, context) {
 };
 
 
-Utils.findElementsByXPath = function (xpath, contextNode, context) {
-  var doc = Utils.getDocument(context);
+Utils.findElementsByXPath = function (xpath, contextNode, doc) {
   var result = doc.evaluate(xpath, contextNode, null,
       Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
   var indices = [];
   var element = result.iterateNext();
   while (element) {
-    var index = Utils.addToKnownElements(element, context);
+    var index = Utils.addToKnownElements(element, doc);
     indices.push(index);
     element = result.iterateNext();
   }
@@ -1086,13 +1119,7 @@ Utils.findElementsByXPath = function (xpath, contextNode, context) {
 };
 
 
-Utils.getLocationOnceScrolledIntoView = function(element) {
-  // Some elements may not a scrollIntoView function - for example,
-  // elements under an SVG element. Call those only if they exist.
-  if (typeof element.scrollIntoView == 'function') {
-    element.scrollIntoView(true);
-  }
-
+Utils.getLocation = function(element) {
   var retrieval = Utils.newInstance(
       "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
 
@@ -1123,9 +1150,10 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
       }
     }
 
-    // Firefox 3.0
+    // Firefox 3.0, but lacking client rect
     Utils.dumpn("Falling back to firefox3 mechanism");
     var accessible = retrieval.getAccessibleFor(element);
+
     var x = {}, y = {}, width = {}, height = {};
     accessible.getBounds(x, y, width, height);
 
@@ -1176,25 +1204,48 @@ Utils.getLocationOnceScrolledIntoView = function(element) {
 };
 
 
-Utils.unwrapParameters = function(wrappedParameters, resultArray, context) {
+Utils.getLocationOnceScrolledIntoView = function(element) {
+  // Some elements may not a scrollIntoView function - for example,
+  // elements under an SVG element. Call those only if they exist.
+  if (typeof element.scrollIntoView == 'function') {
+    element.scrollIntoView(true);
+  }
+
+  return Utils.getLocation(element);
+};
+
+
+Utils.unwrapParameters = function(wrappedParameters, doc) {
+  var converted = [];
   while (wrappedParameters && wrappedParameters.length > 0) {
     var t = wrappedParameters.shift();
-
-    if (t != null && t.length !== undefined && t.length != null && (t['type']
-        === undefined || t['type'] == null)) {
-      var innerArray = [];
-      Utils.unwrapParameters(t, innerArray);
-      resultArray.push(innerArray);
-      return;
+    switch (typeof t) {
+      case 'number':
+      case 'string':
+      case 'boolean':
+        converted.push(t);
+        break;
+      case 'object':
+        if (t == null) {
+          converted.push(null);
+        } else if (typeof t.length === 'number' &&
+            !(t.propertyIsEnumerable('length'))) {
+          converted.push(Utils.unwrapParameters(t, doc));
+        } else if (typeof t['ELEMENT'] === 'string') {
+          var element = Utils.getElementAt(t['ELEMENT'], doc);
+          element = element.wrappedJSObject ? element.wrappedJSObject : element;
+          converted.push(element);
+        } else {
+          var convertedObj = {};
+          for (var prop in t) {
+            convertedObj[prop] = Utils.unwrapParameters(t[prop], doc);
+          }
+          converted.push(convertedObj);
+        }
+        break;
     }
-
-    if (t['type'] == "ELEMENT") {
-      var element = Utils.getElementAt(t['value'], context);
-      t['value'] = element.wrappedJSObject ? element.wrappedJSObject : element;
-    }
-
-    resultArray.push(t['value']);
   }
+  return converted;
 };
 
 
@@ -1210,21 +1261,47 @@ Utils.isHtmlCollection_ = function(obj) {
 }
 
 
-Utils.wrapResult = function(result, context) {
+Utils.wrapResult = function(result, doc) {
   // Sophisticated.
-  if (null === result || undefined === result) {
-    return {type: "NULL", value: null};
-  } else if (result['tagName']) {
-    return {type: "ELEMENT",
-            value: Utils.addToKnownElements(result, context)};
-  } else if (Utils.isArray_(result) || Utils.isHtmlCollection_(result)) {
-    var array = [];
-    for (var i = 0; i < result.length; i++) {
-      array.push(Utils.wrapResult(result[i], context));
-    }
-    return {type: "ARRAY", value: array};
-  } else {
-    return {type: "OTHER", value: result};
+  switch (typeof result) {
+    case 'string':
+    case 'number':
+    case 'boolean':
+      return result;
+
+    case 'function':
+      return result.toString();
+
+    case 'undefined':
+      return null;
+
+    case 'object':
+      if (result == null) {
+        return null;
+      }
+
+      // There's got to be a more intelligent way of detecting this.
+      if (result['tagName']) {
+        return {'ELEMENT': Utils.addToKnownElements(result, doc)};
+      }
+
+      if (typeof result.length === 'number' &&
+          !(result.propertyIsEnumerable('length'))) {
+        var array = [];
+        for (var i = 0; i < result.length; i++) {
+          array.push(Utils.wrapResult(result[i], doc));
+        }
+        return array;
+      }
+
+      var convertedObj = {};
+      for (var prop in result) {
+        convertedObj[prop] = Utils.wrapResult(result[prop], doc);
+      }
+      return convertedObj;
+
+    default:
+      return result;
   }
 }
 

@@ -75,6 +75,7 @@ EXPORT int wdGetPageSource(WebDriver* driver, StringWrapper** result);
 
 EXPORT int wdGetCookies(WebDriver* driver, StringWrapper** result);
 EXPORT int wdAddCookie(WebDriver* driver, const wchar_t* cookie);
+EXPORT int wdDeleteCookie(WebDriver* driver, const wchar_t* cookieName);
 
 EXPORT int wdSwitchToActiveElement(WebDriver* driver, WebElement** result);
 EXPORT int wdSwitchToWindow(WebDriver* driver, const wchar_t* name);
@@ -86,7 +87,7 @@ EXPORT int wdGetCurrentWindowHandle(WebDriver* driver, StringWrapper** handle);
 
 // Element functions
 EXPORT int wdeClick(WebElement* element);
-EXPORT int wdeGetAttribute(WebElement* element, const wchar_t* string, StringWrapper** result);
+EXPORT int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* string, StringWrapper** result);
 EXPORT int wdeGetValueOfCssProperty(WebElement* element, const wchar_t* name, StringWrapper** result);
 EXPORT int wdeGetText(WebElement* element, StringWrapper** result);
 EXPORT int wdeGetTagName(WebElement* element, StringWrapper** result);
@@ -132,12 +133,16 @@ EXPORT int wdAddNumberScriptArg(ScriptArgs* scriptArgs, long number);
 EXPORT int wdAddDoubleScriptArg(ScriptArgs* scriptArgs, double number);
 EXPORT int wdAddElementScriptArg(ScriptArgs* scriptArgs, WebElement* element);
 EXPORT int wdExecuteScript(WebDriver* driver, const wchar_t* script, ScriptArgs* scriptArgs, ScriptResult** scriptResultRef);
-EXPORT int wdGetScriptResultType(ScriptResult* result, int* type);
+EXPORT int wdGetScriptResultType(WebDriver* driver, ScriptResult* result, int* type);
 EXPORT int wdGetStringScriptResult(ScriptResult* result, StringWrapper** wrapper);
 EXPORT int wdGetNumberScriptResult(ScriptResult* result, long* value);
 EXPORT int wdGetDoubleScriptResult(ScriptResult* result, double* value);
 EXPORT int wdGetBooleanScriptResult(ScriptResult* result, int* value);
 EXPORT int wdGetElementScriptResult(ScriptResult* result, WebDriver* driver, WebElement** element);
+EXPORT int wdGetArrayLengthScriptResult(WebDriver* driver, ScriptResult* result, int* length);
+EXPORT int wdGetArrayItemFromScriptResult(WebDriver* driver,
+                                          ScriptResult* result, int index,
+                                          ScriptResult** arrayItem);
 
 
 // Element collection functions
@@ -156,6 +161,9 @@ EXPORT int wdCopyString(StringWrapper* source, int length, wchar_t* dest);
 EXPORT int wdeMouseDownAt(HWND hwnd, long windowX, long windowY);
 EXPORT int wdeMouseUpAt(HWND hwnd, long windowX, long windowY);
 EXPORT int wdeMouseMoveTo(HWND hwnd, long duration, long fromX, long fromY, long toX, long toY);
+
+// Screenshot capturing
+EXPORT int wdCaptureScreenshotAsBase64(WebDriver* driver, StringWrapper** result);
 
 #ifdef __cplusplus
 }

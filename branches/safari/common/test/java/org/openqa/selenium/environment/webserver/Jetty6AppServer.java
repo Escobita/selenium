@@ -17,13 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.environment.webserver;
 
-import junit.framework.Assert;
-
-import javax.servlet.Servlet;
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
@@ -32,6 +25,13 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.servlet.MultiPartFilter;
 import org.openqa.selenium.NetworkUtils;
+
+import junit.framework.Assert;
+
+import javax.servlet.Servlet;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 
 public class Jetty6AppServer implements AppServer {
 
@@ -47,10 +47,17 @@ public class Jetty6AppServer implements AppServer {
   private File jsSrcRoot;
   private File jsTestRoot;
   private File thirdPartyJsRoot;
-  private final Server server = new Server();
+  private final Server server;
   private WebAppContext context;
 
   public Jetty6AppServer() {
+    // Be quiet. Unless we want things to be chatty
+    if (!Boolean.getBoolean("webdriver.debug")) {
+      new NullLogger().disableLogging();
+    }
+
+    server = new Server();
+
     path = findRootOfWebApp();
     jsSrcRoot = findJsSrcWebAppRoot();
     jsTestRoot = findJsTestWebAppRoot();
@@ -64,6 +71,8 @@ public class Jetty6AppServer implements AppServer {
     addServlet("Redirecter", "/redirect", RedirectServlet.class);
     addServlet("InfinitePagerServer", "/page/*", PageServlet.class);
     addServlet("Uploader", "/upload", UploadServlet.class);
+    addServlet("Unusual encoding", "/encoding", EncodingServlet.class);
+    addServlet("Sleeper", "/sleep", SleepingServlet.class);
     addFilter(MultiPartFilter.class, "/upload", Handler.DEFAULT);
 
     listenOn(findFreePort());
@@ -235,7 +244,7 @@ public class Jetty6AppServer implements AppServer {
     }
   }
 
-  public void addFilter(Class filter, String path, int dispatches) {
+  public void addFilter(Class<?> filter, String path, int dispatches) {
     context.addFilter(filter, path, dispatches);
   }
 

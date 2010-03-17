@@ -1,6 +1,8 @@
 module Selenium
   module WebDriver
     module Firefox
+
+      # @private
       module Util
         module_function
 
@@ -15,6 +17,10 @@ module Selenium
           else
             raise "Unknown os: #{Platform.os}"
           end
+        end
+
+        def stringified?(str)
+          str =~ /^".*"$/
         end
 
       end # Util

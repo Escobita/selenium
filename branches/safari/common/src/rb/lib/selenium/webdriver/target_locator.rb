@@ -32,7 +32,15 @@ module Selenium
         if block_given?
           original = @bridge.getCurrentWindowHandle
           @bridge.switchToWindow id
+
           yield
+
+          current_handles = @bridge.getWindowHandles
+
+          if current_handles.size == 1
+            original = current_handles.shift
+          end
+
           @bridge.switchToWindow original
         else
           @bridge.switchToWindow id
@@ -47,6 +55,14 @@ module Selenium
 
       def active_element
         @bridge.switchToActiveElement
+      end
+
+      #
+      # selects either the first frame on the page, or the main document when a page contains iframes.
+      #
+
+      def default_content
+        @bridge.switchToDefaultContent
       end
 
     end # TargetLocator

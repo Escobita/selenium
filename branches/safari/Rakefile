@@ -12,8 +12,10 @@ require 'rake-tasks/iphone'
 require 'rake-tasks/selenium'
 require 'rake-tasks/mozilla'
 require 'rake-tasks/ruby'
+require 'rake-tasks/se-ide'
+require 'rake-tasks/ie_code_generator'
 
-version = "2.0a1"
+version = "2.0a2"
 
 task :default => [:test]
 
@@ -182,7 +184,33 @@ dotnet_library(:name => "build/x64/Release/webdriver-ie-test.dll",
                :project => "webdriver-ie-test",
                :arch => "x64",
                :prebuilt => "jobbie/prebuilt")
+dotnet_library(:name => "build/Win32/Release/WebDriver.Firefox.dll",
+               :srcs => [ "firefox/src/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox",
+               :arch => "Win32",
+               :prebuilt => "firefox/prebuilt")
 
+dotnet_library(:name => "build/x64/Release/WebDriver.Firefox.dll",
+               :srcs => [ "firefox/src/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox",
+               :arch => "x64",
+               :prebuilt => "firefox/prebuilt")
+
+dotnet_library(:name => "build/Win32/Release/webdriver-firefox-test.dll",
+               :srcs => [ "firefox/test/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox-test",
+               :arch => "Win32",
+               :prebuilt => "firefox/prebuilt")
+
+dotnet_library(:name => "build/x64/Release/webdriver-firefox-test.dll",
+               :srcs => [ "firefox/test/csharp/**/*.cs" ],
+               :solution => "WebDriver.sln",
+               :project => "webdriver-firefox-test",
+               :arch => "x64",
+               :prebuilt => "firefox/prebuilt")
 dotnet_library(:name => "build/Win32/Release/WebDriver.Remote.dll",
                :srcs => [ "remote/client/src/csharp/**/*.cs" ],
                :solution => "WebDriver.sln",
@@ -209,17 +237,35 @@ dotnet_library(:name => "build/x64/Release/webdriver-remote-test.dll",
 
 task :dotnet => [ :'build/x64/Release/webdriver-ie-test.dll', :'build/Win32/Release/webdriver-ie-test.dll',
                   :'build/x64/Release/Webdriver.Ie.dll', :'build/Win32/Release/Webdriver.Ie.dll',
+                  :'build/x64/Release/webdriver-firefox-test.dll', :'build/Win32/Release/webdriver-firefox-test.dll',
+                  :'build/x64/Release/Webdriver.Firefox.dll', :'build/Win32/Release/Webdriver.Firefox.dll',
                   :'build/x64/Release/webdriver-remote-test.dll', :'build/Win32/Release/webdriver-remote-test.dll',
                   :'build/x64/Release/Webdriver.Remote.dll', :'build/Win32/Release/Webdriver.Remote.dll',
                   :'build/x64/Release/webdriver-common-test.dll', :'build/Win32/Release/webdriver-common-test.dll',
                   :'build/x64/Release/Webdriver.Common.dll', :'build/Win32/Release/Webdriver.Common.dll',
                   :ie_win32_dll, :ie_x64_dll ]
 
+# Generate a C++ Header file for mapping between magic numbers and #defines
+# in the C++ code.
+ie_generate_type_mapping(:name => "ie_result_type_cpp",
+                         :src => "jobbie/src/common/result_types.txt",
+                         :type => "cpp",
+                         :out => "cpp/InternetExplorerDriver/IEReturnTypes.h")
+
+# Generate a Java class for mapping between magic numbers and Java static
+# class members describing them.
+ie_generate_type_mapping(:name => "ie_result_type_java",
+                         :src => "jobbie/src/common/result_types.txt",
+                         :type => "java",
+                         :out => "java/org/openqa/selenium/ie/IeReturnTypes.java")
+
 java_jar(:name => "webdriver-ie",
     :srcs  => [ "jobbie/src/java/**/*.java" ],
     :deps => [
                :'webdriver-common',
-               "jobbie/lib/runtime/*.jar"
+               "jobbie/lib/runtime/*.jar",
+               :ie_result_type_java,
+               :ie_result_type_cpp
              ],
     :resources => [
                {:ie_win32_dll => "x86/InternetExplorerDriver.dll"},
@@ -323,11 +369,13 @@ java_jar(:name => "webdriver-firefox",
     :srcs  => [ "firefox/src/java/**/*.java" ],
     :deps => [
                :common,
+               :remote_client,
+               :remote_common,
                :firefox_xpi,
                :libnoblur,
                "firefox/lib/runtime/*.jar"
              ],
-    :resources => [ 
+    :resources => [
                     :firefox_xpi,
                     { "linux/Release/x_ignore_nofocus.so" => "x86/x_ignore_nofocus.so" },
                     { "linux64/Release/x_ignore_nofocus.so" => "amd64/x_ignore_nofocus.so" }
@@ -341,9 +389,9 @@ java_test(:name => "webdriver-firefox-test",
                    ])
 
 java_test(:name => "webdriver-single-testsuite",
-          :srcs  => [ "common/test/java/org/openqa/selenium/SingleTestSuite.java" ],
+          :srcs  => [ "common/test/java/org/openqa/selenium/SingleTestSuite.java"],
           :deps => [
-                     :'webdriver-firefox',
+                     :'webdriver-ie',
                      :'webdriver-common-test',
                    ])
 
@@ -352,7 +400,7 @@ java_jar(:name => "webdriver-support",
     :deps => [
                :common,
                "support/lib/runtime/*.jar",
-               "third_party/java/google-collect-1.0-rc3.jar",
+               "third_party/java/google-collect-1.0.jar",
              ])
 
 java_test(:name => "webdriver-support-test",
@@ -367,7 +415,7 @@ java_jar(:name => "webdriver-remote-common",
          :deps => [
                :common,
                "remote/common/lib/runtime/*.jar",
-               "third_party/java/google-collect-1.0-rc3.jar",
+               "third_party/java/google-collect-1.0.jar",
              ])
 
 java_jar(:name => "webdriver-remote-client",
@@ -377,6 +425,28 @@ java_jar(:name => "webdriver-remote-client",
                :'webdriver-remote-common',
                "remote/client/lib/runtime/*.jar",
              ])
+
+xpt(:name => "ide-auto-complete",
+    :src  => [ "ide/src/extension/idl/SeleniumIDEGenericAutoCompleteSearch.idl" ],
+    :prebuilt => "ide/prebuilt",
+    :out  => "SeleniumIDEGenericAutoCompleteSearch.xpt")
+
+xpi(:name => "ide",
+    :srcs => [],
+    :deps => [],
+    :resources => [
+                    { "ide/src/extension/chrome/" => "/" },
+                    { "common/src/js/core/*" => "chrome/content/selenium/"},
+                    { "ide/src/extension/content" => "chrome/" },
+                    { "ide/src/extension/skin" => "chrome/" },
+                    { "ide/src/extension/locale" => "chrome/" },
+                    { :"ide-auto-complete" => "components/" },
+                    { "ide/src/extension/components/SeleniumIDEGenericAutoCompleteSearch.js" => "components/" },
+                    { "ide/src/extension/install.rdf" => "/" },
+                    { "ide/src/extension/chrome.manifest.production" => "/chrome.manifest" },
+                    { "common/src/js/core/scripts/selenium-testrunner.js" => "content-files/" }
+                  ],
+    :out => "selenium-ide-1.0.6-SNAPSHOT.xpi")
 
 java_jar(:name => "selenium-common-js",
     :resources => [
@@ -425,7 +495,9 @@ java_uberjar(:name => "selenium-server",
              :exclude => [
                            "META-INF/BCKEY.*"
                          ],
-             :main => "org.openqa.selenium.server.SeleniumServer")
+             :main => "org.openqa.selenium.server.SeleniumServer",
+             :no_libs => true)
+
 task :'selenium-server_zip' do
   temp = "build/selenium-server_zip"
   mkdir_p temp
@@ -510,7 +582,7 @@ java_test(:name => "webdriver-selenium-test",
           :deps => [
                      :test_common,
                      :htmlunit,
-                     :'selenium-server',
+                     :'selenium-server-standalone',
                      "selenium/lib/buildtime/*.jar",
                    ],
           :main => "org.testng.TestNG",
@@ -521,7 +593,7 @@ java_test(:name => "webdriver-selenese-test",
           :deps => [
                      :test_common,
                      :htmlunit,
-                     :'selenium-server',
+                     :'selenium-server-standalone',
                      "selenium/lib/buildtime/*.jar",
                    ])
 
@@ -533,17 +605,17 @@ java_jar(:name => "selenium-core",
 
 selenium_test(:name => "test_core_firefox",
               :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [ 
+              :deps => [
                 :"webdriver-remote-server",
-                :"selenium-core" 
+                :"selenium-core"
               ],
               :browser => "*chrome" )
-        
+
 selenium_test(:name => "test_core_ie",
               :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [ 
+              :deps => [
                 :"webdriver-remote-server",
-                :"selenium-core" 
+                :"selenium-core"
               ],
               :browser => "*iexploreproxy")
 
@@ -565,30 +637,109 @@ java_test(:name => "debug_jsapi",
           :deps => [ :firefox, :test_common ],
           :main => "org.openqa.selenium.environment.webserver.Jetty6AppServer")
 
-task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :chrome] do
+task :javadocs => [:common, :firefox, :htmlunit, :jobbie, :remote, :support, :chrome, :selenium] do
   mkdir_p "build/javadoc", :verbose => false
    sourcepath = ""
    classpath = "support/lib/runtime/hamcrest-all-1.1.jar"
-   %w(common firefox jobbie htmlunit support remote/common remote/client chrome).each do |m|
+   %w(common firefox jobbie htmlunit support remote/common remote/client chrome selenium).each do |m|
      sourcepath += ":#{m}/src/java"
    end
-   cmd = "javadoc -d build/javadoc -sourcepath #{sourcepath} -classpath #{classpath} -subpackages org.openqa.selenium"
-   if (windows?) 
-     cmd = cmd.gsub(/\//, "\\").gsub(/:/, ";") 
+   cmd = "javadoc -d build/javadoc -sourcepath #{sourcepath} -classpath #{classpath} -subpackages org.openqa.selenium -subpackages com.thoughtworks"
+   if (windows?)
+     cmd = cmd.gsub(/\//, "\\").gsub(/:/, ";")
    end
    sh cmd
 end
 
-task :test_firefox_py => :firefox do
+# Installs the webdriver python bindings using virtualenv for testing.
+task :webdriver_py => [:chrome, :firefox, :firefox_xpi, :remote_client] do
   if python? then
-    sh "python setup.py build", :verbose => true
-    sh "python build/lib/webdriver/py_test.py", :verbose => true
+    sh "virtualenv build/python", :verbose => true do |ok, res|
+        if ! ok
+            puts ""
+            puts "PYTHON DEPENDENCY ERROR: Virtualenv not found."
+            puts "Please run '[sudo] pip install virtualenv'"
+            puts ""
+        end
+    end
+
+    sh "build/python/bin/pip install simplejson py", :verbose => true
+
+    # Copy browser extensions over to src so setup.py will pick them up. This is such a hack.
+    cp 'build/chrome-extension.zip', "chrome/src/py/", :verbose => true
+    cp 'build/webdriver-extension.zip', "firefox/src/py/", :verbose => true
+
+    sh "build/python/bin/python setup.py build", :verbose => true
+
+    # Remove the extensions we copied to src.
+    rm "chrome/src/py/chrome-extension.zip", :verbose => true
+    rm "firefox/src/py/webdriver-extension.zip", :verbose => true
+  end
+end
+
+task :test_chrome_py => :webdriver_py do
+  if python? then
+    sh "virtualenv build/python", :verbose => true do |ok, res|
+        if ! ok
+            puts ""
+            puts "PYTHON DEPENDENCY ERROR: Virtualenv not found."
+            puts "Please run '[sudo] pip install virtualenv'"
+            puts ""
+        end
+    end
+    if File.exists?('build/python/bin/py.test')
+        py_test = 'build/python/bin/py.test'
+    else
+        py_test = 'py.test'
+    end
+    test_dir = Dir.glob('build/lib**/selenium/chrome_tests').first
+    sh py_test, test_dir, :verbose => true
+  end
+end
+
+task :test_firefox_py => :webdriver_py do
+  if python? then
+    sh "virtualenv build/python", :verbose => true do |ok, res|
+        if ! ok
+            puts ""
+            puts "PYTHON DEPENDENCY ERROR: Virtualenv not found."
+            puts "Please run '[sudo] pip install virtualenv'"
+            puts ""
+        end
+    end
+    if File.exists?('build/python/bin/py.test')
+        py_test = 'build/python/bin/py.test'
+    else
+        py_test = 'py.test'
+    end
+    test_dir = Dir.glob('build/lib**/selenium/firefox_tests').first
+    sh py_test, test_dir, :verbose => true
+  end
+end
+
+task :test_remote_py => [:webdriver_py, :'selenium-server-standalone'] do
+  if python? then
+    sh "virtualenv build/python", :verbose => true do |ok, res|
+        if ! ok
+            puts ""
+            puts "PYTHON DEPENDENCY ERROR: Virtualenv not found."
+            puts "Please run '[sudo] pip install virtualenv'"
+            puts ""
+        end
+    end
+    if File.exists?('build/python/bin/py.test')
+        py_test = 'build/python/bin/py.test'
+    else
+        py_test = 'py.test'
+    end
+    test_dir = Dir.glob('build/lib**/selenium/remote_tests').first
+    sh py_test, test_dir, :verbose => true
   end
 end
 
 task :test_selenium_py => [:'selenium-core', :'selenium-server-standalone'] do
     if python? then
-        sh "python selenium/test/py/runtests.py", :verbose => true
+        sh "python2.6 selenium/test/py/runtests.py", :verbose => true
     end
 end
 
@@ -611,7 +762,7 @@ iphone_test(:name => "webdriver-iphone-client-test",
 
 
 #### iPhone ####
-task :iphone_server => FileList['iphone/src/objc/**'] do
+task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
     puts "Building iWebDriver iphone app"
@@ -679,7 +830,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_client'
   cp Dir.glob('remote/client/lib/runtime/*.jar'), 'build/dist/remote_client'
-  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_client'
+  cp 'third_party/java/google-collect-1.0.jar', 'build/dist/remote_client'
 
   sh "cd build/dist && zip -r webdriver-remote-client-#{version}.zip remote_client/*"
   rm_rf "build/dist/remote_client", :verbose => false
@@ -692,7 +843,7 @@ task :remote_release => [:remote] do
 
   cp Dir.glob('remote/common/lib/runtime/*.jar'), 'build/dist/remote_server'
   cp Dir.glob('remote/server/lib/runtime/*.jar'), 'build/dist/remote_server'
-  cp 'third_party/java/google-collect-1.0-rc3.jar', 'build/dist/remote_server'
+  cp 'third_party/java/google-collect-1.0.jar', 'build/dist/remote_server'
 
   rm Dir.glob('build/dist/remote_server/servlet*.jar')
 
@@ -709,9 +860,10 @@ java_uberjar(:name => "selenium-java",
                     :remote_client,
                     :selenium,
                     :support
-                  ])
+                  ],
+              :no_libs => true)
 
-task :release => [:'selenium-java_zip', :'selenium-server-standalone', :'selenium-server_zip'] do
+task :release => [:'all_zip', :'selenium-server-standalone', :'selenium-server_zip'] do
   cp "build/selenium-server-standalone.jar", "build/selenium-server-standalone-#{version}.jar"
   cp "build/selenium-java.zip", "build/selenium-java-#{version}.zip"
   cp "build/selenium-server.zip", "build/selenium-server-#{version}.zip"
@@ -726,3 +878,4 @@ task :'selenium-java_zip' do
   mv "#{temp}/selenium-java.jar", "#{temp}/selenium-java-#{version}.jar"
   sh "cd #{temp} && jar cMf ../selenium-java.zip *", :verbose => false
 end
+

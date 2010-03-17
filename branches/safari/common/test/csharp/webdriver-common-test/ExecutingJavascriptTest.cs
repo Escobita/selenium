@@ -10,8 +10,8 @@ namespace OpenQA.Selenium
     public class ExecutingJavascriptTest : DriverTestFixture
     {
 
-        [Category("Javascript")]
         [Test]
+        [Category("Javascript")]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnAString()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -25,8 +25,8 @@ namespace OpenQA.Selenium
             Assert.AreEqual("XHTML Test Page", result);
         }
 
-        [Category("Javascript")]
         [Test]
+        [Category("Javascript")]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnALong()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -40,8 +40,8 @@ namespace OpenQA.Selenium
             Assert.AreEqual((long)"XHTML Test Page".Length, (long)result);
         }
 
-        [Category("Javascript")]
         [Test]
+        [Category("Javascript")]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnAWebElement()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -55,8 +55,8 @@ namespace OpenQA.Selenium
             Assert.IsTrue(result is IWebElement);
         }
 
-        [Category("Javascript")]
         [Test]
+        [Category("Javascript")]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnABoolean()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -73,7 +73,6 @@ namespace OpenQA.Selenium
 
         [Test]
         [Category("Javascript")]
-        [IgnoreBrowser(Browser.IE)]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnAnArray()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -89,8 +88,8 @@ namespace OpenQA.Selenium
             subList.Add(false);
             expectedResult.Add(subList);
             object result = ExecuteScript("return ['zero', [true, false]];");
-            Assert.IsTrue(result is List<object>, "result was: " + result + " (" + result.GetType().Name + ")");
-            List<object> list = (List<object>)result;
+            Assert.IsTrue(result is ReadOnlyCollection<object>, "result was: " + result + " (" + result.GetType().Name + ")");
+            ReadOnlyCollection<object> list = (ReadOnlyCollection<object>)result;
             //Assert.IsTrue(CompareLists(expectedResult, list));
         }
 
@@ -150,9 +149,9 @@ namespace OpenQA.Selenium
             Assert.AreEqual((double)expectedResult, result);
         }
 
+        [Test]
         [Category("Javascript")]
         [ExpectedException(typeof(InvalidOperationException))]
-        [Test]
         public void ShouldThrowAnExceptionWhenTheJavascriptIsBad()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -394,7 +393,6 @@ namespace OpenQA.Selenium
 
         [Test]
         [Category("Javascript")]
-        [IgnoreBrowser(Browser.IE)]
         public void ShouldBeAbleToPassAnArrayAsArgument()
         {
             if (!(driver is IJavaScriptExecutor))
@@ -502,26 +500,26 @@ namespace OpenQA.Selenium
 
         [Test]
         [Category("Javascript")]
-        [IgnoreBrowser(Browser.IE)]
         [IgnoreBrowser(Browser.Chrome)]
-        [IgnoreBrowser(Browser.Remote)]
         [IgnoreBrowser(Browser.IPhone)]
-        public void testShouldBeAbleToExecuteScriptAndReturnElementsList()
+        public void ShouldBeAbleToExecuteScriptAndReturnElementsList()
         {
             driver.Url = formsPage;
             String scriptToExec = "return document.getElementsByName('snack');";
 
-            ReadOnlyCollection<IWebElement> resultsList = (ReadOnlyCollection<IWebElement>)((IJavaScriptExecutor)driver).ExecuteScript(scriptToExec);
+            object resultObject = ((IJavaScriptExecutor)driver).ExecuteScript(scriptToExec);
+
+            ReadOnlyCollection<IWebElement> resultsList = (ReadOnlyCollection<IWebElement>)resultObject;
 
             Assert.Greater(resultsList.Count, 0);
         }
 
         [Test]
+        [NeedsFreshDriver(BeforeTest = true, AfterTest = true)]
         [Ignore("Reason for ignore: Failure indicates hang condition, which would break the test suite. Really needs a timeout set.")]
         public void ShouldThrowExceptionIfExecutingOnNoPage()
         {
             bool exceptionCaught = false;
-            CreateFreshDriver();
             try
             {
                 ((IJavaScriptExecutor)driver).ExecuteScript("return 1;");
@@ -535,7 +533,6 @@ namespace OpenQA.Selenium
             {
                 Assert.Fail("Expected an exception to be caught");
             }
-            CreateFreshDriver();
         }
 
         private object ExecuteScript(String script, params Object[] args)

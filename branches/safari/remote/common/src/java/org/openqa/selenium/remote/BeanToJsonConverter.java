@@ -89,7 +89,7 @@ public class BeanToJsonConverter {
 
   private Map<String, Object> convertJsonObject(JSONObject jsonObject) {
     Map<String, Object> toReturn = new HashMap<String, Object>();
-    Iterator allKeys = jsonObject.keys();
+    Iterator<?> allKeys = jsonObject.keys();
     while (allKeys.hasNext()) {
       String key = (String) allKeys.next();
 
@@ -156,12 +156,6 @@ public class BeanToJsonConverter {
       for (int i = 0; i < length; i++) {
         converted.put(convertObject(Array.get(toConvert, i), maxDepth - 1));
       }
-      return converted;
-    }
-
-    if (toConvert instanceof Context) {
-      JSONObject converted = new JSONObject();
-      converted.put("value", toConvert.toString());
       return converted;
     }
 

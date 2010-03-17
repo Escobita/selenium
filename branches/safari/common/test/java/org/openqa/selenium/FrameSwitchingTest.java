@@ -21,15 +21,28 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
-import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @Ignore(IPHONE)
 public class FrameSwitchingTest extends AbstractDriverTestCase {
+
+  @Override
+  protected void tearDown() throws Exception {
+    try {
+      driver.switchTo().defaultContent();
+    } catch (Exception e) {
+      //May happen if the driver went away.
+    } finally {
+      super.tearDown();
+    }
+  }
 
   @Ignore(SELENESE)
   public void testShouldContinueToReferToTheSameFrameOnceItHasBeenSelected() {
@@ -53,10 +66,13 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage() {
+  public void testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage() throws Exception {
     driver.get(framesetPage);
 
     driver.findElement(By.linkText("top")).click();
+
+    // TODO(simon): Avoid going too fast when native events are there. 
+    Thread.sleep(1000);
 
     assertThat(driver.getTitle(), equalTo("XHTML Test Page"));
     assertThat(driver.findElement(By.xpath("/html/head/title")).getText(),
@@ -97,21 +113,27 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     driver.get(framesetPage);
     driver.switchTo().frame("third");
 
+    // This should replace frame "third" ...
     driver.findElement(By.id("submitButton")).click();
-    String hello = driver.findElement(By.id("greeting")).getText();
-    assertThat(hello, equalTo("Success!"));
-    driver.switchTo().defaultContent();
+    // driver should still be focused on frame "third" ...
+    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
+    // Make sure it was really frame "third" which was replaced ...
+    driver.switchTo().defaultContent().switchTo().frame("third");
+    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
   }
 
-  @Ignore({CHROME, FIREFOX, HTMLUNIT, IE, SELENESE})
+  @Ignore({CHROME, IE, SELENESE})
   public void testShouldBeAbleToClickInASubFrame() {
     driver.get(framesetPage);
     driver.switchTo().frame("sixth.iframe1");
 
+    // This should replaxe frame "iframe1" inside frame "sixth" ...
     driver.findElement(By.id("submitButton")).click();
-    driver.switchTo().frame("sixth");
-    String hello = driver.findElement(By.id("greeting")).getText();
-    assertThat(hello, equalTo("Success!"));
+    // driver should still be focused on frame "iframe1" inside frame "sixth" ...
+    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
+    // Make sure it was really frame "iframe1" inside frame "sixth" which was replaced ...
+    driver.switchTo().defaultContent().switchTo().frame("sixth.iframe1");
+    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
   }
 
   @Ignore(SELENESE)
@@ -166,13 +188,18 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   @NoDriverAfterTest
-  @Ignore({IPHONE, SELENESE})
+  @Ignore({IPHONE, SELENESE, CHROME})
   public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
     driver.get(simpleTestPage);
     try {
       driver.close();
     } catch (Exception e) {
-      fail("This is not expected. " + e.getMessage());
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      pw.flush();
+      pw.close();
+      fail("This is not expected. " + sw);
     }
   }
 

@@ -11,7 +11,7 @@ describe "Driver" do
     driver.page_source.should match(%r[<title>XHTML Test Page</title>]i)
   end
 
-  not_compliant_on :browser => :ie do
+  not_compliant_on :browser => [:ie, :chrome] do
     it "should refresh the page" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.find_element(:link_text, 'Update a div').click
@@ -76,6 +76,17 @@ describe "Driver" do
       driver.find_element(:xpath, "//h1").text.should == "XHTML Might Be The Future"
     end
 
+    not_compliant_on :driver => [:ie, :remote] do
+      it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
+        driver.navigate.to url_for("xhtmlTest.html")
+        driver.find_element(:css, "div.content")
+      end
+    end
+
     it "should find by tag name" do
       driver.navigate.to url_for("xhtmlTest.html")
       driver.find_element(:tag_name, 'div').attribute("class").should == "navigation"
@@ -116,6 +127,17 @@ describe "Driver" do
       driver.find_elements(:class, "nameC").should have(2).things
     end
 
+    not_compliant_on :driver => [:ie, :remote] do
+      it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
+        driver.navigate.to url_for("xhtmlTest.html")
+        driver.find_elements(:css, 'p')
+      end
+    end
+
     it "should find children by field name" do
       driver.navigate.to url_for("nestedElements.html")
       element = driver.find_element(:name, "form2")
@@ -152,6 +174,11 @@ describe "Driver" do
       lambda { driver.execute_script("return squiggle();") }.should raise_error
     end
 
+    it "should return arrays" do
+      driver.navigate.to url_for("xhtmlTest.html")
+      driver.execute_script('return ["zero", "one", "two"];').should == %w[zero one two]
+    end
+
     it "should be able to call functions on the page" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.execute_script("displayMessage('I like cheese');")
@@ -179,15 +206,11 @@ describe "Driver" do
       driver.execute_script("arguments[0]['flibble'] = arguments[0].getAttribute('id'); return arguments[0]['flibble'];", button).should == "plainButton"
     end
 
-    it "should raise an exception if arguments are invalid" do
-      driver.navigate.to url_for("javascriptPage.html")
-      lambda { driver.execute_script("arguments[0]", Object.new) }.should raise_error(TypeError, /Parameter is not of recognized type:/)
-    end
-
     it "should be able to pass in multiple arguments" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.execute_script("return arguments[0] + arguments[1];", "one", "two").should == "onetwo"
     end
   end
+
 end
 

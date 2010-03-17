@@ -17,8 +17,6 @@ limitations under the License.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenQA.Selenium
 {
@@ -41,6 +39,13 @@ namespace OpenQA.Selenium
         /// but can be used to find drivers with certain capabilities.
         /// </summary>
         Windows,
+
+        /// <summary>
+        /// Any Windows NT-based version of Microsoft Windows. This value is never returned 
+        /// by a driver, but can be used to find drivers with certain capabilities. This value
+        /// is equivalent to PlatformType.Windows.
+        /// </summary>
+        WinNT = Windows,
 
         /// <summary>
         /// Versions of Microsoft Windows that are compatible with Windows XP.
@@ -103,9 +108,10 @@ namespace OpenQA.Selenium
                     {
                         platformTypeValue = PlatformType.Vista;
                     }
-
+                    
                     break;
 
+                // Thanks to a bug in Mono Mac and Linux will be treated the same  https://bugzilla.novell.com/show_bug.cgi?id=515570 but adding this in case
                 case PlatformID.MacOSX:
                     platformTypeValue = PlatformType.MacOSX;
                     break;
@@ -180,6 +186,11 @@ namespace OpenQA.Selenium
 
                 case PlatformType.XP:
                     platformIsType = platformTypeValue == PlatformType.Windows || platformTypeValue == PlatformType.XP;
+                    break;
+
+                // Thanks to a bug in Mono Mac and Linux need to be treated the same  https://bugzilla.novell.com/show_bug.cgi?id=515570 but adding this in case
+                case PlatformType.MacOSX:
+                    platformIsType = platformTypeValue == PlatformType.MacOSX;
                     break;
 
                 case PlatformType.Linux:

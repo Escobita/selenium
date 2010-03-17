@@ -17,11 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 
 public class I18nTest extends AbstractDriverTestCase {
@@ -44,7 +46,6 @@ public class I18nTest extends AbstractDriverTestCase {
     driver.findElement(By.linkText(Messages.getString("I18nTest.link1"))).click();
   }
 
-  @Ignore(REMOTE)
   public void testEnteringHebrewTextFromLeftToRight() {
     driver.get(chinesePage);
     WebElement input = driver.findElement(By.name("i18n"));
@@ -54,7 +55,6 @@ public class I18nTest extends AbstractDriverTestCase {
     assertEquals(shalom, input.getValue());
   }
 
-  @Ignore(REMOTE)
   public void testEnteringHebrewTextFromRightToLeft() {
     driver.get(chinesePage);
     WebElement input = driver.findElement(By.name("i18n"));
@@ -62,5 +62,17 @@ public class I18nTest extends AbstractDriverTestCase {
     input.sendKeys(tmunot);
 
     assertEquals(tmunot, input.getValue());
+  }
+
+  @Ignore(value = {IE, SELENESE})
+  public void testShouldBeAbleToReturnTheTextInAPage() {
+    String url = GlobalTestEnvironment.get()
+        .getAppServer()
+        .whereIs("encoding");
+    driver.get(url);
+
+    String text = driver.findElement(By.tagName("body")) .getText();
+
+    assertEquals(shalom, text);
   }
 }
