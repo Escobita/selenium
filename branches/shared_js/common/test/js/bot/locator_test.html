@@ -56,6 +56,33 @@
     function testFindByClassNameReturnsNullIfNoMatchIsFound() {
       assertNull(bot.locators.findElement({className: 'catsAndDogs'}));
     }
+
+    function testCanFindElementByCssSelector() {
+      var after = bot.locators.findElement({css: '#wrong'});
+
+      assertNotNull(after);
+      assertEquals('wrong', after.id);
+    }
+
+    function testShouldReturnNullIfNoCssMatchIsFound() {
+      assertNull(bot.locators.findElement({css: '#uglyfish'}))
+    }
+
+    function testWillRejectShouldRejectMultipleSelectors() {
+      assertThrows(goog.bind(bot.locators.findElement, null,
+          {css: '.one, #two'}));
+    }
+
+    function testCanLocateElementsUsingXPath() {
+      var doggies = bot.locators.findElement({xpath: "//*[@id = 'after']"});
+
+      assertNotNull(doggies);
+      assertEquals('after', doggies.id);
+    }
+
+    function testWillReturnNullIfNoMatchUsingXPathIsFound() {
+      assertNull(bot.locators.findElement({xpath: "//fish"}));
+    }
   </script>
 </head>
 <body>

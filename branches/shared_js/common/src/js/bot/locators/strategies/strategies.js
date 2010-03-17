@@ -1,9 +1,12 @@
 
 goog.provide('bot.locators.strategies');
 
-goog.require('bot.locators.strategies.id');
-goog.require('bot.locators.strategies.name');
 goog.require('bot.locators.strategies.className');
+goog.require('bot.locators.strategies.css');
+goog.require('bot.locators.strategies.id');
+//goog.require('bot.locators.strategies.link');
+goog.require('bot.locators.strategies.name');
+goog.require('bot.locators.strategies.xpath');
 goog.require('goog.object');
 
 bot.locators.strategies.lookup = function(target) {
