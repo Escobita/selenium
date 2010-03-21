@@ -22,10 +22,14 @@
       assertEquals('right', e.getAttribute('name'));
     }
 
-    function testCanFindByName() {
+    function testCanFindByNameOutsideOfAForm() {
       var e = bot.locators.findElement({name: 'para'});
 
       assertEquals('x', e.getAttribute('id'));
+    }
+
+    function testWillNotFindAnElementByNameWhereNoMatchShouldBeFound() {
+      assertNull(bot.locators.findElement({name: 'foobar'}));
     }
 
     function testCanFindByClassName() {
