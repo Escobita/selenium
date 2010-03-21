@@ -9,16 +9,26 @@ The official documentation for Selenium can be found at http://seleniumhq.org/do
 Be sure to understand chapter 1 "Fundamental Concepts" of the [http://svnbook.red-bean.com/en/1.5/svn-book.pdf SVN book].
 
 == Subversion client ==
-For non-developers: The recommended way is to install a desktop-integrated client from http://subversion.tigris.org/links.html#desktop-integrations.
 
-For developers: No recommendation.
+For non-developers: The recommended way is to install a GUI client.
+Windows users should probably start with the free
+[http://tortoisesvn.tigris.org/ Tortoise SVN].  If you are using Mac
+OS X, you may wish to purchase [Versions http://versionsapp.com/].
+
+For developers: Mac OS X and many Linux distros, ship with a fine SVN
+command-line client.  Linux users who don't have an `svn` command, can
+install it using a package manager such as Apt or Yum.  Windows
+developers have a few choices, but may wish to try
+[http://www.sliksvn.com/en/download/ the Slik SVN command-line
+client.] Windows users should also be aware that the Cygwin SVN client
+is _not_ recommended at this time.
 
 == Repository ==
 According to your interest/profile choose one the following two URLs to be used for checkout in the Subversion client of your choice
 
-Only working on the RST files: http://selenium.googlecode.com/svn/selenium-core/selenium-website/src/main/rst/
+Only working on the RST files: http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/src/main/rst/
 
-Also working on the website: http://selenium.googlecode.com/svn/selenium-core/selenium-website/
+Also working on the website: http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/
 
 == Access ==
 In order to be able to commit you need an Google account with the appropriate privileges - if you don't have one already and you're part of the team contact Patrick Lightbody.
@@ -36,21 +46,23 @@ We use reStructured Text for structuring and shaping the documentation, therefor
  * http://docutils.sourceforge.net/docs/user/rst/quickref.html(short, with lots of examples)
  * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html (longer, more advanced)
 
-== Local machine parsing using sphinx ==
-The rst files written by the team are parsed using sphinx, a python documentation tool that takes care of the styling and superficial stuff. To do this manually, you must first install sphinx (which also needs python)
+== Local machine parsing using Sphinx ==
+The RST files written by the team are parsed using Sphinx, a python documentation tool that takes care of the styling and superficial stuff. To do this manually, you must first install Sphinx (which also needs python)
 
-=== Install python ===
-Already installed on most `*`NIX. Grab the installer from http://python.org/download/ if you use windows.
+=== Install Python ===
+Already installed on most `*`NIX, and on Mac OS X. Grab the installer from http://python.org/download/ if you use Windows.
 
   Notice: the version of python recommended to install is 2.5.x (latest setuptools windows installer is for version 2.5)
 
 === Install setuptools ===
-This will allow you to use easy_install on the next step.
+
+Setuptools is a package manager for Python. Installing setuptools will
+allow you to use `easy_install` on the next step.
 
 Get the installer from http://pypi.python.org/pypi/setuptools
 
-=== Install sphinx ===
-Run the following on a terminal:
+=== Install Sphinx ===
+Run the following on a terminal (you may need to `sudo`):
 
 {{{
     easy_install Sphinx
@@ -64,6 +76,38 @@ Finally, to generate the docs. All you have to do is run this on a terminal:
 }}}
 
 That's it, you should find the files on the html_destination you've chosen (open index.html to see the docs).
+
+Note that the HTML will be generated without any CSS.
+
+==== Using Make (optional) ====
+
+If you have Make installed on your system, go to
+`websites/www.seleniumhq.org/src/main/rst` and type `make` You will
+then see a list of available build targets for the Selenium docs.  For
+details, say `cat Makefile`
+
+Assuming you're in the `rst` directory, you can build the HTML
+documentation with `make html` The output will be placed in
+`rst/.build/html`
+
+If you'd like to generate the PDF version of the Selenium
+documentation, use the following incantation:
+
+{{{
+    make latex
+    cd .build/latex
+    make all-pdf
+    cd -
+}}}
+
+The final PDF output will be a file named `rst/.build/latex/Selenium_Documentation.pdf`
+
+===== Checking for broken links =====
+
+One of the available Make targets is `linkcheck` If you run `make
+linkcheck` then Sphinx will validate all of the links in the document,
+and let you know if any links are malformed, or point to dead URLs.
+Note that checking all the links does take a while.
 
 == Some rules ==
 
