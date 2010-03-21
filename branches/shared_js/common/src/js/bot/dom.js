@@ -23,8 +23,7 @@ bot.dom.hasAttribute = function(element, attributeName) {
   // the "attributes" array, but this is only present in IE 8 and above. Fall
   // back to simulating the method. Clumsily, but as MS suggest.
   for (var i in element) {
-    if (attributeName != i) {
-    } else {
+    if (attributeName == i) {
       return true;
     }
   }
@@ -74,3 +73,5 @@ bot.dom.getAttribute = function(element, attributeName) {
 
   return value;
 };
+goog.exportProperty(bot.dom, 'getAttribute',
+                    bot.dom.getAttribute);
