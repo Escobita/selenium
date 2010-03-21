@@ -18,6 +18,3 @@ bot.locators.strategies.name = function(win, name) {
 
   return undefined;  
 };
-
-goog.exportProperty(bot.locators.strategies, 'name',
-                    bot.locators.strategies.name);

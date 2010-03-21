@@ -4,19 +4,31 @@ goog.provide('bot.locators.strategies');
 goog.require('bot.locators.strategies.className');
 goog.require('bot.locators.strategies.css');
 goog.require('bot.locators.strategies.id');
-//goog.require('bot.locators.strategies.link');
 goog.require('bot.locators.strategies.name');
 goog.require('bot.locators.strategies.xpath');
 goog.require('goog.object');
 
+bot.locators.strategies.known_ = {
+  'className': bot.locators.strategies.className,
+  'css':       bot.locators.strategies.css,
+  'id':        bot.locators.strategies.id,
+  'name':      bot.locators.strategies.name,
+  'xpath':     bot.locators.strategies.xpath
+};
+
+/**
+ * Lookup a particular element finding strategy based on the sole property of
+ * the "target". The value of this key is used to locate the element.  
+ *
+ * @param {*} target A JS object with a single key
+ * @return {function} The finder function, ready to be called
+ */
 bot.locators.strategies.lookup = function(target) {
   var key = goog.object.getAnyKey(target);
 
   if (key) {
-    if (goog.isFunction(bot.locators.strategies[key])) {
-      return function find() {
-        return bot.locators.strategies[key].call(undefined, bot.window_, target[key]);
-      }
+    if (goog.isFunction(bot.locators.strategies.known_[key])) {
+      return goog.bind(bot.locators.strategies.known_[key], null, bot.window_, target[key]);
     }
   }
   throw new Error('Unsupported locator strategy: ' + key);

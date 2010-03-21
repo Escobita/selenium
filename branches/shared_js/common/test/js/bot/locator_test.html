@@ -27,32 +27,32 @@
 
       assertEquals('x', e.getAttribute('id'));
     }
-    
+
     function testCanFindByClassName() {
       var dogs = bot.locators.findElement({className: 'dogs'});
       assertNotNull(dogs);
       assertEquals('after', dogs.id);
     }
-    
+
     function testCannotSearchWithCompoundClassNames() {
       assertThrows(goog.bind(bot.locators.findElement, null,
           {className: 'feline cats'}));
     }
-    
+
     function testFindByClassNameReturnsFirstMatchingElement() {
       var cats = bot.locators.findElement({className: 'cats'});
       assertNotNull(cats);
       assertEquals('wrong', cats.id);
     }
-    
+
     function testCanFindByAnyOfAnElementsClassNames() {
       var felines = bot.locators.findElement({className: 'feline'});
       var cats = bot.locators.findElement({className: 'cats'});
-      
+
       assertEquals(felines, cats);
       assertEquals('wrong', cats.id);
     }
-    
+
     function testFindByClassNameReturnsNullIfNoMatchIsFound() {
       assertNull(bot.locators.findElement({className: 'catsAndDogs'}));
     }
