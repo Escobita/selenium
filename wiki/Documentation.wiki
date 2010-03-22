@@ -13,14 +13,14 @@ Be sure to understand chapter 1 "Fundamental Concepts" of the [http://svnbook.re
 For non-developers: The recommended way is to install a GUI client.
 Windows users should probably start with the free
 [http://tortoisesvn.tigris.org/ Tortoise SVN].  If you are using Mac
-OS X, you may wish to purchase [Versions http://versionsapp.com/].
+OS X, you may wish to purchase [http://versionsapp.com/ Versions].
 
 For developers: Mac OS X and many Linux distros, ship with a fine SVN
 command-line client.  Linux users who don't have an `svn` command, can
 install it using a package manager such as Apt or Yum.  Windows
 developers have a few choices, but may wish to try
-[http://www.sliksvn.com/en/download/ the Slik SVN command-line
-client.] Windows users should also be aware that the Cygwin SVN client
+[http://www.sliksvn.com/en/download/ the Slik SVN command-line client.] 
+Windows users should also be aware that the Cygwin SVN client
 is _not_ recommended at this time.
 
 == Repository ==
@@ -104,8 +104,8 @@ The final PDF output will be a file named `rst/.build/latex/Selenium_Documentati
 
 ===== Checking for broken links =====
 
-One of the available Make targets is `linkcheck` If you run `make
-linkcheck` then Sphinx will validate all of the links in the document,
+One of the available Make targets is `linkcheck` If you run `make linkcheck` 
+then Sphinx will validate all of the links in the document,
 and let you know if any links are malformed, or point to dead URLs.
 Note that checking all the links does take a while.
 
