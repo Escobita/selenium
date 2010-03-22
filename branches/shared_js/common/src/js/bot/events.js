@@ -20,7 +20,7 @@ bot.events.button = {
 /**
  * Convert a button number to the correct button value based on the user agent.
  *
- * @param {number} Derived from bot.events.button
+ * @param {number} button Derived from bot.events.button
  * @return The converted button value
  * @private
  */
@@ -35,6 +35,17 @@ bot.events.buttonValue_ = function(button) {
 
   return undefined;
 };
+
+// The related target field is only useful for mouseover, mouseout, dragenter
+// and dragexit events. We use this array to see if the relatedTarget field
+// needs to be assigned a value.
+// https://developer.mozilla.org/en/DOM/event.relatedTarget
+bot.events.relatedTargetEvents_ = [
+  goog.events.EventType.DRAGSTART,
+  'dragexit', /** goog.events.EventType.DRAGEXIT, */
+  goog.events.EventType.MOUSEOVER,
+  goog.events.EventType.MOUSEOUT
+];
 
 /**
  * Initialize a new mouse event. The opt_args can be used to pass in extra
@@ -59,6 +70,8 @@ bot.events.buttonValue_ = function(button) {
  * <dd>Is the "Alt" key pressed. Defaults to false</dd>
  * <dt>meta</dt>
  * <dd>Is the "Alt" key pressed. Defaults to false</dd>
+ * <dt>related</dt>
+ * <dd>The related target. Defaults to null</dd>
  * </dl>
  *
  * @param {Element} element The element on which the event will be fired
@@ -79,7 +92,11 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
   var canBubble = opt_args['bubble'] || true;
   // Only useful for mouseover, mouseout, dragenter and dragexit
   // https://developer.mozilla.org/en/DOM/event.relatedTarget
-  var relatedTarget = opt_args['related'] || null;
+
+  var relatedTarget = null;
+  if (goog.array.contains(bot.events.relatedTargetEvents_, type)) {
+    relatedTarget = opt_args['related'] || null;
+  }
 
   var alt = opt_args['alt'] || true;
   var control = opt_args['control'] || true;
@@ -87,7 +104,8 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
   var meta = opt_args['meta'] || true;
 
   // IE path first
-  if (goog.isFunction(element['fireEvent']) && doc && goog.isFunction(doc['createEventObject'])) {
+//  if (goog.isFunction(element['fireEvent']) && doc && goog.isFunction(doc['createEventObject'])) {
+  if (element['fireEvent'] && doc && doc['createEventObject']) {
     event = doc.createEventObject();
 
     // NOTE: ie8 does a strange thing with the coordinates passed in the event:
@@ -141,7 +159,7 @@ bot.events.initFunctions_[goog.events.EventType.MOUSEUP] = bot.events.newMouseEv
  * @private
  */
 bot.events.dispatchEvent_ = function(target, type, event) {
-  if (goog.isFunction(target['fireEvent'])) {
+  if (target['fireEvent']) {
     // when we go this route, window.event is never set to contain the event we have just created.
     // ideally we could just slide it in as follows in the try-block below, but this normally
     // doesn't work.  This is why I try to avoid this code path, which is only required if we need to
@@ -176,6 +194,7 @@ bot.events.fire = function(target, type, opt_args) {
   }
 
   var event = init(target, type, opt_args);
+
   bot.events.dispatchEvent_(target, type, event);
 };
 
