@@ -550,7 +550,10 @@ java_jar(:name => "webdriver-selenium",
              ],
     :resources => [
                     { "selenium/src/java/org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" => "org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" },
-                    { "selenium/src/java/org/openqa/selenium/internal/seleniumemulation/htmlutils.js" => "org/openqa/selenium/internal/seleniumemulation/htmlutils.js" }
+                    { "selenium/src/java/org/openqa/selenium/internal/seleniumemulation/htmlutils.js" => "org/openqa/selenium/internal/seleniumemulation/htmlutils.js" },
+                    "build/fire.js",
+                    "build/findElement.js",
+                    "build/findElements.js"
                   ])
 
 java_test(:name => "webdriver-selenium-test",
@@ -784,4 +787,12 @@ file 'build/fire.js' do
   )
 end
 
-task :fragments => ["build/fire.js", "build/findElement.js", "build/findElements.js"]
+file 'build/getAttribute.js' do
+  create_js_fragment(:name => "getAttribute", 
+    :module => "bot.dom",
+    :function => "bot.dom.getAttribute"
+  )
+end
+
+
+task :fragments => ["build/fire.js", "build/findElement.js", "build/findElements.js", "build/getAttribute.js"]
