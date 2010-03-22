@@ -3,11 +3,12 @@ require "fcntl"
 module Selenium
   module WebDriver
     module Firefox
+
+      # @private
       class Launcher
 
         attr_reader :binary, :connection
         SOCKET_LOCK_TIMEOUT = 45
-
 
         def initialize(binary, port = DEFAULT_PORT, profile = DEFAULT_PROFILE_NAME)
           @binary       = binary
@@ -82,7 +83,6 @@ module Selenium
           end
 
           @profile.delete_extensions_cache
-
           @profile.port = @port
           @profile.add_webdriver_extension(true)
           @profile.update_user_prefs
@@ -111,7 +111,6 @@ module Selenium
             begin
               connection = ExtensionConnection.new(@host, @port)
               connection.connect(1)
-              connection.close
 
               connect
               return

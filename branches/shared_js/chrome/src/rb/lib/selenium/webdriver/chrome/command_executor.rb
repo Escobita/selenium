@@ -1,124 +1,126 @@
 module Selenium
   module WebDriver
     module Chrome
-     class CommandExecutor
-       HTML_TEMPLATE = "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n%s"
-       JSON_TEMPLATE = "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n%s"
 
-       def initialize
-         @server       = TCPServer.new(localhost, 0)
-         @queue        = Queue.new
+      # @private
+      class CommandExecutor
+        HTML_TEMPLATE = "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n%s"
+        JSON_TEMPLATE = "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n%s"
 
-         @accepted_any = false
-         @next_socket  = nil
-         @listening    = true
+        def initialize
+          @server       = TCPServer.new(localhost, 0)
+          @queue        = Queue.new
 
-         Thread.new { start_run_loop }
-       end
+          @accepted_any = false
+          @next_socket  = nil
+          @listening    = true
 
-       def execute(command)
-         until accepted_any?
-           Thread.pass
-           sleep 0.01
-         end
+          Thread.new { start_run_loop }
+        end
 
-         json = command.to_json
-         data = JSON_TEMPLATE % [json.length, json]
+        def execute(command)
+          until accepted_any?
+            Thread.pass
+            sleep 0.01
+          end
 
-         @next_socket.write data
-         @next_socket.close
+          json = command.to_json
+          data = JSON_TEMPLATE % [json.length, json]
 
-         JSON.parse read_response(@queue.pop)
-       end
+          @next_socket.write data
+          @next_socket.close
 
-       def close
-         stop_listening
-         close_sockets
-         @server.close unless @server.closed?
-       rescue IOError
-         nil
-       end
+          JSON.parse read_response(@queue.pop)
+        end
 
-       def port
-         @server.addr[1]
-       end
+        def close
+          stop_listening
+          close_sockets
+          @server.close unless @server.closed?
+        rescue IOError
+          nil
+        end
 
-       def uri
-         "http://localhost:#{port}/chromeCommandExecutor"
-       end
+        def port
+          @server.addr[1]
+        end
 
-       private
+        def uri
+          "http://localhost:#{port}/chromeCommandExecutor"
+        end
 
-       def localhost
-         Platform.ironruby? ? "localhost" : "0.0.0.0" # yeah, weird..
-       end
+        private
 
-       def start_run_loop
-         while(@listening) do
-           socket = @server.accept
+        def localhost
+          Platform.ironruby? ? "localhost" : "0.0.0.0" # yeah, weird..
+        end
 
-           if socket.read(1) == "G" # initial GET(s)
-             write_holding_page_to socket
-           else
-             if accepted_any?
-               @queue << socket
-             else
-               read_response(socket)
-               @accepted_any = true
-             end
-           end
-         end
-       rescue IOError, Errno::EBADF
-         raise unless @server.closed?
-       end
+        def start_run_loop
+          while(@listening) do
+            socket = @server.accept
 
-       def read_response(socket)
-         result = ''
-         seen_double_crlf = false
+            if socket.read(1) == "G" # initial GET(s)
+              write_holding_page_to socket
+            else
+              if accepted_any?
+                @queue << socket
+              else
+                read_response(socket)
+                @accepted_any = true
+              end
+            end
+          end
+        rescue IOError, Errno::EBADF
+          raise if @listening
+        end
 
-         while line = next_line(socket)
-           seen_double_crlf = true if line.empty?
-           result << "#{line}\n" if seen_double_crlf
-         end
+        def read_response(socket)
+          result = ''
+          seen_double_crlf = false
 
-         @next_socket = socket
+          while line = next_line(socket)
+            seen_double_crlf = true if line.empty?
+            result << "#{line}\n" if seen_double_crlf
+          end
 
-         result.strip!
-       end
+          @next_socket = socket
 
-       def accepted_any?
-         @accepted_any
-       end
+          result.strip!
+        end
 
-       def close_sockets
-         @queue.pop.close until @queue.empty?
-         @next_socket.close if @next_socket
-       end
+        def accepted_any?
+          @accepted_any
+        end
 
-       def stop_listening
-         @listening = false
-       end
+        def close_sockets
+          @next_socket.close if @next_socket
+          @queue.pop.close until @queue.empty?
+        end
 
-       def next_line(socket)
-        return if socket.closed?
-        input = socket.gets
+        def stop_listening
+          @listening = false
+        end
 
-        raise Error::WebDriverError, "unexpected EOF from Chrome" if input.nil?
+        def next_line(socket)
+          return if socket.closed?
+          input = socket.gets
 
-        line = input.chomp
-        return if line == "EOResponse"
+          raise Error::WebDriverError, "unexpected EOF from Chrome" if input.nil?
 
-        line
-       end
+          line = input.chomp
+          return if line == "EOResponse"
 
-       def write_holding_page_to(socket)
-         msg = %[<html><head><script type='text/javascript'>if (window.location.search == '') { setTimeout("window.location = window.location.href + '?reloaded'", 5000); }</script></head><body><p>ChromeDriver server started and connected.  Please leave this tab open.</p></body></html>]
+          line
+        end
 
-         socket.write HTML_TEMPLATE % [msg.length, msg]
-         socket.close
-       end
+        def write_holding_page_to(socket)
+          msg = %[<html><head><script type='text/javascript'>if (window.location.search == '') { setTimeout("window.location = window.location.href + '?reloaded'", 5000); }</script></head><body><p>ChromeDriver server started and connected.  Please leave this tab open.</p></body></html>]
 
-     end # CommandExecutor
+          socket.write HTML_TEMPLATE % [msg.length, msg]
+          socket.close
+        end
+
+      end # CommandExecutor
     end # Chrome
   end # WebDriver
 end # Selenium

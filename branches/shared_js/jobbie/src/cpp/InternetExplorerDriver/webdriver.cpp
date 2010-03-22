@@ -24,6 +24,7 @@ limitations under the License.
 #include "jsxpath.h"
 #include "cookies.h"
 #include "utils.h"
+#include "IEReturnTypes.h"
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -607,7 +608,7 @@ int wdeClick(WebElement* element)
 	} END_TRY;	
 }
 
-int wdeGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** result)
+int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name, StringWrapper** result)
 {
 	*result = NULL;
 	int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
@@ -649,8 +650,8 @@ int wdeGetAttribute(WebElement* element, const wchar_t* name, StringWrapper** re
 		}
 
 		int type;
-		wdGetScriptResultType(scriptResult, &type);
-		if (type != 5) {
+		wdGetScriptResultType(driver, scriptResult, &type);
+		if (type != TYPE_EMPTY) {
 			const std::wstring originalString(bstr2cw(scriptResult->result.bstrVal));
 			size_t length = originalString.length() + 1;
 			wchar_t* toReturn = new wchar_t[length];
@@ -1209,8 +1210,8 @@ int wdFindElementByXPath(WebDriver* driver, WebElement* element, const wchar_t* 
 		// And be done
 		if (result == SUCCESS) {
 			int type = 0;
-			result = wdGetScriptResultType(queryResult, &type);
-			if (type != 5) {
+			result = wdGetScriptResultType(driver, queryResult, &type);
+			if (type != TYPE_EMPTY) {
 				result = wdGetElementScriptResult(queryResult, driver, out);
 			} else {
 				result = ENOSUCHELEMENT;
@@ -1304,7 +1305,7 @@ int wdFindElementsByXPath(WebDriver* driver, WebElement* element, const wchar_t*
 			WebElement* e;
 			wdGetElementScriptResult(getElemRes, driver, &e);
 			elements->elements->push_back(e->element);
-			//TODO(eranm): Probably missing wdFreeScriptArgs
+			wdFreeScriptArgs(getElemArgs);
 		}
 		SafeArrayDestroy(queryArgs);
 
@@ -1428,41 +1429,53 @@ int wdExecuteScript(WebDriver* driver, const wchar_t* script, ScriptArgs* script
 	} END_TRY;
 }
 
-int wdGetScriptResultType(ScriptResult* result, int* type) 
+int wdGetScriptResultType(WebDriver* driver, ScriptResult* result, int* type)
 {
 	if (!result) { return ENOSCRIPTRESULT; }
 
 	switch (result->result.vt) {
 		case VT_BSTR:
-			*type = 1;
+			*type = TYPE_STRING;
 			break;
 
 		case VT_I4:
 		case VT_I8:
-			*type = 2;
+			*type = TYPE_LONG;
 			break;
 
 		case VT_BOOL:
-			*type = 3;
+			*type = TYPE_BOOLEAN;
 			break;
 
 		case VT_DISPATCH:
 			{
-				*type = 4;
+			  LPCWSTR itemType = driver->ie->getScriptResultType(&(result->result));
+			  std::string itemTypeStr;
+			  cw2string(itemType, itemTypeStr);
+
+			  LOG(DEBUG) << "Got type: " << itemTypeStr;
+			  // If it's a Javascript array or an HTML Collection - type 8 will
+			  // indicate the driver that this is ultimately an array.
+			  if ((itemTypeStr == "JavascriptArray") ||
+			      (itemTypeStr == "HtmlCollection")) {
+			    *type = TYPE_ARRAY;
+			  } else {
+			    *type = TYPE_ELEMENT;
+			  }
 			}
 			break;
 
 		case VT_EMPTY:
-			*type = 5;
+			*type = TYPE_EMPTY;
 			break;
 
 		case VT_USERDEFINED:
-			*type = 6;
+			*type = TYPE_EXCEPTION;
 			break;
 
 		case VT_R4:
 		case VT_R8:
-			*type = 7;
+			*type = TYPE_DOUBLE;
 			break;
 
 		default:
@@ -1534,6 +1547,63 @@ int wdGetElementScriptResult(ScriptResult* result, WebDriver* driver, WebElement
 
 	return SUCCESS;
 }
+
+int wdGetArrayLengthScriptResult(WebDriver* driver, ScriptResult* result,
+                                 int* length)
+{
+  // Prepare an array for the Javascript execution, containing only one
+  // element - the original returned array from a JS execution.
+  SAFEARRAYBOUND lengthQuery;
+  lengthQuery.cElements = 1;
+  lengthQuery.lLbound = 0;
+  SAFEARRAY* lengthArgs = SafeArrayCreate(VT_VARIANT, 1, &lengthQuery);
+  LONG index = 0;
+  SafeArrayPutElement(lengthArgs, &index, &(result->result));
+  CComVariant lengthVar;
+  int lengthResult = driver->ie->executeScript(
+      L"(function(){return function() {return arguments[0].length;}})();",
+      lengthArgs, &lengthVar);
+  SafeArrayDestroy(lengthArgs);
+  if (lengthResult != SUCCESS) {
+    return lengthResult;
+  }
+
+  // Expect the return type to be an integer. A non-integer means this was
+  // not an array after all.
+  if (lengthVar.vt != VT_I4) {
+    return EUNEXPECTEDJSERROR;
+  }
+
+  *length = lengthVar.lVal;
+
+  return SUCCESS;
+}
+
+int wdGetArrayItemFromScriptResult(WebDriver* driver, ScriptResult* result,
+                                   int index, ScriptResult** arrayItem)
+{
+  // Prepare an array for Javascript execution. The array contains the original
+  // array returned from a previous execution and the index of the item required
+  // from that array.
+  ScriptArgs* getItemArgs;
+  wdNewScriptArgs(&getItemArgs, 2);
+  LONG argIndex = 0;
+  // Original array.
+  SafeArrayPutElement(getItemArgs->args, &argIndex, &(result->result));
+  getItemArgs->currentIndex++;
+  // Item index
+  wdAddNumberScriptArg(getItemArgs, index);
+
+  int execRes = wdExecuteScript(
+      driver,
+      L"(function(){return function() {return arguments[0][arguments[1]];}})();",
+      getItemArgs, arrayItem);
+
+  wdFreeScriptArgs(getItemArgs);
+  getItemArgs = NULL;
+  return execRes;
+}
+
 
 int wdeMouseDownAt(HWND hwnd, long windowX, long windowY)
 {

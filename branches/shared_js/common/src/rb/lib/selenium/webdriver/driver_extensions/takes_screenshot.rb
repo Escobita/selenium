@@ -1,5 +1,10 @@
 module Selenium
   module WebDriver
+
+    #
+    # @private
+    #
+
     module DriverExtensions
       module TakesScreenshot
 
@@ -10,9 +15,9 @@ module Selenium
         def screenshot_as(format)
           case format
           when :base64
-            bridge.getScreenshotAsBase64
+            bridge.getScreenshot
           when :png
-            bridge.getScreenshotAsBase64.unpack("m")[0]
+            bridge.getScreenshot.unpack("m")[0]
           else
             raise Error::UnsupportedOperationError, "unsupported format: #{format.inspect}"
           end

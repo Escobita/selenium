@@ -17,20 +17,25 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
+
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
@@ -94,7 +99,25 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @SuppressWarnings("unchecked")
   @JavascriptEnabled
-  @Ignore({IE, SELENESE, IPHONE})
+  public void testShouldBeAbleToExecuteSimpleJavascriptAndAStringsArray() {
+    if (!(driver instanceof JavascriptExecutor)) {
+      return;
+    }
+
+    driver.get(javascriptPage);
+    List<Object> expectedResult = new ArrayList<Object>();
+    expectedResult.add("zero");
+    expectedResult.add("one");
+    expectedResult.add("two");
+    Object result = ((JavascriptExecutor) driver).executeScript(
+    "return ['zero', 'one', 'two'];");
+
+    ExecutingJavascriptTest.compareLists(expectedResult, (List<Object>) result);
+  }
+
+  @SuppressWarnings("unchecked")
+  @JavascriptEnabled
+  @Ignore({SELENESE, IPHONE})
   public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnAnArray() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -108,12 +131,77 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     subList.add(false);
     expectedResult.add(subList);
     Object result = executeScript("return ['zero', [true, false]];");
+    assertNotNull(result);
     assertTrue("result was: " + result + " (" + result.getClass() + ")", result instanceof List);
     List<Object> list = (List<Object>) result;
     assertTrue(compareLists(expectedResult, list));
   }
 
-  private boolean compareLists(List<?> first, List<?> second) {
+
+  @SuppressWarnings("unchecked")
+  @JavascriptEnabled
+  @Ignore({IE, SELENESE, IPHONE, HTMLUNIT})
+  public void testShouldBeAbleToExecuteJavascriptAndReturnABasicObjectLiteral() {
+    if (!(driver instanceof JavascriptExecutor)) {
+      return;
+    }
+
+    driver.get(javascriptPage);
+
+    Object result = executeScript("return {abc: '123', tired: false};");
+    assertTrue("result was: " + result + " (" + result.getClass() + ")", result instanceof Map);
+    Map<String, Object> map = (Map<String, Object>) result;
+
+    Map<String, Object> expected = new HashMap<String, Object>();
+    expected.put("abc", "123");
+    expected.put("tired", false);
+
+    assertEquals("Expected:<" + expected + ">, but was:<" + map + ">",
+        expected.size(), map.size());
+    for (Map.Entry<String, Object> entry : expected.entrySet()) {
+      assertEquals("Difference at key:<" + entry.getKey() + ">",
+          entry.getValue(), map.get(entry.getKey()));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @JavascriptEnabled
+  @Ignore({IE, SELENESE, IPHONE, HTMLUNIT})
+  public void testShouldBeAbleToExecuteSimpleJavascriptAndReturnAnObjectLiteral() {
+    if (!(driver instanceof JavascriptExecutor)) {
+      return;
+    }
+
+    driver.get(javascriptPage);
+
+    Map<String, Object> expectedResult = new HashMap<String, Object>(){{
+      put("foo", "bar");
+      put("baz", Arrays.asList("a", "b", "c"));
+      put("person", new HashMap<String, String>(){{
+        put("first", "John");
+        put("last", "Doe");
+      }});
+    }};
+
+    Object result = executeScript(
+        "return {foo:'bar', baz: ['a', 'b', 'c'], " +
+            "person: {first: 'John',last: 'Doe'}};");
+    assertTrue("result was: " + result + " (" + result.getClass() + ")", result instanceof Map);
+
+    Map<String, Object> map = (Map<String, Object>) result;
+    assertEquals("Expected:<" + expectedResult + ">, but was:<" + map + ">", 3, map.size());
+    assertEquals(expectedResult.keySet(), map.keySet());
+    assertEquals("bar", map.get("foo"));
+    assertTrue(compareLists((List<?>) expectedResult.get("baz"),
+        (List<?>) map.get("baz")));
+
+    Map<String, String> person = (Map<String, String>) map.get("person");
+    assertEquals(2, person.size());
+    assertEquals("John", person.get("first"));
+    assertEquals("Doe", person.get("last"));
+  }
+
+  private static boolean compareLists(List<?> first, List<?> second) {
     if (first.size() != second.size()) {
       return false;
     }
@@ -371,10 +459,10 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     // This should not throw an exception ...
     executeScript(jquery);
   }
-  
+
   @SuppressWarnings("unchecked")
   @JavascriptEnabled
-  @Ignore({SELENESE, IE, CHROME, REMOTE, IPHONE})
+  @Ignore({SELENESE, CHROME, REMOTE, IPHONE})
   public void testShouldBeAbleToExecuteScriptAndReturnElementsList() {
     driver.get(formPage);
     String scriptToExec = "return document.getElementsByName('snack');";

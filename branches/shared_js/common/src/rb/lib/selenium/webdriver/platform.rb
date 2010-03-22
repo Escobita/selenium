@@ -2,13 +2,15 @@ require "rbconfig"
 
 module Selenium
   module WebDriver
+
+    # @private
     module Platform
 
       module_function
 
       def home
         # jruby has an issue with ENV['HOME'] on Windows
-        @home ||= Platform.jruby? ? java.lang.System.getProperty('user.home') : ENV['HOME']
+        @home ||= Platform.jruby? ? Java.java.lang.System.getProperty('user.home') : ENV['HOME']
       end
 
       def platform
@@ -69,6 +71,20 @@ module Selenium
 
       def make_writable(file)
         File.chmod 0766, file
+      end
+
+      def find_binary(*binary_names)
+        paths = ENV['PATH'].split(File::PATH_SEPARATOR)
+        binary_names.map! { |n| "#{n}.exe" } if win?
+
+        binary_names.each do |binary_name|
+          paths.each do |path|
+            exe = File.join(path, binary_name)
+            return exe if File.executable?(exe)
+          end
+        end
+
+        nil
       end
 
     end # Platform

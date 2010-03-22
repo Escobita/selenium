@@ -78,6 +78,10 @@ describe "Driver" do
 
     not_compliant_on :driver => [:ie, :remote] do
       it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
         driver.navigate.to url_for("xhtmlTest.html")
         driver.find_element(:css, "div.content")
       end
@@ -125,6 +129,10 @@ describe "Driver" do
 
     not_compliant_on :driver => [:ie, :remote] do
       it "should find by css selector" do
+        if driver.bridge.browser == :firefox && driver.bridge.capabilities.version < "3.5"
+          pending "needs Firefox >= 3.5"
+        end
+
         driver.navigate.to url_for("xhtmlTest.html")
         driver.find_elements(:css, 'p')
       end
@@ -166,6 +174,11 @@ describe "Driver" do
       lambda { driver.execute_script("return squiggle();") }.should raise_error
     end
 
+    it "should return arrays" do
+      driver.navigate.to url_for("xhtmlTest.html")
+      driver.execute_script('return ["zero", "one", "two"];').should == %w[zero one two]
+    end
+
     it "should be able to call functions on the page" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.execute_script("displayMessage('I like cheese');")
@@ -193,27 +206,9 @@ describe "Driver" do
       driver.execute_script("arguments[0]['flibble'] = arguments[0].getAttribute('id'); return arguments[0]['flibble'];", button).should == "plainButton"
     end
 
-    it "should raise an exception if arguments are invalid" do
-      driver.navigate.to url_for("javascriptPage.html")
-      lambda { driver.execute_script("arguments[0]", Object.new) }.should raise_error(TypeError, /Parameter is not of recognized type:/)
-    end
-
     it "should be able to pass in multiple arguments" do
       driver.navigate.to url_for("javascriptPage.html")
       driver.execute_script("return arguments[0] + arguments[1];", "one", "two").should == "onetwo"
-    end
-  end
-
-  compliant_on :driver => :firefox do
-    describe ".new" do
-      it "should take a Firefox::Profile instance as argument" do
-        begin
-          profile = Selenium::WebDriver::Firefox::Profile.new
-          driver = Selenium::WebDriver.for :firefox, :profile => profile
-        ensure
-          driver.quit if driver
-        end
-      end
     end
   end
 

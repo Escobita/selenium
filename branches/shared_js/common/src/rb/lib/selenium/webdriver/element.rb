@@ -8,7 +8,7 @@ module Selenium
       #
       # Creates a new Element
       #
-      # @api private
+      # @private
       #
 
       def initialize(bridge, id)
@@ -248,14 +248,23 @@ module Selenium
       #
       # for Find and execute_script
       #
-      # @api private
+      # @private
       #
 
       def ref
         @id
       end
 
+      #
+      # Convert to a WebElement JSON Object for transmission over the wire.
+      # @see http://code.google.com/p/selenium/wiki/JsonWireProtocol#Basic_Concepts_And_Terms
+      #
+      # @private
+      #
 
+      def to_json(*args)
+        { :ELEMENT => @id }.to_json(*args)
+      end
 
     end # Element
   end # WebDriver

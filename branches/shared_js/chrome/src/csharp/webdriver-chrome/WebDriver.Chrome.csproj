@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\build\cli\Release\WebDriver.Chrome.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.1, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
@@ -49,16 +50,12 @@
   <ItemGroup>
     <Compile Include="ChromeCommandExecutor.cs" />
     <Compile Include="ChromeBinary.cs" />
-    <Compile Include="ChromeCommand.cs" />
-    <Compile Include="ChromeCommandJsonConverter.cs" />
     <Compile Include="ChromeDriver.cs" />
     <Compile Include="ChromeExtension.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ChromeProfile.cs" />
-    <Compile Include="ChromeResponse.cs" />
     <Compile Include="ChromeWebElement.cs" />
-    <Compile Include="CookieJsonConverter.cs" />
     <Compile Include="FatalChromeException.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,7 +65,7 @@
       <Project>{ABB9B87F-FEEA-410E-ACBF-26479B8C72B0}</Project>
       <Name>WebDriver.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\remote\client\src\csharp\webdriver-remote\WebDriver.Remote.csproj">
+    <ProjectReference Include="..\..\..\..\remote\client\src\csharp\webdriver-remote-client\WebDriver.Remote.csproj">
       <Project>{32122F8D-CD64-495A-B9B0-5516FF67C79F}</Project>
       <Name>WebDriver.Remote</Name>
     </ProjectReference>

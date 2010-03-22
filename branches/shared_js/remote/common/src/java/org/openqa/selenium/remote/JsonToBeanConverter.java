@@ -72,23 +72,15 @@ public class JsonToBeanConverter {
       SessionId sessionId = null;
       if (rawCommand.has("sessionId"))
         sessionId = convert(SessionId.class, rawCommand.getString("sessionId"));
-      Context context = null;
-      if (rawCommand.has("context"))
-        context = convert(Context.class, rawCommand.getString("context"));
 
       DriverCommand name = DriverCommand.fromName(rawCommand.getString("name"));
       if (rawCommand.has("parameters")) {
-        List args = convert(ArrayList.class, rawCommand.getJSONArray("parameters"));
-        return (T) new Command(sessionId, context, name, args.toArray());
+        Map<String, ?> args =
+            (Map<String, ?>) convert(HashMap.class, rawCommand.getJSONObject("parameters"));
+        return (T) new Command(sessionId, name, args);
       }
 
-      return (T) new Command(sessionId, context, name);
-    }
-
-    if (Context.class.equals(clazz)) {
-      JSONObject object = new JSONObject((String) text);
-      String value = object.getString("value");
-      return (T) new Context(value);
+      return (T) new Command(sessionId, name);
     }
 
     if (SessionId.class.equals(clazz)) {
@@ -156,7 +148,7 @@ public class JsonToBeanConverter {
   }
 
   private boolean isEnum(Class<?> clazz, Object text) {
-    return clazz.isEnum() || text instanceof Enum;
+    return clazz.isEnum() || text instanceof Enum<?>;
   }
 
   private Object convert(Object toConvert) throws Exception {

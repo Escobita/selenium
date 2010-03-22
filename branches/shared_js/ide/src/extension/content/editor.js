@@ -117,7 +117,14 @@ function Editor(window) {
 	//window.controllers.appendController(controller);
 
     this.app.newTestSuite();
-    this.toggleRecordingEnabled(true);
+    if (this.app.options.recordOnOpen && this.app.options.recordOnOpen == 'true') {
+      document.getElementById("record-button").checked = true;
+      this.toggleRecordingEnabled(true);
+    } else {
+      document.getElementById("record-button").checked = false;
+      this.toggleRecordingEnabled(false);      
+    }
+
 	this.updateViewTabs();
     this.infoPanel = new Editor.InfoPanel(this);
     
@@ -526,9 +533,10 @@ Editor.prototype.addCommand = function(command,target,value,window,insertBeforeL
                 // popup
                 var windowName = window.name;
                 if (window.name == '') {
-                    windowName = 'null';
-                }
-                this.addCommand('selectWindow', "name=" + windowName, '', window);
+					this.addCommand('selectWindow', 'null', '', window);
+                }else{
+					this.addCommand('selectWindow', "name=" + windowName, '', window);
+				}
             }
         }
 	}
@@ -673,7 +681,10 @@ Editor.prototype.playback = function(newWindow, resultCallback) {
     var auto = resultCallback != null;
 
     var extensionsURLs = [];
-    extensionsURLs.push(ExtensionsLoader.getURLs(this.getOptions().userExtensionsURL));
+    var userProvidedPlugins = ExtensionsLoader.getURLs(this.getOptions().userExtensionsURL);
+    if (userProvidedPlugins.length != 0) {
+        extensionsURLs.push(userProvidedPlugins);
+    }
     extensionsURLs.push(ExtensionsLoader.getURLs(SeleniumIDE.Preferences.getString("pluginProvidedUserExtensions")));
     // Using chrome://selenium-ide-testrunner instead of chrome://selenium-ide because
     // we need to disable implicit XPCNativeWrapper to make TestRunner work
