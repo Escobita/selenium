@@ -132,6 +132,8 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
       event.initMouseEvent(type, canBubble, true, win, 1, 0, 0, x, y,
           control, alt, shift, meta, button, relatedTarget);
     } else {
+      // You're in a strange and bad place here.
+
       event.initEvent(type, canBubble, true);
 
       event.shiftKey = shift;
