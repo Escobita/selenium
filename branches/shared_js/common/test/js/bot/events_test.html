@@ -21,16 +21,34 @@
   
   <script>
   function testCanFireMoveEvent() {
-  var e = bot.locators.findElement({id: 'x'});
+    var e = bot.locators.findElement({id: 'x'});
 
-  bot.events.fire(e, goog.events.EventType.MOUSEMOVE);
+    bot.events.fire(e, goog.events.EventType.MOUSEMOVE);
 
-  assertTrue(goog.array.indexOf(MESSAGES, 'move') != -1);
+    assertTrue(goog.array.indexOf(MESSAGES, 'move') != -1);
+  }
+
+  function testCanFireFocusEvent() {
+    var e = bot.locators.findElement({id: 'focus'});
+
+    bot.events.fire(e, goog.events.EventType.FOCUS);
+
+    assertTrue(goog.array.indexOf(MESSAGES, 'focus') != -1);
+  }
+
+  function testCanFireBlurEvent() {
+    var e = bot.locators.findElement({id: 'blur'});
+
+    bot.events.fire(e, goog.events.EventType.BLUR);
+
+    assertTrue(goog.array.indexOf(MESSAGES, 'blur') != -1);
   }
   </script>
 
 </head>
 <body>
   <p id="x" onmousemove="log('move');">Move</p>
+  <p id="focus" onfocus="log('focus');">Move</p>
+  <p id="blur" onblur="log('blur');">Move</p>
 </body>
 </html>

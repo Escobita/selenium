@@ -104,9 +104,12 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
   var meta = opt_args['meta'] || true;
 
   // IE path first
-//  if (goog.isFunction(element['fireEvent']) && doc && goog.isFunction(doc['createEventObject'])) {
   if (element['fireEvent'] && doc && doc['createEventObject']) {
     event = doc.createEventObject();
+    event.altKey = alt;
+    event.controlKey = control;
+    event.metaKey = meta;
+    event.shiftKey = shift;
 
     // NOTE: ie8 does a strange thing with the coordinates passed in the event:
     // - if offset{X,Y} coordinates are specified, they are also used for
@@ -117,11 +120,11 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
     event.clientX = x;
     event.clientY = y;
     event.button = button;
-    event.relatedTarget = null;
+    event.relatedTarget = relatedTarget;
   } else {
     var event = doc.createEvent('MouseEvents');
 
-    if (goog.isFunction(event['initMouseEvent'])) {
+    if (event['initMouseEvent']) {
       // see http://developer.mozilla.org/en/docs/DOM:event.button and
       // http://developer.mozilla.org/en/docs/DOM:event.initMouseEvent for button ternary logic logic
 
@@ -134,9 +137,64 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
       event.shiftKey = shift;
       event.metaKey = meta;
       event.altKey = alt;
-      event.ctrlKey = contol;
+      event.ctrlKey = control;
       event.button = button;
     }
+  }
+
+  return event;
+};
+
+/**
+ * Initialize a new HTML event. The opt_args can be used to pass in extra
+ * parameters that might be needed, though the function attempts to guess some
+ * valid default values. Extra arguments are specified as properties of the
+ * object passed in as "opt_args" and can be:
+ *
+ * <dl>
+ * <dt>bubble</dt>
+ * <dd>Can the event bubble? Defaults to true</dd>
+ * <dt>alt</dt>
+ * <dd>Is the "Alt" key pressed. Defaults to false</dd>
+ * <dt>control</dt>
+ * <dd>Is the "Alt" key pressed. Defaults to false</dd>
+ * <dt>shift</dt>
+ * <dd>Is the "Alt" key pressed. Defaults to false</dd>
+ * <dt>meta</dt>
+ * <dd>Is the "Alt" key pressed. Defaults to false</dd>
+ * </dl>
+ *
+ * @param {Element} element The element on which the event will be fired
+ * @param {string} type One of the goog.events.EventType values
+ * @param {Object} [opt_args] See above
+ */
+bot.events.newHtmlEvent_ = function(element, type, opt_args) {
+  var doc = goog.dom.getOwnerDocument(element);
+  var win = goog.dom.getWindow(doc);
+
+  opt_args = opt_args || {};
+
+  var canBubble = opt_args['bubble'] || true;
+
+  var alt = opt_args['alt'] || true;
+  var control = opt_args['control'] || true;
+  var shift = opt_args['shift'] || true;
+  var meta = opt_args['meta'] || true;
+
+  if (element['fireEvent'] && doc && doc['createEventObject']) {
+    var event = doc.createEventObject();
+    event.altKey = alt;
+    event.ctrl = control;
+    event.metaKey = meta;
+    event.shiftKey = shift;
+  } else {
+    event = doc.createEvent('HTMLEvents');
+    event.initEvent(type, canBubble, true);
+
+    event.shiftKey = shift;
+    event.metaKey = meta;
+    event.altKey = alt;
+    event.ctrlKey = control;
   }
 
   return event;
@@ -187,11 +245,7 @@ bot.events.dispatchEvent_ = function(target, type, event) {
  * @param {Object} [opt_args] Optional arguments, used to initialize the event
  */
 bot.events.fire = function(target, type, opt_args) {
-  var init = bot.events.initFunctions_[type];
-
-  if (!init) {
-    // Should default to a standard HTML event
-  }
+  var init = bot.events.initFunctions_[type] || bot.events.newHtmlEvent_;
 
   var event = init(target, type, opt_args);
 
