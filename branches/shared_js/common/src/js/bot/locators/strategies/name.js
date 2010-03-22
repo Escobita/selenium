@@ -3,6 +3,7 @@ goog.provide('bot.locators.strategies.name');
 
 goog.require('bot.dom');
 goog.require('goog.array');
+goog.require('goog.dom');
 
 /**
  * Find an element by the value of the name attribute
@@ -12,8 +13,8 @@ goog.require('goog.array');
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  */
-bot.locators.strategies.name = function(win, target) {
-  var doc = win.document;
+bot.locators.strategies.name.single = function(win, target) {
+  var doc = goog.dom.getOwnerDocument(win);
 
   if (doc['getElementsByName']) {
     var results = doc.getElementsByName(target);
@@ -35,4 +36,21 @@ bot.locators.strategies.name = function(win, target) {
   return goog.array.find(allElements, function(element) {
     return bot.dom.getAttribute(element, 'name') == target;
   })
+};
+
+/**
+ * Find all elements by the value of the name attribute
+ *
+ * @param {Window} win The DOM window to search in.
+ * @param {string} target The id to search for.
+ * @return {array} All matching elements, or an empty list
+ */
+bot.locators.strategies.name.many = function(win, target) {
+  var doc = goog.dom.getOwnerDocument(win);
+
+  var allElements = doc.getElementsByTagName('*');
+
+  return goog.array.filter(allElements, function(element) {
+    return bot.dom.getAttribute(element, 'name') == target;
+  });
 };

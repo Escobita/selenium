@@ -4,7 +4,7 @@ goog.require('goog.dom');
 goog.require('goog.object');
 goog.require('goog.string');
 
-// TODO(simon): Add support for browsers with native xpath
+// TODO(simon): Add support for browsers without native xpath
 
 /**
  * Find an element by using an xpath expression
@@ -13,8 +13,8 @@ goog.require('goog.string');
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  */
-bot.locators.strategies.xpath = function(win, target) {
-  var doc = win.document;
+bot.locators.strategies.xpath.single = function(win, target) {
+  var doc = goog.dom.getOwnerDocument(win);
 
   if (!goog.isFunction(doc['evaluate'])) {
     throw Error('XPath location is not supported');
@@ -29,5 +29,32 @@ bot.locators.strategies.xpath = function(win, target) {
 
   return element ? element : null;
 };
-goog.exportProperty(bot.locators.strategies, 'xpath',
-                    bot.locators.strategies.xpath);
+
+/**
+ * Find an element by using an xpath expression
+ * @param {Window} win The DOM window to search in.
+ * @param {string} target The xpath to search for.
+ * @return {?Element} The first matching element found in the DOM, or null if no
+ *     such element could be found.
+ */
+bot.locators.strategies.xpath.many = function(win, target) {
+  var doc = goog.dom.getOwnerDocument(win);
+
+  if (!goog.isFunction(doc['evaluate'])) {
+    throw Error('XPath location is not supported');
+  }
+
+  if (!target) {
+    throw Error('No xpath specified');
+  }
+
+  var nodes = doc.evaluate(target, doc, null, /* ORDERED_NODE_ITERATOR_TYPE */ 5, null);
+
+  var elements = [];
+  var e = nodes.iterateNext();
+  while (e) {
+    elements.push(e);
+    e = nodes.iterateNext();
+  }
+  return elements;
+};

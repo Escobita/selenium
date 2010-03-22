@@ -770,6 +770,13 @@ file 'build/findElement.js' do
   )
 end
 
+file 'build/findElements.js' do
+  create_js_fragment(:name => "findElements", 
+    :module => "bot.locators",
+    :function => "bot.locators.findElements"
+  )
+end
+
 file 'build/fire.js' do
   create_js_fragment(:name => "fire", 
     :module => "bot.events",
@@ -777,4 +784,4 @@ file 'build/fire.js' do
   )
 end
 
-task :fragments => ["build/fire.js", "build/findElement.js"]
+task :fragments => ["build/fire.js", "build/findElement.js", "build/findElements.js"]

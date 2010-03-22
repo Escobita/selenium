@@ -13,7 +13,11 @@ goog.require('bot.locators.strategies');
  *     such element could be found.
  */
 bot.locators.findElement = function(target) {
-  var finder_func = bot.locators.strategies.lookup(target);
+  var finder_func = bot.locators.strategies.lookupSingle(target);
   return finder_func();
 };
 
+bot.locators.findElements = function(target) {
+  var finder_func = bot.locators.strategies.lookupMany(target);
+  return finder_func();
+};
