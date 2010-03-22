@@ -20,8 +20,8 @@ bot.locators.strategies.known_ = {
  * Lookup a particular element finding strategy based on the sole property of
  * the "target". The value of this key is used to locate the element.  
  *
- * @param {*} target A JS object with a single key
- * @return {function} The finder function, ready to be called
+ * @param {*} target A JS object with a single key.
+ * @return {Function} The finder function, ready to be called
  */
 bot.locators.strategies.lookup = function(target) {
   var key = goog.object.getAnyKey(target);

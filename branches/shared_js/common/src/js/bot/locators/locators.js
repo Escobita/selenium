@@ -5,7 +5,8 @@ goog.require('bot');
 goog.require('bot.locators.strategies');
 
 /**
- * Find an element by using a selector. The format of the sel
+ * Find an element by using a selector.
+ * 
  * @param {Window} win The DOM window to search in.
  * @param {string} target The selector to search for.
  * @return {?Element} The first matching element found in the DOM, or null if no
