@@ -15,3 +15,4 @@ bot.locators.findElement = function(target) {
   var finder_func = bot.locators.strategies.lookup(target);
   return finder_func();
 };
+

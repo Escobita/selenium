@@ -52,7 +52,7 @@ bot.dom.booleanAttributes_ = [
 bot.dom.getAttribute = function(element, attributeName) {
   var lattr = attributeName.toLowerCase();
 
-  // TODO(simon): We should really get the value of style converted to a string
+  // TODO(simon): What's the right thing to do here?
   if ('style' == lattr) { return ''; }
 
   // Commonly looked up attributes that are aliases
@@ -73,5 +73,3 @@ bot.dom.getAttribute = function(element, attributeName) {
 
   return value;
 };
-goog.exportProperty(bot.dom, 'getAttribute',
-                    bot.dom.getAttribute);
