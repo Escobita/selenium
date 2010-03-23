@@ -12,34 +12,19 @@ goog.require('goog.userAgent');
  * @enum {number}
  */
 bot.events.button = {
-  LEFT: 0,
-  MIDDLE: 1,
-  RIGHT: 2
+  LEFT: (goog.userAgent.IE ? 0 : 1),
+  MIDDLE: (goog.userAgent.IE ? 1 : 4),
+  RIGHT: (goog.userAgent.IE ? 2 : 2)
 };
 
 /**
- * Convert a button number to the correct button value based on the user agent.
+ * The related target field is only useful for mouseover, mouseout, dragenter
+ * and dragexit events. We use this array to see if the relatedTarget field
+ * needs to be assigned a value.
  *
- * @param {number} button Derived from bot.events.button
- * @return The converted button value
+ * https://developer.mozilla.org/en/DOM/event.relatedTarget
  * @private
  */
-bot.events.buttonValue_ = function(button) {
-  if (!goog.userAgent.IE) return button;
-
-  switch (button) {
-    case bot.events.button.LEFT: return 1;
-    case bot.events.button.MIDDLE: return 4;
-    case bot.events.button.RIGHT: return 2;
-  }
-
-  return undefined;
-};
-
-// The related target field is only useful for mouseover, mouseout, dragenter
-// and dragexit events. We use this array to see if the relatedTarget field
-// needs to be assigned a value.
-// https://developer.mozilla.org/en/DOM/event.relatedTarget
 bot.events.relatedTargetEvents_ = [
   goog.events.EventType.DRAGSTART,
   'dragexit', /** goog.events.EventType.DRAGEXIT, */
@@ -76,7 +61,8 @@ bot.events.relatedTargetEvents_ = [
  *
  * @param {Element} element The element on which the event will be fired
  * @param {string} type One of the goog.events.EventType values
- * @param {Object} [opt_args] See above
+ * @param {Object=} opt_args See above
+ * @private
  */
 bot.events.newMouseEvent_ = function(element, type, opt_args) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -87,7 +73,7 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
   // Use string indexes so we can be compiled aggressively
   var x = opt_args['x'] || 0;
   var y = opt_args['y'] || 0;
-  var button = bot.events.buttonValue_(opt_args['button'] || bot.events.button.LEFT);
+  var button = opt_args['button'] || bot.events.button.LEFT;
 
   var canBubble = opt_args['bubble'] || true;
   // Only useful for mouseover, mouseout, dragenter and dragexit
@@ -98,10 +84,10 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
     relatedTarget = opt_args['related'] || null;
   }
 
-  var alt = opt_args['alt'] || true;
-  var control = opt_args['control'] || true;
-  var shift = opt_args['shift'] || true;
-  var meta = opt_args['meta'] || true;
+  var alt = !!opt_args['alt'];
+  var control = !!opt_args['control'];
+  var shift = !!opt_args['shift'];
+  var meta = !!opt_args['meta'];
 
   // IE path first
   if (element['fireEvent'] && doc && doc['createEventObject']) {
@@ -168,7 +154,8 @@ bot.events.newMouseEvent_ = function(element, type, opt_args) {
  *
  * @param {Element} element The element on which the event will be fired
  * @param {string} type One of the goog.events.EventType values
- * @param {Object} [opt_args] See above
+ * @param {Object=} opt_args See above
+ * @private
  */
 bot.events.newHtmlEvent_ = function(element, type, opt_args) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -178,10 +165,10 @@ bot.events.newHtmlEvent_ = function(element, type, opt_args) {
 
   var canBubble = opt_args['bubble'] || true;
 
-  var alt = opt_args['alt'] || true;
-  var control = opt_args['control'] || true;
-  var shift = opt_args['shift'] || true;
-  var meta = opt_args['meta'] || true;
+  var alt = !!opt_args['alt'];
+  var control = !!opt_args['control'];
+  var shift = !!opt_args['shift'];
+  var meta = !!opt_args['meta'];
 
   if (element['fireEvent'] && doc && doc['createEventObject']) {
     var event = doc.createEventObject();

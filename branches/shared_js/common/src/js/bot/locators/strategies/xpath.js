@@ -1,5 +1,6 @@
 goog.provide('bot.locators.strategies.xpath');
 
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.object');
 goog.require('goog.string');
@@ -34,8 +35,7 @@ bot.locators.strategies.xpath.single = function(win, target) {
  * Find an element by using an xpath expression
  * @param {Window} win The DOM window to search in.
  * @param {string} target The xpath to search for.
- * @return {?Element} The first matching element found in the DOM, or null if no
- *     such element could be found.
+ * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
 bot.locators.strategies.xpath.many = function(win, target) {
   var doc = goog.dom.getOwnerDocument(win);

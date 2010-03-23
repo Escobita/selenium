@@ -1,5 +1,6 @@
 goog.provide('bot.locators.strategies.className');
 
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.string');
 
@@ -33,8 +34,7 @@ bot.locators.strategies.className.single = function(win, target) {
  * Find an element by its class name.
  * @param {Window} win The DOM window to search in.
  * @param {string} target The class name to search for.
- * @return {?Element} The first matching element found in the DOM, or null if no
- *     such element could be found.
+ * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
 bot.locators.strategies.className.many = function(win, target) {
   if (!target) {

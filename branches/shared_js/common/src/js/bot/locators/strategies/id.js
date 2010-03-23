@@ -48,7 +48,7 @@ bot.locators.strategies.id.single = function(win, target) {
  * Find many elements by using the value of the ID attribute
  * @param {Window} win The DOM window to search in.
  * @param {string} target The id to search for.
- * @return {array} All matching elements, or an empty list
+ * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
 bot.locators.strategies.id.many = function(win, target) {
   var doc = goog.dom.getOwnerDocument(win);

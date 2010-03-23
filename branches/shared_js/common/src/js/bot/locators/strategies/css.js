@@ -1,5 +1,6 @@
 goog.provide('bot.locators.strategies.css');
 
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.object');
 goog.require('goog.string');
@@ -41,7 +42,7 @@ bot.locators.strategies.css.single = function(win, target) {
  *
  * @param {Window} win The DOM window to search in.
  * @param {string} target The selector to search for.
- * @return {array} All matching elements, or an empty list
+ * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
 bot.locators.strategies.css.many = function(win, target) {
   var doc = win.document;

@@ -43,7 +43,7 @@ bot.locators.strategies.name.single = function(win, target) {
  *
  * @param {Window} win The DOM window to search in.
  * @param {string} target The id to search for.
- * @return {array} All matching elements, or an empty list
+ * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
 bot.locators.strategies.name.many = function(win, target) {
   var doc = goog.dom.getOwnerDocument(win);
