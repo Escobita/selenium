@@ -33,6 +33,13 @@ bot.events.relatedTargetEvents_ = [
 ];
 
 /**
+ * @type {{x: ?number, y: ?number, button: ?number, bubble: ?boolean,
+ *         alt: ?boolean, control: ?boolean, shift: ?boolean, meta: ?boolean,
+ *         related: ?Element}
+ */
+bot.events.mouseArgs = goog.typedef;
+
+/**
  * Initialize a new mouse event. The opt_args can be used to pass in extra
  * parameters that might be needed, though the function attempts to guess some
  * valid default values. Extra arguments are specified as properties of the
@@ -61,7 +68,7 @@ bot.events.relatedTargetEvents_ = [
  *
  * @param {Element} element The element on which the event will be fired
  * @param {string} type One of the goog.events.EventType values
- * @param {Object=} opt_args See above
+ * @param {bot.events.mouseArgs=} opt_args See above
  * @private
  */
 bot.events.newMouseEvent_ = function(element, type, opt_args) {
