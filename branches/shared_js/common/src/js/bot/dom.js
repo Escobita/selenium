@@ -1,6 +1,7 @@
 goog.provide('bot.dom');
 
 goog.require('goog.array');
+goog.require('goog.style');
 
 /**
  * Determines whether or not the element has an attribute of the given name,
@@ -72,4 +73,16 @@ bot.dom.getAttribute = function(element, attributeName) {
   }
 
   return value;
+};
+
+// TODO(simon): I strongly believe that this function lies
+bot.dom.getLocation = function(element) {
+  // Position is only relative to the viewport.
+  var position = goog.style.getClientPosition(element);
+
+  var scroll = goog.dom.getDomHelper(element).scrollCoord;
+  position.x += scroll.x;
+  position.y += scroll.y;
+
+  return position;
 };

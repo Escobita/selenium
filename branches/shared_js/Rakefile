@@ -874,5 +874,23 @@ file 'build/getAttribute.js' do
   )
 end
 
+file 'build/getLocation.js' do
+  create_js_fragment(:name => "getLocation", 
+    :module => "bot.dom",
+    :function => "bot.dom.getLocation"
+  )
+end
 
-task :fragments => ["build/fire.js", "build/findElement.js", "build/findElements.js", "build/getAttribute.js"]
+file 'build/getSize.js' do
+  create_js_fragment(:name => "getSize", 
+    :module => "goog.style",
+    :function => "goog.style.getSize"
+  )
+end
+
+task :fragments => ["build/fire.js", 
+                    "build/findElement.js", 
+                    "build/findElements.js", 
+                    "build/getAttribute.js", 
+                    "build/getLocation.js",
+                    "build/getSize.js"]
