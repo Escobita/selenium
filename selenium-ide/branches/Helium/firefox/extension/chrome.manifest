@@ -1,8 +1,0 @@
-content helium chrome/content/
-
-overlay chrome://browser/content/browser.xul chrome://helium/content/view/outilmenu.xul
-overlay chrome://selenium-ide/content/selenium-ide.xul chrome://helium/content/view/seleniumOverlay.xul
-overlay chrome://selenium-ide/content/selenium-ide-common.xul chrome://helium/content/view/optionOverlay.xul
-
-locale helium en-US chrome/locale/en-US/
-locale helium fr-FR chrome/locale/fr-FR/

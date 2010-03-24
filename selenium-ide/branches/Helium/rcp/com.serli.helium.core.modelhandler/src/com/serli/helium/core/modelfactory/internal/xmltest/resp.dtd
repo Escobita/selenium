@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT seqtest (test*)>
-<!ELEMENT test (param+)>
-<!ATTLIST test type CDATA #REQUIRED>
-<!ELEMENT param (#PCDATA)>
-<!ATTLIST param name ID #REQUIRED>

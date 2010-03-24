@@ -1,2 +1,0 @@
-Main-Class: org.openqa.selenium.server.SeleniumServer
-One-Jar-Main-Class: org.openqa.selenium.server.SeleniumServerOrig

@@ -1,8 +1,0 @@
-build.xml
-pom.xml
-target
-pkg
-doc
-iedoc2ruby.xml
-.svn
-lib/selenium/client/generated_driver.rb
