@@ -895,7 +895,7 @@ file 'build/isSelected.js' do
   )
 end
 
-task :fragments => ["build/fire.js", 
+multitask :fragments => ["build/fire.js", 
                     "build/findElement.js", 
                     "build/findElements.js", 
                     "build/getAttribute.js", 
