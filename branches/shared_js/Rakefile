@@ -888,9 +888,17 @@ file 'build/getSize.js' do
   )
 end
 
+file 'build/isSelected.js' do
+  create_js_fragment(:name => "isSelected",
+    :module => "bot.dom",
+    :function => "bot.dom.isSelected"
+  )
+end
+
 task :fragments => ["build/fire.js", 
                     "build/findElement.js", 
                     "build/findElements.js", 
                     "build/getAttribute.js", 
                     "build/getLocation.js",
-                    "build/getSize.js"]
+                    "build/getSize.js",
+                    "build/isSelected.js"]

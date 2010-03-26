@@ -75,6 +75,17 @@ bot.dom.getAttribute = function(element, attributeName) {
   return value;
 };
 
+/**
+ * Determines whether an element is what a user would call "selected". This boils
+ * down to checking to see if either the "checked" or "selected" attribute is true
+ *
+ * @param {Node} element The element to use
+ */
+bot.dom.isSelected = function(element) {
+  // TODO(simon): Add test
+  return bot.dom.getAttribute(element, 'checked') || bot.dom.getAttribute(element, 'selected');
+};
+
 // TODO(simon): I strongly believe that this function lies
 bot.dom.getLocation = function(element) {
   // Position is only relative to the viewport.
