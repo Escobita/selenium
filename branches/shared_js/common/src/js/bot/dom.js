@@ -51,6 +51,9 @@ bot.dom.booleanAttributes_ = [
  * @return {*} The value of the node or "null" if entirely missing
  */
 bot.dom.getAttribute = function(element, attributeName) {
+  if (!element) { throw Error('Element has not been specified'); }
+  if (!attributeName) { throw Error('Attribute name must be set'); }
+
   var lattr = attributeName.toLowerCase();
 
   // TODO(simon): What's the right thing to do here?
@@ -82,8 +85,14 @@ bot.dom.getAttribute = function(element, attributeName) {
  * @param {Node} element The element to use
  */
 bot.dom.isSelected = function(element) {
-  // TODO(simon): Add test
-  return bot.dom.getAttribute(element, 'checked') || bot.dom.getAttribute(element, 'selected');
+  if (bot.dom.hasAttribute(element, 'checked')) {
+    return bot.dom.getAttribute(element, 'checked');
+  }
+  if (bot.dom.hasAttribute(element, 'selected')) {
+    return bot.dom.getAttribute(element, 'selected');
+  }
+
+  throw Error('Element has neither checked nor selected attributes');
 };
 
 // TODO(simon): I strongly believe that this function lies

@@ -4,10 +4,11 @@
   <title>dom_test.html</title>
   <script src="bot-bootstrap.js"></script>
   <script>
-    goog.require('goog.testing.jsunit');
-    goog.require('goog.events.EventType');
     goog.require('bot.dom');
     goog.require('bot.locators');
+    goog.require('goog.events.EventType');
+    goog.require('goog.testing.ExpectedFailures');
+    goog.require('goog.testing.jsunit');
   </script>
 
   <script>
@@ -71,6 +72,38 @@
 
       assertEquals('', bot.dom.getAttribute(e, 'empty'));
     }
+
+    function testShouldFailToFindAnAttributeWhenTheAttributeNameIsNotSpecified() {
+      var e = bot.locators.findElement({id: 'gouda'});
+
+      try {
+        bot.dom.getAttribute(e);
+        fail('Should never get this far');
+      } catch (e) {
+        // though this is expected
+      }
+    }
+
+    function testShouldFailToFindAnAttributeWhenTheElementIsNotSpecified() {
+      try {
+        bot.dom.getAttribute(undefined, 'tagName');
+        fail('Should never get this far');
+      } catch (e) {
+        // though this is expected
+      }
+    }
+
+    function testIsSelectedShouldReturnTrueForSelectedElements() {
+      var selected = bot.locators.findElement({id: 'peas'});
+      var notSelected = bot.locators.findElement({id: 'chips'});
+      var checky = bot.locators.findElement({name: 'checky'});
+      var notChecky = bot.locators.findElement({name: 'notChecky'});
+
+      assertTrue(bot.dom.isSelected(selected));
+      assertTrue(bot.dom.isSelected(checky));
+      assertFalse(bot.dom.isSelected(notSelected));
+      assertFalse(bot.dom.isSelected(notChecky));
+    }
   </script>
 </head>
 <body>
@@ -87,6 +120,7 @@
     </select>
 
     <input name="checky" type="checkbox" checked="cheese" />
+    <input name="notChecky" type="checkbox" />
     <input name="radio" id="unchecked" type="radio" value="me">Me
     <input name="radio" id="checked" type="radio" value="myself" checked="checked">Myself
     <input name="radio" type="radio" value="i">And I
