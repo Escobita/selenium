@@ -15,6 +15,7 @@ require 'rake-tasks/ruby'
 require 'rake-tasks/se-ide'
 require 'rake-tasks/ie_code_generator'
 require 'rake-tasks/js_to_header'
+require 'rake-tasks/create_fragment'
 
 version = "2.0a2"
 
@@ -847,78 +848,57 @@ def create_js_fragment(args)
   sh "./create_fragment.sh \"#{args[:module]}\" \"#{args[:function]}\" \"#{args[:name]}\" \"#{args[:name]}\""
 end
 
-file 'build/findElement.js' do
-  create_js_fragment(:name => "findElement", 
-    :module => "bot.locators",
-    :function => "bot.locators.findElement"
-  )
-end
+js_fragment(:name => "findElement", 
+            :module => "bot.locators",
+            :function => "bot.locators.findElement")
 js_to_header(:name => "findElement",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/findElement.js")
 
 
-file 'build/findElements.js' do
-  create_js_fragment(:name => "findElements", 
-    :module => "bot.locators",
-    :function => "bot.locators.findElements"
-  )
-end
+js_fragment(:name => "findElements", 
+            :module => "bot.locators",
+            :function => "bot.locators.findElements")
 js_to_header(:name => "findElements",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/findElements.js")
 
 
-file 'build/fire.js' do
-  create_js_fragment(:name => "fire", 
-    :module => "bot.events",
-    :function => "bot.events.fire"
-  )
-end
+js_fragment(:name => "fire", 
+            :module => "bot.events",
+            :function => "bot.events.fire")
 js_to_header(:name => "fire",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/fire.js")
 
 
-file 'build/getAttribute.js' do
-  create_js_fragment(:name => "getAttribute", 
-    :module => "bot.dom",
-    :function => "bot.dom.getAttribute"
-  )
-end
+js_fragment(:name => "getAttribute", 
+            :module => "bot.dom",
+            :function => "bot.dom.getAttribute")
 js_to_header(:name => "getAttribute",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/getAttribute.js")
 
 
-file 'build/getLocation.js' do
-  create_js_fragment(:name => "getLocation", 
-    :module => "bot.dom",
-    :function => "bot.dom.getLocation"
-  )
-end
+js_fragment(:name => "getLocation", 
+            :module => "bot.dom",
+            :function => "bot.dom.getLocation")
 js_to_header(:name => "getLocation",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/getLocation.js")
 
 
-file 'build/getSize.js' do
-  create_js_fragment(:name => "getSize", 
-    :module => "goog.style",
-    :function => "goog.style.getSize"
-  )
-end
+js_fragment(:name => "getSize", 
+            :module => "goog.style",
+            :function => "goog.style.getSize")
 js_to_header(:name => "getSize",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/getSize.js")
 
 
-file 'build/isSelected.js' do
-  create_js_fragment(:name => "isSelected",
-    :module => "bot.dom",
-    :function => "bot.dom.isSelected"
-  )
-end
+js_fragment(:name => "isSelected",
+            :module => "bot.dom",
+            :function => "bot.dom.isSelected")
 js_to_header(:name => "isSelected",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/isSelected.js")
