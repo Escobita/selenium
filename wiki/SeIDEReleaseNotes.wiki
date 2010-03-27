@@ -5,6 +5,7 @@
 
 The big thing in this release is that the scary log message that was showing up on 'open' is fixed. The other big things are:
 
+  * BUG - The scary log message that was happening when you used 'open' has had its underlying cause fixed (Adam Goucher, Jérémy Hérault)
   * BUG - fixed a build issue with FF 3.6 and type-ahead for commands (Jérémy Hérault)
   * BUG - fixed some PHP export issues - see http://jira.openqa.org/browse/SIDE-346 and http://jira.openqa.org/browse/SIDE-183 (Adam Goucher)
   * BUG - there was a packaging issue around user-extensions (Adam Goucher)
