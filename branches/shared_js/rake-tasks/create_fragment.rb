@@ -15,7 +15,7 @@ def js_fragment(args)
     end
     
     cmd = ""
-    cmd << "python third_party/closure/bin/calcdeps.py "
+    cmd << "java -jar third_party/py/jython.jar third_party/closure/bin/calcdeps.py "
     cmd << "-c third_party/closure/bin/compiler-20100201.jar "
     cmd << "-o compiled "
     cmd << "-f \"--third_party=true\" "
