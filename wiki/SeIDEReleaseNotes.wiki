@@ -1,6 +1,19 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.6==
+
+The big thing in this release is that the scary log message that was showing up on 'open' is fixed. The other big things are:
+
+  * BUG - fixed a build issue with FF 3.6 and type-ahead for commands (Jérémy Hérault)
+  * BUG - fixed some PHP export issues - see http://jira.openqa.org/browse/SIDE-346 and http://jira.openqa.org/browse/SIDE-183 (Adam Goucher)
+  * BUG - there was a packaging issue around user-extensions (Adam Goucher)
+  * BUG - ide won't put 'name=' as the Target when recording a selectWindow (David Burns)
+  * BUG - to avoid confusion, when viewing formatter source, if it is read-only the button says 'ok' and if it is editable then it is 'save' (Jérémy Hérault)
+  * NEW - you can now set a preference on whether you want record to be on or off when you start ide (Adam Goucher)
+  * NEW - se-ide plugin information is read from the plugin's install.rdf (most people won't care about this, but its pretty cool from a geek perspective)
+
+
 ==1.0.5==
 
 One thing that does not really fit the BUG or NEW label is that the code for Se-IDE is now in the main repo rather than tucked away in a somewhat hidden location.
