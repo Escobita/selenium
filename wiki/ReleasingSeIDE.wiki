@@ -1,4 +1,5 @@
 #summary How to release Se-IDE
+#labels ide
 
 = Introduction =
 
