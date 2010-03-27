@@ -14,6 +14,7 @@
                 <em:minVersion>1.5</em:minVersion> 
                 <em:maxVersion>3.*</em:maxVersion> 
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.0.6/selenium-ide-1.0.6.xpi</em:updateLink>
+                <em:updateHash>sha1:c7c61a3840d61f937969dfd23c5f33b81fb5a06f</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
