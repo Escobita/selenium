@@ -1,0 +1,31 @@
+#summary How to release Se-IDE
+
+= Introduction =
+
+The steps to releasing Se-IDE (because I keep forgetting something)
+
+
+= Details =
+
+  # Get it 'good enough' on trunk
+  # Create a branch (/branches/ide-x.y.z) to run rc's on
+  # Change -SNAPSHOT to -RC-N
+  # Add branch to bamboo
+  # Distribute URL to build artifact
+  # Get it 'good enough' on the branch
+  # Remove the -RC-N stuff
+  # Wait for build
+  # Download build from bamboo
+  # Do a quick test
+  # Upload final xpi to /tmp on releases.seleniumhq.org
+  # Become the release user (sudo su - release) and copy release.openqa.org/htdocs/selenium-ide/1.0.6 
+  # update website release page
+  # test download
+  # update update.rdf
+  # test upgrade
+  # update release notes
+  # close out issues in the tracker
+  # announce
+  # merge your changes from the branch to trunk so a reversion exists with just the clean version
+  # increment the version with -SNAPSHOT
+  # disable branch build in bamboo
