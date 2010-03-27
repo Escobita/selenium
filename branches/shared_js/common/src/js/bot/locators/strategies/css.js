@@ -12,13 +12,14 @@ goog.require('goog.string');
  *
  * @param {Window} win The DOM window to search in.
  * @param {string} target The selector to search for.
+ * @param {Node=} opt_root The node from which to start the search
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  */
-bot.locators.strategies.css.single = function(win, target) {
-  var doc = win.document;
+bot.locators.strategies.css.single = function(win, target, opt_root) {
+  var root = opt_root || goog.dom.getOwnerDocument(win);
 
-  if (!goog.isFunction(doc['querySelector'])) {
+  if (!goog.isFunction(root['querySelector'])) {
     throw Error('CSS selection is not supported');
   }
 
@@ -32,7 +33,7 @@ bot.locators.strategies.css.single = function(win, target) {
 
   target = goog.string.trim(target);
 
-  var element = doc.querySelector(target);
+  var element = root.querySelector(target);
 
   return element ? element : null;
 };
@@ -42,12 +43,13 @@ bot.locators.strategies.css.single = function(win, target) {
  *
  * @param {Window} win The DOM window to search in.
  * @param {string} target The selector to search for.
+ * @param {Node=} opt_root The node from which to start the search
  * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
-bot.locators.strategies.css.many = function(win, target) {
-  var doc = win.document;
+bot.locators.strategies.css.many = function(win, target, opt_root) {
+  var root = opt_root || goog.dom.getOwnerDocument(win);
 
-  if (!goog.isFunction(doc['querySelectorAll'])) {
+  if (!goog.isFunction(root['querySelectorAll'])) {
     throw Error('CSS selection is not supported');
   }
 
@@ -61,5 +63,5 @@ bot.locators.strategies.css.many = function(win, target) {
 
   target = goog.string.trim(target);
 
-  return doc.querySelectorAll(target);
+  return root.querySelectorAll(target);
 };

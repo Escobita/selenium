@@ -11,11 +11,13 @@ goog.require('goog.string');
  * Find an element by using an xpath expression
  * @param {Window} win The DOM window to search in.
  * @param {string} target The xpath to search for.
+ * @param {Node=} opt_root The node from which to start the search
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  */
-bot.locators.strategies.xpath.single = function(win, target) {
+bot.locators.strategies.xpath.single = function(win, target, opt_root) {
   var doc = goog.dom.getOwnerDocument(win);
+  var root = opt_root || doc;
 
   if (!goog.isFunction(doc['evaluate'])) {
     throw Error('XPath location is not supported');
@@ -26,7 +28,7 @@ bot.locators.strategies.xpath.single = function(win, target) {
   }
 
   var element =
-      doc.evaluate(target, doc, null, /* FIRST_ORDERED_NODE_TYPE */ 9, null).singleNodeValue;
+      doc.evaluate(target, root, null, /* FIRST_ORDERED_NODE_TYPE */ 9, null).singleNodeValue;
 
   return element ? element : null;
 };
@@ -35,10 +37,12 @@ bot.locators.strategies.xpath.single = function(win, target) {
  * Find an element by using an xpath expression
  * @param {Window} win The DOM window to search in.
  * @param {string} target The xpath to search for.
+ * @param {Node=} opt_root The node from which to start the search
  * @return {goog.array.ArrayLike} All matching elements, or an empty list
  */
-bot.locators.strategies.xpath.many = function(win, target) {
+bot.locators.strategies.xpath.many = function(win, target, opt_root) {
   var doc = goog.dom.getOwnerDocument(win);
+  var root = opt_root || doc;
 
   if (!goog.isFunction(doc['evaluate'])) {
     throw Error('XPath location is not supported');
@@ -48,7 +52,7 @@ bot.locators.strategies.xpath.many = function(win, target) {
     throw Error('No xpath specified');
   }
 
-  var nodes = doc.evaluate(target, doc, null, /* ORDERED_NODE_ITERATOR_TYPE */ 5, null);
+  var nodes = doc.evaluate(target, root, null, /* ORDERED_NODE_ITERATOR_TYPE */ 5, null);
 
   var elements = [];
   var e = nodes.iterateNext();

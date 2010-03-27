@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>child_locator_test.html</title>
+  <script src="bot-bootstrap.js"></script>
+  <script>
+    goog.require('bot.dom');
+    goog.require('bot.locators');
+    goog.require('goog.dom');
+    goog.require('goog.events.EventType');
+    goog.require('goog.testing.jsunit');
+  </script>
+
+  <script>
+    function testCanFindChildElementByClassName() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var child = bot.locators.findElement({className: 'child'}, parent);
+
+      assertEquals('Child 1', goog.dom.getTextContent(child));
+    }
+
+    function testCanFindChildElementsByClassName() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var children = bot.locators.findElements({className: 'child'}, parent);
+
+      assertEquals(3, children.length);
+      assertEquals('Child 1', goog.dom.getTextContent(children[0]));
+      assertEquals('Child 3', goog.dom.getTextContent(children[2]));
+    }
+
+    function testCanFindChildElementByCss() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var child = bot.locators.findElement({css: '.child'}, parent);
+
+      assertEquals('Child 1', goog.dom.getTextContent(child));
+    }
+
+    function testCanFindChildElementsByCss() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var children = bot.locators.findElements({css: '.child'}, parent);
+
+      assertEquals(3, children.length);
+      assertEquals('Child 1', goog.dom.getTextContent(children[0]));
+      assertEquals('Child 3', goog.dom.getTextContent(children[2]));
+    }
+
+    function testCanFindChildElementById() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var child = bot.locators.findElement({id: 'child'}, parent);
+
+      assertEquals('Child 1', goog.dom.getTextContent(child));
+    }
+
+    function testCanFindChildElementsById() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var children = bot.locators.findElements({id: 'child'}, parent);
+
+      assertEquals(3, children.length);
+      assertEquals('Child 1', goog.dom.getTextContent(children[0]));
+      assertEquals('Child 3', goog.dom.getTextContent(children[2]));
+    }
+
+    function testCanFindChildElementByName() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var child = bot.locators.findElement({name: 'child'}, parent);
+
+      assertEquals('Child 1', goog.dom.getTextContent(child));
+    }
+
+    function testCanFindChildElementsByName() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var children = bot.locators.findElements({name: 'child'}, parent);
+
+      assertEquals(3, children.length);
+      assertEquals('Child 1', goog.dom.getTextContent(children[0]));
+      assertEquals('Child 3', goog.dom.getTextContent(children[2]));
+    }
+
+    function testCanFindChildElementByXpath() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var child = bot.locators.findElement({xpath: './/*[@id="child"]'}, parent);
+
+      assertEquals('Child 1', goog.dom.getTextContent(child));
+    }
+
+    function testCanFindChildElementsByXpath() {
+      var parent = bot.locators.findElement({id: 'parent'});
+      var children = bot.locators.findElements({xpath: './/*[@id="child"]'}, parent);
+
+      assertEquals(3, children.length);
+      assertEquals('Child 1', goog.dom.getTextContent(children[0]));
+      assertEquals('Child 3', goog.dom.getTextContent(children[2]));
+    }
+  </script>
+</head>
+<body>
+  <p name="child" id="child" class="child">Not really!</p>
+
+  <div id="parent">
+    <p name="child" id="child" class="child">Child 1</p>
+    <p name="child" id="child" class="child">Child 2</p>
+    <p name="child" id="child" class="child">Child 3</p>
+  </div>
+
+  <p name="child">Me either</p>
+</body>
+</html>

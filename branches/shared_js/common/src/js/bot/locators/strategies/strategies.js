@@ -21,15 +21,16 @@ bot.locators.strategies.known_ = {
  * the "target". The value of this key is used to locate the element.  
  *
  * @param {*} target A JS object with a single key.
+ * @param {Node=} opt_root Root node for the search (defaults to document)
  * @return {Function} The finder function, ready to be called
  */
-bot.locators.strategies.lookupSingle = function(target) {
+bot.locators.strategies.lookupSingle = function(target, opt_root) {
   var key = goog.object.getAnyKey(target);
 
   if (key) {
     var strategy = bot.locators.strategies.known_[key];
     if (strategy && goog.isFunction(strategy.single)) {
-      return goog.bind(strategy.single, null, bot.window_, target[key]);
+      return goog.bind(strategy.single, null, bot.window_, target[key], opt_root);
     }
   }
   throw new Error('Unsupported locator strategy: ' + key);
@@ -40,15 +41,17 @@ bot.locators.strategies.lookupSingle = function(target) {
  * the "target". The value of this key is used to locate the elements.  
  *
  * @param {*} target A JS object with a single key.
+ * @param {Node=} opt_root Root node the search (defaults to document)
  * @return {Function} The finder function, ready to be called
  */
-bot.locators.strategies.lookupMany = function(target) {
+bot.locators.strategies.lookupMany = function(target, opt_root) {
   var key = goog.object.getAnyKey(target);
 
   if (key) {
     var strategy = bot.locators.strategies.known_[key];
     if (strategy && goog.isFunction(strategy.many)) {
-      return goog.bind(bot.locators.strategies.known_[key].many, null, bot.window_, target[key]);
+      return goog.bind(
+          bot.locators.strategies.known_[key].many, null, bot.window_, target[key], opt_root);
     }
   }
   throw new Error('Unsupported locator strategy: ' + key);
