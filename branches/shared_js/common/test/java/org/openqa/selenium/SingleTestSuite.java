@@ -56,7 +56,7 @@ public class SingleTestSuite extends TestCase {
         .keepDriverInstance()
         .includeJavascriptTests()
         .onlyRun("ElementAttributeTest")
-//        .method("testShouldReturnTheValueOfTheDisabledAttrbuteEvenIfItIsMissing")
+        .method("testShouldReturnTheValueOfTheDisabledAttrbuteEvenIfItIsMissing")
         .exclude(ALL)
         .exclude(Ignore.Driver.FIREFOX)
         .outputTestNames()

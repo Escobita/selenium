@@ -279,7 +279,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
                                    respond.session.getDocument());
   var attributeName = parameters.name;
 
-  var value;
+  var value = null;
 
   var lattr = attributeName.toLowerCase();
   if ('checked' == lattr || 'selected' == lattr) {
@@ -288,11 +288,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
     value = bot.dom.getAttribute(element, attributeName);
   }
   
-  if (value === undefined) {
-    respond.value = undefined;
-  } else {
-    respond.value = value !== null ? value.toString() : null;
-  }
+  respond.value = (value === undefined) ? undefined : value;
   respond.send();
 };
 
