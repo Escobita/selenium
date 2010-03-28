@@ -41,7 +41,7 @@ public class SingleTestSuite extends TestCase {
   private final static String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = REMOTE;
+    String driver = IE;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -55,13 +55,10 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("ExecutingJavascriptTest")
-        .method("testShouldBeAbleToExecuteSimpleJavascriptAndReturnAnArray")
-        .method("testShouldBeAbleToExecuteSimpleJavascriptAndAStringsArray")
-        .method("testShouldBeAbleToExecuteScriptAndReturnElementsList")
-        .method("testShouldBeAbleToExecuteSimpleJavascriptAndReturnAWebElement")
+        .onlyRun("ChildrenFindingTest")
+        .method("testFindElementByXPath")
         .exclude(ALL)
-        .exclude(Ignore.Driver.REMOTE)
+        .exclude(Ignore.Driver.IE)
         .outputTestNames()
         //.leaveRunning()
         ;  // Yeah, this look strange :)

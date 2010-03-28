@@ -25,6 +25,7 @@ limitations under the License.
 #include "cookies.h"
 #include "utils.h"
 #include "IEReturnTypes.h"
+#include "atoms/getAttribute.h"
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -615,16 +616,13 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 
 	try {
 		std::wstring script(L"(function() { return function(){ ");
-		script += L"var e = arguments[0]; var attr = arguments[1]; var lattr = attr.toLowerCase(); ";
-		script += L"if ('class' == lattr) { attr = 'className' }; ";
-		script += L"if ('readonly' == lattr) { attr = 'readOnly' }; ";
-		script += L"if ('style' == lattr) { return ''; } ";
-		script += L"if ('disabled' == lattr) { return e.disabled ? 'true' : 'false'; } ";
-		script += L"if (e.tagName.toLowerCase() == 'input') { ";
-        script += L"  var type = e.type.toLowerCase(); ";
-		script += L"  if (type == 'radio' && lattr == 'selected') { return e.checked == '' || e.checked == undefined ? 'false' : 'true' ; } ";
-		script += L"} ";
-		script += L"return e[attr] === undefined ? undefined : e[attr].toString(); ";
+
+		for (int i = 0; GETATTRIBUTE[i]; i++) {
+			script += GETATTRIBUTE[i];
+			script += L"\n";
+		}
+
+		script += L"return getAttribute(arguments[0], arguments[1]); ";
 		script += L"};})();";
 
 		ScriptArgs* args;

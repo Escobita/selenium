@@ -399,11 +399,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ScreenshotCapture.cpp"
+				RelativePath=".\ScopeTracer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ScopeTracer.cpp"
+				RelativePath=".\ScreenshotCapture.cpp"
 				>
 			</File>
 			<File
@@ -441,7 +441,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\atoms\findElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\atoms\findElements.h"
+				>
+			</File>
+			<File
 				RelativePath=".\finder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\atoms\fire.h"
+				>
+			</File>
+			<File
+				RelativePath=".\atoms\getAttribute.h"
+				>
+			</File>
+			<File
+				RelativePath=".\atoms\getLocation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\atoms\getSize.h"
 				>
 			</File>
 			<File
@@ -465,15 +489,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\atoms\isSelected.h"
+				>
+			</File>
+			<File
 				RelativePath=".\jsxpath.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ScreenshotCapture.h"
+				RelativePath=".\ScopeTracer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ScopeTracer.h"
+				RelativePath=".\ScreenshotCapture.h"
 				>
 			</File>
 			<File
