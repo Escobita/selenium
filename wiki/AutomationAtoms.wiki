@@ -11,8 +11,8 @@ Browser Automation Atoms are building blocks intended to be used by Selenium imp
 
 There are two ways to make use of the automation atoms. 
 
-# Using Google Closure
-# As compiled fragments
+  # Using Google Closure
+  # As compiled fragments
 
 The first of these approaches is useful when constructing a monolithic application, such as Selenium Core. The second approach is used in those drivers that are implemented natively and wish to use the atoms to interrogate the DOM (such as the InternetExplorerDriver).
 
@@ -28,4 +28,3 @@ Each of the atoms listed here is exposed via the list *method name*, which deleg
 || getLocation || Get the absolute location of an element in the DOM || bot.dom.getLocation ||
 || getSize || Get the size of an element || bot.dom.getSize ||
 || isSelected || Would a user consider this element selected? || bot.dom.isSelected ||
-
