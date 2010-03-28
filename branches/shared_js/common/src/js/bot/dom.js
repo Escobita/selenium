@@ -69,7 +69,16 @@ bot.dom.getAttribute = function(element, attributeName) {
   }
 
   // TODO(simon): What's the right thing to do here?
-  if ('style' == lattr) { return ''; }
+  if ('style' == lattr) {
+    var style = element['style'];
+
+    // emulating selenium's behaviour for style attribute on IE
+    if (style['cssText']) {
+      value = style['cssText'];
+    } else {
+      value = '';
+    }
+  }
 
   // Commonly looked up attributes that are aliases
   if ('class' == lattr) { attributeName = 'className' }
