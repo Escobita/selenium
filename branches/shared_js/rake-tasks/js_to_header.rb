@@ -17,7 +17,7 @@ def js_to_header(args)
         to << "wchar_t* #{upper}[] = {\n"
           
         while line = from.gets
-          converted = line.chomp.gsub(/\\/, "\\\\").gsub(/"/, "\\\"")
+          converted = line.chomp.gsub(/\\/, "\\\\\\").gsub(/"/, "\\\"")
           to << "L\"#{converted}\",\n"
         end
           
