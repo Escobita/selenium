@@ -13,11 +13,17 @@ goog.require('goog.style');
  */
 bot.dom.hasAttribute = function(element, attributeName) {
   if (goog.isFunction(element['hasAttribute'])) {
-
     // But if might be an element property....
     if (element.hasAttribute(attributeName)) {
       return true;
     }
+  }
+
+  // When running in Firefox's chrome mode, the element needs to be cast to
+  // the appropriate XPCOM object for the hack below to work. Try and work
+  // round this problem.
+  if (element[attributeName] !== undefined) {
+    return true;
   }
 
   // Handle the case where we lack the hasAttribute method. Normally we'd use
@@ -56,6 +62,12 @@ bot.dom.getAttribute = function(element, attributeName) {
 
   var lattr = attributeName.toLowerCase();
 
+  // Handle common boolean values
+  if (goog.array.contains(bot.dom.booleanAttributes_, attributeName)) {
+    var value = element[attributeName];    
+    return !!(value && value != 'false');
+  }
+
   // TODO(simon): What's the right thing to do here?
   if ('style' == lattr) { return ''; }
 
@@ -67,15 +79,8 @@ bot.dom.getAttribute = function(element, attributeName) {
     return null;
   }
 
-  var value = element[attributeName] === undefined ?
+  return element[attributeName] === undefined ?
       element.getAttribute(attributeName) : element[attributeName];
-
-  // Handle common boolean values
-  if (goog.array.contains(bot.dom.booleanAttributes_, attributeName)) {
-    value = (value != '' && value != 'false' && value != false);
-  }
-
-  return value;
 };
 
 /**

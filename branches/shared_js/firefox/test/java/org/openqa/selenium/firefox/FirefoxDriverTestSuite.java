@@ -128,7 +128,7 @@ public class FirefoxDriverTestSuite extends TestCase {
         }
       }
 
-      copyXpts(extension);
+      copyBuiltItems(extension);
 
       // Now delete all the .svn directories
       deleteSvnDirectories(extension);
@@ -140,8 +140,9 @@ public class FirefoxDriverTestSuite extends TestCase {
       return profile;
     }
 
-    private static void copyXpts(File extension) {
+    private static void copyBuiltItems(File extension) {
       Map<String, String> components = new HashMap<String, String>() {{
+        put("build/atoms.js", "components/atoms.js");
         put("build/nsINativeEvents.xpt", "components/nsINativeEvents.xpt");
         put("build/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt");
         put("build/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt");

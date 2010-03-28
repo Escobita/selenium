@@ -277,49 +277,22 @@ FirefoxDriver.prototype.getElementTagName = function(respond, parameters) {
 FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-
   var attributeName = parameters.name;
 
-  if (element.hasAttribute(attributeName)) {
-    respond.value = element.getAttribute(attributeName);
-    // Is this block necessary?
-    if (attributeName.toLowerCase() == "disabled") {
-      respond.value = element.disabled;
-    } else if (attributeName.toLowerCase() == "selected") {
-      respond.value = element.selected;
-    } else if (attributeName.toLowerCase() == "checked") {
-      respond.value = element.checked;
-    } else if (attributeName.toLowerCase() == "readonly") {
-      respond.value = element.readOnly;
-    }
+  var value;
 
-    respond.send();
-    return;
+  var lattr = attributeName.toLowerCase();
+  if ('checked' == lattr || 'selected' == lattr) {
+    value = bot.dom.isSelected(element);
+  } else {
+    value = bot.dom.getAttribute(element, attributeName);
   }
-
-  attributeName = attributeName.toLowerCase();
-
-  if (attributeName == "disabled") {
-    respond.value = (element.disabled === undefined ? false : element.disabled);
-    respond.send();
-    return;
-  } else if ((attributeName == "checked" || attributeName == "selected") &&
-             element.tagName.toLowerCase() == "input") {
-    respond.value = element.checked;
-    respond.send();
-    return;
-  } else if (attributeName == "selected" && element.tagName.toLowerCase()
-      == "option") {
-    respond.value = element.selected;
-    respond.send();
-    return;
-  } else if (attributeName == "index" && element.tagName.toLowerCase()
-      == "option") {
-    respond.value = element.index;
-    respond.send();
-    return;
+  
+  if (value === undefined) {
+    respond.value = undefined;
+  } else {
+    respond.value = value !== null ? value.toString() : null;
   }
-  respond.value = null;
   respond.send();
 };
 
@@ -327,7 +300,7 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
 FirefoxDriver.prototype.isElementEnabled = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-  respond.value = !!!element.disabled;
+  respond.value = !bot.dom.getAttribute(element, 'disabled');
   respond.send();
 };
 
@@ -391,25 +364,7 @@ FirefoxDriver.prototype.isElementSelected = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
-  var selected = false;
-
-  try {
-    var option =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement);
-    selected = option.selected;
-  } catch(e) {
-  }
-
-  try {
-    var inputElement =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
-    if (inputElement.type == "checkbox" || inputElement.type == "radio") {
-      selected = inputElement.checked;
-    }
-  } catch(e) {
-  }
-
-  respond.value = selected;
+  respond.value = bot.dom.isSelected(element);
   respond.send();
 };
 

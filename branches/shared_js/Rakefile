@@ -8,14 +8,13 @@ require 'rake-tasks/dotnet'
 require 'rake-tasks/zip'
 require 'rake-tasks/c'
 require 'rake-tasks/java'
+require 'rake-tasks/javascript'
 require 'rake-tasks/iphone'
 require 'rake-tasks/selenium'
 require 'rake-tasks/mozilla'
 require 'rake-tasks/ruby'
 require 'rake-tasks/se-ide'
 require 'rake-tasks/ie_code_generator'
-require 'rake-tasks/js_to_header'
-require 'rake-tasks/create_fragment'
 
 version = "2.0a2"
 
@@ -301,10 +300,12 @@ xpi(:name => "firefox_xpi",
     :deps => [
                :firefox_dll,
                :libwebdriver_firefox,
+               "common/src/js/bot/**/*"
              ],
     :resources => [
                     { "firefox/src/extension/components/*.js" => "components/" },
                     { "common/src/js/extension/*.js" => "content/" },
+                    { :atoms => "components/" },
                     { :commandProcessor_xpt => "components/" },
                     { :events_xpt => "components/" },
                     { :responseHandler_xpt => "components/" },
@@ -903,6 +904,8 @@ js_to_header(:name => "isSelected",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/isSelected.js")
 
+js_library(:name => "atoms",
+           :srcs => [ "common/src/js/bot/*.js", "common/src/js/bot/locators/locators.js" ])
 
 multitask :fragments => [
   "build/fire.js", 
