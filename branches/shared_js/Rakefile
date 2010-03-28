@@ -928,3 +928,5 @@ multitask :headers => [
   "getSize.h",
   "isSelected.h"
 ]
+task :ie_win32_dll => :headers
+task :ie_x64_dll => :headers
