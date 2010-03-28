@@ -65,7 +65,6 @@ bot.dom.getAttribute = function(element, attributeName) {
   // Handle common boolean values
   if (goog.array.contains(bot.dom.booleanAttributes_, attributeName)) {
     var value = element[attributeName];
-    Utils.dumpn("Value of " + attributeName + " is " + value + " which is returned as " + (!!(value && value != 'false')));
     return !!(value && value != 'false');
   }
 
