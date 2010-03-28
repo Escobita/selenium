@@ -479,6 +479,9 @@ java_jar(:name => "webdriver-remote-server",
         "common/src/js/core/TestRunner.html" => "core/TestRunner.hta",
         "common/src/js/core/RemoteRunner.html" => "core/RemoteRunner.hta",
       },
+      {
+        :atoms => "core/scripts/"
+      }
     ],
     :deps => [
                :chrome,
