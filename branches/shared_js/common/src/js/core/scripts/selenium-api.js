@@ -15,6 +15,8 @@
  *
  */
 
+goog.require('goog.style');
+
 // TODO: stop navigating this.browserbot.document() ... it breaks encapsulation
 
 var storedVars = new Object();
@@ -2137,119 +2139,36 @@ Selenium.prototype._isCommentOrEmptyTextNode = function(node) {
     return node.nodeType == 8 || ((node.nodeType == 3) && !(/[^\t\n\r ]/.test(node.data)));
 }
 
-Selenium.prototype.getElementPositionLeft = function(locator) {
-   /**
-   * Retrieves the horizontal position of an element
-   *
-   * @param locator an <a href="#locators">element locator</a> pointing to an element OR an element itself
-   * @return number of pixels from the edge of the frame.
-   */
-       var element;
-        if ("string"==typeof locator) {
-            element = this.browserbot.findElement(locator);
-        }
-        else {
-            element = locator;
-        }
-    var x = element.offsetLeft;
-    var elementParent = element.offsetParent;
-
-    while (elementParent != null)
-    {
-        if(document.all)
-        {
-            if( (elementParent.tagName != "TABLE") && (elementParent.tagName != "BODY") )
-            {
-                x += elementParent.clientLeft;
-            }
-        }
-        else // Netscape/DOM
-        {
-            if(elementParent.tagName == "TABLE")
-            {
-                var parentBorder = parseInt(elementParent.border);
-                if(isNaN(parentBorder))
-                {
-                    var parentFrame = elementParent.getAttribute('frame');
-                    if(parentFrame != null)
-                    {
-                        x += 1;
-                    }
-                }
-                else if(parentBorder > 0)
-                {
-                    x += parentBorder;
-                }
-            }
-        }
-        x += elementParent.offsetLeft;
-        elementParent = elementParent.offsetParent;
+Selenium.prototype.getElementPosition_ = function(locator) {
+   var element;
+    if ("string"==typeof locator) {
+        element = this.browserbot.findElement(locator);
     }
-    return x;
+    else {
+        element = locator;
+  }
+
+  return goog.style.getPageOffset(element);
 };
 
-Selenium.prototype.getElementPositionTop = function(locator) {
-   /**
+/**
+ * Retrieves the horizontal position of an element
+ *
+ * @param locator an <a href="#locators">element locator</a> pointing to an element OR an element itself
+ * @return number of pixels from the edge of the frame.
+   */
+Selenium.prototype.getElementPositionLeft = function(locator) {
+  return this.getElementPosition_(locator).x;
+};
+
+/**
    * Retrieves the vertical position of an element
    *
    * @param locator an <a href="#locators">element locator</a> pointing to an element OR an element itself
    * @return number of pixels from the edge of the frame.
    */
-       var element;
-        if ("string"==typeof locator) {
-            element = this.browserbot.findElement(locator);
-        }
-        else {
-            element = locator;
-        }
-
-       var y = 0;
-
-       while (element != null)
-    {
-        if(document.all)
-        {
-            if( (element.tagName != "TABLE") && (element.tagName != "BODY") )
-            {
-            y += element.clientTop;
-            }
-        }
-        else // Netscape/DOM
-        {
-            if(element.tagName == "TABLE")
-            {
-            var parentBorder = parseInt(element.border);
-            if(isNaN(parentBorder))
-            {
-                var parentFrame = element.getAttribute('frame');
-                if(parentFrame != null)
-                {
-                    y += 1;
-                }
-            }
-            else if(parentBorder > 0)
-            {
-                y += parentBorder;
-            }
-            }
-        }
-        y += element.offsetTop;
-
-            // Netscape can get confused in some cases, such that the height of the parent is smaller
-            // than that of the element (which it shouldn't really be). If this is the case, we need to
-            // exclude this element, since it will result in too large a 'top' return value.
-            if (element.offsetParent && element.offsetParent.offsetHeight && element.offsetParent.offsetHeight < element.offsetHeight)
-            {
-                // skip the parent that's too small
-                element = element.offsetParent.offsetParent;
-            }
-            else
-            {
-            // Next up...
-            element = element.offsetParent;
-        }
-       }
-    return y;
+Selenium.prototype.getElementPositionTop = function(locator) {
+   return this.getElementPosition_(locator).y;
 };
 
 Selenium.prototype.getElementWidth = function(locator) {

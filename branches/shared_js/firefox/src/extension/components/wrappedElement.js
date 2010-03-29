@@ -16,6 +16,7 @@
  limitations under the License.
  */
 
+goog.require('goog.style');
 
 FirefoxDriver.prototype.elementEquals = function(respond, parameters) {
   var elementA = Utils.getElementAt(parameters.id,
@@ -493,8 +494,7 @@ FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
 FirefoxDriver.prototype.getElementLocation = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-
-  var location = Utils.getElementLocation(element);
+  var location = goog.style.getPageOffset(element);
 
   respond.value = {
     x: Math.round(location.x),
@@ -532,7 +532,7 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
   // Scroll the first element into view
   //  element.scrollIntoView(true);
 
-  var clientStartXY = Utils.getElementLocation(element);
+  var clientStartXY = goog.style.getPageOffset(element);
 
   var clientStartX = clientStartXY.x;
   var clientStartY = clientStartXY.y;
@@ -578,7 +578,7 @@ FirefoxDriver.prototype.dragElement = function(respond, parameters) {
   // send the mouseup to that
   Utils.triggerMouseEvent(element, 'mouseup', clientFinishX, clientFinishY);
 
-  var finalLoc = Utils.getElementLocation(element);
+  var finalLoc = goog.style.getPageOffset(element);
 
   respond.value = finalLoc.x + "," + finalLoc.y;
   respond.send();

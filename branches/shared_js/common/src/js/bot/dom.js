@@ -108,15 +108,3 @@ bot.dom.isSelected = function(element) {
 
   throw Error('Element has neither checked nor selected attributes');
 };
-
-// TODO(simon): I strongly believe that this function lies
-bot.dom.getLocation = function(element) {
-  // Position is only relative to the viewport.
-  var position = goog.style.getClientPosition(element);
-
-  var scroll = goog.dom.getDomHelper(element).scrollCoord;
-  position.x += scroll.x;
-  position.y += scroll.y;
-
-  return position;
-};
