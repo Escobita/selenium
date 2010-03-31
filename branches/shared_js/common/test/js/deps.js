@@ -19,9 +19,9 @@ goog.addDependency('../../../js/src/bot/locators/locators.js', ['bot.locators'],
 goog.addDependency('../../../js/src/bot/locators/strategies/classname.js', ['bot.locators.strategies.className'], ['goog.array', 'goog.dom', 'goog.string']);
 goog.addDependency('../../../js/src/bot/locators/strategies/css.js', ['bot.locators.strategies.css'], ['goog.array', 'goog.dom', 'goog.object', 'goog.string']);
 goog.addDependency('../../../js/src/bot/locators/strategies/id.js', ['bot.locators.strategies.id'], ['bot.dom', 'goog.array', 'goog.dom']);
-goog.addDependency('../../../js/src/bot/locators/strategies/linkText.js', ['bot.locators.strategies.linkText'], ['bot.dom', 'goog.array', 'goog.dom']);
+goog.addDependency('../../../js/src/bot/locators/strategies/linkText.js', ['bot.locators.strategies.linkText', 'bot.locators.strategies.partialLinkText'], ['bot', 'bot.dom', 'goog.array', 'goog.dom']);
 goog.addDependency('../../../js/src/bot/locators/strategies/name.js', ['bot.locators.strategies.name'], ['bot.dom', 'goog.array', 'goog.dom']);
-goog.addDependency('../../../js/src/bot/locators/strategies/strategies.js', ['bot.locators.strategies'], ['bot.locators.strategies.className', 'bot.locators.strategies.css', 'bot.locators.strategies.id', 'bot.locators.strategies.name', 'bot.locators.strategies.xpath', 'goog.object']);
+goog.addDependency('../../../js/src/bot/locators/strategies/strategies.js', ['bot.locators.strategies'], ['bot.locators.strategies.className', 'bot.locators.strategies.css', 'bot.locators.strategies.id', 'bot.locators.strategies.linkText', 'bot.locators.strategies.name', 'bot.locators.strategies.partialLinkText', 'bot.locators.strategies.xpath', 'goog.object']);
 goog.addDependency('../../../js/src/bot/locators/strategies/xpath.js', ['bot.locators.strategies.xpath'], ['goog.array', 'goog.dom', 'goog.object', 'goog.string']);
 goog.addDependency('../../../js/src/core/lib/prototype.js', [], []);
 goog.addDependency('../../../js/src/core/lib/snapsie.js', [], []);

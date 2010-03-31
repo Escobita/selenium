@@ -117,6 +117,30 @@
 
       assertEquals(2, bad.length);
     }
+
+    function testCanFindElementByLinkText() {
+      var link = bot.locators.findElement({link: 'this is a link'});
+
+      assertEquals('link', bot.dom.getAttribute(link, 'id'));
+    }
+
+    function testCanFindElementsByLinkText() {
+      var links = bot.locators.findElements({link: 'this is a link'});
+
+      assertEquals(5, links.length);
+    }
+
+    function testCanFindElementByPartialLinkText() {
+      var link = bot.locators.findElement({partialLink: 'is a'});
+
+      assertEquals('link', bot.dom.getAttribute(link, 'id'));
+    }
+
+    function testCanFindElementsByPartialLinkText() {
+      var links = bot.locators.findElements({partialLink: 'a lin'});
+
+      assertEquals(5, links.length);
+    }
   </script>
 </head>
 <body>
@@ -140,5 +164,11 @@
     <li id="illegal">item
     <li id="illegal">item
   </ul>
+
+  <a id="link" href="#">this is a link</a>
+  <a name="fishsticks">this is a link</a>
+  <a href="#">this is a link</a>
+  <a href="#">this is a link</a>
+  <a href="#">this is a link</a>
 </body>
 </html>

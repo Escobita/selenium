@@ -4,16 +4,20 @@ goog.provide('bot.locators.strategies');
 goog.require('bot.locators.strategies.className');
 goog.require('bot.locators.strategies.css');
 goog.require('bot.locators.strategies.id');
+goog.require('bot.locators.strategies.linkText');
 goog.require('bot.locators.strategies.name');
+goog.require('bot.locators.strategies.partialLinkText');
 goog.require('bot.locators.strategies.xpath');
 goog.require('goog.object');
 
 bot.locators.strategies.known_ = {
-  'className': bot.locators.strategies.className,
-  'css':       bot.locators.strategies.css,
-  'id':        bot.locators.strategies.id,
-  'name':      bot.locators.strategies.name,
-  'xpath':     bot.locators.strategies.xpath
+  'className':    bot.locators.strategies.className,
+  'css':          bot.locators.strategies.css,
+  'id':           bot.locators.strategies.id,
+  'link':         bot.locators.strategies.linkText,
+  'name':         bot.locators.strategies.name,
+  'partialLink':  bot.locators.strategies.partialLinkText,
+  'xpath':        bot.locators.strategies.xpath
 };
 
 /**
