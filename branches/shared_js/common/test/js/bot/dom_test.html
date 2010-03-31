@@ -2,16 +2,15 @@
 <html>
 <head>
   <title>dom_test.html</title>
-  <script src="bot-bootstrap.js"></script>
-  <script>
+  <script src="bot-bootstrap.js" type="text/javascript"></script>
+  <script type="text/javascript">
     goog.require('bot.dom');
     goog.require('bot.locators');
     goog.require('goog.events.EventType');
-    goog.require('goog.testing.ExpectedFailures');
     goog.require('goog.testing.jsunit');
   </script>
 
-  <script>
+  <script type="text/javascript">
     function testHasAttributeShouldWorkWithWellKnownDefaultProperties() {
       var chips = bot.locators.findElement({id: 'chips'});
       var peas = bot.locators.findElement({id: 'peas'});

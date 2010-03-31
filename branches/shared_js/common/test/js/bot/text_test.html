@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>text_test.html</title>
+  <script src="bot-bootstrap.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    goog.require('bot.dom');
+    goog.require('bot.locators');
+    goog.require('goog.testing.jsunit');
+  </script>
+
+  <script type="text/javascript">
+    function testCanGetSimpleTextOfAnElement() {
+      var e = bot.locators.findElement({id: 'heading'});
+      var text = bot.dom.getVisibleText(e);
+
+      assertEquals("Heading 1", text);
+    }
+
+    function testCollapsesMultipleSpacesIntoOne() {
+      var e = bot.locators.findElement({id: 'many_spaces'});
+      var text = bot.dom.getVisibleText(e);
+
+      assertEquals("Here be spaces", text);
+    }
+
+    function testShouldTrimSpacesFromStartAndEndOfString() {
+      var e = bot.locators.findElement({id: 'needs_trim'});
+      var text = bot.dom.getVisibleText(e);
+
+      assertEquals("Trimmed", text);
+    }
+  </script>
+</head>
+<body>
+  <h1 id="heading">Heading 1</h1>
+
+  <p id="many_spaces">Here  be    spaces</p>
+
+  <p id="needs_trim"> Trimmed </p>
+</body>
+</html>

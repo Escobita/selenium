@@ -900,8 +900,8 @@ js_to_header(:name => "getSize",
              :src  => "build/getSize.js")
 
 js_fragment(:name => "getVisibleText",
-            :module => "goog.dom",
-            :function => "goog.dom.getText")
+            :module => "bot.dom",
+            :function => "bot.dom.getVisibleText")
 js_to_header(:name => "getVisibleText",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/getVisibleText.js")            
@@ -921,7 +921,7 @@ js_to_header(:name => "isSelected",
              :src  => "build/isSelected.js")
 
 
-# Need atoms for getText, find by link, submit (walking, at least), get value of css property
+# Need atoms for find by link, submit (walking, at least), get value of css property
 
 
 js_library(:name => "atoms",

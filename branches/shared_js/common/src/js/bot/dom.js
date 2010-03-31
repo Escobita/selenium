@@ -137,11 +137,12 @@ bot.dom.parentElement = function(element) {
  * @return {boolean} Whether or not the element would be visible.
  */
 bot.dom.isDisplayed = function(element) {
-  if (!element) {
-    throw new Error("No value given for isDisplayed required parameter");
+  var el = bot.dom.parentElement(element);
+  if (!el) {
+    throw new Error('No value given for isDisplayed required parameter');
   }
 
-  var doc = goog.dom.getOwnerDocument(element);
+  var doc = goog.dom.getOwnerDocument(el);
   var win = goog.dom.getWindow(doc);
 
   var style = function(elem, style) {
@@ -152,6 +153,10 @@ bot.dom.isDisplayed = function(element) {
   };
 
   var visible = function(elem) {
+    if (!elem.tagName) {
+      alert(elem);
+    }
+
     if (elem.tagName.toLowerCase() == 'input' && elem.type.toLowerCase() == 'hidden') {
       return false;
     }
@@ -166,10 +171,130 @@ bot.dom.isDisplayed = function(element) {
     return !parent || displayed(parent);
   };
 
-  if (!(visible(element) && displayed(element))) {
+  if (!(visible(el) && displayed(el))) {
     return false;
   }
 
-  var size = goog.style.getSize(element);
+  var size = goog.style.getSize(el);
   return size.height > 0 && size.width > 0;
+};
+
+
+/**
+ * @param {Node} node Node to examine.
+ * @returns {boolean} Whether or not the node is a block level element.
+ * @private
+ */
+bot.dom.isBlockLevel_ = function(node) {
+  if (node['tagName'] && node.tagName == 'BR')
+    return true;
+
+  try {
+    // Should we think about getting hold of the current document?
+    //        return 'block' == Utils.getStyleProperty(node, 'display');
+  } catch (e) {
+    return false;
+  }
+  // TODO(simon): Don't hard code this
+  return false;
+};
+
+
+/**
+ * Get the text from the current node, appending on to the running value if
+ * necessary.
+ *
+ * @param {Node} node Node to get text from.
+ * @param {string} toReturn The value that will ultimately be sent to the user.
+ * @param {string} textSoFar The current fragment of text.
+ * @private
+ */
+bot.dom.getTextFromNode_ = function(node, toReturn, textSoFar) {
+  if (node['tagName'] && node.tagName == 'SCRIPT') {
+    return [toReturn, textSoFar];
+  } else if (node['tagName'] && node.tagName == 'TITLE') {
+    return [textSoFar + node.text, ''];
+  }
+  var children = node.childNodes;
+
+  for (var i = 0; i < children.length; i++) {
+    var child = children[i];
+
+    var bits;
+    // Do we need to collapse the text so far?
+    if (child['tagName'] && child.tagName == 'PRE') {
+      toReturn += bot.dom.collapseWhitespace_(textSoFar);
+      textSoFar = '';
+      bits = bot.dom.getTextFromNode_(child, toReturn, '', true);
+      toReturn += bits[1];
+      continue;
+    }
+
+    // Or is this just plain text?
+    if (child.nodeName == '#text') {
+      if (bot.dom.isDisplayed(child)) {
+        var textToAdd = child.nodeValue;
+        textToAdd = textToAdd.replace(new RegExp(String.fromCharCode(160), 'gm'), ' ');
+        textSoFar += textToAdd;
+      }
+      continue;
+    }
+
+    // Treat as another child node.
+    bits = bot.dom.getTextFromNode_(child, toReturn, textSoFar, false);
+    toReturn = bits[0];
+    textSoFar = bits[1];
+  }
+
+  if (bot.dom.isBlockLevel_(node)) {
+    if (node['tagName'] && node.tagName != 'PRE') {
+      toReturn += bot.dom.collapseWhitespace_(textSoFar) + '\n';
+      textSoFar = '';
+    } else {
+      toReturn += '\n';
+    }
+  }
+  return [toReturn, textSoFar];
+};
+
+
+/**
+ * @param {string} textSoFar The text so far.
+ * @private
+ */
+bot.dom.collapseWhitespace_ = function(textSoFar) {
+  return textSoFar.replace(/\s+/g, ' ');
+};
+
+
+/**
+ * @param {string} character The single character to consider.
+ * @private
+ */
+bot.dom.isWhiteSpace_ = function(character) {
+  // TODO(simon): I can't remember why I didn't use a pattern.
+  return character == '\n' || character == ' ' || character == '\t' || character == '\r';
+};
+
+
+/**
+ * Get the user-visible text within an element, normalized as much as possible.
+ * The returned text will be stripped of the content of any script tags, and so
+ * may not match the value of text returned by innerText et al.
+ *
+ * @param {Element} element The element to read text from.
+ * @returns {string} The user-visible text contained within the element.
+ */
+bot.dom.getVisibleText = function(element) {
+  var bits = bot.dom.getTextFromNode_(element, '', '', element.tagName == 'PRE');
+  var text = bits[0] + bot.dom.collapseWhitespace_(bits[1]);
+  var start = 0;
+  while (start < text.length && bot.dom.isWhiteSpace_(text[start])) {
+    ++start;
+  }
+  var end = text.length;
+  while (end > start && bot.dom.isWhiteSpace_(text[end - 1])) {
+    --end;
+  }
+  return text.slice(start, end);
 };
