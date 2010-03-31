@@ -899,6 +899,19 @@ js_to_header(:name => "getSize",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/getSize.js")
 
+js_fragment(:name => "getVisibleText",
+            :module => "goog.dom",
+            :function => "goog.dom.getText")
+js_to_header(:name => "getVisibleText",
+             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+             :src  => "build/getVisibleText.js")            
+
+js_fragment(:name => "isDisplayed",
+            :module => "bot.dom",
+            :function => "bot.dom.isDisplayed")
+js_to_header(:name => "isDisplayed",
+             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+             :src  => "build/isDisplayed.js")
 
 js_fragment(:name => "isSelected",
             :module => "bot.dom",
@@ -907,25 +920,33 @@ js_to_header(:name => "isSelected",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/isSelected.js")
 
+
+# Need atoms for getText, find by link, submit (walking, at least), get value of css property
+
+
 js_library(:name => "atoms",
            :srcs => [ "common/src/js/bot/*.js", "common/src/js/bot/locators/locators.js" ])
 
-multitask :fragments => [
+task :fragments => [
   "build/fire.js", 
   "build/findElement.js", 
   "build/findElements.js", 
   "build/getAttribute.js", 
   "build/getLocation.js",
   "build/getSize.js",
+  "build/getVisibleText.js",
+  "build/isDisplayed.js",
   "build/isSelected.js"
 ]
-multitask :headers => [
+task :headers => [
   "fire.h", 
   "findElement.h", 
   "findElements.h", 
   "getAttribute.h", 
   "getLocation.h",
   "getSize.h",
+  "getVisibleText.h",
+  "isDisplayed.h",
   "isSelected.h"
 ]
 task :ie_win32_dll => :headers

@@ -108,3 +108,68 @@ bot.dom.isSelected = function(element) {
 
   throw Error('Element has neither checked nor selected attributes');
 };
+
+
+/**
+ * Returns the parent element of the given node, or null
+ *
+ * @param {Element} element The element who's parent is desired.
+ * @return {?Element} The parent element, if available.
+ */
+bot.dom.parentElement = function(element) {
+  var elem = element.parentNode;
+
+  if (!elem) {
+    return null;
+  }
+
+  while (elem.nodeType != /* Element */ 1 &&
+         !(elem.nodeType == /* Document node */ 9 || elem.nodeType == /* Document fragment node */ 11)) {
+    elem = elem.parentNode;
+  }
+  return elem && elem.nodeType == 1 ? elem : null;
+};
+
+/**
+ * Determines whether an element is what a user would call "displayed".
+ *
+ * @param {Element} element The element to consider.
+ * @return {boolean} Whether or not the element would be visible.
+ */
+bot.dom.isDisplayed = function(element) {
+  if (!element) {
+    throw new Error("No value given for isDisplayed required parameter");
+  }
+
+  var doc = goog.dom.getOwnerDocument(element);
+  var win = goog.dom.getWindow(doc);
+
+  var style = function(elem, style) {
+    if (win['getComputedStyle']) {
+      return goog.style.getComputedStyle(elem, style);
+    }
+    return goog.style.getCascadedStyle(elem, style);
+  };
+
+  var visible = function(elem) {
+    if (elem.tagName.toLowerCase() == 'input' && elem.type.toLowerCase() == 'hidden') {
+      return false;
+    }
+    return style(elem, 'visibility') != 'hidden';
+  };
+
+  var displayed = function(elem) {
+    if (style(elem, 'display') == 'none') {
+      return false;
+    }
+    var parent = bot.dom.parentElement(elem);
+    return !parent || displayed(parent);
+  };
+
+  if (!(visible(element) && displayed(element))) {
+    return false;
+  }
+
+  var size = goog.style.getSize(element);
+  return size.height > 0 && size.width > 0;
+};

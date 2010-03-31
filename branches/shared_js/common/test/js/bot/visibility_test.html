@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>visibility_test.html</title>
+  <script src="bot-bootstrap.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    goog.require('bot.dom');
+    goog.require('bot.locators');
+    goog.require('goog.testing.jsunit');
+  </script>
+
+  <script type="text/javascript">
+    var isDisplayed = bot.dom.isDisplayed;
+    var findElement = bot.locators.findElement;
+
+    function testMustBeGivenAnElement() {
+      try {
+        isDisplayed(undefined);
+        fail("Should not get this far");
+      } catch (e) {
+        // Expected
+      }
+    }
+
+    function testCanDetermineIfAnElementIsDisplayedOrNot() {
+      assertTrue(isDisplayed(findElement({id: 'displayed'})));
+      assertFalse(isDisplayed(findElement({id: 'none'})));
+      assertFalse(isDisplayed(findElement({id: 'suppressedParagraph'})));
+      assertFalse(isDisplayed(findElement({id: 'hidden'})));
+    }
+
+
+    function testVisibilityTakesIntoAccountParentVisibility() {
+      var childDiv = findElement({id: 'hiddenchild'});
+      var hiddenLink = findElement({id: 'hiddenlink'});
+
+      assertFalse(isDisplayed(childDiv));
+      assertFalse(isDisplayed(hiddenLink));
+    }
+
+
+    function testCountElementsAsVisibleIfStylePropertyHasBeenSet() {
+      var shown = findElement({id: 'visibleSubElement'});
+      assertTrue(isDisplayed(shown));
+    }
+
+
+    function testHiddenInputElementsAreNeverVisible() {
+      var hidden = findElement({name: 'hidden'});
+      assertFalse(isDisplayed(hidden));
+    }
+
+    function testElementWithZeroHeightIsNotConsideredDisplayed() {
+      var zeroHeight = findElement({id: 'zeroheight'});
+      assertFalse(isDisplayed(zeroHeight));
+    }
+
+
+    function testElementWithZeroWidthIsNotConsideredDisplayed() {
+      var zeroWidth = findElement({id: 'zerowidth'});
+      assertFalse(isDisplayed(zeroWidth));
+    }
+  </script>
+
+  <style type="text/css">
+        #nav {
+            padding: 0; margin: 0; list-style: none;
+        }
+        #nav li {
+            float: left; position: relative; width: 10em;
+        }
+        #nav li ul {
+            display: none; position: absolute; top: 1em; left: 0;
+        }
+        #nav li > ul { top: auto; left: auto; }
+        #nav li:hover ul, #nav li.over ul{ display: block; background: white; }
+    </style>
+</head>
+<body>
+<div>
+    <p id="displayed">Displayed</p>
+
+    <form action="#"><input type="hidden" name="hidden"/></form>
+
+    <p id="none" style="display: none;">Display set to none</p>
+
+    <p id="hidden" style="visibility: hidden;">Hidden</p>
+
+    <div id="hiddenparent" style="height: 2em; display: none;">
+        <div id="hiddenchild">
+            <a href="#" id="hiddenlink">ok</a>
+        </div>
+    </div>
+
+    <div style="visibility: hidden;">
+      <span>
+        <input id="unclickable"/>
+        <input type="checkbox" id="untogglable" checked="checked"/>Check box you can't see
+      </span>
+    </div>
+
+    <p id="outer" style="visibility: hidden">A <b id="visibleSubElement" style="visibility: visible">sub-element that is
+        explicitly visible</b> using CSS visibility=visible</p>
+</div>
+
+<p id="zeroheight" style="height:0px;">This is a foo</p>
+
+<p id="zerowidth" style="width:0;">This is a bar</p>
+
+<p id="suppressedParagraph" style="display: none">A paragraph suppressed using CSS display=none</p>
+
+</body>
+</html>
