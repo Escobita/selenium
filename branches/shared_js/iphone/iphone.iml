@@ -11,6 +11,24 @@
     <orderEntry type="module" module-name="remote-common" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="remote-client" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../remote/common/lib/runtime/json-20080701.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../remote/common/lib/runtime/commons-codec-1.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

@@ -921,7 +921,7 @@ js_to_header(:name => "isSelected",
              :src  => "build/isSelected.js")
 
 
-# Need atoms for find by link, submit (walking, at least), get value of css property
+# Need atoms for submit (walking, at least), get value of css property
 
 
 js_library(:name => "atoms",
