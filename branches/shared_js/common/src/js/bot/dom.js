@@ -27,7 +27,14 @@ bot.dom.hasAttribute = function(element, attributeName) {
   return goog.isDef(element[attributeName]);
 };
 
-// Used to determine whether we should return a boolean value from getAttribute
+/**
+ * Used to determine whether we should return a boolean value from
+ * getAttribute.
+ *
+ * TODO(simon): Consider using a hash instead of an array
+ *
+ * @private
+ */
 bot.dom.booleanAttributes_ = [
   'checked',
   'disabled',
@@ -51,6 +58,10 @@ bot.dom.getAttribute = function(element, attributeName) {
 
   var lattr = attributeName.toLowerCase();
 
+  if (!bot.dom.hasAttribute(element, attributeName)) {
+    return null;
+  }
+  
   // Handle common boolean values
   if (goog.array.contains(bot.dom.booleanAttributes_, attributeName)) {
     var value = element[attributeName];
@@ -72,10 +83,6 @@ bot.dom.getAttribute = function(element, attributeName) {
   // Commonly looked up attributes that are aliases
   if ('class' == lattr) { attributeName = 'className' }
   if ('readonly' == lattr) { attributeName = 'readOnly' }
-
-  if (!bot.dom.hasAttribute(element, attributeName)) {
-    return null;
-  }
 
   return element[attributeName] === undefined ?
       element.getAttribute(attributeName) : element[attributeName];
