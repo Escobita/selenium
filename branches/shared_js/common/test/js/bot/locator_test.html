@@ -141,6 +141,12 @@
 
       assertEquals(5, links.length);
     }
+
+    function testShouldFindEveryLinkWhenLinkTextIsTheEmptyString() {
+      var links = bot.locators.findElements({partialLink: ''});
+
+      assertEquals(6, links.length);
+    }
   </script>
 </head>
 <body>
@@ -170,5 +176,7 @@
   <a href="#">this is a link</a>
   <a href="#">this is a link</a>
   <a href="#">this is a link</a>
+
+  <a href="#">unrelated</a>
 </body>
 </html>

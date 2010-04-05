@@ -14,12 +14,7 @@
     var findElement = bot.locators.findElement;
 
     function testMustBeGivenAnElement() {
-      try {
-        isDisplayed(undefined);
-        fail("Should not get this far");
-      } catch (e) {
-        // Expected
-      }
+      assertThrows(isDisplayed(undefined));
     }
 
     function testCanDetermineIfAnElementIsDisplayedOrNot() {
@@ -60,6 +55,11 @@
       var zeroWidth = findElement({id: 'zerowidth'});
       assertFalse(isDisplayed(zeroWidth));
     }
+
+    function testCorrectlyDeterminesVisibilityViaDisplayStyle() {
+      var span = findElement({id: 'visibleSpan'});
+      assertFalse(isDisplayed(span));
+    }
   </script>
 
   <style type="text/css">
@@ -97,6 +97,10 @@
         <input id="unclickable"/>
         <input type="checkbox" id="untogglable" checked="checked"/>Check box you can't see
       </span>
+    </div>
+
+    <div style="display:none">
+        <span id="visibleSpan" style="display:block">cheese puffs</span>
     </div>
 
     <p id="outer" style="visibility: hidden">A <b id="visibleSubElement" style="visibility: visible">sub-element that is

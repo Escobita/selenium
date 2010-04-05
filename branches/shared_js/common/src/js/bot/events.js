@@ -33,9 +33,9 @@ bot.events.relatedTargetEvents_ = [
 ];
 
 /**
- * @type {{x: ?number, y: ?number, button: ?number, bubble: ?boolean,
- *         alt: ?boolean, control: ?boolean, shift: ?boolean, meta: ?boolean,
- *         related: ?Element}}
+ * @type {{x: number=, y: number=, button: number=, bubble: boolean=,
+ *         alt: boolean=, control: boolean=, shift: boolean=, meta: boolean=,
+ *         related: Element=}}
  */
 bot.events.mouseArgs = goog.typedef;
 

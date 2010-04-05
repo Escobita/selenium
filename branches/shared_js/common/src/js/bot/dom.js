@@ -19,23 +19,12 @@ bot.dom.hasAttribute = function(element, attributeName) {
     }
   }
 
+  // Handle the case where we lack the hasAttribute method. Normally we'd use
+  // the "attributes" array, but this is only present in IE 8 and above.
   // When running in Firefox's chrome mode, the element needs to be cast to
   // the appropriate XPCOM object for the hack below to work. Try and work
   // round this problem.
-  if (element[attributeName] !== undefined) {
-    return true;
-  }
-
-  // Handle the case where we lack the hasAttribute method. Normally we'd use
-  // the "attributes" array, but this is only present in IE 8 and above. Fall
-  // back to simulating the method. Clumsily, but as MS suggest.
-  for (var i in element) {
-    if (attributeName == i) {
-      return true;
-    }
-  }
-
-  return false;
+  return goog.isDef(element[attributeName]);
 };
 
 // Used to determine whether we should return a boolean value from getAttribute
@@ -111,7 +100,8 @@ bot.dom.isSelected = function(element) {
 
 
 /**
- * Returns the parent element of the given node, or null
+ * Returns the parent element of the given node, or null. This is required
+ * because the parent node of an element may not be another element.
  *
  * @param {Element} element The element who's parent is desired.
  * @return {?Element} The parent element, if available.
@@ -123,15 +113,18 @@ bot.dom.parentElement = function(element) {
     return null;
   }
 
-  while (elem.nodeType != /* Element */ 1 &&
-         !(elem.nodeType == /* Document node */ 9 || elem.nodeType == /* Document fragment node */ 11)) {
+  while (elem.nodeType != goog.dom.NodeType.ELEMENT &&
+         !(elem.nodeType == goog.dom.NodeType.DOCUMENT || elem.nodeType == goog.dom.NodeType.DOCUMENT_FRAGMENT)) {
     elem = elem.parentNode;
   }
-  return elem && elem.nodeType == 1 ? elem : null;
+  return elem && elem.nodeType == goog.dom.NodeType.ELEMENT ? elem : null;
 };
 
 /**
- * Determines whether an element is what a user would call "displayed".
+ * Determines whether an element is what a user would call "displayed". This
+ * means that the element not only has height and width greater than 0px, but
+ * also that its visibility is not "hidden" and that it's display property is
+ * not "none".
  *
  * @param {Element} element The element to consider.
  * @return {boolean} Whether or not the element would be visible.
@@ -153,10 +146,6 @@ bot.dom.isDisplayed = function(element) {
   };
 
   var visible = function(elem) {
-    if (!elem.tagName) {
-      alert(elem);
-    }
-
     if (elem.tagName.toLowerCase() == 'input' && elem.type.toLowerCase() == 'hidden') {
       return false;
     }
@@ -207,6 +196,8 @@ bot.dom.isBlockLevel_ = function(node) {
  * @param {Node} node Node to get text from.
  * @param {string} toReturn The value that will ultimately be sent to the user.
  * @param {string} textSoFar The current fragment of text.
+ * @retrun {Array.<string>} A tuple of the ultimate text to return, the current
+ *     fragment to append and a space that may be needed.
  * @private
  */
 bot.dom.getTextFromNode_ = function(node, toReturn, textSoFar) {
@@ -263,7 +254,9 @@ bot.dom.getTextFromNode_ = function(node, toReturn, textSoFar) {
  * @private
  */
 bot.dom.collapseWhitespace_ = function(textSoFar) {
-  return textSoFar.replace(/\s+/g, ' ');
+  // Handle the special case of IE not counting the nbsp character as
+  // whitespace.
+  return textSoFar.replace(/[\s\xa0]+/g, ' ');
 };
 
 
@@ -273,7 +266,8 @@ bot.dom.collapseWhitespace_ = function(textSoFar) {
  */
 bot.dom.isWhiteSpace_ = function(character) {
   // TODO(simon): I can't remember why I didn't use a pattern.
-  return character == '\n' || character == ' ' || character == '\t' || character == '\r';
+  return character == '\n' || character == ' ' || character == '\t' ||
+         character == '\r' || character == '\xa0';
 };
 
 

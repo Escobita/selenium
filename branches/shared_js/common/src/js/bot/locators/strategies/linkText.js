@@ -12,12 +12,14 @@ goog.require('goog.dom');
  * @param {Window} win The DOM window to search in.
  * @param {string} target The link text to search for.
  * @param {Node=} opt_root The node from which to start the search
+ * @param {boolean} opt_isPartial Whether the link text needs to be matched
+ *     only partially.
  * @return {?Element} The first matching element found in the DOM, or null if no
  *     such element could be found.
  * @private
  */
 bot.locators.strategies.linkText.single_ = function(win, target, opt_root, isPartial) {
-  if (!target) {
+  if (!target && target != '') {
     throw Error('No link text specified');
   }
 
@@ -25,7 +27,7 @@ bot.locators.strategies.linkText.single_ = function(win, target, opt_root, isPar
   var root = opt_root || doc;
 
   var domHelper = new goog.dom.DomHelper(doc);
-  var elements = domHelper.getElementsByTagNameAndClass(/*tagName=*/'A');
+  var elements = domHelper.getElementsByTagNameAndClass(goog.dom.TagName.A);
 
   return goog.array.find(elements, function(element) {
     var text = bot.dom.getVisibleText(element);
@@ -42,11 +44,13 @@ bot.locators.strategies.linkText.single_ = function(win, target, opt_root, isPar
  * @param {Window} win The DOM window to search in.
  * @param {string} target The link text to search for.
  * @param {Node=} opt_root The node from which to start the search
+ * @param {boolean} opt_isPartial Whether the link text needs to be matched
+ *     only partially.
  * @return {goog.array.ArrayLike} All matching elements, or an empty list
  * @private
  */
 bot.locators.strategies.linkText.many_ = function(win, target, opt_root, isPartial) {
-  if (!target) {
+  if (!target && target != '') {
     throw Error('No link text specified');
   }
 
@@ -54,7 +58,7 @@ bot.locators.strategies.linkText.many_ = function(win, target, opt_root, isParti
   var root = opt_root || doc;
 
   var domHelper = new goog.dom.DomHelper(doc);
-  var allElements = domHelper.getElementsByTagNameAndClass(/*tagName=*/'A');
+  var allElements = domHelper.getElementsByTagNameAndClass(goog.dom.TagName.A);
   return goog.array.filter(allElements, function(element) {
     var text = bot.dom.getVisibleText(element);
     if ((isPartial && text.indexOf(target) != -1) ||
