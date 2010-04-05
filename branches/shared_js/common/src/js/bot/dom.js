@@ -111,14 +111,14 @@ bot.dom.isSelected = function(element) {
  * because the parent node of an element may not be another element.
  *
  * @param {Element} element The element who's parent is desired.
- * @return {?Element} The parent element, if available.
+ * @return {?Element} The parent element, if available, null otherwise.
  */
 bot.dom.parentElement = function(element) {
-  var elem = element.parentNode;
-
-  if (!elem) {
+  if (!element || !element.parentNode) {
     return null;
   }
+
+  var elem = element.parentNode;
 
   while (elem.nodeType != goog.dom.NodeType.ELEMENT &&
          !(elem.nodeType == goog.dom.NodeType.DOCUMENT || elem.nodeType == goog.dom.NodeType.DOCUMENT_FRAGMENT)) {
@@ -137,9 +137,17 @@ bot.dom.parentElement = function(element) {
  * @return {boolean} Whether or not the element would be visible.
  */
 bot.dom.isDisplayed = function(element) {
-  var el = bot.dom.parentElement(element);
+  if (!element) {
+    throw new Error('No value given for isDisplayed required parameter.');
+  }
+
+  var el = element;
+  if (el.nodeType != goog.dom.NodeType.ELEMENT) {
+    el = bot.dom.parentElement(element);
+  }
+
   if (!el) {
-    throw new Error('No value given for isDisplayed required parameter');
+    throw new Error('Node given does not have a parent element.');
   }
 
   var doc = goog.dom.getOwnerDocument(el);

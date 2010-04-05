@@ -14,7 +14,9 @@
     var findElement = bot.locators.findElement;
 
     function testMustBeGivenAnElement() {
-      assertThrows(isDisplayed(undefined));
+      assertThrows(function() {
+        isDisplayed(undefined);
+      });
     }
 
     function testCanDetermineIfAnElementIsDisplayedOrNot() {
