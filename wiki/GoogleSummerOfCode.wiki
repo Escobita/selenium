@@ -44,7 +44,150 @@ Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace La
 
 These are project ideas proposed by mentors.  Please contact the mentors if you are interested in it and cc [mailto:grace@saucelabs.com Grace Law].
 
-http://wiki.openqa.org/display/SEL/2010+Google+Summer+of+Code
+==Record and Playback of Silverlight Applications in Selenium==
+
+*Mentor*
+David Burns
+
+*Description*
+Silverlight provides a rich user experience, but is black box as far as Selenium is concerned. This project would enable Selenium to 
+- record and playback scripts in Se-IDE 
+- playback scripts in Se2 using the native bindings (from WebDriver) 
+- playback scripts in the 1.x RPC style 
+
+From an Se-IDE perspective, students would create a plugin for it which will likely need to contain 
+- additions to the Se API 
+- new object location strategies
+
+
+*Tags* Se-IDE, Se2, Silverlight
+
+==Record and Playback of HTML Applications in Selenium==
+
+*Summary*
+See Silverlight
+
+==Integrate Selenium Grid with Selenium 2.0==
+
+*Mentor*
+Jason Huggins (and others)
+
+*Description*
+Selenium Grid provides a mechanism for distributed test execution for Selenium 1.x RC style scripts. This project further enhances that work and extends it to work with the new Se2 type execution.
+
+*Tags* Se-Grid, Se2
+
+==Make Selenium 2.0 Python bindings production ready==
+
+*Mentor*
+Miki Tebeka, Frank Wierzbicki
+
+
+*Description*
+The Selenium 2 Python bindings need a lot of love:
+
+    * Make sure all browser bindings pass the API tests
+    * Have setup.py create a working package
+        * Currently some build steps are done manually
+    * Fix the remote driver code
+    * Support Selenium 1 backend
+    * Make the bindings more "Pythonic" (use of with statement, ...)
+    * Make sure it's Python 3.x compatible
+    * Support Jython, IronPython, PyPy ...
+
+
+*Tags*  Python, Se2
+
+==Python Templating System Selenium Integration==
+
+*Mentor*
+Miki Tebeka
+
+*Description*
+This project will allow uses to add special markup to Python template and create a tool that will produce a set of Selenium tests for this template. We'll need to find a way to tell the test the routing information to get this page (maybe another integration) and also server information.
+
+The output test code should run with one of Python's testing frameworks (probably "nose").
+
+Idea from http://tinyurl.com/yeahzfo.
+
+*Tags*  Python, Selenium, Template
+
+==Selenium 2.0 backend for running IDE test suites via the Se2 Firefox Driver==
+
+*Mentor*
+Adam Goucher, Eric Allen
+
+*Description*
+Selenium IDE is currently built upon Selenium Core for interacting with web pages. Selenium Core has several major limitations, most notably the inability to fire native events. Selenium RC is migrating to using WebDriver in place of of Selenium Core as the underlying browser driver to avoid these limitations, and IDE needs to make the same transition. The bulk of the work involves porting the WebDriverBackedSelenium code to JavaScript. I've already created an asynchronous execution loop and ported the top 10 or so popular commands.
+
+*Tags* Se-IDE, Se2
+
+==Selenium Drivers for both IPhone and Android (can be split into 2 projects)==
+
+*Mentor*
+David Burns
+
+*Description*
+More and more web applications need to be able to support web browsers. These browsers have their own limitations. Selenium 2 is a good way of testing web applications in a browser with the ability to do native tasks. The work that has been done for all of the browsers needs to be extended to work on mobile devices like the iPhone, Android Devices and iPad.
+
+*Tags* Se2, Android, iPhone, Java, Objective C, etc.
+
+==Selenium IDE Plugin: Remote Storage==
+
+*Summary*
+Support for Selenium IDE to remotely upload/download scripts using a WebDAV-like API
+
+*Mentor*
+Patrick Lightbody, Jérémy Hérault
+
+*Description*
+Currently Selenium IDE can only save and open files on the local desktop. However, as more commercial (Sauce Labs, BrowserMob, Go-Test-It, CloudTesting, etc) and open source (Bromine, Selenium Portal, etc) solutions appear, there is a growing need to support saving and opening files stored on remote systems.
+
+This project would involve creating a Selenium IDE plugin that added new functionality to Selenium IDE, specifically in the form of File->Open Remote and File->Save Remote menu items. If taken further, we could possibly even support some sort of "remote playback" functionality and API.
+
+This project requires both the buildout of a Firefox extension (Selenium IDE plugins are actually Firefox extensions), as well as the specification of an API that other projects can implement as a backend server for storing these files.
+
+
+*Tags* WebDAV, API, Selenium IDE, Plugin
+
+==Selenium Portal==
+
+*Summary*
+A web-based application acts as a front-end to storing and playing back Selenium scripts
+
+*Mentor*
+Patrick Lightbody
+
+*Description*
+Selenium has two large populations of users: developers and testers. Often the testers don't have the development skills to effectively utilize the advanced Selenium projects such as Selenium Remote Control, Selenium Grid, WebDriver, etc. As such they stick with using Selenium IDE and sometimes Selenium Core, both of which use a simple table-like language for test scripts called "Selenese".
+
+
+In order to have not only a clean migration path from 1.x to 2.x, but to also better support our tester community, we should make an application specifically geared towards them: Selenium Portal. It would definitely store the Selenese scripts, but it might also be appropriate to store and run scripts in other languages (especially those that can be run in the JVM), such as JavaScript, Ruby, and Python.
+
+
+This webapp would serve as a storage location for test scripts (ideally implementing the API designed in the "Selenium IDE Plugin: Remote Storage"). It would also interface with Selenium Remote Control and/or Selenium Grid to allow for playing back a single test or an entire test suite and archiving the test results permanently. Other basic features would include authentication, individual user accounts, and maybe even ACLs to allow for defined roles.
+
+*Tags* Webapp, Selenium Core, Selenium IDE
+
+==FlexMonkey Integration==
+
+*Summary*
+First class support for record + playback of webapps that contain Flex
+
+*Mentor*
+Patrick Lightbody
+
+*Description*
+One of the most popular and full featured open source Flex automation frameworks is FlexMonkey. Unfortunately, FlexMonkey was really only designed to automate applications that were 100% Flex and did not have great support for hybrid webapps that contains Flex components inside of a larger HTML webapp.
+
+Recently the team behind FlexMonkey began initial work on FlexMonkium, a bridge between Selenium and FlexMonkey. So far their work has required no changes to Selenium, but we anticipate that both projects will need to make some changes in order to integrate nicely.
+
+
+Because of license incompatibilities (AGPL vs Apache), this work must be delivered as a plugin. We anticipate that there would be a plugin for Selenium IDE to do recording, as well as a plugin for Selenium's various language bindings for playback.
+
+
+*Tags* Flex, Flash, FlexMonkey, Record, Playback, Selenium IDE, Selenium 2
+
 
 =Perspective mentors=
 
