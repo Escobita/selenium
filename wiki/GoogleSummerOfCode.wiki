@@ -42,7 +42,7 @@ Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace La
 
 =Project Ideas=
 
-These are project ideas proposed by mentors.  Please contact the mentors if you are interested in it and cc [mailto:grace@saucelabs.com Grace Law].
+These are project ideas proposed by mentors.  Please send a post to the  [http://groups.google.com/group/selenium-developers/ developer mailing list] if you are interested in it or [mailto:grace@saucelabs.com email] GSoC coordinator Grace Law.
 
 ==Record and Playback of Silverlight Applications in Selenium==
 
