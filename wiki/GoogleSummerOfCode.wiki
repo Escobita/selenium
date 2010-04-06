@@ -17,18 +17,6 @@ When participating in the Selenium - Google Summer of Code program, students wil
 
 Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
 
-=Next steps and deadlines=
-
-   # Read [GoogleSummerOfCode#Expectations Expectations] to understand what is expected of you.
-   # Read [GoogleSummerOfCode#Application Applications] to find out what to put on your application.
-   # Take a look at the Project Ideas *need link - see below*.  If any interest you, feel free to contact the proposer for details.  You can also discuss your own project ideas with the people mentioned or talk about them on our [http://groups.google.com/group/selenium-developers/ developer mailing list] or on IRC #selenium on freenode
-   # [http://socghop.appspot.com/gsoc/student/apply/google/gsoc2010 Submit your application directly to Google] before April 9, 2010.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
-   # Selenium GSoC team will finish reviewing applications and match students with mentors by April 21, 2010.
-   # Google announces accepted students on April 26, 2010.
-
-Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
-
-
 =Student Eligibility=
 
     * 18 years of age or older by April 26, 2010
@@ -41,6 +29,16 @@ Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace La
 
 If you meet the above requirements, we’d love to have you apply to Selenium for this year's Google Summer of Code.
 
+=Next steps and deadlines=
+
+   # Read [GoogleSummerOfCode#Expectations Expectations] to understand what is expected of you.
+   # Read [GoogleSummerOfCode#Application Applications] to find out what to put on your application.
+   # Take a look at the Project Ideas *need link - see below*.  If any interest you, feel free to contact the proposer for details.  You can also discuss your own project ideas with the people mentioned or talk about them on our [http://groups.google.com/group/selenium-developers/ developer mailing list] or on IRC #selenium on freenode
+   # [http://socghop.appspot.com/gsoc/student/apply/google/gsoc2010 Submit your application directly to Google] before April 9, 2010.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
+   # Selenium GSoC team will finish reviewing applications and match students with mentors by April 21, 2010.
+   # Google announces accepted students on April 26, 2010.
+
+Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
 
 =Project Ideas=
 
@@ -58,10 +56,7 @@ It's not too late to apply to be a mentor, if you are interested, please add you
 
 This page covers, in detail, the expectations for Google Summer of Code students in regards to communication. This is useful for Selenium projects which haven't codified their expectations--they can point to this document and use it as is.
 
- 
-
 The Google Summer of Code coding period is very short. On top of that, many students haven't done a lot of real-world development/engineering work previously; one of the primary purposes of the program is to introduce students to F/OSS and real-world development scenarios. On top of that, most mentors and students are in different locations--so face-to-face time is difficult. Because of this, it's vitally important to the success of the GSoC project for all expectations to be specified before students begin coding on May 26th. This should be the first step in a long series of frequent communication between student and mentor(s).
- 
 
 This document walks through various expectations for students and mentors, as well as addressing various ways to communicate effectively.
  
