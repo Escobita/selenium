@@ -286,22 +286,22 @@ Sample Proposal Outline
 
 A good proposal will have the following component:
 
-    * Name and Contact Information.  Include email, phone(s), IM, Skype, etc.
-    * Title.  One liner on the goal to your project.  
-    * Synopsis.  Short summary, what would your project do?   
-    * Benefits to Community. Why would Google and Selenium be proud to sponsor this work? How would open source or society as a whole benefit?
-    * Deliverables.  We want to know that you have a plan and that at the end of the summer, something get delivered. :-)  Give a brief, clear work breakdown structure with milestones and deadlines. Make sure to label deliverables as optional or required. You may want plan to start by producing some kind of whitepaper, or planning the project in traditional Software Engineering style.  It’s OK to include thinking time (“investigation”) in your work schedule. Work should include:
+    * *Name and Contact Information*.  Include email, phone(s), IM, Skype, etc.
+    * *Title*.  One liner on the goal to your project.  
+    * *Synopsis*.  Short summary, what would your project do?   
+    * *Benefits to Community*. Why would Google and Selenium be proud to sponsor this work? How would open source or society as a whole benefit?
+    * *Deliverables*. We want to know that you have a plan and that at the end of the summer, something get delivered. :-)  Give a brief, clear work breakdown structure with milestones and deadlines. Make sure to label deliverables as optional or required. You may want plan to start by producing some kind of whitepaper, or planning the project in traditional Software Engineering style.  It’s OK to include thinking time (“investigation”) in your work schedule. Work should include:
         * investigation
         * programming
         * documentation
         * dissemination
-    * Description.  A small list of project details.  Your mentors can give you some guidance on this, but start by letting us know you are thinking :-)
+    * *Description*.  A small list of project details.  Your mentors can give you some guidance on this, but start by letting us know you are thinking :-)
         * rough architecture
         * links to parallel projects that you may get insights from
         * what version control and build system do you plan to use
         * how do you plan to test
         * best practices to get your code accepted, etc. 
-    * Bio - Who are you? What makes you the best person to work on this project?
+    * *Bio*. Who are you? What makes you the best person to work on this project?
         * Summarize your education, work, and open source experience.
         * List your skills and give evidence of your qualifications.  Convince us that you can do the work.
         * Any published papers, successful open source projects, etc? Please tell us!
