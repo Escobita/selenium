@@ -1,3 +1,4 @@
+#labels Featured
 <wiki:toc max_depth="1" />
 
 = What is Google Summer of Code? =
@@ -88,7 +89,6 @@ The student is expected to be self-motivated. The mentor may push the student to
 ==Regular Weekly Meeting and Frequent Communication with mentor==
 
 Regular weekly meeting with your mentor is a must.  The planned meeting should cover:
-
  
     * what you're currently working on
     * how far you've gotten
@@ -98,7 +98,6 @@ Regular weekly meeting with your mentor is a must.  The planned meeting should c
     * what you did to get around them
     * what's blocking you if you're stuck
     * code review, when applicable
-
  
 
 The mentor is one of the most valuable resources for GSoC projects. The mentor is both a solid developer and a solid engineer. The mentor likely has worked on the project for long enough to know the history of decisions, how things are architected, the other people involved, the process for doing things, and all other cultural lore that will help the student be most successful.
