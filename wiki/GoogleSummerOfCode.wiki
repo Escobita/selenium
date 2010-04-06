@@ -68,8 +68,6 @@ This document walks through various expectations for students and mentors, as we
 
 Students are expected to work at least 40 hours a week on their GSoC project. This is essentially a full-time job.
 
- 
-
 The benefits for the GSoC project are huge:
 
     * the chance to become part of a project community over the long term--this can lead to involvement with other projects, social network, good friends, valuable resources, ...
@@ -92,9 +90,7 @@ The student is expected to be self-motivated. The mentor may push the student to
 Regular weekly meeting with your mentor is a must.  The planned meeting should cover:
 
  
-
     * what you're currently working on
-
     * how far you've gotten
     * how you're implementing it
     * what you plan on working on next
@@ -107,40 +103,31 @@ Regular weekly meeting with your mentor is a must.  The planned meeting should c
 
 The mentor is one of the most valuable resources for GSoC projects. The mentor is both a solid developer and a solid engineer. The mentor likely has worked on the project for long enough to know the history of decisions, how things are architected, the other people involved, the process for doing things, and all other cultural lore that will help the student be most successful.
 
- 
-
 Before the GSoC project starts, the mentor and student should iron out answers to the following questions:
 
-   1. When is the regular, scheduled communication scheduled?  Weekly?  Every two days? Mondays, Wednesdays, Fridays?
-   2. What is the best medium to use for regular, scheduled communication? VOIP? Telephone call? Face-to-face?
-   3. What is the best medium to use for non-scheduled communication? Email? Instant messenger?
- 
+   # When is the regular, scheduled communication scheduled?  Weekly?  Every two days? Mondays, Wednesdays, Fridays?
+   # What is the best medium to use for regular, scheduled communication? VOIP? Telephone call? Face-to-face?
+   # What is the best medium to use for non-scheduled communication? Email? Instant messenger?
 
 DO:
-
     * be considerate of your time and your mentor’s time and plan for your regular meeting 
-          o Consider emailing the answers to the above agenda ahead of time so you can spend your time productively on coming up with solutions, code reviews, and planning for the next milestones.
-
+        * Consider emailing the answers to the above agenda ahead of time so you can spend your time productively on coming up with solutions, code reviews, and planning for the next milestones.
     * talk to your mentors and developers on the mailing list / IRC frequently, outside of your planned meeting
-          o your mentor is not the only person that can help you out and keep you stay on track, Selenium has a nice community and you will learn a lot from the other people as well.
+        * your mentor is not the only person that can help you out and keep you stay on track, Selenium has a nice community and you will learn a lot from the other people as well.
     * let your mentor know what your schedule is
-          o Are you going on vacation, moving, writing papers for class? If your mentor doesn't know where you'll be or to expect a lag in your productivity, your mentor can't help you course correct or plan accordingly.
+        * Are you going on vacation, moving, writing papers for class? If your mentor doesn't know where you'll be or to expect a lag in your productivity, your mentor can't help you course correct or plan accordingly.
 
 AVOID:
-
     * going for more than a week without communicating with your mentor
-          o The project timeline doesn't allow for unplanned gaps in communication.
-
+        * The project timeline doesn't allow for unplanned gaps in communication.
 
 ==Version control==
 
 Students should be using version control for their project.
 
 DO:
-
     * commit-early/commit-often
-          o This allows issues to be caught quickly and prevents the dreaded one-massive-commit-before-deadline.
-
+        * This allows issues to be caught quickly and prevents the dreaded one-massive-commit-before-deadline.
     * use quality commit messages
 
 Bad examples:
@@ -150,16 +137,13 @@ Good examples:
 Fixed a memory leak where the thingamajig wasn't getting freed after the parent doohicky was freed.  Fixed bug #902 by changing the comparison used for duplicate removal.  Implemented Joe's good idea about rendering in a separate buffer and then swapping the buffer in after rendering is complete.  Improved HTML by simplifying tables.
 
     * refer to specific bug numbers, links, and issues as much as possible
-
     * The history in version control is frequently the best timeline log of what happened, why, and who did it.
 
 AVOID:
-
     * checking in multiple non-related changes in one big commit
-          o If something is bad about one of the changes and someone needs to roll it back, it's more difficult to do so.
+        * If something is bad about one of the changes and someone needs to roll it back, it's more difficult to do so.
     * checking in changes that haven't been tested
 
- 
 ==Communication with project==
 
 Most F/OSS projects have mailing lists for project members and the community and/or have IRC channels to communicate. These communication channels allow the student to keep in touch with the other project members and are an incredibly valuable resource. Other members of the project may be better versed in various parts of the project, they may provide a fallback if the mentor isn't available, and they may be a good sounding board for figuring out the specific behavior for features. You are assigned a mentor, but the whole community is there to help you learn. Make use of all the resources at your disposal.
@@ -179,18 +163,18 @@ DO:
     * search through the archives for answers before asking on the list
     * be courteous at all times
     * be specific
-          o Cite data, references, and use links wherever possible when discussing technical things.
+        * Cite data, references, and use links wherever possible when discussing technical things.
     * be patient
-          o Don't expect an answer within minutes or hours; people often read their mailing-list messages once per day.
+        * Don't expect an answer within minutes or hours; people often read their mailing-list messages once per day.
 
 AVOID:
 
     * being rude
-          o Since most mailing lists are archived or recorded, it's likely anything you say will be available for everyone to see forever; exercise good manners in all aspects of life.
+        * Since most mailing lists are archived or recorded, it's likely anything you say will be available for everyone to see forever; exercise good manners in all aspects of life.
     * saying things with all capital letters and excessive punctuation
-          o This is perceived as shouting
+        * This is perceived as shouting
     * getting into heated arguments
-          o If someone insults you, it's best to ignore it.
+        * If someone insults you, it's best to ignore it.
 
 ===IRC===
 
@@ -201,12 +185,10 @@ If the project has an IRC channel, it's a good idea to hang out there. This allo
 
 
 DO:
-
     * *hang out on the project IRC channels when you're working on the project*
     * *take time to interact with people who are on the IRC channel* This builds community and it's easier to get help from people who are familiar with you than people who aren't.
 
 AVOID:
-
     * *saying things with all capital letters and excessive punctuation* This is perceived as shouting.
     * *poor grammar* It makes it harder for other people to understand what you're trying to say.
     * *being rude*
@@ -214,7 +196,6 @@ AVOID:
 We're all real people with real feelings and if you're rude it's likely people will interact with you and help you less; also it's not uncommon for IRC history to be recorded and archived for all to see forever.
 
 See:
-
      * http://www.linuxchix.org/irc-basics.html
      * http://en.wikipedia.org/wiki/Internet_Relay_Chat
  
