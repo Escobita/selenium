@@ -1,4 +1,4 @@
-#labels Featured
+#labels Featured,gsoc,dev,getting-involved
 <wiki:toc max_depth="1" />
 
 = What is Google Summer of Code? =
@@ -185,9 +185,7 @@ Recently the team behind FlexMonkey began initial work on FlexMonkium, a bridge 
 
 Because of license incompatibilities (AGPL vs Apache), this work must be delivered as a plugin. We anticipate that there would be a plugin for Selenium IDE to do recording, as well as a plugin for Selenium's various language bindings for playback.
 
-
 *Tags* Flex, Flash, FlexMonkey, Record, Playback, Selenium IDE, Selenium 2
-
 
 =Perspective mentors=
 
