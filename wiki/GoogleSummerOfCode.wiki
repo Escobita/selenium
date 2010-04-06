@@ -28,22 +28,26 @@ Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace La
 
 If you meet the above requirements, we’d love to have you apply to Selenium for this year's Google Summer of Code.
 
-=Next steps=
+=Next steps and deadlines=
 
    # Read [GoogleSummerOfCode#Expectations Expectations] to understand what is expected of you.
    # Read [GoogleSummerOfCode#Application Applications] to find out what to put on your application.
    # Take a look at the Project Ideas *need link - see below*.  If any interest you, feel free to contact the proposer for details.  You can also discuss your own project ideas with the people mentioned or talk about them on our [http://groups.google.com/group/selenium-developers/ developer mailing list] or on IRC #selenium on freenode
-   # [http://socghop.appspot.com/gsoc/student/apply/google/gsoc2010 Submit your application directly to Google] before April 9, 2010.  You can modify your application after your initial submission, and contact [mailto:grace@saucelabs.com Grace Law], GSoC coordinator if you need help.
+   # [http://socghop.appspot.com/gsoc/student/apply/google/gsoc2010 Submit your application directly to Google] before April 9, 2010.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
+   # Selenium GSoC team will finish reviewing applications and match students with mentors by April 21, 2010.
+   # Google announces accepted students on April 26, 2010.
 
-=Perspective mentors=
-
-If you are interested in becoming a mentor, contact [mailto:grace@saucelabs.com Grace Law] to submit your project idea and discuss logistics. 
+Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
 
 =Project Ideas=
 
 These are project ideas proposed by mentors.  Please contact the mentors if you are interested in it and cc [mailto:grace@saucelabs.com Grace Law].
 
 http://wiki.openqa.org/display/SEL/2010+Google+Summer+of+Code
+
+=Perspective mentors=
+
+It's not too late to apply to be a mentor, if you are interested, please add your project idea here and discuss logistics with [mailto:grace@saucelabs.com Grace Law]
 
 =Expectations=
  
@@ -232,4 +236,77 @@ Students should get in the habit of blogging about about his/her work at least o
 
 =Application=
 
-Coming soon!
+We recognized that very few students have exposures to Selenium during their studies and will therefore evaluate you based on your:
+
+    * ability to think, learn, and reason
+    * talents (what have you accomplished thus far, programming and otherwise)
+    * attitude, communications, ability to work well with the community and your mentor
+    * availability and commitment to succeeding in GSoC and potential for continuous involvement with community
+    * in a nutshell, what makes you a good person to lead that project initiative :-)
+
+
+As long as you get your application in before April 9, you will have until April 18 to fine-tune your proposal with our mentors.  
+
+Here are some questions to get you started.  You don't have to follow it and your application will still be considered, but it's a good place to start.  
+
+Feel free to include anything else you feel is important.   One liner answers are not likely going to be considered.  In the meanwhile, do feel free to introduce yourself to the community and discuss your project proposal by writing to our developer mailing list.
+
+
+General Questions:
+
+   1. Give us a short introduction of yourself.
+   2. Email address and phone number we can reach you at.
+   3. What are you studying? What year of study will you be in September 2010?
+   4. How much time can you devote to Summer of code?  What else are you doing this summer?
+
+Your Experience:
+
+   1. How did you get started with programming?  How long have you been doing it?  Why do you love it?  Any personal projects you can show us? Have you participated in coding contests / taught / mentor other students?
+   2. What are your programming interests? Are you a C guy - do you like to get down and dirty with the linux kernel?  Do you know more about Java than your peers? Or are you more of a python/ruby person?  What about JavaScript?  You know, what's your style?
+   3. Have you worked for a sofware company as a programmer before? 
+   4. Have you worked on an open source project before? Which ones? Describe your participation
+   5. Do you have a blog?  A resume?
+   6. What makes you a good person for Google Summer of Code?  What do you want to get out of it?
+
+
+Project Questions:
+
+   1. What idea did you choose?
+   2. Elaborate on the idea and describe what you would like to accomplish during the summer. This question is especially important if you have your own idea instead of picking one from our list, as we want to have a good understanding of what you're proposing so we can help you take the idea forward.
+   3. Give us a brief time-line of the project for the things you'd like to accomplish.  It’s OK to include thinking time (“investigation”) in your work schedule. Work should include:
+          * investigation
+          * programming
+          * documentation
+          * dissemination
+   4. How do you plan to test your code?  What version control and build systems do you plan to use?
+   5. If your project is very successful, do you wish to contributing to it further once Google Summer of Code is complete?
+
+
+Sample Proposal Outline
+
+A good proposal will have the following component:
+
+
+    * Name and Contact Information.  Include email, phone(s), IM, Skype, etc.
+
+    * Title.  One liner on the goal to your project.  
+    * Synopsis.  Short summary, what would your project do?   
+
+    * Benefits to Community. Why would Google and Selenium be proud to sponsor this work? How would open source or society as a whole benefit?
+
+    * Deliverables.  We want to know that you have a plan and that at the end of the summer, something get delivered. :-)  Give a brief, clear work breakdown structure with milestones and deadlines. Make sure to label deliverables as optional or required. You may want plan to start by producing some kind of whitepaper, or planning the project in traditional Software Engineering style.  It’s OK to include thinking time (“investigation”) in your work schedule. Work should include:
+          o investigation
+          o programming
+          o documentation
+          o dissemination
+    * Description.  A small list of project details.  Your mentors can give you some guidance on this, but start by letting us know you are thinking :-)
+          o rough architecture
+          o links to parallel projects that you may get insights from
+          o what version control and build system do you plan to use
+          o how do you plan to test
+          o best practices to get your code accepted, etc. 
+    * Bio - Who are you? What makes you the best person to work on this project?
+          o Summarize your education, work, and open source experience.
+          o List your skills and give evidence of your qualifications.  Convince us that you can do the work.
+          o Any published papers, successful open source projects, etc? Please tell us!
+          o Please list any non-Summer-of-Code plans you have for the Summer, especially employment and class-taking. Be specific about schedules and time commitments.
