@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The steps to releasing Se Grid
+The steps to releasing Se Grid from GitHub.  _This will need to be updated when the code moves into SVN._
 
 
 = Details =
@@ -12,7 +12,7 @@ The steps to releasing Se Grid
   # Tag the release in git
   # Push the tag up to GitHub
   # Set up new version in JIRA for next release
-  # Release version in JIRA and move open issues to next version
+  # Release version in JIRA and move open issues with fix version to next version
   # Build the distribution: ant dist
   # Upload the distribution to /tmp on releases.seleniumhq.org
   # Become the release user (sudo su - release) and copy the distribution to release.openqa.org/htdocs/selenium-grid/
