@@ -1,0 +1,21 @@
+#summary How to Release Se Grid
+
+= Introduction =
+
+The steps to releasing Se Grid
+
+
+= Details =
+
+  # Make sure tests are passing on master
+  # Update the Changelog
+  # Tag the release in git
+  # Push the tag up to GitHub
+  # Set up new version in JIRA for next release
+  # Release version in JIRA and move open issues to next version
+  # Build the distribution: ant dist
+  # Upload the distribution to /tmp on releases.seleniumhq.org
+  # Become the release user (sudo su - release) and copy the distribution to release.openqa.org/htdocs/selenium-grid/
+  # Update website release page
+  # Test download
+  # Make announcement on user list
