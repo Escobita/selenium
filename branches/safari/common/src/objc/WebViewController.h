@@ -16,10 +16,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <UIKit/UIKit.h>
+#if TARGET_OS_IPHONE
+#include <UIKit/UIKit.h>
+typedef UIWebView WebViewType;
+#else
+#include <WebKit/WebKit.h>
+typedef WebView WebViewType;
+#endif
 
-// The WebViewController manages the iWebDriver's WebView.
-@interface WebViewController : UIViewController<UIWebViewDelegate>
+@protocol WebViewControllerDelegate
+
+- (void)describeLastAction:(NSString *)status;
+- (ImageType *)screenshot;
+- (void)clickOnPageElementAt:(CGPoint)point;
+- (void)loadRequest:(NSURLRequest*)url;
+
+@end
+
+
+@interface WebViewController
 {
  @private
   // The spec states that the GET message shouldn't return until the new page
@@ -32,69 +47,19 @@
 	
   NSURLRequestCachePolicy cachePolicy_;
   
-  // Pointer to the status / activity label.
-  IBOutlet UILabel *statusLabel_;
-  
   // This is nil if the last operation succeeded.
   NSError *lastError_;
+  
+  NSObject<WebViewControllerDelegate>* delegate_;
+  WebViewType* webView_;
 }
 
-@property (retain, readonly) UIWebView *webView;
+- (id)initWithWebView:(WebViewType*)webView;
 
-- (CGRect)viewableArea;
-- (BOOL)pointIsViewable:(CGPoint)point;
+- (void)webViewDidFinishLoad:(WebViewType *)webView;
+- (void)webView:(WebViewType *)webView didFailLoadWithError:(NSError *)error;
 
-// Some webdriver stuff.
-- (id)visible;
-- (void)setVisible:(NSNumber *)target;
-
-// Get the current page title
-- (NSString *)currentTitle;
-
-// Get the URL of the page we're looking at
-- (NSString *)URL;
-
-// Navigate to a URL.
-// The URL should be specified by the |url| key in the |urlMap|.
-- (void)setURL:(NSDictionary *)urlMap;
-
-- (void)forward;
-- (void)back;
-- (void)refresh;
-
-// Evaluate a javascript string and return the result.
-// Arguments can be passed in in NSFormatter (printf) style.
-//
-// Variables declared with var are kept between script calls. However, they are
-// lost when the page reloads. Check before using any variables which were
-// defined during previous events.
-- (NSString *)jsEval:(NSString *)format, ...;
-
-// Evaluate a javascript string and return the result. Block if the evaluation
-// results in a page reload.
-// Arguments can be passed in in NSFormatter (printf) style.
-- (NSString *)jsEvalAndBlock:(NSString *)format, ...;
-
-// Test if a JS expression evaluates to true
-- (BOOL)testJsExpression:(NSString *)format, ...;
-
-// Get a float property of a javascript object
-- (float)floatProperty:(NSString *)property ofObject:(NSString *)jsObject;
-
-// Test if a JS object is equal to null
-- (BOOL)jsElementIsNullOrUndefined:(NSString *)expression;
-
-// Get the HTML source of the page we've loaded
-- (NSString *)source;
-
-// Get a screenshot of the page we've loaded
-- (UIImage *)screenshot;
-
-- (void)clickOnPageElementAt:(CGPoint)point;
-
-- (void)addFirebug;
-
-// Calls the same on the main view controller.
-- (void)describeLastAction:(NSString *)status;
+@property (retain, readonly, nonatomic) WebViewType *webView;
+@property (assign, nonatomic) NSObject<WebViewControllerDelegate>* delegate;
 
 @end
