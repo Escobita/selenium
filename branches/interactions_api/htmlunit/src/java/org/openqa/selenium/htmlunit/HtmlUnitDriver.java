@@ -59,6 +59,7 @@ import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.HasInputDevices;
 import org.openqa.selenium.InvalidCookieDomainException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -75,13 +76,14 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.internal.Keyboard;
 import org.openqa.selenium.internal.ReturnedCookie;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
                                        FindsById, FindsByLinkText, FindsByXPath, FindsByName,
-                                       FindsByTagName {
+                                       FindsByTagName, HasInputDevices {
 
   private WebClient webClient;
   private WebWindow currentWindow;
@@ -385,6 +387,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     } else {
       return arg;
     }
+  }
+
+  @Override
+  public Keyboard getKeyboard() {
+    return new HtmlUnitKeyboardInput(this);
   }
 
   protected interface JavaScriptResultsCollection {

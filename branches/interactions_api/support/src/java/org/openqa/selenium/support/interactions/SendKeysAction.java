@@ -5,8 +5,6 @@ import org.openqa.selenium.internal.Keyboard;
 
 /**
  * Sending a sequence of keys to an element.
- *
- * Created by Eran Mes (eran.mes@gmail.com)
  */
 public class SendKeysAction implements Action {
   private final Keyboard keyboard;
@@ -21,6 +19,6 @@ public class SendKeysAction implements Action {
 
   @Override
   public void perform() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    keyboard.sendKeys(toElement, keysToSend);
   }
 }

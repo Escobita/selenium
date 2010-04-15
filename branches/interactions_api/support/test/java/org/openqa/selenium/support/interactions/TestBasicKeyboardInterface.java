@@ -11,8 +11,6 @@ import static org.hamcrest.Matchers.is;
 
 /**
  * Tests interaction through the advanced gestures API of keyboard handling.
- * 
- * Created by Eran Mes (eran.mes@gmail.com)
  */
 public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
   public void testBasicKeyboardInput() {
