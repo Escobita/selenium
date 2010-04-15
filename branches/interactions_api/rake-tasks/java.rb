@@ -191,9 +191,9 @@ class JavaGen < BaseGenerator
           clazz =~ /.*\s+(.*TestSuite\.class)/ ? $1.gsub("/", ".").gsub(/\.class\s*$/, "") : nil
         end
         tests.compact!
-
+        
         if (!args[:test_suite].nil?)
-          tests.reject {|clazz| clazz !~ /#{args[:test_suite]}/}
+          tests.reject! {|clazz| clazz !~ /#{args[:test_suite]}/}
         end
 
         args[:tests] = tests
