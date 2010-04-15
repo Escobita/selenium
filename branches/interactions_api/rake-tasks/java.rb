@@ -184,13 +184,17 @@ class JavaGen < BaseGenerator
     out = out_path_(args)
     
     file "#{args[:name]}_never_there" => [ "#{out}" ] do
-      if (args[:run].nil? || args[:run])    
+      if (args[:run].nil? || args[:run])
         tests = `jar tvf #{out}` 
         tests = tests.split /\n/
         tests.map! do |clazz|
           clazz =~ /.*\s+(.*TestSuite\.class)/ ? $1.gsub("/", ".").gsub(/\.class\s*$/, "") : nil
         end
         tests.compact!
+
+        if (!args[:test_suite].nil?)
+          tests.reject {|clazz| clazz !~ /#{args[:test_suite]}/}
+        end
 
         args[:tests] = tests
         run_test_ args
