@@ -41,7 +41,7 @@ public class SingleTestSuite extends TestCase {
   private final static String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = REMOTE_IE;
+    String driver = HTML_UNIT_JS;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -52,11 +52,12 @@ public class SingleTestSuite extends TestCase {
     TestSuiteBuilder builder = new TestSuiteBuilder()
         .addSourceDir("common")
         .addSourceDir("remote/server")
+        .addSourceDir("support")
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("RemoteWebDriverTest")
-        .method("testCanAugmentWebDriverInstanceIfNecessary")
+        .onlyRun("TestBasicKeyboardInterface")
+        //.method("testBasicKeyboardInput")
         .exclude(ALL)
         .exclude(Ignore.Driver.REMOTE)
         .outputTestNames()
