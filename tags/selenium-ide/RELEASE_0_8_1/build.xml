@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<project name="selenium-ide" default="create-xpi">
+  <property file="build.properties" />
+  <property name="build" value="build"/>
+  <property name="output.path" value="${build}/classes"/>
+  
+  <target name="prepare">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/chrome"/>
+  </target>
+
+  <target name="clean" description="Delete build files">
+    <delete dir="${build}"/>
+    <delete dir="content/selenium"/>
+    <delete dir="content/selenium-tests"/>
+    <delete dir="content/jsunit"/>
+  </target>
+
+  <target name="copy-sources" if="output.path">
+    <copy todir="${output.path}">
+      <fileset dir=".">
+	<include name="content/**" />
+	<include name="locale/**" />
+	<include name="skin/**" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="import-selenium" description="Import Selenium source into the extension">
+    <fail message="Please set selenium.core.dir property in build.properties file." unless="selenium.core.dir"/>
+    <copy todir="content/selenium">
+      <fileset dir="${selenium.core.dir}/core">
+	<include name="**"/>
+      </fileset>
+      <fileset dir="content/selenium-src"/>
+    </copy>
+    <copy todir="content/selenium-tests">
+      <fileset dir="${selenium.core.dir}/tests">
+	<include name="**"/>
+      </fileset>
+    </copy>
+    <copy todir="content/selenium">
+      <fileset dir="${selenium.core.dir}">
+	<include name="reference.html"/>
+      </fileset>
+    </copy>
+    <copy todir="content/jsunit">
+      <fileset dir="${selenium.core.dir}/jsunit">
+	<include name="**"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="create-jar" depends="prepare,import-selenium,copy-sources">
+    <zip destfile="${build}/chrome/${ant.project.name}.jar">
+      <fileset dir="${output.path}" />
+    </zip>
+  </target>
+
+  <target name="create-xpi" depends="create-jar" description="Create the extension package">
+    <zip destfile="${build}/${ant.project.name}.xpi">
+      <fileset dir="${build}">
+	<include name="chrome/*"/>
+      </fileset>
+      <fileset dir=".">
+	<include name="install.rdf"/>
+	<include name="components/**"/>
+	<exclude name="components/*.idl"/>
+      </fileset>
+      <fileset dir="production">
+	<include name="chrome.manifest"/>
+      </fileset>
+    </zip>
+  </target>
+
+</project>

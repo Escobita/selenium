@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<project name="selenium-ide" default="create-xpi">
+  <property file="build.properties"/>
+  <property name="build" value="build"/>
+  
+  <target name="prepare">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/chrome"/>
+  </target>
+
+  <target name="clean" description="Delete build files">
+    <delete dir="${build}"/>
+    <delete dir="content/selenium"/>
+  </target>
+
+  <target name="import-selenium" description="Import Selenium source into the extension">
+    <fail message="Please set selenium.src property in build.properties file." unless="selenium.src"/>
+    <copy todir="content/selenium">
+      <fileset dir="${selenium.src}">
+	<include name="*.*"/>
+	<include name="dom-images/*.*"/>
+	<include name="dom-styles/*.*"/>
+	<include name="html-xpath/*.*"/>
+	<include name="jsunit/**"/>
+	<exclude name="TestSuite.html"/>
+	<exclude name="*.bat"/>
+	<exclude name="*.py"/>
+	<exclude name="jsunit/java/**"/>
+      </fileset>
+      <fileset dir="content/selenium-src"/>
+    </copy>
+  </target>
+
+  <target name="create-jar" depends="prepare,import-selenium">
+    <zip destfile="${build}/chrome/${ant.project.name}.jar">
+      <fileset dir=".">
+	<include name="content/**"/>
+	<include name="locale/**"/>
+      </fileset>
+    </zip>
+  </target>
+
+  <target name="create-xpi" depends="create-jar" description="Create the extension package">
+    <zip destfile="${build}/${ant.project.name}.xpi">
+      <fileset dir="${build}">
+	<include name="chrome/*"/>
+      </fileset>
+      <fileset dir=".">
+	<include name="install.rdf"/>
+	<include name="components/**"/>
+	<exclude name="components/*.idl"/>
+      </fileset>
+      <fileset dir="production">
+	<include name="chrome.manifest"/>
+      </fileset>
+    </zip>
+  </target>
+
+</project>

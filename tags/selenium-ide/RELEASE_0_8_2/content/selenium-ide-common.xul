@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!--
+Copyright 2005 Shinya Kasatani
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!DOCTYPE window [
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
+%browserDTD;
+<!ENTITY % seleniumIdeDTD SYSTEM "chrome://selenium-ide/locale/selenium-ide.dtd">
+%seleniumIdeDTD;
+]>
+<overlay id="selenium-ide-common" 
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/preferences.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/tools.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/scripts/selenium-browserdetect.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/lib/prototype.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/scripts/htmlutils.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/scripts/selenium-browserbot.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/scripts/selenium-logging.js"/>
+<!--  <script type="application/x-javascript" src="chrome://selenium-ide/content/eventManager.js"/>-->
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/recorder.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/recorder-handlers.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/locatorBuilders.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/editor.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/commandBuilders.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/options.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/file-utils.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/format.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/testCase.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/treeView.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/sourceView.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/debugger.js"/>
+  
+  <stringbundle id="strings" src="chrome://selenium-ide/locale/selenium-ide.properties" />
+
+  <commandset id="seleniumIDECommands">
+    <command id="cmd_save" oncommand="goDoCommand('cmd_save')"/>
+    <command id="cmd_open" oncommand="goDoCommand('cmd_open')"/>
+    <command id="cmd_close" oncommand="goDoCommand('cmd_close')"/>
+    <command id="cmd_selenium_play" oncommand="goDoCommand('cmd_selenium_play')"/>
+    <command id="cmd_selenium_testrunner" oncommand="goDoCommand('cmd_selenium_testrunner')"/>
+    <command id="cmd_selenium_pause" oncommand="goDoCommand('cmd_selenium_pause')"/>
+    <command id="cmd_selenium_step" oncommand="goDoCommand('cmd_selenium_step')"/>
+    <command id="cmd_selenium_breakpoint" oncommand="goDoCommand('cmd_selenium_breakpoint')"/>
+    <command id="cmd_selenium_startpoint" oncommand="goDoCommand('cmd_selenium_startpoint')"/>
+    <command id="cmd_selenium_exec_command" oncommand="goDoCommand('cmd_selenium_exec_command')"/>
+  </commandset>
+<!--  <commandset id="stateUpdater" commandupdater="true" events="focus,selenium-ide-state" oncommandupdate="alert('commandupdate: window.editor=' + window.editor);if (window.editor) { editor.updateSeleniumCommands() }"/>-->
+  <commandset id="seleniumIDEUpdater" commandupdater="true" events="focus,selenium-ide-state" oncommandupdate="if (window.editor) { editor.updateSeleniumCommands() }"/>
+
+  <keyset id="seleniumIDEKeys">
+    <key id="close-key" modifiers="accel" key="W" command="cmd_close"/>
+    <key id="save-key" modifiers="accel" key="S" command="cmd_save"/>
+    <key id="open-key" modifiers="accel" key="O" command="cmd_open"/>
+    <key id="breakpoint-key" key="B" command="cmd_selenium_breakpoint"/>
+    <key id="startpoint-key" key="S" command="cmd_selenium_startpoint"/>
+    <key id="exec-key" key="X" command="cmd_selenium_exec_command"/>
+  </keyset>
+
+  <popupset id="seleniumIDEPopup">
+    <!-- popup menu on the tree view -->
+    <popup id="treeContextMenu">
+      <menuitem label="&contextMenu.cut.label;" command="cmd_cut" key="key_cut" accesskey="T"/>
+      <menuitem label="&contextMenu.copy.label;" command="cmd_copy" key="key_copy" accesskey="C"/>
+      <menuitem label="&contextMenu.paste.label;" command="cmd_paste" key="key_paste" accesskey="P"/>
+      <menuitem label="&contextMenu.delete.label;" command="cmd_delete" key="key_delete" accesskey="D"/>
+      <menuseparator/>
+      <menuitem label="&contextMenu.insertCommand.label;" oncommand="editor.treeView.insertCommand()" accesskey="I"/>
+      <menuitem label="&contextMenu.insertComment.label;" oncommand="editor.treeView.insertComment()" accesskey="M"/>
+      <menuseparator/>
+      <menuitem label="&contextMenu.clear.label;" oncommand="editor.clear()" accesskey="A"/>
+      <menuseparator/>
+      <menuitem label="&contextMenu.breakpoint.label;" command="cmd_selenium_breakpoint" key="breakpoint-key" accesskey="B"/>
+      <menuitem label="&contextMenu.startpoint.label;" command="cmd_selenium_startpoint" key="startpoint-key" accesskey="S"/>
+      <menuitem label="&contextMenu.execCommand.label;" command="cmd_selenium_exec_command" key="exec-key" accesskey="E"/>
+    </popup>
+    <popup id="popupSeleniumCommands">
+      <menuitem label="&contextMenu.clear.label;" oncommand="editor.clear()" accesskey="A"/>
+    </popup>
+  </popupset>
+
+  <menu id="fileMenu" label="&fileMenu.label;" accesskey="F">
+    <menupopup id="file-popup">
+      <menuitem label="&newTestCmd.label;" oncommand="editor.newTestCase();" accesskey="N"/>
+      <menuitem label="&openCmd.label;" command="cmd_open" key="open-key" accesskey="O"/>
+      <menuitem label="&saveTestCmd.label;" command="cmd_save" key="save-key" accesskey="S"/>
+      <menuitem label="&saveTestAsCmd.label;" oncommand="editor.saveNewTestCase();" accesskey="A"/>
+      <menu label="&exportCmd.label;" accesskey="E">
+	<menupopup id="popup_export_formats" onpopupshowing="editor.populateFormatsPopup(this)" oncommand="editor.exportTestCaseWithFormat(editor.formats.selectFormat(event.target.getAttribute('value')))">
+	</menupopup>
+      </menu>
+      <menuseparator/>
+      <menuitem label="&closeCmd.label;" command="cmd_close" key="close-key" accesskey="X"/>
+    </menupopup>
+  </menu>
+  <menu id="menu_edit">
+    <menupopup>
+      <menuitem id="menu_undo"/>
+      <menuitem id="menu_redo"/>
+      <menuseparator/>
+      <menuitem id="menu_cut"/>
+      <menuitem id="menu_copy"/>
+      <menuitem id="menu_paste"/>
+      <menuitem id="menu_delete"/>
+      <menuseparator/>
+      <menuitem id="menu_selectAll"/>
+    </menupopup>
+  </menu>
+  <menu id="optionsMenu" label="&optionsMenu.label;" accesskey="O">
+    <menupopup id="options-popup" onpopupshowing="editor.onPopupOptions()">
+      <menuitem label="&optionsCmd.label;" oncommand="editor.openSeleniumIDEPreferences();" accesskey="O"/>
+      <menu label="&formatCmd.label;" accesskey="F">
+	<menupopup id="popup_formats" onpopupshowing="editor.populateFormatsPopup(this, editor.currentFormat)" oncommand="editor.setCurrentFormat(editor.formats.selectFormat(event.target.getAttribute('value')))">
+	</menupopup>
+      </menu>
+      <menu id="clipboardFormatMenu" label="&clipboardFormatCmd.label;">
+	<menupopup id="popup_clipboard_formats" onpopupshowing="editor.populateFormatsPopup(this, editor.clipboardFormat)" oncommand="editor.setClipboardFormat(editor.formats.selectFormat(event.target.getAttribute('value')))">
+	</menupopup>
+      </menu>
+      <menuitem id="internalTestsMenu" label="Test Selenium IDE" oncommand="editor.showInBrowser('chrome://selenium-ide/content/tests/index.html');" />
+    </menupopup>
+  </menu>
+  
+  <vbox id="logBox">
+    <hbox id="logMenu" align="center">
+      <toolbarbutton id="logTab" label="&logConsole.label;" onclick="editor.infoPanel.switchView(editor.infoPanel.logView)" class="console-tab" selected="true"/>
+      <toolbarbutton id="helpTab" label="&reference.label;" onclick="editor.infoPanel.switchView(editor.infoPanel.helpView)" class="console-tab"/>
+      <spacer flex="1"/>
+      <hbox align="center" id="logButtons">
+	<toolbarbutton id="logFilter" label="Debug" type="menu" class="console-button">
+	  <menupopup id="logFilterPopup" oncommand="editor.infoPanel.logView.changeLogLevel(event.target.value, true)">
+	    <menuitem label="&logFilter.debug.label;" value="0"/>
+	    <menuitem label="&logFilter.info.label;" value="1" selected="true"/>
+	    <menuitem label="&logFilter.warn.label;" value="2"/>
+	    <menuitem label="&logFilter.error.label;" value="3"/>
+	  </menupopup>
+        </toolbarbutton>
+	<toolbarbutton id="logClear" label="&logClear.label;" oncommand="editor.infoPanel.logView.clear()" class="console-button"/>
+      </hbox>
+    </hbox>
+    <iframe flex="1" id="logView" src="LogFrame.html">
+    </iframe>
+    <iframe flex="1" id="helpView" src="HelpView.html" hidden="true">
+    </iframe>
+  </vbox>
+</overlay>

@@ -1,0 +1,30 @@
+<html>
+	<title>Bogus Search Engine</title>
+	<body>
+    <!-- image link without alt attribute -->
+    <a href="search.html"><img src="chrome://selenium-ide/content/selenium/selenium-logo.png"></a>
+    <!-- image link with alt attribute -->
+    <a href="search.html"><img alt="Selenium logo" src="chrome://selenium-ide/content/selenium/selenium-logo.png"></a>
+    <a href="#" onclick="document.location.href = 'chrome://selenium-ide/content/tests/functional/aut/search.html'; return false">link with onclick attribute</a>
+		<form action="result.html" method="post">
+			<div>
+				<input type="text" name="q" />
+			</div>
+			<div>
+				Show
+				<select name="num">
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="30">30</option>
+				</select>
+				items
+			</div>
+			<div>
+        <textarea name="comment"></textarea>
+			</div>
+			<div>
+				<input type="submit" name="search" value="Search" />
+			</div>
+		</form>
+	</body>
+</html>
