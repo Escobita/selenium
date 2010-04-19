@@ -58,7 +58,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 import com.gargoylesoftware.htmlunit.html.StyledElement;
 
+import com.gargoylesoftware.htmlunit.javascript.host.Event;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -227,13 +229,45 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
   }
 
-  public void sendKeys(CharSequence... value) {
+  private void verifyKeysCanBeSent() {
     assertElementNotStale();
-
-    String originalValue = getValue();
 
     if (!isDisplayed())
       throw new ElementNotVisibleException("You may only sendKeys to visible elements");
+  }
+
+  private void switchFocusToThisIfNeeded() {
+    HtmlUnitWebElement oldActiveElement =
+        ((HtmlUnitWebElement)parent.switchTo().activeElement());
+    if (parent.isJavascriptEnabled() &&
+        !oldActiveElement.equals(element) &&
+        !oldActiveElement.getTagName().toLowerCase().equals("body")) {
+      oldActiveElement.element.blur();
+      element.focus();
+    }
+  }
+
+  public void sendKeyDownEvent(Keys modifierKey) {
+    sendSingleKeyEvent(modifierKey, Event.TYPE_KEY_DOWN);
+  }
+
+  public void sendKeyUpEvent(Keys modifierKey) {
+    sendSingleKeyEvent(modifierKey, Event.TYPE_KEY_UP);
+  }
+
+  private void sendSingleKeyEvent(Keys modifierKey, String eventDescription) {
+    verifyKeysCanBeSent();
+    switchFocusToThisIfNeeded();
+    boolean shiftKey = modifierKey.equals(Keys.SHIFT);
+    boolean ctrlKey = modifierKey.equals(Keys.CONTROL);
+    boolean altKey = modifierKey.equals(Keys.ALT);
+
+    Event keyEvent = new Event(getElement(), eventDescription, shiftKey, ctrlKey, altKey);
+    getElement().fireEvent(keyEvent);
+  }
+
+  public void sendKeys(CharSequence... value) {
+    verifyKeysCanBeSent();
 
     StringBuilder builder = new StringBuilder();
     for (CharSequence seq : value) {
@@ -247,14 +281,8 @@ public class HtmlUnitWebElement implements RenderedWebElement,
       builder.delete(indexOfSubmitKey, builder.length());
     }
 
-    HtmlUnitWebElement oldActiveElement =
-        ((HtmlUnitWebElement)parent.switchTo().activeElement());
-    if (parent.isJavascriptEnabled() &&
-        !oldActiveElement.equals(element) &&
-        !oldActiveElement.getTagName().toLowerCase().equals("body")) {
-      oldActiveElement.element.blur();
-      element.focus();
-    }
+    switchFocusToThisIfNeeded();
+
     if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
       try {
         element.type(builder.toString());

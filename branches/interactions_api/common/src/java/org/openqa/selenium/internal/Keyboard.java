@@ -1,5 +1,6 @@
 package org.openqa.selenium.internal;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -9,6 +10,6 @@ import org.openqa.selenium.WebElement;
  */
 public interface Keyboard {
   void sendKeys(WebElement toElement, CharSequence... keysToSend);
-  void pressKey(WebElement toElement, CharSequence keyToPress);
-  void releaseKey(WebElement toElement, CharSequence keyToRelease);
+  void pressKey(WebElement toElement, Keys keyToPress);
+  void releaseKey(WebElement toElement, Keys keyToRelease);
 }
