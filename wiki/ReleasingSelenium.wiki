@@ -27,6 +27,13 @@
 
 TBC.
 
+= For .NET =
+
+  # Run `rake clean dotnet`
+  # If you want to create docs and have the correct tools installed, run `msbuild rake-tasks\msbuild\webdriver.msbuild.proj /t:BuildDocs`. This will create WebDriver.chm in the build/dotnet directory.
+  # Zip up the build/dotnet directory (do not include subdirectories)
+  # Upload the ZIP file to the downloads page.
+
 = Areas to Improve =
 
   * We should really automate the version number bumps.
