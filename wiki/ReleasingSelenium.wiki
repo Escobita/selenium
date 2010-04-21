@@ -34,6 +34,16 @@ TBC.
   # Zip up the build/dotnet directory (do not include subdirectories)
   # Upload the ZIP file to the downloads page.
 
+= For Ruby =
+
+== selenium-webdriver ==
+
+ # Release gem, replace A.B.C with the appropriate version. You will need to be registered as a gem owner on rubygems.org.
+  # `rake gem:release VERSION=A.B.C`
+ # Update docs
+  # `rake rubydocs`
+  # `cp -r build/rubydocs/* docs/api/rb`
+
 = Areas to Improve =
 
   * We should really automate the version number bumps.
