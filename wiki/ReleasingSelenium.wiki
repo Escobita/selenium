@@ -43,6 +43,7 @@ TBC.
  # Update docs
   # `rake rubydocs`
   # `cp -r build/rubydocs/* docs/api/rb`
+  # Commit new docs.
 
 = Areas to Improve =
 
