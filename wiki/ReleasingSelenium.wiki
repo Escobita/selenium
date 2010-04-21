@@ -1,0 +1,33 @@
+#summary The release process for a new selenium
+
+<wiki:toc depth=2>
+
+= For Everything =
+
+  # Bump the revision numbers at the top of the Rakefile.
+  # Bump the revision number in firefox's install.rdf.
+  # Bump the revision number in the ChromeDriver's manifest.json files.
+  # Commit version number bump.
+
+= For Java =
+
+  # Run `rake clean release`
+  # Upload the new versions of the ZIP files available on the downloads page.
+  # Create source jars. I do this manually right now. Ugh.
+  # Update the docs. I do this on a UNIX variant:
+    # `rake javadocs`
+    # `find docs/api/java -name "*.html" | grep -v svn | xargs rm`
+    # `cp -r build/javadoc/* docs/api/java`
+    # `svn st docs/api/java | grep -v \! | awk '{print $2}' | xargs svn rm`
+    # `svn st docs/api/java | grep -v \? | awk '{print $2}' | xargs svn add`
+    # `find docs/api/java -name "*.html" | xargs svn ps "svn:mime-type" "text/html"`
+    # Commit new docs
+
+== Updating the Maven Repos ==
+
+TBC.
+
+= Areas to Improve =
+
+  * We should really automate the version number bumps.
+  * Creating the source jars should be automated.
