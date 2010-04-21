@@ -29,17 +29,50 @@ bot.dom.hasAttribute = function(element, attributeName) {
 
 /**
  * Used to determine whether we should return a boolean value from
- * getAttribute.
+ * getAttribute. These are mostly derived from the HTML 5 spec.
  *
  * TODO(simon): Consider using a hash instead of an array
  *
  * @private
  */
 bot.dom.booleanAttributes_ = [
+  'async',
+  'autofocus',
+  'autoplay',
   'checked',
+  'compact',
+  'complete',
+  'declare',
+  'defaultChecked',
+  'defaultSelected',
+  'defer',
   'disabled',
+  'draggable',
+  'ended',
+  'formNoValidate',
+  'hidden',
+  'indeterminate',
+  'isContentEditable',
+  'isMap',
+  'loop',
+  'multiple',
+  'muted',
+  'noHref',
+  'noResize',
+  'noShade',
+  'noWrap',
+  'noValidate',
+  'open',
+  'paused',
   'readOnly',
-  'selected'
+  'required',
+  'reversed',
+  'scoped',
+  'seamless',
+  'seeking',
+  'selected',
+  'visible',
+  'willValidate'
 ];
 
 /**
