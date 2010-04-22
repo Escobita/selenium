@@ -159,6 +159,7 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session || Create a new session. || _N/A_ ||
 || GET || /session/:sessionId || Retrieve the capabilities of the specified session. || _N/A_ ||
 || DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
+|| POST || /session/:sessionId/timeouts/implicit_wait || Set the amount of time the driver should wait when searching for elements. || _N/A_ <wiki:comment>TODO: Add a link to the javadoc once the docs are updated.</wiki:comment> ||
 || GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
 || GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
 || GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
@@ -293,6 +294,37 @@ will be returned in a JSON object with the following properties:
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()]</dd>
 </dl>
 </dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/timeouts/implicit_wait ===
+
+<dl>
+<dd>*POST /session/:sessionId/timeouts/implicit_wait*</dd>
+<dd>
+<dl>
+<dd>Set the amount of time the driver should wait when searching for elements. When searching for a single element, the driver should poll the page until an element is found or the timeout expires, which ever occurs first.  When searching for multiple elements, the driver should poll the page until at least one element is found or the timeout expires, at which point it should return an empty list.
+<p/>
+If this command is never sent, the driver should default to an implicit wait of 0ms.
+</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`ms` - `{number}` The amount of time to wait, in milliseconds.</dd>
+</dl>
+</dd>
+<wiki:comment>
+TODO: Add a *See Also* link to the javadoc once the docs are updated.
+</wiki:comment>
 </dl>
 </dd>
 </dl>
@@ -1695,6 +1727,3 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
-
-
-
