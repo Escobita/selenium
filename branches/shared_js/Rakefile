@@ -920,6 +920,14 @@ js_to_header(:name => "isSelected",
              :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
              :src  => "build/isSelected.js")
 
+js_fragment(:name => "setSelected",
+            :module => "bot.user",
+            :function => "bot.user.setSelected")
+
+js_fragment(:name => "toggle",
+            :module => "bot.user",
+            :function => "bot.user.toggle")
+
 
 # Need atoms for submit (walking, at least), get value of css property
 

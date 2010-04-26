@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>user_test.html</title>
+  <script src="bot-bootstrap.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    goog.require('bot.user');
+    goog.require('goog.events');
+    goog.require('goog.events.EventType');
+    goog.require('goog.testing.jsunit');
+  </script>
+
+  <script type="text/javascript">
+
+    var changeCount;
+    var listeningTo;
+
+    function setUp() {
+      changeCount = 0;
+      listeningTo = [];
+    }
+
+    function tearDown() {
+      while (listeningTo.length) {
+        goog.events.removeAll(listeningTo.shift());
+      }
+    }
+
+    function expectChangeEvent(expectedTarget) {
+      changeCount = 0;
+      listeningTo.push(expectedTarget);
+      goog.events.listen(expectedTarget, goog.events.EventType.CHANGE,
+          function(e) {
+            assertEquals('Not the expected change event target',
+                expectedTarget, e.target);
+            changeCount += 1;
+          });
+    }
+
+    function assertChangeFired(opt_count) {
+      var count = opt_count || 1;
+      assertEquals('Change event not fired expected # of times!',
+          count, changeCount);
+    }
+
+
+    function doNotExpectChangeEvent(expectedTarget) {
+      listeningTo.push(expectedTarget);
+      goog.events.listen(expectedTarget, goog.events.EventType.CHANGE,
+          goog.partial(fail, 'Was not expecting a change event to be fired'));
+    }
+
+    function testShouldNotBeAbleToSelectChildrenOfHead() {
+      var title = document.getElementsByTagName(goog.dom.TagName.TITLE);
+      assertThrows(goog.partial(bot.user.setSelected, title, true));
+      assertThrows(goog.partial(bot.user.setSelected, title, false));
+
+      var head = document.getElementsByTagName(goog.dom.TagName.HEAD);
+      assertThrows(goog.partial(bot.user.setSelected, head, true));
+      assertThrows(goog.partial(bot.user.setSelected, head, false));
+    }
+
+    function testShouldNotBeAbleToSelectUnselectableElements() {
+      assertThrows(goog.partial(bot.user.setSelected, document, true));
+      assertThrows(goog.partial(bot.user.setSelected, document.body, true));
+      assertThrows(goog.partial(bot.user.setSelected,
+          goog.dom.$('textField'), true));
+    }
+
+    function testShouldNotBeAbleToSelectAnOptionThatIsNotInASelect() {
+      var option = goog.dom.$('nogo-option');
+      assertThrows(goog.partial(bot.user.setSelected, option, true));
+      assertThrows(goog.partial(bot.user.setSelected, option, false));
+    }
+
+    function testShouldBeAbleToSelectAnOptionFromASingleSelect() {
+      var ss = goog.dom.$('singleSelect');
+      var index = ss.selectedIndex == 0 ? 1 : 0;
+      var notSelected = ss.options[index];
+      expectChangeEvent(ss);
+      bot.user.setSelected(notSelected, true);
+      assertChangeFired();
+      assertEquals(index, ss.selectedIndex);
+    }
+
+    function testShouldNotBeAbleToDeselectAnOptionFromASingleSelect() {
+      var ss = goog.dom.$('singleSelect');
+      var option = ss.options[ss.selectedIndex];
+      assertThrows(goog.partial(bot.user.setSelected, option, false));
+    }
+
+    function testShouldDoNothingIfOptionIsAlreadyInTheDesiredState() {
+      var ss = goog.dom.$('singleSelect');
+      var selected = ss.options[ss.selectedIndex];
+      var notSelected = ss.options[ss.selectedIndex == 0 ? 1 : 0];
+
+      doNotExpectChangeEvent(ss);
+      bot.user.setSelected(selected, true);
+      bot.user.setSelected(notSelected, false);
+    }
+
+    function testShouldNotBeAbleToSelectFromADisabledSelect() {
+      var ds = goog.dom.$('disabledSelect');
+      var selected = ds.options[ds.selectedIndex];
+      var notSelected = ds.options[ds.selectedIndex == 0 ? 1 : 0];
+
+      doNotExpectChangeEvent(ds);
+
+      assertThrows(goog.partial(bot.user.setSelected, selected, false));
+      assertThrows(goog.partial(bot.user.setSelected, notSelected, true));
+    }
+
+    function testShouldBeAbleToSelectAnEnabledOptionFromASelectThatHasADisabledOptionInIt() {
+      var select = goog.dom.$('disabledOption');
+      var index = select.selectedIndex == 0 ? 2 : 0;
+      var notSelected = select.options[index];
+      expectChangeEvent(select);
+      bot.user.setSelected(notSelected, true);
+      assertChangeFired();
+      assertEquals(index, select.selectedIndex);
+    }
+
+    function testShouldNotBeAbleToSelectADisabledOption() {
+      var select = goog.dom.$('disabledOption');
+      var disabledOption = select.options[1];
+      doNotExpectChangeEvent(select);
+      assertThrows(goog.partial(bot.user.setSelected, disabledOption, true));
+      assertThrows(goog.partial(bot.user.setSelected, disabledOption, false));
+    }
+
+    function testShouldBeAbleToSelectMultipleOptionsFromAMultiSelect() {
+      var ms = goog.dom.$('multiSelect');
+      var apples = ms.options[0];
+      var oranges = ms.options[1];
+      var cherries = ms.options[2];
+
+      assertFalse(bot.dom.isSelected(oranges));
+      assertFalse(bot.dom.isSelected(cherries));
+
+      expectChangeEvent(ms);
+      bot.user.setSelected(oranges, true);
+      bot.user.setSelected(cherries, true);
+      assertChangeFired(2);
+    }
+
+    function testShouldBeAbleToDeselectOptionsInAMultiSelect() {
+      var ms = goog.dom.$('multiSelect2');
+      var red = ms.options[0];
+      var green = ms.options[1];
+      var blue = ms.options[2];
+
+      expectChangeEvent(ms);
+
+      assertTrue(bot.dom.isSelected(red));
+      bot.user.setSelected(red, false);
+      assertFalse(bot.dom.isSelected(red));
+
+      assertTrue(bot.dom.isSelected(green));
+      bot.user.setSelected(green, false);
+      assertFalse(bot.dom.isSelected(green));
+
+      assertTrue(bot.dom.isSelected(blue));
+      bot.user.setSelected(blue, false);
+      assertFalse(bot.dom.isSelected(blue));
+
+      assertChangeFired(3);
+    }
+
+    function testShouldBeAbleToToggleOptionsInAMultiSelect() {
+      var ms = goog.dom.$('multiSelect2');
+      var red = ms.options[0];
+
+      var state = bot.dom.isSelected(red);
+      expectChangeEvent(ms);
+
+      assertEquals(!state, bot.user.toggle(red));
+      assertEquals(state, bot.user.toggle(red));
+      assertEquals(!state, bot.user.toggle(red));
+      assertChangeFired(3);
+    }
+
+    function testShouldNotBeAbleToSelectADisabledCheckbox() {
+      var cb = goog.dom.$('check4');
+      doNotExpectChangeEvent(cb);
+      assertThrows(goog.partial(bot.user.setSelected, cb, true));
+      assertThrows(goog.partial(bot.user.setSelected, cb, false));
+    }
+
+    function testShouldBeAbleToToggleCheckboxes() {
+      var cb1 = goog.dom.$('check1');
+      var state = bot.dom.isSelected(cb1);
+
+      expectChangeEvent(cb1);
+
+      assertEquals(!state, bot.user.toggle(cb1));
+      assertEquals(state, bot.user.toggle(cb1));
+      assertEquals(!state, bot.user.toggle(cb1));
+
+      assertChangeFired(3);
+    }
+
+    function testShouldBeAbleToSelectMultipleCheckboxesFromTheSameGroup() {
+      var cb1 = goog.dom.$('check1');
+      var cb2 = goog.dom.$('check2');
+      var cb3 = goog.dom.$('check3');
+
+      bot.user.setSelected(cb1, false);
+      bot.user.setSelected(cb2, false);
+      bot.user.setSelected(cb3, false);
+      assertFalse(bot.dom.isSelected(cb1));
+      assertFalse(bot.dom.isSelected(cb2));
+      assertFalse(bot.dom.isSelected(cb3));
+
+      expectChangeEvent(cb1);
+      bot.user.setSelected(cb1, true);
+      assertChangeFired();
+      assertTrue(bot.dom.isSelected(cb1));
+      assertFalse(bot.dom.isSelected(cb2));
+      assertFalse(bot.dom.isSelected(cb3));
+
+      expectChangeEvent(cb2);
+      bot.user.setSelected(cb2, true);
+      assertChangeFired();
+      assertTrue(bot.dom.isSelected(cb1));
+      assertTrue(bot.dom.isSelected(cb2));
+      assertFalse(bot.dom.isSelected(cb3));
+
+      expectChangeEvent(cb3);
+      bot.user.setSelected(cb3, true);
+      assertChangeFired();
+      assertTrue(bot.dom.isSelected(cb1));
+      assertTrue(bot.dom.isSelected(cb2));
+      assertTrue(bot.dom.isSelected(cb3));
+    }
+
+    function testShouldNotBeAbleToDeselectARadioButton() {
+      var radio = goog.dom.$('selectedRadio');
+      doNotExpectChangeEvent(radio);
+      assertThrows(goog.partial(bot.user.setSelected, radio, false));
+    }
+
+    function testShouldNotBeAbleToManipulateADisabledRadiobutton() {
+      var radio = goog.dom.$('disabledRadio');
+      doNotExpectChangeEvent(radio);
+      assertThrows(goog.partial(bot.user.setSelected, radio, false));
+    }
+
+    function testSelectingARadioButtonShouldDeselectTheOthersInTheGroup() {
+      var r1 = goog.dom.$('radio1');
+      var r2 = goog.dom.$('radio2');
+      var r3 = goog.dom.$('radio3');
+    
+      assertFalse('precondition failed', bot.dom.isSelected(r1));
+      assertFalse('precondition failed', bot.dom.isSelected(r2));
+      assertFalse('precondition failed', bot.dom.isSelected(r3));
+
+      expectChangeEvent(r1);
+      bot.user.setSelected(r1, true);
+      assertChangeFired();
+      assertTrue(bot.dom.isSelected(r1));
+      assertFalse(bot.dom.isSelected(r2));
+      assertFalse(bot.dom.isSelected(r3));
+
+      expectChangeEvent(r2);
+      bot.user.setSelected(r2, true);
+      assertChangeFired();
+      assertFalse(bot.dom.isSelected(r1));
+      assertTrue(bot.dom.isSelected(r2));
+      assertFalse(bot.dom.isSelected(r3));
+
+      expectChangeEvent(r3);
+      bot.user.setSelected(r3, true);
+      assertChangeFired();
+      assertFalse(bot.dom.isSelected(r1));
+      assertFalse(bot.dom.isSelected(r2));
+      assertTrue(bot.dom.isSelected(r3));
+    }
+  </script>
+</head>
+<body>
+  <form action="javascript:void(0)">
+    <div>
+      <option id="nogo-option" value="nogo">Option not in a select</option>
+    </div>
+
+    <div>
+      <label for="singleSelect">Single option select</label>
+      <select id="singleSelect">
+        <option value="foo">FOO</option>
+        <option value="bar" selected>BAR</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="disabledSelect">Disabled select</label>
+      <select id="disabledSelect" disabled>
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="disabledOption">Select with disabled option</label>
+      <select id="disabledOption">
+        <option value="1" selected>1</option>
+        <option value="2" disabled>2</option>
+        <option value="3">2</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="multiSelect">Multi-select</label>
+      <select id="multiSelect" multiple>
+        <option value="apples" selected>apples</option>
+        <option value="oranges">oranges</option>
+        <option value="cherries">cherries</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="multiSelect2">Another Multi-select</label>
+      <select id="multiSelect2" multiple>
+        <option value="red" selected>red</option>
+        <option value="green" selected>green</option>
+        <option value="blue" selected>blue</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="textField">Text field</label>
+      <input type="text" id="textField"/>
+    </div>
+
+    <div>
+      <div><strong>Checkboxes</strong></div>
+      <label for="check1">Strike 1</label>
+      <input type="checkbox" id="check1" name="checkBoxes" value="Strike One"/>
+      <label for="check2">Strike 2</label>
+      <input type="checkbox" id="check2" name="checkBoxes" value="Strike Two"/>
+      <label for="check3">Strike 3</label>
+      <input type="checkbox" id="check3" name="checkBoxes"
+             value="Strike Three"/>
+      <label for="check4">Disabled</label>
+      <input type="checkbox" id="check4" name="checkBoxes"
+             value="Strike Four" disabled/>
+    </div>
+
+    <div>
+      <label for="selectedRadio">Selected radiobutton</label>
+      <input id="selectedRadio" type="radio" value="Pre-selected" checked/>
+    </div>
+
+    <div>
+      <label for="disabledRadio">Disabled radiobutton</label>
+      <input id="disabledRadio" type="radio" value="Disabled radio" disabled/>
+    </div>
+
+    <div>
+      <div><strong>Radiobuttons</strong></div>
+      <label for="radio1">Radio 1</label>
+      <input id="radio1" type="radio" name="radiogroup" value="Radio1"/>
+      <label for="radio2">Radio 2</label>
+      <input id="radio2" type="radio" name="radiogroup" value="Radio2"/>
+      <label for="radio3">Radio 3</label>
+      <input id="radio3" type="radio" name="radiogroup" value="Radio3"/>
+    </div>
+
+  </form>
+</body>
+</html>

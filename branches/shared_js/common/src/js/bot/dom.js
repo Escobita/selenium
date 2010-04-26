@@ -160,6 +160,20 @@ bot.dom.parentElement = function(element) {
   return elem && elem.nodeType == goog.dom.NodeType.ELEMENT ? elem : null;
 };
 
+
+/**
+ * Determines if an element is located within the HEAD element.
+ *
+ * @param {Element} element The element to consider.
+ * @return {boolean} Whether the element is a descendant of HEAD.
+ */
+bot.dom.isInHead = function(element) {
+  return !!goog.dom.getAncestor(element, function(node) {
+    return node.tagName == goog.dom.TagName.HEAD;
+  }, true);
+};
+
+
 /**
  * Determines whether an element is what a user would call "displayed". This
  * means that the element not only has height and width greater than 0px, but

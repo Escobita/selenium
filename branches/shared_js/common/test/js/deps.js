@@ -15,6 +15,7 @@ goog.addDependency('../../../js/src/webelement.js', ['webdriver.WebElement'], ['
 goog.addDependency('../../../js/src/bot/bot.js', ['bot'], []);
 goog.addDependency('../../../js/src/bot/dom.js', ['bot.dom'], ['goog.array', 'goog.style']);
 goog.addDependency('../../../js/src/bot/events.js', ['bot.events'], ['bot.dom', 'goog.dom', 'goog.events.EventType', 'goog.userAgent']);
+goog.addDependency('../../../js/src/bot/user.js', ['bot.user'], ['bot.dom', 'bot.events', 'goog.dom', 'goog.dom.TagName']);
 goog.addDependency('../../../js/src/bot/locators/locators.js', ['bot.locators'], ['bot', 'bot.locators.strategies', 'goog.array']);
 goog.addDependency('../../../js/src/bot/locators/strategies/classname.js', ['bot.locators.strategies.className'], ['goog.array', 'goog.dom', 'goog.string']);
 goog.addDependency('../../../js/src/bot/locators/strategies/css.js', ['bot.locators.strategies.css'], ['goog.array', 'goog.dom', 'goog.object', 'goog.string']);

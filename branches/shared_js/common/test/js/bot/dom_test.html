@@ -103,6 +103,29 @@
       assertFalse(bot.dom.isSelected(notSelected));
       assertFalse(bot.dom.isSelected(notChecky));
     }
+
+    function testShouldBeAbleToDetermineIfAnElementIsLocatedWithinHead() {
+      var head = goog.dom.getElementsByTagNameAndClass('HEAD')[0];
+      var title = goog.dom.getElementsByTagNameAndClass('TITLE')[0];
+      var selected = goog.dom.$('peas');
+      var notSelected = goog.dom.$('chips');
+
+      assertNotUndefined('head not found!', head);
+      assertNotUndefined('title not found!', title);
+
+      assertTrue(bot.dom.isInHead(head));
+      assertTrue(bot.dom.isInHead(title));
+      assertFalse(bot.dom.isInHead(document));
+      assertFalse(bot.dom.isInHead(document.body));
+      assertFalse(bot.dom.isInHead(document.documentElement));
+      assertFalse(bot.dom.isInHead(selected));
+      assertFalse(bot.dom.isInHead(notSelected));
+    }
+
+
+    function testAnElementNotAttachedToTheDomShouldNotBeConsideredInHead() {
+      assertFalse(bot.dom.isInHead(goog.dom.createElement('DIV')));
+    }
   </script>
 </head>
 <body>
