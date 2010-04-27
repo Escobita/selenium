@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview tmpnetwork.js contains some temporary networking functions
@@ -24,7 +36,6 @@ goog.provide('goog.net.tmpnetwork');
 
 goog.require('goog.Uri');
 goog.require('goog.net.ChannelDebug');
-goog.require('goog.userAgent');
 
 
 /**
@@ -54,7 +65,7 @@ goog.net.GOOGLECOM_TIMEOUT = 10000;
  * error.
  *
  * @param {Function} callback The function to call back with results.
- * @param {goog.Uri?} opt_imageUri The URI of an image to use for the
+ * @param {goog.Uri?=} opt_imageUri The URI of an image to use for the
  *     network test.  You *must* provide an image URI; the default behavior is
  *     provided for compatibility with existing code, but the GWS team does not
  *     want people using images served off of google.com for this purpose. The
@@ -81,7 +92,7 @@ goog.net.testGoogleCom = function(callback, opt_imageUri) {
  * @param {number} timeout Milliseconds before giving up.
  * @param {Function} callback Function to call with results.
  * @param {number} retries The number of times to retry.
- * @param {number} opt_pauseBetweenRetriesMS Optional number of milliseconds
+ * @param {number=} opt_pauseBetweenRetriesMS Optional number of milliseconds
  *     between retries - defaults to 0.
  */
 goog.net.testLoadImageWithRetries = function(url, timeout, callback, retries,
@@ -93,10 +104,8 @@ goog.net.testLoadImageWithRetries = function(url, timeout, callback, retries,
     callback(false);
     return;
   }
-  if (!opt_pauseBetweenRetriesMS) {
-    opt_pauseBetweenRetriesMS = 0;
-  }
 
+  var pauseBetweenRetries = opt_pauseBetweenRetriesMS || 0;
   retries--;
   goog.net.testLoadImage(url, timeout, function(succeeded) {
     if (succeeded) {
@@ -105,8 +114,8 @@ goog.net.testLoadImageWithRetries = function(url, timeout, callback, retries,
       // try again
       goog.global.setTimeout(function() {
         goog.net.testLoadImageWithRetries(url, timeout, callback, retries,
-            opt_pauseBetweenRetriesMS);
-        }, opt_pauseBetweenRetriesMS);
+            pauseBetweenRetries);
+        }, pauseBetweenRetries);
     }
   });
 };

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview This file contains a class for working with keyboard events
@@ -118,7 +130,7 @@ goog.require('goog.userAgent');
  * A wrapper around an element that you want to listen to keyboard events on.
  * XXX: {Document|Element} != {Element|Document}.
  * see: http://b/1470354
- * @param {Element|Document} opt_element The element or document to listen on.
+ * @param {Element|Document=} opt_element The element or document to listen on.
  * @constructor
  * @extends {goog.events.EventTarget}
  */
@@ -142,7 +154,7 @@ goog.events.KeyHandler.prototype.element_ = null;
 
 /**
  * The key for the key press listener.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.events.KeyHandler.prototype.keyPressKey_ = null;
@@ -150,7 +162,7 @@ goog.events.KeyHandler.prototype.keyPressKey_ = null;
 
 /**
  * The key for the key down listener.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.events.KeyHandler.prototype.keyDownKey_ = null;
@@ -158,7 +170,7 @@ goog.events.KeyHandler.prototype.keyDownKey_ = null;
 
 /**
  * The key for the key up listener.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.events.KeyHandler.prototype.keyUpKey_ = null;
@@ -396,6 +408,16 @@ goog.events.KeyHandler.prototype.handleEvent = function(e) {
   } finally {
     event.dispose();
   }
+};
+
+
+/**
+ * Returns the element listened on for the real keyboard events.
+ * @return {Element|Document|null} The element listened on for the real
+ *     keyboard events.
+ */
+goog.events.KeyHandler.prototype.getElement = function() {
+  return this.element_;
 };
 
 

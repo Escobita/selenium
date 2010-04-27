@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 // All Rights Reserved.
 
 /**
@@ -29,6 +41,7 @@ goog.require('goog.array');
 goog.require('goog.async.Delay');
 goog.require('goog.debug.Logger');
 goog.require('goog.dom');
+goog.require('goog.dom.Range');
 goog.require('goog.dom.TagName');
 goog.require('goog.dom.classes');
 goog.require('goog.editor.BrowserFeature');
@@ -36,6 +49,7 @@ goog.require('goog.editor.Command');
 goog.require('goog.editor.Plugin');
 goog.require('goog.editor.icontent');
 goog.require('goog.editor.icontent.FieldFormatInfo');
+goog.require('goog.editor.icontent.FieldStyleInfo');
 goog.require('goog.editor.node');
 goog.require('goog.editor.range');
 goog.require('goog.events');
@@ -44,7 +58,6 @@ goog.require('goog.events.EventHandler');
 goog.require('goog.events.EventType');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.functions');
-goog.require('goog.object');
 goog.require('goog.string');
 goog.require('goog.string.Unicode');
 goog.require('goog.style');
@@ -70,7 +83,7 @@ goog.require('goog.userAgent');
  *
  * @param {string} id An identifer for the field. This is used to find the
  *    field and the element associated with this field.
- * @param {Document} opt_doc The document that the element with the given
+ * @param {Document=} opt_doc The document that the element with the given
  *     id can be found in.  If not provided, the default document is used.
  * @constructor
  * @extends {goog.events.EventTarget}
@@ -292,7 +305,7 @@ goog.editor.Field.DEBOUNCE_TIME_MS_ = 500;
 /**
  * There is at most one "active" field at a time.  By "active" field, we mean
  * a field that has focus and is being used.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.editor.Field.activeFieldId_ = null;
@@ -325,7 +338,7 @@ goog.editor.Field.prototype.originalDomHelper;
 
 /**
  * Sets the active field id.
- * @param {string?} fieldId The active field id.
+ * @param {?string} fieldId The active field id.
  */
 goog.editor.Field.setActiveFieldId = function(fieldId) {
   goog.editor.Field.activeFieldId_ = fieldId;
@@ -333,7 +346,7 @@ goog.editor.Field.setActiveFieldId = function(fieldId) {
 
 
 /**
- * @return {string?} The id of the active field.
+ * @return {?string} The id of the active field.
  */
 goog.editor.Field.getActiveFieldId = function() {
   return goog.editor.Field.activeFieldId_;
@@ -401,9 +414,9 @@ goog.editor.Field.prototype.getOriginalElement = function() {
  * @param {string|Array.<string>} type Event type to listen for or array of
  *    event types, for example goog.events.EventType.KEYDOWN.
  * @param {Function} listener Function to be used as the listener.
- * @param {boolean} opt_capture Whether to use capture phase (optional,
+ * @param {boolean=} opt_capture Whether to use capture phase (optional,
  *    defaults to false).
- * @param {Object} opt_handler Object in whose scope to call the listener.
+ * @param {Object=} opt_handler Object in whose scope to call the listener.
  */
 goog.editor.Field.prototype.addListener = function(type, listener, opt_capture,
                                                   opt_handler) {
@@ -530,7 +543,7 @@ goog.editor.Field.prototype.resetOriginalElemProperties = function() {
  * Checks the modified state of the field.
  * Note: Changes that take place while the goog.editor.Field.EventType.CHANGE
  * event is stopped do not effect the modified state.
- * @param {boolean} opt_useIsEverModified Set to true to check if the field
+ * @param {boolean=} opt_useIsEverModified Set to true to check if the field
  *   has ever been modified since it was created, otherwise checks if the field
  *   has been modified since the last goog.editor.Field.EventType.DELAYEDCHANGE
  *   event was dispatched.
@@ -1043,7 +1056,7 @@ goog.editor.Field.POTENTIAL_SHORTCUT_KEYCODES_ = {
  * given arguments. This is short-circuiting: once one plugin cancels
  * the event, no more plugins will be invoked.
  * @param {goog.editor.Plugin.Op} op A plugin op.
- * @param {*} var_args The arguments to the plugin.
+ * @param {...*} var_args The arguments to the plugin.
  * @return {boolean} True if one of the plugins cancel the event, false
  *    otherwise.
  * @private
@@ -1072,7 +1085,7 @@ goog.editor.Field.prototype.invokeShortCircuitingOp_ = function(op, var_args) {
 /**
  * Invoke this operation on all plugins with the given arguments.
  * @param {goog.editor.Plugin.Op} op A plugin op.
- * @param {*} var_args The arguments to the plugin.
+ * @param {...*} var_args The arguments to the plugin.
  * @private
  */
 goog.editor.Field.prototype.invokeOp_ = function(op, var_args) {
@@ -1095,7 +1108,7 @@ goog.editor.Field.prototype.invokeOp_ = function(op, var_args) {
  * @param {string} arg The argument to reduce. For now, we assume it's a
  *     string, but we should widen this later if there are reducing
  *     plugins that don't operate on strings.
- * @param {*} var_args Any extra arguments to pass to the plugin. These args
+ * @param {...*} var_args Any extra arguments to pass to the plugin. These args
  *     will not be reduced.
  * @return {string} The reduced argument.
  * @private
@@ -1256,7 +1269,7 @@ goog.editor.Field.prototype.handleKeyboardShortcut_ = function(e) {
 /**
  * Executes an editing command as per the registered plugins.
  * @param {string} command The command to execute.
- * @param {Object|undefined} var_args Any additional parameters needed to
+ * @param {...*} var_args Any additional parameters needed to
  *     execute the command.
  * @return {Object|boolean} False if the command wasn't handled,
  *     otherwise, the result of the command.
@@ -1283,9 +1296,9 @@ goog.editor.Field.prototype.execCommand = function(command, var_args) {
 /**
  * Gets the value of command(s).
  * @param {string|Array.<string>} commands String name(s) of the command.
- * @return {string|Object} Value of each command. Returns false (or array of
- *     falses) if designMode is off or the field is otherwise uneditable,
- *     and there are no activeOnUneditable plugins for the command.
+ * @return {*} Value of each command. Returns false (or array of falses)
+ *     if designMode is off or the field is otherwise uneditable, and
+ *     there are no activeOnUneditable plugins for the command.
  */
 goog.editor.Field.prototype.queryCommandValue = function(commands) {
   var isEditable = this.isLoaded() && this.isSelectionEditable();
@@ -1407,7 +1420,7 @@ goog.editor.Field.prototype.handleDrop_ = function(e) {
 
 
 /**
- * @return {HTMLIFrameElement?} The iframe that's body is editable.
+ * @return {HTMLIFrameElement} The iframe that's body is editable.
  * @protected
  */
 goog.editor.Field.prototype.getEditableIframe = function() {
@@ -1443,7 +1456,7 @@ goog.editor.Field.prototype.getRange = function() {
 /**
  * Dispatch a selection change event, optionally caused by the given browser
  * event.
- * @param {goog.events.BrowserEvent} opt_e Optional browser event causing this
+ * @param {goog.events.BrowserEvent=} opt_e Optional browser event causing this
  *     event.
  */
 goog.editor.Field.prototype.dispatchSelectionChangeEvent = function(opt_e) {
@@ -1495,8 +1508,8 @@ goog.editor.Field.prototype.dispatchBeforeTab_ = function(e) {
  * Temporarily ignore change events. If the time has already been set, it will
  * fire immediately now.  Further setting of the timer is stopped and
  * dispatching of events is stopped until startChangeEvents is called.
- * @param {boolean} opt_stopChange Whether to ignore base change events.
- * @param {boolean} opt_stopDelayedChange Whether to ignore delayed change
+ * @param {boolean=} opt_stopChange Whether to ignore base change events.
+ * @param {boolean=} opt_stopDelayedChange Whether to ignore delayed change
  *     events.
  */
 goog.editor.Field.prototype.stopChangeEvents = function(opt_stopChange,
@@ -1517,8 +1530,9 @@ goog.editor.Field.prototype.stopChangeEvents = function(opt_stopChange,
 
 /**
  * Start change events again and fire once if desired.
- * @param {boolean} opt_fireChange Whether to fire the change event immediately.
- * @param {boolean} opt_fireDelayedChange Whether to fire the delayed change
+ * @param {boolean=} opt_fireChange Whether to fire the change event
+ *      immediately.
+ * @param {boolean=} opt_fireDelayedChange Whether to fire the delayed change
  *      event immediately.
  */
 goog.editor.Field.prototype.startChangeEvents = function(opt_fireChange,
@@ -1528,7 +1542,7 @@ goog.editor.Field.prototype.startChangeEvents = function(opt_fireChange,
     // In the case where change events were stopped and we're not firing
     // them on start, the user was trying to suppress all change or delayed
     // change events. Clear the change timer now while the events are still
-    // stopped so that it's firing doesn't fire a stopped change event, or
+    // stopped so that its firing doesn't fire a stopped change event, or
     // queue up a delayed change event that we were trying to stop.
     this.changeTimerGecko_.fireIfActive();
   }
@@ -1606,10 +1620,10 @@ goog.editor.Field.prototype.isEventStopped = function(eventType) {
  * {@code opt_preventDelayedChange}.
  *
  * @param {function()} func The function to call that will manipulate the dom.
- * @param {boolean} opt_preventDelayedChange Whether delayed change should be
+ * @param {boolean=} opt_preventDelayedChange Whether delayed change should be
  *      prevented after calling {@code func}. Defaults to always firing
  *      delayed change.
- * @param {Object} opt_handler Object in whose scope to call the listener.
+ * @param {Object=} opt_handler Object in whose scope to call the listener.
  */
 goog.editor.Field.prototype.manipulateDom = function(func,
     opt_preventDelayedChange, opt_handler) {
@@ -1639,7 +1653,7 @@ goog.editor.Field.prototype.manipulateDom = function(func,
 
 /**
  * Dispatches a command value change event.
- * @param {Array.<string>} opt_commands Commands whose state has
+ * @param {Array.<string>=} opt_commands Commands whose state has
  *     changed.
  */
 goog.editor.Field.prototype.dispatchCommandValueChange =
@@ -1659,7 +1673,7 @@ goog.editor.Field.prototype.dispatchCommandValueChange =
  * starts the appropriate timer for goog.editor.Field.EventType.DELAYEDCHANGE.
  * This also starts up change events again if they were stopped.
  *
- * @param {boolean} opt_noDelay True if
+ * @param {boolean=} opt_noDelay True if
  *      goog.editor.Field.EventType.DELAYEDCHANGE should be fired syncronously.
  */
 goog.editor.Field.prototype.dispatchChange = function(opt_noDelay) {
@@ -1938,11 +1952,11 @@ goog.editor.Field.prototype.getFieldCopy = function() {
  * Sets the contents of the field.
  * @param {boolean} addParas Boolean to specify whether to add paragraphs
  *    to long fields.
- * @param {string?} html html to insert.  If html=null, then this defaults
+ * @param {?string} html html to insert.  If html=null, then this defaults
  *    to a nsbp for mozilla and an empty string for IE.
- * @param {boolean} opt_dontFireDelayedChange True to make this content change
+ * @param {boolean=} opt_dontFireDelayedChange True to make this content change
  *    not fire a delayed change event.
- * @param {boolean} opt_applyLorem Whether to apply lorem ipsum styles.
+ * @param {boolean=} opt_applyLorem Whether to apply lorem ipsum styles.
  */
 goog.editor.Field.prototype.setHtml = function(
     addParas, html, opt_dontFireDelayedChange, opt_applyLorem) {
@@ -2000,7 +2014,7 @@ goog.editor.Field.prototype.setHtml = function(
 /**
  * Sets the inner HTML of the field. Works on both editable and
  * uneditable fields.
- * @param {string?} html The new inner HTML of the field.
+ * @param {?string} html The new inner HTML of the field.
  * @private
  */
 goog.editor.Field.prototype.setInnerHtml_ = function(html) {
@@ -2146,7 +2160,7 @@ goog.editor.Field.prototype.focus = function() {
  */
 goog.editor.Field.prototype.focusAndPlaceCursorAtStart = function() {
   // NOTE: Excluding Gecko to maintain existing behavior post refactoring
-  // placeCursorAtStart into it's own method. In Gecko browsers that currently
+  // placeCursorAtStart into its own method. In Gecko browsers that currently
   // have a selection the existing selection will be restored, otherwise it
   // will go to the start.
   // TODO: Refactor the code using this and related methods. We should
@@ -2166,39 +2180,25 @@ goog.editor.Field.prototype.focusAndPlaceCursorAtStart = function() {
  */
 goog.editor.Field.prototype.placeCursorAtStart = function() {
   var field = this.getElement();
-  var cursorPosition = field;
-
-  if (goog.editor.BrowserFeature.HAS_W3C_RANGES) {
-    if (field) {
-      cursorPosition = goog.editor.node.getLeftMostLeaf(field);
-      // NOTE:
-      // If the field does not itself have any children (for example, if the
-      // lorem ipsum plugin was not loaded) then getLeftMostLeaf will have
-      // returned the field itself.  We need to avoid calling placeCursorNextTo
-      // in that case, because that would result in a text node as a sibling of
-      // the field, which isn't what we want at all.  We also don't want to
-      // create a child text node and then call placeCursorNextTo, because that
-      // could result in two adjacent text nodes, which may crash some browsers.
-      // So instead, we'll add an empty text node and create a caret around it.
-      if (field == cursorPosition) {
-        var textNode = goog.dom.getDomHelper(cursorPosition).createTextNode('');
-        field.appendChild(textNode);
-        goog.dom.Range.createCaret(textNode, 0);
-        this.dispatchSelectionChangeEvent();
-        return;
-      }
+  if (field) {
+    var cursorPosition = goog.editor.node.getLeftMostLeaf(field);
+    if (field == cursorPosition) {
+      // The leftmost leaf we found was the field element itself (which likely
+      // means the field element is empty). We can't place the cursor next to
+      // the field element, so just place it at the beginning.
+      goog.dom.Range.createCaret(field, 0).select();
+    } else {
+      goog.editor.range.placeCursorNextTo(cursorPosition, true);
     }
+    this.dispatchSelectionChangeEvent();
   }
-
-  goog.editor.range.placeCursorNextTo(cursorPosition, true);
-  this.dispatchSelectionChangeEvent();
 };
 
 
 /**
  * Makes a field editable.
  *
- * @param {string} opt_iframeSrc URL to set the iframe src to if necessary.
+ * @param {string=} opt_iframeSrc URL to set the iframe src to if necessary.
  */
 goog.editor.Field.prototype.makeEditable = function(opt_iframeSrc) {
   this.loadState_ = goog.editor.Field.LoadState_.LOADING;
@@ -2221,7 +2221,7 @@ goog.editor.Field.prototype.makeEditable = function(opt_iframeSrc) {
 /**
  * Handles actually making something editable - creating necessary nodes,
  * injecting content, etc.
- * @param {string} opt_iframeSrc URL to set the iframe src to if necessary.
+ * @param {string=} opt_iframeSrc URL to set the iframe src to if necessary.
  * @protected
  */
 goog.editor.Field.prototype.makeEditableInternal = function(opt_iframeSrc) {
@@ -2265,7 +2265,7 @@ goog.editor.Field.prototype.handleFieldLoad = function() {
  * should check fieldOj.isModified() if they depend on the final change event.
  * Throws an error if the field is already uneditable.
  *
- * @param {boolean} opt_skipRestore True to prevent copying of editable field
+ * @param {boolean=} opt_skipRestore True to prevent copying of editable field
  *     contents back into the original node.
  */
 goog.editor.Field.prototype.makeUneditable = function(opt_skipRestore) {
@@ -2382,7 +2382,7 @@ goog.editor.Field.prototype.shouldLoadAsynchronously = function() {
  * Start the editable iframe creation process for Mozilla or IE whitebox.
  * The iframes load asynchronously.
  *
- * @param {string} opt_iframeSrc URL to set the iframe src to if necessary.
+ * @param {string=} opt_iframeSrc URL to set the iframe src to if necessary.
  * @private
  */
 goog.editor.Field.prototype.makeIframeField_ = function(opt_iframeSrc) {

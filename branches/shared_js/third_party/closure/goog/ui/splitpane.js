@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview  Class for splitting two areas with draggable control for
@@ -58,7 +70,7 @@ goog.require('goog.userAgent');
  * @param {goog.ui.Component} firstComponent Left or Top component.
  * @param {goog.ui.Component} secondComponent Right or Bottom component.
  * @param {goog.ui.SplitPane.Orientation} orientation SplitPane orientation.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @extends {goog.ui.Component}
  * @constructor
  */
@@ -154,7 +166,7 @@ goog.ui.SplitPane.prototype.splitDragger_ = null;
 
 /**
  * The left/top component dom container.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.SplitPane.prototype.firstComponentContainer_ = null;
@@ -162,7 +174,7 @@ goog.ui.SplitPane.prototype.firstComponentContainer_ = null;
 
 /**
  * The right/bottom component dom container.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.SplitPane.prototype.secondComponentContainer_ = null;
@@ -178,7 +190,7 @@ goog.ui.SplitPane.prototype.handleSize_ = 5;
 
 /**
  * The initial size (width or height) of the left or top component.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.SplitPane.prototype.initialSize_ = null;
@@ -188,7 +200,7 @@ goog.ui.SplitPane.prototype.initialSize_ = null;
  * The saved size (width or height) of the left or top component on a
  * double-click (snap).
  * This needs to be saved so it can be restored after another double-click.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.SplitPane.prototype.savedSnapSize_ = null;
@@ -196,7 +208,7 @@ goog.ui.SplitPane.prototype.savedSnapSize_ = null;
 
 /**
  * The first component size, so we don't change it on a window resize.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.SplitPane.prototype.firstComponentSize_ = null;
@@ -212,7 +224,7 @@ goog.ui.SplitPane.prototype.continuousResize_ = true;
 
 /**
  * Iframe overlay to prevent iframes from grabbing events.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.SplitPane.prototype.iframeOverlay_ = null;
@@ -223,7 +235,7 @@ goog.ui.SplitPane.prototype.iframeOverlay_ = null;
  * @enum {number}
  * @private
  */
-goog.ui.SplitPane.prototype.iframeOverlayIndex_ = {
+goog.ui.SplitPane.IframeOverlayIndex_ = {
   HIDDEN: -1,
   OVERLAY: 1,
   SPLITTER_HANDLE: 2
@@ -282,7 +294,8 @@ goog.ui.SplitPane.prototype.createDom = function() {
  */
 goog.ui.SplitPane.prototype.canDecorate = function(element) {
   var className = goog.ui.SplitPane.FIRST_CONTAINER_CLASS_NAME_;
-  var firstContainer = goog.dom.$$(null, className, element)[0];
+  var firstContainer = goog.dom.getElementsByTagNameAndClass(
+      null, className, element)[0];
   if (!firstContainer) {
     return false;
   }
@@ -291,14 +304,16 @@ goog.ui.SplitPane.prototype.canDecorate = function(element) {
   this.firstComponentContainer_ = firstContainer;
 
   className = goog.ui.SplitPane.SECOND_CONTAINER_CLASS_NAME_;
-  var secondContainer = goog.dom.$$(null, className, element)[0];
+  var secondContainer = goog.dom.getElementsByTagNameAndClass(
+      null, className, element)[0];
   if (!secondContainer) {
     return false;
   }
   this.secondComponentContainer_ = secondContainer;
 
   className = goog.ui.SplitPane.HANDLE_CLASS_NAME_;
-  var splitpaneHandle = goog.dom.$$(null, className, element)[0];
+  var splitpaneHandle = goog.dom.getElementsByTagNameAndClass(
+      null, className, element)[0];
   if (!splitpaneHandle) {
     return false;
   }
@@ -358,7 +373,7 @@ goog.ui.SplitPane.prototype.finishSetup_ = function() {
   handleStyle.position = 'absolute';
   handleStyle.overflow = 'hidden';
   handleStyle.zIndex =
-      goog.ui.SplitPane.prototype.iframeOverlayIndex_.SPLITTER_HANDLE;
+      goog.ui.SplitPane.IframeOverlayIndex_.SPLITTER_HANDLE;
 };
 
 
@@ -525,7 +540,7 @@ goog.ui.SplitPane.prototype.moveAndSize_ = function(element, rect) {
 
 
 /**
- * @return {number?} The size of the left/top component.
+ * @return {?number} The size of the left/top component.
  */
 goog.ui.SplitPane.prototype.getFirstComponentSize = function() {
   return this.firstComponentSize_;
@@ -535,7 +550,7 @@ goog.ui.SplitPane.prototype.getFirstComponentSize = function() {
 /**
  * Set the size of the left/top component, and resize the other component based
  * on that size and handle size.
- * @param {number?} opt_size The size of the top or left, in pixels.
+ * @param {?number=} opt_size The size of the top or left, in pixels.
  */
 goog.ui.SplitPane.prototype.setFirstComponentSize = function(opt_size) {
   var top = 0, left = 0;
@@ -719,7 +734,7 @@ goog.ui.SplitPane.prototype.handleDragStart_ = function(e) {
     this.getDomHelper().appendChild(this.getElement(), this.iframeOverlay_);
   }
   this.iframeOverlay_.style.zIndex =
-      goog.ui.SplitPane.prototype.iframeOverlayIndex_.OVERLAY;
+      goog.ui.SplitPane.IframeOverlayIndex_.OVERLAY;
 
   goog.style.setBorderBoxSize(this.iframeOverlay_,
       goog.style.getBorderBoxSize(this.getElement()));
@@ -804,7 +819,7 @@ goog.ui.SplitPane.prototype.handleDrag_ = function(e) {
 goog.ui.SplitPane.prototype.handleDragEnd_ = function(e) {
   // Push iframe overlay down.
   this.iframeOverlay_.style.zIndex =
-      goog.ui.SplitPane.prototype.iframeOverlayIndex_.HIDDEN;
+      goog.ui.SplitPane.IframeOverlayIndex_.HIDDEN;
   if (this.continuousResize_) {
     return;
   }

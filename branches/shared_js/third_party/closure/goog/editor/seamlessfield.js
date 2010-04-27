@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Class to encapsulate an editable field that blends in with
@@ -40,7 +52,6 @@ goog.require('goog.editor.node');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.style');
-goog.require('goog.userAgent');
 
 
 /**
@@ -50,7 +61,7 @@ goog.require('goog.userAgent');
  *
  * @param {string} id An identifer for the field. This is used to find the
  *     field and the element associated with this field.
- * @param {Document} opt_doc The document that the element with the given
+ * @param {Document=} opt_doc The document that the element with the given
  *     id can be found it.
  * @constructor
  * @extends {goog.editor.Field}
@@ -152,7 +163,7 @@ goog.editor.SeamlessField.prototype.handleOuterDocChange_ = function() {
 
 
 /**
- * Sizes the iframe to it's body's height.
+ * Sizes the iframe to its body's height.
  * @private
  */
 goog.editor.SeamlessField.prototype.sizeIframeToBodyHeightGecko_ = function() {
@@ -243,8 +254,8 @@ goog.editor.SeamlessField.getScrollbarThickness_ = function() {
 
 
 /**
- * Sizes the iframe to it's container div's width. The width of the div
- * is controlled by it's containing context, not by it's contents.
+ * Sizes the iframe to its container div's width. The width of the div
+ * is controlled by its containing context, not by its contents.
  * if it extends outside of it's contents, then it gets a horizontal scroll.
  * @private
  */
@@ -339,7 +350,7 @@ goog.editor.SeamlessField.prototype.iframeableCss_ = '';
 /**
  * Gets the css rules that should be used to style an iframe's body as if it
  * were the original element that we made editable.
- * @param {boolean} opt_forceRegeneration Set to true to not read the cached
+ * @param {boolean=} opt_forceRegeneration Set to true to not read the cached
  * copy and instead completely regenerate the css rules.
  * @return {string} The string containing the css rules to use.
  */
@@ -468,18 +479,18 @@ goog.editor.SeamlessField.prototype.dispatchBlur = function() {
 
   goog.editor.SeamlessField.superClass_.dispatchBlur.call(this);
 
-  // Only clear the selection on blur if doing fielded editing
-  // with an iframe
+  // Clear the selection and restore the current range back after collapsing
+  // it. The ideal solution would have been to just leave the range intact; but
+  // when there are multiple fields present on the page, its important that
+  // the selection isn't retained when we switch between the fields. We also
+  // have to make sure that the cursor position is retained when we tab in and
+  // out of a field and our approach addresses both these issues.
+  // Another point to note is that we do it on a setTimeout to allow for
+  // DOM modifications on blur. Otherwise, something like setLoremIpsum will
+  // leave a blinking cursor in the field even though it's blurred.
   if (!goog.editor.BrowserFeature.HAS_CONTENT_EDITABLE &&
       !goog.editor.BrowserFeature.CLEARS_SELECTION_WHEN_FOCUS_LEAVES) {
     var win = this.getEditableDomHelper().getWindow();
-    // Collapse the selection in the iframe on blur
-    // This is not the ideal solution, but it's the best we can get with
-    // iframes. Better than clearing the selection because when you tab into
-    // the field, at least your cursor will be in the right place.
-    // Do it on a setTimeout to allow for DOM modifications on blur
-    // Otherwise, something like setLoremIpsum will leave a blinking cursor
-    // in the field even though it's blurred.
     var dragging = false;
     goog.events.listenOnce(win.document.body, 'dragover',
         function() {
@@ -491,11 +502,25 @@ goog.editor.SeamlessField.prototype.dispatchBlur = function() {
       // but clearing the selection confuses Firefox's drag-and-drop
       // implementation. For more info, see http://b/1061064
       if (!dragging) {
-        // Since this is on a timeout, the window that contains the selection
-        // could be display: none in which case getSelection() returns null
         if (this.editableDomHelper) {
+          var rng = this.getRange();
+
+          // If there are multiple fields on a page, we need to make sure that
+          // the selection isn't retained when we switch between fields. We
+          // could have collapsed the range but there is a bug in GECKO where
+          // the selection stays highlighted even though its backing range is
+          // collapsed (http://b/1390115). To get around this, we clear the
+          // selection and restore the collapsed range back in. Restoring the
+          // range is important so that the cursor stays intact when we tab out
+          // and into a field (See http://b/1790301 for additional details on
+          // this).
           var iframeWindow = this.editableDomHelper.getWindow();
           goog.dom.Range.clearSelection(iframeWindow);
+
+          if (rng) {
+            rng.collapse(true);
+            rng.select();
+          }
         }
       }
     }, this), 0);
@@ -579,7 +604,7 @@ goog.editor.SeamlessField.prototype.attachIframe = function(iframe) {
   var dh = goog.dom.getDomHelper(field);
 
   // Grab the width/height values of the field before modifying any CSS
-  // as some of the modifications affect it's size (e.g. innerHTML='')
+  // as some of the modifications affect its size (e.g. innerHTML='')
   // Here, we set the size of the field to fixed so there's not too much
   // jiggling when we set the innerHTML of the field.
   var oldWidth = field.style.width;

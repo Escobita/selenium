@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2005 Google Inc. All Rights Reserved.
+// Copyright 2005 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Trogedit constants for browser features and quirks that should
@@ -21,6 +33,8 @@ goog.provide('goog.editor.BrowserFeature');
 
 goog.require('goog.editor.defines');
 goog.require('goog.userAgent');
+goog.require('goog.userAgent.product');
+goog.require('goog.userAgent.product.isVersion');
 
 
 /**
@@ -231,10 +245,6 @@ goog.editor.BrowserFeature = {
 
   CAN_LISTIFY_BR: !goog.userAgent.IE && !goog.userAgent.OPERA,
 
-  // Opera has a bad habit of making empty text nodes cause a newline
-  // (kind of like a <br>), but only in an editable element.
-  EMPTY_TEXT_NODES_ACT_LIKE_BR: goog.userAgent.OPERA,
-
   // See bug 1286408. When somewhere inside your selection there is an element
   // with a style attribute that sets the font size, if you change the font
   // size, the browser creates a font tag, but the font size in the style attr
@@ -242,7 +252,8 @@ goog.editor.BrowserFeature = {
   // attr.
   DOESNT_OVERRIDE_FONT_SIZE_IN_STYLE_ATTR: !goog.userAgent.WEBKIT,
 
-  // Changing the href of a link in IE automatically updates the anchor
-  // text too.  See http://b/issue?id=2182147.
-  SETTING_HREF_RESETS_ANCHOR_TEXT: goog.userAgent.IE
+  // Implements this spec about dragging files from the filesystem to the
+  // browser: http://www.whatwg/org/specs/web-apps/current-work/#dnd
+  SUPPORTS_HTML5_FILE_DRAGGING: goog.userAgent.product.CHROME &&
+      goog.userAgent.product.isVersion('4')
 };

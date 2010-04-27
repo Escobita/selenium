@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 
 /**
@@ -113,7 +125,7 @@ goog.ui.media.Vimeo.CSS_CLASS = goog.getCssName('goog-ui-media-vimeo');
  * except if you need more fine control over the configuration.
  *
  * @param {goog.ui.media.VimeoModel} dataModel A vimeo video URL.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper, used for
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @return {goog.ui.media.Media} A Control binded to the Vimeo renderer.
  */
@@ -166,8 +178,8 @@ goog.ui.media.Vimeo.prototype.getCssClass = function() {
  * parameters.
  *
  * @param {string} videoId The vimeo video id.
- * @param {string} opt_caption An optional caption of the vimeo video.
- * @param {string} opt_description An optional description of the vimeo video.
+ * @param {string=} opt_caption An optional caption of the vimeo video.
+ * @param {string=} opt_description An optional description of the vimeo video.
  * @constructor
  * @extends {goog.ui.media.MediaModel}
  */
@@ -209,8 +221,8 @@ goog.ui.media.VimeoModel.matcher_ = /http:\/\/(www\.)?vimeo.com\/([0-9]+)/i;
  * Takes a {@code vimeoUrl} and extracts the video id.
  *
  * @param {string} vimeoUrl A vimeo video URL.
- * @param {string} opt_caption An optional caption of the vimeo video.
- * @param {string} opt_description An optional description of the vimeo video.
+ * @param {string=} opt_caption An optional caption of the vimeo video.
+ * @param {string=} opt_description An optional description of the vimeo video.
  * @return {goog.ui.media.VimeoModel} The vimeo data model that represents this
  *     URL.
  * @throws exception in case the parsing fails

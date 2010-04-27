@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Bootstrap for the Google JS Library (Closure).
@@ -79,7 +91,7 @@ goog.LOCALE = 'en';  // default to en
  * Indicates whether or not we can call 'eval' directly to eval code in the
  * global scope. Set to a Boolean by the first call to goog.globalEval (which
  * empirically tests whether eval works for globals). @see goog.globalEval
- * @type {boolean?}
+ * @type {?boolean}
  * @private
  */
 goog.evalWorksForGlobals_ = null;
@@ -132,8 +144,8 @@ if (!COMPILED) {
  * "a.b.c" -> a = {};a.b={};a.b.c={};
  * Used by goog.provide and goog.exportSymbol.
  * @param {string} name name of the object that this file defines.
- * @param {Object} opt_object the object to expose at the end of the path.
- * @param {Object} opt_objectToExportTo The object to add the path to; default
+ * @param {*=} opt_object the object to expose at the end of the path.
+ * @param {Object=} opt_objectToExportTo The object to add the path to; default
  *     is |goog.global|.
  * @private
  */
@@ -173,9 +185,9 @@ goog.exportPath_ = function(name, opt_object, opt_objectToExportTo) {
  * function will not find renamed properties.
  *
  * @param {string} name The fully qualified name.
- * @param {Object} opt_obj The object within which to look; default is
+ * @param {Object=} opt_obj The object within which to look; default is
  *     |goog.global|.
- * @return {Object?} The object or, if not found, null.
+ * @return {Object} The object or, if not found, null.
  */
 goog.getObjectByName = function(name, opt_obj) {
   var parts = name.split('.');
@@ -195,7 +207,7 @@ goog.getObjectByName = function(name, opt_obj) {
  * Globalizes a whole namespace, such as goog or goog.lang.
  *
  * @param {Object} obj The namespace to globalize.
- * @param {Object} opt_global The object to add the properties to.
+ * @param {Object=} opt_global The object to add the properties to.
  * @deprecated Properties may be explicitly exported to the global scope, but
  *     this should no longer be done in bulk.
  */
@@ -273,13 +285,6 @@ goog.require = function(rule) {
 
 
 /**
- * Whether goog.require should throw an exception if it fails.
- * @type {boolean}
- */
-goog.useStrictRequires = false;
-
-
-/**
  * Path for included scripts
  * @type {string}
  */
@@ -311,7 +316,7 @@ goog.nullFunction = function() {};
 /**
  * The identity function. Returns its first argument.
  *
- * @param {*} var_args The arguments of the function.
+ * @param {...*} var_args The arguments of the function.
  * @return {*} The first argument.
  * @deprecated Use goog.functions.identity instead.
  */
@@ -503,7 +508,7 @@ if (!COMPILED) {
    * Looks at the dependency rules and tries to determine the script file that
    * fulfills a particular rule.
    * @param {string} rule In the form goog.namespace.Class or project.script.
-   * @return {string?} Url corresponding to the rule, or null.
+   * @return {?string} Url corresponding to the rule, or null.
    * @private
    */
   goog.getPathFromDeps_ = function(rule) {
@@ -789,62 +794,86 @@ goog.isObject = function(val) {
 
 
 /**
- * Adds a hash code field to an object. The hash code is unique for the
- * given object.
- * @param {Object} obj The object to get the hash code for.
- * @return {number} The hash code for the object.
+ * Gets a unique ID for an object. This mutates the object so that further
+ * calls with the same object as a parameter returns the same value. The unique
+ * ID is guaranteed to be unique across the current session amongst objects that
+ * are passed into {@code getUid}. There is no guarantee that the ID is unique
+ * or consistent across sessions.
+ *
+ * @param {Object} obj The object to get the unique ID for.
+ * @return {number} The unique ID for the object.
  */
-goog.getHashCode = function(obj) {
+goog.getUid = function(obj) {
+  // TODO: Make the type stricter, do not accept null.
+
   // In IE, DOM nodes do not extend Object so they do not have this method.
   // we need to check hasOwnProperty because the proto might have this set.
-
-  // TODO: There is a proposal to add hashcode as a global function to JS2
-  //            we should keep track of this process so we can use that whenever
-  //            it starts to show up in the real world.
-  if (obj.hasOwnProperty && obj.hasOwnProperty(goog.HASH_CODE_PROPERTY_)) {
-    return obj[goog.HASH_CODE_PROPERTY_];
+  if (obj.hasOwnProperty && obj.hasOwnProperty(goog.UID_PROPERTY_)) {
+    return obj[goog.UID_PROPERTY_];
   }
-  if (!obj[goog.HASH_CODE_PROPERTY_]) {
-    obj[goog.HASH_CODE_PROPERTY_] = ++goog.hashCodeCounter_;
+  if (!obj[goog.UID_PROPERTY_]) {
+    obj[goog.UID_PROPERTY_] = ++goog.uidCounter_;
   }
-  return obj[goog.HASH_CODE_PROPERTY_];
+  return obj[goog.UID_PROPERTY_];
 };
 
 
 /**
- * Removes the hash code field from an object.
- * @param {Object} obj The object to remove the field from.
+ * Removes the unique ID from an object. This is useful if the object was
+ * previously mutated using {@code goog.getUid} in which case the mutation is
+ * undone.
+ * @param {Object} obj The object to remove the unique ID field from.
  */
-goog.removeHashCode = function(obj) {
+goog.removeUid = function(obj) {
+  // TODO: Make the type stricter, do not accept null.
+
   // DOM nodes in IE are not instance of Object and throws exception
   // for delete. Instead we try to use removeAttribute
   if ('removeAttribute' in obj) {
-    obj.removeAttribute(goog.HASH_CODE_PROPERTY_);
+    obj.removeAttribute(goog.UID_PROPERTY_);
   }
   /** @preserveTry */
   try {
-    delete obj[goog.HASH_CODE_PROPERTY_];
+    delete obj[goog.UID_PROPERTY_];
   } catch (ex) {
   }
 };
 
 
 /**
- * Name for hash code property. Initialized in a way to help avoid collisions
+ * Name for unique ID property. Initialized in a way to help avoid collisions
  * with other closure javascript on the same page.
  * @type {string}
  * @private
  */
-goog.HASH_CODE_PROPERTY_ = 'closure_hashCode_' +
+goog.UID_PROPERTY_ = 'closure_uid_' +
     Math.floor(Math.random() * 2147483648).toString(36);
 
 
 /**
- * Counter for hash codes.
+ * Counter for UID.
  * @type {number}
  * @private
  */
-goog.hashCodeCounter_ = 0;
+goog.uidCounter_ = 0;
+
+
+/**
+ * Adds a hash code field to an object. The hash code is unique for the
+ * given object.
+ * @param {Object} obj The object to get the hash code for.
+ * @return {number} The hash code for the object.
+ * @deprecated Use goog.getUid instead.
+ */
+goog.getHashCode = goog.getUid;
+
+
+/**
+ * Removes the hash code field from an object.
+ * @param {Object} obj The object to remove the field from.
+ * @deprecated Use goog.removeUid instead.
+ */
+goog.removeHashCode = goog.removeUid;
 
 
 /**
@@ -901,7 +930,7 @@ Object.prototype.clone;
  * @param {Object|undefined} selfObj Specifies the object which |this| should
  *     point to when the function is run. If the value is null or undefined, it
  *     will default to the global object.
- * @param {*} var_args Additional arguments that are partially
+ * @param {...*} var_args Additional arguments that are partially
  *     applied to the function.
  *
  * @return {!Function} A partially-applied form of the function bind() was
@@ -936,7 +965,7 @@ goog.bind = function(fn, selfObj, var_args) {
  * g(arg3, arg4);
  *
  * @param {Function} fn A function to partially apply.
- * @param {*} var_args Additional arguments that are partially
+ * @param {...*} var_args Additional arguments that are partially
  *     applied to fn.
  * @return {!Function} A partially-applied form of the function bind() was
  *     invoked as a method of.
@@ -953,18 +982,19 @@ goog.partial = function(fn, var_args) {
 
 
 /**
- * Copies all the members of a source object to a target object.
+ * Copies all the members of a source object to a target object. This method
+ * does not work on all browsers for all objects that contain keys such as
+ * toString or hasOwnProperty. Use goog.object.extend for this purpose.
  * @param {Object} target Target.
  * @param {Object} source Source.
- * @deprecated Use goog.object.extend instead.
  */
 goog.mixin = function(target, source) {
   for (var x in source) {
     target[x] = source[x];
   }
 
-  // For IE the for-in-loop does not contain any properties that are not
-  // enumerable on the prototype object (for example, isPrototypeOf from
+  // For IE7 or lower, the for-in-loop does not contain any properties that are
+  // not enumerable on the prototype object (for example, isPrototypeOf from
   // Object.prototype) but also it will not include 'replace' on objects that
   // extend String and change 'replace' (not that it is common for anyone to
   // extend anything except Object).
@@ -1077,7 +1107,7 @@ goog.cssNameMapping_;
  * original, unobfuscated class name is inlined.
  *
  * @param {string} className The class name.
- * @param {string} opt_modifier A modifier to be appended to the class name.
+ * @param {string=} opt_modifier A modifier to be appended to the class name.
  * @return {string} The class name or the concatenation of the class name and
  *     the modifier.
  */
@@ -1117,7 +1147,7 @@ goog.setCssNameMapping = function(mapping) {
 /**
  * Abstract implementation of goog.getMsg for use with localized messages.
  * @param {string} str Translatable string, places holders in the form {$foo}.
- * @param {Object} opt_values Map of place holder name to value.
+ * @param {Object=} opt_values Map of place holder name to value.
  * @return {string} message with placeholders filled.
  */
 goog.getMsg = function(str, opt_values) {
@@ -1149,8 +1179,8 @@ goog.getMsg = function(str, opt_values) {
  *     new public.path.Foo().myMethod();
  *
  * @param {string} publicPath Unobfuscated name to export.
- * @param {Object} object Object the name should point to.
- * @param {Object} opt_objectToExportTo The object to add the path to; default
+ * @param {*} object Object the name should point to.
+ * @param {Object=} opt_objectToExportTo The object to add the path to; default
  *     is |goog.global|.
  */
 goog.exportSymbol = function(publicPath, object, opt_objectToExportTo) {
@@ -1164,7 +1194,7 @@ goog.exportSymbol = function(publicPath, object, opt_objectToExportTo) {
  * ex. goog.exportProperty(Foo.prototype, 'myMethod', Foo.prototype.myMethod);
  * @param {Object} object Object whose static property is being exported.
  * @param {string} publicName Unobfuscated name to export.
- * @param {Object} symbol Object the name should point to.
+ * @param {*} symbol Object the name should point to.
  */
 goog.exportProperty = function(object, publicName, symbol) {
   object[publicName] = symbol;
@@ -1209,6 +1239,64 @@ goog.inherits = function(childCtor, parentCtor) {
   childCtor.superClass_ = parentCtor.prototype;
   childCtor.prototype = new tempCtor();
   childCtor.prototype.constructor = childCtor;
+};
+
+
+/**
+ * Call up to the superclass.
+ *
+ * If this is called from a constructor, then this calls the superclass
+ * contructor with arguments 1-N.
+ *
+ * If this is called from a prototype method, then you must pass
+ * the name of the method as the second argument to this function. If
+ * you do not, you will get a runtime error. This calls the superclass'
+ * method with arguments 2-N.
+ *
+ * This function only works if you use goog.inherits to express
+ * inheritance relationships between your classes.
+ *
+ * This function is a compiler primitive. At compile-time, the
+ * compiler will do macro expansion to remove a lot of
+ * the extra overhead that this function introduces. The compiler
+ * will also enforce a lot of the assumptions that this function
+ * makes, and treat it as a compiler error if you break them.
+ *
+ * @param {!Object} me Should always be "this".
+ * @param {*=} opt_methodName The method name if calling a super method.
+ * @param {...*} var_args The rest of the arguments.
+ * @return {*} The return value of the superclass method.
+ */
+goog.base = function(me, opt_methodName, var_args) {
+  var caller = arguments.callee.caller;
+  if (caller.superClass_) {
+    // This is a constructor. Call the superclass constructor.
+    return caller.superClass_.constructor.apply(
+        me, Array.prototype.slice.call(arguments, 1));
+  }
+
+  var args = Array.prototype.slice.call(arguments, 2);
+  var foundCaller = false;
+  for (var ctor = me.constructor;
+       ctor; ctor = ctor.superClass_ && ctor.superClass_.constructor) {
+    if (ctor.prototype[opt_methodName] === caller) {
+      foundCaller = true;
+    } else if (foundCaller) {
+      return ctor.prototype[opt_methodName].apply(me, args);
+    }
+  }
+
+  // If we did not find the caller in the prototype chain,
+  // then one of two things happened:
+  // 1) The caller is an instance method.
+  // 2) This method was not called by the right caller.
+  if (me[opt_methodName] === caller) {
+    return me.constructor.prototype[opt_methodName].apply(me, args);
+  } else {
+    throw Error(
+        'goog.base called from a method of one name ' +
+        'to a method of a different name');
+  }
 };
 
 

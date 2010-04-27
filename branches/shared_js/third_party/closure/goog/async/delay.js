@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Defines a class useful for handling functions that must be
@@ -36,9 +48,9 @@ goog.require('goog.Timer');
  * the timer.
  *
  * @param {Function} listener Function to call when the delay completes.
- * @param {number} opt_interval The default length of the invocation delay (in
+ * @param {number=} opt_interval The default length of the invocation delay (in
  *     milliseconds).
- * @param {Object} opt_handler The object scope to invoke the function in.
+ * @param {Object=} opt_handler The object scope to invoke the function in.
  * @constructor
  * @extends {goog.Disposable}
  */
@@ -107,7 +119,7 @@ goog.async.Delay.prototype.disposeInternal = function() {
  * Starts the delay timer. The provided listener function will be called after
  * the specified interval. Calling start on an active timer will reset the
  * delay interval.
- * @param {number} opt_interval If specified, overrides the object's default
+ * @param {number=} opt_interval If specified, overrides the object's default
  *     interval with this one (in milliseconds).
  */
 goog.async.Delay.prototype.start = function(opt_interval) {

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Implementation of a progress bar.
@@ -35,7 +47,7 @@ goog.require('goog.userAgent');
 
 /**
  * This creates a progress bar object.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Component}
  */
@@ -163,8 +175,8 @@ goog.ui.ProgressBar.prototype.decorateInternal = function(element) {
       ORIENTATION_TO_CSS_NAME_[this.orientation_]);
 
   // find thumb
-  var thumb = goog.dom.$$(null, goog.getCssName('progress-bar-thumb'),
-      this.getElement())[0];
+  var thumb = goog.dom.getElementsByTagNameAndClass(
+      null, goog.getCssName('progress-bar-thumb'), this.getElement())[0];
   if (!thumb) {
     thumb = this.createThumb_();
     this.getElement().appendChild(thumb);
@@ -372,7 +384,7 @@ goog.ui.ProgressBar.prototype.disposeInternal = function() {
 
 
 /**
- * @return {number?} The step value used to determine how to round the value.
+ * @return {?number} The step value used to determine how to round the value.
  */
 goog.ui.ProgressBar.prototype.getStep = function() {
   return this.rangeModel_.getStep();
@@ -382,7 +394,7 @@ goog.ui.ProgressBar.prototype.getStep = function() {
 /**
  * Sets the step value. The step value is used to determine how to round the
  * value.
- * @param {number?} step  The step size.
+ * @param {?number} step  The step size.
  */
 goog.ui.ProgressBar.prototype.setStep = function(step) {
   this.rangeModel_.setStep(step);

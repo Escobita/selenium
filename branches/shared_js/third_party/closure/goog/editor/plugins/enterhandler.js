@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google, Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Plugin to handle enter keys.
@@ -24,7 +36,6 @@ goog.require('goog.dom.AbstractRange');
 goog.require('goog.dom.NodeOffset');
 goog.require('goog.dom.NodeType');
 goog.require('goog.dom.TagName');
-goog.require('goog.dom.classes');
 goog.require('goog.editor.BrowserFeature');
 goog.require('goog.editor.Plugin');
 goog.require('goog.editor.node');
@@ -410,7 +421,7 @@ goog.editor.plugins.EnterHandler.isBrElem = function(node) {
  * don't want to format the h2, but we do want to format the P that is
  * created on enter.  The P node is not available until keyup.
  * @param {goog.dom.TagName} tag The tag name to convert to.
- * @param {boolean} opt_keyUp Whether the function is being called on key up.
+ * @param {boolean=} opt_keyUp Whether the function is being called on key up.
  *     When called on key up, the cursor is in the newly created node, so the
  *     semantics for when to change it to a block are different.  Specifically,
  *     if the resulting node contains only a BR, it is converted to <tag>.
@@ -439,13 +450,17 @@ goog.editor.plugins.EnterHandler.prototype.ensureBlockIeOpera = function(tag,
 
   var paragraph;
   while (container && container != field) {
-    // We only need to ensure a block if we aren't already in the same block,
-    // or another block level node that we don't want to change the format of.
+    // We don't need to ensure a block if we are already in the same block, or
+    // in another block level node that we don't want to change the format of
+    // (unless we're handling keyUp and that block node just contains a BR).
     var nodeName = container.nodeName;
-    var doNotEnsureBlock =
-        goog.editor.plugins.EnterHandler.DO_NOT_ENSURE_BLOCK_NODES_[nodeName];
-    var isBr = goog.editor.plugins.EnterHandler.isBrElem(container);
-    if (nodeName == tag || (doNotEnsureBlock && (!opt_keyUp || !isBr))) {
+    // Due to @bug 2455389, the call to isBrElem needs to be inlined in the if
+    // instead of done before and saved in a variable, so that it can be
+    // short-circuited and avoid a weird IE edge case.
+    if (nodeName == tag ||
+        (goog.editor.plugins.EnterHandler.DO_NOT_ENSURE_BLOCK_NODES_[nodeName]
+         && !(opt_keyUp &&
+              goog.editor.plugins.EnterHandler.isBrElem(container)))) {
       // Opera can create a <p> inside of a <div> in some situations,
       // such as when breaking out of a list that is contained in a <div>.
       if (goog.userAgent.OPERA && paragraph) {
@@ -561,7 +576,7 @@ goog.editor.plugins.EnterHandler.prototype.deleteCursorSelectionIE_ =
 /**
  * Delete the selection at the current cursor position, then returns the node
  * at the current position.
- * @return {goog.editor.range.Point_} The current cursor position. Note that
+ * @return {goog.editor.range.Point} The current cursor position. Note that
  *    unlike simulateEnterIE_, this should not be removed from the DOM.
  * @private
  */

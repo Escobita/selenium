@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Zippy widget implementation.
@@ -28,6 +40,7 @@ goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 goog.require('goog.events.EventType');
 goog.require('goog.events.KeyCodes');
+goog.require('goog.style');
 
 
 /**
@@ -36,31 +49,51 @@ goog.require('goog.events.KeyCodes');
  *
  * @extends {goog.events.EventTarget}
  * @param {Element|string|null} header Header element, either element
- *                              reference, string id or null if no header
- *                              exists.
- * @param {Element|string} opt_content Content element (if any), either element
- *                         reference or string id.  If skipped, the caller
- *                         should handle the TOGGLE event in its own way.
- * @param {boolean} opt_expanded Initial expanded/visibility state. Defaults to
- *                  false.
+ *     reference, string id or null if no header exists.
+ * @param {Element|string|function():Element=} opt_content Content element
+ *     (if any), either element reference or string id.  If skipped, the caller
+ *     should handle the TOGGLE event in its own way. If a function is passed,
+ *     then if will be called to create the content element the first time the
+ *     zippy is expanded.
+ * @param {boolean=} opt_expanded Initial expanded/visibility state. Defaults to
+ *     false.
+ * @param {Element|string=} opt_expandedHeader Element to use as the header when
+ *     the zippy is expanded.
  * @constructor
  */
-goog.ui.Zippy = function(header, opt_content, opt_expanded) {
+goog.ui.Zippy = function(header, opt_content, opt_expanded,
+    opt_expandedHeader) {
   goog.events.EventTarget.call(this);
 
   /**
    * Header element or null if no header exists.
-   * @type {?Element}
+   * @type {Element}
    * @private
    */
   this.elHeader_ = goog.dom.getElement(header) || null;
 
   /**
-   * Content element.
-   * @type {?Element}
+   * When present, the header to use when the zippy is expanded.
+   * @type {Element}
    * @private
    */
-  this.elContent_ = opt_content ? goog.dom.getElement(opt_content) : null;
+  this.elExpandedHeader_ = goog.dom.getElement(opt_expandedHeader || null);
+
+  /**
+   * Function that will create the content element, or false if there is no such
+   * function.
+   * @type {?function():Element}
+   * @private
+   */
+  this.lazyCreateFunc_ = goog.isFunction(opt_content) ? opt_content : null;
+
+  /**
+   * Content element.
+   * @type {Element}
+   * @private
+   */
+  this.elContent_ = this.lazyCreateFunc_ || !opt_content ? null :
+      goog.dom.getElement(/** @type {Element} */ (opt_content));
 
   /**
    * Expanded state.
@@ -69,14 +102,19 @@ goog.ui.Zippy = function(header, opt_content, opt_expanded) {
    */
   this.expanded_ = opt_expanded == true;
 
-  if (this.elHeader_) {
-    // Listen for click and keydown events on header
-    this.elHeader_.tabIndex = 0;
-    goog.events.listen(this.elHeader_, goog.events.EventType.CLICK,
-        this.onHeaderClick_, false, this);
-    goog.events.listen(this.elHeader_, goog.events.EventType.KEYDOWN,
-        this.onHeaderKeyDown_, false, this);
+  var self = this;
+  function addHeaderEvents(el) {
+    if (el) {
+      // Listen for click and keydown events on header
+      el.tabIndex = 0;
+      goog.events.listen(el, goog.events.EventType.CLICK,
+          self.onHeaderClick_, false, self);
+      goog.events.listen(el, goog.events.EventType.KEYDOWN,
+          self.onHeaderKeyDown_, false, self);
+    }
   }
+  addHeaderEvents(this.elHeader_);
+  addHeaderEvents(this.elExpandedHeader_);
 
   // initialize based on expanded state
   this.setExpanded(this.expanded_);
@@ -99,6 +137,9 @@ goog.ui.Zippy.Events = {
 goog.ui.Zippy.prototype.disposeInternal = function() {
   if (this.elHeader_) {
     goog.events.removeAll(this.elHeader_);
+  }
+  if (this.elExpandedHeader_) {
+    goog.events.removeAll(this.elExpandedHeader_);
   }
   goog.ui.Zippy.superClass_.disposeInternal.call(this);
 };
@@ -133,13 +174,22 @@ goog.ui.Zippy.prototype.toggle = function() {
  * @param {boolean} expanded Expanded/visibility state.
  */
 goog.ui.Zippy.prototype.setExpanded = function(expanded) {
-
   if (this.elContent_) {
     // Hide the element, if one is provided.
-    this.elContent_.style.display = expanded ? '' : 'none';
+    goog.style.showElement(this.elContent_, expanded);
+  } else if (expanded && this.lazyCreateFunc_) {
+    // Assume that when the element is not hidden upon creation.
+    this.elContent_ = this.lazyCreateFunc_();
   }
-  // Update header image, if any.
-  this.updateHeaderClassName_(expanded);
+
+  if (this.elExpandedHeader_) {
+    // Hide the show header and show the hide one.
+    goog.style.showElement(this.elHeader_, !expanded);
+    goog.style.showElement(this.elExpandedHeader_, expanded);
+  } else {
+    // Update header image, if any.
+    this.updateHeaderClassName_(expanded);
+  }
 
   this.expanded_ = expanded;
 

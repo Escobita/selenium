@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utilities for string manipulation.
@@ -40,7 +52,7 @@ goog.string.Unicode = {
  * @return {boolean} True if {@code str} begins with {@code prefix}.
  */
 goog.string.startsWith = function(str, prefix) {
-  return str.indexOf(prefix) == 0;
+  return str.lastIndexOf(prefix, 0) == 0;
 };
 
 
@@ -52,7 +64,7 @@ goog.string.startsWith = function(str, prefix) {
  */
 goog.string.endsWith = function(str, suffix) {
   var l = str.length - suffix.length;
-  return l >= 0 && str.lastIndexOf(suffix, l) == l;
+  return l >= 0 && str.indexOf(suffix, l) == l;
 };
 
 
@@ -86,7 +98,7 @@ goog.string.caseInsensitiveEndsWith = function(str, suffix) {
  * Does simple python-style string substitution.
  * subs("foo%s hot%s", "bar", "dog") becomes "foobar hotdog".
  * @param {string} str The string containing the pattern.
- * @param {*} var_args The items to substitute into the pattern.
+ * @param {...*} var_args The items to substitute into the pattern.
  * @return {string} A copy of {@code str} in which each occurrence of
  *     {@code %s} has been replaced an argument from {@code var_args}.
  */
@@ -430,7 +442,7 @@ goog.string.urlDecode = function(str) {
 /**
  * Converts \n to <br>s or <br />s.
  * @param {string} str The string in which to convert newlines.
- * @param {boolean} opt_xml Whether to use XML compatible tags.
+ * @param {boolean=} opt_xml Whether to use XML compatible tags.
  * @return {string} A copy of {@code str} with converted newlines.
  */
 goog.string.newLineToBr = function(str, opt_xml) {
@@ -472,7 +484,7 @@ goog.string.newLineToBr = function(str, opt_xml) {
  * application grows the difference between the various methods would increase.
  *
  * @param {string} str string to be escaped.
- * @param {boolean} opt_isLikelyToContainHtmlChars Don't perform a check to see
+ * @param {boolean=} opt_isLikelyToContainHtmlChars Don't perform a check to see
  *     if the character needs replacing - use this option if you expect each of
  *     the characters to appear often. Leave false if you expect few html
  *     characters to occur in your strings, such as if you are escaping HTML.
@@ -636,7 +648,7 @@ goog.string.NORMALIZE_FN_ = 'normalize';
  * Do escaping of whitespace to preserve spatial formatting. We use character
  * entity #160 to make it safer for xml.
  * @param {string} str The string in which to escape whitespace.
- * @param {boolean} opt_xml Whether to use XML compatible tags.
+ * @param {boolean=} opt_xml Whether to use XML compatible tags.
  * @return {string} An escaped copy of {@code str}.
  */
 goog.string.whitespaceEscape = function(str, opt_xml) {
@@ -658,7 +670,6 @@ goog.string.whitespaceEscape = function(str, opt_xml) {
  * @param {string} str The string to strip.
  * @param {string} quoteChars The quote characters to strip.
  * @return {string} A copy of {@code str} without the quotes.
- *
  */
 goog.string.stripQuotes = function(str, quoteChars) {
   var length = quoteChars.length;
@@ -678,7 +689,7 @@ goog.string.stripQuotes = function(str, quoteChars) {
  * 'Hello World!' produces 'Hello W...'.
  * @param {string} str The string to truncate.
  * @param {number} chars Max number of characters.
- * @param {boolean} opt_protectEscapedCharacters Whether to protect escaped
+ * @param {boolean=} opt_protectEscapedCharacters Whether to protect escaped
  *     characters from being cut off in the middle.
  * @return {string} The truncated {@code str} string.
  */
@@ -704,7 +715,7 @@ goog.string.truncate = function(str, chars, opt_protectEscapedCharacters) {
  * and favoring the beginning of the string.
  * @param {string} str The string to truncate the middle of.
  * @param {number} chars Max number of characters.
- * @param {boolean} opt_protectEscapedCharacters Whether to protect escaped
+ * @param {boolean=} opt_protectEscapedCharacters Whether to protect escaped
  *     characters from being cutoff in the middle.
  * @return {string} A truncated copy of {@code str}.
  */
@@ -912,7 +923,7 @@ goog.string.repeat = function(string, length) {
  *
  * @param {number} num The number to pad.
  * @param {number} length The desired length.
- * @param {number} opt_precision The desired precision.
+ * @param {number=} opt_precision The desired precision.
  * @return {string} {@code num} as a string with the given options.
  */
 goog.string.padNumber = function(num, length, opt_precision) {
@@ -947,7 +958,7 @@ goog.string.makeSafe = function(obj) {
  * <pre>buildString('a', 'b', 'c', 'd') -> 'abcd'
  * buildString(null, undefined) -> ''
  * </pre>
- * @param {*} var_args A list of strings to concatenate. If not a string,
+ * @param {...*} var_args A list of strings to concatenate. If not a string,
  *     it will be casted to one.
  * @return {string} The concatenation of {@code var_args}.
  */
@@ -967,8 +978,7 @@ goog.string.buildString = function(var_args) {
  */
 goog.string.getRandomString = function() {
   return Math.floor(Math.random() * 2147483648).toString(36) +
-         (Math.floor(Math.random() * 2147483648) ^
-          (new Date).getTime()).toString(36);
+         (Math.floor(Math.random() * 2147483648) ^ goog.now()).toString(36);
 };
 
 
@@ -1081,17 +1091,16 @@ goog.string.hashCode = function(str) {
 
 
 /**
- * The most recent globally unique ID.
+ * The most recent unique ID. |0 is equivalent to Math.floor in this case.
  * @type {number}
  * @private
  */
-goog.string.uniqueStringCounter_ = goog.now();
+goog.string.uniqueStringCounter_ = Math.random() * 0x80000000 | 0;
 
 
 /**
- * Generates and returns a unique string based on the current date so strings
- * remain unique between sessions.  This is useful, for example, to create
- * unique IDs for DOM elements.
+ * Generates and returns a string which is unique in the current document.
+ * This is useful, for example, to create unique IDs for DOM elements.
  * @return {string} A unique id.
  */
 goog.string.createUniqueString = function() {

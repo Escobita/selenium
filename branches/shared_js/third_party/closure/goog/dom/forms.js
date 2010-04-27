@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utilities for manipulating a form and elements.
@@ -25,7 +37,7 @@ goog.require('goog.structs.Map');
  * Returns form data as a map of name to value arrays. This doesn't
  * support file inputs.
  * @param {HTMLFormElement} form The form.
- * @return {goog.structs.Map} A map of the form data as form name to arrays of
+ * @return {!goog.structs.Map} A map of the form data as form name to arrays of
  *     values.
  */
 goog.dom.forms.getFormDataMap = function(form) {
@@ -271,7 +283,7 @@ goog.dom.forms.getValueByName = function(form, name) {
 /**
  * Gets the current value of a checkable input element.
  * @param {Element} el The element.
- * @return {string?} The value of the form element (or null).
+ * @return {?string} The value of the form element (or null).
  * @private
  */
 goog.dom.forms.getInputChecked_ = function(el) {
@@ -282,7 +294,7 @@ goog.dom.forms.getInputChecked_ = function(el) {
 /**
  * Gets the current value of a select-one element.
  * @param {Element} el The element.
- * @return {string?} The value of the form element (or null).
+ * @return {?string} The value of the form element (or null).
  * @private
  */
 goog.dom.forms.getSelectSingle_ = function(el) {
@@ -311,7 +323,7 @@ goog.dom.forms.getSelectMultiple_ = function(el) {
 /**
  * Sets the current value of any element with a type.
  * @param {Element} el The element.
- * @param {string|Array} opt_value The value to give to the element.
+ * @param {string|Array=} opt_value The value to give to the element.
  */
 goog.dom.forms.setValue = function(el, opt_value) {
   var type = el.type;
@@ -343,7 +355,7 @@ goog.dom.forms.setValue = function(el, opt_value) {
  * the value property but my hunch is that the primary use case is to check a
  * checkbox, not to reset its value property.
  * @param {Element} el The element.
- * @param {string|boolean} opt_value The value, sets the element checked if
+ * @param {string|boolean=} opt_value The value, sets the element checked if
  *     val is set.
  * @private
  */
@@ -355,7 +367,7 @@ goog.dom.forms.setInputChecked_ = function(el, opt_value) {
 /**
  * Sets the value of a select-one element.
  * @param {Element} el The element.
- * @param {string} opt_value The value of the selected option element.
+ * @param {string=} opt_value The value of the selected option element.
  * @private
  */
 goog.dom.forms.setSelectSingle_ = function(el, opt_value) {
@@ -375,7 +387,7 @@ goog.dom.forms.setSelectSingle_ = function(el, opt_value) {
 /**
  * Sets the value of a select-multiple element.
  * @param {Element} el The element.
- * @param {Array.<string>|string} opt_value The value of the selected option
+ * @param {Array.<string>|string=} opt_value The value of the selected option
  *     element(s).
  * @private
  */

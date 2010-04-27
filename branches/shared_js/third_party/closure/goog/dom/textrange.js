@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utilities for working with text ranges in HTML documents.
@@ -47,7 +59,7 @@ goog.inherits(goog.dom.TextRange, goog.dom.AbstractRange);
  * Create a new range wrapper from the given browser range object.  Do not use
  * this method directly - please use goog.dom.Range.createFrom* instead.
  * @param {Range|TextRange} range The browser range object.
- * @param {boolean} opt_isReversed Whether the focus node is before the anchor
+ * @param {boolean=} opt_isReversed Whether the focus node is before the anchor
  *     node.
  * @return {goog.dom.TextRange} A range wrapper object.
  */
@@ -61,7 +73,7 @@ goog.dom.TextRange.createFromBrowserRange = function(range, opt_isReversed) {
  * Create a new range wrapper from the given browser range wrapper.
  * @param {goog.dom.browserrange.AbstractRange} browserRange The browser range
  *     wrapper.
- * @param {boolean} opt_isReversed Whether the focus node is before the anchor
+ * @param {boolean=} opt_isReversed Whether the focus node is before the anchor
  *     node.
  * @return {goog.dom.TextRange} A range wrapper object.
  * @private
@@ -82,7 +94,7 @@ goog.dom.TextRange.createFromBrowserRangeWrapper_ = function(browserRange,
  * Create a new range wrapper that selects the given node's text.  Do not use
  * this method directly - please use goog.dom.Range.createFrom* instead.
  * @param {Node} node The node to select.
- * @param {boolean} opt_isReversed Whether the focus node is before the anchor
+ * @param {boolean=} opt_isReversed Whether the focus node is before the anchor
  *     node.
  * @return {goog.dom.TextRange} A range wrapper object.
  */
@@ -157,7 +169,7 @@ goog.dom.TextRange.prototype.browserRangeWrapper_ = null;
 /**
  * The start node of the range.  This can be null if one of the other
  * representations of the range is specified.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.TextRange.prototype.startNode_ = null;
@@ -166,7 +178,7 @@ goog.dom.TextRange.prototype.startNode_ = null;
 /**
  * The start offset of the range.  This can be null if one of the other
  * representations of the range is specified.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.dom.TextRange.prototype.startOffset_ = null;
@@ -175,7 +187,7 @@ goog.dom.TextRange.prototype.startOffset_ = null;
 /**
  * The end node of the range.  This can be null if one of the other
  * representations of the range is specified.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.TextRange.prototype.endNode_ = null;
@@ -184,7 +196,7 @@ goog.dom.TextRange.prototype.endNode_ = null;
 /**
  * The end offset of the range.  This can be null if one of the other
  * representations of the range is specified.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.dom.TextRange.prototype.endOffset_ = null;
@@ -456,7 +468,7 @@ goog.dom.TextRange.prototype.getPastableHtml = function() {
 /**
  * Returns a TextRangeIterator over the contents of the range.  Regardless of
  * the direction of the range, the iterator will move in document order.
- * @param {boolean} opt_keys Unused for this iterator.
+ * @param {boolean=} opt_keys Unused for this iterator.
  * @return {goog.dom.TextRangeIterator} An iterator over tags in the range.
  */
 goog.dom.TextRange.prototype.__iterator__ = function(opt_keys) {
@@ -486,9 +498,9 @@ goog.dom.TextRange.prototype.removeContents = function() {
  * clone of the specified element (on IE).  Returns a reference to the
  * surrounding element if the operation was successful; returns null if the
  * operation failed.
- * @param {Element?} element The element with which the selection is to be
+ * @param {Element} element The element with which the selection is to be
  *    surrounded.
- * @return {Element?} The surrounding element (same as the argument on Mozilla,
+ * @return {Element} The surrounding element (same as the argument on Mozilla,
  *    but not on IE), or null if unsuccessful.
  */
 goog.dom.TextRange.prototype.surroundContents = function(element) {

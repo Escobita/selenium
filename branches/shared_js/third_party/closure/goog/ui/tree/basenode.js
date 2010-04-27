@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the goog.ui.tree.BaseNode class.
@@ -25,6 +37,7 @@ goog.provide('goog.ui.tree.BaseNode');
 goog.provide('goog.ui.tree.BaseNode.EventType');
 
 goog.require('goog.Timer');
+goog.require('goog.asserts');
 goog.require('goog.dom.a11y');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.string');
@@ -37,10 +50,10 @@ goog.require('goog.userAgent');
  * An abstract base class for a node in the tree.
  *
  * @param {string} html The html content of the node label.
- * @param {Object} opt_config The configuration for the tree. See
+ * @param {Object=} opt_config The configuration for the tree. See
  *    goog.ui.tree.TreeControl.DefaultConfig. If not specified, a default config
  *    will be used.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Component}
  */
@@ -55,15 +68,15 @@ goog.ui.tree.BaseNode = function(html, opt_config, opt_domHelper) {
   this.config_ = opt_config || goog.ui.tree.TreeControl.defaultConfig;
 
   /**
-   * Html content of the node label.
+   * HTML content of the node label.
    * @type {string}
    * @private
    */
-  this.html_ = html || this.config_.defaultHtml;
+  this.html_ = html;
 
   /**
    * Extra data associated with the node.
-   * @type {Object?}
+   * @type {Object}
    * @private
    */
   this.clientData_ = null;
@@ -120,7 +133,7 @@ goog.ui.tree.BaseNode.prototype.expanded_ = false;
 
 /**
  * Tooltip for the tree item
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.ui.tree.BaseNode.prototype.toolTip_ = null;
@@ -253,96 +266,102 @@ goog.ui.tree.BaseNode.prototype.enterDocument = function() {
 
 
 /**
+ * The method assumes that the child doesn't have parent node yet.
+ * The {@code opt_render} argument is not used. If the parent node is expanded,
+ * the child node's state will be the same as the parent's. Otherwise the
+ * child's DOM tree won't be created.
+ * @override
+ */
+goog.ui.tree.BaseNode.prototype.addChildAt = function(child, index,
+    opt_render) {
+  goog.asserts.assert(!child.getParent());
+  var prevNode = this.getChildAt(index - 1);
+  var nextNode = this.getChildAt(index);
+
+  goog.ui.tree.BaseNode.superClass_.addChildAt.call(this, child, index);
+
+  child.previousSibling_ = prevNode;
+  child.nextSibling_ = nextNode;
+
+  if (prevNode) {
+    prevNode.nextSibling_ = child;
+  } else {
+    this.firstChild_ = child;
+  }
+  if (nextNode) {
+    nextNode.previousSibling_ = child;
+  } else {
+    this.lastChild_ = child;
+  }
+
+  var tree = this.getTree();
+  if (tree) {
+    child.setTreeInternal(tree);
+  }
+
+  child.setDepth_(this.getDepth() + 1);
+
+  if (this.getElement() && (!tree || !tree.getSuspendRedraw())) {
+    this.updateExpandIcon();
+    if (this.getExpanded()) {
+      var el = this.getChildrenElement();
+      if (!child.getElement()) {
+        child.createDom();
+      }
+      var childElement = child.getElement();
+      var nextElement = nextNode && nextNode.getElement();
+      el.insertBefore(childElement, nextElement);
+
+      if (this.isInDocument()) {
+        child.enterDocument();
+      }
+
+      if (!nextNode) {
+        if (prevNode) {
+          prevNode.updateExpandIcon();
+        } else {
+          goog.style.showElement(el, true);
+          this.setExpanded(this.getExpanded());
+        }
+      }
+    }
+  }
+};
+
+
+/**
  * Adds a node as a child to the current node.
  * @param {goog.ui.tree.BaseNode} child The child to add.
- * @param {goog.ui.tree.BaseNode} opt_before If specified, the new child is
+ * @param {goog.ui.tree.BaseNode=} opt_before If specified, the new child is
  *    added as a child before this one. If not specified, it's appended to the
  *    end.
  * @return {goog.ui.tree.BaseNode} The added child.
  */
 goog.ui.tree.BaseNode.prototype.add = function(child, opt_before) {
-  var oldLast;
-  var emptyBefore = this.getChildCount() == 0;
-  var parent = child.getParent();
-  var before = opt_before;
-
-  if (!before) { // append
-    if (parent != null) {
-      parent.remove(child);
-    }
-    oldLast = this.getLastChild();
-    this.addChild(child);
-  } else { // insertBefore
-    if (opt_before.getParent() != this) {
-      throw Error('Can only add nodes before siblings');
-    }
-    if (parent != null) {
-      parent.remove(child);
-    }
-    this.addChildAt(child, this.indexOfChild(before));
+  goog.asserts.assert(!opt_before || opt_before.getParent() == this,
+      'Can only add nodes before siblings');
+  if (child.getParent()) {
+    child.getParent().removeChild(child);
   }
-
-  if (before) {
-    if (before == this.firstChild_) {
-      this.firstChild_ = child;
-      child.previousSibling_ = null;
-    }
-    if (before.previousSibling_) {
-      child.previousSibling_ = before.previousSibling_;
-      before.previousSibling_.nextSibling_ = child;
-    }
-    before.previousSibling_ = child;
-    child.nextSibling_ = before;
-  } else {
-    if (!this.firstChild_) {
-      this.firstChild_ = child;
-      child.previousSibling_ = null;
-    }
-    if (this.lastChild_) {
-      this.lastChild_.nextSibling_ = child;
-    }
-    child.previousSibling_ = this.lastChild_;
-    child.nextSibling_ = null;
-    this.lastChild_ = child;
-  }
-
-  var t = this.getTree();
-  if (t) {
-    child.setTreeInternal(t);
-  }
-  child.setDepth_(this.getDepth() + 1);
-
-  if (this.isInDocument() && !t.getSuspendRedraw()) {
-    var el = this.getChildrenElement();
-
-    var newEl = child.getElement() || child.createDom();
-    var refEl = before ? before.getElement() : null;
-    el.insertBefore(newEl, refEl);
-    if (this.isInDocument()) {
-      child.enterDocument();
-    }
-
-    if (oldLast) {
-      oldLast.updateExpandIcon();
-    }
-    if (emptyBefore) {
-      el.style.display = '';
-      this.setExpanded(this.getExpanded());
-      // if we are using classic expand will not update icon
-      if (t && t.getBehavior() != 'classic')
-        this.updateIcon();
-    }
-  }
+  this.addChildAt(child,
+      opt_before ? this.indexOfChild(opt_before) : this.getChildCount());
   return child;
 };
 
 
 /**
  * Removes a child. The caller is responsible for disposing the node.
- * @param {goog.ui.tree.BaseNode} child The child to remove.
+ * @param {goog.ui.Component|string} childNode The child to remove. Must be a
+ *     {@link goog.ui.tree.BaseNode}.
+ * @param {boolean=} opt_unrender Unused. The child will always be unrendered.
  * @return {goog.ui.tree.BaseNode} The child that was removed.
+ * @override
  */
-goog.ui.tree.BaseNode.prototype.remove = function(child) {
+goog.ui.tree.BaseNode.prototype.removeChild =
+    function(childNode, opt_unrender) {
+  // In reality, this only accepts BaseNodes.
+  var child = /** @type {goog.ui.tree.BaseNode} */ (childNode);
+
   // if we remove selected or tree with the selected we should select this
   var tree = this.getTree();
   var selectedItem = tree ? tree.getSelectedItem() : null;
@@ -358,7 +377,7 @@ goog.ui.tree.BaseNode.prototype.remove = function(child) {
   if (child.getParent() != this) {
     throw Error('Can only remove children');
   }
-  this.removeChild(child.getId());
+  goog.ui.tree.BaseNode.superClass_.removeChild.call(this, child);
 
   if (this.lastChild_ == child) {
     this.lastChild_ = child.previousSibling_;
@@ -408,6 +427,13 @@ goog.ui.tree.BaseNode.prototype.remove = function(child) {
 
   return child;
 };
+
+
+/**
+ * @deprecated Use {@link #removeChild}.
+ */
+goog.ui.tree.BaseNode.prototype.remove =
+    goog.ui.tree.BaseNode.prototype.removeChild;
 
 
 /**
@@ -610,9 +636,6 @@ goog.ui.tree.BaseNode.prototype.setSelectedInternal_ = function(selected) {
 
   this.updateRow();
   var tree = this.getTree();
-  if (tree.getBehavior() != 'classic') {
-    this.updateIcon();
-  }
 
   var el = this.getElement();
   if (el) {
@@ -646,7 +669,6 @@ goog.ui.tree.BaseNode.prototype.setExpanded = function(b) {
                           goog.ui.tree.BaseNode.EventType.BEFORE_COLLAPSE);
     if (prevented) return;
   }
-
   var ce;
   this.expanded_ = b;
   var t = this.getTree();
@@ -683,7 +705,7 @@ goog.ui.tree.BaseNode.prototype.setExpanded = function(b) {
       ce.style.display = 'none';
     }
   }
-  if (t && t.getBehavior() == 'classic') {
+  if (t) {
     this.updateIcon();
   }
   if (el) {
@@ -1060,7 +1082,7 @@ goog.ui.tree.BaseNode.prototype.getRowElement = function() {
 
 
 /**
- * @return {Element?} The expanded icon element.
+ * @return {Element} The expanded icon element.
  */
 goog.ui.tree.BaseNode.prototype.getExpandIconElement = function() {
   var el = this.getRowElement();
@@ -1069,7 +1091,7 @@ goog.ui.tree.BaseNode.prototype.getExpandIconElement = function() {
 
 
 /**
- * @return {Element?} The icon element.
+ * @return {Element} The icon element.
  */
 goog.ui.tree.BaseNode.prototype.getIconElement = function() {
   var el = this.getRowElement();
@@ -1078,7 +1100,7 @@ goog.ui.tree.BaseNode.prototype.getIconElement = function() {
 
 
 /**
- * @return {Element?} The label element.
+ * @return {Element} The label element.
  */
 goog.ui.tree.BaseNode.prototype.getLabelElement = function() {
   var el = this.getRowElement();
@@ -1090,7 +1112,7 @@ goog.ui.tree.BaseNode.prototype.getLabelElement = function() {
 
 
 /**
- * @return {Element?} The element after the label.
+ * @return {Element} The element after the label.
  */
 goog.ui.tree.BaseNode.prototype.getAfterLabelElement = function() {
   var el = this.getRowElement();
@@ -1099,7 +1121,7 @@ goog.ui.tree.BaseNode.prototype.getAfterLabelElement = function() {
 
 
 /**
- * @return {Element?} The div containing the children.
+ * @return {Element} The div containing the children.
  */
 goog.ui.tree.BaseNode.prototype.getChildrenElement = function() {
   var el = this.getElement();
@@ -1210,7 +1232,7 @@ goog.ui.tree.BaseNode.prototype.setToolTip = function(s) {
 
 /**
  * Returns the text of the tooltip.
- * @return {string?} The tooltip text.
+ * @return {?string} The tooltip text.
  */
 goog.ui.tree.BaseNode.prototype.getToolTip = function() {
   return this.toolTip_;
@@ -1302,9 +1324,7 @@ goog.ui.tree.BaseNode.prototype.onMouseDown = function(e) {
  * @param {goog.events.BrowserEvent} e The browser event.
  * @private
  */
-goog.ui.tree.BaseNode.prototype.onClick_ = function(e) {
-  e.preventDefault();
-};
+goog.ui.tree.BaseNode.prototype.onClick_ = goog.events.Event.preventDefault;
 
 
 /**
@@ -1431,7 +1451,7 @@ goog.ui.tree.BaseNode.prototype.getNextShownNode = function() {
   } else {
     var p = this;
     var next;
-    while (p != null) {
+    while (p != this.getTree()) {
       next = p.getNextSibling();
       if (next != null) {
         return next;
@@ -1461,7 +1481,7 @@ goog.ui.tree.BaseNode.prototype.getPreviousShownNode = function() {
 
 
 /**
- * @return {Object?} Data set by the client.
+ * @return {Object} Data set by the client.
  */
 goog.ui.tree.BaseNode.prototype.getClientData = function() {
   return this.clientData_;

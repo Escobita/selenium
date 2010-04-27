@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview A combo box control that allows user input with
@@ -23,10 +35,8 @@ goog.provide('goog.ui.ComboBox');
 goog.provide('goog.ui.ComboBoxItem');
 
 goog.require('goog.Timer');
-goog.require('goog.array');
 goog.require('goog.debug.Logger');
 goog.require('goog.dom.classes');
-goog.require('goog.dom.selection');
 goog.require('goog.events');
 goog.require('goog.events.InputHandler');
 goog.require('goog.events.KeyCodes');
@@ -43,7 +53,7 @@ goog.require('goog.userAgent');
 
 /**
  * A ComboBox control.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @extends {goog.ui.Component}
  * @constructor
  */
@@ -93,7 +103,7 @@ goog.ui.ComboBox.prototype.inputHandler_ = null;
 
 /**
  * The last input token.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.ui.ComboBox.prototype.lastToken_ = null;
@@ -125,7 +135,7 @@ goog.ui.ComboBox.prototype.visibleCount_ = -1;
 
 /**
  * The input element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.ComboBox.prototype.input_ = null;
@@ -142,7 +152,7 @@ goog.ui.ComboBox.prototype.matchFunction_ = goog.string.startsWith;
 
 /**
  * Element used as the combo boxes button.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.ComboBox.prototype.button_ = null;
@@ -166,7 +176,7 @@ goog.ui.ComboBox.prototype.fieldName_ = '';
 
 /**
  * Timer identifier for delaying the dismissal of the combo menu.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.ComboBox.prototype.dismissTimer_ = null;
@@ -792,8 +802,8 @@ goog.ui.ComboBox.prototype.isItemSticky_ = function(item) {
 /**
  * Class for combo box items.
  * @param {string} caption Text caption for the menu item.
- * @param {Object} opt_data Identifying data for the menu item.
- * @param {goog.dom.DomHelper} opt_domHelper Optional dom helper used for dom
+ * @param {Object=} opt_data Identifying data for the menu item.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional dom helper used for dom
  *     interactions.
  * @constructor
  * @extends {goog.ui.MenuItem}

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Class for managing the interactions between an
@@ -108,11 +120,11 @@ goog.require('goog.ui.AutoComplete');
  * Class for managing the interaction between an auto-complete object and a
  * text-input or textarea.
  *
- * @param {?string} opt_separators Separators to split multiple entries.
- * @param {?string} opt_literals Characters used to delimit text literals.
- * @param {?boolean} opt_multi Whether to allow multiple entries
+ * @param {?string=} opt_separators Separators to split multiple entries.
+ * @param {?string=} opt_literals Characters used to delimit text literals.
+ * @param {?boolean=} opt_multi Whether to allow multiple entries
  *     (Default: true).
- * @param {?number} opt_throttleTime Number of milliseconds to throttle
+ * @param {?number=} opt_throttleTime Number of milliseconds to throttle
  *     keyevents with (Default: 150). Use -1 to disable updates on typing. Note
  *     that typing the separator will update autocomplete suggestions.
  * @constructor
@@ -233,7 +245,7 @@ goog.ui.AutoComplete.InputHandler.prototype.defaultSeparator_;
 
 /**
  * Regular expression used from trimming tokens or null for no trimming.
- * @type {RegExp?}
+ * @type {RegExp}
  * @private
  */
 goog.ui.AutoComplete.InputHandler.prototype.trimmer_;
@@ -368,6 +380,43 @@ goog.ui.AutoComplete.InputHandler.prototype.getActiveElement = function() {
 
 
 /**
+ * Returns the value of the current active element.
+ * @return {string} The value of the current active element.
+ */
+goog.ui.AutoComplete.InputHandler.prototype.getValue = function() {
+  return this.activeElement_.value;
+};
+
+
+/**
+ * Sets the value of the current active element.
+ * @param {string} value The new value.
+ */
+goog.ui.AutoComplete.InputHandler.prototype.setValue = function(value) {
+  this.activeElement_.value = value;
+};
+
+
+/**
+ * Returns the current cursor position.
+ * @return {number} The index of the cursor position.
+ */
+goog.ui.AutoComplete.InputHandler.prototype.getCursorPosition = function() {
+  return goog.dom.selection.getStart(this.activeElement_);
+};
+
+
+/**
+ * Sets the cursor at the given position.
+ * @param {number} pos The index of the cursor position.
+ */
+goog.ui.AutoComplete.InputHandler.prototype.setCursorPosition = function(pos) {
+  goog.dom.selection.setStart(this.activeElement_, pos);
+  goog.dom.selection.setEnd(this.activeElement_, pos);
+};
+
+
+/**
  * Attaches the input handler to an element such as a textarea or input box.
  * The element could basically be anything as long as it exposes the correct
  * interface and events.
@@ -406,7 +455,7 @@ goog.ui.AutoComplete.InputHandler.prototype.detachInput = function(el) {
 
 /**
  * Attaches the input handler to multiple elements.
- * @param {Element} var_args Elements to attach the input handler too.
+ * @param {...Element} var_args Elements to attach the input handler too.
  */
 goog.ui.AutoComplete.InputHandler.prototype.attachInputs = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
@@ -417,7 +466,7 @@ goog.ui.AutoComplete.InputHandler.prototype.attachInputs = function(var_args) {
 
 /**
  * Detaches the input handler from multuple elements.
- * @param {Element} var_args Variable arguments for elements to unbind from.
+ * @param {...Element} var_args Variable arguments for elements to unbind from.
  */
 goog.ui.AutoComplete.InputHandler.prototype.detachInputs = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
@@ -429,20 +478,17 @@ goog.ui.AutoComplete.InputHandler.prototype.detachInputs = function(var_args) {
 /**
  * Selects the given row.  Implements the SelectionHandler interface.
  * @param {Object} row The row to select.
- * @param {boolean} opt_multi Should this be treated as a single or multi-token
+ * @param {boolean=} opt_multi Should this be treated as a single or multi-token
  *     auto-complete?  Overrides previous setting of opt_multi on constructor.
  * @return {boolean} Whether to suppress the update event.
  */
 goog.ui.AutoComplete.InputHandler.prototype.selectRow = function(row,
                                                                  opt_multi) {
-  var target = this.ac_.getTarget();
-
   if (goog.isDef(opt_multi) ? opt_multi : this.multi_) {
-    var caret = goog.dom.selection.getStart(target);
-    var index = this.getTokenIndex_(target.value, caret);
+    var index = this.getTokenIndex_(this.getValue(), this.getCursorPosition());
 
     // Break up the current input string.
-    var entries = this.splitInput_(target.value);
+    var entries = this.splitInput_(this.getValue());
 
 
     // Get the new value, ignoring whitespace associated with the entry.
@@ -472,23 +518,32 @@ goog.ui.AutoComplete.InputHandler.prototype.selectRow = function(row,
       // Replace the value in the array.
       entries[index] = replaceValue;
 
+      var el = this.activeElement_;
+      // If there is an uncommitted IME in Firefox, setting the value fails and
+      // results in actually clearing the value that's already in the input.
+      // The FF bug is http://bugzilla.mozilla.org/show_bug.cgi?id=549674
+      // Blurring before setting the value works around this problem. We'd like
+      // to do this only if there is an uncommitted IME, but this isn't possible
+      // to detect for FF/Mac. Since text editing is finicky we restrict this
+      // workaround to Firefox.
+      if (goog.userAgent.GECKO) {
+        el.blur();
+      }
       // Join the array and replace the contents of the input.
-      target.value = entries.join('');
+      el.value = entries.join('');
 
       // Calculate which position to put the cursor at.
-      var str = ''
       var pos = 0;
       for (var i = 0; i <= index; i++) {
         pos += entries[i].length;
       }
 
       // Set the cursor.
-      target.focus();
-      goog.dom.selection.setStart(target, pos);
-      goog.dom.selection.setEnd(target, pos);
+      el.focus();
+      this.setCursorPosition(pos);
     }
   } else {
-    target.value = row.toString();
+    this.setValue(row.toString());
   }
 
   this.rowJustSelected_ = true;
@@ -563,7 +618,7 @@ goog.ui.AutoComplete.InputHandler.prototype.setGenerateNewTokenOnLiteral =
  * Sets the regular expression used to trim the tokens before passing them to
  * the matcher:  every substring that matches the given regular expression will
  * be removed.  This can also be set to null to disable trimming.
- * @param {RegExp?} trimmer Regexp to use for trimming or null to disable it.
+ * @param {RegExp} trimmer Regexp to use for trimming or null to disable it.
  */
 goog.ui.AutoComplete.InputHandler.prototype.setTrimmingRegExp =
     function(trimmer) {
@@ -611,6 +666,16 @@ goog.ui.AutoComplete.InputHandler.prototype.setSeparatorSelects =
  */
 goog.ui.AutoComplete.InputHandler.prototype.getThrottleTime = function() {
   return this.timer_ ? this.timer_.getInterval() : -1;
+};
+
+
+/**
+ * Sets whether a row has just been selected.
+ * @param {boolean} justSelected Whether or not the row has just been selected.
+ */
+goog.ui.AutoComplete.InputHandler.prototype.setRowJustSelected =
+    function(justSelected) {
+  this.rowJustSelected_ = justSelected;
 };
 
 
@@ -690,11 +755,15 @@ goog.ui.AutoComplete.InputHandler.prototype.handleKeyEvent = function(e) {
     // action is also prevented if the input is a multi input, to prevent the
     // user tabbing out of the field.
     case goog.events.KeyCodes.TAB:
-      // Ensure the menu is up to date before completing.
-      this.update();
-      if (this.ac_.selectHilited() && this.preventDefaultOnTab_) {
-        e.preventDefault();
-        return true;
+      if (this.ac_.isOpen()) {
+        // Ensure the menu is up to date before completing.
+        this.update();
+        if (this.ac_.selectHilited() && this.preventDefaultOnTab_) {
+          e.preventDefault();
+          return true;
+        }
+      } else {
+        this.ac_.dismiss();
       }
       break;
 
@@ -842,7 +911,7 @@ goog.ui.AutoComplete.InputHandler.prototype.onFocus_ = function(e) {
       this.timer_.start();
       this.eh_.listen(this.timer_, goog.Timer.TICK, this.onTick_);
     }
-    this.lastValue_ = this.activeElement_.value;
+    this.lastValue_ = this.getValue();
     this.addKeyEvents_();
   }
 };
@@ -850,7 +919,7 @@ goog.ui.AutoComplete.InputHandler.prototype.onFocus_ = function(e) {
 
 /**
  * Handles an element blurring.
- * @param {goog.events.Event} opt_e Browser event object.
+ * @param {goog.events.Event=} opt_e Browser event object.
  * @private
  */
 goog.ui.AutoComplete.InputHandler.prototype.onBlur_ = function(opt_e) {
@@ -986,22 +1055,31 @@ goog.ui.AutoComplete.InputHandler.prototype.onIeKeyPress_ = function(e) {
 /**
  * Checks if an update has occurred and notified the autocomplete of the new
  * token.
- * @param {boolean} opt_force If true the menu will be forced to update.
+ * @param {boolean=} opt_force If true the menu will be forced to update.
  */
 goog.ui.AutoComplete.InputHandler.prototype.update = function(opt_force) {
-  if (opt_force ||
-      this.activeElement_ && this.activeElement_.value != this.lastValue_) {
+  if (opt_force || this.activeElement_ && this.getValue() != this.lastValue_) {
     if (opt_force || !this.rowJustSelected_) {
-      var token = this.parseToken_();
+      var token = this.parseToken();
 
       if (this.ac_) {
         this.ac_.setTarget(this.activeElement_);
-        this.ac_.setToken(token, this.activeElement_.value);
+        this.ac_.setToken(token, this.getValue());
       }
     }
-    this.lastValue_ = this.activeElement_.value;
+    this.lastValue_ = this.getValue();
   }
   this.rowJustSelected_ = false;
+};
+
+
+/**
+ * Parses a text area or input box for the currently highlighted token.
+ * @return {string} Token to complete.
+ * @protected
+ */
+goog.ui.AutoComplete.InputHandler.prototype.parseToken = function() {
+  return this.parseToken_()
 };
 
 
@@ -1026,13 +1104,13 @@ goog.ui.AutoComplete.InputHandler.prototype.moveDown_ = function() {
 
 
 /**
- * Parses a text area or input box for the currently highlighted token
+ * Parses a text area or input box for the currently highlighted token.
  * @return {string} Token to complete.
  * @private
  */
 goog.ui.AutoComplete.InputHandler.prototype.parseToken_ = function() {
-  var caret = goog.dom.selection.getStart(this.activeElement_);
-  var text = this.activeElement_.value;
+  var caret = this.getCursorPosition();
+  var text = this.getValue();
   return this.trim_(this.splitInput_(text)[this.getTokenIndex_(text, caret)]);
 };
 

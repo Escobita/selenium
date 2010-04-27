@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 // All Rights Reserved.
 
 /**
@@ -274,7 +286,7 @@ goog.editor.Plugin.prototype.handleKeyUp;
 
 /**
  * Handles selection change.
- * @param {!goog.events.BrowserEvent} opt_e The browser event.
+ * @param {!goog.events.BrowserEvent=} opt_e The browser event.
  * @return {boolean} Whether the event was handled and thus should *not* be
  *     propagated to other plugins.
  */
@@ -316,9 +328,9 @@ goog.editor.Plugin.prototype.handleKeyboardShortcut;
  * Multi-field plugins must override execCommand.
  *
  * @param {string} command The command to execute.
- * @param {Object} var_args Any additional parameters needed to
+ * @param {...*} var_args Any additional parameters needed to
  *     execute the command.
- * @return {Object|undefined} The result of the execCommand, if any.
+ * @return {*} The result of the execCommand, if any.
  */
 goog.editor.Plugin.prototype.execCommand = function(command, var_args) {
   // TODO: Replace all uses of isSilentCommand with plugins that just
@@ -371,9 +383,9 @@ goog.editor.Plugin.prototype.execCommand = function(command, var_args) {
  * instead.
  *
  * @param {string} command The command to execute.
- * @param {Object} var_args Any additional parameters needed to
+ * @param {...*} var_args Any additional parameters needed to
  *     execute the command.
- * @return {Object|undefined} The result of the execCommand, if any.
+ * @return {*} The result of the execCommand, if any.
  * @protected
  */
 goog.editor.Plugin.prototype.execCommandInternal;

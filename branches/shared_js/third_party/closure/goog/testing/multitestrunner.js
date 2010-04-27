@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utility for running multiple test files that utilize the same
@@ -37,7 +49,7 @@ goog.require('goog.ui.ServerChart.ChartType');
 
 /**
  * A component for running multiple tests within the browser.
- * @param {goog.dom.DomHelper} opt_domHelper A DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper A DOM helper.
  * @extends {goog.ui.Component}
  * @constructor
  */
@@ -51,6 +63,13 @@ goog.testing.MultiTestRunner = function(opt_domHelper) {
    * @private
    */
   this.allTests_ = [];
+
+  /**
+   * Tests that match the filter function.
+   * @type {Array.<string>}
+   * @private
+   */
+  this.activeTests_ = [];
 
   /**
    * An event handler for handling events.
@@ -97,6 +116,14 @@ goog.testing.MultiTestRunner.prototype.basePath_ = '';
 
 
 /**
+ * A set of tests that have finished.  All extant keys map to true.
+ * @type {Object.<boolean>}
+ * @private
+ */
+goog.testing.MultiTestRunner.prototype.finished_ = null;
+
+
+/**
  * Whether the report should contain verbose information about the passes.
  * @type {boolean}
  * @private
@@ -127,14 +154,6 @@ goog.testing.MultiTestRunner.prototype.stopped_ = false;
  * @private
  */
 goog.testing.MultiTestRunner.prototype.active_ = false;
-
-
-/**
- * Tests that match the filter function.
- * @type {Array.<string>}
- * @private
- */
-goog.testing.MultiTestRunner.prototype.activeTests_ = [];
 
 
 /**
@@ -197,7 +216,7 @@ goog.testing.MultiTestRunner.prototype.stats_ = null;
 
 /**
  * Reference to the start button element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.startButtonEl_ = null;
@@ -205,7 +224,7 @@ goog.testing.MultiTestRunner.prototype.startButtonEl_ = null;
 
 /**
  * Reference to the stop button element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.stopButtonEl_ = null;
@@ -213,7 +232,7 @@ goog.testing.MultiTestRunner.prototype.stopButtonEl_ = null;
 
 /**
  * Reference to the log element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.logEl_ = null;
@@ -221,7 +240,7 @@ goog.testing.MultiTestRunner.prototype.logEl_ = null;
 
 /**
  * Reference to the report element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.reportEl_ = null;
@@ -229,7 +248,7 @@ goog.testing.MultiTestRunner.prototype.reportEl_ = null;
 
 /**
  * Reference to the stats element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.statsEl_ = null;
@@ -237,7 +256,7 @@ goog.testing.MultiTestRunner.prototype.statsEl_ = null;
 
 /**
  * Reference to the progress bar's element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.progressEl_ = null;
@@ -245,7 +264,7 @@ goog.testing.MultiTestRunner.prototype.progressEl_ = null;
 
 /**
  * Reference to the progress bar's inner row element.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.progressRow_ = null;
@@ -253,7 +272,7 @@ goog.testing.MultiTestRunner.prototype.progressRow_ = null;
 
 /**
  * Reference to the log tab.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.logTabEl_ = null;
@@ -261,7 +280,7 @@ goog.testing.MultiTestRunner.prototype.logTabEl_ = null;
 
 /**
  * Reference to the report tab.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.reportTabEl_ = null;
@@ -269,7 +288,7 @@ goog.testing.MultiTestRunner.prototype.reportTabEl_ = null;
 
 /**
  * Reference to the stats tab.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.testing.MultiTestRunner.prototype.statsTabEl_ = null;
@@ -618,6 +637,7 @@ goog.testing.MultiTestRunner.prototype.start = function() {
   this.stopButtonEl_.disabled = false;
   this.stopped_ = false;
   this.active_ = true;
+  this.finished_ = {};
   this.activeTests_ = this.getTestsToRun();
   this.startedCount_ = 0;
   this.resultCount_ = 0;
@@ -684,8 +704,11 @@ goog.testing.MultiTestRunner.prototype.processResult = function(frame) {
   var test = frame.getTestFile();
 
   this.stats_.push(frame.getStats());
+  this.finished_[test] = true;
 
-  this.log(this.trimFileName_(test) + ' : ' + (success ? 'Passed' : 'Failed'));
+  var prefix = success ? '' : '*** FAILURE *** ';
+  this.log(prefix +
+      this.trimFileName_(test) + ' : ' + (success ? 'Passed' : 'Failed'));
 
   this.resultCount_++;
 
@@ -742,6 +765,20 @@ goog.testing.MultiTestRunner.prototype.finish_ = function() {
   // Remove all the test frames
   while (this.getChildCount() > 0) {
     this.removeChildAt(0, true).disposeInternal();
+  }
+
+  // Compute tests that did not finish before the stop button was hit.
+  var unfinished = [];
+  for (var i = 0; i < this.activeTests_.length; i++) {
+    var test = this.activeTests_[i];
+    if (!this.finished_[test]) {
+      unfinished.push(test);
+    }
+  }
+
+  if (unfinished.length) {
+    this.reportEl_.appendChild(goog.dom.createDom('pre', undefined,
+        'Theses tests did not finish:\n' + unfinished.join('\n')));
   }
 };
 
@@ -1105,7 +1142,7 @@ goog.testing.MultiTestRunner.prototype.onStatsTabClicked_ = function(e) {
  * @param {string} basePath The base path for tests.
  * @param {number} timeoutMs The time to wait for the test to load and run.
  * @param {boolean} verbosePasses Whether to show results for passes.
- * @param {goog.dom.DomHelper} opt_domHelper Optional dom helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional dom helper.
  * @constructor
  * @extends {goog.ui.Component}
  */
@@ -1147,7 +1184,7 @@ goog.inherits(goog.testing.MultiTestRunner.TestFrame, goog.ui.Component);
 
 /**
  * Reference to the iframe.
- * @type {HTMLIFrameElement?}
+ * @type {HTMLIFrameElement}
  * @private
  */
 goog.testing.MultiTestRunner.TestFrame.prototype.iframeEl_ = null;
@@ -1203,7 +1240,7 @@ goog.testing.MultiTestRunner.TestFrame.prototype.numFilesLoaded_ = 0;
 
 /**
  * Whether the test was successful, null if no result has been returned yet.
- * @type {boolean?}
+ * @type {?boolean}
  * @private
  */
 goog.testing.MultiTestRunner.TestFrame.prototype.isSuccess_ = null;
@@ -1306,7 +1343,7 @@ goog.testing.MultiTestRunner.TestFrame.prototype.getReport = function() {
 
 
 /**
- * @return {boolean?} Whether the test frame had a success.
+ * @return {?boolean} Whether the test frame had a success.
  */
 goog.testing.MultiTestRunner.TestFrame.prototype.isSuccess = function() {
   return this.isSuccess_;

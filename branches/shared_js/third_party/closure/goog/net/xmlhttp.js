@@ -10,14 +10,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Low level handling of XMLHttpRequest.
  */
 
-
 goog.provide('goog.net.XmlHttp');
+goog.provide('goog.net.XmlHttp.OptionType');
+goog.provide('goog.net.XmlHttp.ReadyState');
+
 
 
 /**
@@ -41,7 +55,7 @@ goog.net.XmlHttp.getOptions = function() {
 
 /**
  * The factory for creating XMLHttpRequest objets.
- * @type {Function?}
+ * @type {Function}
  * @private
  */
 goog.net.XmlHttp.factory_ = null;
@@ -50,7 +64,7 @@ goog.net.XmlHttp.factory_ = null;
 /**
  * The factory for creating the Options for the XMLHttpRequest objets given
  * from the factory.
- * @type {Function?}
+ * @type {Function}
  * @private
  */
 goog.net.XmlHttp.optionsFactory_ = null;
@@ -58,7 +72,7 @@ goog.net.XmlHttp.optionsFactory_ = null;
 
 /**
  * The cached options object used to minimize object allocations.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.net.XmlHttp.cachedOptions_ = null;
@@ -170,7 +184,7 @@ goog.net.XmlHttp.ReadyState = {
 
 /**
  * The ActiveX PROG ID string to use to create xhr's in IE. Lazily initialized.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.net.XmlHttp.ieProgId_ = null;

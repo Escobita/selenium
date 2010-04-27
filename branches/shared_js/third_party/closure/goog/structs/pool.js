@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Datastructure: Pool.
@@ -24,15 +36,14 @@
 goog.provide('goog.structs.Pool');
 
 goog.require('goog.Disposable');
-goog.require('goog.iter');
 goog.require('goog.structs.Queue');
 goog.require('goog.structs.Set');
 
 
 /**
  * A generic pool class. If max is greater than min, an error is thrown.
- * @param {number} opt_minCount Min. number of objects (Default: 1).
- * @param {number} opt_maxCount Max. number of objects (Default: 10).
+ * @param {number=} opt_minCount Min. number of objects (Default: 1).
+ * @param {number=} opt_maxCount Max. number of objects (Default: 10).
  * @constructor
  * @extends {goog.Disposable}
  */
@@ -333,12 +344,9 @@ goog.structs.Pool.prototype.disposeInternal = function() {
   if (this.getInUseCount() > 0) {
     throw Error(goog.structs.Pool.ERROR_DISPOSE_UNRELEASED_OBJS_);
   }
-
-  // Call disposeObject on each object held by the pool.
-  goog.iter.forEach(this.inUseSet_, this.disposeObject, this);
-  this.inUseSet_.clear();
   delete this.inUseSet_;
 
+  // Call disposeObject on each object held by the pool.
   var freeQueue = this.freeQueue_;
   while (!freeQueue.isEmpty()) {
     this.disposeObject(/** @type {Object} */ (freeQueue.dequeue()));

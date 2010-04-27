@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview A base menu class that supports key and mouse events. The menu
@@ -44,7 +56,6 @@
 goog.provide('goog.ui.Menu');
 goog.provide('goog.ui.Menu.EventType');
 
-goog.require('goog.array');
 goog.require('goog.string');
 goog.require('goog.style');
 goog.require('goog.ui.Component.EventType');
@@ -62,8 +73,8 @@ goog.require('goog.ui.MenuSeparator');
 // TODO: Reverse constructor argument order for consistency.
 /**
  * A basic menu class.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
- * @param {goog.ui.MenuRenderer} opt_renderer Renderer used to render or
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
+ * @param {goog.ui.MenuRenderer=} opt_renderer Renderer used to render or
  *     decorate the container; defaults to {@link goog.ui.MenuRenderer}.
  * @constructor
  * @extends {goog.ui.Container}
@@ -253,7 +264,7 @@ goog.ui.Menu.prototype.getItems = function() {
 /**
  * Sets the position of the menu relative to the view port.
  * @param {number|goog.math.Coordinate} x Left position or coordinate obj.
- * @param {number} opt_y Top position.
+ * @param {number=} opt_y Top position.
  */
 goog.ui.Menu.prototype.setPosition = function(x, opt_y) {
   // NOTE: It is necessary to temporarily set the display from none, so
@@ -373,7 +384,7 @@ goog.ui.Menu.prototype.highlightNextPrefix = function(charStr) {
         return index;
       }
     } while (!wrapped || index != start);
-    return null;
+    return this.getHighlightedIndex();
   }, this.getHighlightedIndex());
 };
 

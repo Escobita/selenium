@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Set of objects that allow animation and visual effects to be
@@ -82,7 +94,7 @@ goog.fx.easing.inAndOut = function(t) {
  * @param {Array.<number>} start Array for start coordinates.
  * @param {Array.<number>} end Array for end coordinates.
  * @param {number} duration Length of animation in milliseconds.
- * @param {Function} opt_acc Acceleration function, returns 0-1 for inputs 0-1.
+ * @param {Function=} opt_acc Acceleration function, returns 0-1 for inputs 0-1.
  * @constructor
  * @extends {goog.events.EventTarget}
  */
@@ -211,7 +223,7 @@ goog.fx.Animation.activeAnimations_ = {};
 
 /**
  * An interval ID for the global timer.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.fx.Animation.globalTimer_ = null;
@@ -227,8 +239,8 @@ goog.fx.Animation.cycleAnimations_ = function() {
   // Cycle all animations at the "same time".
   var now = goog.now();
 
-  for (var hc in goog.fx.Animation.activeAnimations_) {
-    goog.fx.Animation.activeAnimations_[hc].cycle(now);
+  for (var uid in goog.fx.Animation.activeAnimations_) {
+    goog.fx.Animation.activeAnimations_[uid].cycle(now);
   }
 
   goog.fx.Animation.globalTimer_ =
@@ -244,9 +256,9 @@ goog.fx.Animation.cycleAnimations_ = function() {
  * @param {Object} animation The animation to register.
  */
 goog.fx.Animation.registerAnimation = function(animation) {
-  var hc = goog.getHashCode(animation);
-  if (!(hc in goog.fx.Animation.activeAnimations_)) {
-    goog.fx.Animation.activeAnimations_[hc] = animation;
+  var uid = goog.getUid(animation);
+  if (!(uid in goog.fx.Animation.activeAnimations_)) {
+    goog.fx.Animation.activeAnimations_[uid] = animation;
   }
 
   // If the timer is not already started, start it now.
@@ -263,8 +275,8 @@ goog.fx.Animation.registerAnimation = function(animation) {
  * @param {Object} animation The animation to unregister.
  */
 goog.fx.Animation.unregisterAnimation = function(animation) {
-  var hc = goog.getHashCode(animation);
-  delete goog.fx.Animation.activeAnimations_[hc];
+  var uid = goog.getUid(animation);
+  delete goog.fx.Animation.activeAnimations_[uid];
 
   // If a timer is running and we no longer have any active timers we stop the
   // timers.
@@ -302,7 +314,7 @@ goog.fx.Animation.prototype.progress = 0;
 
 /**
  * Timestamp for when animation was started.
- * @type {number?}
+ * @type {?number}
  * @protected
  */
 goog.fx.Animation.prototype.startTime = null;
@@ -310,7 +322,7 @@ goog.fx.Animation.prototype.startTime = null;
 
 /**
  * Timestamp for when animation was started.
- * @type {number?}
+ * @type {?number}
  * @protected
  */
 goog.fx.Animation.prototype.endTime = null;
@@ -318,7 +330,7 @@ goog.fx.Animation.prototype.endTime = null;
 
 /**
  * Timestamp for when last frame was run.
- * @type {number?}
+ * @type {?number}
  * @protected
  */
 goog.fx.Animation.prototype.lastFrame = null;
@@ -326,7 +338,7 @@ goog.fx.Animation.prototype.lastFrame = null;
 
 /**
  * Starts or resumes an animation.
- * @param {boolean} opt_restart Whether to restart the
+ * @param {boolean=} opt_restart Whether to restart the
  *     animation from the beginning if it has been paused.
  * @return {boolean} Whether animation was started.
  */

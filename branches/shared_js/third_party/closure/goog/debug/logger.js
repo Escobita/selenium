@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the Logger class. Please minimize dependencies
@@ -51,29 +63,15 @@ goog.debug.Logger = function(name) {
    * @private
    */
   this.name_ = name;
-
-  /**
-   * Parent Logger.
-   * @type {goog.debug.Logger?}
-   * @private
-   */
-  this.parent_ = null;
-
-  /**
-   * Map of children loggers. The keys are the leaf names of the children and
-   * the values are the child loggers.
-   * @type {!Object}
-   * @private
-   */
-  this.children_ = {};
-
-  /**
-   * Handlers that are listening to this logger.
-   * @type {!Array.<Function>}
-   * @private
-   */
-  this.handlers_ = [];
 };
+
+
+/**
+ * Parent Logger.
+ * @type {goog.debug.Logger}
+ * @private
+ */
+goog.debug.Logger.prototype.parent_ = null;
 
 
 /**
@@ -83,6 +81,23 @@ goog.debug.Logger = function(name) {
  * @private
  */
 goog.debug.Logger.prototype.level_ = null;
+
+
+/**
+ * Map of children loggers. The keys are the leaf names of the children and
+ * the values are the child loggers.
+ * @type {Object}
+ * @private
+ */
+goog.debug.Logger.prototype.children_ = null;
+
+
+/**
+ * Handlers that are listening to this logger.
+ * @type {Array.<Function>}
+ * @private
+ */
+goog.debug.Logger.prototype.handlers_ = null;
 
 
 /**
@@ -232,7 +247,7 @@ goog.debug.Logger.Level.PREDEFINED_LEVELS = [
 /**
  * A lookup map used to find the level object based on the name or value of
  * the level object.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.debug.Logger.Level.predefinedLevelsCache_ = null;
@@ -323,6 +338,9 @@ goog.debug.Logger.prototype.getName = function() {
  * @param {Function} handler Handler function to add.
  */
 goog.debug.Logger.prototype.addHandler = function(handler) {
+  if (!this.handlers_) {
+    this.handlers_ = [];
+  }
   this.handlers_.push(handler);
 };
 
@@ -334,7 +352,7 @@ goog.debug.Logger.prototype.addHandler = function(handler) {
  * @return {boolean} Whether the handler was removed.
  */
 goog.debug.Logger.prototype.removeHandler = function(handler) {
-  return goog.array.remove(this.handlers_, handler);
+  return !!this.handlers_ && goog.array.remove(this.handlers_, handler);
 };
 
 
@@ -353,6 +371,9 @@ goog.debug.Logger.prototype.getParent = function() {
  *     values are the Logger objects.
  */
 goog.debug.Logger.prototype.getChildren = function() {
+  if (!this.children_) {
+    this.children_ = {};
+  }
   return this.children_;
 };
 
@@ -424,12 +445,13 @@ goog.debug.Logger.prototype.isLoggable = function(level) {
  * registered output Handler objects.
  * @param {goog.debug.Logger.Level} level One of the level identifiers.
  * @param {string} msg The string message.
- * @param {Error|Object} opt_exception An exception associated with the message.
+ * @param {Error|Object=} opt_exception An exception associated with the
+ *     message.
  */
 goog.debug.Logger.prototype.log = function(level, msg, opt_exception) {
   // java caches the effective level, not sure it's necessary here
   if (this.isLoggable(level)) {
-    this.logRecord(this.getLogRecord(level, msg, opt_exception));
+    this.doLogRecord_(this.getLogRecord(level, msg, opt_exception));
   }
 };
 
@@ -438,7 +460,8 @@ goog.debug.Logger.prototype.log = function(level, msg, opt_exception) {
  * Creates a new log record and adds the exception (if present) to it.
  * @param {goog.debug.Logger.Level} level One of the level identifiers.
  * @param {string} msg The string message.
- * @param {Error|Object} opt_exception An exception associated with the message.
+ * @param {Error|Object=} opt_exception An exception associated with the
+ *     message.
  * @return {!goog.debug.LogRecord} A log record.
  */
 goog.debug.Logger.prototype.getLogRecord = function(level, msg, opt_exception) {
@@ -457,7 +480,7 @@ goog.debug.Logger.prototype.getLogRecord = function(level, msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.shout = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.SHOUT, msg, opt_exception);
@@ -469,7 +492,7 @@ goog.debug.Logger.prototype.shout = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.severe = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.SEVERE, msg, opt_exception);
@@ -481,7 +504,7 @@ goog.debug.Logger.prototype.severe = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.warning = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.WARNING, msg, opt_exception);
@@ -493,7 +516,7 @@ goog.debug.Logger.prototype.warning = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.info = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.INFO, msg, opt_exception);
@@ -505,7 +528,7 @@ goog.debug.Logger.prototype.info = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.config = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.CONFIG, msg, opt_exception);
@@ -517,7 +540,7 @@ goog.debug.Logger.prototype.config = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.fine = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.FINE, msg, opt_exception);
@@ -529,7 +552,7 @@ goog.debug.Logger.prototype.fine = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.finer = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.FINER, msg, opt_exception);
@@ -541,7 +564,7 @@ goog.debug.Logger.prototype.finer = function(msg, opt_exception) {
  * If the logger is currently enabled for the given message level then the
  * given message is forwarded to all the registered output Handler objects.
  * @param {string} msg The string message.
- * @param {Error} opt_exception An exception associated with the message.
+ * @param {Error=} opt_exception An exception associated with the message.
  */
 goog.debug.Logger.prototype.finest = function(msg, opt_exception) {
   this.log(goog.debug.Logger.Level.FINEST, msg, opt_exception);
@@ -556,11 +579,21 @@ goog.debug.Logger.prototype.finest = function(msg, opt_exception) {
  */
 goog.debug.Logger.prototype.logRecord = function(logRecord) {
   if (this.isLoggable(logRecord.getLevel())) {
-    var target = this;
-    while (target) {
-      target.callPublish_(logRecord);
-      target = target.getParent();
-    }
+    this.doLogRecord_(logRecord);
+  }
+};
+
+
+/**
+ * Log a LogRecord.
+ * @param {goog.debug.LogRecord} logRecord A log record to log.
+ * @private
+ */
+goog.debug.Logger.prototype.doLogRecord_ = function(logRecord) {
+  var target = this;
+  while (target) {
+    target.callPublish_(logRecord);
+    target = target.getParent();
   }
 };
 
@@ -571,8 +604,10 @@ goog.debug.Logger.prototype.logRecord = function(logRecord) {
  * @private
  */
 goog.debug.Logger.prototype.callPublish_ = function(logRecord) {
-  for (var i = 0; i < this.handlers_.length; i++) {
-    this.handlers_[i](logRecord);
+  if (this.handlers_) {
+    for (var i = 0, handler; handler = this.handlers_[i]; i++) {
+      handler(logRecord);
+    }
   }
 };
 
@@ -594,7 +629,7 @@ goog.debug.Logger.prototype.setParent_ = function(parent) {
  * @private
  */
 goog.debug.Logger.prototype.addChild_ = function(name, logger) {
-  this.children_[name] = logger;
+  this.getChildren()[name] = logger;
 };
 
 
@@ -602,7 +637,6 @@ goog.debug.Logger.prototype.addChild_ = function(name, logger) {
  * There is a single global LogManager object that is used to maintain a set of
  * shared state about Loggers and log services. This is loosely based on the
  * java class java.util.logging.LogManager.
- *
  */
 goog.debug.LogManager = {};
 
@@ -663,11 +697,24 @@ goog.debug.LogManager.getRoot = function() {
  */
 goog.debug.LogManager.getLogger = function(name) {
   goog.debug.LogManager.initialize();
-  if (name in goog.debug.LogManager.loggers_) {
-    return goog.debug.LogManager.loggers_[name];
-  } else {
-    return goog.debug.LogManager.createLogger_(name);
-  }
+  var ret = goog.debug.LogManager.loggers_[name];
+  return ret || goog.debug.LogManager.createLogger_(name);
+};
+
+
+/**
+ * Creates a function that can be passed to goog.debug.catchErrors. The function
+ * will log all reported errors using the given logger.
+ * @param {goog.debug.Logger=} opt_logger The logger to log the errors to.
+ *     Defaults to the root logger.
+ * @return {function(Object)} The created function.
+ */
+goog.debug.LogManager.createFunctionForCatchErrors = function(opt_logger) {
+  return function(info) {
+    var logger = opt_logger || goog.debug.LogManager.getRoot();
+    logger.severe('Error: ' + info.message + ' (' + info.fileName +
+                  ' @ Line: ' + info.line + ')');
+  };
 };
 
 
@@ -681,10 +728,9 @@ goog.debug.LogManager.getLogger = function(name) {
 goog.debug.LogManager.createLogger_ = function(name) {
   // find parent logger
   var logger = new goog.debug.Logger(name);
-  var parts = name.split('.');
-  var leafName = parts[parts.length - 1];
-  parts.length = parts.length - 1;
-  var parentName = parts.join('.');
+  var lastDotIndex = name.lastIndexOf('.');
+  var parentName = name.substr(0, lastDotIndex);
+  var leafName = name.substr(lastDotIndex + 1);
   var parentLogger = goog.debug.LogManager.getLogger(parentName);
 
   // tell the parent about the child and the child about the parent

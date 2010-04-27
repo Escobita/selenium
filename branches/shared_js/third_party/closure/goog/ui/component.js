@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Abstract class for all UI components. This defines the standard
@@ -39,7 +51,7 @@ goog.require('goog.ui.IdGenerator');
 /**
  * Default implementation of UI component.
  *
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.events.EventTarget}
  */
@@ -63,7 +75,7 @@ goog.ui.Component.prototype.idGenerator_ = goog.ui.IdGenerator.getInstance();
 
 /**
  * The default right to left value.
- * @type {boolean?}
+ * @type {?boolean}
  * @private
  */
 goog.ui.Component.defaultRightToLeft_ = null;
@@ -309,7 +321,7 @@ goog.ui.Component.getStateTransitionEvent = function(state, isEntering) {
  * this point foward to have the given value. This is useful for cases where
  * a given page is always in one directionality, avoiding unnecessary
  * right to left determinations.
- * @param {boolean?} rightToLeft Whether the components should be rendered
+ * @param {?boolean} rightToLeft Whether the components should be rendered
  *     right-to-left. Null iff components should determine their directionality.
  */
 goog.ui.Component.setDefaultRightToLeft = function(rightToLeft) {
@@ -321,7 +333,7 @@ goog.ui.Component.setDefaultRightToLeft = function(rightToLeft) {
  * Unique ID of the component, lazily initialized in {@link
  * goog.ui.Component#getId} if needed.  This property is strictly private and
  * must not be accessed directly outside of this class!
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.ui.Component.prototype.id_ = null;
@@ -348,7 +360,7 @@ goog.ui.Component.prototype.inDocument_ = false;
 // TODO: Stop referring to this private field in subclasses.
 /**
  * The DOM element for the component.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.Component.prototype.element_ = null;
@@ -369,7 +381,7 @@ goog.ui.Component.prototype.googUiComponentHandler_;
  * Whether the component is rendered right-to-left.  Right-to-left is set
  * lazily when {@link #isRightToLeft} is called the first time, unless it has
  * been set by calling {@link #setRightToLeft} explicitly.
- * @type {boolean?}
+ * @type {?boolean}
  * @private
  */
 goog.ui.Component.prototype.rightToLeft_ = null;
@@ -413,7 +425,7 @@ goog.ui.Component.prototype.children_ = null;
  * 'valueOf', but this shouldn't really be an issue in practice, and if it is,
  * we can always fix it later without changing the API.
  *
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.ui.Component.prototype.childIndex_ = null;
@@ -461,7 +473,7 @@ goog.ui.Component.prototype.setId = function(id) {
 
 /**
  * Gets the component's element.
- * @return {Element?} The element for the component.
+ * @return {Element} The element for the component.
  */
 goog.ui.Component.prototype.getElement = function() {
   return this.element_;
@@ -577,7 +589,7 @@ goog.ui.Component.prototype.createDom = function() {
  *
  * Throws an Error if the component is already rendered.
  *
- * @param {Element} opt_parentElement Optional parent element to render the
+ * @param {Element=} opt_parentElement Optional parent element to render the
  *    component into.
  */
 goog.ui.Component.prototype.render = function(opt_parentElement) {
@@ -607,9 +619,9 @@ goog.ui.Component.prototype.renderBefore = function(siblingElement) {
  *
  * Throws an Error if the component is already rendered.
  *
- * @param {Element} opt_parentElement Optional parent element to render the
+ * @param {Element=} opt_parentElement Optional parent element to render the
  *    component into.
- * @param {Element} opt_beforeElement Element before which the component is to
+ * @param {Element=} opt_beforeElement Element before which the component is to
  *    be rendered.  If left out the node is appended to the parent element.
  * @private
  */
@@ -825,7 +837,7 @@ goog.ui.Component.prototype.getFragmentFromId = function(id) {
  * Helper function for returning an element in the document with a unique id
  * generated using makeId().
  * @param {string} idFragment The partial id.
- * @return {Element?} The element with the unique id, or null if it cannot be
+ * @return {Element} The element with the unique id, or null if it cannot be
  *     found.
  */
 goog.ui.Component.prototype.getElementByFragment = function(idFragment) {
@@ -842,7 +854,7 @@ goog.ui.Component.prototype.getElementByFragment = function(idFragment) {
  *
  * @see goog.ui.Component#addChildAt
  * @param {goog.ui.Component} child The new child component.
- * @param {boolean} opt_render If true, the child component will be rendered
+ * @param {boolean=} opt_render If true, the child component will be rendered
  *    into the parent.
  */
 goog.ui.Component.prototype.addChild = function(child, opt_render) {
@@ -885,8 +897,9 @@ goog.ui.Component.prototype.addChild = function(child, opt_render) {
  * @param {goog.ui.Component} child The new child component.
  * @param {number} index 0-based index at which the new child component is to be
  *    added; must be between 0 and the current child count (inclusive).
- * @param {boolean} opt_render If true, the child component will be rendered
+ * @param {boolean=} opt_render If true, the child component will be rendered
  *    into the parent.
+ * @return {void}
  */
 goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
   if (child.inDocument_ && (opt_render || !this.inDocument_)) {
@@ -926,7 +939,7 @@ goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
     // Changing the position of an existing child, move the DOM node.
     var contentElement = this.getContentElement();
     contentElement.insertBefore(child.getElement(),
-        (contentElement.childNodes[index + 1] || null));
+        (contentElement.childNodes[index] || null));
 
   } else if (opt_render) {
     // If this (parent) component doesn't have a DOM yet, call createDom now
@@ -958,7 +971,7 @@ goog.ui.Component.prototype.addChildAt = function(child, index, opt_render) {
  * or null if the component itself hasn't been rendered yet.  This default
  * implementation returns the component's root element.  Subclasses with
  * complex DOM structures must override this method.
- * @return {Element?} Element to contain child elements (null if none).
+ * @return {Element} Element to contain child elements (null if none).
  */
 goog.ui.Component.prototype.getContentElement = function() {
   return this.element_;
@@ -1062,7 +1075,7 @@ goog.ui.Component.prototype.getChildAt = function(index) {
  * component and its 0-based index.  The return value is ignored.
  * @param {Function} f The function to call for every child component; should
  *    take 2 arguments (the child and its index).
- * @param {Object} opt_obj Used as the 'this' object in f when called.
+ * @param {Object=} opt_obj Used as the 'this' object in f when called.
  */
 goog.ui.Component.prototype.forEachChild = function(f, opt_obj) {
   if (this.children_) {
@@ -1097,7 +1110,7 @@ goog.ui.Component.prototype.indexOfChild = function(child) {
  * @see goog.ui.Component#removeChildAt
  * @param {string|goog.ui.Component|null} child The ID of the child to remove,
  *    or the child component itself.
- * @param {boolean} opt_unrender If true, calls {@code exitDocument} on the
+ * @param {boolean=} opt_unrender If true, calls {@code exitDocument} on the
  *    removed child component, and detaches its DOM from the document.
  * @return {goog.ui.Component} The removed component, if any.
  */
@@ -1143,7 +1156,7 @@ goog.ui.Component.prototype.removeChild = function(child, opt_unrender) {
  *
  * @see goog.ui.Component#removeChild
  * @param {number} index 0-based index of the child to remove.
- * @param {boolean} opt_unrender If true, calls {@code exitDocument} on the
+ * @param {boolean=} opt_unrender If true, calls {@code exitDocument} on the
  *    removed child component, and detaches its DOM from the document.
  * @return {goog.ui.Component} The removed component, if any.
  */
@@ -1157,7 +1170,7 @@ goog.ui.Component.prototype.removeChildAt = function(index, opt_unrender) {
  * Removes every child component attached to this one.
  *
  * @see goog.ui.Component#removeChild
- * @param {boolean} opt_unrender If true, calls {@link #exitDocument} on the
+ * @param {boolean=} opt_unrender If true, calls {@link #exitDocument} on the
  *    removed child components, and detaches their DOM from the document.
  */
 goog.ui.Component.prototype.removeChildren = function(opt_unrender) {

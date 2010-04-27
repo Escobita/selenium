@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Functions for dealing with Date formatting & Parsing,
@@ -269,11 +281,11 @@ goog.locale.getVariantSubTag = function(languageCode) {
 
 
 /**
- * Returns the country name of the provided language code in it's native
+ * Returns the country name of the provided language code in its native
  * language.
  *
  * This method depends on goog.locale.nativeNameConstants available from
- * nativenameconstants.js. User of this method has to add dependacy to this.
+ * nativenameconstants.js. User of this method has to add dependency to this.
  *
  * @param {string} countryCode Code to lookup the country name for.
  *
@@ -293,10 +305,10 @@ goog.locale.getNativeCountryName = function(countryCode) {
  *
  * This method depends on goog.locale.LocaleNameConstants__<locale> available
  * from //javascript/googledata/i18n/js_locale_data. User of this method
- * has to add dependacy to this.
+ * has to add dependency to this.
  *
  * @param {string} languageCode Language code to lookup the country name for.
- * @param {Object} opt_localeSymbols If omitted the current locale symbol
+ * @param {Object=} opt_localeSymbols If omitted the current locale symbol
  *     set is used.
  *
  * @return {string} Localized country name.
@@ -314,11 +326,11 @@ goog.locale.getLocalizedCountryName = function(languageCode,
 
 
 /**
- * Returns the language name of the provided language code in it's native
+ * Returns the language name of the provided language code in its native
  * language.
  *
  * This method depends on goog.locale.nativeNameConstants available from
- * nativenameconstants.js. User of this method has to add dependacy to this.
+ * nativenameconstants.js. User of this method has to add dependency to this.
  *
  * @param {string} languageCode Language code to lookup the language name for.
  *
@@ -337,10 +349,10 @@ goog.locale.getNativeLanguageName = function(languageCode) {
  *
  * This method depends on goog.locale.LocaleNameConstants__<locale> available
  * from //javascript/googledata/i18n/js_locale_data. User of this method
- * has to add dependacy to this.
+ * has to add dependency to this.
  *
  * @param {string} languageCode Language code to lookup the language name for.
- * @param {Object} opt_localeSymbols locale symbol set if given.
+ * @param {Object=} opt_localeSymbols locale symbol set if given.
  *
  * @return {string} Localized language name of the provided language code.
  */
@@ -493,7 +505,7 @@ goog.locale.registerTimeZoneAllLongNames = function(dataObj, localeName) {
 /**
  * Retrieve specified resource for certain locale.
  * @param {string} resourceName String that represents the type of resource.
- * @param {string} opt_locale Locale ID, if not given, current locale
+ * @param {string=} opt_locale Locale ID, if not given, current locale
  *     will be assumed.
  * @return {Object|undefined} The resource object that hold all the resource
  *     data, or undefined if not available.
@@ -515,7 +527,7 @@ goog.locale.getResource = function(resourceName, opt_locale) {
  * resourceName does not exist at all, undefined will be returned.
  *
  * @param {string} resourceName String that represents the type of resource.
- * @param {string} opt_locale locale ID, if not given, current locale
+ * @param {string=} opt_locale locale ID, if not given, current locale
  *     will be assumed.
  * @return {Object|undefined} The resource object for desired locale.
  */

@@ -1,5 +1,3 @@
-// Copyright 2009 Google Inc.
-//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,6 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Copyright 2010 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 goog.provide('goog.testing.JsUnitException');
 goog.provide('goog.testing.asserts');
 
@@ -141,6 +152,10 @@ function _assert(comment, booleanValue, failureMessage) {
   }
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assert(a, opt_b) {
   _validateArguments(1, arguments);
   var comment = commentArg(1, arguments);
@@ -151,22 +166,35 @@ function assert(a, opt_b) {
   _assert(comment, booleanValue, 'Call to assert(boolean) with false');
 }
 
+/**
+ * Asserts that the function throws an error.
+ *
+ * @param {!(string|Function)} a The assertion comment or the function to call.
+ * @param {!Function=} opt_b The function to call (if the first argument of
+ *     {@code assertThrows} was the comment).
+ * @return {*} The error thrown by the function.
+ * @throws {goog.testing.JsUnitException} If the assertion failed.
+ */
 function assertThrows(a, opt_b) {
   _validateArguments(1, arguments);
   var func = nonCommentArg(1, 1, arguments);
-  _assert(commentArg(1, arguments), typeof func == 'function',
+  var comment = commentArg(1, arguments);
+  _assert(comment, typeof func == 'function',
       'Argument passed to assertThrows is not a function');
 
-  var isOk = false;
   try {
     func();
   } catch (e) {
-    isOk = true;
+    return e;
   }
-  _assert(commentArg(1, arguments), isOk,
+  goog.testing.asserts.raiseException_(comment,
       'No exception thrown from function passed to assertThrows');
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNotThrows(a, opt_b) {
   _validateArguments(1, arguments);
   var func = nonCommentArg(1, 1, arguments);
@@ -184,6 +212,10 @@ function assertNotThrows(a, opt_b) {
       'assertNotThrows');
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertTrue(a, opt_b) {
   _validateArguments(1, arguments);
   var comment = commentArg(1, arguments);
@@ -194,6 +226,10 @@ function assertTrue(a, opt_b) {
   _assert(comment, booleanValue, 'Call to assertTrue(boolean) with false');
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertFalse(a, opt_b) {
   _validateArguments(1, arguments);
   var comment = commentArg(1, arguments);
@@ -204,6 +240,11 @@ function assertFalse(a, opt_b) {
   _assert(comment, !booleanValue, 'Call to assertFalse(boolean) with true');
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var var1 = nonCommentArg(1, 2, arguments);
@@ -213,6 +254,11 @@ function assertEquals(a, b, opt_c) {
           _displayStringForValue(var2));
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertNotEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var var1 = nonCommentArg(1, 2, arguments);
@@ -221,6 +267,10 @@ function assertNotEquals(a, b, opt_c) {
       'Expected not to be ' + _displayStringForValue(var2));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNull(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
@@ -229,6 +279,10 @@ function assertNull(a, opt_b) {
       _displayStringForValue(aVar));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNotNull(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
@@ -236,6 +290,10 @@ function assertNotNull(a, opt_b) {
       'Expected not to be ' + _displayStringForValue(null));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertUndefined(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
@@ -244,6 +302,10 @@ function assertUndefined(a, opt_b) {
       ' but was ' + _displayStringForValue(aVar));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNotUndefined(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
@@ -251,6 +313,20 @@ function assertNotUndefined(a, opt_b) {
       'Expected not to be ' + _displayStringForValue(JSUNIT_UNDEFINED_VALUE));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
+function assertNotNullNorUndefined(a, opt_b) {
+  _validateArguments(1, arguments);
+  assertNotNull.apply(null, arguments);
+  assertNotUndefined.apply(null, arguments);
+}
+
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNonEmptyString(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
@@ -260,29 +336,45 @@ function assertNonEmptyString(a, opt_b) {
       'Expected non-empty string but was ' + _displayStringForValue(aVar));
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNaN(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
   _assert(commentArg(1, arguments), isNaN(aVar), 'Expected NaN');
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertNotNaN(a, opt_b) {
   _validateArguments(1, arguments);
   var aVar = nonCommentArg(1, 1, arguments);
   _assert(commentArg(1, arguments), !isNaN(aVar), 'Expected not NaN');
 }
 
-// Notes:
-// Object equality has some nasty browser quirks, and this implementation is
-// not 100% correct. For example,
-//
-// var a = [0, 1, 2];
-// var b = [0, 1, 2];
-// delete a[1];
-// b[1] = undefined;
-// assertObjectEquals(a, b); // should fail, but currently passes
-//
-// See asserts_test.html for more interesting edge cases.
+/**
+ * Notes:
+ * Object equality has some nasty browser quirks, and this implementation is
+ * not 100% correct. For example,
+ *
+ * <code>
+ * var a = [0, 1, 2];
+ * var b = [0, 1, 2];
+ * delete a[1];
+ * b[1] = undefined;
+ * assertObjectEquals(a, b); // should fail, but currently passes
+ * </code>
+ *
+ * See asserts_test.html for more interesting edge cases.
+ *
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertObjectEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var v1 = nonCommentArg(1, 2, arguments);
@@ -376,6 +468,11 @@ function assertObjectEquals(a, b, opt_c) {
           failures.join('\n   '));
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertArrayEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var v1 = nonCommentArg(1, 2, arguments);
@@ -401,7 +498,7 @@ function assertArrayEquals(a, b, opt_c) {
  *     expected elements.
  * @param {goog.testing.asserts.ArrayLike} b Expected elements or the actual
  *     elements.
- * @param {goog.testing.asserts.ArrayLike} opt_c Actual elements.
+ * @param {goog.testing.asserts.ArrayLike=} opt_c Actual elements.
  */
 function assertSameElements(a, b, opt_c) {
   _validateArguments(2, arguments);
@@ -431,6 +528,10 @@ function assertSameElements(a, b, opt_c) {
   }
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertEvaluatesToTrue(a, opt_b) {
   _validateArguments(1, arguments);
   var value = nonCommentArg(1, 1, arguments);
@@ -439,6 +540,10 @@ function assertEvaluatesToTrue(a, opt_b) {
   }
 }
 
+/**
+ * @param {*} a
+ * @param {*=} opt_b
+ */
 function assertEvaluatesToFalse(a, opt_b) {
   _validateArguments(1, arguments);
   var value = nonCommentArg(1, 1, arguments);
@@ -447,6 +552,11 @@ function assertEvaluatesToFalse(a, opt_b) {
   }
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertHTMLEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var var1 = nonCommentArg(1, 2, arguments);
@@ -470,7 +580,7 @@ function assertHTMLEquals(a, b, opt_c) {
  * @param {string} a Assertion message, or the CSS property name.
  * @param {string} b CSS property name, or the expected value.
  * @param {string} c The expected value, or the actual value.
- * @param {string} opt_d The actual value.
+ * @param {string=} opt_d The actual value.
  */
 function assertCSSValueEquals(a, b, c, opt_d) {
   _validateArguments(3, arguments);
@@ -488,6 +598,11 @@ function assertCSSValueEquals(a, b, c, opt_d) {
           ' but was ' + _displayStringForValue(actualValueStandardized));
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertHashEquals(a, b, opt_c) {
   _validateArguments(2, arguments);
   var var1 = nonCommentArg(1, 2, arguments);
@@ -506,6 +621,12 @@ function assertHashEquals(a, b, opt_c) {
   }
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*} c
+ * @param {*=} opt_d
+ */
 function assertRoughlyEquals(a, b, c, opt_d) {
   _validateArguments(3, arguments);
   var expected = nonCommentArg(1, 3, arguments);
@@ -516,6 +637,11 @@ function assertRoughlyEquals(a, b, c, opt_d) {
       ' which was more than ' + tolerance + ' away');
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertContains(a, b, opt_c) {
   _validateArguments(2, arguments);
   var contained = nonCommentArg(1, 2, arguments);
@@ -525,6 +651,11 @@ function assertContains(a, b, opt_c) {
       'Expected \'' + container + '\' to contain \'' + contained + '\'');
 }
 
+/**
+ * @param {*} a
+ * @param {*} b
+ * @param {*=} opt_c
+ */
 function assertNotContains(a, b, opt_c) {
   _validateArguments(2, arguments);
   var contained = nonCommentArg(1, 2, arguments);
@@ -611,7 +742,7 @@ function standardizeCSSValue(propertyName, value) {
 /**
  * Raises a JsUnit exception with the given comment.
  * @param {string} comment A summary for the exception.
- * @param {string} opt_message A description of the exception.
+ * @param {string=} opt_message A description of the exception.
  * @private
  */
 goog.testing.asserts.raiseException_ = function(comment, opt_message) {
@@ -626,7 +757,7 @@ goog.testing.asserts.raiseException_ = function(comment, opt_message) {
 
 /**
  * @param {string} comment A summary for the exception.
- * @param {?string} opt_message A description of the exception.
+ * @param {?string=} opt_message A description of the exception.
  * @constructor
  */
 goog.testing.JsUnitException = function(comment, opt_message) {
@@ -635,6 +766,9 @@ goog.testing.JsUnitException = function(comment, opt_message) {
                  (comment && opt_message ? '\n' : '') +
                  (opt_message ? opt_message : '');
   this.stackTrace = goog.testing.stacktrace.get();
+  // These fields are for compatibility with jsUnitTestManager.
+  this.comment = comment || null;
+  this.jsUnitMessage = opt_message || '';
 };
 
 /** @inheritDoc */
@@ -656,6 +790,7 @@ goog.exportSymbol('assertNull', assertNull);
 goog.exportSymbol('assertNotNull', assertNotNull);
 goog.exportSymbol('assertUndefined', assertUndefined);
 goog.exportSymbol('assertNotUndefined', assertNotUndefined);
+goog.exportSymbol('assertNotNullNorUndefined', assertNotNullNorUndefined);
 goog.exportSymbol('assertNonEmptyString', assertNonEmptyString);
 goog.exportSymbol('assertNaN', assertNaN);
 goog.exportSymbol('assertNotNaN', assertNotNaN);

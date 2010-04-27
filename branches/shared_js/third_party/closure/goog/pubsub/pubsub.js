@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview  Topic-based publish/subscribe channel implementation.
@@ -115,7 +127,7 @@ goog.pubsub.PubSub.prototype.publishDepth_ = 0;
  * @param {string} topic Topic to subscribe to.
  * @param {Function} fn Function to be invoked when a message is published to
  *     the given topic.
- * @param {Object} opt_context Object in whose context the function is to be
+ * @param {Object=} opt_context Object in whose context the function is to be
  *     called (the global scope if none).
  * @return {number} Subscription key.
  */
@@ -151,7 +163,7 @@ goog.pubsub.PubSub.prototype.subscribe = function(topic, fn, opt_context) {
  * @param {string} topic Topic to subscribe to.
  * @param {Function} fn Function to be invoked once and then unsubscribed when
  *     a message is published to the given topic.
- * @param {Object} opt_context Object in whose context the function is to be
+ * @param {Object=} opt_context Object in whose context the function is to be
  *     called (the global scope if none).
  * @return {number} Subscription key.
  */
@@ -171,7 +183,7 @@ goog.pubsub.PubSub.prototype.subscribeOnce = function(topic, fn, opt_context) {
  *
  * @param {string} topic Topic to unsubscribe from.
  * @param {Function} fn Function to unsubscribe.
- * @param {Object} opt_context Object in whose context the function was to be
+ * @param {Object=} opt_context Object in whose context the function was to be
  *     called (the global scope if none).
  * @return {boolean} Whether a matching subscription was removed.
  */
@@ -234,7 +246,8 @@ goog.pubsub.PubSub.prototype.unsubscribeByKey = function(key) {
  * the functions throws an uncaught error, publishing is aborted.
  *
  * @param {string} topic Topic to publish to.
- * @param {*} var_args Arguments that are applied to each subscription function.
+ * @param {...*} var_args Arguments that are applied to each subscription
+ *     function.
  * @return {boolean} Whether any subscriptions were called.
  */
 goog.pubsub.PubSub.prototype.publish = function(topic, var_args) {
@@ -276,7 +289,7 @@ goog.pubsub.PubSub.prototype.publish = function(topic, var_args) {
 
 /**
  * Clears the subscription list for a topic, or all topics if unspecified.
- * @param {string} opt_topic Topic to clear (all topics if unspecified).
+ * @param {string=} opt_topic Topic to clear (all topics if unspecified).
  */
 goog.pubsub.PubSub.prototype.clear = function(opt_topic) {
   if (opt_topic) {
@@ -298,7 +311,7 @@ goog.pubsub.PubSub.prototype.clear = function(opt_topic) {
 /**
  * Returns the number of subscriptions to the given topic (or all topics if
  * unspecified).
- * @param {string} opt_topic The topic (all topics if unspecified).
+ * @param {string=} opt_topic The topic (all topics if unspecified).
  * @return {number} Number of subscriptions to the topic.
  */
 goog.pubsub.PubSub.prototype.getCount = function(opt_topic) {

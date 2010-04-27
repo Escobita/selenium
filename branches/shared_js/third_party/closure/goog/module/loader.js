@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  *
@@ -26,6 +38,7 @@ goog.provide('goog.module.Loader');
 goog.require('goog.Timer');
 goog.require('goog.array');
 goog.require('goog.dom');
+goog.require('goog.object');
 
 /**
  * The dynamic loading functionality is defined as a class. The class
@@ -54,8 +67,17 @@ goog.module.Loader = function() {
   this.modules_ = {};
 
   /**
+   * Map of module name to module url. Used to avoid fetching the same URL
+   * twice by keeping track of in-flight URLs.
+   * Note: this allows two modules to be bundled into the same file.
+   * @type {Object}
+   * @private
+   */
+  this.pendingModuleUrls_ = {};
+
+  /**
    * The base url to load modules from. This property will be set in init().
-   * @type {string?}
+   * @type {?string}
    * @private
    */
   this.urlBase_ = null;
@@ -122,7 +144,7 @@ goog.module.Loader.loaderEval_ = function(t_) {
  * name, preceded by a period, before the .js prefix of the base URL.
  *
  * @param {string} baseUrl The URL of the base library.
- * @param {Function} opt_urlFunction Function that creates the URL for the
+ * @param {Function=} opt_urlFunction Function that creates the URL for the
  *     module file. It will be passed the base URL for module files and the
  *     module name and should return the fully-formed URL to the module file to
  *     load.
@@ -189,10 +211,10 @@ goog.module.Loader.prototype.require = function(module, symbol, callback) {
  *
  * @param {string} module The name of the module. Cf. parameter module
  *     of method require().
- * @param {number} opt_symbol The symbol being defined, or nothing when all
+ * @param {number=} opt_symbol The symbol being defined, or nothing when all
  *     symbols of the module are defined. Cf. parameter symbol of method
  *     require().
- * @param {Object} opt_object The object bound to the symbol, or nothing when
+ * @param {Object=} opt_object The object bound to the symbol, or nothing when
  *     all symbols of the module are defined.
  */
 goog.module.Loader.prototype.provide = function(
@@ -214,6 +236,7 @@ goog.module.Loader.prototype.provide = function(
       callback(modules[module][symbol]);
     }
     delete pending[module];
+    delete this.pendingModuleUrls_[module];
   }
 };
 
@@ -234,7 +257,21 @@ goog.module.Loader.prototype.load_ = function(module) {
   // script if the assignment to src happens *after* the script
   // element is inserted into the DOM.
   goog.Timer.callOnce(function() {
+    // The module might have been registered in the interim (if fetched as part
+    // of another module fetch because they share the same url)
+    if (this.modules_[module]) {
+      return;
+    }
+
     var url = this.getModuleUrl_(this.urlBase_, module);
+
+    // Check if specified URL is already in flight
+    var urlInFlight = goog.object.containsValue(this.pendingModuleUrls_, url);
+    this.pendingModuleUrls_[module] = url;
+    if (urlInFlight) {
+      return;
+    }
+
     var s = goog.dom.createDom('script',
         {'type': 'text/javascript', 'src': url});
     document.body.appendChild(s);

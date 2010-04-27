@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Functions for dealing with locale-specific formatting.
@@ -29,7 +41,7 @@ goog.require('goog.locale.NumberFormat');
  * @param {string} pattern Pattern String to specify how the date should
  *     be formatted.
  * @param {Date} date Date object being formatted.
- * @param {goog.locale.TimeZone} opt_timeZone optional, if specified, time
+ * @param {goog.locale.TimeZone=} opt_timeZone optional, if specified, time
  *    related fields will be formatted based on its setting.
  *
  * @return {string} string representation of date/time.
@@ -47,7 +59,7 @@ goog.locale.formatDateTime = function(pattern, date, opt_timeZone) {
  * date format pattern specified in symbols object.
  * @param {number} formatType Number used to reference predefined pattern.
  * @param {Date} date The date object being formatted.
- * @param {goog.locale.TimeZone} opt_timeZone optional, if specified, time
+ * @param {goog.locale.TimeZone=} opt_timeZone optional, if specified, time
  *    related fields will be formatted based on its setting.
  * @return {string} string representation of date/time.
  * @deprecated Use goog.i18n.DateTimeFormat.
@@ -196,7 +208,7 @@ goog.locale.formatNumber = function(pattern, value) {
  * Parse the given text using specified pattern to get a number.
  * @param {string} pattern tells how the text is constructed.
  * @param {string} text input text being parsed.
- * @param {Array} opt_pos optional one element array that holds position
+ * @param {Array=} opt_pos optional one element array that holds position
  *     information. It tells from where parse should begin. Upon return, it
  *     holds parse stop position.
  * @return {number} Parsed number, NaN if in error.
@@ -227,7 +239,7 @@ goog.locale.standardFormatNumber = function(patternType, value) {
  * Parse the given text using a predefined pattern to get a number.
  * @param {number} patternType identifies a predefined pattern to use.
  * @param {string} text the input text being parsed.
- * @param {number} opt_pos optional position information, it holds parse start
+ * @param {number=} opt_pos optional position information, it holds parse start
  *     position in the beginning. If parsing is successful, this position will
  *     be updated to the character next to where parsing ends.
  * @return {number} Parsed number, 0 if in error.
@@ -243,7 +255,7 @@ goog.locale.standardParseNumber = function(patternType, text, opt_pos) {
 /**
  * To obtain a NumberFormat object that can be used for number format/parse.
  * @param {string} pattern number format pattern string.
- * @param {string} opt_currencyCode optional international currency code, it
+ * @param {string=} opt_currencyCode optional international currency code, it
  *     determines the currency code/symbol should be used in format/parse. If
  *     not given, the currency code for current locale will be used.
  * @return {goog.locale.NumberFormat}  A goog.locale.NumberFormat instance
@@ -261,7 +273,7 @@ goog.locale.getNumberFormatter = function(pattern, opt_currencyCode) {
  * To obtain a NumberFormat object that can be used for number format/parse from
  * a predefined pattern type.
  * @param {number} patternType identifies a predefined number format pattern.
- * @param {string} opt_currencyCode optional international currency code. It
+ * @param {string=} opt_currencyCode optional international currency code. It
  *     determines the currency code/symbol used in format/parse. If not given,
  *     the currency code for current locale will be used.
  * @return {goog.locale.NumberFormat} A goog.locale.NumberFormat instance for

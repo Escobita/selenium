@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Character Picker widget for picking any Unicode character.
@@ -45,13 +57,13 @@ goog.require('goog.ui.MenuItem');
  *
  * See charpicker.html demo for example usage.
  * @param {goog.i18n.CharPickerData} charPickerData Category names and charlist.
- * @param {Array.<string>} opt_recents List of characters to be displayed in
+ * @param {Array.<string>=} opt_recents List of characters to be displayed in
  *     resently selected characters area.
- * @param {number} opt_initCategory Sequence number of initial category.
- * @param {number} opt_initSubcategory Sequence number of initial subcategory.
- * @param {number} opt_rowCount Number of rows in the grid.
- * @param {number} opt_columnCount Number of columns in the grid.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {number=} opt_initCategory Sequence number of initial category.
+ * @param {number=} opt_initSubcategory Sequence number of initial subcategory.
+ * @param {number=} opt_rowCount Number of rows in the grid.
+ * @param {number=} opt_columnCount Number of columns in the grid.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Component}
  */
@@ -430,22 +442,18 @@ goog.ui.CharPicker.prototype.enterDocument = function() {
   var inputkh = new goog.events.InputHandler(this.input_.getElement());
   this.keyHandler_ = new goog.events.KeyHandler(this.input_.getElement());
 
-  // Use this function to stop menu click event in the bubbling phase.
+  // Stop the propagation of ACTION events at menu and submenu buttons.
   // If stopped at capture phase, the button will not be set to normal state.
   // If not stopped, the user widget will receive the event, which is
   // undesired. User widget should receive an event only on the character
   // click.
-  var stopPropagationFn = function(e) {
-    e.stopPropagation();
-  };
-
   this.eventHandler_.listen(
       this.menubutton_,
       goog.ui.Component.EventType.ACTION,
-      stopPropagationFn).listen(
+      goog.events.Event.stopPropagation).listen(
           this.submenubutton_,
           goog.ui.Component.EventType.ACTION,
-          stopPropagationFn).listen(
+          goog.events.Event.stopPropagation).listen(
               this,
               goog.ui.Component.EventType.ACTION,
               this.handleSelectedItem_,
@@ -534,7 +542,7 @@ goog.ui.CharPicker.prototype.handleInput_ = function(e) {
 
 /**
  * On OK click accepts the character and updates the recent char list.
- * @param {goog.events.Event} opt_event Event for click on OK button.
+ * @param {goog.events.Event=} opt_event Event for click on OK button.
  * @return {boolean} Indicates whether to propagate event.
  * @private
  */
@@ -592,7 +600,7 @@ goog.ui.CharPicker.prototype.createMenuItem_ = function(id, caption) {
 /**
  * Sets the category and updates the submenu items and grid accordingly.
  * @param {number} category Category index used to index the data tables.
- * @param {number} opt_subcategory Subcategory index used with category index.
+ * @param {number=} opt_subcategory Subcategory index used with category index.
  * @private
  */
 goog.ui.CharPicker.prototype.setSelectedCategory_ = function(category,
@@ -699,7 +707,7 @@ goog.ui.CharPicker.prototype.modifyGridWithItems_ = function(grid, items,
     grid.getChildAt(buttonpos).setVisible(false);
   }
   var first = grid.getChildAt(0);
-  first.getElement().setAttribute('tabindex', 0);
+  goog.dom.setFocusableTabIndex(first.getElement(), true);
 };
 
 
@@ -733,7 +741,7 @@ goog.ui.CharPicker.prototype.modifyCharNode_ = function(button, ch) {
   var buttonEl = button.getElement();
   buttonEl.innerHTML = text;
   buttonEl.setAttribute('char', ch);
-  buttonEl.removeAttribute('tabindex');
+  goog.dom.setFocusableTabIndex(buttonEl, false);
   button.setVisible(true);
 };
 

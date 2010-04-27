@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview An HSVA (hue/saturation/value/alpha) color palette/picker
@@ -30,14 +42,15 @@ goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.HsvPalette');
 
 
+
 /**
  * Creates an HSVA palette. Allows a user to select the hue, saturation,
  * value/brightness and alpha/opacity.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
- * @param {string} opt_color Optional initial color, without alpha (default is
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
+ * @param {string=} opt_color Optional initial color, without alpha (default is
  *     red).
- * @param {number} opt_alpha Optional initial alpha (default is 1).
- * @param {string} opt_class Optional base for creating classnames (default is
+ * @param {number=} opt_alpha Optional initial alpha (default is 1).
+ * @param {string=} opt_class Optional base for creating classnames (default is
  *     'goog-hsva-palette').
  * @extends {goog.ui.HsvPalette}
  * @constructor
@@ -52,7 +65,7 @@ goog.ui.HsvaPalette = function(opt_domHelper, opt_color, opt_alpha, opt_class) {
    * @type {number}
    * @private
    */
-  this.alpha_ = opt_alpha || 1;
+  this.alpha_ = goog.isDef(opt_alpha) ? opt_alpha : 1;
 
   /**
    * The base class name for the component.
@@ -96,11 +109,7 @@ goog.ui.HsvaPalette.prototype.aHandleEl_;
 goog.ui.HsvaPalette.prototype.swatchBackdropEl_;
 
 
-/**
- * Gets the color that is currently selected in this color picker.
- * Alpha transparency of the currently selected color, in [0, 1].
- * @return {number} The current alpha value.
- */
+/** @inheritDoc */
 goog.ui.HsvaPalette.prototype.getAlpha = function() {
   return this.alpha_;
 };

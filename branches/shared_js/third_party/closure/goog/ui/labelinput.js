@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview This behavior is applied to a text input and it shows a text
@@ -43,8 +55,8 @@ goog.require('goog.ui.Component');
 
 /**
  * This creates the label input object.
- * @param {string} opt_label The text to show as the label.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {string=} opt_label The text to show as the label.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @extends {goog.ui.Component}
  * @constructor
  */
@@ -64,7 +76,7 @@ goog.inherits(goog.ui.LabelInput, goog.ui.Component);
 /**
  * Variable used to store the element value on keydown and restore it on
  * keypress.  See {@link #handleEscapeKeys_}
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.ui.LabelInput.prototype.ffKeyRestoreValue_ = null;
@@ -231,7 +243,7 @@ goog.ui.LabelInput.prototype.handleBlur_ = function(e) {
  * Handler for key events in Firefox.
  *
  * If the escape key is pressed when a text input has not been changed manually
- * since being focussed, the text input will revert to it's previous value.
+ * since being focused, the text input will revert to its previous value.
  * Firefox does not honor preventDefault for the escape key. The revert happens
  * after the keydown event and before every keypress. We therefore store the
  * element's value on keydown and restore it on keypress. The restore value is
@@ -404,7 +416,7 @@ goog.ui.LabelInput.prototype.restoreLabel_ = function() {
   // Check again in case something changed since this was scheduled.
   // We check that the element is still there since this is called by a timer
   // and the dispose method may have been called prior to this.
-  if (this.getElement() && !this.hasChanged()) {
+  if (this.getElement() && !this.hasChanged() && !this.hasFocus_) {
     this.getElement().value = this.label_;
   }
 };

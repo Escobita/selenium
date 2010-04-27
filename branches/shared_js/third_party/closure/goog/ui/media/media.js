@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Provides the base goog.ui.Control and goog.ui.ControlRenderer
@@ -49,7 +61,7 @@
  * <pre>
  *   var renderer = new goog.ui.media.MediaRenderer();
  *   var control = new goog.ui.media.Media('hello world', renderer);
- *   var control.render(goog.dom.$('mediaHolder'));
+ *   var control.render(goog.dom.getElement('mediaHolder'));
  * </pre>
  *
  * It requires a few CSS rules to be defined, which you should use to control
@@ -74,7 +86,7 @@
  *   var renderer = goog.ui.ControlRenderer.getCustomRenderer(
  *       goog.ui.media.MediaRenderer, 'my-custom-namespace');
  *   var media = new goog.ui.media.Media('', renderer);
- *   media.render(goog.dom.$('parent'));
+ *   media.render(goog.dom.getElement('parent'));
  * </pre>
  *
  * Which will allow you to set your own .my-custom-namespace-hover,
@@ -94,7 +106,6 @@
 goog.provide('goog.ui.media.Media');
 goog.provide('goog.ui.media.MediaRenderer');
 
-goog.require('goog.array');
 goog.require('goog.style');
 goog.require('goog.ui.Component.State');
 goog.require('goog.ui.Control');
@@ -106,9 +117,9 @@ goog.require('goog.ui.ControlRenderer');
  *
  * @param {goog.ui.media.MediaModel} dataModel The data model to be used by the
  *     renderer.
- * @param {goog.ui.ControlRenderer} opt_renderer Renderer used to render or
+ * @param {goog.ui.ControlRenderer=} opt_renderer Renderer used to render or
  *     decorate the component; defaults to {@link goog.ui.ControlRenderer}.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper, used for
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @constructor
  * @extends {goog.ui.Control}

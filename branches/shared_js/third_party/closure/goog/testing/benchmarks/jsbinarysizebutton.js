@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Sample code to instantiate a few goog.ui.Buttons.  The
@@ -34,7 +46,7 @@ function drawButtons() {
 
   // Create a simple button programmatically
   var b1 = new goog.ui.Button('Hello!');
-  b1.render(goog.dom.$('b1'));
+  b1.render(goog.dom.getElement('b1'));
   b1.setTooltip('I changed the tooltip.');
   goog.events.listen(b1, goog.ui.Component.EventType.ACTION, logEvent);
 
@@ -54,7 +66,7 @@ function drawButtons() {
   centerButton.setCollapsed(goog.ui.Button.Side.BOTH);
   rightButton.setCollapsed(goog.ui.Button.Side.START);
   goog.array.forEach(customButtons, function(b) {
-    b.render(goog.dom.$('cb1'));
+    b.render(goog.dom.getElement('cb1'));
     goog.events.listen(b, goog.ui.Component.EventType.ACTION, logEvent);
   });
 }

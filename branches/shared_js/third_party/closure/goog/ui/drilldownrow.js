@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Tree-like drilldown components for HTML tables.
@@ -70,7 +82,7 @@ goog.require('goog.ui.Component');
  * Builds a DrilldownRow component, which can overlay a tree
  * structure onto sections of an HTML table.
  *
- * @param {Object} opt_properties This parameter can contain:
+ * @param {Object=} opt_properties This parameter can contain:
  *   contents:  if present, user data identifying
  *     the information loaded into the row and its children.
  *   loaded: initializes the isLoaded property, defaults to true.
@@ -194,7 +206,7 @@ goog.ui.DrilldownRow.prototype.canDecorate = function(node) {
  *
  * @param {goog.ui.DrilldownRow} child New child to be added.
  * @param {number} index position to be occupied by the child.
- * @param {boolean} opt_render true to force immediate rendering.
+ * @param {boolean=} opt_render true to force immediate rendering.
  */
 goog.ui.DrilldownRow.prototype.addChildAt = function(child, index, opt_render) {
   goog.ui.DrilldownRow.superClass_.addChildAt.call(this, child, index, false);

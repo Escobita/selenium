@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Mock Clock implementation for working with setTimeout,
@@ -28,7 +40,7 @@ goog.require('goog.Disposable');
 
 /**
  * Class for unit testing code that uses setTimeout and clearTimeout.
- * @param {boolean} opt_autoInstall Install the MockClock at constuction time.
+ * @param {boolean=} opt_autoInstall Install the MockClock at constuction time.
  * @constructor
  * @extends {goog.Disposable}
  */
@@ -86,7 +98,7 @@ goog.testing.MockClock.prototype.installed_ = false;
 /**
  * Map of deleted keys.  These keys represents keys that were deleted in a
  * clearInterval, timeoutid -> object.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.testing.MockClock.prototype.deletedKeys_ = null;
@@ -230,7 +242,7 @@ goog.testing.MockClock.prototype.getTimeoutDelay = function() {
 /**
  * Increments the MockClock's time by a given number of milliseconds, running
  * any functions that are now overdue.
- * @param {number} opt_millis Number of milliseconds to increment the counter.
+ * @param {number=} opt_millis Number of milliseconds to increment the counter.
  *     If not specified, clock ticks 1 millisecond.
  * @return {number} Current mock time in millis.
  */

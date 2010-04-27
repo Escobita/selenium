@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google, Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview goog.editor plugin to handle splitting block quotes.
@@ -37,7 +49,7 @@ goog.require('goog.functions');
  * subclasses.
  * @param {boolean} requiresClassnameToSplit Whether to split only blockquotes
  *     that have the given classname.
- * @param {string} opt_classname The classname to apply to generated
+ * @param {string=} opt_classname The classname to apply to generated
  *     blockquotes.  Defaults to 'tr_bq'.
  * @constructor
  * @extends {goog.editor.Plugin}
@@ -191,11 +203,11 @@ goog.editor.plugins.Blockquote.prototype.isSupportedCommand = function(
  * function returns true, the event that caused it to be called should be
  * canceled.
  * @param {string} command The command to execute.
- * @param {Node|Object} var_args Single additional argument representing the
+ * @param {...*} var_args Single additional argument representing the
  *     current cursor position.  In IE, it is a single node.  In any other
  *     browser, it is an object with a {@code node} key and an {@code offset}
  *     key.
- * @return {Object|undefined} Boolean true when the quoted region has been
+ * @return {boolean|undefined} Boolean true when the quoted region has been
  *     split, false or undefined otherwise.
  * @override
  */

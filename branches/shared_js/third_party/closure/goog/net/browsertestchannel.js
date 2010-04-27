@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the BrowserTestChannel class.  A
@@ -82,7 +94,7 @@ goog.net.BrowserTestChannel.prototype.receivedIntermediateResult_ = false;
 /**
  * The time for of the first result part. We use timing in IE as a
  * heuristic for whether we're behind a buffering proxy.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.firstTime_ = null;
@@ -90,14 +102,14 @@ goog.net.BrowserTestChannel.prototype.firstTime_ = null;
 /**
  * The time for of the last result part. We use timing in IE as a
  * heuristic for whether we're behind a buffering proxy.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.lastTime_ = null;
 
 /**
  * The relative path for test requests.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.path_ = null;
@@ -105,7 +117,7 @@ goog.net.BrowserTestChannel.prototype.path_ = null;
 /**
  * The state of the state machine for this object.
  *
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.state_ = null;
@@ -120,7 +132,7 @@ goog.net.BrowserTestChannel.prototype.lastStatusCode_ = -1;
 /**
  * A subdomain prefix for using a subdomain in IE for the backchannel
  * requests.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.hostPrefix_ = null;
@@ -128,7 +140,7 @@ goog.net.BrowserTestChannel.prototype.hostPrefix_ = null;
 /**
  * A subdomain prefix for testing whether the channel was disabled by
  * a network administrator;
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.net.BrowserTestChannel.prototype.blockedPrefix_ = null;
@@ -210,9 +222,9 @@ goog.net.BrowserTestChannel.prototype.connect = function(path) {
 
   // the first request returns server specific parameters
   sendDataUri.setParameterValues('MODE', 'init');
-  this.request_ = new goog.net.ChannelRequest(this, this.channelDebug_);
+  this.request_ = goog.net.BrowserChannel.createChannelRequest(
+      this, this.channelDebug_);
   this.request_.setExtraHeaders(this.extraHeaders_);
-  this.request_.setMaxRetries(0);
   this.request_.xmlHttpGet(sendDataUri, false, true);
   this.state_ = goog.net.BrowserTestChannel.State_.INIT;
 };
@@ -267,9 +279,9 @@ goog.net.BrowserTestChannel.prototype.checkBlockedCallback_ = function(
  */
 goog.net.BrowserTestChannel.prototype.connectStage2_ = function() {
   this.channelDebug_.debug('TestConnection: starting stage 2');
-  this.request_ = new goog.net.ChannelRequest(this, this.channelDebug_);
+  this.request_ = goog.net.BrowserChannel.createChannelRequest(
+      this, this.channelDebug_);
   this.request_.setExtraHeaders(this.extraHeaders_);
-  this.request_.setMaxRetries(0);
   var recvDataUri = this.channel_.getBackChannelUri(this.hostPrefix_,
       /** @type {string} */ (this.path_));
 
@@ -414,8 +426,7 @@ goog.net.BrowserTestChannel.prototype.onRequestComplete =
         // TODO: need to empirically verify that this number is OK
         // for slow computers
         goodConn = false;
-      }
-      else {
+      } else {
         goodConn = true;
       }
     } else {

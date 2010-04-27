@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview provides a reusable youtube UI component given a youtube data
@@ -122,7 +134,7 @@ goog.addSingletonGetter(goog.ui.media.Youtube);
  * Youtube videos, except if you need finer control over the configuration.
  *
  * @param {goog.ui.media.YoutubeModel} youtubeModel The youtube data model.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper, used for
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @return {goog.ui.media.Media} A Control binded to the youtube renderer.
  */
@@ -200,8 +212,9 @@ goog.ui.media.Youtube.prototype.getCssClass = function() {
  * parameters.
  *
  * @param {string} videoId The youtube video id.
- * @param {string} opt_caption An optional caption of the youtube video.
- * @param {string} opt_description An optional description of the youtube video.
+ * @param {string=} opt_caption An optional caption of the youtube video.
+ * @param {string=} opt_description An optional description of the youtube
+ *     video.
  * @constructor
  * @extends {goog.ui.media.MediaModel}
  */
@@ -244,8 +257,9 @@ goog.ui.media.YoutubeModel.matcher_ =
  * video, and builds a YoutubeModel.
  *
  * @param {string} youtubeUrl A youtube URL.
- * @param {string} opt_caption An optional caption of the youtube video.
- * @param {string} opt_description An optional description of the youtube video.
+ * @param {string=} opt_caption An optional caption of the youtube video.
+ * @param {string=} opt_description An optional description of the youtube
+ *     video.
  * @return {goog.ui.media.YoutubeModel} The data model that represents the
  *     youtube URL.
  * @see goog.ui.media.YoutubeModel.getVideoId()
@@ -299,8 +313,8 @@ goog.ui.media.YoutubeModel.getThumbnailUrl = function(youtubeId) {
  * out of the youtube video id.
  *
  * @param {string} videoId The youtube video ID.
- * @param {boolean} opt_autoplay Whether the flash movie should start playing as
- *     soon as it is shown, or if it should show a 'play' button.
+ * @param {boolean=} opt_autoplay Whether the flash movie should start playing
+ *     as soon as it is shown, or if it should show a 'play' button.
  * @return {string} The flash URL to be embedded on the page.
  */
 goog.ui.media.YoutubeModel.prototype.getFlashUrl = function(videoId,

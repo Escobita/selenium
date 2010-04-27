@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview A class representing menu items that open a submenu.
@@ -46,10 +58,10 @@ goog.require('goog.ui.registry');
  * @param {goog.ui.ControlContent} content Text caption or DOM structure to
  *     display as the content of the submenu (use to add icons or styling to
  *     menus).
- * @param {Object} opt_model Data/model associated with the menu item.
- * @param {goog.dom.DomHelper} opt_domHelper Optional dom helper used for dom
+ * @param {*=} opt_model Data/model associated with the menu item.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional dom helper used for dom
  *     interactions.
- * @param {goog.ui.MenuItemRenderer} opt_renderer Renderer used to render or
+ * @param {goog.ui.MenuItemRenderer=} opt_renderer Renderer used to render or
  *     decorate the component; defaults to {@link goog.ui.SubMenuRenderer}.
  * @constructor
  * @extends {goog.ui.MenuItem}
@@ -71,7 +83,7 @@ goog.ui.SubMenu.MENU_DELAY_MS = 350;
 
 /**
  * Timer used to dismiss the submenu when the item becomes unhighlighted.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.SubMenu.prototype.dismissTimer_ = null;
@@ -79,7 +91,7 @@ goog.ui.SubMenu.prototype.dismissTimer_ = null;
 
 /**
  * Timer used to show the submenu on mouseover.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.SubMenu.prototype.showTimer_ = null;
@@ -174,7 +186,7 @@ goog.ui.SubMenu.prototype.disposeInternal = function() {
  * accuracy when moving to submenus.  Alternate implementations could use
  * geometry instead of a timer.
  * @param {boolean} highlight Whether item should be highlighted.
- * @param {boolean} opt_btnPressed Whether the mouse button is held down.
+ * @param {boolean=} opt_btnPressed Whether the mouse button is held down.
  */
 goog.ui.SubMenu.prototype.setHighlighted = function(highlight,
                                                     opt_btnPressed) {
@@ -243,7 +255,7 @@ goog.ui.SubMenu.prototype.clearTimers = function() {
 /**
  * Sets the menu item to be visible or invisible.
  * @param {boolean} visible Whether to show or hide the component.
- * @param {boolean} opt_force If true, doesn't check whether the component
+ * @param {boolean=} opt_force If true, doesn't check whether the component
  *     already has the requested visibility, and doesn't dispatch any events.
  * @return {boolean} Whether the visibility was changed.
  */
@@ -300,7 +312,7 @@ goog.ui.SubMenu.prototype.handleKeyEvent = function(e) {
       return false;
     }
 
-  // Menu item has control, so let it's menu try to handle the keys (this may
+  // Menu item has control, so let its menu try to handle the keys (this may
   // in turn be handled by sub-sub menus).
   } else if (this.getMenu().handleKeyEvent(e)) {
     // Nothing to do
@@ -346,7 +358,7 @@ goog.ui.SubMenu.prototype.onParentHidden_ = function(e) {
   // Ignore propagated events
   if (e.target == this.getParentEventTarget()) {
     // TODO: Using an event for this is expensive.  Consider having a
-    // generalized interface that the parent menu calls on it's children when
+    // generalized interface that the parent menu calls on its children when
     // it is hidden.
     this.dismissSubMenu();
     this.clearTimers();
@@ -587,7 +599,7 @@ goog.ui.SubMenu.prototype.getMenu = function() {
 /**
  * Sets the submenu to a specific menu.
  * @param {goog.ui.Menu} menu The menu to show when this item is selected.
- * @param {boolean} opt_internal Whether this menu is an "internal" menu, and
+ * @param {boolean=} opt_internal Whether this menu is an "internal" menu, and
  *     should be disposed of when this object is disposed of.
  */
 goog.ui.SubMenu.prototype.setMenu = function(menu, opt_internal) {

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Simple wrapper around a Gears ManagedResourceStore.
@@ -43,15 +55,14 @@ goog.require('goog.string');
  * NOTE: This relies on at least the 0.2 version of gears (for timer).
  *
  * @param {string} name  The name of the managed store.
- * @param {string?} requiredCookie  A cookie that must be present for the
+ * @param {?string} requiredCookie  A cookie that must be present for the
  *     managed store to be active. Should have the form "foo=bar". Can be null
  *     if not required.
- * @param {GearsLocalServer} opt_localServer  Gears local server -- if not set,
+ * @param {GearsLocalServer=} opt_localServer  Gears local server -- if not set,
  *     create a new one internally.
  *
  * @constructor
  * @extends {goog.events.EventTarget}
- *
  */
 goog.gears.ManagedResourceStore = function(name, requiredCookie,
     opt_localServer) {
@@ -104,7 +115,7 @@ goog.gears.ManagedResourceStore.prototype.logger_ =
 
 /**
  * The Gears local server object.
- * @type {GearsLocalServer?}
+ * @type {GearsLocalServer}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.localServer_;
@@ -112,7 +123,7 @@ goog.gears.ManagedResourceStore.prototype.localServer_;
 
 /**
  * The name of the managed store.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.name_;
@@ -122,7 +133,7 @@ goog.gears.ManagedResourceStore.prototype.name_;
  * A cookie that must be present for the managed store to be active.
  * Should have the form "foo=bar". String cast is a safety measure since
  * Gears behaves very badly when it gets an unexpected data type.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.requiredCookie_;
@@ -138,7 +149,7 @@ goog.gears.ManagedResourceStore.prototype.supportsEvents_;
 
 /**
  * The Gears ManagedResourceStore instance we are wrapping.
- * @type {GearsManagedResourceStore?}
+ * @type {GearsManagedResourceStore}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.gearsStore_;
@@ -146,7 +157,7 @@ goog.gears.ManagedResourceStore.prototype.gearsStore_;
 
 /**
  * The id of the check status timer.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.timerId_ = null;
@@ -154,7 +165,7 @@ goog.gears.ManagedResourceStore.prototype.timerId_ = null;
 
 /**
  * The check status timer.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.gears.ManagedResourceStore.prototype.timer_ = null;
@@ -298,7 +309,7 @@ goog.gears.ManagedResourceStore.prototype.assertNotExists_ = function() {
 
 /**
  * Create the ManagedResourceStore in gears
- * @param {string} opt_manifestUrl  The url of the manifest to associate.
+ * @param {string=} opt_manifestUrl  The url of the manifest to associate.
  */
 goog.gears.ManagedResourceStore.prototype.create = function(opt_manifestUrl) {
   if (!this.exists()) {
@@ -367,7 +378,7 @@ goog.gears.ManagedResourceStore.prototype.setManifestUrl = function(url) {
 
 
 /**
- * @return {string?} The version of the managed store that is currently being
+ * @return {?string} The version of the managed store that is currently being
  *     served.
  */
 goog.gears.ManagedResourceStore.prototype.getVersion = function() {
@@ -532,7 +543,7 @@ goog.gears.ManagedResourceStore.EventType = {
 /**
  * Event used when a ManagedResourceStore update is complete
  * @param {string} type  The type of the event.
- * @param {string} opt_errorMessage  The error message if failure.
+ * @param {string=} opt_errorMessage  The error message if failure.
  * @constructor
  * @extends {goog.events.Event}
  */
@@ -548,6 +559,6 @@ goog.inherits(goog.gears.ManagedResourceStoreEvent, goog.events.Event);
 
 /**
  * Error message in the case of a failure event.
- * @type {string?}
+ * @type {?string}
  */
 goog.gears.ManagedResourceStoreEvent.prototype.errorMessage = null;

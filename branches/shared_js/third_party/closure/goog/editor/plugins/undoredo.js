@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2005 Google, Inc. All Rights Reserved.
+// Copyright 2005 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 
 /**
@@ -33,7 +45,6 @@ goog.require('goog.editor.plugins.UndoRedoManager');
 goog.require('goog.editor.plugins.UndoRedoState');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');
-goog.require('goog.events.KeyCodes');
 
 
 /**
@@ -42,8 +53,8 @@ goog.require('goog.events.KeyCodes');
  * clobbered on DOM modifications). Also, this allows interleaving non-editing
  * commands into the undo stack via the UndoRedoManager.
  *
- * @param {goog.editor.plugins.UndoRedoManager} opt_manager An undo redo manager
- *    to be used by this plugin. If none is provided one is created.
+ * @param {goog.editor.plugins.UndoRedoManager=} opt_manager An undo redo
+ *    manager to be used by this plugin. If none is provided one is created.
  * @constructor
  * @extends {goog.editor.Plugin}
  */
@@ -59,7 +70,7 @@ goog.editor.plugins.UndoRedo = function(opt_manager) {
   this.currentStates_ = {};
 
   /**
-   * @type {string?}
+   * @type {?string}
    * @private
    */
   this.initialFieldChange_ = null;
@@ -209,7 +220,7 @@ goog.editor.plugins.UndoRedo.prototype.getCurrentFieldObject = function() {
 
 /**
  * This is so subclasses can deal with multifield undo-redo.
- * @param {String} fieldHashCode The Field's hashcode.
+ * @param {string} fieldHashCode The Field's hashcode.
  * @return {goog.editor.Field} The field object with the hashcode.
  */
 goog.editor.plugins.UndoRedo.prototype.getFieldObject = function(
@@ -464,7 +475,7 @@ goog.editor.plugins.UndoRedo.prototype.handleKeyboardShortcut = function(e, key,
     }
 
     if (command) {
-      // In the case where Trogedit shares it's undo redo stack with another
+      // In the case where Trogedit shares its undo redo stack with another
       // application it's possible that an undo or redo will not be for an
       // goog.editor.Field. In this case we don't want to go through the
       // goog.editor.Field execCommand flow which stops and restarts events on

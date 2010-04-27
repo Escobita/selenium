@@ -1,0 +1,13 @@
+URL: http://code.google.com/p/closure-library/source/browse/?r=134#svn/trunk
+Version: r134
+License: Apache 2.0
+License File: LICENSE
+
+Description:
+Closure Library is a powerful, low level JavaScript library designed
+for building complex and scalable web applications.  It is used by many
+major Google web applications, such as Gmail and Google Docs.
+
+Local Modifications:
+- Copied the dojo and mochikit extensions to Closure into the main goog tree
+

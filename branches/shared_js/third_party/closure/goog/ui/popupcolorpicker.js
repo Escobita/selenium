@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Popup Color Picker implementation.  This is intended to be
@@ -35,8 +47,8 @@ goog.require('goog.ui.Popup');
 /**
  * Popup color picker widget.
  *
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
- * @param {goog.ui.ColorPicker} opt_colorPicker Optional color picker to use
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
+ * @param {goog.ui.ColorPicker=} opt_colorPicker Optional color picker to use
  *     for this popup.
  * @extends {goog.ui.Component}
  * @constructor
@@ -87,14 +99,14 @@ goog.ui.PopupColorPicker.prototype.popupCorner_ =
 
 /**
  * Reference to the element that triggered the last popup.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.PopupColorPicker.prototype.lastTarget_ = null;
 
 
 /**
- * Whether the color picker can move the focus to it's key event target when it
+ * Whether the color picker can move the focus to its key event target when it
  * is shown.  The default is true.  Setting to false can break keyboard
  * navigation, but this is needed for certain scenarios, for example the
  * toolbar menu in trogedit which can't have the selection changed.
@@ -191,7 +203,7 @@ goog.ui.PopupColorPicker.prototype.setAutoHide = function(autoHide) {
  * Returns the region inside which the Popup dismisses itself when the user
  * clicks, or null if it was not set. Null indicates the entire document is
  * the autohide region.
- * @return {Element?} The DOM element for autohide, or null if it hasn't been
+ * @return {Element} The DOM element for autohide, or null if it hasn't been
  *     set.
  */
 goog.ui.PopupColorPicker.prototype.getAutoHideRegion = function() {
@@ -228,7 +240,7 @@ goog.ui.PopupColorPicker.prototype.getPopup = function() {
 
 
 /**
- * @return {Element?} The last element that triggered the popup.
+ * @return {Element} The last element that triggered the popup.
  */
 goog.ui.PopupColorPicker.prototype.getLastTarget = function() {
   return this.lastTarget_;
@@ -257,7 +269,7 @@ goog.ui.PopupColorPicker.prototype.detach = function(element) {
 
 /**
  * Gets the color that is currently selected in this color picker.
- * @return {string?} The hex string of the color selected, or null if no
+ * @return {?string} The hex string of the color selected, or null if no
  *     color is selected.
  */
 goog.ui.PopupColorPicker.prototype.getSelectedColor = function() {
@@ -280,7 +292,7 @@ goog.ui.PopupColorPicker.prototype.setFocusable = function(focusable) {
 
 
 /**
- * Sets whether the color picker can automatically move focus to it's key event
+ * Sets whether the color picker can automatically move focus to its key event
  * target when it is set to visible.
  * @param {boolean} allow Whether to allow auto focus.
  */
@@ -291,7 +303,7 @@ goog.ui.PopupColorPicker.prototype.setAllowAutoFocus = function(allow) {
 
 /**
  * @return {boolean} Whether the color picker can automatically move focus to
- *     it's key event target when it is set to visible.
+ *     its key event target when it is set to visible.
  */
 goog.ui.PopupColorPicker.prototype.getAllowAutoFocus = function() {
   return this.allowAutoFocus_;

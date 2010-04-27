@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Idle Timer.
@@ -38,7 +50,7 @@ goog.require('goog.ui.ActivityMonitor');
  * active.
  * @param {number} idleThreshold Amount of time in ms at which we consider the
  *     user has gone idle.
- * @param {goog.ui.ActivityMonitor} opt_activityMonitor The activity monitor
+ * @param {goog.ui.ActivityMonitor=} opt_activityMonitor The activity monitor
  *     keeping track of user interaction. Defaults to a default-constructed
  *     activity monitor. If a default activity monitor is used then this class
  *     will dispose of it. If an activity monitor is passed in then the caller
@@ -91,7 +103,7 @@ goog.ui.IdleTimer.prototype.hasActivityListener_ = false;
 
 /**
  * Handle to the timer ID used for checking ongoing activity, or null
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.ui.IdleTimer.prototype.onActivityTimerId_ = null;

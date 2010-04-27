@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Datastructure: Pool.
@@ -46,7 +58,6 @@ goog.require('goog.Disposable');
  * @param {number} maxCount Maximum number of objects to keep in the free pool.
  * @constructor
  * @extends {goog.Disposable}
- *
  */
 goog.structs.SimplePool = function(initialCount, maxCount) {
   goog.Disposable.call(this);
@@ -74,7 +85,7 @@ goog.inherits(goog.structs.SimplePool, goog.Disposable);
 /**
  * Function for overriding createObject. The avoids a common case requiring
  * subclassing this class.
- * @type {Function?}
+ * @type {Function}
  * @private
  */
 goog.structs.SimplePool.prototype.createObjectFn_ = null;
@@ -83,7 +94,7 @@ goog.structs.SimplePool.prototype.createObjectFn_ = null;
 /**
  * Function for overriding disposeObject. The avoids a common case requiring
  * subclassing this class.
- * @type {Function?}
+ * @type {Function}
  * @private
  */
 goog.structs.SimplePool.prototype.disposeObjectFn_ = null;

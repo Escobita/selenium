@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utilties for working with the styles of DOM nodes, and
@@ -46,7 +58,7 @@ goog.require('goog.userAgent');
  * @param {Node} node Node to get style of.
  * @param {string} stylePropertyName Property to get (must be camelCase,
  *     not css-style).
- * @return {string?} Style value, or null if this is not an element node.
+ * @return {?string} Style value, or null if this is not an element node.
  * @private
  */
 goog.editor.style.getComputedOrCascadedStyle_ =
@@ -80,7 +92,7 @@ goog.editor.style.isDisplayBlock = function(node) {
  * other inline elements and are thus, not containers. Containers are elements
  * that should not be broken up when wrapping selections with a node of an
  * inline block styling.
- * @param {Node?} element The element to check.
+ * @param {Node} element The element to check.
  * @return {boolean} Whether the element is a container.
  */
 goog.editor.style.isContainer = function(element) {
@@ -96,7 +108,7 @@ goog.editor.style.isContainer = function(element) {
 /**
  * Return the first ancestor of this node that is a container, inclusive.
  * @see isContainer
- * @param {Node?} node Node to find the container of.
+ * @param {Node} node Node to find the container of.
  * @return {Element} The element which contains node.
  */
 goog.editor.style.getContainer = function(node) {

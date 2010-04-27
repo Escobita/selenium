@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Number format/parse library with locale support.
@@ -39,7 +51,7 @@ goog.locale.NumberFormat = function() {
  * Apply a predefined pattern to NumberFormat object.
  * @param {number} patternType The number that indicates a predefined number
  *     format pattern.
- * @param {string} opt_currency Optional international currency code. This
+ * @param {string=} opt_currency Optional international currency code. This
  *     determines the currency code/symbol used in format/parse. If not given,
  *     the currency code for current locale will be used.
  * @deprecated Use goog.i18n.NumberFormat.
@@ -68,7 +80,7 @@ goog.locale.NumberFormat.prototype.applyStandardPattern =
 /**
  * Apply a pattern to NumberFormat object.
  * @param {string} pattern The number format pattern string.
- * @param {string} opt_currency Optional international currency code. This
+ * @param {string=} opt_currency Optional international currency code. This
  *     determines the currency code/symbol used in format/parse. If not given,
  *     the currency code for current locale will be used.
  * @deprecated Use goog.i18n.NumberFormat.
@@ -110,7 +122,7 @@ goog.locale.NumberFormat.prototype.applyPattern =
  * parsing stops after the call. If an error occurs, opt_pos won't be updated.
  *
  * @param {string} text the string to be parsed.
- * @param {Array} opt_pos position to pass in and get back.
+ * @param {Array=} opt_pos position to pass in and get back.
  * @return {number} Parsed number, or NaN if the parse fails.
  * @deprecated Use goog.i18n.NumberFormat.prototype.parse.
  */

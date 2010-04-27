@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Generic rich data access API.
@@ -62,7 +74,7 @@ goog.ds.DataNode.prototype.set = goog.nullFunction;
 /**
  * Gets all of the child nodes of the current node.
  * Should return an empty DataNode list if no child nodes.
- * @param {string} opt_selector String selector to choose child nodes.
+ * @param {string=} opt_selector String selector to choose child nodes.
  * @return {goog.ds.DataNodeList} The child nodes.
  */
 goog.ds.DataNode.prototype.getChildNodes = goog.nullFunction;
@@ -71,7 +83,7 @@ goog.ds.DataNode.prototype.getChildNodes = goog.nullFunction;
 /**
  * Gets a named child node of the current node
  * @param {string} name The node name.
- * @param {boolean} opt_canCreate Whether to create a child node if it does not
+ * @param {boolean=} opt_canCreate Whether to create a child node if it does not
  *     exist.
  * @return {goog.ds.DataNode} The child node, or null
  * if no node of this name exists.
@@ -172,7 +184,7 @@ goog.ds.BaseDataNode.prototype.set = goog.nullFunction;
 /**
  * Gets all of the child nodes of the current node.
  * Should return an empty DataNode list if no child nodes.
- * @param {string} opt_selector String selector to choose child nodes.
+ * @param {string=} opt_selector String selector to choose child nodes.
  * @return {goog.ds.DataNodeList} The child nodes.
  */
 goog.ds.BaseDataNode.prototype.getChildNodes = function(opt_selector) {
@@ -183,7 +195,7 @@ goog.ds.BaseDataNode.prototype.getChildNodes = function(opt_selector) {
 /**
  * Gets a named child node of the current node
  * @param {string} name The node name.
- * @param {boolean} opt_canCreate Whether you can create the child node if
+ * @param {boolean=} opt_canCreate Whether you can create the child node if
  *     it doesn't exist already.
  * @return {goog.ds.DataNode} The child node, or null if no node of
  *     this name exists and opt_create is false.
@@ -196,12 +208,19 @@ goog.ds.BaseDataNode.prototype.getChildNode = function(name, opt_canCreate) {
 /**
  * Gets the value of a child node
  * @param {string} name The node name.
- * @return {Object?} The value of the node, or null if no value or the
+ * @return {Object} The value of the node, or null if no value or the
  *     child node doesn't exist.
  */
 goog.ds.BaseDataNode.prototype.getChildNodeValue = function(name) {
   return null;
 };
+
+
+/**
+ * Get the name of the node relative to the parent node
+ * @return {string} The name of the node.
+ */
+goog.ds.BaseDataNode.prototype.getDataName = goog.nullFunction;
 
 
 /**
@@ -238,7 +257,7 @@ goog.ds.BaseDataNode.prototype.getLoadState = function() {
 
 /**
  * Gets the parent node. Subclasses implement this function
- * @type {Function?}
+ * @type {Function}
  * @protected
  * @suppress {underscore}
  */
@@ -318,7 +337,7 @@ goog.ds.DataNodeList.prototype.removeNode = goog.nullFunction;
  * names: eval, toSource, toString, unwatch, valueOf, watch. Behavior is
  * undefined if these names are used.
  *
- * @param {Array.<goog.ds.DataNode>} opt_nodes optional nodes to add to list.
+ * @param {Array.<goog.ds.DataNode>=} opt_nodes optional nodes to add to list.
  * @constructor
  * @extends {goog.ds.DataNodeList}
  */
@@ -476,7 +495,7 @@ goog.ds.EmptyNodeList.prototype.add = function(node) {
  *     node list is sorted. Should take 2 arguments to compare, and return a
  *     negative integer, zero, or a positive integer depending on whether the
  *     first argument is less than, equal to, or greater than the second.
- * @param {Array.<goog.ds.DataNode>} opt_nodes optional nodes to add to list;
+ * @param {Array.<goog.ds.DataNode>=} opt_nodes optional nodes to add to list;
  *    these are assumed to be in sorted order.
  * @extends {goog.ds.BasicNodeList}
  * @constructor

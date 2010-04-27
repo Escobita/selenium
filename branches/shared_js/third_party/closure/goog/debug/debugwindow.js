@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the DebugWindow class. Please minimize
@@ -37,8 +49,8 @@ goog.require('goog.userAgent');
  * functionality in a separate class.
  *
  * @constructor
- * @param {string} opt_identifier Identifier for this logging class.
- * @param {string} opt_prefix Prefix prepended to messages.
+ * @param {string=} opt_identifier Identifier for this logging class.
+ * @param {string=} opt_prefix Prefix prepended to messages.
  */
 goog.debug.DebugWindow = function(opt_identifier, opt_prefix) {
   /**
@@ -134,7 +146,7 @@ goog.debug.DebugWindow.prototype.welcomeMessage = 'LOGGING';
 
 /**
  * Reference to debug window
- * @type {Window?}
+ * @type {Window}
  * @protected
  * @suppress {underscore}
  */
@@ -166,7 +178,7 @@ goog.debug.DebugWindow.showedBlockedAlert_ = false;
 
 /**
  * Reference to timeout used to buffer the output stream.
- * @type {number?}
+ * @type {?number}
  * @private
  */
 goog.debug.DebugWindow.prototype.bufferTimeout_ = null;
@@ -493,7 +505,7 @@ goog.debug.DebugWindow.prototype.setCookie_ = function(key, value) {
 /**
  * Retrieve data (using cookies).
  * @param {string} key Data name.
- * @param {string} opt_default Optional default value if cookie doesn't exist.
+ * @param {string=} opt_default Optional default value if cookie doesn't exist.
  * @return {string} Cookie value.
  * @private
  */
@@ -507,7 +519,7 @@ goog.debug.DebugWindow.prototype.getCookie_ = function(key, opt_default) {
  * Retrieve data (using cookies).
  * @param {string} identifier Identifier for logging class.
  * @param {string} key Data name.
- * @param {string} opt_default Optional default value if cookie doesn't exist.
+ * @param {string=} opt_default Optional default value if cookie doesn't exist.
  * @return {string} Cookie value.
  * @private
  */

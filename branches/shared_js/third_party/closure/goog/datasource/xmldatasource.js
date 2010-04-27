@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview
@@ -37,7 +49,7 @@ goog.require('goog.string');
  *
  * @param {Node} node The XML node. Can be null.
  * @param {goog.ds.XmlDataSource} parent Parent of XML element. Can be null.
- * @param {string} opt_name The name of this node relative to the parent node.
+ * @param {string=} opt_name The name of this node relative to the parent node.
  *
  * @extends {goog.ds.DataNode}
  * @constructor
@@ -152,7 +164,7 @@ goog.ds.XmlDataSource.prototype.set = function(value) {
 /**
  * Gets all of the child nodes of the current node.
  * Should return an empty DataNode list if no child nodes.
- * @param {string} opt_selector String selector to choose child nodes.
+ * @param {string=} opt_selector String selector to choose child nodes.
  * @return {goog.ds.DataNodeList} The child nodes.
  */
 goog.ds.XmlDataSource.prototype.getChildNodes = function(opt_selector) {
@@ -403,7 +415,7 @@ goog.ds.XmlHttpDataSource.prototype.failure_ = function() {
  * @param {(string,goog.Uri)} uri The URL to send to.
  * @param {Function} onload Function to call when xml document loads
  *     succesfully.
- * @param {Function} opt_onerror Function to call when xml document load fails.
+ * @param {Function=} opt_onerror Function to call when xml document load fails.
  *
  * @constructor
  * @private

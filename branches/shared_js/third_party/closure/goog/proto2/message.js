@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Protocol Buffer Message base class.
@@ -18,7 +30,6 @@
 
 goog.provide('goog.proto2.Message');
 
-goog.require('goog.json');
 goog.require('goog.proto2.Descriptor');
 goog.require('goog.proto2.FieldDescriptor');
 goog.require('goog.proto2.Util');
@@ -33,7 +44,7 @@ goog.require('goog.string');
 goog.proto2.Message = function() {
   /**
    * Stores the field values in this message.
-   * @type {Object}
+   * @type {*}
    * @private
    */
   this.values_ = {};
@@ -108,7 +119,7 @@ goog.proto2.Message.FieldType = {
  * @param {goog.proto2.LazyDeserializer} deserializer The lazy deserializer to
  *   use to decode the data on the fly.
  *
- * @param {Object} data The data to decode/deserialize.
+ * @param {*} data The data to decode/deserialize.
  */
 goog.proto2.Message.prototype.initializeForLazyDeserializer =
   function(deserializer, data) {
@@ -139,7 +150,7 @@ goog.proto2.Message.prototype.setUnknown = function(tag, value) {
 /**
  * Iterates over all the unknown fields in the message.
  *
- * @param {function(number, Object)} callback A callback method
+ * @param {function(number, *)} callback A callback method
  *     which gets invoked for each unknown field.
  */
 goog.proto2.Message.prototype.forEachUnknown = function(callback) {
@@ -165,7 +176,7 @@ goog.proto2.Message.prototype.getDescriptor = function() {
  * Returns the data in the current message as an anonymous
  * ECMAScript object (i.e a simple key/value pair object).
  *
- * @param {goog.proto2.ObjectSerializer.KeyOption} opt_keyOption Specifies
+ * @param {goog.proto2.ObjectSerializer.KeyOption=} opt_keyOption Specifies
  *     the format of the keys in the generated object. See the definition
  *     of the enumeration for more information.
  *
@@ -201,7 +212,7 @@ goog.proto2.Message.prototype.has = function(field) {
  * @param {goog.proto2.FieldDescriptor} field The field for which to
  *     return the values.
  *
- * @return {Array.<Object>} The values found.
+ * @return {Array.<*>} The values found.
  */
 goog.proto2.Message.prototype.arrayOf = function(field) {
   goog.proto2.Util.assert(
@@ -235,10 +246,10 @@ goog.proto2.Message.prototype.countOf = function(field) {
  *
  * @param {goog.proto2.FieldDescriptor} field The field for which to get the
  *     value.
- * @param {number} opt_index If the field is repeated, the index to use when
+ * @param {number=} opt_index If the field is repeated, the index to use when
  *     looking up the value.
  *
- * @return {Object?} The value found or undefined if none.
+ * @return {*} The value found or undefined if none.
  */
 goog.proto2.Message.prototype.get = function(field, opt_index) {
   goog.proto2.Util.assert(
@@ -255,10 +266,10 @@ goog.proto2.Message.prototype.get = function(field, opt_index) {
  *
  * @param {goog.proto2.FieldDescriptor} field The field for which to get the
  *     value.
- * @param {number} opt_index If the field is repeated, the index to use when
+ * @param {number=} opt_index If the field is repeated, the index to use when
  *     looking up the value.
  *
- * @return {Object?} The value found or the default if none.
+ * @return {*} The value found or the default if none.
  */
 goog.proto2.Message.prototype.getOrDefault = function(field, opt_index) {
   goog.proto2.Util.assert(
@@ -275,7 +286,7 @@ goog.proto2.Message.prototype.getOrDefault = function(field, opt_index) {
  *
  * @param {goog.proto2.FieldDescriptor} field The field for which to set
  *     the value.
- * @param {Object} value The new value for the field.
+ * @param {*} value The new value for the field.
  */
 goog.proto2.Message.prototype.set = function(field, value) {
   goog.proto2.Util.assert(
@@ -292,7 +303,7 @@ goog.proto2.Message.prototype.set = function(field, value) {
  *
  * @param {goog.proto2.FieldDescriptor} field The field in which to add the
  *     the value.
- * @param {Object} value The new value to add to the field.
+ * @param {*} value The new value to add to the field.
  */
 goog.proto2.Message.prototype.add = function(field, value) {
   goog.proto2.Util.assert(
@@ -380,10 +391,10 @@ goog.proto2.Message.prototype.lazyDeserialize_ = function(field) {
  * GENERATED CODE USE ONLY. Basis of the get{Field} methods.
  *
  * @param {number} tag The field's tag index.
- * @param {number} opt_index If the field is a repeated field, the index
+ * @param {number=} opt_index If the field is a repeated field, the index
  *     at which to get the value.
  *
- * @return {Object?} The value found or undefined for none.
+ * @return {*} The value found or undefined for none.
  */
 goog.proto2.Message.prototype.get$Value = function(tag, opt_index) {
   var field = this.getFieldByTag_(tag);
@@ -412,10 +423,10 @@ goog.proto2.Message.prototype.get$Value = function(tag, opt_index) {
  * GENERATED CODE USE ONLY. Basis of the get{Field} methods.
  *
  * @param {number} tag The field's tag index.
- * @param {number} opt_index If the field is a repeated field, the index
+ * @param {number=} opt_index If the field is a repeated field, the index
  *     at which to get the value.
  *
- * @return {Object} The value found or the default value if none set.
+ * @return {*} The value found or the default value if none set.
  */
 goog.proto2.Message.prototype.get$ValueOrDefault = function(tag, opt_index) {
 
@@ -487,7 +498,7 @@ goog.proto2.Message.prototype.count$Values = function(tag) {
  * GENERATED CODE USE ONLY. Basis of the set{Field} methods.
  *
  * @param {number} tag The field's tag index.
- * @param {Object?} value The field's value.
+ * @param {*} value The field's value.
  */
 goog.proto2.Message.prototype.set$Value = function(tag, value) {
   if (goog.proto2.Util.conductChecks()) {
@@ -509,7 +520,7 @@ goog.proto2.Message.prototype.set$Value = function(tag, value) {
  * GENERATED CODE USE ONLY. Basis of the add{Field} methods.
  *
  * @param {number} tag The field's tag index.
- * @param {Object?} value The value to add.
+ * @param {*} value The value to add.
  */
 goog.proto2.Message.prototype.add$Value = function(tag, value) {
   if (goog.proto2.Util.conductChecks()) {
@@ -534,7 +545,7 @@ goog.proto2.Message.prototype.add$Value = function(tag, value) {
  * is valid.
  *
  * @param {goog.proto2.FieldDescriptor} field The field being assigned.
- * @param {Object?} value The value being assigned.
+ * @param {*} value The value being assigned.
  * @private
  */
 goog.proto2.Message.prototype.checkFieldType_ = function(field, value) {

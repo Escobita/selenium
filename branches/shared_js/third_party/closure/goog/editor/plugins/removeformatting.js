@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 // All Rights Reserved.
 
 /**
@@ -448,7 +460,7 @@ goog.editor.plugins.RemoveFormatting.prototype.convertSelectedHtmlText_ =
 
   // For multiple ranges, it is really hard to do our custom remove formatting
   // without invalidating other ranges. So instead of always losing the
-  // content, this solution at least lets the browser do it's own remove
+  // content, this solution at least lets the browser do its own remove
   // formatting which works correctly most of the time.
   if (range.getTextRangeCount() > 1) {
     return;
@@ -605,7 +617,7 @@ goog.editor.plugins.RemoveFormatting.prototype.removeFormattingWorker_ =
       var nodeName = node.nodeName;
 
       var formatted = this.getValueForNode(node);
-      if (formatted) {
+      if (goog.isDefAndNotNull(formatted)) {
         sb.push(formatted);
         continue;
       }
@@ -724,7 +736,7 @@ goog.editor.plugins.RemoveFormatting.prototype.removeFormattingWorker_ =
  * NOTE: If an alternate RemoveFormatting processor is provided
  * (setRemoveFormattingFunc()), this will no longer work.
  * @param {Element} node The node to clean.
- * @return {string?} The HTML strig representation of the cleaned data.
+ * @return {?string} The HTML strig representation of the cleaned data.
  */
 goog.editor.plugins.RemoveFormatting.prototype.getValueForNode = function(
     node) {

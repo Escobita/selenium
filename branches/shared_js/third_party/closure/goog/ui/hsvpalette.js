@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview An HSV (hue/saturation/value) color palette/picker
@@ -41,9 +53,9 @@ goog.require('goog.userAgent');
 /**
  * Creates an HSV palette. Allows a user to select the hue, saturation and
  * value/brightness.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
- * @param {string} opt_color Optional initial color (default is red).
- * @param {string} opt_class Optional base for creating classnames (default is
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
+ * @param {string=} opt_color Optional initial color (default is red).
+ * @param {string=} opt_class Optional base for creating classnames (default is
  *     goog.getCssName('goog-hsv-palette')).
  * @extends {goog.ui.Component}
  * @constructor
@@ -131,7 +143,7 @@ goog.ui.HsvPalette.prototype.inputHandler_;
 
 /**
  * Listener key for the mousemove event (during a drag operation).
- * @type {Number}
+ * @type {?number}
  * @private
  */
 goog.ui.HsvPalette.prototype.mouseMoveListener_;
@@ -139,7 +151,7 @@ goog.ui.HsvPalette.prototype.mouseMoveListener_;
 
 /**
  * Listener key for the mouseup event (during a drag operation).
- * @type {Number}
+ * @type {?number}
  * @private
  */
 goog.ui.HsvPalette.prototype.mouseUpListener_;
@@ -151,6 +163,17 @@ goog.ui.HsvPalette.prototype.mouseUpListener_;
  */
 goog.ui.HsvPalette.prototype.getColor = function() {
   return this.color_;
+};
+
+
+/**
+ * Alpha transparency of the currently selected color, in [0, 1].
+ * For the HSV palette this always returns 1. The HSVA palette overrides
+ * this method.
+ * @return {number} The current alpha value.
+ */
+goog.ui.HsvPalette.prototype.getAlpha = function() {
+  return 1;
 };
 
 
@@ -204,9 +227,9 @@ goog.ui.HsvPalette.prototype.setColor_ = function(color) {
 /**
  * Alters the hue, saturation, and/or value of the currently selected color and
  * updates the UI.
- * @param {Number} opt_hue (optional) hue in [0, 1].
- * @param {Number} opt_saturation (optional) saturation in [0, 1].
- * @param {Number} opt_value (optional) value in [0, 255].
+ * @param {?number=} opt_hue (optional) hue in [0, 1].
+ * @param {?number=} opt_saturation (optional) saturation in [0, 1].
+ * @param {?number=} opt_value (optional) value in [0, 255].
  */
 goog.ui.HsvPalette.prototype.setHsv = function(opt_hue,
                                                opt_saturation,
@@ -221,9 +244,9 @@ goog.ui.HsvPalette.prototype.setHsv = function(opt_hue,
 
 /**
  * Alters the hue, saturation, and/or value of the currently selected color.
- * @param {Number} opt_hue (optional) hue in [0, 1].
- * @param {Number} opt_saturation (optional) saturation in [0, 1].
- * @param {Number} opt_value (optional) value in [0, 255].
+ * @param {?number=} opt_hue (optional) hue in [0, 1].
+ * @param {?number=} opt_saturation (optional) saturation in [0, 1].
+ * @param {?number=} opt_value (optional) value in [0, 255].
  * @private
  */
 goog.ui.HsvPalette.prototype.setHsv_ = function(opt_hue,
@@ -247,7 +270,7 @@ goog.ui.HsvPalette.prototype.setHsv_ = function(opt_hue,
  * HsvPalettes cannot be used to decorate pre-existing html, since the
  * structure they build is fairly complicated.
  * @param {Element} element Element to decorate.
- * @return {Boolean} Returns always false.
+ * @return {boolean} Returns always false.
  */
 goog.ui.HsvPalette.prototype.canDecorate = function(element) {
   return false;

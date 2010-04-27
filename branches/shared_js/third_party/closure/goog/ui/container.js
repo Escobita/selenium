@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Base class for containers that host {@link goog.ui.Control}s,
@@ -39,7 +51,6 @@ goog.require('goog.ui.Component.Error');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.Component.State');
 goog.require('goog.ui.ContainerRenderer');
-goog.require('goog.userAgent');
 
 /**
  * Base class for containers.  Extends {@link goog.ui.Component} by adding
@@ -51,11 +62,11 @@ goog.require('goog.userAgent');
  *    <li>methods to manage child controls hosted in the container,
  *    <li>default mouse and keyboard event handling methods.
  *  </ul>
- * @param {?goog.ui.Container.Orientation} opt_orientation Container
+ * @param {?goog.ui.Container.Orientation=} opt_orientation Container
  *     orientation; defaults to {@code VERTICAL}.
- * @param {?goog.ui.ContainerRenderer} opt_renderer Renderer used to render or
+ * @param {?goog.ui.ContainerRenderer=} opt_renderer Renderer used to render or
  *     decorate the container; defaults to {@link goog.ui.ContainerRenderer}.
- * @param {?goog.dom.DomHelper} opt_domHelper DOM helper, used for document
+ * @param {?goog.dom.DomHelper=} opt_domHelper DOM helper, used for document
  *     interaction.
  * @extends {goog.ui.Component}
  * @constructor
@@ -195,7 +206,7 @@ goog.ui.Container.prototype.allowFocusableChildren_ = false;
  * control's root element; each value is a reference to the child control
  * itself.  Used for looking up the child control corresponding to a DOM
  * node in O(1) time.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.ui.Container.prototype.childElementIdMap_ = null;
@@ -207,7 +218,7 @@ goog.ui.Container.prototype.childElementIdMap_ = null;
 /**
  * Returns the DOM element on which the container is listening for keyboard
  * events (null if none).
- * @return {Element?} Element on which the container is listening for key
+ * @return {Element} Element on which the container is listening for key
  *     events.
  */
 goog.ui.Container.prototype.getKeyEventTarget = function() {
@@ -301,7 +312,7 @@ goog.ui.Container.prototype.createDom = function() {
  * Returns the DOM element into which child components are to be rendered,
  * or null if the container itself hasn't been rendered yet.  Overrides
  * {@link goog.ui.Component#getContentElement} by delegating to the renderer.
- * @return {Element?} Element to contain child elements (null if none).
+ * @return {Element} Element to contain child elements (null if none).
  */
 goog.ui.Container.prototype.getContentElement = function() {
   // Delegate to renderer.
@@ -662,7 +673,7 @@ goog.ui.Container.prototype.handleBlur = function(e) {
  * @return {boolean} Whether the key event was handled.
  */
 goog.ui.Container.prototype.handleKeyEvent = function(e) {
-  if (this.isEnabled() && this.getChildCount() != 0 &&
+  if (this.isEnabled() && this.isVisible() && this.getChildCount() != 0 &&
       this.handleKeyEventInternal(e)) {
     e.preventDefault();
     e.stopPropagation();
@@ -792,12 +803,32 @@ goog.ui.Container.prototype.registerChildId_ = function(child) {
  * Adds the specified control as the last child of this container.  See
  * {@link goog.ui.Container#addChildAt} for detailed semantics.
  * @param {goog.ui.Control} child The new child control.
- * @param {boolean} opt_render Whether the new child should be rendered
+ * @param {boolean=} opt_render Whether the new child should be rendered
  *     immediately after being added (defaults to false).
  */
 goog.ui.Container.prototype.addChild = function(child, opt_render) {
   goog.ui.Container.superClass_.addChild.call(this, child, opt_render);
 };
+
+
+/**
+ * Overrides {@link goog.ui.Container#getChild} to make it clear that it
+ * only returns {@link goog.ui.Control}s.
+ * @param {string} id Child component ID.
+ * @return {goog.ui.Control} The child with the given ID; null if none.
+ * @override
+ */
+goog.ui.Container.prototype.getChild;
+
+
+/**
+ * Overrides {@link goog.ui.Container#getChildAt} to make it clear that it
+ * only returns {@link goog.ui.Control}s.
+ * @param {number} index 0-based index.
+ * @return {goog.ui.Control} The child with the given ID; null if none.
+ * @override
+ */
+goog.ui.Container.prototype.getChildAt;
 
 
 /**
@@ -807,7 +838,7 @@ goog.ui.Container.prototype.addChild = function(child, opt_render) {
  * {@link #addChildAt} internally, we only need to override this method.
  * @param {goog.ui.Control} control New child.
  * @param {number} index Index at which the new child is to be added.
- * @param {boolean} opt_render Whether the new child should be rendered
+ * @param {boolean=} opt_render Whether the new child should be rendered
  *     immediately after being added (defaults to false).
  */
 goog.ui.Container.prototype.addChildAt = function(control, index, opt_render) {
@@ -843,7 +874,7 @@ goog.ui.Container.prototype.addChildAt = function(control, index, opt_render) {
  * uses {@link #removeChild} internally, we only need to override this method.
  * @param {string|goog.ui.Control} control The ID of the child to remove, or
  *     the control itself.
- * @param {boolean} opt_unrender Whether to call {@code exitDocument} on the
+ * @param {boolean=} opt_unrender Whether to call {@code exitDocument} on the
  *     removed control, and detach its DOM from the document (defaults to
  *     false).
  * @return {goog.ui.Control} The removed control, if any.
@@ -922,7 +953,7 @@ goog.ui.Container.prototype.isVisible = function() {
  * the requested visibility.  Otherwise, dispatches a SHOW or HIDE event as
  * appropriate, giving listeners a chance to prevent the visibility change.
  * @param {boolean} visible Whether to show or hide the container.
- * @param {boolean} opt_force If true, doesn't check whether the container
+ * @param {boolean=} opt_force If true, doesn't check whether the container
  *     already has the requested visibility, and doesn't dispatch any events.
  * @return {boolean} Whether the visibility was changed.
  */
@@ -1098,8 +1129,7 @@ goog.ui.Container.prototype.setHighlighted = function(item) {
  * @return {goog.ui.Control?} Highlighted item (null if none).
  */
 goog.ui.Container.prototype.getHighlighted = function() {
-  return /** @type {goog.ui.Control} */ (
-      this.getChildAt(this.highlightedIndex_));
+  return this.getChildAt(this.highlightedIndex_);
 };
 
 
@@ -1163,16 +1193,16 @@ goog.ui.Container.prototype.highlightHelper = function(fn, startIndex) {
       this.indexOfChild(this.openItem_) : startIndex;
   var numItems = this.getChildCount();
 
-  curIndex = fn(curIndex, numItems);
+  curIndex = fn.call(this, curIndex, numItems);
   var visited = 0;
   while (visited <= numItems) {
-    var control = /** @type {goog.ui.Control} */ (this.getChildAt(curIndex));
+    var control = this.getChildAt(curIndex);
     if (control && this.canHighlightItem(control)) {
       this.setHighlightedIndexFromKeyEvent(curIndex);
       return true;
     }
     visited++;
-    curIndex = fn(curIndex, numItems);
+    curIndex = fn.call(this, curIndex, numItems);
   }
   return false;
 };

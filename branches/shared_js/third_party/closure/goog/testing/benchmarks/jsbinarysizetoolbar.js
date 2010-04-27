@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Sample code to render a simple goog.ui.Toolbar.  The
@@ -58,7 +70,7 @@ function drawToolbar() {
 
   t1.addChild(s1, true);
   goog.events.listen(t1, EVENTS, logEvent);
-  t1.render(goog.dom.$('toolbar'));
+  t1.render(goog.dom.getElement('toolbar'));
 }
 
 goog.exportSymbol('drawToolbar', drawToolbar);

@@ -20,6 +20,7 @@ main() {
   command=( "${command[@]}" "--output_mode=deps" )
   command=( "${command[@]}" "--path=${JS_RELATIVE_SRC}" )
   command=( "${command[@]}" "--path=${JS_RELATIVE_TEST}" )
+  command=( "${command[@]}" "--dep=." )
 
   echo
   count=${#command[@]}

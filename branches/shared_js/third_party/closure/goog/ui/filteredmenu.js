@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Menu where items can be filtered based on user keyboard input.
@@ -32,9 +44,9 @@ goog.require('goog.ui.Menu');
 
 /**
  * Filtered menu class.
- * @param {goog.ui.MenuRenderer} opt_renderer Renderer used to render filtered
+ * @param {goog.ui.MenuRenderer=} opt_renderer Renderer used to render filtered
  *     menu; defaults to {@link goog.ui.MenuRenderer}.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Menu}
  */
@@ -235,7 +247,7 @@ goog.ui.FilteredMenu.prototype.disposeInternal = function() {
 /**
  * Sets the filter label (the label displayed in the filter input element if no
  * text has been entered).
- * @param {string?} label Label text.
+ * @param {?string} label Label text.
  */
 goog.ui.FilteredMenu.prototype.setFilterLabel = function(label) {
   this.label_ = label || '';
@@ -255,7 +267,7 @@ goog.ui.FilteredMenu.prototype.getFilterLabel = function() {
 
 /**
  * Sets the filter string.
- * @param {string?} str Filter string.
+ * @param {?string} str Filter string.
  */
 goog.ui.FilteredMenu.prototype.setFilter = function(str) {
   if (this.filterInput_) {

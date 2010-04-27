@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Testing utilities for DOM related tests.
@@ -52,7 +64,6 @@ goog.testing.dom.END_TAG_MARKER_ = {};
  *         string starting with '#': Match the node's id with the text
  *             after "#".
  *         other string: Match the text node's contents.
- *
  */
 goog.testing.dom.assertNodesMatch = function(it, array) {
   var i = 0;
@@ -86,6 +97,38 @@ goog.testing.dom.assertNodesMatch = function(it, array) {
   });
 
   assertEquals('Used entire match array', array.length, i);
+};
+
+
+/**
+ * Exposes a node as a string.
+ * @param {Node} node A node.
+ * @return {string} A string representation of the node.
+ */
+goog.testing.dom.exposeNode = function(node) {
+  return (node.tagName || node.nodeValue) + (node.id ? '#' + node.id : '') +
+      ':"' + (node.innerHTML || '') + '"';
+};
+
+
+/**
+ * Exposes the nodes of a range wrapper as a string.
+ * @param {goog.dom.AbstractRange} range A range.
+ * @return {string} A string representation of the range.
+ */
+goog.testing.dom.exposeRange = function(range) {
+  // This is deliberately not implemented as
+  // goog.dom.AbstractRange.prototype.toString, because it is non-authoritative.
+  // Two equivalent ranges may have very different exposeRange values, and
+  // two different ranges may have equal exposeRange values.
+  // (The mapping of ranges to DOM nodes/offsets is a many-to-many mapping).
+  if (!range) {
+    return 'null';
+  }
+  return goog.testing.dom.exposeNode(range.getStartNode()) + ':' +
+         range.getStartOffset() + ' to ' +
+         goog.testing.dom.exposeNode(range.getEndNode()) + ':' +
+         range.getEndOffset();
 };
 
 
@@ -203,9 +246,9 @@ goog.testing.dom.describeNode_ = function(node) {
  * expected to show up in that user agent and expected not to show up in
  * others.
  * @param {string} htmlPattern The pattern to match.
- * @param {Element} actual The element to check: its contents are matched
+ * @param {!Element} actual The element to check: its contents are matched
  *     against the HTML pattern.
- * @param {boolean} opt_strictAttributes If false, attributes that appear in
+ * @param {boolean=} opt_strictAttributes If false, attributes that appear in
  *     htmlPattern must be in actual, but actual can have attributes not
  *     present in htmlPattern.  If true, htmlPattern and actual must have the
  *     same set of attributes.  Default is false.
@@ -225,8 +268,8 @@ goog.testing.dom.assertHtmlContentsMatch = function(htmlPattern, actual,
 
   var expectedIt = goog.iter.filter(new goog.dom.NodeIterator(div),
       goog.testing.dom.nodeFilter_);
-  var actualNode;
 
+  var actualNode;
   var preIterated = false;
   var advanceActualNode = function() {
     // If the iterator has already been advanced, don't advance it again.
@@ -241,8 +284,19 @@ goog.testing.dom.assertHtmlContentsMatch = function(htmlPattern, actual,
     }
   };
 
+  // HACK: IE has unique ideas about whitespace handling when setting
+  // innerHTML. This results in elision of leading whitespace in the expected
+  // nodes where doing so doesn't affect visible rendering. As a workaround, we
+  // remove the leading whitespace in the actual nodes where necessary.
+  //
+  // The collapsible variable tracks whether we should collapse the whitespace
+  // in the next Text node we encounter.
+  var collapsible = true;
+
   var number = 0;
   goog.iter.forEach(expectedIt, function(expectedNode) {
+    expectedNode = /** @type {Node} */ (expectedNode);
+
     advanceActualNode();
     assertNotNull('Finished actual HTML before finishing expected HTML at ' +
                   'node number ' + number + ': ' +
@@ -267,13 +321,32 @@ goog.testing.dom.assertHtmlContentsMatch = function(htmlPattern, actual,
           goog.style.parseStyleAttribute(actualNode.style.cssText));
       goog.testing.dom.assertAttributesEqual_(errorSuffix, expectedNode,
           actualNode, !!opt_strictAttributes);
+
+      if (goog.userAgent.IE &&
+          goog.style.getCascadedStyle(
+              /** @type {Element} */ (actualNode), 'display') != 'inline') {
+        // Text may be collapsed after any non-inline element.
+        collapsible = true;
+      }
     } else {
       // Concatenate text nodes until we reach a non text node.
       var actualText = actualNode.nodeValue;
       preIterated = true;
-      while ((actualNode = goog.iter.nextOrValue(actualIt, null)) &&
+      while ((actualNode = /** @type {Node} */
+              (goog.iter.nextOrValue(actualIt, null))) &&
           actualNode.nodeType == goog.dom.NodeType.TEXT) {
         actualText += actualNode.nodeValue;
+      }
+
+      if (goog.userAgent.IE) {
+        // Collapse the leading whitespace, unless the string consists entirely
+        // of whitespace.
+        if (collapsible && !goog.string.isEmpty(actualText)) {
+          actualText = goog.string.trimLeft(actualText);
+        }
+        // Prepare to collapse whitespace in the next Text node if this one does
+        // not end in a whitespace character.
+        collapsible = /\s$/.test(actualText);
       }
 
       var expectedText = goog.testing.dom.getExpectedText_(expectedNode);

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Defines a 2-element vector class that can be used for
@@ -31,8 +43,8 @@ goog.require('goog.math.Coordinate');
  * Inherits from goog.math.Coordinate so that a Vec2 may be passed in to any
  * function that requires a Coordinate.
  *
- * @param {number} opt_x The x coordinate for the vector.
- * @param {number} opt_y The y coordinate for the vector.
+ * @param {number=} opt_x The x coordinate for the vector.
+ * @param {number=} opt_y The y coordinate for the vector.
  * @constructor
  * @extends {goog.math.Coordinate}
  */

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview An implementation of DataNode for wrapping JS data.
@@ -37,7 +49,7 @@ goog.require('goog.ds.LoadState');
  *
  * @param {Object} root The root JS node.
  * @param {string} dataName The name of this node relative to the parent node.
- * @param {Object} opt_parent Optional parent of this JsDataSource.
+ * @param {Object=} opt_parent Optional parent of this JsDataSource.
  *
  * implements goog.ds.DataNode.
  * @constructor
@@ -53,7 +65,7 @@ goog.ds.JsDataSource = function(root, dataName, opt_parent) {
 
 /**
  * The root JS object. Can be null.
- * @type {?Object}
+ * @type {Object}
  * @protected
  * @suppress {underscore}
  */
@@ -62,7 +74,7 @@ goog.ds.JsDataSource.prototype.root_;
 
 /**
  * Sets the root JS object
- * @param {Object?} root The root JS object. Can be null.
+ * @param {Object} root The root JS object. Can be null.
  *
  * @protected
  */
@@ -77,7 +89,7 @@ goog.ds.JsDataSource.prototype.setRoot = function(root) {
  * - Are assumed to have child nodes of all of the same type of data
  * - Fire data changes on the root node of the list whenever children
  *     are added or removed
- * @param {boolean?} isList True to use list semantics.
+ * @param {?boolean} isList True to use list semantics.
  * @private
  */
 goog.ds.JsDataSource.prototype.setIsList_ = function(isList) {
@@ -116,7 +128,7 @@ goog.ds.JsDataSource.prototype.set = function(value) {
 /**
  * Gets all of the child nodes of the current node.
  * Should return an empty DataNode list if no child nodes.
- * @param {string} opt_selector String selector to choose child nodes.
+ * @param {string=} opt_selector String selector to choose child nodes.
  * @return {goog.ds.DataNodeList} The child nodes.
  *
  * TODO revisit lazy creation.
@@ -146,7 +158,7 @@ goog.ds.JsDataSource.prototype.getChildNodes = function(opt_selector) {
  * Creates the DataNodeList with the child nodes for this element.
  * Allows for only building list as needed.
  *
- * @param {boolean} opt_force Whether to force recreating child nodes,
+ * @param {boolean=} opt_force Whether to force recreating child nodes,
  *     defaults to false.
  * @private
  */
@@ -192,7 +204,7 @@ goog.ds.JsDataSource.prototype.createChildNodes_ = function(opt_force) {
 /**
  * Gets a named child node of the current node
  * @param {string} name The node name.
- * @param {boolean} opt_canCreate If true, can create child node.
+ * @param {boolean=} opt_canCreate If true, can create child node.
  * @return {goog.ds.DataNode} The child node, or null if no node of
  *     this name exists.
  */
@@ -221,7 +233,7 @@ goog.ds.JsDataSource.prototype.getChildNode = function(name, opt_canCreate) {
 /**
  * Gets the value of a child node
  * @param {string} name The node name.
- * @return {Object?} The value of the node, or null if no value or the child
+ * @return {Object} The value of the node, or null if no value or the child
  *    node doesn't exist.
  */
 goog.ds.JsDataSource.prototype.getChildNodeValue = function(name) {
@@ -240,9 +252,9 @@ goog.ds.JsDataSource.prototype.getChildNodeValue = function(name) {
  * Sets a named child node of the current node.
  * If value is null, removes the child node.
  * @param {string} name The node name.
- * @param {Object?} value The value to set, can be DataNode, object,
+ * @param {Object} value The value to set, can be DataNode, object,
  *     property, or null.
- * @return {Object?} The child node, if set.
+ * @return {Object} The child node, if set.
  */
 goog.ds.JsDataSource.prototype.setChildNode = function(name, value) {
   var removedPath = null;
@@ -402,7 +414,7 @@ goog.ds.JsDataSource.prototype.isList = function() {
  *
  * @param {goog.ds.DataNode} parent Parent object.
  * @param {string} dataName Name of this property.
- * @param {goog.ds.DataNode} opt_parentDataNode The parent data node. If
+ * @param {goog.ds.DataNode=} opt_parentDataNode The parent data node. If
  *     omitted, assumes that the parent object is the parent data node.
  *
  * @constructor

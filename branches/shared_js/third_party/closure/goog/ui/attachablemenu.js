@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the AttachableMenu class.
@@ -37,7 +49,7 @@ goog.require('goog.ui.MenuBase');
  * classNameSelected - A class that will be added to the element's class names
  * when the item is selected via keyboard or mouse.
  *
- * @param {Element} opt_element A DOM element for the popup.
+ * @param {Element=} opt_element A DOM element for the popup.
  * @constructor
  * @extends {goog.ui.MenuBase}
  * @deprecated Use goog.ui.PopupMenu.
@@ -50,7 +62,7 @@ goog.inherits(goog.ui.AttachableMenu, goog.ui.MenuBase);
 
 /**
  * The currently selected element (mouse was moved over it or keyboard arrows)
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.AttachableMenu.prototype.selectedElement_ = null;
@@ -130,7 +142,7 @@ goog.ui.AttachableMenu.prototype.setSelectedItemClassName = function(name) {
 /**
  * Returns the selected item
  *
- * @return {Element?} The item selected or null if no item is selected.
+ * @return {Element} The item selected or null if no item is selected.
  */
 goog.ui.AttachableMenu.prototype.getSelectedItem = function() {
   return this.selectedElement_;
@@ -140,7 +152,7 @@ goog.ui.AttachableMenu.prototype.getSelectedItem = function() {
 /**
  * Sets the specified item as the selected element.
  *
- * @param {Element?} elt The item to select. The type of this item is specific
+ * @param {Element} elt The item to select. The type of this item is specific
  * to the menu class.
  */
 goog.ui.AttachableMenu.prototype.setSelectedItem = function(elt) {
@@ -214,7 +226,7 @@ goog.ui.AttachableMenu.prototype.onShow_ = function() {
  * Returns the next or previous item. Used for up/down arrows.
  *
  * @param {boolean} prev True to go to the previous element instead of next.
- * @return {Element?} The next or previous element.
+ * @return {Element} The next or previous element.
  * @protected
  */
 goog.ui.AttachableMenu.prototype.getNextPrevItem = function(prev) {
@@ -295,14 +307,12 @@ goog.ui.AttachableMenu.prototype.onMouseOut = function(e) {
 
 
 /**
- * Mouse down handler for the menu.
+ * Mouse down handler for the menu. Prevents default to avoid text selection.
  * @param {goog.events.Event} e The event object.
  * @protected
  */
-goog.ui.AttachableMenu.prototype.onMouseDown = function(e) {
-  // prevent default to avoid text selecton
-  e.preventDefault();
-};
+goog.ui.AttachableMenu.prototype.onMouseDown = goog.events.Event.preventDefault;
+
 
 /**
  * Mouse up handler for the menu.
@@ -365,9 +375,9 @@ goog.ui.AttachableMenu.prototype.onKeyDown = function(e) {
  * Find an item that has the given prefix and select it.
  *
  * @param {string} prefix The entered prefix, so far.
- * @param {number} opt_direction 1 to search forward from the selection
+ * @param {number=} opt_direction 1 to search forward from the selection
  *     (default), -1 to search backward (e.g. to go to the previous match).
- * @param {boolean} opt_skip True if should skip the current selection,
+ * @param {boolean=} opt_skip True if should skip the current selection,
  *     unless no other item has the given prefix.
  * @private
  */
@@ -415,7 +425,7 @@ goog.ui.AttachableMenu.prototype.selectByName_ =
 
 /**
  * Dispatch an ITEM_ACTION event when an item is selected
- * @param {Object} opt_item Item selected.
+ * @param {Object=} opt_item Item selected.
  * @private
  */
 goog.ui.AttachableMenu.prototype.onItemSelected_ = function(opt_item) {

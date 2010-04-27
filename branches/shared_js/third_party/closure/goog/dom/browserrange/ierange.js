@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the IE browser specific range wrapper.
@@ -135,7 +147,7 @@ goog.dom.browserrange.IeRange.getBrowserRangeForNodes_ = function(startNode,
     }
     child = startNode.childNodes[startOffset];
     collapse = !child;
-    startNode = child || startNode;
+    startNode = child || startNode.lastChild || startNode;
     startOffset = 0;
   }
   var leftRange = goog.dom.browserrange.IeRange.
@@ -150,12 +162,12 @@ goog.dom.browserrange.IeRange.getBrowserRangeForNodes_ = function(startNode,
   // Create a range that ends at the right position.
   collapse = false;
   if (endNode.nodeType == goog.dom.NodeType.ELEMENT) {
-    if (startOffset > startNode.childNodes.length) {
+    if (endOffset > endNode.childNodes.length) {
       goog.dom.browserrange.IeRange.logger_.severe(
           'Cannot have endOffset > endNode child count');
     }
     child = endNode.childNodes[endOffset];
-    endNode = child || endNode;
+    endNode = child || endNode.lastChild || endNode;
     endOffset = 0;
     collapse = !child;
   }
@@ -209,7 +221,7 @@ goog.dom.browserrange.IeRange.createFromNodes = function(startNode,
 
 /**
  * Lazy cache of the node containing the entire selection.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.browserrange.IeRange.prototype.parentNode_ = null;
@@ -217,7 +229,7 @@ goog.dom.browserrange.IeRange.prototype.parentNode_ = null;
 
 /**
  * Lazy cache of the node containing the start of the selection.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.browserrange.IeRange.prototype.startNode_ = null;
@@ -225,7 +237,7 @@ goog.dom.browserrange.IeRange.prototype.startNode_ = null;
 
 /**
  * Lazy cache of the node containing the end of the selection.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.browserrange.IeRange.prototype.endNode_ = null;
@@ -270,12 +282,13 @@ goog.dom.browserrange.IeRange.prototype.getContainer = function() {
     // inconsistency where it selects the spaces after a word when you double
     // click, but leaves out the spaces during execCommands.
     // NOTE: this relies on the fact that 'foo'.charAt(-1) == ''
+    var range = this.range_.duplicate();
     for (var i = 1; selectText.charAt(selectText.length - i) == ' '; i++) {
-      this.range_.moveEnd('character', -1);
+      range.moveEnd('character', -1);
     }
 
     // Get the parent node.  This should be the end, but alas, it is not.
-    var parent = this.range_.parentElement();
+    var parent = range.parentElement();
 
     // Deal with selection bug where IE thinks one of the selection's children
     // is actually the selection's parent. Relies on the assumption that the
@@ -284,7 +297,7 @@ goog.dom.browserrange.IeRange.prototype.getContainer = function() {
 
     // Also note IE will sometimes insert \r and \n whitespace, which should be
     // disregarded. Otherwise the loop may run too long and return wrong parent
-    var htmlText = goog.string.stripNewlines(this.range_.htmlText);
+    var htmlText = goog.string.stripNewlines(range.htmlText);
     while (htmlText.length >
            goog.string.stripNewlines(parent.outerHTML).length) {
       parent = parent.parentNode;
@@ -387,7 +400,7 @@ goog.dom.browserrange.IeRange.prototype.compareBrowserRangeEndpoints =
 /**
  * Recurses to find the correct node for the given endpoint.
  * @param {goog.dom.RangeEndpoint} endpoint The endpoint to get the node for.
- * @param {Node} opt_node Optional node to start the search from.
+ * @param {Node=} opt_node Optional node to start the search from.
  * @return {Node} The deepest node containing the endpoint.
  * @private
  */
@@ -434,7 +447,7 @@ goog.dom.browserrange.IeRange.prototype.getEndpointNode_ = function(endpoint,
 /**
  * Returns the offset into the start/end container.
  * @param {goog.dom.RangeEndpoint} endpoint The endpoint to get the offset for.
- * @param {Node} opt_container The container to get the offset relative to.
+ * @param {Node=} opt_container The container to get the offset relative to.
  *     Defaults to the value returned by getStartNode/getEndNode.
  * @return {number} The offset.
  * @private
@@ -639,7 +652,7 @@ goog.dom.browserrange.IeRange.getDomHelper_ = function(range) {
  * element.
  * @param {TextRange} range The range to paste into.
  * @param {Element} element The node to insert a copy of.
- * @param {goog.dom.DomHelper} opt_domHelper DOM helper object for the document
+ * @param {goog.dom.DomHelper=} opt_domHelper DOM helper object for the document
  *     the range resides in.
  * @return {Element} The resulting copy of element.
  * @private
@@ -701,7 +714,7 @@ goog.dom.browserrange.IeRange.prototype.surroundContents = function(element) {
  * @param {TextRange} clone A clone of this range's browser range object.
  * @param {Node} node The node to insert.
  * @param {boolean} before Whether to insert the node before or after the range.
- * @param {goog.dom.DomHelper} opt_domHelper The dom helper to use.
+ * @param {goog.dom.DomHelper=} opt_domHelper The dom helper to use.
  * @return {Node} The resulting copy of node.
  * @private
  */

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Tooltip widget implementation.
@@ -47,10 +59,10 @@ goog.require('goog.ui.PopupBase');
  * slight delay, when the the cursor is over the element or the element gains
  * focus.
  *
- * @param {Element|string} opt_el Element to display tooltip for, either element
- *                                reference or string id.
- * @param {?string} opt_str Text message to display in tooltip.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {Element|string=} opt_el Element to display tooltip for, either
+ *     element reference or string id.
+ * @param {?string=} opt_str Text message to display in tooltip.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Popup}
  */
@@ -68,8 +80,8 @@ goog.ui.Tooltip = function(opt_el, opt_str, opt_domHelper) {
       'div', {'style': 'position:absolute;display:none;'}));
 
   /**
-   * Object for representing cursor position.
-   * @type {goog.math.Coordinate}
+   * Cursor position relative to the page.
+   * @type {!goog.math.Coordinate}
    * @protected
    */
   this.cursorPosition = new goog.math.Coordinate(1, 1);
@@ -77,7 +89,7 @@ goog.ui.Tooltip = function(opt_el, opt_str, opt_domHelper) {
   /**
    * Active element reference. Used by the delayed show functionality to keep
    * track of the element the mouse is over or the element with focus.
-   * @type {Element?}
+   * @type {Element}
    * @private
    */
   this.activeEl_ = null;
@@ -243,7 +255,7 @@ goog.ui.Tooltip.prototype.attach = function(el) {
 /**
  * Detach from element(s).
  *
- * @param {Element|string} opt_el Element to detach from, either element
+ * @param {Element|string=} opt_el Element to detach from, either element
  *                                reference or string id. If no element is
  *                                specified all are detached.
  */
@@ -499,7 +511,7 @@ goog.ui.Tooltip.prototype.onHide_ = function() {
  * over the same element.
  *
  * @param {Element} el Element to show tooltip for.
- * @param {goog.positioning.AbstractPosition} opt_pos Position to display popup
+ * @param {goog.positioning.AbstractPosition=} opt_pos Position to display popup
  *     at.
  */
 goog.ui.Tooltip.prototype.maybeShow = function(el, opt_pos) {
@@ -522,7 +534,7 @@ goog.ui.Tooltip.prototype.maybeShow = function(el, opt_pos) {
  * Shows tooltip for a specific element.
  *
  * @param {Element} el Element to show tooltip for.
- * @param {goog.positioning.AbstractPosition} opt_pos Position to display popup
+ * @param {goog.positioning.AbstractPosition=} opt_pos Position to display popup
  *     at.
  */
 goog.ui.Tooltip.prototype.showForElement = function(el, opt_pos) {
@@ -537,7 +549,7 @@ goog.ui.Tooltip.prototype.showForElement = function(el, opt_pos) {
  * Sets tooltip position and shows it.
  *
  * @param {Element} el Element to show tooltip for.
- * @param {goog.positioning.AbstractPosition} opt_pos Position to display popup
+ * @param {goog.positioning.AbstractPosition=} opt_pos Position to display popup
  *     at.
  * @private
  */
@@ -546,9 +558,7 @@ goog.ui.Tooltip.prototype.positionAndShow_ = function(el, opt_pos) {
   if (opt_pos) {
     pos = opt_pos;
   } else {
-    var coord = new goog.math.Coordinate(
-       this.cursorPosition.x,
-       this.cursorPosition.y);
+    var coord = this.cursorPosition.clone();
     pos = new goog.ui.Tooltip.CursorTooltipPosition(coord);
   }
 
@@ -608,7 +618,7 @@ goog.ui.Tooltip.prototype.handleMouseOver = function(event) {
  * Find anchor containing the given element, if any.
  *
  * @param {Element} el Element that triggered event.
- * @return {Element?} Element in elements_ array that contains given element,
+ * @return {Element} Element in elements_ array that contains given element,
  *     or null if not found.
  * @protected
  */
@@ -622,7 +632,7 @@ goog.ui.Tooltip.prototype.getAnchorFromElement = function(el) {
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=330961
   try {
     while (el && !this.elements_.contains(el)) {
-      el = /** @type {Element?} */ (el.parentNode);
+      el = /** @type {Element} */ (el.parentNode);
     }
     return el;
   } catch (e) {
@@ -634,7 +644,7 @@ goog.ui.Tooltip.prototype.getAnchorFromElement = function(el) {
 /**
  * Handler for mouse move events.
  *
- * @param {goog.events.BrowserEvent} event Event object.
+ * @param {goog.events.BrowserEvent} event MOUSEMOVE event.
  * @protected
  */
 goog.ui.Tooltip.prototype.handleMouseMove = function(event) {
@@ -752,7 +762,7 @@ goog.ui.Tooltip.prototype.handleTooltipMouseOut = function(event) {
  * the maybeShow method.
  *
  * @param {Element} el Element to show tooltip for.
- * @param {goog.positioning.AbstractPosition} opt_pos Position to display popup
+ * @param {goog.positioning.AbstractPosition=} opt_pos Position to display popup
  *     at.
  * @protected
  */
@@ -828,7 +838,7 @@ goog.ui.Tooltip.prototype.disposeInternal = function() {
  * Used to position tooltips triggered by the cursor.
  *
  * @param {number|!goog.math.Coordinate} arg1 Left position or coordinate.
- * @param {number} opt_arg2 Top position.
+ * @param {number=} opt_arg2 Top position.
  * @constructor
  * @extends {goog.positioning.ViewportPosition}
  */
@@ -845,7 +855,7 @@ goog.inherits(goog.ui.Tooltip.CursorTooltipPosition,
  * @param {Element} element The DOM element of the popup.
  * @param {goog.positioning.Corner} popupCorner The corner of the popup element
  *     that that should be positioned adjacent to the anchorElement.
- * @param {goog.math.Box} opt_margin A margin specified in pixels.
+ * @param {goog.math.Box=} opt_margin A margin specified in pixels.
  */
 goog.ui.Tooltip.CursorTooltipPosition.prototype.reposition = function(
     element, popupCorner, opt_margin) {
@@ -894,7 +904,7 @@ goog.inherits(goog.ui.Tooltip.ElementTooltipPosition,
  * @param {Element} element The DOM element of the popup.
  * @param {goog.positioning.Corner} popupCorner The corner of the popup element
  *     that should be positioned adjacent to the anchorElement.
- * @param {goog.math.Box} opt_margin A margin specified in pixels.
+ * @param {goog.math.Box=} opt_margin A margin specified in pixels.
  */
 goog.ui.Tooltip.ElementTooltipPosition.prototype.reposition = function(
     element, popupCorner, opt_margin) {

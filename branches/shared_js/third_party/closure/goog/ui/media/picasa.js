@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 
 /**
@@ -123,7 +135,7 @@ goog.ui.media.PicasaAlbum.CSS_CLASS = goog.getCssName('goog-ui-media-picasa');
  * configuration.
  *
  * @param {goog.ui.media.PicasaAlbumModel} dataModel A picasa album data model.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper, used for
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @return {goog.ui.media.Media} A Control instance binded to the Picasa
  *     renderer.
@@ -181,10 +193,10 @@ goog.ui.media.PicasaAlbum.prototype.getCssClass = function() {
  *
  * @param {string} userId The picasa userId associated with this album.
  * @param {string} albumId The picasa albumId associated with this album.
- * @param {string} opt_authKey An optional authentication key, used on private
+ * @param {string=} opt_authKey An optional authentication key, used on private
  *     albums.
- * @param {string} opt_caption An optional caption of the picasa album.
- * @param {string} opt_description An optional description of the picasa album.
+ * @param {string=} opt_caption An optional caption of the picasa album.
+ * @param {string=} opt_description An optional description of the picasa album.
  * @constructor
  * @extends {goog.ui.media.MediaModel}
  */
@@ -257,8 +269,8 @@ goog.ui.media.PicasaAlbumModel.matcher_ =
  * Gets a {@code picasaUrl} and extracts the user and album id.
  *
  * @param {string} picasaUrl A picasa album URL.
- * @param {string} opt_caption An optional caption of the picasa album.
- * @param {string} opt_description An optional description of the picasa album.
+ * @param {string=} opt_caption An optional caption of the picasa album.
+ * @param {string=} opt_description An optional description of the picasa album.
  * @return {goog.ui.media.PicasaAlbumModel} The picasa album data model that
  *     represents the picasa URL.
  * @throws exception in case the parsing fails

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Base class for UI controls such as buttons, menus, menu items,
@@ -66,9 +78,9 @@ goog.require('goog.userAgent');
  * for example usage.
  * @param {goog.ui.ControlContent} content Text caption or DOM structure
  *     to display as the content of the component (if any).
- * @param {goog.ui.ControlRenderer} opt_renderer Renderer used to render or
+ * @param {goog.ui.ControlRenderer=} opt_renderer Renderer used to render or
  *     decorate the component; defaults to {@link goog.ui.ControlRenderer}.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper, used for
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @constructor
  * @extends {goog.ui.Component}
@@ -270,7 +282,7 @@ goog.ui.Control.prototype.setHandleMouseEvents = function(enable) {
 /**
  * Returns the DOM element on which the control is listening for keyboard
  * events (null if none).
- * @return {Element?} Element on which the control is listening for key
+ * @return {Element} Element on which the control is listening for key
  *     events.
  */
 goog.ui.Control.prototype.getKeyEventTarget = function() {
@@ -426,7 +438,7 @@ goog.ui.Control.prototype.createDom = function() {
  * Returns the DOM element into which child components are to be rendered,
  * or null if the control itself hasn't been rendered yet.  Overrides
  * {@link goog.ui.Component#getContentElement} by delegating to the renderer.
- * @return {Element?} Element to contain child elements (null if none).
+ * @return {Element} Element to contain child elements (null if none).
  */
 goog.ui.Control.prototype.getContentElement = function() {
   // Delegate to renderer.
@@ -627,7 +639,7 @@ goog.ui.Control.prototype.setContentInternal = function(content) {
 
 /**
  * Returns the text caption of the component.
- * @return {string?} Text caption of the component (null if none).
+ * @return {?string} Text caption of the component (null if none).
  */
 goog.ui.Control.prototype.getCaption = function() {
   var content = this.getContent();
@@ -714,7 +726,7 @@ goog.ui.Control.prototype.isVisible = function() {
  * its key target has a tab index.  When hiding a component that is enabled
  * and focusable, blurs its key target and removes its tab index.
  * @param {boolean} visible Whether to show or hide the component.
- * @param {boolean} opt_force If true, doesn't check whether the component
+ * @param {boolean=} opt_force If true, doesn't check whether the component
  *     already has the requested visibility, and doesn't dispatch any events.
  * @return {boolean} Whether the visibility was changed.
  */
@@ -1233,7 +1245,8 @@ goog.ui.Control.prototype.performActionInternal = function(e) {
   var actionEvent = new goog.events.Event(goog.ui.Component.EventType.ACTION,
       this);
   if (e) {
-    var properties = ['altKey', 'ctrlKey', 'metaKey', 'shiftKey'];
+    var properties = ['altKey', 'ctrlKey', 'metaKey', 'shiftKey',
+        'platformModifierKey'];
     for (var property, i = 0; property = properties[i]; i++) {
       actionEvent[property] = e[property];
     }

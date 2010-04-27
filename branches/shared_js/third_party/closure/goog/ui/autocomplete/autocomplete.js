@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Gmail-like AutoComplete logic.
@@ -21,7 +33,6 @@
 goog.provide('goog.ui.AutoComplete');
 goog.provide('goog.ui.AutoComplete.EventType');
 
-goog.require('goog.array');
 goog.require('goog.events');
 goog.require('goog.events.EventTarget');
 
@@ -84,7 +95,7 @@ goog.ui.AutoComplete = function(matcher, renderer, selectionHandler) {
 
   /**
    * Currently typed token which will be used for completion.
-   * @type {string?}
+   * @type {?string}
    * @protected
    * @suppress {underscore}
    */
@@ -125,7 +136,7 @@ goog.ui.AutoComplete = function(matcher, renderer, selectionHandler) {
 
   /**
    * The timer id for dismissing autocomplete menu with a delay.
-   * @type {number?}
+   * @type {?number}
    * @private
    */
   this.dismissTimer_ = null;
@@ -190,6 +201,16 @@ goog.ui.AutoComplete.EventType = {
    * return custom-type row data.
    */
   UPDATE: 'update'
+};
+
+
+/**
+ * Returns the renderer that renders/shows/highlights/hides the autocomplete
+ * menu.
+ * @return {goog.events.EventTarget} Renderer used by the this widget.
+ */
+goog.ui.AutoComplete.prototype.getRenderer = function() {
+  return this.renderer_;
 };
 
 
@@ -270,7 +291,7 @@ goog.ui.AutoComplete.prototype.setTriggerSuggestionsOnUpdate = function(
  * <code>renderer.renderRows()</code>.
  *
  * @param {string} token The string for which to search in the Matcher.
- * @param {String} opt_fullString Optionally, the full string in the input
+ * @param {string=} opt_fullString Optionally, the full string in the input
  *     field.
  */
 goog.ui.AutoComplete.prototype.setToken = function(token, opt_fullString) {
@@ -286,7 +307,7 @@ goog.ui.AutoComplete.prototype.setToken = function(token, opt_fullString) {
 
 /**
  * Gets the current target HTML node for displaying autocomplete UI.
- * @return {Element?} The current target HTML node for displaying autocomplete
+ * @return {Element} The current target HTML node for displaying autocomplete
  *     UI.
  */
 goog.ui.AutoComplete.prototype.getTarget = function() {
@@ -447,11 +468,11 @@ goog.ui.AutoComplete.prototype.disposeInternal = function() {
 
 
 /**
- * Callback passed to Matcher when requesting mathces for a token.
+ * Callback passed to Matcher when requesting matches for a token.
  * This might be called synchronously, or asynchronously, or both, for
  * any implementation of a Matcher.
  * If the Matcher calls this back, with the same token this AutoComplete
- * has set currently, then this will package the mathcing rows in object
+ * has set currently, then this will package the matching rows in object
  * of the form
  * <pre>
  * {
@@ -461,8 +482,8 @@ goog.ui.AutoComplete.prototype.disposeInternal = function() {
  * </pre>
  *
  * @param {string} matchedToken Token that corresponds with the rows.
- * @param {Array} rows Set of data that match the given token.
- * @param {boolean} opt_preserveHilited If true, keeps the currently hilited
+ * @param {!Array} rows Set of data that match the given token.
+ * @param {boolean=} opt_preserveHilited If true, keeps the currently hilited
  *     (by index) element hilited.
  *
  * @private
@@ -476,6 +497,18 @@ goog.ui.AutoComplete.prototype.matchListener_ = function(matchedToken, rows,
     return;
   }
 
+  this.renderRows(rows, opt_preserveHilited);
+};
+
+
+/**
+ * Renders the rows and adds highlighting.
+ * @param {!Array} rows Set of data that match the given token.
+ * @param {boolean=} opt_preserveHilited If true, keeps the currently hilited
+ *     (by index) element hilited.
+ */
+goog.ui.AutoComplete.prototype.renderRows = function(rows,
+                                                     opt_preserveHilited) {
   var indexToHilite = opt_preserveHilited ?
       this.getIndexOfId(this.hiliteId_) : null;
 
@@ -531,7 +564,7 @@ goog.ui.AutoComplete.prototype.getIdOfIndex_ = function(index) {
  * Attach text areas or input boxes to the autocomplete by DOM reference.  After
  * elements are attached to the autocomplete, when a user types they will see
  * the autocomplete drop down.
- * @param {Element} var_args Variable args: Input or text area elements to
+ * @param {...Element} var_args Variable args: Input or text area elements to
  *     attach the autocomplete too.
  */
 goog.ui.AutoComplete.prototype.attachInputs = function(var_args) {
@@ -544,7 +577,7 @@ goog.ui.AutoComplete.prototype.attachInputs = function(var_args) {
 
 /**
  * Detach text areas or input boxes to the autocomplete by DOM reference.
- * @param {Element} var_args Variable args: Input or text area elements to
+ * @param {...Element} var_args Variable args: Input or text area elements to
  *     detach from the autocomplete.
  */
 goog.ui.AutoComplete.prototype.detachInputs = function(var_args) {

@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2009 Google Inc. All Rights Reserved.
+// Copyright 2009 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Trogedit unit tests for goog.editor.SeamlessField.
@@ -23,6 +35,7 @@ goog.require('goog.editor.SeamlessField');
 goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.testing.MockClock');
+goog.require('goog.testing.MockRange');
 goog.require('goog.testing.jsunit');
 
 
@@ -30,7 +43,7 @@ var fieldElem;
 var fieldElemClone;
 
 function setUp() {
-  fieldElem = goog.dom.$('field');
+  fieldElem = goog.dom.getElement('field');
   fieldElemClone = fieldElem.cloneNode(true);
 }
 
@@ -148,8 +161,12 @@ function testDispatchBlur() {
     var clearSelection = goog.dom.Range.clearSelection;
     var cleared = false;
     var clearedWindow;
-    blendedField.editableDomHelper = {
-      getWindow: goog.functions.constant(iframe.contentWindow)
+    blendedField.editableDomHelper = new goog.dom.DomHelper();
+    blendedField.editableDomHelper.getWindow =
+        goog.functions.constant(iframe.contentWindow);
+    var mockRange = new goog.testing.MockRange();
+    blendedField.getRange = function() {
+      return mockRange;
     };
     goog.dom.Range.clearSelection = function(opt_window) {
       clearSelection(opt_window);
@@ -158,6 +175,9 @@ function testDispatchBlur() {
     }
     var clock = new goog.testing.MockClock(true);
 
+    mockRange.collapse(true);
+    mockRange.select();
+    mockRange.$replay();
     blendedField.dispatchBlur();
     clock.tick(1);
 
@@ -165,6 +185,7 @@ function testDispatchBlur() {
     assertTrue('Selection must be cleared.', cleared);
     assertEquals('Selection must be cleared in iframe',
         iframe.contentWindow, clearedWindow);
+    mockRange.$verify();
     clock.dispose();
   }
 }
@@ -180,7 +201,7 @@ function testSetMinHeight() {
       // Initially create and size iframe.
       var iframe = createSeamlessIframe();
       field.attachIframe(iframe);
-      field.iframeFieldLoadHandler(iframe, '');
+      field.iframeFieldLoadHandler(iframe, '', {});
       // Need to process timeouts set by load handlers.
       clock.tick(1000);
 
@@ -323,7 +344,7 @@ function testAttachIframe() {
   var iframe = createSeamlessIframe();
   try {
     blendedField.attachIframe(iframe);
-  } catch(err) {
+  } catch (err) {
     fail('Error occurred while attaching iframe.');
   }
 }
@@ -343,11 +364,10 @@ function createSeamlessIframe() {
  *
  * @param {string} innerHTML html for the field contents.
  * @param {Object} styles Key-value pairs for styles on the field.
- * @return {goog.editor.SeamlessField}
+ * @return {goog.editor.SeamlessField} The field.
  */
 function initSeamlessField(innerHTML, styles) {
-  var field = new goog.editor.SeamlessField('field', undefined,
-      fieldElem.ownerDocument);
+  var field = new goog.editor.SeamlessField('field');
   fieldElem.innerHTML = innerHTML;
   goog.style.setStyle(fieldElem, styles);
   return field;
@@ -359,8 +379,8 @@ function initSeamlessField(innerHTML, styles) {
  * true, then the field will fidget while we're initializing the field,
  * and that's not what we want.
  *
- * @param {goog.editor.Field} fieldObj
- * @param {Element} iframe
+ * @param {goog.editor.Field} fieldObj The field.
+ * @param {HTMLIFrameElement} iframe The iframe.
  */
 function assertAttachSeamlessIframeSizesCorrectly(fieldObj, iframe) {
   var size = goog.style.getSize(fieldObj.getOriginalElement());

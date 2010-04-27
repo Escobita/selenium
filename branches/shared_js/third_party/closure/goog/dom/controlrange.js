@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2008 Google Inc. All Rights Reserved.
+// Copyright 2008 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Utilities for working with IE control ranges.
@@ -61,7 +73,7 @@ goog.dom.ControlRange.createFromBrowserRange = function(controlRange) {
 /**
  * Create a new range wrapper that selects the given element.  Do not use
  * this method directly - please use goog.dom.Range.createFrom* instead.
- * @param {Element} var_args The element(s) to select.
+ * @param {...Element} var_args The element(s) to select.
  * @return {goog.dom.ControlRange} A range wrapper object.
  */
 goog.dom.ControlRange.createFromElements = function(var_args) {
@@ -75,7 +87,7 @@ goog.dom.ControlRange.createFromElements = function(var_args) {
 
 /**
  * The IE control range obejct.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.dom.ControlRange.prototype.range_ = null;
@@ -407,7 +419,7 @@ goog.inherits(goog.dom.ControlRangeIterator, goog.dom.RangeIterator);
 
 /**
  * The first node in the selection.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.ControlRangeIterator.prototype.startNode_ = null;
@@ -415,7 +427,7 @@ goog.dom.ControlRangeIterator.prototype.startNode_ = null;
 
 /**
  * The last node in the selection.
- * @type {Node?}
+ * @type {Node}
  * @private
  */
 goog.dom.ControlRangeIterator.prototype.endNode_ = null;

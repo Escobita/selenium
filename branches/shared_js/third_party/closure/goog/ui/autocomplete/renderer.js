@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Class for rendering the results of an auto complete and
@@ -36,14 +48,14 @@ goog.require('goog.userAgent');
  * Class for rendering the results of an auto-complete in a drop down list.
  *
  * @constructor
- * @param {Element} opt_parentNode optional reference to the parent element that
- *     will hold the autocomplete elements. goog.dom.getDocument().body will be
- *     used if this is null.
- * @param {?({renderRow}|{render})} opt_customRenderer Custom full renderer to
+ * @param {Element=} opt_parentNode optional reference to the parent element
+ *     that will hold the autocomplete elements. goog.dom.getDocument().body
+ *     will be used if this is null.
+ * @param {?({renderRow}|{render})=} opt_customRenderer Custom full renderer to
  *     render each row. Should be something with a renderRow or render method.
- * @param {boolean} opt_rightAlign Determines if the autocomplete will always be
- *     right aligned. False by default.
- * @param {boolean} opt_useStandardHighlighting Determines if standard
+ * @param {boolean=} opt_rightAlign Determines if the autocomplete will always
+ *     be right aligned. False by default.
+ * @param {boolean=} opt_useStandardHighlighting Determines if standard
  *     highlighting should be applied to each row of data. Standard highlighting
  *     bolds every matching substring for a given token in each row.
  * @extends {goog.events.EventTarget}
@@ -74,7 +86,7 @@ goog.ui.AutoComplete.Renderer = function(opt_parentNode, opt_customRenderer,
 
   /**
    * Reference to the main element that controls the rendered autocomplete
-   * @type {Element?}
+   * @type {Element}
    * @private
    */
   this.element_ = null;
@@ -182,7 +194,7 @@ goog.ui.AutoComplete.Renderer = function(opt_parentNode, opt_customRenderer,
   /**
    * Alignment lock that forces all alignment to the give type, RIGHT | LEFT.
    * This is set the first time the renderer is aligned.
-   * @type {string?}
+   * @type {?string}
    * @private
    */
   this.keepAligned_ = null;
@@ -218,6 +230,15 @@ goog.ui.AutoComplete.Renderer.DELAY_BEFORE_MOUSEOVER = 300;
 
 
 /**
+ * Gets the renderer's element.
+ * @return {Element} The  main element that controls the rendered autocomplete.
+ */
+goog.ui.AutoComplete.Renderer.prototype.getElement = function() {
+  return this.element_;
+};
+
+
+/**
  * Set whether to align autocomplete to top of target element
  * @param {boolean} align If true, align to top.
  */
@@ -241,7 +262,7 @@ goog.ui.AutoComplete.Renderer.prototype.setUseStandardHighlighting =
  *
  * @param {Array} rows Matching UI rows.
  * @param {string} token Token we are currently matching against.
- * @param {Element} opt_target Current HTML node, will position popup beneath
+ * @param {Element=} opt_target Current HTML node, will position popup beneath
  *     this node.
  */
 goog.ui.AutoComplete.Renderer.prototype.renderRows = function(rows, token,
@@ -490,7 +511,7 @@ goog.ui.AutoComplete.Renderer.prototype.setAutoPosition = function(auto) {
 
 
 /**
- * Disposes of the renderer and it's associated HTML.
+ * Disposes of the renderer and its associated HTML.
  */
 goog.ui.AutoComplete.Renderer.prototype.disposeInternal = function() {
   goog.ui.AutoComplete.Renderer.superClass_.disposeInternal.call(this);
@@ -549,8 +570,8 @@ goog.ui.AutoComplete.Renderer.prototype.renderRowContents_ =
 
 
 /**
- * Goes through a node and all of it's child nodes, replacing HTML text that
- * matches a token with <b>token</b>
+ * Goes through a node and all of its child nodes, replacing HTML text that
+ * matches a token with <b>token</b>.
  *
  * @param {Node} node Node to match.
  * @param {string | Array} tokenOrArray Token to match or array of tokens to

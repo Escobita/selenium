@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of goog.gears.BaseStore which
@@ -285,7 +297,7 @@ goog.gears.BaseStore.prototype.getCreateTriggerStatement_ =
 /**
  * Generates an SQLITE CREATE statement from a definition object.
  * @param {Object} def  a schema statement definition.
- * @param {boolean} opt_ifNotExists true if the table or index should be
+ * @param {boolean=} opt_ifNotExists true if the table or index should be
  *     created only if it does not exist. Otherwise trying to create a table
  *     or index that already exists will result in an exception being thrown.
  * @return {string} the statement.
@@ -372,7 +384,7 @@ goog.gears.BaseStore.prototype.getDropStatement_ = function(def) {
  *       the when clause for the trigger. The trigger object also contains
  *       an 'actions' field which is an array of strings containing
  *       the actions for this trigger.
- * @param {boolean} opt_ifNotExists true if the table or index should be
+ * @param {boolean=} opt_ifNotExists true if the table or index should be
  *     created only if it does not exist. Otherwise trying to create a table
  *     or index that already exists will result in an exception being thrown.
  */

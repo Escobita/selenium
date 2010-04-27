@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2006 Google Inc. All Rights Reserved.
+// Copyright 2006 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Deprecated button class; use {@link goog.ui.Button} instead.
@@ -27,7 +39,7 @@ goog.require('goog.events.EventTarget');
 /**
  * Default implementation of a button. Uses the default browser-style button.
  *
- * @param {string} opt_class Optional class for component.
+ * @param {string=} opt_class Optional class for component.
  *                           Default: 'goog-button'.
  * @constructor
  * @extends {goog.events.EventTarget}
@@ -127,15 +139,15 @@ goog.ui.DeprecatedButton.prototype.rendered_ = false;
 
 /**
  * HTML caption displayed in the component.
- * @type {string?}
+ * @type {string}
  * @private
  */
-goog.ui.DeprecatedButton.prototype.caption_ = null;
+goog.ui.DeprecatedButton.prototype.caption_ = '';
 
 
 /**
  * Tooltip for the component.
- * @type {string?}
+ * @type {?string}
  * @private
  */
 goog.ui.DeprecatedButton.prototype.tooltip_ = null;
@@ -143,7 +155,7 @@ goog.ui.DeprecatedButton.prototype.tooltip_ = null;
 
 /**
  * Value associated with the component.
- * @type {Object?}
+ * @type {Object}
  * @private
  */
 goog.ui.DeprecatedButton.prototype.value_ = null;
@@ -151,7 +163,7 @@ goog.ui.DeprecatedButton.prototype.value_ = null;
 
 /**
  * Main element for the component.
- * @type {Element?}
+ * @type {Element}
  * @private
  */
 goog.ui.DeprecatedButton.prototype.element_ = null;
@@ -159,7 +171,7 @@ goog.ui.DeprecatedButton.prototype.element_ = null;
 
 /**
  * Gets the caption for the component.
- * @return {string?} The caption.
+ * @return {?string} The caption.
  */
 goog.ui.DeprecatedButton.prototype.getCaption = function() {
   return this.caption_;
@@ -183,7 +195,7 @@ goog.ui.DeprecatedButton.prototype.setCaption = function(caption) {
 
 /**
  * Gets the tooltip for the component.
- * @return {string?} The tooltip.
+ * @return {?string} The tooltip.
  */
 goog.ui.DeprecatedButton.prototype.getTooltip = function() {
   return this.tooltip_;
@@ -204,7 +216,7 @@ goog.ui.DeprecatedButton.prototype.setTooltip = function(tooltip) {
 
 /**
  * Gets the value for the component.
- * @return {Object?} The value.
+ * @return {Object} The value.
  */
 goog.ui.DeprecatedButton.prototype.getValue = function() {
   return this.value_;
@@ -256,7 +268,7 @@ goog.ui.DeprecatedButton.prototype.getClass = function() {
 
 /**
  * Gets the element representing the UI component.
- * @return {Element?} Element representing component if any. Otherwise, null.
+ * @return {Element} Element representing component if any. Otherwise, null.
  */
 goog.ui.DeprecatedButton.prototype.getElement = function() {
   return this.element_;
@@ -283,7 +295,7 @@ goog.ui.DeprecatedButton.prototype.isRendered = function() {
 
 /**
  * Renders the component. Throws an Error if the component is already rendered.
- * @param {Element} opt_element Element to render the compponent into.
+ * @param {Element=} opt_element Element to render the compponent into.
  *                              If omitted, then the componenet is appended to
  *                              the document.
  */

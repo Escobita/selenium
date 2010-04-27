@@ -10,7 +10,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2007 Google Inc. All Rights Reserved.
+// Copyright 2007 Google Inc. All Rights Reserved
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Definition of the goog.ui.tree.TreeControl class, which
@@ -43,10 +55,10 @@ goog.require('goog.userAgent');
  * This creates a TreeControl object. A tree control provides a way to
  * view a hierachical set of data.
  * @param {string} html The html content of the node label.
- * @param {Object} opt_config The configuration for the tree. See
+ * @param {Object=} opt_config The configuration for the tree. See
  *    goog.ui.tree.TreeControl.DefaultConfig. If not specified, a default config
  *    will be used.
- * @param {goog.dom.DomHelper} opt_domHelper Optional DOM helper.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.tree.BaseNode}
  */
@@ -320,13 +332,7 @@ goog.ui.tree.TreeControl.prototype.getRowClassName = function() {
  * @return {string} Src for the icon.
  */
 goog.ui.tree.TreeControl.prototype.getCalculatedIconClass = function() {
-  // if classic then the openIcon is used for expanded, otherwise openIcon is
-  // used for selected
-  var config = this.getConfig();
-  var behavior = this.getTree() ? this.getTree().getBehavior() :
-                 config.defaultBehavior;
-  var expanded = behavior == 'classic' && this.getExpanded() ||
-                 behavior != 'classic' && this.isSelected();
+  var expanded = this.getExpanded();
   if (expanded && this.expandedIconClass_) {
     return this.expandedIconClass_;
   }
@@ -335,6 +341,7 @@ goog.ui.tree.TreeControl.prototype.getCalculatedIconClass = function() {
   }
 
   // fall back on default icons
+  var config = this.getConfig();
   if (expanded && config.cssExpandedRootIcon) {
     return config.cssTreeIcon + ' ' + config.cssExpandedRootIcon;
   } else if (!expanded && config.cssCollapsedRootIcon) {
@@ -378,17 +385,6 @@ goog.ui.tree.TreeControl.prototype.setSelectedItem = function(o) {
  */
 goog.ui.tree.TreeControl.prototype.getSelectedItem = function() {
   return this.selectedItem_;
-};
-
-
-/**
- * Returns the behavior of the tree.
- * @return {string} Describes when to show the open icon.
- */
-goog.ui.tree.TreeControl.prototype.getBehavior = function() {
-  // TODO (arv) - should this be an enum? if so, what are the values? Classic
-  // and something else?
-  return this.getConfig().defaultBehavior;
 };
 
 
@@ -688,7 +684,11 @@ goog.ui.tree.TreeControl.prototype.getSuspendRedraw = function() {
  * @return {goog.ui.tree.TreeNode} The new item.
  */
 goog.ui.tree.TreeControl.prototype.createNode = function(html) {
-  return new goog.ui.tree.TreeNode(html, this.getConfig(), this.getDomHelper());
+  // Some projects call createNode without arguments which causes failure.
+  // See http://goto/misuse-createnode
+  // TODO: Fix them and remove the html || '' workaround.
+  return new goog.ui.tree.TreeNode(html || '', this.getConfig(),
+      this.getDomHelper());
 };
 
 
@@ -732,8 +732,6 @@ goog.ui.tree.TreeControl.prototype.clearTypeAhead = function() {
  */
 goog.ui.tree.TreeControl.defaultConfig = {
   cleardotPath: 'images/cleardot.gif',
-  defaultHtml: 'Tree Item',
-  defaultBehavior: 'classic',
   indentWidth: 19,
   cssRoot: goog.getCssName('goog-tree-root') + ' ' +
       goog.getCssName('goog-tree-item'),
