@@ -1,12 +1,12 @@
 /**
  * @fileoverview Atoms for simulating user actions against the DOM.
- * The bot.user namespace is required since these atoms would otherwise form a
+ * The bot.action namespace is required since these atoms would otherwise form a
  * circular dependency between bot.dom and bot.events.
  *
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 
-goog.provide('bot.user');
+goog.provide('bot.action');
 
 goog.require('bot.dom');
 goog.require('bot.events');
@@ -19,7 +19,7 @@ goog.require('goog.dom.TagName');
  * @param {Element} element The element to check.
  * @see bot.dom.isDisplayed
  */
-bot.user.checkDisplayed_ = function(element) {
+bot.action.checkDisplayed_ = function(element) {
   if (!bot.dom.isDisplayed(element)) {
     throw Error('Element is not currently visible and may not be manipuated');
   }
@@ -35,7 +35,7 @@ bot.user.checkDisplayed_ = function(element) {
  * @param {boolean} selected Whether the final state of the element should be
  *     what a user would consider "selected".
  */
-bot.user.setSelected = function(element, selected) {
+bot.action.setSelected = function(element, selected) {
   if (bot.dom.isInHead(element)) {
     throw Error('You may not select children of HEAD');
   }
@@ -50,7 +50,7 @@ bot.user.setSelected = function(element, selected) {
 
   switch (element.tagName) {
     case goog.dom.TagName.INPUT:
-      bot.user.checkDisplayed_(element);
+      bot.action.checkDisplayed_(element);
 
       if (element.type == 'checkbox' || element.type == 'radio') {
         if (element.checked != selected) {
@@ -83,11 +83,11 @@ bot.user.setSelected = function(element, selected) {
 
       // We check if the parent select is displayed since an option may not be
       // considered displayed if it is not the selected option.
-      bot.user.checkDisplayed_(select);
+      bot.action.checkDisplayed_(select);
 
       if (!select.multiple && !selected) {
-        throw Error('You may not deselect an option within a select that does ' +
-                    'not support multiple selections.')
+        throw Error('You may not deselect an option within a select that ' +
+                    'does not support multiple selections.')
       }
 
       element.selected = selected;
@@ -105,10 +105,10 @@ bot.user.setSelected = function(element, selected) {
  * Toggles the selected state of the given element.
  *
  * @param {Element} element The element to toggle.
- * @see bot.user.setSelected
+ * @see bot.action.setSelected
  * @see bot.dom.isSelected
  */
-bot.user.toggle = function(element) {
-  bot.user.setSelected(element, !bot.dom.isSelected(element));
+bot.action.toggle = function(element) {
+  bot.action.setSelected(element, !bot.dom.isSelected(element));
   return bot.dom.isSelected(element);
 };

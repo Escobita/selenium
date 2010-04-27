@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>user_test.html</title>
+  <title>action_test.html</title>
   <script src="bot-bootstrap.js" type="text/javascript"></script>
   <script type="text/javascript">
-    goog.require('bot.user');
+    goog.require('bot.action');
     goog.require('goog.events');
     goog.require('goog.events.EventType');
     goog.require('goog.testing.jsunit');
@@ -52,25 +52,25 @@
 
     function testShouldNotBeAbleToSelectChildrenOfHead() {
       var title = document.getElementsByTagName(goog.dom.TagName.TITLE);
-      assertThrows(goog.partial(bot.user.setSelected, title, true));
-      assertThrows(goog.partial(bot.user.setSelected, title, false));
+      assertThrows(goog.partial(bot.action.setSelected, title, true));
+      assertThrows(goog.partial(bot.action.setSelected, title, false));
 
       var head = document.getElementsByTagName(goog.dom.TagName.HEAD);
-      assertThrows(goog.partial(bot.user.setSelected, head, true));
-      assertThrows(goog.partial(bot.user.setSelected, head, false));
+      assertThrows(goog.partial(bot.action.setSelected, head, true));
+      assertThrows(goog.partial(bot.action.setSelected, head, false));
     }
 
     function testShouldNotBeAbleToSelectUnselectableElements() {
-      assertThrows(goog.partial(bot.user.setSelected, document, true));
-      assertThrows(goog.partial(bot.user.setSelected, document.body, true));
-      assertThrows(goog.partial(bot.user.setSelected,
+      assertThrows(goog.partial(bot.action.setSelected, document, true));
+      assertThrows(goog.partial(bot.action.setSelected, document.body, true));
+      assertThrows(goog.partial(bot.action.setSelected,
           goog.dom.$('textField'), true));
     }
 
     function testShouldNotBeAbleToSelectAnOptionThatIsNotInASelect() {
       var option = goog.dom.$('nogo-option');
-      assertThrows(goog.partial(bot.user.setSelected, option, true));
-      assertThrows(goog.partial(bot.user.setSelected, option, false));
+      assertThrows(goog.partial(bot.action.setSelected, option, true));
+      assertThrows(goog.partial(bot.action.setSelected, option, false));
     }
 
     function testShouldBeAbleToSelectAnOptionFromASingleSelect() {
@@ -78,7 +78,7 @@
       var index = ss.selectedIndex == 0 ? 1 : 0;
       var notSelected = ss.options[index];
       expectChangeEvent(ss);
-      bot.user.setSelected(notSelected, true);
+      bot.action.setSelected(notSelected, true);
       assertChangeFired();
       assertEquals(index, ss.selectedIndex);
     }
@@ -86,7 +86,7 @@
     function testShouldNotBeAbleToDeselectAnOptionFromASingleSelect() {
       var ss = goog.dom.$('singleSelect');
       var option = ss.options[ss.selectedIndex];
-      assertThrows(goog.partial(bot.user.setSelected, option, false));
+      assertThrows(goog.partial(bot.action.setSelected, option, false));
     }
 
     function testShouldDoNothingIfOptionIsAlreadyInTheDesiredState() {
@@ -95,8 +95,8 @@
       var notSelected = ss.options[ss.selectedIndex == 0 ? 1 : 0];
 
       doNotExpectChangeEvent(ss);
-      bot.user.setSelected(selected, true);
-      bot.user.setSelected(notSelected, false);
+      bot.action.setSelected(selected, true);
+      bot.action.setSelected(notSelected, false);
     }
 
     function testShouldNotBeAbleToSelectFromADisabledSelect() {
@@ -106,8 +106,8 @@
 
       doNotExpectChangeEvent(ds);
 
-      assertThrows(goog.partial(bot.user.setSelected, selected, false));
-      assertThrows(goog.partial(bot.user.setSelected, notSelected, true));
+      assertThrows(goog.partial(bot.action.setSelected, selected, false));
+      assertThrows(goog.partial(bot.action.setSelected, notSelected, true));
     }
 
     function testShouldBeAbleToSelectAnEnabledOptionFromASelectThatHasADisabledOptionInIt() {
@@ -115,7 +115,7 @@
       var index = select.selectedIndex == 0 ? 2 : 0;
       var notSelected = select.options[index];
       expectChangeEvent(select);
-      bot.user.setSelected(notSelected, true);
+      bot.action.setSelected(notSelected, true);
       assertChangeFired();
       assertEquals(index, select.selectedIndex);
     }
@@ -124,8 +124,8 @@
       var select = goog.dom.$('disabledOption');
       var disabledOption = select.options[1];
       doNotExpectChangeEvent(select);
-      assertThrows(goog.partial(bot.user.setSelected, disabledOption, true));
-      assertThrows(goog.partial(bot.user.setSelected, disabledOption, false));
+      assertThrows(goog.partial(bot.action.setSelected, disabledOption, true));
+      assertThrows(goog.partial(bot.action.setSelected, disabledOption, false));
     }
 
     function testShouldBeAbleToSelectMultipleOptionsFromAMultiSelect() {
@@ -138,8 +138,8 @@
       assertFalse(bot.dom.isSelected(cherries));
 
       expectChangeEvent(ms);
-      bot.user.setSelected(oranges, true);
-      bot.user.setSelected(cherries, true);
+      bot.action.setSelected(oranges, true);
+      bot.action.setSelected(cherries, true);
       assertChangeFired(2);
     }
 
@@ -152,15 +152,15 @@
       expectChangeEvent(ms);
 
       assertTrue(bot.dom.isSelected(red));
-      bot.user.setSelected(red, false);
+      bot.action.setSelected(red, false);
       assertFalse(bot.dom.isSelected(red));
 
       assertTrue(bot.dom.isSelected(green));
-      bot.user.setSelected(green, false);
+      bot.action.setSelected(green, false);
       assertFalse(bot.dom.isSelected(green));
 
       assertTrue(bot.dom.isSelected(blue));
-      bot.user.setSelected(blue, false);
+      bot.action.setSelected(blue, false);
       assertFalse(bot.dom.isSelected(blue));
 
       assertChangeFired(3);
@@ -173,17 +173,17 @@
       var state = bot.dom.isSelected(red);
       expectChangeEvent(ms);
 
-      assertEquals(!state, bot.user.toggle(red));
-      assertEquals(state, bot.user.toggle(red));
-      assertEquals(!state, bot.user.toggle(red));
+      assertEquals(!state, bot.action.toggle(red));
+      assertEquals(state, bot.action.toggle(red));
+      assertEquals(!state, bot.action.toggle(red));
       assertChangeFired(3);
     }
 
     function testShouldNotBeAbleToSelectADisabledCheckbox() {
       var cb = goog.dom.$('check4');
       doNotExpectChangeEvent(cb);
-      assertThrows(goog.partial(bot.user.setSelected, cb, true));
-      assertThrows(goog.partial(bot.user.setSelected, cb, false));
+      assertThrows(goog.partial(bot.action.setSelected, cb, true));
+      assertThrows(goog.partial(bot.action.setSelected, cb, false));
     }
 
     function testShouldBeAbleToToggleCheckboxes() {
@@ -192,9 +192,9 @@
 
       expectChangeEvent(cb1);
 
-      assertEquals(!state, bot.user.toggle(cb1));
-      assertEquals(state, bot.user.toggle(cb1));
-      assertEquals(!state, bot.user.toggle(cb1));
+      assertEquals(!state, bot.action.toggle(cb1));
+      assertEquals(state, bot.action.toggle(cb1));
+      assertEquals(!state, bot.action.toggle(cb1));
 
       assertChangeFired(3);
     }
@@ -204,29 +204,29 @@
       var cb2 = goog.dom.$('check2');
       var cb3 = goog.dom.$('check3');
 
-      bot.user.setSelected(cb1, false);
-      bot.user.setSelected(cb2, false);
-      bot.user.setSelected(cb3, false);
+      bot.action.setSelected(cb1, false);
+      bot.action.setSelected(cb2, false);
+      bot.action.setSelected(cb3, false);
       assertFalse(bot.dom.isSelected(cb1));
       assertFalse(bot.dom.isSelected(cb2));
       assertFalse(bot.dom.isSelected(cb3));
 
       expectChangeEvent(cb1);
-      bot.user.setSelected(cb1, true);
+      bot.action.setSelected(cb1, true);
       assertChangeFired();
       assertTrue(bot.dom.isSelected(cb1));
       assertFalse(bot.dom.isSelected(cb2));
       assertFalse(bot.dom.isSelected(cb3));
 
       expectChangeEvent(cb2);
-      bot.user.setSelected(cb2, true);
+      bot.action.setSelected(cb2, true);
       assertChangeFired();
       assertTrue(bot.dom.isSelected(cb1));
       assertTrue(bot.dom.isSelected(cb2));
       assertFalse(bot.dom.isSelected(cb3));
 
       expectChangeEvent(cb3);
-      bot.user.setSelected(cb3, true);
+      bot.action.setSelected(cb3, true);
       assertChangeFired();
       assertTrue(bot.dom.isSelected(cb1));
       assertTrue(bot.dom.isSelected(cb2));
@@ -236,13 +236,13 @@
     function testShouldNotBeAbleToDeselectARadioButton() {
       var radio = goog.dom.$('selectedRadio');
       doNotExpectChangeEvent(radio);
-      assertThrows(goog.partial(bot.user.setSelected, radio, false));
+      assertThrows(goog.partial(bot.action.setSelected, radio, false));
     }
 
     function testShouldNotBeAbleToManipulateADisabledRadiobutton() {
       var radio = goog.dom.$('disabledRadio');
       doNotExpectChangeEvent(radio);
-      assertThrows(goog.partial(bot.user.setSelected, radio, false));
+      assertThrows(goog.partial(bot.action.setSelected, radio, false));
     }
 
     function testSelectingARadioButtonShouldDeselectTheOthersInTheGroup() {
@@ -255,21 +255,21 @@
       assertFalse('precondition failed', bot.dom.isSelected(r3));
 
       expectChangeEvent(r1);
-      bot.user.setSelected(r1, true);
+      bot.action.setSelected(r1, true);
       assertChangeFired();
       assertTrue(bot.dom.isSelected(r1));
       assertFalse(bot.dom.isSelected(r2));
       assertFalse(bot.dom.isSelected(r3));
 
       expectChangeEvent(r2);
-      bot.user.setSelected(r2, true);
+      bot.action.setSelected(r2, true);
       assertChangeFired();
       assertFalse(bot.dom.isSelected(r1));
       assertTrue(bot.dom.isSelected(r2));
       assertFalse(bot.dom.isSelected(r3));
 
       expectChangeEvent(r3);
-      bot.user.setSelected(r3, true);
+      bot.action.setSelected(r3, true);
       assertChangeFired();
       assertFalse(bot.dom.isSelected(r1));
       assertFalse(bot.dom.isSelected(r2));
