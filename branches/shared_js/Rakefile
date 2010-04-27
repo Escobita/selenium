@@ -921,12 +921,12 @@ js_to_header(:name => "isSelected",
              :src  => "build/isSelected.js")
 
 js_fragment(:name => "setSelected",
-            :module => "bot.user",
-            :function => "bot.user.setSelected")
+            :module => "bot.action",
+            :function => "bot.action.setSelected")
 
 js_fragment(:name => "toggle",
-            :module => "bot.user",
-            :function => "bot.user.toggle")
+            :module => "bot.action",
+            :function => "bot.action.toggle")
 
 
 # Need atoms for submit (walking, at least), get value of css property
