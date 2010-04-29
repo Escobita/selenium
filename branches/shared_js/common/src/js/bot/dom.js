@@ -91,16 +91,20 @@ bot.dom.getAttribute = function(element, attributeName) {
 
   var lattr = attributeName.toLowerCase();
 
-  if (!bot.dom.hasAttribute(element, attributeName)) {
-    return null;
-  }
-  
   // Handle common boolean values
   if (goog.array.contains(bot.dom.booleanAttributes_, attributeName)) {
+    if (!bot.dom.hasAttribute(element, attributeName)) {
+      return false;
+    }
+
     var value = element[attributeName];
     return !!(value && value != 'false');
   }
 
+  if (!bot.dom.hasAttribute(element, attributeName)) {
+    return null;
+  }
+  
   // TODO(simon): What's the right thing to do here?
   if ('style' == lattr) {
     var style = element['style'];

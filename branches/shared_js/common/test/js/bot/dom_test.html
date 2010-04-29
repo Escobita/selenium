@@ -47,10 +47,10 @@
       assertTrue(result);
     }
 
-    function testReturnsNullWhenSelectedAttributeCannotBeSet() {
+    function testReturnsFalseWhenSelectedAttributeCannotBeSet() {
       var e = bot.locators.findElement({id: 'cheddar'});
 
-      assertEquals(null, bot.dom.getAttribute(e, 'selected'));
+      assertFalse(bot.dom.getAttribute(e, 'selected'));
     }
 
     function testShouldAliasClassNameAttribute() {
@@ -125,6 +125,22 @@
 
     function testAnElementNotAttachedToTheDomShouldNotBeConsideredInHead() {
       assertFalse(bot.dom.isInHead(goog.dom.createElement('DIV')));
+    }
+
+
+    function testShouldReturnABooleanValueForTheDisabledAttributeEvenIfItIsMissing() {
+      var checky = bot.locators.findElement({name: 'checky'});
+      var disabled = bot.dom.getAttribute(checky, 'disabled');
+      assertNotNull(disabled);
+      assertNotUndefined(disabled);
+      assertFalse(disabled);
+    }
+
+    function testShouldReturnFalseForElementsThatDoNotSupportTheDisabledAttribute() {
+      var disabled = bot.dom.getAttribute(document.body, 'disabled');
+      assertNotNull(disabled);
+      assertNotUndefined(disabled);
+      assertFalse(disabled);
     }
   </script>
 </head>
