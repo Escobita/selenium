@@ -1270,7 +1270,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`value` - `{Array.<string>|string}` The sequence of keys to type. If an array is provided, the server should flatten it to a single string to be typed.</dd>
+<dd>`value` - `{Array.<string>}` The sequence of keys to type. An array must be provided. The server should flatten the array items to a single string to be typed.</dd>
 </dl>
 </dd>
 <dd>
