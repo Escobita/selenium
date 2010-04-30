@@ -1,5 +1,5 @@
 //
-//  HTTPPNGResponse.m
+//  WebViewController.h
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -16,18 +16,27 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import "HTTPPNGResponse.h"
+#import <UIKit/UIKit.h>
 
-@implementation HTTPPNGResponse
+#import "WebViewController.h"
 
-- (id)initWithImage:(UIImage *)image {
-  NSData *imageData = UIImagePNGRepresentation(image);
-  NSLog(@"Sending PNG image of size %d bytes", [imageData length]);
-  return [super initWithData:imageData];
+// The WebViewController manages the iWebDriver's WebView.
+@interface WebViewControllerIPhone : UIViewController<UIWebViewDelegate,WebViewControllerDelegate>
+{
+ @private
+  NSURLRequestCachePolicy cachePolicy_;
+  
+  // Pointer to the status / activity label.
+  IBOutlet UILabel *statusLabel_;
+  
+  // This is nil if the last operation succeeded.
+  NSError *lastError_;
+  
+  WebViewController* webViewController_;
 }
 
-- (NSString *) contentType {
-  return @"image/png";
-}
+@property (retain, readonly) UIWebView *webView;
+
+- (WebViewController*)webViewController;
 
 @end

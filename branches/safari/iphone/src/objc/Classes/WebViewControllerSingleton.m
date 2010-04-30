@@ -1,8 +1,8 @@
 //
-//  HTTPDataResponse+Utility.m
+//  WebDriverSignleton.m
 //  iWebDriver
 //
-//  Copyright 2009 Google Inc.
+//  Copyright 2010 WebDriver contributors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import "HTTPResponse+Utility.h"
+#import "WebViewControllerSingleton.h"
+#import "HTTPServerController.h"
+#import "WebDriverPreferences.h"
+#import "WebDriverRequestFetcher.h"
+#import "WebViewController.h"
 
-@implementation HTTPDataResponse (Utility)
+@implementation WebViewControllerSingleton
 
-- (id)initWithString:(NSString *)str {
-  return [self initWithData:[str dataUsingEncoding:NSUTF8StringEncoding]];
-}
-
-+ (HTTPDataResponse *)responseWithString:(NSString *)str {
-  return [[[self alloc] initWithString:str] autorelease];
-}
-
-- (NSString *)description {
-  return [[[NSString alloc] initWithData:data
-                                encoding:NSUTF8StringEncoding] autorelease]; 
++ (WebViewController*)instance
+{
+  NSString* mode = [[WebDriverPreferences sharedInstance] mode];
+  if ([mode isEqualToString:@"Server"]) {
+    return [[HTTPServerController sharedInstance] viewController];
+  } else {
+    return [[WebDriverRequestFetcher sharedInstance] viewController];
+  }
 }
 
 @end

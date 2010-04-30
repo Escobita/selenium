@@ -25,6 +25,7 @@
 #import "ElementStore+FindElement.h"
 #import "Element.h"
 #import "NSException+WebDriver.h"
+#import "WebViewController.h"
 #import "errorcodes.h"
 
 static const NSString *JSARRAY = @"_WEBDRIVER_ELEM_CACHE";
