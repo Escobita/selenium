@@ -17,8 +17,9 @@
 
   type_name = [a-z] >start_type_name $track [a-z0-9_]* $track %leaving;
 
+  arg_name = [a-z] >start_arg_name $track [a-z0-9_]* $track %leaving;
   arg_value = string | symbol | array;
-  arg = space* >start_arg symbol space* '=>' space* arg_value space* %leaving;
+  arg = space* >start_arg arg_name space* '=' space* arg_value space* %leaving;
   args = arg (',' arg)*;
 
   output_type = type_name >start_type '(' args ')' %leaving;

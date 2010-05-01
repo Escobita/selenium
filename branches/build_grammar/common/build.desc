@@ -1,9 +1,9 @@
-java_jar(:name => "common", 
-  :srcs => [ "src/java/**/*.java" ])
+java_jar(name = "common", 
+  srcs = [ "src/java/**/*.java" ])
  
-java_jar(:name => "tests",
-  :srcs => [ "test/java/**/*.java"],
-  :deps => [
+java_jar(name = "tests",
+  srcs = [ "test/java/**/*.java"],
+  deps = [
               :common,
               "//third_party/java:commons_io",
               "//third_party/java:hamcrest",
@@ -13,5 +13,5 @@ java_jar(:name => "tests",
               "//third_party/java:servlet-api"
     ])
 
-js_library(:name => "driver_predefs",
-  :srcs => [ "src/js/spoof_header.js" ])
+js_library(name = "driver_predefs",
+  srcs = [ "src/js/spoof_header.js" ])

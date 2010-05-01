@@ -16,6 +16,10 @@ class BuildFile
        puts "Starting arg" if @debug
        @lhs.push ArgType.new
      }
+     action start_arg_name { 
+        puts "Starting arg name" if @debug
+        @lhs.push SymbolType.new 
+      }
      action start_array {
        puts "Starting array" if @debug
        @lhs.push ArrayType.new 

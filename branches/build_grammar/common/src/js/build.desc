@@ -1,6 +1,6 @@
 
-js_library(:name => "js_api",
-  :srcs => [ 
+js_library(name = "js_api",
+  srcs = [ 
     "abstractcommandprocessor.js",
     "by.js",
     "context.js",
@@ -17,7 +17,7 @@ js_library(:name => "js_api",
     "webdriver.js"
   ])
 
-js_library(:name => "extension",
-  :srcs => [
+js_library(name = "extension",
+  srcs = [
     "extension/dommessenger.js"
   ])

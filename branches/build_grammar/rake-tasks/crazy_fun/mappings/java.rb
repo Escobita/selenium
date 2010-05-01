@@ -193,7 +193,7 @@ end
 
 class RunTests < BaseJava
   def handle(fun, dir, args)
-    raise FailedPrecondition, "java_test targets need :srcs defined" if args[:srcs].nil?
+#    raise FailedPrecondition, "java_test targets need :srcs defined" if args[:srcs].nil || ar?
     
     task_name = task_name(dir, args[:name])
     
@@ -201,7 +201,7 @@ class RunTests < BaseJava
     task "#{task_name}:run" => [task_name] do
       # Find the list of tests
       tests = [] 
-      args[:srcs].each do |src|
+      (args[:srcs] || []).each do |src|
         srcs = to_filelist(dir, src).each do |f|
           tests.push f if f.to_s =~ /TestSuite\.java$/
         end
@@ -209,6 +209,8 @@ class RunTests < BaseJava
       
       cp = ClassPath.new(task_name)
       cp.push jar_name(dir, args[:name])
+      
+      tests = args[:class].nil? ? tests : "#{args[:class]}.java"
       
       tests.each do |test|
         cmd = "java -Xmx128m -Xms128m "
