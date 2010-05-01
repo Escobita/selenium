@@ -1,19 +1,19 @@
-java_jar(name = "commons_codec",
+java_library(name = "commons_codec",
   deps = ["commons-codec-1.4.jar"])
 
-java_jar(name = "commons_collections",
+java_library(name = "commons_collections",
   deps = ["commons-collections-3.2.1.jar"])
 
-java_jar(name = "commons_io",
+java_library(name = "commons_io",
   deps = ["commons-io-1.4.jar"])
 
-java_jar(name = "commons_lang",
+java_library(name = "commons_lang",
   deps = ["commons-lang-2.4.jar"])
 
-java_jar(name = "commons_logging",
+java_library(name = "commons_logging",
   deps = ["commons-logging-1.1.1.jar"])
 
-java_jar(name = "htmlunit",
+java_library(name = "htmlunit",
   deps = [
     :commons_io,
     :httpclient,
@@ -25,7 +25,7 @@ java_jar(name = "htmlunit",
     "nekohtml-1.9.13.jar"
   ])
 
-java_jar(name = "httpclient",
+java_library(name = "httpclient",
   deps = [
     :commons_codec,
     :commons_collections,
@@ -33,7 +33,7 @@ java_jar(name = "httpclient",
     "commons-httpclient-3.1.jar"
   ])
 
-java_jar(name = "jetty",
+java_library(name = "jetty",
   deps = [
     :commons_logging,
     "jasper-compiler-5.5.15.jar",
@@ -44,22 +44,22 @@ java_jar(name = "jetty",
     "jsp-api-2.0.jar"
   ])
 
-java_jar(name = "jmock",
+java_library(name = "jmock",
   deps = [
     "jmock-2.4.0.jar",
     "jmock-junit3-2.4.0.jar"
   ])
 
-java_jar(name = "junit",
+java_library(name = "junit",
   deps = ["junit-dep-4.4.jar"])
   
-java_jar(name = "hamcrest",
+java_library(name = "hamcrest",
   deps = ["hamcrest-all-1.1.jar"])
   
-java_jar(name = "servlet-api",
+java_library(name = "servlet-api",
   deps = ["servlet-api-2.5-6.1.9.jar"])
   
-java_jar(name = "xml_libs",
+java_library(name = "xml_libs",
   deps = [
     "xml-apis-1.3.04.jar",
     "xalan-2.7.1.jar",

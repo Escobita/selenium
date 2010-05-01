@@ -15,12 +15,12 @@ crazy_fun = CrazyFun.new
 # rule into a (series of) rake tasks. For example if we're looking at a file
 # in subdirectory "subdir" contains the line:
 #
-# java_jar(:name => "example", :srcs => ["foo.java"])
+# java_library(:name => "example", :srcs => ["foo.java"])
 #
 # we would generate a rake target of "//subdir:example" which would generate
 # a Java JAR at "build/subdir/example.jar". 
 # 
-# If crazy fun doesn't know how to handle a particular output type ("java_jar"
+# If crazy fun doesn't know how to handle a particular output type ("java_library"
 # in the example above) then it will throw an exception, stopping the build
 JavaMappings.new.add_all(crazy_fun)
 JavascriptMappings.new.add_all(crazy_fun)

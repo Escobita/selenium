@@ -295,7 +295,7 @@ def walk_war_deps_(dep, dest)
   end
 end
 
-def java_jar(args)
+def java_library(args)
   JavaGen.new().jar(args)
 end
 

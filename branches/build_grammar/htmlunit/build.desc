@@ -1,4 +1,4 @@
-java_jar(name = "htmlunit",
+java_library(name = "htmlunit",
   srcs = [ "src/java/**/*.java" ],
   deps = [
     "//common:common",

@@ -62,7 +62,7 @@ mozilla_xpi(name = "webdriver",
   install = "src/extension/install.rdf"
 )
 
-java_jar(name = "firefox",
+java_library(name = "firefox",
   srcs = ["src/java/**/*.java"],
   resources = [ :webdriver ],
   deps = [

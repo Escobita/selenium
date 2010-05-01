@@ -1,7 +1,7 @@
-java_jar(name = "common", 
+java_library(name = "common", 
   srcs = [ "src/java/**/*.java" ])
  
-java_jar(name = "tests",
+java_library(name = "tests",
   srcs = [ "test/java/**/*.java"],
   deps = [
               :common,
