@@ -2,29 +2,73 @@
 
 = WebDriver's Build System =
 
-WebDriver is built using Rake. Rather than being a straight series of tasks, we've layered a declarative layer on top of this. That is, rather than:
+<wiki:toc />
+
+WebDriver is a large project: if we tried to push everything into a single monolithic build file it eventually becomes unmanageable. We know this. We've tried it. So we broke the single Rakefile into a series of {{{build.desc}}} files. Each of these describe a part of the build.
+
+Let's take a look at a build.desc file. This is the [http://code.google.com/p/selenium/source/browse/trunk/htmlunit/build.desc htmlunit build.desc]:
 
 {{{
-task foo => [:bar, :baz]
+java_library(name = "htmlunit",
+  srcs = [ "src/java/**/*.java" ],
+  deps = [
+    "//common",
+    "//third_party/java/htmlunit"
+  ])
+  
+java_test(name = "test",
+  srcs = [ "test/java/**/*.java" ],
+  deps = [
+    ":htmlunit",
+    "//common:test",
+    "//third_party/java/junit"
+  ])
 }}}
 
-the webdriver Rakefile has lines such as:
+This highlights most of the key concepts. Firstly, it declares *target*, in this case there is a single {{{java_library}}} target and a single {{{java_test}}} target. Each target has a {{{name}}} attribute.
 
-{{{
-java_jar(:name => "webdriver-common",
-         :srcs   => "common/src/java/**/*.java"
-}}}
+== Target Names ==
 
-This boils down to a call of the method "java_jar", passing in a Hash containing the details required to build the target. Behind the scenes, this sets up a normal rake task called "webdriver-common" which depends on the file "build/webdriver-common.jar", which in turn depends on the sources. This means that at the end of the day _we're just a Rakefile_.
+The combination of the location of the "build.desc" file and the name are used to derive the rake tasks that are generated. All task names are prefixed with "//" followed by the path to the directory containing the "build.desc" file relative to the {{{Rakefile}}}, followed by a ":" and then the name of the target within the "build.desc". An example makes this far clearer :)
 
-== Implicit Targets and Outputs ==
+The example file above is located at "htmlunit/build.desc". The two rake tasks generated are {{{//htmlunit:htmlunit}}} and {{{//htmlunit:test}}}
 
-The following implicit targets and outputs are generated:
+== Short Target Names ==
 
-|| *Method name * || * :name value* || * Called with * || *Output* || * What it does * ||
-|| java_jar || "foo" || rake foo || build/foo.jar || Builds the jar from the sources ||
-|| java_jar || "foo" || rake foo_zip || build/foo.zip || Packages the output of target, with dependencies, into a zip || 
+As a shortcut, if a output target is named after the directory containing the "build.desc" file, you can omit the part of the rake task name after the colon. In our example: {{{//htmlunit}}} is the same as {{{//htmlunit:htmlunit}}}.
 
-== Future Plans ==
+== Outputs == 
 
-At the moment, the Rakefile is monolithic and hard to understand. We'd like to "shatter" the various pieces into subdirectories.
+Each target specified in a "build.desc" file produces one and only one output. This is important. Keep it in mind. Generally, all output files are placed in the "build" directory, relative to the rake task name. In our example, the output of "//htmlunit:htmlunit" would be found in "build/htmlunit/htmlunit.jar".
+
+== Dependencies ==
+
+Take a look at the "deps" section of the "test" target above. The {{{":htmlunit"}}} is a reference to a target in the current "build.desc" file, in this case, the "java_library" target immediately above. You'll also see that there's a reference to several full paths. For example {{{"//common:test"}}} This refers to a rake task.
+
+= Build Targets = 
+
+Being a brief description of the available targets that you can use.
+
+== java_library ==
+
+*Output:* JAR file named after the "name" attribute if the "srcs" attribute is set.
+*Implicit Targets:* None.
+*Required Attributes:* "name" and at least one of "srcs" or "deps".
+
+|| *Attribute Name* || *Type* || *Meaning* ||
+|| name || string || The name of the target. The output jar is named after this attribute with ".jar" appended (eg: if the "name" is "test", the resulting jar is "test.jar") ||
+|| deps || array || A list of dependencies. If a dependency refers to another {{{java_library}}}, a {{{java_test}}} target or a file (relative to this "build.desc" file), it is added to the CLASSPATH. ||
+|| srcs || array || The source files ||
+|| resources || array || Any resources that should be copied into the jar file ||
+  
+== java_test ==
+
+*Output:* JAR file named after the "name" attribute if the "srcs" attribute is set.
+*Implicit Targets:* ":run" (to actually run the tests)
+*Required Attributes:* "name" and at least one of "srcs" or "deps".
+
+|| *Attribute Name* || *Type* || *Meaning* ||
+|| name || string || The name of the target. The output jar is named after this attribute with ".jar" appended (eg: if the "name" is "test", the resulting jar is "test.jar") ||
+|| deps || array || A list of dependencies. If a dependency refers to another {{{java_library}}}, a {{{java_test}}} target or a file (relative to this "build.desc" file), it is added to the CLASSPATH. ||
+|| srcs || array || The source files ||
+|| resources || array || Any resources that should be copied into the jar file ||
