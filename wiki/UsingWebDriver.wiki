@@ -5,51 +5,32 @@
 
 == From a New Download ==
 
-Unpack the "webdriver-all.zip" you can download from [http://code.google.com/p/selenium/downloads/list the site], and add all the JARs to your CLASSPATH. This will give you the ChromeDriver, FirefoxDriver, HtmlUnitDriver, InternetExplorerDriver, RemoteWebDriver client and the support packages. The support packages give you useful helper classes, such as the LiftStyleApi and the PageFactory.
+There are two [http://code.google.com/p/selenium/downloads/list downloads] that you will generally want to chose:
+
+   * {{{selenium-server-standalone.jar}}} - This contains the Selenium server (required if you want to use the Selenium 1.x classes) and the RemoteWebDriver server as a standalone jar, that can be executed using {{{java -jar}}}. Note that this JAR contains _all_ of the required dependencies. If you'd prefer to manage the classpath yourself, then download the "selenium-server-XXX.zip" file.
+
+   * The language bindings for your language of choice. If you're using Java, then download the latest {{{selenium-java-XXX.zip}}} where "XXX" represents the version number. For .Net, the appropriate zip is the {{{selenium-dotnet-XXX.zip}}}.
 
 == With Maven ==
 
-If you want to use the HtmlUnitDriver, add the following dependency to your pom.xml:
-{{{
-    <dependency>
-        <groupId>org.seleniumhq.webdriver</groupId>
-        <artifactId>webdriver-htmlunit</artifactId>
-        <version>0.9.7376</version>
-    </dependency>
-}}}
-If you want to use the FirefoxDriver, you need to add the following dependency to your pom.xml:
-{{{
-    <dependency>
-        <groupId>org.seleniumhq.webdriver</groupId>
-        <artifactId>webdriver-firefox</artifactId>
-        <version>0.9.7376</version>
-    </dependency>
-}}}
-If you want to use the InternetExplorerDriver, you need to add the following dependency to your pom.xml:
-{{{
-    <dependency>
-        <groupId>org.seleniumhq.webdriver</groupId>
-        <artifactId>webdriver-ie</artifactId>
-        <version>0.9.7376</version>
-    </dependency>
-}}}
-If you want to use the ChromeDriver, you need to add the following dependency to your pom.xml:
-{{{
-    <dependency>
-        <groupId>org.seleniumhq.webdriver</groupId>
-        <artifactId>webdriver-chrome</artifactId>
-        <version>0.9.7376</version>
-    </dependency>
-}}}
-Hint: ChromeDriver currently only works with Chrome 4.0.x (from the beta and dev channels).
+To use the client libraries (the remote webdriver client, HtmlUnitDriver, ChromeDriver, InternetExplorerDriver, FirefoxDriver and support libraries) Add the following dependencies to your project:
 
-Finally, if you like to use any of our support classes, you should add the following dependency to your pom.xml:
 {{{
-    <dependency>
-        <groupId>org.seleniumhq.webdriver</groupId>
-        <artifactId>webdriver-support</artifactId>
-        <version>0.9.7376</version>
-    </dependency>
+  <dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium</artifactId>
+    <version>2.0a4</version>
+  </dependency>
+}}}
+
+If you want to start a selenium server, you will need the following dependency:
+
+{{{
+  <dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-server</artifactId>
+    <version>2.0a4</version>
+  </dependency>
 }}}
 
 That's it. 
@@ -58,23 +39,5 @@ That's it.
 
  * Follow the instructions in CheckOut in order to get the latest version of WebDriver.
  * Run {{{rake}}} without any targets (that is, just run {{{rake}}}) This will run the unit tests too, and if that's not what you want to do, just run: {{{rake all}}}
- * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver) The JARs for the classes in "org.openqa.selenium" are located in "build".
- * Now, just copy the required runtime libraries and the newly built jars on to your CLASSPATH. 
-
-Perhaps that last point needs a little more explanation...
-
-=== Where Jars Are Located ===
-
-If you take a look at the top level of WebDriver's trunk, you'll see a number of directories which contain the drivers you may want to use (*common* contains code needed by every driver, *firefox*, and *htmlunit* should be obvious, and *jobbie* contains the InternetExplorerDriver)
-
-Each of these top level directories is arranged in the same way. After a build, the built binray is found at {{{build/webdriver-$DRIVER.jar}}}.. That is, the FirefoxDriver jar is located at {{{build/webdriver-firefox.jar}}} and the common jar is located at {{{build/webdriver-common.jar}}} and so on. These jars only contain the driver code, and not any required supporting libraries. For example, the HtmlUnitDriver requires the HtmlUnit jars, plus any libraries that _it_ needs.
-
-Fortunately, all the libraries required for a particular driver are located under {{{$DRIVER/lib/runtime}}} You'll need to copy those on to your CLASSPATH too.
-
-|| *Driver* || *Location of driver jar under trunk* || *Location of required libraries* || *Notes* ||
-|| common || common/build/webdriver-common.jar || none needed || Required by every driver ||
-|| htmlunit || htmlunit/build/webdriver-htmlunit.jar || htmlunit/lib/runtime || none ||
-|| firefox || firefox/build/webdriver-firefox.jar || firefox/lib/runtime || none ||
-|| internet explorer || jobbie/build/webdriver-jobbie.jar || jobbie/lib/runtime || none ||
-
-Once you've done that, you should be ready to start using WebDriver in your project.
+ * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver) The JARs for the classes in "org.openqa.selenium" are located in subdirectories of the "build" directory. It should be obvious what is where.
+ * Now, just copy the required runtime libraries and the newly built jars on to your CLASSPATH. Read the {{{build.desc}}} files to figure out what these are.
