@@ -7,15 +7,20 @@
 
 For all versions of WebDriver:
 
- * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Sun's site] if it's not already on your computer)
- * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also includes Rake. If you're using OS X 10.5 the default versions of ruby and rake are fine)
- * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
- * The source code (you may need to CheckOut the source from source control)
+  * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Sun's site] if it's not already on your computer)
+  * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also  includes Rake. If you're using OS X 10.5 the default versions of ruby and rake are fine)
+  * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
+  * The source code (you may need to CheckOut the source from source control)
 
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
 
- * Visual Studio 2008
- * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from that Start menu.
+  * Visual Studio 2008
+  * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from that Start menu.
+
+The following ruby gems are also required:
+
+  * Antwrap
+  * yard
 
 == Building ==
 
