@@ -8,10 +8,13 @@
 
 goog.provide('bot.action');
 
+goog.require('bot.Error');
+goog.require('bot.ErrorCode');
 goog.require('bot.dom');
 goog.require('bot.events');
 goog.require('goog.dom');
 goog.require('goog.dom.TagName');
+
 
 
 /**
@@ -21,7 +24,8 @@ goog.require('goog.dom.TagName');
  */
 bot.action.checkDisplayed_ = function(element) {
   if (!bot.dom.isDisplayed(element)) {
-    throw Error('Element is not currently visible and may not be manipuated');
+    throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_VISIBLE,
+        'Element is not currently visible and may not be manipuated');
   }
 };
 
@@ -37,15 +41,13 @@ bot.action.checkDisplayed_ = function(element) {
  */
 bot.action.setSelected = function(element, selected) {
   if (bot.dom.isInHead(element)) {
-    throw Error('You may not select children of HEAD');
+    throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_SELECTABLE,
+        'You may not select children of HEAD');
   }
 
   if (element.disabled) {
-    throw Error('You may not select a disabled element');
-  }
-
-  if (selected == bot.dom.isSelected(element)) {
-    return;  // Already in the desired state.
+    throw new bot.Error(bot.ErrorCode.INVALID_ELEMENT_STATE,
+        'You may not select a disabled element');
   }
 
   switch (element.tagName) {
@@ -55,14 +57,21 @@ bot.action.setSelected = function(element, selected) {
       if (element.type == 'checkbox' || element.type == 'radio') {
         if (element.checked != selected) {
           if (element.type == 'radio' && !selected) {
-            throw Error('You may not deselect a radio button');
+            throw new bot.Error(bot.ErrorCode.INVALID_ELEMENT_STATE,
+                'You may not deselect a radio button');
           }
+
+          if (selected == bot.dom.isSelected(element)) {
+            return;  // Already in the desired state.
+          }
+
           element.checked = selected;
           bot.events.fire(element, 'change');
         }
       } else {
-        throw Error('You may not select an unselectable input element: ' +
-            element.type);
+        throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_SELECTABLE,
+            'You may not select an unselectable input element: ' +
+                element.type);
       }
       break;
 
@@ -73,12 +82,14 @@ bot.action.setSelected = function(element, selected) {
       });
 
       if (!select) {
-        throw Error('You may not de/select an option that is not within a ' +
-                    'select element');
+        throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_SELECTABLE,
+            'You may not de/select an option that is not within a ' +
+            'select element');
       }
 
       if (select.disabled) {
-        throw Error('You may not select an option from a disabled select');
+        throw new bot.Error(bot.ErrorCode.INVALID_ELEMENT_STATE,
+            'You may not select an option from a disabled select');
       }
 
       // We check if the parent select is displayed since an option may not be
@@ -86,8 +97,13 @@ bot.action.setSelected = function(element, selected) {
       bot.action.checkDisplayed_(select);
 
       if (!select.multiple && !selected) {
-        throw Error('You may not deselect an option within a select that ' +
-                    'does not support multiple selections.')
+        throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_SELECTABLE,
+            'You may not deselect an option within a select that ' +
+            'does not support multiple selections.')
+      }
+
+      if (selected == bot.dom.isSelected(element)) {
+        return;  // Already in the desired state.
       }
 
       element.selected = selected;
@@ -95,8 +111,8 @@ bot.action.setSelected = function(element, selected) {
       break;
 
     default:
-      throw Error('You may not select an unselectable element: ' +
-          element.tagName);
+      throw new bot.Error(bot.ErrorCode.ELEMENT_NOT_SELECTABLE,
+          'You may not select an unselectable element: ' + element.tagName);
   }
 };
 
@@ -109,6 +125,10 @@ bot.action.setSelected = function(element, selected) {
  * @see bot.dom.isSelected
  */
 bot.action.toggle = function(element) {
+  if (element.tagName == goog.dom.TagName.INPUT && 'radio' == element.type) {
+    throw new bot.Error(bot.ErrorCode.INVALID_ELEMENT_STATE,
+        'You may not toggle a radio button');
+  }
   bot.action.setSelected(element, !bot.dom.isSelected(element));
   return bot.dom.isSelected(element);
 };

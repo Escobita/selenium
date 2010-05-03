@@ -12,10 +12,10 @@ goog.addDependency("../../../js/src/testcase.js", ['webdriver.TestCase', 'webdri
 goog.addDependency("../../../js/src/timing.js", ['webdriver.timing'], ['goog.userAgent']);
 goog.addDependency("../../../js/src/webdriver.js", ['webdriver.WebDriver', 'webdriver.WebDriver.EventType', 'webdriver.WebDriver.Speed'], ['goog.debug.Logger', 'goog.events', 'goog.events.EventTarget', 'webdriver.By.Locator', 'webdriver.Command', 'webdriver.CommandName', 'webdriver.Response', 'webdriver.WebElement', 'webdriver.timing']);
 goog.addDependency("../../../js/src/webelement.js", ['webdriver.WebElement'], ['goog.array', 'webdriver.By.Locator', 'webdriver.By.Strategy', 'webdriver.CommandName', 'webdriver.Future']);
-goog.addDependency("../../../js/src/bot/action.js", ['bot.action'], ['bot.dom', 'bot.events', 'goog.dom', 'goog.dom.TagName']);
+goog.addDependency("../../../js/src/bot/action.js", ['bot.action'], ['bot.Error', 'bot.ErrorCode', 'bot.dom', 'bot.events', 'goog.dom', 'goog.dom.TagName']);
 goog.addDependency("../../../js/src/bot/bot.js", ['bot'], []);
 goog.addDependency("../../../js/src/bot/dom.js", ['bot.dom'], ['goog.array', 'goog.style']);
-goog.addDependency("../../../js/src/bot/error.js", ['bot.Error', 'bot.Error.Code'], ['goog.debug.Error']);
+goog.addDependency("../../../js/src/bot/error.js", ['bot.Error', 'bot.ErrorCode'], ['goog.debug.Error', 'goog.object']);
 goog.addDependency("../../../js/src/bot/events.js", ['bot.events'], ['bot.dom', 'goog.dom', 'goog.events.EventType', 'goog.userAgent']);
 goog.addDependency("../../../js/src/bot/locators/locators.js", ['bot.locators'], ['bot', 'bot.locators.strategies', 'goog.array']);
 goog.addDependency("../../../js/src/bot/locators/strategies/classname.js", ['bot.locators.strategies.className'], ['goog.array', 'goog.dom', 'goog.string']);

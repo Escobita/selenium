@@ -123,7 +123,7 @@ Response.prototype = {
     // WebDriverError is defined in the utils.js subscript which is
     // loaded independently in this component and in the main driver
     // component.
-    this.status = e.isWebDriverError ? e.code : ErrorCode.UNHANDLED_ERROR;
+    this.status = e.isAutomationError ? e.code : ErrorCode.UNHANDLED_ERROR;
     this.value = ErrorCode.toJSON(e);
     this.send();
   },

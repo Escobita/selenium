@@ -33,6 +33,12 @@
 
       assertFalse(isDisplayed(childDiv));
       assertFalse(isDisplayed(hiddenLink));
+
+      var parent = findElement({id: 'hiddenFormFields'});
+      var child = findElement({id: 'untogglable'});
+
+      assertFalse(isDisplayed(parent));
+      assertFalse(isDisplayed(child));
     }
 
 
@@ -94,7 +100,7 @@
         </div>
     </div>
 
-    <div style="visibility: hidden;">
+    <div id="hiddenFormFields" style="visibility: hidden;">
       <span>
         <input id="unclickable"/>
         <input type="checkbox" id="untogglable" checked="checked"/>Check box you can't see

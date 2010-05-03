@@ -944,7 +944,9 @@ task :fragments => [
   "build/getSize.js",
   "build/getVisibleText.js",
   "build/isDisplayed.js",
-  "build/isSelected.js"
+  "build/isSelected.js",
+  "build/setSelected.js",
+  "build/toggle.js"
 ]
 task :headers => [
   "fire.h", 

@@ -92,11 +92,16 @@
     function testShouldDoNothingIfOptionIsAlreadyInTheDesiredState() {
       var ss = goog.dom.$('singleSelect');
       var selected = ss.options[ss.selectedIndex];
-      var notSelected = ss.options[ss.selectedIndex == 0 ? 1 : 0];
 
       doNotExpectChangeEvent(ss);
       bot.action.setSelected(selected, true);
-      bot.action.setSelected(notSelected, false);
+    }
+
+
+    function testShouldNotBeAbleToDeselectAnOptionInASingleSelectEvenIfItIsAlreadyUnselected() {
+      var ss = goog.dom.$('singleSelect');
+      var notSelected = ss.options[ss.selectedIndex == 0 ? 1 : 0];
+      assertThrows(goog.partial(bot.action.setSelected, notSelected, false));
     }
 
     function testShouldNotBeAbleToSelectFromADisabledSelect() {

@@ -61,7 +61,7 @@ function WebDriverError(code, messageOrError) {
    * component boundaries.
    * @type {!boolean}
    */
-  this.isWebDriverError = true;
+  this.isAutomationError = true;
 }
 
 

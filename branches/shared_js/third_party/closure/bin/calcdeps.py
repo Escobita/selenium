@@ -425,8 +425,11 @@ def Compile(compiler_jar_path, source_paths, out, flags=None):
     flags: A list of additional flags to pass on to Closure compiler.
   """
   args = ['java', '-jar', compiler_jar_path]
+  seen = {}
   for path in source_paths:
-    args += ['--js', path]
+    if path not in seen:
+      seen[path] = 1
+      args += ['--js', path]
 
   if flags:
     args += flags

@@ -17,6 +17,7 @@
  */
 
 goog.require('goog.style');
+goog.require('bot.action');
 
 FirefoxDriver.prototype.elementEquals = function(respond, parameters) {
   var elementA = Utils.getElementAt(parameters.id,
@@ -369,117 +370,16 @@ FirefoxDriver.prototype.isElementSelected = function(respond, parameters) {
 FirefoxDriver.prototype.setElementSelected = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-
-  if (!Utils.isDisplayed(element, true) && !Utils.isInHead(element)) {
-    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
-        "Element is not currently visible and so may not be selected");
-  }
-
-  function safeQueryInterface(element, queryFor) {
-    try {
-      return element.QueryInterface(queryFor);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  var option = safeQueryInterface(
-      element, Components.interfaces.nsIDOMHTMLOptionElement);
-  if (option) {
-    var select = element;
-    while (select.parentNode && select.tagName.toLowerCase() != 'select') {
-      select = select.parentNode;
-    }
-    select = safeQueryInterface(
-        select, Components.interfaces.nsIDOMHTMLSelectElement);
-    if (!select) {
-      //If we're not within a select element, fire the event from the option, and hope that it bubbles up
-      Utils.dumpn("Falling back to event firing from option, not select element");
-      select = option;
-    }
-
-    if (!option.selected) {
-      option.selected = true;
-      Utils.fireHtmlEvent(select, 'change');
-    }
-
-    respond.status = ErrorCode.SUCCESS;
-    respond.value = '';
-    respond.send();
-    return;
-  }
-
-  var inputElement = safeQueryInterface(
-      element, Components.interfaces.nsIDOMHTMLInputElement);
-  if (inputElement) {
-    if (inputElement.disabled) {
-      throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
-          "You may not select a disabled element");
-    }
-
-    if (inputElement.type == 'checkbox' || inputElement.type == 'radio') {
-      if (!inputElement.checked) {
-        inputElement.checked = true;
-        Utils.fireHtmlEvent(inputElement, 'change');
-      }
-
-      respond.status = ErrorCode.SUCCESS;
-      respond.value = '';
-      respond.send();
-      return;
-    }
-  }
-
-  throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
-      'You may not select an unselectable element');
+  bot.action.setSelected(element, true);
+  respond.send();
 };
 
 
 FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-
-  if (!Utils.isDisplayed(element) && !Utils.isInHead(element)) {
-    throw new WebDriverError(ErrorCode.ELEMENT_NOT_VISIBLE,
-        "Element is not currently visible and so may not be toggled");
-  }
-
-  try {
-    var checkbox =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLInputElement);
-    if (checkbox.type == "checkbox") {
-      checkbox.checked = !checkbox.checked;
-      Utils.fireHtmlEvent(checkbox, "change");
-      respond.value = checkbox.checked;
-      respond.send();
-      return;
-    }
-  } catch(e) {
-  }
-
-  try {
-    var option =
-        element.QueryInterface(Components.interfaces.nsIDOMHTMLOptionElement);
-
-    // Find our containing select and see if it allows multiple selections
-    var select = option.parentNode;
-    while (select && select.tagName != "SELECT") {
-      select = select.parentNode;
-    }
-
-    if (select && select.multiple) {
-      option.selected = !option.selected;
-      Utils.fireHtmlEvent(option, "change");
-      respond.value = option.selected;
-      respond.send();
-      return;
-    }
-  } catch(e) {
-  }
-
-    throw new WebDriverError(ErrorCode.INVALID_ELEMENT_STATE,
-      "You may only toggle an element that is either a checkbox or an "  +
-      "option in a select that allows multiple selections");
+  respond.value = bot.action.toggle(element);
+  respond.send();
 };
 
 
