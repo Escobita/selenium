@@ -22,7 +22,11 @@ try:
     import json
 except ImportError: # < 2.6
     import simplejson as json
-from ..common.exceptions import NoSuchElementException
+
+if not hasattr(json, 'dumps'):
+    import simplejson as json
+
+from selenium.common.exceptions import NoSuchElementException
 
 
 def format_json(json_struct):

@@ -16,16 +16,15 @@
  */
 package org.openqa.selenium.server.browserlaunchers;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.ApplicationRegistry;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
-import org.openqa.selenium.server.browserlaunchers.FirefoxChromeLauncher.FileLockRemainedException;
 import org.openqa.selenium.server.browserlaunchers.locators.Firefox2or3Locator;
-
-import java.io.File;
-import java.io.IOException;
 
 public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
 
@@ -35,7 +34,6 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
     private BrowserInstallation browserInstallation;
     private Process process;
     
-    protected LauncherUtils.ProxySetting proxySetting = LauncherUtils.ProxySetting.PROXY_SELENIUM_TRAFFIC_ONLY;
     private static boolean alwaysChangeMaxConnections = false;
     protected boolean changeMaxConnections = alwaysChangeMaxConnections;
 
@@ -52,6 +50,9 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
 
     public FirefoxCustomProfileLauncher(BrowserConfigurationOptions browserOptions, RemoteControlConfiguration configuration, String sessionId, BrowserInstallation browserInstallation) {
         super(sessionId, configuration, browserOptions);
+        browserOptions.setProxyEverything(false);
+        browserOptions.setAvoidProxy(true);
+        browserOptions.setOnlyProxySeleniumTraffic(true);
         init();
         this.browserInstallation = browserInstallation;
         shell.setLibraryPath(browserInstallation.libraryPath());
@@ -109,7 +110,7 @@ public class FirefoxCustomProfileLauncher extends AbstractBrowserLauncher {
             LauncherUtils.copySingleFileWithOverwrite(new File(firefoxProfileTemplate, "cert8.db"), new File(customProfileDir, "cert8.db"), true);
         }
 
-        LauncherUtils.generatePacAndPrefJs(customProfileDirectory, getPort(), proxySetting, null, changeMaxConnections, getTimeout(), browserConfigurationOptions.is("avoidProxy"));
+        LauncherUtils.generatePacAndPrefJs(customProfileDirectory, getPort(), null, changeMaxConnections, getTimeout(), browserConfigurationOptions);
     }
 
     /** Implementation identical to that in FirefoxChromeLauncher. **/

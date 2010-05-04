@@ -77,7 +77,15 @@
 </dl>
 <div class="clear"></div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
 
+  </div>
+</div>
+<div class="tags">
+  
+</div>
   <h2>Constant Summary</h2>
   
     <dl class="constants">
@@ -91,7 +99,7 @@
         <dt id="DEFAULT_HEADERS-constant" class="">DEFAULT_HEADERS =
             <span class="summary_desc"></span>
         </dt>
-        <dd><pre class="code"><span class='lbrace token'>{</span> <span class='string val'>&quot;Accept&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='CONTENT_TYPE constant id'>CONTENT_TYPE</span> <span class='rbrace token'>}</span>
+        <dd><pre class="code"><span class='lbrace token'>{</span> <span class='string val'>&quot;Accept&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='CONTENT_TYPE constant id'>CONTENT_TYPE</span><span class='comma token'>,</span> <span class='string val'>&quot;Content-Length&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;0&quot;</span> <span class='rbrace token'>}</span>
 </pre></dd>
       
     </dl>
@@ -106,7 +114,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#call-instance_method" title="#call (instance method)">- (Object) <strong>call</strong>(verb, url, *args) </a>
+      <a href="#call-instance_method" title="#call (instance method)">- (Object) <strong>call</strong>(verb, url, command_hash) </a>
     
 
     
@@ -202,7 +210,7 @@ A new instance of DefaultHttpClient
       <div class="method_details first">
   <p class="signature first" id="call-instance_method">
   
-    - (<tt>Object</tt>) <strong>call</strong>(verb, url, *args) 
+    - (<tt>Object</tt>) <strong>call</strong>(verb, url, command_hash) 
   
 
   
@@ -229,52 +237,28 @@ A new instance of DefaultHttpClient
 30
 31
 32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45</pre>
+33</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'remote/client/src/rb/lib/selenium/webdriver/remote/default_http_client.rb', line 16</span>
 
-<span class='def def kw'>def</span> <span class='call identifier id'>call</span><span class='lparen token'>(</span><span class='verb identifier id'>verb</span><span class='comma token'>,</span> <span class='url identifier id'>url</span><span class='comma token'>,</span> <span class='mult op'>*</span><span class='args identifier id'>args</span><span class='rparen token'>)</span>
+<span class='def def kw'>def</span> <span class='call identifier id'>call</span><span class='lparen token'>(</span><span class='verb identifier id'>verb</span><span class='comma token'>,</span> <span class='url identifier id'>url</span><span class='comma token'>,</span> <span class='command_hash identifier id'>command_hash</span><span class='rparen token'>)</span>
   <span class='response identifier id'>response</span> <span class='assign token'>=</span> <span class='nil nil kw'>nil</span>
   <span class='url identifier id'>url</span>      <span class='assign token'>=</span> <span class='@server_url ivar id'>@server_url</span><span class='dot token'>.</span><span class='merge identifier id'>merge</span><span class='lparen token'>(</span><span class='url identifier id'>url</span><span class='rparen token'>)</span> <span class='unless unless_mod kw'>unless</span> <span class='url identifier id'>url</span><span class='dot token'>.</span><span class='kind_of? fid id'>kind_of?</span><span class='lparen token'>(</span><span class='URI constant id'>URI</span><span class='rparen token'>)</span>
   <span class='headers identifier id'>headers</span>  <span class='assign token'>=</span> <span class='DEFAULT_HEADERS constant id'>DEFAULT_HEADERS</span><span class='dot token'>.</span><span class='dup identifier id'>dup</span>
 
-  <span class='if if kw'>if</span> <span class='args identifier id'>args</span><span class='dot token'>.</span><span class='any? fid id'>any?</span>
-    <span class='headers identifier id'>headers</span><span class='dot token'>.</span><span class='merge! fid id'>merge!</span><span class='lparen token'>(</span><span class='string val'>&quot;Content-Type&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;#{CONTENT_TYPE}; charset=utf-8&quot;</span><span class='rparen token'>)</span>
-    <span class='payload identifier id'>payload</span> <span class='assign token'>=</span> <span class='args identifier id'>args</span><span class='dot token'>.</span><span class='to_json identifier id'>to_json</span>
-    <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;   &gt;&gt;&gt; #{payload}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
-  <span class='end end kw'>end</span>
+  <span class='if if kw'>if</span> <span class='command_hash identifier id'>command_hash</span>
+    <span class='payload identifier id'>payload</span> <span class='assign token'>=</span> <span class='command_hash identifier id'>command_hash</span><span class='dot token'>.</span><span class='to_json identifier id'>to_json</span>
+    <span class='headers identifier id'>headers</span><span class='lbrack token'>[</span><span class='string val'>&quot;Content-Type&quot;</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='dstring node'>&quot;#{CONTENT_TYPE}; charset=utf-8&quot;</span>
+    <span class='headers identifier id'>headers</span><span class='lbrack token'>[</span><span class='string val'>&quot;Content-Length&quot;</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='payload identifier id'>payload</span><span class='dot token'>.</span><span class='bytesize identifier id'>bytesize</span><span class='dot token'>.</span><span class='to_s identifier id'>to_s</span> <span class='if if_mod kw'>if</span> <span class='lbrack token'>[</span><span class='symbol val'>:post</span><span class='comma token'>,</span> <span class='symbol val'>:put</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='include? fid id'>include?</span><span class='lparen token'>(</span><span class='verb identifier id'>verb</span><span class='rparen token'>)</span>
 
-  <span class='begin begin kw'>begin</span>
-    <span class='request identifier id'>request</span> <span class='assign token'>=</span> <span class='Net constant id'>Net</span><span class='colon2 op'>::</span><span class='HTTP constant id'>HTTP</span><span class='dot token'>.</span><span class='const_get identifier id'>const_get</span><span class='lparen token'>(</span><span class='verb identifier id'>verb</span><span class='dot token'>.</span><span class='to_s identifier id'>to_s</span><span class='dot token'>.</span><span class='capitalize identifier id'>capitalize</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='new identifier id'>new</span><span class='lparen token'>(</span><span class='url identifier id'>url</span><span class='dot token'>.</span><span class='path identifier id'>path</span><span class='comma token'>,</span> <span class='headers identifier id'>headers</span><span class='rparen token'>)</span>
-
-    <span class='comment val'># TODO: should be checking against a maximum redirect count</span>
-    <span class='http identifier id'>http</span><span class='dot token'>.</span><span class='request identifier id'>request</span><span class='lparen token'>(</span><span class='request identifier id'>request</span><span class='comma token'>,</span> <span class='payload identifier id'>payload</span><span class='rparen token'>)</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='res identifier id'>res</span><span class='bitor op'>|</span>
-      <span class='if if kw'>if</span> <span class='res identifier id'>res</span><span class='dot token'>.</span><span class='kind_of? fid id'>kind_of?</span> <span class='Net constant id'>Net</span><span class='colon2 op'>::</span><span class='HTTPRedirection constant id'>HTTPRedirection</span>
-        <span class='verb identifier id'>verb</span><span class='comma token'>,</span> <span class='payload identifier id'>payload</span> <span class='assign token'>=</span> <span class='symbol val'>:get</span><span class='comma token'>,</span> <span class='nil nil kw'>nil</span>
-        <span class='url identifier id'>url</span>           <span class='assign token'>=</span> <span class='URI constant id'>URI</span><span class='dot token'>.</span><span class='parse identifier id'>parse</span><span class='lparen token'>(</span><span class='res identifier id'>res</span><span class='lbrack token'>[</span><span class='string val'>&quot;Location&quot;</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
-        <span class='raise identifier id'>raise</span> <span class='RetryException constant id'>RetryException</span>
-      <span class='else else kw'>else</span>
-        <span class='response identifier id'>response</span> <span class='assign token'>=</span> <span class='create_response identifier id'>create_response</span><span class='lparen token'>(</span><span class='res identifier id'>res</span><span class='rparen token'>)</span>
-      <span class='end end kw'>end</span>
+    <span class='if if kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+      <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;   &gt;&gt;&gt; #{payload}&quot;</span>
+      <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;     &gt; #{headers.inspect}&quot;</span>
     <span class='end end kw'>end</span>
-
-    <span class='response identifier id'>response</span>
-  <span class='rescue rescue kw'>rescue</span> <span class='RetryException constant id'>RetryException</span>
-    <span class='retry retry kw'>retry</span>
   <span class='end end kw'>end</span>
+
+  <span class='request identifier id'>request</span> <span class='verb identifier id'>verb</span><span class='comma token'>,</span> <span class='url identifier id'>url</span><span class='comma token'>,</span> <span class='headers identifier id'>headers</span><span class='comma token'>,</span> <span class='payload identifier id'>payload</span>
 <span class='end end kw'>end</span>
 </pre>
     </td>
@@ -287,7 +271,7 @@ A new instance of DefaultHttpClient
 </div>
     
     <div id="footer">
-  Generated on Wed Feb  3 14:46:59 2010 by 
+  Generated on Wed Apr 21 13:36:18 2010 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool">yard</a>
   0.5.3 (ruby-1.8.7).
 </div>

@@ -1,6 +1,6 @@
 /*
-Copyright 2007-2009 WebDriver committers
-Copyright 2007-2009 Google Inc.
+Copyright 2007-2010 WebDriver committers
+Copyright 2007-2010 Google Inc.
 Portions copyright 2007 ThoughtWorks, Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,16 +46,18 @@ import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.internal.CircularOutputStream;
 
 public class NewProfileExtensionConnection implements CommandExecutor, ExtensionConnection {
-  private final HttpCommandExecutor delegate;
   private final long connectTimeout;
   private final FirefoxBinary process;
   private final FirefoxProfile profile;
+  private final String host;
   private final Lock lock;
+
   private final int bufferSize = 4096;
+  private HttpCommandExecutor delegate;
 
   public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile,
                                        String host) throws Exception {
-    delegate = new HttpCommandExecutor(buildUrl(host, determineNextFreePort(profile.getPort())));
+    this.host = host;
     this.connectTimeout = binary.getTimeout();
     this.lock = lock;
     this.profile = profile;
@@ -65,6 +67,7 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
   public void start() throws IOException {
     lock.lock(connectTimeout);
     try {
+      delegate = new HttpCommandExecutor(buildUrl(host, determineNextFreePort(profile.getPort())));
       String firefoxLogFile = System.getProperty("webdriver.firefox.logfile");
       File logFile = firefoxLogFile == null ? null : new File(firefoxLogFile);
       this.process.setOutputWatcher(new CircularOutputStream(logFile, bufferSize));
@@ -75,14 +78,22 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
       this.process.clean(profile);
       this.process.startProfile(profile);
 
+      // There is currently no mechanism for the profile to notify us when it has started
+      // successfully and is ready for requests.  Instead, we must loop until we're able to
+      // open a connection with the server, at which point it should be safe to continue
+      // (since the extension shouldn't accept connections until it is ready for requests).
       long waitUntil = System.currentTimeMillis() + connectTimeout;
-      while (!isConnected() && waitUntil > System.currentTimeMillis()) {
-        // Do nothing
-      }
+      while (!isConnected()) {
+        if (waitUntil < System.currentTimeMillis()) {
+          throw new NotConnectedException(
+              delegate.getAddressOfRemoteServer(), connectTimeout);
+        }
 
-      if (!isConnected()) {
-        throw new NotConnectedException(
-            delegate.getAddressOfRemoteServer(), connectTimeout);
+        try {
+          Thread.sleep(100);
+        } catch(InterruptedException ignored) {
+          // Do nothing
+        }
       }
     } catch (IOException e) {
       throw new WebDriverException(
@@ -92,6 +103,8 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
       throw new WebDriverException(
           String.format("Failed to connect to binary %s on port %d; process output follows: \n%s",
               process.toString(), profile.getPort(), process.getConsoleOutput()), e);
+    } catch (Exception e) {
+      throw new WebDriverException(e);
     } finally {
       lock.unlock();
     }
@@ -101,7 +114,7 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
     return delegate.execute(command);
   }
 
-  protected static int determineNextFreePort(int port) throws IOException {
+  protected int determineNextFreePort(int port) throws IOException {
     // Attempt to connect to the given port on the host
     // If we can't connect, then we're good to use it
     int newport;

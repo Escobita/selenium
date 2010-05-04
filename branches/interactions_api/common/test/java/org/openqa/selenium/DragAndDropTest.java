@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -31,7 +32,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, CHROME, SELENESE})
   public void testDragAndDrop() throws Exception {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
     RenderedWebElement img = (RenderedWebElement) driver.findElement(By.id("test1"));
     Point expectedLocation = img.getLocation();
     drag(img, expectedLocation, 150, 200);
@@ -50,7 +51,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, CHROME, SELENESE})
   public void testDragAndDropToElement() {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
     RenderedWebElement img1 = (RenderedWebElement) driver.findElement(By.id("test1"));
     RenderedWebElement img2 = (RenderedWebElement) driver.findElement(By.id("test2"));
     img2.dragAndDropOn(img1);
@@ -60,7 +61,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, CHROME, SELENESE})
   public void testElementInDiv() {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
     RenderedWebElement img = (RenderedWebElement) driver.findElement(By.id("test3"));
     Point expectedLocation = img.getLocation();
     drag(img, expectedLocation, 100, 100);
@@ -70,7 +71,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, IE, CHROME, SELENESE})
   public void testDragTooFar() {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
     RenderedWebElement img = (RenderedWebElement) driver.findElement(By.id("test1"));
 //        Point expectedLocation = img.getLocation();
 
@@ -85,7 +86,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, IE, CHROME, SELENESE})
   public void testMouseSpeed() throws Exception {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
     driver.manage().setSpeed(Speed.SLOW);
     assertEquals(Speed.SLOW, driver.manage().getSpeed());
     driver.manage().setSpeed(Speed.MEDIUM);
@@ -97,7 +98,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, IE, CHROME, SELENESE})
   public void testShouldAllowUsersToDragAndDropToElementsOffTheCurrentViewPort() {
-    driver.get(dragAndDropPage);
+    driver.get(pages.dragAndDropPage);
 
     JavascriptExecutor js = (JavascriptExecutor) driver;
     Long height = (Long) js.executeScript("return window.outerHeight;");
@@ -105,7 +106,7 @@ public class DragAndDropTest extends AbstractDriverTestCase {
     js.executeScript("window.resizeTo(300, 300);");
 
     try {
-      driver.get(dragAndDropPage);
+      driver.get(pages.dragAndDropPage);
       RenderedWebElement img = (RenderedWebElement) driver.findElement(By.id("test3"));
       Point expectedLocation = img.getLocation();
       drag(img, expectedLocation, 100, 100);

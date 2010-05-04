@@ -21,27 +21,27 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 import static org.openqa.selenium.Ignore.Driver.*;
+import static org.openqa.selenium.internal.PortProber.findFreePort;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import org.openqa.selenium.internal.PortProber;
 
 @SuppressWarnings("unused")
 public class SingleTestSuite extends TestCase {
-  private final static String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
-  private final static String CHROME_TEST = "org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver";
+  private static final String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
+  private static final String CHROME_TEST = "org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver";
 
-  private final static String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriver";
-  private final static String FIREFOX_TEST = "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
+  private static final String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriver";
+  private static final String FIREFOX_TEST = "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
  
-  private final static String HTML_UNIT = "org.openqa.selenium.htmlunit.HtmlUnitDriver";
-  private final static String HTML_UNIT_JS = "org.openqa.selenium.htmlunit.JavascriptEnabledHtmlUnitDriverTestSuite$HtmlUnitDriverForTest";
-  private final static String IE = "org.openqa.selenium.ie.InternetExplorerDriver";
-  private final static String REMOTE = "org.openqa.selenium.remote.server.RemoteWebDriverTestSuite$RemoteWebDriverForTest";
-  private final static String REMOTE_IE = "org.openqa.selenium.remote.server.RemoteWebDriverIeTestSuite$RemoteIeWebDriverForTest";
-  private final static String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
+  private static final String HTML_UNIT = "org.openqa.selenium.htmlunit.HtmlUnitDriver";
+  private static final String HTML_UNIT_JS = "org.openqa.selenium.htmlunit.JavascriptEnabledHtmlUnitDriverTestSuite$HtmlUnitDriverForTest";
+  private static final String IE = "org.openqa.selenium.ie.InternetExplorerDriver";
+  private static final String REMOTE = "org.openqa.selenium.remote.server.RemoteWebDriverTestSuite$RemoteWebDriverForTest";
+  private static final String REMOTE_IE = "org.openqa.selenium.remote.server.RemoteWebDriverIeTestSuite$RemoteIeWebDriverForTest";
+  private static final String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = HTML_UNIT_JS;
+    String driver = IE;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -51,17 +51,17 @@ public class SingleTestSuite extends TestCase {
                                                       
     TestSuiteBuilder builder = new TestSuiteBuilder()
         .addSourceDir("common")
-        .addSourceDir("remote/server")
+        .addSourceDir("firefox")
         .addSourceDir("support")
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("TestBasicKeyboardInterface")
-        //.method("testBasicKeyboardInput")
+        .onlyRun("ElementFindingTest")
+//        .method("testShouldImplicitlyWaitUntilAtLeastOneElementIsFoundWhenSearchingForMany")
         .exclude(ALL)
-        .exclude(Ignore.Driver.REMOTE)
+        .exclude(Ignore.Driver.IE)
         .outputTestNames()
-        //.leaveRunning()
+        .leaveRunning()
         ;  // Yeah, this look strange :)
 
     if (REMOTE.equals(driver) || REMOTE_IE.equals(driver)) {
@@ -75,12 +75,5 @@ public class SingleTestSuite extends TestCase {
     builder.addSuiteDecorator("org.openqa.selenium.TestNameDecorator");
 
     return builder.create();
-  }
-
-  private static int findFreePort() throws IOException {
-    ServerSocket serverSocket = new ServerSocket(0);
-    int port = serverSocket.getLocalPort();
-    serverSocket.close();
-    return port;
   }
 }

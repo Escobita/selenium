@@ -20,6 +20,8 @@ package org.openqa.selenium.chrome;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.NoDriverAfterTest;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
  */
@@ -33,7 +35,7 @@ public class ChromeCommandExecutorTest extends AbstractDriverTestCase {
     executor.getBinary().kill();
 
     try {
-      chrome.get(simpleTestPage);
+      chrome.get(pages.simpleTestPage);
       fail("Should have detected that chrome is no longer running");
     } catch (ChromeNotRunningException expected) {
       // Do nothing

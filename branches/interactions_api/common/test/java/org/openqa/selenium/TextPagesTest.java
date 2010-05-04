@@ -19,6 +19,8 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -57,7 +59,7 @@ public class TextPagesTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore({IE, CHROME, IPHONE})
+  @Ignore({IE, CHROME, IPHONE, SELENESE})
   public void testShouldThrowExceptionWhenAddingCookieToAPageThatIsNotHtml() {
     driver.get(textPage);
 

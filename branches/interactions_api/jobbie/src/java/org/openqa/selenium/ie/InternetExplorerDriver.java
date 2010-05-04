@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, TakesScreenshot {
 
@@ -467,6 +468,19 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, Ta
 
     public void setSpeed(Speed speed) {
       InternetExplorerDriver.this.speed = speed;
+    }
+
+    public Timeouts timeouts() {
+      return new InternetExplorerTimeouts();
+    }
+  }
+
+  private class InternetExplorerTimeouts implements Timeouts {
+    public Timeouts implicitlyWait(long time, TimeUnit unit) {
+      NativeLong timeout = new NativeLong(unit.toMillis(time));
+      int result = lib.wdSetImplicitWaitTimeout(driver, timeout);
+      errors.verifyErrorCode(result, "Unable to set implicit wait timeout.");
+      return this;
     }
   }
 

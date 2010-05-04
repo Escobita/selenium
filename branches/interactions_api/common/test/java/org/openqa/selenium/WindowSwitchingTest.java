@@ -19,6 +19,10 @@ package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -34,7 +38,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testShouldSwitchFocusToANewWindowWhenItIsOpenedAndNotStopFutureOperations() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
     driver.findElement(By.linkText("Open new window")).click();
@@ -43,7 +47,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     driver.switchTo().window("result");
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
 
-    driver.get(iframePage);
+    driver.get(pages.iframePage);
     final String handle = driver.getWindowHandle();
     driver.findElement(By.id("iframe_page_heading"));
     driver.switchTo().frame("iframe1");
@@ -54,7 +58,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testShouldThrowNoSuchWindowException() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
     try {
@@ -72,7 +76,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NoDriverAfterTest
   @Ignore({IE, FIREFOX, REMOTE, SELENESE})
   public void testShouldBeAbleToIterateOverAllOpenWindows() throws Exception {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     driver.findElement(By.name("windowOne")).click();
     driver.findElement(By.name("windowTwo")).click();
 
@@ -91,7 +95,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore({IE, SELENESE})
   public void testClickingOnAButtonThatClosesAnOpenWindowDoesNotCauseTheBrowserToHang() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
 
@@ -111,7 +115,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @Ignore({IE, SELENESE})
   @JavascriptEnabled
   public void testCanCallGetWindowHandlesAfterClosingAWindow() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
 
@@ -130,7 +134,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testCanObtainAWindowHandle() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
 
@@ -139,7 +143,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testFailingToSwitchToAWindowLeavesTheCurrentWindowAsIs() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
     try {
@@ -158,7 +162,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NoDriverAfterTest
   @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
   public void testCanCloseWindowWhenMultipleWindowsAreOpen() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     driver.findElement(By.name("windowOne")).click();
 
     sleepBecauseWindowsTakeTimeToOpen();
@@ -186,7 +190,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NoDriverAfterTest
   @Ignore(SELENESE)
   public void testClosingOnlyWindowShouldNotCauseTheBrowserToHang() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     driver.close();
   }
 }

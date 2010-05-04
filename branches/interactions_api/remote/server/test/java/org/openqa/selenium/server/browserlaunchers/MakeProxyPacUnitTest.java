@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.openqa.selenium.server.BrowserConfigurationOptions;
+
 public class MakeProxyPacUnitTest extends TestCase {
     public MakeProxyPacUnitTest(String name) {
         super(name);
@@ -28,10 +30,12 @@ public class MakeProxyPacUnitTest extends TestCase {
         LauncherUtils.recursivelyDeleteDir(parentDir);
     }
 
-    private String makeProxyPAC() throws FileNotFoundException, IOException {
-        LauncherUtils.makeProxyPAC(parentDir, 4444, proxySeleniumTrafficOnly, httpProxyHost, httpProxyPort, httpNonProxyHosts, avoidProxy);
-        String pac = readEntirePacFile();
-        return pac;
+    private String makeProxyPAC() throws IOException {
+      BrowserConfigurationOptions options = new BrowserConfigurationOptions();
+      options.setOnlyProxySeleniumTraffic(proxySeleniumTrafficOnly);
+      options.setAvoidProxy(avoidProxy);
+      LauncherUtils.makeProxyPAC(parentDir, 4444, httpProxyHost, httpProxyPort, httpNonProxyHosts, options);
+        return readEntirePacFile();
     }
     private String readEntirePacFile() throws IOException {
         FileReader fileReader = new FileReader(pacFile);
@@ -42,13 +46,14 @@ public class MakeProxyPacUnitTest extends TestCase {
             sb.append(line).append('\n');
         }
         String pac = sb.toString();
-        return pac.replaceAll("\\s+", " ");
+        return pac.replaceAll("\\s+", " ").trim();
     }
     
     public void testBasic() throws IOException {
+        proxySeleniumTrafficOnly = false;
         String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ return 'PROXY localhost:4444; DIRECT'; } ";
+        		"{ return 'PROXY localhost:4444; DIRECT'; }";
         assertEquals(expected, pac);
     }
     
@@ -56,7 +61,7 @@ public class MakeProxyPacUnitTest extends TestCase {
     	proxySeleniumTrafficOnly = false;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ return 'PROXY localhost:4444; DIRECT'; } ";
+        		"{ return 'PROXY localhost:4444; DIRECT'; }";
         assertEquals(expected, pac);
     }
     
@@ -65,7 +70,7 @@ public class MakeProxyPacUnitTest extends TestCase {
     	avoidProxy = true;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ return 'PROXY localhost:4444; DIRECT'; } ";
+        		"{ return 'PROXY localhost:4444; DIRECT'; }";
         assertEquals(expected, pac);
     }
     
@@ -73,15 +78,16 @@ public class MakeProxyPacUnitTest extends TestCase {
     	avoidProxy = true;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; DIRECT'; } } ";
+            "{ if (shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; DIRECT'; } }";
         assertEquals(expected, pac);
     }
-    
+
     public void testConfiguredProxy() throws IOException {
+      proxySeleniumTrafficOnly = false;
     	httpProxyHost = "foo";
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ return 'PROXY localhost:4444; PROXY foo'; } ";
+        		"{ return 'PROXY localhost:4444; PROXY foo'; }";
         assertEquals(expected, pac);
     }
     
@@ -90,7 +96,7 @@ public class MakeProxyPacUnitTest extends TestCase {
     	avoidProxy = true;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
-        		"{ if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; PROXY foo'; } else { return 'PROXY foo'; } } ";
+        		"{ if (shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; PROXY foo'; } return 'PROXY foo'; }";
         assertEquals(expected, pac);
     }
     
@@ -98,9 +104,10 @@ public class MakeProxyPacUnitTest extends TestCase {
         avoidProxy = true;
         httpNonProxyHosts = "www.google.com";
         String pac = makeProxyPAC();
-        String expected = "function FindProxyForURL(url, host) " +
-        		"{ if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; DIRECT'; } " +
-        		"else if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } } ";
+        String expected = "function FindProxyForURL(url, host) { "
+                          + "if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(url, '*/selenium-server/*')) "
+                          + "{ return 'PROXY localhost:4444; DIRECT'; } }";
         assertEquals(expected, pac);
     }
     
@@ -109,9 +116,10 @@ public class MakeProxyPacUnitTest extends TestCase {
         httpProxyHost = "foo";
         httpNonProxyHosts = "www.google.com";
         String pac = makeProxyPAC();
-        String expected = "function FindProxyForURL(url, host) " +
-        		"{ if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; PROXY foo'; } " +
-        		"else if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } else { return 'PROXY foo'; } } ";
+        String expected = "function FindProxyForURL(url, host) { "
+                          + "if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(url, '*/selenium-server/*')) { "
+                          + "return 'PROXY localhost:4444; PROXY foo'; } return 'PROXY foo'; }";
         assertEquals(expected, pac);
     }
     
@@ -119,10 +127,11 @@ public class MakeProxyPacUnitTest extends TestCase {
         avoidProxy = true;
         httpNonProxyHosts = "www.google.com|*.yahoo.com";
         String pac = makeProxyPAC();
-        String expected = "function FindProxyForURL(url, host) " +
-        		"{ if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; DIRECT'; } " +
-        		"else if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } " +
-        		"else if (shExpMatch(host, '*.yahoo.com')) { return 'DIRECT'; } } ";
+        String expected = "function FindProxyForURL(url, host) { "
+                          + "if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(host, '*.yahoo.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(url, '*/selenium-server/*')) { "
+                          + "return 'PROXY localhost:4444; DIRECT'; } }";
         assertEquals(expected, pac);
     }
     
@@ -131,11 +140,11 @@ public class MakeProxyPacUnitTest extends TestCase {
         httpProxyHost = "foo";
         httpNonProxyHosts = "www.google.com|*.yahoo.com";
         String pac = makeProxyPAC();
-        String expected = "function FindProxyForURL(url, host) { " +
-        		"if(shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:4444; PROXY foo'; } " +
-        		"else if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } " +
-        		"else if (shExpMatch(host, '*.yahoo.com')) { return 'DIRECT'; } " +
-        		"else { return 'PROXY foo'; } } ";
+        String expected = "function FindProxyForURL(url, host) { "
+                          + "if (shExpMatch(host, 'www.google.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(host, '*.yahoo.com')) { return 'DIRECT'; } "
+                          + "if (shExpMatch(url, '*/selenium-server/*')) "
+                          + "{ return 'PROXY localhost:4444; PROXY foo'; } return 'PROXY foo'; }";
         assertEquals(expected, pac);
     }
 

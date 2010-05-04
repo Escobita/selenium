@@ -38,6 +38,7 @@ package org.openqa.selenium.htmlunit;
 import com.gargoylesoftware.htmlunit.Page;
 
 import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.SgmlPage;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomText;
@@ -56,7 +57,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
-import com.gargoylesoftware.htmlunit.html.StyledElement;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Event;
 import org.openqa.selenium.By;
@@ -80,6 +80,7 @@ import org.w3c.dom.NamedNodeMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.Point;
@@ -179,7 +180,15 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
 
     if (submit == null) {
-      throw new WebDriverException("Cannot locate element used to submit form");
+      if (parent.isJavascriptEnabled()) {
+        ScriptResult eventResult = form.fireEvent("submit");
+        if (!ScriptResult.isFalse(eventResult)) {
+          parent.executeScript("arguments[0].submit()", form);
+        }
+        return;
+      } else {
+        throw new WebDriverException("Cannot locate element used to submit form");
+      }
     }
     try {
       submit.click();
@@ -618,14 +627,12 @@ public class HtmlUnitWebElement implements RenderedWebElement,
 
   public WebElement findElement(By by) {
     assertElementNotStale();
-
-    return by.findElement(this);
+    return parent.findElement(by, this);
   }
 
   public List<WebElement> findElements(By by) {
     assertElementNotStale();
-
-    return by.findElements(this);
+    return parent.findElements(by, this);
   }
 
   public WebElement findElementById(String id) {
@@ -793,13 +800,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   private String getEffectiveStyle(HtmlElement htmlElement, String propertyName) {
-    if (!(htmlElement instanceof StyledElement)) {
-      return "";
-    }
-
     HtmlElement current = htmlElement;
     String value = "inherit";
-    while (current instanceof StyledElement && "inherit".equals(value)) {
+    while (current instanceof HtmlElement && "inherit".equals(value)) {
       // Hat-tip to the Selenium team
       Object result = parent.executeScript(
           "if (window.getComputedStyle) { " +

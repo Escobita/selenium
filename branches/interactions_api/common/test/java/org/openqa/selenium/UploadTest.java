@@ -1,5 +1,6 @@
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -33,15 +34,14 @@ public class UploadTest extends AbstractDriverTestCase {
   @Ignore(value = {CHROME, SELENESE},
           reason = "Chrome: File input elements are not supported yet")
   public void testFileUploading() throws Exception {
-    driver.get(uploadPage);
+    driver.get(pages.uploadPage);
     driver.findElement(By.id("upload")).sendKeys(testFile.getAbsolutePath());
     driver.findElement(By.id("go")).submit();
 
     driver.switchTo().frame("upload_target");
 
     WebElement body = driver.findElement(By.xpath("//body"));
-    assertEquals("Page source is: " + driver.getPageSource(),
-        LOREM_IPSUM_TEXT, body.getText());
+    assertEquals("Page source is: " + driver.getPageSource(), LOREM_IPSUM_TEXT, body.getText());
   }
 
   private File createTmpFile(String content) throws IOException {
