@@ -4,6 +4,7 @@ import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.Pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Keyboard;
 
@@ -15,7 +16,7 @@ import static org.hamcrest.Matchers.is;
  */
 public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
   public void testBasicKeyboardInput() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
     Keyboard keyb = ((HasInputDevices) driver).getKeyboard();
@@ -29,7 +30,7 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
   }
 
   public void testSendingKeyDownOnly() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     WebElement keysEventInput = driver.findElement(By.id("theworks"));
     Keyboard keyb = ((HasInputDevices) driver).getKeyboard();
@@ -44,7 +45,7 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
   }
 
   public void testSendingKeyUp() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     WebElement keysEventInput = driver.findElement(By.id("theworks"));
     Keyboard keyb = ((HasInputDevices) driver).getKeyboard();

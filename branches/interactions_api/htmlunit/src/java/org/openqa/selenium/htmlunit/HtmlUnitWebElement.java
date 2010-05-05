@@ -59,6 +59,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Event;
+import com.gargoylesoftware.htmlunit.javascript.host.KeyboardEvent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -271,7 +272,7 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     boolean ctrlKey = modifierKey.equals(Keys.CONTROL);
     boolean altKey = modifierKey.equals(Keys.ALT);
 
-    Event keyEvent = new Event(getElement(), eventDescription, shiftKey, ctrlKey, altKey);
+    Event keyEvent = new KeyboardEvent(getElement(), eventDescription, 0, shiftKey, ctrlKey, altKey);
     getElement().fireEvent(keyEvent);
   }
 

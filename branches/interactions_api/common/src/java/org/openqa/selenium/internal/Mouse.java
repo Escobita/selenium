@@ -11,6 +11,7 @@ public interface Mouse {
   void mouseDown(WebElement onElement);
   void mouseUp(WebElement onElement);
   void mouseMove(WebElement fromElement, WebElement toElement);
+  void mouseMove(long xOffset, long yOffset);
   // Right-clicks an element. 
   void contextClick(WebElement onElement);
 }

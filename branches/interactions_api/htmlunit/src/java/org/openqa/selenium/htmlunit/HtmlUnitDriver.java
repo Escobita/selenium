@@ -391,7 +391,6 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
   }
 
-  @Override
   public Keyboard getKeyboard() {
     return new HtmlUnitKeyboard();
   }
