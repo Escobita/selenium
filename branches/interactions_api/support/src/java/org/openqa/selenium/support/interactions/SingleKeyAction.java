@@ -20,7 +20,7 @@ public class SingleKeyAction {
     this.toElement = toElement;
     this.key = key;
     if (!Lists.newArrayList(MODIFIER_KEYS).contains(key)) {
-      throw new IllegalArgumentException("Key Down / Up events only make sense for modifier kesy.");
+      throw new IllegalArgumentException("Key Down / Up events only make sense for modifier keys.");
     }
   }
 }

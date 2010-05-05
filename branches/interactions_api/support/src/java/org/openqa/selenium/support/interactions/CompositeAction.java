@@ -9,7 +9,6 @@ import com.google.common.collect.Lists;
  */
 public class CompositeAction implements Action {
   private List<Action> actionsList = Lists.newLinkedList();
-  @Override
   public void perform() {
     for (Action action : actionsList) {
       action.perform();

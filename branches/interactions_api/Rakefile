@@ -271,9 +271,11 @@ java_test(:name => "webdriver-single-testsuite",
                       "htmlunit/test/java/**/*.java",
                       ],
           :deps => [
-                     :'webdriver-ie',
+                     :'htmlunit',
                      "//common:test",
-                   ])
+                     "//support:support",
+                   ],
+         :test_suite => "SingleTestSuite")
 
 #xpt(:name => "ide-auto-complete",
 #    :src  => [ "ide/src/extension/idl/SeleniumIDEGenericAutoCompleteSearch.idl" ],

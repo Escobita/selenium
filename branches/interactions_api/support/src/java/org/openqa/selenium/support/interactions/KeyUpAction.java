@@ -12,7 +12,6 @@ public class KeyUpAction extends SingleKeyAction implements Action {
     super(keyboard, toElement, key);
   }
 
-  @Override
   public void perform() {
     keyboard.releaseKey(toElement, key);
   }

@@ -17,7 +17,6 @@ public class SendKeysAction implements Action {
     this.keysToSend = keysToSend;
   }
 
-  @Override
   public void perform() {
     keyboard.sendKeys(toElement, keysToSend);
   }

@@ -13,7 +13,6 @@ public class KeyDownAction extends SingleKeyAction implements Action {
     super(keyboard, toElement, key);
   }
 
-  @Override
   public void perform() {
     keyboard.pressKey(toElement, key);
   }
