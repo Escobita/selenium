@@ -17,13 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import static org.junit.Assert.assertTrue;
-import static org.openqa.selenium.OutputType.*;
-
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.openqa.selenium.OutputType.BASE64;
+
 public class TakesScreenshotTest extends AbstractDriverTestCase {
-  public void testSaveScreenshotAsFile() throws Exception {
+  @Test public void SaveScreenshotAsFile() throws Exception {
     if (!isAbleToTakeScreenshots(driver)) {
       return;
     }
@@ -35,7 +36,7 @@ public class TakesScreenshotTest extends AbstractDriverTestCase {
     tempFile.delete();
   }
 
-  public void testCaptureToBase64() throws Exception {
+  @Test public void CaptureToBase64() throws Exception {
     if (!isAbleToTakeScreenshots(driver)) {
       return;
     }

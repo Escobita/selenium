@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Test;
+
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
@@ -28,7 +30,7 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
  */
 public class ObjectStateAssumptionsTest extends AbstractDriverTestCase {
   
-  public void testUninitializedWebDriverDoesNotThrowNPE() {
+  @Test public void UninitializedWebDriverDoesNotThrowNPE() {
     try {
       variousMethodCallsToCheckAssumptions();
     } catch (NullPointerException npe) {
@@ -45,7 +47,7 @@ public class ObjectStateAssumptionsTest extends AbstractDriverTestCase {
    * WebDriver with an initial call to get(). It also should not fail.
    */
   @Ignore(SELENESE)
-  public void testinitializedWebDriverDoesNotThrowNPE() {
+  @Test public void initializedWebDriverDoesNotThrowNPE() {
     driver.get(pages.simpleTestPage);
     try {
       variousMethodCallsToCheckAssumptions();
@@ -71,7 +73,7 @@ public class ObjectStateAssumptionsTest extends AbstractDriverTestCase {
    * Test the various options, again for an uninitialized driver, NPEs are thrown.
    */
   @Ignore({SELENESE, IPHONE})
-  public void testOptionsForUninitializedWebDriver() {
+  @Test public void OptionsForUninitializedWebDriver() {
     WebDriver.Options options = driver.manage();
     try {
       options.getCookies();

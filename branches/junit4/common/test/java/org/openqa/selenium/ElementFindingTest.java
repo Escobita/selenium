@@ -17,21 +17,19 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.List;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import java.util.List;
-
 public class ElementFindingTest extends AbstractDriverTestCase {
 
-  public void testShouldReturnTitleOfPageIfSet() {
+  @Test public void shouldReturnTitleOfPageIfSet() {
     driver.get(pages.xhtmlTestPage);
     assertThat(driver.getTitle(), equalTo(("XHTML Test Page")));
 
@@ -39,7 +37,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertThat(driver.getTitle(), equalTo("Hello WebDriver"));
   }
 
-  public void testShouldNotBeAbleToLocateASingleElementThatDoesNotExist() {
+  @Test public void shouldNotBeAbleToLocateASingleElementThatDoesNotExist() {
     driver.get(pages.formPage);
 
     try {
@@ -50,26 +48,26 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldBeAbleToClickOnLinkIdentifiedByText() {
+  @Test public void shouldBeAbleToClickOnLinkIdentifiedByText() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
-  public void testDriverShouldBeAbleToFindElementsAfterLoadingMoreThanOnePageAtATime() {
+  @Test public void DriverShouldBeAbleToFindElementsAfterLoadingMoreThanOnePageAtATime() {
     driver.get(pages.formPage);
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
-  public void testshouldBeAbleToClickOnLinkIdentifiedById() {
+  @Test public void shouldBeAbleToClickOnLinkIdentifiedById() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.id("linkId")).click();
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
-  public void testShouldThrowAnExceptionWhenThereIsNoLinkToClickAndItIsFoundWithLinkText() {
+  @Test public void shouldThrowAnExceptionWhenThereIsNoLinkToClickAndItIsFoundWithLinkText() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -80,7 +78,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldfindAnElementBasedOnId() {
+  @Test public void shouldfindAnElementBasedOnId() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.id("checky"));
@@ -88,7 +86,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertThat(element.isSelected(), is(false));
   }
 
-  public void testShouldNotBeAbleTofindElementsBasedOnIdIfTheElementIsNotThere() {
+  @Test public void shouldNotBeAbleTofindElementsBasedOnIdIfTheElementIsNotThere() {
     driver.get(pages.formPage);
 
     try {
@@ -100,7 +98,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindChildrenOfANode() {
+  @Test public void shouldBeAbleToFindChildrenOfANode() {
     driver.get(pages.xhtmlTestPage);
     List<WebElement> elements = driver.findElements(By.xpath("/html/head"));
     WebElement head = elements.get(0);
@@ -109,7 +107,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testReturnAnEmptyListWhenThereAreNoChildrenOfANode() {
+  @Test public void ReturnAnEmptyListWhenThereAreNoChildrenOfANode() {
     driver.get(pages.xhtmlTestPage);
     WebElement table = driver.findElement(By.id("table"));
     List<WebElement> rows = table.findElements(By.tagName("tr"));
@@ -118,7 +116,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldFindElementsByName() {
+  @Test public void shouldFindElementsByName() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.name("checky"));
@@ -126,35 +124,35 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertThat(element.getValue(), is("furrfu"));
   }
 
-  public void testShouldFindElementsByClass() {
+  @Test public void shouldFindElementsByClass() {
     driver.get(pages.xhtmlTestPage);
 
     WebElement element = driver.findElement(By.className("extraDiv"));
     assertTrue(element.getText().startsWith("Another div starts here."));
   }
 
-  public void testShouldFindElementsByClassWhenItIsTheFirstNameAmongMany() {
+  @Test public void shouldFindElementsByClassWhenItIsTheFirstNameAmongMany() {
     driver.get(pages.xhtmlTestPage);
 
     WebElement element = driver.findElement(By.className("nameA"));
     assertThat(element.getText(), equalTo("An H2 title"));
   }
 
-  public void testShouldFindElementsByClassWhenItIsTheLastNameAmongMany() {
+  @Test public void shouldFindElementsByClassWhenItIsTheLastNameAmongMany() {
     driver.get(pages.xhtmlTestPage);
 
     WebElement element = driver.findElement(By.className("nameC"));
     assertThat(element.getText(), equalTo("An H2 title"));
   }
 
-  public void testShouldFindElementsByClassWhenItIsInTheMiddleAmongMany() {
+  @Test public void shouldFindElementsByClassWhenItIsInTheMiddleAmongMany() {
     driver.get(pages.xhtmlTestPage);
 
     WebElement element = driver.findElement(By.className("nameBnoise"));
     assertThat(element.getText(), equalTo("An H2 title"));
   }
   
-  public void testShouldFindElementByClassWhenItsNameIsSurroundedByWhitespace() {
+  @Test public void shouldFindElementByClassWhenItsNameIsSurroundedByWhitespace() {
     driver.get(pages.xhtmlTestPage);
     
     WebElement element = driver.findElement(By.className("spaceAround"));
@@ -162,7 +160,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
   
   @Ignore(SELENESE)
-  public void testShouldFindElementsByClassWhenItsNameIsSurroundedByWhitespace() {
+  @Test public void shouldFindElementsByClassWhenItsNameIsSurroundedByWhitespace() {
     driver.get(pages.xhtmlTestPage);
     
     List<WebElement> elements = driver.findElements(By.className("spaceAround"));
@@ -170,7 +168,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertThat(elements.get(0).getText(), equalTo("Spaced out"));
   }
 
-  public void testShouldNotFindElementsByClassWhenTheNameQueriedIsShorterThanCandidateName() {
+  @Test public void shouldNotFindElementsByClassWhenTheNameQueriedIsShorterThanCandidateName() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -182,7 +180,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsByXPath() {
+  @Test public void shouldBeAbleToFindMultipleElementsByXPath() {
     driver.get(pages.xhtmlTestPage);
 
     List<WebElement> elements = driver.findElements(By.xpath("//div"));
@@ -191,7 +189,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsByLinkText() {
+  @Test public void shouldBeAbleToFindMultipleElementsByLinkText() {
     driver.get(pages.xhtmlTestPage);
 
     List<WebElement> elements = driver.findElements(By.linkText("click me"));
@@ -200,7 +198,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsByPartialLinkText() {
+  @Test public void shouldBeAbleToFindMultipleElementsByPartialLinkText() {
     driver.get(pages.xhtmlTestPage);
 
     List<WebElement> elements = driver.findElements(By.partialLinkText("ick me"));
@@ -209,7 +207,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindElementByPartialLinkText() {
+  @Test public void shouldBeAbleToFindElementByPartialLinkText() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -220,7 +218,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsByName() {
+  @Test public void shouldBeAbleToFindMultipleElementsByName() {
     driver.get(pages.nestedPage);
 
     List<WebElement> elements = driver.findElements(By.name("checky"));
@@ -229,7 +227,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsById() {
+  @Test public void shouldBeAbleToFindMultipleElementsById() {
     driver.get(pages.nestedPage);
 
     List<WebElement> elements = driver.findElements(By.id("2"));
@@ -238,7 +236,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindMultipleElementsByClassName() {
+  @Test public void shouldBeAbleToFindMultipleElementsByClassName() {
     driver.get(pages.xhtmlTestPage);
 
     List<WebElement> elements = driver.findElements(By.className("nameC"));
@@ -247,7 +245,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   // You don't want to ask why this is here
-  public void testWhenFindingByNameShouldNotReturnById() {
+  @Test public void WhenFindingByNameShouldNotReturnById() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.name("id-name1"));
@@ -264,14 +262,14 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldFindGrandChildren() {
+  @Test public void shouldFindGrandChildren() {
     driver.get(pages.formPage);
     WebElement form = driver.findElement(By.id("nested_form"));
     form.findElement(By.name("x"));
   }
 
   @Ignore(SELENESE)
-  public void testShouldNotFindElementOutSideTree() {
+  @Test public void shouldNotFindElementOutSideTree() {
     driver.get(pages.formPage);
     WebElement element = driver.findElement(By.name("login"));
     try {
@@ -282,14 +280,14 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnElementsThatDoNotSupportTheNameProperty() {
+  @Test public void shouldReturnElementsThatDoNotSupportTheNameProperty() {
     driver.get(pages.nestedPage);
 
     driver.findElement(By.name("div1"));
     // If this works, we're all good
   }
 
-  public void testShouldFindHiddenElementsByName() {
+  @Test public void shouldFindHiddenElementsByName() {
     driver.get(pages.formPage);
 
     try {
@@ -300,7 +298,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldfindAnElementBasedOnTagName() {
+  @Test public void shouldfindAnElementBasedOnTagName() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.tagName("input"));
@@ -309,7 +307,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldfindElementsBasedOnTagName() {
+  @Test public void shouldfindElementsBasedOnTagName() {
     driver.get(pages.formPage);
 
     List<WebElement> elements = driver.findElements(By.tagName("input"));
@@ -317,7 +315,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertNotNull(elements);
   }
 
-  public void testFindingByCompoundClassNameIsAnError() {
+  @Test public void findingByCompoundClassNameIsAnError() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -336,7 +334,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldBeAbleToClickOnLinksWithNoHrefAttribute() {
+  @Test public void shouldBeAbleToClickOnLinksWithNoHrefAttribute() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.linkText("No href"));
@@ -347,7 +345,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({SELENESE})
-  public void testShouldNotBeAbleToFindAnElementOnABlankPage() {
+  @Test public void shouldNotBeAbleToFindAnElementOnABlankPage() {
     driver.get("about:blank");
 
     try {
@@ -361,7 +359,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
 
   @Ignore({IPHONE})
   @NeedsFreshDriver
-  public void testShouldNotBeAbleToLocateASingleElementOnABlankPage() {
+  @Test public void shouldNotBeAbleToLocateASingleElementOnABlankPage() {
     // Note we're on the default start page for the browser at this point.
 
     try {
@@ -373,7 +371,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testRemovingAnElementDynamicallyFromTheDomShouldCauseAStaleRefException() {
+  @Test public void RemovingAnElementDynamicallyFromTheDomShouldCauseAStaleRefException() {
     driver.get(pages.javascriptPage);
 
     RenderedWebElement toBeDeleted = (RenderedWebElement) driver.findElement(By.id("deleted"));
@@ -389,7 +387,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testFindingALinkByXpathUsingContainsKeywordShouldWork() {
+  @Test public void findingALinkByXpathUsingContainsKeywordShouldWork() {
     driver.get(pages.nestedPage);
 
     try {
@@ -401,7 +399,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldBeAbleToFindAnElementByCssSelector() {
+  @Test public void shouldBeAbleToFindAnElementByCssSelector() {
     driver.get(pages.xhtmlTestPage);
     if (!supportsSelectorApi()) {
       System.out.println("Skipping test: selector API not supported");
@@ -411,7 +409,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldBeAbleToFindAnElementsByCssSelector() {
+  @Test public void shouldBeAbleToFindAnElementsByCssSelector() {
     driver.get(pages.xhtmlTestPage);
     if (!supportsSelectorApi()) {
       System.out.println("Skipping test: selector API not supported");

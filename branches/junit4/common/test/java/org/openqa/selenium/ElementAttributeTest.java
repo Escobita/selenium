@@ -19,12 +19,12 @@ package org.openqa.selenium;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -33,7 +33,7 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
 public class ElementAttributeTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
-  public void testShouldReturnNullWhenGettingTheValueOfAnAttributeThatIsNotListed() {
+  @Test public void shouldReturnNullWhenGettingTheValueOfAnAttributeThatIsNotListed() {
     driver.get(pages.simpleTestPage);
     WebElement head = driver.findElement(By.xpath("/html"));
     String attribute = head.getAttribute("cheese");
@@ -41,14 +41,14 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnEmptyAttributeValuesWhenPresentAndTheValueIsActuallyEmpty() {
+  @Test public void shouldReturnEmptyAttributeValuesWhenPresentAndTheValueIsActuallyEmpty() {
     driver.get(pages.simpleTestPage);
     WebElement body = driver.findElement(By.xpath("//body"));
     assertThat(body.getAttribute("style"), equalTo(""));
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfTheDisabledAttrbuteEvenIfItIsMissing() {
+  @Test public void shouldReturnTheValueOfTheDisabledAttrbuteEvenIfItIsMissing() {
     driver.get(pages.formPage);
     WebElement inputElement = driver.findElement(By.xpath("//input[@id='working']"));
     assertThat(inputElement.getAttribute("disabled"), equalTo("false"));
@@ -60,7 +60,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfTheIndexAttrbuteEvenIfItIsMissing() {
+  @Test public void shouldReturnTheValueOfTheIndexAttrbuteEvenIfItIsMissing() {
     driver.get(pages.formPage);
 
     WebElement multiSelect = driver.findElement(By.id("multi"));
@@ -68,7 +68,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(options.get(1).getAttribute("index"), equalTo("1"));
   }
   
-  public void testShouldIndicateTheElementsThatAreDisabledAreNotEnabled() {
+  @Test public void shouldIndicateTheElementsThatAreDisabledAreNotEnabled() {
     driver.get(pages.formPage);
     WebElement inputElement = driver.findElement(By.xpath("//input[@id='notWorking']"));
     assertThat(inputElement.isEnabled(), is(false));
@@ -77,7 +77,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(inputElement.isEnabled(), is(true));
   }
   
-  public void testElementsShouldBeDisabledIfTheyAreDisabledUsingRandomDisabledStrings() {
+  @Test public void ElementsShouldBeDisabledIfTheyAreDisabledUsingRandomDisabledStrings() {
     driver.get(pages.formPage);
     WebElement disabledTextElement1 = driver.findElement(By.id("disabledTextElement1"));
     assertThat(disabledTextElement1.isEnabled(), is(false));
@@ -90,7 +90,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
   
   @Ignore(value = IE, reason = "Issue 514")
-  public void testShouldNotBeAbleToTypeToElementsIfTheyAreDisabledUsingRandomDisabledStrings() {
+  @Test public void shouldNotBeAbleToTypeToElementsIfTheyAreDisabledUsingRandomDisabledStrings() {
     driver.get(pages.formPage);
     WebElement disabledTextElement1 = driver.findElement(By.id("disabledTextElement1"));
     disabledTextElement1.sendKeys("foo");
@@ -102,7 +102,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(value = {FIREFOX, CHROME}, reason = "Issue 514")
-  public void testShouldNotBeAbleToSubmitFormsWithDisabledSubmitButtons() {
+  @Test public void shouldNotBeAbleToSubmitFormsWithDisabledSubmitButtons() {
     driver.get(pages.formPage);
     WebElement disabledSubmitElement = driver.findElement(By.id("disabledSubmitElement"));
     assertThat(disabledSubmitElement.isEnabled(), is(false));
@@ -110,13 +110,13 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(driver.getTitle(), is("We Leave From Here"));
   }
 
-  public void testShouldIndicateWhenATextAreaIsDisabled() {
+  @Test public void shouldIndicateWhenATextAreaIsDisabled() {
     driver.get(pages.formPage);
     WebElement textArea = driver.findElement(By.xpath("//textarea[@id='notWorkingArea']"));
     assertThat(textArea.isEnabled(), is(false));
   }
 
-  public void testShouldIndicateWhenASelectIsDisabled() {
+  @Test public void shouldIndicateWhenASelectIsDisabled() {
     driver.get(pages.formPage);
 
     WebElement enabled = driver.findElement(By.name("selectomatic"));
@@ -127,7 +127,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfCheckedForACheckboxEvenIfItLacksThatAttribute() {
+  @Test public void shouldReturnTheValueOfCheckedForACheckboxEvenIfItLacksThatAttribute() {
     driver.get(pages.formPage);
     WebElement checkbox = driver.findElement(By.xpath("//input[@id='checky']"));
     assertThat(checkbox.getAttribute("checked"), equalTo("false"));
@@ -136,7 +136,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfSelectedForRadioButtonsEvenIfTheyLackThatAttribute() {
+  @Test public void shouldReturnTheValueOfSelectedForRadioButtonsEvenIfTheyLackThatAttribute() {
     driver.get(pages.formPage);
     WebElement neverSelected = driver.findElement(By.id("cheese"));
     WebElement initiallyNotSelected = driver.findElement(By.id("peas"));
@@ -153,7 +153,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfSelectedForOptionsInSelectsEvenIfTheyLackThatAttribute() {
+  @Test public void shouldReturnTheValueOfSelectedForOptionsInSelectsEvenIfTheyLackThatAttribute() {
     driver.get(pages.formPage);
     WebElement selectBox = driver.findElement(By.xpath("//select[@name='selectomatic']"));
     List<WebElement> options = selectBox.findElements(By.tagName("option"));
@@ -165,7 +165,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(two.getAttribute("selected"), equalTo("false"));
   }
 
-  public void testShouldReturnValueOfClassAttributeOfAnElement() {
+  @Test public void shouldReturnValueOfClassAttributeOfAnElement() {
     driver.get(pages.xhtmlTestPage);
 
     WebElement heading = driver.findElement(By.xpath("//h1"));
@@ -174,7 +174,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(className, equalTo("header"));
   }
 
-  public void testShouldReturnTheContentsOfATextAreaAsItsValue() {
+  @Test public void shouldReturnTheContentsOfATextAreaAsItsValue() {
     driver.get(pages.formPage);
 
     String value = driver.findElement(By.id("withText")).getValue();
@@ -183,7 +183,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldTreatReadonlyAsAValue() {
+  @Test public void shouldTreatReadonlyAsAValue() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.name("readonly"));
@@ -196,7 +196,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
   
   @Ignore(SELENESE)
-  public void testShouldGetNumericAtribute() {
+  @Test public void shouldGetNumericAtribute() {
     driver.get(pages.formPage);
     WebElement element = driver.findElement(By.id("withText"));
     assertThat(element.getAttribute("rows"), is("5"));

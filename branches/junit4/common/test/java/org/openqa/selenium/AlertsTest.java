@@ -19,13 +19,14 @@ package org.openqa.selenium;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+import org.openqa.selenium.environment.TestEnvironment;
+
+import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
-import org.openqa.selenium.environment.GlobalTestEnvironment;
-import org.openqa.selenium.environment.TestEnvironment;
 
 public class AlertsTest extends AbstractDriverTestCase {
 
@@ -41,7 +42,7 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
-  public void testShouldBeAbleToOverrideTheWindowAlertMethod() {
+  @Test public void shouldBeAbleToOverrideTheWindowAlertMethod() {
     driver.get(alertPage);
 
     ((JavascriptExecutor) driver).executeScript(
@@ -50,7 +51,7 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @Ignore
-  public void testShouldAllowUsersToDealWithAnAlertManually() {
+  @Test public void shouldAllowUsersToDealWithAnAlertManually() {
     driver.get(alertPage);
 
     driver.findElement(By.id("alert")).click();
@@ -63,7 +64,7 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @Ignore
-  public void testShouldThrowAnExceptionIfAnAlertHasNotBeenDealtWith() {
+  @Test public void shouldThrowAnExceptionIfAnAlertHasNotBeenDealtWith() {
     driver.get(alertPage);
 
     driver.findElement(By.id("alert")).click();

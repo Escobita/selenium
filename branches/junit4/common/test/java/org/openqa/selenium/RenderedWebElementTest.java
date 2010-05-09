@@ -16,22 +16,22 @@ limitations under the License.
 */
 package org.openqa.selenium;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.awt.Dimension;
+import java.awt.Point;
+
+import org.junit.Test;
+
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
 public class RenderedWebElementTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({SELENESE, IPHONE})
-  public void testShouldPickUpStyleOfAnElement() {
+  @Test public void shouldPickUpStyleOfAnElement() {
     driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("green-parent"));
@@ -48,7 +48,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({IE, CHROME, SELENESE, IPHONE})
   //Reason for Chrome: WebKit bug 28804
-  public void testShouldHandleNonIntegerPositionAndSize() {
+  @Test public void shouldHandleNonIntegerPositionAndSize() {
     driver.get(pages.rectanglesPage);
 
     RenderedWebElement r2 = (RenderedWebElement) driver.findElement(By.id("r2"));
@@ -66,7 +66,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({SELENESE, IPHONE})
-  public void testShouldAllowInheritedStylesToBeUsed() {
+  @Test public void shouldAllowInheritedStylesToBeUsed() {
     driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("green-item"));
@@ -77,7 +77,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({IPHONE, CHROME, SELENESE, HTMLUNIT})
-  public void testShouldAllowUsersToHoverOverElements() {
+  @Test public void shouldAllowUsersToHoverOverElements() {
     driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));
@@ -97,7 +97,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldCorrectlyIdentifyThatAnElementHasWidth() {
+  @Test public void shouldCorrectlyIdentifyThatAnElementHasWidth() {
     driver.get(pages.xhtmlTestPage);
 
     RenderedWebElement shrinko = (RenderedWebElement) driver.findElement(By.id("linkId"));
@@ -108,7 +108,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore
-  public void testCanClickOnSuckerFishMenuItem() throws Exception {
+  @Test public void CanClickOnSuckerFishMenuItem() throws Exception {
     driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));

@@ -18,18 +18,17 @@ package org.openqa.selenium;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class OutputTypeTest extends AbstractDriverTestCase {
 	public static final String TEST_BASE64 = "ABADABAD";
 	public static final byte[] TEST_BYTES = new byte[]{ 0, 16, 3, 0, 16, 3 };
 	
-	public void testBase64() {
+	@Test public void Base64() {
     assertEquals(TEST_BASE64, OutputType.BASE64.convertFromBase64Png(TEST_BASE64));
   }
 	
-	public void testBytes() {
+	@Test public void Bytes() {
 		byte[] bytes = OutputType.BYTES
         .convertFromBase64Png(TEST_BASE64);
     assertEquals(TEST_BYTES.length, bytes.length);
@@ -38,7 +37,7 @@ public class OutputTypeTest extends AbstractDriverTestCase {
     }
 	}
 	
-	public void testFiles() {
+	@Test public void Files() {
 		File tmpFile = OutputType.FILE
         .convertFromBase64Png(TEST_BASE64);
     assertTrue(tmpFile.exists());

@@ -17,12 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
+
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 public class StaleElementReferenceTest extends AbstractDriverTestCase {
 
-  public void testOldPage() {
+  @Test public void OldPage() {
     driver.get(pages.simpleTestPage);
     WebElement elem = driver.findElement(By.id("links"));
     driver.get(pages.xhtmlTestPage);
@@ -36,7 +37,7 @@ public class StaleElementReferenceTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldNotCrashWhenCallingGetSizeOnAnObsoleteElement() {
+  @Test public void shouldNotCrashWhenCallingGetSizeOnAnObsoleteElement() {
     driver.get(pages.simpleTestPage);
     RenderedWebElement elem = (RenderedWebElement) driver.findElement(By.id("links"));
     driver.get(pages.xhtmlTestPage);
@@ -50,7 +51,7 @@ public class StaleElementReferenceTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldNotCrashWhenQueryingTheAttributeOfAStaleElement() {
+  @Test public void shouldNotCrashWhenQueryingTheAttributeOfAStaleElement() {
     driver.get(pages.xhtmlTestPage);
     WebElement heading = driver.findElement(By.xpath("//h1"));
     driver.get(pages.simpleTestPage);

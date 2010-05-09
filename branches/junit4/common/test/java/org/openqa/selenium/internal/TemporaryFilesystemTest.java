@@ -2,16 +2,15 @@ package org.openqa.selenium.internal;
 
 import junit.framework.TestCase;
 
-import org.junit.Test;
-import org.openqa.selenium.WebDriverException;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Test;
+import org.openqa.selenium.WebDriverException;
+
 public class TemporaryFilesystemTest extends TestCase {
 
-  @Test
-  public void testCanCreateTempFiles() {
+  @Test public void CanCreateTempFiles() {
     File tmp = TemporaryFilesystem.createTempDir("TemporaryFilesystem", "canCreate");
     try {
       assertTrue(tmp.exists());
@@ -21,8 +20,7 @@ public class TemporaryFilesystemTest extends TestCase {
     }
   }
 
-  @Test
-  public void testFilesystemCleanupDeletesDirs() {
+  @Test public void FilesystemCleanupDeletesDirs() {
     if (!TemporaryFilesystem.shouldReap()) {
       System.out.println("Reaping of files disabled - " +
                          "ignoring testFilesystemCleanupDeletesDirs");
@@ -35,8 +33,7 @@ public class TemporaryFilesystemTest extends TestCase {
     assertFalse(tmp.exists());
   }
 
-  @Test
-  public void testFilesystemCleanupDeletesRecursive() throws IOException {
+  @Test public void FilesystemCleanupDeletesRecursive() throws IOException {
     if (!TemporaryFilesystem.shouldReap()) {
       System.out.println("Reaping of files disabled - " +
                          "ignoring testFilesystemCleanupDeletesRecursive");
@@ -49,8 +46,7 @@ public class TemporaryFilesystemTest extends TestCase {
     assertFalse(tmp.exists());
   }
 
-  @Test
-  public void testSpecificDeleteRequestHonored() throws IOException {
+  @Test public void SpecificDeleteRequestHonored() throws IOException {
     if (!TemporaryFilesystem.shouldReap()) {
       System.out.println("Reaping of files disabled - " +
                          "ignoring testSpecificDeleteRequestHonored");
@@ -64,8 +60,7 @@ public class TemporaryFilesystemTest extends TestCase {
     assertFalse(tmp.exists());
   }
 
-  @Test
-  public void testDoesNotDeleteArbitraryFiles() throws IOException {
+  @Test public void DoesNotDeleteArbitraryFiles() throws IOException {
     File tempFile = File.createTempFile("TemporaryFilesystem", "dndaf");
     assertTrue(tempFile.exists());
     try {
@@ -76,8 +71,7 @@ public class TemporaryFilesystemTest extends TestCase {
     }
   }
 
-  @Test
-  public void testShouldReapDefaultsTrue() {
+  @Test public void shouldReapDefaultsTrue() {
     if (!TemporaryFilesystem.shouldReap()) {
       System.out.println("Reaping of files disabled - " +
                          "ignoring testShouldReapDefaultsTrue");

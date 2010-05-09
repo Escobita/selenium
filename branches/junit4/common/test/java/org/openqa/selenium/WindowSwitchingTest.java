@@ -17,12 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -30,14 +31,11 @@ import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Ignore(value = IPHONE, reason = "The iPhone only supports one window")
 public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
-  public void testShouldSwitchFocusToANewWindowWhenItIsOpenedAndNotStopFutureOperations() {
+  @Test public void shouldSwitchFocusToANewWindowWhenItIsOpenedAndNotStopFutureOperations() {
     driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
@@ -57,7 +55,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldThrowNoSuchWindowException() {
+  @Test public void shouldThrowNoSuchWindowException() {
     driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
@@ -75,7 +73,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NeedsFreshDriver
   @NoDriverAfterTest
   @Ignore({IE, FIREFOX, REMOTE, SELENESE})
-  public void testShouldBeAbleToIterateOverAllOpenWindows() throws Exception {
+  @Test public void shouldBeAbleToIterateOverAllOpenWindows() throws Exception {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.name("windowOne")).click();
     driver.findElement(By.name("windowTwo")).click();
@@ -94,7 +92,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IE, SELENESE})
-  public void testClickingOnAButtonThatClosesAnOpenWindowDoesNotCauseTheBrowserToHang() {
+  @Test public void ClickingOnAButtonThatClosesAnOpenWindowDoesNotCauseTheBrowserToHang() {
     driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
@@ -114,7 +112,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   
   @Ignore({IE, SELENESE})
   @JavascriptEnabled
-  public void testCanCallGetWindowHandlesAfterClosingAWindow() {
+  @Test public void CanCallGetWindowHandlesAfterClosingAWindow() {
     driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
@@ -133,7 +131,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testCanObtainAWindowHandle() {
+  @Test public void CanObtainAWindowHandle() {
     driver.get(pages.xhtmlTestPage);
 
     String currentHandle = driver.getWindowHandle();
@@ -142,7 +140,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testFailingToSwitchToAWindowLeavesTheCurrentWindowAsIs() {
+  @Test public void FailingToSwitchToAWindowLeavesTheCurrentWindowAsIs() {
     driver.get(pages.xhtmlTestPage);
     String current = driver.getWindowHandle();
 
@@ -161,7 +159,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NeedsFreshDriver
   @NoDriverAfterTest
   @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS}, reason = "Chrome failing on OS X")
-  public void testCanCloseWindowWhenMultipleWindowsAreOpen() {
+  @Test public void CanCloseWindowWhenMultipleWindowsAreOpen() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.name("windowOne")).click();
 
@@ -189,7 +187,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
   @NeedsFreshDriver
   @NoDriverAfterTest
   @Ignore(SELENESE)
-  public void testClosingOnlyWindowShouldNotCauseTheBrowserToHang() {
+  @Test public void ClosingOnlyWindowShouldNotCauseTheBrowserToHang() {
     driver.get(pages.xhtmlTestPage);
     driver.close();
   }

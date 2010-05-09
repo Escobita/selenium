@@ -19,8 +19,6 @@ package org.openqa.selenium.internal;
 
 import junit.framework.TestCase;
 
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,17 +28,17 @@ import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.junit.Test;
+
 public class FileHandlerTest extends TestCase {
 
-  @Test
-  public void testUnzip() throws IOException {
+  @Test public void Unzip() throws IOException {
     File testZip = writeTestZip(File.createTempFile("testUnzip", "zip"), 25);
     File out = FileHandler.unzip(new FileInputStream(testZip));
     assertEquals(25, out.list().length);
   }
 
-  @Test
-  public void testFileCopy() throws IOException {
+  @Test public void FileCopy() throws IOException {
     File newFile = File.createTempFile("testFileCopy", "dst");
     File tmpFile = writeTestFile(File.createTempFile("FileUtilTest", "src"));
     assertTrue(newFile.length() == 0);

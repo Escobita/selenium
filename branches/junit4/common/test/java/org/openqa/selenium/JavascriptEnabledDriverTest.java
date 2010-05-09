@@ -18,13 +18,16 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.awt.Dimension;
+import java.awt.Point;
+
 import org.hamcrest.Matchers;
+import org.junit.Test;
+import org.openqa.selenium.internal.Locatable;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.matchers.JUnitMatchers.either;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
@@ -34,10 +37,6 @@ import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import org.openqa.selenium.internal.Locatable;
-
-import java.awt.*;
-
 /**
  * Test case for browsers that support using Javascript
  */
@@ -45,7 +44,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = SELENESE, reason = "I'm not sure why this fails")
-  public void testDocumentShouldReflectLatestTitle() throws Exception {
+  @Test public void DocumentShouldReflectLatestTitle() throws Exception {
     driver.get(pages.javascriptPage);
 
     assertThat(driver.getTitle(), equalTo("Testing Javascript"));
@@ -57,7 +56,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testDocumentShouldReflectLatestDom() throws Exception {
+  @Test public void DocumentShouldReflectLatestDom() throws Exception {
     driver.get(pages.javascriptPage);
     String currentText = driver.findElement(By.xpath("//div[@id='dynamo']")).getText();
     assertThat(currentText, equalTo("What's for dinner?"));
@@ -69,14 +68,14 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     assertThat(newText, equalTo("Fish and chips!"));
   }
 
-//    public void testShouldAllowTheUserToOkayConfirmAlerts() {
+//    @Test public void shouldAllowTheUserToOkayConfirmAlerts() {
 //		driver.get(alertPage);
 //		driver.findElement(By.id("confirm").click();
 //		driver.switchTo().alert().accept();
 //		assertEquals("Hello WebDriver", driver.getTitle());
 //	}
 //
-//	public void testShouldAllowUserToDismissAlerts() {
+//	@Test public void shouldAllowUserToDismissAlerts() {
 //		driver.get(alertPage);
 //		driver.findElement(By.id("confirm").click();
 //
@@ -84,7 +83,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 //		assertEquals("Testing Alerts", driver.getTitle());
 //	}
 //
-//	public void testShouldBeAbleToGetTheTextOfAnAlert() {
+//	@Test public void shouldBeAbleToGetTheTextOfAnAlert() {
 //		driver.get(alertPage);
 //		driver.findElement(By.id("confirm").click();
 //
@@ -92,7 +91,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 //		assertEquals("Are you sure?", alertText);
 //	}
 //
-//	public void testShouldThrowAnExceptionIfAnAlertIsBeingDisplayedAndTheUserAttemptsToCarryOnRegardless() {
+//	@Test public void shouldThrowAnExceptionIfAnAlertIsBeingDisplayedAndTheUserAttemptsToCarryOnRegardless() {
 //		driver.get(alertPage);
 //		driver.findElement(By.id("confirm").click();
 //
@@ -107,7 +106,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS, IPHONE},
       reason = "Chrome failing on OS X;\n  iPhone: does not detect that a new page loaded.")
-  public void testShouldWaitForLoadsToCompleteAfterJavascriptCausesANewPageToLoad() {
+  @Test public void shouldWaitForLoadsToCompleteAfterJavascriptCausesANewPageToLoad() {
     driver.get(pages.formPage);
 
     driver.findElement(By.id("changeme")).setSelected();
@@ -118,7 +117,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS, IPHONE},
       reason = "Chrome failing on OS X;\n  iPhone: does not detect that a new page loaded.")
-  public void testShouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad()
+  @Test public void shouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad()
       throws InterruptedException {
     driver.get(pages.formPage);
 
@@ -129,7 +128,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldBeAbleToDetermineTheLocationOfAnElement() {
+  @Test public void shouldBeAbleToDetermineTheLocationOfAnElement() {
     driver.get(pages.xhtmlTestPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("username"));
@@ -141,7 +140,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldBeAbleToDetermineTheSizeOfAnElement() {
+  @Test public void shouldBeAbleToDetermineTheSizeOfAnElement() {
     driver.get(pages.xhtmlTestPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("username"));
@@ -154,7 +153,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {CHROME_NON_WINDOWS, IPHONE},
       reason = "iPhone: sendKeys not implemented correctly")
-  public void testShouldFireOnChangeEventWhenSettingAnElementsValue() {
+  @Test public void shouldFireOnChangeEventWhenSettingAnElementsValue() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("change")).sendKeys("foo");
     String result = driver.findElement(By.id("result")).getText();
@@ -163,7 +162,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldBeAbleToSubmitFormsByCausingTheOnClickEventToFire() {
+  @Test public void shouldBeAbleToSubmitFormsByCausingTheOnClickEventToFire() {
     driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("jsSubmitButton"));
     element.click();
@@ -173,7 +172,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = IE, reason = "Fails for IE in the continuous build")
-  public void testShouldBeAbleToClickOnSubmitButtons() {
+  @Test public void shouldBeAbleToClickOnSubmitButtons() {
     driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("submittingButton"));
     element.click();
@@ -182,7 +181,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testIssue80ClickShouldGenerateClickEvent() {
+  @Test public void Issue80ClickShouldGenerateClickEvent() {
     driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("clickField"));
     assertEquals("Hello", element.getValue());
@@ -194,7 +193,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {SELENESE,IPHONE}, reason = "iPhone: focus doesn't change as expected")
-  public void testShouldBeAbleToSwitchToFocusedElement() {
+  @Test public void shouldBeAbleToSwitchToFocusedElement() {
     driver.get(pages.javascriptPage);
 
     driver.findElement(By.id("switchFocus")).click();
@@ -205,7 +204,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testIfNoElementHasFocusTheActiveElementIsTheBody() {
+  @Test public void IfNoElementHasFocusTheActiveElementIsTheBody() {
     driver.get(pages.simpleTestPage);
 
     WebElement element = driver.switchTo().activeElement();
@@ -216,7 +215,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {IE, FIREFOX, REMOTE, CHROME, SELENESE},
           reason = "Firefox: Window demands focus to work. Chrome: Event firing is broken.  Other platforms: not properly tested")
-  public void testChangeEventIsFiredAppropriatelyWhenFocusIsLost() {
+  @Test public void ChangeEventIsFiredAppropriatelyWhenFocusIsLost() {
     driver.get(pages.javascriptPage);
 
     WebElement input = driver.findElement(By.id("changeable"));
@@ -240,7 +239,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
    * If the click handler throws an exception, the firefox driver freezes. This is suboptimal.
    */
   @JavascriptEnabled
-  public void testShouldBeAbleToClickIfEvenSomethingHorribleHappens() {
+  @Test public void shouldBeAbleToClickIfEvenSomethingHorribleHappens() {
     driver.get(pages.javascriptPage);
 
     driver.findElement(By.id("error")).click();
@@ -253,7 +252,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldBeAbleToGetTheLocationOfAnElement() {
+  @Test public void shouldBeAbleToGetTheLocationOfAnElement() {
     driver.get(pages.javascriptPage);
 
     if (!(driver instanceof JavascriptExecutor)) {

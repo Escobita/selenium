@@ -17,25 +17,25 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @Ignore(value = {CHROME, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
-  public void testShouldFireFocusEventWhenClicking() {
+  @Test public void shouldFireFocusEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -44,7 +44,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldFireClickEventWhenClicking() {
+  @Test public void shouldFireClickEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -54,7 +54,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldFireMouseDownEventWhenClicking() {
+  @Test public void shouldFireMouseDownEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -64,7 +64,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldFireMouseUpEventWhenClicking() {
+  @Test public void shouldFireMouseUpEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -74,7 +74,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {SELENESE, CHROME})
-  public void testShouldFireMouseOverEventWhenClicking() {
+  @Test public void shouldFireMouseOverEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -84,7 +84,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({SELENESE, CHROME, FIREFOX})
-  public void testShouldFireMouseMoveEventWhenClicking() {
+  @Test public void shouldFireMouseMoveEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -94,7 +94,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @Ignore(value = {CHROME, SELENESE, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
-  public void testShouldFireEventsInTheRightOrder() {
+  @Test public void shouldFireEventsInTheRightOrder() {
     driver.get(pages.javascriptPage);
 
     clickOnElementWhichRecordsEvents();
@@ -112,7 +112,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testsShouldIssueMouseDownEvents() {
+  @Test public void sShouldIssueMouseDownEvents() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mousedown")).click();
 
@@ -121,7 +121,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldIssueClickEvents() {
+  @Test public void shouldIssueClickEvents() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mouseclick")).click();
 
@@ -131,7 +131,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldIssueMouseUpEvents() {
+  @Test public void shouldIssueMouseUpEvents() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mouseup")).click();
 
@@ -141,7 +141,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {IPHONE, SELENESE})
-  public void testMouseEventsShouldBubbleUpToContainingElements() {
+  @Test public void MouseEventsShouldBubbleUpToContainingElements() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("child")).click();
 
@@ -151,7 +151,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {IPHONE, SELENESE})
-  public void testShouldEmitOnChangeEventsWhenSelectingElements() {
+  @Test public void shouldEmitOnChangeEventsWhenSelectingElements() {
     driver.get(pages.javascriptPage);
     //Intentionally not looking up the select tag.  See selenium r7937 for details.
     List<WebElement> allOptions = driver.findElements(By.xpath("//select[@id='selector']//option"));
@@ -171,7 +171,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldEmitOnChangeEventsWhenChangingTheStateOfACheckbox() {
+  @Test public void shouldEmitOnChangeEventsWhenChangingTheStateOfACheckbox() {
     driver.get(pages.javascriptPage);
     WebElement checkbox = driver.findElement(By.id("checkbox"));
 
@@ -181,7 +181,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testShouldEmitClickEventWhenClickingOnATextInputElement() {
+  @Test public void shouldEmitClickEventWhenClickingOnATextInputElement() {
     driver.get(pages.javascriptPage);
 
     WebElement clicker = driver.findElement(By.id("clickField"));
@@ -191,7 +191,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  public void testClearingAnElementShouldCauseTheOnChangeHandlerToFire() {
+  @Test public void ClearingAnElementShouldCauseTheOnChangeHandlerToFire() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("clearMe"));
@@ -206,7 +206,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
       reason = "Chrome: Non-native event firing is broken in .\n"
                + "  Selenese: Fails when running in firefox.\n"
                + "  iPhone: sendKeys implementation is incorrect")
-  public void testSendingKeysToAnotherElementShouldCauseTheBlurEventToFire() {
+  @Test public void SendingKeysToAnotherElementShouldCauseTheBlurEventToFire() {
     if (browserNeedsFocusOnThisOs(driver)) {
       System.out.println("Skipping this test because browser demands focus");
       return;
@@ -225,7 +225,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
       reason = ": Non-native event firing is broken in Chrome.\n"
                + "  Selenese: Fails when running in firefox.\n"
                + "  iPhone: sendKeys implementation is incorrect")
-  public void testSendingKeysToAnElementShouldCauseTheFocusEventToFire() {
+  @Test public void SendingKeysToAnElementShouldCauseTheFocusEventToFire() {
     if (browserNeedsFocusOnThisOs(driver)) {
       System.out.println("Skipping this test because browser demands focus");
       return;
@@ -239,7 +239,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testSendingKeysToAFocusedElementShouldNotBlurThatElement() {
+  @Test public void SendingKeysToAFocusedElementShouldNotBlurThatElement() {
     if (browserNeedsFocusOnThisOs(driver)) {
       System.out.println("Skipping this test because browser demands focus");
       return;
@@ -273,7 +273,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({IE, SELENESE})
-  public void testSubmittingFormFromFormElementShouldFireOnSubmitForThatForm() {
+  @Test public void SubmittingFormFromFormElementShouldFireOnSubmitForThatForm() {
     driver.get(pages.javascriptPage);
     WebElement formElement = driver.findElement(By.id("submitListeningForm"));
     formElement.submit();
@@ -282,7 +282,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({IE, SELENESE})
-  public void testSubmittingFormFromFormInputSubmitElementShouldFireOnSubmitForThatForm() {
+  @Test public void SubmittingFormFromFormInputSubmitElementShouldFireOnSubmitForThatForm() {
     driver.get(pages.javascriptPage);
     WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));
     submit.submit();
@@ -291,7 +291,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled 
   @Ignore({IE, SELENESE})
-  public void testSubmittingFormFromFormInputTextElementShouldFireOnSubmitForThatFormAndNotClickOnThatInput() {
+  @Test public void SubmittingFormFromFormInputTextElementShouldFireOnSubmitForThatFormAndNotClickOnThatInput() {
     driver.get(pages.javascriptPage);
     WebElement submit = driver.findElement(By.id("submitListeningForm-submit"));
     submit.submit();
@@ -302,7 +302,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   @JavascriptEnabled 
   @Ignore(value = {CHROME, SELENESE, IPHONE},
       reason = "Does not yet support file uploads")
-  public void testUploadingFileShouldFireOnChangeEvent() throws IOException {
+  @Test public void UploadingFileShouldFireOnChangeEvent() throws IOException {
     driver.get(pages.formPage);
     WebElement uploadElement = driver.findElement(By.id("upload"));
     WebElement result = driver.findElement(By.id("fileResults"));

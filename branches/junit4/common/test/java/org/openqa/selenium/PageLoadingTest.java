@@ -17,6 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Test;
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -25,36 +28,34 @@ import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import org.openqa.selenium.environment.GlobalTestEnvironment;
-
 public class PageLoadingTest extends AbstractDriverTestCase {
 
-  public void testShouldWaitForDocumentToBeLoaded() {
+  @Test public void shouldWaitForDocumentToBeLoaded() {
     driver.get(pages.simpleTestPage);
 
     assertThat(driver.getTitle(), equalTo("Hello WebDriver"));
   }
 
-  public void testShouldFollowRedirectsSentInTheHttpResponseHeaders() {
+  @Test public void shouldFollowRedirectsSentInTheHttpResponseHeaders() {
     driver.get(pages.redirectPage);
 
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
-  public void testShouldFollowMetaRedirects() throws Exception {
+  @Test public void shouldFollowMetaRedirects() throws Exception {
     driver.get(pages.metaRedirectPage);
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToGetAFragmentOnTheCurrentPage() {
+  @Test public void shouldBeAbleToGetAFragmentOnTheCurrentPage() {
     driver.get(pages.xhtmlTestPage);
     driver.get(pages.xhtmlTestPage + "#text");
     driver.findElement(By.id("id1"));
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnWhenGettingAUrlThatDoesNotResolve() {
+  @Test public void shouldReturnWhenGettingAUrlThatDoesNotResolve() {
     try {
       // Of course, we're up the creek if this ever does get registered
       driver.get("http://www.thisurldoesnotexist.comx/");
@@ -66,13 +67,13 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IPHONE, SELENESE})
-  public void testShouldReturnWhenGettingAUrlThatDoesNotConnect() {
+  @Test public void shouldReturnWhenGettingAUrlThatDoesNotConnect() {
     // Here's hoping that there's nothing here. There shouldn't be
     driver.get("http://localhost:3001");
   }
 
   @Ignore({IPHONE, SELENESE})
-  public void testShouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded() {
+  @Test public void shouldBeAbleToLoadAPageWithFramesetsAndWaitUntilAllFramesAreLoaded() {
     driver.get(pages.framesetPage);
 
     driver.switchTo().frame(0);
@@ -86,7 +87,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
 
   @Ignore({IPHONE, SELENESE})
   @NeedsFreshDriver
-  public void testSouldDoNothingIfThereIsNothingToGoBackTo() {
+  @Test public void SouldDoNothingIfThereIsNothingToGoBackTo() {
     String originalTitle = driver.getTitle();
     driver.get(pages.formPage);
 
@@ -96,7 +97,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToNavigateBackInTheBrowserHistory() {
+  @Test public void shouldBeAbleToNavigateBackInTheBrowserHistory() {
     driver.get(pages.formPage);
 
     driver.findElement(By.id("imageButton")).submit();
@@ -107,7 +108,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes() {
+  @Test public void shouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes() {
     driver.get(pages.xhtmlTestPage);
 
     driver.findElement(By.name("sameWindow")).click();
@@ -118,7 +119,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToNavigateForwardsInTheBrowserHistory() {
+  @Test public void shouldBeAbleToNavigateForwardsInTheBrowserHistory() {
     driver.get(pages.formPage);
 
     driver.findElement(By.id("imageButton")).submit();
@@ -132,7 +133,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IE, CHROME, SELENESE, IPHONE})
-  public void testShouldBeAbleToAccessPagesWithAnInsecureSslCertificate() {
+  @Test public void shouldBeAbleToAccessPagesWithAnInsecureSslCertificate() {
     String url = GlobalTestEnvironment.get().getAppServer().whereIsSecure("simpleTest.html");
     driver.get(url);
 
@@ -141,7 +142,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IE, SELENESE})
-  public void testShouldBeAbleToRefreshAPage() {
+  @Test public void shouldBeAbleToRefreshAPage() {
     driver.get(pages.xhtmlTestPage);
 
     driver.navigate().refresh();
@@ -156,7 +157,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
    */
   @Ignore(value = {IE, SELENESE, CHROME, IPHONE}, reason = "Untested user-agents")
   @JavascriptEnabled
-  public void testShouldNotHangIfDocumentOpenCallIsNeverFollowedByDocumentCloseCall()
+  @Test public void shouldNotHangIfDocumentOpenCallIsNeverFollowedByDocumentCloseCall()
       throws Exception {
     driver.get(pages.documentWrite);
 

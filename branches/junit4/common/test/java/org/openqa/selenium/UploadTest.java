@@ -1,15 +1,16 @@
 package org.openqa.selenium;
 
-import static org.junit.Assert.assertEquals;
-import static org.openqa.selenium.Ignore.Driver.CHROME;
-import static org.openqa.selenium.Ignore.Driver.IPHONE;
-import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
+import org.junit.Test;
+
+import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 /**
  * Demonstrates how to use WebDriver with a file input element.
@@ -33,7 +34,7 @@ public class UploadTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {CHROME, SELENESE},
           reason = "Chrome: File input elements are not supported yet")
-  public void testFileUploading() throws Exception {
+  @Test public void FileUploading() throws Exception {
     driver.get(pages.uploadPage);
     driver.findElement(By.id("upload")).sendKeys(testFile.getAbsolutePath());
     driver.findElement(By.id("go")).submit();

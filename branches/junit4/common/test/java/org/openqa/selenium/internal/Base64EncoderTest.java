@@ -18,18 +18,20 @@ package org.openqa.selenium.internal;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 public class Base64EncoderTest extends TestCase {
 
     private Base64Encoder encoder = new Base64Encoder();
 
-    public void testEncodesEntireByteArrayAsString() {
+    @Test public void EncodesEntireByteArrayAsString() {
         byte input[] = "hello world".getBytes();
         String expected = "aGVsbG8gd29ybGQ=";
         assertEquals(expected, encoder.encode(input));
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testWrapsLinesAt76Chars() {
+    @Test public void WrapsLinesAt76Chars() {
         byte input[] = ("hello world. hello world. hello world. hello world. hello world. hello world. hello world. "
                 + "hello world. hello world. hello world. hello world. hello world. hello world. hello world. ").getBytes();
         String expected = "aGVsbG8gd29ybGQuIGhlbGxvIHdvcmxkLiBoZWxsbyB3b3JsZC4gaGVsbG8gd29ybGQuIGhlbGxv\n"
@@ -40,28 +42,28 @@ public class Base64EncoderTest extends TestCase {
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testPadsSingleMissingByteWhenNotMultipleOfThree() {
+    @Test public void PadsSingleMissingByteWhenNotMultipleOfThree() {
         byte input[] = { 1, 2, 3, 4, 5 };
         String expected = "AQIDBAU=";
         assertEquals(expected, encoder.encode(input));
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testPadsDoubleMissingByteWhenNotMultipleOfThree() {
+    @Test public void PadsDoubleMissingByteWhenNotMultipleOfThree() {
         byte input[] = { 1, 2, 3, 4  };
         String expected = "AQIDBA==";
         assertEquals(expected, encoder.encode(input));
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testDoesNotPadWhenMultipleOfThree() {
+    @Test public void DoesNotPadWhenMultipleOfThree() {
         byte input[] = { 1, 2, 3, 4, 5, 6 };
         String expected = "AQIDBAUG";
         assertEquals(expected, encoder.encode(input));
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testHandlesAllPositiveBytes() {
+    @Test public void HandlesAllPositiveBytes() {
         byte input[] = new byte[127];
         for (int i = 0; i < 126; i++) input[i] = (byte) (i + 1);
         String expected = "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5\n"
@@ -71,7 +73,7 @@ public class Base64EncoderTest extends TestCase {
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testHandlesAllNegativeBytes() {
+    @Test public void HandlesAllNegativeBytes() {
         byte input[] = new byte[128];
         for (int i = 0; i < 127; i++) input[i] = (byte) (-1 - i);
         String expected = "//79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjH\n"
@@ -81,14 +83,14 @@ public class Base64EncoderTest extends TestCase {
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testHandlesZeroByte() {
+    @Test public void HandlesZeroByte() {
         byte input[] = { 0, 0, 0, 0 };
         String expected = "AAAAAA==";
         assertEquals(expected, encoder.encode(input));
         assertByteArrayEquals(input, encoder.decode(expected));
     }
 
-    public void testProducesEmptyStringWhenNoBytesGiven() {
+    @Test public void ProducesEmptyStringWhenNoBytesGiven() {
         byte input[] = new byte[0];
         String expected = "";
         assertEquals(expected, encoder.encode(input));

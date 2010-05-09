@@ -19,25 +19,27 @@ package org.openqa.selenium;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 public class PlatformTest extends TestCase {
 
-  public void testShouldIdentifyWindowsVariants() {
+  @Test public void shouldIdentifyWindowsVariants() {
     assertAllAre(Platform.WINDOWS, "Windows 2003");
   }
 
-  public void testShouldIdentifyMacVariants() {
+  @Test public void shouldIdentifyMacVariants() {
     assertAllAre(Platform.MAC, "Darwin", "Mac OS X");
   }
   
-  public void testShouldIdentifyUnixVariants() {
+  @Test public void shouldIdentifyUnixVariants() {
     assertAllAre(Platform.UNIX, "solaris", "bsd");
   }
   
-  public void testShouldIdentifyLinux() {
+  @Test public void shouldIdentifyLinux() {
     assertAllAre(Platform.LINUX, "Linux");
   }
   
-  public void testShouldDistinctLinuxFromUnix() {
+  @Test public void shouldDistinctLinuxFromUnix() {
     Platform linPlatform = Platform.extractFromSysProperty("Linux");
     assertTrue("Linux should be identified as Unix", linPlatform.is(Platform.UNIX));
     

@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -24,7 +26,7 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 public class MiscTest extends AbstractDriverTestCase {
 
-  public void testShouldReportTheCurrentUrlCorrectly() {
+  @Test public void shouldReportTheCurrentUrlCorrectly() {
     driver.get(pages.simpleTestPage);
     assertThat(driver.getCurrentUrl(), equalTo(pages.simpleTestPage));
 
@@ -34,7 +36,7 @@ public class MiscTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldReturnTheSourceOfAPage() {
+  @Test public void shouldReturnTheSourceOfAPage() {
     driver.get(pages.simpleTestPage);
 
     String source = driver.getPageSource().toLowerCase();

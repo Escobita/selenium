@@ -17,9 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Test;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 
-import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -42,12 +42,12 @@ public class I18nTest extends AbstractDriverTestCase {
   private static final String tmunot = "\u05EA\u05DE\u05D5\u05E0\u05D5\u05EA";
 
   @Ignore({HTMLUNIT, IE, FIREFOX, IPHONE})
-  public void testCn() {
+  @Test public void shouldDealWithChineseInput() {
     driver.get(pages.chinesePage);
     driver.findElement(By.linkText(Messages.getString("I18nTest.link1"))).click();
   }
 
-  public void testEnteringHebrewTextFromLeftToRight() {
+  @Test public void EnteringHebrewTextFromLeftToRight() {
     driver.get(pages.chinesePage);
     WebElement input = driver.findElement(By.name("i18n"));
 
@@ -56,7 +56,7 @@ public class I18nTest extends AbstractDriverTestCase {
     assertEquals(shalom, input.getValue());
   }
 
-  public void testEnteringHebrewTextFromRightToLeft() {
+  @Test public void EnteringHebrewTextFromRightToLeft() {
     driver.get(pages.chinesePage);
     WebElement input = driver.findElement(By.name("i18n"));
 
@@ -66,7 +66,7 @@ public class I18nTest extends AbstractDriverTestCase {
   }
 
   @Ignore(value = {IE, SELENESE})
-  public void testShouldBeAbleToReturnTheTextInAPage() {
+  @Test public void shouldBeAbleToReturnTheTextInAPage() {
     String url = GlobalTestEnvironment.get()
         .getAppServer()
         .whereIs("encoding");

@@ -17,8 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.regex.Pattern;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.openqa.selenium.environment.GlobalTestEnvironment;
+
+import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -26,18 +32,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-import org.hamcrest.TypeSafeMatcher;
-
-import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-import org.openqa.selenium.environment.GlobalTestEnvironment;
-
-import java.util.regex.Pattern;
 
 public class TextHandlingTest extends AbstractDriverTestCase {
 
@@ -50,7 +50,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     newLine = "\n";
   }
 
-  public void testShouldReturnTheTextContentOfASingleElementWithNoChildren() {
+  @Test public void shouldReturnTheTextContentOfASingleElementWithNoChildren() {
     driver.get(pages.simpleTestPage);
     String selectText = driver.findElement(By.id("oneline")).getText();
     assertThat(selectText, equalTo("A single line of text"));
@@ -59,7 +59,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(getText, equalTo("A single line of text"));
   }
 
-  public void testShouldReturnTheEntireTextContentOfChildElements() {
+  @Test public void shouldReturnTheEntireTextContentOfChildElements() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("multiline")).getText();
 
@@ -69,7 +69,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldIgnoreScriptElements() {
+  @Test public void shouldIgnoreScriptElements() {
     driver.get(pages.javascriptEnhancedForm);
     WebElement labelForUsername = driver.findElement(By.id("labelforusername"));
     String text = labelForUsername.getText();
@@ -79,7 +79,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(text, is("Username:"));
   }
 
-  public void testShouldRepresentABlockLevelElementAsANewline() {
+  @Test public void shouldRepresentABlockLevelElementAsANewline() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("multiline")).getText();
 
@@ -88,14 +88,14 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(text, endsWith("and block level elements"));
   }
 
-  public void testShouldCollapseMultipleWhitespaceCharactersIntoASingleSpace() {
+  @Test public void shouldCollapseMultipleWhitespaceCharactersIntoASingleSpace() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("lotsofspaces")).getText();
 
     assertThat(text, equalTo("This line has lots of spaces."));
   }
 
-  public void testShouldTrimText() {
+  @Test public void shouldTrimText() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("multiline")).getText();
 
@@ -103,7 +103,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(text, endsWith("block level elements"));
   }
 
-  public void testShouldConvertANonBreakingSpaceIntoANormalSpaceCharacter() {
+  @Test public void shouldConvertANonBreakingSpaceIntoANormalSpaceCharacter() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("nbsp")).getText();
 
@@ -111,7 +111,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IPHONE, SELENESE})
-  public void testShouldTreatANonBreakingSpaceAsAnyOtherWhitespaceCharacterWhenCollapsingWhitespace() {
+  @Test public void shouldTreatANonBreakingSpaceAsAnyOtherWhitespaceCharacterWhenCollapsingWhitespace() {
     driver.get(pages.simpleTestPage);
     WebElement element = driver.findElement(By.id("nbspandspaces"));
     String text = element.getText();
@@ -120,7 +120,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(IPHONE)
-  public void testHavingInlineElementsShouldNotAffectHowTextIsReturned() {
+  @Test public void HavingInlineElementsShouldNotAffectHowTextIsReturned() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("inline")).getText();
 
@@ -128,14 +128,14 @@ public class TextHandlingTest extends AbstractDriverTestCase {
                equalTo("This line has text within elements that are meant to be displayed inline"));
   }
 
-  public void testShouldReturnTheEntireTextOfInlineElements() {
+  @Test public void shouldReturnTheEntireTextOfInlineElements() {
     driver.get(pages.simpleTestPage);
     String text = driver.findElement(By.id("span")).getText();
 
     assertThat(text, equalTo("An inline element"));
   }
 
-//    public void testShouldRetainTheFormatingOfTextWithinAPreElement() {
+//    @Test public void shouldRetainTheFormatingOfTextWithinAPreElement() {
 //        driver.get(simpleTestPage);
 //        String text = driver.findElement(By.id("preformatted")).getText();
 //
@@ -145,7 +145,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 //    }
 
   @Ignore(value = {SELENESE, IPHONE}, reason = "iPhone: sendKeys is broken")
-  public void testShouldBeAbleToSetMoreThanOneLineOfTextInATextArea() {
+  @Test public void shouldBeAbleToSetMoreThanOneLineOfTextInATextArea() {
     driver.get(pages.formPage);
     WebElement textarea = driver.findElement(By.id("withText"));
     textarea.clear();
@@ -157,7 +157,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToEnterDatesAfterFillingInOtherValuesFirst() {
+  @Test public void shouldBeAbleToEnterDatesAfterFillingInOtherValuesFirst() {
     driver.get(pages.formPage);
     WebElement input = driver.findElement(By.id("working"));
     String expectedValue = "10/03/2007 to 30/07/1993";
@@ -167,28 +167,28 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(seenValue, equalTo(expectedValue));
   }
 
-  public void testShouldReturnEmptyStringWhenTextIsOnlySpaces() {
+  @Test public void shouldReturnEmptyStringWhenTextIsOnlySpaces() {
     driver.get(pages.xhtmlTestPage);
 
     String text = driver.findElement(By.id("spaces")).getText();
     assertThat(text, equalTo(""));
   }
 
-  public void testShouldReturnEmptyStringWhenTextIsEmpty() {
+  @Test public void shouldReturnEmptyStringWhenTextIsEmpty() {
     driver.get(pages.xhtmlTestPage);
 
     String text = driver.findElement(By.id("empty")).getText();
     assertThat(text, equalTo(""));
   }
 
-  public void testShouldReturnEmptyStringWhenTagIsSelfClosing() {
+  @Test public void shouldReturnEmptyStringWhenTagIsSelfClosing() {
     driver.get(pages.xhtmlTestPage);
 
     String text = driver.findElement(By.id("self-closed")).getText();
     assertThat(text, equalTo(""));
   }
 
-  public void testShouldHandleSiblingBlockLevelElements() {
+  @Test public void shouldHandleSiblingBlockLevelElements() {
     driver.get(pages.simpleTestPage);
 
     String text = driver.findElement(By.id("twoblocks")).getText();
@@ -197,7 +197,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({FIREFOX, HTMLUNIT, IE, CHROME, SELENESE})
-  public void testShouldHandleNestedBlockLevelElements() {
+  @Test public void shouldHandleNestedBlockLevelElements() {
     driver.get(pages.simpleTestPage);
 
     String text = driver.findElement(By.id("nestedblocks")).getText();
@@ -206,7 +206,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
                         + "and also" + newLine + "Brie"));
   }
 
-  public void testShouldHandleWhitespaceInInlineElements() {
+  @Test public void shouldHandleWhitespaceInInlineElements() {
     driver.get(pages.simpleTestPage);
 
     String text = driver.findElement(By.id("inlinespan")).getText();
@@ -215,14 +215,14 @@ public class TextHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(value = {SELENESE, IPHONE})
-  public void testReadALargeAmountOfData() {
+  @Test public void ReadALargeAmountOfData() {
     driver.get(GlobalTestEnvironment.get().getAppServer().whereIs("macbeth.html"));
     String source = driver.getPageSource().trim().toLowerCase();
 
     assertThat(source.endsWith("</html>"), is(true));
   }
 
-  public void testGetTextWithLineBreakForInlineElement() {
+  @Test public void GetTextWithLineBreakForInlineElement() {
     driver.get(pages.simpleTestPage);
 
     WebElement label = driver.findElement(By.id("label1"));
@@ -248,7 +248,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({SELENESE, IPHONE})
-  public void testShouldOnlyIncludeVisibleText() {
+  @Test public void shouldOnlyIncludeVisibleText() {
     driver.get(pages.javascriptPage);
 
     String empty = driver.findElement(By.id("suppressedParagraph")).getText();

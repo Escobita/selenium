@@ -17,16 +17,17 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.List;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
-import java.util.List;
 
 public class XPathElementFindingTest extends AbstractDriverTestCase {
 
-  public void testShouldThrowAnExceptionWhenThereIsNoLinkToClickAndItIsFoundWithXPath() {
+  @Test public void shouldThrowAnExceptionWhenThereIsNoLinkToClickAndItIsFoundWithXPath() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -37,7 +38,7 @@ public class XPathElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldThrowAnExceptionWhenThereIsNoLinkToClick() {
+  @Test public void shouldThrowAnExceptionWhenThereIsNoLinkToClick() {
     driver.get(pages.xhtmlTestPage);
 
     try {
@@ -48,14 +49,14 @@ public class XPathElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldFindSingleElementByXPath() {
+  @Test public void shouldFindSingleElementByXPath() {
     driver.get(pages.xhtmlTestPage);
     WebElement element = driver.findElement(By.xpath("//h1"));
     assertThat(element.getText(), equalTo("XHTML Might Be The Future"));
   }
 
   @Ignore(SELENESE)
-  public void testShouldFindElementsByXPath() {
+  @Test public void shouldFindElementsByXPath() {
     driver.get(pages.xhtmlTestPage);
     List<WebElement> divs = driver.findElements(By.xpath("//div"));
 
@@ -63,7 +64,7 @@ public class XPathElementFindingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToFindManyElementsRepeatedlyByXPath() {
+  @Test public void shouldBeAbleToFindManyElementsRepeatedlyByXPath() {
     driver.get(pages.xhtmlTestPage);
     String xpathString = "//node()[contains(@id,'id')]";
     assertThat(driver.findElements(By.xpath(xpathString)).size(), equalTo(3));
@@ -72,14 +73,14 @@ public class XPathElementFindingTest extends AbstractDriverTestCase {
     assertThat(driver.findElements(By.xpath(xpathString)).size(), equalTo(0));
   }
 
-  public void testShouldBeAbleToIdentifyElementsByClass() {
+  @Test public void shouldBeAbleToIdentifyElementsByClass() {
     driver.get(pages.xhtmlTestPage);
 
     String header = driver.findElement(By.xpath("//h1[@class='header']")).getText();
     assertThat(header, equalTo("XHTML Might Be The Future"));
   }
 
-  public void testShouldBeAbleToSearchForMultipleAttributes() {
+  @Test public void shouldBeAbleToSearchForMultipleAttributes() {
     driver.get(pages.formPage);
 
     try {
@@ -90,7 +91,7 @@ public class XPathElementFindingTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldLocateElementsWithGivenText() {
+  @Test public void shouldLocateElementsWithGivenText() {
     driver.get(pages.xhtmlTestPage);
 
     try {

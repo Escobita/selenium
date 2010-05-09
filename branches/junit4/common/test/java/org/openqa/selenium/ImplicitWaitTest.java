@@ -1,14 +1,12 @@
 package org.openqa.selenium;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
@@ -30,9 +28,8 @@ public class ImplicitWaitTest extends AbstractDriverTestCase {
     super.tearDown();
   }
 
-  @Test
   @JavascriptEnabled
-  public void testShouldImplicitlyWaitForASingleElement() {
+  @Test public void shouldImplicitlyWaitForASingleElement() {
     driver.get(pages.dynamicPage);
     WebElement add = driver.findElement(By.id("adder"));
 
@@ -42,9 +39,8 @@ public class ImplicitWaitTest extends AbstractDriverTestCase {
     driver.findElement(By.id("box0"));  // All is well if this doesn't throw.
   }
 
-  @Test
   @JavascriptEnabled
-  public void testShouldStillFailToFindAnElementWhenImplicitWaitsAreEnabled() {
+  @Test public void shouldStillFailToFindAnElementWhenImplicitWaitsAreEnabled() {
     driver.get(pages.dynamicPage);
     driver.manage().timeouts().implicitlyWait(500, MILLISECONDS);
     try {
@@ -54,9 +50,8 @@ public class ImplicitWaitTest extends AbstractDriverTestCase {
     }
   }
 
-  @Test
   @JavascriptEnabled
-  public void testShouldReturnAfterFirstAttemptToFindOneAfterDisablingImplicitWaits() {
+  @Test public void shouldReturnAfterFirstAttemptToFindOneAfterDisablingImplicitWaits() {
     driver.get(pages.dynamicPage);
     driver.manage().timeouts().implicitlyWait(1100, MILLISECONDS);
     driver.manage().timeouts().implicitlyWait(0, MILLISECONDS);
@@ -67,10 +62,9 @@ public class ImplicitWaitTest extends AbstractDriverTestCase {
     }
   }
 
-  @Test
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldImplicitlyWaitUntilAtLeastOneElementIsFoundWhenSearchingForMany() {
+  @Test public void shouldImplicitlyWaitUntilAtLeastOneElementIsFoundWhenSearchingForMany() {
     driver.get(pages.dynamicPage);
     WebElement add = driver.findElement(By.id("adder"));
 
@@ -82,20 +76,18 @@ public class ImplicitWaitTest extends AbstractDriverTestCase {
     assertFalse(elements.isEmpty());
   }
 
-  @Test
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldStillFailToFindElementsWhenImplicitWaitsAreEnabled() {
+  @Test public void shouldStillFailToFindElementsWhenImplicitWaitsAreEnabled() {
     driver.get(pages.dynamicPage);
     driver.manage().timeouts().implicitlyWait(500, MILLISECONDS);
     List<WebElement> elements = driver.findElements(By.className("redbox"));
     assertTrue(elements.isEmpty());
   }
 
-  @Test
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldReturnAfterFirstAttemptToFindManyAfterDisablingImplicitWaits() {
+  @Test public void shouldReturnAfterFirstAttemptToFindManyAfterDisablingImplicitWaits() {
     driver.get(pages.dynamicPage);
     WebElement add = driver.findElement(By.id("adder"));
 

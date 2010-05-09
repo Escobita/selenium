@@ -17,11 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -35,7 +36,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testShouldFireKeyPressEvents() {
+  @Test public void shouldFireKeyPressEvents() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -47,7 +48,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testShouldFireKeyDownEvents() {
+  @Test public void shouldFireKeyDownEvents() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -59,7 +60,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testShouldFireKeyUpEvents() {
+  @Test public void shouldFireKeyUpEvents() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -69,7 +70,7 @@ public class TypingTest extends AbstractDriverTestCase {
     assertThat(result.getText(), containsString("up:"));
   }
 
-  public void testShouldTypeLowerCaseLetters() {
+  @Test public void shouldTypeLowerCaseLetters() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -78,7 +79,7 @@ public class TypingTest extends AbstractDriverTestCase {
     assertThat(keyReporter.getValue(), is("abc def"));
   }
 
-  public void testShouldBeAbleToTypeCapitalLetters() {
+  @Test public void shouldBeAbleToTypeCapitalLetters() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -87,7 +88,7 @@ public class TypingTest extends AbstractDriverTestCase {
     assertThat(keyReporter.getValue(), is("ABC DEF"));
   }
 
-  public void testShouldBeAbleToTypeQuoteMarks() {
+  @Test public void shouldBeAbleToTypeQuoteMarks() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -96,7 +97,7 @@ public class TypingTest extends AbstractDriverTestCase {
     assertThat(keyReporter.getValue(), is("\""));
   }
 
-  public void testShouldBeAbleToTypeTheAtCharacter() {
+  @Test public void shouldBeAbleToTypeTheAtCharacter() {
     // simon: I tend to use a US/UK or AUS keyboard layout with English
     // as my primary language. There are consistent reports that we're
     // not handling i18nised keyboards properly. This test exposes this
@@ -112,7 +113,7 @@ public class TypingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToMixUpperAndLowerCaseLetters() {
+  @Test public void shouldBeAbleToMixUpperAndLowerCaseLetters() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -123,7 +124,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({CHROME_NON_WINDOWS, SELENESE})
-  public void testArrowKeysShouldNotBePrintable() {
+  @Test public void ArrowKeysShouldNotBePrintable() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -133,7 +134,7 @@ public class TypingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({HTMLUNIT, CHROME_NON_WINDOWS, SELENESE})
-  public void testShouldBeAbleToUseArrowKeys() {
+  @Test public void shouldBeAbleToUseArrowKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
@@ -144,7 +145,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({CHROME_NON_WINDOWS, SELENESE})
-  public void testWillSimulateAKeyUpWhenEnteringTextIntoInputElements() {
+  @Test public void WillSimulateAKeyUpWhenEnteringTextIntoInputElements() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyUp"));
@@ -156,7 +157,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testWillSimulateAKeyDownWhenEnteringTextIntoInputElements() {
+  @Test public void WillSimulateAKeyDownWhenEnteringTextIntoInputElements() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyDown"));
@@ -170,7 +171,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testWillSimulateAKeyPressWhenEnteringTextIntoInputElements() {
+  @Test public void WillSimulateAKeyPressWhenEnteringTextIntoInputElements() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyPress"));
@@ -184,7 +185,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore({CHROME_NON_WINDOWS, SELENESE})
-  public void testWillSimulateAKeyUpWhenEnteringTextIntoTextAreas() {
+  @Test public void WillSimulateAKeyUpWhenEnteringTextIntoTextAreas() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyUpArea"));
@@ -196,7 +197,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testWillSimulateAKeyDownWhenEnteringTextIntoTextAreas() {
+  @Test public void WillSimulateAKeyDownWhenEnteringTextIntoTextAreas() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyDownArea"));
@@ -210,7 +211,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(CHROME_NON_WINDOWS)
-  public void testWillSimulateAKeyPressWhenEnteringTextIntoTextAreas() {
+  @Test public void WillSimulateAKeyPressWhenEnteringTextIntoTextAreas() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyPressArea"));
@@ -225,7 +226,7 @@ public class TypingTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {FIREFOX, IE, CHROME_NON_WINDOWS, SELENESE, CHROME},
           reason = "firefox specific not yet tested in htmlunit. Firefox demands to have the focus on the window already.  Chrome: event firing broken.")
-  public void testShouldFireFocusKeyEventsInTheRightOrder() {
+  @Test public void shouldFireFocusKeyEventsInTheRightOrder() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -237,7 +238,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IE, CHROME, SELENESE}, reason = "firefox-specific")
-  public void testShouldReportKeyCodeOfArrowKeys() {
+  @Test public void shouldReportKeyCodeOfArrowKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -261,7 +262,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testShouldReportKeyCodeOfArrowKeysUpDownEvents() {
+  @Test public void shouldReportKeyCodeOfArrowKeysUpDownEvents() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -289,7 +290,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {SELENESE}, reason = "untested user agent")
-  public void testNumericNonShiftKeys() {
+  @Test public void NumericNonShiftKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -302,7 +303,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agent")
-  public void testNumericShiftKeys() {
+  @Test public void NumericShiftKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -317,7 +318,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {SELENESE}, reason = "untested user agent")
-  public void testLowerCaseAlphaKeys() {
+  @Test public void LowerCaseAlphaKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -330,7 +331,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testUppercaseAlphaKeys() {
+  @Test public void UppercaseAlphaKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -345,7 +346,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME, SELENESE}, reason = "untested user agents")
-  public void testAllPrintableKeys() {
+  @Test public void AllPrintableKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement result = driver.findElement(By.id("result"));
@@ -361,7 +362,7 @@ public class TypingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testArrowKeysAndPageUpAndDown() {
+  @Test public void ArrowKeysAndPageUpAndDown() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -373,7 +374,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testHomeAndEndAndPageUpAndPageDownKeys() {
+  @Test public void HomeAndEndAndPageUpAndPageDownKeys() {
     // FIXME: macs don't have HOME keys, would PGUP work?
     if (Platform.getCurrent().is(Platform.MAC)) {
       return;
@@ -391,7 +392,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testDeleteAndBackspaceKeys() {
+  @Test public void DeleteAndBackspaceKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -408,7 +409,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testSpecialSpaceKeys() {
+  @Test public void SpecialSpaceKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -419,7 +420,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testNumberpadAndFunctionKeys() {
+  @Test public void NumberpadAndFunctionKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -438,7 +439,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testShiftSelectionDeletes() {
+  @Test public void ShiftSelectionDeletes() {
     driver.get(pages.javascriptPage);
 
     WebElement element = driver.findElement(By.id("keyReporter"));
@@ -453,7 +454,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testChordControlHomeShiftEndDelete() {
+  @Test public void ChordControlHomeShiftEndDelete() {
     // FIXME: macs don't have HOME keys, would PGUP work?
     if (Platform.getCurrent().is(Platform.MAC)) {
       return;
@@ -475,7 +476,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testChordReveseShiftHomeSelectionDeletes() {
+  @Test public void ChordReveseShiftHomeSelectionDeletes() {
     // FIXME: macs don't have HOME keys, would PGUP work?
     if (Platform.getCurrent().is(Platform.MAC)) {
       return;
@@ -509,7 +510,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testChordControlCutAndPaste() {
+  @Test public void ChordControlCutAndPaste() {
     // FIXME: macs don't have HOME keys, would PGUP work?
     if (Platform.getCurrent().is(Platform.MAC)) {
       return;
@@ -551,7 +552,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(SELENESE)
-  public void testShouldTypeIntoInputElementsThatHaveNoTypeAttribute() {
+  @Test public void shouldTypeIntoInputElementsThatHaveNoTypeAttribute() {
     driver.get(pages.formPage);
 
     WebElement element = driver.findElement(By.id("no-type"));
@@ -562,7 +563,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {CHROME_NON_WINDOWS, SELENESE}, reason = "untested user agents")
-  public void testShouldNotTypeIntoElementsThatPreventKeyDownEvents() {
+  @Test public void shouldNotTypeIntoElementsThatPreventKeyDownEvents() {
     driver.get(pages.javascriptPage);
 
     WebElement silent = driver.findElement(By.name("suppress"));
@@ -573,7 +574,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {IE, CHROME}, reason = "firefox-specific")
-  public void testGenerateKeyPressEventEvenWhenElementPreventsDefault() {
+  @Test public void GenerateKeyPressEventEvenWhenElementPreventsDefault() {
     driver.get(pages.javascriptPage);
 
     WebElement silent = driver.findElement(By.name("suppress"));
@@ -585,7 +586,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IE, CHROME, SELENESE}, reason = "Chrome: See crbug 20773")
-  public void testTypingIntoAnIFrameWithContentEditableOrDesignModeSet() {
+  @Test public void TypingIntoAnIFrameWithContentEditableOrDesignModeSet() {
     driver.get(pages.richTextPage);
 
     driver.switchTo().frame("editFrame");
@@ -602,7 +603,7 @@ public class TypingTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   @Ignore(value = {HTMLUNIT, IE, CHROME, SELENESE}, reason = "Chrome: See crbug 20773")
-  public void testNonPrintableCharactersShouldWorkWithContentEditableOrDesignModeSet() {
+  @Test public void NonPrintableCharactersShouldWorkWithContentEditableOrDesignModeSet() {
     driver.get(pages.richTextPage);
 
     // not tested on mac

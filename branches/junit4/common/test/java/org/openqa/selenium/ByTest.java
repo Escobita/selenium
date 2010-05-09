@@ -19,6 +19,7 @@ package org.openqa.selenium;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -26,7 +27,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 
 public class ByTest extends MockObjectTestCase {
 
-  public void testShouldUseFindsByNameToLocateElementsByName() {
+  @Test public void shouldUseFindsByNameToLocateElementsByName() {
     final AllDriver driver = mock(AllDriver.class);
 
     checking(new Expectations() {{

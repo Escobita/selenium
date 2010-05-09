@@ -1,5 +1,7 @@
 package org.openqa.selenium;
 
+import org.junit.Test;
+
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
  */
@@ -14,7 +16,7 @@ public class ErrorsTest extends AbstractDriverTestCase {
    */
   @JavascriptEnabled
   @Ignore(value = Ignore.Driver.IE, reason = "IE does not support onerror")
-  public void testShouldNotGenerateErrorsWhenOpeningANewPage() {
+  @Test public void shouldNotGenerateErrorsWhenOpeningANewPage() {
     driver.get(pages.errorsPage);
     Object result = ((JavascriptExecutor) driver).
         executeScript("return window.ERRORS.join('\\n');");

@@ -17,19 +17,20 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.List;
+
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
-import java.util.List;
-
 public class SelectElementHandlingTest extends AbstractDriverTestCase {
 
   @Ignore({IE, SELENESE, IPHONE})
-  public void testShouldBePossibleToDeselectASingleOptionFromASelectWhichAllowsMultipleChoices() {
+  @Test public void shouldBePossibleToDeselectASingleOptionFromASelectWhichAllowsMultipleChoices() {
     driver.get(pages.formPage);
 
     WebElement multiSelect = driver.findElement(By.id("multi"));
@@ -47,7 +48,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore({IE, SELENESE, IPHONE})
-  public void testShouldNotBeAbleToDeselectAnOptionFromANormalSelect() {
+  @Test public void shouldNotBeAbleToDeselectAnOptionFromANormalSelect() {
     driver.get(pages.formPage);
 
     WebElement select = driver.findElement(By.xpath("//select[@name='selectomatic']"));
@@ -63,7 +64,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToChangeTheSelectedOptionInASelect() {
+  @Test public void shouldBeAbleToChangeTheSelectedOptionInASelect() {
     driver.get(pages.formPage);
     WebElement selectBox = driver.findElement(By.xpath("//select[@name='selectomatic']"));
     List<WebElement> options = selectBox.findElements(By.tagName("option"));
@@ -78,7 +79,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldBeAbleToSelectMoreThanOneOptionFromASelectWhichAllowsMultipleChoices() {
+  @Test public void shouldBeAbleToSelectMoreThanOneOptionFromASelectWhichAllowsMultipleChoices() {
     driver.get(pages.formPage);
 
     WebElement multiSelect = driver.findElement(By.id("multi"));

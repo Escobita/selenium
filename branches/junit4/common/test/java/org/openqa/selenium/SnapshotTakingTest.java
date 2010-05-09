@@ -20,11 +20,11 @@ package org.openqa.selenium;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class SnapshotTakingTest extends AbstractDriverTestCase {
 
-  public void testShouldTakeSnapshotsOfThePage() throws Exception {
+  @Test public void shouldTakeSnapshotsOfThePage() throws Exception {
     if (!isAbleToTakeSnapshots(driver)) {
       return;
     }
