@@ -12,7 +12,7 @@
   <p>Configuring and Tuning</p>
 </div>
 <p class='toc'>Table Of Contents:</p>
-<div class='maruku_toc'><ul style='list-style: none;'><li><a href='#selenium_grid_main_configuration_file'>Selenium Grid Main Configuration File</a></li><li><a href='#defining_new_environments'>Defining New Environments</a></li><li><a href='#changing_hubs_port'>Changing Hub&#8217;s Port</a></li><li><a href='#changing_hub_selfhealing_parameters'>Changing Hub Self-Healing Parameters</a></li><li><a href='#changing_remote_control_selfhealing_parameters'>Changing Remote Control Self-Healing Parameters</a></li></ul></div>
+<div class='maruku_toc'><ul style='list-style: none;'><li><a href='#selenium_grid_main_configuration_file'>Selenium Grid Main Configuration File</a></li><li><a href='#defining_new_environments'>Defining New Environments</a></li><li><a href='#changing_hubs_port'>Changing Hub&#8217;s Port</a></li><li><a href='#changing_hub_selfhealing_parameters'>Changing Hub Self-Healing Parameters</a></li><li><a href='#changing_remote_control_selfhealing_parameters'>Changing Remote Control Self-Healing Parameters</a></li><li><a href='#changing_maximum_wait_time_for_new_session'>Changing Maximum Wait Time for New Session</a></li></ul></div>
 <h1 id='selenium_grid_main_configuration_file'>Selenium Grid Main Configuration File</h1>
 
 <p>Once you have Selenium Grid up and running, you might want to tweak some of its settings.</p>
@@ -100,4 +100,19 @@
 <p>e.g.</p>
 
 <pre><code>ant -DhubPollerIntervalInSeconds=120 launch-hub  </code></pre>
+
+<h1 id='changing_maximum_wait_time_for_new_session'>Changing Maximum Wait Time for New Session</h1>
+
+<p>By default the Hub will block until a Remote Control becomes available when requesting a new browser session. This can be problematic if the requesting client times out. Since the Hub is unaware of this timeout, it will request the new session anyway and that session will become effectively orphaned.</p>
+
+<p>If your client cannot wait for the session you may change the maximum time the Hub will wait in <code>grid_configuration.yml</code>. When the <code>newSessionMaxWaitTimeInSeconds</code> value is exceeded, the Hub will return an Error indicating that no Remote Controls were available to fulfill the request.</p>
+
+<p>For instance:</p>
+
+<pre><code>  hub:
+     newSessionMaxWaitTimeInSeconds: 120</code></pre>
+
+<p>This sample configuration will instruct the Hub to block for up to 2 minutes while waiting for a Remote Control to become available to handle the new session request.</p>
+
+<p>NB: If this configuration value is not provided, the default value of infinite will be used.</p>
 </body></html>
