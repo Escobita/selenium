@@ -168,6 +168,13 @@ Since a user cannot read text in a hidden element, WebDriver will not allow acce
 However, it is possible to use Javascript execution abilities to call getText directly from the element:
 ((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", ...)
 
+=== Q: How do I start Firefox with an extension installed? ===
+{{{
+FirefoxProfile profile = new FirefoxProfile()
+profile.addExtension(....);
+
+WebDriver driver = new FirefoxDriver(profile);
+}}}
 
 === Q: I'd like it if WebDriver did.... ===
 
