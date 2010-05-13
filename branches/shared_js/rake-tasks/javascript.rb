@@ -90,4 +90,5 @@ def js_to_header(args)
   
   task args[:name] => out
   Rake::Task[args[:name]].out = out
+  Rake::Task["#{args[:name]}.h"].out = out
 end

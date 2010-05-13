@@ -425,6 +425,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\atoms.h"
+				>
+			</File>
+			<File
 				RelativePath=".\cookies.h"
 				>
 			</File>
@@ -441,31 +445,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\atoms\findElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\findElements.h"
-				>
-			</File>
-			<File
 				RelativePath=".\finder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\fire.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\getAttribute.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\getLocation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\getSize.h"
 				>
 			</File>
 			<File
@@ -486,10 +466,6 @@
 			</File>
 			<File
 				RelativePath=".\InternetExplorerDriver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\atoms\isSelected.h"
 				>
 			</File>
 			<File

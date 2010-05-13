@@ -2,6 +2,8 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 
+verbose false
+
 require 'rake-tasks/task-gen'
 require 'rake-tasks/checks'
 require 'rake-tasks/dotnet'
@@ -855,16 +857,16 @@ end
 js_fragment(:name => "findElement", 
             :module => "bot.locators",
             :function => "bot.locators.findElement")
-js_to_header(:name => "findElement",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "find_element",
+             :root => "build/headers",
              :src  => "build/findElement.js")
 
 
 js_fragment(:name => "findElements", 
             :module => "bot.locators",
             :function => "bot.locators.findElements")
-js_to_header(:name => "findElements",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "find_elements",
+             :root => "build/headers",
              :src  => "build/findElements.js")
 
 
@@ -872,72 +874,76 @@ js_fragment(:name => "fire",
             :module => "bot.events",
             :function => "bot.events.fire")
 js_to_header(:name => "fire",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+             :root => "build/headers",
              :src  => "build/fire.js")
 
 
 js_fragment(:name => "getAttribute", 
             :module => "bot.dom",
             :function => "bot.dom.getAttribute")
-js_to_header(:name => "getAttribute",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "get_attribute",
+             :root => "build/headers",
              :src  => "build/getAttribute.js")
 
 
 js_fragment(:name => "getLocation", 
             :module => "goog.style",
             :function => "goog.style.getPageOffset")
-js_to_header(:name => "getLocation",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "get_location",
+             :root => "build/headers",
              :src  => "build/getLocation.js")
 
 
 js_fragment(:name => "getSize", 
             :module => "goog.style",
             :function => "goog.style.getSize")
-js_to_header(:name => "getSize",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "get_size",
+             :root => "build/headers",
              :src  => "build/getSize.js")
 
 js_fragment(:name => "getVisibleText",
             :module => "bot.dom",
             :function => "bot.dom.getVisibleText")
-js_to_header(:name => "getVisibleText",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
-             :src  => "build/getVisibleText.js")            
+js_to_header(:name => "get_visible_text",
+             :root => "build/headers",
+             :src  => "build/getVisibleText.js")
 
 js_fragment(:name => "isDisplayed",
             :module => "bot.dom",
             :function => "bot.dom.isDisplayed")
-js_to_header(:name => "isDisplayed",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "is_displayed",
+             :root => "build/headers",
              :src  => "build/isDisplayed.js")
 
 js_fragment(:name => "isSelected",
             :module => "bot.dom",
             :function => "bot.dom.isSelected")
-js_to_header(:name => "isSelected",
-             :root => "jobbie/src/cpp/InternetExplorerDriver/atoms",
+js_to_header(:name => "is_selected",
+             :root => "build/headers",
              :src  => "build/isSelected.js")
 
 js_fragment(:name => "setSelected",
             :module => "bot.action",
             :function => "bot.action.setSelected")
+js_to_header(:name => "set_selected",
+             :root => "build/headers",
+             :src  => "build/setSelected.js")
 
 js_fragment(:name => "toggle",
             :module => "bot.action",
             :function => "bot.action.toggle")
-
+js_to_header(:name => "toggle",
+             :root => "build/headers",
+             :src  => "build/toggle.js")
 
 # Need atoms for submit (walking, at least), get value of css property
-
 
 js_library(:name => "atoms",
            :srcs => [ "common/src/js/bot/*.js", "common/src/js/bot/locators/locators.js" ])
 
 task :fragments => [
   "build/fire.js", 
-  "build/findElement.js", 
+  "build/findElement.js",
   "build/findElements.js", 
   "build/getAttribute.js", 
   "build/getLocation.js",
@@ -948,17 +954,26 @@ task :fragments => [
   "build/setSelected.js",
   "build/toggle.js"
 ]
-task :headers => [
+file "jobbie/src/cpp/InternetExplorerDriver/atoms.h" => [
   "fire.h", 
-  "findElement.h", 
-  "findElements.h", 
-  "getAttribute.h", 
-  "getLocation.h",
-  "getSize.h",
-  "getVisibleText.h",
-  "isDisplayed.h",
-  "isSelected.h"
-]
+  "find_element.h", 
+  "find_elements.h",
+  "get_attribute.h",
+  "get_location.h",
+  "get_size.h",
+  "get_visible_text.h",
+  "is_displayed.h",
+  "is_selected.h"
+] do |task|
+   File.open('jobbie/src/cpp/InternetExplorerDriver/atoms.h', 'w') do |f|
+    task.prerequisites.each do |req|
+      source = Rake::Task[req].out
+      f << IO.read(source) + "\n"         
+    end
+  end
+end
+
 task :ie_win32_dll => :headers
 task :ie_x64_dll => :headers
 
+task :headers => [ 'jobbie/src/cpp/InternetExplorerDriver/atoms.h' ]

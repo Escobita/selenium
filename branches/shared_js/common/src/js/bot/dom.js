@@ -262,7 +262,7 @@ bot.dom.isBlockLevel_ = function(node) {
  * @param {Node} node Node to get text from.
  * @param {string} toReturn The value that will ultimately be sent to the user.
  * @param {string} textSoFar The current fragment of text.
- * @retrun {Array.<string>} A tuple of the ultimate text to return, the current
+ * @return {Array.<string>} A tuple of the ultimate text to return, the current
  *     fragment to append and a space that may be needed.
  * @private
  */

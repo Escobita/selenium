@@ -25,7 +25,7 @@ limitations under the License.
 #include "cookies.h"
 #include "utils.h"
 #include "IEReturnTypes.h"
-#include "atoms/getAttribute.h"
+#include "atoms.h"
 #include <stdio.h>
 #include <iostream>
 #include <string>
