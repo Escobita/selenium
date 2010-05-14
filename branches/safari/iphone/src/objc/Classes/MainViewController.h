@@ -17,7 +17,7 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
-#import "WebViewController.h"
+#import "WebViewControllerIPhone.h"
 
 // |MainViewController| is the |UIViewController| responsible for the main
 // view. The view contains a |UIWebView and a |UILabel| for status display.
@@ -25,11 +25,11 @@
 // [MainViewController sharedInstance];
 // The UI element definitions are contained in MainView.xib.
 @interface MainViewController : UIViewController {
-  IBOutlet WebViewController *webViewController;
+  IBOutlet WebViewControllerIPhone *webViewController;
   IBOutlet UILabel *statusLabel_;
 }
 
-@property (nonatomic, retain) WebViewController *webViewController;
+@property (nonatomic, retain) WebViewControllerIPhone *webViewController;
 
 // Set the current status text.
 - (void)describeLastAction:(NSString *)status;
