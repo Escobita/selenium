@@ -88,14 +88,13 @@
 		CABAC8BB118AB695008C2EA9 /* NSURLRequest+IgnoreSSL.m in Sources */ = {isa = PBXBuildFile; fileRef = D8432AD5114273FD00F2A242 /* NSURLRequest+IgnoreSSL.m */; };
 		CABAC8BC118AB696008C2EA9 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FD90B64E111690D500BE94EA /* NSString+SBJSON.m */; };
 		CABAC8BD118AB697008C2EA9 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FD90B64C111690D500BE94EA /* NSObject+SBJSON.m */; };
-		CABAC8BE118AB699008C2EA9 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 280E754C0DD40C5E005A515E /* MainWindow.xib */; };
-		CABAC8BF118AB69B008C2EA9 /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8399863B0EE3A2E70074D106 /* MainView.xib */; };
 		CABAC8C1118AB69D008C2EA9 /* iWebDriverAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* iWebDriverAppDelegate.m */; };
 		CABAC8C2118AB69F008C2EA9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 833103FC0F1D7F57000A38DB /* Info.plist */; };
 		CABAC8C3118AB6A0008C2EA9 /* HTTPVirtualDirectory+AccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8361602B0EF72F190028DAE5 /* HTTPVirtualDirectory+AccessViewController.m */; };
 		D87B2371118786B7001ED3DE /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D87B2370118786B7001ED3DE /* WebViewController.m */; };
 		D8851F741142A4B1005013C8 /* WebViewControllerSingleton.m in Sources */ = {isa = PBXBuildFile; fileRef = D8851F731142A4B1005013C8 /* WebViewControllerSingleton.m */; };
 		D8B93798114B9852006F8CE8 /* Session+ExecuteScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B334B0F14254C00F72BC4 /* Session+ExecuteScript.m */; };
+		D8D373E4119D884300C69970 /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8399863B0EE3A2E70074D106 /* MainView.xib */; };
 		D8D640A01143123600C72A5D /* WebDriverResource.m in Sources */ = {isa = PBXBuildFile; fileRef = 835DF5D60F00C65600F3DD80 /* WebDriverResource.m */; };
 		D8D640AC1143125F00C72A5D /* Element.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33780F142CE800F72BC4 /* Element.m */; };
 		D8D640AD1143126500C72A5D /* ElementStore+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B33740F14286600F72BC4 /* ElementStore+FindElement.m */; };
@@ -659,9 +658,8 @@
 				CABAC8B2118AB67F008C2EA9 /* FlipsideView.xib in Resources */,
 				CABAC8B5118AB68D008C2EA9 /* Settings.bundle in Resources */,
 				CABAC8B6118AB68F008C2EA9 /* selenium-icon.png in Resources */,
-				CABAC8BE118AB699008C2EA9 /* MainWindow.xib in Resources */,
-				CABAC8BF118AB69B008C2EA9 /* MainView.xib in Resources */,
 				CABAC8C2118AB69F008C2EA9 /* Info.plist in Resources */,
+				D8D373E4119D884300C69970 /* MainView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

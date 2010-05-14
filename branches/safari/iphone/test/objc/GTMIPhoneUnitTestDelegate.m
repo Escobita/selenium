@@ -54,6 +54,26 @@ static int MethodSort(const void *a, const void *b) {
   return iscase;
 }
 
+- (void)verifyThatImStillTheDelegate
+{
+    // see http://jamesmoorecode.blogspot.com/2009/04/gtm-test-suite-for-iphone-figuring-out.html
+    if ([[UIApplication sharedApplication] delegate] != self) {
+        for(int i = 0; i < 5; ++i) NSLog(@"!!!!!!");
+        NSLog(@"!!!!!Warning: Someone overwrote GTMIPhoneUnitTestDelegate as UIApplication delegate. Did you add MainWindow.xib to the test target?");
+        for(int i = 0; i < 5; ++i) NSLog(@"!!!!!!");
+    }
+}
+
+- (id) init
+{
+    self = [super init];
+    if (self != nil) {
+        [self performSelector:@selector(verifyThatImStillTheDelegate) withObject:nil afterDelay:0.1];
+    }
+    return self;
+}
+
+
 // Run through all the registered classes and run test methods on any
 // that are subclasses of SenTestCase. Terminate the application upon
 // test completion.
