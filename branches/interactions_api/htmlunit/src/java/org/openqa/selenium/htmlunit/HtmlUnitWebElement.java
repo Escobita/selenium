@@ -878,4 +878,35 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   public WebDriver getWrappedDriver() {
     return parent;
   }
+
+  public void doubleClick() {
+    //TODO(eran.mes): Remember the state of modifier keys and send the correct state
+    // to the dblClick method.
+    try {
+      getElement().dblClick();
+    } catch (IOException e) {
+      //TODO(eran.mes): What should we do in case of error?
+      e.printStackTrace();
+    }
+  }
+
+  public void mouseDown() {
+    getElement().mouseDown();
+  }
+
+  public void mouseUp() {
+    getElement().mouseMove();
+    getElement().mouseOver();
+    getElement().mouseUp();
+  }
+
+  public void moveToHere() {
+    getElement().mouseMove();
+    getElement().mouseOver();
+  }
+
+  public void leaveHere() {
+    getElement().mouseOut();
+    getElement().mouseMove();
+  }
 }

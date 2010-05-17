@@ -78,6 +78,7 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Keyboard;
+import org.openqa.selenium.internal.Mouse;
 import org.openqa.selenium.internal.ReturnedCookie;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -393,6 +394,10 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
   public Keyboard getKeyboard() {
     return new HtmlUnitKeyboard();
+  }
+
+  public Mouse getMouse() {
+    return new HtmlUnitMouse();
   }
 
   protected interface JavaScriptResultsCollection {

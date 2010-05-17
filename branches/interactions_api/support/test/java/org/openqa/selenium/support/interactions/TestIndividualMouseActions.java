@@ -54,4 +54,14 @@ public class TestIndividualMouseActions extends MockObjectTestCase {
     action.perform();
   }
 
+  public void testMouseMoveAction() {
+    final WebElement dummyToElement = mock(WebElement.class, "to");
+    checking(new Expectations() {{
+      one(dummyMouse).mouseMove(dummyElement, dummyToElement);
+    }});
+
+    MouseMoveAction action = new MouseMoveAction(dummyMouse, dummyElement, dummyToElement);
+    action.perform();
+  }
+
 }

@@ -43,6 +43,8 @@ public class Pages {
   public String errorsPage;
   public String dynamicPage;
   public String slowIframes;
+  public String draggableLists;
+  public String droppableItems;
 
   public Pages(AppServer appServer) {
     simpleTestPage = appServer.whereIs("simpleTest.html");
@@ -68,5 +70,7 @@ public class Pages {
     errorsPage = appServer.whereIs("errors.html");
     dynamicPage = appServer.whereIs("dynamic.html");
     slowIframes = appServer.whereIs("slow_loading_iframes.html");
+    draggableLists = appServer.whereIs("draggableLists.html");
+    droppableItems = appServer.whereIs("droppableItems.html");
   }
 }

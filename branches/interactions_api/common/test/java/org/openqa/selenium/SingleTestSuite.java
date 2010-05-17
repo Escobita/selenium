@@ -56,7 +56,7 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("TestBasicKeyboardInterface")
+        .onlyRun("TestBasicMouseInterface")
 //        .method("testShouldImplicitlyWaitUntilAtLeastOneElementIsFoundWhenSearchingForMany")
         .exclude(ALL)
         .exclude(Ignore.Driver.REMOTE)
