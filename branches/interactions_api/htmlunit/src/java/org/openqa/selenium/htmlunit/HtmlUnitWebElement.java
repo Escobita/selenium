@@ -901,6 +901,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   public void moveToHere() {
+    System.out.println(String.format("Element coordinates: left: %d top: %d right: %d bottom: %d",
+        readAndRound("left"), readAndRound("top"), readAndRound("right"), readAndRound("bottom")));
+    System.out.println(this.toString());
     getElement().mouseMove();
     getElement().mouseOver();
   }
@@ -908,5 +911,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   public void leaveHere() {
     getElement().mouseOut();
     getElement().mouseMove();
+  }
+
+  public void mouseContextClick() {
+    getElement().rightClick();
   }
 }

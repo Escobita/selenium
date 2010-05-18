@@ -28,7 +28,7 @@ public class HtmlUnitMouse implements Mouse {
   }
 
   public void mouseMove(WebElement fromElement, WebElement toElement) {
-    ((HtmlUnitWebElement) fromElement).leaveHere();
+    //((HtmlUnitWebElement) fromElement).leaveHere();
 
     HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) toElement;
     htmlElem.moveToHere();
@@ -40,6 +40,7 @@ public class HtmlUnitMouse implements Mouse {
   }
 
   public void contextClick(WebElement onElement) {
-    throw new UnsupportedOperationException("Right-click not supported for now.");
+    HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
+    htmlElem.mouseContextClick();
   }
 }
