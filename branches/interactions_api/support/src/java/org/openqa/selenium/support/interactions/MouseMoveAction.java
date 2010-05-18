@@ -8,17 +8,15 @@ import org.openqa.selenium.internal.Mouse;
  */
 public class MouseMoveAction implements Action {
   private final Mouse mouse;
-  private final WebElement fromElement;
   private final WebElement toElement;
 
-  public MouseMoveAction(Mouse mouse, WebElement fromElement, WebElement toElement) {
+  public MouseMoveAction(Mouse mouse, WebElement toElement) {
     this.mouse = mouse;
-    this.fromElement = fromElement;
     this.toElement = toElement;
   }
 
 
   public void perform() {
-    mouse.mouseMove(fromElement, toElement);
+    mouse.mouseMove(toElement);
   }
 }

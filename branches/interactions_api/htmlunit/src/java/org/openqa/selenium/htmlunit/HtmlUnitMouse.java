@@ -27,9 +27,7 @@ public class HtmlUnitMouse implements Mouse {
     htmlElem.mouseUp();
   }
 
-  public void mouseMove(WebElement fromElement, WebElement toElement) {
-    //((HtmlUnitWebElement) fromElement).leaveHere();
-
+  public void mouseMove(WebElement toElement) {
     HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) toElement;
     htmlElem.moveToHere();
   }

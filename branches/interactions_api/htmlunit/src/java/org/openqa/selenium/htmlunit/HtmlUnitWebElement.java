@@ -895,8 +895,6 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   public void mouseUp() {
-    getElement().mouseMove();
-    getElement().mouseOver();
     getElement().mouseUp();
   }
 
