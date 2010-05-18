@@ -13,9 +13,9 @@ public class TestCompositeAction extends MockObjectTestCase {
     final Action dummyAction2 = mock(Action.class, "dummy2");
     final Action dummyAction3 = mock(Action.class, "dummy3");
 
-    sequence.addAction(dummyAction1);
-    sequence.addAction(dummyAction2);
-    sequence.addAction(dummyAction3);
+    sequence.addAction(dummyAction1)
+        .addAction(dummyAction2)
+        .addAction(dummyAction3);
     
     assertEquals(3, sequence.getNumberOfActions());
   }

@@ -15,8 +15,9 @@ public class CompositeAction implements Action {
     }
   }
 
-  public void addAction(Action action) {
+  public CompositeAction addAction(Action action) {
     actionsList.add(action);
+    return this;
   }
 
   public int getNumberOfActions() {
