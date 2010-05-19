@@ -17,7 +17,7 @@
 //  limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "PlatformSpecificDefs.h"
 
 @class HTTPServer;
 @class WebViewController;

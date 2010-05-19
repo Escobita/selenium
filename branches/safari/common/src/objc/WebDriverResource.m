@@ -19,7 +19,6 @@
 #import "WebDriverResource.h"
 #import "WebDriverResponse.h"
 #import "NSString+SBJSON.h"
-#import "MainViewController.h"
 #import "errorcodes.h"
 
 @implementation WebDriverResource
@@ -229,7 +228,7 @@
                                                       signature:methodSignature
                                                       arguments:arguments];
 
-  [[MainViewController sharedInstance]
+  [[WebViewController sharedInstance]
    describeLastAction:NSStringFromSelector(selector)];
   
   // Finally call the invocation and create a response from it.

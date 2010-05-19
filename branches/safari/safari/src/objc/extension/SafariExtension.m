@@ -25,10 +25,9 @@
 - (void)gotWebView:(WebView*)webView {
   if (!loaded_) {
     loaded_ = true;
-    NSLog(@"SafariDriver init");
+    NSLog(@"SafariDriver init (WebView located!)");
+    [[SafariWebViewController sharedInstance] initWithWebView:webView];
   }
-  [[WebViewController sharedInstance] setWebView:webView];
-  NSLog(@"WebView located!");
 }
 
 - (void)onWebViewLoaded:(NSNotification*)n {

@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Webkit/Webkit.h>
-#import "WebViewController.h"
+#import "SafariWebViewController.h"
 
 @interface SafariExtension : NSObject {
   bool loaded_;

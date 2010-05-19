@@ -6,7 +6,9 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
+#ifdef TARGET_OS_IPHONE
 #import <sqlite3.h>
+#endif
 #import "WebDriverUtilities.h"
 
 @implementation WebDriverUtilities
@@ -42,6 +44,9 @@
 }
 
 + (void)cleanDatabases{
+
+// TODO(kurniady): Implement the equivalent for Safari
+#ifdef TARGET_OS_IPHONE
   // We refer to the logic in webkit/trunk/WebKit/Storage/* Revison 41563
   // (e.g., WebDatabaseManager.mm) and webkit/trunk/WebCore/Storage/* Revision
   // 41578 (e.g., DatabaseTracker.cpp).
@@ -100,6 +105,7 @@
     NSLog(@"Delete database file %@", path);
     [fm removeItemAtPath:path error:nil];
   } 
-}
+#endif
 
+}
 @end

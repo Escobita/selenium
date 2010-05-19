@@ -44,7 +44,7 @@
     [webViewController_ release];
     webViewController_ = 0;
   }
-  webViewController_ = [[WebViewController alloc] initWithWebView:[self webView]];
+  webViewController_ = [[WebViewController sharedInstance] initWithWebView:[self webView]];
   webViewController_.delegate = self;
   [[self webView] setScalesPageToFit:NO];
   [[self webView] setDelegate:self];

@@ -8,37 +8,39 @@
 
 /* Begin PBXBuildFile section */
 		CA5A68AE110825E500BF1BC8 /* SafariExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6873110825E500BF1BC8 /* SafariExtension.m */; };
-		CA5A68AF110825E500BF1BC8 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6875110825E500BF1BC8 /* WebViewController.m */; };
-		CA5A68B0110825E500BF1BC8 /* Attribute.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6878110825E500BF1BC8 /* Attribute.m */; };
-		CA5A68B1110825E500BF1BC8 /* Context+ExecuteScript.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A687A110825E500BF1BC8 /* Context+ExecuteScript.m */; };
-		CA5A68B2110825E500BF1BC8 /* Context.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A687C110825E500BF1BC8 /* Context.m */; };
-		CA5A68B3110825E500BF1BC8 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = CA5A687D110825E500BF1BC8 /* COPYING */; };
-		CA5A68B4110825E500BF1BC8 /* Element+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A687F110825E500BF1BC8 /* Element+FindElement.m */; };
-		CA5A68B5110825E500BF1BC8 /* Element.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6881110825E500BF1BC8 /* Element.m */; };
-		CA5A68B6110825E500BF1BC8 /* ElementStore+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6883110825E500BF1BC8 /* ElementStore+FindElement.m */; };
-		CA5A68B7110825E500BF1BC8 /* ElementStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6885110825E500BF1BC8 /* ElementStore.m */; };
-		CA5A68B8110825E500BF1BC8 /* HTTPJSONResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6887110825E500BF1BC8 /* HTTPJSONResponse.m */; };
-		CA5A68B9110825E500BF1BC8 /* HTTPPNGResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6889110825E500BF1BC8 /* HTTPPNGResponse.m */; };
-		CA5A68BA110825E500BF1BC8 /* HTTPResponse+Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A688B110825E500BF1BC8 /* HTTPResponse+Utility.m */; };
-		CA5A68BB110825E500BF1BC8 /* HTTPServerController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A688D110825E500BF1BC8 /* HTTPServerController.m */; };
-		CA5A68BC110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A688F110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.m */; };
-		CA5A68BD110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6891110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.m */; };
-		CA5A68BE110825E500BF1BC8 /* JSONRESTResource.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6894110825E500BF1BC8 /* JSONRESTResource.m */; };
-		CA5A68C0110825E500BF1BC8 /* NSException+WebDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6897110825E500BF1BC8 /* NSException+WebDriver.m */; };
-		CA5A68C1110825E500BF1BC8 /* RESTServiceMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6899110825E500BF1BC8 /* RESTServiceMapping.m */; };
-		CA5A68C2110825E500BF1BC8 /* selenium-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CA5A689A110825E500BF1BC8 /* selenium-icon.png */; };
-		CA5A68C3110825E500BF1BC8 /* Session.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A689C110825E500BF1BC8 /* Session.m */; };
-		CA5A68C4110825E500BF1BC8 /* UIResponder+SimulateTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A689E110825E500BF1BC8 /* UIResponder+SimulateTouch.m */; };
-		CA5A68C5110825E500BF1BC8 /* WebDriverHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68A0110825E500BF1BC8 /* WebDriverHTTPConnection.m */; };
-		CA5A68C6110825E500BF1BC8 /* WebDriverHTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68A2110825E500BF1BC8 /* WebDriverHTTPServer.m */; };
-		CA5A68C7110825E500BF1BC8 /* WebDriverPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68A4110825E500BF1BC8 /* WebDriverPreferences.m */; };
-		CA5A68C8110825E500BF1BC8 /* WebDriverRequestFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68A6110825E500BF1BC8 /* WebDriverRequestFetcher.m */; };
-		CA5A68C9110825E500BF1BC8 /* WebDriverResource.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68A8110825E500BF1BC8 /* WebDriverResource.m */; };
-		CA5A68CA110825E500BF1BC8 /* WebDriverResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68AA110825E500BF1BC8 /* WebDriverResponse.m */; };
-		CA5A68CB110825E500BF1BC8 /* WebDriverUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A68AC110825E500BF1BC8 /* WebDriverUtilities.m */; };
+		CA5A68AF110825E500BF1BC8 /* SafariWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA5A6875110825E500BF1BC8 /* SafariWebViewController.m */; };
 		CA5A68D81108262400BF1BC8 /* libCocoaHTTPServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5A68D71108261D00BF1BC8 /* libCocoaHTTPServer.a */; };
 		CA5A69231108360500BF1BC8 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5A69221108360500BF1BC8 /* WebKit.framework */; };
 		CA5DFD941112BD6600DCE78D /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5DFD671112BD0F00DCE78D /* libjson.a */; };
+		CA707DEA11A3CF7200646473 /* Attribute.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DB211A3CF7200646473 /* Attribute.m */; };
+		CA707DEB11A3CF7200646473 /* Cookie.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DB411A3CF7200646473 /* Cookie.m */; };
+		CA707DEC11A3CF7200646473 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = CA707DB511A3CF7200646473 /* COPYING */; };
+		CA707DED11A3CF7200646473 /* Element+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DB711A3CF7200646473 /* Element+FindElement.m */; };
+		CA707DEE11A3CF7200646473 /* Element.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DB911A3CF7200646473 /* Element.m */; };
+		CA707DEF11A3CF7200646473 /* ElementStore+FindElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DBB11A3CF7200646473 /* ElementStore+FindElement.m */; };
+		CA707DF011A3CF7200646473 /* ElementStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DBD11A3CF7200646473 /* ElementStore.m */; };
+		CA707DF111A3CF7200646473 /* HTTPJSONResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DBF11A3CF7200646473 /* HTTPJSONResponse.m */; };
+		CA707DF211A3CF7200646473 /* HTTPResponse+Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DC211A3CF7200646473 /* HTTPResponse+Utility.m */; };
+		CA707DF311A3CF7200646473 /* HTTPServerController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DC411A3CF7200646473 /* HTTPServerController.m */; };
+		CA707DF411A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DC611A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.m */; };
+		CA707DF511A3CF7200646473 /* HTTPVirtualDirectory+Remove.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DC811A3CF7200646473 /* HTTPVirtualDirectory+Remove.m */; };
+		CA707DF611A3CF7200646473 /* JSONRESTResource.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DCB11A3CF7200646473 /* JSONRESTResource.m */; };
+		CA707DF711A3CF7200646473 /* NSException+WebDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DCD11A3CF7200646473 /* NSException+WebDriver.m */; };
+		CA707DF811A3CF7200646473 /* NSURLRequest+IgnoreSSL.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DCF11A3CF7200646473 /* NSURLRequest+IgnoreSSL.m */; };
+		CA707DF911A3CF7200646473 /* RESTServiceMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DD111A3CF7200646473 /* RESTServiceMapping.m */; };
+		CA707DFA11A3CF7200646473 /* Session+ExecuteScript.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DD311A3CF7200646473 /* Session+ExecuteScript.m */; };
+		CA707DFB11A3CF7200646473 /* Session.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DD511A3CF7200646473 /* Session.m */; };
+		CA707DFC11A3CF7200646473 /* SessionRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DD711A3CF7200646473 /* SessionRoot.m */; };
+		CA707DFE11A3CF7200646473 /* WebDriverHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DDB11A3CF7200646473 /* WebDriverHTTPConnection.m */; };
+		CA707DFF11A3CF7200646473 /* WebDriverHTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DDD11A3CF7200646473 /* WebDriverHTTPServer.m */; };
+		CA707E0011A3CF7200646473 /* WebDriverPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DDF11A3CF7200646473 /* WebDriverPreferences.m */; };
+		CA707E0111A3CF7200646473 /* WebDriverRequestFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE111A3CF7200646473 /* WebDriverRequestFetcher.m */; };
+		CA707E0211A3CF7200646473 /* WebDriverResource.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE311A3CF7200646473 /* WebDriverResource.m */; };
+		CA707E0311A3CF7200646473 /* WebDriverResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE511A3CF7200646473 /* WebDriverResponse.m */; };
+		CA707E0411A3CF7200646473 /* WebDriverUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE711A3CF7200646473 /* WebDriverUtilities.m */; };
+		CA707E0511A3CF7200646473 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE911A3CF7200646473 /* WebViewController.m */; };
+		CA707FE611A3D86D00646473 /* HTTPPNGResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707FE511A3D86D00646473 /* HTTPPNGResponse.m */; };
+		CA70801011A3DBCC00646473 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA70800F11A3DBCC00646473 /* QuartzCore.framework */; };
 		D8F6C985110D6B19009DADFF /* BundleInjector.m in Sources */ = {isa = PBXBuildFile; fileRef = D8F6C984110D6B19009DADFF /* BundleInjector.m */; };
 		D8F6CA48110D6C5D009DADFF /* BundleInjector.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = D8F6C97E110D6AE8009DADFF /* BundleInjector.dylib */; };
 		D8F6CBE5110E596E009DADFF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F6CBE4110E596E009DADFF /* libcrypto.dylib */; };
@@ -56,42 +58,42 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 53D229810C96121600276605 /* JSON.framework */;
+			remoteGlobalIDString = 53D229810C96121600276605;
 			remoteInfo = JSON;
 		};
 		CA5DFD641112BD0F00DCE78D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 53D2298D0C96122A00276605 /* Tests.octest */;
+			remoteGlobalIDString = 53D2298D0C96122A00276605;
 			remoteInfo = Tests;
 		};
 		CA5DFD661112BD0F00DCE78D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = FE2BBD800D8B0D3900184787 /* libjson.a */;
+			remoteGlobalIDString = FE2BBD800D8B0D3900184787;
 			remoteInfo = libjson;
 		};
 		CA5DFD681112BD0F00DCE78D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = FE2BBDAB0D8B0EE000184787 /* libjsontests.octest */;
+			remoteGlobalIDString = FE2BBDAB0D8B0EE000184787;
 			remoteInfo = libjsontests;
 		};
 		CA5DFD6A1112BD0F00DCE78D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 53EF4D400DC247B3005F5E6D /* bench */;
+			remoteGlobalIDString = 53EF4D400DC247B3005F5E6D;
 			remoteInfo = bench;
 		};
 		CA5DFDC11112BEEC00DCE78D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = FE2BBD7F0D8B0D3900184787 /* libjson */;
+			remoteGlobalIDString = FE2BBD7F0D8B0D3900184787;
 			remoteInfo = libjson;
 		};
 		D8F6C62C110C970A009DADFF /* PBXContainerItemProxy */ = {
@@ -119,65 +121,72 @@
 /* Begin PBXFileReference section */
 		CA5A6872110825E500BF1BC8 /* SafariExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafariExtension.h; sourceTree = "<group>"; };
 		CA5A6873110825E500BF1BC8 /* SafariExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafariExtension.m; sourceTree = "<group>"; };
-		CA5A6874110825E500BF1BC8 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
-		CA5A6875110825E500BF1BC8 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
-		CA5A6877110825E500BF1BC8 /* Attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Attribute.h; sourceTree = "<group>"; };
-		CA5A6878110825E500BF1BC8 /* Attribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Attribute.m; sourceTree = "<group>"; };
-		CA5A6879110825E500BF1BC8 /* Context+ExecuteScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Context+ExecuteScript.h"; sourceTree = "<group>"; };
-		CA5A687A110825E500BF1BC8 /* Context+ExecuteScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Context+ExecuteScript.m"; sourceTree = "<group>"; };
-		CA5A687B110825E500BF1BC8 /* Context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Context.h; sourceTree = "<group>"; };
-		CA5A687C110825E500BF1BC8 /* Context.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Context.m; sourceTree = "<group>"; };
-		CA5A687D110825E500BF1BC8 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
-		CA5A687E110825E500BF1BC8 /* Element+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Element+FindElement.h"; sourceTree = "<group>"; };
-		CA5A687F110825E500BF1BC8 /* Element+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Element+FindElement.m"; sourceTree = "<group>"; };
-		CA5A6880110825E500BF1BC8 /* Element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Element.h; sourceTree = "<group>"; };
-		CA5A6881110825E500BF1BC8 /* Element.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Element.m; sourceTree = "<group>"; };
-		CA5A6882110825E500BF1BC8 /* ElementStore+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ElementStore+FindElement.h"; sourceTree = "<group>"; };
-		CA5A6883110825E500BF1BC8 /* ElementStore+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ElementStore+FindElement.m"; sourceTree = "<group>"; };
-		CA5A6884110825E500BF1BC8 /* ElementStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementStore.h; sourceTree = "<group>"; };
-		CA5A6885110825E500BF1BC8 /* ElementStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ElementStore.m; sourceTree = "<group>"; };
-		CA5A6886110825E500BF1BC8 /* HTTPJSONResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPJSONResponse.h; sourceTree = "<group>"; };
-		CA5A6887110825E500BF1BC8 /* HTTPJSONResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPJSONResponse.m; sourceTree = "<group>"; };
-		CA5A6888110825E500BF1BC8 /* HTTPPNGResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPPNGResponse.h; sourceTree = "<group>"; };
-		CA5A6889110825E500BF1BC8 /* HTTPPNGResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPPNGResponse.m; sourceTree = "<group>"; };
-		CA5A688A110825E500BF1BC8 /* HTTPResponse+Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPResponse+Utility.h"; sourceTree = "<group>"; };
-		CA5A688B110825E500BF1BC8 /* HTTPResponse+Utility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HTTPResponse+Utility.m"; sourceTree = "<group>"; };
-		CA5A688C110825E500BF1BC8 /* HTTPServerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPServerController.h; sourceTree = "<group>"; };
-		CA5A688D110825E500BF1BC8 /* HTTPServerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPServerController.m; sourceTree = "<group>"; };
-		CA5A688E110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPVirtualDirectory+AccessViewController.h"; sourceTree = "<group>"; };
-		CA5A688F110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HTTPVirtualDirectory+AccessViewController.m"; sourceTree = "<group>"; };
-		CA5A6890110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HTTPVirtualDirectory+Remove.h"; sourceTree = "<group>"; };
-		CA5A6891110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HTTPVirtualDirectory+Remove.m"; sourceTree = "<group>"; };
-		CA5A6892110825E500BF1BC8 /* iWebDriver_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iWebDriver_Prefix.pch; sourceTree = "<group>"; };
-		CA5A6893110825E500BF1BC8 /* JSONRESTResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONRESTResource.h; sourceTree = "<group>"; };
-		CA5A6894110825E500BF1BC8 /* JSONRESTResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONRESTResource.m; sourceTree = "<group>"; };
-		CA5A6896110825E500BF1BC8 /* NSException+WebDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSException+WebDriver.h"; sourceTree = "<group>"; };
-		CA5A6897110825E500BF1BC8 /* NSException+WebDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSException+WebDriver.m"; sourceTree = "<group>"; };
-		CA5A6898110825E500BF1BC8 /* RESTServiceMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RESTServiceMapping.h; sourceTree = "<group>"; };
-		CA5A6899110825E500BF1BC8 /* RESTServiceMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RESTServiceMapping.m; sourceTree = "<group>"; };
-		CA5A689A110825E500BF1BC8 /* selenium-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selenium-icon.png"; sourceTree = "<group>"; };
-		CA5A689B110825E500BF1BC8 /* Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Session.h; sourceTree = "<group>"; };
-		CA5A689C110825E500BF1BC8 /* Session.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Session.m; sourceTree = "<group>"; };
-		CA5A689D110825E500BF1BC8 /* UIResponder+SimulateTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIResponder+SimulateTouch.h"; sourceTree = "<group>"; };
-		CA5A689E110825E500BF1BC8 /* UIResponder+SimulateTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIResponder+SimulateTouch.m"; sourceTree = "<group>"; };
-		CA5A689F110825E500BF1BC8 /* WebDriverHTTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverHTTPConnection.h; sourceTree = "<group>"; };
-		CA5A68A0110825E500BF1BC8 /* WebDriverHTTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverHTTPConnection.m; sourceTree = "<group>"; };
-		CA5A68A1110825E500BF1BC8 /* WebDriverHTTPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverHTTPServer.h; sourceTree = "<group>"; };
-		CA5A68A2110825E500BF1BC8 /* WebDriverHTTPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverHTTPServer.m; sourceTree = "<group>"; };
-		CA5A68A3110825E500BF1BC8 /* WebDriverPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverPreferences.h; sourceTree = "<group>"; };
-		CA5A68A4110825E500BF1BC8 /* WebDriverPreferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverPreferences.m; sourceTree = "<group>"; };
-		CA5A68A5110825E500BF1BC8 /* WebDriverRequestFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverRequestFetcher.h; sourceTree = "<group>"; };
-		CA5A68A6110825E500BF1BC8 /* WebDriverRequestFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverRequestFetcher.m; sourceTree = "<group>"; };
-		CA5A68A7110825E500BF1BC8 /* WebDriverResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverResource.h; sourceTree = "<group>"; };
-		CA5A68A8110825E500BF1BC8 /* WebDriverResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverResource.m; sourceTree = "<group>"; };
-		CA5A68A9110825E500BF1BC8 /* WebDriverResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverResponse.h; sourceTree = "<group>"; };
-		CA5A68AA110825E500BF1BC8 /* WebDriverResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverResponse.m; sourceTree = "<group>"; };
-		CA5A68AB110825E500BF1BC8 /* WebDriverUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverUtilities.h; sourceTree = "<group>"; };
-		CA5A68AC110825E500BF1BC8 /* WebDriverUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverUtilities.m; sourceTree = "<group>"; };
+		CA5A6874110825E500BF1BC8 /* SafariWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafariWebViewController.h; sourceTree = "<group>"; };
+		CA5A6875110825E500BF1BC8 /* SafariWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafariWebViewController.m; sourceTree = "<group>"; };
 		CA5A68CF1108261D00BF1BC8 /* CocoaHTTPServerLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CocoaHTTPServerLibrary.xcodeproj; path = "lib/buildtime-src/cocoahttpserver/CocoaHTTPServerLibrary.xcodeproj"; sourceTree = "<group>"; };
 		CA5A6906110833FB00BF1BC8 /* SafariExtension.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafariExtension.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA5A69221108360500BF1BC8 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CA5DFD561112BD0F00DCE78D /* JSON.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JSON.xcodeproj; path = "lib/buildtime-src/json-framework/project/JSON.xcodeproj"; sourceTree = "<group>"; };
+		CA707DB111A3CF7200646473 /* Attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Attribute.h; path = ../common/src/objc/Attribute.h; sourceTree = SOURCE_ROOT; };
+		CA707DB211A3CF7200646473 /* Attribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Attribute.m; path = ../common/src/objc/Attribute.m; sourceTree = SOURCE_ROOT; };
+		CA707DB311A3CF7200646473 /* Cookie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Cookie.h; path = ../common/src/objc/Cookie.h; sourceTree = SOURCE_ROOT; };
+		CA707DB411A3CF7200646473 /* Cookie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Cookie.m; path = ../common/src/objc/Cookie.m; sourceTree = SOURCE_ROOT; };
+		CA707DB511A3CF7200646473 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = COPYING; path = ../common/src/objc/COPYING; sourceTree = SOURCE_ROOT; };
+		CA707DB611A3CF7200646473 /* Element+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Element+FindElement.h"; path = "../common/src/objc/Element+FindElement.h"; sourceTree = SOURCE_ROOT; };
+		CA707DB711A3CF7200646473 /* Element+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Element+FindElement.m"; path = "../common/src/objc/Element+FindElement.m"; sourceTree = SOURCE_ROOT; };
+		CA707DB811A3CF7200646473 /* Element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Element.h; path = ../common/src/objc/Element.h; sourceTree = SOURCE_ROOT; };
+		CA707DB911A3CF7200646473 /* Element.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Element.m; path = ../common/src/objc/Element.m; sourceTree = SOURCE_ROOT; };
+		CA707DBA11A3CF7200646473 /* ElementStore+FindElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ElementStore+FindElement.h"; path = "../common/src/objc/ElementStore+FindElement.h"; sourceTree = SOURCE_ROOT; };
+		CA707DBB11A3CF7200646473 /* ElementStore+FindElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "ElementStore+FindElement.m"; path = "../common/src/objc/ElementStore+FindElement.m"; sourceTree = SOURCE_ROOT; };
+		CA707DBC11A3CF7200646473 /* ElementStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElementStore.h; path = ../common/src/objc/ElementStore.h; sourceTree = SOURCE_ROOT; };
+		CA707DBD11A3CF7200646473 /* ElementStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ElementStore.m; path = ../common/src/objc/ElementStore.m; sourceTree = SOURCE_ROOT; };
+		CA707DBE11A3CF7200646473 /* HTTPJSONResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTTPJSONResponse.h; path = ../common/src/objc/HTTPJSONResponse.h; sourceTree = SOURCE_ROOT; };
+		CA707DBF11A3CF7200646473 /* HTTPJSONResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTTPJSONResponse.m; path = ../common/src/objc/HTTPJSONResponse.m; sourceTree = SOURCE_ROOT; };
+		CA707DC011A3CF7200646473 /* HTTPPNGResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTTPPNGResponse.h; path = ../common/src/objc/HTTPPNGResponse.h; sourceTree = SOURCE_ROOT; };
+		CA707DC111A3CF7200646473 /* HTTPResponse+Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "HTTPResponse+Utility.h"; path = "../common/src/objc/HTTPResponse+Utility.h"; sourceTree = SOURCE_ROOT; };
+		CA707DC211A3CF7200646473 /* HTTPResponse+Utility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "HTTPResponse+Utility.m"; path = "../common/src/objc/HTTPResponse+Utility.m"; sourceTree = SOURCE_ROOT; };
+		CA707DC311A3CF7200646473 /* HTTPServerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTTPServerController.h; path = ../common/src/objc/HTTPServerController.h; sourceTree = SOURCE_ROOT; };
+		CA707DC411A3CF7200646473 /* HTTPServerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTTPServerController.m; path = ../common/src/objc/HTTPServerController.m; sourceTree = SOURCE_ROOT; };
+		CA707DC511A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "HTTPVirtualDirectory+AccessViewController.h"; path = "../common/src/objc/HTTPVirtualDirectory+AccessViewController.h"; sourceTree = SOURCE_ROOT; };
+		CA707DC611A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "HTTPVirtualDirectory+AccessViewController.m"; path = "../common/src/objc/HTTPVirtualDirectory+AccessViewController.m"; sourceTree = SOURCE_ROOT; };
+		CA707DC711A3CF7200646473 /* HTTPVirtualDirectory+Remove.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "HTTPVirtualDirectory+Remove.h"; path = "../common/src/objc/HTTPVirtualDirectory+Remove.h"; sourceTree = SOURCE_ROOT; };
+		CA707DC811A3CF7200646473 /* HTTPVirtualDirectory+Remove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "HTTPVirtualDirectory+Remove.m"; path = "../common/src/objc/HTTPVirtualDirectory+Remove.m"; sourceTree = SOURCE_ROOT; };
+		CA707DC911A3CF7200646473 /* iWebDriver_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iWebDriver_Prefix.pch; path = ../common/src/objc/iWebDriver_Prefix.pch; sourceTree = SOURCE_ROOT; };
+		CA707DCA11A3CF7200646473 /* JSONRESTResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONRESTResource.h; path = ../common/src/objc/JSONRESTResource.h; sourceTree = SOURCE_ROOT; };
+		CA707DCB11A3CF7200646473 /* JSONRESTResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONRESTResource.m; path = ../common/src/objc/JSONRESTResource.m; sourceTree = SOURCE_ROOT; };
+		CA707DCC11A3CF7200646473 /* NSException+WebDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSException+WebDriver.h"; path = "../common/src/objc/NSException+WebDriver.h"; sourceTree = SOURCE_ROOT; };
+		CA707DCD11A3CF7200646473 /* NSException+WebDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSException+WebDriver.m"; path = "../common/src/objc/NSException+WebDriver.m"; sourceTree = SOURCE_ROOT; };
+		CA707DCE11A3CF7200646473 /* NSURLRequest+IgnoreSSL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURLRequest+IgnoreSSL.h"; path = "../common/src/objc/NSURLRequest+IgnoreSSL.h"; sourceTree = SOURCE_ROOT; };
+		CA707DCF11A3CF7200646473 /* NSURLRequest+IgnoreSSL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURLRequest+IgnoreSSL.m"; path = "../common/src/objc/NSURLRequest+IgnoreSSL.m"; sourceTree = SOURCE_ROOT; };
+		CA707DD011A3CF7200646473 /* RESTServiceMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RESTServiceMapping.h; path = ../common/src/objc/RESTServiceMapping.h; sourceTree = SOURCE_ROOT; };
+		CA707DD111A3CF7200646473 /* RESTServiceMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RESTServiceMapping.m; path = ../common/src/objc/RESTServiceMapping.m; sourceTree = SOURCE_ROOT; };
+		CA707DD211A3CF7200646473 /* Session+ExecuteScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Session+ExecuteScript.h"; path = "../common/src/objc/Session+ExecuteScript.h"; sourceTree = SOURCE_ROOT; };
+		CA707DD311A3CF7200646473 /* Session+ExecuteScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Session+ExecuteScript.m"; path = "../common/src/objc/Session+ExecuteScript.m"; sourceTree = SOURCE_ROOT; };
+		CA707DD411A3CF7200646473 /* Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Session.h; path = ../common/src/objc/Session.h; sourceTree = SOURCE_ROOT; };
+		CA707DD511A3CF7200646473 /* Session.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Session.m; path = ../common/src/objc/Session.m; sourceTree = SOURCE_ROOT; };
+		CA707DD611A3CF7200646473 /* SessionRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SessionRoot.h; path = ../common/src/objc/SessionRoot.h; sourceTree = SOURCE_ROOT; };
+		CA707DD711A3CF7200646473 /* SessionRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SessionRoot.m; path = ../common/src/objc/SessionRoot.m; sourceTree = SOURCE_ROOT; };
+		CA707DDA11A3CF7200646473 /* WebDriverHTTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverHTTPConnection.h; path = ../common/src/objc/WebDriverHTTPConnection.h; sourceTree = SOURCE_ROOT; };
+		CA707DDB11A3CF7200646473 /* WebDriverHTTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverHTTPConnection.m; path = ../common/src/objc/WebDriverHTTPConnection.m; sourceTree = SOURCE_ROOT; };
+		CA707DDC11A3CF7200646473 /* WebDriverHTTPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverHTTPServer.h; path = ../common/src/objc/WebDriverHTTPServer.h; sourceTree = SOURCE_ROOT; };
+		CA707DDD11A3CF7200646473 /* WebDriverHTTPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverHTTPServer.m; path = ../common/src/objc/WebDriverHTTPServer.m; sourceTree = SOURCE_ROOT; };
+		CA707DDE11A3CF7200646473 /* WebDriverPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverPreferences.h; path = ../common/src/objc/WebDriverPreferences.h; sourceTree = SOURCE_ROOT; };
+		CA707DDF11A3CF7200646473 /* WebDriverPreferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverPreferences.m; path = ../common/src/objc/WebDriverPreferences.m; sourceTree = SOURCE_ROOT; };
+		CA707DE011A3CF7200646473 /* WebDriverRequestFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverRequestFetcher.h; path = ../common/src/objc/WebDriverRequestFetcher.h; sourceTree = SOURCE_ROOT; };
+		CA707DE111A3CF7200646473 /* WebDriverRequestFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverRequestFetcher.m; path = ../common/src/objc/WebDriverRequestFetcher.m; sourceTree = SOURCE_ROOT; };
+		CA707DE211A3CF7200646473 /* WebDriverResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverResource.h; path = ../common/src/objc/WebDriverResource.h; sourceTree = SOURCE_ROOT; };
+		CA707DE311A3CF7200646473 /* WebDriverResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverResource.m; path = ../common/src/objc/WebDriverResource.m; sourceTree = SOURCE_ROOT; };
+		CA707DE411A3CF7200646473 /* WebDriverResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverResponse.h; path = ../common/src/objc/WebDriverResponse.h; sourceTree = SOURCE_ROOT; };
+		CA707DE511A3CF7200646473 /* WebDriverResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverResponse.m; path = ../common/src/objc/WebDriverResponse.m; sourceTree = SOURCE_ROOT; };
+		CA707DE611A3CF7200646473 /* WebDriverUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDriverUtilities.h; path = ../common/src/objc/WebDriverUtilities.h; sourceTree = SOURCE_ROOT; };
+		CA707DE711A3CF7200646473 /* WebDriverUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDriverUtilities.m; path = ../common/src/objc/WebDriverUtilities.m; sourceTree = SOURCE_ROOT; };
+		CA707DE811A3CF7200646473 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewController.h; path = ../common/src/objc/WebViewController.h; sourceTree = SOURCE_ROOT; };
+		CA707DE911A3CF7200646473 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewController.m; path = ../common/src/objc/WebViewController.m; sourceTree = SOURCE_ROOT; };
+		CA707E0711A3CFA700646473 /* errorcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errorcodes.h; path = "../common/src/cpp/webdriver-interactions/errorcodes.h"; sourceTree = SOURCE_ROOT; };
+		CA707E0B11A3D0F500646473 /* PlatformSpecificDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlatformSpecificDefs.h; path = ../common/src/objc/PlatformSpecificDefs.h; sourceTree = SOURCE_ROOT; };
+		CA707F5311A3D23600646473 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		CA707FE511A3D86D00646473 /* HTTPPNGResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTTPPNGResponse.m; path = ../common/src/objc/HTTPPNGResponse.m; sourceTree = SOURCE_ROOT; };
+		CA70800F11A3DBCC00646473 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		D8F6C97E110D6AE8009DADFF /* BundleInjector.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BundleInjector.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8F6C984110D6B19009DADFF /* BundleInjector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleInjector.m; sourceTree = "<group>"; };
 		D8F6CAAC110E42D3009DADFF /* SafariExtensionTest-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SafariExtensionTest-Info.plist"; sourceTree = "<group>"; };
@@ -193,6 +202,7 @@
 				CA5A69231108360500BF1BC8 /* WebKit.framework in Frameworks */,
 				D8F6CBE5110E596E009DADFF /* libcrypto.dylib in Frameworks */,
 				CA5DFD941112BD6600DCE78D /* libjson.a in Frameworks */,
+				CA70801011A3DBCC00646473 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,8 +221,8 @@
 			children = (
 				CA5A6872110825E500BF1BC8 /* SafariExtension.h */,
 				CA5A6873110825E500BF1BC8 /* SafariExtension.m */,
-				CA5A6874110825E500BF1BC8 /* WebViewController.h */,
-				CA5A6875110825E500BF1BC8 /* WebViewController.m */,
+				CA5A6874110825E500BF1BC8 /* SafariWebViewController.h */,
+				CA5A6875110825E500BF1BC8 /* SafariWebViewController.m */,
 			);
 			name = extension;
 			path = src/objc/extension;
@@ -221,59 +231,64 @@
 		CA5A6876110825E500BF1BC8 /* httpserver */ = {
 			isa = PBXGroup;
 			children = (
-				CA5A6877110825E500BF1BC8 /* Attribute.h */,
-				CA5A6878110825E500BF1BC8 /* Attribute.m */,
-				CA5A6879110825E500BF1BC8 /* Context+ExecuteScript.h */,
-				CA5A687A110825E500BF1BC8 /* Context+ExecuteScript.m */,
-				CA5A687B110825E500BF1BC8 /* Context.h */,
-				CA5A687C110825E500BF1BC8 /* Context.m */,
-				CA5A687D110825E500BF1BC8 /* COPYING */,
-				CA5A687E110825E500BF1BC8 /* Element+FindElement.h */,
-				CA5A687F110825E500BF1BC8 /* Element+FindElement.m */,
-				CA5A6880110825E500BF1BC8 /* Element.h */,
-				CA5A6881110825E500BF1BC8 /* Element.m */,
-				CA5A6882110825E500BF1BC8 /* ElementStore+FindElement.h */,
-				CA5A6883110825E500BF1BC8 /* ElementStore+FindElement.m */,
-				CA5A6884110825E500BF1BC8 /* ElementStore.h */,
-				CA5A6885110825E500BF1BC8 /* ElementStore.m */,
-				CA5A6886110825E500BF1BC8 /* HTTPJSONResponse.h */,
-				CA5A6887110825E500BF1BC8 /* HTTPJSONResponse.m */,
-				CA5A6888110825E500BF1BC8 /* HTTPPNGResponse.h */,
-				CA5A6889110825E500BF1BC8 /* HTTPPNGResponse.m */,
-				CA5A688A110825E500BF1BC8 /* HTTPResponse+Utility.h */,
-				CA5A688B110825E500BF1BC8 /* HTTPResponse+Utility.m */,
-				CA5A688C110825E500BF1BC8 /* HTTPServerController.h */,
-				CA5A688D110825E500BF1BC8 /* HTTPServerController.m */,
-				CA5A688E110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.h */,
-				CA5A688F110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.m */,
-				CA5A6890110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.h */,
-				CA5A6891110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.m */,
-				CA5A6892110825E500BF1BC8 /* iWebDriver_Prefix.pch */,
-				CA5A6893110825E500BF1BC8 /* JSONRESTResource.h */,
-				CA5A6894110825E500BF1BC8 /* JSONRESTResource.m */,
-				CA5A6896110825E500BF1BC8 /* NSException+WebDriver.h */,
-				CA5A6897110825E500BF1BC8 /* NSException+WebDriver.m */,
-				CA5A6898110825E500BF1BC8 /* RESTServiceMapping.h */,
-				CA5A6899110825E500BF1BC8 /* RESTServiceMapping.m */,
-				CA5A689A110825E500BF1BC8 /* selenium-icon.png */,
-				CA5A689B110825E500BF1BC8 /* Session.h */,
-				CA5A689C110825E500BF1BC8 /* Session.m */,
-				CA5A689D110825E500BF1BC8 /* UIResponder+SimulateTouch.h */,
-				CA5A689E110825E500BF1BC8 /* UIResponder+SimulateTouch.m */,
-				CA5A689F110825E500BF1BC8 /* WebDriverHTTPConnection.h */,
-				CA5A68A0110825E500BF1BC8 /* WebDriverHTTPConnection.m */,
-				CA5A68A1110825E500BF1BC8 /* WebDriverHTTPServer.h */,
-				CA5A68A2110825E500BF1BC8 /* WebDriverHTTPServer.m */,
-				CA5A68A3110825E500BF1BC8 /* WebDriverPreferences.h */,
-				CA5A68A4110825E500BF1BC8 /* WebDriverPreferences.m */,
-				CA5A68A5110825E500BF1BC8 /* WebDriverRequestFetcher.h */,
-				CA5A68A6110825E500BF1BC8 /* WebDriverRequestFetcher.m */,
-				CA5A68A7110825E500BF1BC8 /* WebDriverResource.h */,
-				CA5A68A8110825E500BF1BC8 /* WebDriverResource.m */,
-				CA5A68A9110825E500BF1BC8 /* WebDriverResponse.h */,
-				CA5A68AA110825E500BF1BC8 /* WebDriverResponse.m */,
-				CA5A68AB110825E500BF1BC8 /* WebDriverUtilities.h */,
-				CA5A68AC110825E500BF1BC8 /* WebDriverUtilities.m */,
+				CA707FE511A3D86D00646473 /* HTTPPNGResponse.m */,
+				CA707E0711A3CFA700646473 /* errorcodes.h */,
+				CA707DB111A3CF7200646473 /* Attribute.h */,
+				CA707DB211A3CF7200646473 /* Attribute.m */,
+				CA707DB311A3CF7200646473 /* Cookie.h */,
+				CA707DB411A3CF7200646473 /* Cookie.m */,
+				CA707DB511A3CF7200646473 /* COPYING */,
+				CA707DB611A3CF7200646473 /* Element+FindElement.h */,
+				CA707DB711A3CF7200646473 /* Element+FindElement.m */,
+				CA707DB811A3CF7200646473 /* Element.h */,
+				CA707DB911A3CF7200646473 /* Element.m */,
+				CA707DBA11A3CF7200646473 /* ElementStore+FindElement.h */,
+				CA707DBB11A3CF7200646473 /* ElementStore+FindElement.m */,
+				CA707DBC11A3CF7200646473 /* ElementStore.h */,
+				CA707DBD11A3CF7200646473 /* ElementStore.m */,
+				CA707DBE11A3CF7200646473 /* HTTPJSONResponse.h */,
+				CA707DBF11A3CF7200646473 /* HTTPJSONResponse.m */,
+				CA707DC011A3CF7200646473 /* HTTPPNGResponse.h */,
+				CA707DC111A3CF7200646473 /* HTTPResponse+Utility.h */,
+				CA707DC211A3CF7200646473 /* HTTPResponse+Utility.m */,
+				CA707DC311A3CF7200646473 /* HTTPServerController.h */,
+				CA707DC411A3CF7200646473 /* HTTPServerController.m */,
+				CA707DC511A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.h */,
+				CA707DC611A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.m */,
+				CA707DC711A3CF7200646473 /* HTTPVirtualDirectory+Remove.h */,
+				CA707DC811A3CF7200646473 /* HTTPVirtualDirectory+Remove.m */,
+				CA707DC911A3CF7200646473 /* iWebDriver_Prefix.pch */,
+				CA707DCA11A3CF7200646473 /* JSONRESTResource.h */,
+				CA707DCB11A3CF7200646473 /* JSONRESTResource.m */,
+				CA707DCC11A3CF7200646473 /* NSException+WebDriver.h */,
+				CA707DCD11A3CF7200646473 /* NSException+WebDriver.m */,
+				CA707DCE11A3CF7200646473 /* NSURLRequest+IgnoreSSL.h */,
+				CA707DCF11A3CF7200646473 /* NSURLRequest+IgnoreSSL.m */,
+				CA707DD011A3CF7200646473 /* RESTServiceMapping.h */,
+				CA707DD111A3CF7200646473 /* RESTServiceMapping.m */,
+				CA707DD211A3CF7200646473 /* Session+ExecuteScript.h */,
+				CA707DD311A3CF7200646473 /* Session+ExecuteScript.m */,
+				CA707DD411A3CF7200646473 /* Session.h */,
+				CA707DD511A3CF7200646473 /* Session.m */,
+				CA707DD611A3CF7200646473 /* SessionRoot.h */,
+				CA707DD711A3CF7200646473 /* SessionRoot.m */,
+				CA707DDA11A3CF7200646473 /* WebDriverHTTPConnection.h */,
+				CA707DDB11A3CF7200646473 /* WebDriverHTTPConnection.m */,
+				CA707DDC11A3CF7200646473 /* WebDriverHTTPServer.h */,
+				CA707DDD11A3CF7200646473 /* WebDriverHTTPServer.m */,
+				CA707DDE11A3CF7200646473 /* WebDriverPreferences.h */,
+				CA707DDF11A3CF7200646473 /* WebDriverPreferences.m */,
+				CA707DE011A3CF7200646473 /* WebDriverRequestFetcher.h */,
+				CA707DE111A3CF7200646473 /* WebDriverRequestFetcher.m */,
+				CA707DE211A3CF7200646473 /* WebDriverResource.h */,
+				CA707DE311A3CF7200646473 /* WebDriverResource.m */,
+				CA707DE411A3CF7200646473 /* WebDriverResponse.h */,
+				CA707DE511A3CF7200646473 /* WebDriverResponse.m */,
+				CA707DE611A3CF7200646473 /* WebDriverUtilities.h */,
+				CA707DE711A3CF7200646473 /* WebDriverUtilities.m */,
+				CA707DE811A3CF7200646473 /* WebViewController.h */,
+				CA707DE911A3CF7200646473 /* WebViewController.m */,
+				CA707E0B11A3D0F500646473 /* PlatformSpecificDefs.h */,
 			);
 			name = httpserver;
 			path = src/objc/httpserver;
@@ -320,6 +335,8 @@
 				CA5A69221108360500BF1BC8 /* WebKit.framework */,
 				D8F6CAAC110E42D3009DADFF /* SafariExtensionTest-Info.plist */,
 				D8F6CBE4110E596E009DADFF /* libcrypto.dylib */,
+				CA707F5311A3D23600646473 /* CoreFoundation.framework */,
+				CA70800F11A3DBCC00646473 /* QuartzCore.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -461,8 +478,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CA5A68B3110825E500BF1BC8 /* COPYING in Resources */,
-				CA5A68C2110825E500BF1BC8 /* selenium-icon.png in Resources */,
+				CA707DEC11A3CF7200646473 /* COPYING in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,32 +490,34 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA5A68AE110825E500BF1BC8 /* SafariExtension.m in Sources */,
-				CA5A68AF110825E500BF1BC8 /* WebViewController.m in Sources */,
-				CA5A68B0110825E500BF1BC8 /* Attribute.m in Sources */,
-				CA5A68B1110825E500BF1BC8 /* Context+ExecuteScript.m in Sources */,
-				CA5A68B2110825E500BF1BC8 /* Context.m in Sources */,
-				CA5A68B4110825E500BF1BC8 /* Element+FindElement.m in Sources */,
-				CA5A68B5110825E500BF1BC8 /* Element.m in Sources */,
-				CA5A68B6110825E500BF1BC8 /* ElementStore+FindElement.m in Sources */,
-				CA5A68B7110825E500BF1BC8 /* ElementStore.m in Sources */,
-				CA5A68B8110825E500BF1BC8 /* HTTPJSONResponse.m in Sources */,
-				CA5A68B9110825E500BF1BC8 /* HTTPPNGResponse.m in Sources */,
-				CA5A68BA110825E500BF1BC8 /* HTTPResponse+Utility.m in Sources */,
-				CA5A68BB110825E500BF1BC8 /* HTTPServerController.m in Sources */,
-				CA5A68BC110825E500BF1BC8 /* HTTPVirtualDirectory+AccessViewController.m in Sources */,
-				CA5A68BD110825E500BF1BC8 /* HTTPVirtualDirectory+Remove.m in Sources */,
-				CA5A68BE110825E500BF1BC8 /* JSONRESTResource.m in Sources */,
-				CA5A68C0110825E500BF1BC8 /* NSException+WebDriver.m in Sources */,
-				CA5A68C1110825E500BF1BC8 /* RESTServiceMapping.m in Sources */,
-				CA5A68C3110825E500BF1BC8 /* Session.m in Sources */,
-				CA5A68C4110825E500BF1BC8 /* UIResponder+SimulateTouch.m in Sources */,
-				CA5A68C5110825E500BF1BC8 /* WebDriverHTTPConnection.m in Sources */,
-				CA5A68C6110825E500BF1BC8 /* WebDriverHTTPServer.m in Sources */,
-				CA5A68C7110825E500BF1BC8 /* WebDriverPreferences.m in Sources */,
-				CA5A68C8110825E500BF1BC8 /* WebDriverRequestFetcher.m in Sources */,
-				CA5A68C9110825E500BF1BC8 /* WebDriverResource.m in Sources */,
-				CA5A68CA110825E500BF1BC8 /* WebDriverResponse.m in Sources */,
-				CA5A68CB110825E500BF1BC8 /* WebDriverUtilities.m in Sources */,
+				CA5A68AF110825E500BF1BC8 /* SafariWebViewController.m in Sources */,
+				CA707DEA11A3CF7200646473 /* Attribute.m in Sources */,
+				CA707DEB11A3CF7200646473 /* Cookie.m in Sources */,
+				CA707DED11A3CF7200646473 /* Element+FindElement.m in Sources */,
+				CA707DEE11A3CF7200646473 /* Element.m in Sources */,
+				CA707DEF11A3CF7200646473 /* ElementStore+FindElement.m in Sources */,
+				CA707DF011A3CF7200646473 /* ElementStore.m in Sources */,
+				CA707DF111A3CF7200646473 /* HTTPJSONResponse.m in Sources */,
+				CA707DF211A3CF7200646473 /* HTTPResponse+Utility.m in Sources */,
+				CA707DF311A3CF7200646473 /* HTTPServerController.m in Sources */,
+				CA707DF411A3CF7200646473 /* HTTPVirtualDirectory+AccessViewController.m in Sources */,
+				CA707DF511A3CF7200646473 /* HTTPVirtualDirectory+Remove.m in Sources */,
+				CA707DF611A3CF7200646473 /* JSONRESTResource.m in Sources */,
+				CA707DF711A3CF7200646473 /* NSException+WebDriver.m in Sources */,
+				CA707DF811A3CF7200646473 /* NSURLRequest+IgnoreSSL.m in Sources */,
+				CA707DF911A3CF7200646473 /* RESTServiceMapping.m in Sources */,
+				CA707DFA11A3CF7200646473 /* Session+ExecuteScript.m in Sources */,
+				CA707DFB11A3CF7200646473 /* Session.m in Sources */,
+				CA707DFC11A3CF7200646473 /* SessionRoot.m in Sources */,
+				CA707DFE11A3CF7200646473 /* WebDriverHTTPConnection.m in Sources */,
+				CA707DFF11A3CF7200646473 /* WebDriverHTTPServer.m in Sources */,
+				CA707E0011A3CF7200646473 /* WebDriverPreferences.m in Sources */,
+				CA707E0111A3CF7200646473 /* WebDriverRequestFetcher.m in Sources */,
+				CA707E0211A3CF7200646473 /* WebDriverResource.m in Sources */,
+				CA707E0311A3CF7200646473 /* WebDriverResponse.m in Sources */,
+				CA707E0411A3CF7200646473 /* WebDriverUtilities.m in Sources */,
+				CA707E0511A3CF7200646473 /* WebViewController.m in Sources */,
+				CA707FE611A3D86D00646473 /* HTTPPNGResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

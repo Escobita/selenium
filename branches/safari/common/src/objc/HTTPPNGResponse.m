@@ -1,5 +1,5 @@
 //
-//  Attribute.h
+//  HTTPPNGResponse.m
 //  iWebDriver
 //
 //  Copyright 2009 Google Inc.
@@ -16,20 +16,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <Foundation/Foundation.h>
-#import "HTTPVirtualDirectory.h"
+#import "HTTPPNGResponse.h"
 
-@class Element;
+@implementation HTTPPNGResponse
 
-// This represents the element/:elementId/attribute virtual directory.
-@interface Attribute : HTTPVirtualDirectory {
-  Element *element_;
+- (id)initWithImage:(ImageType *)image {
+#ifdef TARGET_OS_IPHONE
+  NSData *imageData = UIImagePNGRepresentation(image);
+#else
+  // TODO(kurniady): make this work again
+  NSData *imageData = nil; 
+#endif
+  NSLog(@"Sending PNG image of size %d bytes", [imageData length]);
+  return [super initWithData:imageData];
 }
 
-+ (Attribute *)attributeDirectoryForElement:(Element *)element;
-
-// Designated initialiser. Does not retain the element as per
-// parent retain pattern.
-- (id)initForElement:(Element *)element;
+- (NSString *) contentType {
+  return @"image/png";
+}
 
 @end

@@ -344,4 +344,12 @@
    "})();"];
 }
 
++ (id)sharedInstance {
+  static id instance = nil;
+  if (instance == nil) {
+    instance = [[WebViewController alloc] init];
+  }
+  return instance;
+}
+
 @end

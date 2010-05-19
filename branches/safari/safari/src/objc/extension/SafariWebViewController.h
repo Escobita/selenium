@@ -1,5 +1,5 @@
 //
-//  WebViewController.h
+//  SafariWebViewController.h
 //  SafariDriver
 //
 //  Created by Andrian Kurniady on 10/13/09.
@@ -10,8 +10,10 @@
 #import <WebKit/WebKit.h>
 #import "HTTPServerController.h"
 #import "WebDriverPreferences.h"
+#import "WebViewController.h"
 
-@interface WebViewController : NSObject {
+//WebViewControllerDelegate
+@interface SafariWebViewController : NSObject<WebViewControllerDelegate> {
   WebView *webView_;
   
   NSString *lastJSResult_;
@@ -21,16 +23,7 @@
   HTTPServerController *httpServerController;
 }
 
-@property (assign, nonatomic) WebView *webView;
-
-- (void)setURL:(NSString *)urlString;
-- (NSString *)URL;
-- (NSString *)currentTitle;
-- (void)back;
-- (void)forward;
-- (NSString *)source;
-- (NSString *)jsEval:(NSString *)format, ...;
-
 + (id)sharedInstance;
+- (id)initWithWebView:(WebViewType*)webView;
 
 @end

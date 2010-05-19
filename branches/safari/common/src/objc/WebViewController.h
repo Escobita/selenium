@@ -16,15 +16,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#if TARGET_OS_IPHONE
-#include <UIKit/UIKit.h>
-typedef UIWebView WebViewType;
-typedef UIImage ImageType;
-#else
-#include <WebKit/WebKit.h>
-typedef WebView WebViewType;
-typedef NSImage ImageType;
-#endif
+#include "PlatformSpecificDefs.h"
 
 @protocol WebViewControllerDelegate
 
@@ -116,6 +108,8 @@ typedef NSImage ImageType;
 
 - (void)webViewDidFinishLoad:(WebViewType *)webView;
 - (void)webView:(WebViewType *)webView didFailLoadWithError:(NSError *)error;
+
++ (id)sharedInstance;
 
 @property (retain, readonly, nonatomic) WebViewType *webView;
 @property (assign, nonatomic) NSObject<WebViewControllerDelegate>* delegate;

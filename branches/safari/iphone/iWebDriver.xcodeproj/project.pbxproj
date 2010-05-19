@@ -92,7 +92,6 @@
 		CABAC8C2118AB69F008C2EA9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 833103FC0F1D7F57000A38DB /* Info.plist */; };
 		CABAC8C3118AB6A0008C2EA9 /* HTTPVirtualDirectory+AccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8361602B0EF72F190028DAE5 /* HTTPVirtualDirectory+AccessViewController.m */; };
 		D87B2371118786B7001ED3DE /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D87B2370118786B7001ED3DE /* WebViewController.m */; };
-		D8851F741142A4B1005013C8 /* WebViewControllerSingleton.m in Sources */ = {isa = PBXBuildFile; fileRef = D8851F731142A4B1005013C8 /* WebViewControllerSingleton.m */; };
 		D8B93798114B9852006F8CE8 /* Session+ExecuteScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 838B334B0F14254C00F72BC4 /* Session+ExecuteScript.m */; };
 		D8D373E4119D884300C69970 /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8399863B0EE3A2E70074D106 /* MainView.xib */; };
 		D8D640A01143123600C72A5D /* WebDriverResource.m in Sources */ = {isa = PBXBuildFile; fileRef = 835DF5D60F00C65600F3DD80 /* WebDriverResource.m */; };
@@ -102,7 +101,6 @@
 		D8D640B91143129000C72A5D /* ElementStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 83615D910EEE47940028DAE5 /* ElementStore.m */; };
 		D8D640BC1143129500C72A5D /* SessionRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 64D8AA421120B94D001649CC /* SessionRoot.m */; };
 		D8D640C4114312AE00C72A5D /* WebDriverResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 836160360EF7343B0028DAE5 /* WebDriverResponse.m */; };
-		D8D640CD114312CA00C72A5D /* WebViewControllerSingleton.m in Sources */ = {isa = PBXBuildFile; fileRef = D8851F731142A4B1005013C8 /* WebViewControllerSingleton.m */; };
 		D8D640D3114312D800C72A5D /* Cookie.m in Sources */ = {isa = PBXBuildFile; fileRef = 64CF265210D190820029D641 /* Cookie.m */; };
 		D8D640D6114312E100C72A5D /* HTTPPNGResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 17D715550FE107B500CC479E /* HTTPPNGResponse.m */; };
 		D8D640DA114312EC00C72A5D /* WebDriverHTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 83615DFF0EF619230028DAE5 /* WebDriverHTTPServer.m */; };
@@ -233,8 +231,6 @@
 		D8432AD5114273FD00F2A242 /* NSURLRequest+IgnoreSSL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+IgnoreSSL.m"; sourceTree = "<group>"; };
 		D87B236F118786B7001ED3DE /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewController.h; path = ../common/src/objc/WebViewController.h; sourceTree = SOURCE_ROOT; };
 		D87B2370118786B7001ED3DE /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewController.m; path = ../common/src/objc/WebViewController.m; sourceTree = SOURCE_ROOT; };
-		D8851F721142A4B1005013C8 /* WebViewControllerSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewControllerSingleton.h; path = Classes/WebViewControllerSingleton.h; sourceTree = "<group>"; };
-		D8851F731142A4B1005013C8 /* WebViewControllerSingleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewControllerSingleton.m; path = Classes/WebViewControllerSingleton.m; sourceTree = "<group>"; };
 		FD61E6970FE150E5006E1274 /* WebDriverUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDriverUtilities.h; sourceTree = "<group>"; };
 		FD61E6980FE150E5006E1274 /* WebDriverUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebDriverUtilities.m; sourceTree = "<group>"; };
 		FD61E69D0FE151A4006E1274 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
@@ -336,8 +332,6 @@
 			children = (
 				D87B236F118786B7001ED3DE /* WebViewController.h */,
 				D87B2370118786B7001ED3DE /* WebViewController.m */,
-				D8851F721142A4B1005013C8 /* WebViewControllerSingleton.h */,
-				D8851F731142A4B1005013C8 /* WebViewControllerSingleton.m */,
 				289233A80DB2D0DB0083E9F9 /* MainViewController.h */,
 				289233A90DB2D0DB0083E9F9 /* MainViewController.m */,
 				8399865B0EE3A5000074D106 /* WebViewControllerIPhone.h */,
@@ -721,7 +715,6 @@
 				64D8AA431120B94D001649CC /* SessionRoot.m in Sources */,
 				64D8AA4F1120B995001649CC /* NSURLRequest+IgnoreSSL.m in Sources */,
 				64D8AA691120B9EC001649CC /* HTTPVirtualDirectory+Remove.m in Sources */,
-				D8851F741142A4B1005013C8 /* WebViewControllerSingleton.m in Sources */,
 				D8D640A01143123600C72A5D /* WebDriverResource.m in Sources */,
 				D8D640AC1143125F00C72A5D /* Element.m in Sources */,
 				D8D640AD1143126500C72A5D /* ElementStore+FindElement.m in Sources */,
@@ -765,7 +758,6 @@
 				D8D640B91143129000C72A5D /* ElementStore.m in Sources */,
 				D8D640BC1143129500C72A5D /* SessionRoot.m in Sources */,
 				D8D640C4114312AE00C72A5D /* WebDriverResponse.m in Sources */,
-				D8D640CD114312CA00C72A5D /* WebViewControllerSingleton.m in Sources */,
 				D8D640D3114312D800C72A5D /* Cookie.m in Sources */,
 				D8D640D6114312E100C72A5D /* HTTPPNGResponse.m in Sources */,
 				D8D640DA114312EC00C72A5D /* WebDriverHTTPServer.m in Sources */,

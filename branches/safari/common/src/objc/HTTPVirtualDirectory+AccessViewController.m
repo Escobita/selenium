@@ -17,7 +17,7 @@
 //  limitations under the License.
 
 #import "HTTPVirtualDirectory+AccessViewController.h"
-#import "WebViewControllerSingleton.h"
+#import "WebViewController.h"
 
 @implementation HTTPVirtualDirectory (AccessViewController)
 
@@ -26,7 +26,7 @@
   // if we have multiple view controllers (eg, tabs), all VirtualDirectory
   // access of the viewController can be easily changed.
   
-  return [WebViewControllerSingleton instance];
+  return [WebViewController sharedInstance];
 }
 
 @end
