@@ -170,12 +170,12 @@ class JavaGen < BaseGenerator
     test_string += ' ' + args[:args] if args[:args]
 
     if args[:tests].length == 0
-      result = sh test_string, :verbose => true
+      result = sh test_string, :verbose => false
     else
       args[:tests].each do |test|
         puts "Running: #{test}\n"
         test_string += " #{test} "
-        result = sh test_string, :verbose => true
+        result = sh test_string, :verbose => false
       end
     end
 
