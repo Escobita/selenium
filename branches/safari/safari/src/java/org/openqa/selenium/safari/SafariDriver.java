@@ -1,6 +1,7 @@
 package org.openqa.selenium.safari;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -18,7 +19,7 @@ import java.util.Set;
  * 
  * @author kurniady@google.com (Andrian Kurniady)
  */
-public class SafariDriver implements WebDriver {
+public class SafariDriver implements WebDriver, JavascriptExecutor {
   private SafariBinary safariBinary;
   private RemoteWebDriver rwd;
   
@@ -96,5 +97,15 @@ public class SafariDriver implements WebDriver {
   @Override
   public TargetLocator switchTo() {
     return rwd.switchTo();
+  }
+
+  @Override
+  public Object executeScript(String script, Object... args) {
+	return rwd.executeScript(script, args);
+  }
+
+  @Override
+  public boolean isJavascriptEnabled() {
+	return rwd.isJavascriptEnabled();
   }
 }

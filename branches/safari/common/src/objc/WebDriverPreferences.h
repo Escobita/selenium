@@ -31,7 +31,7 @@
 @property (readonly, nonatomic) NSUInteger memoryCacheCapacity;
 @property (readonly, nonatomic) NSURLRequestCachePolicy cache_policy;
 
-@property (readonly, nonatomic) UInt16 serverPortNumber;
+@property (assign, nonatomic) UInt16 serverPortNumber;
 @property (readonly, nonatomic, copy) NSString *connectorAddr;
 @property (readonly, nonatomic, copy) NSString *requesterId;
 

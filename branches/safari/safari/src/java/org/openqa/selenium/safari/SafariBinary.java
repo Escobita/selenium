@@ -18,7 +18,7 @@ public class SafariBinary {
   private static final String SAFARI_BINARY_LOCATION = 
       "/Applications/Safari.app/Contents/MacOS/Safari";
   
-  private static final int LOAD_WAIT = 3000;
+  private static final int LOAD_WAIT = 500;
   
   private ProcessWrapper safariProcess;
   private ProcessBuilder processBuilder;
@@ -80,8 +80,8 @@ public class SafariBinary {
   
   private void setupBuilderEnvironments() throws IOException {
     Map<String, String> extraEnvs = new HashMap<String, String>(); 
-    safariExtension.addLoadExtensionEnvs(extraEnvs,SAFARI_BINARY_LOCATION);
-    safariExtension.addListenPortEnv(extraEnvs,new URL(getUrl()));
+    safariExtension.addLoadExtensionEnvs(extraEnvs, SAFARI_BINARY_LOCATION);
+    safariExtension.addListenPortEnv(extraEnvs, new URL(getUrl()));
     processBuilder.environment().putAll(extraEnvs);	
   }
   
@@ -115,6 +115,7 @@ public class SafariBinary {
   }
   
   public String getUrl() {
+	// TODO(kurniady): implement automatic picking of random free ports.
     return "http://localhost:4000/hub";
   }
   

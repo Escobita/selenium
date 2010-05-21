@@ -18,6 +18,7 @@
 
 #import "WebDriverResource.h"
 #import "WebDriverResponse.h"
+#import "WebViewController.h"
 #import "NSString+SBJSON.h"
 #import "errorcodes.h"
 

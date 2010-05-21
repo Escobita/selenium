@@ -144,11 +144,7 @@
 // Get the specified URL and block until it's finished loading.
 - (void)setURL:(NSDictionary *)urlMap {
   NSString *urlString = (NSString*) [urlMap objectForKey:@"url"];
-  NSURLRequest *url = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]
-                                       cachePolicy:cachePolicy_
-                                   timeoutInterval:60];
-  
-  [delegate_ loadRequest:url];
+  [delegate_ loadURL:urlString];
   [self waitForLoad];
 }
 

@@ -23,7 +23,7 @@
 - (void)describeLastAction:(NSString *)status;
 - (ImageType *)screenshot;
 - (void)clickOnPageElementAt:(CGPoint)point;
-- (void)loadRequest:(NSURLRequest*)url;
+- (void)loadURL:(NSString *)url;
 
 @end
 

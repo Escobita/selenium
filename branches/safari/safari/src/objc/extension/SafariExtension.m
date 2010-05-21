@@ -7,6 +7,7 @@
 //
 
 #import "SafariExtension.h"
+#import "WebDriverPreferences.h"
 #import <WebKit/WebKit.h>
 
 @interface NSDocument(BrowserDocumentProtocol)
@@ -69,6 +70,13 @@
                                            selector:@selector(onWebViewLoaded:)
                                                name:WebViewProgressFinishedNotification
                                              object:nil];
+
+  // TODO(kurniady): Rewrite this in a cleaner way, as we may need to pass more
+  //                 environment variables later from the Java side.
+  const char* portEnv = getenv("WEBDRIVER_SAFARI_PORT");
+  int port;
+  sscanf(portEnv, "%d", &port);
+  [[WebDriverPreferences sharedInstance] setServerPortNumber:port];
 }
 
 + (id)sharedInstance {

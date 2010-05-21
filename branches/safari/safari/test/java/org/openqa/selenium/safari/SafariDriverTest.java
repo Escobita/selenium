@@ -25,6 +25,6 @@ public class SafariDriverTest extends AbstractDriverTestCase {
     
     assertEquals("http://code.google.com/p/selenium/", driver.getCurrentUrl());
     
-    Thread.sleep(10000);
+    //Thread.sleep(10000);
   }  
 }

@@ -127,9 +127,13 @@
   [webViewController_ webView:webView didFailLoadWithError:error];
 }
 
-- (void)loadRequest:(NSURLRequest*)url {
+- (void)loadURL:(NSString *)url {
+  NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
+                                       cachePolicy:cachePolicy_
+                                   timeoutInterval:60];
+
   [[self webView] performSelectorOnMainThread:@selector(loadRequest:) 
-    withObject:url 
+    withObject:urlRequest
     waitUntilDone:YES];
 }
 

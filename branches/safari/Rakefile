@@ -783,6 +783,9 @@ task :test_iphone_server do
 end  
 
 java_test(:name => "webdriver-safari-test",
+          # The shutdown hook for cleaning the profile seems to get called
+          # in the middle of tests. TODO(kurniady): fix it and remove this.
+          :system_properties => [ "webdriver.reap_profile=false" ],
           :srcs  => [ "safari/test/java/**/*.java" ],
           :deps => [
                      :'webdriver-safari',

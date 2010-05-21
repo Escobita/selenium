@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 #import "JSONRESTResource.h"
-#import "WebViewController.h"
 
 // This class wraps a standard obj-c method into a method which webdriver can
 // call. Method arguments are passed in through PUT/POST data. The data is
