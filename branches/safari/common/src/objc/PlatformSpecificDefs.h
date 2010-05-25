@@ -7,7 +7,7 @@
  *
  */
 
-#if TARGET_OS_IPHONE
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 // IPhone Deps here
 #import <UIKit/UIKit.h>
 typedef UIImage ImageType;

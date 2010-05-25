@@ -21,7 +21,7 @@
 @implementation HTTPPNGResponse
 
 - (id)initWithImage:(ImageType *)image {
-#ifdef TARGET_OS_IPHONE
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
   NSData *imageData = UIImagePNGRepresentation(image);
 #else
   // TODO(kurniady): make this work again
