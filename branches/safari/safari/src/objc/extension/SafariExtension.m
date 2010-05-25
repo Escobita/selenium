@@ -7,7 +7,14 @@
 //
 
 #import "SafariExtension.h"
+/*
+<<<<<<< HEAD
 #import "WebDriverPreferences.h"
+=======
+#import "HTTPServerController.h"
+*/
+#import "PerProcessSafariFiles.h"
+/*>>>>>>> 6e889f9... Safari now uses per process storage for cookies, database, cache*/
 #import <WebKit/WebKit.h>
 
 @interface NSDocument(BrowserDocumentProtocol)
@@ -50,10 +57,11 @@
 
 - (void)onSafariLoaded {
   NSLog(@"Safari loaded!");
+  [PerProcessSafariFiles init];
   WebView* webView = 0;
   if (webView = [self viewViewFromDocument]) {
     [self gotWebView:webView];
-  }
+  } 
 }
 
 + (void)load {  
