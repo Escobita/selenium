@@ -41,6 +41,7 @@
 		CA707E0511A3CF7200646473 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707DE911A3CF7200646473 /* WebViewController.m */; };
 		CA707FE611A3D86D00646473 /* HTTPPNGResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CA707FE511A3D86D00646473 /* HTTPPNGResponse.m */; };
 		CA70801011A3DBCC00646473 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA70800F11A3DBCC00646473 /* QuartzCore.framework */; };
+		D832EDC411AA8D1A006CE516 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D832EDC311AA8D1A006CE516 /* libsqlite3.dylib */; };
 		D8F6C985110D6B19009DADFF /* BundleInjector.m in Sources */ = {isa = PBXBuildFile; fileRef = D8F6C984110D6B19009DADFF /* BundleInjector.m */; };
 		D8F6CA48110D6C5D009DADFF /* BundleInjector.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = D8F6C97E110D6AE8009DADFF /* BundleInjector.dylib */; };
 		D8F6CBE5110E596E009DADFF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F6CBE4110E596E009DADFF /* libcrypto.dylib */; };
@@ -187,6 +188,7 @@
 		CA707F5311A3D23600646473 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		CA707FE511A3D86D00646473 /* HTTPPNGResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTTPPNGResponse.m; path = ../common/src/objc/HTTPPNGResponse.m; sourceTree = SOURCE_ROOT; };
 		CA70800F11A3DBCC00646473 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
+		D832EDC311AA8D1A006CE516 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		D8F6C97E110D6AE8009DADFF /* BundleInjector.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BundleInjector.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8F6C984110D6B19009DADFF /* BundleInjector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleInjector.m; sourceTree = "<group>"; };
 		D8F6CAAC110E42D3009DADFF /* SafariExtensionTest-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SafariExtensionTest-Info.plist"; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				D8F6CBE5110E596E009DADFF /* libcrypto.dylib in Frameworks */,
 				CA5DFD941112BD6600DCE78D /* libjson.a in Frameworks */,
 				CA70801011A3DBCC00646473 /* QuartzCore.framework in Frameworks */,
+				D832EDC411AA8D1A006CE516 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,6 +340,7 @@
 				D8F6CBE4110E596E009DADFF /* libcrypto.dylib */,
 				CA707F5311A3D23600646473 /* CoreFoundation.framework */,
 				CA70800F11A3DBCC00646473 /* QuartzCore.framework */,
+				D832EDC311AA8D1A006CE516 /* libsqlite3.dylib */,
 			);
 			sourceTree = "<group>";
 		};
