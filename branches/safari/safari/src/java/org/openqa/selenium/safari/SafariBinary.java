@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriverException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.List;
@@ -18,7 +19,7 @@ public class SafariBinary {
   private static final String SAFARI_BINARY_LOCATION = 
       "/Applications/Safari.app/Contents/MacOS/Safari";
   
-  private static final int LOAD_WAIT = 500;
+  private static final int MAX_LOAD_WAIT = 10000;
   
   private ProcessWrapper safariProcess;
   private ProcessBuilder processBuilder;
@@ -84,6 +85,30 @@ public class SafariBinary {
     safariExtension.addListenPortEnv(extraEnvs, new URL(getUrl()));
     processBuilder.environment().putAll(extraEnvs);	
   }
+
+  private void waitForServerToRespond(URL appUrl,long timeoutInMilliseconds,ProcessWrapper process) throws Exception {
+    long start = System.currentTimeMillis();
+    boolean responding = false;
+    while (!responding && (System.currentTimeMillis() - start < timeoutInMilliseconds)) {
+      HttpURLConnection connection = null;
+      try {
+        connection = (HttpURLConnection) appUrl.openConnection();
+        connection.setConnectTimeout(500);
+        connection.setRequestMethod("TRACE");
+        connection.connect();
+        responding = true;
+      } catch (IOException e) {
+        responding = false;
+      } finally {
+        if (connection != null) {
+          connection.disconnect();
+        }
+      }
+    }
+    if (!responding) {
+      throw new Exception("Unable to start serer on url:" + appUrl +  "time:" + (System.currentTimeMillis() - start) + "process:"+ process);
+    }
+  }
   
   public void startSafari() {
     if (safariProcess == null) {
@@ -98,11 +123,9 @@ public class SafariBinary {
           }          
         });
         
-        // TODO(kurniady): Add polling every 1 second until Safari's extension is loaded
-        // currently we just rely on RemoteWebDriver's failure to know that the extension
-        // hasn't been loaded, which may be good enough.
-        Thread.sleep(LOAD_WAIT);
+        waitForServerToRespond(new URL(getUrl()),MAX_LOAD_WAIT,safariProcess);
       } catch (Exception e) {
+        quit();
         throw new WebDriverException("Failed to launch Safari.", e);
       }
     } else {

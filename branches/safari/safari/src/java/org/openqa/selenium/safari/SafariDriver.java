@@ -31,6 +31,7 @@ public class SafariDriver implements WebDriver, JavascriptExecutor {
       this.safariBinary = safariBinary;
     } catch (Exception e) {
       safariBinary.quit();
+      throw e;
     }
   }
 
