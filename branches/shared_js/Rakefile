@@ -850,17 +850,35 @@ task :'selenium-java_zip' do
   sh "cd #{temp} && jar cMf ../selenium-java.zip *", :verbose => false
 end
 
-def create_js_fragment(args)
-  sh "./create_fragment.sh \"#{args[:module]}\" \"#{args[:function]}\" \"#{args[:name]}\" \"#{args[:name]}\""
+
+file "common/test/js/deps.js" => FileList["third_party/closure/goog/**/*.js", "common/src/js/**/*.js"] do
+  our_cmd = "java -jar third_party/py/jython.jar third_party/closure/bin/calcdeps.py "
+  our_cmd << "--output_mode=deps --path=common/src/js --path=common/test/js "
+  our_cmd << "--dep=third_party/closure/goog"
+
+    # Generate the deps. The file paths will be as they appear on the filesystem,
+    # but for our tests, the WebDriverJS source files are served from /js/src and
+    # the Closure Library source is under /third_party/closure/goog, so we need
+    # to modify the generated paths to match that scheme.
+    output = ""
+    io = IO.popen(our_cmd)
+    io.each do |line|
+      line = line.gsub("\\\\", "/")
+      output << line.gsub(/common\/(.*)\/js/, 'js/\1')
+    end
+    File.open("common/test/js/deps.js", "w") do |f| f.write(output); end    
 end
 
-js_fragment(:name => "findElement", 
+desc "Calculate dependencies required for testing the automation atoms"
+task :calcdeps => "common/test/js/deps.js"
+
+
+js_fragment(:name => "findElement",
             :module => "bot.locators",
             :function => "bot.locators.findElement")
 js_to_header(:name => "find_element",
              :root => "build/headers",
              :src  => "build/findElement.js")
-
 
 js_fragment(:name => "findElements", 
             :module => "bot.locators",
@@ -893,13 +911,19 @@ js_to_header(:name => "get_location",
              :root => "build/headers",
              :src  => "build/getLocation.js")
 
-
 js_fragment(:name => "getSize", 
             :module => "goog.style",
             :function => "goog.style.getSize")
 js_to_header(:name => "get_size",
              :root => "build/headers",
              :src  => "build/getSize.js")
+
+js_fragment(:name => "getStyle",
+            :module => "bot.style",
+            :function => "bot.style.getBestStyle")
+js_to_header(:name => "get_style",
+             :root => "build/headers",
+             :src => "build/getStyle.js")
 
 js_fragment(:name => "getVisibleText",
             :module => "bot.dom",
@@ -948,6 +972,7 @@ task :fragments => [
   "build/getAttribute.js", 
   "build/getLocation.js",
   "build/getSize.js",
+  "build/getStyle.js",
   "build/getVisibleText.js",
   "build/isDisplayed.js",
   "build/isSelected.js",
@@ -961,12 +986,14 @@ file "jobbie/src/cpp/InternetExplorerDriver/atoms.h" => [
   "get_attribute.h",
   "get_location.h",
   "get_size.h",
+  "get_style.h",
   "get_visible_text.h",
   "is_displayed.h",
   "is_selected.h"
 ] do |task|
    File.open('jobbie/src/cpp/InternetExplorerDriver/atoms.h', 'w') do |f|
     task.prerequisites.each do |req|
+      puts "REading: " + req
       source = Rake::Task[req].out
       f << IO.read(source) + "\n"         
     end

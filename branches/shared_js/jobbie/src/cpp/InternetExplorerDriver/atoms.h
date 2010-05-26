@@ -137,6 +137,19 @@ NULL
 /* AUTO GENERATED - Do not edit by hand. */
 /* See rake-tasts/js_to_header.rb instead. */
 
+#ifndef GET_STYLE_H
+#define GET_STYLE_H
+
+wchar_t* GET_STYLE[] = {
+L"var c=this;var d,e,f,g;function h(){return c.navigator?c.navigator.userAgent:null}g=f=e=d=false;var i;if(i=h()){var j=c.navigator;d=i.indexOf(\"Opera\")==0;e=!d&&i.indexOf(\"MSIE\")!=-1;f=!d&&i.indexOf(\"WebKit\")!=-1;g=!d&&!f&&j.product==\"Gecko\"}var k=e,l=g,m=f,o=\"\",p;if(d&&c.opera){var q=c.opera.version;o=typeof q==\"function\"?q():q}else{if(l)p=/rv\\:([^\\);]+)(\\)|;)/;else if(k)p=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(m)p=/WebKit\\/(\\S+)/;if(p){var r=p.exec(h());o=r?r[1]:\"\"}};var s=function(b,n){var a;a:{a=b.nodeType==9?b:b.ownerDocument||b.document;if(a.defaultView&&a.defaultView.getComputedStyle)if(a=a.defaultView.getComputedStyle(b,\"\")){a=a[n];break a}a=null}return a||(b.currentStyle?b.currentStyle[n]:null)||b.style[n]},t=\"getStyle\".split(\".\"),u=c;!(t[0]in u)&&u.execScript&&u.execScript(\"var \"+t[0]);for(var v;t.length&&(v=t.shift());)if(!t.length&&s!==undefined)u[v]=s;else u=u[v]?u[v]:(u[v]={});",
+NULL
+};
+
+#endif
+
+/* AUTO GENERATED - Do not edit by hand. */
+/* See rake-tasts/js_to_header.rb instead. */
+
 #ifndef GET_VISIBLE_TEXT_H
 #define GET_VISIBLE_TEXT_H
 

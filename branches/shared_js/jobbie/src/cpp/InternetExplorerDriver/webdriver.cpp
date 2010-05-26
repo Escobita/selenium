@@ -617,8 +617,8 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 	try {
 		std::wstring script(L"(function() { return function(){ ");
 
-		for (int i = 0; GETATTRIBUTE[i]; i++) {
-			script += GETATTRIBUTE[i];
+		for (int i = 0; GET_ATTRIBUTE[i]; i++) {
+			script += GET_ATTRIBUTE[i];
 			script += L"\n";
 		}
 
