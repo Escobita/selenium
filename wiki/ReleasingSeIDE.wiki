@@ -19,7 +19,7 @@ The steps to releasing Se-IDE (because I keep forgetting something)
   # Download build from bamboo
   # Do a quick test
   # Upload final xpi to /tmp on releases.seleniumhq.org
-  # Become the release user (sudo su - release) and copy release.openqa.org/htdocs/selenium-ide/1.0.6 
+  # Become the release user (sudo su - release) and copy release.openqa.org/htdocs/selenium-ide/x.y.z 
   # update website release page
   # test download
   # update update.rdf
