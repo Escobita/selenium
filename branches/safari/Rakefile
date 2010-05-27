@@ -795,8 +795,7 @@ java_test(:name => "webdriver-safari-test",
 task :safari_extension => FileList['safari/src/objc/**'] do |t|
   if xcode? then
     puts "Building safari extension"
-    sh "cd safari && xcodebuild -target SafariExtension", :verbose => true
-#    sh "cd safari && xcodebuild -target SafariExtension >/dev/null", :verbose => false
+    sh "cd safari && xcodebuild -target BundleInjector && xcodebuild -target SafariExtension", :verbose => true
     t.out = "safari/build/Release/SafariExtension.bundle"
   else
     puts "XCode not found. Not building the safari extension."
