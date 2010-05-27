@@ -7,14 +7,7 @@
 //
 
 #import "SafariExtension.h"
-/*
-<<<<<<< HEAD
-#import "WebDriverPreferences.h"
-=======
-#import "HTTPServerController.h"
-*/
 #import "PerProcessSafariFiles.h"
-/*>>>>>>> 6e889f9... Safari now uses per process storage for cookies, database, cache*/
 #import <WebKit/WebKit.h>
 
 @interface NSDocument(BrowserDocumentProtocol)
