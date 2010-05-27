@@ -64,18 +64,33 @@ static id new_cookieStoreInternalInitIMP(id self_, SEL sel_)
 - (id)initWithStorageLocation:(NSURL*)storageFileURL;
 @end
 
-@interface NSHTTPCookieStorageInternal(PerProcessHTTPCookieStore)
+@interface NSHTTPCookieStorageInternalOverride : NSHTTPCookieStorageInternal
 
 - (id)init;
 + (void)makeSurePerProcessHTTPCookieStoreLinkedIn;
 
 @end
 
-@implementation NSHTTPCookieStorageInternal(OverrideCookieURL)
+@implementation NSHTTPCookieStorageInternalOverride
 
 - (id)init
 {
-  return cookieStoreInitImpl(self);
+  if ([self respondsToSelector:@selector(initWithStorageLocation:)]) {
+    return cookieStoreInitImpl(self);
+  } else {
+    // Todo (MiklosFazekas): on pre 10.6 systems there seems to be no way to change the cookie storage location
+    // Todo (MiklosFazekas): check if we can find a magic function in CFNetwork. Maybe we can do a 
+    //     CFHTTPCookieStorageCreateFromFile, and then set as the cookie store...
+    // CF_EXPORT CFTypeRef _CFHTTPCookieStorageGetDefault();
+    // CF_EXPORT void _CFHTTPCookieStorageSetDefaultLocation(CFTypeRef store,CFURLRef url);
+    NSLog(@"Using shared cookie store, cannot set cookie store location on this os");
+    [super init];
+  }
+}
+
++ (void)load 
+{
+  [self poseAsClass:[NSHTTPCookieStorageInternal class]];
 }
 
 @end
