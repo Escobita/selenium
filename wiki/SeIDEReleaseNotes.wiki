@@ -1,6 +1,16 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.7==
+
+Only a couple of things of note in this release to end-users which is somewhat silly since it is a month overdue, but that was due to some build changes that took a bit of work to get the kinks worked out. Should be ok now though.
+
+  * NEW - you can now drag-and-drop command around instead of the cut-insert-paste dance that you used to have to do (Jérémy Hérault)
+  * NEW - same thing with tests in the test suite panel (Jérémy Hérault)
+  * NEW - an new optional parameter when registering you se-ide plugin to allow for command exporting. see http://adam.goucher.ca/?p=1456 for details (Adam Goucher)
+  * NEW - Swedish locale sv-SE now has translations (Olle Jonsson)
+  * BUG - Some people were reporting an annoying popup when starting se-ide without any plugins installed (Adam oucher)
+
 ==1.0.6==
 
 The big thing in this release is that the scary log message that was showing up on 'open' is fixed. The other big things are:
