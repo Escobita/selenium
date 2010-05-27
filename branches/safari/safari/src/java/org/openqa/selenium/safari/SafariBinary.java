@@ -53,7 +53,6 @@ public class SafariBinary {
       process.destroy();
     }
     
-    @Override
     public void run() {
       int in = 0;
       while (in != -1) {
@@ -117,7 +116,6 @@ public class SafariBinary {
         
         safariProcess = new ProcessWrapper(processBuilder.start());
         safariProcess.addProcessListener(new ProcessListener() {          
-          @Override
           public void onProcessFinished() {
             safariProcess = null;            
           }          

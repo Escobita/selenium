@@ -35,77 +35,62 @@ public class SafariDriver implements WebDriver, JavascriptExecutor {
     }
   }
 
-  @Override
   public void close() {
     safariBinary.quit();
   }
 
-  @Override
   public WebElement findElement(By by) {
     return rwd.findElement(by);
   }
 
-  @Override
   public List<WebElement> findElements(By by) {
     return rwd.findElements(by);
   }
 
-  @Override
   public void get(String url) {
     rwd.get(url);
   }
 
-  @Override
   public String getCurrentUrl() {
     return rwd.getCurrentUrl();
   }
 
-  @Override
   public String getPageSource() {
     return rwd.getPageSource();
   }
 
-  @Override
   public String getTitle() {
     return rwd.getTitle();
   }
 
-  @Override
   public String getWindowHandle() {
     return rwd.getWindowHandle();
   }
 
-  @Override
   public Set<String> getWindowHandles() {
     return rwd.getWindowHandles();
   }
 
-  @Override
   public Options manage() {
     return rwd.manage();
   }
 
-  @Override
   public Navigation navigate() {
     return rwd.navigate();
   }
 
-  @Override
   public void quit() {
     safariBinary.quit();
   }
 
-  @Override
   public TargetLocator switchTo() {
     return rwd.switchTo();
   }
 
-  @Override
   public Object executeScript(String script, Object... args) {
 	return rwd.executeScript(script, args);
   }
 
-  @Override
   public boolean isJavascriptEnabled() {
 	return rwd.isJavascriptEnabled();
   }
