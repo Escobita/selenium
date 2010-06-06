@@ -25,7 +25,7 @@ That's it :) However you may want to run some sanity tests... If so you can run 
 
 Alternatively, you can run the tests using:
 
-{{{rake test_firefox_py}}}
+{{{./go test_firefox_py}}}
 
 If you are developing webdriver itself, we recommend you do this.
 
