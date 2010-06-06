@@ -61,7 +61,7 @@ There isn't any additional setup to use the firefox driver. For example usage, s
 
 === Other browsers via remote driver ===
 
-You need to download and run a Remote driver server. [http://webdriver.googlecode.com/files/RemoteDriverServer.jar]  Put it in your webdriver directory and run {{{java -jar  emoteDriverServer.jar 8888}}} The number is the port you want the server to listen on. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
+You need to download and run a Remote driver server. [http://webdriver.googlecode.com/files/RemoteDriverServer.jar]  Put it in your webdriver directory and run {{{java -jar  RemoteDriverServer.jar 8888}}} The number is the port you want the server to listen on. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
 
 {{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}
 
