@@ -7,44 +7,36 @@
 
 For all versions of WebDriver:
 
-  * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Sun's site] if it's not already on your computer)
-  * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also  includes Rake. If you're using OS X 10.5 the default versions of ruby and rake are fine)
+  * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Oracle's site] if it's not already on your computer)
+  * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also  includes Rake. If you're using OS X 10.5 or above the default versions of ruby and rake are fine)
   * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
   * The source code (you may need to CheckOut the source from source control)
 
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
 
-  * Visual Studio 2008
+  * Visual Studio 2008, with the 32 and 64 bit cross compilers installed
   * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from that Start menu.
-
-The following ruby gems are also required:
-
-  * Antwrap
-  * yard
 
 == Building ==
 
-The build script will determine which parts of WebDriver will be built. The HtmlUnitDriver, ChromeDriver and FirefoxDriver will be built on all platforms, but the InternetExplorerDriver will only be built on Windows. When there are native components that must be built, the build file will attempt to construct them before falling back to prebuilt binaries. Assuming you have checked out the source to {{{$WEBDRIVER_HOME}}}, now:
+The build script will determine which parts of WebDriver will be built. When there are native components that must be built, the build file will attempt to construct them before falling back to prebuilt binaries. Assuming you have checked out the source to {{{$WEBDRIVER_HOME}}}, now:
 
 {{{
 cd $WEBDRIVER_HOME   # Where the top level Rakefile is kept
-rake
+go  
+# or, on a UNIX system: 
+./go
 }}}
 
-This will not only compile the source, but will also run any tests which need to be run. If these all pass, then you have successfully built WebDriver!
+This will not only compile the source, but will also run any tests which need to be run. If these all pass, then you have successfully built WebDriver! 
 
-== Implicit Targets ==
-
-Each target that builds a JAR file also has the following implicit targets:
-
-|| *Target extension* || *What it does* ||
-|| _zip || Creates a zip of the output file and all dependencies ||
+There are more detailed instructions about how the build system works in the CrazyFunBuild section.
 
 = Common Problems =
 
 == Nothing Compiles ==
 
-Make sure that you've got the JAVA_HOME environment setting properly set up. In addition, make sure that you can execute "rake" "java", "jar" and "javac" from the command line. If you're on Windows, you'll also need to be able to execute "devenv". You may need to install a JDK.
+Make sure that you've got the JAVA_HOME environment setting properly set up. In addition, make sure that you can execute "rake" "java", "jar" and "javac" from the command line. If you're on Windows, you'll also need to be able to execute "devenv". You may need to install a JDK. If a C++ component doesn't build properly on Windows, make sure that you are actually using the VS2008 version of msbuild (this might not be the case, even if you're in a VS2008 Command Prompt)
 
 == All Firefox Tests Fail ==
 
@@ -65,6 +57,6 @@ There have been reports of problems involving slow builds. Every test that runs 
 
 Other things to check:
 
- * The FirefoxDriver is only compatible with Firefox 2 and above. Check that the first available version of firefox on the PATH is version 2 or 3.x.
+ * The FirefoxDriver is only compatible with Firefox 3 and above. Check that the first available version of firefox on the PATH is version 3 or later.
  * The driver assumes that Firefox is installed in the default location for your OS. If Firefox is not in this location, then you need to set the VM property {{{webdriver.firefox.bin}}} or modify the PATH variable to include the directory with the firefox binary in it.
  * On some platforms such as Linux, Firefox is started with a shell script. There have been reports that if your installation of Firefox wraps this shell script with another one the FirefoxDriver won't work properly. Consider calling the original Firefox script.

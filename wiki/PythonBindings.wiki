@@ -13,7 +13,7 @@ Job done.
 
 = Installation of the python bindings from source =
 
-Checkout the source code from http://code.google.com/p/selenium/source/checkout. The subversion location is http://selenium.googlecode.com/svn/webdriver/trunk In the root directory of the downloaded code, run the following command from a command prompt:
+Checkout the source code from http://code.google.com/p/selenium/source/checkout. The subversion location is http://selenium.googlecode.com/svn/trunk In the root directory of the downloaded code, run the following command from a command prompt:
 
 {{{python setup.py install}}}
 
@@ -57,11 +57,11 @@ All the browsers supported by the Java implementation are available on the Pytho
 
 === Firefox ===
 
-There isn't any additional setup to use the firefox driver. For example usage, see http://code.google.com/p/webdriver/source/browse/trunk/common/test/py/example2.py
+There isn't any additional setup to use the firefox driver. For example usage, see http://code.google.com/p/selenium/source/browse/trunk/common/test/py/example2.py
 
 === Other browsers via remote driver ===
 
-You need to download and run a Remote driver server. [http://webdriver.googlecode.com/files/RemoteDriverServer.jar]  Put it in your webdriver directory and run {{{java -jar  RemoteDriverServer.jar 8888}}} The number is the port you want the server to listen on. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
+You need to download and run a copy of the Selenium server which is [http://code.google.com/p/selenium/downloads/list available here]  Put it in your webdriver directory and run {{{java -jar  selenium-server-standalone.jar -port 8888}}} The number is the port you want the server to listen on and if it's not listed will default to port 4444. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
 
 {{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}
 
