@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium.internal;
 
 import java.io.IOException;
+import java.lang.Math;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -46,10 +47,10 @@ public class PortProber {
     synchronized (random) {
       int seed = random.nextInt();
       // avoid protected ports
-      while (seed < 1025 || seed > 65534) {
-        seed = random.nextInt();
-      }
-
+      final int FIRST_PORT = 1025;
+      final int LAST_PORT = 65534;
+      final int randomInt = Math.abs(random.nextInt());
+      seed = (randomInt % (LAST_PORT - FIRST_PORT + 1)) + FIRST_PORT;
       return seed;
     }
   }
@@ -74,10 +75,7 @@ public class PortProber {
     long end = System.currentTimeMillis() + unit.toMillis(timeout);
     while (System.currentTimeMillis() < end) {
       try {
-        InetSocketAddress address = new InetSocketAddress(InetAddress.getByName(null), port);
-
-        Socket socket = new Socket();
-        socket.connect(address, 15000);
+        Socket socket = new Socket("localhost", port);
         socket.close();
         return true;
       } catch (ConnectException e) {

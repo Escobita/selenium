@@ -22,8 +22,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.thoughtworks.selenium.SeleniumException;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.JsonToBeanConverter;
-import org.openqa.selenium.remote.ProxyPac;
+
+import static org.openqa.selenium.browserlaunchers.CapabilityType.ForSeleniumServer.AVOIDING_PROXY;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.ForSeleniumServer.PROXYING_EVERYTHING;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.ForSeleniumServer.PROXY_PAC;
 
 public class BrowserConfigurationOptions {
 
@@ -121,27 +129,27 @@ public class BrowserConfigurationOptions {
   }
 
   public boolean isAvoidingProxy() {
-    return is("avoidProxy");
+    return is(AVOIDING_PROXY);
   }
 
   public void setAvoidProxy(boolean avoidProxy) {
-    set("avoidProxy", avoidProxy);
+    set(AVOIDING_PROXY, avoidProxy);
   }
 
   public void setOnlyProxySeleniumTraffic(boolean onlyProxySeleniumTraffic) {
-    set("onlyProxySeleniumTraffic", onlyProxySeleniumTraffic);
+    set(ONLY_PROXYING_SELENIUM_TRAFFIC, onlyProxySeleniumTraffic);
   }
 
   public boolean isOnlyProxyingSeleniumTraffic() {
-    return is("onlyProxySeleniumTraffic");
+    return is(ONLY_PROXYING_SELENIUM_TRAFFIC);
   }
 
   public void setProxyEverything(boolean proxyEverything) {
-    set("proxyEverything", proxyEverything);
+    set(PROXYING_EVERYTHING, proxyEverything);
   }
 
   public boolean isProxyingEverything() {
-    return is("proxyEverything");
+    return is(PROXYING_EVERYTHING);
   }
 
   public void setProxyRequired(boolean proxyRequired) {
@@ -152,21 +160,21 @@ public class BrowserConfigurationOptions {
     return is("proxyRequired") || getProxyConfig() != null;
   }
 
-  public ProxyPac getProxyConfig() {
-    String raw = get("proxy");
+  public DoNotUseProxyPac getProxyConfig() {
+    String raw = get(PROXY_PAC);
     if (raw == null) {
       return null;
     }
 
     try {
-      return new JsonToBeanConverter().convert(ProxyPac.class, raw);
+      return new JsonToBeanConverter().convert(DoNotUseProxyPac.class, raw);
     } catch (Exception e) {
       throw new SeleniumException("Unable to retrieve proxy configuration", e);
     }
   }
 
   public boolean isEnsuringCleanSession() {
-    return is("ensureCleanSession");
+    return is(ENSURING_CLEAN_SESSION);
   }
 
   public boolean is(String key) {
@@ -221,5 +229,13 @@ public class BrowserConfigurationOptions {
   @Override
   public String toString() {
     return serialize();
+  }
+
+  public Capabilities asCapabilities() {
+    DesiredCapabilities caps = new DesiredCapabilities();
+    for (Map.Entry<String, String> entry : options.entrySet()) {
+      caps.setCapability(entry.getKey(), entry.getValue());
+    }
+    return caps;
   }
 }

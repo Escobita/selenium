@@ -7,9 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
+
 public class ProxyPacTest extends TestCase {
   public void testShouldNotReturnAnythingIfNothingIsConfigured() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     StringWriter writer = new StringWriter();
     pac.outputTo(writer);
@@ -18,7 +20,7 @@ public class ProxyPacTest extends TestCase {
   }
 
   public void testShouldAllowSpecificUrlsToBeProxied() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     pac.mapHost("www.google.com").toProxy("http://localhost:8080");
     String config = captureOutput(pac);
@@ -30,7 +32,7 @@ public class ProxyPacTest extends TestCase {
   }
 
   public void testShouldAllowSpecificUrlsToBePassedThroughDirectly() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     pac.map("http://seleniumhq.org/cheese").toNoProxy();
     String config = captureOutput(pac);
@@ -42,7 +44,7 @@ public class ProxyPacTest extends TestCase {
   }
 
   public void testShouldAllowBasicWildCarding() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     pac.map("*/selenium-server/*").toProxy("http://localhost:8080/selenium-server/");
     String config = captureOutput(pac);
@@ -55,7 +57,7 @@ public class ProxyPacTest extends TestCase {
 
   // See: http://support.microsoft.com/kb/274204
   public void testShouldUseJsRegexIfIEWouldNotHandleTheMappingUrl() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     pac.map("/[a-zA-Z]{4}.microsoft.com/").toProxy("http://localhost:8080/selenium-server/");
     String config = captureOutput(pac);
@@ -67,7 +69,7 @@ public class ProxyPacTest extends TestCase {
   }
 
   public void testFinalLineOfFunctionShouldRedirectToDefaultProxy() throws IOException {
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
     String config = captureOutput(pac);
     assertTrue(config, config.endsWith("{\n}\n"));
@@ -93,7 +95,7 @@ public class ProxyPacTest extends TestCase {
     out.append(EXAMPLE_PAC);
     out.close();
 
-    ProxyPac pac = new ProxyPac();
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
     pac.map("/foobar/*").toNoProxy();
     pac.defaults().toProxy("http://example.com:8080/se-server");
     pac.deriveFrom(example.toURI());
@@ -112,7 +114,7 @@ public class ProxyPacTest extends TestCase {
        + "}\n", converted);
   }
 
-  private String captureOutput(ProxyPac pac) throws IOException {
+  private String captureOutput(DoNotUseProxyPac pac) throws IOException {
     StringWriter writer = new StringWriter();
     pac.outputTo(writer);
     return writer.toString();

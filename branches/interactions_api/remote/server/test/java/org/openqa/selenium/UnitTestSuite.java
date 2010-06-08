@@ -1,5 +1,7 @@
 package org.openqa.selenium;
 
+import org.openqa.selenium.browserlaunchers.WindowsProxyManagerUnitTest;
+import org.openqa.selenium.browserlaunchers.WindowsUtilsUnitTest;
 import org.openqa.selenium.server.*;
 import org.openqa.selenium.server.browserlaunchers.*;
 import org.openqa.selenium.server.mock.MockPIFrameUnitTest;

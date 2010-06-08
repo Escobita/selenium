@@ -1,6 +1,22 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import com.thoughtworks.selenium.SeleniumException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -8,20 +24,9 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.taskdefs.Delete;
 import org.apache.tools.ant.types.FileSet;
 import org.openqa.jetty.log.LogFactory;
-import org.openqa.selenium.remote.ProxyPac;
+import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.ClassPathResource;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.openqa.selenium.server.browserlaunchers.ProxyUtils.isOnlyProxyingSelenium;
 
 /**
  * Various static utility functions used to launch browsers
@@ -93,71 +98,6 @@ public class LauncherUtils {
     }
   }
 
-  /**
-   * Generate a proxy.pac file, configuring a dynamic proxy. <p/> If
-   * proxySeleniumTrafficOnly is true, then the proxy applies only to URLs
-   * containing "/selenium-server/". Otherwise the proxy applies to all URLs.
-   */
-  protected static File makeProxyPAC(File parentDir, int port, BrowserConfigurationOptions options)
-      throws FileNotFoundException {
-    return makeProxyPAC(parentDir, port,
-        System.getProperty("http.proxyHost"),
-        System.getProperty("http.proxyPort"),
-        System.getProperty("http.nonProxyHosts"), options);
-  }
-
-
-  public static File makeProxyPAC(File parentDir, int port, String configuredProxy, String proxyPort, String nonProxyHosts, BrowserConfigurationOptions options)
-      throws FileNotFoundException {
-    ProxyPac pac =
-        newProxyPac(port, configuredProxy, proxyPort, nonProxyHosts,
-            options);
-
-    try {
-      File pacFile = new File(parentDir, "proxy.pac");
-      Writer out = new FileWriter(pacFile);
-      pac.outputTo(out);
-      out.close();
-      return pacFile;
-    } catch (IOException e) {
-      throw new SeleniumException("Unable to configure proxy. Selenium will not work.");
-    }
-  }
-
-  private static ProxyPac newProxyPac(int port, String configuredProxy, String proxyPort, String nonProxyHosts, BrowserConfigurationOptions options) {
-    ProxyPac existingConfig = options.getProxyConfig();
-    ProxyPac pac = existingConfig == null ? new ProxyPac() : existingConfig;
-
-    if (configuredProxy != null) {
-      String proxyToUse = configuredProxy;
-      if (proxyPort != null) {
-        proxyToUse += ":" + proxyPort;
-      }
-      pac.defaults().toProxy(proxyToUse);
-    }
-
-    String defaultProxy = "DIRECT";
-    if (configuredProxy != null) {
-      defaultProxy = "PROXY " + configuredProxy;
-      if (proxyPort != null) {
-        defaultProxy += ":" + proxyPort;
-      }
-    }
-
-    String seleniumServerAsProxy = "localhost:" + port + "; " + defaultProxy;
-    if (isOnlyProxyingSelenium(options)) {
-      pac.map("*/selenium-server/*").toProxy(seleniumServerAsProxy);
-      if (nonProxyHosts != null && nonProxyHosts.trim().length() > 0) {
-        String[] hosts = nonProxyHosts.split("\\|");
-        for (String host : hosts) {
-          pac.mapHost(host).toNoProxy();
-        }
-      }
-    } else {
-      pac.defaults().toProxy(seleniumServerAsProxy);
-    }
-    return pac;
-  }
 
   /**
    * Strips the specified URL so it only includes a protocal, hostname and
@@ -368,7 +308,7 @@ public class LauncherUtils {
 
     if (options.isProxyRequired()) {
       // Configure us as the local proxy
-      File proxyPAC = LauncherUtils.makeProxyPAC(customProfileDir, port, options);
+      File proxyPAC = Proxies.makeProxyPAC(customProfileDir, port, options.asCapabilities());
       out.println("user_pref('network.proxy.type', 2);");
       out.println("user_pref('network.proxy.autoconfig_url', '"
                   + pathToBrowserURL(proxyPAC.getAbsolutePath()) + "');");
@@ -470,32 +410,4 @@ public class LauncherUtils {
     }
     return url;
   }
-
-  /**
-   * Run the specified pattern on each line of the data to extract a dictionary
-   */
-  public static Map<String, String> parseDictionary(String data, Pattern pattern, boolean reverse) {
-    Map<String, String> map = new HashMap<String, String>();
-    for (String line : data.split("\n")) {
-      Matcher m = pattern.matcher(line);
-      if (!m.find()) {
-        continue;
-      }
-      String name, value;
-      if (reverse) {
-        name = m.group(2);
-        value = m.group(1);
-      } else {
-        name = m.group(1);
-        value = m.group(2);
-      }
-      map.put(name, value);
-    }
-    return map;
-  }
-
-  public static Map<String, String> parseDictionary(String data, Pattern pattern) {
-    return parseDictionary(data, pattern, false);
-	}
-
 }

@@ -19,7 +19,6 @@ package org.openqa.selenium.remote.server.handler;
 
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.rest.ResultType;
@@ -41,14 +40,6 @@ public class CaptureScreenshot extends WebDriverHandler {
 
     response.setValue(((TakesScreenshot) driver).getScreenshotAs(BASE64));
     return ResultType.SUCCESS;
-  }
-
-  private WebDriver unwrap(WebDriver driver) {
-    WebDriver toReturn = driver;
-    while (toReturn instanceof WrapsDriver) {
-      toReturn = ((WrapsDriver) toReturn).getWrappedDriver();
-    }
-    return toReturn;
   }
 
   public Response getResponse() {

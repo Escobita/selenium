@@ -1,20 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using OpenQA.Selenium;
 using System.Text.RegularExpressions;
+using OpenQA.Selenium;
 
 namespace Selenium.Internal.SeleniumEmulation
 {
-    class IsTextPresent : SeleneseCommand
+    internal class IsTextPresent : SeleneseCommand
     {
-        private static readonly Regex TextMatchingStrategyAndValueRegex = new Regex("^(\\p{Alpha}+):(.*)");
+        private static readonly Regex TextMatchingStrategyAndValueRegex = new Regex("^([a-zA-Z]+):(.*)");
         private static Dictionary<string, ITextMatchingStrategy> textMatchingStrategies = new Dictionary<string, ITextMatchingStrategy>();
-        private JavaScriptLibrary library;
 
-        public IsTextPresent(JavaScriptLibrary js)
+        public IsTextPresent()
         {
-            library = js;
             SetUpTextMatchingStrategies();
         }
 
@@ -29,11 +27,10 @@ namespace Selenium.Internal.SeleniumEmulation
             }
             else
             {
-                text = library.CallEmbeddedHtmlUtils(driver, "getTextContent", body).ToString();
+                text = JavaScriptLibrary.CallEmbeddedHtmlUtils(driver, "getTextContent", body).ToString();
             }
 
             text = text.Trim();
-
 
             string strategyName = "implicit";
             string use = pattern;
@@ -41,21 +38,23 @@ namespace Selenium.Internal.SeleniumEmulation
             if (TextMatchingStrategyAndValueRegex.IsMatch(pattern))
             {
                 Match textMatch = TextMatchingStrategyAndValueRegex.Match(pattern);
-                strategyName = textMatch.Groups[0].Value;
-                use = textMatch.Groups[1].Value;
+                strategyName = textMatch.Groups[1].Value;
+                use = textMatch.Groups[2].Value;
             }
+
             ITextMatchingStrategy strategy = textMatchingStrategies[strategyName];
-
             return strategy.IsAMatch(use, text);
-
         }
 
         private void SetUpTextMatchingStrategies()
         {
-            textMatchingStrategies.Add("implicit", new GlobTextMatchingStrategy());
-            textMatchingStrategies.Add("glob", new GlobTextMatchingStrategy());
-            textMatchingStrategies.Add("regexp", new RegExTextMatchingStrategy());
-            textMatchingStrategies.Add("exact", new ExactTextMatchingStrategy());
+            if (textMatchingStrategies.Count == 0)
+            {
+                textMatchingStrategies.Add("implicit", new GlobTextMatchingStrategy());
+                textMatchingStrategies.Add("glob", new GlobTextMatchingStrategy());
+                textMatchingStrategies.Add("regexp", new RegexTextMatchingStrategy());
+                textMatchingStrategies.Add("exact", new ExactTextMatchingStrategy());                
+            }
         }
     }
 }

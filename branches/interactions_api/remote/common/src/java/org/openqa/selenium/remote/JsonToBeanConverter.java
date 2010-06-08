@@ -20,6 +20,8 @@ package org.openqa.selenium.remote;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -30,9 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 
 public class JsonToBeanConverter {
 
@@ -77,7 +76,7 @@ public class JsonToBeanConverter {
       if (rawCommand.has("sessionId"))
         sessionId = convert(SessionId.class, rawCommand.getString("sessionId"));
 
-      DriverCommand name = DriverCommand.fromName(rawCommand.getString("name"));
+      String name = rawCommand.getString("name");
       if (rawCommand.has("parameters")) {
         Map<String, ?> args =
             (Map<String, ?>) convert(HashMap.class, rawCommand.getJSONObject("parameters"));
@@ -104,9 +103,9 @@ public class JsonToBeanConverter {
       return (T) caps;
     }
 
-    if (ProxyPac.class.equals(clazz)) {
+    if (DoNotUseProxyPac.class.equals(clazz)) {
       JSONObject object = new JSONObject((String) text);
-      ProxyPac pac = new ProxyPac();
+      DoNotUseProxyPac pac = new DoNotUseProxyPac();
 
       if (object.has("directUrls")) {
         JSONArray allUrls = object.getJSONArray("directUrls");

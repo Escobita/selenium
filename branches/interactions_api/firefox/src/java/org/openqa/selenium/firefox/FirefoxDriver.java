@@ -18,25 +18,27 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import static org.openqa.selenium.OutputType.FILE;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.firefox.internal.Lock;
 import org.openqa.selenium.firefox.internal.NewProfileExtensionConnection;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
@@ -48,9 +50,11 @@ import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 
-import static org.openqa.selenium.OutputType.FILE;
+import com.google.common.collect.ImmutableMap;
+import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 
 
 /**
@@ -65,6 +69,9 @@ import static org.openqa.selenium.OutputType.FILE;
  * This allows multiple instances of firefox to be started.
  */
 public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, FindsByCssSelector {
+  public static final String BINARY = "firefox_binary";
+  public static final String PROFILE = "firefox_profile";
+
   public static final int DEFAULT_PORT = 7055;
   // For now, only enable native events on Windows
   public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
@@ -77,14 +84,12 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   public static final boolean ASSUME_UNTRUSTED_ISSUER = true;
 
   // Commands we can execute with needing to dismiss an active alert
-  private final Set<DriverCommand> alertWhiteListedCommands = new HashSet<DriverCommand>() {{
+  private final Set<String> alertWhiteListedCommands = new HashSet<String>() {{
     add(DriverCommand.DISMISS_ALERT);
   }};
 
   private FirefoxAlert currentAlert;
 
-
-  private final LazyCommandExecutor executor;
   protected FirefoxBinary binary;
   protected FirefoxProfile profile;
 
@@ -96,11 +101,52 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
     this(new FirefoxBinary(), profile);
   }
 
+  public FirefoxDriver(Capabilities capabilities) {
+    this(getBinary(capabilities), extractProfile(capabilities));
+  }
+
+  private static FirefoxProfile extractProfile(Capabilities capabilities) {
+    FirefoxProfile profile = new FirefoxProfile();
+
+    if (capabilities.getCapability(PROFILE) != null) {
+      Object raw = capabilities.getCapability(PROFILE);
+      if (raw instanceof FirefoxProfile) {
+        profile = (FirefoxProfile) raw;
+      } else if (raw instanceof String) {
+        try {
+          profile = FirefoxProfile.fromJson((String) raw);
+        } catch (IOException e) {
+          throw new WebDriverException(e);
+        }
+      }
+    }
+
+    if (capabilities.getCapability(PROXY) != null) {
+      Proxy proxy = Proxies.extractProxy(capabilities);
+      profile.setProxyPreferences(proxy);
+    }
+
+    return profile;
+  }
+
+  private static FirefoxBinary getBinary(Capabilities capabilities) {
+    if (capabilities.getCapability(BINARY) != null) {
+      File file = new File((String) capabilities.getCapability(BINARY));
+      new FirefoxBinary(file);
+    }
+    return new FirefoxBinary();
+  }
+
   public FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile) {
     super(new LazyCommandExecutor(binary, profile), DesiredCapabilities.firefox());
     this.binary = binary;
     this.profile = profile;
-    executor = (LazyCommandExecutor) getCommandExecutor();
+    setElementConverter(new JsonToWebElementConverter(this) {
+      @Override
+      protected RemoteWebElement newRemoteWebElement() {
+        return new FirefoxWebElement(FirefoxDriver.this);
+      }
+    });
   }
 
   @Override
@@ -179,7 +225,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   }
 
   @Override
-  protected Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+  protected Response execute(String driverCommand, Map<String, ?> parameters) {
     if (currentAlert != null) {
       if (!alertWhiteListedCommands.contains(driverCommand)) {
         ((FirefoxTargetLocator) switchTo()).alert()

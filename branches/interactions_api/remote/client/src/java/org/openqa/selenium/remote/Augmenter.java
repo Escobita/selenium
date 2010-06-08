@@ -27,11 +27,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.html5.AddApplicationCache;
+import org.openqa.selenium.remote.html5.AddBrowserConnection;
+import org.openqa.selenium.remote.html5.AddDatabaseStorage;
+import org.openqa.selenium.remote.html5.AddLocationContext;
+import org.openqa.selenium.browserlaunchers.CapabilityType;
 
 /**
  * Enhance the interfaces implemented by an instance of the
  * {@link org.openqa.selenium.remote.RemoteWebDriver} based on the returned
- * {@link org.openqa.selenium.remote.Capabilities} of the driver.
+ * {@link org.openqa.selenium.Capabilities} of the driver.
  *
  * Note: this class is still experimental. Use at your own risk.
  */
@@ -41,6 +46,10 @@ public class Augmenter {
 
   public Augmenter() {
     addAugmentation(CapabilityType.TAKES_SCREENSHOT, new AddTakesScreenshot());
+    addAugmentation(CapabilityType.SUPPORTS_SQL_DATABASE, new AddDatabaseStorage());
+    addAugmentation(CapabilityType.SUPPORTS_LOCATION_CONTEXT, new AddLocationContext());
+    addAugmentation(CapabilityType.SUPPORTS_APPLICATION_CACHE, new AddApplicationCache());
+    addAugmentation(CapabilityType.SUPPORTS_BROWSER_CONNECTION, new AddBrowserConnection());
   }
 
   /**
@@ -75,11 +84,11 @@ public class Augmenter {
       return driver;
     }
 
-    Map<String,Object> capabilities = ((RemoteWebDriver) driver).getCapabilities().asMap();
+    Map<String, ?> capabilities = ((RemoteWebDriver) driver).getCapabilities().asMap();
 
     CompoundHandler handler = new CompoundHandler((RemoteWebDriver) driver);
 
-    for (Map.Entry<String, Object> capablityName : capabilities.entrySet()) {
+    for (Map.Entry<String, ?> capablityName : capabilities.entrySet()) {
       AugmenterProvider augmenter = augmentors.get(capablityName.getKey());
       if (augmenter == null) {
         continue;

@@ -23,6 +23,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.internal.Cleanly;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.internal.Zip;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -99,7 +100,7 @@ public class FirefoxProfile {
     }
 
     try {
-      addExtension(FirefoxProfile.class, "webdriver-extension.zip");
+      addExtension(FirefoxProfile.class, "webdriver.xpi");
     } catch (IOException e) {
       if (!Boolean.getBoolean("webdriver.development")) {
         throw new WebDriverException("Failed to install webdriver extension", e);
@@ -362,14 +363,18 @@ public class FirefoxProfile {
         return this;
       }
       setPreference("network.proxy.type", proxy.getProxyType().ordinal());
+
       switch (proxy.getProxyType()) {
-        case MANUAL:
+        case MANUAL:// By default, assume we're proxying the lot
+          setPreference("network.proxy.no_proxies_on", "");
+
           setManualProxyPreference("ftp", proxy.getFtpProxy());
           setManualProxyPreference("http", proxy.getHttpProxy());
           setManualProxyPreference("ssl", proxy.getSslProxy());
           if (proxy.getNoProxy() != null) {
             setPreference("network.proxy.no_proxies_on", proxy.getNoProxy());
           }
+          
           break;
         case PAC:
           setPreference("network.proxy.autoconfig_url", proxy.getProxyAutoconfigUrl());
@@ -578,4 +583,18 @@ public class FirefoxProfile {
     public void clean() {
       TemporaryFilesystem.deleteTempDir(profileDir);
     }
+
+  public String toJson() throws IOException {
+    updateUserPrefs();
+
+    return new Zip().zip(profileDir);
+  }
+
+  public static FirefoxProfile fromJson(String json) throws IOException {
+    File dir = TemporaryFilesystem.createTempDir("webdriver", "duplicated");
+
+    new Zip().unzip(json, dir);
+
+    return new FirefoxProfile(dir);
+  }
 }

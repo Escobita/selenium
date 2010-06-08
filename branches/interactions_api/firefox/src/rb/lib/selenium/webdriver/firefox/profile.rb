@@ -6,7 +6,7 @@ module Selenium
         ANONYMOUS_PROFILE_NAME = "WEBDRIVER_ANONYMOUS_PROFILE"
         EXTENSION_NAME         = "fxdriver@googlecode.com"
         EM_NAMESPACE_URI       = "http://www.mozilla.org/2004/em-rdf#"
-        NO_FOCUS_LIBRARY_NAME  = "x_ignore_nofocus.so"
+        NO_FOCUS_LIBRARY_NAME  = "libnoblur.so"
 
         DEFAULT_EXTENSION_SOURCE = File.expand_path("#{WebDriver.root}/firefox/src/extension")
 
@@ -16,15 +16,19 @@ module Selenium
           ["#{WebDriver.root}/firefox/prebuilt/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt"],
         ]
 
-        NATIVE_WINDOWS = ["#{WebDriver.root}/firefox/prebuilt/Win32/Release/webdriver-firefox.dll", "platform/WINNT_x86-msvc/components/webdriver-firefox.dll"]
+        NATIVE_WINDOWS = [
+          "#{WebDriver.root}/firefox/prebuilt/Win32/Release/webdriver-firefox.dll",
+          "platform/WINNT_x86-msvc/components/webdriver-firefox.dll"
+        ]
+
         NATIVE_LINUX   = [
           ["#{WebDriver.root}/firefox/prebuilt/linux/Release/libwebdriver-firefox.so", "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so"],
           ["#{WebDriver.root}/firefox/prebuilt/linux64/Release/libwebdriver-firefox.so", "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so"]
         ]
 
         NO_FOCUS = [
-          ["#{WebDriver.root}/firefox/prebuilt/linux64/Release/x_ignore_nofocus.so", "amd64/x_ignore_nofocus.so"],
-          ["#{WebDriver.root}/firefox/prebuilt/linux/Release/x_ignore_nofocus.so", "x86/x_ignore_nofocus.so"],
+          ["#{WebDriver.root}/firefox/prebuilt/amd64/libnoblur64.so", "amd64/#{NO_FOCUS_LIBRARY_NAME}"],
+          ["#{WebDriver.root}/firefox/prebuilt/i386/libnoblur.so", "x86/#{NO_FOCUS_LIBRARY_NAME}"],
         ]
 
         SHARED = [
@@ -71,6 +75,7 @@ module Selenium
           @extension_source  = DEFAULT_EXTENSION_SOURCE
           @native_events     = DEFAULT_ENABLE_NATIVE_EVENTS
           @secure_ssl        = DEFAULT_SECURE_SSL
+          @untrusted_issuer  = DEFAULT_ASSUME_UNTRUSTED_ISSUER
           @load_no_focus_lib = DEFAULT_LOAD_NO_FOCUS_LIB
 
           @additional_prefs  = {}
@@ -113,10 +118,13 @@ module Selenium
           prefs.merge! @additional_prefs
           prefs.merge! DEFAULT_PREFERENCES
 
-          prefs['webdriver_firefox_port']           = @port
-          prefs['webdriver_accept_untrusted_certs'] = 'true' unless secure_ssl?
-          prefs['webdriver_enable_native_events']   = 'true' if native_events?
-          prefs["startup.homepage_welcome_url"]     = prefs["browser.startup.homepage"] # If the user sets the home page, we should also start up there
+          prefs['webdriver_firefox_port']            = @port
+          prefs['webdriver_accept_untrusted_certs']  = !secure_ssl?
+          prefs['webdriver_enable_native_events']    = native_events?
+          prefs['webdriver_assume_untrusted_issuer'] = assume_untrusted_certificate_issuer?
+
+          # If the user sets the home page, we should also start up there
+          prefs["startup.homepage_welcome_url"] = prefs["browser.startup.homepage"]
 
           write_prefs prefs
         end
@@ -197,6 +205,14 @@ module Selenium
 
         def secure_ssl?
           @secure_ssl == true
+        end
+
+        def assume_untrusted_certificate_issuer?
+          @untrusted_issuer == true
+        end
+
+        def assume_untrusted_certificate_issuer=(bool)
+          @untrusted_issuer = bool
         end
 
         private

@@ -19,10 +19,11 @@ package org.openqa.selenium.server.browserlaunchers;
 import org.apache.commons.logging.Log;
 import org.apache.tools.ant.taskdefs.condition.Os;
 import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
+import org.openqa.selenium.browserlaunchers.WindowsUtils;
 import org.openqa.selenium.server.ApplicationRegistry;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
-import org.openqa.selenium.server.SeleniumServer;
 import org.openqa.selenium.server.browserlaunchers.locators.SafariLocator;
 
 import java.io.*;
@@ -233,7 +234,7 @@ public class SafariCustomProfileLauncher extends AbstractBrowserLauncher {
   }
 
   protected void changeRegistrySettings() throws IOException {
-    wpm.changeRegistrySettings(browserConfigurationOptions);
+    wpm.changeRegistrySettings(browserConfigurationOptions.asCapabilities());
   }
 
   private void createSystemProxyManager(String sessionId) {

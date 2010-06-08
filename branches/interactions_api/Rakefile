@@ -6,9 +6,12 @@ verbose false
 
 # The CrazyFun build grammar. There's no magic here, just ruby
 require 'rake-tasks/crazy_fun'
+require 'rake-tasks/crazy_fun/mappings/gcc'
 require 'rake-tasks/crazy_fun/mappings/java'
 require 'rake-tasks/crazy_fun/mappings/javascript'
 require 'rake-tasks/crazy_fun/mappings/mozilla'
+require 'rake-tasks/crazy_fun/mappings/rake'
+require 'rake-tasks/crazy_fun/mappings/ruby'
 
 # The original build rules
 require 'rake-tasks/task-gen'
@@ -19,12 +22,11 @@ require 'rake-tasks/c'
 require 'rake-tasks/java'
 require 'rake-tasks/iphone'
 require 'rake-tasks/selenium'
-require 'rake-tasks/mozilla'
-require 'rake-tasks/ruby'
 require 'rake-tasks/se-ide'
 require 'rake-tasks/ie_code_generator'
 
 version = "2.0a4"
+ide_version = "1.0.8-SNAPSHOT"
 
 # The build system used by webdriver is layered on top of rake, and we call it
 # "crazy fun" for no readily apparent reason.
@@ -32,32 +34,35 @@ version = "2.0a4"
 # First off, create a new CrazyFun object.
 crazy_fun = CrazyFun.new
 
-# Secondly, we add the handlers, which are responsible for turning a build 
+# Secondly, we add the handlers, which are responsible for turning a build
 # rule into a (series of) rake tasks. For example if we're looking at a file
 # in subdirectory "subdir" contains the line:
 #
 # java_library(:name => "example", :srcs => ["foo.java"])
 #
 # we would generate a rake target of "//subdir:example" which would generate
-# a Java JAR at "build/subdir/example.jar". 
-# 
+# a Java JAR at "build/subdir/example.jar".
+#
 # If crazy fun doesn't know how to handle a particular output type ("java_library"
 # in the example above) then it will throw an exception, stopping the build
+GccMappings.new.add_all(crazy_fun)
 JavaMappings.new.add_all(crazy_fun)
 JavascriptMappings.new.add_all(crazy_fun)
 MozillaMappings.new.add_all(crazy_fun)
+RakeMappings.new.add_all(crazy_fun)
+RubyMappings.new.add_all(crazy_fun)
 
 # Not every platform supports building every binary needed, so we sometimes
 # need to fall back to prebuilt binaries. The prebuilt binaries are stored in
 # a directory structure identical to that used in the "build" folder, but
 # rooted at one of the following locations:
-["chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt"].each do |pre|
+["chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt", "ide/prebuilt"].each do |pre|
   crazy_fun.prebuilt_roots << pre
 end
 
 # Finally, find every file named "build.desc" in the project, and generate
 # rake tasks from them. These tasks are normal rake tasks, and can be invoked
-# from rake. 
+# from rake.
 crazy_fun.create_tasks(Dir["**/build.desc"])
 
 # Notice that because we're using rake, anything you can do in a normal rake
@@ -70,37 +75,40 @@ task :all => [:'selenium-java']
 task :all_zip => [:'selenium-java_zip']
 task :chrome => [ "//chrome" ]
 task :common => [ "//common" ]
+task :common_core => [ "//common:core" ]
 task :htmlunit => [ "//htmlunit" ]
-task :ie => [:'webdriver-ie']
-task :firefox => [:'webdriver-firefox']
+task :ie => [ "//jobbie" ]
+task :firefox => [ "//firefox" ]
 task :jobbie => [:ie]
-task :jsapi => :'webdriver-jsapi'
+task :jsapi => "//jsapi:debug:run"
 task :remote => [:remote_common, :remote_server, :remote_client]
 task :remote_common => ["//remote/common"]
 task :remote_client => ["//remote/client"]
-task :remote_server => [:'webdriver-remote-server']
-task :selenium => [:'webdriver-selenium']
+task :remote_server => ["//remote/server"]
+task :selenium => [ "//selenium" ]
 task :support => [ "//support" ]
-task :iphone_client => [:'webdriver-iphone-client']
+task :iphone_client => ['//iphone']
 task :iphone => [:iphone_server, :iphone_client]
+task :'selenium-server-standalone' => ["//remote/server:server:uber"]
+task :ide => [ "//ide:selenium-ide" ]
 
 task :test_common => [ "//common:test" ]
-task :test_chrome => [ "//chrome:test" ]
+task :test_chrome => [ "//chrome:test:run" ]
 task :test_htmlunit => [ "//htmlunit:test:run" ]
-task :test_ie => [:'webdriver-ie-test']
-task :test_jobbie => [:test_ie]
-task :test_jsapi => :'webdriver-jsapi-test'
-task :test_firefox => [:'webdriver-firefox-test']
-task :test_remote => [:'webdriver-selenium-server-test']
-task :test_selenium => [:'webdriver-selenium-server-test', :'webdriver-selenium-test', :'webdriver-selenese-test']
+task :test_ie => [ "//jobbie:test:run" ]
+task :test_jobbie => [ "//jobbie:test:run" ]
+task :test_jsapi => "//jsapi:test:run"
+task :test_firefox => [ "//firefox:test:run" ]
+task :test_remote => [ "//remote/server:test:run" ]
+task :test_selenium => [ "//selenium:selenium_test:run", "//selenium:test-selenese:run", :'test_core']
 task :test_support => [ "//support:test:run" ]
 task :test_iphone_client => [:'webdriver-iphone-client-test']
 task :test_iphone => [:test_iphone_server, :test_iphone_client]
 
-task :test_core => [:'test_core_firefox']
 if (windows?)
   task :test_core => [:'test_core_ie']
 end
+task :test_core => [:'test_core_firefox']
 
 task :build => [:all, :iphone, :remote, :selenium]
 task :test => [
@@ -115,8 +123,8 @@ task :test => [
               ]
 
 task :clean do
-  rm_rf 'build/', :verbose => false
-  rm_rf 'iphone/build/', :verbose => false
+  rm_rf 'build/'
+  rm_rf 'iphone/build/'
 end
 
 dll(:name => "ie_win32_dll",
@@ -152,67 +160,14 @@ ie_generate_type_mapping(:name => "ie_result_type_java",
                          :type => "java",
                          :out => "java/org/openqa/selenium/ie/IeReturnTypes.java")
 
-java_jar(:name => "webdriver-ie",
-    :srcs  => [ "jobbie/src/java/**/*.java" ],
-    :deps => [
-               "//common",
-               "jobbie/lib/runtime/*.jar",
-               :ie_result_type_java,
-               :ie_result_type_cpp
-             ],
-    :resources => [
-               {:ie_win32_dll => "x86/InternetExplorerDriver.dll"},
-               {:ie_x64_dll => "amd64/InternetExplorerDriver.dll"},
-             ])
-
-java_test(:name => "webdriver-ie-test",
-          :srcs  => [ "jobbie/test/java/**/*.java" ],
-          :deps => [
-                     :ie,
-                     :test_common
-                   ],
-          :run  => windows?)
-
-xpi(:name => "firefox_xpi",
-    :srcs  => [ "firefox/src/extension/**" ],
-    :deps => [
-               :firefox_dll,
-               :libwebdriver_firefox,
-             ],
-    :resources => [
-                    { "firefox/src/extension/components/*.js" => "components/" },
-                    { "common/src/js/extension/*.js" => "content/" },
-                    { :"//firefox:command_processor_xpt" => "components/" },
-                    { :"//firefox:native_events_xpt" => "components/" },
-                    { :"//firefox:response_handler_xpt" => "components/" },
-                    { :firefox_dll => "platform/WINNT_x86-msvc/components/webdriver-firefox.dll" },
-                    { :libwebdriver_firefox_so => "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so" },
-                    { :libwebdriver_firefox_so64 => "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so" },
-                  ],
-    :out  => "webdriver-extension.zip")
-
 dll(:name => "firefox_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "jobbie/src/cpp/webdriver-firefox/**/*" ],
     :solution => "WebDriver.sln",
     :out  => "Win32/Release/webdriver-firefox.dll",
-    :deps  => [ 
+    :deps  => [
                 "//firefox:native_events_xpt",
               ],
     :prebuilt => "firefox/prebuilt")
-
-dll(:name => "libnoblur_so_64",
-    :src  => FileList['firefox/src/cpp/linux-specific/*.c'],
-    :arch => "amd64",
-    :prebuilt => "firefox/prebuilt",
-    :out  => "linux64/Release/x_ignore_nofocus.so")
-
-dll(:name => "libnoblur_so",
-    :src  => FileList['firefox/src/cpp/linux-specific/*.c'],
-    :arch => "i386",
-    :prebuilt => "firefox/prebuilt",
-    :out  => "linux/Release/x_ignore_nofocus.so")
-
-task :libnoblur => [:libnoblur_so, :libnoblur_so_64]
 
 gecko_sdk = "third_party/gecko-1.9.0.11/linux/"
 
@@ -225,12 +180,12 @@ dll(:name => "libwebdriver_firefox_so",
     :prebuilt => "firefox/prebuilt",
     :out  => "linux/Release/libwebdriver-firefox.so")
 
-# There is no official 64 bit gecko SDK. Fall back to trying to use the one on 
-# system, but be ready for this to fail. I have a Ubuntu machine, so that's 
+# There is no official 64 bit gecko SDK. Fall back to trying to use the one on
+# system, but be ready for this to fail. I have a Ubuntu machine, so that's
 # what I'm basing this on. I understand that's a Bad Idea
 
 gecko_devels = FileList.new("/usr/lib/xulrunner-devel-1.9.*/sdk")
-local_gecko = gecko_devels.empty? ? "" : gecko_devels.to_a[0] + "/" 
+local_gecko = gecko_devels.empty? ? "" : gecko_devels.to_a[0] + "/"
 
 dll(:name => "libwebdriver_firefox_so64",
     :src  => FileList.new('common/src/cpp/webdriver-interactions/*_linux.cpp') + FileList.new('firefox/src/cpp/webdriver-firefox/native_events.cpp'),
@@ -240,208 +195,21 @@ dll(:name => "libwebdriver_firefox_so64",
     :prebuilt => "firefox/prebuilt",
     :out  => "linux64/Release/libwebdriver-firefox.so")
 
-task :libwebdriver_firefox => [:libwebdriver_firefox_so, :libwebdriver_firefox_so64]
-
-java_jar(:name => "webdriver-firefox",
-    :srcs  => [ "firefox/src/java/**/*.java" ],
-    :deps => [
-               :common,
-               :remote_client,
-               :remote_common,
-               :firefox_xpi,
-               :libnoblur,
-               "third_party/java/json/json-20080701.jar"
-             ],
-    :resources => [
-                    :firefox_xpi,
-                    { "linux/Release/x_ignore_nofocus.so" => "x86/x_ignore_nofocus.so" },
-                    { "linux64/Release/x_ignore_nofocus.so" => "amd64/x_ignore_nofocus.so" }
-                  ])
-
-java_test(:name => "webdriver-firefox-test",
-          :srcs  => [ "firefox/test/java/**/*.java" ],
-          :deps => [
-                     :'webdriver-firefox',
-                     "//common:test",
-                   ])
-
-java_test(:name => "webdriver-single-testsuite",
-          :srcs  => [ "common/test/java/org/openqa/selenium/SingleTestSuite.java",
-                      "support/test/java/**/*.java",
-                      "htmlunit/test/java/**/*.java",
-                      ],
-          :deps => [
-                     :'htmlunit',
-                     "//common:test",
-                     "//support:support",
-                   ],
-         :test_suite => "SingleTestSuite")
-
-#xpt(:name => "ide-auto-complete",
-#    :src  => [ "ide/src/extension/idl/SeleniumIDEGenericAutoCompleteSearch.idl" ],
-#    :prebuilt => "ide/prebuilt",
-#    :out  => "SeleniumIDEGenericAutoCompleteSearch.xpt")
-
-xpi(:name => "ide",
-    :srcs => [],
-    :deps => [],
-    :resources => [
-                    { "ide/src/extension/chrome/" => "/" },
-                    { "common/src/js/core/*" => "chrome/content/selenium/"},
-                    { "ide/src/extension/content" => "chrome/" },
-                    { "ide/src/extension/skin" => "chrome/" },
-                    { "ide/src/extension/locale" => "chrome/" },
-                    { :"ide-auto-complete" => "components/" },
-                    { "ide/src/extension/components/SeleniumIDEGenericAutoCompleteSearch.js" => "components/" },
-                    { "ide/src/extension/install.rdf" => "/" },
-                    { "ide/src/extension/chrome.manifest.production" => "/chrome.manifest" },
-                    { "common/src/js/core/scripts/selenium-testrunner.js" => "content-files/" }
-                  ],
-    :out => "selenium-ide-1.0.7-SNAPSHOT.xpi")
-
-java_jar(:name => "selenium-common-js",
-    :resources => [
-      "common/src/js/core",
-      "common/src/js/jsunit",
-      {
-        "common/src/js/core/TestRunner.html" => "core/TestRunner.hta",
-        "common/src/js/core/RemoteRunner.html" => "core/RemoteRunner.hta",
-      }])
-
-java_jar(:name => "webdriver-remote-server",
-    :srcs  => [ "remote/server/src/java/**/*.java" ],
-    :resources => [
-      {
-        "remote/server/src/java/org/openqa/jetty/http/mime.properties" => "org/openqa/jetty/http/mime.properties",
-        "remote/server/src/java/org/openqa/jetty/http/encoding.properties" => "org/openqa/jetty/http/encoding.properties",
-      },
-      "remote/server/src/java/customProfileDir*",
-      "remote/server/src/java/cybervillains",
-      "remote/server/src/java/hudsuckr",
-      "remote/server/src/java/killableprocess",
-      "remote/server/src/java/konqueror",
-      "remote/server/src/java/opera",
-      "remote/server/src/java/sslSupport",
-      "remote/server/src/java/VERSION.txt",
-      "common/src/js/core",
-      "common/src/js/jsunit",
-      {
-        "common/src/js/core/TestRunner.html" => "core/TestRunner.hta",
-        "common/src/js/core/RemoteRunner.html" => "core/RemoteRunner.hta",
-      },
-    ],
-    :deps => [
-               :chrome,
-               "//htmlunit",
-               :ie,
-               :firefox,
-               :remote_common,
-               :selenium,
-               :support,
-               "remote/server/lib/runtime/*.jar"
-             ])
-
-java_uberjar(:name => "selenium-server",
-             :deps => [ "webdriver-remote-server", :selenium ],
-             :exclude => [
-                           "META-INF/BCKEY.*"
-                         ],
-             :main => "org.openqa.selenium.server.SeleniumServer",
-             :no_libs => true)
-
 task :'selenium-server_zip' do
   temp = "build/selenium-server_zip"
   mkdir_p temp
-  sh "cd #{temp} && jar xf ../selenium-server.zip", :verbose => false
+  sh "cd #{temp} && jar xf ../selenium-server.zip"
   rm_f "build/selenium-server.zip"
   Dir["#{temp}/webdriver-*.jar"].each { |file| rm_rf file }
   mv "#{temp}/selenium-server.jar", "#{temp}/selenium-server-#{version}.jar"
-  sh "cd #{temp} && jar cMf ../selenium-server.zip *", :verbose => false
+  sh "cd #{temp} && jar cMf ../selenium-server.zip *"
 end
-
-java_uberjar(:name => "selenium-server-standalone",
-             :deps => [ :'selenium-server' ],
-             :standalone => true,
-             :exclude => [
-                           "META-INF/BCKEY.*"
-                         ],
-             :main => "org.openqa.selenium.server.SeleniumServer")
-
-java_test(:name => "webdriver-selenium-server-test",
-          :srcs => [
-                     "remote/client/test/java/**/*.java",
-                     "remote/server/test/java/org/openqa/selenium/remote/**/*.java",
-                     "remote/server/test/java/org/openqa/selenium/server/**/*.java",
-                     "remote/server/test/java/org/openqa/selenium/testworker/**/*.java"
-                   ],
-          :deps => [
-                     :remote_client,
-                     :remote_server,
-                     :test_common,
-                     "//remote/common:test",
-                     "remote/server/lib/buildtime/*.jar"
-                   ])
-
-java_war(:name => "webdriver-remote-servlet",
-         :deps => [ :'webdriver-remote-server' ],
-         :resources => [
-                         "remote/server/src/web/**"
-                       ]
-         )
 
 dll(:name => "chrome_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "chome/src/cpp/**/*" ],
     :solution => "WebDriver.sln",
     :out  => 'Win32/Release/npchromedriver.dll',
     :prebuilt => "chrome/prebuilt")
-
-xpi(:name => "chrome_extension",
-    :srcs  => [ "chrome/src/extension/**" ],
-    :deps => [ :chrome_dll ],
-    :resources => [
-                     { :chrome_dll => "npchromedriver.dll" }
-                  ],
-    :out => "chrome-extension.zip")
-task "chrome/build/chrome-extension.zip" => :'chrome_extension'
-Rake::Task["build/chrome-extension.zip"].out = "build/chrome-extension.zip"
-
-java_jar(:name => "webdriver-selenium",
-    :srcs  => [ "selenium/src/java/**/*.java" ],
-    :deps => [
-               :chrome,
-               :ie,
-               :firefox,
-               :remote_client,
-               :support,
-               "selenium/lib/runtime/*.jar"
-             ],
-    :resources => [
-                    { "selenium/src/java/org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" => "org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" },
-                    { "selenium/src/java/org/openqa/selenium/internal/seleniumemulation/htmlutils.js" => "org/openqa/selenium/internal/seleniumemulation/htmlutils.js" }
-                  ])
-
-java_test(:name => "webdriver-selenium-test",
-          :srcs => [ "selenium/test/java/**/*.java" ],
-          :resources => [
-                     { "selenium/test/java/com/thoughtworks/selenium/testHelpers.js" => "com/thoughtworks/selenium/testHelpers.js" },
-                   ],
-          :deps => [
-                     :test_common,
-                     "//htmlunit",
-                     :'selenium-server-standalone',
-                     "selenium/lib/buildtime/*.jar",
-                   ],
-          :main => "org.testng.TestNG",
-          :args => "selenium/test/java/webdriver-selenium-suite.xml")
-
-java_test(:name => "webdriver-selenese-test",
-          :srcs => [ "selenium/test/java/**/*.java" ],
-          :deps => [
-                     :test_common,
-                     "//htmlunit",
-                     :'selenium-server-standalone',
-                     "selenium/lib/buildtime/*.jar",
-                   ])
 
 java_jar(:name => "selenium-core",
          :resources => [
@@ -452,7 +220,7 @@ java_jar(:name => "selenium-core",
 selenium_test(:name => "test_core_firefox",
               :srcs => [ "common/test/js/core/*.js" ],
               :deps => [
-                :"webdriver-remote-server",
+                "//remote/server",
                 :"selenium-core"
               ],
               :browser => "*chrome" )
@@ -460,31 +228,23 @@ selenium_test(:name => "test_core_firefox",
 selenium_test(:name => "test_core_ie",
               :srcs => [ "common/test/js/core/*.js" ],
               :deps => [
-                :"webdriver-remote-server",
+                "//remote/server",
                 :"selenium-core"
               ],
               :browser => "*iexploreproxy")
 
-java_jar(:name => "webdriver-jsapi",
-    :srcs => [ "remote/server/test/java/**/JsApi*.java" ],
-    :deps => [ :firefox, :test_common ])
-
-# Comprehensive test suite for testing the JS API in isolation against all of
-# the supported browsers. This should be included in the :test task; for that we
-# defer to the suites for the individual drivers.
-java_test(:name => "webdriver-jsapi-test",
-          :srcs => [ "jsapi/test/java/**/*.java" ],
-          :deps => [ :firefox, :chrome, :test_common ])
-
-# Simply starts the Jetty6AppServer for manually testing the JS API tests.
-# After starting, open a browser to http://localhost:$PORT/js/test, where $PORT
-# is the port the server was started on.
-java_test(:name => "debug_jsapi",
-          :deps => [ :firefox, :test_common ],
-          :main => "org.openqa.selenium.environment.webserver.Jetty6AppServer")
+# Copy things around to make life easier when packaging IDE
+file "build/ide/selenium" => "//common:js_core" do
+  rm_rf "build/ide/selenium"
+  mkdir_p "build/ide"
+  puts Rake::Task["//common:js_core"].out
+  cp_r Rake::Task["//common:js_core"].out + "/", "build/ide/selenium/"
+  Dir["build/ide/selenium/**/.svn"].each { |file| rm_rf file }
+end
+task "rename_core" => "build/ide/selenium"
 
 task :javadocs => [:common, :firefox, "//htmlunit", :jobbie, :remote, :support, :chrome, :selenium] do
-  mkdir_p "build/javadoc", :verbose => false
+  mkdir_p "build/javadoc"
    sourcepath = ""
    classpath = "third_party/java/hamcrest/hamcrest-all-1.1.jar"
    %w(common firefox jobbie htmlunit support remote/common remote/client chrome selenium).each do |m|
@@ -498,7 +258,7 @@ task :javadocs => [:common, :firefox, "//htmlunit", :jobbie, :remote, :support, 
 end
 
 # Installs the webdriver python bindings using virtualenv for testing.
-task :webdriver_py => [:chrome, :firefox, :firefox_xpi, :remote_client] do
+task :webdriver_py => [:chrome, :firefox, "//firefox:webdriver", :remote_client] do
   if python? then
     sh "virtualenv build/python", :verbose => true do |ok, res|
         if ! ok
@@ -512,14 +272,14 @@ task :webdriver_py => [:chrome, :firefox, :firefox_xpi, :remote_client] do
     sh "build/python/bin/pip install simplejson py", :verbose => true
 
     # Copy browser extensions over to src so setup.py will pick them up. This is such a hack.
-    cp 'build/chrome-extension.zip', "chrome/src/py/", :verbose => true
-    cp 'build/webdriver-extension.zip', "firefox/src/py/", :verbose => true
+    cp 'build/chrome/chrome-extension.zip', "chrome/src/py/", :verbose => true
+    cp 'build/firefox/webdriver.xpi', "firefox/src/py/", :verbose => true
 
     sh "build/python/bin/python setup.py build", :verbose => true
 
     # Remove the extensions we copied to src.
     rm "chrome/src/py/chrome-extension.zip", :verbose => true
-    rm "firefox/src/py/webdriver-extension.zip", :verbose => true
+    rm "firefox/src/py/webdriver.xpi", :verbose => true
   end
 end
 
@@ -589,14 +349,6 @@ task :test_selenium_py => [:'selenium-core', :'selenium-server-standalone'] do
     end
 end
 
-# Place-holder tasks
-java_jar(:name => "webdriver-iphone-client",
-         :srcs  => [ "iphone/src/java/**/*.java" ],
-         :deps => [
-                    :common,
-                    :remote_common,
-                    :remote_client
-                  ])
 
 iphone_test(:name => "webdriver-iphone-client-test",
             :srcs => [ "iphone/test/java/**/*.java" ],
@@ -612,7 +364,7 @@ task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
     puts "Building iWebDriver iphone app"
-    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver >/dev/null", :verbose => false
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver >/dev/null"
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -633,7 +385,7 @@ def version
 end
 
 task :remote_release => [:remote] do
-  mkdir_p "build/dist/remote_client", :verbose => false
+  mkdir_p "build/dist/remote_client"
 
   cp 'remote/build/webdriver-remote-client.jar', 'build/dist/remote_client'
   cp 'remote/build/webdriver-remote-common.jar', 'build/dist/remote_client'
@@ -644,9 +396,9 @@ task :remote_release => [:remote] do
   cp 'third_party/java/google-collect/google-collect-1.0.jar', 'build/dist/remote_client'
 
   sh "cd build/dist && zip -r webdriver-remote-client-#{version}.zip remote_client/*"
-  rm_rf "build/dist/remote_client", :verbose => false
+  rm_rf "build/dist/remote_client"
 
-  mkdir_p "build/dist/remote_server", :verbose => false
+  mkdir_p "build/dist/remote_server"
 
   cp 'remote/build/webdriver-remote-server.jar', 'build/dist/remote_server'
   cp 'remote/build/webdriver-remote-common.jar', 'build/dist/remote_server'
@@ -659,20 +411,8 @@ task :remote_release => [:remote] do
   rm Dir.glob('build/dist/remote_server/servlet*.jar')
 
   sh "cd build/dist && zip -r webdriver-remote-server-#{version}.zip remote_server/*"
-  rm_rf "build/dist/remote_server", :verbose => false
+  rm_rf "build/dist/remote_server"
 end
-
-java_uberjar(:name => "selenium-java",
-             :deps => [
-                    :chrome,
-                    "//htmlunit",
-                    :ie,
-                    :firefox,
-                    :remote_client,
-                    :selenium,
-                    :support
-                  ],
-              :no_libs => true)
 
 task :release => [:'all_zip', :'selenium-server-standalone', :'selenium-server_zip'] do
   cp "build/selenium-server-standalone.jar", "build/selenium-server-standalone-#{version}.jar"
@@ -683,18 +423,26 @@ end
 task :'selenium-java_zip' do
   temp = "build/selenium-java_zip"
   mkdir_p temp
-  sh "cd #{temp} && jar xf ../selenium-java.zip", :verbose => false
+  sh "cd #{temp} && jar xf ../selenium-java.zip"
   rm_f "build/selenium-java.zip"
   Dir["#{temp}/webdriver-*.jar"].each { |file| rm_rf file }
   mv "#{temp}/selenium-java.jar", "#{temp}/selenium-java-#{version}.jar"
-  sh "cd #{temp} && jar cMf ../selenium-java.zip *", :verbose => false
+  sh "cd #{temp} && jar cMf ../selenium-java.zip *"
 end
 
-desc 'Install prerequisites for the build. You may need to run this as root or Administrator'
-task :setup do
-  sh "gem install Antwrap yard"
-  
-  if python?
-    sh "easy_install virtualenv"
-  end
+desc 'Build the selenium client jars'
+task 'selenium-java' => 'build/selenium-java.jar'
+file 'build/selenium-java.jar' => '//remote/client:combined:project' do
+  cp 'build/remote/client/combined-nodeps.jar', 'build/selenium-java.jar'
+end
+
+desc 'Build the standalone server'
+task 'selenium-server-standalone' => 'build/selenium-server-standalone.jar'
+file 'build/selenium-server-standalone.jar' => '//remote/server:server:uber' do
+  cp 'build/remote/server/server-standalone.jar', 'build/selenium-server-standalone.jar'
+end
+
+desc 'Build and package Selenium IDE'
+task :release_ide  => [:ide] do
+  cp 'build/ide/selenium-ide.xpi', "build/ide/selenium-ide-#{ide_version}.xpi"
 end

@@ -21,10 +21,12 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StubDriver;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.browserlaunchers.CapabilityType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

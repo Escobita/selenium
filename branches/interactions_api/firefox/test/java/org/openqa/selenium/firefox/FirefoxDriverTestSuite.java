@@ -20,10 +20,13 @@ package org.openqa.selenium.firefox;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +57,27 @@ public class FirefoxDriverTestSuite extends TestCase {
 
     public TestFirefoxDriver(FirefoxProfile profile) {
       super(copyExtensionTo(profile));
+    }
+
+    public TestFirefoxDriver(Capabilities capabilities) {
+      super(tweakCapabilities(capabilities));
+    }
+
+    private static Capabilities tweakCapabilities(Capabilities caps) {
+      DesiredCapabilities tweaked = new DesiredCapabilities(caps.asMap());
+      if (tweaked.getCapability(PROFILE) == null) {
+        tweaked.setCapability(PROFILE, createTemporaryProfile());
+      } else {
+        try {
+          FirefoxProfile profile = 
+              FirefoxProfile.fromJson((String) tweaked.getCapability(PROFILE));
+          copyExtensionTo(profile);
+          tweaked.setCapability(PROFILE, profile);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return tweaked;
     }
 
     private static FirefoxProfile createTemporaryProfile() {
@@ -147,9 +171,9 @@ public class FirefoxDriverTestSuite extends TestCase {
 
     private static void copyXpts(File extension) {
       Map<String, String> components = new HashMap<String, String>() {{
-        put("build/nsINativeEvents.xpt", "components/nsINativeEvents.xpt");
-        put("build/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt");
-        put("build/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt");
+        put("build/firefox/nsINativeEvents.xpt", "components/nsINativeEvents.xpt");
+        put("build/firefox/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt");
+        put("build/firefox/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt");
       }};
 
       for (Map.Entry<String, String> component : components.entrySet()) {

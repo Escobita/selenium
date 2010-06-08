@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using OpenQA.Selenium;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Text.RegularExpressions;
+using OpenQA.Selenium;
 
 namespace Selenium.Internal.SeleniumEmulation
 {
-    class SeleniumOptionSelector
+    internal class SeleniumOptionSelector
     {
-        private Dictionary<string, IOptionSelectStrategy> optionSelectStrategies = new Dictionary<string, IOptionSelectStrategy>();
+        private static Dictionary<string, IOptionSelectStrategy> optionSelectStrategies = new Dictionary<string, IOptionSelectStrategy>();
         private ElementFinder finder;
 
         public SeleniumOptionSelector(ElementFinder finder)
@@ -24,6 +24,23 @@ namespace Selenium.Internal.SeleniumEmulation
             Index,
             Text,
             Value,
+        }
+
+        public static bool IsMultiSelect(IWebElement theSelect)
+        {
+            string multiple = theSelect.GetAttribute("multiple");
+
+            if (string.IsNullOrEmpty(multiple))
+            {
+                return false;
+            }
+
+            if (multiple == "false")
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public List<string> GetOptions(IWebDriver driver, string selectLocator, Property property, bool fetchAll)
@@ -68,22 +85,6 @@ namespace Selenium.Internal.SeleniumEmulation
             return selectedOptions;
         }
 
-        public bool IsMultiSelect(IWebElement theSelect)
-        {
-            string multiple = theSelect.GetAttribute("multiple");
-
-            if (string.IsNullOrEmpty(multiple))
-            {
-                return false;
-            }
-            if (multiple == "false")
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public void Select(IWebDriver driver, string selectLocator, string optionLocator, bool setSelected, bool onlyOneOption)
         {
             IWebElement select = finder.FindElement(driver, selectLocator);
@@ -102,10 +103,11 @@ namespace Selenium.Internal.SeleniumEmulation
 
             if (matcher.IsMatch(optionLocator))
             {
-                MatchCollection matches = matcher.Matches(optionLocator);
-                strategyName = matches[0].Value;
-                use = matches[1].Value;
+                Match matches = matcher.Match(optionLocator);
+                strategyName = matches.Groups[1].Value;
+                use = matches.Groups[2].Value;
             }
+
             if (use == null)
             {
                 use = string.Empty;
@@ -119,7 +121,7 @@ namespace Selenium.Internal.SeleniumEmulation
                     strategyName + " (from " + optionLocator + ") is not a method for selecting options");
             }
 
-            if (!strategy.Select(allOptions, use, setSelected, isMultiple))
+            if (!strategy.SelectOption(allOptions, use, setSelected, isMultiple))
             {
                 throw new SeleniumException(optionLocator + " is not an option");
             }
@@ -127,11 +129,14 @@ namespace Selenium.Internal.SeleniumEmulation
 
         private void SetUpOptionFindingStrategies()
         {
-            optionSelectStrategies.Add("implicit", new LabelOptionSelectStrategy());
-            optionSelectStrategies.Add("id", new IdOptionSelectStrategy());
-            optionSelectStrategies.Add("index", new IndexOptionSelectStrategy());
-            optionSelectStrategies.Add("label", new LabelOptionSelectStrategy());
-            optionSelectStrategies.Add("value", new ValueOptionSelectStrategy());
+            if (optionSelectStrategies.Count == 0)
+            {
+                optionSelectStrategies.Add("implicit", new LabelOptionSelectStrategy());
+                optionSelectStrategies.Add("id", new IdOptionSelectStrategy());
+                optionSelectStrategies.Add("index", new IndexOptionSelectStrategy());
+                optionSelectStrategies.Add("label", new LabelOptionSelectStrategy());
+                optionSelectStrategies.Add("value", new ValueOptionSelectStrategy());
+            }
         }
     }
 }

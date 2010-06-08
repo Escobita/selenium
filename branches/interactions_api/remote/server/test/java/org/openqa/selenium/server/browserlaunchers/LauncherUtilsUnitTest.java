@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
 public class LauncherUtilsUnitTest extends TestCase {
@@ -291,7 +292,7 @@ public class LauncherUtilsUnitTest extends TestCase {
           BrowserConfigurationOptions options = new BrowserConfigurationOptions();
           options.setAvoidProxy(avoidProxy);
           options.setOnlyProxySeleniumTraffic(proxySeleniumTrafficOnly);
-          LauncherUtils.makeProxyPAC(parentDir, port, configuredProxy, proxyPort, nonProxyHosts, options);
+          Proxies.makeProxyPAC(parentDir, port, configuredProxy, proxyPort, nonProxyHosts, options.asCapabilities());
         } catch (FileNotFoundException e) {
             fail();
         }

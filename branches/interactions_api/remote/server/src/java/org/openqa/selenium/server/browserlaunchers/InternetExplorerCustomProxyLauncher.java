@@ -18,6 +18,8 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
+import org.openqa.selenium.browserlaunchers.WindowsUtils;
 import org.openqa.selenium.server.ApplicationRegistry;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
@@ -54,7 +56,7 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
   }
 
   protected void changeRegistrySettings() throws IOException {
-    wpm.changeRegistrySettings(browserConfigurationOptions);
+    wpm.changeRegistrySettings(browserConfigurationOptions.asCapabilities());
   }
 
   @Override

@@ -22,12 +22,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.Platform;
 
-import static org.openqa.selenium.remote.CapabilityType.BROWSER_NAME;
-import static org.openqa.selenium.remote.CapabilityType.PLATFORM;
-import static org.openqa.selenium.remote.CapabilityType.SUPPORTS_JAVASCRIPT;
-import static org.openqa.selenium.remote.CapabilityType.VERSION;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.BROWSER_NAME;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.PLATFORM;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.SUPPORTS_JAVASCRIPT;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.VERSION;
 
 public class DesiredCapabilities implements Capabilities, Serializable {
   private final Map<String, Object> capabilities = new HashMap<String, Object>();
@@ -42,8 +43,12 @@ public class DesiredCapabilities implements Capabilities, Serializable {
     // no-arg constructor
   }
 
-  public DesiredCapabilities(Map<String, Object> rawMap) {
+  public DesiredCapabilities(Map<String, ?> rawMap) {
     capabilities.putAll(rawMap);
+    Object value = capabilities.get(PLATFORM);
+    if (value instanceof String) {
+      capabilities.put(PLATFORM, Platform.valueOf((String) value));
+    }
   }
 
   public String getBrowserName() {
@@ -98,6 +103,14 @@ public class DesiredCapabilities implements Capabilities, Serializable {
     return capabilities.get(capabilityName);
   }
 
+  public boolean is(String capabilityName) {
+    Object cap = getCapability(capabilityName);
+    if (cap == null) {
+      return false;
+    }
+    return cap instanceof Boolean ? (Boolean) cap : Boolean.parseBoolean(String.valueOf(cap));
+  }
+
   public void setCapability(String capabilityName, boolean value) {
     capabilities.put(capabilityName, value);
   }
@@ -110,18 +123,12 @@ public class DesiredCapabilities implements Capabilities, Serializable {
     capabilities.put(capabilityName, value);
   }
 
-  public Map<String, Object> asMap() {
+  public Map<String, ?> asMap() {
     return Collections.unmodifiableMap(capabilities);
   }
 
-  protected void setCapability(String key, Object value) {
-    if (value instanceof Boolean) {
-      setCapability(key, ((Boolean) value).booleanValue());
-    } else if (value instanceof Platform) {
-      setCapability(key, (Platform) value);
-    } else if (value instanceof String) {
-      setCapability(key, (String) value);
-    }
+  public void setCapability(String key, Object value) {
+    capabilities.put(key, value);
   }
 
   public static DesiredCapabilities firefox() {

@@ -2,12 +2,12 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
 public class MakeProxyPacUnitTest extends TestCase {
@@ -34,8 +34,9 @@ public class MakeProxyPacUnitTest extends TestCase {
       BrowserConfigurationOptions options = new BrowserConfigurationOptions();
       options.setOnlyProxySeleniumTraffic(proxySeleniumTrafficOnly);
       options.setAvoidProxy(avoidProxy);
-      LauncherUtils.makeProxyPAC(parentDir, 4444, httpProxyHost, httpProxyPort, httpNonProxyHosts, options);
-        return readEntirePacFile();
+      Proxies
+          .makeProxyPAC(parentDir, 4444, httpProxyHost, httpProxyPort, httpNonProxyHosts, options.asCapabilities());
+      return readEntirePacFile();
     }
     private String readEntirePacFile() throws IOException {
         FileReader fileReader = new FileReader(pacFile);
