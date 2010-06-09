@@ -1,6 +1,6 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+
 import org.easymock.classextension.ConstructorArgs;
 
 import java.io.IOException;
@@ -12,11 +12,14 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 /**
  * {@link com.thoughtworks.selenium.HttpCommandProcessor} unit test class.
  */
-public class HttpCommandProcessorUnitTest extends TestCase {
-
+public class HttpCommandProcessorUnitTest {
 	public void testCanStopTheSeleneseSessionEvenIfThereIsNoCurrentSession() {
 		final HttpCommandProcessor processor;
 

@@ -1,7 +1,10 @@
 package org.openqa.selenium;
 
 import junit.extensions.TestSetup;
-import junit.framework.Test;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test; import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,17 +14,13 @@ import org.openqa.selenium.internal.PortProber;
 
 import static org.openqa.selenium.internal.PortProber.pollPort;
 
-public class SeleniumServerStarter extends TestSetup {
+public class SeleniumServerStarter {
 
   private static final String SELENIUM_JAR = "build/selenium-server-standalone.jar";
   private Process serverProcess;
 
-  public SeleniumServerStarter(Test test) {
-    super(test);
-  }
-
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     // Walk up the path until we find the "third_party/selenium" directory
     File seleniumJar = findSeleniumJar();
 
@@ -48,8 +47,6 @@ public class SeleniumServerStarter extends TestSetup {
         }
       }
     }).start();
-
-    super.setUp();
   }
 
   private String startSeleniumServer(File seleniumJar) throws IOException {
@@ -75,12 +72,10 @@ public class SeleniumServerStarter extends TestSetup {
     return seleniumJar;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     if (serverProcess != null) {
       serverProcess.destroy();
     }
-
-    super.tearDown();
   }
 }

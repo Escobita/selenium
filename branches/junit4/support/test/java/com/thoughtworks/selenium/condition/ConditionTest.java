@@ -18,14 +18,18 @@
 package com.thoughtworks.selenium.condition;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test for Condition class.
  */
-public class ConditionTest extends TestCase {
+public class ConditionTest {
 
     private static final ConditionRunner conditionRunner =
             new JUnitConditionRunner(null, 1, 100);

@@ -1,9 +1,11 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class BrowserConfigurationOptionsTest extends TestCase {
 
+public class BrowserConfigurationOptionsTest {
 	public void testCanUseWithValidArg() {
 		BrowserConfigurationOptions bco = new BrowserConfigurationOptions();
 		assertTrue(bco.canUse("foobar"));

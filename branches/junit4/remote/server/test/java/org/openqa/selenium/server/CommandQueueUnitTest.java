@@ -1,7 +1,12 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
 import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -9,10 +14,13 @@ import org.openqa.selenium.server.log.TerseFormatter;
 import org.openqa.selenium.testworker.TrackableRunnable;
 import org.openqa.selenium.testworker.TrackableThread;
 
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class CommandQueueUnitTest extends TestCase {
+public class CommandQueueUnitTest {
 
     private static final String sessionId = "1";
     private static final String testCommand = "testCommand";
@@ -26,14 +34,14 @@ public class CommandQueueUnitTest extends TestCase {
     private CommandQueue cq;
     private RemoteControlConfiguration configuration;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         configureLogging();
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
         configuration.setProxyInjectionModeArg(false);
-        cq = new CommandQueue(sessionId, getName(), configuration);
-        log.info("Start test: " + getName());
+//        cq = new CommandQueue(sessionId, getName(), configuration);
+//        log.info("Start test: " + getName());
     }
 
     private void configureLogging() throws Exception {
@@ -47,7 +55,7 @@ public class CommandQueueUnitTest extends TestCase {
         }
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }
@@ -65,12 +73,13 @@ public class CommandQueueUnitTest extends TestCase {
         assertEquals(newSpeed, cq.getQueueDelay());
         assertEquals(newGlobalSpeed, CommandQueue.getSpeed());
 
-        CommandQueue cq2 = new CommandQueue(sessionId, getName() + "2", new RemoteControlConfiguration());
-        assertEquals(newGlobalSpeed, cq2.getQueueDelay());
+//        CommandQueue cq2 = new CommandQueue(sessionId, getName() + "2", new RemoteControlConfiguration());
+//        assertEquals(newGlobalSpeed, cq2.getQueueDelay());
 
-        CommandQueue cq3 = new CommandQueue(sessionId, getName() + "3", newSpeed, new RemoteControlConfiguration());
-        assertEquals(newSpeed, cq3.getQueueDelay());
+//        CommandQueue cq3 = new CommandQueue(sessionId, getName() + "3", newSpeed, new RemoteControlConfiguration());
+//        assertEquals(newSpeed, cq3.getQueueDelay());
 
+      fail("I made this test fail");
         CommandQueue.setSpeed(defaultSpeed);
     }
 
@@ -103,7 +112,8 @@ public class CommandQueueUnitTest extends TestCase {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
         configuration.setProxyInjectionModeArg(true);
-        cq = new CommandQueue(sessionId, getName(), configuration);
+//        cq = new CommandQueue(sessionId, getName(), configuration);
+      cq = null;
         cq.putResult(testResult);
         cq.doCommandWithoutWaitingForAResponse(testCommand, "", "");
         assertEquals(testResult, cq.peekAtResult());
@@ -114,7 +124,8 @@ public class CommandQueueUnitTest extends TestCase {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
         configuration.setProxyInjectionModeArg(true);
-        cq = new CommandQueue(sessionId, getName(), configuration);
+//        cq = new CommandQueue(sessionId, getName(), configuration);
+      cq = null;
         cq.putResult(testResult);
         cq.doCommandWithoutWaitingForAResponse(waitCommand, "", "");
         assertEquals(testResult, cq.peekAtResult());
@@ -157,7 +168,8 @@ public class CommandQueueUnitTest extends TestCase {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
         configuration.setProxyInjectionModeArg(true);
-        cq = new CommandQueue(sessionId, getName(), configuration);
+//        cq = new CommandQueue(sessionId, getName(), configuration);
+      cq = null;
         cq.handleCommandResultWithoutWaitingForACommand(testResult);
         assertEquals(testResult, cq.peekAtResult());
     }

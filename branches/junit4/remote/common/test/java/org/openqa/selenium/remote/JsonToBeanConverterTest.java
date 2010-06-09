@@ -19,12 +19,18 @@ package org.openqa.selenium.remote;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Platform;
 
-import junit.framework.TestCase;
+
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -34,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JsonToBeanConverterTest extends TestCase {
+public class JsonToBeanConverterTest {
 
   public void testCanConstructASimpleString() throws Exception {
     String text = new JsonToBeanConverter().convert(String.class, "cheese");

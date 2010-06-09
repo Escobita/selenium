@@ -17,10 +17,11 @@ limitations under the License.
 
 package org.openqa.selenium.internal.seleniumemulation;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class ElementFinderTest extends TestCase {
 
+public class ElementFinderTest {
   public void testShouldBeAbleToConvertLocatorsToStrategies() {
     ElementFinder finder = new ElementFinder();
 

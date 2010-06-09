@@ -1,16 +1,17 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
-
-import org.openqa.selenium.server.BrowserConfigurationOptions;
-import org.openqa.selenium.server.RemoteControlConfiguration;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FirefoxCustomProfileLauncherUnitTest extends TestCase {
-    
+import org.openqa.selenium.server.BrowserConfigurationOptions;
+import org.openqa.selenium.server.RemoteControlConfiguration;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class FirefoxCustomProfileLauncherUnitTest {
     public void testProfileRemovedWhenProcessNull() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.setCustomProfileDir(new File("testdir"));

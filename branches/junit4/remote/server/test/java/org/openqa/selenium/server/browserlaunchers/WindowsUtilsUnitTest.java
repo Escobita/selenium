@@ -16,13 +16,18 @@
  */
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WindowsUtilsUnitTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WindowsUtilsUnitTest {
 
     private int majorVersion;
     private int minorVersion;

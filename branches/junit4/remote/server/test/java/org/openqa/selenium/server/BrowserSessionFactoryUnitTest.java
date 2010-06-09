@@ -1,5 +1,11 @@
 package org.openqa.selenium.server;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
+import org.junit.Before;
 import org.openqa.selenium.server.BrowserSessionFactory.BrowserSessionInfo;
 import org.openqa.selenium.server.browserlaunchers.BrowserLauncherFactory;
 import org.openqa.selenium.server.browserlaunchers.DummyLauncher;
@@ -7,21 +13,19 @@ import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
 import org.openqa.selenium.server.log.TerseFormatter;
 
-import junit.framework.TestCase;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
-
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class BrowserSessionFactoryUnitTest extends TestCase {
-
+public class BrowserSessionFactoryUnitTest {
     private static final String SESSION_ID_1 = "testLookupByBrowserAndUrl1";
     private static final String BROWSER_1 = "*firefox";
     private static final String BASEURL1 = "http://www.google.com";
@@ -30,10 +34,8 @@ public class BrowserSessionFactoryUnitTest extends TestCase {
     private static final String BROWSER2 = "*firefox";
     private static final String BASEURL2 = "http://maps.google.com";
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     configureLogging();
   }
 

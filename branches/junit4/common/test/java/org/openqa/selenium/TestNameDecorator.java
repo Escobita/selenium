@@ -17,24 +17,21 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
+import org.junit.Test;
 
-public class TestNameDecorator extends TestSetup {
+public class TestNameDecorator {
 
   public TestNameDecorator(Test test) {
-    super(test);
+    //super(test);
   }
 
-  @Override
   protected void setUp() throws Exception {
-    System.out.print(fTest.toString() + ":");
-    super.setUp();
+//    System.out.print(fTest.toString() + ":");
+//    super.setUp();
   }
 
-  @Override
   protected void tearDown() throws Exception {
-    super.tearDown();
-    System.out.println("");
+//    super.tearDown();
+//    System.out.println("");
   }
 }

@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class SnapshotTakingTest extends AbstractDriverTestCase {
 
   @Test public void shouldTakeSnapshotsOfThePage() throws Exception {

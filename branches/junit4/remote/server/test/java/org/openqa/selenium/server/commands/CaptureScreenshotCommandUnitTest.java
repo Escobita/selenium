@@ -1,18 +1,21 @@
 package org.openqa.selenium.server.commands;
 
-import junit.framework.TestCase;
-import org.easymock.classextension.ConstructorArgs;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class CaptureScreenshotCommandUnitTest extends TestCase {
+import org.easymock.classextension.ConstructorArgs;
 
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.expectLastCall;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CaptureScreenshotCommandUnitTest {
 	private CaptureScreenshotCommand command;
 	private String fileName = "test_screenshot.png";
 	private File file = new File(fileName);

@@ -1,12 +1,13 @@
 package org.openqa.selenium.server.browserlaunchers.locators;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * {@link org.openqa.selenium.server.browserlaunchers.locators.Firefox3Locator} unit test class.
  */
-public class Firefox3LocatorUnitTest extends TestCase {
-
+public class Firefox3LocatorUnitTest {
     public void testUsualLauncherLocationsOnWindows() {
         final Firefox3Locator locator;
 

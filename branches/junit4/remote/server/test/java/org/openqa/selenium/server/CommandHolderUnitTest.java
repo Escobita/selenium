@@ -1,20 +1,26 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.logging.Log;
-import org.openqa.jetty.log.LogFactory;
-import org.openqa.selenium.server.log.StdOutHandler;
-import org.openqa.selenium.server.log.TerseFormatter;
-import org.openqa.selenium.server.log.LoggingManager;
-import org.openqa.selenium.testworker.TrackableRunnable;
-import org.openqa.selenium.testworker.TrackableThread;
 
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-public class CommandHolderUnitTest extends TestCase {
+import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
+import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.server.log.LoggingManager;
+import org.openqa.selenium.server.log.StdOutHandler;
+import org.openqa.selenium.server.log.TerseFormatter;
+import org.openqa.selenium.testworker.TrackableRunnable;
+import org.openqa.selenium.testworker.TrackableThread;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CommandHolderUnitTest {
     private static Log log = LogFactory.getLog(CommandHolderUnitTest.class);
 
     private static final String sessionId = "1";
@@ -27,12 +33,18 @@ public class CommandHolderUnitTest extends TestCase {
     private static final int retryTimeout = 2;
     private CommandHolder holder;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         configureLogging();
         holder = new CommandHolder(sessionId, retryTimeout);
         log.info("Start test: " + getName());
     }
+
+  private String getName() {
+    fail("foo");
+    return null;
+  }
+
 
     private void configureLogging() throws Exception {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), true);
@@ -45,7 +57,7 @@ public class CommandHolderUnitTest extends TestCase {
         }
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }

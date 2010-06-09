@@ -17,13 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test; import static org.junit.Assert.*;
+
 
 import static org.openqa.selenium.Ignore.Driver.IE;
 import org.openqa.selenium.TestSuiteBuilder;
 
-public class InternetExplorerDriverTestSuite extends TestCase {
+public class InternetExplorerDriverTestSuite {
   public static Test suite() throws Exception {
     System.setProperty("webdriver.development", "true");
     String arch = System.getProperty("os.arch").toLowerCase() + "/";

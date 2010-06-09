@@ -2,9 +2,11 @@ package com.thoughtworks.selenium;
 
 import com.thoughtworks.selenium.Wait.WaitTimedOutException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class WaitTest extends TestCase {
+
+public class WaitTest {
 
     private long finished;
     private long now;

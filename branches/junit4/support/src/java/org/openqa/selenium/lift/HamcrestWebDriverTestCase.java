@@ -17,12 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium.lift;
 
-import junit.framework.TestCase;
+
 
 import static org.openqa.selenium.lift.match.NumericalMatchers.exactly;
 import static org.openqa.selenium.lift.match.SelectionMatcher.selection;
 
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.lift.find.Finder;
@@ -32,7 +33,7 @@ import org.openqa.selenium.lift.find.Finder;
  * @author rchatley (Robert Chatley)
  *
  */
-public abstract class HamcrestWebDriverTestCase extends TestCase {
+public abstract class HamcrestWebDriverTestCase {
 
 	private static final long DEFAULT_TIMEOUT = 5000;
 
@@ -41,10 +42,9 @@ public abstract class HamcrestWebDriverTestCase extends TestCase {
 
 	protected abstract WebDriver createDriver();
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		context.quit();
-		super.tearDown();
 	}
 
         protected WebDriver getWebDriver() {

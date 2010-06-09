@@ -21,13 +21,13 @@ package org.openqa.selenium.htmlunit;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test; import static org.junit.Assert.*;
+
 
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import org.openqa.selenium.TestSuiteBuilder;
 
-public class JavascriptEnabledHtmlUnitDriverTestSuite extends TestCase {
+public class JavascriptEnabledHtmlUnitDriverTestSuite {
 
   public static Test suite() throws Exception {
     return new TestSuiteBuilder()

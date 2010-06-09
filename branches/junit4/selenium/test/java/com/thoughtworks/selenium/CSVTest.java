@@ -4,13 +4,14 @@
  */
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class CSVTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
+public class CSVTest {
     Method CSV;
     
     protected void setUp() throws Exception {

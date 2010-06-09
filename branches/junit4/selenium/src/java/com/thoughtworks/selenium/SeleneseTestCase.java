@@ -1,6 +1,7 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
+
 
 /**
  * Provides a JUnit TestCase base class that implements some handy functionality 
@@ -12,22 +13,13 @@ import junit.framework.TestCase;
  * 
  * @author Nelson Sproul (nsproul@bea.com) Mar 13-06
  */
-public class SeleneseTestCase extends TestCase {
+public class SeleneseTestCase {
 
     private SeleneseTestBase stb = new SeleneseTestBase();
     
     /** Use this object to run all of your selenium tests */
     protected Selenium selenium;
-    
-    public SeleneseTestCase() {
-        super();
-    }
 
-    
-    public SeleneseTestCase(String name) {
-        super(name);
-    }
-    
     /** Asserts that there were no verification errors during the current test, failing immediately if any are found */
     public void checkForVerificationErrors() {
         stb.checkForVerificationErrors();
@@ -201,36 +193,43 @@ public class SeleneseTestCase extends TestCase {
     protected void setTestContext() {
         selenium.setContext(this.getClass().getSimpleName() + "." + getName());
     }
-    
+
+  private String getName() {
+    fail("foo");
+    return null;
+  }
+
+
+
     /**
      * Runs the bare test sequence, capturing a screenshot if a test fails
      * @exception Throwable if any exception is thrown
      */
     // @Override
     public void runBare() throws Throwable {
-        if (!isCaptureScreenShotOnFailure()) {
-            super.runBare();
-            return;
-        }
-        setUp();
-        try {
-            runTest();
-        } catch (Throwable t) {
-            if (selenium != null) {
-                String filename = getName() + ".png";
-                try {
-                    selenium.captureScreenshot(filename);
-                    System.err.println("Saved screenshot " + filename);
-                } catch (Exception e) {
-                    System.err.println("Couldn't save screenshot " + filename + ": " + e.getMessage());
-                    e.printStackTrace();
-                }
-                throw t;
-            }
-        }
-        finally {
-            tearDown();
-        }
+//        if (!isCaptureScreenShotOnFailure()) {
+//            super.runBare();
+//            return;
+//        }
+//        setUp();
+//        try {
+//            runTest();
+//        } catch (Throwable t) {
+//            if (selenium != null) {
+//                String filename = getName() + ".png";
+//                try {
+//                    selenium.captureScreenshot(filename);
+//                    System.err.println("Saved screenshot " + filename);
+//                } catch (Exception e) {
+//                    System.err.println("Couldn't save screenshot " + filename + ": " + e.getMessage());
+//                    e.printStackTrace();
+//                }
+//                throw t;
+//            }
+//        }
+//        finally {
+//            tearDown();
+//        }
     }
 
     public String join(String[] array, char c) {

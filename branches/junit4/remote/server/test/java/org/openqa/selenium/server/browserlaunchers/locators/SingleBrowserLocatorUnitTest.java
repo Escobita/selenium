@@ -1,12 +1,12 @@
 package org.openqa.selenium.server.browserlaunchers.locators;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * {@link org.openqa.selenium.server.browserlaunchers.AbstractBrowserLauncher} unit test class.
  */
-public class SingleBrowserLocatorUnitTest extends TestCase {
-
+public class SingleBrowserLocatorUnitTest {
     public void testHumanFriendlyLauncherFileNamesReturnsEmptyStringWhenThereIsNoStandardFileNames() {
         final SingleBrowserLocator locator;
 

@@ -14,13 +14,20 @@ import java.util.Map;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
+import org.junit.Before;
 import org.openqa.selenium.server.browserlaunchers.MacProxyManager.MacNetworkSetupException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class MacProxyManagerUnitTest extends TestCase {
-    
+
+public class MacProxyManagerUnitTest {
     MockableMacProxyManager mmpm;
+
+    @Before
     public void setUp() {
         mmpm = new MockableMacProxyManager("", 4444);
     }

@@ -1,9 +1,13 @@
 package org.openqa.selenium.server.mock;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.io.File;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
 import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.DefaultRemoteCommand;
 import org.openqa.selenium.server.InjectionHelper;
@@ -16,12 +20,11 @@ import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
 import org.openqa.selenium.server.log.TerseFormatter;
 
-import java.io.File;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class MockPIFrameUnitTest extends TestCase {
-
+public class MockPIFrameUnitTest {
     static final Log LOGGER = LogFactory.getLog(MockPIFrameUnitTest.class);
 
     private static final String DRIVER_URL = "http://localhost:4444/selenium-server/driver/";
@@ -29,18 +32,15 @@ public class MockPIFrameUnitTest extends TestCase {
     private String sessionId;
     private SeleniumServer server;
 
-    public MockPIFrameUnitTest(String name) {
-        super(name);
-    }
-
     public static Test suitex() {
-        TestSuite suite = new TestSuite();
-        //for (int i= 0; i < 100; i++)
-        suite.addTest(new MockPIFrameUnitTest("testClickAndPause"));
-        return suite;
+//        TestSuite suite = new TestSuite();
+//        //for (int i= 0; i < 100; i++)
+//        suite.addTest(new MockPIFrameUnitTest("testClickAndPause"));
+//        return suite;
+      return null;
     }
                                  
-    @Override
+    @Before
     public void setUp() throws Exception {
         configureLogging();
         RemoteControlConfiguration configuration = new RemoteControlConfiguration();
@@ -54,7 +54,13 @@ public class MockPIFrameUnitTest extends TestCase {
         LOGGER.info("Starting " + getName());
     }
 
-    private RemoteControlConfiguration configureLogging() throws Exception {
+  private String getName() {
+    fail("getName");
+    return null;
+  }
+
+
+  private RemoteControlConfiguration configureLogging() throws Exception {
 //        SeleniumServer.setDebugMode(true);
         RemoteControlConfiguration configuration = new RemoteControlConfiguration();
         File target = new File("target");
@@ -75,7 +81,7 @@ public class MockPIFrameUnitTest extends TestCase {
     }
 
 
-    @Override
+    @After
     public void tearDown() {
         server.stop();
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);

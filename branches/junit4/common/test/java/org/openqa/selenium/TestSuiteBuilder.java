@@ -17,18 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -108,145 +104,146 @@ public class TestSuiteBuilder {
       assertThat("No driver class set", driverClass, is(notNullValue()));
     }
 
-    TestSuite suite = new TestSuite();
-    for (File dir : sourceDirs) {
-      addTestsRecursively(suite, dir);
-    }
-
-    if (includeJsApiTests && includeJavascript) {
-      addJsApiTests(suite);
-    }
-
-    TestSuite toReturn = new TestSuite();
-    if (withEnvironment) {
-      toReturn.addTest(new EnvironmentStarter(suite));
-    } else {
-      toReturn.addTest(suite);
-    }
-
-    if (suite.countTestCases() == 0) {
-      System.err.println("No test cases found");
-    }
-    return decorate(toReturn);
+//    TestSuite suite = new TestSuite();
+//    for (File dir : sourceDirs) {
+//      addTestsRecursively(suite, dir);
+//    }
+//
+//    if (includeJsApiTests && includeJavascript) {
+//      addJsApiTests(suite);
+//    }
+//
+//    TestSuite toReturn = new TestSuite();
+//    if (withEnvironment) {
+//      toReturn.addTest(new EnvironmentStarter(suite));
+//    } else {
+//      toReturn.addTest(suite);
+//    }
+//
+//    if (suite.countTestCases() == 0) {
+//      System.err.println("No test cases found");
+//    }
+//    return decorate(toReturn);
+    return null;
   }
 
-  private Test decorate(TestSuite toDecorate) throws Exception {
-    TestSuite toReturn = toDecorate;
+//  private Test decorate(TestSuite toDecorate) throws Exception {
+//    TestSuite toReturn = toDecorate;
+//
+//    for (String name : decorators) {
+//      TestSuite temp = new TestSuite();
+//      Test test = (Test) Class.forName(name).getConstructor(Test.class).newInstance(toReturn);
+//      temp.addTest(test);
+//      toReturn = temp;
+//    }
+//
+//    return toReturn;
+//  }
 
-    for (String name : decorators) {
-      TestSuite temp = new TestSuite();
-      Test test = (Test) Class.forName(name).getConstructor(Test.class).newInstance(toReturn);
-      temp.addTest(test);
-      toReturn = temp;
-    }
+//  private void addTestsRecursively(TestSuite suite, File dir) {
+//    File[] files = dir.listFiles();
+//    for (File file : files) {
+//      if (file.isDirectory()) {
+//        addTestsRecursively(suite, file);
+//      } else {
+//        addTestsFromFile(suite, file);
+//      }
+//    }
+//  }
 
-    return toReturn;
-  }
+//  private void addTestsFromFile(TestSuite suite, File file) {
+//    Class<?> rawClass = getClassFrom(file);
+//    if (rawClass == null
+//        || !TestCase.class.isAssignableFrom(rawClass)
+//        || JsApiTestCase.class.isAssignableFrom(rawClass)) {
+//      return;
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    Class<? extends TestCase> clazz = (Class<? extends TestCase>) rawClass;
+//
+//    int modifiers = clazz.getModifiers();
+//
+//    if (Modifier.isAbstract(modifiers) || !Modifier.isPublic(modifiers)) {
+//      return;
+//    }
+//
+//    if (onlyRun != null && !clazz.getName().endsWith(onlyRun)) {
+//      return;
+//    }
+//
+//    if (isIgnored(clazz)) {
+//      System.err.println("Ignoring test class: " + clazz + ": "
+//                         + clazz.getAnnotation(Ignore.class).reason());
+//      return;
+//    }
+//
+//    boolean include = true;
+//    if (patterns.size() >0) {
+//      include = false;
+//      for (String pattern : patterns) {
+//        include |= clazz.getName().matches(pattern);
+//      }
+//    }
+//    if (!include) {
+//      return;
+//    }
+//
+//    for (String excludePattern : excludePatterns) {
+//      if (clazz.getName().matches(excludePattern)) {
+//        return;
+//      }
+//    }
+//
+//    Method[] methods = clazz.getMethods();
+//    for (Method method : methods) {
+//      if (isTestMethod(method)) {
+//        Test test = TestSuite.createTest(clazz, method.getName());
+//        if (test instanceof NeedsDriver) {
+//          boolean freshDriver = false;
+//          if (method.isAnnotationPresent(NeedsFreshDriver.class)) {
+//            freshDriver = true;
+//          }
+//
+//          boolean restartDriver = false;
+//          if (method.isAnnotationPresent(NoDriverAfterTest.class)) {
+//            restartDriver = true;
+//          }
+//
+//          if (withDriver) {
+//            test = new DriverTestDecorator(test, driverClass,
+//                                           keepDriver, freshDriver, restartDriver);
+//          }
+//        }
+//        if (outputTestNames) {
+//          test = new TestNameDecorator(test);
+//        }
+//        suite.addTest(test);
+//      }
+//    }
+//  }
 
-  private void addTestsRecursively(TestSuite suite, File dir) {
-    File[] files = dir.listFiles();
-    for (File file : files) {
-      if (file.isDirectory()) {
-        addTestsRecursively(suite, file);
-      } else {
-        addTestsFromFile(suite, file);
-      }
-    }
-  }
-
-  private void addTestsFromFile(TestSuite suite, File file) {
-    Class<?> rawClass = getClassFrom(file);
-    if (rawClass == null
-        || !TestCase.class.isAssignableFrom(rawClass)
-        || JsApiTestCase.class.isAssignableFrom(rawClass)) {
-      return;
-    }
-
-    @SuppressWarnings("unchecked")
-    Class<? extends TestCase> clazz = (Class<? extends TestCase>) rawClass;
-
-    int modifiers = clazz.getModifiers();
-
-    if (Modifier.isAbstract(modifiers) || !Modifier.isPublic(modifiers)) {
-      return;
-    }
-
-    if (onlyRun != null && !clazz.getName().endsWith(onlyRun)) {
-      return;
-    }
-
-    if (isIgnored(clazz)) {
-      System.err.println("Ignoring test class: " + clazz + ": "
-                         + clazz.getAnnotation(Ignore.class).reason());
-      return;
-    }
-
-    boolean include = true;
-    if (patterns.size() >0) {
-      include = false;
-      for (String pattern : patterns) {
-        include |= clazz.getName().matches(pattern);
-      }
-    }
-    if (!include) {
-      return;
-    }
-
-    for (String excludePattern : excludePatterns) {
-      if (clazz.getName().matches(excludePattern)) {
-        return;
-      }
-    }
-
-    Method[] methods = clazz.getMethods();
-    for (Method method : methods) {
-      if (isTestMethod(method)) {
-        Test test = TestSuite.createTest(clazz, method.getName());
-        if (test instanceof NeedsDriver) {
-          boolean freshDriver = false;
-          if (method.isAnnotationPresent(NeedsFreshDriver.class)) {
-            freshDriver = true;
-          }
-
-          boolean restartDriver = false;
-          if (method.isAnnotationPresent(NoDriverAfterTest.class)) {
-            restartDriver = true;
-          }
-
-          if (withDriver) {
-            test = new DriverTestDecorator(test, driverClass,
-                                           keepDriver, freshDriver, restartDriver);
-          }
-        }
-        if (outputTestNames) {
-          test = new TestNameDecorator(test);
-        }
-        suite.addTest(test);
-      }
-    }
-  }
-
-  private boolean isTestMethod(Method method) {
-    if (!testMethodNames.isEmpty()) {
-      return testMethodNames.contains(method.getName());
-    }
-
-    if (isIgnored(method)) {
-      System.err.println("Ignoring: "
-                         + method.getDeclaringClass() + "."
-                         + method.getName() + ": "
-                         + method.getAnnotation(Ignore.class).reason());
-      return false;
-    }
-
-    if (!includeJavascript
-        && method.isAnnotationPresent(JavascriptEnabled.class)) {
-      return false;
-    }
-
-    return method.getName().startsWith("test")
-           || method.getAnnotation(org.junit.Test.class) != null;
-  }
+//  private boolean isTestMethod(Method method) {
+//    if (!testMethodNames.isEmpty()) {
+//      return testMethodNames.contains(method.getName());
+//    }
+//
+//    if (isIgnored(method)) {
+//      System.err.println("Ignoring: "
+//                         + method.getDeclaringClass() + "."
+//                         + method.getName() + ": "
+//                         + method.getAnnotation(Ignore.class).reason());
+//      return false;
+//    }
+//
+//    if (!includeJavascript
+//        && method.isAnnotationPresent(JavascriptEnabled.class)) {
+//      return false;
+//    }
+//
+//    return method.getName().startsWith("test")
+//           || method.getAnnotation(org.junit.Test.class) != null;
+//  }
 
   private boolean isIgnored(AnnotatedElement annotatedElement) {
     Ignore ignore = annotatedElement.getAnnotation(Ignore.class);
@@ -354,25 +351,25 @@ public class TestSuiteBuilder {
    *
    * @param suite The suite to add the JS API tests to.
    */
-  private void addJsApiTests(TestSuite suite) {
-    if (isIgnored(JsApiTestCase.class)) {
-      System.err.println("Ignoring JS API tests for " + driverClass.getName() + ": "
-                         + JsApiTestCase.class.getAnnotation(Ignore.class).reason());
-      return;
-    } else if (!withDriver) {
-      System.err.println("Skipping JS API tests: tests require a driver instance");
-      return;
-    }
-
-    for (File file : jsTestDir.listFiles(new TestFilenameFilter())) {
-      String path = file.getAbsolutePath()
-          .replace(jsTestDir.getAbsolutePath() + File.separator, "")
-          .replace(File.separator, "/");
-      TestCase test = new JsApiTestCase("/js/test/" + path);
-      suite.addTest(new DriverTestDecorator(test, driverClass,
-          /*keepDriver=*/true, /*freshDriver=*/false, /*refreshDriver=*/false));
-    }
-  }
+//  private void addJsApiTests(TestSuite suite) {
+//    if (isIgnored(JsApiTestCase.class)) {
+//      System.err.println("Ignoring JS API tests for " + driverClass.getName() + ": "
+//                         + JsApiTestCase.class.getAnnotation(Ignore.class).reason());
+//      return;
+//    } else if (!withDriver) {
+//      System.err.println("Skipping JS API tests: tests require a driver instance");
+//      return;
+//    }
+//
+//    for (File file : jsTestDir.listFiles(new TestFilenameFilter())) {
+//      String path = file.getAbsolutePath()
+//          .replace(jsTestDir.getAbsolutePath() + File.separator, "")
+//          .replace(File.separator, "/");
+//      TestCase test = new JsApiTestCase("/js/test/" + path);
+//      suite.addTest(new DriverTestDecorator(test, driverClass,
+//          /*keepDriver=*/true, /*freshDriver=*/false, /*refreshDriver=*/false));
+//    }
+//  }
 
   public TestSuiteBuilder pattern(String pattern) {
     patterns.add(pattern);

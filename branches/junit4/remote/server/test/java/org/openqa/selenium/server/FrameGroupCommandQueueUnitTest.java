@@ -1,9 +1,9 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-public class FrameGroupCommandQueueUnitTest extends TestCase {
-  
+
+public class FrameGroupCommandQueueUnitTest {
   private static String firstSessionId = "session 1";
   private static String firstQueueId = "queue 1";
   private static String secondSessionId = "session 2";

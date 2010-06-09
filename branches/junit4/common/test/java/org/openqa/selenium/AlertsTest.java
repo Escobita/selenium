@@ -19,10 +19,12 @@ package org.openqa.selenium;
 
 import java.lang.reflect.Method;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
 
+import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
@@ -32,10 +34,8 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   private String alertPage;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     TestEnvironment environment = GlobalTestEnvironment.get();
     alertPage = environment.getAppServer().whereIs("alerts.html");
   }

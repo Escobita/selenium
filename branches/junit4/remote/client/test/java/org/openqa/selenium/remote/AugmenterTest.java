@@ -19,7 +19,7 @@ package org.openqa.selenium.remote;
 
 import java.lang.reflect.Method;
 
-import org.junit.Test;
+import org.junit.Test; import static org.junit.Assert.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StubDriver;

@@ -17,12 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.support;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test; import static org.junit.Assert.*;
+
 
 import org.openqa.selenium.TestSuiteBuilder;
 
-public class SupportTestSuite extends TestCase {
+public class SupportTestSuite {
 	public static Test suite() throws Exception {
 		return new TestSuiteBuilder()
 					.addSourceDir("support")

@@ -18,13 +18,15 @@ limitations under the License.
 
 package org.openqa.selenium.remote.internal;
 
-import junit.framework.TestCase;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-public class CircularOutputStreamTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class CircularOutputStreamTest {
   public void testShouldReturnTheEntireWrittenContentIfSmallerThanTheBufferSize() throws Exception {
     String expected = "foo";
     int maxSize = expected.getBytes().length;

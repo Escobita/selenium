@@ -17,12 +17,12 @@
 
 package org.openqa.selenium.remote;
 
-import junit.framework.TestCase;
 
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.junit.Before;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
@@ -31,16 +31,22 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.XPathLookupException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Unit tests for {@link ErrorHandler}.
  *
  * @author jmleyba@gmail.com (Jason Leyba)
  */
-public class ErrorHandlerTest extends TestCase {
+public class ErrorHandlerTest {
   private ErrorHandler handler;
 
-  @Override
-  protected void setUp() {
+  @Before
+  public void setUp() {
     handler = new ErrorHandler();
     handler.setIncludeServerErrors(true);
   }

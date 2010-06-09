@@ -1,6 +1,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
+
 
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
@@ -8,8 +8,7 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
 /**
  * {@link org.openqa.selenium.server.browserlaunchers.BrowserLauncherFactory} unit test class
  */
-public class BrowserLauncherFactoryUnitTest extends TestCase {
-
+public class BrowserLauncherFactoryUnitTest {
     public void testAllSupportedBrowsersDefineAppropriateConstructor() {
         for (Class<? extends BrowserLauncher> c : BrowserLauncherFactory.getSupportedLaunchers().values()) {
             try {

@@ -1,15 +1,15 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import org.openqa.selenium.server.BrowserConfigurationOptions;
-import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
-import junit.framework.TestCase;
+import org.openqa.selenium.server.BrowserConfigurationOptions;
+import org.openqa.selenium.server.RemoteControlConfiguration;
+
 
 /**
  * {@link org.openqa.selenium.server.browserlaunchers.SafariCustomProfileLauncher} integration test class.
  */
-public class SafariLauncherIntegrationTest extends TestCase {
+public class SafariLauncherIntegrationTest {
 
     private static final Log LOGGER = LogFactory.getLog(SafariLauncherIntegrationTest.class);
     private static final int SECONDS = 1000;

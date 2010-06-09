@@ -2,18 +2,14 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
-public class MakeProxyPacUnitTest extends TestCase {
-    public MakeProxyPacUnitTest(String name) {
-        super(name);
-    }
+import static org.junit.Assert.assertEquals;
+
+public class MakeProxyPacUnitTest { 
     private File parentDir, pacFile;
     private boolean proxySeleniumTrafficOnly = true;
     private boolean avoidProxy = false;

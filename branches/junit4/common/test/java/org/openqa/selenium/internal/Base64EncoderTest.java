@@ -16,11 +16,12 @@ package org.openqa.selenium.internal;
 
 //import com.thoughtworks.acceptance.AbstractAcceptanceTest;
 
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class Base64EncoderTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class Base64EncoderTest {
 
     private Base64Encoder encoder = new Base64Encoder();
 

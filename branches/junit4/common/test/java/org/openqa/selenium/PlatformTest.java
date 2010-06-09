@@ -17,11 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class PlatformTest extends TestCase {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class PlatformTest {
 
   @Test public void shouldIdentifyWindowsVariants() {
     assertAllAre(Platform.WINDOWS, "Windows 2003");

@@ -1,17 +1,20 @@
 package org.openqa.selenium.server.commands;
 
-import junit.framework.TestCase;
-import org.bouncycastle.util.encoders.Base64;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.io.ByteArrayInputStream;
 
-public class CaptureScreenshotToStringCommandUnitTest extends TestCase {
+import org.bouncycastle.util.encoders.Base64;
+
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.expectLastCall;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class CaptureScreenshotToStringCommandUnitTest {
 
 	private CaptureScreenshotToStringCommand command;
 

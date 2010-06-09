@@ -17,14 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.internal.PortProber.findFreePort;
 
 @SuppressWarnings("unused")
-public class SingleTestSuite extends TestCase {
+public class SingleTestSuite {
   private static final String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
   private static final String CHROME_TEST = "org.openqa.selenium.chrome.ChromeDriverTestSuite$TestChromeDriver";
 

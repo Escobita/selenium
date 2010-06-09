@@ -17,9 +17,11 @@ limitations under the License.
 
 package org.openqa.selenium.support.ui;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SlowLoadableComponentTest extends TestCase {
+
+public class SlowLoadableComponentTest {
 
   public void testShouldDoNothingIfComponentIsAlreadyLoaded() {
     try {

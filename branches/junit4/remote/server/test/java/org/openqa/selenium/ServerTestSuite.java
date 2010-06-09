@@ -4,23 +4,22 @@
  */
 package org.openqa.selenium;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.openqa.selenium.server.LinuxHTMLRunnerFunctionalTest;
-import org.openqa.selenium.server.WindowsHTMLRunnerFunctionalTest;
-import org.openqa.selenium.server.browserlaunchers.WindowsUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
-public class ServerTestSuite extends TestCase {
+public class ServerTestSuite {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(ServerTestSuite.class.getName());
-        if (WindowsUtils.thisIsWindows()) {
-            suite.addTestSuite(WindowsHTMLRunnerFunctionalTest.class);
-        } else {
-            suite.addTestSuite(LinuxHTMLRunnerFunctionalTest.class);
-        }
-        return suite;
+//        TestSuite suite = new TestSuite(ServerTestSuite.class.getName());
+//        if (WindowsUtils.thisIsWindows()) {
+//            suite.addTestSuite(WindowsHTMLRunnerFunctionalTest.class);
+//        } else {
+//            suite.addTestSuite(LinuxHTMLRunnerFunctionalTest.class);
+//        }
+//        return suite;
+      fail("foo");
+      return null;
     }
 }

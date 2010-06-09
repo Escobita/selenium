@@ -17,18 +17,22 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
+import org.junit.Before;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class DriverFactoryTest extends TestCase {
+
+public class DriverFactoryTest {
   private DriverFactory factory;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     factory = new DriverFactory();
   }
 

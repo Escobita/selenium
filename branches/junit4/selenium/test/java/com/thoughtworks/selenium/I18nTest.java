@@ -5,21 +5,21 @@
 package com.thoughtworks.selenium;
 
 import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test; import static org.junit.Assert.*;
+
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.SeleniumServer;
 
 import java.io.UnsupportedEncodingException;
 
-public class I18nTest extends TestCase {
-    
+public class I18nTest {
     private static String startUrl = "http://localhost:" + RemoteControlConfiguration.getDefaultPort();
     private static Selenium sel;
     
     public static Test suite() {
-        return new I18nTestSetup(new TestSuite(I18nTest.class), "*mock", true);
+//        return new I18nTestSetup(new TestSuite(I18nTest.class), "*mock", true);
+      fail("ouch");
+      return null;
     }
     
     protected static class I18nTestSetup extends TestSetup {
@@ -27,12 +27,16 @@ public class I18nTest extends TestCase {
         String browser;
         boolean launchServer;
         SeleniumServer server;
-        
-        public I18nTestSetup(Test test, String browser, boolean launchServer) {
-            super(test);
-            this.browser = browser;
-            this.launchServer = launchServer;
-        }
+
+      public I18nTestSetup(junit.framework.Test test) {
+        super(test);
+      }
+
+//        public I18nTestSetup(Test test, String browser, boolean launchServer) {
+////            super(test);
+//            this.browser = browser;
+//            this.launchServer = launchServer;
+//        }
         
         public void setUp() throws Exception {
             if (launchServer) {
@@ -95,6 +99,12 @@ public class I18nTest extends TestCase {
         assertEquals("mangled label", "c:\\foo\\bar", labels[1]);
         assertEquals("mangled label", "c:\\I came, I \\saw\\, I conquered", labels[2]);
     }
+
+  private String getName() {
+    fail("foo");
+    return null;
+  }
+
 
     private void verifyText(String expected, String id) throws UnsupportedEncodingException {
         System.out.println(getName());

@@ -20,10 +20,19 @@ package org.openqa.selenium.iphone;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.NoDriverAfterTest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
  */
 public class IPhoneSimulatorCommandExecutorTest extends AbstractDriverTestCase {
+
+  private String getName() {
+    fail("foo");
+    return null;
+  }
+
 
   @NoDriverAfterTest
   public void testShouldDetectThatTheIPhoneSimulatorHasUnexpectedlyShutdown() throws Exception {

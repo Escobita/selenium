@@ -22,12 +22,12 @@ import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.internal.FileHandler;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test; import static org.junit.Assert.*;
+
 
 import java.io.File;
 
-public class IPhoneDriverTestSuite extends TestCase {
+public class IPhoneDriverTestSuite {
 
   public static Test suite() throws Exception {
     return new TestSuiteBuilder()

@@ -26,6 +26,8 @@ import org.openqa.selenium.environment.webserver.AppServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -35,14 +37,11 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
 @Ignore(IPHONE)
 public class FrameSwitchingTest extends AbstractDriverTestCase {
 
-  @Override
   protected void tearDown() throws Exception {
     try {
       driver.switchTo().defaultContent();
     } catch (Exception e) {
       //May happen if the driver went away.
-    } finally {
-      super.tearDown();
     }
   }
 

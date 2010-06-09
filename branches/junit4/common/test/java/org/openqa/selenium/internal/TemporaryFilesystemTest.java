@@ -1,6 +1,5 @@
 package org.openqa.selenium.internal;
 
-import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +7,10 @@ import java.io.IOException;
 import org.junit.Test;
 import org.openqa.selenium.WebDriverException;
 
-public class TemporaryFilesystemTest extends TestCase {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class TemporaryFilesystemTest {
 
   @Test public void CanCreateTempFiles() {
     File tmp = TemporaryFilesystem.createTempDir("TemporaryFilesystem", "canCreate");

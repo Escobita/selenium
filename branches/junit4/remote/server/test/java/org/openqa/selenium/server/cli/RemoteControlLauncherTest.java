@@ -1,13 +1,15 @@
 package org.openqa.selenium.server.cli;
 
-import junit.framework.TestCase;
+
 import org.openqa.selenium.server.RemoteControlConfiguration;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * {@link org.openqa.selenium.server.cli.RemoteControlLauncher} unit test class.
  */
-public class RemoteControlLauncherTest extends TestCase {
-
+public class RemoteControlLauncherTest {
     public void testHonorSystemProxyIsSetWhenProvidedAsAnOption() {
         final RemoteControlConfiguration configuration;
         

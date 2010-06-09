@@ -1,20 +1,26 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
-import org.openqa.jetty.http.HttpContext;
-import org.openqa.jetty.util.Resource;
 
 import java.io.File;
 
-public class FsResourceLocatorUnitTest extends TestCase {
+import org.junit.Before;
+import org.openqa.jetty.http.HttpContext;
+import org.openqa.jetty.util.Resource;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class FsResourceLocatorUnitTest {
 	private File tempFile;
 
 	private FsResourceLocator resourceLocator;
 
 	private HttpContext context;
 
+  @Before
 	public void setUp() throws Exception {
-		super.setUp();
 		tempFile = File.createTempFile("selenium-test-", "");
 		tempFile.deleteOnExit();
 		resourceLocator = new FsResourceLocator(tempFile.getParentFile());

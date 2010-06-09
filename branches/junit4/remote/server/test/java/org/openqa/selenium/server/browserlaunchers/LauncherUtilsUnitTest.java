@@ -1,6 +1,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,13 @@ import java.io.IOException;
 
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
-public class LauncherUtilsUnitTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+public class LauncherUtilsUnitTest {
     private static String COOKIE_SUFFIX = "txt";
 
     public void testCopySingleFileWithOverwrite() throws IOException {

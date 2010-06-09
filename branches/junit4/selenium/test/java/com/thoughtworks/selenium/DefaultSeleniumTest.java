@@ -1,9 +1,9 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultSeleniumTest extends TestCase {
 
+public class DefaultSeleniumTest {
     private static final String prefix = "setContext,com.thoughtworks.selenium.DefaultSeleniumTest: ";
 
     public void testBannerSimple() throws Throwable {

@@ -1,12 +1,15 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
+
 
 import java.io.File;
 import java.io.IOException;
 
-public class WindowsProxyManagerUnitTest extends TestCase {
-  
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class WindowsProxyManagerUnitTest {
   public void testDeleteFlatDirContentsWithNoSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     WindowsProxyManager.deleteFlatDirContents(srcDir, null);

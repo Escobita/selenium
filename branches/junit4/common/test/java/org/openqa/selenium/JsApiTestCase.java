@@ -1,5 +1,7 @@
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
@@ -21,10 +23,9 @@ public class JsApiTestCase extends AbstractDriverTestCase {
 
   public JsApiTestCase(String relativeUrl) {
     this.relativeUrl = relativeUrl;
-    this.setName(relativeUrl);
+//    this.setName(relativeUrl);
   }
 
-  @Override
   @JavascriptEnabled
   protected void runTest() throws Throwable {
     String testUrl = appServer.whereIs(relativeUrl);

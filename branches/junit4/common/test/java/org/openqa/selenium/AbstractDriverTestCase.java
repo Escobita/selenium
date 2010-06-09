@@ -17,11 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.TestCase;
+
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.junit.Before;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
@@ -32,7 +33,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
-public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
+public class AbstractDriverTestCase implements NeedsDriver {
 
   protected TestEnvironment environment;
   protected AppServer appServer;
@@ -43,10 +44,8 @@ public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
     this.driver = driver;
   }
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     environment = GlobalTestEnvironment.get();
     appServer = environment.getAppServer();
 

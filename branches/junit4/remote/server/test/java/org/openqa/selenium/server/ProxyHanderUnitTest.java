@@ -1,15 +1,16 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+
+import org.openqa.jetty.http.HttpRequest;
+import org.openqa.jetty.http.HttpResponse;
+
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
-import org.openqa.jetty.http.HttpRequest;
-import org.openqa.jetty.http.HttpResponse;
+import static org.junit.Assert.assertNull;
 
-public class ProxyHanderUnitTest extends TestCase {
-
+public class ProxyHanderUnitTest {
 	public void testSendNotFoundSends404ResponseCode() throws Exception {
 		ProxyHandler proxyHandler = new ProxyHandler(true, "", "", false, false);
 		HttpResponse httpResponseMock = createMock(HttpResponse.class);

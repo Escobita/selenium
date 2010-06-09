@@ -17,13 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.TestCase;
+
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 
-public class WebDriverBackSeleniumTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
+public class WebDriverBackSeleniumTest {
   public void testShouldConvertScriptsProperly() {
     String script = "return selenium.browserbot.getCurrentWindow().title;";
     final String expectedScript = "return eval(\"return window.title;\");";

@@ -21,6 +21,7 @@ import java.io.File;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.OutputType.BASE64;
 
 public class TakesScreenshotTest extends AbstractDriverTestCase {

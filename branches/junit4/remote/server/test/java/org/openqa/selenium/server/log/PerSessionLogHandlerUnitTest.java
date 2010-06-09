@@ -1,16 +1,17 @@
 package org.openqa.selenium.server.log;
 
-import junit.framework.TestCase;
 
 import java.io.IOException;
-import java.util.logging.LogRecord;
-import java.util.logging.Level;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * {@link org.openqa.selenium.server.log.PerSessionLogHandler} unit test class.
  */
-public class PerSessionLogHandlerUnitTest extends TestCase {
+public class PerSessionLogHandlerUnitTest {
     private static final int CAPACITY = 1;
 
     public void testThreadToSessionMappingOnInitialNullSession() throws IOException {

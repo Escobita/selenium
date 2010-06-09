@@ -17,14 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
-import junit.framework.TestCase;
+
 
 import org.openqa.selenium.Ignore;
 import org.openqa.selenium.WebDriver;
 
 import static org.openqa.selenium.Ignore.Driver.IE;
 
-public class InternetExplorerDriverTest extends TestCase {
+public class InternetExplorerDriverTest {
 
   @Ignore(value = IE, reason = "Not sure why this is failing on my machine")
   public void testCanRestartTheIeDriverInATightLoop() {  

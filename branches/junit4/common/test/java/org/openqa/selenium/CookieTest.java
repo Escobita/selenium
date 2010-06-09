@@ -17,14 +17,16 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.framework.TestCase;
 
 import java.util.Date;
 
 import org.junit.Test;
 import org.openqa.selenium.internal.ReturnedCookie;
 
-public class CookieTest extends TestCase {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CookieTest {
 
   @Test public void CanCreateAWellFormedCookie() {
     new ReturnedCookie("Fish", "cod", "", "", null, false, null);

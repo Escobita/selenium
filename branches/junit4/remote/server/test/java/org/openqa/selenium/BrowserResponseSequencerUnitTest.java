@@ -6,25 +6,31 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
 import org.openqa.selenium.server.BrowserResponseSequencer;
 
-public class BrowserResponseSequencerUnitTest extends TestCase {
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class BrowserResponseSequencerUnitTest {
 
 	private BrowserResponseSequencer seq;
 	private List<Integer> numbers;
 
-	public BrowserResponseSequencerUnitTest(String name) {
-		super(name);
-	}
-	
+  @Before
 	public void setUp() {
 		seq = new BrowserResponseSequencer(getName());
 		numbers = new ArrayList<Integer>();
 	}
 
-	public void testBrowserResponseSequencer() throws InterruptedException, ExecutionException {
+  private String getName() {
+    fail("Foo");
+    return null;  //To change body of created methods use File | Settings | File Templates.
+  }
+
+
+  public void testBrowserResponseSequencer() throws InterruptedException, ExecutionException {
 		
 		// we launch them in reverse order, but they get added in sequence
 		FutureTask<Void> three = NumberWriter.launchNumberWriter(3, seq, numbers);

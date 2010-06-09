@@ -17,17 +17,18 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.framework.TestCase;
+
+import org.openqa.selenium.remote.server.rest.Handler;
+import org.openqa.selenium.remote.server.rest.ResultConfig;
+import org.openqa.selenium.remote.server.rest.ResultType;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import org.openqa.selenium.remote.server.rest.Handler;
-import org.openqa.selenium.remote.server.rest.ResultConfig;
-import org.openqa.selenium.remote.server.rest.ResultType;
+import static org.junit.Assert.fail;
 
-public class ResultConfigTest extends TestCase {
+public class ResultConfigTest {
   private LogTo logger = new NullLogTo();
 
   public void testShouldMatchBasicUrls() throws Exception {

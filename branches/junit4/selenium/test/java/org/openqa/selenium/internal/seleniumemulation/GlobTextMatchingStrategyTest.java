@@ -18,12 +18,14 @@ limitations under the License.
 
 package org.openqa.selenium.internal.seleniumemulation;
 
-import junit.framework.TestCase;
+
 
 import org.openqa.selenium.internal.seleniumemulation.GlobTextMatchingStrategy;
 
+import static org.junit.Assert.assertTrue;
 
-public class GlobTextMatchingStrategyTest extends TestCase {
+
+public class GlobTextMatchingStrategyTest {
 	public void testShouldMatchAgainstASimplePattern() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("This is a test", "This is a test");

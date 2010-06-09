@@ -1,7 +1,12 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
 import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -9,11 +14,13 @@ import org.openqa.selenium.server.log.TerseFormatter;
 import org.openqa.selenium.testworker.TrackableRunnable;
 import org.openqa.selenium.testworker.TrackableThread;
 
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class SingleEntryAsyncQueueUnitTest extends TestCase {
-
+public class SingleEntryAsyncQueueUnitTest {
     private static final Log logger = LogFactory.getLog(SingleEntryAsyncQueueUnitTest.class);
 
     private static final String testCommand = "testCommand";
@@ -24,14 +31,19 @@ public class SingleEntryAsyncQueueUnitTest extends TestCase {
 
     private SingleEntryAsyncQueue<String> queue;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         configureLogging();
         queue = new SingleEntryAsyncQueue<String>(timeout);
         logger.info("Start test: " + getName());
     }
 
-    @Override
+  private String getName() {
+    fail("foo");
+    return null;
+  }
+
+  @After
     public void tearDown() throws Exception {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }

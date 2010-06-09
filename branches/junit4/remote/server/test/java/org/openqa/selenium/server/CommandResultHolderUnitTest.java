@@ -1,7 +1,12 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+
 import org.apache.commons.logging.Log;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -9,11 +14,12 @@ import org.openqa.selenium.server.log.TerseFormatter;
 import org.openqa.selenium.testworker.TrackableRunnable;
 import org.openqa.selenium.testworker.TrackableThread;
 
-import java.util.logging.Handler;
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class CommandResultHolderUnitTest extends TestCase {
-
+public class CommandResultHolderUnitTest {
   private static Log log = LogFactory.getLog(CommandResultHolderUnitTest.class);
 
   private static final String sessionId = "1";
@@ -22,13 +28,18 @@ public class CommandResultHolderUnitTest extends TestCase {
   private static final int cmdTimeout = 3;
   private CommandResultHolder holder;
   
-  @Override
+  @Before
   public void setUp() throws Exception {
     configureLogging();
     holder = new CommandResultHolder(sessionId, cmdTimeout);
     log.info("Start test: " + getName());
   }
-  
+
+  private String getName() {
+    fail("The pain");
+    return null;
+  }
+
   private void configureLogging() throws Exception {
       LoggingManager.configureLogging(new RemoteControlConfiguration(), true);
       Logger logger = Logger.getLogger("");
@@ -40,7 +51,7 @@ public class CommandResultHolderUnitTest extends TestCase {
       }
   }
   
-  @Override
+  @After
   public void tearDown() throws Exception {
       LoggingManager.configureLogging(new RemoteControlConfiguration(), true);
   }

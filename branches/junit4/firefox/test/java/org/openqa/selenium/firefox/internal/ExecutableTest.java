@@ -1,12 +1,12 @@
 package org.openqa.selenium.firefox.internal;
 
-import junit.framework.TestCase;
 
-import org.junit.Test;
+
+import org.junit.Test; import static org.junit.Assert.*;
 
 import java.io.File;
 
-public class ExecutableTest extends TestCase {
+public class ExecutableTest {
 
   @Test
   public void testEnvironmentDiscovery() {

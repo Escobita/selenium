@@ -1,9 +1,10 @@
 package com.thoughtworks.selenium;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class DefaultSeleniumStartErrorHandlingTest extends TestCase {
 
+public class DefaultSeleniumStartErrorHandlingTest {
     public void testWrapsConnectionRefusedWithUserFriendlyExceptionMessage() {
         final FailOnStartCommandProcessor failOnStartCommandProcessor;
 

@@ -1,12 +1,17 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
-import org.openqa.jetty.http.HttpContext;
-import org.openqa.jetty.util.Resource;
 
 import java.io.IOException;
 
-public class ClasspathResourceLocatorUnitTest extends TestCase {
+import org.openqa.jetty.http.HttpContext;
+import org.openqa.jetty.util.Resource;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class ClasspathResourceLocatorUnitTest {
     public void testShouldGetResourceFromClasspath() throws Exception {
         Resource resource = getResourceFromClasspath("ClasspathResourceLocatorUnitTest.class");
         assertNotNull(resource.getInputStream());

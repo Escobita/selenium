@@ -4,11 +4,11 @@
  */
 package org.openqa.selenium;
 
-import org.openqa.selenium.server.htmlrunner.*;
+import org.openqa.selenium.server.htmlrunner.HTMLSuiteResult;
 
-import junit.framework.*;
+import static org.junit.Assert.assertEquals;
 
-public class HTMLSuiteResultUnitTest extends TestCase {
+public class HTMLSuiteResultUnitTest {
 
     public void testBasic() {
         String input = "\r\n" + 

@@ -17,24 +17,24 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import static org.openqa.selenium.Ignore.Driver.IE;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.TestSuiteBuilder;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
 import java.net.URL;
 
-public class RemoteWebDriverIeTestSuite extends TestCase {
+import org.junit.Test;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static org.junit.Assert.fail;
+import static org.openqa.selenium.Ignore.Driver.IE;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
+
+public class RemoteWebDriverIeTestSuite {
   public static Test suite() throws Exception {
     if (!(Platform.getCurrent().is(Platform.WINDOWS))) {      
-      TestSuite toReturn = new TestSuite();
-      toReturn.addTestSuite(EmptyTest.class);
-      return toReturn;
+//      TestSuite toReturn = new TestSuite();
+//      toReturn.addTestSuite(EmptyTest.class);
+//      return toReturn;
     }
 
 //    System.setProperty("webdriver.development", "true");
@@ -67,9 +67,11 @@ public class RemoteWebDriverIeTestSuite extends TestCase {
             .excludePattern(".*LauncherTest")
             .create();
 
-    TestSuite toReturn = new TestSuite();
-    toReturn.addTest(new RemoteWebDriverTestSuite.RemoteDriverServerStarter(rawSuite));
-    return toReturn;
+//    TestSuite toReturn = new TestSuite();
+//    toReturn.addTest(new RemoteWebDriverTestSuite.RemoteDriverServerStarter(rawSuite));
+//    return toReturn;
+    fail("foo");
+    return null;
   }
 
   public static class RemoteIeWebDriverForTest extends RemoteWebDriver {
@@ -78,7 +80,7 @@ public class RemoteWebDriverIeTestSuite extends TestCase {
     }
   }
 
-  public static class EmptyTest extends TestCase {
+  public static class EmptyTest {
     public void testDoNothingButLetTheSuiteWork() {
       // Does nothing
     }

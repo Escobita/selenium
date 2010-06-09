@@ -2,6 +2,8 @@ package org.openqa.selenium;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
  */

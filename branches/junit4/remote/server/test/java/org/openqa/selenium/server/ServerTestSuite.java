@@ -17,12 +17,11 @@ limitations under the License.
 
 package org.openqa.selenium.server;
 
+import org.junit.Test;
 import org.openqa.selenium.TestSuiteBuilder;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
 
-public class ServerTestSuite  extends TestCase {
+public class ServerTestSuite {
   public static Test suite() throws Exception {
     return new TestSuiteBuilder()
         .addSourceDir("remote/server")

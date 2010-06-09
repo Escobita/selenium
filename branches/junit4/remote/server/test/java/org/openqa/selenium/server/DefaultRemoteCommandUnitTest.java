@@ -1,12 +1,11 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 
-public class DefaultRemoteCommandUnitTest extends TestCase {
 
-    public DefaultRemoteCommandUnitTest(String name) {
-        super(name);
-    }
+public class DefaultRemoteCommandUnitTest {
 
     public void testParseNoJs() {
         DefaultRemoteCommand drc = new DefaultRemoteCommand("foo", "bar", "baz");

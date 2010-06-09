@@ -19,9 +19,12 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -32,10 +35,8 @@ public class TextPagesTest extends AbstractDriverTestCase {
 
   private String textPage;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     textPage = GlobalTestEnvironment.get().getAppServer().whereIs("plain.txt");
   }
 

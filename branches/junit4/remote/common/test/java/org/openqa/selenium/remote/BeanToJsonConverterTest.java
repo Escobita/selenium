@@ -17,10 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import junit.framework.TestCase;
+
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class BeanToJsonConverterTest extends TestCase {
+public class BeanToJsonConverterTest {
 
   public void testShouldBeAbleToConvertASimpleString() throws Exception {
     String json = new BeanToJsonConverter().convert("cheese");

@@ -19,9 +19,10 @@ package org.openqa.selenium.firefox;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
 
+import org.junit.Before;
 import org.openqa.selenium.Proxy;
 
 import java.io.BufferedReader;
@@ -30,14 +31,12 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirefoxProfileTest extends TestCase {
+public class FirefoxProfileTest {
 
   private FirefoxProfile profile;
   
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     profile = new FirefoxProfile();
   }
 

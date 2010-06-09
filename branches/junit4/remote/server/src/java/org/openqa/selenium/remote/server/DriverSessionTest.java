@@ -17,14 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.framework.TestCase;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class DriverSessionTest extends TestCase {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class DriverSessionTest {
   public void testShouldRegisterCorrectDefaultsOnMac() {
     DriverFactory factory = new DriverFactory();
     new DriverSessions(Platform.MAC, factory);

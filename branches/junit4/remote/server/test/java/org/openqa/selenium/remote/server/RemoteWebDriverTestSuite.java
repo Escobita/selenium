@@ -18,15 +18,15 @@ limitations under the License.
 package org.openqa.selenium.remote.server;
 
 import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.environment.webserver.Jetty6AppServer;
@@ -35,10 +35,11 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpRequest;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 
-public class RemoteWebDriverTestSuite extends TestCase {
+public class RemoteWebDriverTestSuite {
   public static Test suite() throws Exception {
     System.setProperty("webdriver.development", "true");
 
@@ -64,9 +65,11 @@ public class RemoteWebDriverTestSuite extends TestCase {
             .excludePattern(".*LauncherTest")
             .create();
 
-    TestSuite toReturn = new TestSuite();
-    toReturn.addTest(new RemoteDriverServerStarter(rawSuite));
-    return toReturn;
+//    TestSuite toReturn = new TestSuite();
+//    toReturn.addTest(new RemoteDriverServerStarter(rawSuite));
+//    return toReturn;
+    fail("Ouch");
+    return null;
   }
 
   public static class RemoteWebDriverForTest extends RemoteWebDriver {
@@ -75,15 +78,11 @@ public class RemoteWebDriverTestSuite extends TestCase {
     }
   }
 
-  public static class RemoteDriverServerStarter extends TestSetup {
+  public static class RemoteDriverServerStarter  {
     private AppServer appServer;
 
-    public RemoteDriverServerStarter(Test test) {
-      super(test);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
       appServer = new Jetty6AppServer() {
         protected File findRootOfWebApp() {
           File common = super.findRootOfWebApp();
@@ -111,19 +110,15 @@ public class RemoteWebDriverTestSuite extends TestCase {
             HttpRequest.Method.POST, "http://localhost:6000/common/hub/config/drivers",
             payload);
       }
-
-      super.setUp();
     }
 
     private boolean isInDevMode() {
       return FirefoxDriver.class.getResource("/webdriver-extension.zip") == null;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
       appServer.stop();
-
-      super.tearDown();
     }
   }
 }

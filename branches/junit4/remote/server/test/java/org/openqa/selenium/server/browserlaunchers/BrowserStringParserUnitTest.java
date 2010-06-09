@@ -1,11 +1,15 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * {@link BrowserInstallationCache} unit test class.
  */
-public class BrowserStringParserUnitTest extends TestCase {
+public class BrowserStringParserUnitTest {
 
     public void testBrowserStartCommandMatchWhenBrowserStringIsTheBrowserName() {
         final BrowserStringParser.Result result;

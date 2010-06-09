@@ -1,9 +1,12 @@
 package org.openqa.selenium.server;
 
-import junit.framework.TestCase;
+
 import org.openqa.selenium.server.log.LoggingManager;
 
-public class HtmlIdentifierTest extends TestCase {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class HtmlIdentifierTest {
     
     public void setUp() throws Exception {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), true);

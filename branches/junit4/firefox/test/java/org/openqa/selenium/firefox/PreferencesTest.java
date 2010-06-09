@@ -17,9 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class PreferencesTest extends TestCase {
+
+public class PreferencesTest {
 
   public void testStringifyVsStringFormat() {
     assertEquals("\"stringifyMe\"", String.format("\"%s\"", "stringifyMe"));

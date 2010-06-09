@@ -1,11 +1,15 @@
 package org.openqa.selenium;
 
-import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.openqa.selenium.Proxy.ProxyType;
 
-public class ProxyTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class ProxyTest {              
   @Test public void Unspecified() {
     Proxy proxy = new Proxy();
     assertEquals(ProxyType.UNSPECIFIED, proxy.getProxyType());

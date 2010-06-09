@@ -17,8 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.junit.Test; import static org.junit.Assert.*;
+
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FirefoxDriverTestSuite extends TestCase {
+public class FirefoxDriverTestSuite {
   public static Test suite() throws Exception {
 
 //    System.setProperty("webdriver.development", "true");

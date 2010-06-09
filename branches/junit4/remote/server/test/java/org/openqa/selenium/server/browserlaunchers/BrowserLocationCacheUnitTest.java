@@ -1,12 +1,14 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-import junit.framework.TestCase;
+
 import org.openqa.selenium.server.browserlaunchers.locators.BrowserLocator;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * {@link BrowserInstallationCache} unit test class.
  */
-public class BrowserLocationCacheUnitTest extends TestCase {
+public class BrowserLocationCacheUnitTest {
 
     public void tesCacheKeyIsTheBrowserStringWhenNoCustomPathIsProvided() {
         assertEquals("*aBrowser", new BrowserInstallationCache().cacheKey("*aBrowser", null));

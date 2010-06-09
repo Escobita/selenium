@@ -17,30 +17,24 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-
+import org.junit.Test;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.InProcessTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
 
-public class EnvironmentStarter extends TestSetup {
+public class EnvironmentStarter {
 
   private TestEnvironment environment;
 
   public EnvironmentStarter(Test test) {
-    super(test);
+//    super(test);
   }
 
-  @Override
   protected void setUp() throws Exception {
-    super.setUp();
-
     environment = new InProcessTestEnvironment();
     GlobalTestEnvironment.set(environment);
   }
 
-  @Override
   protected void tearDown() throws Exception {
     WebDriver driver = DriverTestDecorator.getDriver();
     if (driver != null && !Boolean.getBoolean("webdriver.singletestsuite.leaverunning")) {
@@ -49,7 +43,5 @@ public class EnvironmentStarter extends TestSetup {
 
     environment.stop();
     GlobalTestEnvironment.set(null);
-
-    super.tearDown();
   }
 }

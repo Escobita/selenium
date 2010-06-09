@@ -2,9 +2,14 @@ package org.openqa.selenium;
 
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
@@ -14,18 +19,14 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
 @Ignore(value = {IPHONE})
 public class ImplicitWaitTest extends AbstractDriverTestCase {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     driver.manage().timeouts().implicitlyWait(0, MILLISECONDS);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     driver.manage().timeouts().implicitlyWait(0, MILLISECONDS);
-    
-    super.tearDown();
   }
 
   @JavascriptEnabled
