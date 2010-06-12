@@ -18,14 +18,16 @@ limitations under the License.
 package org.openqa.selenium.lift;
 
 import org.hamcrest.Matcher;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.lift.find.Finder;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Unit test for {@link HamcrestWebDriverTestCase}.
@@ -42,7 +44,7 @@ public class HamcrestWebdriverTestCaseTest extends MockObjectTestCase {
 
 	HamcrestWebDriverTestCase testcase = createTestCase();
 	
-	public void testDelegatesAllCallsToItsTestContext() {
+	@Test public void delegatesAllCallsToItsTestContext() {
 		
 		final TestContext testContext = mock(TestContext.class);
 		testcase.setContext(testContext);
@@ -64,7 +66,7 @@ public class HamcrestWebdriverTestCaseTest extends MockObjectTestCase {
 		testcase.assertPresenceOf(someNumberOf, something);
 	}
 	
-	public void testProvidesSyntacticSugarMethodNamedInto() throws Exception {
+	@Test public void providesSyntacticSugarMethodNamedInto() throws Exception {
 		
 		Finder<WebElement, WebDriver> result = testcase.into(something);
 		assertThat(result, is(something));

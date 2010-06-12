@@ -37,8 +37,7 @@ public class SeleniumServerUnitTest {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
-	public void testJettyThreadsPositive() throws Exception {
+	@Test public void jettyThreadsPositive() throws Exception {
 		RemoteControlConfiguration configuration = new RemoteControlConfiguration();
 	    configuration.setJettyThreads(positiveJettyThreads);
 
@@ -56,7 +55,7 @@ public class SeleniumServerUnitTest {
 //	 * 
 //	 * @throws Exception
 //	 */
-//	public void testJettyServerArgumentPositive() throws Exception {
+//	@Test public void jettyServerArgumentPositive() throws Exception {
 //		String[] args = new String[] { "-jettyThreads",
 //				String.valueOf(positiveJettyThreads) };
 //		SeleniumServer.main(args);
@@ -70,7 +69,7 @@ public class SeleniumServerUnitTest {
 //	 * 
 //	 * @throws Exception
 //	 */
-//	public void testJettyServerArgumentNegativeMaximum() throws Exception {
+//	@Test public void jettyServerArgumentNegativeMaximum() throws Exception {
 //		int expectedJettyThreads = SeleniumServer.getJettyThreads();
 //
 //		String[] args = new String[] { "-jettyThreads",
@@ -95,7 +94,7 @@ public class SeleniumServerUnitTest {
 //	 * 
 //	 * @throws Exception
 //	 */
-//	public void testJettyServerArgumentNegativeZero() throws Exception {
+//	@Test public void jettyServerArgumentNegativeZero() throws Exception {
 //		int expectedJettyThreads = SeleniumServer.getJettyThreads();
 //
 //		String[] args = new String[] { "-jettyThreads",

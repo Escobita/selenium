@@ -20,12 +20,10 @@ limitations under the License.
 package org.openqa.selenium.htmlunit;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
-
-import org.junit.Test; import static org.junit.Assert.*;
-
+import org.junit.Test;
+import org.openqa.selenium.TestSuiteBuilder;
 
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
-import org.openqa.selenium.TestSuiteBuilder;
 
 public class JavascriptEnabledHtmlUnitDriverTestSuite {
 

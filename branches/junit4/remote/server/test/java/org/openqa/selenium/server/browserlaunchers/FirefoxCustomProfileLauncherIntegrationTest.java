@@ -2,6 +2,7 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import java.util.UUID;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -10,18 +11,18 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
  */
 public class FirefoxCustomProfileLauncherIntegrationTest extends LauncherFunctionalTestCase {
 
-    public void testLauncherWithDefaultConfiguration() throws Exception {
+    @Test public void launcherWithDefaultConfiguration() throws Exception {
         launchBrowser(new FirefoxCustomProfileLauncher(new BrowserConfigurationOptions(), new RemoteControlConfiguration(), "CUSTFFCHROME", (String) null));
     }
 
-    public void testLaunchTwoBrowsersInARowWithDefaultConfiguration() throws Exception {
+    @Test public void launchTwoBrowsersInARowWithDefaultConfiguration() throws Exception {
         final RemoteControlConfiguration configuration = new RemoteControlConfiguration();
 
         launchBrowser(new FirefoxCustomProfileLauncher(new BrowserConfigurationOptions(), configuration, "CUSTFFCHROME", (String) null));
         launchBrowser(new FirefoxCustomProfileLauncher(new BrowserConfigurationOptions(), configuration, "CUSTFFCHROME", (String) null));
     }
 
-    public void testLaunchMultipleBrowsersConcurrentlyWithDefaultConfiguration() {
+    @Test public void launchMultipleBrowsersConcurrentlyWithDefaultConfiguration() {
     	Thread t1 = new Thread(run);
     	Thread t2 = new Thread(run);
     	Thread t3 = new Thread(run);

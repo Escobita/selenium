@@ -16,10 +16,11 @@
  */
 package org.openqa.selenium.server.browserlaunchers;
 
-
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,7 +47,7 @@ public class WindowsUtilsUnitTest {
         return majorVersion >= 5 && minorVersion >= 1;
     }
     
-    public void testLoadEnvironment() {
+    @Test public void loadEnvironment() {
         if (!WindowsUtils.thisIsWindows()) return;
         Map p =WindowsUtils.loadEnvironment();
         assertFalse("Environment appears to be empty!", p.isEmpty());
@@ -59,17 +60,17 @@ public class WindowsUtilsUnitTest {
 //            }
         assertNotNull("SystemRoot env var apparently not set on Windows!", WindowsUtils.findSystemRoot());
     }
-    public void testWMIC() {
+    @Test public void wMIC() {
         if (!WindowsUtils.thisIsWindows()) return;
         if (!isXpOrHigher()) return;
         assertTrue("wmic should be found", "wmic" != WindowsUtils.findWMIC());
     }
-    public void testTaskKill() {
+    @Test public void taskKill() {
         if (!WindowsUtils.thisIsWindows()) return;
         if (!isXpOrHigher()) return;
         assertTrue("taskkill should be found", "taskkill" != WindowsUtils.findTaskKill());
     }
-    public void testRegistry() {
+    @Test public void registry() {
         if (!WindowsUtils.thisIsWindows()) return;
         String keyCurrentVersion = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion";
         String keyProxyEnable = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyEnable";
@@ -89,7 +90,7 @@ public class WindowsUtilsUnitTest {
         WindowsUtils.deleteRegistryValue(keySeleniumFoo);
         assertFalse("Didn't delete Foo key correctly", WindowsUtils.doesRegistryValueExist(keySeleniumFoo));
     }
-    public void testVersion1() {
+    @Test public void version1() {
     	if (!WindowsUtils.thisIsWindows()) return;
     	System.out.println("Version 1: " + WindowsUtils.isRegExeVersion1());
     }

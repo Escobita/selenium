@@ -1,5 +1,7 @@
 package org.openqa.selenium.server;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 
@@ -10,7 +12,7 @@ public class FrameGroupCommandQueueUnitTest {
   private static int defaultSpeed = CommandQueue.getSpeed();
   private static int newSpeed = defaultSpeed + 42;
   
-  public void testGetGlobalQueueSpeed() {
+  @Test public void getGlobalQueueSpeed() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     FrameGroupCommandQueueSet session1 = 
       FrameGroupCommandQueueSet.makeQueueSet(firstSessionId, RemoteControlConfiguration.DEFAULT_PORT, new RemoteControlConfiguration());
@@ -19,7 +21,7 @@ public class FrameGroupCommandQueueUnitTest {
     FrameGroupCommandQueueSet.clearQueueSet(firstSessionId);
   }
   
-  public void testSetGlobalQueueSpeed() {
+  @Test public void setGlobalQueueSpeed() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     CommandQueue.setSpeed(newSpeed);
     FrameGroupCommandQueueSet session1 = 
@@ -30,7 +32,7 @@ public class FrameGroupCommandQueueUnitTest {
     FrameGroupCommandQueueSet.clearQueueSet(firstSessionId);
   }
   
-  public void testSetSessionSpeedNotGlobalSpeed() {
+  @Test public void setSessionSpeedNotGlobalSpeed() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     FrameGroupCommandQueueSet session1 = 
       FrameGroupCommandQueueSet.makeQueueSet(firstSessionId, RemoteControlConfiguration.DEFAULT_PORT, new RemoteControlConfiguration());
@@ -47,7 +49,7 @@ public class FrameGroupCommandQueueUnitTest {
     FrameGroupCommandQueueSet.clearQueueSet(secondSessionId);
   }
   
-  public void testCommandQueueInitSpeedMatchesSessionSpeed() {
+  @Test public void commandQueueInitSpeedMatchesSessionSpeed() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     FrameGroupCommandQueueSet session1 = 
       FrameGroupCommandQueueSet.makeQueueSet(firstSessionId, RemoteControlConfiguration.DEFAULT_PORT, new RemoteControlConfiguration());

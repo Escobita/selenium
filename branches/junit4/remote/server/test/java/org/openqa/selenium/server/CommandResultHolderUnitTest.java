@@ -1,12 +1,12 @@
 package org.openqa.selenium.server;
 
-
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -56,7 +56,7 @@ public class CommandResultHolderUnitTest {
       LoggingManager.configureLogging(new RemoteControlConfiguration(), true);
   }
 
-  public void testGetCommandGeneratesTimeoutStringWhenNoResult() {
+  @Test public void getCommandGeneratesTimeoutStringWhenNoResult() {
 	long now = System.currentTimeMillis();
 	String result = holder.getResult();
 	long after = System.currentTimeMillis();
@@ -65,7 +65,7 @@ public class CommandResultHolderUnitTest {
 	assertTrue(after - now >= (cmdTimeout*999)); // at least timeout seconds
   }
 	
-  public void testGetCommandGeneratesNullMsgWhenPoisoned() throws Throwable {
+  @Test public void getCommandGeneratesNullMsgWhenPoisoned() throws Throwable {
 	TrackableRunnable internalGetter = new TrackableRunnable() {
 		@Override
 		public Object go() throws Throwable {
@@ -82,7 +82,7 @@ public class CommandResultHolderUnitTest {
 	         t.getResult());
   }
 
-  public void testSimpleSingleThreaded() throws Throwable {
+  @Test public void simpleSingleThreaded() throws Throwable {
     injectContent(testResult, true);
     expectContent(testResult);
     assertTrue(holder.isEmpty()); // command got picked up.

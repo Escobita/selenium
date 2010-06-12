@@ -1,9 +1,7 @@
 package org.openqa.selenium.remote;
 
+import org.junit.Test;
 import org.openqa.selenium.TestSuiteBuilder;
-
-
-import org.junit.Test; import static org.junit.Assert.*;
 
 public class RemoteCommonTestSuite {
 

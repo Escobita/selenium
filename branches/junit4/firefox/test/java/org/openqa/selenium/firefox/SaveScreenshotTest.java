@@ -17,20 +17,22 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.Test;
+import org.openqa.selenium.AbstractDriverTestCase;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import org.openqa.selenium.AbstractDriverTestCase;
-
-import java.io.File;
-import java.io.IOException;
 
 public class SaveScreenshotTest extends AbstractDriverTestCase {
 
     /**
      * Test the deprecated version of screenshot capturing.
      */
-    public void testDeprecatedSaveScreenshot() throws IOException {
+    @Test public void deprecatedSaveScreenshot() throws IOException {
         File tempFile = File.createTempFile("formPage", ".png");
         assertThat(tempFile.length(), is(0L));
         driver.get(pages.formPage);

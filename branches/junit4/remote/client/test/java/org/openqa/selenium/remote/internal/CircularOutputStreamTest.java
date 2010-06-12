@@ -18,16 +18,16 @@ limitations under the License.
 
 package org.openqa.selenium.remote.internal;
 
-
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 public class CircularOutputStreamTest {
-  public void testShouldReturnTheEntireWrittenContentIfSmallerThanTheBufferSize() throws Exception {
+  @Test public void shouldReturnTheEntireWrittenContentIfSmallerThanTheBufferSize() throws Exception {
     String expected = "foo";
     int maxSize = expected.getBytes().length;
 
@@ -39,7 +39,7 @@ public class CircularOutputStreamTest {
     assertEquals(expected, seen);
   }
   
-  public void testShouldReturnJustTheWrittenOutputIfBufferIsTooLarge() throws Exception {
+  @Test public void shouldReturnJustTheWrittenOutputIfBufferIsTooLarge() throws Exception {
     String expected = "foo";
     // Note, this makes the buffer larger than what we write to it
     int maxSize = expected.getBytes().length + 1;
@@ -52,7 +52,7 @@ public class CircularOutputStreamTest {
     assertEquals(expected, seen);
   }
 
-  public void testShouldTruncateOutputToMatchTheSizeOfTheBuffer() throws Exception {
+  @Test public void shouldTruncateOutputToMatchTheSizeOfTheBuffer() throws Exception {
     String expected = "oo";
     int maxSize = expected.getBytes().length;
 
@@ -64,7 +64,7 @@ public class CircularOutputStreamTest {
     assertEquals(expected, seen);
   }
 
-  public void testShouldReturnContentInTheCorrectOrder() throws Exception {
+  @Test public void shouldReturnContentInTheCorrectOrder() throws Exception {
     String expected = "234";
     int maxSize = expected.getBytes().length;
 
@@ -76,7 +76,7 @@ public class CircularOutputStreamTest {
     assertEquals(expected, seen);
   }
 
-  public void testLongerMultiLineOutputPreservesJustTheEnd() throws Exception {
+  @Test public void longerMultiLineOutputPreservesJustTheEnd() throws Exception {
     int maxSize = 64;
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -96,7 +96,7 @@ public class CircularOutputStreamTest {
     assertEquals(expected, seen);
   }
 
-  public void testCircularness() {
+  @Test public void circularness() {
     CircularOutputStream os = new CircularOutputStream(5);
     PrintWriter pw = new PrintWriter(os, true);
 

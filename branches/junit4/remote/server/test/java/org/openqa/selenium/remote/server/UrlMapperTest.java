@@ -17,7 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-
+import org.junit.Test;
 import org.openqa.selenium.remote.server.rest.Handler;
 import org.openqa.selenium.remote.server.rest.ResultConfig;
 import org.openqa.selenium.remote.server.rest.ResultType;
@@ -29,7 +29,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class UrlMapperTest {
 
-  public void testShouldBePossibleToBindAHandler() throws Exception {
+  @Test public void shouldBePossibleToBindAHandler() throws Exception {
     UrlMapper mapper = new UrlMapper(new DriverSessions(), new NullLogTo());
 
     mapper.bind("/foo", StubHandler.class);
@@ -39,7 +39,7 @@ public class UrlMapperTest {
     assertThat(config, is(notNullValue()));
   }
 
-  public void testShouldInjectDependenciesViaTheConstructor() throws Exception {
+  @Test public void shouldInjectDependenciesViaTheConstructor() throws Exception {
     DriverSessions sessions = new DriverSessions();
     UrlMapper mapper = new UrlMapper(sessions, new NullLogTo());
     mapper.bind("/example", SessionHandler.class);

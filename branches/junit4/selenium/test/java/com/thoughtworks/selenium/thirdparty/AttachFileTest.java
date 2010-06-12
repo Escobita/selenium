@@ -1,13 +1,11 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import org.testng.annotations.Test;
 
 public class AttachFileTest extends SeleneseTestNgHelper {
     
-    @Test
-    public void testAttachfile() throws Throwable {
+    @Test public void attachfile() throws Throwable {
 		selenium.open("http://www.snipshot.com");
 		assertEquals("Snipshot: Edit pictures online", selenium.getTitle());
 		

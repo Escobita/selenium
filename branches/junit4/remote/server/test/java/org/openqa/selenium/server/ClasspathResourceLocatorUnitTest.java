@@ -1,8 +1,8 @@
 package org.openqa.selenium.server;
 
-
 import java.io.IOException;
 
+import org.junit.Test;
 import org.openqa.jetty.http.HttpContext;
 import org.openqa.jetty.util.Resource;
 
@@ -12,18 +12,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class ClasspathResourceLocatorUnitTest {
-    public void testShouldGetResourceFromClasspath() throws Exception {
+    @Test public void shouldGetResourceFromClasspath() throws Exception {
         Resource resource = getResourceFromClasspath("ClasspathResourceLocatorUnitTest.class");
         assertNotNull(resource.getInputStream());
     }
 
-    public void testShouldReturnMissingResourceWhenResourceNotFound() throws Exception {
+    @Test public void shouldReturnMissingResourceWhenResourceNotFound() throws Exception {
         Resource resource = getResourceFromClasspath("not_exists");
         assertFalse(resource.exists());
         assertNull(resource.getInputStream());
     }
 
-    public void testShouldStoreFileNameInMetaData() throws Exception {
+    @Test public void shouldStoreFileNameInMetaData() throws Exception {
     	String filename = "ClasspathResourceLocatorUnitTest.class";
         Resource resource = getResourceFromClasspath(filename);
         assertEquals("toString() must end with filename, because Jetty used this method to determine file type",

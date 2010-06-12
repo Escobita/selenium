@@ -1,6 +1,5 @@
 package org.openqa.selenium.server.commands;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +11,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.Test;
 import org.openqa.jetty.http.HttpRequest;
 import org.openqa.jetty.http.HttpResponse;
 import org.openqa.selenium.server.ModifiedIO;
@@ -20,17 +20,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CaptureNetworkTrafficCommandTest {
-    public void testJson() throws ParseException, IOException {
+    @Test public void json() throws ParseException, IOException {
         prepare();
         check("json", "json.txt");
     }
 
-    public void testXml() throws ParseException, IOException {
+    @Test public void xml() throws ParseException, IOException {
         prepare();
         check("xml", "xml.xml");
     }
 
-    public void testPlain() throws ParseException, IOException {
+    @Test public void plain() throws ParseException, IOException {
         prepare();
         check("plain", "plain.txt");
     }

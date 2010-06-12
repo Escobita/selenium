@@ -21,6 +21,7 @@ import junit.framework.AssertionFailedError;
 
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +35,7 @@ public class ConditionTest {
     private static final ConditionRunner conditionRunner =
             new JUnitConditionRunner(null, 1, 100);
 
-    public void testAppendsInfoToFailureMessage() throws Exception {
+    @Test public void appendsInfoToFailureMessage() throws Exception {
         try {
             conditionRunner.waitFor("this condition should always fail", new AlwaysFalseCondition());
             fail("the condition should have failed");
@@ -44,7 +45,7 @@ public class ConditionTest {
         }
     }
 
-    public void testNotCanInvertFailingSituationQuickly() throws Exception {
+    @Test public void notCanInvertFailingSituationQuickly() throws Exception {
         Condition alwaysFalse = new AlwaysFalseCondition();
         long start = System.currentTimeMillis();
         final StringBuilder sb = new StringBuilder();
@@ -70,7 +71,7 @@ public class ConditionTest {
         assertEquals("sky is in fact pink", sb.toString()); 
     }
 
-    public void testNotCanNegatePassingSituationAfterTimeout() throws Exception {
+    @Test public void notCanNegatePassingSituationAfterTimeout() throws Exception {
         Condition alwaysTrue = new AlwaysTrueCondition();
         long start = System.currentTimeMillis();
         try {
@@ -83,7 +84,7 @@ public class ConditionTest {
         }
     }
 
-    public void testCanTurnTrueBeforeTimeout() throws Exception {
+    @Test public void canTurnTrueBeforeTimeout() throws Exception {
         long start = System.currentTimeMillis();
         final int[] time = new int[1];
         JUnitConditionRunner conditionRunner1 = new JUnitConditionRunner(null, 0, 100, 2000);
@@ -97,7 +98,7 @@ public class ConditionTest {
         assertTrue(l < 2000); // but timing out before 2000 milliseconds
     }
 
-    public void testCannotTurnTrueAfterTimeout() throws Exception {
+    @Test public void cannotTurnTrueAfterTimeout() throws Exception {
         long start = System.currentTimeMillis();
         final int[] time = new int[1];
         JUnitConditionRunner conditionRunner1 = new JUnitConditionRunner(null, 0, 100, 5000);
@@ -121,7 +122,7 @@ public class ConditionTest {
      * See http://jira.openqa.org/browse/SRC-302
      * @throws Exception
      */
-    public void testCanLateNotifyOfSeleniumExceptionAfterTimeout() throws Exception {
+    @Test public void canLateNotifyOfSeleniumExceptionAfterTimeout() throws Exception {
         long start = System.currentTimeMillis();
         final int[] time = new int[1];
         JUnitConditionRunner conditionRunner1 = new JUnitConditionRunner(null, 0, 100, 5000);
@@ -141,7 +142,7 @@ public class ConditionTest {
     }
 
 
-    public void testRuntimeExceptionInsideConditionIsWrapped() {
+    @Test public void runtimeExceptionInsideConditionIsWrapped() {
         final RuntimeException thrownException = new RuntimeException("ooops");
         Condition condition = new Condition("foo") {
             public boolean isTrue(ConditionRunner.Context runner) {
@@ -156,7 +157,7 @@ public class ConditionTest {
         }
     }
 
-    public void testAssertionFailureInsideConditionIsNotWrapped() {
+    @Test public void assertionFailureInsideConditionIsNotWrapped() {
         Condition condition = new Condition() {
             public boolean isTrue(ConditionRunner.Context runner) {
                 assertTrue("OMG", false);
@@ -172,7 +173,7 @@ public class ConditionTest {
         }
     }
 
-    public void testMessageWithArgs() {
+    @Test public void messageWithArgs() {
         final RuntimeException thrownException = new RuntimeException();
         Condition condition = new Condition("foo %s baz", "bar") {
             public boolean isTrue(ConditionRunner.Context runner) {

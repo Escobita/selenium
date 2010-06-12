@@ -1,10 +1,7 @@
 package org.openqa.selenium.thirdparty;
 
-import static org.testng.Assert.assertTrue;
-
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import org.testng.annotations.Test;
 
 public class GoogleTest extends SeleneseTestNgHelper {
     @Test
@@ -23,7 +20,7 @@ public class GoogleTest extends SeleneseTestNgHelper {
 
     @Test(enabled = false)
     // DGF this test is too brittle
-    public void testMaps() throws InterruptedException {
+    public void maps() throws InterruptedException {
         selenium.open("http://maps.google.com");
         selenium.getEval("window.moveTo(0, 0)");
         selenium.getEval("window.resizeTo(800, 600)");

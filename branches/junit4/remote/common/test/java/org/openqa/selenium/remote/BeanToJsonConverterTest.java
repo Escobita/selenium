@@ -17,7 +17,17 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -26,27 +36,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 
 public class BeanToJsonConverterTest {
 
-  public void testShouldBeAbleToConvertASimpleString() throws Exception {
+  @Test public void shouldBeAbleToConvertASimpleString() throws Exception {
     String json = new BeanToJsonConverter().convert("cheese");
 
     assertThat(json, is("cheese"));
   }
 
-  public void testShouldConvertAMapIntoAJsonObject() throws Exception {
+  @Test public void shouldConvertAMapIntoAJsonObject() throws Exception {
     Map<String, String> toConvert = new HashMap<String, String>();
     toConvert.put("cheese", "cheddar");
     toConvert.put("fish", "nice bit of haddock");
@@ -57,14 +56,14 @@ public class BeanToJsonConverterTest {
     assertThat((String) converted.get("cheese"), is("cheddar"));
   }
 
-  public void testShouldConvertASimpleJavaBean() throws Exception {
+  @Test public void shouldConvertASimpleJavaBean() throws Exception {
     String json = new BeanToJsonConverter().convert(new SimpleBean());
 
     JSONObject converted = new JSONObject(json);
     assertThat((String) converted.get("foo"), is("bar"));
   }
 
-  public void testShouldConvertArrays() throws Exception {
+  @Test public void shouldConvertArrays() throws Exception {
     String json = new BeanToJsonConverter().convert(new BeanWithArray());
 
     JSONObject converted = new JSONObject(json);
@@ -72,7 +71,7 @@ public class BeanToJsonConverterTest {
     assertThat(allNames.length(), is(3));
   }
 
-  public void testShouldConvertCollections() throws Exception {
+  @Test public void shouldConvertCollections() throws Exception {
     String json = new BeanToJsonConverter().convert(new BeanWithCollection());
 
     JSONObject converted = new JSONObject(json);
@@ -80,7 +79,7 @@ public class BeanToJsonConverterTest {
     assertThat(allNames.length(), is(2));
   }
 
-  public void testShouldConvertNumbersAsLongs() throws Exception {
+  @Test public void shouldConvertNumbersAsLongs() throws Exception {
     
     String json = new BeanToJsonConverter().convert(new Exception());
     Map map = new JsonToBeanConverter().convert(Map.class, json);
@@ -92,7 +91,7 @@ public class BeanToJsonConverterTest {
     assertTrue("line number is of type: " + o.getClass(), o instanceof Long);
   }
 
-  public void testShouldNotChokeWhenCollectionIsNull() throws Exception {
+  @Test public void shouldNotChokeWhenCollectionIsNull() throws Exception {
     try {
       new BeanToJsonConverter().convert(new BeanWithNullCollection());
     } catch (Exception e) {
@@ -101,17 +100,17 @@ public class BeanToJsonConverterTest {
     }
   }
 
-  public void testShouldConvertEnumsToStrings() throws Exception {
+  @Test public void shouldConvertEnumsToStrings() throws Exception {
     // If this doesn't hang indefinitely, we're all good
     new BeanToJsonConverter().convert(State.INDIFFERENT);
   }
 
-  public void testShouldConvertEnumsWithMethods() throws Exception {
+  @Test public void shouldConvertEnumsWithMethods() throws Exception {
     // If this doesn't hang indefinitely, we're all good
     new BeanToJsonConverter().convert(WithMethods.CHEESE);
   }
 
-  public void testNullAndAnEmptyStringAreEncodedDifferently() throws Exception {
+  @Test public void nullAndAnEmptyStringAreEncodedDifferently() throws Exception {
     BeanToJsonConverter converter = new BeanToJsonConverter();
 
     String nullValue = converter.convert(null);
@@ -120,7 +119,7 @@ public class BeanToJsonConverterTest {
     assertFalse(emptyString.equals(nullValue));
   }
 
-  public void testShouldBeAbleToConvertAPoint() throws Exception {
+  @Test public void shouldBeAbleToConvertAPoint() throws Exception {
     Point point = new Point(65, 75);
 
     try {
@@ -130,14 +129,14 @@ public class BeanToJsonConverterTest {
     }
   }
 
-  public void testShouldEncodeClassNameAsClassProperty() throws Exception {
+  @Test public void shouldEncodeClassNameAsClassProperty() throws Exception {
     String json = new BeanToJsonConverter().convert(new SimpleBean());
     JSONObject converted = new JSONObject(json);
 
     assertEquals(SimpleBean.class.getName(), converted.get("class"));
   }
 
-  public void testShouldBeAbleToConvertASessionId() throws JSONException {
+  @Test public void shouldBeAbleToConvertASessionId() throws JSONException {
     SessionId sessionId = new SessionId("some id");
     String json = new BeanToJsonConverter().convert(sessionId);
     JSONObject converted = new JSONObject(json);
@@ -145,7 +144,7 @@ public class BeanToJsonConverterTest {
     assertEquals("some id", converted.getString("value"));
   }
 
-  public void testShouldBeAbleToConvertAJsonObject() throws JSONException {
+  @Test public void shouldBeAbleToConvertAJsonObject() throws JSONException {
     JSONObject obj = new JSONObject();
     obj.put("key", "value");
     String json = new BeanToJsonConverter().convert(obj);
@@ -154,7 +153,7 @@ public class BeanToJsonConverterTest {
     assertEquals("value", converted.getString("key"));
   }
 
-  public void testShouldBeAbleToConvertACapabilityObject() throws JSONException {
+  @Test public void shouldBeAbleToConvertACapabilityObject() throws JSONException {
     DesiredCapabilities caps = new DesiredCapabilities();
     caps.setCapability("key", "alpha");
 
@@ -164,7 +163,7 @@ public class BeanToJsonConverterTest {
     assertEquals("alpha", converted.getString("key"));
   }
 
-  public void testShouldConvertAProxyPacProperly() throws JSONException {
+  @Test public void shouldConvertAProxyPacProperly() throws JSONException {
     ProxyPac pac = new ProxyPac();
     pac.map("*/selenium/*").toProxy("http://localhost:8080/selenium-server");
     pac.map("/[a-zA-Z]{4}.microsoft.com/").toProxy("http://localhost:1010/selenium-server/");

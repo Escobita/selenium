@@ -1,14 +1,13 @@
 package org.openqa.selenium.server;
 
-
-
+import org.junit.Test;
 import org.openqa.selenium.server.browserlaunchers.BrowserLauncherFactory;
 
 import static org.junit.Assert.fail;
 
 public class BrowserSessionFactoryFunctionalTest {
 
-    public void testBrowserIsAutomaticallyCloseWhenTimingOutOnBrowserLaunch() throws RemoteCommandException {
+    @Test public void browserIsAutomaticallyCloseWhenTimingOutOnBrowserLaunch() throws RemoteCommandException {
         final BrowserSessionFactory factory;
         final RemoteControlConfiguration configuration;
         final BrowserConfigurationOptions options = new BrowserConfigurationOptions();

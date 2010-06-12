@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium.remote.server;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Capabilities;
@@ -36,7 +37,7 @@ public class DriverFactoryTest {
     factory = new DriverFactory();
   }
 
-  public void testShouldBeAbleToRegisterNewDrivers() {
+  @Test public void shouldBeAbleToRegisterNewDrivers() {
     Capabilities capabilities = DesiredCapabilities.htmlUnit();
     assertFalse(factory.hasMappingFor(capabilities));
 
@@ -45,7 +46,7 @@ public class DriverFactoryTest {
     assertTrue(factory.hasMappingFor(capabilities));
   }
 
-  public void testShouldReturnMatchIfOneFieldMatchesAndOnlyOneDriverIsRegistered() {
+  @Test public void shouldReturnMatchIfOneFieldMatchesAndOnlyOneDriverIsRegistered() {
     DesiredCapabilities template = new DesiredCapabilities();
     template.setBrowserName("foo");
     template.setVersion("1.0");
@@ -60,7 +61,7 @@ public class DriverFactoryTest {
     assertEquals(DriverOne.class, result);
   }
 
-  public void testShouldReturnDriverWhereTheMostCapabilitiesMatch() {
+  @Test public void shouldReturnDriverWhereTheMostCapabilitiesMatch() {
     DesiredCapabilities first = new DesiredCapabilities();
     first.setBrowserName("foo");
     first.setVersion("1.0");
@@ -83,7 +84,7 @@ public class DriverFactoryTest {
     assertEquals(DriverTwo.class, result);
   }
   
-  public void testShouldReturnMostRecentlyAddedDriverWhenAllCapabilitiesAreEqual() {
+  @Test public void shouldReturnMostRecentlyAddedDriverWhenAllCapabilitiesAreEqual() {
     Capabilities capabilities = DesiredCapabilities.firefox();
 
     factory.registerDriver(capabilities, DriverOne.class);
@@ -94,7 +95,7 @@ public class DriverFactoryTest {
     assertEquals(DriverTwo.class, result);
   }
 
-  public void testShouldConsiderJavascriptCapabilities() {
+  @Test public void shouldConsiderJavascriptCapabilities() {
     DesiredCapabilities nojavascript = new DesiredCapabilities("browser", "v1", Platform.LINUX);
     nojavascript.setJavascriptEnabled(false);
     DesiredCapabilities javascript = new DesiredCapabilities("browser", "v1", Platform.LINUX);

@@ -17,12 +17,12 @@
 
 package org.openqa.selenium.remote;
 
-
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
@@ -51,12 +51,12 @@ public class ErrorHandlerTest {
     handler.setIncludeServerErrors(true);
   }
 
-  public void testShouldNotThrowIfResponseWasASuccess() {
+  @Test public void shouldNotThrowIfResponseWasASuccess() {
     handler.throwIfResponseFailed(createResponse(ErrorCodes.SUCCESS));
     // All is well if this doesn't throw.
   }
 
-  public void testThrowsCorrectExceptionTypes() {
+  @Test public void throwsCorrectExceptionTypes() {
     assertThrowsCorrectExceptionType(ErrorCodes.NO_SUCH_WINDOW, NoSuchWindowException.class);
     assertThrowsCorrectExceptionType(ErrorCodes.NO_SUCH_FRAME, NoSuchFrameException.class);
     assertThrowsCorrectExceptionType(ErrorCodes.NO_SUCH_ELEMENT, NoSuchElementException.class);
@@ -86,7 +86,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-  public void testShouldThrowAVanillaWebDriverExceptionIfServerDoesNotProvideAValue() {
+  @Test public void shouldThrowAVanillaWebDriverExceptionIfServerDoesNotProvideAValue() {
     try {
       handler.throwIfResponseFailed(createResponse(ErrorCodes.UNHANDLED_ERROR));
       fail("Should have thrown!");
@@ -97,7 +97,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-  public void testShouldNotSetCauseIfResponseValueIsJustAString() {
+  @Test public void shouldNotSetCauseIfResponseValueIsJustAString() {
     try {
       handler.throwIfResponseFailed(createResponse(ErrorCodes.UNHANDLED_ERROR, "boom"));
       fail("Should have thrown!");
@@ -109,7 +109,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-  public void testCauseShouldBeAnUnknownServerExceptionIfServerOnlyReturnsAMessage() {
+  @Test public void causeShouldBeAnUnknownServerExceptionIfServerOnlyReturnsAMessage() {
     try {
       handler.throwIfResponseFailed(createResponse(ErrorCodes.UNHANDLED_ERROR,
           ImmutableMap.of("message", "boom")));
@@ -122,7 +122,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-  public void testCauseShouldUseTheNamedClassIfAvailableOnTheClassPath() {
+  @Test public void causeShouldUseTheNamedClassIfAvailableOnTheClassPath() {
     try {
       handler.throwIfResponseFailed(createResponse(ErrorCodes.UNHANDLED_ERROR,
           ImmutableMap.of("message", "boom",
@@ -140,7 +140,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-  public void testCauseStackTraceShouldBeEmptyIfTheServerDidNotProvideThatInformation() {
+  @Test public void causeStackTraceShouldBeEmptyIfTheServerDidNotProvideThatInformation() {
     try {
       handler.throwIfResponseFailed(createResponse(ErrorCodes.UNHANDLED_ERROR,
           ImmutableMap.of("message", "boom",
@@ -159,7 +159,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldBeAbleToRebuildASerializedException() throws Exception {
+  @Test public void shouldBeAbleToRebuildASerializedException() throws Exception {
     RuntimeException serverError = new RuntimeException("foo bar baz!");
 
     try {
@@ -179,7 +179,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldIncludeScreenshotIfProvided() throws Exception {
+  @Test public void shouldIncludeScreenshotIfProvided() throws Exception {
     RuntimeException serverError = new RuntimeException("foo bar baz!");
     Map<String, Object> data = toMap(serverError);
     data.put("screen", "screenGrabText");
@@ -205,7 +205,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldDefaultToUnknownServerErrorIfClassIsNotSpecified()
+  @Test public void shouldDefaultToUnknownServerErrorIfClassIsNotSpecified()
       throws Exception {
     RuntimeException serverError = new RuntimeException("foo bar baz!");
     Map<String, Object> data = toMap(serverError);
@@ -228,7 +228,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldStillTryToBuildServerErrorIfClassIsNotProvidedAndStackTraceIsNotForJava() {
+  @Test public void shouldStillTryToBuildServerErrorIfClassIsNotProvidedAndStackTraceIsNotForJava() {
     Map<String, ?> data = ImmutableMap.of(
         "message", "some error message",
         "stackTrace", Lists.newArrayList(
@@ -261,7 +261,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldNotIncludeTheServerSideExceptionAsACauseIfServerSideErrorsAreDisabled()
+  @Test public void shouldNotIncludeTheServerSideExceptionAsACauseIfServerSideErrorsAreDisabled()
       throws Exception {
     RuntimeException serverError = new RuntimeException("foo bar baz!");
 
@@ -279,7 +279,7 @@ public class ErrorHandlerTest {
   }
 
   @SuppressWarnings({"unchecked", "ThrowableInstanceNeverThrown"})
-  public void testShouldStillIncludeScreenshotEvenIfServerSideExceptionsAreDisabled()
+  @Test public void shouldStillIncludeScreenshotEvenIfServerSideExceptionsAreDisabled()
       throws Exception {
     RuntimeException serverError = new RuntimeException("foo bar baz!");
     Map<String, Object> data = toMap(serverError);

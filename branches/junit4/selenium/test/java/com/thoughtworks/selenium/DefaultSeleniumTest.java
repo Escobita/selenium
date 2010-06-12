@@ -1,26 +1,28 @@
 package com.thoughtworks.selenium;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 
 public class DefaultSeleniumTest {
     private static final String prefix = "setContext,com.thoughtworks.selenium.DefaultSeleniumTest: ";
 
-    public void testBannerSimple() throws Throwable {
+    @Test public void bannerSimple() throws Throwable {
         MyCommandProcessor cp = new MyCommandProcessor();
         DefaultSelenium selenium = new DefaultSelenium(cp);
 		selenium.showContextualBanner();
         assertEquals(prefix + "test Banner Simple\n", cp.commands.toString());
     }
 
-    public void testMoreComplexExample() throws Throwable {
+    @Test public void moreComplexExample() throws Throwable {
         MyCommandProcessor cp = new MyCommandProcessor();
         DefaultSelenium selenium = new DefaultSelenium(cp);
 		selenium.showContextualBanner();
         assertEquals(prefix + "test More Complex Example\n", cp.commands.toString());
     }
 
-    public void testEvenMOREComplexExample() throws Throwable {
+    @Test public void evenMOREComplexExample() throws Throwable {
         MyCommandProcessor cp = new MyCommandProcessor();
         DefaultSelenium selenium = new DefaultSelenium(cp);
 		selenium.showContextualBanner();

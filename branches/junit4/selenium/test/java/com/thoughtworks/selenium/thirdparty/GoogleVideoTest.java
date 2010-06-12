@@ -1,13 +1,11 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import org.testng.annotations.Test;
 
 public class GoogleVideoTest extends SeleneseTestNgHelper {
     
-    @Test
-    public void testGoogle() {
+    @Test public void google() {
         selenium.open("http://video.google.com");
         selenium.type("q", "hello world");
         selenium.click("search-button");

@@ -17,7 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-
 import java.util.Date;
 
 import org.junit.Test;

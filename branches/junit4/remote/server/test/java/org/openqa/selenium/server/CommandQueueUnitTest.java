@@ -1,12 +1,12 @@
 package org.openqa.selenium.server;
 
-
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -60,11 +60,11 @@ public class CommandQueueUnitTest {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }
 
-    public void testQueueDelayInitializedAtDefault() {
+    @Test public void queueDelayInitializedAtDefault() {
         assertEquals(CommandQueue.getSpeed(), cq.getQueueDelay());
     }
 
-    public void testQueueDelayChangedAsSetNoCrosstalk() {
+    @Test public void queueDelayChangedAsSetNoCrosstalk() {
         int defaultSpeed = CommandQueue.getSpeed();
         int newSpeed = cq.getQueueDelay() + 42;
         int newGlobalSpeed = defaultSpeed + 21;
@@ -83,12 +83,12 @@ public class CommandQueueUnitTest {
         CommandQueue.setSpeed(defaultSpeed);
     }
 
-    public void testAssertStartingState() {
+    @Test public void assertStartingState() {
         assertNull(cq.peekAtCommand());
         assertNull(cq.peekAtResult());
     }
 
-    public void testBasicDoCommandWithoutWaiting() throws WindowClosedException {
+    @Test public void basicDoCommandWithoutWaiting() throws WindowClosedException {
         cq.doCommandWithoutWaitingForAResponse(testCommand, "", "");
         RemoteCommand rc = cq.peekAtCommand();
         assertNotNull(rc);
@@ -96,7 +96,7 @@ public class CommandQueueUnitTest {
         assertNull(cq.peekAtResult());
     }
 
-    public void testDoCommandWithoutWaitingWithResultAlreadyThereWithNoPI()
+    @Test public void doCommandWithoutWaitingWithResultAlreadyThereWithNoPI()
             throws WindowClosedException {
         cq.putResult(testResult);
         try {
@@ -107,7 +107,7 @@ public class CommandQueueUnitTest {
         }
     }
 
-    public void testDoCommandWithoutWaitingWithResultAlreadyThereWithPI()
+    @Test public void doCommandWithoutWaitingWithResultAlreadyThereWithPI()
             throws WindowClosedException {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
@@ -119,7 +119,7 @@ public class CommandQueueUnitTest {
         assertEquals(testResult, cq.peekAtResult());
     }
 
-    public void testDoCommandWithoutWaitingWithBadResultAlreadyThereWithPI()
+    @Test public void doCommandWithoutWaitingWithBadResultAlreadyThereWithPI()
             throws WindowClosedException {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
@@ -131,12 +131,12 @@ public class CommandQueueUnitTest {
         assertEquals(testResult, cq.peekAtResult());
     }
 
-    public void testGetsTimeoutExceptionOnGetResult() {
+    @Test public void getsTimeoutExceptionOnGetResult() {
         expectResult(CommandResultHolder.CMD_TIMED_OUT_MSG);
         assertNull(cq.peekAtResult());
     }
 
-    public void testDoCommandTimesOut() {
+    @Test public void doCommandTimesOut() {
         long now = System.currentTimeMillis();
         String result = cq.doCommand(testCommand, "", "");
         long after = System.currentTimeMillis();
@@ -144,13 +144,13 @@ public class CommandQueueUnitTest {
         assertTrue((after - now) > defaultTimeout);
     }
 
-    public void testGetsPrevCommandFromHandleNullResult() throws WindowClosedException {
+    @Test public void getsPrevCommandFromHandleNullResult() throws WindowClosedException {
         cq.doCommandWithoutWaitingForAResponse(testCommand, "", "");
         RemoteCommand rc = cq.handleCommandResult(null);
         assertEquals(testCommand, rc.getCommand());
     }
 
-    public void testSendsRetryCommandIfNoneAfterRetryPeriod() {
+    @Test public void sendsRetryCommandIfNoneAfterRetryPeriod() {
         long now = System.currentTimeMillis();
         RemoteCommand rc = cq.handleCommandResult(null);
         long after = System.currentTimeMillis();
@@ -158,13 +158,13 @@ public class CommandQueueUnitTest {
         assertEquals(CommandHolder.RETRY_CMD_STRING, rc.getCommand());
     }
 
-    public void testHandleResultNoWaitingWithOKResultWithResExpectedNoPI() {
+    @Test public void handleResultNoWaitingWithOKResultWithResExpectedNoPI() {
         cq.setResultExpected(true);
         cq.handleCommandResultWithoutWaitingForACommand(testResult);
         assertEquals(testResult, cq.peekAtResult());
     }
 
-    public void testHandleResultWithOKResultWithNoResExpectedWithPI() {
+    @Test public void handleResultWithOKResultWithNoResExpectedWithPI() {
         configuration = new RemoteControlConfiguration();
         configuration.setTimeoutInSeconds(defaultTimeout);
         configuration.setProxyInjectionModeArg(true);
@@ -174,7 +174,7 @@ public class CommandQueueUnitTest {
         assertEquals(testResult, cq.peekAtResult());
     }
 
-    public void testGetNextCommandWhenAlreadyWaiting() throws Throwable {
+    @Test public void getNextCommandWhenAlreadyWaiting() throws Throwable {
         cq.setResultExpected(true);
         TrackableRunnable internalRunner = new TrackableRunnable() {
             @Override
@@ -195,29 +195,29 @@ public class CommandQueueUnitTest {
         assertEquals(testCommand, cmd.getCommand());
     }
 
-    public void testSimpleSingleThreaded() throws Exception {
+    @Test public void simpleSingleThreaded() throws Exception {
         injectCommandAsIfWaiting("something", "arg1", "arg2");
         expectCommand("something", "arg1", "arg2");
         cq.handleCommandResultWithoutWaitingForACommand("OK");
         expectResult("OK");
     }
 
-    public void testRealSimple() throws Throwable {
+    @Test public void realSimple() throws Throwable {
         TrackableThread commandRunner = launchCommandRunner("something", "arg1", "arg2");
         expectCommand("something", "arg1", "arg2");
         cq.handleCommandResultWithoutWaitingForACommand("OK");
         assertEquals("OK", commandRunner.getResult());
     }
 
-    public void testTwoRoundsSingleThreaded() throws Exception {
-        testSimpleSingleThreaded();
+    @Test public void twoRoundsSingleThreaded() throws Exception {
+        simpleSingleThreaded();
         cq.doCommandWithoutWaitingForAResponse("testComplete", "", "");
         expectCommand("testComplete", "", "");
         cq.handleCommandResultWithoutWaitingForACommand("OK");
         expectResult("OK");
     }
 
-    public void testRealTwoRounds() throws Throwable {
+    @Test public void realTwoRounds() throws Throwable {
         // do "something"
         TrackableThread commandRunner = launchCommandRunner("something", "arg1", "arg2");
         // browser receives "something"
@@ -237,7 +237,7 @@ public class CommandQueueUnitTest {
     /**
      * In PI Mode, open replies "OK", but then we asynchronously receive "closed!"
      */
-    public void testPIOpenSingleThreaded() throws Exception {
+    @Test public void pIOpenSingleThreaded() throws Exception {
         injectCommandAsIfWaiting("open", "blah.html", "");
         expectCommand("open", "blah.html", "");
         cq.handleCommandResultWithoutWaitingForACommand("OK");

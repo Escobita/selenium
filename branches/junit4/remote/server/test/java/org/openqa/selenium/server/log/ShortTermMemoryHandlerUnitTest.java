@@ -1,9 +1,10 @@
 package org.openqa.selenium.server.log;
 
-
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class ShortTermMemoryHandlerUnitTest {
 
-    public void testRecordsReturnsAnEmptyArrayWhenNoRecordHasBeenAdded() {
+    @Test public void recordsReturnsAnEmptyArrayWhenNoRecordHasBeenAdded() {
         final ShortTermMemoryHandler handler;
 
         handler = new ShortTermMemoryHandler(1, Level.FINEST, null);
@@ -21,7 +22,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(0, handler.records().length);
     }
 
-    public void testRecordsReturnsTheAddedRecordWhenASingleOneIsPublished() {
+    @Test public void recordsReturnsTheAddedRecordWhenASingleOneIsPublished() {
         final ShortTermMemoryHandler handler;
         final LogRecord theLogRecord;
 
@@ -33,7 +34,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(theLogRecord, handler.records()[0]);
     }
 
-    public void testRecordsIsEmptyWhenAddedRecordIsLowerThanTheMinimumLevel() {
+    @Test public void recordsIsEmptyWhenAddedRecordIsLowerThanTheMinimumLevel() {
         final ShortTermMemoryHandler handler;
         final LogRecord theLogRecord;
 
@@ -44,7 +45,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(0, handler.records().length);
     }
 
-    public void testRecordsIsEmptyWhenAddedRecordIsEqualToTheMinimumLevel() {
+    @Test public void recordsIsEmptyWhenAddedRecordIsEqualToTheMinimumLevel() {
         final ShortTermMemoryHandler handler;
         final LogRecord theLogRecord;
 
@@ -56,7 +57,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(theLogRecord, handler.records()[0]);
     }
 
-    public void testRecordsReturnsTheTwoAddedRecordWhenATwoRecordsArePublishedAndCapacityIsNotExceeded() {
+    @Test public void recordsReturnsTheTwoAddedRecordWhenATwoRecordsArePublishedAndCapacityIsNotExceeded() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;
@@ -72,7 +73,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(secondLogRecord, handler.records()[1]);
     }
 
-    public void testRecordsOnlyReturnsTheLastRecordWhenATwoRecordsArePublishedAndCapacityIsExceeded() {
+    @Test public void recordsOnlyReturnsTheLastRecordWhenATwoRecordsArePublishedAndCapacityIsExceeded() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;
@@ -87,7 +88,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(secondLogRecord, handler.records()[0]);
     }
 
-    public void testRecordsOnlyReturnsTheLastTwoRecordsWhenThreeRecordsArePublishedAndCapacityIsExceeded() {
+    @Test public void recordsOnlyReturnsTheLastTwoRecordsWhenThreeRecordsArePublishedAndCapacityIsExceeded() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;
@@ -106,7 +107,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(thirdLogRecord, handler.records()[1]);
     }
 
-    public void testRecordsOnlyReturnsTheLastRecordWhenThreeRecordsArePublishedAndCapacityIsOne() {
+    @Test public void recordsOnlyReturnsTheLastRecordWhenThreeRecordsArePublishedAndCapacityIsOne() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;
@@ -124,7 +125,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(thirdLogRecord, handler.records()[0]);
     }
 
-    public void testAfterCloseAllRecordsAreCleared() {
+    @Test public void afterCloseAllRecordsAreCleared() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;
@@ -139,7 +140,7 @@ public class ShortTermMemoryHandlerUnitTest {
         assertEquals(0, handler.records().length);
     }
 
-    public void testFormattedRecordsReturnsAnEmptyStringWhenThereIsNoRecord() {
+    @Test public void formattedRecordsReturnsAnEmptyStringWhenThereIsNoRecord() {
         final ShortTermMemoryHandler handler;
 
         handler = new ShortTermMemoryHandler(1, Level.INFO, null);
@@ -147,7 +148,7 @@ public class ShortTermMemoryHandlerUnitTest {
 
     }
 
-    public void testFormattedRecords() {
+    @Test public void formattedRecords() {
         final ShortTermMemoryHandler handler;
         final LogRecord firstLogRecord;
         final LogRecord secondLogRecord;

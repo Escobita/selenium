@@ -1,15 +1,13 @@
 package org.openqa.selenium;
 
-import static org.testng.Assert.assertNotNull;
-
+import com.thoughtworks.selenium.SeleneseTestNgHelper;
 import org.testng.annotations.Test;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import static org.testng.Assert.assertNotNull;
 
 public class CacheBlockTest extends SeleneseTestNgHelper {
 
-    @Test
-    public void testCacheBlock() throws Exception {
+    @Test public void cacheBlock() throws Exception {
         selenium.open("/selenium-server/cachedContentTest");
         String text = selenium.getBodyText();
         assertNotNull("body text should not be null", text);

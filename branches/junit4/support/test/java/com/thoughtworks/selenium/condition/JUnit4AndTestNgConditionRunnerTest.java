@@ -16,13 +16,15 @@
  */
 package com.thoughtworks.selenium.condition;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
 public class JUnit4AndTestNgConditionRunnerTest {
 
-    public void testAssertionErrorIsOfRightType() {
+    @Test public void assertionErrorIsOfRightType() {
         JUnit4AndTestNgConditionRunner cr = new JUnit4AndTestNgConditionRunner(null, null, 1, 1);
         try {
             cr.throwAssertionException("foo");

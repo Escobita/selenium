@@ -17,8 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
-
-
+import org.junit.Test;
 import org.openqa.selenium.Ignore;
 import org.openqa.selenium.WebDriver;
 
@@ -27,7 +26,7 @@ import static org.openqa.selenium.Ignore.Driver.IE;
 public class InternetExplorerDriverTest {
 
   @Ignore(value = IE, reason = "Not sure why this is failing on my machine")
-  public void testCanRestartTheIeDriverInATightLoop() {  
+  @Test public void canRestartTheIeDriverInATightLoop() {  
     for (int i = 0; i < 5; i++) {
       WebDriver driver = new InternetExplorerDriver();
       driver.quit();

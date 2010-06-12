@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.iphone;
 
+import org.junit.Test;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.NoDriverAfterTest;
 
@@ -35,7 +36,7 @@ public class IPhoneSimulatorCommandExecutorTest extends AbstractDriverTestCase {
 
 
   @NoDriverAfterTest
-  public void testShouldDetectThatTheIPhoneSimulatorHasUnexpectedlyShutdown() throws Exception {
+  @Test public void shouldDetectThatTheIPhoneSimulatorHasUnexpectedlyShutdown() throws Exception {
     if (!(driver instanceof IPhoneSimulatorDriver)) {
       System.out.println(String.format(
           "[%s] Skipping test; requires current driver to be a %s, but instead is a %s",

@@ -17,7 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;

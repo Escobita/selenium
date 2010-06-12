@@ -17,15 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium.iphone;
 
-import static org.openqa.selenium.Ignore.Driver.IPHONE;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import java.io.File;
+
+import org.junit.Test;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.internal.FileHandler;
 
-import org.junit.Test; import static org.junit.Assert.*;
-
-
-import java.io.File;
+import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
 
 public class IPhoneDriverTestSuite {
 

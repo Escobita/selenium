@@ -327,9 +327,7 @@
           <option name="m_ignoreInvisibleFields" value="true" />
         </inspection_tool>
         <inspection_tool class="FinalMethodInFinalClass" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Finalize" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreTrivialFinalizers" value="true" />
-        </inspection_tool>
+        <inspection_tool class="Finalize" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FinalizeNotProtected" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FloatingPointEquality" enabled="true" level="ERROR" enabled_by_default="true" />
         <inspection_tool class="ForCanBeForeach" enabled="false" level="WARNING" enabled_by_default="false">

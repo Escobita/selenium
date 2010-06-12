@@ -1,29 +1,5 @@
 package com.thoughtworks.selenium;
 
-import java.lang.reflect.Method;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.openqa.selenium.SeleniumTestEnvironment;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverBackedSelenium;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.environment.GlobalTestEnvironment;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.Assert;
-
-import static org.openqa.selenium.DevMode.isInDevMode;
-
 public class SeleneseTestNgHelper extends SeleneseTestBase
 {
 //    private static Selenium staticSelenium;

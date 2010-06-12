@@ -1,6 +1,7 @@
 package org.openqa.selenium.server.browserlaunchers;
 
 import org.apache.commons.logging.Log;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
@@ -15,7 +16,7 @@ public class SafariLauncherIntegrationTest {
     private static final int SECONDS = 1000;
     private static final int WAIT_TIME = 15 * SECONDS;
 
-    public void testLauncherWithDefaultConfiguration() throws Exception {
+    @Test public void launcherWithDefaultConfiguration() throws Exception {
         final SafariCustomProfileLauncher launcher;
 
         launcher = new SafariCustomProfileLauncher(new BrowserConfigurationOptions(), new RemoteControlConfiguration(), "CUST", null);
@@ -27,7 +28,7 @@ public class SafariLauncherIntegrationTest {
         LOGGER.info("He's dead now, right?");
     }
 
-    public void testLauncherWithHonorSystemProxyEnabled() throws Exception {
+    @Test public void launcherWithHonorSystemProxyEnabled() throws Exception {
         final SafariCustomProfileLauncher launcher;
         final RemoteControlConfiguration configuration;
 

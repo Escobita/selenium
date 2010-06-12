@@ -18,15 +18,16 @@ limitations under the License.
 
 package org.openqa.selenium.lift.find;
 
+import java.util.Collections;
+
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import java.util.Collections;
-
 public class XPathFinderTest extends MockObjectTestCase {
-  public void testShouldReturnManyElements() {
+  @Test public void shouldReturnManyElements() {
     final String xpath = "//body";
 
     XPathFinder finder = new XPathFinder(xpath);

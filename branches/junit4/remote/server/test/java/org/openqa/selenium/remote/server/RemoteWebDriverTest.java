@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
+import org.junit.Test;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptEnabled;
@@ -34,7 +35,7 @@ import static org.junit.Assert.fail;
 import static org.openqa.selenium.OutputType.BASE64;
 
 public class RemoteWebDriverTest extends AbstractDriverTestCase {
-  public void testShouldBeAbleToGrabASnapshotOnException() {
+  @Test public void shouldBeAbleToGrabASnapshotOnException() {
     driver.get(pages.simpleTestPage);
 
     try {
@@ -51,11 +52,11 @@ public class RemoteWebDriverTest extends AbstractDriverTestCase {
    * @see <a href="http://code.google.com/p/webdriver/issues/detail?id=248">Issue 248</a>
    */
   @JavascriptEnabled
-  public void testShouldBeAbleToCallIsJavascriptEnabled() {
+  @Test public void shouldBeAbleToCallIsJavascriptEnabled() {
     assertTrue(((JavascriptExecutor) driver).isJavascriptEnabled());
   }
 
-  public void testCanAugmentWebDriverInstanceIfNecessary() {
+  @Test public void canAugmentWebDriverInstanceIfNecessary() {
     if (!(driver instanceof RemoteWebDriver)) {
       System.out.println("Skipping test: driver is not a remote webdriver");
       return;

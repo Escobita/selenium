@@ -17,8 +17,11 @@ limitations under the License.
 
 package org.openqa.selenium.support.pagefactory;
 
+import java.lang.reflect.Field;
+
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -27,8 +30,6 @@ import org.openqa.selenium.support.ByIdOrName;
 import org.openqa.selenium.support.ui.Clock;
 import org.openqa.selenium.support.ui.FakeClock;
 
-import java.lang.reflect.Field;
-
 public class AjaxElementLocatorTest extends MockObjectTestCase {
   private FakeClock clock = new FakeClock();
 
@@ -36,7 +37,7 @@ public class AjaxElementLocatorTest extends MockObjectTestCase {
     return new MonkeyedAjaxElementLocator(clock, driver, field, 10);
   }
   
-  public void testShouldContinueAttemptingToFindElement() throws Exception {
+  @Test public void shouldContinueAttemptingToFindElement() throws Exception {
     Field f = Page.class.getDeclaredField("first");
     final WebDriver driver = mock(WebDriver.class);
     final By by = new ByIdOrName("first");
@@ -53,7 +54,7 @@ public class AjaxElementLocatorTest extends MockObjectTestCase {
     assertEquals(element, returnedElement);
   }
 
-  public void testShouldThrowNoSuchElementExceptionIfElementTakesTooLongToAppear() throws Exception {
+  @Test public void shouldThrowNoSuchElementExceptionIfElementTakesTooLongToAppear() throws Exception {
     Field f = Page.class.getDeclaredField("first");
     final WebDriver driver = mock(WebDriver.class);
     final By by = new ByIdOrName("first");
@@ -72,7 +73,7 @@ public class AjaxElementLocatorTest extends MockObjectTestCase {
     }
   }
 
-  public void testShouldAlwaysDoAtLeastOneAttemptAtFindingTheElement() throws Exception {
+  @Test public void shouldAlwaysDoAtLeastOneAttemptAtFindingTheElement() throws Exception {
     Field f = Page.class.getDeclaredField("first");
     final WebDriver driver = mock(WebDriver.class);
     final By by = new ByIdOrName("first");

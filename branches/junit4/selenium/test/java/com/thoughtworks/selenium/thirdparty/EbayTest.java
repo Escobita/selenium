@@ -1,13 +1,11 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import org.testng.annotations.Test;
 
 public class EbayTest extends SeleneseTestNgHelper {
     
-    @Test
-    public void testEbayOpen() throws Throwable {
+    @Test public void ebayOpen() throws Throwable {
         // interesting because they use frames served by different domains.  Injected JavaScript
         // which tries to cross frames will be revealed with permission denied errors.
         

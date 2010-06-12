@@ -1,10 +1,11 @@
 package org.openqa.selenium;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
+import org.junit.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class MockBrowserTest {
     Selenium sel;
@@ -17,7 +18,7 @@ public class MockBrowserTest {
         sel.stop();
     }
     
-    public void testMock() {
+    @Test public void mock() {
         sel.open("/");
         sel.click("foo");
         assertEquals(sel.getTitle(), "x", "Incorrect title");

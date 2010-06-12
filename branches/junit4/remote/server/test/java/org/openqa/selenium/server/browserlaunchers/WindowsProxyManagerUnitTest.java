@@ -1,16 +1,16 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-
-
 import java.io.File;
 import java.io.IOException;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class WindowsProxyManagerUnitTest {
-  public void testDeleteFlatDirContentsWithNoSuffix() throws IOException {
+  @Test public void deleteFlatDirContentsWithNoSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     WindowsProxyManager.deleteFlatDirContents(srcDir, null);
     assertTrue(srcDir.exists());
@@ -20,7 +20,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(srcDir.exists());
   }
   
-  public void testDeleteFlatDirContentsWithSuffix() throws IOException {
+  @Test public void deleteFlatDirContentsWithSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     WindowsProxyManager.deleteFlatDirContents(srcDir, "nomatch");
     assertTrue(srcDir.exists());
@@ -30,7 +30,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(srcDir.exists());
   }
   
-  public void testDeleteFlatDirContentsWithNoSuchDir() {
+  @Test public void deleteFlatDirContentsWithNoSuchDir() {
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
     File srcDir = new File(tempDir, "rc-wpmt-src");
     assertFalse(srcDir.exists());
@@ -38,7 +38,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(srcDir.exists());
   }
   
-  public void testHidePreexistingCookiesNoDestDirNoSuffix() throws IOException {
+  @Test public void hidePreexistingCookiesNoDestDirNoSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     File destDir = getNonexistentDir();
     WindowsProxyManager.hideCookies(srcDir, null, destDir);
@@ -52,7 +52,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(destDir.exists());
   }
   
-  public void testHidePreexistingCookiesWithDestDirNoSuffix() throws IOException {
+  @Test public void hidePreexistingCookiesWithDestDirNoSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     File destDir = getNonexistentDir();
 
@@ -75,7 +75,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(destDir.exists());
   }
   
-  public void testRestorePreexistingCookiesNoSuffix() throws IOException {
+  @Test public void restorePreexistingCookiesNoSuffix() throws IOException {
     File hiddenDir = makeSourceDirAndCookie("hiddencookie");
     File cookieDir = getNonexistentDir();
     
@@ -91,7 +91,7 @@ public class WindowsProxyManagerUnitTest {
     assertFalse(hiddenDir.exists());
   }
   
-  public void testHidePreexistingCookiesNoDestDirWithSuffix() throws IOException {
+  @Test public void hidePreexistingCookiesNoDestDirWithSuffix() throws IOException {
     File srcDir = makeSourceDirAndCookie("testcookie");
     File destDir = getNonexistentDir();
     

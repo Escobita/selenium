@@ -19,13 +19,14 @@ package org.openqa.selenium.support.ui;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class WebDriverWaitTest extends MockObjectTestCase {
   @SuppressWarnings("unchecked")
-  public void testShouldWaitUntilReturnValueOfConditionIsNotNull() {
+  @Test public void shouldWaitUntilReturnValueOfConditionIsNotNull() {
     final ExpectedCondition<String> condition = mock(ExpectedCondition.class);
 
     checking(new Expectations() {{
@@ -39,7 +40,7 @@ public class WebDriverWaitTest extends MockObjectTestCase {
   }
 
   @SuppressWarnings("unchecked")
-  public void testShouldWaitUntilABooleanResultIsTrue() {
+  @Test public void shouldWaitUntilABooleanResultIsTrue() {
     final ExpectedCondition<Boolean> condition = mock(ExpectedCondition.class);
 
     checking(new Expectations() {{
@@ -52,7 +53,7 @@ public class WebDriverWaitTest extends MockObjectTestCase {
     wait.until(condition);
   }
 
-  public void testShouldThrowAnExceptionIfTheTimerRunsOut() {
+  @Test public void shouldThrowAnExceptionIfTheTimerRunsOut() {
     Clock clock = new TickingClock(500);
     WebDriverWait wait = new WebDriverWait(clock, null, 1, 0);
 
@@ -65,7 +66,7 @@ public class WebDriverWaitTest extends MockObjectTestCase {
   }
 
   @SuppressWarnings("unchecked")
-  public void testShouldSilentlyCaptureNoSuchElementExceptions() {
+  @Test public void shouldSilentlyCaptureNoSuchElementExceptions() {
     final WebElement element = mock(WebElement.class);
 
     final ExpectedCondition<WebElement> condition = mock(ExpectedCondition.class);
@@ -81,7 +82,7 @@ public class WebDriverWaitTest extends MockObjectTestCase {
   }
 
   @SuppressWarnings("unchecked")
-  public void testShouldPassWebDriverFromConstructorToExpectation() {
+  @Test public void shouldPassWebDriverFromConstructorToExpectation() {
     final WebDriver driver = mock(WebDriver.class);
     final ExpectedCondition<String> condition = mock(ExpectedCondition.class);
 
@@ -96,7 +97,7 @@ public class WebDriverWaitTest extends MockObjectTestCase {
   }
 
   @SuppressWarnings("unchecked")
-  public void testShouldChainNoSuchElementExceptionWhenTimingOut() {
+  @Test public void shouldChainNoSuchElementExceptionWhenTimingOut() {
     final ExpectedCondition<WebElement> expectation = mock(ExpectedCondition.class);
 
     checking(new Expectations() {{

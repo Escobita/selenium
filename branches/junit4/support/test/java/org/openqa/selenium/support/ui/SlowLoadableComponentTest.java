@@ -17,13 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.support.ui;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
 public class SlowLoadableComponentTest {
 
-  public void testShouldDoNothingIfComponentIsAlreadyLoaded() {
+  @Test public void shouldDoNothingIfComponentIsAlreadyLoaded() {
     try {
       new DetonatingSlowLoader().get();
     } catch (RuntimeException e) {
@@ -31,14 +33,14 @@ public class SlowLoadableComponentTest {
     }
   }
 
-  public void testShouldCauseTheLoadMethodToBeCalledIfTheComponentIsNotAlreadyLoaded() {
+  @Test public void shouldCauseTheLoadMethodToBeCalledIfTheComponentIsNotAlreadyLoaded() {
     int numberOfTimesThroughLoop = 1;
     SlowLoading slowLoading = new SlowLoading(new SystemClock(), 1, numberOfTimesThroughLoop).get();
 
     assertEquals(numberOfTimesThroughLoop, slowLoading.getLoopCount());
   }
 
-  public void testTheLoadMethodShouldOnlyBeCalledOnceIfTheComponentTakesALongTimeToLoad() {
+  @Test public void theLoadMethodShouldOnlyBeCalledOnceIfTheComponentTakesALongTimeToLoad() {
     try {
       new OnlyOneLoad(new SystemClock(), 5, 5).get();
     } catch (RuntimeException e) {
@@ -46,7 +48,7 @@ public class SlowLoadableComponentTest {
     }
   }
 
-  public void testShouldThrowAnErrorIfCallingLoadDoesNotCauseTheComponentToLoadBeforeTimeout() {
+  @Test public void shouldThrowAnErrorIfCallingLoadDoesNotCauseTheComponentToLoadBeforeTimeout() {
     FakeClock clock = new FakeClock();
     try {
       new BasicSlowLoader(clock, 2).get();
@@ -56,7 +58,7 @@ public class SlowLoadableComponentTest {
     }
   }
 
-  public void testShouldCancelLoadingIfAnErrorIsDetected() {
+  @Test public void shouldCancelLoadingIfAnErrorIsDetected() {
     HasError error = new HasError();
 
     try {

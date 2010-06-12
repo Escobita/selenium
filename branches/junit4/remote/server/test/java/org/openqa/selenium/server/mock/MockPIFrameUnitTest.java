@@ -92,7 +92,7 @@ public class MockPIFrameUnitTest {
     /**
      * start a basic browser session
      */
-    public void testStartSession() {
+    @Test public void testStartSession() {
         startSession();
     }
 
@@ -128,7 +128,7 @@ public class MockPIFrameUnitTest {
     /**
      * create a session and issue a valid "open" command
      */
-    public void testRegularOpen() {
+    @Test public void regularOpen() {
         openUrl();
     }
 
@@ -159,7 +159,7 @@ public class MockPIFrameUnitTest {
      * response from the browser, as the new page load request comes in before the
      * "OK" from the original page
      */
-    public void testEvilOpen() {
+    @Test public void evilOpen() {
         MockPIFrame frame1 = startSession();
 
         // 1. driver issues an "open" command
@@ -184,7 +184,7 @@ public class MockPIFrameUnitTest {
     /**
      * Click, then waitForPageToLoad
      */
-    public void testClickThenWait() {
+    @Test public void clickThenWait() {
         MockPIFrame frame1 = startSession();
 
         DriverRequest driverRequest = sendCommand("click", "foo", "");
@@ -209,7 +209,7 @@ public class MockPIFrameUnitTest {
     /**
      * Click, then wait for page to load; but this time, frame2 starts before frame1 declares close
      */
-    public void testEvilClickThenWait() {
+    @Test public void evilClickThenWait() {
         MockPIFrame frame1 = startSession();
         BrowserRequest browserRequest = frame1.getMostRecentRequest();
 
@@ -239,7 +239,7 @@ public class MockPIFrameUnitTest {
     /**
      * click, then wait for page to load, but frame1 may send close before sending OK result
      */
-    public void testEvilClickThenWaitRaceCondition() throws InterruptedException {
+    @Test public void evilClickThenWaitRaceCondition() throws InterruptedException {
         MockPIFrame frame1 = startSession();
         BrowserRequest browserRequest = frame1.getMostRecentRequest();
 
@@ -274,7 +274,7 @@ public class MockPIFrameUnitTest {
      * Click, then sleep for a while, then send commands.
      * We expect this to work; waitForPageToLoad should not be mandatory
      */
-    public void testClickAndPause() {
+    @Test public void clickAndPause() {
         MockPIFrame frame1 = startSession();
         BrowserRequest browserRequest = frame1.getMostRecentRequest();
 
@@ -301,7 +301,7 @@ public class MockPIFrameUnitTest {
      * WaitForPageToLoad should work regardles of whether it runs before or after
      * the page loads.
      */
-    public void testClickAndPauseThenWait() {
+    @Test public void clickAndPauseThenWait() {
         MockPIFrame frame1 = startSession();
         BrowserRequest browserRequest = frame1.getMostRecentRequest();
 
@@ -331,7 +331,7 @@ public class MockPIFrameUnitTest {
      * you'll get a WindowClosedException, even if you click more than once.  Eventually
      * the page will load and then clicking will work again.
      */
-    public void testClickForgetToWait() {
+    @Test public void clickForgetToWait() {
         MockPIFrame frame1 = startSession();
         BrowserRequest browserRequest = frame1.getMostRecentRequest();
 
@@ -362,7 +362,7 @@ public class MockPIFrameUnitTest {
     /**
      * Test out the retryLast logic.
      */
-    public void testRetryLast() throws Exception {
+    @Test public void retryLast() throws Exception {
         MockPIFrame frame = startSession();
 
         // 1. driver requests getTitle
@@ -395,7 +395,7 @@ public class MockPIFrameUnitTest {
      *
      * @throws Exception
      */
-    public void testSetTimeout() throws Exception {
+    @Test public void setTimeout() throws Exception {
         MockPIFrame frame = startSession();
         int timeout = 4000;
 
@@ -418,7 +418,7 @@ public class MockPIFrameUnitTest {
     /**
      * Open a subWindow, close the subWindow, select the mainWindow, and send it a command.
      */
-    public void testMultiWindow() throws Exception {
+    @Test public void multiWindow() throws Exception {
         MockPIFrame frame = openUrl();
         MockPIFrame subWindow = openSubWindow(frame);
 
@@ -461,7 +461,7 @@ public class MockPIFrameUnitTest {
      * Raising the timeout does not necessarily help.
      * test.
      */
-    public void testEvilClosingWindow() throws Exception {
+    @Test public void evilClosingWindow() throws Exception {
         MockPIFrame frame = startSession();
         MockPIFrame subWindow = openSubWindow(frame);
         BrowserRequest mainBrowserRequest = frame.getMostRecentRequest();
@@ -555,14 +555,14 @@ public class MockPIFrameUnitTest {
     /**
      * Open a page that has subframes
      */
-    public void testSubFrames() {
+    @Test public void subFrames() {
         openSubFrames();
     }
 
     /**
      * Select a subFrame, then send an "open" command to that subFrame
      */
-    public void testFramesOpen() {
+    @Test public void framesOpen() {
         SmallFrameSet set = openSubFrames();
 
         DriverRequest driverRequest = sendCommand("selectFrame", "subFrame1", "");

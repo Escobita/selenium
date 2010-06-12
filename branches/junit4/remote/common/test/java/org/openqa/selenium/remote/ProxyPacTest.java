@@ -1,17 +1,17 @@
 package org.openqa.selenium.remote;
 
-
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ProxyPacTest {
-  public void testShouldNotReturnAnythingIfNothingIsConfigured() throws IOException {
+  @Test public void shouldNotReturnAnythingIfNothingIsConfigured() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     StringWriter writer = new StringWriter();
@@ -20,7 +20,7 @@ public class ProxyPacTest {
     assertEquals(writer.toString(), EMPTY_PAC, writer.toString());
   }
 
-  public void testShouldAllowSpecificUrlsToBeProxied() throws IOException {
+  @Test public void shouldAllowSpecificUrlsToBeProxied() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     pac.mapHost("www.google.com").toProxy("http://localhost:8080");
@@ -32,7 +32,7 @@ public class ProxyPacTest {
         + "}"));
   }
 
-  public void testShouldAllowSpecificUrlsToBePassedThroughDirectly() throws IOException {
+  @Test public void shouldAllowSpecificUrlsToBePassedThroughDirectly() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     pac.map("http://seleniumhq.org/cheese").toNoProxy();
@@ -44,7 +44,7 @@ public class ProxyPacTest {
         + "}"));
   }
 
-  public void testShouldAllowBasicWildCarding() throws IOException {
+  @Test public void shouldAllowBasicWildCarding() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     pac.map("*/selenium-server/*").toProxy("http://localhost:8080/selenium-server/");
@@ -57,7 +57,7 @@ public class ProxyPacTest {
   }
 
   // See: http://support.microsoft.com/kb/274204
-  public void testShouldUseJsRegexIfIEWouldNotHandleTheMappingUrl() throws IOException {
+  @Test public void shouldUseJsRegexIfIEWouldNotHandleTheMappingUrl() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     pac.map("/[a-zA-Z]{4}.microsoft.com/").toProxy("http://localhost:8080/selenium-server/");
@@ -69,7 +69,7 @@ public class ProxyPacTest {
         + "}"));
   }
 
-  public void testFinalLineOfFunctionShouldRedirectToDefaultProxy() throws IOException {
+  @Test public void finalLineOfFunctionShouldRedirectToDefaultProxy() throws IOException {
     ProxyPac pac = new ProxyPac();
 
     String config = captureOutput(pac);
@@ -85,7 +85,7 @@ public class ProxyPacTest {
   }
 
   // This is going to be a whole heap of fun.
-  public void testShouldAllowAPacToBeBasedOffAnExistingPacFile() throws IOException {
+  @Test public void shouldAllowAPacToBeBasedOffAnExistingPacFile() throws IOException {
     // We should allow people to override the settings in the given pac
     // The strategy will be to rename the method we care about to something else
     // And then include the original (JS) source code. How badly can this fail?

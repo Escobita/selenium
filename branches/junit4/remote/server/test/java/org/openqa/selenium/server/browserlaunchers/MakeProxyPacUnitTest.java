@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,7 @@ public class MakeProxyPacUnitTest {
         return pac.replaceAll("\\s+", " ").trim();
     }
     
-    public void testBasic() throws IOException {
+    @Test public void basic() throws IOException {
         proxySeleniumTrafficOnly = false;
         String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
@@ -53,7 +54,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testNeverProxySeleniumTrafficOnly() throws IOException {
+    @Test public void neverProxySeleniumTrafficOnly() throws IOException {
     	proxySeleniumTrafficOnly = false;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
@@ -61,7 +62,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testAvoidProxyNeverProxySeleniumTrafficOnly() throws IOException {
+    @Test public void avoidProxyNeverProxySeleniumTrafficOnly() throws IOException {
     	proxySeleniumTrafficOnly = false;
     	avoidProxy = true;
     	String pac = makeProxyPAC();
@@ -70,7 +71,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testAvoidProxy() throws IOException {
+    @Test public void avoidProxy() throws IOException {
     	avoidProxy = true;
     	String pac = makeProxyPAC();
         String expected = "function FindProxyForURL(url, host) " +
@@ -78,7 +79,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
 
-    public void testConfiguredProxy() throws IOException {
+    @Test public void configuredProxy() throws IOException {
       proxySeleniumTrafficOnly = false;
     	httpProxyHost = "foo";
     	String pac = makeProxyPAC();
@@ -87,7 +88,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testConfiguredProxyAvoidProxy() throws IOException {
+    @Test public void configuredProxyAvoidProxy() throws IOException {
     	httpProxyHost = "foo";
     	avoidProxy = true;
     	String pac = makeProxyPAC();
@@ -96,7 +97,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testAvoidProxyNonProxyHost() throws IOException {
+    @Test public void avoidProxyNonProxyHost() throws IOException {
         avoidProxy = true;
         httpNonProxyHosts = "www.google.com";
         String pac = makeProxyPAC();
@@ -107,7 +108,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testConfiguredProxyAvoidProxyNonProxyHost() throws IOException {
+    @Test public void configuredProxyAvoidProxyNonProxyHost() throws IOException {
         avoidProxy = true;
         httpProxyHost = "foo";
         httpNonProxyHosts = "www.google.com";
@@ -119,7 +120,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testAvoidProxyNonProxyHosts() throws IOException {
+    @Test public void avoidProxyNonProxyHosts() throws IOException {
         avoidProxy = true;
         httpNonProxyHosts = "www.google.com|*.yahoo.com";
         String pac = makeProxyPAC();
@@ -131,7 +132,7 @@ public class MakeProxyPacUnitTest {
         assertEquals(expected, pac);
     }
     
-    public void testConfiguredProxyAvoidProxyNonProxyHosts() throws IOException {
+    @Test public void configuredProxyAvoidProxyNonProxyHosts() throws IOException {
         avoidProxy = true;
         httpProxyHost = "foo";
         httpNonProxyHosts = "www.google.com|*.yahoo.com";

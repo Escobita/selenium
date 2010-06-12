@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserResponseSequencer;
 
 import static junit.framework.Assert.fail;
@@ -30,7 +31,7 @@ public class BrowserResponseSequencerUnitTest {
   }
 
 
-  public void testBrowserResponseSequencer() throws InterruptedException, ExecutionException {
+  @Test public void browserResponseSequencer() throws InterruptedException, ExecutionException {
 		
 		// we launch them in reverse order, but they get added in sequence
 		FutureTask<Void> three = NumberWriter.launchNumberWriter(3, seq, numbers);
@@ -41,7 +42,7 @@ public class BrowserResponseSequencerUnitTest {
 		assertEquals("[0, 1, 2, 3]", numbers.toString());
 	}
 	
-	public void testOutOfSequence() throws InterruptedException, ExecutionException {
+	@Test public void outOfSequence() throws InterruptedException, ExecutionException {
 		// we launch them in reverse order, but they get added in sequence
 		long now = System.currentTimeMillis();
 		FutureTask<Void> three = NumberWriter.launchNumberWriter(3, seq, numbers);

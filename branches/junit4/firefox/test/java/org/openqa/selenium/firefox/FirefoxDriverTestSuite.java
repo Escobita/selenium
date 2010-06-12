@@ -17,18 +17,18 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import org.junit.Test; import static org.junit.Assert.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import org.junit.Test;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.TemporaryFilesystem;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 
 public class FirefoxDriverTestSuite {
   public static Test suite() throws Exception {

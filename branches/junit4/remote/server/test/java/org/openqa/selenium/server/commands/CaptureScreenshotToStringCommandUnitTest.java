@@ -1,11 +1,11 @@
 package org.openqa.selenium.server.commands;
 
-
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.io.ByteArrayInputStream;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.junit.Test;
 
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.expectLastCall;
@@ -18,7 +18,7 @@ public class CaptureScreenshotToStringCommandUnitTest {
 
 	private CaptureScreenshotToStringCommand command;
 
-    public void testDumbJUnit() {
+    @Test public void dumbJUnit() {
         // this test is needed to make JUnit happy since the rest of the tests are disabled temporarily
     }
     

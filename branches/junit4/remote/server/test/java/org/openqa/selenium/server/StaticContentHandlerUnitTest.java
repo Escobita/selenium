@@ -1,11 +1,11 @@
 package org.openqa.selenium.server;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.http.HttpContext;
 import org.openqa.jetty.http.HttpRequest;
 import org.openqa.jetty.http.HttpResponse;
@@ -34,13 +34,13 @@ public class StaticContentHandlerUnitTest {
         StaticContentHandler.setSlowResources(slowResourcesInitially);
     }
 
-    public void testShouldMakePageNotCachedWhenHandle() throws Exception {
+    @Test public void shouldMakePageNotCachedWhenHandle() throws Exception {
         HttpResponse response = new HttpResponse();
         handler.handle("", "", new HttpRequest(), response);
         assertEquals("Thu, 01 Jan 1970 00:00:00 GMT", response.getField("Expires"));
     }
     
-    public void testShouldDelayResourceLoadingIfSetToSlow() throws Exception {
+    @Test public void shouldDelayResourceLoadingIfSetToSlow() throws Exception {
         long start = new Date().getTime();
         StaticContentHandler.setSlowResources(true);
         handler.getResource("not_exists");
@@ -48,7 +48,7 @@ public class StaticContentHandlerUnitTest {
         assertTrue(end - start >= 0.9 * StaticContentHandler.SERVER_DELAY);
     }
 
-    public void testShouldDoubleDelayWithAPageMarkedAsSlow() throws Exception {
+    @Test public void shouldDoubleDelayWithAPageMarkedAsSlow() throws Exception {
         long start = new Date().getTime();
         StaticContentHandler.setSlowResources(true);
         handler.getResource("something-really-slow.html");
@@ -58,7 +58,7 @@ public class StaticContentHandlerUnitTest {
         assertTrue(end - start >= 1.9 * StaticContentHandler.SERVER_DELAY);
     }
 
-    public void testShouldReturnTheFirstResourceLocatedByLocators() throws Exception {
+    @Test public void shouldReturnTheFirstResourceLocatedByLocators() throws Exception {
         final File file = File.createTempFile("selenium-test-", "");
         file.deleteOnExit();
         handler.addStaticContent(new ResourceLocator() {
@@ -74,12 +74,12 @@ public class StaticContentHandlerUnitTest {
         assertEquals(file, handler.getResource(file.toURI().toURL().toString()).getFile());
     }
 
-    public void testShouldReturnMissingResourceIfNoResourceLocated() throws Exception {
+    @Test public void shouldReturnMissingResourceIfNoResourceLocated() throws Exception {
         Resource resource = handler.getResource("not exists path");
         assertFalse(resource.exists());
     }
 
-    public void testHandleSetsResponseAttributeInCaseOfMissingResource() throws Exception {
+    @Test public void handleSetsResponseAttributeInCaseOfMissingResource() throws Exception {
     	String pathInContext = "/invalid";
     	String pathParams = "";
     	HttpRequest httpRequest = new HttpRequest();
@@ -88,7 +88,7 @@ public class StaticContentHandlerUnitTest {
     	assertEquals("True", httpResponse.getAttribute("NotFound"));
     }
     
-    public void testHandleSetsNoResponseStatusCodeInCaseOfAvailableResource() throws Exception {
+    @Test public void handleSetsNoResponseStatusCodeInCaseOfAvailableResource() throws Exception {
     	
     	StaticContentHandler mock = createMock(StaticContentHandler.class,
                 StaticContentHandler.class.getDeclaredMethod("getResource", String.class),

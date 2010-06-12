@@ -1,5 +1,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -9,7 +10,7 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
  */
 public class InternetExplorerCustomProxyLauncherFunctionalTest {
 
-    public void testCanLaunchASingleBrowser() {
+    @Test public void canLaunchASingleBrowser() {
         final InternetExplorerCustomProxyLauncher launcher;
 
         launcher = new InternetExplorerCustomProxyLauncher(new BrowserConfigurationOptions(), new RemoteControlConfiguration(), "aSessionId", (String) null);
@@ -18,7 +19,7 @@ public class InternetExplorerCustomProxyLauncherFunctionalTest {
         launcher.close();
     }
 
-    public void testCanLaunchTwoBrowsersInSequence() {
+    @Test public void canLaunchTwoBrowsersInSequence() {
         final InternetExplorerCustomProxyLauncher firstLauncher;
         final InternetExplorerCustomProxyLauncher secondLauncher;
 
@@ -32,7 +33,7 @@ public class InternetExplorerCustomProxyLauncherFunctionalTest {
         secondLauncher.close();
     }
 
-    public void testCanLaunchTwoBrowsersInterleaved() {
+    @Test public void canLaunchTwoBrowsersInterleaved() {
         final InternetExplorerCustomProxyLauncher firstLauncher;
         final InternetExplorerCustomProxyLauncher secondLauncher;
 

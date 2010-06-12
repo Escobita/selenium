@@ -1,10 +1,8 @@
 package org.openqa.selenium;
 
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.junit.Test;
 
-
-import org.junit.Test; import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * Test suite for running the WebDriver JS API test cases against all of its

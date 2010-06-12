@@ -1,12 +1,12 @@
 package org.openqa.selenium.server;
 
-
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -62,7 +62,7 @@ public class CommandHolderUnitTest {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }
 
-    public void testGetCommandGeneratesRetryWhenNoCommand() {
+    @Test public void getCommandGeneratesRetryWhenNoCommand() {
         long now = System.currentTimeMillis();
         RemoteCommand nextCmd = holder.getCommand();
         long after = System.currentTimeMillis();
@@ -72,7 +72,7 @@ public class CommandHolderUnitTest {
         assertNull(holder.peek());
     }
 
-    public void testGetCommandGeneratesNullWhenPoisoned() throws Throwable {
+    @Test public void getCommandGeneratesNullWhenPoisoned() throws Throwable {
         TrackableRunnable internalGetter = new TrackableRunnable() {
             @Override
             public Object go() throws Throwable {
@@ -88,7 +88,7 @@ public class CommandHolderUnitTest {
         assertNull(t.getResult());
     }
 
-    public void testSimpleSingleThreaded() throws Throwable {
+    @Test public void simpleSingleThreaded() throws Throwable {
         injectCommand(testRemoteCommand, true);
         expectCommand(testRemoteCommand);
         assertTrue(holder.isEmpty()); // command got picked up.

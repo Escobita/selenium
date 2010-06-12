@@ -21,213 +21,213 @@ public class RemoteControlConfigurationUnitTest {
 	public void setUp() {
 	}
 	
-    @Test public void testPortIs4444ByDefault() {
+    @Test public void portIs4444ByDefault() {
         assertEquals(4444, configuration.getPort());
     }
 
-    @Test public void testPortCanBeSet() {
+    @Test public void portCanBeSet() {
         configuration.setPort(1234);
         assertEquals(1234, configuration.getPort());
     }
 
-    @Test public void testMultiWindowIsTrueByDefault() {
+    @Test public void multiWindowIsTrueByDefault() {
         assertTrue((!configuration.isSingleWindow()));
     }
 
-    @Test public void testMultiWindowCanBeSet() {
+    @Test public void multiWindowCanBeSet() {
         configuration.setSingleWindow(false);
         assertTrue((!configuration.isSingleWindow()));
     }
 
-    @Test public void testProxyInjectionModeArgIsFalseByDefault() {
+    @Test public void proxyInjectionModeArgIsFalseByDefault() {
         assertFalse(configuration.getProxyInjectionModeArg());
     }
 
-    @Test public void testProxyInjectionModeArgCanBeSet() {
+    @Test public void proxyInjectionModeArgCanBeSet() {
         configuration.setProxyInjectionModeArg(true);
         assertTrue(configuration.getProxyInjectionModeArg());
     }
 
-    @Test public void testPortDriversShouldContactIsSamePortByDefault() {
+    @Test public void portDriversShouldContactIsSamePortByDefault() {
         configuration.setPort(1515);
         assertEquals(1515, configuration.getPortDriversShouldContact());
     }
 
-    @Test public void testPortDriversShouldContactCanBeSet() {
+    @Test public void portDriversShouldContactCanBeSet() {
         configuration.setPortDriversShouldContact(1234);
         assertEquals(1234, configuration.getPortDriversShouldContact());
     }
 
-    @Test public void testHTMLSuiteIsFalseByDefault() {
+    @Test public void hTMLSuiteIsFalseByDefault() {
         assertFalse(configuration.isHTMLSuite());
     }
 
-    @Test public void testHTMLSuiteCanBeSet() {
+    @Test public void hTMLSuiteCanBeSet() {
         configuration.setHTMLSuite(true);
         assertTrue(configuration.isHTMLSuite());
     }
 
-    @Test public void testSelfTestIsFalseByDefault() {
+    @Test public void selfTestIsFalseByDefault() {
         assertFalse(configuration.isSelfTest());
     }
 
-    @Test public void testSelfTestCanBeSet() {
+    @Test public void selfTestCanBeSet() {
         configuration.setSelfTest(true);
         assertTrue(configuration.isSelfTest());
     }
 
-    @Test public void testSelfTestDirIsNullByDefault() {
+    @Test public void selfTestDirIsNullByDefault() {
         assertNull(configuration.getSelfTestDir());
     }
 
-    @Test public void testSelfTestDirCanBeSet() {
+    @Test public void selfTestDirCanBeSet() {
         final File aDirectory = new File("\"A Directory Name\"");
         configuration.setSelfTestDir(aDirectory);
         assertEquals(aDirectory, configuration.getSelfTestDir());
     }
 
-    @Test public void testInteractiveIsFalseByDefault() {
+    @Test public void interactiveIsFalseByDefault() {
         assertFalse(configuration.isInteractive());
     }
 
-    @Test public void testInteractiveCanBeSet() {
+    @Test public void interactiveCanBeSet() {
         configuration.setInteractive(true);
         assertTrue(configuration.isInteractive());
     }
 
-    @Test public void testUserExtensionsIsNullByDefault() {
+    @Test public void userExtensionsIsNullByDefault() {
         assertNull(configuration.getUserExtensions());
     }
 
-    @Test public void testUserExtensionsCanBeSet() {
+    @Test public void userExtensionsCanBeSet() {
         final File aDirectory = new File("\"A File Name\"");
         configuration.setUserExtensions(aDirectory);
         assertEquals(aDirectory, configuration.getUserExtensions());
     }
 
-    @Test public void testUserJSInjectionIsFalseByDefault() {
+    @Test public void userJSInjectionIsFalseByDefault() {
         assertFalse(configuration.userJSInjection());
     }
 
-    @Test public void testUserJSInjectionCanBeSet() {
+    @Test public void userJSInjectionCanBeSet() {
         configuration.setUserJSInjection(true);
         assertTrue(configuration.userJSInjection());
     }
 
-    @Test public void testTrustAllSSLCertificatesIsFalseByDefault() {
+    @Test public void trustAllSSLCertificatesIsFalseByDefault() {
         assertFalse(configuration.trustAllSSLCertificates());
     }
 
-    @Test public void testTrustAllSSLCertificatesCanBeSet() {
+    @Test public void trustAllSSLCertificatesCanBeSet() {
         configuration.setTrustAllSSLCertificates(true);
         assertTrue(configuration.trustAllSSLCertificates());
     }
 
-    @Test public void testDebugURLIsEmptyByDefault() {
+    @Test public void debugURLIsEmptyByDefault() {
         assertEquals("", configuration.getDebugURL());
     }
 
 
-    @Test public void testDebugURLCanBeSet() {
+    @Test public void debugURLCanBeSet() {
         configuration.setDebugURL("A URL");
         assertEquals("A URL", configuration.getDebugURL());
     }
 
-    @Test public void testDontInjectRegexIsNullByDefault() {
+    @Test public void dontInjectRegexIsNullByDefault() {
         assertNull(configuration.getDontInjectRegex());
     }
 
-    @Test public void testDontInjectRegexCanBeSet() {
+    @Test public void dontInjectRegexCanBeSet() {
         configuration.setDontInjectRegex("A Regex");
         assertEquals("A Regex", configuration.getDontInjectRegex());
     }
 
-    @Test public void testFirefoxProfileTemplateIsNullByDefault() {
+    @Test public void firefoxProfileTemplateIsNullByDefault() {
         assertNull(configuration.getFirefoxProfileTemplate());
     }
 
-    @Test public void testFirefoxProfileTemplateCanBeSet() {
+    @Test public void firefoxProfileTemplateCanBeSet() {
         final File aDirectory = new File("\"A Directory Path\"");
         configuration.setFirefoxProfileTemplate(aDirectory);
         assertEquals(aDirectory, configuration.getFirefoxProfileTemplate());
     }
 
-    @Test public void testReuseBrowserSessionsIsFalseByDefault() {
+    @Test public void reuseBrowserSessionsIsFalseByDefault() {
         assertFalse(configuration.reuseBrowserSessions());
     }
 
-    @Test public void testReuseBrowserSessionsCanBeSet() {
+    @Test public void reuseBrowserSessionsCanBeSet() {
         configuration.setReuseBrowserSessions(true);
         assertTrue(configuration.reuseBrowserSessions());
     }
 
-    @Test public void testLogoutFileNameIsNullByDefault() {
+    @Test public void logoutFileNameIsNullByDefault() {
         assertNull(configuration.getLogOutFileName());
     }
 
-    @Test public void testLogoutFileNameCanBeSet() {
+    @Test public void logoutFileNameCanBeSet() {
     	configuration.setLogOutFileName("A File Name");
         assertEquals("A File Name", configuration.getLogOutFileName());
     }
 
-    @Test public void testForcedBrowserModeIsNullByDefault() {
+    @Test public void forcedBrowserModeIsNullByDefault() {
         assertNull(configuration.getForcedBrowserMode());
     }
 
-    @Test public void testForcedBrowserModeCanBeSet() {
+    @Test public void forcedBrowserModeCanBeSet() {
         configuration.setForcedBrowserMode("A Mode");
         assertEquals("A Mode", configuration.getForcedBrowserMode());
     }
 
-    @Test public void testHonorSystemProxyIsFalseByDefault() {
+    @Test public void honorSystemProxyIsFalseByDefault() {
         assertFalse(configuration.honorSystemProxy());
 
     }
 
-    @Test public void testHonorSystemProxyCanBeSet() {
+    @Test public void honorSystemProxyCanBeSet() {
         configuration.setHonorSystemProxy(true);
         assertTrue(configuration.honorSystemProxy());
 
     }
 
-    @Test public void testShouldOverrideSystemProxyIsTrueByDefault() {
+    @Test public void shouldOverrideSystemProxyIsTrueByDefault() {
         assertTrue(configuration.shouldOverrideSystemProxy());
 
     }
 
-    @Test public void testShouldOverrideSystemProxyIsFalseIfHonorSystemProxyIsSet() {
+    @Test public void shouldOverrideSystemProxyIsFalseIfHonorSystemProxyIsSet() {
         configuration.setHonorSystemProxy(true);
         assertFalse(configuration.shouldOverrideSystemProxy());
     }
 
-    @Test public void testTimeoutInSecondsIs30MinutesByDefault() {
+    @Test public void timeoutInSecondsIs30MinutesByDefault() {
         assertEquals(30 * 60, configuration.getTimeoutInSeconds());
     }
 
-    @Test public void testTimeoutInSecondsCanBeSet() {
+    @Test public void timeoutInSecondsCanBeSet() {
         configuration.setTimeoutInSeconds(123);
         assertEquals(123, configuration.getTimeoutInSeconds());
     }
 
-    @Test public void testRetryTimeoutInSecondsIs10SecondsByDefault() {
+    @Test public void retryTimeoutInSecondsIs10SecondsByDefault() {
         assertEquals(10, configuration.getRetryTimeoutInSeconds());
     }
 
-    @Test public void testRetryTimeoutInSecondsCanBeSet() {
+    @Test public void retryTimeoutInSecondsCanBeSet() {
         configuration.setRetryTimeoutInSeconds(123);
         assertEquals(123, configuration.getRetryTimeoutInSeconds());
     }
 
-    @Test public void testDontTouchLoggingIsFalseByDefault() {
+    @Test public void dontTouchLoggingIsFalseByDefault() {
         assertFalse(configuration.dontTouchLogging());
     }
 
-    @Test public void testDontTouchLoggingCanBeSet() {
+    @Test public void dontTouchLoggingCanBeSet() {
         configuration.setDontTouchLogging(true);
         assertTrue(configuration.dontTouchLogging());
     }
 
-    @Test public void testShortTermMemoryLoggerCapacityIs50Bydefault() {
+    @Test public void shortTermMemoryLoggerCapacityIs50Bydefault() {
         assertEquals(30, configuration.shortTermMemoryLoggerCapacity());
     }
 

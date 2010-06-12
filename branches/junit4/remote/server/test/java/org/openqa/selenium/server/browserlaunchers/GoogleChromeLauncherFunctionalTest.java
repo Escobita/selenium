@@ -17,6 +17,7 @@
 
 package org.openqa.selenium.server.browserlaunchers;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -30,7 +31,7 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
  * Selenium Server is already running.  The tests will still pass, though.
  */
 public class GoogleChromeLauncherFunctionalTest {
-    public void testCanLaunchASingleBrowser() {
+    @Test public void canLaunchASingleBrowser() {
         final GoogleChromeLauncher launcher;
 
         launcher = new GoogleChromeLauncher(new BrowserConfigurationOptions(), new RemoteControlConfiguration(), "aSessionId", (String) null);
@@ -39,7 +40,7 @@ public class GoogleChromeLauncherFunctionalTest {
         launcher.close();
     }
 
-    public void testCanLaunchTwoBrowsersInSequence() {
+    @Test public void canLaunchTwoBrowsersInSequence() {
         final GoogleChromeLauncher firstLauncher;
         final GoogleChromeLauncher secondLauncher;
 
@@ -55,7 +56,7 @@ public class GoogleChromeLauncherFunctionalTest {
         secondLauncher.close();
     }
 
-    public void testCanLaunchTwoBrowsersInterleaved() {
+    @Test public void canLaunchTwoBrowsersInterleaved() {
         final GoogleChromeLauncher firstLauncher;
         final GoogleChromeLauncher secondLauncher;
 

@@ -1,8 +1,5 @@
 package com.thoughtworks.selenium;
 
-
-import org.easymock.classextension.ConstructorArgs;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -12,6 +9,9 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.easymock.classextension.ConstructorArgs;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -20,14 +20,14 @@ import static org.junit.Assert.fail;
  * {@link com.thoughtworks.selenium.HttpCommandProcessor} unit test class.
  */
 public class HttpCommandProcessorUnitTest {
-	public void testCanStopTheSeleneseSessionEvenIfThereIsNoCurrentSession() {
+	@Test public void canStopTheSeleneseSessionEvenIfThereIsNoCurrentSession() {
 		final HttpCommandProcessor processor;
 
 		processor = new HttpCommandProcessor("a Server", 1234, "", "a url");
 		processor.stop();
 	}
 
-	public void testCanStopTheSeleneseSessionWhenASessionIsInProgress() {
+	@Test public void canStopTheSeleneseSessionWhenASessionIsInProgress() {
 		final HttpCommandProcessor processor;
 
 		processor = new HttpCommandProcessor("a Server", 1234, "", "a url") {
@@ -41,7 +41,7 @@ public class HttpCommandProcessorUnitTest {
 		processor.stop();
 	}
 
-	public void testResourcesClosedWhenIoeOnGetConnection() {
+	@Test public void resourcesClosedWhenIoeOnGetConnection() {
 		IOEThrowingHttpCommandProcessor cmdProc = new IOEThrowingHttpCommandProcessor(
 				"localhost", 4444, "*chrome", "http://www.google.com");
 		cmdProc.throwIoeOnGetConnection = true;
@@ -53,7 +53,7 @@ public class HttpCommandProcessorUnitTest {
 		}
 	}
 
-	public void testResourcesClosedWhenIoeOnGetOutputStream() {
+	@Test public void resourcesClosedWhenIoeOnGetOutputStream() {
 		IOEThrowingHttpCommandProcessor cmdProc = new IOEThrowingHttpCommandProcessor(
 				"localhost", 4444, "*chrome", "http://www.google.com");
 		cmdProc.throwIoeOnGetOutputStream = true;
@@ -65,7 +65,7 @@ public class HttpCommandProcessorUnitTest {
 		}
 	}
 
-	public void testResourcesClosedWhenIoeOnGetInputStream() {
+	@Test public void resourcesClosedWhenIoeOnGetInputStream() {
 		IOEThrowingHttpCommandProcessor cmdProc = new IOEThrowingHttpCommandProcessor(
 				"localhost", 4444, "*chrome", "http://www.google.com");
 		cmdProc.throwIoeOnGetInputStream = true;
@@ -77,7 +77,7 @@ public class HttpCommandProcessorUnitTest {
 		}
 	}
 
-	public void testResourcesClosedWhenNoIoes() {
+	@Test public void resourcesClosedWhenNoIoes() {
 		IOEThrowingHttpCommandProcessor cmdProc = new IOEThrowingHttpCommandProcessor(
 				"localhost", 4444, "*chrome", "http://www.google.com");
 		try {
@@ -163,7 +163,7 @@ public class HttpCommandProcessorUnitTest {
 
 	}
 
-	public void testGetBooleanArray() throws Exception {
+	@Test public void getBooleanArray() throws Exception {
 		final HttpCommandProcessor processor;
 		final ConstructorArgs constArgs = new ConstructorArgs(
 				HttpCommandProcessor.class.getConstructor(String.class,	int.class, String.class, String.class),

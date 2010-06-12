@@ -1,5 +1,7 @@
 package org.openqa.selenium.server;
 
+import org.junit.Test;
+
 public class WindowsHTMLRunnerMultiWindowFunctionalTest extends HTMLRunnerTestBase {
     public WindowsHTMLRunnerMultiWindowFunctionalTest() {
         super.multiWindow = true;
@@ -10,23 +12,23 @@ public class WindowsHTMLRunnerMultiWindowFunctionalTest extends HTMLRunnerTestBa
         super.multiWindow = true;
     }
     
-    public void testFirefox() throws Exception{
+    @Test public void firefox() throws Exception{
         runHTMLSuite("*firefox", false);
     }
     
-    public void testIExplore() throws Exception {
+    @Test public void iExplore() throws Exception {
         runHTMLSuite("*iexplore", false);
     }
     
-    public void testChrome() throws Exception {
+    @Test public void chrome() throws Exception {
         runHTMLSuite("*chrome", false);
     }
     
-    public void testOpera() throws Exception {
+    @Test public void opera() throws Exception {
         runHTMLSuite("*opera", false);
     }
     
-    public void testHTA() throws Exception {
+    @Test public void hTA() throws Exception {
         try {
             runHTMLSuite("*iehta", false);
             fail("Didn't catch expected exception");

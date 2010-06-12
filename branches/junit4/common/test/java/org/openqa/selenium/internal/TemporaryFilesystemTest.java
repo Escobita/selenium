@@ -1,6 +1,5 @@
 package org.openqa.selenium.internal;
 
-
 import java.io.File;
 import java.io.IOException;
 

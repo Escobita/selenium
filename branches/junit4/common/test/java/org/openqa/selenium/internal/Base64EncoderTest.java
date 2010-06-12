@@ -12,10 +12,8 @@
  * Original code from <a href="http://xstream.codehaus.org/">XStream</a> 
  */
 //package com.thoughtworks.xstream.core.util;
+
 package org.openqa.selenium.internal;
-
-//import com.thoughtworks.acceptance.AbstractAcceptanceTest;
-
 
 import org.junit.Test;
 

@@ -4,10 +4,10 @@
  */
 package com.thoughtworks.selenium;
 
-
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,43 +39,43 @@ public class CSVTest {
         return output;
     }
     
-    public void testSimple() {
+    @Test public void simple() {
         String input = "1,2,3";
         String[] expected = new String[] {"1","2", "3"};
         parseCSV(input, expected);
     }
     
-    public void testBackSlash() {
+    @Test public void backSlash() {
         String input = "1,2\\,3,4"; // Java-escaped, but not CSV-escaped
         String[] expected = new String[] {"1","2,3", "4"}; // backslash should disappear in output
         parseCSV(input, expected);
     }
     
-    public void testRandomSingleBackSlash() {
+    @Test public void randomSingleBackSlash() {
         String input = "1,\\2,3"; // Java-escaped, but not CSV-escaped
         String[] expected = new String[] {"1","2", "3"}; // backslash should disappear
         parseCSV(input, expected);
     }
     
-    public void testDoubleBackSlashBeforeComma() {
+    @Test public void doubleBackSlashBeforeComma() {
         String input = "1,2\\\\,3"; // Java-escaped and CSV-escaped
         String[] expected = new String[] {"1","2\\", "3"}; // one backslash should disappear in output
         parseCSV(input, expected);
     }
     
-    public void testRandomDoubleBackSlash() {
+    @Test public void randomDoubleBackSlash() {
         String input = "1,\\\\2,3"; // Java-escaped, and CSV-escaped
         String[] expected = new String[] {"1","\\2", "3"}; // one backslash should disappear in output
         parseCSV(input, expected);
     }
     
-    public void testTripleBackSlashBeforeComma() {
+    @Test public void tripleBackSlashBeforeComma() {
         String input = "1,2\\\\\\,3,4"; // Java-escaped, and CSV-escaped
         String[] expected = new String[] {"1","2\\,3", "4"}; // one backslash should disappear in output
         parseCSV(input, expected);
     }
     
-    public void test4BackSlashesBeforeComma() {
+    @Test public void test4BackSlashesBeforeComma() {
         String input = "1,2\\\\\\\\,3"; // Java-escaped, and CSV-escaped
         String[] expected = new String[] {"1","2\\\\", "3"}; // two backslashes should disappear in output
         parseCSV(input, expected);

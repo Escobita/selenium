@@ -17,22 +17,20 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-
-
-import org.junit.Test; import static org.junit.Assert.*;
-
 import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
 
 public class StreamsTest {
 
-  @Test
-  public void testStreamExtraction() throws IOException {
+  @Test public void streamExtraction() throws IOException {
 //    InputStream stream = new ByteArrayInputStream("foo".getBytes());
 //    assertEquals("foo", new String(Streams.drainStream(stream)));
   }
   
-  @Test
-  public void testNullStreamIsQuiet() throws IOException {
+  @Test public void nullStreamIsQuiet() throws IOException {
     assertNull(Streams.drainStream(null));
   }
 }

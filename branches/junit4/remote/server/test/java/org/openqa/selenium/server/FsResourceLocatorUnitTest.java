@@ -1,9 +1,9 @@
 package org.openqa.selenium.server;
 
-
 import java.io.File;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.http.HttpContext;
 import org.openqa.jetty.util.Resource;
 
@@ -27,25 +27,25 @@ public class FsResourceLocatorUnitTest {
 		context = new HttpContext();
 	}
 
-	public void testShouldGetResourceFromRootDir() throws Exception {
+	@Test public void shouldGetResourceFromRootDir() throws Exception {
 		Resource resource = resourceLocator.getResource(context, tempFile.getName());
 		assertTrue(resource.exists());
 		assertNotNull(resource.getInputStream());
 		assertEquals(tempFile.getAbsolutePath(), resource.getFile().getAbsolutePath());
 	}
 
-	public void testShouldReturnMissingResourceIfResourceNotFound()
+	@Test public void shouldReturnMissingResourceIfResourceNotFound()
 			throws Exception {
 		assertFalse(resourceLocator.getResource(context, "not_exists").exists());
 	}
 
-	public void testShouldReturnFilePathFromToString() throws Exception {
+	@Test public void shouldReturnFilePathFromToString() throws Exception {
 		Resource resource = resourceLocator.getResource(context, tempFile.getName());
 		assertTrue("toString() must end with filename, because Jetty used this method to determine file type",
 				resource.toString().endsWith(tempFile.getName()));
 	}
 
-	public void testHackForJsUserExtensionsLocating() throws Exception {
+	@Test public void hackForJsUserExtensionsLocating() throws Exception {
 		File extension = new File("user-extensions.js").getAbsoluteFile();
 		extension.createNewFile();
 		extension.deleteOnExit();

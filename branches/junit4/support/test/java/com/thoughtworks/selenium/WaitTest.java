@@ -1,6 +1,7 @@
 package com.thoughtworks.selenium;
 
 import com.thoughtworks.selenium.Wait.WaitTimedOutException;
+import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -16,7 +17,7 @@ public class WaitTest {
         now = System.currentTimeMillis();
     }
     
-    public void testUntil() {
+    @Test public void until() {
         finished = now + 500l;
         new Wait() {
             public boolean until() {
@@ -28,7 +29,7 @@ public class WaitTest {
     }
     
     
-    public void testUntilWithWaitTakingString() {
+    @Test public void untilWithWaitTakingString() {
         finished = now + 500l;
         new Wait("a message to be shown if wait times out") {
             public boolean until() {
@@ -39,7 +40,7 @@ public class WaitTest {
         assertTrue("didn't try enough times: " + tries, tries > 1);
     }
     
-    public void testTimedOut() {
+    @Test public void timedOut() {
         finished = now + 5000l;
         try {
             new Wait() {

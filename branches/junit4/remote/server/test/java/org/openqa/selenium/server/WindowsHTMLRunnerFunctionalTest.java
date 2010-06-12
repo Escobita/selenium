@@ -1,24 +1,26 @@
 package org.openqa.selenium.server;
 
+import org.junit.Test;
+
 public class WindowsHTMLRunnerFunctionalTest extends HTMLRunnerTestBase {
 
-    public void testFirefox() throws Exception {
+    @Test public void firefox() throws Exception {
         runHTMLSuite("*firefox", false);
     }
 
-    public void testIExplore() throws Exception {
+    @Test public void iExplore() throws Exception {
         runHTMLSuite("*iexplore", false);
     }
 
-    public void testChrome() throws Exception {
+    @Test public void chrome() throws Exception {
         runHTMLSuite("*chrome", false);
     }
 
-    public void testOpera() throws Exception {
+    @Test public void opera() throws Exception {
         runHTMLSuite("*opera", false);
     }
 
-    public void testHTA() throws Exception {
+    @Test public void hTA() throws Exception {
         runHTMLSuite("*iehta", false);
     }
 

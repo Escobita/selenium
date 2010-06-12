@@ -1,10 +1,11 @@
 package org.openqa.selenium.server.log;
 
-
 import java.io.IOException;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class PerSessionLogHandlerUnitTest {
     private static final int CAPACITY = 1;
 
-    public void testThreadToSessionMappingOnInitialNullSession() throws IOException {
+    @Test public void threadToSessionMappingOnInitialNullSession() throws IOException {
         final PerSessionLogHandler handler;
         final Formatter formatter;
 
@@ -41,7 +42,7 @@ public class PerSessionLogHandlerUnitTest {
                 logs);
     }
 
-    public void testThreadToSessionMappingOnTwoInitialNullSessions() throws IOException {
+    @Test public void threadToSessionMappingOnTwoInitialNullSessions() throws IOException {
         final PerSessionLogHandler handler;
         final Formatter formatter;
 
@@ -83,7 +84,7 @@ public class PerSessionLogHandlerUnitTest {
                 logs);
     }
 
-    public void testThreadToSessionMappingAndClearMapping() throws IOException {
+    @Test public void threadToSessionMappingAndClearMapping() throws IOException {
         final PerSessionLogHandler handler;
         final Formatter formatter;
 

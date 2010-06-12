@@ -17,15 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class WebDriverBackSeleniumTest {
-  public void testShouldConvertScriptsProperly() {
+  @Test public void shouldConvertScriptsProperly() {
     String script = "return selenium.browserbot.getCurrentWindow().title;";
     final String expectedScript = "return eval(\"return window.title;\");";
 
@@ -46,7 +45,7 @@ public class WebDriverBackSeleniumTest {
     context.assertIsSatisfied();
   }
 
-  public void testShouldConvertScriptsThatReferenceWindowByPageFnProperly() {
+  @Test public void shouldConvertScriptsThatReferenceWindowByPageFnProperly() {
     String script = "return selenium.page().getCurrentWindow().title;";
     final String expectedScript = "return eval(\"return window.title;\");";
 
@@ -67,7 +66,7 @@ public class WebDriverBackSeleniumTest {
     context.assertIsSatisfied();
   }
 
-  public void testShouldConvertScriptsThatReferenceDocumentByBrowserbotProperly() {
+  @Test public void shouldConvertScriptsThatReferenceDocumentByBrowserbotProperly() {
     String script = "return selenium.browserbot.getDocument().body.innerHTML;";
     final String expectedScript = "return eval(\"return window.document.body.innerHTML;\");";
 
@@ -88,7 +87,7 @@ public class WebDriverBackSeleniumTest {
     context.assertIsSatisfied();
   }
 
-  public void testShouldConvertScriptsThatReferenceDocumentByPageFnProperly() {
+  @Test public void shouldConvertScriptsThatReferenceDocumentByPageFnProperly() {
     String script = "return selenium.page().getDocument().body.innerHTML;";
     final String expectedScript = "return eval(\"return window.document.body.innerHTML;\");";
 
@@ -109,7 +108,7 @@ public class WebDriverBackSeleniumTest {
     context.assertIsSatisfied();
   }
 
-  public void testShouldConvertScriptsWithMultipleBrowserbotAndPageReferences() {
+  @Test public void shouldConvertScriptsWithMultipleBrowserbotAndPageReferences() {
     String script = "return "
         + "selenium.browserbot.getCurrentWindow().title + "
         + "selenium.page().getCurrentWindow().title + "

@@ -1,16 +1,11 @@
 package org.openqa.selenium;
 
-import junit.extensions.TestSetup;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test; import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.openqa.selenium.internal.PortProber;
+import org.junit.After;
+import org.junit.Before;
 
 import static org.openqa.selenium.internal.PortProber.pollPort;
 

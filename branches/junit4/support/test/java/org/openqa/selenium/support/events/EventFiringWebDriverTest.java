@@ -19,6 +19,7 @@ package org.openqa.selenium.support.events;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -32,7 +33,7 @@ import org.openqa.selenium.WebElement;
  */
 public class EventFiringWebDriverTest extends MockObjectTestCase {
 
-    public void testNavigationEvents() {
+    @Test public void navigationEvents() {
         final WebDriver mockedDriver = mock(WebDriver.class);
         final Navigation mockedNavigation = mock(Navigation.class);
         final StringBuilder log = new StringBuilder();
@@ -72,7 +73,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
         );
     }
 
-    public void testClickEvent() {
+    @Test public void clickEvent() {
         final WebDriver mockedDriver = mock(WebDriver.class);
         final WebElement mockedElement = mock(WebElement.class);
         final StringBuilder log = new StringBuilder();
@@ -96,7 +97,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
         );
     }
 
-    public void testChangeValueEvent() {
+    @Test public void changeValueEvent() {
         final WebDriver mockedDriver = mock(WebDriver.class);
         final WebElement mockedElement = mock(WebElement.class);
         final StringBuilder log = new StringBuilder();
@@ -128,7 +129,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
         );
     }
 
-    public void testFindByEvent() {
+    @Test public void findByEvent() {
         final WebDriver mockedDriver = mock(WebDriver.class);
         final WebElement mockedElement = mock(WebElement.class);
         final StringBuilder log = new StringBuilder();
@@ -163,7 +164,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
         );
     }
 
-  public void testShouldCallListenersWhenAnExceptionIsThrown() {
+  @Test public void shouldCallListenersWhenAnExceptionIsThrown() {
     final WebDriver mockedDriver = mock(WebDriver.class);
     final StringBuilder log = new StringBuilder();
 
@@ -190,7 +191,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
     assertEquals(exception.getMessage(), log.toString());
   }
 
-  public void testShouldUnpackElementArgsWhenCallingScripts() {
+  @Test public void shouldUnpackElementArgsWhenCallingScripts() {
     final ExececutingDriver mockedDriver = mock(ExececutingDriver.class);
     final WebElement stubbedElement = mock(WebElement.class);
 
@@ -212,7 +213,7 @@ public class EventFiringWebDriverTest extends MockObjectTestCase {
     }
   }
 
-  public void testShouldBeAbleToWrapSubclassesOfSomethingImplementingTheWebDriverInterface() {
+  @Test public void shouldBeAbleToWrapSubclassesOfSomethingImplementingTheWebDriverInterface() {
     try {
       new EventFiringWebDriver(new ChildDriver());
       // We should get this far

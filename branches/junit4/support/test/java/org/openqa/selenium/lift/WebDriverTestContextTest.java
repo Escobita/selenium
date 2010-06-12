@@ -17,22 +17,23 @@ limitations under the License.
 
 package org.openqa.selenium.lift;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.hamcrest.Description;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.lift.find.Finder;
 import org.openqa.selenium.support.ui.Clock;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.lift.match.NumericalMatchers.atLeast;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Unit test for {@link WebDriverTestContext}.
@@ -48,11 +49,11 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 	Finder<WebElement, WebDriver> finder = mockFinder();
 	Clock clock = mock(Clock.class);
 	
-	public void testIsCreatedWithAWebDriverImplementation() throws Exception {
+	@Test public void isCreatedWithAWebDriverImplementation() throws Exception {
 		new WebDriverTestContext(webdriver);
 	}
 	
-	public void testCanNavigateToAGivenUrl() throws Exception {
+	@Test public void canNavigateToAGivenUrl() throws Exception {
 
 		final String url = "http://www.example.com";
 		
@@ -63,7 +64,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.goTo(url);
 	}
 	
-	public void testCanAssertPresenceOfWebElements() throws Exception {
+	@Test public void canAssertPresenceOfWebElements() throws Exception {
 		
 		checking(new Expectations() {{ 
 			one(finder).findFrom(webdriver); will(returnValue(oneElement()));
@@ -72,7 +73,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.assertPresenceOf(finder);
 	}
 	
-	public void testCanCheckQuantitiesOfWebElementsAndThrowsExceptionOnMismatch() throws Exception {
+	@Test public void canCheckQuantitiesOfWebElementsAndThrowsExceptionOnMismatch() throws Exception {
 		
 		checking(new Expectations() {{ 
 			allowing(finder).findFrom(webdriver); will(returnValue(oneElement()));
@@ -88,7 +89,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		}
 	}
 	
-	public void testCanDirectTextInputToSpecificElements() throws Exception {
+	@Test public void canDirectTextInputToSpecificElements() throws Exception {
 		 
 		final String inputText = "test";
 		
@@ -100,7 +101,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.type(inputText, finder);
 	}
 	
-	public void testCanTriggerClicksOnSpecificElements() throws Exception {
+	@Test public void canTriggerClicksOnSpecificElements() throws Exception {
 		 
 		checking(new Expectations() {{ 
 			one(finder).findFrom(webdriver); will(returnValue(oneElement()));
@@ -110,7 +111,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.clickOn(finder);
 	}
 	
-	public void testThrowsAnExceptionIfTheFinderReturnsAmbiguousResults() throws Exception {
+	@Test public void throwsAnExceptionIfTheFinderReturnsAmbiguousResults() throws Exception {
 		 
 		checking(new Expectations() {{ 
 			one(finder).findFrom(webdriver); will(returnValue(twoElements()));
@@ -125,7 +126,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		}
 	}
 	
-	public void testSupportsWaitingForElementToAppear() throws Exception {
+	@Test public void supportsWaitingForElementToAppear() throws Exception {
 		
 		context = new WebDriverTestContext(webdriver, clock);
 		
@@ -140,7 +141,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.waitFor(finder, timeout);
 	}
 	
-	public void testSupportsWaitingForElementToAppearWithTimeout() throws Exception {
+	@Test public void supportsWaitingForElementToAppearWithTimeout() throws Exception {
 		
 		context = new WebDriverTestContext(webdriver, clock);
 		
@@ -155,7 +156,7 @@ public class WebDriverTestContextTest extends MockObjectTestCase {
 		context.waitFor(finder, timeout);
 	}
 	
-	public void testFailsAssertionIfElementNotDisplayedBeforeTimeout() throws Exception {
+	@Test public void failsAssertionIfElementNotDisplayedBeforeTimeout() throws Exception {
 		
 		context = new WebDriverTestContext(webdriver, clock);
 		

@@ -1,11 +1,13 @@
 package com.thoughtworks.selenium;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
 public class DefaultSeleniumStartErrorHandlingTest {
-    public void testWrapsConnectionRefusedWithUserFriendlyExceptionMessage() {
+    @Test public void wrapsConnectionRefusedWithUserFriendlyExceptionMessage() {
         final FailOnStartCommandProcessor failOnStartCommandProcessor;
 
         failOnStartCommandProcessor = new FailOnStartCommandProcessor("Connection refused: connect");
@@ -19,7 +21,7 @@ public class DefaultSeleniumStartErrorHandlingTest {
         }
     }
 
-    public void testShouldLeaveOtherExceptionAlone() {
+    @Test public void shouldLeaveOtherExceptionAlone() {
         FailOnStartCommandProcessor failOnStartCommandProcessor;
         failOnStartCommandProcessor = new FailOnStartCommandProcessor("some crazy unexpected exception");
 

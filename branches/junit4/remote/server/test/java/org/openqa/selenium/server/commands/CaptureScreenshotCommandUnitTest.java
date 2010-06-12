@@ -1,11 +1,11 @@
 package org.openqa.selenium.server.commands;
 
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.easymock.classextension.ConstructorArgs;
+import org.junit.Test;
 
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.expectLastCall;
@@ -21,7 +21,7 @@ public class CaptureScreenshotCommandUnitTest {
 	private File file = new File(fileName);
 	private String tempDirName = System.getProperty("java.io.tmpdir"); 
 
-    public void testDumbJUnit() {
+    @Test public void dumbJUnit() {
         // this test is needed to make JUnit happy since the rest of the tests are disabled temporarily
     }
 

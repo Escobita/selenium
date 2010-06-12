@@ -1,5 +1,7 @@
 package org.openqa.selenium.server.browserlaunchers;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -11,21 +13,21 @@ import static org.junit.Assert.assertTrue;
  */
 public class BrowserStringParserUnitTest {
 
-    public void testBrowserStartCommandMatchWhenBrowserStringIsTheBrowserName() {
+    @Test public void browserStartCommandMatchWhenBrowserStringIsTheBrowserName() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "firefox");
         assertTrue(result.match());
         assertNull(result.customLauncher());
     }
-    public void testBrowserStartCommandMatchWhenBrowserStringIsStarTheBrowserName() {
+    @Test public void browserStartCommandMatchWhenBrowserStringIsStarTheBrowserName() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "*firefox");
         assertTrue(result.match());
     }
 
-    public void testBrowserStartCommandDoNotMatchWhenBrowsersAreWayDifferent() {
+    @Test public void browserStartCommandDoNotMatchWhenBrowsersAreWayDifferent() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "*safari");
@@ -33,7 +35,7 @@ public class BrowserStringParserUnitTest {
         assertNull(result.customLauncher());
     }
 
-    public void testBrowserStartCommandMatchWhenCustomLauncherIsProvided() {
+    @Test public void browserStartCommandMatchWhenCustomLauncherIsProvided() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "*firefox /a/custom/launcher");
@@ -41,7 +43,7 @@ public class BrowserStringParserUnitTest {
         assertEquals("/a/custom/launcher", result.customLauncher());
     }
 
-    public void testBrowserStartCommandDoNotMatchWhenBrowsersisASubstring() {
+    @Test public void browserStartCommandDoNotMatchWhenBrowsersisASubstring() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "*firefoxproxy");
@@ -49,7 +51,7 @@ public class BrowserStringParserUnitTest {
         assertNull(result.customLauncher());
     }
 
-    public void testBrowserStartCommandIsNullWhenThereIsNothingButSpaceAfterTheBrowserName() {
+    @Test public void browserStartCommandIsNullWhenThereIsNothingButSpaceAfterTheBrowserName() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("firefox", "firefox    ");
@@ -57,7 +59,7 @@ public class BrowserStringParserUnitTest {
         assertNull(result.customLauncher());
     }
 
-    public void testBrowserStartCommandMatchIgnoredTrailingSpacesWhenCustomLauncherIsProvided() {
+    @Test public void browserStartCommandMatchIgnoredTrailingSpacesWhenCustomLauncherIsProvided() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("iexplore", "*iexplore /a/custom/launcher   ");
@@ -65,7 +67,7 @@ public class BrowserStringParserUnitTest {
         assertEquals("/a/custom/launcher", result.customLauncher());
     }
 
-    public void testBrowserStartCommandMatchPreservedSpacesWhithinCustomLauncher() {
+    @Test public void browserStartCommandMatchPreservedSpacesWhithinCustomLauncher() {
         final BrowserStringParser.Result result;
 
         result = new BrowserStringParser().parseBrowserStartCommand("hta", "*hta '/a/custom/launcher with space'   ");

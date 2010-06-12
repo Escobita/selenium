@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,16 +26,16 @@ import static org.junit.Assert.assertTrue;
 
 public class PreferencesTest {
 
-  public void testStringifyVsStringFormat() {
+  @Test public void stringifyVsStringFormat() {
     assertEquals("\"stringifyMe\"", String.format("\"%s\"", "stringifyMe"));
   }
 
 
-  public void testStringFormatOfStringify() {
+  @Test public void stringFormatOfStringify() {
     assertEquals("\"\"stringifyMe\"\"", String.format("\"%s\"", "\"stringifyMe\""));
   }
 
-  public void testDetectStringification() {
+  @Test public void detectStringification() {
     Preferences a = new Preferences();
 
     assertFalse("Empty String", canSet(a, "\"\""));

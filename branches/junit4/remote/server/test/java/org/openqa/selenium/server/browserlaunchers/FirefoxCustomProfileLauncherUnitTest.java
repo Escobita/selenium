@@ -1,10 +1,10 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class FirefoxCustomProfileLauncherUnitTest {
-    public void testProfileRemovedWhenProcessNull() {
+    @Test public void profileRemovedWhenProcessNull() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.setCustomProfileDir(new File("testdir"));
       launcher.close();
@@ -20,7 +20,7 @@ public class FirefoxCustomProfileLauncherUnitTest {
       assertTrue(launcher.wasRemoveCustomProfileCalled());
     }
     
-    public void testProfileRemovedWhenProcessKillFails() {
+    @Test public void profileRemovedWhenProcessKillFails() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.haveProcessKillThrowException(false);
       launcher.setCustomProfileDir(new File("testdir"));
@@ -30,7 +30,7 @@ public class FirefoxCustomProfileLauncherUnitTest {
       assertTrue(launcher.wasRemoveCustomProfileCalled());
     }
     
-    public void testProfileRemovedWhenProcessNotNull() {
+    @Test public void profileRemovedWhenProcessNotNull() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.setCustomProfileDir(new File("testdir"));
       launcher.setProcess(new TestProcess());
@@ -39,14 +39,14 @@ public class FirefoxCustomProfileLauncherUnitTest {
       assertTrue(launcher.wasRemoveCustomProfileCalled());
     }
     
-    public void testNothingRemovedIfAlreadyNull() {
+    @Test public void nothingRemovedIfAlreadyNull() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.close();
       assertFalse(launcher.wasKillFirefoxProcessCalled());
       assertFalse(launcher.wasRemoveCustomProfileCalled());
     }
     
-    public void testSecondCloseIsNoOp() {
+    @Test public void secondCloseIsNoOp() {
       FirefoxCustomProfileLauncherStubbedForShutdown launcher = new FirefoxCustomProfileLauncherStubbedForShutdown();
       launcher.setCustomProfileDir(new File("testdir"));
       launcher.close();

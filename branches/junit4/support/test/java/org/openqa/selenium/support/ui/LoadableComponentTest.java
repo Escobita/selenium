@@ -17,13 +17,15 @@ limitations under the License.
 
 package org.openqa.selenium.support.ui;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
 public class LoadableComponentTest {
-  public void testShouldDoNothingIfComponentIsAlreadyLoaded() {
+  @Test public void shouldDoNothingIfComponentIsAlreadyLoaded() {
     try {
       new DetonatingComponent().get();
     } catch (RuntimeException e) {
@@ -31,7 +33,7 @@ public class LoadableComponentTest {
     }
   }
 
-  public void testShouldCauseTheLoadMethodToBeCalledIfTheComponentIsNotAlreadyLoaded() {
+  @Test public void shouldCauseTheLoadMethodToBeCalledIfTheComponentIsNotAlreadyLoaded() {
     LoadsOk ok = new LoadsOk(true);
 
     ok.get();
@@ -39,7 +41,7 @@ public class LoadableComponentTest {
     assertTrue(ok.wasLoadCalled());
   }
 
-  public void testShouldThrowAnErrorIfCallingLoadDoesNotCauseTheComponentToLoad() {
+  @Test public void shouldThrowAnErrorIfCallingLoadDoesNotCauseTheComponentToLoad() {
     LoadsOk ok = new LoadsOk(false);
 
     try {

@@ -1,6 +1,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-
+import org.junit.Test;
 import org.openqa.selenium.server.browserlaunchers.locators.BrowserLocator;
 
 import static org.junit.Assert.assertEquals;
@@ -14,11 +14,11 @@ public class BrowserLocationCacheUnitTest {
         assertEquals("*aBrowser", new BrowserInstallationCache().cacheKey("*aBrowser", null));
     }
 
-    public void testCacaheIsTheBrowserStringConcatenatedWithCustomPathWhenCustomPathIsProvided() {
+    @Test public void cacaheIsTheBrowserStringConcatenatedWithCustomPathWhenCustomPathIsProvided() {
         assertEquals("*aBrowseraCustomPath", new BrowserInstallationCache().cacheKey("*aBrowser", "aCustomPath"));
     }
 
-    public void testLocateBrowserInstallationUseLocatorWhenCacheIsEmpty() {
+    @Test public void locateBrowserInstallationUseLocatorWhenCacheIsEmpty() {
         final BrowserInstallation expectedInstallation;
         final BrowserLocator locator;
 
@@ -39,7 +39,7 @@ public class BrowserLocationCacheUnitTest {
                      new BrowserInstallationCache().locateBrowserInstallation("aBrowser", null, locator));
     }
 
-    public void testLocateBrowserInstallationUseCacheOnSecondAccess() {
+    @Test public void locateBrowserInstallationUseCacheOnSecondAccess() {
         final BrowserInstallation expectedInstallation;
         final BrowserInstallationCache cache;
         final BrowserLocator locator;
@@ -61,7 +61,7 @@ public class BrowserLocationCacheUnitTest {
         assertEquals(expectedInstallation, cache.locateBrowserInstallation("aBrowser", null, null));
     }
 
-    public void testLocateBrowserInstallationUseLocatorWhenCacheIsEmptyAndACustomPathIsProvided() {
+    @Test public void locateBrowserInstallationUseLocatorWhenCacheIsEmptyAndACustomPathIsProvided() {
         final BrowserInstallation expectedInstallation;
         final BrowserLocator locator;
 
@@ -85,7 +85,7 @@ public class BrowserLocationCacheUnitTest {
                      new BrowserInstallationCache().locateBrowserInstallation("aBrowser", "aCustomLauncher", locator));
     }
 
-    public void testLocateBrowserInstallationUseCacheOnSecondAccessWhenCustomLauncherIsProvided() {
+    @Test public void locateBrowserInstallationUseCacheOnSecondAccessWhenCustomLauncherIsProvided() {
         final BrowserInstallation expectedInstallation;
         final BrowserInstallationCache cache;
         final BrowserLocator locator;

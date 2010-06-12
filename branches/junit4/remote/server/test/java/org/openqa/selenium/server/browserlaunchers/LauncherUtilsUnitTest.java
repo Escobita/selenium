@@ -1,13 +1,12 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +18,7 @@ import static org.junit.Assert.fail;
 public class LauncherUtilsUnitTest {
     private static String COOKIE_SUFFIX = "txt";
 
-    public void testCopySingleFileWithOverwrite() throws IOException {
+    @Test public void copySingleFileWithOverwrite() throws IOException {
         File srcFile = createFileWithData("src-dir", "cert8.db", "src text"); 	    
         File destFile = createFileWithData("dest-dir", "cert8.db", "some text"); 	    
         LauncherUtils.copySingleFileWithOverwrite(srcFile, destFile, true);
@@ -50,7 +49,7 @@ public class LauncherUtilsUnitTest {
 	writer.close();
     }
 
-    public void testCopyDirectoryWithNonMatchingSuffix() throws IOException {
+    @Test public void copyDirectoryWithNonMatchingSuffix() throws IOException {
         File srcDir = makeSourceDirAndCookie();
         File destDir = getNonexistentDestDir();
         LauncherUtils.copyDirectory(srcDir, COOKIE_SUFFIX + "foo", destDir);
@@ -59,7 +58,7 @@ public class LauncherUtilsUnitTest {
         copyDirectoryCleanUp(srcDir, destDir);
     }
 
-    public void testCopyDirectoryWithMatchingSuffix() throws IOException {
+    @Test public void copyDirectoryWithMatchingSuffix() throws IOException {
         File srcDir = makeSourceDirAndCookie();
         File destDir = getNonexistentDestDir();
         LauncherUtils.copyDirectory(srcDir, COOKIE_SUFFIX, destDir);
@@ -94,7 +93,7 @@ public class LauncherUtilsUnitTest {
         assertFalse(destDir.exists());
     }
 
-    public void testProxyPacMaking() {
+    @Test public void proxyPacMaking() {
         doProxyPacTest(true, null, "448", "confProxy", true, 999, "function FindProxyForURL(url, host) {\n"
             + "  if (shExpMatch(url, '*/selenium-server/*')) { return 'PROXY localhost:999; PROXY confProxy:448'; }\n"
             + "  return 'PROXY confProxy:448';\n"

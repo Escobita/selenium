@@ -15,6 +15,7 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.server.browserlaunchers.MacProxyManager.MacNetworkSetupException;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +34,7 @@ public class MacProxyManagerUnitTest {
     }
     
     
-    public void testReadSettingsProxyEnabled() throws Exception {
+    @Test public void readSettingsProxyEnabled() throws Exception {
         MacProxyManager.MacNetworkSettings networkSettings = mmpm._getCurrentNetworkSettings();
         networkSettings.toString();
         assertEquals("wrong serviceName", "foo bar", networkSettings.serviceName);
@@ -46,7 +47,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "3\thost-one\thost-two\thost-three\t", networkSettings.bypassAsString());
     }
     
-    public void testReadSettingsProxyDisabled() throws Exception {
+    @Test public void readSettingsProxyDisabled() throws Exception {
         useProxyDisabledMMPM();
         MacProxyManager.MacNetworkSettings networkSettings = mmpm._getCurrentNetworkSettings();
         assertEquals("wrong serviceName", "foo bar", networkSettings.serviceName);
@@ -83,7 +84,7 @@ public class MacProxyManagerUnitTest {
         };
     }
     
-    public void testReadSettingsBlankDomain() throws Exception {
+    @Test public void readSettingsBlankDomain() throws Exception {
         useBlankDomainMMPM();
         MacProxyManager.MacNetworkSettings networkSettings = mmpm._getCurrentNetworkSettings();
         assertEquals("wrong bypass length", 1, networkSettings.bypass.length);
@@ -91,7 +92,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "1\t\t", networkSettings.bypassAsString());
     }
     
-    public void testReadSettingsNoCpWarningBlankDomain() throws Exception {
+    @Test public void readSettingsNoCpWarningBlankDomain() throws Exception {
         mmpm = new MockableMacProxyManager("", 4444) {
             @Override
             protected String runNetworkSetupGetProxyBypassDomains() {
@@ -104,13 +105,13 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "1\t\t", networkSettings.bypassAsString());
     }
     
-    public void testBackupBlankDomain() throws IOException {
+    @Test public void backupBlankDomain() throws IOException {
         useBlankDomainMMPM();
         mmpm.backupNetworkSettings();
         assertEquals("wrong bypass", "1\t\t", mmpm.mockPrefs.internalPrefs.get("bypass"));
     }
     
-    public void testRestoreBlankDomain() {
+    @Test public void restoreBlankDomain() {
         preparePrefsProxyDisabled();
         mmpm.mockPrefs.put("bypass", "1\t\t");
         mmpm.restoreNetworkSettings();
@@ -123,7 +124,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong backupready", "false", mmpm.mockPrefs.internalPrefs.get("backupready"));
     }
     
-    public void testReadSettingsNoCpWarningProxyDisabled() throws Exception {
+    @Test public void readSettingsNoCpWarningProxyDisabled() throws Exception {
         // networksetup usually generates an ignorable warning that the preferences.plist couldn't be backed up
         // what if that warning doesn't appear?
         mmpm = new MockableMacProxyManager("", 4444) {
@@ -147,7 +148,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "0\t", networkSettings.bypassAsString());
     }
     
-    public void testReadSettingsNoCpWarningProxyEnabled() throws Exception {
+    @Test public void readSettingsNoCpWarningProxyEnabled() throws Exception {
         // networksetup usually generates an ignorable warning that the preferences.plist couldn't be backed up
         // what if that warning doesn't appear?
         mmpm = new MockableMacProxyManager("", 4444) {
@@ -171,7 +172,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "3\thost-one\thost-two\thost-three\t", networkSettings.bypassAsString());
     }
     
-    public void testBackupProxyEnabled() throws IOException {
+    @Test public void backupProxyEnabled() throws IOException {
         mmpm.backupNetworkSettings();
         
         assertEquals("wrong backupready", "true", mmpm.mockPrefs.internalPrefs.get("backupready"));
@@ -184,7 +185,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "3\thost-one\thost-two\thost-three\t", mmpm.mockPrefs.internalPrefs.get("bypass"));
     }
     
-    public void testBackupProxyDisabled() throws IOException {
+    @Test public void backupProxyDisabled() throws IOException {
         useProxyDisabledMMPM();
         mmpm.backupNetworkSettings();
         
@@ -197,7 +198,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong bypass", "0\t", mmpm.mockPrefs.internalPrefs.get("bypass"));
     }
     
-    public void testChange() throws Exception {
+    @Test public void change() throws Exception {
         mmpm.changeNetworkSettings();
         List<String> setwebproxy = assertNetworkSetupCall("-setwebproxy");
         List<String> setproxybypassdomains = assertNetworkSetupCall("-setproxybypassdomains");
@@ -205,7 +206,7 @@ public class MacProxyManagerUnitTest {
         assertStringListEquals("setproxybypassdomains was wrong", Arrays.asList("-setproxybypassdomains", "foo bar", "Empty"), setproxybypassdomains);
     }
     
-    public void testRestoreProxyEnabled() {
+    @Test public void restoreProxyEnabled() {
         mmpm.mockPrefs.put("backupready", "true");
         mmpm.mockPrefs.put("serviceName", "foo bar");
         mmpm.mockPrefs.put("enabled", "true");
@@ -223,7 +224,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong backupready", "false", mmpm.mockPrefs.internalPrefs.get("backupready"));
     }
     
-    public void testRestoreProxyDisabled() {
+    @Test public void restoreProxyDisabled() {
         preparePrefsProxyDisabled();
         mmpm.restoreNetworkSettings();
         List<String> setwebproxy = assertNetworkSetupCall("-setwebproxy");
@@ -246,15 +247,15 @@ public class MacProxyManagerUnitTest {
         mmpm.mockPrefs.put("bypass", "0\t");
     }
     
-    public void testRestoreBackupNotReady() {
+    @Test public void restoreBackupNotReady() {
         mmpm.restoreNetworkSettings();
         assertTrue("Not supposed to call networksetup when the backup isn't ready: " + mmpm.networkSetupCalls, mmpm.networkSetupCalls.size() == 0);
         assertEquals("wrong backupready", null, mmpm.mockPrefs.internalPrefs.get("backupready"));
     }
     
-    public void testRestoreAfterBackupProxyDisabled() throws Exception {
-        testBackupProxyDisabled();
-        testChange();
+    @Test public void restoreAfterBackupProxyDisabled() throws Exception {
+        backupProxyDisabled();
+        change();
         mmpm.networkSetupCalls.clear();
         mmpm.restoreNetworkSettings();
         List<String> setwebproxy = assertNetworkSetupCall("-setwebproxy");
@@ -266,9 +267,9 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong backupready", "false", mmpm.mockPrefs.internalPrefs.get("backupready"));
     }
     
-    public void testRestoreAfterBackupProxyEnabled() throws Exception {
-        testBackupProxyEnabled();
-        testChange();
+    @Test public void restoreAfterBackupProxyEnabled() throws Exception {
+        backupProxyEnabled();
+        change();
         mmpm.networkSetupCalls.clear();
         mmpm.restoreNetworkSettings();
         List<String> setwebproxy = assertNetworkSetupCall("-setwebproxy");
@@ -280,7 +281,7 @@ public class MacProxyManagerUnitTest {
         assertEquals("wrong backupready", "false", mmpm.mockPrefs.internalPrefs.get("backupready"));
     }
     
-    public void testEvilScutilState() throws Exception {
+    @Test public void evilScutilState() throws Exception {
         mmpm = new MockableMacProxyManager("", 4444) {
             @Override
             protected String runScutil(String arg) {
@@ -312,7 +313,7 @@ public class MacProxyManagerUnitTest {
         return sw.toString();
     }
     
-    public void testEvilNetworkSetupMissingInterface() throws Exception {
+    @Test public void evilNetworkSetupMissingInterface() throws Exception {
         mmpm = new MockableMacProxyManager("", 4444) {
             @Override
             protected String runNetworkSetupListNetworkServiceOrder() {
@@ -327,7 +328,7 @@ public class MacProxyManagerUnitTest {
         }
     }
     
-    public void testEvilPrefsMissingKey() {
+    @Test public void evilPrefsMissingKey() {
         mmpm.mockPrefs.put("backupready", "true");
         try {
             mmpm.restoreNetworkSettings();
@@ -337,7 +338,7 @@ public class MacProxyManagerUnitTest {
         }
     }
     
-    public void testEvilPrefsBadEncodedDomains() {
+    @Test public void evilPrefsBadEncodedDomains() {
         verifyEvilPrefsBadEncodedDomains("foo");
         verifyEvilPrefsBadEncodedDomains("4");
         verifyEvilPrefsBadEncodedDomains("4\tfoo");
@@ -354,7 +355,7 @@ public class MacProxyManagerUnitTest {
         }
     }
     
-    public void testEvilNetworkSetupBadPort() throws Exception {
+    @Test public void evilNetworkSetupBadPort() throws Exception {
         mmpm = new MockableMacProxyManager("", 4444) {
             @Override
             protected String runNetworkSetupGetWebProxy() {
@@ -369,7 +370,7 @@ public class MacProxyManagerUnitTest {
         }
     }
     
-    public void testEvilNetworkSetupMissingKey() throws Exception {
+    @Test public void evilNetworkSetupMissingKey() throws Exception {
         mmpm = new MockableMacProxyManager("", 4444) {
             @Override
             protected String runNetworkSetupGetWebProxy() {
@@ -385,15 +386,15 @@ public class MacProxyManagerUnitTest {
         }
     }
     
-    public void testChooseSuitableNetworkSetupNoCandidates() throws Exception { 
+    @Test public void chooseSuitableNetworkSetupNoCandidates() throws Exception { 
         String result = mmpm._chooseSuitableNetworkSetup("", "", "foo", "bar");
         assertNull("Should not have picked a candidate", result);
     }
-    public void testChooseSuitableNetworkSetupOneCandidate() throws Exception {
+    @Test public void chooseSuitableNetworkSetupOneCandidate() throws Exception {
         String result = mmpm._chooseSuitableNetworkSetup("", "", "foo", "networksetup-bar");
         assertEquals("Should have picked the only candidate", "networksetup-bar", result);
     }
-    public void testChooseSuitableNetworkSetupEvilOsVersion() throws Exception {
+    @Test public void chooseSuitableNetworkSetupEvilOsVersion() throws Exception {
         String result = mmpm._chooseSuitableNetworkSetup("", "", "networksetup-foo", "networksetup-bar");
         assertNull("Should not have picked a candidate; OS version was blank", result);
         result = mmpm._chooseSuitableNetworkSetup("12.8", "", "networksetup-foo", "networksetup-bar");
@@ -401,11 +402,11 @@ public class MacProxyManagerUnitTest {
         result = mmpm._chooseSuitableNetworkSetup("10.8", "", "networksetup-foo", "networksetup-bar");
         assertNull("Should not have picked a candidate; OS version was 10.8 (unrecognized)", result);
     }
-    public void testChooseSuitableNetworkSetupPanther() throws Exception {
+    @Test public void chooseSuitableNetworkSetupPanther() throws Exception {
         String result = mmpm._chooseSuitableNetworkSetup("10.3", "", "networksetup-foo", "networksetup-panther");
         assertEquals("Wrong candidate", "networksetup-panther", result);
     }
-    public void testChooseSuitableNetworkSetupEvilPantherButNoneSuitable() throws Exception {
+    @Test public void chooseSuitableNetworkSetupEvilPantherButNoneSuitable() throws Exception {
         String result = mmpm._chooseSuitableNetworkSetup("10.3", "", "networksetup-foo", "networksetup-bar");
         assertNull("Should not have picked a candidate", result);
     }    

@@ -1,12 +1,14 @@
 package org.openqa.selenium.server;
 
+import org.junit.Test;
+
 
 public class LinuxHTMLRunnerFunctionalTest extends HTMLRunnerTestBase {
-    public void testFirefox() throws Exception{
+    @Test public void firefox() throws Exception{
         runHTMLSuite("*firefox", false);
     }
     
-    public void testChrome() throws Exception {
+    @Test public void chrome() throws Exception {
         runHTMLSuite("*chrome", false);
     }
     

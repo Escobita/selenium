@@ -1,7 +1,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
-
-
+import org.junit.Test;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -12,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class AbstractBrowserLauncherUnitTest {
 
-    public void testGetConfigurationReturnsConfigurationProvidedInConstructor() {
+    @Test public void getConfigurationReturnsConfigurationProvidedInConstructor() {
         final RemoteControlConfiguration theConfiguration;
         final BrowserConfigurationOptions browserOptions;
 

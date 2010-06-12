@@ -1,6 +1,5 @@
 package org.openqa.selenium;
 
-
 import org.junit.Test;
 import org.openqa.selenium.Proxy.ProxyType;
 

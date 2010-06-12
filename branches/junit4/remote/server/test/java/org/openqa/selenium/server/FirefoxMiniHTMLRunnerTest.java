@@ -1,5 +1,6 @@
 package org.openqa.selenium.server;
 
+import org.junit.Test;
 import org.openqa.selenium.Ignore;
 
 
@@ -15,7 +16,7 @@ public class FirefoxMiniHTMLRunnerTest extends HTMLRunnerTestBase {
         super.suiteName="TestSuite.html";
     }
     
-    public void testFirefoxMini() throws Exception{
+    @Test public void firefoxMini() throws Exception{
         runHTMLSuite("*firefox", false);
     }
     

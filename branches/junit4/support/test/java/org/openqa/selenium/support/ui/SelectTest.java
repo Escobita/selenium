@@ -17,18 +17,19 @@ limitations under the License.
 
 package org.openqa.selenium.support.ui;
 
-import org.jmock.Expectations;
-import org.jmock.integration.junit3.MockObjectTestCase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jmock.Expectations;
+import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+
 public class SelectTest extends MockObjectTestCase {
-  public void testShouldThrowAnExceptionIfTheElementIsNotASelectElement() {
+  @Test public void shouldThrowAnExceptionIfTheElementIsNotASelectElement() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -43,7 +44,7 @@ public class SelectTest extends MockObjectTestCase {
     }
   }
 
-  public void testShouldIndicateThatASelectCanSupportMultipleOptions() {
+  @Test public void shouldIndicateThatASelectCanSupportMultipleOptions() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -55,7 +56,7 @@ public class SelectTest extends MockObjectTestCase {
     assertTrue(select.isMultiple());
   }
 
-  public void testShouldNotIndicateThatANormalSelectSupportsMulitpleOptions() {
+  @Test public void shouldNotIndicateThatANormalSelectSupportsMulitpleOptions() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -67,7 +68,7 @@ public class SelectTest extends MockObjectTestCase {
     assertFalse(select.isMultiple());
   }
 
-  public void testShouldReturnAllOptionsWhenAsked() {
+  @Test public void shouldReturnAllOptionsWhenAsked() {
     final WebElement element = mock(WebElement.class);
     final List<WebElement> options = Collections.emptyList();
 
@@ -83,7 +84,7 @@ public class SelectTest extends MockObjectTestCase {
     assertSame(options, returnedOptions);
   }
 
-  public void testShouldReturnOptionsWhichAreSelected() {
+  @Test public void shouldReturnOptionsWhichAreSelected() {
     final WebElement element = mock(WebElement.class);
     final WebElement optionGood = mock(WebElement.class, "good");
     final WebElement optionBad = mock(WebElement.class, "bad");
@@ -104,7 +105,7 @@ public class SelectTest extends MockObjectTestCase {
     assertSame(optionGood, returnedOptions.get(0));
   }
 
-  public void testShouldReturnFirstSelectedOptions() {
+  @Test public void shouldReturnFirstSelectedOptions() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "second");
@@ -124,7 +125,7 @@ public class SelectTest extends MockObjectTestCase {
     assertSame(firstOption, firstSelected);
   }
 
-  public void testShouldThrowANoSuchElementExceptionIfNothingIsSelected() {
+  @Test public void shouldThrowANoSuchElementExceptionIfNothingIsSelected() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final List<WebElement> options = Arrays.asList(firstOption);
@@ -146,7 +147,7 @@ public class SelectTest extends MockObjectTestCase {
     }
   }
 
-  public void testShouldAllowOptionsToBeSelectedByVisibleText() {
+  @Test public void shouldAllowOptionsToBeSelectedByVisibleText() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final List<WebElement> options = Arrays.asList(firstOption);
@@ -162,7 +163,7 @@ public class SelectTest extends MockObjectTestCase {
     select.selectByVisibleText("fish");
   }
 
-  public void testShouldAllowOptionsToBeSelectedByIndex() {
+  @Test public void shouldAllowOptionsToBeSelectedByIndex() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "second");
@@ -182,7 +183,7 @@ public class SelectTest extends MockObjectTestCase {
     select.selectByIndex(1);
   }
 
-  public void testShouldAllowOptionsToBeSelectedByReturnedValue() {
+  @Test public void shouldAllowOptionsToBeSelectedByReturnedValue() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final List<WebElement> options = Arrays.asList(firstOption);
@@ -198,7 +199,7 @@ public class SelectTest extends MockObjectTestCase {
     select.selectByValue("b");
   }
 
-  public void testShouldAllowUserToDeselectAllWhenSelectSupportsMultipleSelections() {
+  @Test public void shouldAllowUserToDeselectAllWhenSelectSupportsMultipleSelections() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "second");
@@ -219,7 +220,7 @@ public class SelectTest extends MockObjectTestCase {
     select.deselectAll();
   }
 
-  public void testShouldNotAllowUserToDeselectAllWhenSelectDoesNotSupportMultipleSelections() {
+  @Test public void shouldNotAllowUserToDeselectAllWhenSelectDoesNotSupportMultipleSelections() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -236,7 +237,7 @@ public class SelectTest extends MockObjectTestCase {
     }
   }
 
-  public void testShouldAllowUserToDeselectOptionsByVisibleText() {
+  @Test public void shouldAllowUserToDeselectOptionsByVisibleText() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "second");
@@ -256,7 +257,7 @@ public class SelectTest extends MockObjectTestCase {
     select.deselectByVisibleText("b");
   }
 
-  public void testShouldAllowOptionsToBeDeselectedByIndex() {
+  @Test public void shouldAllowOptionsToBeDeselectedByIndex() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "second");
@@ -277,7 +278,7 @@ public class SelectTest extends MockObjectTestCase {
     select.deselectByIndex(2);
   }
 
-  public void testShouldAllowOptionsToBeDeselectedByReturnedValue() {
+  @Test public void shouldAllowOptionsToBeDeselectedByReturnedValue() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final WebElement secondOption = mock(WebElement.class, "third");
@@ -297,7 +298,7 @@ public class SelectTest extends MockObjectTestCase {
     select.deselectByValue("b");
   }
 
-  public void testShouldConvertAnUnquotedStringIntoOneWithQuotes() {
+  @Test public void shouldConvertAnUnquotedStringIntoOneWithQuotes() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -311,7 +312,7 @@ public class SelectTest extends MockObjectTestCase {
     assertEquals("\"foo\"", result);
   }
 
-  public void testShouldConvertAStringWithATickIntoOneWithQuotes() {
+  @Test public void shouldConvertAStringWithATickIntoOneWithQuotes() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -325,7 +326,7 @@ public class SelectTest extends MockObjectTestCase {
     assertEquals("\"f'oo\"", result);
   }
 
-  public void testShouldConvertAStringWithAQuotIntoOneWithTicks() {
+  @Test public void shouldConvertAStringWithAQuotIntoOneWithTicks() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -339,7 +340,7 @@ public class SelectTest extends MockObjectTestCase {
     assertEquals("'f\"oo'", result);
   }
   
-  public void testShouldProvideConcatenatedStringsWhenStringToEscapeContainsTicksAndQuotes() {
+  @Test public void shouldProvideConcatenatedStringsWhenStringToEscapeContainsTicksAndQuotes() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -357,7 +358,7 @@ public class SelectTest extends MockObjectTestCase {
    * Tests that escapeQuotes returns concatenated strings when the given
    * string contains a tick and and ends with a quote.
    */
-  public void testShouldProvideConcatenatedStringsWhenStringEndsWithQuote() {
+  @Test public void shouldProvideConcatenatedStringsWhenStringEndsWithQuote() {
     final WebElement element = mock(WebElement.class);
 
     checking(new Expectations() {{
@@ -371,7 +372,7 @@ public class SelectTest extends MockObjectTestCase {
     assertEquals("concat(\"'\", '\"')", result);
   }
 
-  public void testShouldFallBackToSlowLooksUpsWhenGetByVisibleTextFailsAndThereIsASpace() {
+  @Test public void shouldFallBackToSlowLooksUpsWhenGetByVisibleTextFailsAndThereIsASpace() {
     final WebElement element = mock(WebElement.class);
     final WebElement firstOption = mock(WebElement.class, "first");
     final By xpath1 = By.xpath(".//option[. = \"foo bar\"]");

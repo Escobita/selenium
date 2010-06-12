@@ -1,13 +1,11 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import org.testng.annotations.Test;
 
 public class GoogleTest extends SeleneseTestNgHelper {
 
-    @Test
-    public void testGoogle() throws Throwable {
+    @Test public void google() throws Throwable {
         selenium.open("http://www.google.com/webhp?hl=en");
 
         assertEquals(selenium.getTitle(), "Google");

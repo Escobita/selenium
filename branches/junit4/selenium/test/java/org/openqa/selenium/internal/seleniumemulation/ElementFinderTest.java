@@ -17,12 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium.internal.seleniumemulation;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
 public class ElementFinderTest {
-  public void testShouldBeAbleToConvertLocatorsToStrategies() {
+  @Test public void shouldBeAbleToConvertLocatorsToStrategies() {
     ElementFinder finder = new ElementFinder();
 
     String locator = "id=button1";

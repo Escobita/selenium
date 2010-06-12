@@ -17,19 +17,19 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertTrue;
-
-
-import org.junit.Before;
-import org.openqa.selenium.Proxy;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.Proxy;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertTrue;
 
 public class FirefoxProfileTest {
 
@@ -40,7 +40,7 @@ public class FirefoxProfileTest {
     profile = new FirefoxProfile();
   }
 
-  public void testShouldQuoteStringsWhenSettingStringProperties() throws Exception {
+  @Test public void shouldQuoteStringsWhenSettingStringProperties() throws Exception {
     profile.setPreference("cheese", "brie");
 
     List<String> props = readGeneratedProperties(profile);
@@ -54,7 +54,7 @@ public class FirefoxProfileTest {
     assertTrue(seenCheese);
   }
 
-  public void testShouldSetIntegerPreferences() throws Exception {
+  @Test public void shouldSetIntegerPreferences() throws Exception {
     profile.setPreference("cheese", 1234);
 
     List<String> props = readGeneratedProperties(profile);
@@ -68,7 +68,7 @@ public class FirefoxProfileTest {
     assertTrue("Did not see integer value being set correctly", seenCheese);
   }
 
-  public void testManualProxy() throws Exception {
+  @Test public void manualProxy() throws Exception {
     profile.setProxyPreferences(
         new Proxy()
         .setHttpProxy("foo:123")
@@ -87,7 +87,7 @@ public class FirefoxProfileTest {
     assertThat(prefs, containsString("network.proxy.type\", 1"));
   }
   
-  public void testProxyAutoconfigUrl() throws Exception {
+  @Test public void proxyAutoconfigUrl() throws Exception {
     profile.setProxyPreferences(
         new Proxy()
         .setProxyAutoconfigUrl("http://foo/bar.pac"));
@@ -97,7 +97,7 @@ public class FirefoxProfileTest {
     assertThat(prefs, containsString("network.proxy.type\", 2"));
   }
   
-  public void testProxyAutodetect() throws Exception {
+  @Test public void proxyAutodetect() throws Exception {
     profile.setProxyPreferences(
         new Proxy()
         .setAutodetect(true));
@@ -106,7 +106,7 @@ public class FirefoxProfileTest {
     assertThat(prefs, containsString("network.proxy.type\", 4"));
   }
   
-  public void testShouldSetBooleanPreferences() throws Exception {
+  @Test public void shouldSetBooleanPreferences() throws Exception {
     profile.setPreference("cheese", false);
 
     List<String> props = readGeneratedProperties(profile);

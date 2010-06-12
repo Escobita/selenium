@@ -17,7 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

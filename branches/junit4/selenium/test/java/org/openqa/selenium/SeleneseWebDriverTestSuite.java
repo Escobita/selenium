@@ -17,8 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import org.junit.Test; import static org.junit.Assert.*;
-
+import org.junit.Test;
 
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.internal.PortProber.findFreePort;

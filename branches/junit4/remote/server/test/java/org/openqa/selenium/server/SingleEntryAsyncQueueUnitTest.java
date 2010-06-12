@@ -1,12 +1,12 @@
 package org.openqa.selenium.server;
 
-
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.server.log.LoggingManager;
 import org.openqa.selenium.server.log.StdOutHandler;
@@ -48,18 +48,18 @@ public class SingleEntryAsyncQueueUnitTest {
         LoggingManager.configureLogging(new RemoteControlConfiguration(), false);
     }
 
-    public void testPeekReturnsNullWhenEmpty() {
+    @Test public void peekReturnsNullWhenEmpty() {
         assertNull(queue.peek());
     }
 
-    public void testPollReturnsNullAfterTimeout() {
+    @Test public void pollReturnsNullAfterTimeout() {
         final String nextRes;
 
         nextRes = queue.pollToGetContentUntilTimeout();
         assertNull(nextRes);
     }
 
-    public void testPollDoesNotReturnBeforeTheTimeoutWhenTimingOut() {
+    @Test public void pollDoesNotReturnBeforeTheTimeoutWhenTimingOut() {
         final long duration;
         final long after;
         final long now;
@@ -71,7 +71,7 @@ public class SingleEntryAsyncQueueUnitTest {
         assertTrue("Returned too fast : " + duration + " ms", duration >= timeout * MILLISECONDS);
     }
 
-    public void testPollReturnAtLeastWithinTwiceTheTimeoutValueWhenTimingOut() {
+    @Test public void pollReturnAtLeastWithinTwiceTheTimeoutValueWhenTimingOut() {
         final long duration;
         final long after;
         final long now;
@@ -84,38 +84,38 @@ public class SingleEntryAsyncQueueUnitTest {
                 duration / MILLISECONDS <= 2 * timeout);
     }
 
-    public void testQueueIsEmptyWhenCreated() {
+    @Test public void queueIsEmptyWhenCreated() {
         assertTrue(queue.isEmpty());
     }
 
-    public void testQueueNotEmptyWhenContentIsPut() {
+    @Test public void queueNotEmptyWhenContentIsPut() {
         assertTrue(queue.putContent(testCommand));
         assertFalse(queue.isEmpty());
     }
 
-    public void testPutContentReturnsFalseWhenPuttingTwice() {
+    @Test public void putContentReturnsFalseWhenPuttingTwice() {
         queue.putContent(testCommand);
         assertFalse(queue.putContent(completeCommand));
     }
 
-    public void testPutContentReturnsPreviousCommandWhenPuttingTwice() {
+    @Test public void putContentReturnsPreviousCommandWhenPuttingTwice() {
         queue.putContent(testCommand);
         queue.putContent(completeCommand);
         assertEquals(testCommand, queue.peek());
     }
 
-    public void testPollingContentReturnsCommandPreviouslyPut() throws Throwable {
+    @Test public void pollingContentReturnsCommandPreviouslyPut() throws Throwable {
         queue.putContent(testCommand);
         assertEquals(testCommand, queue.pollToGetContentUntilTimeout());
     }
 
-    public void testCommandGotPickedUpAndQueueIsEmptyWhenPollingContentReturns() throws Throwable {
+    @Test public void commandGotPickedUpAndQueueIsEmptyWhenPollingContentReturns() throws Throwable {
         queue.putContent(testCommand);
         queue.pollToGetContentUntilTimeout();
         assertTrue(queue.isEmpty());
     }
 
-    public void testCanPollTwice() throws Throwable {
+    @Test public void canPollTwice() throws Throwable {
         queue.putContent(testCommand);
         assertEquals(testCommand, queue.pollToGetContentUntilTimeout());
         assertTrue(queue.isEmpty());
@@ -125,13 +125,13 @@ public class SingleEntryAsyncQueueUnitTest {
         assertTrue(queue.isEmpty());
     }
 
-    public void testCanPollContentThatWhatPutByADifferentThread() throws Throwable {
+    @Test public void canPollContentThatWhatPutByADifferentThread() throws Throwable {
         new Thread(new AsyncCommandSender(testCommand), "launching sender").start();
         assertEquals(testCommand, queue.pollToGetContentUntilTimeout());
         assertNull(queue.peek());
     }
 
-    public void testCanGetResultPostedByTheMainThreadFromAnotherThread() throws Throwable {
+    @Test public void canGetResultPostedByTheMainThreadFromAnotherThread() throws Throwable {
         final TrackableThread getter;
 
         /*
@@ -144,7 +144,7 @@ public class SingleEntryAsyncQueueUnitTest {
         assertNull(queue.peek());
     }
 
-    public void testCanPutAndGetResultsFromDifferentThreads() throws Throwable {
+    @Test public void canPutAndGetResultsFromDifferentThreads() throws Throwable {
         final TrackableThread firstGetter;
         final TrackableThread secondGetter;
 
@@ -159,7 +159,7 @@ public class SingleEntryAsyncQueueUnitTest {
         assertEquals(completeCommand, secondGetter.getResult());
     }
 
-    public void testPollReturnsPoisonOncePoisonedAndPoisonPollersIsCalled() throws Throwable {
+    @Test public void pollReturnsPoisonOncePoisonedAndPoisonPollersIsCalled() throws Throwable {
         queue.setPoison(poisonString);        
         TrackableThread getter = new TrackableThread(new AsyncCommandGetter(), "launching getter");
         getter.start();
@@ -167,7 +167,7 @@ public class SingleEntryAsyncQueueUnitTest {
         assertEquals(poisonString, getter.getResult());
     }
 
-    public void testPoisonPollersClearContentWhenThereIsNoPoison() throws Throwable {
+    @Test public void poisonPollersClearContentWhenThereIsNoPoison() throws Throwable {
         queue.putContent("some command");
         assertFalse(queue.poisonPollers());
         assertTrue(queue.isEmpty());

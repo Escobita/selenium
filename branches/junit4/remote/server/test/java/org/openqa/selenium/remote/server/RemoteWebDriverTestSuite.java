@@ -17,8 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-import junit.extensions.TestSetup;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Map;

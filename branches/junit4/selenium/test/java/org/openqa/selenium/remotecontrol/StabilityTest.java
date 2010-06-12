@@ -1,7 +1,7 @@
 package org.openqa.selenium.remotecontrol;
 
 import com.thoughtworks.selenium.DefaultSelenium;
-import org.junit.Test; import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Regression test suite for stability problems discovered in Selenium Remote Control

@@ -17,11 +17,10 @@
 
 package org.openqa.selenium;
 
-import org.testng.annotations.Test;
-
 import com.thoughtworks.selenium.SeleneseTestNgHelper;
 import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.SeleniumLogLevels;
+import org.testng.annotations.Test;
 
 /**
  * @author Paul Hammant
@@ -29,8 +28,7 @@ import com.thoughtworks.selenium.SeleniumLogLevels;
  */
 public class RealDealIntegrationTest extends SeleneseTestNgHelper {
 
-    @Test
-    public void testWithJavaScript() {
+    @Test public void withJavaScript() {
         selenium.setContext("A real test, using the real Selenium on the browser side served by Jetty, driven from Java");
         selenium.setBrowserLogLevel(SeleniumLogLevels.DEBUG);
         selenium.open("/selenium-server/tests/html/test_click_page1.html");
@@ -47,13 +45,11 @@ public class RealDealIntegrationTest extends SeleneseTestNgHelper {
         assertTrue(selenium.getLocation().endsWith("/selenium-server/tests/html/test_click_page1.html"));
     }
     
-    @Test
-    public void testAgain() {
-        testWithJavaScript();
+    @Test public void again() {
+        withJavaScript();
     }
     
-    @Test
-    public void testFailure() {
+    @Test public void failure() {
         selenium.setContext("A real negative test, using the real Selenium on the browser side served by Jetty, driven from Java");
         selenium.open("/selenium-server/tests/html/test_click_page1.html");
         String badElementName = "This element doesn't exist, so Selenium should throw an exception";

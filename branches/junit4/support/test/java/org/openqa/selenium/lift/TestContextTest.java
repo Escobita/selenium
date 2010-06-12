@@ -17,20 +17,22 @@ limitations under the License.
 
 package org.openqa.selenium.lift;
 
-import org.hamcrest.Description;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import org.jmock.Expectations;
-import org.jmock.integration.junit3.MockObjectTestCase;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.lift.find.Finder;
-import static org.openqa.selenium.lift.match.NumericalMatchers.atLeast;
-import static org.openqa.selenium.lift.Finders.first;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.hamcrest.Description;
+import org.jmock.Expectations;
+import org.jmock.integration.junit3.MockObjectTestCase;
+import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.lift.find.Finder;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.openqa.selenium.lift.Finders.first;
+import static org.openqa.selenium.lift.match.NumericalMatchers.atLeast;
 
 /**
  * Unit test for {@link WebDriverTestContext}.
@@ -44,11 +46,11 @@ public class TestContextTest extends MockObjectTestCase {
 	TestContext context = new WebDriverTestContext(webdriver);
 	private WebElement element = mock(WebElement.class);
 	
-	public void testIsCreatedWithAWebDriverImplementation() throws Exception {
+	@Test public void isCreatedWithAWebDriverImplementation() throws Exception {
 		new WebDriverTestContext(webdriver);
 	}
 	
-	public void testCanNavigateToAGivenUrl() throws Exception {
+	@Test public void canNavigateToAGivenUrl() throws Exception {
 
 		final String url = "http://www.example.com";
 		
@@ -60,7 +62,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testCanAssertPresenceOfWebElements() throws Exception {
+	@Test public void canAssertPresenceOfWebElements() throws Exception {
 		
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 		
@@ -72,7 +74,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testCanCheckQuantitiesOfWebElementsAndThrowsExceptionOnMismatch() throws Exception {
+	@Test public void canCheckQuantitiesOfWebElementsAndThrowsExceptionOnMismatch() throws Exception {
 		
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 		
@@ -91,7 +93,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testCanDirectTextInputToSpecificElements() throws Exception {
+	@Test public void canDirectTextInputToSpecificElements() throws Exception {
 		 
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 		final String inputText = "test";
@@ -105,7 +107,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testCanTriggerClicksOnSpecificElements() throws Exception {
+	@Test public void canTriggerClicksOnSpecificElements() throws Exception {
 		 
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 		
@@ -118,7 +120,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testCanTriggerClicksOnFirstElement() throws Exception {
+	@Test public void canTriggerClicksOnFirstElement() throws Exception {
 
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 
@@ -131,7 +133,7 @@ public class TestContextTest extends MockObjectTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void testThrowsAnExceptionIfTheFinderReturnsAmbiguousResults() throws Exception {
+	@Test public void throwsAnExceptionIfTheFinderReturnsAmbiguousResults() throws Exception {
 		 
 		final Finder<WebElement, WebDriver> finder = mock(Finder.class);
 		

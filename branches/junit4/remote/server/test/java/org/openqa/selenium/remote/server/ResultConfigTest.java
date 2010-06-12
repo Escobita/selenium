@@ -17,7 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
-
+import org.junit.Test;
 import org.openqa.selenium.remote.server.rest.Handler;
 import org.openqa.selenium.remote.server.rest.ResultConfig;
 import org.openqa.selenium.remote.server.rest.ResultType;
@@ -31,14 +31,14 @@ import static org.junit.Assert.fail;
 public class ResultConfigTest {
   private LogTo logger = new NullLogTo();
 
-  public void testShouldMatchBasicUrls() throws Exception {
+  @Test public void shouldMatchBasicUrls() throws Exception {
     ResultConfig config = new ResultConfig("/fish", StubHandler.class, null, logger);
 
     assertThat(config.getHandler("/fish"), is(notNullValue()));
     assertThat(config.getHandler("/cod"), is(nullValue()));
   }
 
-  public void testShouldNotAllowNullToBeUsedAsTheUrl() {
+  @Test public void shouldNotAllowNullToBeUsedAsTheUrl() {
     try {
       new ResultConfig(null, StubHandler.class, null, logger);
       fail("Should have failed");
@@ -47,7 +47,7 @@ public class ResultConfigTest {
     }
   }
 
-  public void testShouldNotAllowNullToBeUsedForTheHandler() {
+  @Test public void shouldNotAllowNullToBeUsedForTheHandler() {
     try {
       new ResultConfig("/cheese", null, null, logger);
       fail("Should have failed");
@@ -56,14 +56,14 @@ public class ResultConfigTest {
     }
   }
 
-  public void testShouldMatchNamedParameters() throws Exception {
+  @Test public void shouldMatchNamedParameters() throws Exception {
     ResultConfig config = new ResultConfig("/foo/:bar", NamedParameterHandler.class, null, logger);
     Handler handler = config.getHandler("/foo/fishy");
 
     assertThat(handler, is(notNullValue()));
   }
 
-  public void testShouldSetNamedParametersOnHandler() throws Exception {
+  @Test public void shouldSetNamedParametersOnHandler() throws Exception {
     ResultConfig config = new ResultConfig("/foo/:bar", NamedParameterHandler.class, null, logger);
     NamedParameterHandler handler = (NamedParameterHandler) config.getHandler("/foo/fishy");
 

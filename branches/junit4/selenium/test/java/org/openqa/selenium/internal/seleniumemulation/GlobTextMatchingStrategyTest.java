@@ -18,46 +18,44 @@ limitations under the License.
 
 package org.openqa.selenium.internal.seleniumemulation;
 
-
-
-import org.openqa.selenium.internal.seleniumemulation.GlobTextMatchingStrategy;
+import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 
 public class GlobTextMatchingStrategyTest {
-	public void testShouldMatchAgainstASimplePattern() {
+	@Test public void shouldMatchAgainstASimplePattern() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("This is a test", "This is a test");
 		
 		assertTrue(result);
 	}
 	
-	public void testShouldMatchAgainstAMultilinePattern() {
+	@Test public void shouldMatchAgainstAMultilinePattern() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("This is a test", "\n\nThis is a test.\n\n");
 		assertTrue(result);
 	}
 	
-	public void testShouldMatchAgainstAPatternContainingAFullStop() {
+	@Test public void shouldMatchAgainstAPatternContainingAFullStop() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("This is a test of the open command.", "This is a test of the open command.");
 		assertTrue(result);
 	}
 	
-	public void testShouldMatchUsingAStringThatIsASubstringOfTheFullText() {
+	@Test public void shouldMatchUsingAStringThatIsASubstringOfTheFullText() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("test", "This is a test of the open command.");
 		assertTrue(result);
 	}
 	
-	public void testShouldMatchAStarAgainstManyCharacters() {
+	@Test public void shouldMatchAStarAgainstManyCharacters() {
 		GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 		boolean result = glob.isAMatch("This * test", "\t\r\nThis is a test of the open command.");
 		assertTrue(result);
 	}
 
-  public void testShouldMatchEvenWhenTextIsAtTheStartOfAString() {
+  @Test public void shouldMatchEvenWhenTextIsAtTheStartOfAString() {
     GlobTextMatchingStrategy glob = new GlobTextMatchingStrategy();
 
     // The second text contains the nbsp character.

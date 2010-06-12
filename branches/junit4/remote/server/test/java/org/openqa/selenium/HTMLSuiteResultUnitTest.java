@@ -4,13 +4,14 @@
  */
 package org.openqa.selenium;
 
+import org.junit.Test;
 import org.openqa.selenium.server.htmlrunner.HTMLSuiteResult;
 
 import static org.junit.Assert.assertEquals;
 
 public class HTMLSuiteResultUnitTest {
 
-    public void testBasic() {
+    @Test public void basic() {
         String input = "\r\n" + 
         "\r\n" + 
         "<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\r\n" + 

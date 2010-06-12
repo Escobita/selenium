@@ -17,9 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.support;
 
-import org.junit.Test; import static org.junit.Assert.*;
-
-
+import org.junit.Test;
 import org.openqa.selenium.TestSuiteBuilder;
 
 public class SupportTestSuite {

@@ -32,15 +32,13 @@ public class SeleniumDriverResourceHandlerUnitTest {
   private static String defaultSpeedString = "OK," + defaultSpeed;
   private static String newSpeedString = "OK," + newSpeed;
   
-  @Test
-  public void testGetDefaultSpeedNullSession() {
+  @Test public void getDefaultSpeedNullSession() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     String speed = SeleniumDriverResourceHandler.getSpeedForSession(null);
     assertEquals(defaultSpeedString, speed);
   }
   
-  @Test
-  public void testGetPresetSpeedNullSession() {
+  @Test public void getPresetSpeedNullSession() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     CommandQueue.setSpeed(newSpeed);
     String speed = SeleniumDriverResourceHandler.getSpeedForSession(null);
@@ -48,8 +46,7 @@ public class SeleniumDriverResourceHandlerUnitTest {
     CommandQueue.setSpeed(defaultSpeed);
   }
   
-  @Test
-  public void testGetPresetSpeedValidSession() {
+  @Test public void getPresetSpeedValidSession() {
     assertEquals(defaultSpeed, CommandQueue.getSpeed());
     FrameGroupCommandQueueSet session1 = 
       FrameGroupCommandQueueSet.makeQueueSet(firstSessionId, RemoteControlConfiguration.DEFAULT_PORT, new RemoteControlConfiguration());
@@ -60,8 +57,7 @@ public class SeleniumDriverResourceHandlerUnitTest {
     FrameGroupCommandQueueSet.clearQueueSet(firstSessionId);
   }
   
-  @Test
-  public void testThrowsExceptionOnFailedBrowserLaunch() throws Exception {
+  @Test public void throwsExceptionOnFailedBrowserLaunch() throws Exception {
     RemoteControlConfiguration configuration = new RemoteControlConfiguration();
     configuration.setTimeoutInSeconds(3);
     SeleniumServer server = new SeleniumServer(false, configuration);
