@@ -107,7 +107,7 @@ Sometimes you want to extract some visual information out of an element, perhaps
 
 {{{
 WebElement plain = driver.findElement(By.name("q"));
-RenderedWebElement element = (RenderedWebElement) element;
+RenderedWebElement element = (RenderedWebElement) plain;
 }}}
 
 Not all drivers render their content to the screen (such as the HtmlUnitDriver), so it's not safe to assume that the cast will work, but if it does you can gather additional information such as the size and location of the element. In addition, you can use drag and drop, either moving an element by a certain amount, or on to another element:
