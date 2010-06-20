@@ -1,7 +1,9 @@
 content helium chrome/content/
 
-overlay chrome://selenium-ide/content/selenium-ide.xul chrome://helium/content/view/seleniumOverlay.xul
-overlay chrome://selenium-ide/content/selenium-ide-common.xul chrome://helium/content/view/optionOverlay.xul
+overlay chrome://selenium-ide/content/selenium-ide-common.xul chrome://helium/content/view/seleniumOverlay.xul
+overlay chrome://selenium-ide/content/selenium-ide-common.xul chrome://helium/content/view/option/optionOverlay.xul
+
+skin helium classic/1.0 chrome/skin/classic
 
 locale helium en-US chrome/locale/en-US/
 locale helium fr-FR chrome/locale/fr-FR/

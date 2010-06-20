@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://helium/skin/classic/helium.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://helium/locale/helium.dtd">
+
+<overlay id="helium_overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	     xmlns:html="http://www.w3.org/1999/xhtml" >
+
+    <!-- JavaScript Files -->
+    <script type="application/javascript" src="chrome://global/content/globalOverlay.js" />
+    <script type="application/javascript" src="../util/JSUtil.js" />
+    <script type="application/javascript" src="../util/NetworkUtil.js" />
+    <script type="application/javascript" src="../model/TestReceiver.js" />
+    <script type="application/javascript" src="../model/PageStatus.js" />
+    <script type="application/javascript" src="../model/StreamObject.js" />
+    <script type="application/javascript" src="../model/RcpChecker.js" />
+    <script type="application/javascript" src="../model/spy/StreamHandler.js" />
+    <script type="application/javascript" src="../model/spy/StreamSpy.js" />
+    <script type="application/javascript" src="../model/spy/StreamSpyEvent.js" />
+    <script type="application/javascript" src="../model/HeliumModel.js" />
+    <script type="application/javascript" src="../controller/HeliumController.js" />
+    <script type="application/javascript" src="HeliumTab.js" />
+    <script type="application/javascript" src="HeliumView.js" />
+
+    <!-- Init script -->
+    <script type="application/javascript">
+
+        window.addEventListener("load", function() {
+
+           heliumView.addController(heliumController);
+           heliumView.setModel(heliumModel);
+
+           heliumController.setModel(heliumModel);
+           heliumController.setView(heliumView);
+
+           heliumView.init();
+           heliumModel.init();
+            
+        }, false);
+
+        window.addEventListener("unload", function() {
+           heliumView.removeController(heliumController);
+           heliumModel.destroy();
+
+        }, false);
+        
+    </script>
+
+    <!-- Commands -->
+    <commandset>
+        <command id="cmd_start" oncommand="goDoCommand('cmd_start');" />
+        <command id="cmd_send" disabled="true" oncommand="goDoCommand('cmd_send');" />
+        <command id="cmd_select" oncommand="goDoCommand('cmd_select');" />
+        <command id="cmd_show_tooltip" oncommand="goDoCommand('cmd_show_tooltip');" />
+    </commandset>
+
+    <!-- UI -->
+    <hbox id="helium_view" flex="1" >
+
+        <vbox flex="2">
+
+            <!-- Top horizontal box -->
+
+            <hbox align="center">
+                <spacer width="5"/>
+                <hbox id="loading" hidden="true" align="center">
+                   <image id="loading_icon" width="20" height="20" />
+                   <label id="loading_label" value="&pageLoadingLabel;" />
+                </hbox>
+                <spacer flex="1"/>
+                <button id="helium_send" label="&sendLabel;" tooltiptext="&sendTooltipText;" command="cmd_send" />
+            </hbox>
+
+            <!-- Stream List -->
+            <listbox id="helium_list" flex="1" seltype="single" onselect="goDoCommand('cmd_select');" ondblclick="goDoCommand('cmd_send');" />
+
+            <!-- Status line -->
+            <hbox id="status" align="center" >
+                <spacer width="5"/>
+                <image id="status_icon" width="15" height="15" />
+                <label id="status_text" flex="2" />
+                <label id="version" class="bold" value="${pom.version}" />
+            </hbox>
+
+            <!-- Info Popup : Show information about the stream -->
+            <tooltip id="helium_tooltip" orient="vertical" onpopupshowing="goDoCommand('cmd_show_tooltip');" noautohide="true" >
+               <hbox>
+                   <label class="bold" value="Content-type :" />
+                   <label id="ctype" flex="1"/>
+               </hbox>
+               <hbox>
+                   <label class="bold" value="Size :" />
+                   <label id="size" flex="1" />
+               </hbox>
+               <vbox id="helium_tooltip_img" align="center" flex="1" hidden="true" >
+                   <spacer height="6" />
+                   <image id="iconic" />
+                   <html:img id="html_image" style="display:none;" />
+                   <spacer height="4" />
+                   <label class="bold" id="imsize" />
+               </vbox>
+            </tooltip>
+
+            <!-- Hidden iframe for JWS -->
+            <html:iframe id="webstart" style="display:none;" />
+          
+            <!-- Locale for JavaScript -->
+            <stringbundle id="helium_strings" src="chrome://helium/locale/helium.properties" />
+         </vbox>
+    </hbox>
+</overlay>
+

@@ -1,129 +1,116 @@
-/* 
-* Copyright 2009 SERLI
-*
-* This file is part of Helium.
-*
-* Helium is free software: you can redistribute it and/or modify it under the terms
-* of the GNU General Public License as published by the Free Software Foundation, 
-* either version 3 of the License, or(at your option) any later version.
-*
-* Helium is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-* See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with Helium.
-*
-* If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Copyright 2009 - SERLI
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
- * The Rcp checker
+ * This class permits to check
+ * the state of the Rcp application.
  * 
  * @author Kevin Pollet
  */
 
-function RcpChecker(){
-	
+function RcpChecker() {
 	this.running = false;
 	this.timer = null;
 	this.listeners = [];
 	
-	if( typeof RcpChecker.initialized == "undefined" ){
-	
+	if (typeof RcpChecker.initialized == "undefined") {
+
+		RcpChecker.prototype.isRunning = function() {
+            return this.running;
+        };
 		
-		RcpChecker.prototype.isRunning = function(){ return this.running; };
-		
-		RcpChecker.prototype.setRunning = function( run_state ){ 
-			
+		RcpChecker.prototype.setRunning = function(run_state){
 			this.old_state = this.running;
 			this.running = run_state;
 			
-			if( run_state != this.old_state ){
-				
-				for( var i = 0 ; i < this.listeners.length ; i++ ){
-					this.listeners[i].rcpStateChanged( run_state );
+			if (run_state != this.old_state) {
+				for (var i = 0; i < this.listeners.length; i++){
+					this.listeners[i].rcpStateChanged(run_state);
 				}				
 			}		
-			 
 		};
 	
-		RcpChecker.prototype.addRcpListener = function( listener ){ 
-			
+		RcpChecker.prototype.addRcpListener = function(listener) { 
 			var exist = false;
 			
-			for( var i = 0 ; !exist && i < this.listeners.length ; i++ ){ 
-
-				if( this.listeners[i] == listener ){
-					exist=true;
+			for (var i = 0; !exist && i < this.listeners.length; i++) {
+				if (this.listeners[i] == listener) {
+					exist = true;
 				}
 			}
 		
-			if( !exist ) this.listeners.push( listener );
-			
+			if (!exist) {
+              this.listeners.push(listener);
+            }
 		};
 		
-		RcpChecker.prototype.removeRcpListener = function( listener ){
-			
+		RcpChecker.prototype.removeRcpListener = function(listener) {
 			var index = -1;
 			
-			for( var i = 0 ; index == -1 && i < this.listeners.length ; i++ ){ 
+			for (var i = 0; index == -1 && i < this.listeners.length; i++) { 
 	
-				if( this.listeners[i] == listener )
+				if (this.listeners[i] == listener) {
 					index = i;
+                }
 			}
 	
-			if( index != -1 ){
-			
-				for( var i = index ; i < (this.listeners.length-1) ; i++ )
-					this.listeners[i] = this.listeners[i+1];						
-				
-			
+			if (index != -1) {
+
+				for (var i = index; i < (this.listeners.length-1); i++) {
+					this.listeners[i] = this.listeners[i+1];
+                }
+
 				this.listeners.pop();
 			}	
 				
 		};
 		
-		RcpChecker.prototype.startCheckRcpState = function( ){
-			
-			this.timer = setInterval( JSUtil.bind(this,this.check) , 2000);
+		RcpChecker.prototype.start = function () {
+			this.timer = setInterval(JSUtil.bind(this, this.check), 2000);
 		};
 		
-		RcpChecker.prototype.stopCheckRcpState = function( ){
-			
-			clearInterval( this.timer );
+		RcpChecker.prototype.stop = function() {
+			clearInterval(this.timer);
 		};
 		
-		RcpChecker.prototype.check = function(){
-		
-			var port = HEPreferences.getServerPort();
-			var name = HEPreferences.getServerName();
-			var instance = this;
+		RcpChecker.prototype.check = function() {
+            var instance = this;
+			var serverPort = prefs.getInt("serverport");
+			var serverName = prefs.getChar("servername");
 			
 			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.open("GET", "http://"+name+":"+port+"/test", true );
-			xmlhttp.onreadystatechange = function(){
-	
-				if( (this.readyState == 4 && this.status == 0) || (this.readyState == 4 && this.status == 404) ){
+			xmlhttp.open("GET", "http://" + serverName + ":" + serverPort + "/test", true);
+			xmlhttp.onreadystatechange = function() {
+				if ((this.readyState == 4 && this.status == 0) || (this.readyState == 4 && this.status == 404)) {
+                    if (instance.running != false) {
+                        instance.setRunning(false);
+                    }
 					
-					if( instance.running != false)
-						instance.setRunning(false);
-					
-				}else if( this.readyState == 4 ){
-					
-					if( instance.running != true)
-						instance.setRunning(true);
+				}else if (this.readyState == 4) {
+                    if (instance.running != true) {
+                        instance.setRunning(true);
+                    }
 				}
-				
 			};
 			
-			xmlhttp.send( null );
+			xmlhttp.send(null);
 		};			
-		
 				
 		RcpChecker.initialized = true;
 	}
-	
-	
 }
 
 

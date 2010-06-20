@@ -1,0 +1,18 @@
+/* Import */
+
+@import url(chrome://global/skin/);
+
+/* Helium CSS */
+
+#loading_icon {
+    list-style-image: url(chrome://helium/skin/classic/loading.gif);
+}
+
+#helium_send {
+    list-style-image: url(chrome://helium/skin/classic/send.png);
+}
+
+label.bold { 
+    font-weight: bold;
+    font-size: 12px;
+}

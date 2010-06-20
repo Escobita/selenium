@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://helium/locale/options.dtd">
+
+<prefwindow id="helium_prefwindow" 
+			title="Helium Settings"
+			width="520" height="600"
+			xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<prefpane id="helium-panel" label="Helium Settings">
+
+		<preferences>
+			<preference id="pref_name" name="extensions.helium.servername" type="string" />
+			<preference id="pref_port" name="extensions.helium.serverport" type="int" />
+		</preferences>
+
+		<tabbox>
+			<tabs>
+				<tab label="General" />
+			</tabs>
+			
+			<tabpanels flex="1">
+				<tabpanel>
+
+					<vbox flex="1">
+						<hbox align="center">
+							<label control="name" value="&servernameValue;" />
+							<textbox preference="pref_name" id="name" flex="1" />
+						</hbox>
+						<spacer height='15' />
+						<hbox align="center">
+							<label control="port" value="&serverportValue;" />
+							<spacer width='5' />
+							<textbox type="number" min="1024" max="65536" preference="pref_port" id="port" flex="1" />
+						</hbox>
+						<spacer height='400' />
+					</vbox>
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+
+	</prefpane>
+</prefwindow>

@@ -1,66 +1,67 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<!-- Project Information -->
+    <!-- Helium Project Information -->
 
-	<groupId>com.serli</groupId>
-	<artifactId>helium</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<description>This is the Helium Firefox extension</description>
+    <groupId>com.serli</groupId>
+    <artifactId>helium</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Helium</name>
+    <description>
+        Helium plugin adds stream test to Selenium IDE
+        Firefox plugin.
+    </description>
 
-	<!-- Properties -->
-	<properties>
-		<maven.antrun.version>1.3</maven.antrun.version>
-	</properties>
+    <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.antrun.version>1.3</maven.antrun.version>
+    </properties>
 
-	<!-- Build Information -->
-	<build>
-	
-		<!-- Folder layout -->
-		<sourceDirectory>src/extension/</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src/extension/</directory>
-			</resource>
-		</resources>
-		
-		<testSourceDirectory>src/test/</testSourceDirectory>
-	
-		<!-- Packaging -->
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>${maven.antrun.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>			
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<copy file="target/helium-${project.version}.jar" tofile="target/helium-${project.version}.xpi" />
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
-		</plugins>
-	</build>
-	
-	<!-- Team -->
-	<developers>
-		<developer>
-			<name>Kevin Pollet</name>
-			<id>pollet.kevin</id>
-			<organization>Serli</organization>
-			<organizationUrl>www.serli.com</organizationUrl>
-		</developer>	
-	</developers>
+    <build>
+        <sourceDirectory>src/extension/</sourceDirectory>
+        <testSourceDirectory>src/test/</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/extension/</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
 
+        <plugins>
+            <!-- Ant -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.version}</version>
+                <executions>
+                    <execution>
+                        <id>package-xpi</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="target/helium-${project.version}.jar" tofile="target/helium-${project.version}.xpi" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <developers>
+        <developer>
+            <id>pollet.kevin</id>
+            <name>Kevin Pollet</name>
+            <email>pollet.kevin@gmail.com</email>
+            <organization>Serli</organization>
+            <organizationUrl>www.serli.com</organizationUrl>
+        </developer>
+    </developers>
 </project>

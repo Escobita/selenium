@@ -1,23 +1,39 @@
-<?xml version="1.0"?>
-<?xul-overlay href="chrome://helium/content/view/helium.xul"?> <!-- Overlay in the same package -->
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?> 
+<?xml version="1.0" encoding="UTF-8"?>
+<?xul-overlay href="chrome://helium/content/view/heliumOverlay.xul"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://selenium-ide/skin/" type="text/css"?>
 
-<overlay id="selenium_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  
-<!-- Script -->
+<overlay id="selenium_overlay" 
+	     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:html="http://www.w3.org/1999/xhtml" >
 
-   <script src="editorhelium.js" />
+  <!-- JavaScript Files -->
+  <script type="application/javascript" src="chrome://selenium-ide/content/api.js"/>
+  <script type="application/javascript" src="../util/PrefsUtil.js" />
 
-<!-- Overlay content -->
+  <!-- Script -->
+  <script type="application/javascript">
+    /**
+     * Register plugin.
+     */
+    var ide_api = new API();
+    ide_api.addPlugin("helium@serli.com");
+    ide_api.addPluginProvidedUserExtension("chrome://helium/content/selenium-extension/user-extensions.js");
+
+    /**
+     * Creates global variable and init helium plugin.
+     */
+    var prefs = new PrefsUtil("extensions.helium.");
+  </script>
+
+
+  <!-- The Helium plugin Tab -->
 
   <vbox id="logBox">
-
     <hbox id="logMenu" align="center">
-      <toolbarbutton id="heliumTab" label="Helium" class="console-tab" insertafter="rollupTab" onclick="window.editor.infoPanel.switchView(helium)" />
+      <toolbarbutton id="helium_tab" class="console-tab" label="Helium" insertafter="rollupTab" onclick="window.editor.infoPanel.switchView(heliumTab)" />
     </hbox> 
-
-    <hbox id="heliumView" hidden="true"/>
-
+    <hbox id="helium_view" hidden="true"/>
   </vbox>
 
 </overlay>

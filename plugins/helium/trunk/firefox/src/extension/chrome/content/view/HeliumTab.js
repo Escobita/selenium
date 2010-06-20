@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-/**
- * The page status enumeration.
- * 
+/** 
+ * Helium Tab JSON object like Selenium LogView, ...
+ * Look at Selenium "editor.js" file.
+ *
  * @author Kevin Pollet
  */
-var PageStatus = {
-    LOADED : 1,
-    LOADING : 2
+
+var heliumTab = {
+    name : "helium",
+
+    show : function() {
+
+        window.document.getElementById(this.name + "_view").hidden = false;
+        window.document.getElementById(this.name + "_tab").setAttribute("selected", "true");
+    },
+
+    hide : function() {
+        
+        window.document.getElementById(this.name + "_view").hidden = true;
+        window.document.getElementById(this.name + "_tab").removeAttribute("selected");
+    }
 };
