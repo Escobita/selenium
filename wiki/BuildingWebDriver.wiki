@@ -32,6 +32,14 @@ This will not only compile the source, but will also run any tests which need to
 
 There are more detailed instructions about how the build system works in the CrazyFunBuild section.
 
+By default, the output of the build is somewhat terse. A log of the java compilation stages is kept in "build/build_log.xml". You can also get more verbose output by adding "log=true" to the build targets. eg:
+
+{{{./go //support:test:test log=true}}}
+
+Finally, you can get even more verbose logging by modifying the Rakefile and commenting out the line that reads:
+
+{{{verbose false}}}
+
 = Common Problems =
 
 == Nothing Compiles ==
