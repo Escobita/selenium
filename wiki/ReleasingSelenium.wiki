@@ -26,7 +26,8 @@
 == Updating the Maven Repos ==
 
  # Prerequisite 1: Make sure Maven 2.2.1 and GnuPG are installed.
- # Prerequisite 2: Make sure your `~/.m2/settings.xml` contains the following lines in the `<servers>` section: {{{
+ # Prerequisite 2: Make sure your `~/.m2/settings.xml` contains the following lines in the `<servers>` section:
+{{{
     <server>
         <id>sonatype-nexus-snapshots</id>
         <username>_your-username-for-oss.sonatype.org_</username>
@@ -37,7 +38,7 @@
         <username>_your-username-for-oss.sonatype.org_</username>
         <password>_your-password_</password>
     </server>
-}}}		
+}}}
  # Prerequisite 3: Make sure your GnuPG public key is distributed to `hkp://pgp.mit.edu` 
  # Update the pom.xml files to reflect the dependencies as stated in the `build.desc` files.
  # Execute `mvn -Dtest=skip -DfailIfNoTests=false package` and make sure the jar files for each module in the target directory have the same content as the jar files produced by CrazyFun in the build directory. 
