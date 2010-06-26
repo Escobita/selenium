@@ -28,7 +28,7 @@ puts driver.title
 driver.quit
 }}}
 
-The ruby bindings have drivers for Firefox, IE, Chrome + a client for the remote driver.
+The ruby bindings have drivers for Firefox, IE, Chrome and the remote server.
 
 The `WebDriver.for()` call is a shortcut for 
 
@@ -41,6 +41,6 @@ Any extra arguments pass to `for()` (besides the driver symbol) will be passed t
 {{{
 include Selenium
 
-driver = WebDriver.for(:remote, :url                  => "http://localhost:6000/"
+driver = WebDriver.for(:remote, :url                  =>  "http://localhost:4444/wd/hub"
                                 :desired_capabilities => WebDriver::Remote::Capabilities.firefox)
 }}}
