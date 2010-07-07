@@ -620,9 +620,9 @@ nsHttpServer.prototype =
     this._handler.registerPathHandler(path, handler);
   },
 
-  registerGlobbedHandler: function(re, handler)
+  registerGlobHandler: function(re, handler)
   {
-    this._handler.registerGlobbedHandler(re, handler);
+    this._handler.registerGlobHandler(re, handler);
   },
 
   //
@@ -2380,8 +2380,10 @@ ServerHandler.prototype =
     this._handlerToField(handler, this._overridePaths, path);
   },
 
-  registerGlobbedHandler: function(re, handler)
+  registerGlobHandler: function(re, handler)
   {
+    dumpn("Registering: " + typeof(handler));
+
     if (typeof(handler) == "function")
       this._globbedPaths[re] = handler;
     else if (handler)

@@ -48,14 +48,15 @@ function WebDriverServer() {
     Utils.dumpn("Have server instance");
 
 //  var server = httpd.getServer();
-//  server.registerGlobbedHandler(".*foo.*", function(request, response) {
-//      dump("Hello world\n");
-//      Utils.dumpn("Here we go!");
-//    var res = <html><head><title>I like cheese</title></head><body>Cheese!</body></html>;
-//
-//    response.write(res.toXMLString());
+  server.registerGlobHandler(".*foo.*", { handle: function(request, response) {
+      dump("Hello world\n");
+      Utils.dumpn("Here we go!");
+    var res = <html><head><title>I like cheese</title></head><body>Cheese!</body></html>;
+
+    response.setHeader("Content-Type", "text/html", false);
+    response.write(res.toXMLString());
 //    response.finish();
-//  });
+  }});
   server.start(5000);
 }
 

@@ -120,6 +120,8 @@ interface nsIHttpServer : nsISupports
    */
   void registerPathHandler(in string path, in nsIHttpRequestHandler handler);
 
+  void registerGlobHandler(in string path, in nsIHttpRequestHandler handler);
+
   /**
    * Registers a custom error page handler.
    *
