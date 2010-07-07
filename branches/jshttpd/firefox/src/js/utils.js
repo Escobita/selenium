@@ -117,10 +117,13 @@ Utils.getUniqueId = function() {
 Utils.newInstance = function(className, interfaceName) {
   var clazz = Components.classes[className];
 
-  if (!clazz)
+  if (!clazz) {
+    Utils.dumpn("Unable to find class: " + className);
     return undefined;
+  }
 
   var iface = Components.interfaces[interfaceName];
+  Utils.dumpn("Iface: " + iface);
   return clazz.createInstance(iface);
 };
 

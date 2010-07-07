@@ -51,8 +51,8 @@ var EXPORTED_SYMBOLS = ['getServer'];
 /**
  * Overwrite both dump functions because we do not wanna have this output for Mozmill
  */
-function dump() {}
-function dumpn() {}
+//function dump() {}
+//function dumpn() {}
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
@@ -64,6 +64,7 @@ const PR_UINT32_MAX = Math.pow(2, 32) - 1;
 
 /** True if debugging output is enabled, false otherwise. */
 var DEBUG = false; // non-const *only* so tweakable in server tests
+var DEBUG = true; // non-const *only* so tweakable in server tests
 
 /** True if debugging output should be timestamped. */
 var DEBUG_TIMESTAMP = false; // non-const so tweakable in server tests
@@ -617,6 +618,11 @@ nsHttpServer.prototype =
   registerPathHandler: function(path, handler)
   {
     this._handler.registerPathHandler(path, handler);
+  },
+
+  registerGlobbedHandler: function(re, handler)
+  {
+    this._handler.registerGlobbedHandler(re, handler);
   },
 
   //
@@ -2180,7 +2186,15 @@ function ServerHandler(server)
    * @see ServerHandler.prototype._defaultPaths
    */
   this._overridePaths = {};
-  
+
+  /**
+     * Custom request handlers for globbed paths for the server. Path-handlers
+     * pairs are stored in an object with two keys "re" and "handler",
+     * representing the regular expression to use to see if a path matches and
+     * the handler to be called when a match is made.
+     */
+  this._globbedPaths = {};
+
   /**
    * Custom request handlers for the error handlers in the server in which this
    * resides.  Path-handler pairs are stored as property-value pairs in this
@@ -2245,7 +2259,23 @@ ServerHandler.prototype =
         }
         else
         {
-          this._handleDefault(request, response);
+          var handled = false;
+          for (var re in this._globbedPaths)
+          {
+            dumpn(re);
+            if (new RegExp(re).test(path))
+            {
+              dumpn("Match made");
+              handled = true;
+              dumpn(this._globbedPaths[re]);
+              this._globbedPaths[re](request, response);
+            }
+          }
+
+          if (!handled)
+          {
+            this._handleDefault(request, response);
+          }
         }
       }
       catch (e)
@@ -2348,6 +2378,14 @@ ServerHandler.prototype =
       throw Cr.NS_ERROR_INVALID_ARG;
 
     this._handlerToField(handler, this._overridePaths, path);
+  },
+
+  registerGlobbedHandler: function(re, handler)
+  {
+    if (typeof(handler) == "function")
+      this._globbedPaths[re] = handler;
+    else if (handler)
+      this._globbedPaths[re] = createHandlerFunc(handler);
   },
 
   //
@@ -5272,7 +5310,7 @@ function server(port, basePath)
   while (thread.hasPendingEvents())
     thread.processNextEvent(true);
 
-  DEBUG = false;
+//  DEBUG = false;
 }
 
 function getServer (port, basePath) {
