@@ -49,8 +49,6 @@ function WebDriverServer() {
 
 //  var server = httpd.getServer();
   server.registerGlobHandler(".*foo.*", { handle: function(request, response) {
-      dump("Hello world\n");
-      Utils.dumpn("Here we go!");
     var res = <html><head><title>I like cheese</title></head><body>Cheese!</body></html>;
 
     response.setHeader("Content-Type", "text/html", false);

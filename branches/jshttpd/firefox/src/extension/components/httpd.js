@@ -48,12 +48,6 @@
 
 var EXPORTED_SYMBOLS = ['getServer'];
 
-/**
- * Overwrite both dump functions because we do not wanna have this output for Mozmill
- */
-//function dump() {}
-//function dumpn() {}
-
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cr = Components.results;
@@ -64,7 +58,6 @@ const PR_UINT32_MAX = Math.pow(2, 32) - 1;
 
 /** True if debugging output is enabled, false otherwise. */
 var DEBUG = false; // non-const *only* so tweakable in server tests
-var DEBUG = true; // non-const *only* so tweakable in server tests
 
 /** True if debugging output should be timestamped. */
 var DEBUG_TIMESTAMP = false; // non-const so tweakable in server tests
@@ -2254,7 +2247,6 @@ ServerHandler.prototype =
         {
           // explicit paths first, then files based on existing directory mappings,
           // then (if the file doesn't exist) built-in server default paths
-          dumpn("calling override for " + path);
           this._overridePaths[path](request, response);
         }
         else
@@ -2262,10 +2254,8 @@ ServerHandler.prototype =
           var handled = false;
           for (var re in this._globbedPaths)
           {
-            dumpn(re);
             if (new RegExp(re).test(path))
             {
-              dumpn("Match made");
               handled = true;
               dumpn(this._globbedPaths[re]);
               this._globbedPaths[re](request, response);
@@ -2382,8 +2372,6 @@ ServerHandler.prototype =
 
   registerGlobHandler: function(re, handler)
   {
-    dumpn("Registering: " + typeof(handler));
-
     if (typeof(handler) == "function")
       this._globbedPaths[re] = handler;
     else if (handler)
