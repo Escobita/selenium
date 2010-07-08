@@ -98,6 +98,7 @@ Response.prototype.status_ = Response.OK;
  * Set this response's HTTP status code.
  */
 Response.prototype.setStatus = function(status) {
+  this.status_ = status;
   this.response_.setStatusLine(null, status, Response.StatusMessage_[status]);
 };
 
@@ -184,17 +185,11 @@ Response.prototype.send = function() {
  * been committed.
  */
 Response.prototype.commit = function() {
-  Utils.dumpn("Committing");
   if (this.committed_) {
     var info = ['Response already committed'];
-//    if (this.request_) {
-//      info.push('request: ' + this.request_.getMethod() + ' ' +
-//                this.request_.getRequestUrl().path);
-//      info.push('         ' + this.request_.getBody())
-//    }
-//    info.push('response: ' + this.status_ + ' ' +
-//              Response.StatusMessage_[this.status_]);
-//    info.push('          ' + this.body_);
+    info.push('response: ' + this.status_ + ' ' +
+              Response.StatusMessage_[this.status_]);
+    info.push('          ' + this.body_);
     Components.utils.reportError(info.join('\n  '));
     return;
   }
@@ -204,13 +199,11 @@ Response.prototype.commit = function() {
   var statusCanHaveBody = (this.status_ < 100 || this.status_ > 199) &&
                           this.status_ != 204 && this.status_ != 304;
 
-  Utils.dumpn("Can have body: " + statusCanHaveBody);
   var converter = Components.
       classes['@mozilla.org/intl/scriptableunicodeconverter'].
       createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
   converter.charset = 'UTF-8';
 
-  Utils.dumpn("Converting");
   var bytes = converter.convertToByteArray(this.body_, {});
 
   if (this.status_ < 100 || this.status_ > 199) {
@@ -220,24 +213,12 @@ Response.prototype.commit = function() {
     this.setHeader('Content-Length', bytes.length);
   }
 
-  Utils.dumpn("Looking good so far. Status:" + this.status_);
-
   // If necessary, send the body.
-  if (statusCanHaveBody) {//} &&
-//      ((this.status_ > 399 && this.status_ < 600))) {
-//       (this.request_.getMethod() != Request.Method.HEAD))) {
-    Utils.dumpn("Body is: " + this.body_);
+  if (statusCanHaveBody) {
     var byteStream = converter.convertToInputStream(this.body_);
     this.response_.bodyOutputStream.writeFrom(byteStream, bytes.length);
     this.response_.bodyOutputStream.flush();      
   }
-
-    Utils.dumpn("Finishing up");
-
-  // Finish things up: flush and close the stream; don't close the stream if
-  // this is a 1xx response as there should be a final response sent (in another
-  // instance using the same stream).
-//  this.response_.bodyOutputStream.flush();
 
   this.response_.finish();
 };

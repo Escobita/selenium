@@ -45,7 +45,6 @@ function WebDriverServer() {
   }
 
   this.server_.registerGlobHandler(".*/hub/.*", { handle: function(request, response) {
-    Utils.dumpn("New request: " + request.path);
     response.processAsync();
     dispatcher_.dispatch(new Request(request), new Response(response));
   }});
@@ -62,7 +61,6 @@ WebDriverServer.prototype.newDriver = function(window) {
     this.enableNativeEvents =
     prefs.prefHasUserValue("webdriver_enable_native_events") ?
     prefs.getBoolPref("webdriver_enable_native_events") : false;
-    Utils.dumpn('Enable native events: ' + this.enableNativeEvents);
   }
   window.fxdriver = new FirefoxDriver(this, this.enableNativeEvents, window);
   return window.fxdriver;

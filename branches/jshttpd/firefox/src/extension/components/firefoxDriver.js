@@ -97,7 +97,6 @@ FirefoxDriver.prototype.get = function(respond, parameters) {
       // Focus on the top window.
       respond.session.setWindow(respond.session.getBrowser().contentWindow);
       respond.value = responseText;
-      Utils.dumpn("Call back from webloading listener");
       respond.send();
     });
   }

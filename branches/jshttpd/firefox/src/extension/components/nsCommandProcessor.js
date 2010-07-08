@@ -545,10 +545,6 @@ nsCommandProcessor.prototype.getSessionCapabilities = function(response) {
     'takesScreenshot': true
   };
 
-  for (var i in response) {
-      Utils.dumpn(i);
-  }
-
   response.send();
 };
 
