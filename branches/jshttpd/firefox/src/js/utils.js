@@ -121,9 +121,8 @@ Utils.newInstance = function(className, interfaceName) {
     Utils.dumpn("Unable to find class: " + className);
     return undefined;
   }
-
   var iface = Components.interfaces[interfaceName];
-  Utils.dumpn("Iface: " + iface);
+
   return clazz.createInstance(iface);
 };
 
@@ -1011,7 +1010,9 @@ Utils.dumpText = function(text) {
 
 
 Utils.dumpn = function(text) {
-  Utils.dumpText(text + "\n");
+  var stack = Components.stack.caller;
+  var filename = stack.filename.replace(/.*\//, '');
+  Utils.dumpText(filename + ":" + stack.lineNumber  + " - " + text + "\n");
 };
 
 

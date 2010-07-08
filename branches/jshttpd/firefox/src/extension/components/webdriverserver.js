@@ -36,26 +36,19 @@ function WebDriverServer() {
   var overrideService = Components.classes["@mozilla.org/security/certoverride;1"]
       .getService(Components.interfaces.nsICertOverrideService);
 
-  /**
-   * This server's request dispatcher.
-   * @type {Dispatcher}
-   * @private
-   */
-  this.dispatcher_ = new Dispatcher();
+  var dispatcher_ = new Dispatcher();
 
-  var server = Utils.newInstance("@mozilla.org/server/jshttp;1", "nsIHttpServer");
+  try {
+  this.server_ = Utils.newInstance("@mozilla.org/server/jshttp;1", "nsIHttpServer");
+  } catch (e) {
+      Utils.dumpn(e);
+  }
 
-    Utils.dumpn("Have server instance");
-
-//  var server = httpd.getServer();
-  server.registerGlobHandler(".*foo.*", { handle: function(request, response) {
-    var res = <html><head><title>I like cheese</title></head><body>Cheese!</body></html>;
-
-    response.setHeader("Content-Type", "text/html", false);
-    response.write(res.toXMLString());
-//    response.finish();
+  this.server_.registerGlobHandler(".*/hub/.*", { handle: function(request, response) {
+    Utils.dumpn("New request: " + request.path);
+    response.processAsync();
+    dispatcher_.dispatch(new Request(request), new Response(response));
   }});
-  server.start(5000);
 }
 
 
@@ -81,15 +74,6 @@ WebDriverServer.prototype.getNextId = function() {
 };
 
 
-WebDriverServer.prototype.onSocketAccepted = function(socket, transport) {
-  try {
-    var socketListener = new SocketListener(this.dispatcher_, transport);
-  } catch(e) {
-    dump(e);
-  }
-};
-
-
 WebDriverServer.prototype.startListening = function(port) {
   if (!port) {
     var prefs =
@@ -100,20 +84,9 @@ WebDriverServer.prototype.startListening = function(port) {
   }
 
   if (!this.isListening) {
-    this.serverSocket.init(port, true, -1);
-    this.serverSocket.asyncListen(this);
+    this.server_.start(port);
     this.isListening = true;
   }
-};
-
-
-WebDriverServer.prototype.onStopListening = function(socket, status)
-{
-};
-
-
-WebDriverServer.prototype.close = function()
-{
 };
 
 

@@ -97,6 +97,8 @@ public class ErrorHandler {
           "is missing. The locally-generated stack trace is useless.)";
     }
 
+    System.out.println("cause = " + cause);
+
     Throwable toThrow = null;
     try {
       Constructor<? extends Throwable> constructor =

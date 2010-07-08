@@ -194,11 +194,15 @@ public class Jetty6AppServer implements AppServer {
     secureSocket.setTrustPassword("password");
     server.addConnector(secureSocket);
 
+    System.out.println("port = " + port);
+
     try {
       server.start();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
+    PortProber.pollPort(port);
   }
 
   protected File getKeyStore() {
