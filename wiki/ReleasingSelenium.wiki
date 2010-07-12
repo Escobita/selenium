@@ -67,4 +67,3 @@
 = Areas to Improve =
 
   * We should really automate the version number bumps.
-  * Creating the source jars should be automated.
