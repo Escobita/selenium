@@ -6,14 +6,14 @@
 
   # Bump the revision numbers at the top of the Rakefile.
   # Bump the revision number in firefox's install.rdf.
+  # Bump the revision number in "server/src/java/VERSION.txt" and "common/src/js/core/scripts/selenium-version.js"
   # Bump the revision number in the ChromeDriver's manifest.json files.
   # Commit version number bump.
 
 = For Java =
 
   # Run `rake clean release`
-  # Upload the new versions of the ZIP files available on the downloads page.
-  # Create source jars. I do this manually right now. Ugh.
+  # Upload the new versions of the ZIP files from "build/dist" to the downloads page.
   # Update the docs. I do this on a UNIX variant:
     # `rake javadocs`
     # `find docs/api/java -name "*.html" | grep -v svn | xargs rm`
