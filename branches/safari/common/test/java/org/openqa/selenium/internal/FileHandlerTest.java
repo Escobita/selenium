@@ -24,8 +24,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,6 +59,30 @@ public class FileHandlerTest extends TestCase {
     }
   }
 
+  @Test public void testFileCopyCanFilterBySuffix() throws IOException {
+    File source = TemporaryFilesystem.createTempDir("filehandler", "source");
+    File textFile = File.createTempFile("example", ".txt", source);
+    File xmlFile = File.createTempFile("example", ".xml", source);
+    File dest = TemporaryFilesystem.createTempDir("filehandler", "dest");
+
+    FileHandler.copy(source, dest, ".txt");
+
+    assertTrue(new File(dest, textFile.getName()).exists());
+    assertFalse(new File(dest, xmlFile.getName()).exists());
+  }
+
+  @Test public void testCanReadFileAsString() throws IOException {
+    String expected = "I like cheese. And peas";
+    
+    File file = File.createTempFile("read-file", "test");
+    Writer writer = new FileWriter(file);
+    writer.write(expected);
+    writer.close();
+    
+    String seen = FileHandler.readAsString(file);
+    assertEquals(expected, seen);
+  }
+  
   private File writeTestZip(File file, int files) throws IOException {
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream(file));
     for (int i = 0; i < files; i++) {

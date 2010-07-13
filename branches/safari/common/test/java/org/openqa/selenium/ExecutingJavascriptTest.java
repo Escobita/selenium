@@ -29,6 +29,11 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
@@ -45,7 +50,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     Object result = executeScript("return document.title;");
 
@@ -59,7 +64,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(nestedPage);
+    driver.get(pages.nestedPage);
 
     Object result = executeScript("return document.getElementsByName('checky').length;");
 
@@ -74,7 +79,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     Object result = executeScript("return document.getElementById('id1');");
 
@@ -88,7 +93,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     Object result = executeScript("return true;");
 
@@ -99,12 +104,13 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @SuppressWarnings("unchecked")
   @JavascriptEnabled
+  @Ignore(SELENESE)
   public void testShouldBeAbleToExecuteSimpleJavascriptAndAStringsArray() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     List<Object> expectedResult = new ArrayList<Object>();
     expectedResult.add("zero");
     expectedResult.add("one");
@@ -123,7 +129,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     List<Object> expectedResult = new ArrayList<Object>();
     expectedResult.add("zero");
     List<Object> subList = new ArrayList<Object>();
@@ -146,7 +152,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     Object result = executeScript("return {abc: '123', tired: false};");
     assertTrue("result was: " + result + " (" + result.getClass() + ")", result instanceof Map);
@@ -156,11 +162,10 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
     expected.put("abc", "123");
     expected.put("tired", false);
 
-    assertEquals("Expected:<" + expected + ">, but was:<" + map + ">",
-        expected.size(), map.size());
+    assertEquals("Expected:<" + expected + ">, but was:<" + map + ">", expected.size(),
+        map.size());
     for (Map.Entry<String, Object> entry : expected.entrySet()) {
-      assertEquals("Difference at key:<" + entry.getKey() + ">",
-          entry.getValue(), map.get(entry.getKey()));
+      assertEquals("Difference at key:<" + entry.getKey() + ">", entry.getValue(), map.get(entry.getKey()));
     }
   }
 
@@ -172,7 +177,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     Map<String, Object> expectedResult = new HashMap<String, Object>(){{
       put("foo", "bar");
@@ -229,7 +234,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     Long expectedResult = 1L;
     Object result = executeScript("return arguments[0];", expectedResult);
     assertTrue("Expected result to be an Integer or Long but was a " +
@@ -243,7 +248,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     Double expectedResult = 1.2;
     Object result = executeScript("return arguments[0];", expectedResult);
     assertTrue("Expected result to be a Double or Float but was a " +
@@ -257,7 +262,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     try {
       executeScript("return squiggle();");
@@ -274,7 +279,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     executeScript("displayMessage('I like cheese');");
     String text = driver.findElement(By.id("result")).getText();
 
@@ -291,7 +296,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     String
         value =
         (String) executeScript("return arguments[0] == 'fish' ? 'fish' : 'not fish';", "fish");
@@ -305,7 +310,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     boolean value = (Boolean) executeScript("return arguments[0] == true;", true);
 
     assertTrue(value);
@@ -317,7 +322,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     boolean value = (Boolean) executeScript("return arguments[0] == 1 ? true : false;", 1);
 
     assertTrue(value);
@@ -330,7 +335,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement button = driver.findElement(By.id("plainButton"));
     String value = (String) executeScript(
         "arguments[0]['flibble'] = arguments[0].getAttribute('id'); return arguments[0]['flibble'];",
@@ -346,7 +351,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     Object[] array = new Object[]{"zero", 1, true, 3.14159};
     long length = (Long) executeScript("return arguments[0].length", array);
     assertEquals(array.length, length);
@@ -359,7 +364,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     Collection<Object> collection = new ArrayList<Object>();
     collection.add("Cheddar");
     collection.add("Brie");
@@ -382,7 +387,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     try {
       executeScript("return arguments[0];", driver);
       fail("Exception should have been thrown");
@@ -397,7 +402,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     String result = (String) executeScript("return arguments[0] + arguments[1];", "one", "two");
 
     assertEquals("onetwo", result);
@@ -408,7 +413,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
                + "iPhone: Frame switching not yet implemented.")
   @JavascriptEnabled
   public void testShouldBeAbleToGrabTheBodyOfFrameOnceSwitchedTo() {
-    driver.get(richTextPage);
+    driver.get(pages.richTextPage);
 
     driver.switchTo().frame("editFrame");
     WebElement body =
@@ -419,7 +424,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @Ignore
   public void testShouldBeAbleToReturnAnArrayOfWebElements() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
 
     List<WebElement> items = (List<WebElement>) ((JavascriptExecutor) driver)
         .executeScript("return document.getElementsByName('snack');");
@@ -430,7 +435,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(SELENESE)
   public void testJavascriptStringHandlingShouldWorkAsExpected() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     String value = (String) executeScript("return '';");
     assertEquals("", value);
@@ -445,7 +450,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({CHROME, FIREFOX})
   public void testShouldBeAbleToExecuteABigChunkOfJavascriptCode() throws IOException {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     File jqueryFile = new File("common/src/web/jquery-1.3.2.js");
     if(!jqueryFile.isFile()) {
@@ -464,12 +469,12 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({SELENESE, CHROME, REMOTE, IPHONE})
   public void testShouldBeAbleToExecuteScriptAndReturnElementsList() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
     String scriptToExec = "return document.getElementsByName('snack');";
     
     List<WebElement> resultsList = (List<WebElement>) ((JavascriptExecutor) driver)
       .executeScript(scriptToExec);
-    
+
     assertTrue(resultsList.size() > 0);
   }
   

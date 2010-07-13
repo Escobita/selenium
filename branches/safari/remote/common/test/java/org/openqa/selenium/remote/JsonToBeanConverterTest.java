@@ -21,11 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
 
 import junit.framework.TestCase;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -232,6 +236,36 @@ public class JsonToBeanConverterTest extends TestCase {
 
     assertEquals(1, converted.getParameters().keySet().size());
     assertEquals("cheese", converted.getParameters().get("food"));
+  }
+
+  public void testShouldConvertCapabilitiesToAMapAndIncludeCustomValues() throws Exception {
+    DesiredCapabilities caps = new DesiredCapabilities();
+    caps.setCapability("furrfu", "fishy");
+
+    String raw = new BeanToJsonConverter().convert(caps);
+    Capabilities converted = new JsonToBeanConverter().convert(Capabilities.class, raw);
+
+    assertEquals("fishy", converted.getCapability("furrfu"));
+  }
+
+  public void testShouldBeAbleToReconstituteAProxyPac() throws Exception {
+    DoNotUseProxyPac pac = new DoNotUseProxyPac();
+    pac.map("*/selenium/*").toProxy("http://localhost:8080/selenium-server");
+    pac.map("/[a-zA-Z]{4}.microsoft.com/").toProxy("http://localhost:1010/selenium-server/");
+    pac.map("/flibble*").toNoProxy();
+    pac.mapHost("www.google.com").toProxy("http://fishy.com/");
+    pac.mapHost("seleniumhq.org").toNoProxy();
+    pac.defaults().toNoProxy();
+
+    String raw = new BeanToJsonConverter().convert(pac);
+    DoNotUseProxyPac converted = new JsonToBeanConverter().convert(DoNotUseProxyPac.class, raw);
+
+    Writer source = new StringWriter();
+    pac.outputTo(source);
+    Writer derived = new StringWriter();
+    converted.outputTo(derived);
+
+    assertEquals(source.toString(), derived.toString());
   }
 
   public static class SimpleBean {

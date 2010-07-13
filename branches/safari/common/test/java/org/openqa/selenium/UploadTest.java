@@ -1,5 +1,6 @@
 package org.openqa.selenium;
 
+import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -15,7 +16,7 @@ import java.io.PrintWriter;
  * 
  * @author jmleyba@gmail.com (Jason Leyba)
  */
-@Ignore(value = IPHONE, reason = "File uploads not allowed on the iPhone")
+@Ignore(value = {IPHONE, ANDROID}, reason = "File uploads not allowed on the iPhone")
 public class UploadTest extends AbstractDriverTestCase {
 
   private static final String LOREM_IPSUM_TEXT = "lorem ipsum dolor sit amet";
@@ -33,15 +34,14 @@ public class UploadTest extends AbstractDriverTestCase {
   @Ignore(value = {CHROME, SELENESE},
           reason = "Chrome: File input elements are not supported yet")
   public void testFileUploading() throws Exception {
-    driver.get(uploadPage);
+    driver.get(pages.uploadPage);
     driver.findElement(By.id("upload")).sendKeys(testFile.getAbsolutePath());
     driver.findElement(By.id("go")).submit();
 
     driver.switchTo().frame("upload_target");
 
     WebElement body = driver.findElement(By.xpath("//body"));
-    assertEquals("Page source is: " + driver.getPageSource(),
-        LOREM_IPSUM_TEXT, body.getText());
+    assertEquals("Page source is: " + driver.getPageSource(), LOREM_IPSUM_TEXT, body.getText());
   }
 
   private File createTmpFile(String content) throws IOException {

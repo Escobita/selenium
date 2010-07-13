@@ -18,6 +18,8 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.browserlaunchers.Proxies;
+import org.openqa.selenium.browserlaunchers.WindowsUtils;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
@@ -141,7 +143,8 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
 
         if (simple) return customProfileDir;
 
-        File proxyPAC = LauncherUtils.makeProxyPAC(customProfileDir, getPort(), browserConfigurationOptions.is("avoidProxy"));
+      File proxyPAC = Proxies
+          .makeProxyPAC(customProfileDir, getPort(), browserConfigurationOptions.asCapabilities());
 
         // TODO Do we want to make these preferences configurable somehow?
         File opera6ini = new File(customProfileDir, "opera6.ini");

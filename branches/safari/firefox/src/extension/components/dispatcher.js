@@ -101,7 +101,7 @@ Dispatcher.translateNewSession = function() {
         var url = request.getRequestUrl();
         response.setStatus(Response.SEE_OTHER);
         response.setHeader('Location',
-            url.scheme + '://' + url.hostPort + url.path + '/' +
+            url.scheme + '://' + url.host + ":" + url.hostPort + url.path + '/' +
                 jsonResponse.value);
         response.commit();
       }
@@ -138,6 +138,9 @@ Dispatcher.prototype.init_ = function() {
   this.bind_('/session/:sessionId/speed').
       on(Request.Method.GET, Dispatcher.executeAs('getSpeed')).
       on(Request.Method.POST, Dispatcher.executeAs('setSpeed'));
+
+  this.bind_('/session/:sessionId/timeouts/implicit_wait').
+      on(Request.Method.POST, Dispatcher.executeAs('implicitlyWait'));
 
   this.bind_('/session/:sessionId/url').
       on(Request.Method.GET, Dispatcher.executeAs('getCurrentUrl')).
@@ -272,7 +275,7 @@ Dispatcher.prototype.bind_ = function(path) {
 Dispatcher.prototype.dispatch = function(request, response) {
   // We only support one servlet, mapped to /hub/*
   // TODO: be more flexible.
-  var path = request.getRequestUrl().path;
+  var path = request.getPathInfo();
   if (path.indexOf('/hub') != 0) {
     response.sendError(Response.NOT_FOUND);
     return;
@@ -457,6 +460,7 @@ Resource.prototype.handle = function(request, response) {
   }
 
   var handlerFn = this.handlers_[requestMethod];
+
   if (handlerFn) {
     handlerFn(request, response);
   } else {

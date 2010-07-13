@@ -19,6 +19,7 @@ package org.openqa.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -29,7 +30,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
 
   @Ignore({IE, SELENESE, IPHONE})
   public void testShouldBePossibleToDeselectASingleOptionFromASelectWhichAllowsMultipleChoices() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
 
     WebElement multiSelect = driver.findElement(By.id("multi"));
     List<WebElement> options = multiSelect.findElements(By.tagName("option"));
@@ -47,7 +48,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
 
   @Ignore({IE, SELENESE, IPHONE})
   public void testShouldNotBeAbleToDeselectAnOptionFromANormalSelect() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
 
     WebElement select = driver.findElement(By.xpath("//select[@name='selectomatic']"));
     List<WebElement> options = select.findElements(By.tagName("option"));
@@ -63,7 +64,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testShouldBeAbleToChangeTheSelectedOptionInASelect() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
     WebElement selectBox = driver.findElement(By.xpath("//select[@name='selectomatic']"));
     List<WebElement> options = selectBox.findElements(By.tagName("option"));
     WebElement one = options.get(0);
@@ -78,7 +79,7 @@ public class SelectElementHandlingTest extends AbstractDriverTestCase {
 
   @Ignore(SELENESE)
   public void testShouldBeAbleToSelectMoreThanOneOptionFromASelectWhichAllowsMultipleChoices() {
-    driver.get(formPage);
+    driver.get(pages.formPage);
 
     WebElement multiSelect = driver.findElement(By.id("multi"));
     List<WebElement> options = multiSelect.findElements(By.tagName("option"));

@@ -18,12 +18,18 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+import static org.openqa.selenium.DevMode.isInDevMode;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 
+import org.junit.Assert;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Ignore;
@@ -40,28 +46,28 @@ import java.util.Set;
 
 public class FirefoxDriverTest extends AbstractDriverTestCase {
     public void testShouldContinueToWorkIfUnableToFindElementById() {
-        driver.get(formPage);
+        driver.get(pages.formPage);
 
         try {
             driver.findElement(By.id("notThere"));
-            fail("Should not be able to select element by id here");
+          fail("Should not be able to select element by id here");
         } catch (NoSuchElementException e) {
             // This is expected
         }
 
         // Is this works, then we're golden
-        driver.get(xhtmlTestPage);
+        driver.get(pages.xhtmlTestPage);
     }
 
     @NeedsFreshDriver
     @Ignore(value = FIREFOX, reason = "Need to figure out how to open a new browser instance mid-test")
     public void testShouldWaitUntilBrowserHasClosedProperly() throws Exception {
-      driver.get(simpleTestPage);
+      driver.get(pages.simpleTestPage);
       driver.close();
 
       setUp();
 
-      driver.get(formPage);
+      driver.get(pages.formPage);
       WebElement textarea = driver.findElement(By.id("withText"));
       String expectedText = "I like cheese\n\nIt's really nice";
       textarea.sendKeys(expectedText);
@@ -73,8 +79,8 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
   public void testShouldBeAbleToStartMoreThanOneInstanceOfTheFirefoxDriverSimultaneously() {
     WebDriver secondDriver = new FirefoxDriver();
 
-    driver.get(xhtmlTestPage);
-    secondDriver.get(formPage);
+    driver.get(pages.xhtmlTestPage);
+    secondDriver.get(pages.formPage);
 
     assertThat(driver.getTitle(), is("XHTML Test Page"));
     assertThat(secondDriver.getTitle(), is("We Leave From Here"));
@@ -83,7 +89,6 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     secondDriver.quit();
   }
 
-  @Ignore
     public void testShouldBeAbleToStartFromAUniqueProfile() {
       FirefoxProfile profile = new FirefoxProfile();
 
@@ -96,10 +101,9 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       }
     }
 
-    @Ignore(FIREFOX)
     public void testANewProfileShouldAllowSettingAdditionalParameters() {
       FirefoxProfile profile = new FirefoxProfile();
-      profile.setPreference("browser.startup.homepage", formPage);
+      profile.setPreference("browser.startup.homepage", pages.formPage);
 
       try {
         WebDriver secondDriver = new FirefoxDriver(profile);
@@ -125,7 +129,6 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore
   public void testShouldBeAbleToStartANewInstanceEvenWithVerboseLogging() {
     FirefoxBinary binary = new FirefoxBinary();
     binary.setEnvironmentProperty("NSPR_LOG_MODULES", "all:5");
@@ -140,7 +143,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
 
   private void sleepBecauseWindowsTakeTimeToOpen() {
     try {
-      Thread.sleep(1000);
+      sleep(1000);
     } catch (InterruptedException e) {
       fail("Interrupted");
     }
@@ -155,13 +158,13 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     // Scenario: Open a new window, make sure the current window still gets
     // native events (keyboard events in this case).
 
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     
     driver.findElement(By.name("windowOne")).click();
     
     sleepBecauseWindowsTakeTimeToOpen();
     
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
     keyReporter.sendKeys("ABC DEF");
@@ -178,7 +181,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     // Scenario: Open a new window, switch to it, make sure it gets native events.
     // Then switch back to the original window, make sure it gets native events.
     
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     
     String originalWinHandle = driver.getWindowHandle();
     
@@ -190,14 +193,14 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
 
     // There should be two windows. We should also see each of the window titles at least once.
     assertEquals(2, allWindowHandles.size());
-    
+
     allWindowHandles.remove(originalWinHandle);
     String newWinHandle = (String) allWindowHandles.toArray()[0];
     
     // Key events in new window.
     driver.switchTo().window(newWinHandle);
     sleepBecauseWindowsTakeTimeToOpen();
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
     keyReporter.sendKeys("ABC DEF");
@@ -206,7 +209,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     // Key events in original window.
     driver.switchTo().window(originalWinHandle);
     sleepBecauseWindowsTakeTimeToOpen();
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     WebElement keyReporter2 = driver.findElement(By.id("keyReporter"));
     keyReporter2.sendKeys("QWERTY");
@@ -222,7 +225,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     // Scenario: Open a new window, switch to it, close it, switch back to the
     // original window - make sure it gets native events.
     
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
     String originalWinHandle = driver.getWindowHandle();
     
     driver.findElement(By.name("windowOne")).click();
@@ -232,7 +235,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     Set<String> allWindowHandles = driver.getWindowHandles();
     // There should be two windows. We should also see each of the window titles at least once.
     assertEquals(2, allWindowHandles.size());
-    
+
     allWindowHandles.remove(originalWinHandle);
     String newWinHandle = (String) allWindowHandles.toArray()[0];
     // Switch to the new window.
@@ -246,7 +249,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     sleepBecauseWindowsTakeTimeToOpen();
 
     // Send events to the new window.
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
     keyReporter.sendKeys("ABC DEF");
     assertThat(keyReporter.getValue(), is("ABC DEF"));
@@ -276,14 +279,66 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
   public void testShouldAllowUserToSuccessfullyOverrideTheHomePage() {
     FirefoxProfile profile = new FirefoxProfile();
     profile.setPreference("browser.startup.page", "1");
-    profile.setPreference("browser.startup.homepage", javascriptPage);
+    profile.setPreference("browser.startup.homepage", pages.javascriptPage);
 
     WebDriver driver2 = new FirefoxDriver(profile);
 
     try {
-      assertEquals(javascriptPage, driver2.getCurrentUrl());
+      assertEquals(pages.javascriptPage, driver2.getCurrentUrl());
     } finally {
       driver2.quit();
     }
+  }
+
+  public void testShouldAllowTwoInstancesOfFirefoxAtTheSameTimeInDifferentThreads()
+      throws InterruptedException {
+    class FirefoxRunner implements Runnable {
+      private WebDriver myDriver;
+      private String url;
+
+      public FirefoxRunner(String url) {
+        this.url = url;
+      }
+
+      public void run() {
+        if (isInDevMode()) {
+          myDriver = new FirefoxDriverTestSuite.TestFirefoxDriver();
+        } else {
+          myDriver = new FirefoxDriver();
+        }
+
+        myDriver.get(url);
+      }
+
+      public void quit() {
+        if (myDriver != null) {
+          myDriver.quit();
+        }
+      }
+
+      public void assertOnRightPage() {
+        Assert.assertEquals(url, myDriver.getCurrentUrl());
+      }
+    }
+
+    FirefoxRunner runnable1 = new FirefoxRunner(pages.formPage);
+    Thread thread1 = new Thread(runnable1);
+    FirefoxRunner runnable2 = new FirefoxRunner(pages.xhtmlTestPage);
+    Thread thread2 = new Thread(runnable2);
+
+    try {
+      thread1.start();
+      thread2.start();
+
+      thread1.join();
+      thread2.join();
+
+      runnable1.assertOnRightPage();
+      runnable1.assertOnRightPage();
+    } finally {
+      runnable1.quit();
+      runnable2.quit();
+    }
+
   }
 }

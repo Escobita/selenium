@@ -73,51 +73,69 @@ Command.innerHTML = function(element) {
 }
 
 Command.loadAPI = function() {
-	if (!this.functions) {
-		var document = this.apiDocument;
-		var functionElements = document.documentElement.getElementsByTagName("function");
-		var functions = {};
-		for (var i = 0; i < functionElements.length; i++) {
-			var element = functionElements.item(i);
-			var def = new CommandDefinition(String(element.attributes.getNamedItem('name').value));
-			var returns = element.getElementsByTagName("return");
-			if (returns.length > 0) {
-				var returnType = new String(returns.item(0).attributes.getNamedItem("type").value);
-				returnType = returnType.replace(/string/, "String");
-				def.returnType = returnType;
-				def.returnDescription = this.innerHTML(returns.item(0));
-			}
-			var comments = element.getElementsByTagName("comment");
-			if (comments.length > 0) {
-				def.comment = this.innerHTML(comments.item(0));
-			}
-			var params = element.getElementsByTagName("param");
-			for (var j = 0; j < params.length; j++) {
-				var paramElement = params.item(j);
-				var param = {};
-				param.name = String(paramElement.attributes.getNamedItem('name').value);
-                param.description = this.innerHTML(paramElement);
-				def.params.push(param);
-			}
-			functions[def.name] = def;
-            // generate negative accessors
-			if (def.name.match(/^(is|get)/)) {
-				def.isAccessor = true;
-				functions["!" + def.name] = def.negativeAccessor();
-			}
-			if (def.name.match(/^assert/)) { // only assertSelected should match
-				var verifyDef = new CommandDefinition(def.name);
-				verifyDef.params = def.params;
-				functions["verify" + def.name.substring(6)] = verifyDef;
-			}
-		}
-		functions['assertFailureOnNext'] = new CommandDefinition('assertFailureOnNext');
-		functions['verifyFailureOnNext'] = new CommandDefinition('verifyFailureOnNext');
-		functions['assertErrorOnNext'] = new CommandDefinition('assertErrorOnNext');
-		functions['verifyErrorOnNext'] = new CommandDefinition('verifyErrorOnNext');
-		this.functions = functions;
-	}
-	return this.functions;
+  if (!this.functions) {
+    var document;
+    var documents = this.apiDocuments;
+    var functions = {};
+    // document.length will be 1 by default, but will grow with plugins
+    for (var d = 0; d < documents.length; d++) {
+      // set the current document. again, by default this is the iedoc-core.xml
+      document = documents[d];
+      
+      // <function name="someName">
+      //   <param name="targetName">description</param>
+      //   <param name="valueName">description</param> -- optional
+      //   <return type="string">description</return> -- optional
+      //   <comment>description for ide here</comment>
+      // </function>
+      var functionElements = document.documentElement.getElementsByTagName("function");
+      for (var i = 0; i < functionElements.length; i++) {
+        var element = functionElements.item(i);
+        var def = new CommandDefinition(String(element.attributes.getNamedItem('name').value));
+        
+        var returns = element.getElementsByTagName("return");
+        if (returns.length > 0) {
+          var returnType = new String(returns.item(0).attributes.getNamedItem("type").value);
+          returnType = returnType.replace(/string/, "String");
+          def.returnType = returnType;
+          def.returnDescription = this.innerHTML(returns.item(0));
+        }
+        
+        var comments = element.getElementsByTagName("comment");
+        if (comments.length > 0) {
+          def.comment = this.innerHTML(comments.item(0));
+        }
+        
+        var params = element.getElementsByTagName("param");
+        for (var j = 0; j < params.length; j++) {
+          var paramElement = params.item(j);
+          var param = {};
+          param.name = String(paramElement.attributes.getNamedItem('name').value);
+          param.description = this.innerHTML(paramElement);
+          def.params.push(param);
+        }
+        
+        functions[def.name] = def;
+
+        // generate negative accessors
+        if (def.name.match(/^(is|get)/)) {
+          def.isAccessor = true;
+          functions["!" + def.name] = def.negativeAccessor();
+        }
+        if (def.name.match(/^assert/)) { // only assertSelected should match
+          var verifyDef = new CommandDefinition(def.name);
+          verifyDef.params = def.params;
+          functions["verify" + def.name.substring(6)] = verifyDef;
+        }
+      }
+    }
+    functions['assertFailureOnNext'] = new CommandDefinition('assertFailureOnNext');
+    functions['verifyFailureOnNext'] = new CommandDefinition('verifyFailureOnNext');
+    functions['assertErrorOnNext'] = new CommandDefinition('assertErrorOnNext');
+    functions['verifyErrorOnNext'] = new CommandDefinition('verifyErrorOnNext');
+    this.functions = functions;
+  }
+  return this.functions;
 }
 
 function CommandDefinition(name) {
@@ -348,12 +366,16 @@ TestCase.prototype.recordModifiedInCommands = function() {
 
 	var _splice = commands.splice;
 	commands.splice = function(index, removeCount, command) {
-		if (command != null) {
-			_splice.call(commands, index, removeCount, command);
+
+                var removed = null;
+		if (command !== undefined && command != null) {
+			removed = _splice.call(commands, index, removeCount, command);
 		} else {
-			_splice.call(commands, index, removeCount);
+			removed = _splice.call(commands, index, removeCount);
 		}
 		self.setModified();
+
+                return removed;
 	}
 
 	var _pop = commands.pop;
@@ -427,6 +449,14 @@ TestCase.prototype.getTitle = function() {
 
 TestCase.prototype.setBaseURL = function(baseURL) {
     this.baseURL = baseURL;
+}
+
+TestCase.prototype.getBaseURL = function() {
+    if (!this.baseURL || this.baseURL == "") {
+		return "http://change-this-to-the-site-you-are-testing/";
+    } else {
+		return this.baseURL;
+	}
 }
 
 observable(TestCase);

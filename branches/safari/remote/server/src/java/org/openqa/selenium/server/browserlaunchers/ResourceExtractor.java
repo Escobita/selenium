@@ -16,15 +16,15 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.tools.ant.util.FileUtils;
-import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.browserlaunchers.NullTrace;
+import org.openqa.selenium.internal.FileHandler;
+import org.openqa.selenium.internal.Trace;
+
 import static org.openqa.selenium.server.browserlaunchers.LauncherUtils.getSeleniumResourceAsStream;
 
 
 public class ResourceExtractor {
-
-    static Log log = LogFactory.getLog(ResourceExtractor.class);
+    private static Trace log = new NullTrace();
     private static final int BUF_SIZE = 8192;
     
     public static File extractResourcePath(String resourcePath, File dest) throws IOException {
@@ -50,7 +50,7 @@ public class ResourceExtractor {
                 if (resourceFile.isDirectory()) {
                     LauncherUtils.copyDirectory(resourceFile, dest);
                 } else {
-                    FileUtils.getFileUtils().copyFile(resourceFile, dest);
+                    FileHandler.copy(resourceFile, dest);
                 }
             } catch (URISyntaxException e) {
                 throw new RuntimeException("Couldn't convert URL to File:" + url, e);
@@ -84,9 +84,13 @@ public class ResourceExtractor {
             copyStream(getSeleniumResourceAsStream(resourcePath), fos);
             
         }
-    } 
+    }
 
-    private static File getJarFileFromUrl(URL url) {
+  public static void traceWith(Trace log) {
+    ResourceExtractor.log = log;
+  }
+
+  private static File getJarFileFromUrl(URL url) {
         if (!"jar".equalsIgnoreCase(url.getProtocol()))
             throw new IllegalArgumentException("This is not a Jar URL:"
                     + url.toString());
@@ -105,8 +109,6 @@ public class ResourceExtractor {
         }
 
     }
-    
-    
     
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
         try {

@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Ionic.Zip;
+using OpenQA.Selenium.Internal;
 
 namespace OpenQA.Selenium.Firefox
 {
@@ -17,7 +18,9 @@ namespace OpenQA.Selenium.Firefox
     {
         #region Constants
         private const string ExtensionName = "fxdriver@googlecode.com";
-        private const string EmNamespaceUri = "http://www.mozilla.org/2004/em-rdf#"; 
+        private const string EmNamespaceUri = "http://www.mozilla.org/2004/em-rdf#";
+        private const string ExtensionFileName = "webdriver.xpi";
+        private const string ExtensionResourceId = "WebDriver.FirefoxExt.zip";
         #endregion
 
         #region Private members
@@ -152,19 +155,17 @@ namespace OpenQA.Selenium.Firefox
             {
                 return;
             }
+         
+            AddExtension(ExtensionFileName);
+        }
 
-            Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            string currentDirectory = executingAssembly.Location;
-
-            // If we're shadow copying,. fiddle with 
-            // the codebase instead 
-            if (AppDomain.CurrentDomain.ShadowCopyFiles)
-            {
-                Uri uri = new Uri(executingAssembly.CodeBase);
-                currentDirectory = uri.LocalPath;
-            }
-
-            InstallExtension(Path.Combine(Path.GetDirectoryName(currentDirectory), "webdriver-extension.zip"));
+        /// <summary>
+        /// Adds a Firefox Extension to this profile
+        /// </summary>
+        /// <param name="extensionToInstall">The path to the new extension</param>
+        public void AddExtension(string extensionToInstall)
+        {
+            InstallExtension(extensionToInstall);
         }
 
         /// <summary>
@@ -241,6 +242,7 @@ namespace OpenQA.Selenium.Firefox
             AddDefaultPreference(prefs, "dom.disable_open_during_load", "false");
             AddDefaultPreference(prefs, "extensions.update.enabled", "false");
             AddDefaultPreference(prefs, "extensions.update.notifyUser", "false");
+            AddDefaultPreference(prefs, "network.manage-offline-status", "false");
             AddDefaultPreference(prefs, "security.fileuri.origin_policy", "3");
             AddDefaultPreference(prefs, "security.fileuri.strict_origin_policy", "false");
             AddDefaultPreference(prefs, "security.warn_entering_secure", "false");
@@ -422,30 +424,22 @@ namespace OpenQA.Selenium.Firefox
             return id;
         }
 
-        private void InstallExtension(string extensionZipPath)
+        private void InstallExtension(string extensionFileName)
         {
-            string tempFileName = Path.Combine(Path.GetTempPath(), "webdriver");
+            string tempFileName = Path.Combine(Path.GetTempPath(), extensionFileName);
             if (Directory.Exists(tempFileName))
             {
                 Directory.Delete(tempFileName, true);
             }
 
             Directory.CreateDirectory(tempFileName);
-            Stream zipFileStream = null;
-            if (!File.Exists(extensionZipPath))
+            string resourceID = string.Empty;
+            if (extensionFileName == ExtensionFileName)
             {
-                // TODO (JimEvans): We assume either (1) the .zip file exists in the same
-                // directory as this assembly, or (2) it exists inside the assembly as
-                // an embedded resource. We can't talk to Firefox if one of those
-                // conditions isn't met, but we need to wrap that up in a nicer error.
-                Assembly executingAssembly = Assembly.GetExecutingAssembly();
-                zipFileStream = executingAssembly.GetManifestResourceStream("WebDriver.FirefoxExt.zip");
-            }
-            else
-            {
-                zipFileStream = new FileStream(extensionZipPath, FileMode.Open, FileAccess.Read);
+                resourceID = ExtensionResourceId;
             }
 
+            Stream zipFileStream = ResourceUtilities.GetResourceStream(extensionFileName, resourceID);
             using (ZipFile extensionZipFile = ZipFile.Read(zipFileStream))
             {
                 extensionZipFile.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;

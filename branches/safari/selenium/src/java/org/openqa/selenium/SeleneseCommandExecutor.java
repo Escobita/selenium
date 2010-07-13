@@ -48,7 +48,6 @@ import org.openqa.selenium.internal.selenesedriver.SubmitElement;
 import org.openqa.selenium.internal.selenesedriver.ToggleElement;
 import org.openqa.selenium.internal.selenesedriver.ExecuteScript;
 import org.openqa.selenium.remote.BeanToJsonConverter;
-import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -60,13 +59,12 @@ import static org.openqa.selenium.remote.DriverCommand.*;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SeleneseCommandExecutor implements CommandExecutor {
   private final ErrorCodes errorCodes;
   private final Selenium instance;
-  private Map<DriverCommand, SeleneseFunction> functions;
+  private Map<String, SeleneseFunction> functions;
 
   public SeleneseCommandExecutor(URL seleniumServer, URL remoteAddress, Capabilities capabilities) {
     this(new HttpCommandProcessor(
@@ -116,12 +114,15 @@ public class SeleneseCommandExecutor implements CommandExecutor {
   }
 
   private void prepareCommands() {
-    functions = ImmutableMap.<DriverCommand, SeleneseFunction>builder()
+    FindElement findElement = new FindElement();
+    
+    functions = ImmutableMap.<String, SeleneseFunction>builder()
         .put(CLEAR_ELEMENT, new ClearElement())
         .put(CLICK_ELEMENT, new ClickElement())
         .put(GET_CURRENT_URL, new GetCurrentUrl())
         .put(EXECUTE_SCRIPT, new ExecuteScript())
-        .put(FIND_ELEMENT, new FindElement())
+        .put(FIND_ELEMENT, findElement)
+        .put(IMPLICITLY_WAIT, findElement.implicitlyWait())
         .put(GET, new GetUrl())
         .put(GET_ELEMENT_ATTRIBUTE, new GetElementAttribute())
         .put(GET_ELEMENT_TEXT, new GetElementText())

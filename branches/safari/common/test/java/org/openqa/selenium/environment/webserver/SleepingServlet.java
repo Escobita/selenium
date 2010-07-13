@@ -26,6 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class SleepingServlet extends HttpServlet {
 
+  private static final String RESPONSE_STRING_FORMAT =
+      "<html><head><title>Done</title></head><body>Slept for %ss</body></html>";
+
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     String duration = request.getParameter("time");
@@ -39,6 +42,7 @@ public class SleepingServlet extends HttpServlet {
 
     response.setContentType("text/html");
 
-    response.getOutputStream().println("<html><head><title>Done</title><head><body></body></html>");
+    response.getOutputStream().println(
+        String.format(RESPONSE_STRING_FORMAT, duration));
   }
 }

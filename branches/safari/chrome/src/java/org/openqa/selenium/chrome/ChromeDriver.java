@@ -8,12 +8,11 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 
 import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +29,13 @@ public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, F
   public ChromeDriver(ChromeProfile profile, ChromeExtension extension) {
     super(new ChromeCommandExecutor(new ChromeBinary(profile, extension)),
         DesiredCapabilities.chrome());
+    
+    setElementConverter(new JsonToWebElementConverter(this) {
+      @Override
+      protected RemoteWebElement newRemoteWebElement() {
+        return new ChromeWebElement(ChromeDriver.this);
+      }
+    });
   }
 
   /**
@@ -69,7 +75,7 @@ public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, F
    * @return response to the command (a Response wrapping a null value if none) 
    */
   @Override
-  protected Response execute(DriverCommand driverCommand, Map<String, ?> parameters) {
+  protected Response execute(String driverCommand, Map<String, ?> parameters) {
     try {
       return super.execute(driverCommand, parameters);
     } catch (Exception e) {
@@ -103,8 +109,7 @@ public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, F
 
   @Override
   protected RemoteWebElement newRemoteWebElement() {
-    RemoteWebElement element = new ChromeWebElement();
-    element.setParent(this);
+    RemoteWebElement element = new ChromeWebElement(this);
     return element;
   }
 

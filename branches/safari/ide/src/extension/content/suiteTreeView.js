@@ -169,5 +169,83 @@ objectExtend(SuiteTreeView.prototype, {
             if (row == this.currentTestCaseIndex) {
                 props.AppendElement(XulUtils.atomService.getAtom("currentTestCase"));
             }
+        },
+
+        getParentIndex: function(index){return -1;},
+
+        getSourceIndexFromDrag: function () {
+            try{
+                var dragService = Cc["@mozilla.org/widget/dragservice;1"].
+                               getService().QueryInterface(Ci.nsIDragService);
+                var dragSession = dragService.getCurrentSession();
+                var transfer = Cc["@mozilla.org/widget/transferable;1"].
+                               createInstance(Ci.nsITransferable);
+
+                transfer.addDataFlavor("text/unicode");
+                dragSession.getData(transfer, 0);
+
+                var dataObj = {};
+                var len = {};
+                var sourceIndex = -1;
+                var out = {};
+
+                transfer.getAnyTransferData(out, dataObj, len);
+
+                if (dataObj.value) {
+                    sourceIndex = dataObj.value.QueryInterface(Ci.nsISupportsString).data;
+                    sourceIndex = parseInt(sourceIndex.substring(0, len.value));
+                }
+
+                var start = new Object();
+                var end = new Object();
+                var numRanges = this.selection.getRangeCount();
+                var n = 0;
+                for (var t = 0; t < numRanges && n <=1; t++){
+                    this.selection.getRangeAt(t,start,end);
+                    for (var v = start.value; v <= end.value && n <=1; v++){
+                       n++;
+                    }
+                }
+                sourceIndex = n > 1 ? -1 : sourceIndex;
+                
+                return sourceIndex;
+
+            }catch(e){
+                new Log("DND").error("getSourceIndexFromDrag error: "+e);
+            }
+        },
+
+        canDrop: function(targetIndex, orientation) {
+                var sourceIndex = this.getSourceIndexFromDrag();
+
+                return (sourceIndex != -1 &&
+                        sourceIndex != targetIndex &&
+                        sourceIndex != (targetIndex + orientation));
+        },
+
+        drop: function(dropIndex, orientation) {
+            try{
+               var sourceIndex = this.getSourceIndexFromDrag();
+
+               if (sourceIndex != -1){
+
+                   if (dropIndex > sourceIndex) {
+                       if (orientation == Ci.nsITreeView.DROP_BEFORE)
+                           dropIndex--;
+                   }else{
+                       if (orientation == Ci.nsITreeView.DROP_AFTER)
+                           dropIndex++;
+                   }
+
+                   //Samit: Ref: Move is now part of the testSuite
+                   this.getTestSuite().move(sourceIndex, dropIndex);
+
+                   this.treebox.invalidate();
+                   this.selection.clearSelection();
+                   this.selection.select(dropIndex);
+               }
+           }catch(e){
+               new Log("DND").error("drop error : "+e);
+           }
         }
     });

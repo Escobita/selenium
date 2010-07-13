@@ -17,7 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server.handler;
 
-import org.openqa.selenium.remote.Capabilities;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.remote.server.DriverSessions;
@@ -52,10 +52,6 @@ public class NewSession implements Handler, JsonParametersAware {
     return sessionId.toString();
   }
 
-  public String getContext() {
-    return "context";
-  }
-  
   @Override
   public String toString() {
     return String.format("[new session: %s]", desiredCapabilities);

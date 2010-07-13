@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
+import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 import static org.openqa.selenium.ie.ExportedWebDriverFunctions.SUCCESS;
 
 import com.sun.jna.Native;
@@ -28,15 +29,20 @@ import com.sun.jna.ptr.PointerByReference;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.browserlaunchers.CapabilityType;
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
+import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.ReturnedCookie;
 import org.openqa.selenium.internal.TemporaryFilesystem;
@@ -50,6 +56,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, TakesScreenshot {
 
@@ -57,8 +64,18 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, Ta
   private Pointer driver;
   private Speed speed = Speed.FAST;
   private ErrorHandler errors = new ErrorHandler();
+  private Thread cleanupThread;
+  private WindowsProxyManager proxyManager;
 
   public InternetExplorerDriver() {
+    this(null);
+  }
+
+  public InternetExplorerDriver(Capabilities caps) {
+    proxyManager = new WindowsProxyManager(true, "webdriver-ie", 0, 0);
+    
+    prepareProxy(caps);
+
     initializeLib();
     PointerByReference ptr = new PointerByReference();
     int result = lib.wdNewDriverInstance(ptr);
@@ -66,6 +83,30 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, Ta
       throw new IllegalStateException("Cannot create new browser instance: " + result);
     }
     driver = ptr.getValue();
+  }
+
+  private void prepareProxy(Capabilities caps) {
+    if (caps == null || caps.getCapability(PROXY) == null) {
+      return;
+    }
+
+    // Because of the way that the proxying is currently implemented,
+    // we can only set a single host.
+
+    try {
+      proxyManager.backupRegistrySettings();
+      proxyManager.changeRegistrySettings(caps);
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
+
+    cleanupThread = new Thread() {
+      @Override
+      public void run() {
+        proxyManager.restoreRegistrySettings(true);
+      }
+    };
+    Runtime.getRuntime().addShutdownHook(cleanupThread);
   }
 
   public String getPageSource() {
@@ -85,6 +126,12 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, Ta
   }
 
   public void quit() {
+    if (proxyManager != null) {
+      proxyManager.restoreRegistrySettings(true);
+    }
+    if (cleanupThread != null) {
+      Runtime.getRuntime().removeShutdownHook(cleanupThread);
+    }
 
     try {
       for (String handle : getWindowHandles()) {
@@ -467,6 +514,19 @@ public class InternetExplorerDriver implements WebDriver, JavascriptExecutor, Ta
 
     public void setSpeed(Speed speed) {
       InternetExplorerDriver.this.speed = speed;
+    }
+
+    public Timeouts timeouts() {
+      return new InternetExplorerTimeouts();
+    }
+  }
+
+  private class InternetExplorerTimeouts implements Timeouts {
+    public Timeouts implicitlyWait(long time, TimeUnit unit) {
+      NativeLong timeout = new NativeLong(unit.toMillis(time));
+      int result = lib.wdSetImplicitWaitTimeout(driver, timeout);
+      errors.verifyErrorCode(result, "Unable to set implicit wait timeout.");
+      return this;
     }
   }
 

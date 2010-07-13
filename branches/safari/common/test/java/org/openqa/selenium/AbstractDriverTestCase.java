@@ -1,6 +1,6 @@
 /*
-Copyright 2007-2009 WebDriver committers
-Copyright 2007-2009 Google Inc.
+Copyright 2007-2010 WebDriver committers
+Copyright 2007-2010 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,27 +36,7 @@ public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
   protected TestEnvironment environment;
   protected AppServer appServer;
   protected WebDriver driver;
-
-  protected String simpleTestPage;
-  protected String xhtmlTestPage;
-  protected String formPage;
-  protected String metaRedirectPage;
-  protected String redirectPage;
-  protected String javascriptEnhancedForm;
-  protected String javascriptPage;
-  protected String framesetPage;
-  protected String iframePage;
-  protected String dragAndDropPage;
-  protected String chinesePage;
-  protected String nestedPage;
-  protected String richTextPage;
-  protected String rectanglesPage;
-  protected String childPage;
-  protected String grandchildPage;
-  protected String uploadPage;
-  protected String svgPage;
-  protected String documentWrite;
-  protected String sleepingPage;
+  protected Pages pages;
 
   public void setDriver(WebDriver driver) {
     this.driver = driver;
@@ -69,26 +49,7 @@ public class AbstractDriverTestCase extends TestCase implements NeedsDriver {
     environment = GlobalTestEnvironment.get();
     appServer = environment.getAppServer();
 
-    simpleTestPage = appServer.whereIs("simpleTest.html");
-    xhtmlTestPage = appServer.whereIs("xhtmlTest.html");
-    formPage = appServer.whereIs("formPage.html");
-    metaRedirectPage = appServer.whereIs("meta-redirect.html");
-    redirectPage = appServer.whereIs("redirect");
-    javascriptEnhancedForm = appServer.whereIs("javascriptEnhancedForm.html");
-    javascriptPage = appServer.whereIs("javascriptPage.html");
-    framesetPage = appServer.whereIs("frameset.html");
-    iframePage = appServer.whereIs("iframes.html");
-    dragAndDropPage = appServer.whereIs("dragAndDropTest.html");
-    chinesePage = appServer.whereIs("cn-test.html");
-    nestedPage = appServer.whereIs("nestedElements.html");
-    richTextPage = appServer.whereIs("rich_text.html");
-    rectanglesPage = appServer.whereIs("rectangles.html");
-    childPage = appServer.whereIs("child/childPage.html");
-    grandchildPage = appServer.whereIs("child/grandchild/grandchildPage.html");
-    uploadPage = appServer.whereIs("upload.html");
-    svgPage = appServer.whereIs("svgPiechart.xhtml");
-    documentWrite = appServer.whereIs("document_write_in_onload.html");
-    sleepingPage = appServer.whereIs("sleep");
+    pages = new Pages(appServer);
 
     String hostName = environment.getAppServer().getHostName();
     String alternateHostName = environment.getAppServer().getAlternateHostName();

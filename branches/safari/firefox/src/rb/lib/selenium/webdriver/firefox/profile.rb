@@ -3,33 +3,10 @@ module Selenium
     module Firefox
       class Profile
 
-        ANONYMOUS_PROFILE_NAME = "WEBDRIVER_ANONYMOUS_PROFILE"
-        EXTENSION_NAME         = "fxdriver@googlecode.com"
-        EM_NAMESPACE_URI       = "http://www.mozilla.org/2004/em-rdf#"
-        NO_FOCUS_LIBRARY_NAME  = "x_ignore_nofocus.so"
-
-        DEFAULT_EXTENSION_SOURCE = File.expand_path("#{WebDriver.root}/firefox/src/extension")
-
-        XPTS = [
-          ["#{WebDriver.root}/firefox/prebuilt/nsINativeEvents.xpt", "components/nsINativeEvents.xpt"],
-          ["#{WebDriver.root}/firefox/prebuilt/nsICommandProcessor.xpt", "components/nsICommandProcessor.xpt"],
-          ["#{WebDriver.root}/firefox/prebuilt/nsIResponseHandler.xpt", "components/nsIResponseHandler.xpt"],
-        ]
-
-        NATIVE_WINDOWS = ["#{WebDriver.root}/firefox/prebuilt/Win32/Release/webdriver-firefox.dll", "platform/WINNT_x86-msvc/components/webdriver-firefox.dll"]
-        NATIVE_LINUX   = [
-          ["#{WebDriver.root}/firefox/prebuilt/linux/Release/libwebdriver-firefox.so", "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so"],
-          ["#{WebDriver.root}/firefox/prebuilt/linux64/Release/libwebdriver-firefox.so", "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so"]
-        ]
-
-        NO_FOCUS = [
-          ["#{WebDriver.root}/firefox/prebuilt/linux64/Release/x_ignore_nofocus.so", "amd64/x_ignore_nofocus.so"],
-          ["#{WebDriver.root}/firefox/prebuilt/linux/Release/x_ignore_nofocus.so", "x86/x_ignore_nofocus.so"],
-        ]
-
-        SHARED = [
-          ["#{WebDriver.root}/common/src/js/extension/dommessenger.js", "content/dommessenger.js"]
-        ]
+        ANONYMOUS_PROFILE_NAME   = "WEBDRIVER_ANONYMOUS_PROFILE"
+        EXTENSION_NAME           = "fxdriver@googlecode.com"
+        EM_NAMESPACE_URI         = "http://www.mozilla.org/2004/em-rdf#"
+        WEBDRIVER_EXTENSION_PATH = File.expand_path("#{WebDriver.root}/selenium/webdriver/firefox/extension/webdriver.xpi")
 
         attr_reader :name, :directory
         attr_writer :secure_ssl, :native_events, :load_no_focus_lib
@@ -64,11 +41,13 @@ module Selenium
             raise Error::WebDriverError, "Profile directory does not exist: #{@directory.inspect}"
           end
 
+          FileReaper << @directory
+
           # TODO: replace constants with options hash
           @port              = DEFAULT_PORT
-          @extension_source  = DEFAULT_EXTENSION_SOURCE
           @native_events     = DEFAULT_ENABLE_NATIVE_EVENTS
           @secure_ssl        = DEFAULT_SECURE_SSL
+          @untrusted_issuer  = DEFAULT_ASSUME_UNTRUSTED_ISSUER
           @load_no_focus_lib = DEFAULT_LOAD_NO_FOCUS_LIB
 
           @additional_prefs  = {}
@@ -111,10 +90,13 @@ module Selenium
           prefs.merge! @additional_prefs
           prefs.merge! DEFAULT_PREFERENCES
 
-          prefs['webdriver_firefox_port']           = @port
-          prefs['webdriver_accept_untrusted_certs'] = 'true' unless secure_ssl?
-          prefs['webdriver_enable_native_events']   = 'true' if native_events?
-          prefs["startup.homepage_welcome_url"]     = prefs["browser.startup.homepage"] # If the user sets the home page, we should also start up there
+          prefs['webdriver_firefox_port']            = @port
+          prefs['webdriver_accept_untrusted_certs']  = !secure_ssl?
+          prefs['webdriver_enable_native_events']    = native_events?
+          prefs['webdriver_assume_untrusted_issuer'] = assume_untrusted_certificate_issuer?
+
+          # If the user sets the home page, we should also start up there
+          prefs["startup.homepage_welcome_url"] = prefs["browser.startup.homepage"]
 
           write_prefs prefs
         end
@@ -122,44 +104,40 @@ module Selenium
         def add_webdriver_extension(force_creation = false)
           ext_path = File.join(extensions_dir, EXTENSION_NAME)
 
-          if File.exists?(ext_path)
+          if File.exists? ext_path
             return unless force_creation
           end
 
-          FileUtils.rm_rf ext_path
-          FileUtils.mkdir_p File.dirname(ext_path), :mode => 0700
-          FileUtils.cp_r @extension_source, ext_path
-
-          from_to = XPTS + SHARED
-
-          if native_events?
-            case Platform.os
-            when :linux
-              NATIVE_LINUX.each do |lib|
-                from_to << lib
-              end
-            when :windows
-              from_to << NATIVE_WINDOWS
-            else
-              raise Error::WebDriverError, "can't enable native events on #{Platform.os.inspect}"
-            end
-          end
-
-          if load_no_focus_lib?
-            from_to += NO_FOCUS
-            modify_link_library_path(NO_FOCUS.map { |source, dest| File.join(ext_path, File.dirname(dest)) })
-          end
-
-          from_to.each do |source, destination|
-            dest = File.join(ext_path, destination)
-            FileUtils.mkdir_p File.dirname(dest)
-            FileUtils.cp source, dest
-          end
-
+          add_extension WEBDRIVER_EXTENSION_PATH
           delete_extensions_cache
         end
 
-        # TODO: add_extension
+        #
+        # Aadd the extension (directory, .zip or .xpi) at the given path to the profile.
+        #
+
+        def add_extension(path)
+          unless File.exist?(path)
+            raise Error::WebDriverError, "could not find extension at #{path.inspect}"
+          end
+
+          if File.directory? path
+            root = path
+          else
+            unless %w[.zip .xpi].include? File.extname(path)
+              raise Error::WebDriverError, "expected .zip or .xpi extension, got #{path.inspect}"
+            end
+
+            root = ZipHelper.unzip(path)
+          end
+
+          id       = read_id_from_install_rdf(root)
+          ext_path = File.join(extensions_dir, id)
+
+          FileUtils.rm_rf ext_path
+          FileUtils.mkdir_p File.dirname(ext_path), :mode => 0700
+          FileUtils.cp_r root, ext_path
+        end
 
         def extensions_dir
           @extensions_dir ||= File.join(directory, "extensions")
@@ -174,17 +152,6 @@ module Selenium
           FileUtils.rm_f cache if File.exist?(cache)
         end
 
-        def modify_link_library_path(paths)
-          old_path = ENV['LD_LIBRARY_PATH']
-
-          unless [nil, ''].include?(old_path)
-            paths << old_path
-          end
-
-          ENV['LD_LIBRARY_PATH'] = paths.join(File::PATH_SEPARATOR)
-          ENV['LD_PRELOAD']      = NO_FOCUS_LIBRARY_NAME
-        end
-
         def native_events?
           @native_events == true
         end
@@ -197,7 +164,22 @@ module Selenium
           @secure_ssl == true
         end
 
+        def assume_untrusted_certificate_issuer?
+          @untrusted_issuer == true
+        end
+
+        def assume_untrusted_certificate_issuer=(bool)
+          @untrusted_issuer = bool
+        end
+
         private
+
+        def read_id_from_install_rdf(directory)
+          rdf_path = File.join(directory, "install.rdf")
+          doc = REXML::Document.new(File.read(rdf_path))
+
+          REXML::XPath.first(doc, "//em:id").text
+        end
 
         def create_tmp_copy(directory)
           tmp_directory = Dir.mktmpdir("webdriver-rb-profilecopy")
@@ -256,6 +238,7 @@ module Selenium
           "dom.disable_open_during_load"              => 'false',
           "extensions.update.enabled"                 => 'false',
           "extensions.update.notifyUser"              => 'false',
+          "network.manage-offline-status"             => 'false',
           "security.warn_entering_secure"             => 'false',
           "security.warn_submit_insecure"             => 'false',
           "security.warn_entering_secure.show_once"   => 'false',

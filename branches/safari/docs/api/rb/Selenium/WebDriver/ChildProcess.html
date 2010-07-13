@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta name="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
 <title>Class: Selenium::WebDriver::ChildProcess</title>
 <link rel="stylesheet" href="../../css/style.css" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="../../css/common.css" type="text/css" media="screen" charset="utf-8" />
@@ -71,6 +71,7 @@
     
   
   
+  
     <dt class="r2 last">Defined in:</dt>
     <dd class="r2 last">common/src/rb/lib/selenium/webdriver/child_process.rb</dd>
   
@@ -88,7 +89,17 @@ Cross platform child process launcher
 </div>
 <div class="tags">
   
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+   
+    
+      <strong class="modules">Modules:</strong> <a href="ChildProcess/IronRubyProcess.html" title="Selenium::WebDriver::ChildProcess::IronRubyProcess (module)">IronRubyProcess</a>, <a href="ChildProcess/JRubyProcess.html" title="Selenium::WebDriver::ChildProcess::JRubyProcess (module)">JRubyProcess</a>, <a href="ChildProcess/WindowsProcess.html" title="Selenium::WebDriver::ChildProcess::WindowsProcess (module)">WindowsProcess</a>
+    
+   
+    
+  
+</p>
+
 
   <h2>Instance Attribute Summary</h2>
   <ul class="summary">
@@ -111,10 +122,10 @@ Cross platform child process launcher
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 Returns the value of attribute pid.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
@@ -122,11 +133,12 @@ Returns the value of attribute pid.
   </ul>
 
 
-  <h2>Instance Method Summary</h2>
+  
+    <h2>Instance Method Summary</h2>
 
-  <ul class="summary">
-    
-      <li class="public ">
+    <ul class="summary">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#assert_started-instance_method" title="#assert_started (instance method)">- (Object) <strong>assert_started</strong> </a>
@@ -141,12 +153,36 @@ Returns the value of attribute pid.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
+      
+        <li class="public ">
+  <span class="summary_signature">
     
-      <li class="public ">
+      <a href="#ensure_death-instance_method" title="#ensure_death (instance method)">- (Object) <strong>ensure_death</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+Tries increasingly harsher methods to make the process die within a
+reasonable time.
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#exit_value-instance_method" title="#exit_value (instance method)">- (Object) <strong>exit_value</strong> </a>
@@ -161,12 +197,15 @@ Returns the value of attribute pid.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'><p>
+Returns the exit value of the process, or nil if it&#8217;s still alive.
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#initialize-instance_method" title="#initialize (instance method)">- (ChildProcess) <strong>initialize</strong>(*args) </a>
@@ -183,15 +222,15 @@ Returns the value of attribute pid.
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 A new instance of ChildProcess.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#kill-instance_method" title="#kill (instance method)">- (Object) <strong>kill</strong> </a>
@@ -206,12 +245,12 @@ A new instance of ChildProcess.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#kill%21-instance_method" title="#kill! (instance method)">- (Object) <strong>kill!</strong> </a>
@@ -226,12 +265,12 @@ A new instance of ChildProcess.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#start-instance_method" title="#start (instance method)">- (Object) <strong>start</strong> </a>
@@ -246,12 +285,12 @@ A new instance of ChildProcess.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#ugly_death%3F-instance_method" title="#ugly_death? (instance method)">- (Boolean) <strong>ugly_death?</strong> </a>
@@ -266,12 +305,12 @@ A new instance of ChildProcess.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#wait-instance_method" title="#wait (instance method)">- (Object) <strong>wait</strong> </a>
@@ -286,12 +325,34 @@ A new instance of ChildProcess.
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
+      
+        <li class="public ">
+  <span class="summary_signature">
     
-  </ul>
+      <a href="#wait_nonblock-instance_method" title="#wait_nonblock (instance method)">- (Object) <strong>wait_nonblock</strong>(timeout) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
 <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -319,8 +380,6 @@ A new instance of ChildProcess
       <pre class="lines">
 
 
-11
-12
 13
 14
 15
@@ -329,10 +388,12 @@ A new instance of ChildProcess
 18
 19
 20
-21</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 13</span>
 
 <span class='def def kw'>def</span> <span class='initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='mult op'>*</span><span class='args identifier id'>args</span><span class='rparen token'>)</span>
   <span class='@args ivar id'>@args</span> <span class='assign token'>=</span> <span class='args identifier id'>args</span>
@@ -383,12 +444,12 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-9
-10
-11</pre>
+11
+12
+13</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 11</span>
 
 <span class='def def kw'>def</span> <span class='pid identifier id'>pid</span>
   <span class='@pid ivar id'>@pid</span>
@@ -440,15 +501,104 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-63
-64
-65</pre>
+114
+115
+116</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 114</span>
 
 <span class='def def kw'>def</span> <span class='assert_started identifier id'>assert_started</span>
   <span class='raise identifier id'>raise</span> <span class='Error constant id'>Error</span><span class='colon2 op'>::</span><span class='WebDriverError constant id'>WebDriverError</span><span class='comma token'>,</span> <span class='string val'>&quot;process not started&quot;</span> <span class='unless unless_mod kw'>unless</span> <span class='@pid ivar id'>@pid</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="ensure_death-instance_method">
+  
+    - (<tt>Object</tt>) <strong>ensure_death</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+Tries increasingly harsher methods to make the process die within a
+reasonable time
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 56</span>
+
+<span class='def def kw'>def</span> <span class='ensure_death identifier id'>ensure_death</span>
+  <span class='begin begin kw'>begin</span>
+    <span class='$stderr gvar id'>$stderr</span><span class='dot token'>.</span><span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;wait_nonblock(5) -&gt; #{self}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+    <span class='return return kw'>return</span> <span class='wait_nonblock identifier id'>wait_nonblock</span><span class='lparen token'>(</span><span class='integer val'>5</span><span class='rparen token'>)</span>
+  <span class='rescue rescue kw'>rescue</span> <span class='Error constant id'>Error</span><span class='colon2 op'>::</span><span class='TimeOutError constant id'>TimeOutError</span>
+    <span class='comment val'># try next</span>
+  <span class='end end kw'>end</span>
+
+  <span class='$stderr gvar id'>$stderr</span><span class='dot token'>.</span><span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;TERM -&gt; #{self}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+  <span class='kill identifier id'>kill</span>
+
+  <span class='begin begin kw'>begin</span>
+    <span class='$stderr gvar id'>$stderr</span><span class='dot token'>.</span><span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;wait_nonblock(5) -&gt; #{self}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+    <span class='return return kw'>return</span> <span class='wait_nonblock identifier id'>wait_nonblock</span><span class='lparen token'>(</span><span class='integer val'>5</span><span class='rparen token'>)</span>
+  <span class='rescue rescue kw'>rescue</span> <span class='Error constant id'>Error</span><span class='colon2 op'>::</span><span class='TimeOutError constant id'>TimeOutError</span>
+    <span class='comment val'># try next</span>
+  <span class='end end kw'>end</span>
+
+  <span class='$stderr gvar id'>$stderr</span><span class='dot token'>.</span><span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;KILL -&gt; #{self}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+  <span class='kill! fid id'>kill!</span>
+
+  <span class='$stderr gvar id'>$stderr</span><span class='dot token'>.</span><span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;wait_nonblock(5) -&gt; #{self}&quot;</span> <span class='if if_mod kw'>if</span> <span class='$DEBUG gvar id'>$DEBUG</span>
+  <span class='wait_nonblock identifier id'>wait_nonblock</span><span class='lparen token'>(</span><span class='integer val'>5</span><span class='rparen token'>)</span>
+<span class='rescue rescue kw'>rescue</span> <span class='Errno constant id'>Errno</span><span class='colon2 op'>::</span><span class='ECHILD constant id'>ECHILD</span>
+  <span class='comment val'># great!</span>
+  <span class='true true kw'>true</span>
 <span class='end end kw'>end</span>
 </pre>
     </td>
@@ -463,19 +613,30 @@ Returns the value of attribute pid
   
 
   
-</p><table class="source_code">
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+Returns the exit value of the process, or nil if it&#8217;s still alive.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-29
-30
-31
-32</pre>
+34
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 34</span>
 
 <span class='def def kw'>def</span> <span class='exit_value identifier id'>exit_value</span>
   <span class='pid identifier id'>pid</span><span class='comma token'>,</span> <span class='status identifier id'>status</span> <span class='assign token'>=</span> <span class='Process constant id'>Process</span><span class='dot token'>.</span><span class='waitpid2 identifier id'>waitpid2</span><span class='lparen token'>(</span><span class='@pid ivar id'>@pid</span><span class='comma token'>,</span> <span class='Process constant id'>Process</span><span class='colon2 op'>::</span><span class='WNOHANG constant id'>WNOHANG</span><span class='rparen token'>)</span>
@@ -500,13 +661,13 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-53
-54
-55
-56</pre>
+104
+105
+106
+107</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 104</span>
 
 <span class='def def kw'>def</span> <span class='kill identifier id'>kill</span>
   <span class='assert_started identifier id'>assert_started</span>
@@ -531,13 +692,13 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-58
-59
-60
-61</pre>
+109
+110
+111
+112</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 109</span>
 
 <span class='def def kw'>def</span> <span class='kill! fid id'>kill!</span>
   <span class='assert_started identifier id'>assert_started</span>
@@ -562,20 +723,20 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-34
-35
-36
-37
-38
 39
 40
 41
 42
 43
-44</pre>
+44
+45
+46
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 39</span>
 
 <span class='def def kw'>def</span> <span class='start identifier id'>start</span>
   <span class='@pid ivar id'>@pid</span> <span class='assign token'>=</span> <span class='fork identifier id'>fork</span> <span class='do do kw'>do</span>
@@ -628,18 +789,16 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-23
-24
 25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 25</span>
 
 <span class='def def kw'>def</span> <span class='ugly_death? fid id'>ugly_death?</span>
-  <span class='code identifier id'>code</span> <span class='assign token'>=</span> <span class='exit_value identifier id'>exit_value</span><span class='lparen token'>(</span><span class='rparen token'>)</span>
-  <span class='comment val'># if exit_val is nil, the process is still alive</span>
+  <span class='code identifier id'>code</span> <span class='assign token'>=</span> <span class='exit_value identifier id'>exit_value</span>
   <span class='code identifier id'>code</span> <span class='andop op'>&amp;&amp;</span> <span class='code identifier id'>code</span> <span class='neq op'>!=</span> <span class='integer val'>0</span>
 <span class='end end kw'>end</span>
 </pre>
@@ -661,15 +820,15 @@ Returns the value of attribute pid
       <pre class="lines">
 
 
-46
-47
-48
-49
-50
-51</pre>
+97
+98
+99
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 97</span>
 
 <span class='def def kw'>def</span> <span class='wait identifier id'>wait</span>
   <span class='assert_started identifier id'>assert_started</span>
@@ -683,14 +842,61 @@ Returns the value of attribute pid
 </table>
 </div>
     
+      <div class="method_details ">
+  <p class="signature " id="wait_nonblock-instance_method">
+  
+    - (<tt>Object</tt>) <strong>wait_nonblock</strong>(timeout) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/child_process.rb', line 84</span>
+
+<span class='def def kw'>def</span> <span class='wait_nonblock identifier id'>wait_nonblock</span><span class='lparen token'>(</span><span class='timeout identifier id'>timeout</span><span class='rparen token'>)</span>
+  <span class='end_time identifier id'>end_time</span> <span class='assign token'>=</span> <span class='Time constant id'>Time</span><span class='dot token'>.</span><span class='now identifier id'>now</span> <span class='plus op'>+</span> <span class='timeout identifier id'>timeout</span>
+  <span class='until until kw'>until</span> <span class='Time constant id'>Time</span><span class='dot token'>.</span><span class='now identifier id'>now</span> <span class='gt op'>&gt;</span> <span class='end_time identifier id'>end_time</span> <span class='orop op'>||</span> <span class='exited identifier id'>exited</span> <span class='assign token'>=</span> <span class='exit_value identifier id'>exit_value</span>
+    <span class='sleep identifier id'>sleep</span> <span class='integer val'>0</span><span class='integer val'>.1</span>
+  <span class='end end kw'>end</span>
+
+  <span class='unless unless kw'>unless</span> <span class='exited identifier id'>exited</span>
+    <span class='raise identifier id'>raise</span> <span class='Error constant id'>Error</span><span class='colon2 op'>::</span><span class='TimeOutError constant id'>TimeOutError</span><span class='comma token'>,</span> <span class='dstring node'>&quot;process still alive after #{timeout} seconds&quot;</span>
+  <span class='end end kw'>end</span>
+
+  <span class='exited identifier id'>exited</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
     
     <div id="footer">
-  Generated on Wed Feb  3 14:47:03 2010 by 
+  Generated on Fri Jun 11 14:24:26 2010 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool">yard</a>
-  0.5.3 (ruby-1.8.7).
+  0.5.4 (ruby-1.8.7).
 </div>
 
   </body>

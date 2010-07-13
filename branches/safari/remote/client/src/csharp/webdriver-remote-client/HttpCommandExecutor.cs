@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace OpenQA.Selenium.Remote
 {
@@ -13,6 +12,8 @@ namespace OpenQA.Selenium.Remote
     /// </summary>
     public class HttpCommandExecutor : ICommandExecutor
     {
+        private const string JsonMimeType = "application/json";
+        private const string RequestAcceptHeader = JsonMimeType + ", image/png";
         private Uri remoteServerUri;
 
         /// <summary>
@@ -26,7 +27,21 @@ namespace OpenQA.Selenium.Remote
                 throw new ArgumentNullException("addressOfRemoteServer", "You must specify a remote address to connect to");
             }
 
+            if (!addressOfRemoteServer.AbsoluteUri.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                addressOfRemoteServer = new Uri(addressOfRemoteServer.ToString() + "/");
+            }
+
             remoteServerUri = addressOfRemoteServer;
+
+            // In the .NET Framework, HttpWebRequest responses with an error code are limited
+            // to 64k by default. Since the remote server error responses include a screenshot,
+            // they can frequently exceed this size. This only applies to the .NET Framework;
+            // Mono does not implement the property.
+            if (Type.GetType("Mono.Runtime", false, true) == null)
+            {
+                HttpWebRequest.DefaultMaximumErrorResponseLength = -1;
+            }
         }
 
         #region ICommandExecutor Members
@@ -38,15 +53,14 @@ namespace OpenQA.Selenium.Remote
         public Response Execute(Command commandToExecute)
         {
             CommandInfo info = CommandInfoRepository.Instance.GetCommandInfo(commandToExecute.Name);
-            HttpWebRequest.DefaultMaximumErrorResponseLength = -1;
             HttpWebRequest request = info.CreateWebRequest(remoteServerUri, commandToExecute);
             request.Timeout = 15000;
-            request.Accept = "application/json, image/png";
+            request.Accept = RequestAcceptHeader;
             if (request.Method == CommandInfo.PostCommand)
             {
                 string payload = commandToExecute.ParametersAsJsonString;
                 byte[] data = Encoding.UTF8.GetBytes(payload);
-                request.ContentType = "application/json";
+                request.ContentType = JsonMimeType;
                 System.IO.Stream requestStream = request.GetRequestStream();
                 requestStream.Write(data, 0, data.Length);
                 requestStream.Close();
@@ -77,9 +91,9 @@ namespace OpenQA.Selenium.Remote
             {
                 string responseString = GetTextOfWebResponse(webResponse);
 
-                if (webResponse.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
+                if (webResponse.ContentType.StartsWith(JsonMimeType, StringComparison.OrdinalIgnoreCase))
                 {
-                    commandResponse = JsonConvert.DeserializeObject<Response>(responseString);
+                    commandResponse = Response.FromJson(responseString);
                 }
                 else
                 {

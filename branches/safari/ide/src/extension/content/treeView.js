@@ -261,7 +261,7 @@ objectExtend(TreeView.prototype, {
          */
         executeAction: function(action) {
             this.undoStack.push(action);
-            this.redoStack.splice(0, this.redoStack.length);
+            this.redoStack.splice(0);
             action.execute();
             window.updateCommands("undo");
         },
@@ -561,6 +561,65 @@ objectExtend(TreeView.prototype, {
             if (0 == col.index && this.testCase.startPoint == command) {
                 props.AppendElement(this.atomService.getAtom("startpoint"));
             }
+        },
+
+        getParentIndex: function(index){return -1;},
+
+        getSourceIndexFromDrag: function () {
+            try{
+                var dragService = Cc["@mozilla.org/widget/dragservice;1"].
+                               getService().QueryInterface(Ci.nsIDragService);
+                var dragSession = dragService.getCurrentSession();
+                var transfer = Cc["@mozilla.org/widget/transferable;1"].
+                               createInstance(Ci.nsITransferable);
+
+                transfer.addDataFlavor("text/unicode");
+                dragSession.getData(transfer, 0);
+
+                var dataObj = {};
+                var len = {};
+                var sourceIndex = -1;
+                var out = {};
+
+                transfer.getAnyTransferData(out, dataObj, len);
+
+                if (dataObj.value) {
+                    sourceIndex = dataObj.value.QueryInterface(Ci.nsISupportsString).data;
+                    sourceIndex = parseInt(sourceIndex.substring(0, len.value));
+                }
+
+                var start = new Object();
+                var end = new Object();
+                var numRanges = this.selection.getRangeCount();
+                var n = 0;
+                for (var t = 0; t < numRanges; t++){
+                    this.selection.getRangeAt(t,start,end);
+                    for (var v = start.value; v <= end.value; v++){
+                       n++;
+                    }
+                }
+                sourceIndex = n > 1 ? -1 : sourceIndex;
+
+                return sourceIndex;
+
+            }catch(e){
+                new Log("DND").error("getSourceIndexFromDrag error: "+e);
+            }
+        },
+
+        canDrop: function(targetIndex, orientation) {
+                var sourceIndex = this.getSourceIndexFromDrag();
+
+                return (sourceIndex != -1 &&
+                        sourceIndex != targetIndex &&
+                        sourceIndex != (targetIndex + orientation));
+        },
+
+        drop: function(dropIndex, orientation) {
+
+            var sourceIndex = this.getSourceIndexFromDrag();
+            if (sourceIndex != -1)
+                this.executeAction(new TreeView.dndCommandAction(this, sourceIndex, dropIndex, orientation));
         }
     });
 
@@ -690,4 +749,71 @@ TreeView.PasteCommandAction.prototype = {
 		this.treeView.selection.select(currentIndex);
 		this.treeView.treebox.ensureRowIsVisible(currentIndex);
 	}
+}
+
+//D'n'D action for the undo/redo process
+TreeView.dndCommandAction = function(treeView, sourceIndex, dropIndex, orientation){
+
+    this.treeView = treeView;
+    this.sourceIndex = sourceIndex;
+    this.dropIndex = dropIndex;
+    this.orientation = orientation;
+    this.sourceIndexU = dropIndex;
+    this.dropIndexU = sourceIndex;
+	if (this.dropIndex > this.sourceIndex) {
+               if (this.orientation == Ci.nsITreeView.DROP_BEFORE)
+                   this.sourceIndexU--;
+    }else{
+        if (this.orientation == Ci.nsITreeView.DROP_AFTER)
+                   this.sourceIndexU++;
+    }
+    this.orientationU = this.orientation == Ci.nsITreeView.DROP_BEFORE ? Ci.nsITreeView.DROP_AFTER : Ci.nsITreeView.DROP_BEFORE;
+}
+
+TreeView.dndCommandAction.prototype = {
+
+    execute: function(){
+
+     try{
+           if (this.dropIndex > this.sourceIndex) {
+               if (this.orientation == Ci.nsITreeView.DROP_BEFORE)
+                   this.dropIndex--;
+           }else{
+               if (this.orientation == Ci.nsITreeView.DROP_AFTER)
+                   this.dropIndex++;
+           }
+
+           var removedRow = this.treeView.testCase.commands.splice(this.sourceIndex, 1)[0];
+           this.treeView.testCase.commands.splice(this.dropIndex, 0, removedRow);
+
+           this.treeView.treebox.invalidate();
+           this.treeView.selection.clearSelection();
+           this.treeView.selection.select(this.dropIndex);
+       }catch(e){
+           new Log("DND").error("dndCommandAction.execute error : "+e);
+       }
+    },
+
+    undo: function(){
+
+        try{
+           if (this.dropIndexU > this.sourceIndexU) {
+               if (this.orientationU == Ci.nsITreeView.DROP_BEFORE)
+                   this.dropIndexU--;
+           }else{
+               if (this.orientationU == Ci.nsITreeView.DROP_AFTER)
+                   this.dropIndexU++;
+           }
+
+           var removedRow = this.treeView.testCase.commands.splice(this.sourceIndexU, 1)[0];
+           this.treeView.testCase.commands.splice(this.dropIndexU, 0, removedRow);
+
+           this.treeView.treebox.invalidate();
+           this.treeView.selection.clearSelection();
+           this.treeView.selection.select(this.dropIndexU);
+        }catch(e){
+           new Log("DND").error("dndCommandAction.undo error : "+e);
+        }
+
+    }
 }

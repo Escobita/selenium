@@ -17,9 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 
@@ -50,6 +50,10 @@ public class DriverSessions {
   }
 
   private void registerDefaults(Platform current) {
+    if (current.equals(Platform.ANDROID)){
+      registerDriver(DesiredCapabilities.android(), "org.openqa.selenium.android.AndroidDriver");
+      return;
+    }
     for (Map.Entry<Capabilities, String> entry : defaultDrivers.entrySet()) {
       Capabilities caps = entry.getKey();
       if (caps.getPlatform() != null && caps.getPlatform().is(current)) {
@@ -65,7 +69,6 @@ public class DriverSessions {
       registerDriver(caps, Class.forName(className).asSubclass(WebDriver.class));
     } catch (ClassNotFoundException e) {
       // OK. Fall through. We just won't be able to create these
-      e.printStackTrace();
     } catch (NoClassDefFoundError e) {
       // OK. Missing a dependency, which is obviously a Bad Thing
       // TODO(simon): Log this!

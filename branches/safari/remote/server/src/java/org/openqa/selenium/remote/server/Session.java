@@ -17,9 +17,20 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server;
 
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Capabilities;
+import org.openqa.selenium.browserlaunchers.CapabilityType;
+import org.openqa.selenium.html5.ApplicationCache;
+import org.openqa.selenium.html5.BrowserConnection;
+import org.openqa.selenium.html5.DatabaseStorage;
+import org.openqa.selenium.html5.LocationContext;
+import org.openqa.selenium.html5.WebStorage;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import java.util.concurrent.Callable;
@@ -44,22 +55,21 @@ public class Session {
     // Ensure that the browser is created on the single thread.
     FutureTask<WebDriver> createBrowser = new FutureTask<WebDriver>(new Callable<WebDriver>() {
       public WebDriver call() throws Exception {
-        EventFiringWebDriver driver =
-            new EventFiringWebDriver(factory.newInstance(capabilities));
-        driver.register(new SnapshotScreenListener(Session.this));
+        WebDriver rawDriver = factory.newInstance(capabilities);
+        if (rawDriver instanceof RemoteWebDriver) {
+          describe(rawDriver, ((RemoteWebDriver) rawDriver).getCapabilities()); 
+        } else {
+          describe(rawDriver, capabilities);
+        }
+        EventFiringWebDriver driver = new EventFiringWebDriver(rawDriver);
+        if (!capabilities.getPlatform().is(Platform.ANDROID)) {
+          driver.register(new SnapshotScreenListener(Session.this));
+        }
         return driver;
       }
     });
     execute(createBrowser);
     this.driver = createBrowser.get();
-
-    boolean isRendered = isRenderingDriver(capabilities);
-    DesiredCapabilities desiredCapabilities =
-        new DesiredCapabilities(capabilities.getBrowserName(), capabilities.getVersion(),
-                                capabilities.getPlatform());
-    desiredCapabilities.setJavascriptEnabled(isRendered);
-
-    this.capabilities = desiredCapabilities;
   }
 
   public <X> X execute(FutureTask<X> future) throws Exception {
@@ -76,13 +86,10 @@ public class Session {
   }
 
   public Capabilities getCapabilities() {
+    if (driver instanceof RemoteWebDriver) {
+      return ((RemoteWebDriver) driver).getCapabilities();
+    }
     return capabilities;
-  }
-
-  private boolean isRenderingDriver(Capabilities capabilities) {
-    String browser = capabilities.getBrowserName();
-
-    return browser != null && !"".equals(browser) && !"htmlunit".equals(browser);
   }
 
   public void attachScreenshot(String base64EncodedImage) {
@@ -93,5 +100,27 @@ public class Session {
     String temp = this.base64EncodedImage;
     base64EncodedImage = null;
     return temp;
+  }
+
+  private void describe(WebDriver instance, Capabilities capabilities) {
+    DesiredCapabilities caps = new DesiredCapabilities(capabilities.asMap());
+    caps.setJavascriptEnabled(instance instanceof JavascriptExecutor);
+    if (instance instanceof TakesScreenshot) {
+      caps.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
+    } else if (instance instanceof DatabaseStorage) {
+      caps.setCapability(CapabilityType.SUPPORTS_SQL_DATABASE, true);
+    } else if (instance instanceof LocationContext) {
+      caps.setCapability(CapabilityType.SUPPORTS_LOCATION_CONTEXT, true);
+    } else if (instance instanceof ApplicationCache) {
+      caps.setCapability(CapabilityType.SUPPORTS_APPLICATION_CACHE, true);
+    } else if (instance instanceof BrowserConnection) {
+      caps.setCapability(CapabilityType.SUPPORTS_BROWSER_CONNECTION, true);
+    } else if (instance instanceof WebStorage) {
+      caps.setCapability(CapabilityType.SUPPORTS_WEB_STORAGE, true);
+    }
+    if (instance instanceof FindsByCssSelector) {
+      caps.setCapability(CapabilityType.SUPPORTS_FINDING_BY_CSS, true);
+    }
+    this.capabilities = caps;
   }
 }

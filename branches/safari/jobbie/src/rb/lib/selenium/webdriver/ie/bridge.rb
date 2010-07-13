@@ -77,6 +77,11 @@ module Selenium
                            "unable to change the visibility of the browser"
         end
 
+        def setImplicitWaitTimeout(milliseconds)
+          check_error_code Lib.wdSetImplicitWaitTimeout(@driver_pointer, milliseconds),
+                           "unable to set implicit wait timeout"
+        end
+
         def switchToWindow(id)
           check_error_code Lib.wdSwitchToWindow(@driver_pointer, wstring_ptr(id)),
                            "unable to locate window #{id.inspect}"
@@ -580,8 +585,13 @@ module Selenium
         end
 
         def check_error_code(code, message)
-          e = WebDriver::Error.for_code(code)
-          raise e, "#{message} (#{code})" if e
+          return unless ex = WebDriver::Error.for_code(code)
+
+          if ex == Error::TimeOutError
+            raise ex, "#{message} (#{code}): The driver reported that the command timed out. There may be several reasons for this. Check that the destination site is in IE's 'Trusted Sites' (accessed from Tools->Internet Options in the 'Security' tab). If it is a trusted site, then the request may have taken more than a minute to finish."
+          else
+            raise ex, "#{message} (#{code})"
+          end
         end
 
       end # Bridge

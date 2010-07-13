@@ -31,7 +31,7 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.browserlaunchers.locators.Firefox2or3Locator;
 
 public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
-  private static Log LOGGER = LogFactory.getLog(FirefoxChromeLauncher.class);
+  private static final Log LOGGER = LogFactory.getLog(FirefoxChromeLauncher.class);
 
   private File customProfileDir = null;
   private String[] cmdarray;
@@ -66,7 +66,9 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
 
     // don't set the library path on Snow Leopard
     Platform platform = Platform.getCurrent();
-    if (!platform.is(Platform.MAC) || ((platform.is(Platform.MAC)) && platform.getMajorVersion() <= 10 && platform.getMinorVersion() <= 5)) {
+    if (!platform.is(Platform.MAC) || ((platform.is(Platform.MAC))
+                                       && platform.getMajorVersion() <= 10
+                                       && platform.getMinorVersion() <= 5)) {
       shell.setLibraryPath(browserInstallation.libraryPath());
     }
     // Set MOZ_NO_REMOTE in order to ensure we always get a new Firefox process
@@ -106,7 +108,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
 
   private void populateCustomProfileDirectory(String profilePath) throws IOException {
     /*
-        * The first time we launch Firefox with an empty profile directory,
+    * The first time we launch Firefox with an empty profile directory,
     * Firefox will launch itself, populate the profile directory, then
     * kill/relaunch itself, so our process handle goes out of date.
     * So, the first time we launch Firefox, we'll start it up at an URL
@@ -185,14 +187,16 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
   }
 
   protected void generatePacAndPrefJs(String homePage) throws IOException {
-    LauncherUtils.ProxySetting proxySetting = LauncherUtils.ProxySetting.NO_PROXY;
-    if (browserConfigurationOptions.is("captureNetworkTraffic") || browserConfigurationOptions.is(
-        "addCustomRequestHeaders")) {
-      proxySetting = LauncherUtils.ProxySetting.PROXY_EVERYTHING;
+    browserConfigurationOptions.setProxyRequired(false);
+    if (browserConfigurationOptions.is("captureNetworkTraffic") ||
+        browserConfigurationOptions.is("addCustomRequestHeaders") ||
+        browserConfigurationOptions.is("trustAllSSLCertificates")) {
+      browserConfigurationOptions.setProxyEverything(true);
+      browserConfigurationOptions.setProxyRequired(true);
     }
 
-    LauncherUtils.generatePacAndPrefJs(customProfileDir, getPort(), proxySetting, homePage,
-        changeMaxConnections, getTimeout(), browserConfigurationOptions.is("avoidProxy"));
+    LauncherUtils.generatePacAndPrefJs(customProfileDir, getPort(), homePage,
+        changeMaxConnections, getTimeout(), browserConfigurationOptions);
   }
 
   private String makeCustomProfile(String homePage) throws IOException {

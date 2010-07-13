@@ -35,6 +35,8 @@ public class ObjectStateAssumptionsTest extends AbstractDriverTestCase {
       throw new IllegalStateException("Assumptions broken for a fresh WebDriver instance", npe);
     } catch (WebDriverException e) {
       // this is fine.
+    } catch (UnsupportedOperationException e) {
+      // This is okay too.
     }
   }
 
@@ -44,7 +46,7 @@ public class ObjectStateAssumptionsTest extends AbstractDriverTestCase {
    */
   @Ignore(SELENESE)
   public void testinitializedWebDriverDoesNotThrowNPE() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     try {
       variousMethodCallsToCheckAssumptions();
     } catch (NullPointerException npe) {

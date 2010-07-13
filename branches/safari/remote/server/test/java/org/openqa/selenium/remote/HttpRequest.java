@@ -22,7 +22,9 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 public class HttpRequest {
-  public HttpRequest(Method method, String url, Object... payload) throws Exception {
+  private String response;
+
+  public HttpRequest(Method method, String url, Object payload) throws Exception {
     if (method == Method.POST) {
       PostMethod post = new PostMethod(url);
       post.addRequestHeader("Accept", "application/json");
@@ -32,10 +34,16 @@ public class HttpRequest {
       post.setRequestEntity(new StringRequestEntity(content, "application/json", "UTF-8"));
 
       new HttpClient().executeMethod(post);
+
+      response = post.getResponseBodyAsString();
       return;
     }
 
     throw new RuntimeException("Unsupported method");
+  }
+
+  public String getResponse() {
+    return response;
   }
 
   public static enum Method {

@@ -5,10 +5,10 @@ module Selenium
       # @private
       class Bridge < Remote::Bridge
 
-        def initialize
+        def initialize(opts = {})
           @executor = CommandExecutor.new
 
-          @launcher = Launcher.launcher
+          @launcher = Launcher.launcher(:default_profile => opts[:default_profile])
           @launcher.launch(@executor.uri)
         end
 
@@ -30,8 +30,8 @@ module Selenium
           rescue IOError
           end
 
-          @launcher.kill
           @executor.close
+          @launcher.quit
         end
 
         def getScreenshot
@@ -47,11 +47,11 @@ module Selenium
         end
 
         def findElementByCssSelector(parent, selector)
-          find_element_by 'css selector', selector, parent
+          find_element_by 'css', selector, parent
         end
 
         def findElementsByCssSelector(parent, selector)
-          find_elements_by 'css selector', selector, parent
+          find_elements_by 'css', selector, parent
         end
 
         def getAllCookies
@@ -60,6 +60,10 @@ module Selenium
 
         def deleteCookie(name)
           execute :deleteCookie, :name => name
+        end
+
+        def setImplicitWaitTimeout(milliseconds)
+          execute :implicitlyWait, :ms => milliseconds
         end
 
         private

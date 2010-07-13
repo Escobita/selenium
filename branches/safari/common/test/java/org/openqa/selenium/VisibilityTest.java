@@ -21,6 +21,9 @@ package org.openqa.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
@@ -30,7 +33,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldAllowTheUserToTellIfAnElementIsDisplayedOrNot() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     assertThat(((RenderedWebElement) driver.findElement(By.id("displayed"))).isDisplayed(),
                is(true));
@@ -42,7 +45,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testVisibilityShouldTakeIntoAccountParentVisibility() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement childDiv = (RenderedWebElement) driver.findElement(By.id("hiddenchild"));
     RenderedWebElement hiddenLink = (RenderedWebElement) driver.findElement(By.id("hiddenlink"));
@@ -53,7 +56,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldCountElementsAsVisibleIfStylePropertyHasBeenSet() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement shown = (RenderedWebElement) driver.findElement(By.id("visibleSubElement"));
 
@@ -62,7 +65,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldModifyTheVisibilityOfAnElementDynamically() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("hideMe"));
 
@@ -75,7 +78,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testHiddenInputElementsAreNeverVisible() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement shown = (RenderedWebElement) driver.findElement(By.name("hidden"));
 
@@ -85,7 +88,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(SELENESE)
   public void testShouldNotBeAbleToClickOnAnElementThatIsNotDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("unclickable"));
 
     try {
@@ -99,7 +102,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {SELENESE, IPHONE}, reason = "iPhone: toggle not yet implemented")
   public void testShouldNotBeAbleToToggleAnElementThatIsNotDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("untogglable"));
 
     try {
@@ -113,7 +116,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(SELENESE)
   public void testShouldNotBeAbleToSelectAnElementThatIsNotDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("untogglable"));
 
     try {
@@ -127,7 +130,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(SELENESE)
   public void testShouldNotBeAbleToTypeAnElementThatIsNotDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
     WebElement element = driver.findElement(By.id("unclickable"));
 
     try {
@@ -143,7 +146,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, IE, SELENESE})
   public void testShouldNotAllowAnElementWithZeroHeightToBeCountedAsDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement zeroHeight = (RenderedWebElement) driver.findElement(By.id("zeroheight"));
 
@@ -153,7 +156,7 @@ public class VisibilityTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({HTMLUNIT, IE, SELENESE})
   public void testShouldNotAllowAnElementWithZeroWidthToBeCountedAsDisplayed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement zeroWidth = (RenderedWebElement) driver.findElement(By.id("zerowidth"));
 

@@ -22,6 +22,7 @@
     <RemoteDescendentReferences Include="@(ReferenceAssemblies)"/>
     <RemoteDescendentReferences Include="$(BuildOutputDirectory)\WebDriver.Common.dll"/> 
     <RemoteDescendentReferences Include="$(BuildOutputDirectory)\WebDriver.Remote.dll"/> 
+    <RemoteDescendentReferences Include="$(BuildOutputDirectory)\WebDriver.Remote.Common.dll"/> 
   </ItemGroup>
 
   <ItemGroup>
@@ -50,16 +51,43 @@
   </Target>
 
   <ItemGroup>
+    <RemoteCommonSourceFiles Include="$(TrunkRoot)\remote\common\src\csharp\**\*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <RemoteCommonReferences Include="@(CommonReferences)"/> 
+    <RemoteCommonReferences Include="$(JsonAssemblyPath)"/> 
+    <RemoteCommonReferences Include="$(BuildOutputDirectory)\WebDriver.Common.dll"/> 
+  </ItemGroup>
+
+  <Target Name="BuildRemoteCommon" DependsOnTargets="BuildCommon">
+    <Message Text="Building WebDriver.Remote.Common.dll"/>
+    <Csc Sources="@(RemoteCommonSourceFiles)"
+         References="@(RemoteCommonReferences)"
+         OutputAssembly="$(BuildOutputDirectory)\WebDriver.Remote.Common.dll"
+         TargetType="library"
+         DebugType="pdbonly"
+         Optimize="true"
+         AllowUnsafeBlocks="false"
+         DocumentationFile="$(BuildOutputDirectory)\WebDriver.Remote.Common.xml"
+    />
+    <Copy SourceFiles="@(ReferenceAssemblies)"
+          DestinationFolder="$(BuildOutputDirectory)"
+          Condition="!Exists('$(BuildOutputDirectory)\%(Filename)%(Extension)')"
+    />
+  </Target>
+
+  <ItemGroup>
     <RemoteSourceFiles Include="$(TrunkRoot)\remote\client\src\csharp\**\*.cs"/>
   </ItemGroup>
 
   <ItemGroup>
     <RemoteReferences Include="@(CommonReferences)"/> 
-    <RemoteReferences Include="$(JsonAssemblyPath)"/> 
     <RemoteReferences Include="$(BuildOutputDirectory)\WebDriver.Common.dll"/> 
+    <RemoteReferences Include="$(BuildOutputDirectory)\WebDriver.Remote.Common.dll"/> 
   </ItemGroup>
 
-  <Target Name="BuildRemote" DependsOnTargets="BuildCommon">
+  <Target Name="BuildRemote" DependsOnTargets="BuildRemoteCommon">
     <Message Text="Building WebDriver.Remote.dll"/>
     <Csc Sources="@(RemoteSourceFiles)"
          References="@(RemoteReferences)"
@@ -117,20 +145,20 @@
   </ItemGroup>
 
   <ItemGroup>
-     <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\Linux\Release\x_ignore_nofocus.so">
+     <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\i386\libnoblur.so">
       <LogicalName>WebDriver.FirefoxNoFocus.x86.dll</LogicalName>
     </FirefoxResources>
-    <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\Linux64\Release\x_ignore_nofocus.so">
+    <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\amd64\libnoblur64.so">
       <LogicalName>WebDriver.FirefoxNoFocus.amd64.dll</LogicalName> 
     </FirefoxResources>
-    <FirefoxResources Include="$(TrunkRoot)\build\webdriver-extension.zip">
+    <FirefoxResources Include="$(TrunkRoot)\build\firefox\webdriver.xpi">
       <LogicalName>WebDriver.FirefoxExt.zip</LogicalName> 
     </FirefoxResources>
   </ItemGroup>
 
-  <Target Name="BuildFirefox" DependsOnTargets="BuildCommon">
-    <Error Text="Could not find webdriver-extension.zip. Expected to find it in $(TrunkRoot)\build."
-           Condition="!Exists('$(TrunkRoot)\build\webdriver-extension.zip')"/>
+  <Target Name="BuildFirefox" DependsOnTargets="BuildRemote">
+    <Error Text="Could not find webdriver.xpi. Expected to find it in $(TrunkRoot)\build."
+           Condition="!Exists('$(TrunkRoot)\build\firefox\webdriver.xpi')"/>
     <Message Text="Building WebDriver.Firefox.dll"/>
     <Csc Sources="@(FirefoxSourceFiles)"
          References="@(RemoteDescendentReferences)"
@@ -153,7 +181,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ChromeResources Include="$(TrunkRoot)\build\chrome-extension.zip">
+    <ChromeResources Include="$(TrunkRoot)\build\chrome\chrome-extension.zip">
       <LogicalName>WebDriver.ChromeExt.zip</LogicalName> 
     </ChromeResources>
     <!--ChromeResources Include="$(TrunkRoot)\build\Win32\Release\chrome-extension.zip">
@@ -164,9 +192,9 @@
     </ChromeResources-->
   </ItemGroup>
 
-  <Target Name="BuildChrome" DependsOnTargets="BuildCommon;BuildRemote">
+  <Target Name="BuildChrome" DependsOnTargets="BuildRemote">
     <Error Text="Could not find chrome-extension.zip. Expected to find it in $(TrunkRoot)\build."
-           Condition="!Exists('$(TrunkRoot)\build\chrome-extension.zip')"/>
+           Condition="!Exists('$(TrunkRoot)\build\chrome\chrome-extension.zip')"/>
     <!--Error Text="Could not find 32-bit chrome-extension.zip. Expected to find it in $(TrunkRoot)\build\Win32\Release\."
            Condition="!Exists('$(TrunkRoot)\build\Win32\Release\chrome-extension.zip')"/-->
     <!--Error Text="Could not find 64-bit chrome-extension.zip. Expected to find it in $(TrunkRoot)\build\x64\Release."
@@ -188,6 +216,60 @@
     />
   </Target>
 
+  <ItemGroup>
+    <SeleniumCoreSourceFiles Include="$(TrunkRoot)\selenium\src\csharp\core\**\*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SeleniumCoreReferences Include="@(CommonReferences)"/>
+    <SeleniumCoreReferences Include="System.Web.dll"/>
+  </ItemGroup>
+
+  <Target Name="BuildSeleniumCore">
+    <Message Text="Building ThoughtWorks.Selenium.Core.dll"/>
+    <Csc Sources="@(SeleniumCoreSourceFiles)"
+         References="@(CommonReferences)"
+         OutputAssembly="$(BuildOutputDirectory)\ThoughtWorks.Selenium.Core.dll"
+         DebugType="pdbonly"
+         TargetType="library"
+         Optimize="true"
+         AllowUnsafeBlocks="false"
+         DocumentationFile="$(BuildOutputDirectory)\Core.xml"
+    />
+  </Target>
+
+  <ItemGroup>
+    <WebDriverBackedSeleniumSourceFiles Include="$(TrunkRoot)\selenium\src\csharp\WebDriverBackedSelenium\**\*.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WebDriverBackedSeleniumReferences Include="@(CommonReferences)"/>
+    <WebDriverBackedSeleniumReferences Include="$(BuildOutputDirectory)\WebDriver.Common.dll"/> 
+    <WebDriverBackedSeleniumReferences Include="$(BuildOutputDirectory)\ThoughtWorks.Selenium.Core.dll"/> 
+  </ItemGroup>
+
+  <ItemGroup>
+    <WebDriverBackedSeleniumResources Include="$(TrunkRoot)\selenium\src\java\org\openqa\selenium\internal\seleniumemulation\htmlutils.js">
+      <LogicalName>htmlutils.js</LogicalName> 
+    </WebDriverBackedSeleniumResources>
+    <WebDriverBackedSeleniumResources Include="$(TrunkRoot)\selenium\src\java\org\openqa\selenium\internal\seleniumemulation\injectableSelenium.js">
+      <LogicalName>injectableSelenium.js</LogicalName> 
+    </WebDriverBackedSeleniumResources>
+  </ItemGroup>
+
+  <Target Name="BuildWebDriverBackedSelenium" DependsOnTargets="BuildCommon;BuildSeleniumCore">
+    <Message Text="Building WebDriverBackedSelenium.dll"/>
+    <Csc Sources="@(WebDriverBackedSeleniumSourceFiles)"
+         References="@(WebDriverBackedSeleniumReferences)"
+         Resources="@(WebDriverBackedSeleniumResources)"
+         OutputAssembly="$(BuildOutputDirectory)\WebDriverBackedSelenium.dll"
+         DebugType="pdbonly"
+         TargetType="library"
+         Optimize="true"
+         AllowUnsafeBlocks="false"
+    />
+  </Target>
+
   <Target Name="BuildNativeCode">
     <MSBuild Projects="$(TrunkRoot)\WebDriver.sln" Properties="Configuration=Release;Platform=Win32"/>
     <MSBuild Projects="$(TrunkRoot)\WebDriver.sln" Properties="Configuration=Release;Platform=x64"/>
@@ -197,10 +279,10 @@
     <Delete Files="@(OutputFiles)" Condition="Exists('$(BuildOutputDirectory)')"/>
   </Target>
 
-  <Target Name="BuildManagedCode" DependsOnTargets="BuildCommon;BuildRemote;BuildIE;BuildFirefox;BuildChrome">
+  <Target Name="BuildManagedCode" DependsOnTargets="BuildCommon;BuildRemoteCommon;BuildRemote;BuildIE;BuildFirefox;BuildChrome;BuildSeleniumCore;BuildWebDriverBackedSelenium">
   </Target>
 
-  <Target Name="RebuildManagedCode" DependsOnTargets="Clean;BuildCommon;BuildRemote;BuildIE;BuildFirefox;BuildChrome">
+  <Target Name="RebuildManagedCode" DependsOnTargets="Clean;BuildCommon;BuildRemoteCommon;BuildRemote;BuildIE;BuildFirefox;BuildChrome;BuildSeleniumCore;BuildWebDriverBackedSelenium">
   </Target>
 
   <Target Name="BuildDocs" DependsOnTargets="BuildManagedCode">

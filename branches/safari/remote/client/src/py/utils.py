@@ -22,7 +22,11 @@ try:
     import json
 except ImportError: # < 2.6
     import simplejson as json
-from ..common.exceptions import NoSuchElementException
+
+if not hasattr(json, 'dumps'):
+    import simplejson as json
+
+from selenium.common.exceptions import NoSuchElementException
 
 
 def format_json(json_struct):
@@ -104,5 +108,5 @@ def unzip_to_temp_dir(zip_file_name):
 
     except IOError, err:
         logging.error(
-            "Error in extracting webdriver-extension.zip: %s" % err)
+            "Error in extracting webdriver.xpi: %s" % err)
         return None

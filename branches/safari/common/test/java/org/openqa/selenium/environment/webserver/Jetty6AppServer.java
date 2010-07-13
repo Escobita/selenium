@@ -25,13 +25,14 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.servlet.MultiPartFilter;
 import org.openqa.selenium.NetworkUtils;
+import org.openqa.selenium.internal.PortProber;
 
 import junit.framework.Assert;
 
 import javax.servlet.Servlet;
 import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
+
+import static org.openqa.selenium.internal.PortProber.*;
 
 public class Jetty6AppServer implements AppServer {
 
@@ -49,8 +50,14 @@ public class Jetty6AppServer implements AppServer {
   private File thirdPartyJsRoot;
   private final Server server;
   private WebAppContext context;
-
+  private final String hostName;
+  
   public Jetty6AppServer() {
+    this("localhost");
+  }
+  
+  public Jetty6AppServer(String hostName) {
+    this.hostName = hostName;
     // Be quiet. Unless we want things to be chatty
     if (!Boolean.getBoolean("webdriver.debug")) {
       new NullLogger().disableLogging();
@@ -70,6 +77,7 @@ public class Jetty6AppServer implements AppServer {
 
     addServlet("Redirecter", "/redirect", RedirectServlet.class);
     addServlet("InfinitePagerServer", "/page/*", PageServlet.class);
+    addServlet("Manifest", "/manifest/*", ManifestServlet.class);
     addServlet("Uploader", "/upload", UploadServlet.class);
     addServlet("Unusual encoding", "/encoding", EncodingServlet.class);
     addServlet("Sleeper", "/sleep", SleepingServlet.class);
@@ -77,24 +85,6 @@ public class Jetty6AppServer implements AppServer {
 
     listenOn(findFreePort());
     listenSecurelyOn(findFreePort());
-  }
-
-  protected int findFreePort() {
-    ServerSocket socket = null;
-    try {
-      socket = new ServerSocket(0);
-      return socket.getLocalPort();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (socket != null) {
-        try {
-          socket.close();
-        } catch (IOException e) {
-          // Throw this away
-        }
-      }
-    }
   }
 
   public File getJsTestRoot() {
@@ -156,7 +146,7 @@ public class Jetty6AppServer implements AppServer {
   }
 
   public String getHostName() {
-    return "localhost";
+    return hostName;
   }
 
   public String getAlternateHostName() {
@@ -266,7 +256,7 @@ public class Jetty6AppServer implements AppServer {
   }
 
   public static void main(String[] args) {
-    Jetty6AppServer server = new Jetty6AppServer();
+    Jetty6AppServer server = new Jetty6AppServer("localhost");
     server.port = 2310;
     server.start();
   }

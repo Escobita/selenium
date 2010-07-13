@@ -16,6 +16,8 @@ limitations under the License.
 */
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -30,7 +32,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({SELENESE, IPHONE})
   public void testShouldPickUpStyleOfAnElement() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("green-parent"));
     String backgroundColour = element.getValueOfCssProperty("background-color");
@@ -47,7 +49,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @Ignore({IE, CHROME, SELENESE, IPHONE})
   //Reason for Chrome: WebKit bug 28804
   public void testShouldHandleNonIntegerPositionAndSize() {
-    driver.get(rectanglesPage);
+    driver.get(pages.rectanglesPage);
 
     RenderedWebElement r2 = (RenderedWebElement) driver.findElement(By.id("r2"));
     String left = r2.getValueOfCssProperty("left");
@@ -65,7 +67,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({SELENESE, IPHONE})
   public void testShouldAllowInheritedStylesToBeUsed() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("green-item"));
     String backgroundColour = element.getValueOfCssProperty("background-color");
@@ -76,7 +78,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({IPHONE, CHROME, SELENESE, HTMLUNIT})
   public void testShouldAllowUsersToHoverOverElements() {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));
     if (!Platform.getCurrent().is(Platform.WINDOWS)) {
@@ -96,7 +98,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(SELENESE)
   public void testShouldCorrectlyIdentifyThatAnElementHasWidth() {
-    driver.get(xhtmlTestPage);
+    driver.get(pages.xhtmlTestPage);
 
     RenderedWebElement shrinko = (RenderedWebElement) driver.findElement(By.id("linkId"));
     Dimension size = shrinko.getSize();
@@ -107,7 +109,7 @@ public class RenderedWebElementTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore
   public void testCanClickOnSuckerFishMenuItem() throws Exception {
-    driver.get(javascriptPage);
+    driver.get(pages.javascriptPage);
 
     RenderedWebElement element = (RenderedWebElement) driver.findElement(By.id("menu1"));
     if (!Platform.getCurrent().is(Platform.WINDOWS)) {

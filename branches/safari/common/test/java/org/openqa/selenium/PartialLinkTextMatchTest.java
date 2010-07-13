@@ -17,6 +17,9 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -27,7 +30,7 @@ public class PartialLinkTextMatchTest extends AbstractDriverTestCase {
 
   @Ignore({IE, REMOTE, SELENESE})
   public void testLinkWithFormattingTags() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     WebElement elem = driver.findElement(By.id("links"));
 
     WebElement res =
@@ -38,7 +41,7 @@ public class PartialLinkTextMatchTest extends AbstractDriverTestCase {
 
   @Ignore({IE, REMOTE, SELENESE})
   public void testLinkWithLeadingSpaces() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     WebElement elem = driver.findElement(By.id("links"));
 
     WebElement res = elem.findElement(By.partialLinkText("link with leading space"));
@@ -48,7 +51,7 @@ public class PartialLinkTextMatchTest extends AbstractDriverTestCase {
 
   @Ignore({IE, REMOTE, SELENESE})
   public void testLinkWithTrailingSpace() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     WebElement elem = driver.findElement(By.id("links"));
 
     WebElement res =
@@ -59,7 +62,7 @@ public class PartialLinkTextMatchTest extends AbstractDriverTestCase {
 
   @Ignore({IE, REMOTE, SELENESE})
   public void testFindMultipleElements() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     WebElement elem = driver.findElement(By.id("links"));
 
     Collection<WebElement> elements =
@@ -69,7 +72,7 @@ public class PartialLinkTextMatchTest extends AbstractDriverTestCase {
   }
   
   public void testCanGetLinkByLinkTestIgnoringTrailingWhitespace() {
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
     WebElement link = null;
     try {
       link = driver.findElement(By.linkText("link with trailing space"));

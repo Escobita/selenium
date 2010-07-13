@@ -20,6 +20,8 @@ package org.openqa.selenium;
 import java.io.File;
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.assertTrue;
+
 public class SnapshotTakingTest extends AbstractDriverTestCase {
 
   public void testShouldTakeSnapshotsOfThePage() throws Exception {
@@ -27,7 +29,7 @@ public class SnapshotTakingTest extends AbstractDriverTestCase {
       return;
     }
 
-    driver.get(simpleTestPage);
+    driver.get(pages.simpleTestPage);
 
     File temp = File.createTempFile("snapshot", "png");
     temp.deleteOnExit();

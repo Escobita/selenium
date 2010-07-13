@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta name="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
 <title>Module: Selenium::WebDriver</title>
 <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
@@ -56,9 +56,10 @@
     
   
   
+  
     <dt class="r1 last">Defined in:</dt>
     <dd class="r1 last">common/src/rb/lib/selenium/webdriver.rb<span class="defines">,<br />
-  jobbie/src/rb/lib/selenium/webdriver/ie.rb,<br /> common/src/rb/lib/selenium/webdriver/find.rb,<br /> common/src/rb/lib/selenium/webdriver/keys.rb,<br /> common/src/rb/lib/selenium/webdriver/error.rb,<br /> common/src/rb/lib/selenium/webdriver/driver.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/lib.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/util.rb,<br /> common/src/rb/lib/selenium/webdriver/options.rb,<br /> common/src/rb/lib/selenium/webdriver/element.rb,<br /> common/src/rb/lib/selenium/webdriver/platform.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/bridge.rb,<br /> common/src/rb/lib/selenium/webdriver/navigation.rb,<br /> common/src/rb/lib/selenium/webdriver/child_process.rb,<br /> common/src/rb/lib/selenium/webdriver/bridge_helper.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/util.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/bridge.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote.rb,<br /> common/src/rb/lib/selenium/webdriver/target_locator.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/binary.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/bridge.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/launcher.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/profile.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/launcher.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/bridge.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/profiles_ini.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/response.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/command_executor.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/capabilities.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/server_error.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/extension_connection.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/default_http_client.rb,<br /> common/src/rb/lib/selenium/webdriver/driver_extensions/takes_screenshot.rb</span>
+  jobbie/src/rb/lib/selenium/webdriver/ie.rb,<br /> common/src/rb/lib/selenium/webdriver/find.rb,<br /> common/src/rb/lib/selenium/webdriver/keys.rb,<br /> common/src/rb/lib/selenium/webdriver/error.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome.rb,<br /> common/src/rb/lib/selenium/webdriver/driver.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/lib.rb,<br /> common/src/rb/lib/selenium/webdriver/element.rb,<br /> common/src/rb/lib/selenium/webdriver/options.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/util.rb,<br /> common/src/rb/lib/selenium/webdriver/platform.rb,<br /> common/src/rb/lib/selenium/webdriver/timeouts.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox.rb,<br /> jobbie/src/rb/lib/selenium/webdriver/ie/bridge.rb,<br /> common/src/rb/lib/selenium/webdriver/navigation.rb,<br /> common/src/rb/lib/selenium/webdriver/file_reaper.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/bridge.rb,<br /> common/src/rb/lib/selenium/webdriver/bridge_helper.rb,<br /> common/src/rb/lib/selenium/webdriver/child_process.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/util.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote.rb,<br /> common/src/rb/lib/selenium/webdriver/target_locator.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/launcher.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/binary.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/bridge.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/profile.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/launcher.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/bridge.rb,<br /> firefox/src/rb/lib/selenium/webdriver/firefox/profiles_ini.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/response.rb,<br /> chrome/src/rb/lib/selenium/webdriver/chrome/command_executor.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/http/curb.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/http/common.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/capabilities.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/server_error.rb,<br /> remote/client/src/rb/lib/selenium/webdriver/remote/http/default.rb,<br /> common/src/rb/lib/selenium/webdriver/driver_extensions/takes_screenshot.rb</span>
 </dd>
   
 </dl>
@@ -68,22 +69,23 @@
 <p class="children">
    
     
-      <strong class="modules">Modules:</strong> <a href="WebDriver/BridgeHelper.html" title="Selenium::WebDriver::BridgeHelper (module)">BridgeHelper</a>, <a href="WebDriver/Chrome.html" title="Selenium::WebDriver::Chrome (module)">Chrome</a>, <a href="WebDriver/DriverExtensions.html" title="Selenium::WebDriver::DriverExtensions (module)">DriverExtensions</a>, <a href="WebDriver/Error.html" title="Selenium::WebDriver::Error (module)">Error</a>, <a href="WebDriver/Find.html" title="Selenium::WebDriver::Find (module)">Find</a>, <a href="WebDriver/Firefox.html" title="Selenium::WebDriver::Firefox (module)">Firefox</a>, <a href="WebDriver/IE.html" title="Selenium::WebDriver::IE (module)">IE</a>, <a href="WebDriver/Keys.html" title="Selenium::WebDriver::Keys (module)">Keys</a>, <a href="WebDriver/Platform.html" title="Selenium::WebDriver::Platform (module)">Platform</a>, <a href="WebDriver/Remote.html" title="Selenium::WebDriver::Remote (module)">Remote</a>
+      <strong class="modules">Modules:</strong> <a href="WebDriver/BridgeHelper.html" title="Selenium::WebDriver::BridgeHelper (module)">BridgeHelper</a>, <a href="WebDriver/Chrome.html" title="Selenium::WebDriver::Chrome (module)">Chrome</a>, <a href="WebDriver/DriverExtensions.html" title="Selenium::WebDriver::DriverExtensions (module)">DriverExtensions</a>, <a href="WebDriver/Error.html" title="Selenium::WebDriver::Error (module)">Error</a>, <a href="WebDriver/FileReaper.html" title="Selenium::WebDriver::FileReaper (module)">FileReaper</a>, <a href="WebDriver/Find.html" title="Selenium::WebDriver::Find (module)">Find</a>, <a href="WebDriver/Firefox.html" title="Selenium::WebDriver::Firefox (module)">Firefox</a>, <a href="WebDriver/IE.html" title="Selenium::WebDriver::IE (module)">IE</a>, <a href="WebDriver/Keys.html" title="Selenium::WebDriver::Keys (module)">Keys</a>, <a href="WebDriver/Platform.html" title="Selenium::WebDriver::Platform (module)">Platform</a>, <a href="WebDriver/Remote.html" title="Selenium::WebDriver::Remote (module)">Remote</a>
     
    
     
-      <strong class="classes">Classes:</strong> <a href="WebDriver/ChildProcess.html" title="Selenium::WebDriver::ChildProcess (class)">ChildProcess</a>, <a href="WebDriver/Dimension.html" title="Selenium::WebDriver::Dimension (class)">Dimension</a>, <a href="WebDriver/Driver.html" title="Selenium::WebDriver::Driver (class)">Driver</a>, <a href="WebDriver/Element.html" title="Selenium::WebDriver::Element (class)">Element</a>, <a href="WebDriver/Navigation.html" title="Selenium::WebDriver::Navigation (class)">Navigation</a>, <a href="WebDriver/Options.html" title="Selenium::WebDriver::Options (class)">Options</a>, <a href="WebDriver/Point.html" title="Selenium::WebDriver::Point (class)">Point</a>, <a href="WebDriver/TargetLocator.html" title="Selenium::WebDriver::TargetLocator (class)">TargetLocator</a>
+      <strong class="classes">Classes:</strong> <a href="WebDriver/ChildProcess.html" title="Selenium::WebDriver::ChildProcess (class)">ChildProcess</a>, <a href="WebDriver/Dimension.html" title="Selenium::WebDriver::Dimension (class)">Dimension</a>, <a href="WebDriver/Driver.html" title="Selenium::WebDriver::Driver (class)">Driver</a>, <a href="WebDriver/Element.html" title="Selenium::WebDriver::Element (class)">Element</a>, <a href="WebDriver/Navigation.html" title="Selenium::WebDriver::Navigation (class)">Navigation</a>, <a href="WebDriver/Options.html" title="Selenium::WebDriver::Options (class)">Options</a>, <a href="WebDriver/Point.html" title="Selenium::WebDriver::Point (class)">Point</a>, <a href="WebDriver/TargetLocator.html" title="Selenium::WebDriver::TargetLocator (class)">TargetLocator</a>, <a href="WebDriver/Timeouts.html" title="Selenium::WebDriver::Timeouts (class)">Timeouts</a>
     
   
 </p>
 
 
 
-  <h2>Class Method Summary</h2>
+  
+    <h2>Class Method Summary</h2>
 
-  <ul class="summary">
-    
-      <li class="public ">
+    <ul class="summary">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#for-class_method" title="for (class method)">+ (Object) <strong>for</strong>(*args) </a>
@@ -98,12 +100,12 @@
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#root-class_method" title="root (class method)">+ (Object) <strong>root</strong> </a>
@@ -118,12 +120,14 @@
   
 
   
-    <span class="summary_desc"></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
-    
-  </ul>
+      
+    </ul>
+  
+
 
 
   <div id="class_method_details" class="method_details_list">
@@ -137,18 +141,33 @@
   
 
   
-</p><table class="source_code">
+</p><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+  <h3>See Also:</h3>
+  <ul class="see">
+    
+      <li><a href="WebDriver/Driver.html#for-class_method" title="Selenium::WebDriver::Driver.for (method)">Selenium::WebDriver::Driver.for</a></li>
+    
+  </ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-61
-62
-63</pre>
+72
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver.rb', line 72</span>
 
 <span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='for identifier id'>for</span><span class='lparen token'>(</span><span class='mult op'>*</span><span class='args identifier id'>args</span><span class='rparen token'>)</span>
   <span class='WebDriver constant id'>WebDriver</span><span class='colon2 op'>::</span><span class='Driver constant id'>Driver</span><span class='dot token'>.</span><span class='for identifier id'>for</span><span class='lparen token'>(</span><span class='mult op'>*</span><span class='args identifier id'>args</span><span class='rparen token'>)</span>
@@ -172,12 +191,12 @@
       <pre class="lines">
 
 
-57
-58
-59</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver.rb', line 64</span>
 
 <span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='root identifier id'>root</span>
   <span class='@root ivar id'>@root</span> <span class='opasgn op'>||=</span> <span class='File constant id'>File</span><span class='dot token'>.</span><span class='expand_path identifier id'>expand_path</span><span class='lparen token'>(</span><span class='File constant id'>File</span><span class='dot token'>.</span><span class='join identifier id'>join</span><span class='lparen token'>(</span><span class='File constant id'>File</span><span class='dot token'>.</span><span class='dirname identifier id'>dirname</span><span class='lparen token'>(</span><span class='__FILE__ __file__ kw'>__FILE__</span><span class='rparen token'>)</span><span class='comma token'>,</span> <span class='string val'>&quot;..&quot;</span><span class='comma token'>,</span> <span class='string val'>&quot;..&quot;</span><span class='comma token'>,</span> <span class='string val'>&quot;..&quot;</span><span class='comma token'>,</span> <span class='string val'>&quot;..&quot;</span><span class='comma token'>,</span> <span class='string val'>&quot;..&quot;</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
@@ -193,9 +212,9 @@
 </div>
     
     <div id="footer">
-  Generated on Wed Feb  3 14:46:58 2010 by 
+  Generated on Fri Jun 11 14:24:19 2010 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool">yard</a>
-  0.5.3 (ruby-1.8.7).
+  0.5.4 (ruby-1.8.7).
 </div>
 
   </body>

@@ -23,6 +23,9 @@
 		<developerConnection>scm:svn:https://selenium.googlecode.com/svn</developerConnection>
 		<url>http://selenium.googlecode.com/svn</url>
 	</scm>
+	<developers>
+		<!-- A complete list can be found here: http://code.google.com/p/selenium/people/list -->
+	</developers>
 
 	<modules>
 		<module>chrome</module>
@@ -88,14 +91,14 @@
 	</build>
 
 	<distributionManagement>
-		<repository>
-			<id>openqa-releases</id>
-			<url>http://nexus.openqa.org/content/repositories/releases</url>
-		</repository>
 		<snapshotRepository>
-			<id>openqa-snapshots</id>
-			<url>http://nexus.openqa.org/content/repositories/snapshots</url>
+			<id>sonatype-nexus-snapshots</id>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url> 
+		</repository>
 	</distributionManagement>
 
 </project>

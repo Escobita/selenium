@@ -23,7 +23,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using OpenQA.Selenium.Firefox.Internal;
 using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Remote;
@@ -90,6 +89,10 @@ namespace OpenQA.Selenium.Firefox
         /// Indicates whether the driver will accept untrusted SSL certificates.
         /// </summary>
         public static readonly bool AcceptUntrustedCertificates = true;
+
+        protected FirefoxBinary binary;
+
+        protected FirefoxProfile profile;
         #endregion
 
         #region Constructors
@@ -119,8 +122,10 @@ namespace OpenQA.Selenium.Firefox
         /// <param name="profile">A <see cref="FirefoxProfile"/> object representing the profile settings
         /// to be used in starting Firefox.</param>
         public FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile)
-            : base(CreateExtensionConnection(binary, profile), DesiredCapabilities.Firefox())
+            :base(CreateExtensionConnection(binary, profile), DesiredCapabilities.Firefox())
         {
+            this.binary = binary;
+            this.profile = profile;
         } 
         #endregion
 
@@ -223,9 +228,7 @@ namespace OpenQA.Selenium.Firefox
         {
             FirefoxProfile profileToUse = profile;
 
-            // TODO (JimEvans): Provide a "named profile" override.
-            // string suggestedProfile = System.getProperty("webdriver.firefox.profile");
-            string suggestedProfile = null;
+            string suggestedProfile = Environment.GetEnvironmentVariable("webdriver.firefox.profile");
             if (profileToUse == null && suggestedProfile != null)
             {
                 profileToUse = new FirefoxProfileManager().GetProfile(suggestedProfile);

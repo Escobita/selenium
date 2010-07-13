@@ -45,7 +45,7 @@ public enum Platform {
    * ones that store files in "\Program Files\" and documents under
    * "\\documents and settings\\username"
    */
-  XP("xp", "windows") {
+  XP("xp", "windows", "winnt") {
     @Override
     public boolean is(Platform compareWith) {
       return compareWith == WINDOWS || compareWith == XP;
@@ -66,6 +66,16 @@ public enum Platform {
     @Override
     public boolean is(Platform compareWith) {
       return compareWith == UNIX || compareWith == LINUX;
+    }
+  },
+  ANDROID("android", "dalvik") {
+    public String getLineEnding() {
+      return "\n";
+    }
+
+    @Override
+    public boolean is(Platform compareWith) {
+      return compareWith == LINUX || compareWith == ANDROID;
     }
   },
   /**
@@ -111,6 +121,10 @@ public enum Platform {
 
   public static Platform extractFromSysProperty(String osName) {
     osName = osName.toLowerCase();
+    // os.name for android is linux
+    if ("dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"))){
+      return Platform.ANDROID;
+    }
     Platform mostLikely = UNIX;
     String previousMatch = null;
     for (Platform os : Platform.values()) {

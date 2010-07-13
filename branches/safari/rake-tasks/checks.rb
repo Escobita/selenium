@@ -1,15 +1,17 @@
+require 'rbconfig'
+
 # Platform checks
 
 def windows?
-  RUBY_PLATFORM.downcase.include?("win32") || RUBY_PLATFORM.downcase.include?("mingw32")
+  (/mswin|msys|mingw32/ =~ RbConfig::CONFIG['host_os']) != nil
 end
 
 def mac?
-  RUBY_PLATFORM.downcase.include?("darwin")
+  (/darwin|mac os/ =~ RbConfig::CONFIG['host_os']) != nil
 end
 
 def linux?
-  RUBY_PLATFORM.downcase.include?("linux")
+  (/linux/ =~ RbConfig::CONFIG['host_os']) != nil
 end
 
 def cygwin?
@@ -110,4 +112,16 @@ def iPhoneSDKVersion?
   if sdk != nil then
     sdk.gsub(/iphonesimulator(.*)/, '\1')
   end
+end
+
+def AndroidSDK?
+  if $androidSDK.nil?
+    prop = YAML.load_file( './properties.yml' )
+    properties=prop["default"]["android"]
+    if (prop[ENV["USER"]])
+      properties=prop[ENV["USER"]]["android"];
+    end
+    $androidSDK = File.exists?(properties["androidsdkpath"])
+  end
+  $androidSDK
 end

@@ -24,6 +24,8 @@ limitations under the License.
 <overlay id="selenium-ide-common" 
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/x-javascript" src="chrome://global/content/nsDragAndDrop.js"/>
+  <script type="application/x-javascript" src="chrome://selenium-ide/content/dnd-observers.js"/>
   <script type="application/x-javascript" src="chrome://selenium-ide/content/preferences.js"/>
   <!-- import misc.js before tools.js, because both declare a Log object -->
   <script type="application/x-javascript" src="chrome://selenium-ide/content/selenium/xpath/misc.js"/>
@@ -77,7 +79,6 @@ limitations under the License.
     <command id="cmd_close" oncommand="goDoCommand('cmd_close')"/>
     <command id="cmd_selenium_play" oncommand="goDoCommand('cmd_selenium_play')"/>
     <command id="cmd_selenium_play_suite" oncommand="goDoCommand('cmd_selenium_play_suite')"/>
-    <command id="cmd_selenium_testrunner" oncommand="goDoCommand('cmd_selenium_testrunner')"/>
     <command id="cmd_selenium_pause" oncommand="goDoCommand('cmd_selenium_pause')"/>
     <command id="cmd_selenium_step" oncommand="goDoCommand('cmd_selenium_step')"/>
     <command id="cmd_selenium_breakpoint" oncommand="goDoCommand('cmd_selenium_breakpoint')"/>
@@ -134,11 +135,11 @@ limitations under the License.
       <menuitem label="&saveTestCmd.label;" command="cmd_save" key="save-key" accesskey="S"/>
       <menuitem label="&saveTestAsCmd.label;" oncommand="window.editor.saveNewTestCase();" accesskey="A"/>
       <menu label="&exportCmd.label;" accesskey="E">
-  <menupopup id="popup_export_formats" onpopupshowing="window.editor.populateFormatsPopup(this)" oncommand="window.editor.exportTestCaseWithFormat(window.editor.app.getFormats().selectFormat(event.target.getAttribute('value')))">
-  </menupopup>
+        <menupopup id="popup_export_formats" onpopupshowing="window.editor.populateFormatsPopup(this)" oncommand="window.editor.exportTestCaseWithFormat(window.editor.app.getFormats().selectFormat(event.target.getAttribute('value')))">
+        </menupopup>
       </menu>
       <menu label="&recentTestCmd.label;">
-        <menupopup id="popup_recent_tests" onpopupshowing="window.editor.app.recentTestCases.populateMenu(this)" oncommand="window.editor.app.loadTestCaseWithNewSuite(event.target.getAttribute('value'))" />
+        <menupopup id="popup_recent_tests" onpopupshowing="window.editor.app.recentTestCases.populateMenu(this)" oncommand="window.editor.loadRecentTestCase(event.target.getAttribute('value'))" /><!-- Samit: Enh: Prompt to save first -->
       </menu>
       <menuseparator/>
       <menuitem label="&addTestCmd.label;" command="cmd_add" key="add-key" accesskey="D"/>
@@ -151,7 +152,7 @@ limitations under the License.
         <menupopup id="popup_export_formats" onpopupshowing="window.editor.populateFormatsPopup(this)" oncommand="window.editor.exportTestSuiteWithFormat(window.editor.app.getFormats().selectFormat(event.target.getAttribute('value')))" />
       </menu>
       <menu label="&recentSuiteCmd.label;">
-        <menupopup id="popup_recent_suites" onpopupshowing="window.editor.app.recentTestSuites.populateMenu(this)" oncommand="window.editor.app.loadTestSuite(event.target.getAttribute('value'))" />
+        <menupopup id="popup_recent_suites" onpopupshowing="window.editor.app.recentTestSuites.populateMenu(this)" oncommand="window.editor.loadRecentSuite(event.target.getAttribute('value'))" /><!-- Samit: Enh: Prompt to save first -->
       </menu>
       <menuseparator id="closeMenuSeparator"/>
       <menuitem label="&closeCmd.label;" command="cmd_close" key="close-key" accesskey="X" id="closeMenuItem"/>
@@ -174,12 +175,12 @@ limitations under the License.
     <menupopup id="options-popup" onpopupshowing="window.editor.onPopupOptions()">
       <menuitem label="&optionsCmd.label;" oncommand="window.editor.openSeleniumIDEPreferences();" accesskey="O"/>
       <menu label="&formatCmd.label;" accesskey="F">
-  <menupopup id="popup_formats" onpopupshowing="window.editor.populateFormatsPopup(this, window.editor.app.getCurrentFormat())" oncommand="window.editor.app.setCurrentFormat(window.editor.app.formats.selectFormat(event.target.getAttribute('value')))">
-  </menupopup>
+        <menupopup id="popup_formats" onpopupshowing="window.editor.populateFormatsPopup(this, window.editor.app.getCurrentFormat())" oncommand="window.editor.app.setCurrentFormat(window.editor.app.formats.selectFormat(event.target.getAttribute('value')))">
+        </menupopup>
       </menu>
       <menu id="clipboardFormatMenu" label="&clipboardFormatCmd.label;">
-  <menupopup id="popup_clipboard_formats" onpopupshowing="window.editor.populateFormatsPopup(this, window.editor.app.clipboardFormat)" oncommand="window.editor.app.setClipboardFormat(window.editor.app.formats.selectFormat(event.target.getAttribute('value')))">
-  </menupopup>
+        <menupopup id="popup_clipboard_formats" onpopupshowing="window.editor.populateFormatsPopup(this, window.editor.app.clipboardFormat)" oncommand="window.editor.app.setClipboardFormat(window.editor.app.formats.selectFormat(event.target.getAttribute('value')))">
+        </menupopup>
       </menu>
       <menuitem id="internalTestsMenu" label="Test Selenium IDE" oncommand="window.editor.showInBrowser('chrome://selenium-ide/content/tests/index.html');" />
     </menupopup>
@@ -194,14 +195,14 @@ limitations under the License.
     <vbox>
       <vbox class="spacer" />
       <stack class="slider-box" flex="1" >
-  <hbox class="slider-background">
-    <hbox class="slider-left" />
-    <hbox class="slider-middle" flex="1" />
-    <hbox class="slider-right" />
-  </hbox>
-  <slider id="speedSlider" width="80" curpos="0" maxpos="1000">
-    <thumb />
-  </slider>
+          <hbox class="slider-background">
+            <hbox class="slider-left" />
+            <hbox class="slider-middle" flex="1" />
+            <hbox class="slider-right" />
+          </hbox>
+          <slider id="speedSlider" width="80" curpos="0" maxpos="1000">
+            <thumb />
+          </slider>
       </stack>
     </vbox>
   </stack>
@@ -210,9 +211,9 @@ limitations under the License.
     <tree id="suiteTree" flex="1" enableColumnDrag="false" hidecolumnpicker="true" width="80"
           context="suiteContextMenu">
       <treecols>
-  <treecol label="&suiteTree.testCase.label;" flex="1" />
+        <treecol label="&suiteTree.testCase.label;" flex="1" />
       </treecols>
-      <treechildren />
+      <treechildren ondraggesture="nsDragAndDrop.startDrag(event, suiteTreeDragObserver);"/>
     </tree>
     <hbox id="suiteProgressBar">
       <box id="suiteProgressIndicator" height="16" class="success" />

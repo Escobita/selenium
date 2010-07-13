@@ -950,7 +950,7 @@ Selenium.prototype.doOpen = function(url, ignoreResponseCode) {
    * @param ignoreResponseCode (optional) turn off ajax head request functionality
    *
    */
-    if (ignoreResponseCode == null) {
+    if (ignoreResponseCode == null || ignoreResponseCode.length == 0) {
         this.browserbot.ignoreResponseCode = true;
     } else if (ignoreResponseCode.toLowerCase() == "true") {
         this.browserbot.ignoreResponseCode = true;
@@ -2023,6 +2023,14 @@ Selenium.prototype.doWindowMaximize = function() {
    var window = this.browserbot.getCurrentWindow();
    if (window!=null && window.screen) {
        window.moveTo(0,0);
+
+       // It appears Firefox on Mac won't move a window to (0,0).  But, you can move it to (0,1), which
+       // seems to do basically the same thing.  In my (KJM - 6/20/10) tests, anything less than (0, 22)
+       // pushed the browser to (0,0), so it seems it's improperly accounting for something in the browser chrome.
+       if (window.screenX != 0) {
+           window.moveTo(0, 1);
+       }
+
        window.resizeTo(screen.availWidth, screen.availHeight);
    }
 };

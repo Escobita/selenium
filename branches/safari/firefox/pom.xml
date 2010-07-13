@@ -17,6 +17,11 @@
 			<artifactId>selenium-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -37,10 +42,16 @@
 		<resources>
 			<resource>
 				<directory>prebuilt/linux/release</directory>
+				<includes>
+					<include>x_ignore_nofocus.so</include>
+				</includes>
 				<targetPath>x86</targetPath>
 			</resource>
 			<resource>
 				<directory>prebuilt/linux64/release</directory>
+				<includes>
+					<include>x_ignore_nofocus.so</include>
+				</includes>
 				<targetPath>amd64</targetPath>
 			</resource>
 		</resources>
@@ -57,6 +68,9 @@
 							<tasks>
 								<copy todir="target/webdriver-extension">
 									<fileset dir="src/extension" excludes="**/.svn/**" />
+								</copy>
+								<copy todir="target/webdriver-extension/content" >
+									<fileset dir="../common/src/js/extension" includes="*.js" />
 								</copy>
 								<copy todir="target/webdriver-extension/components">
 									<fileset dir="prebuilt" includes="*.xpt" />

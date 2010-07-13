@@ -87,9 +87,19 @@ public class ErrorHandler {
       }
     }
 
-    RuntimeException toThrow = null;
+    if (cause == null) {
+      // The stacktrace from the server was unavailable or could not be
+      // deserialized.
+      // In this case, the stacktrace will be pointless - it will point to the
+      // exception as generated from this class, which is technically correct
+      // but utterly useless. Let the user know that.
+      message = message + " (Note: The stack trace from the server side " +
+          "is missing. The locally-generated stack trace is useless.)";
+    }
+
+    Throwable toThrow = null;
     try {
-      Constructor<? extends RuntimeException> constructor =
+      Constructor<? extends Throwable> constructor =
           outerErrorType.getConstructor(String.class, Throwable.class);
       toThrow = constructor.newInstance(message, cause);
     } catch (Exception e) {
@@ -100,7 +110,7 @@ public class ErrorHandler {
 
     if (toThrow == null) {
       try {
-        Constructor<? extends RuntimeException> constructor =
+        Constructor<? extends Throwable> constructor =
             outerErrorType.getConstructor(String.class);
         toThrow = constructor.newInstance(message);
       } catch (Exception e) {
@@ -110,7 +120,15 @@ public class ErrorHandler {
       }
     }
 
-    throw (toThrow != null) ? toThrow : new WebDriverException(message, cause);
+    if (toThrow == null) {
+      throw new WebDriverException(message, cause);
+    }
+
+    if (!(toThrow instanceof RuntimeException)) {
+      throw new RuntimeException(toThrow);
+    }
+
+    throw (RuntimeException) toThrow;
   }
 
   private Throwable rebuildServerError(Map<String, Object> rawErrorData) {

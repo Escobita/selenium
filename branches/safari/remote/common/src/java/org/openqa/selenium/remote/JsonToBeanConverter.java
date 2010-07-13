@@ -20,10 +20,11 @@ package org.openqa.selenium.remote;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
 
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +74,7 @@ public class JsonToBeanConverter {
       if (rawCommand.has("sessionId"))
         sessionId = convert(SessionId.class, rawCommand.getString("sessionId"));
 
-      DriverCommand name = DriverCommand.fromName(rawCommand.getString("name"));
+      String name = rawCommand.getString("name");
       if (rawCommand.has("parameters")) {
         Map<String, ?> args =
             (Map<String, ?>) convert(HashMap.class, rawCommand.getJSONObject("parameters"));
@@ -87,6 +88,77 @@ public class JsonToBeanConverter {
       JSONObject object = new JSONObject((String) text);
       String value = object.getString("value");
       return (T) new SessionId(value);
+    }
+
+    if (Capabilities.class.equals(clazz)) {
+      JSONObject object = new JSONObject((String) text);
+      DesiredCapabilities caps = new DesiredCapabilities();
+      Iterator allKeys = object.keys();
+      while (allKeys.hasNext()) {
+        String key = (String) allKeys.next();
+        caps.setCapability(key, object.get(key));
+      }
+      return (T) caps;
+    }
+
+    if (DoNotUseProxyPac.class.equals(clazz)) {
+      JSONObject object = new JSONObject((String) text);
+      DoNotUseProxyPac pac = new DoNotUseProxyPac();
+
+      if (object.has("directUrls")) {
+        JSONArray allUrls = object.getJSONArray("directUrls");
+        for (int i = 0; i < allUrls.length(); i++) {
+          pac.map(allUrls.getString(i)).toNoProxy();
+        }
+      }
+
+      if (object.has("directHosts")) {
+        JSONArray allHosts = object.getJSONArray("directHosts");
+        for (int i = 0; i < allHosts.length(); i++) {
+          pac.mapHost(allHosts.getString(i)).toNoProxy();
+        }
+      }
+
+      if (object.has("proxiedHosts")) {
+        JSONObject proxied = object.getJSONObject("proxiedHosts");
+        Iterator allHosts = proxied.keys();
+        while (allHosts.hasNext()) {
+          String host = (String) allHosts.next();
+          pac.mapHost(host).toProxy(proxied.getString(host));
+        }
+      }
+
+      if (object.has("proxiedUrls")) {
+        JSONObject proxied = object.getJSONObject("proxiedUrls");
+        Iterator allUrls = proxied.keys();
+        while (allUrls.hasNext()) {
+          String host = (String) allUrls.next();
+          pac.map(host).toProxy(proxied.getString(host));
+        }
+      }
+
+      if (object.has("proxiedRegexUrls")) {
+        JSONObject proxied = object.getJSONObject("proxiedRegexUrls");
+        Iterator allUrls = proxied.keys();
+        while (allUrls.hasNext()) {
+          String host = (String) allUrls.next();
+          pac.map(host).toProxy(proxied.getString(host));
+        }
+      }
+
+      if (object.has("defaultProxy")) {
+        if ("'DIRECT'".equals(object.getString("defaultProxy"))) {
+          pac.defaults().toNoProxy();
+        } else {
+          pac.defaults().toProxy(object.getString("defaultProxy"));
+        }
+      }
+
+      if (object.has("deriveFrom")) {
+        pac.deriveFrom(new URI(object.getString("deriveFrom")));
+      }
+
+      return (T) pac;
     }
 
     if (text != null && text instanceof String && !((String) text).startsWith("{") && Object.class
@@ -157,8 +229,9 @@ public class JsonToBeanConverter {
 
   public <T> T convertBean(Class<T> clazz, JSONObject toConvert) throws Exception {
     T t = clazz.newInstance();
-    PropertyDescriptor[] allProperties = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
-    for (PropertyDescriptor property : allProperties) {
+    SimplePropertyDescriptor[] allProperties =
+        SimplePropertyDescriptor.getPropertyDescriptors(clazz);
+    for (SimplePropertyDescriptor property : allProperties) {
       if (!toConvert.has(property.getName()))
         continue;
 

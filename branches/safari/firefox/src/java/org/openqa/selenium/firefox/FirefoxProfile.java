@@ -23,6 +23,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.internal.Cleanly;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.internal.Zip;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -99,7 +100,7 @@ public class FirefoxProfile {
     }
 
     try {
-      addExtension(FirefoxProfile.class, "webdriver-extension.zip");
+      addExtension(FirefoxProfile.class, "webdriver.xpi");
     } catch (IOException e) {
       if (!Boolean.getBoolean("webdriver.development")) {
         throw new WebDriverException("Failed to install webdriver extension", e);
@@ -350,7 +351,7 @@ public class FirefoxProfile {
     public void setPreference(String key, int value) {
         additionalPrefs.setPreference(key, value);
     }
-    
+
     /**
      * Set proxy preferences for this profile.
      * 
@@ -362,14 +363,18 @@ public class FirefoxProfile {
         return this;
       }
       setPreference("network.proxy.type", proxy.getProxyType().ordinal());
+
       switch (proxy.getProxyType()) {
-        case MANUAL:
+        case MANUAL:// By default, assume we're proxying the lot
+          setPreference("network.proxy.no_proxies_on", "");
+
           setManualProxyPreference("ftp", proxy.getFtpProxy());
           setManualProxyPreference("http", proxy.getHttpProxy());
           setManualProxyPreference("ssl", proxy.getSslProxy());
           if (proxy.getNoProxy() != null) {
             setPreference("network.proxy.no_proxies_on", proxy.getNoProxy());
           }
+          
           break;
         case PAC:
           setPreference("network.proxy.autoconfig_url", proxy.getProxyAutoconfigUrl());
@@ -400,17 +405,18 @@ public class FirefoxProfile {
         }
 
         Map<String, String> prefs = new HashMap<String, String>();
-        if (userPrefs.exists()) {
-            prefs = readExistingPrefs(userPrefs);
-            if (!userPrefs.delete())
-                throw new WebDriverException("Cannot delete existing user preferences");
-        }
 
         // Allow users to override these settings
         prefs.put("browser.startup.homepage", "\"about:blank\"");
         // The user must be able to override this setting (to 1) in order to
         // to change homepage on Firefox 3.0
         prefs.put("browser.startup.page", "0");
+
+        if (userPrefs.exists()) {
+            prefs = readExistingPrefs(userPrefs);
+            if (!userPrefs.delete())
+                throw new WebDriverException("Cannot delete existing user preferences");
+        }
 
         additionalPrefs.addTo(prefs);
 
@@ -431,6 +437,7 @@ public class FirefoxProfile {
         prefs.put("dom.disable_open_during_load", "false");
         prefs.put("extensions.update.enabled", "false");
         prefs.put("extensions.update.notifyUser", "false");
+        prefs.put("network.manage-offline-status", "false");
         prefs.put("security.fileuri.origin_policy", "3");
         prefs.put("security.fileuri.strict_origin_policy", "false");
         prefs.put("security.warn_entering_secure", "false");
@@ -466,6 +473,10 @@ public class FirefoxProfile {
 
         // If the user sets the home page, we should also start up there
         prefs.put("startup.homepage_welcome_url", prefs.get("browser.startup.homepage"));
+
+        if (!"about:blank".equals(prefs.get("browser.startup.homepage"))) {
+          prefs.put("browser.startup.page", "1");
+        }
 
         writeNewPrefs(prefs);
     }
@@ -573,4 +584,18 @@ public class FirefoxProfile {
     public void clean() {
       TemporaryFilesystem.deleteTempDir(profileDir);
     }
+
+  public String toJson() throws IOException {
+    updateUserPrefs();
+
+    return new Zip().zip(profileDir);
+  }
+
+  public static FirefoxProfile fromJson(String json) throws IOException {
+    File dir = TemporaryFilesystem.createTempDir("webdriver", "duplicated");
+
+    new Zip().unzip(json, dir);
+
+    return new FirefoxProfile(dir);
+  }
 }

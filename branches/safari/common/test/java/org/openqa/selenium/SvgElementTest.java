@@ -17,6 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
@@ -29,7 +31,7 @@ public class SvgElementTest extends AbstractDriverTestCase {
 
   @Ignore({HTMLUNIT, IE, CHROME, REMOTE, SELENESE})
   public void testShouldClickOnGraphVisualElements() {
-    driver.get(svgPage);
+    driver.get(pages.svgPage);
     WebElement svg = driver.findElement(By.tagName("svg:svg"));
 
     List<WebElement> groupElements = svg.findElements(By.tagName("svg:g"));
@@ -56,7 +58,7 @@ public class SvgElementTest extends AbstractDriverTestCase {
 
   @Ignore({HTMLUNIT, IE, CHROME, REMOTE, SELENESE})
   public void testShouldClickOnGraphTextElements() {
-    driver.get(svgPage);
+    driver.get(pages.svgPage);
     WebElement svg = driver.findElement(By.tagName("svg:svg"));
     List<WebElement> textElements = svg.findElements(By.tagName("svg:text"));
 

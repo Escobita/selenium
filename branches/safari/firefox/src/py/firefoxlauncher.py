@@ -18,18 +18,13 @@ installing the extension"""
 
 
 from subprocess import Popen
-from subprocess import PIPE
 import logging
-import shutil
-import tempfile
 import time
-import platform
 import os
 from extensionconnection import ExtensionConnection
-from firefox_profile import FirefoxProfile
 import utils
 
-MAX_START_ATTEMPTS = 20
+MAX_START_ATTEMPTS = 60
 
 class FirefoxLauncher(object):
     """Launches the firefox browser."""

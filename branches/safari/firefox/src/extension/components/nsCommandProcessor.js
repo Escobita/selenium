@@ -28,10 +28,7 @@
  * When this component is loaded, load the necessary subscripts.
  */
 (function() {
-  var scripts = [
-    'errorcode.js',
-    'utils.js'
-  ];
+  var scripts = [];
 
   // Firefox 3.5+ has native JSON support; prefer that over our script from
   // www.json.org, which may be slower.
@@ -133,7 +130,7 @@ Response.prototype = {
   set status(newStatus) { this.json_.status = newStatus; },
   get status()          { return this.json_.status; },
   set value(val)     { this.json_.value = val; },
-  get value()        { return this.json_.value; },
+  get value()        { return this.json_.value; }
 };
 
 
@@ -233,6 +230,7 @@ DelayedCommand.prototype.shouldDelayExecutionForPendingRequest_ = function() {
     }
   } catch(e) {
     Utils.dumpn('Problem while checking if we should delay execution: ' + e);
+    return true;
   }
 
   return false;
@@ -284,6 +282,9 @@ DelayedCommand.prototype.executeInternal_ = function() {
  * @constructor
  */
 var nsCommandProcessor = function() {
+  Components.utils.import('resource://fxdriver/modules/errorcode.js');
+  Components.utils.import('resource://fxdriver/modules/utils.js');
+
   this.wrappedJSObject = this;
   this.wm = Components.classes['@mozilla.org/appshell/window-mediator;1'].
       getService(Components.interfaces.nsIWindowMediator);
@@ -539,10 +540,11 @@ nsCommandProcessor.prototype.getSessionCapabilities = function(response) {
     'browserName': 'firefox',
     'version': appInfo.version,
     'javascriptEnabled': true,
-    // TODO: standardize on which one?
-    'operatingSystem': xulRuntime.OS,  // same as System.getProperty("os.name")?
-    'platform': xulRuntime.OS          // same as Platform.valueOf("name");
+    'platform': xulRuntime.OS,          // same as Platform.valueOf("name");
+    'cssSelectorsEnabled': true,
+    'takesScreenshot': true
   };
+
   response.send();
 };
 

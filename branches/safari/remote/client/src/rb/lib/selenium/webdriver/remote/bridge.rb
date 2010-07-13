@@ -93,6 +93,14 @@ module Selenium
           execute :get, {}, :url => url
         end
 
+        def getCapabilities
+          Capabilities.json_create execute(:getCapabilities)
+        end
+
+        def setImplicitWaitTimeout(milliseconds)
+          execute :setImplicitWaitTimeout, {}, :ms => milliseconds
+        end
+
         def goBack
           execute :goBack
         end
@@ -133,8 +141,11 @@ module Selenium
           execute :switchToFrame, {}, :id => nil
         end
 
+        QUIT_ERRORS = [IOError]
+
         def quit
           execute :quit
+        rescue *QUIT_ERRORS
         end
 
         def close
@@ -328,10 +339,6 @@ module Selenium
           execute :dragElement, {:id => element}, :x => rigth_by, :y => down_by
         end
 
-        def getCapabilities
-          Capabilities.json_create execute(:getCapabilities)
-        end
-
         private
 
         def find_element_by(how, what, parent = nil)
@@ -346,7 +353,6 @@ module Selenium
 
         def find_elements_by(how, what, parent = nil)
           if parent
-            # TODO: why is how sent twice in the payload?
             ids = execute :findChildElements, {:id => parent}, {:using => how, :value => what}
           else
             ids = execute :findElements, {}, {:using => how, :value => what}
@@ -392,18 +398,9 @@ module Selenium
         def default_options
           {
             :url                  => "http://localhost:4444/wd/hub",
-            # TODO(jari): enable Patron when http://github.com/toland/patron/issues/issue/13 is fixed
-            :http_client          => DefaultHttpClient,
+            :http_client          => Http::Default,
             :desired_capabilities => Capabilities.firefox
           }
-        end
-
-        def http_client_class
-          require "selenium/webdriver/remote/patron_http_client"
-          PatronHttpClient
-        rescue LoadError
-          # patron not available
-          DefaultHttpClient
         end
 
       end # Bridge

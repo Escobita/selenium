@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta name="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
 <title>Class: Selenium::WebDriver::TargetLocator</title>
 <link rel="stylesheet" href="../../css/style.css" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="../../css/common.css" type="text/css" media="screen" charset="utf-8" />
@@ -71,6 +71,7 @@
     
   
   
+  
     <dt class="r2 last">Defined in:</dt>
     <dd class="r2 last">common/src/rb/lib/selenium/webdriver/target_locator.rb</dd>
   
@@ -80,11 +81,12 @@
 
 
 
-  <h2>Instance Method Summary</h2>
+  
+    <h2>Instance Method Summary</h2>
 
-  <ul class="summary">
-    
-      <li class="public ">
+    <ul class="summary">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#active_element-instance_method" title="#active_element (instance method)">- (WebDriver::Element) <strong>active_element</strong> </a>
@@ -99,15 +101,15 @@
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 get the active element.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#default_content-instance_method" title="#default_content (instance method)">- (Object) <strong>default_content</strong> </a>
@@ -122,16 +124,16 @@ get the active element.
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 selects either the first frame on the page, or the main document when a
 page contains iframes.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#frame-instance_method" title="#frame (instance method)">- (Object) <strong>frame</strong>(id) </a>
@@ -146,15 +148,15 @@ page contains iframes.
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 switch to the frame with the given id.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#initialize-instance_method" title="#initialize (instance method)">- (TargetLocator) <strong>initialize</strong>(driver) </a>
@@ -171,15 +173,15 @@ switch to the frame with the given id.
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 A new instance of TargetLocator.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-      <li class="public ">
+      
+        <li class="public ">
   <span class="summary_signature">
     
       <a href="#window-instance_method" title="#window (instance method)">- (Object) <strong>window</strong>(id) </a>
@@ -194,15 +196,17 @@ A new instance of TargetLocator.
   
 
   
-    <span class="summary_desc">
+    <span class="summary_desc"><div class='inline'><p>
 switch to the frame with the given id.
-
-</span>
+</p>
+</div></span>
   
 </li>
 
-    
-  </ul>
+      
+    </ul>
+  
+
 <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -290,12 +294,12 @@ get the active element
       <pre class="lines">
 
 
-48
-49
-50</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/target_locator.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/target_locator.rb', line 56</span>
 
 <span class='def def kw'>def</span> <span class='active_element identifier id'>active_element</span>
   <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='switchToActiveElement identifier id'>switchToActiveElement</span>
@@ -331,12 +335,12 @@ page contains iframes.
       <pre class="lines">
 
 
-56
-57
-58</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/target_locator.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/target_locator.rb', line 64</span>
 
 <span class='def def kw'>def</span> <span class='default_content identifier id'>default_content</span>
   <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='switchToDefaultContent identifier id'>switchToDefaultContent</span>
@@ -421,10 +425,10 @@ block execution.
       
       
         &mdash;
-        
+        <div class='inline'><p>
 A window handle
-
-
+</p>
+</div>
       
     </li>
   
@@ -445,7 +449,15 @@ A window handle
 37
 38
 39
-40</pre>
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'common/src/rb/lib/selenium/webdriver/target_locator.rb', line 31</span>
@@ -454,7 +466,15 @@ A window handle
   <span class='if if kw'>if</span> <span class='block_given? fid id'>block_given?</span>
     <span class='original identifier id'>original</span> <span class='assign token'>=</span> <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='getCurrentWindowHandle identifier id'>getCurrentWindowHandle</span>
     <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='switchToWindow identifier id'>switchToWindow</span> <span class='id identifier id'>id</span>
+
     <span class='yield yield kw'>yield</span>
+
+    <span class='current_handles identifier id'>current_handles</span> <span class='assign token'>=</span> <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='getWindowHandles identifier id'>getWindowHandles</span>
+
+    <span class='if if kw'>if</span> <span class='current_handles identifier id'>current_handles</span><span class='dot token'>.</span><span class='size identifier id'>size</span> <span class='eq op'>==</span> <span class='integer val'>1</span>
+      <span class='original identifier id'>original</span> <span class='assign token'>=</span> <span class='current_handles identifier id'>current_handles</span><span class='dot token'>.</span><span class='shift identifier id'>shift</span>
+    <span class='end end kw'>end</span>
+
     <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='switchToWindow identifier id'>switchToWindow</span> <span class='original identifier id'>original</span>
   <span class='else else kw'>else</span>
     <span class='@bridge ivar id'>@bridge</span><span class='dot token'>.</span><span class='switchToWindow identifier id'>switchToWindow</span> <span class='id identifier id'>id</span>
@@ -471,9 +491,9 @@ A window handle
 </div>
     
     <div id="footer">
-  Generated on Wed Feb  3 14:46:58 2010 by 
+  Generated on Fri Jun 11 14:24:26 2010 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool">yard</a>
-  0.5.3 (ruby-1.8.7).
+  0.5.4 (ruby-1.8.7).
 </div>
 
   </body>

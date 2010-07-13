@@ -9,7 +9,11 @@ module Selenium
       module Lib
         extend FFI::Library
 
-        ffi_lib WebDriver::IE::DLL
+        if Platform.bitsize == 64
+          ffi_lib WebDriver::IE::DLLS[:x64]
+        else
+          ffi_lib WebDriver::IE::DLLS[:win32]
+        end
 
         attach_function :wdAddBooleanScriptArg,               [:pointer, :int                                             ], :int
         attach_function :wdAddCookie,                         [:pointer, :pointer                                         ], :int
@@ -85,6 +89,7 @@ module Selenium
         attach_function :wdNewDriverInstance,                 [:pointer                                                   ], :int
         attach_function :wdNewScriptArgs,                     [:pointer, :int                                             ], :int
         attach_function :wdRefresh,                           [:pointer,                                                  ], :int
+        attach_function :wdSetImplicitWaitTimeout,            [:pointer, :long                                            ], :int
         attach_function :wdSetVisible,                        [:pointer, :int                                             ], :int
         attach_function :wdStringLength,                      [:pointer, :pointer                                         ], :int
         attach_function :wdSwitchToActiveElement,             [:pointer, :pointer                                         ], :int

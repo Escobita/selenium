@@ -14,11 +14,9 @@
 # limitations under the License.
 
 """WebElement implementation."""
-import urllib
-import utils
 from command import Command
-from ..common.exceptions import ErrorInResponseException
-from ..common.exceptions import NoSuchElementException
+
+from selenium.common.exceptions import NoSuchAttributeException
 
 class WebElement(object):
     """Represents an HTML element.
@@ -51,8 +49,13 @@ class WebElement(object):
 
     def get_attribute(self, name):
         """Gets the attribute value."""
-        resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name':name})
-        return resp['value']
+        try:
+            resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name':name})
+            return str(resp['value'])
+        # FIXME: This is a hack around selenium server bad response, remove this
+        #        code when it's fixed
+        except AssertionError, e:
+            raise NoSuchAttributeException(name)
 
     def toggle(self):
         """Toggles the element state."""
@@ -84,26 +87,26 @@ class WebElement(object):
     def find_element_by_name(self, name):
         """Find element by name."""
         return self._get_elem_by("name", name)
-        
+
     def find_elements_by_name(self, name):
         return self._get_elems_by("name", name)
 
     def find_element_by_link_text(self, link_text):
         """Finds element by link text."""
         return self._get_elem_by("link text", link_text)
-        
+
     def find_elements_by_link_text(self, link_text):
         return self._get_elems_by("link text", link_text)
-        
+
     def find_element_by_partial_link_text(self, link_text):
         return self._get_elem_by("partial link text", link_text)
-        
+
     def find_elements_by_partial_link_text(self, link_text):
         return self._get_elems_by("partial link text", link_text)
-        
+
     def find_element_by_tag_name(self, name):
         return self._get_elem_by("tag name", name)
-        
+
     def find_elements_by_tag_name(self, name):
         return self._get_elems_by("tag name", name)
 
@@ -114,6 +117,14 @@ class WebElement(object):
     def find_elements_by_xpath(self, xpath):
         """Finds elements within the elements by xpath."""
         return self._get_elems_by("xpath", xpath)
+
+    def find_element_by_class_name(self, name):
+        """Finds an element by their class name."""
+        return self._get_elem_by("class name", name)
+
+    def find_elements_by_class_name(self, name):
+        """Finds elements by their class name."""
+        return self._get_elems_by("class name", name)
 
     def send_keys(self, *value):
         """Simulates typing into the element."""

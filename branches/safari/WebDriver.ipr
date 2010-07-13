@@ -12,7 +12,7 @@
       </class-settings>
       <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker">
         <setting name="getModuleJdks" value="rO0ABXNyABFqYXZhLnV0aWwuSGFzaFNldLpEhZWWuLc0AwAAeHB3DAAAABA/QAAAAAAAAHg=" />
-        <setting name="getProjectJdk" value="/usr/local/buildtools/java/jdk1.5.0_06" />
+        <setting name="getProjectJdk" value="C:/buildtools/java/jdk1.5.0_06" />
       </class-settings>
       <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
       <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
@@ -90,7 +90,7 @@
         <option name="THROWS_LIST_WRAP" value="1" />
         <option name="EXTENDS_KEYWORD_WRAP" value="1" />
         <option name="THROWS_KEYWORD_WRAP" value="1" />
-        <option name="METHOD_CALL_CHAIN_WRAP" value="2" />
+        <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
         <option name="BINARY_OPERATION_WRAP" value="1" />
         <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
         <option name="TERNARY_OPERATION_WRAP" value="1" />
@@ -113,6 +113,15 @@
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="java">
           <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
@@ -121,6 +130,24 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="true" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="js">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="txt">
           <option name="INDENT_SIZE" value="4" />
@@ -170,6 +197,7 @@
       <entry name="?*.jpeg" />
       <entry name="?*.jpg" />
       <entry name="?*.js" />
+      <entry name="*.exe" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
@@ -188,11 +216,8 @@
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
-    <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="DEPRECATION" value="false" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
   </component>
   <component name="EclipseEmbeddedCompilerSettings">
     <option name="DEBUGGING_INFO" value="true" />
@@ -294,7 +319,9 @@
           <option name="m_ignoreInvisibleFields" value="true" />
         </inspection_tool>
         <inspection_tool class="FinalMethodInFinalClass" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Finalize" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="Finalize" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreTrivialFinalizers" value="true" />
+        </inspection_tool>
         <inspection_tool class="FinalizeNotProtected" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FloatingPointEquality" enabled="true" level="ERROR" enabled_by_default="true" />
         <inspection_tool class="ForCanBeForeach" enabled="false" level="WARNING" enabled_by_default="false">
@@ -467,14 +494,6 @@
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
   </component>
-  <component name="JikesSettings">
-    <option name="JIKES_PATH" value="" />
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="DEPRECATION" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="IS_EMACS_ERRORS_MODE" value="true" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-  </component>
   <component name="LogConsolePreferences">
     <option name="FILTER_ERRORS" value="false" />
     <option name="FILTER_WARNINGS" value="false" />
@@ -611,6 +630,8 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/android/client/android-client.iml" filepath="$PROJECT_DIR$/android/client/android-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/server/android-server.iml" filepath="$PROJECT_DIR$/android/server/android-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/chrome/chrome.iml" filepath="$PROJECT_DIR$/chrome/chrome.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/firefox/firefox.iml" filepath="$PROJECT_DIR$/firefox/firefox.iml" />
@@ -638,6 +659,61 @@
     </option>
   </component>
   <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://selenium.googlecode.com/svn/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://selenium.googlecode.com/svn/plugins">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://selenium.googlecode.com/svn/selenium-grid-website">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://selenium.googlecode.com/svn/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://selenium.googlecode.com/svn/websites">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://selenium.googlecode.com/svn/wiki">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://selenium.googlecode.com/svn/branches" />
+                  <option value="https://selenium.googlecode.com/svn/plugins" />
+                  <option value="https://selenium.googlecode.com/svn/selenium-grid-website" />
+                  <option value="https://selenium.googlecode.com/svn/tags" />
+                  <option value="https://selenium.googlecode.com/svn/websites" />
+                  <option value="https://selenium.googlecode.com/svn/wiki" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://selenium.googlecode.com/svn/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="myVersion" value="124" />
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
@@ -655,29 +731,31 @@
   <component name="libraryTable">
     <library name="common-buildtime">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/junit-dep-4.4.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/hamcrest-all-1.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jmock-2.4.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jmock-junit3-2.4.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jetty-util-6.1.9.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jsp-api-2.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/commons-el-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/slf4j-api-1.3.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jasper-compiler-5.5.15.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jasper-runtime-5.5.15.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jasper-compiler-jdt-5.5.15.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jcl104-over-slf4j-1.3.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/slf4j-simple-1.3.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/servlet-api-2.5-6.1.9.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/jetty-6.1.9.jar!/" />
-        <root url="jar://$PROJECT_DIR$/common/lib/buildtime/commons-io-1.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/junit/junit-dep-4.8.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/slf4j/slf4j-api-1.3.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jasper/jasper-compiler-jdt-5.5.15.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jetty/jetty-6.1.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jetty/jetty-util-6.1.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/hamcrest/hamcrest-all-1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jasper/jasper-compiler-5.5.15.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/commons-io/commons-io-1.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jasper/jsp-api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/slf4j/jcl104-over-slf4j-1.3.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/servlet-api/servlet-api-2.5-6.1.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/slf4j/slf4j-simple-1.3.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/commons-el/commons-el-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jasper/jasper-runtime-5.5.15.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jmock/jmock-2.4.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/jmock/jmock-junit3-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/third_party/java/junit/junit-4.8.1-src.jar!/" />
+      </SOURCES>
     </library>
     <library name="third_party-buildtime">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/third_party/java/google-collect-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/third_party/java/google-collect/google-collect-1.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
