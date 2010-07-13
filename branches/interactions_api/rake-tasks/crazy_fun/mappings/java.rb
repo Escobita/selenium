@@ -14,8 +14,10 @@ class JavaMappings
     fun.add_mapping("java_library", CrazyFunJava::TidyTempDir.new)
     fun.add_mapping("java_library", CrazyFunJava::RunBinary.new)
     fun.add_mapping("java_library", CrazyFunJava::CreateSourceJar.new)
+    fun.add_mapping("java_library", CrazyFunJava::CreateProjectSourceJar.new)
     fun.add_mapping("java_library", CrazyFunJava::CreateUberJar.new)
     fun.add_mapping("java_library", CrazyFunJava::CreateProjectJar.new)
+    fun.add_mapping("java_library", CrazyFunJava::Zip.new)
 
     fun.add_mapping("java_test", CrazyFunJava::CheckPreconditions.new)
     fun.add_mapping("java_test", CrazyFunJava::CreateTask.new)
@@ -28,6 +30,8 @@ class JavaMappings
     fun.add_mapping("java_test", CrazyFunJava::TidyTempDir.new)
     fun.add_mapping("java_test", CrazyFunJava::RunTests.new)
     fun.add_mapping("java_test", CrazyFunJava::CreateSourceJar.new)
+    fun.add_mapping("java_test", CrazyFunJava::CreateUberJar.new)
+    fun.add_mapping("java_test", CrazyFunJava::CreateProjectJar.new)
   end
 end
 
@@ -123,11 +127,13 @@ class BaseJava < Tasks
     
     while !paths.empty? 
       # This is a fairly arbitrary list of TLDs
-      if paths[0] =~ /com|org|net|uk|de/
+      if paths[0] =~ /^(com|org|net|uk|de)$/
         break
       end
       paths.shift
     end
+    
+    return nil if paths[-1].nil?
     
     paths[-1] = paths[-1].sub /\.(class|java)$/, ""
     
@@ -177,10 +183,12 @@ end
 
 class CreateTask < BaseJava
   def handle(fun, dir, args)
-    task task_name(dir, args[:name])
+    name = task_name(dir, args[:name])
+    task name
     
     if args[:srcs]
-      file jar_name(dir, args[:name])
+      jar_name = jar_name(dir, args[:name])
+      file jar_name
     else
       task jar_name(dir, args[:name])
     end
@@ -277,58 +285,7 @@ class CopyResources < BaseJava
     
     file jar_name(dir, args[:name]) do
       out_dir = temp_dir(dir, args[:name])
-      
-      args[:resources].each do |res|
-        if (res.is_a? Symbol)
-          out = Rake::Task[task_name(dir, res)].out
-        elsif (Rake::Task.task_defined?(res)) 
-          out = Rake::Task[res].out
-        elsif (res.is_a? Hash)
-          # Copy the key to "out_dir + value"
-          res.each do |from, to|
-            possible_task = task_name(dir, from)
-            if Rake::Task.task_defined?(possible_task) and Rake::Task[possible_task].out
-              target = Rake::Task[possible_task].out
-              
-              if File.directory? target
-                dest = File.join(out_dir, to)
-                mkdir_p dest
-                cp_r target, dest
-              else
-                dest = File.join(out_dir, to)
-                mkdir_p File.dirname(dest)
-                cp_r target, dest
-              end
-            else
-              tdir = to.gsub(/\/.*?$/, "")
-              mkdir_p "#{out_dir}/#{tdir}"
-              src = find_file(File.join(dir, from))
-            
-              begin
-                if File.directory? src
-                  mkdir_p "#{out_dir}/#{to}"
-                else 
-                  mkdir_p File.join(out_dir, File.dirname(to))
-                end
-                cp_r src, "#{out_dir}/#{to}"
-              rescue
-                Dir["#{out_dir}/**/.svn"].each { |file| rm_rf file }
-                cp_r src, "#{out_dir}/#{to}"
-              end
-            end
-          end
-          
-          next
-        else
-          if File.exists? res
-            out = res
-          else
-            out = File.join(dir, res)
-          end
-        end
-        
-        cp_r out, out_dir
-      end
+      copy_resources(dir, args[:resources], out_dir)
     end
   end
 end
@@ -550,6 +507,9 @@ class CreateUberJar < BaseJava
       end
     end
     task task_name(dir, args[:name]) + ":uber" => jar
+    
+    Rake::Task[task_name(dir, args[:name]) + ":uber"].out = jar
+    Rake::Task[jar].out = jar
   end
 end
 
@@ -587,7 +547,99 @@ class CreateProjectJar < BaseJava
       end
     end
     task task_name(dir, args[:name]) + ":project" => jar
+    Rake::Task[task_name(dir, args[:name]) + ":project"].out = jar
     Rake::Task[jar].out = jar
+  end
+end
+
+class CreateProjectSourceJar < BaseJava
+  def handle(fun, dir, args)
+    src_jar = custom_name(dir, args[:name], "nodeps-srcs")
+    project_jar = custom_name(dir, args[:name], "nodeps")
+    
+    file src_jar => [project_jar] do
+      # Grab the dependencies of the project_jar, and if they have sources
+      # add them to a map of doom (after expansion)
+      
+      srcs = gather_sources([], Rake::Task[project_jar])
+      
+      temp_dir = "#{src_jar}_temp"
+      
+      puts "Preparing sources: #{custom_name(dir, args[:name], "all-srcs")}:srcs as #{src_jar}"
+      rm_rf temp_dir
+      mkdir_p temp_dir
+      copied = []
+      srcs.each do |src|
+        class_name = class_name(src)
+        next if class_name.nil?
+        
+        dest = temp_dir + "/" + class_name.gsub(".", "/") + ".java"
+        dest.gsub!("/", File::SEPARATOR)
+        
+        if (!copied.index(src))
+          mkdir_p File.dirname(dest)
+          cp_r src, dest
+          copied << src
+        end
+      end
+      zip(temp_dir, src_jar)
+      rm_rf temp_dir
+    end 
+    
+    task task_name(dir, args[:name]) + ":project-srcs" => src_jar
+    Rake::Task[task_name(dir, args[:name]) + ":project-srcs"].out = src_jar
+  end
+  
+  private 
+  def gather_sources(srcs, dep)
+    dep.prerequisites.each do |dep|
+      if dep.to_s =~ /\.java$/
+        srcs.push dep
+      end
+      
+      if Rake::Task.task_defined? dep
+        gather_sources(srcs, Rake::Task[dep])
+      end
+    end
+    srcs
+  end
+end
+
+class Zip < BaseJava
+  def handle(fun, dir, args)
+    # Copy third party deps and the output of the rule into a zip
+    # Also collect source jar
+    
+    task_name = task_name(dir, args[:name])
+    zip = jar_name(dir, args[:name]).sub(/\.jar/, '.zip')
+    uber = task_name + ":uber"
+    project = task_name + ":project"
+    srcs = task_name + ":project-srcs"
+    
+    file zip => [uber, project, srcs] do
+      puts "Zip: #{task_name}:zip as #{zip}"
+      
+      temp = zip + "temp"
+      mkdir_p File.join(temp, "libs")
+      
+      cp Rake::Task[uber].out, temp
+      cp Rake::Task[project].out, temp
+      cp Rake::Task[srcs].out, temp
+      
+      # we only need the third_party deps
+      libs = File.join(temp, "libs")
+      ClassPath.new(zip).all.each do |dep|
+        next unless /^third_party/.match(dep)
+        
+        cp dep, libs
+      end
+      
+      zip(temp, zip)
+      rm_rf temp
+    end
+    
+    task task_name + ":zip" => [zip]
+    Rake::Task[task_name + ":zip"].out = zip
   end
 end
 

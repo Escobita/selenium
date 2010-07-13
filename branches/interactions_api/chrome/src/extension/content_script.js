@@ -23,7 +23,7 @@ if (ChromeDriverContentScript.currentDocument.location != "about:blank") {
   var isFrameset = (ChromeDriverContentScript.currentDocument.getElementsByTagName("frameset").length > 0);
   ChromeDriverContentScript.port.postMessage({response: {response: "newTabInformation",
       value: {statusCode: "no-op", isFrameset: isFrameset, frameCount: window.frames.length,
-      portName: ChromeDriverContentScript.port.name}}, sequenceNumber: -1});
+      portName: ChromeDriverContentScript.port.name, isDefaultContent: (window == window.top)}}, sequenceNumber: -1});
 }
 
 /**
@@ -579,7 +579,7 @@ function addElementToInternalArray(element) {
 
 function addElementsToInternalArray(elements) {
   var toReturn = [];
-  for (var element in elements) {
+  for (var element = 0; element < elements.length; ++element) {
     toReturn.push(addElementToInternalArray(elements[element]));
   }
   return toReturn;
@@ -675,10 +675,14 @@ function getElementAttribute(element, attribute) {
     value = (element.disabled ? element.disabled : "false");
     break;
   case "selected":
-    value = findWhetherElementIsSelected(element);
+    if (findWhetherElementIsSelected(element)) {
+      value = "true";
+    }
     break;
   case "checked":
-    value = (element.checked ? element.checked : "false");
+    if (element.checked) {
+      value = "true";
+    }
     break;
   case "index":
     value = element.index;

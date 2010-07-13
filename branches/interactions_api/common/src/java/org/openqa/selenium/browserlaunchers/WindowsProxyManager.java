@@ -202,6 +202,19 @@ public class WindowsProxyManager {
 
     WindowsUtils.writeBooleanRegistryValue(RegKey.WARN_ON_FORM_SUBMIT.key, false);
 
+    // Disable HTTP <=> HTTPS issues.
+    WindowsUtils.writeIntRegistryValue(RegKey.DISPLAY_MIXED_CONTENT.key, 0);
+    WindowsUtils.writeIntRegistryValue(RegKey.WARN_ON_HTTPS_TO_HTTP_REDIRECT.key, 0);
+    WindowsUtils.writeIntRegistryValue(RegKey.WARN_ON_BAD_CERT_RECEIVING.key, 0);
+
+    // Disable script debugger & errors.
+    WindowsUtils.writeStringRegistryValue(RegKey.DISABLE_SCRIPT_DEBUGGER.key, "yes");
+    WindowsUtils.writeStringRegistryValue(RegKey.DISABLE_SCRIPT_DEBUGGER_IE.key, "yes");
+    WindowsUtils.writeStringRegistryValue(RegKey.ERROR_DIALOG_DISPLAYED_ON_EVERY_ERROR.key, "no");
+
+    // Disable prompting & running signed ActiveX controls that haven't already been enabled.
+    WindowsUtils.writeIntRegistryValue(RegKey.DOWNLOAD_SIGNED_ACTIVEX.key, 3);
+
     // DGF Don't manage proxy settings the IE4 way; use hudsuckr instead
 //        if (WindowsUtils.doesRegistryValueExist(RegKey.PROXY_OVERRIDE.key)) {
 //            WindowsUtils.deleteRegistryValue(RegKey.PROXY_OVERRIDE.key);
@@ -408,6 +421,28 @@ public class WindowsProxyManager {
     WARN_ON_FORM_SUBMIT(REG_KEY_BASE
                         + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3\\1601",
         boolean.class),
+    DISPLAY_MIXED_CONTENT(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3\\1609",
+        int.class),
+    WARN_ON_HTTPS_TO_HTTP_REDIRECT(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\WarnOnHTTPSToHTTPRedirect",
+        int.class),
+    WARN_ON_BAD_CERT_RECEIVING(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\WarnonBadCertRecving",
+        int.class),
+    DISABLE_SCRIPT_DEBUGGER(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Internet Explorer\\Main\\Disable Script Debugger",
+        String.class),
+    DISABLE_SCRIPT_DEBUGGER_IE(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Internet Explorer\\Main\\DisableScriptDebuggerIE",
+        String.class),
+    ERROR_DIALOG_DISPLAYED_ON_EVERY_ERROR(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Internet Explorer\\Main\\Error Dlg Displayed On Every Error",
+        String.class),
+    DOWNLOAD_SIGNED_ACTIVEX(REG_KEY_BASE
+                        + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3\\1001",
+        int.class),
+
     //DGF Don't manage proxy settings the IE4 way; use hudsuckr instead
     //AUTOCONFIG_URL(REG_KEY_BASE + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\AutoConfigURL", String.class),
     //PROXY_ENABLE(REG_KEY_BASE + "\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyEnable", boolean.class),

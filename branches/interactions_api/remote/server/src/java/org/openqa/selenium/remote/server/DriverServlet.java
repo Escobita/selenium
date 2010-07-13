@@ -37,7 +37,6 @@ import org.openqa.selenium.remote.server.handler.DeleteSession;
 import org.openqa.selenium.remote.server.handler.DescribeElement;
 import org.openqa.selenium.remote.server.handler.DragElement;
 import org.openqa.selenium.remote.server.handler.ElementEquality;
-import org.openqa.selenium.remote.server.handler.ExecuteSQL;
 import org.openqa.selenium.remote.server.handler.ExecuteScript;
 import org.openqa.selenium.remote.server.handler.FindActiveElement;
 import org.openqa.selenium.remote.server.handler.FindChildElement;
@@ -46,8 +45,6 @@ import org.openqa.selenium.remote.server.handler.FindElement;
 import org.openqa.selenium.remote.server.handler.FindElements;
 import org.openqa.selenium.remote.server.handler.GetAllCookies;
 import org.openqa.selenium.remote.server.handler.GetAllWindowHandles;
-import org.openqa.selenium.remote.server.handler.GetAppCache;
-import org.openqa.selenium.remote.server.handler.GetAppCacheStatus;
 import org.openqa.selenium.remote.server.handler.GetCssProperty;
 import org.openqa.selenium.remote.server.handler.GetCurrentUrl;
 import org.openqa.selenium.remote.server.handler.GetCurrentWindowHandle;
@@ -59,7 +56,6 @@ import org.openqa.selenium.remote.server.handler.GetElementSelected;
 import org.openqa.selenium.remote.server.handler.GetElementSize;
 import org.openqa.selenium.remote.server.handler.GetElementText;
 import org.openqa.selenium.remote.server.handler.GetElementValue;
-import org.openqa.selenium.remote.server.handler.GetLocationContext;
 import org.openqa.selenium.remote.server.handler.GetMouseSpeed;
 import org.openqa.selenium.remote.server.handler.GetPageSource;
 import org.openqa.selenium.remote.server.handler.GetSessionCapabilities;
@@ -69,18 +65,34 @@ import org.openqa.selenium.remote.server.handler.GoBack;
 import org.openqa.selenium.remote.server.handler.GoForward;
 import org.openqa.selenium.remote.server.handler.HoverOverElement;
 import org.openqa.selenium.remote.server.handler.ImplicitlyWait;
-import org.openqa.selenium.remote.server.handler.IsBrowserOnline;
 import org.openqa.selenium.remote.server.handler.NewSession;
 import org.openqa.selenium.remote.server.handler.RefreshPage;
 import org.openqa.selenium.remote.server.handler.SendKeys;
-import org.openqa.selenium.remote.server.handler.SetBrowserConnection;
 import org.openqa.selenium.remote.server.handler.SetElementSelected;
-import org.openqa.selenium.remote.server.handler.SetLocationContext;
 import org.openqa.selenium.remote.server.handler.SetMouseSpeed;
 import org.openqa.selenium.remote.server.handler.SubmitElement;
 import org.openqa.selenium.remote.server.handler.SwitchToFrame;
 import org.openqa.selenium.remote.server.handler.SwitchToWindow;
 import org.openqa.selenium.remote.server.handler.ToggleElement;
+import org.openqa.selenium.remote.server.handler.html5.ClearLocalStorage;
+import org.openqa.selenium.remote.server.handler.html5.ClearSessionStorage;
+import org.openqa.selenium.remote.server.handler.html5.ExecuteSQL;
+import org.openqa.selenium.remote.server.handler.html5.GetAppCache;
+import org.openqa.selenium.remote.server.handler.html5.GetAppCacheStatus;
+import org.openqa.selenium.remote.server.handler.html5.GetLocalStorageItem;
+import org.openqa.selenium.remote.server.handler.html5.GetLocalStorageKeys;
+import org.openqa.selenium.remote.server.handler.html5.GetLocalStorageSize;
+import org.openqa.selenium.remote.server.handler.html5.GetLocationContext;
+import org.openqa.selenium.remote.server.handler.html5.GetSessionStorageItem;
+import org.openqa.selenium.remote.server.handler.html5.GetSessionStorageKeys;
+import org.openqa.selenium.remote.server.handler.html5.GetSessionStorageSize;
+import org.openqa.selenium.remote.server.handler.html5.IsBrowserOnline;
+import org.openqa.selenium.remote.server.handler.html5.RemoveLocalStorageItem;
+import org.openqa.selenium.remote.server.handler.html5.RemoveSessionStorageItem;
+import org.openqa.selenium.remote.server.handler.html5.SetBrowserConnection;
+import org.openqa.selenium.remote.server.handler.html5.SetLocalStorageItem;
+import org.openqa.selenium.remote.server.handler.html5.SetLocationContext;
+import org.openqa.selenium.remote.server.handler.html5.SetSessionStorageItem;
 import org.openqa.selenium.remote.server.renderer.EmptyResult;
 import org.openqa.selenium.remote.server.renderer.ForwardResult;
 import org.openqa.selenium.remote.server.renderer.JsonErrorExceptionResult;
@@ -259,6 +271,32 @@ public class DriverServlet extends HttpServlet {
     postMapper.bind("/session/:sessionId/browser_connection", SetBrowserConnection.class)
     .on(ResultType.SUCCESS, new EmptyResult());
     getMapper.bind("/session/:sessionId/browser_connection", IsBrowserOnline.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    
+    getMapper.bind("/session/:sessionId/local_storage/:key", GetLocalStorageItem.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    deleteMapper.bind("/session/:sessionId/local_storage/:key", RemoveLocalStorageItem.class)
+    .on(ResultType.SUCCESS, new JsonResult(":response"));
+    getMapper.bind("/session/:sessionId/local_storage", GetLocalStorageKeys.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    postMapper.bind("/session/:sessionId/local_storage", SetLocalStorageItem.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
+    deleteMapper.bind("/session/:sessionId/local_storage", ClearLocalStorage.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
+    getMapper.bind("/session/:sessionId/local_storage/size", GetLocalStorageSize.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    
+    getMapper.bind("/session/:sessionId/session_storage/:key", GetSessionStorageItem.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    deleteMapper.bind("/session/:sessionId/session_storage/:key", RemoveSessionStorageItem.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    getMapper.bind("/session/:sessionId/session_storage", GetSessionStorageKeys.class)
+        .on(ResultType.SUCCESS, new JsonResult(":response"));
+    postMapper.bind("/session/:sessionId/session_storage", SetSessionStorageItem.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
+    deleteMapper.bind("/session/:sessionId/session_storage", ClearSessionStorage.class)
+        .on(ResultType.SUCCESS, new EmptyResult());
+    getMapper.bind("/session/:sessionId/session_storage/size", GetSessionStorageSize.class)
         .on(ResultType.SUCCESS, new JsonResult(":response"));
   }
 

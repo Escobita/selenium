@@ -5,9 +5,11 @@ module Selenium
       # @private
       class Binary
 
-        def initialize
-          ENV['MOZ_NO_REMOTE'] = '1' # able to launch multiple instances
-        end
+        NO_FOCUS_LIBRARY_NAME = "x_ignore_nofocus.so"
+        NO_FOCUS_LIBRARIES = [
+          ["#{WebDriver.root}/selenium/webdriver/firefox/native/linux/amd64/#{NO_FOCUS_LIBRARY_NAME}", "amd64/#{NO_FOCUS_LIBRARY_NAME}"],
+          ["#{WebDriver.root}/selenium/webdriver/firefox/native/linux/x86/#{NO_FOCUS_LIBRARY_NAME}", "x86/#{NO_FOCUS_LIBRARY_NAME}"],
+        ]
 
         def create_base_profile(name)
           execute("-CreateProfile", name)
@@ -24,6 +26,12 @@ module Selenium
 
         def start_with(profile, *args)
           ENV['XRE_PROFILE_PATH'] = profile.absolute_path
+          ENV['MOZ_NO_REMOTE'] = '1' # able to launch multiple instances
+
+          if Platform.linux? && (profile.native_events? || profile.load_no_focus_lib?)
+            modify_link_library_path profile
+          end
+
           execute(*args)
           cope_with_mac_strangeness(args) if Platform.mac?
         end
@@ -66,6 +74,24 @@ module Selenium
         end
 
         private
+
+        def modify_link_library_path(profile)
+          paths = []
+          profile_path = profile.absolute_path
+
+          NO_FOCUS_LIBRARIES.each do |from, to|
+            dest = File.join(profile_path, to)
+            FileUtils.mkdir_p File.dirname(dest)
+            FileUtils.cp from, dest
+
+            paths << File.expand_path(File.dirname(dest))
+          end
+
+          paths += ENV['LD_LIBRARY_PATH'].to_s.split(File::PATH_SEPARATOR)
+
+          ENV['LD_LIBRARY_PATH'] = paths.uniq.join(File::PATH_SEPARATOR)
+          ENV['LD_PRELOAD']      = NO_FOCUS_LIBRARY_NAME
+        end
 
         class << self
           def path

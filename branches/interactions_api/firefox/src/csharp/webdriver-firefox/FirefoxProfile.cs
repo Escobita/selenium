@@ -155,19 +155,17 @@ namespace OpenQA.Selenium.Firefox
             {
                 return;
             }
+         
+            AddExtension(ExtensionFileName);
+        }
 
-            Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            string currentDirectory = executingAssembly.Location;
-
-            // If we're shadow copying,. fiddle with 
-            // the codebase instead 
-            if (AppDomain.CurrentDomain.ShadowCopyFiles)
-            {
-                Uri uri = new Uri(executingAssembly.CodeBase);
-                currentDirectory = uri.LocalPath;
-            }
-
-            InstallExtension();
+        /// <summary>
+        /// Adds a Firefox Extension to this profile
+        /// </summary>
+        /// <param name="extensionToInstall">The path to the new extension</param>
+        public void AddExtension(string extensionToInstall)
+        {
+            InstallExtension(extensionToInstall);
         }
 
         /// <summary>
@@ -244,6 +242,7 @@ namespace OpenQA.Selenium.Firefox
             AddDefaultPreference(prefs, "dom.disable_open_during_load", "false");
             AddDefaultPreference(prefs, "extensions.update.enabled", "false");
             AddDefaultPreference(prefs, "extensions.update.notifyUser", "false");
+            AddDefaultPreference(prefs, "network.manage-offline-status", "false");
             AddDefaultPreference(prefs, "security.fileuri.origin_policy", "3");
             AddDefaultPreference(prefs, "security.fileuri.strict_origin_policy", "false");
             AddDefaultPreference(prefs, "security.warn_entering_secure", "false");
@@ -425,16 +424,22 @@ namespace OpenQA.Selenium.Firefox
             return id;
         }
 
-        private void InstallExtension()
+        private void InstallExtension(string extensionFileName)
         {
-            string tempFileName = Path.Combine(Path.GetTempPath(), "webdriver");
+            string tempFileName = Path.Combine(Path.GetTempPath(), extensionFileName);
             if (Directory.Exists(tempFileName))
             {
                 Directory.Delete(tempFileName, true);
             }
 
             Directory.CreateDirectory(tempFileName);
-            Stream zipFileStream = ResourceUtilities.GetResourceStream(ExtensionFileName, ExtensionResourceId);
+            string resourceID = string.Empty;
+            if (extensionFileName == ExtensionFileName)
+            {
+                resourceID = ExtensionResourceId;
+            }
+
+            Stream zipFileStream = ResourceUtilities.GetResourceStream(extensionFileName, resourceID);
             using (ZipFile extensionZipFile = ZipFile.Read(zipFileStream))
             {
                 extensionZipFile.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;

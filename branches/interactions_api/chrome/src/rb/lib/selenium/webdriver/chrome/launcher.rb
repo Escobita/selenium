@@ -8,19 +8,24 @@ module Selenium
 
         attr_reader :pid
 
-        def self.launcher
+        def self.launcher(*args)
           launcher =  case Platform.os
                       when :windows
-                        WindowsLauncher.new
+                        WindowsLauncher.new(*args)
                       when :macosx
-                        MacOSXLauncher.new
+                        MacOSXLauncher.new(*args)
                       when :unix, :linux
-                        UnixLauncher.new
+                        UnixLauncher.new(*args)
                       else
                         raise "unknown OS: #{Platform.os}"
                       end
 
           launcher
+        end
+
+        def initialize(opts = {})
+          super()
+          @default_profile = opts[:default_profile]
         end
 
         def self.binary_path
@@ -51,7 +56,6 @@ module Selenium
           cp_r ext_path, tmp_extension_dir
 
           if Platform.win?
-            cp linked_lib_path, tmp_extension_dir
             mv "#{tmp_extension_dir}/manifest-win.json", "#{tmp_extension_dir}/manifest.json"
           else
             mv "#{tmp_extension_dir}/manifest-nonwin.json", "#{tmp_extension_dir}/manifest.json"
@@ -64,19 +68,26 @@ module Selenium
         end
 
         def launch_chrome(server_url)
-          @process = ChildProcess.new Platform.wrap_in_quotes_if_necessary(self.class.binary_path),
-                                      "--load-extension=#{Platform.wrap_in_quotes_if_necessary tmp_extension_dir}",
-                                      "--user-data-dir=#{Platform.wrap_in_quotes_if_necessary tmp_profile_dir}",
-                                      "--activate-on-launch",
-                                      "--disable-hang-monitor",
-                                      "--disable-popup-blocking",
-                                      "--disable-prompt-on-repost",
-                                      server_url
-          @process.start
+          args = [
+            Platform.wrap_in_quotes_if_necessary(self.class.binary_path),
+            "--load-extension=#{Platform.wrap_in_quotes_if_necessary tmp_extension_dir}",
+            "--activate-on-launch",
+            "--disable-hang-monitor",
+            "--disable-popup-blocking",
+            "--disable-prompt-on-repost"
+          ]
+
+          unless @default_profile
+            args << "--user-data-dir=#{Platform.wrap_in_quotes_if_necessary tmp_profile_dir}"
+          end
+
+          args << server_url
+
+          @process = ChildProcess.new(*args).start
         end
 
         def ext_path
-          @ext_path ||= "#{WebDriver.root}/chrome/src/extension"
+          @ext_path ||= ZipHelper.unzip("#{WebDriver.root}/selenium/webdriver/chrome/extension.zip")
         end
 
         def tmp_extension_dir
@@ -122,9 +133,10 @@ module Selenium
             nil
           end
 
-          def linked_lib_path
-            # TODO: x64
-            @linked_lib_path ||= "#{WebDriver.root}/chrome/prebuilt/Win32/Release/npchromedriver.dll"
+          def quit
+            # looks like we need a kill right away on Windows + MRI
+            @process.kill if Platform.engine == :ruby
+            super
           end
         end
 

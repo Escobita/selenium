@@ -13,8 +13,8 @@ module Selenium
         @home ||= jruby? ? ENV_JAVA['user.home'] : ENV['HOME']
       end
 
-      def platform
-        @platform ||= (
+      def engine
+        @engine ||= (
           if defined? RUBY_ENGINE
             RUBY_ENGINE.to_sym
           else
@@ -46,7 +46,7 @@ module Selenium
           if defined?(FFI::BITSIZE)
             FFI::BITSIZE
           elsif defined?(FFI)
-            FFI.type_size :pointer
+            FFI.type_size(:pointer) == 4 ? 32 : 64
           elsif jruby?
             Integer(ENV_JAVA['sun.arch.data.model'])
           else
@@ -56,11 +56,11 @@ module Selenium
       end
 
       def jruby?
-        platform == :jruby
+        engine == :jruby
       end
 
       def ironruby?
-        platform == :ironruby
+        engine == :ironruby
       end
 
       def ruby187?
@@ -77,6 +77,10 @@ module Selenium
 
       def mac?
         os == :macosx
+      end
+
+      def linux?
+        os == :linux
       end
 
       def wrap_in_quotes_if_necessary(str)
@@ -106,7 +110,7 @@ module Selenium
 end # Selenium
 
 if __FILE__ == $0
-  p :platform => Selenium::WebDriver::Platform.platform,
+  p :engine   => Selenium::WebDriver::Platform.engine,
     :os       => Selenium::WebDriver::Platform.os,
     :ruby187? => Selenium::WebDriver::Platform.ruby187?,
     :ruby19?  => Selenium::WebDriver::Platform.ruby19?,

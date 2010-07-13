@@ -20,6 +20,7 @@ package org.openqa.selenium.remote.server.rest;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.PropertyMunger;
+import org.openqa.selenium.remote.SimplePropertyDescriptor;
 import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.LogTo;
@@ -27,9 +28,6 @@ import org.openqa.selenium.remote.server.handler.WebDriverHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.BufferedReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -48,9 +46,11 @@ public class ResultConfig {
   private final DriverSessions sessions;
   private final Map<ResultType, Set<Result>> resultToRender =
       new HashMap<ResultType, Set<Result>>();
+  private final String url;
   private final LogTo logger;
 
   public ResultConfig(String url, Class<? extends Handler> handlerClazz, DriverSessions sessions, LogTo logger) {
+    this.url = url;
     this.logger = logger;
     if (url == null || handlerClazz == null) {
       throw new IllegalArgumentException("You must specify the handler and the url");
@@ -116,11 +116,23 @@ public class ResultConfig {
     return on(success, renderer, "");
   }
 
+  /*
+  Configure this ResultConfig to handle results of type ResultType with a
+  specific renderer. The mimeType is used to distinguish between JSON
+  calls and "ordinary" browser pointed at the remote WD Server, which is
+  not implemented at all yet.
+   */
   public ResultConfig on(ResultType success, Renderer renderer, String mimeType) {
     Set<Result> results = resultToRender.get(success);
     if (results == null) {
       results = new LinkedHashSet<Result>();
       resultToRender.put(success, results);
+    }
+
+    // There should not be more than one renderer for each result and
+    // mime type.
+    for (Result existingResult : results) {
+      assert(existingResult.isExactMimeTypeMatch(mimeType) == false);
     }
     results.add(new Result(mimeType, renderer));
     return this;
@@ -145,12 +157,9 @@ public class ResultConfig {
       logger.log("Done: " + pathInfo);
     } catch (Exception e) {
       result = ResultType.EXCEPTION;
-      Throwable toUse = e;
-      if (e instanceof UndeclaredThrowableException) {
-        // An exception was thrown within an invocation handler. Not smart.
-        // Extract the original exception
-        toUse = e.getCause().getCause();
-      }
+      logger.log("Caught: " + e);
+      
+      Throwable toUse = getRootExceptionCause(e);
 
       logger.log("Exception: " + toUse.getMessage());
       request.setAttribute("exception", toUse);
@@ -205,9 +214,9 @@ public class ResultConfig {
 
   protected void addHandlerAttributesToRequest(HttpServletRequest request, Handler handler)
       throws Exception {
-    BeanInfo info = Introspector.getBeanInfo(handler.getClass());
-    PropertyDescriptor[] properties = info.getPropertyDescriptors();
-    for (PropertyDescriptor property : properties) {
+    SimplePropertyDescriptor[] properties =
+        SimplePropertyDescriptor.getPropertyDescriptors(handler.getClass());
+    for (SimplePropertyDescriptor property : properties) {
       Method readMethod = property.getReadMethod();
       if (readMethod == null) {
         continue;
@@ -216,5 +225,57 @@ public class ResultConfig {
       Object result = readMethod.invoke(handler);
       request.setAttribute(property.getName(), result);
     }
+  }
+
+  public Throwable getRootExceptionCause(Throwable originalException) {
+    Throwable toReturn = originalException;
+    if (originalException instanceof UndeclaredThrowableException) {
+      // An exception was thrown within an invocation handler. Not smart.
+      // Extract the original exception
+      toReturn = originalException.getCause().getCause();
+    }
+
+    // When catching an exception here, it is most likely wrapped by
+    // several other exceptions. Peel the layers and use the original
+    // exception as the one to return to the client. That is the most
+    // likely to contain informative data about the error.
+    Throwable currentThrowable = toReturn;
+    // This is a safety measure to make sure this loop is never endless
+    int causeTraversalCounter = 0;
+    while ((currentThrowable != null) && (causeTraversalCounter < 10)) {
+      causeTraversalCounter++;
+      logger.log("Peeling exception: " + currentThrowable +
+                 " (" + currentThrowable.getClass() + ")");
+      // Remember the last exception - this one will be used if
+      // there was no exception that caused it.
+      toReturn = currentThrowable;
+      // Peeling the layers is done here
+      currentThrowable = currentThrowable.getCause();
+    }
+
+    return toReturn;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ResultConfig)) {
+      return false;
+    }
+
+    ResultConfig that = (ResultConfig) o;
+
+    if (!url.equals(that.url)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return url.hashCode();
   }
 }

@@ -145,10 +145,10 @@
   </ItemGroup>
 
   <ItemGroup>
-     <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\Linux\Release\x_ignore_nofocus.so">
+     <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\i386\libnoblur.so">
       <LogicalName>WebDriver.FirefoxNoFocus.x86.dll</LogicalName>
     </FirefoxResources>
-    <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\Linux64\Release\x_ignore_nofocus.so">
+    <FirefoxResources Include="$(TrunkRoot)\firefox\prebuilt\amd64\libnoblur64.so">
       <LogicalName>WebDriver.FirefoxNoFocus.amd64.dll</LogicalName> 
     </FirefoxResources>
     <FirefoxResources Include="$(TrunkRoot)\build\firefox\webdriver.xpi">
@@ -157,7 +157,7 @@
   </ItemGroup>
 
   <Target Name="BuildFirefox" DependsOnTargets="BuildRemote">
-    <Error Text="Could not find webdriver-extension.zip. Expected to find it in $(TrunkRoot)\build."
+    <Error Text="Could not find webdriver.xpi. Expected to find it in $(TrunkRoot)\build."
            Condition="!Exists('$(TrunkRoot)\build\firefox\webdriver.xpi')"/>
     <Message Text="Building WebDriver.Firefox.dll"/>
     <Csc Sources="@(FirefoxSourceFiles)"

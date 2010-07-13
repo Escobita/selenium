@@ -24,6 +24,7 @@ limitations under the License.
 #include "jsxpath.h"
 #include "cookies.h"
 #include "utils.h"
+#include "atoms.h"
 #include "IEReturnTypes.h"
 #include "windowHandling.h"
 #include <stdio.h>
@@ -696,16 +697,40 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 
 	try {
 		std::wstring script(L"(function() { return function(){ ");
-		script += L"var e = arguments[0]; var attr = arguments[1]; var lattr = attr.toLowerCase(); ";
-		script += L"if ('class' == lattr) { attr = 'className' }; ";
-		script += L"if ('readonly' == lattr) { attr = 'readOnly' }; ";
-		script += L"if ('style' == lattr) { return ''; } ";
-		script += L"if ('disabled' == lattr) { return e.disabled ? 'true' : 'false'; } ";
-		script += L"if (e.tagName.toLowerCase() == 'input') { ";
-        script += L"  var type = e.type.toLowerCase(); ";
-		script += L"  if (type == 'radio' && lattr == 'selected') { return e.checked == '' || e.checked == undefined ? 'false' : 'true' ; } ";
-		script += L"} ";
-		script += L"return e[attr] === undefined ? undefined : e[attr].toString(); ";
+
+		const wchar_t** scripts[] = {
+		  GET_ATTRIBUTE,
+		  GET_PROPERTY,
+		  HAS_ATTRIBUTE,
+		  NULL
+		};
+
+		// Read in all the scripts
+		for (int i = 0; scripts[i]; i++) {
+			for (int j = 0; scripts[i][j]; j++) {
+				script += scripts[i][j];
+				script += L"\n";
+			}
+		}
+
+		// Now for the magic
+		script += L"var element = arguments[0];\n";
+		script += L"var attributeName = arguments[1];\n";
+		script += L"var lattr = arguments[1].toLowerCase();\n";
+		script += L"var value = null;\n";
+		script += L"if ('checked' == lattr || 'selected' == lattr) {\n";
+		script += L"	value = getProperty(element, 'selected') || getProperty(element, 'checked');\n";
+		script += L"	if (!value) {\n";
+		script += L"		value = null;\n";
+		script += L"	}\n";
+		script += L"} else if (hasAttribute(element, attributeName)) {\n";
+		script += L"	value = getAttribute(element, attributeName);\n";
+		script += L"} else {\n";
+		script += L"	value = getProperty(element, attributeName);\n";
+		script += L"}\n";
+		script += L"return value;\n";
+
+		// Close things
 		script += L"};})();";
 
 		ScriptArgs* args;
@@ -732,8 +757,8 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 
 		int type;
 		wdGetScriptResultType(driver, scriptResult, &type);
-		if (type != TYPE_EMPTY) {
-			const std::wstring originalString(bstr2cw(scriptResult->result.bstrVal));
+		if (type != TYPE_EMPTY && scriptResult->result.vt != VT_NULL) {
+			const std::wstring originalString(comvariant2cw(scriptResult->result));
 			size_t length = originalString.length() + 1;
 			wchar_t* toReturn = new wchar_t[length];
 
@@ -814,10 +839,22 @@ int wdeGetTagName(WebElement* element, StringWrapper** result)
 
 int wdeIsSelected(WebElement* element, int* result)
 {
-    int res = verifyFresh(element);	if (res != SUCCESS) { return res; }
+	*result = 0;
 
 	try {
-		*result = element->element->isSelected() ? 1 : 0;
+		StringWrapper* wrapper;
+		WebDriver* driver = new WebDriver();
+		driver->ie = element->element->getParent();
+		int res = wdeGetAttribute(driver, element, L"selected", &wrapper);
+		driver->ie = NULL;
+		delete driver;
+		if (res != SUCCESS) 
+		{
+			return res;
+		}
+
+		*result = wrapper ? 1 : 0;
+		wdFreeString(wrapper);
 
 		return SUCCESS;
 	} END_TRY;

@@ -19,6 +19,8 @@ import ctypes
 import re
 from os import environ, pathsep
 from os.path import dirname, abspath
+from sys import platform
+from platform import machine
 
 try:
     from selenium.common.exceptions import NoSuchElementException
@@ -60,17 +62,41 @@ _ERRORS = (
     "ENOSUCHWINDOW",
 )
 
+_ERROR_EXPLENATION = {
+    "ETIMEOUT" : '''
+    The driver reported that the command timed out. There may
+    be several reasons for this. Check that the destination
+    site is in IE's 'Trusted Sites' (accessed from Tools->
+    Internet Options in the 'Security' tab) If it is a "
+    trusted site, then the request may have taken more than
+    a minute to finish.''',
+}
+
+def _num_bits():
+    if machine().endswith("86"):
+        return 32
+    return 64
+
 def _load_library():
     # We assume the DLL is next to the driver, the build (setup.py) should take
-    # care of it (it currently doesn't)
+    # care of it
     old_path = environ["PATH"]
     environ["PATH"] = pathsep.join([environ["PATH"], abspath(dirname(__file__))])
     try:
-        return ctypes.cdll.LoadLibrary("InternetExplorerDriver.dll")
+        # We first try the platform specific dll and then the general one
+        for suffix in (_num_bits(), ""):
+            dll = "InternetExplorerDriver%s.dll" % suffix
+            try:
+                return ctypes.cdll.LoadLibrary(dll)
+            except WindowsError:
+                pass
     finally:
         environ["PATH"] = old_path
 
-_DLL = _load_library()
+if platform == "win32":
+    _DLL = _load_library()
+else:
+    _DLL = None
 
 class _StringWrapper(ctypes.Structure):
     _fields_ = [
@@ -87,10 +113,18 @@ class WebDriverError(ErrorInResponseException):
         else:
             self.error = _ERRORS[error]
 
-    def __repr__(self):
-        return "<WebDriverError> `%s(%s)` -> %s" % \
+    def __str__(self):
+        return "<WebDriverError> `%s%s` -> %s" % \
                 (self.funcname, self.args, self.error)
-    __str__ = __repr__
+
+    def __repr__(self):
+        msg = str(self)
+
+        longdesc = _ERROR_EXPLENATION.get(self.error)
+        if longdesc:
+            msg = "%s\n%s" % (msg, longdesc)
+
+        return msg
 
 
 def _call(funcname, *args):
@@ -265,7 +299,6 @@ class WebDriver(DllWrapper):
         self._call("wdWaitForLoadToComplete")
 
     def get_window_handles(self):
-        dll = _DLL
         handles = ctypes.c_void_p()
         self._call("wdGetAllWindowHandles", ctypes.byref(handles))
 
@@ -331,7 +364,6 @@ class WebDriver(DllWrapper):
         return elements
 
     def _parse_script_args(self, args):
-        dll = _DLL
         ptr = ctypes.c_void_p()
         max_length = ctypes.c_int(len(args)) # FIXME: Is this the right length?
         _call("wdNewScriptArgs", ctypes.byref(ptr), max_length)
@@ -359,8 +391,6 @@ class WebDriver(DllWrapper):
         return ptr
 
     def _parse_script_result(self, ptr):
-        dll = _DLL
-
         restype = ctypes.c_int()
         _call("wdGetScriptResultType", ptr, ctypes.byref(restype))
         restype = restype.value
@@ -394,8 +424,6 @@ class WebDriver(DllWrapper):
             raise ValueError("Unknown result type - %d" % restype)
 
     def execute_script(self, script, *args):
-        dll = _DLL
-
         result = ctypes.c_void_p()
 
         script = "(function() { return function(){" + script + "};})();";

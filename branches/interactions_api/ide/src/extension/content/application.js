@@ -43,7 +43,10 @@ Application.prototype = {
     },
 
     getBaseURL: function() {
-        return this.baseURL;
+        //if there is a testCase with a base URL return it
+        //if not, return the value of the baseURL value
+        return this.testCase && this.testCase.baseURL ?
+            this.testCase.baseURL : this.baseURL;
     },
 
     setBaseURL: function(baseURL) {
@@ -71,7 +74,7 @@ Application.prototype = {
     },
 
     initOptions: function() {
-        if (this.options.rememberBaseURL == 'true' && this.options.baseURL != null){
+        if (this.options.rememberBaseURL == 'true' && this.options.baseURL != null) {
             this.setBaseURL(this.options.baseURL);
         }
         //initializing the reload button
@@ -93,10 +96,22 @@ Application.prototype = {
     },
 
     setCurrentFormat: function(format) {
-        this.currentFormat = format;
-        this.options.selectedFormat = format.id;
-        Preferences.save(this.options, 'selectedFormat');
-        this.notify("currentFormatChanged", format);
+        //if the testcase is manually changed
+        var edited = this.testCase.edited;
+        //sync the testcase with the data view
+        this.notify("currentFormatChanging");
+        //if the format is reversible (implements the "parse" method)
+        //or if the testcase isn't changed manually by user: all be fine
+        //if not, the format isn't changed
+        if ((this.currentFormat.isReversible && this.currentFormat.isReversible()) || !edited){
+            this.currentFormat = format;
+            this.options.selectedFormat = format.id;
+            Preferences.save(this.options, 'selectedFormat');
+            this.notify("currentFormatChanged", format);
+        }else{
+            //advise the user of the impossibility of changing the format
+            this.notify("currentFormatUnChanged");
+        }
     },
 
     getCurrentFormat: function() {
@@ -156,7 +171,7 @@ Application.prototype = {
         if (testCase.baseURL) {
             this.setBaseURL(testCase.baseURL);
         } else {
-            //testCase.setBaseURL(this.baseURL);
+            testCase.setBaseURL(this.baseURL);
         }
         this.notify("testCaseChanged", this.testCase);
     },
@@ -254,25 +269,27 @@ Application.prototype = {
         }
     },
     
-    saveTestSuite: function() {
-        this._saveTestSuiteAs(function(testSuite) {
+    saveTestSuite: function(suppressTestCasePrompt) {
+    	//Samit: Enh: Added suppressTestCasePrompt to allow saving test suite and test cases without a yes/no prompt for each test case
+        return this._saveTestSuiteAs(function(testSuite) {
                 return testSuite.save(false);
-            });
+            }, suppressTestCasePrompt);
     },
 
     saveNewTestSuite: function() {
-        this._saveTestSuiteAs(function(testSuite) {
+    	return this._saveTestSuiteAs(function(testSuite) {
                 return testSuite.save(true);
             });
     },
 
-    _saveTestSuiteAs: function(handler) {
+    _saveTestSuiteAs: function(handler, suppressTestCasePrompt) {
         this.log.debug("saveTestSuite");
         var cancelled = false;
         this.getTestSuite().tests.forEach(function(test) {
                 if (cancelled) return;
                 if (test.content && test.content.modified) {
-                    if (confirm("The test case is modified. Do you want to save this test case?")) {
+                	//Samit: Enh: Added suppressTestCasePrompt to allow saving test suite and test cases without a yes/no prompt for each test case
+                    if (suppressTestCasePrompt || confirm("The test case " + test.getTitle() + " is modified. Do you want to save this test case?")) {
                         if (!this.getCurrentFormat().save(test.content)) {
                             cancelled = true;
                         }
@@ -284,8 +301,10 @@ Application.prototype = {
         if (!cancelled) {
             if (handler(this.getTestSuite())) {
                 this.addRecentTestSuite(this.getTestSuite());
+                return true;
             }
         }
+        return false;
     },
 
     saveTestCase: function() {

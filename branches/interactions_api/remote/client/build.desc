@@ -28,15 +28,23 @@ java_library(name = "combined",
     "//support"
   ])
 
-ruby_test(
+ruby_library(name = "client",
+  srcs = [ "src/rb/lib/**/*.rb" ],
+  deps = [
+    "//common:ruby"
+  ]
+)
+
+ruby_test(name = "remote",
   srcs = [
     "common/test/rb/spec/**/*_spec.rb",
     "remote/client/test/rb/spec/**/*_spec.rb"
   ],
-  include = ["remote/client/src/rb/lib"],
+  include = ["build/ruby/lib"],
   deps = [
     "//remote/server:server",
-    "//remote/server:test"
-  ],
-  driver_name = "remote"
+    "//remote/server:test",
+    ":ruby"
+  ]
 )
+

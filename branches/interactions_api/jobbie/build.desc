@@ -6,6 +6,7 @@ java_library(name = "jobbie",
     {":ie_x64_dll" : "amd64/InternetExplorerDriver.dll"}
   ],
   deps = [
+    ":atoms",
     ":ie_result_type_cpp",
     ":ie_result_type_java",
     "//common",
@@ -17,17 +18,29 @@ java_test(name = "test",
   deps = [
     ":jobbie",
     "//common:test"
-  ])
+])
 
-ruby_test(
+ruby_library(name = "ie",
+  srcs = [ "src/rb/lib/**/*.rb" ],
+  resources = [
+    {":ie_win32_dll" : "lib/selenium/webdriver/ie/native/win32/InternetExplorerDriver.dll"},
+    {":ie_x64_dll" : "lib/selenium/webdriver/ie/native/x64/InternetExplorerDriver.dll"}
+  ],
+  deps = [ "//common:ruby" ]
+)
+
+ruby_test(name = "ie",
   srcs = [
     "common/test/rb/spec/**/*_spec.rb",
     "jobbie/test/rb/spec/**/*_spec.rb"
   ],
-  include = ["jobbie/src/rb/lib"],
-  driver_name = "ie"
+  include = ["build/ruby/lib"],
+  deps = [ ":ruby" ]
 )
 
+rake_task(name = "atoms",
+  task_name = "atomic_header",
+  out = "jobbie/src/cpp/InternetExplorerDriver/atoms.h")
 
 rake_task(name = "ie_result_type_java",
   task_name = "ie_result_type_java",

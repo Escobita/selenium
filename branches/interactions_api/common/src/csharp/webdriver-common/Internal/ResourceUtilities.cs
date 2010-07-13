@@ -47,6 +47,10 @@ namespace OpenQA.Selenium.Internal
             }
             else
             {
+                if (string.IsNullOrEmpty(resourceId))
+                {
+                    throw new WebDriverException("The file specified does not exist, and you have specified no internal resource ID");
+                }
                 resourceStream = executingAssembly.GetManifestResourceStream(resourceId);
             }
 

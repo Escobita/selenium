@@ -17,14 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.io.File;
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -32,9 +32,6 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
-import java.io.File;
-import java.io.IOException;
 
 public class FormHandlingTest extends AbstractDriverTestCase {
 
@@ -192,6 +189,24 @@ public class FormHandlingTest extends AbstractDriverTestCase {
     assertThat(radioButton.isSelected(), is(true));
   }
 
+  @Ignore(IE)
+  public void testRadioShouldNotBeSelectedAfterSelectingSibling() {
+    driver.get(pages.formPage);
+
+    WebElement cheese = driver.findElement(By.id("cheese"));
+    WebElement peas = driver.findElement(By.id("peas"));
+
+    cheese.setSelected();
+
+    assertThat(cheese.isSelected(), is(true));
+    assertThat(peas.isSelected(), is(false));
+
+    peas.setSelected();
+
+    assertThat(peas.isSelected(), is(true));
+    assertThat(cheese.isSelected(), is(false));
+  }
+
   public void testShouldBeAbleToSelectARadioButtonByClickingOnIt() {
     driver.get(pages.formPage);
     WebElement radioButton = driver.findElement(By.id("peas"));
@@ -252,7 +267,7 @@ public class FormHandlingTest extends AbstractDriverTestCase {
   }
 
 
-  @Ignore(value = {CHROME, SELENESE, IPHONE},
+  @Ignore(value = {CHROME, SELENESE, IPHONE, ANDROID},
       reason = "Does not yet support file uploads")
   public void testShouldBeAbleToAlterTheContentsOfAFileUploadInputElement() throws IOException {
     driver.get(pages.formPage);
