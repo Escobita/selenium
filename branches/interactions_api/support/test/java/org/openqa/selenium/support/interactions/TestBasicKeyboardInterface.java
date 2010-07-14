@@ -57,4 +57,29 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
     WebElement keyLoggingElement = driver.findElement(By.id("result"));
     assertTrue("Key up event not isolated.", keyLoggingElement.getText().equals("keyup"));
   }
+
+  public void testSendingKeysWithShiftPressed() {
+    driver.get(pages.javascriptPage);
+
+    WebElement keysEventInput = driver.findElement(By.id("theworks"));
+    Keyboard keyb = ((HasInputDevices) driver).getKeyboard();
+
+    keysEventInput.click();
+
+    KeyDownAction pressShift = new KeyDownAction(keyb, keysEventInput, Keys.SHIFT);
+    pressShift.perform();
+
+    SendKeysAction sendLowercase = new SendKeysAction(keyb, keysEventInput, "ab");
+    sendLowercase.perform();
+
+    KeyUpAction releaseShift = new KeyUpAction(keyb, keysEventInput, Keys.SHIFT);
+    releaseShift.perform();
+
+    WebElement keyLoggingElement = driver.findElement(By.id("result"));
+    assertTrue("Shift key not held, events: " + keyLoggingElement.getText(),
+        keyLoggingElement.getText()
+            .equals("focus keydown keydown keypress keyup keydown keypress keyup keyup"));
+
+    assertThat(keysEventInput.getValue(), is("AB"));
+  }
 }

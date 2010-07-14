@@ -55,7 +55,8 @@ java_test(name = "single",
     "//chrome:test",
     "//htmlunit:test",    
     "//firefox:test",
-    "//jobbie:test"
+    "//jobbie:test",
+    "//support:test"
   ],
   test_suite = "org.openqa.selenium.SingleTestSuite")
   
