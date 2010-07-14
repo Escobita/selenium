@@ -249,9 +249,13 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   private void switchFocusToThisIfNeeded() {
     HtmlUnitWebElement oldActiveElement =
         ((HtmlUnitWebElement)parent.switchTo().activeElement());
-    if (parent.isJavascriptEnabled() &&
-        !oldActiveElement.equals(element) &&
-        !oldActiveElement.getTagName().toLowerCase().equals("body")) {
+
+    boolean jsEnabled = parent.isJavascriptEnabled();
+    boolean oldActiveEqualsCurrent = oldActiveElement.equals(this);
+    boolean isBody = oldActiveElement.getTagName().toLowerCase().equals("body");
+    if (jsEnabled &&
+        !oldActiveEqualsCurrent &&
+        !isBody) {
       oldActiveElement.element.blur();
       element.focus();
     }
