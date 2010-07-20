@@ -14,6 +14,7 @@
 
   # Run `rake clean release`
   # Upload the new versions of the ZIP files from "build/dist" to the downloads page.
+  # Add a subversion tag!
   # Update the docs. I do this on a UNIX variant:
     # `rake javadocs`
     # `find docs/api/java -name "*.html" | grep -v svn | xargs rm`
@@ -22,6 +23,7 @@
     # `svn st docs/api/java | grep -v \? | awk '{print $2}' | xargs svn add`
     # `find docs/api/java -name "*.html" | xargs svn ps "svn:mime-type" "text/html"`
     # Commit new docs
+
 
 == Updating the Maven Repos ==
 
