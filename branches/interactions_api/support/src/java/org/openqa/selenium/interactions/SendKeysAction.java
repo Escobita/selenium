@@ -1,7 +1,7 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
+import org.openqa.selenium.Keyboard;
 
 /**
  * Sending a sequence of keys to an element.

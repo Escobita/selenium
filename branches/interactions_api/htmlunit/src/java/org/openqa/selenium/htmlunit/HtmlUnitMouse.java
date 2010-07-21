@@ -1,7 +1,7 @@
 package org.openqa.selenium.htmlunit;
 
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Mouse;
 
 /**
  * Implements mouse operations using the HtmlUnit WebDriver.

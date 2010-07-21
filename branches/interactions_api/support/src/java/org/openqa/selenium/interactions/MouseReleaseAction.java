@@ -1,7 +1,7 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Mouse;
 
 /**
  * Releases the left mouse button

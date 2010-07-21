@@ -1,9 +1,8 @@
 package org.openqa.selenium.htmlunit;
 
-import com.gargoylesoftware.htmlunit.javascript.host.Event;
+import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
 
 /**
  * Implements keyboard operations using the HtmlUnit WebDriver.

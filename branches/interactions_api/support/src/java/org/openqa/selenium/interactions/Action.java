@@ -1,4 +1,4 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 /**
  * Interface representing a single user-interaction action.

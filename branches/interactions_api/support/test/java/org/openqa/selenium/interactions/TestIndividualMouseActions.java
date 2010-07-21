@@ -1,9 +1,9 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Mouse;
 
 /**
  * Unit test for all simple keyboard actions.

@@ -1,12 +1,11 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
+import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.Pages;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

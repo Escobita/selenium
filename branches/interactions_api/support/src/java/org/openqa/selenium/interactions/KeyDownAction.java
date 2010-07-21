@@ -1,9 +1,8 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
-import com.google.common.collect.Lists;
+import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
 
 /**
  * Emulates key press only, without the release.

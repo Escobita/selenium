@@ -1,4 +1,4 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;

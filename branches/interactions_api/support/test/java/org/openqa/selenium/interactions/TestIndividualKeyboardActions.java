@@ -1,10 +1,10 @@
-package org.openqa.selenium.support.interactions;
+package org.openqa.selenium.interactions;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
 
 /**
  * Unit test for all simple keyboard actions.

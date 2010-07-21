@@ -1,15 +1,11 @@
-package org.openqa.selenium.support.interactions;
-
-import java.util.List;
+package org.openqa.selenium.interactions;
 
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
-import org.openqa.selenium.RenderedWebElement;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Keyboard;
-import org.openqa.selenium.internal.Mouse;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 

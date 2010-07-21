@@ -1,4 +1,4 @@
-package org.openqa.selenium.internal;
+package org.openqa.selenium;
 
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
