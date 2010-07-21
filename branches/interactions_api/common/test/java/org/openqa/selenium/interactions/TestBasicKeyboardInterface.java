@@ -3,6 +3,7 @@ package org.openqa.selenium.interactions;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
+import org.openqa.selenium.JavascriptEnabled;
 import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -28,6 +29,7 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
 
   }
 
+  @JavascriptEnabled
   public void testSendingKeyDownOnly() {
     driver.get(pages.javascriptPage);
 
@@ -43,6 +45,7 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
     assertTrue("Key down event not isolated.", keyLoggingElement.getText().endsWith("keydown"));
   }
 
+  @JavascriptEnabled
   public void testSendingKeyUp() {
     driver.get(pages.javascriptPage);
 
@@ -57,6 +60,7 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
     assertTrue("Key up event not isolated.", keyLoggingElement.getText().equals("keyup"));
   }
 
+  @JavascriptEnabled
   public void testSendingKeysWithShiftPressed() {
     driver.get(pages.javascriptPage);
 

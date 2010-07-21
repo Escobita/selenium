@@ -99,6 +99,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private final BrowserVersion version;
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
+  private KeyboardModifiersState modifiersState = new KeyboardModifiersState();
 
   public HtmlUnitDriver(BrowserVersion version) {
     this.version = version;
@@ -439,7 +440,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Keyboard getKeyboard() {
-    return new HtmlUnitKeyboard();
+    return new HtmlUnitKeyboard(modifiersState);
   }
 
   public Mouse getMouse() {

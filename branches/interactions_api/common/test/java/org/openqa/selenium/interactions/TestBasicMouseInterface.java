@@ -3,6 +3,7 @@ package org.openqa.selenium.interactions;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
+import org.openqa.selenium.JavascriptEnabled;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -12,39 +13,7 @@ import org.openqa.selenium.WebElement;
  * Tests operations that involve mouse and keyboard.
  */
 public class TestBasicMouseInterface extends AbstractDriverTestCase {
-
-  /*
-  public void testDraggingElementWithMouseRaw() {
-    driver.get("http://jqueryui.com/demos/sortable/connect-lists.html");
-    doSleep(3);
-    WebElement sortable2 = driver.findElement(By.id("sortable2"));
-    List<WebElement> sortable2Items = sortable2.findElements(By.tagName("li"));
-    WebElement toDrag = sortable2Items.get(2);
-
-    WebElement dragInto = driver.findElement(By.id("sortable1"));
-
-    Mouse mouse = ((HasInputDevices) driver).getMouse();
-    MouseClickAndHoldAction holdDrag = new MouseClickAndHoldAction(mouse, toDrag);
-
-    MouseMoveAction move = new MouseMoveAction(mouse, toDrag, dragInto);
-
-    MouseReleaseAction drop = new MouseReleaseAction(mouse, dragInto);
-
-
-    holdDrag.perform();
-    move.perform();
-
-    doSleep(2);
-    System.out.println(driver.getPageSource());
-
-    drop.perform();
-    doSleep(2);
-    System.out.println(driver.getPageSource());
-
-    fail();    
-  }
-  */
-  
+  @JavascriptEnabled
   public void testDraggingElementWithMouse() {
     driver.get(pages.draggableLists);
 
@@ -88,6 +57,7 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
     }
   }
 
+  @JavascriptEnabled
   public void testDragAndDrop() throws InterruptedException {
     driver.get(pages.droppableItems);
 
@@ -123,6 +93,7 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
     assertEquals("Dropped!", text);
   }
 
+  @JavascriptEnabled
   public void testDoubleClick() {
     driver.get(pages.javascriptPage);
 
@@ -136,6 +107,7 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
         toDoubleClick.getValue());
   }
 
+  @JavascriptEnabled
   public void testContextClick() {
     driver.get(pages.javascriptPage);
 
@@ -147,14 +119,5 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
     contextClick.perform();
     assertEquals("Value should change to ContextClicked.", "ContextClicked",
         toContextClick.getValue());
-  }
-
-
-  private void doSleep(int nseconds) {
-    try {
-      Thread.sleep(nseconds * 1000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
   }
 }
