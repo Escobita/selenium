@@ -1,6 +1,5 @@
 package org.openqa.selenium.interactions;
 
-import com.google.common.collect.Lists;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Keyboard;
@@ -19,8 +18,14 @@ public class SingleKeyAction {
     this.keyboard = keyboard;
     this.toElement = toElement;
     this.key = key;
-    if (!Lists.newArrayList(MODIFIER_KEYS).contains(key)) {
+    boolean isModifier = false;
+    for (Keys modifier : MODIFIER_KEYS) {
+      isModifier = isModifier | modifier.equals(key);
+    }
+
+    if (!isModifier) {
       throw new IllegalArgumentException("Key Down / Up events only make sense for modifier keys.");
     }
+
   }
 }

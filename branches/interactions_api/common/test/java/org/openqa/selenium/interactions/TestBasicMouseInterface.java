@@ -4,13 +4,9 @@ import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
 import org.openqa.selenium.Mouse;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 /**
  * Tests operations that involve mouse and keyboard.
@@ -83,19 +79,28 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
     //assertEquals("Nothing happened. DragOut DropIn RightItem 3", dragReporter.getText());
   }
 
-  public void testDragAndDrop() {
+  private boolean isElementAvailable(WebDriver driver, By locator) {
+    try {
+      driver.findElement(locator);
+      return true;
+    } catch (NoSuchElementException e) {
+      return false;
+    }
+  }
+
+  public void testDragAndDrop() throws InterruptedException {
     driver.get(pages.droppableItems);
 
-    WebDriverWait wait = new WebDriverWait(driver, 15);
+    long waitEndTime = System.currentTimeMillis() + 15000;
 
-    ExpectedCondition pageLoaded = new ExpectedCondition<Boolean>() {
-      public Boolean apply(WebDriver driver) {
-        driver.findElement(By.id("draggable"));
-        return true;
-      }
-    };
+    while (!isElementAvailable(driver, By.id("draggable")) &&
+           (System.currentTimeMillis() < waitEndTime)) {
+      Thread.sleep(200);
+    }
 
-    wait.until(pageLoaded);
+    if (!isElementAvailable(driver, By.id("draggable"))) {
+      throw new RuntimeException("Could not find draggable element after 15 seconds.");
+    }
 
     WebElement toDrag = driver.findElement(By.id("draggable"));
     WebElement dropInto = driver.findElement(By.id("droppable"));
