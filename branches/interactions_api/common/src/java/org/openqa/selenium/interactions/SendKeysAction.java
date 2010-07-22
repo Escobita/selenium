@@ -17,6 +17,10 @@ public class SendKeysAction implements Action {
     this.keysToSend = keysToSend;
   }
 
+  public SendKeysAction(Keyboard keyboard, CharSequence... keysToSend) {
+    this(keyboard, null, keysToSend);
+  }
+
   public void perform() {
     keyboard.sendKeys(toElement, keysToSend);
   }

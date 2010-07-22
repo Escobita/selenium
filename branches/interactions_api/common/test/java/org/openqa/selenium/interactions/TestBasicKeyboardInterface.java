@@ -85,4 +85,21 @@ public class TestBasicKeyboardInterface extends AbstractDriverTestCase {
 
     assertThat(keysEventInput.getValue(), is("AB"));
   }
+
+  @JavascriptEnabled
+  public void testSendingKeysToActiveElement() {
+    driver.get(pages.bodyTypingPage);
+
+    Keyboard keyb = ((HasInputDevices) driver).getKeyboard();
+
+    SendKeysAction someKeys = new SendKeysAction(keyb, "ab");
+    someKeys.perform();
+
+    WebElement bodyLoggingElement = driver.findElement(By.id("body_result"));
+    assertThat(bodyLoggingElement.getText(), is("keypress keypress"));
+
+    WebElement formLoggingElement = driver.findElement(By.id("result"));
+    assertThat(formLoggingElement.getText(), is(""));
+  }
+
 }

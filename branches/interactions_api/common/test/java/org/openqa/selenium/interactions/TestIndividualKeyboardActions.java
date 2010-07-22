@@ -12,7 +12,7 @@ import org.openqa.selenium.WebElement;
 public class TestIndividualKeyboardActions extends MockObjectTestCase {
   private Keyboard dummyKeyboard;
   private WebElement dummyElement;
-  
+
   public void setUp() {
     dummyKeyboard = mock(Keyboard.class);
     dummyElement = mock(WebElement.class);
@@ -62,4 +62,38 @@ public class TestIndividualKeyboardActions extends MockObjectTestCase {
       assertTrue(e.getMessage().contains("modifier keys"));
     }
   }
+
+  public void testKeyDownActionWithoutAnElement() {
+    final Keys keyToPress = Keys.SHIFT;
+
+    checking(new Expectations() {{
+      one(dummyKeyboard).pressKey(null, keyToPress);
+    }});
+
+    KeyDownAction downAction = new KeyDownAction(dummyKeyboard, keyToPress);
+    downAction.perform();
+  }
+
+  public void testKeyUpActionWithoutAnElement() {
+    final Keys keyToRelease = Keys.SHIFT;
+
+    checking(new Expectations() {{
+      one(dummyKeyboard).releaseKey(null, keyToRelease);
+    }});
+
+    KeyUpAction upAction = new KeyUpAction(dummyKeyboard, keyToRelease);
+    upAction.perform();
+  }
+
+  public void testSendKeysActionWithoutAnElement() {
+    final String keysToSend = "hello";
+
+    checking(new Expectations() {{
+      one(dummyKeyboard).sendKeys(null, keysToSend);
+    }});
+
+    SendKeysAction sendKeys = new SendKeysAction(dummyKeyboard, keysToSend);
+    sendKeys.perform();
+  }
+
 }

@@ -440,7 +440,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Keyboard getKeyboard() {
-    return new HtmlUnitKeyboard(modifiersState);
+    return new HtmlUnitKeyboard(this, modifiersState);
   }
 
   public Mouse getMouse() {

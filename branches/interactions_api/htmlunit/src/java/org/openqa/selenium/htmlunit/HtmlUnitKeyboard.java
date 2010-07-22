@@ -9,13 +9,25 @@ import org.openqa.selenium.WebElement;
  */
 public class HtmlUnitKeyboard implements Keyboard {
   private final KeyboardModifiersState modifiersState;
+  private final HtmlUnitDriver parent;
 
-  HtmlUnitKeyboard(KeyboardModifiersState modifiersState) {
+  HtmlUnitKeyboard(HtmlUnitDriver parent, KeyboardModifiersState modifiersState) {
     this.modifiersState = modifiersState;
+    this.parent = parent;
+  }
+
+  private HtmlUnitWebElement getElementToSend(WebElement toElement) {
+    WebElement sendToElement = toElement;
+    if (sendToElement == null) {
+      sendToElement = parent.switchTo().activeElement();
+    }
+
+    return (HtmlUnitWebElement) sendToElement;
   }
 
   public void sendKeys(WebElement toElement, CharSequence... keysToSend) {
-    HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) toElement;
+
+    HtmlUnitWebElement htmlElem = getElementToSend(toElement);
     if (modifiersState.isShiftPressed()) {
       StringBuilder upperCaseKeys = new StringBuilder();
       for (CharSequence seq : keysToSend) {
@@ -29,13 +41,13 @@ public class HtmlUnitKeyboard implements Keyboard {
   }
 
   public void pressKey(WebElement toElement, Keys keyToPress) {
-    HtmlUnitWebElement htmlElement = (HtmlUnitWebElement) toElement;
+    HtmlUnitWebElement htmlElement = getElementToSend(toElement);
     modifiersState.storeKeyDown(keyToPress);
     htmlElement.sendKeyDownEvent(keyToPress);
   }
 
   public void releaseKey(WebElement toElement, Keys keyToRelease) {
-    HtmlUnitWebElement htmlElement = (HtmlUnitWebElement) toElement;
+    HtmlUnitWebElement htmlElement = getElementToSend(toElement);
     modifiersState.storeKeyUp(keyToRelease);
     htmlElement.sendKeyUpEvent(keyToRelease);
   }

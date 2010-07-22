@@ -12,6 +12,10 @@ public class KeyUpAction extends SingleKeyAction implements Action {
     super(keyboard, toElement, key);
   }
 
+  public KeyUpAction(Keyboard keyboard, Keys key) {
+    super(keyboard, null, key);
+  }
+
   public void perform() {
     keyboard.releaseKey(toElement, key);
   }

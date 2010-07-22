@@ -56,7 +56,7 @@ public class SingleTestSuite extends TestCase {
         .keepDriverInstance()
         .includeJavascriptTests()
         .onlyRun("TestBasicKeyboardInterface")
-        .method("testSendingKeysWithShiftPressed")
+        .method("testSendingKeysToActiveElement")
         .exclude(ALL)
         .exclude(Ignore.Driver.HTMLUNIT)
         .outputTestNames()
