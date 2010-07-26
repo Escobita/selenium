@@ -43,7 +43,7 @@
 }}}
  # Prerequisite 3: Make sure your GnuPG public key is distributed to `hkp://pgp.mit.edu` 
  # Update the pom.xml files to reflect the dependencies as stated in the `build.desc` files.
- # Execute `mvn -Dtest=skip -DfailIfNoTests=false package` and make sure the jar files for each module in the target directory have the same content as the jar files produced by CrazyFun in the build directory. 
+ # Execute `mvn -Dtest=skip -DfailIfNoTests=false install` and make sure the jar files for each module in the target directory have the same content as the jar files produced by CrazyFun in the build directory. 
  # Update the version number in all pom.xml files (but do not check in those changes)
  # Execute `mvn clean source:jar javadoc:jar -Dtest=skip -DfailIfNoTests=false package -Dgpg.passphrase=_your-GnuPG-key-passphrase_ gpg:sign deploy`
  # Goto http://oss.sonatype.org, log in, close the staging repository, and promote it to the releases repository.
