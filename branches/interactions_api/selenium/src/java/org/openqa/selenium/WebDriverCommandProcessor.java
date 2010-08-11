@@ -34,6 +34,7 @@ import org.openqa.selenium.internal.seleniumemulation.CaptureScreenshotToString;
 import org.openqa.selenium.internal.seleniumemulation.Check;
 import org.openqa.selenium.internal.seleniumemulation.Click;
 import org.openqa.selenium.internal.seleniumemulation.Close;
+import org.openqa.selenium.internal.seleniumemulation.CompoundMutator;
 import org.openqa.selenium.internal.seleniumemulation.ControlKeyDown;
 import org.openqa.selenium.internal.seleniumemulation.ControlKeyUp;
 import org.openqa.selenium.internal.seleniumemulation.CreateCookie;
@@ -94,6 +95,7 @@ import org.openqa.selenium.internal.seleniumemulation.Refresh;
 import org.openqa.selenium.internal.seleniumemulation.RemoveAllSelections;
 import org.openqa.selenium.internal.seleniumemulation.RemoveSelection;
 import org.openqa.selenium.internal.seleniumemulation.RunScript;
+import org.openqa.selenium.internal.seleniumemulation.ScriptMutator;
 import org.openqa.selenium.internal.seleniumemulation.SelectFrame;
 import org.openqa.selenium.internal.seleniumemulation.SelectOption;
 import org.openqa.selenium.internal.seleniumemulation.SelectWindow;
@@ -128,6 +130,7 @@ public class WebDriverCommandProcessor implements CommandProcessor {
   private final Map<String, SeleneseCommand> seleneseMethods = Maps.newHashMap();
   private final String baseUrl;
   private final Timer timer;
+  private final CompoundMutator scriptMutator;
   private Supplier<WebDriver> maker;
   private WebDriver driver;
 
@@ -183,6 +186,7 @@ public class WebDriverCommandProcessor implements CommandProcessor {
     }
 
     this.timer = new Timer(30000);
+    this.scriptMutator = new CompoundMutator(baseUrl);
   }
 
   /**
@@ -272,6 +276,10 @@ public class WebDriverCommandProcessor implements CommandProcessor {
     });
   }
 
+  public void addMutator(ScriptMutator mutator) {
+    scriptMutator.addMutator(mutator);
+  }
+
   public boolean isMethodAvailable(String methodName) {
     return seleneseMethods.containsKey(methodName);
   }
@@ -329,7 +337,7 @@ public class WebDriverCommandProcessor implements CommandProcessor {
     seleneseMethods.put("getElementPositionLeft", new GetElementPositionLeft(elementFinder));
     seleneseMethods.put("getElementPositionTop", new GetElementPositionTop(elementFinder));
     seleneseMethods.put("getElementWidth", new GetElementWidth(elementFinder));
-    seleneseMethods.put("getEval", new GetEval(baseUrl));
+    seleneseMethods.put("getEval", new GetEval(scriptMutator));
     seleneseMethods.put("getHtmlSource", new GetHtmlSource());
     seleneseMethods.put("getLocation", new GetLocation());
     seleneseMethods.put("getSelectedId", new FindFirstSelectedOptionProperty(select, ID));
@@ -371,7 +379,7 @@ public class WebDriverCommandProcessor implements CommandProcessor {
     seleneseMethods.put("mouseUp", new MouseEvent(elementFinder, javascriptLibrary, "mouseup"));
     seleneseMethods.put("mouseUpAt", new MouseEventAt(elementFinder, javascriptLibrary, "mouseup"));
     seleneseMethods.put("open", new Open(baseUrl));
-    seleneseMethods.put("openWindow", new OpenWindow(new GetEval(baseUrl)));
+    seleneseMethods.put("openWindow", new OpenWindow(new GetEval(scriptMutator)));
     seleneseMethods.put("refresh", new Refresh());
     seleneseMethods.put("removeAllSelections", new RemoveAllSelections(elementFinder));
     seleneseMethods.put("removeSelection", new RemoveSelection(elementFinder, select));

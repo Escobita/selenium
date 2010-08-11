@@ -25,6 +25,10 @@ rake_task(
 js_deps(name = "bot",
   srcs = [ "src/js/bot/**/*.js" ])
 
+js_deps(name = "atomic_driver",
+  srcs = [ "src/js/webdriver/**/*.js" ],
+  deps = [ ":bot" ])
+
 js_binary(name = "atoms",
   type = "script",
   closure = "true",
@@ -62,7 +66,7 @@ rubydocs(
 )
 
 rubygem(
-  version = "0.0.24",
+  version = "0.0.27",
   name = "selenium-webdriver",
   dir = "build/ruby",
   deps = [
@@ -74,30 +78,10 @@ rubygem(
   ]
 )
 
-js_fragment(name = "get_attribute",
-  module = "bot.dom",
-  function = "bot.dom.getAttribute",
+# Only add fragments that we actually use.
+js_fragment(name = "wd_get_attribute",
+  module = "webdriver.element",
+  function = "webdriver.element.getAttribute",
   deps = [
-    ":bot"
-  ])
-
-js_fragment(name = "get_property",
-  module = "bot.dom",
-  function = "bot.dom.getProperty",
-  deps = [
-    ":bot"
-  ])
-
-js_fragment(name = "has_attribute",
-  module = "bot.dom",
-  function = "bot.dom.hasAttribute",
-  deps = [
-    ":bot"
-  ])
-
-js_fragment(name = "has_property",
-  module = "bot.dom",
-  function = "bot.dom.hasProperty",
-  deps = [
-    ":bot"
+    ":atomic_driver"
   ])

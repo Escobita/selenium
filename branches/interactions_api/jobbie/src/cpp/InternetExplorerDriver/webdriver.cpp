@@ -699,9 +699,7 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 		std::wstring script(L"(function() { return function(){ ");
 
 		const wchar_t** scripts[] = {
-		  GET_ATTRIBUTE,
-		  GET_PROPERTY,
-		  HAS_ATTRIBUTE,
+		  WD_GET_ATTRIBUTE,
 		  NULL
 		};
 
@@ -716,19 +714,7 @@ int wdeGetAttribute(WebDriver* driver, WebElement* element, const wchar_t* name,
 		// Now for the magic
 		script += L"var element = arguments[0];\n";
 		script += L"var attributeName = arguments[1];\n";
-		script += L"var lattr = arguments[1].toLowerCase();\n";
-		script += L"var value = null;\n";
-		script += L"if ('checked' == lattr || 'selected' == lattr) {\n";
-		script += L"	value = getProperty(element, 'selected') || getProperty(element, 'checked');\n";
-		script += L"	if (!value) {\n";
-		script += L"		value = null;\n";
-		script += L"	}\n";
-		script += L"} else if (hasAttribute(element, attributeName)) {\n";
-		script += L"	value = getAttribute(element, attributeName);\n";
-		script += L"} else {\n";
-		script += L"	value = getProperty(element, attributeName);\n";
-		script += L"}\n";
-		script += L"return value;\n";
+		script += L"return wdGetAttribute(element, attributeName);\n";
 
 		// Close things
 		script += L"};})();";
@@ -853,7 +839,7 @@ int wdeIsSelected(WebElement* element, int* result)
 			return res;
 		}
 
-		*result = wrapper ? 1 : 0;
+		*result = wrapper && wrapper->text && wcscmp(L"true", wrapper->text) == 0 ? 1 : 0;
 		wdFreeString(wrapper);
 
 		return SUCCESS;

@@ -5,7 +5,6 @@ import junit.framework.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.openqa.selenium.internal.CommandLine;
 import org.openqa.selenium.internal.PortProber;
@@ -27,7 +26,10 @@ public class SeleniumServerStarter extends TestSetup {
     File seleniumJar = findSeleniumJar();
 
     if (!seleniumJar.exists()) {
-      throw new IllegalStateException("Cannot locate selenium jar");
+      new Build().of("//remote/server:server:uber").go();
+      if (!seleniumJar.exists()) {
+        throw new IllegalStateException("Cannot locate selenium jar");
+      }
     }
 
     String port = startSeleniumServer(seleniumJar);

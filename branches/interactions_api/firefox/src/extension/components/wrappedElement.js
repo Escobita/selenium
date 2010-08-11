@@ -100,12 +100,52 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   }
 
   Utils.dumpn("Falling back to synthesized click");
-  var doc = respond.session.getDocument()
+
+  var browser = respond.session.getBrowser();
+  var alreadyReplied = false;
+
+  // Register a listener for the window closing.
+  var observer = {
+    observe: function(subject, topic, opt_data) {
+      if ('domwindowclosed' != topic) {
+        return;
+      }
+
+      var target = browser.contentWindow;
+      var source = subject.content;
+
+
+      if (target == source) {
+        respond.send();
+      }
+    }
+  };
+
+  var mediator = Utils.getService('@mozilla.org/embedcomp/window-watcher;1', 'nsIWindowWatcher');
+  mediator.registerNotification(observer);
+  // Override the "respond.send" function to remove the observer, otherwise
+  // it'll just get awkward
+  var originalSend = goog.bind(respond.send, respond);
+  respond.send = function() {
+    mediator.unregisterNotification(observer);
+    originalSend();
+  };
+
+  var doc = respond.session.getDocument();
   var currentlyActive = Utils.getActiveElement(doc);
 
+  if (element['scrollIntoView']) {
+    element.scrollIntoView();
+  }
+
+  // An SVG element won't report its location properly.
+  var dimension = webdriver.element.getLocation(element);
+  var midX = !dimension ? 0 : dimension.left + (dimension.width / 2);
+  var midY = !dimension ? 0 : dimension.top + (dimension.height / 2);
+
   Utils.fireMouseEventOn(element, "mouseover");
-  Utils.fireMouseEventOn(element, "mousemove");
-  Utils.fireMouseEventOn(element, "mousedown");
+  Utils.fireMouseEventOn(element, "mousemove", midX, midY);
+  Utils.fireMouseEventOn(element, "mousedown", midX, midY);
   if (element != currentlyActive) {
     // Some elements may not have blur, focus functions - for example,
     // elements under an SVG element. Call those only if they exist.
@@ -117,11 +157,8 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
     }
   }
 
-  Utils.fireMouseEventOn(element, "mouseup");
-  Utils.fireMouseEventOn(element, "click");
-
-  var browser = respond.session.getBrowser();
-  var alreadyReplied = false;
+  Utils.fireMouseEventOn(element, "mouseup", midX, midY);
+  Utils.fireMouseEventOn(element, "click", midX, midY);
 
   var clickListener = new WebLoadingListener(browser, function(event) {
     if (!alreadyReplied) {
@@ -167,7 +204,7 @@ FirefoxDriver.prototype.getElementText = function(respond, parameters) {
   if (element.tagName == "TITLE") {
     respond.value = respond.session.getBrowser().contentTitle;
   } else {
-    respond.value = Utils.getText(element, true);
+    respond.value = webdriver.element.getText(element);
   }
 
   respond.send();
@@ -278,22 +315,8 @@ FirefoxDriver.prototype.getElementAttribute = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                   respond.session.getDocument());
   var attributeName = parameters.name;
-
-  var value = null;
-
-  var lattr = attributeName.toLowerCase();
-  if ('checked' == lattr || 'selected' == lattr) {
-    value = bot.dom.getProperty(element, 'selected') || bot.dom.getProperty(element, 'checked');
-    if (!value) {
-      value = null;
-    }
-  } else if (bot.dom.hasAttribute(element, attributeName)) {
-    value = bot.dom.getAttribute(element, attributeName);
-  } else {
-    value = bot.dom.getProperty(element, attributeName);
-  }
   
-  respond.value = (value === undefined) ? null : value;
+  respond.value = webdriver.element.getAttribute(element, attributeName);
   respond.send();
 };
 
@@ -508,7 +531,7 @@ FirefoxDriver.prototype.toggleElement = function(respond, parameters) {
 FirefoxDriver.prototype.isElementDisplayed = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-  respond.value = Utils.isDisplayed(element, false);
+  respond.value = bot.style.isShown(element);
   respond.send();
 };
 

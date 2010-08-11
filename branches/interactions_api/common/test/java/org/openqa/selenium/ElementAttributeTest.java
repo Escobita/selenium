@@ -19,16 +19,13 @@ package org.openqa.selenium;
 
 import java.util.List;
 
-import org.hamcrest.Matchers;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
@@ -50,14 +47,14 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfTheDisabledAttrbuteEvenIfItIsMissing() {
+  public void testShouldReturnTheValueOfTheDisabledAttrbuteAsNullIfNotSet() {
     driver.get(pages.formPage);
     WebElement inputElement = driver.findElement(By.xpath("//input[@id='working']"));
-    assertThat(inputElement.getAttribute("disabled"), equalTo("false"));
+    assertThat(inputElement.getAttribute("disabled"), equalTo(null));
     assertThat(inputElement.isEnabled(), equalTo(true));
     
     WebElement pElement = driver.findElement(By.id("peas"));
-    assertThat(pElement.getAttribute("disabled"), equalTo("false"));
+    assertThat(pElement.getAttribute("disabled"), equalTo(null));
     assertThat(pElement.isEnabled(), equalTo(true));
   }
 
@@ -202,5 +199,15 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     driver.get(pages.formPage);
     WebElement element = driver.findElement(By.id("withText"));
     assertThat(element.getAttribute("rows"), is("5"));
+  }
+
+  @Ignore({CHROME, FIREFOX, HTMLUNIT})
+  public void testCanReturnATextApproximationOfTheStyleAttribute() {
+    driver.get(pages.javascriptPage);
+
+    String style = driver.findElement(By.id("red-item")).getAttribute("style");
+
+    System.out.println("style = " + style);
+    assertTrue(style.toLowerCase().contains("background-color"));
   }
 }

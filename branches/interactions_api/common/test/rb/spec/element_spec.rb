@@ -1,4 +1,4 @@
-require "#{File.dirname(__FILE__)}/spec_helper"
+require "spec_helper"
 
 describe "Element" do
 
@@ -54,6 +54,7 @@ describe "Element" do
 
   it "should get and set selected" do
     driver.navigate.to url_for("formPage.html")
+
     cheese = driver.find_element(:id, "cheese")
     peas   = driver.find_element(:id, "peas")
 

@@ -1,66 +1,13 @@
 /* AUTO GENERATED - Do not edit by hand. */
 /* See rake-tasts/crazy_fun/mappings/javascript.rb for generator. */
 
-#ifndef GET_ATTRIBUTE_H
-#define GET_ATTRIBUTE_H
+#ifndef WD_GET_ATTRIBUTE_H
+#define WD_GET_ATTRIBUTE_H
 
-const wchar_t* GET_ATTRIBUTE[] = {
-L"var getAttribute=function(){var d=this;",
-L"function e(a){var c=typeof a;if(c==\"object\")if(a){if(a instanceof Array||!(a instanceof Object)&&Object.prototype.toString.call(a)==\"[object Array]\"||typeof a.length==\"number\"&&typeof a.splice!=\"undefined\"&&typeof a.propertyIsEnumerable!=\"undefined\"&&!a.propertyIsEnumerable(\"splice\"))return\"array\";if(!(a instanceof Object)&&(Object.prototype.toString.call(a)==\"[object Function]\"||typeof a.call!=\"undefined\"&&typeof a.propertyIsEnumerable!=\"undefined\"&&!a.propertyIsEnumerable(\"call\")))return\"function\"}else return\"null\";else if(c==",
-L"\"function\"&&typeof a.call==\"undefined\")return\"object\";return c};",
-L"var f=Array.prototype,g=f.indexOf?function(a,c,b){return f.indexOf.call(a,c,b)}:function(a,c,b){for(b=b==null?0:b<0?Math.max(0,a.length+b):b;b<a.length;b++)if(b in a&&a[b]===c)return b;return-1};function h(a,c){if(a<c)return-1;else if(a>c)return 1;return 0}(Date.now||function(){return+new Date})();var i,j,k,l;function m(){return d.navigator?d.navigator.userAgent:null}l=k=j=i=false;var n;if(n=m()){var o=d.navigator;i=n.indexOf(\"Opera\")==0;j=!i&&n.indexOf(\"MSIE\")!=-1;k=!i&&n.indexOf(\"WebKit\")!=-1;l=!i&&!k&&o.product==\"Gecko\"}var p=j,q=l,r=k,s,t=\"\",u;if(i&&d.opera){var v=d.opera.version;t=typeof v==\"function\"?v():v}else{if(q)u=/rv\\:([^\\);]+)(\\)|;)/;else if(p)u=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(r)u=/WebKit\\/(\\S+)/;if(u){var w=u.exec(m());t=w?w[1]:\"\"}}s=t;var x={};if(r)if(!x[\"522\"]){var y=0,z=String(s).replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),A=String(\"522\").replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),B=Math.max(z.length,A.length);for(var C=0;y==0&&C<B;C++){var D=z[C]||\"\",E=A[C]||\"\",F=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\"),G=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\");do{var H=F.exec(D)||[\"\",\"\",\"\"],I=G.exec(E)||[\"\",\"\",\"\"];if(H[0].length==0&&I[0].length==0)break;y=h(H[1].length==0?0:parseInt(H[1],10),I[1].length==0?0:parseInt(I[1],10))||h(H[2].length==0,I[2].length==0)||h(H[2],",
-L"I[2])}while(y==0)}x[\"522\"]=y>=0};",
-L"var J=[\"checked\",\"disabled\",\"readOnly\",\"selected\"];function K(a,c){if(8==a.nodeType)return null;var b=c.toLowerCase();if(\"style\"==b)return\"\";if(\"readonly\"==b)c=\"readOnly\";b=null;if(e(a.hasAttribute)==\"function\")b=a.getAttribute(c);else{b=a.attributes[c];if(b!==undefined)b=b.value}if(b==null)return null;if(g(J,c)>=0)b=!!b&&b!=\"false\";return b}var L=\"_\".split(\".\"),M=d;!(L[0]in M)&&M.execScript&&M.execScript(\"var \"+L[0]);for(var N;L.length&&(N=L.shift());)if(!L.length&&K!==undefined)M[N]=K;else M=M[N]?M[N]:M[N]={};; return _.apply(null,arguments);};",
-NULL
-};
-
-#endif
-
-/* AUTO GENERATED - Do not edit by hand. */
-/* See rake-tasts/crazy_fun/mappings/javascript.rb for generator. */
-
-#ifndef GET_PROPERTY_H
-#define GET_PROPERTY_H
-
-const wchar_t* GET_PROPERTY[] = {
-L"var getProperty=function(){var a=this;",
-L"function b(j,d){if(j<d)return-1;else if(j>d)return 1;return 0}(Date.now||function(){return+new Date})();var c,e,f,g;function h(){return a.navigator?a.navigator.userAgent:null}g=f=e=c=false;var i;if(i=h()){var k=a.navigator;c=i.indexOf(\"Opera\")==0;e=!c&&i.indexOf(\"MSIE\")!=-1;f=!c&&i.indexOf(\"WebKit\")!=-1;g=!c&&!f&&k.product==\"Gecko\"}var l=e,m=g,n=f,o,p=\"\",q;if(c&&a.opera){var r=a.opera.version;p=typeof r==\"function\"?r():r}else{if(m)q=/rv\\:([^\\);]+)(\\)|;)/;else if(l)q=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(n)q=/WebKit\\/(\\S+)/;if(q){var s=q.exec(h());p=s?s[1]:\"\"}}o=p;var t={};if(n)if(!t[\"522\"]){var u=0,v=String(o).replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),w=String(\"522\").replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),x=Math.max(v.length,w.length);for(var y=0;u==0&&y<x;y++){var z=v[y]||\"\",A=w[y]||\"\",B=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\"),C=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\");do{var D=B.exec(z)||[\"\",\"\",\"\"],E=C.exec(A)||[\"\",\"\",\"\"];if(D[0].length==0&&E[0].length==0)break;u=b(D[1].length==0?0:parseInt(D[1],10),E[1].length==0?0:parseInt(E[1],10))||b(D[2].length==0,E[2].length==0)||b(D[2],",
-L"E[2])}while(u==0)}t[\"522\"]=u>=0};",
-L"var F={\"class\":\"className\",readonly:\"readOnly\"};function G(j,d){return j[F[d]||d]}var H=\"_\".split(\".\"),I=a;!(H[0]in I)&&I.execScript&&I.execScript(\"var \"+H[0]);for(var J;H.length&&(J=H.shift());)if(!H.length&&G!==undefined)I[J]=G;else I=I[J]?I[J]:I[J]={};; return _.apply(null,arguments);};",
-NULL
-};
-
-#endif
-
-/* AUTO GENERATED - Do not edit by hand. */
-/* See rake-tasts/crazy_fun/mappings/javascript.rb for generator. */
-
-#ifndef HAS_ATTRIBUTE_H
-#define HAS_ATTRIBUTE_H
-
-const wchar_t* HAS_ATTRIBUTE[] = {
-L"var hasAttribute=function(){var d=this;",
-L"function e(a){var c=typeof a;if(c==\"object\")if(a){if(a instanceof Array||!(a instanceof Object)&&Object.prototype.toString.call(a)==\"[object Array]\"||typeof a.length==\"number\"&&typeof a.splice!=\"undefined\"&&typeof a.propertyIsEnumerable!=\"undefined\"&&!a.propertyIsEnumerable(\"splice\"))return\"array\";if(!(a instanceof Object)&&(Object.prototype.toString.call(a)==\"[object Function]\"||typeof a.call!=\"undefined\"&&typeof a.propertyIsEnumerable!=\"undefined\"&&!a.propertyIsEnumerable(\"call\")))return\"function\"}else return\"null\";else if(c==",
-L"\"function\"&&typeof a.call==\"undefined\")return\"object\";return c};",
-L"var f=Array.prototype,g=f.indexOf?function(a,c,b){return f.indexOf.call(a,c,b)}:function(a,c,b){for(b=b==null?0:b<0?Math.max(0,a.length+b):b;b<a.length;b++)if(b in a&&a[b]===c)return b;return-1};function h(a,c){if(a<c)return-1;else if(a>c)return 1;return 0}(Date.now||function(){return+new Date})();var i,j,k,l;function m(){return d.navigator?d.navigator.userAgent:null}l=k=j=i=false;var n;if(n=m()){var o=d.navigator;i=n.indexOf(\"Opera\")==0;j=!i&&n.indexOf(\"MSIE\")!=-1;k=!i&&n.indexOf(\"WebKit\")!=-1;l=!i&&!k&&o.product==\"Gecko\"}var p=j,q=l,r=k,s,t=\"\",u;if(i&&d.opera){var v=d.opera.version;t=typeof v==\"function\"?v():v}else{if(q)u=/rv\\:([^\\);]+)(\\)|;)/;else if(p)u=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(r)u=/WebKit\\/(\\S+)/;if(u){var w=u.exec(m());t=w?w[1]:\"\"}}s=t;var x={};if(r)if(!x[\"522\"]){var y=0,z=String(s).replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),A=String(\"522\").replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),B=Math.max(z.length,A.length);for(var C=0;y==0&&C<B;C++){var D=z[C]||\"\",E=A[C]||\"\",F=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\"),G=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\");do{var H=F.exec(D)||[\"\",\"\",\"\"],I=G.exec(E)||[\"\",\"\",\"\"];if(H[0].length==0&&I[0].length==0)break;y=h(H[1].length==0?0:parseInt(H[1],10),I[1].length==0?0:parseInt(I[1],10))||h(H[2].length==0,I[2].length==0)||h(H[2],",
-L"I[2])}while(y==0)}x[\"522\"]=y>=0};",
-L"var J=[\"checked\",\"disabled\",\"readOnly\",\"selected\"];function K(a,c){if(8==a.nodeType)return null;var b=c.toLowerCase();if(\"style\"==b)return\"\";if(\"readonly\"==b)c=\"readOnly\";b=null;if(e(a.hasAttribute)==\"function\")b=a.getAttribute(c);else{b=a.attributes[c];if(b!==undefined)b=b.value}if(b==null)return null;if(g(J,c)>=0)b=!!b&&b!=\"false\";return b};function L(a,c){return K(a,c)!==null}var M=\"_\".split(\".\"),N=d;!(M[0]in N)&&N.execScript&&N.execScript(\"var \"+M[0]);for(var O;M.length&&(O=M.shift());)if(!M.length&&L!==undefined)N[O]=L;else N=N[O]?N[O]:N[O]={};; return _.apply(null,arguments);};",
-NULL
-};
-
-#endif
-
-/* AUTO GENERATED - Do not edit by hand. */
-/* See rake-tasts/crazy_fun/mappings/javascript.rb for generator. */
-
-#ifndef HAS_PROPERTY_H
-#define HAS_PROPERTY_H
-
-const wchar_t* HAS_PROPERTY[] = {
-L"var hasProperty=function(){var a=this;",
-L"function b(j,d){if(j<d)return-1;else if(j>d)return 1;return 0}(Date.now||function(){return+new Date})();var c,e,f,g;function h(){return a.navigator?a.navigator.userAgent:null}g=f=e=c=false;var i;if(i=h()){var k=a.navigator;c=i.indexOf(\"Opera\")==0;e=!c&&i.indexOf(\"MSIE\")!=-1;f=!c&&i.indexOf(\"WebKit\")!=-1;g=!c&&!f&&k.product==\"Gecko\"}var l=e,m=g,n=f,o,p=\"\",q;if(c&&a.opera){var r=a.opera.version;p=typeof r==\"function\"?r():r}else{if(m)q=/rv\\:([^\\);]+)(\\)|;)/;else if(l)q=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(n)q=/WebKit\\/(\\S+)/;if(q){var s=q.exec(h());p=s?s[1]:\"\"}}o=p;var t={};if(n)if(!t[\"522\"]){var u=0,v=String(o).replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),w=String(\"522\").replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").split(\".\"),x=Math.max(v.length,w.length);for(var y=0;u==0&&y<x;y++){var z=v[y]||\"\",A=w[y]||\"\",B=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\"),C=RegExp(\"(\\\\d*)(\\\\D*)\",\"g\");do{var D=B.exec(z)||[\"\",\"\",\"\"],E=C.exec(A)||[\"\",\"\",\"\"];if(D[0].length==0&&E[0].length==0)break;u=b(D[1].length==0?0:parseInt(D[1],10),E[1].length==0?0:parseInt(E[1],10))||b(D[2].length==0,E[2].length==0)||b(D[2],",
-L"E[2])}while(u==0)}t[\"522\"]=u>=0};",
-L"var F={\"class\":\"className\",readonly:\"readOnly\"};function G(j,d){return j[F[d]||d]!==null}var H=\"_\".split(\".\"),I=a;!(H[0]in I)&&I.execScript&&I.execScript(\"var \"+H[0]);for(var J;H.length&&(J=H.shift());)if(!H.length&&G!==undefined)I[J]=G;else I=I[J]?I[J]:I[J]={};; return _.apply(null,arguments);};",
+const wchar_t* WD_GET_ATTRIBUTE[] = {
+L"var wdGetAttribute=function(){var e=this;function f(a){return typeof a==\"string\"}function g(a){var c=Array.prototype.slice.call(arguments,1);return function(){var b=Array.prototype.slice.call(arguments);b.unshift.apply(b,c);return a.apply(this,b)}}function i(a,c){function b(){}b.prototype=c.prototype;a.b=c.prototype;a.prototype=new b};function j(a){this.stack=Error().stack||\"\";if(a)this.message=String(a)}i(j,Error);function k(a){for(var c=1;c<arguments.length;c++){var b=String(arguments[c]).replace(/\\$/g,\"$$$$\");a=a.replace(/\\%s/,b)}return a};function l(a,c){c.unshift(a);j.call(this,k.apply(null,c));c.shift();this.a=a}i(l,j);function m(a,c,b,d){var h=\"Assertion failed\";if(b){h+=\": \"+b;var x=d}else if(a){h+=\": \"+a;x=c}throw new l(\"\"+h,x||[]);}function n(a,c){!a&&m(\"\",null,c,Array.prototype.slice.call(arguments,2))}function o(a,c){typeof a!=\"number\"&&m(\"Expected number but got %s.\",[a],c,Array.prototype.slice.call(arguments,2));return a};var p=Array.prototype,q=p.indexOf?function(a,c,b){n(a||f(a));o(a.length);return p.indexOf.call(a,c,b)}:function(a,c,b){b=b==null?0:b<0?Math.max(0,a.length+b):b;if(f(a)){if(!f(c)||c.length!=1)return-1;return a.indexOf(c,b)}for(b=b;b<a.length;b++)if(b in a&&a[b]===c)return b;return-1};var r,s,t,u;function v(){return e.navigator?e.navigator.userAgent:null}u=t=s=r=false;var w;if(w=v()){var y=e.navigator;r=w.indexOf(\"Opera\")==0;s=!r&&w.indexOf(\"MSIE\")!=-1;t=!r&&w.indexOf(\"WebKit\")!=-1;u=!r&&!t&&y.product==\"Gecko\"}var z=s,A=u,B=t,C=\"\",D;if(r&&e.opera){var E=e.opera.version;C=typeof E==\"function\"?E():E}else{if(A)D=/rv\\:([^\\);]+)(\\)|;)/;else if(z)D=/MSIE\\s+([^\\);]+)(\\)|;)/;else if(B)D=/WebKit\\/(\\S+)/;if(D){var F=D.exec(v());C=F?F[1]:\"\"}};function G(a,c,b,d){if(typeof d==\"number\")d=(c?Math.round(d):d)+\"px\";b.style[a]=d}g(G,\"height\",true);g(G,\"width\",true);var H={\"class\":\"className\",readonly:\"readOnly\"},I=[\"checked\",\"disabled\",\"readonly\",\"selected\"];function J(a,c){if(8==a.nodeType)return null;c=c.toLowerCase();if(c==\"style\"){var b=a.style.cssText.replace(/^[\\s\\xa0]+|[\\s\\xa0]+$/g,\"\").toLowerCase();return b.charAt(b.length-1)==\";\"?b:b+\";\"}b=a.getAttributeNode(c);if(!b)return null;if(q(I,c)>=0)return z&&b.value==\"false\"?null:true;return b.specified?b.value:null};",
+L"var K=[\"checkbox\",\"radio\"];function L(a){var c=a.tagName.toUpperCase();if(c==\"OPTION\")return true;if(c==\"INPUT\")if(q(K,a.type)>=0)return true;return false};function M(a,c){var b=null,d=c.toLowerCase();if(\"style\"==c.toLowerCase()){if((b=a.style)&&!f(b))b=b.cssText;return b}if(\"selected\"==d||\"checked\"==d&&L(a)){if(L(a)){b=\"selected\";d=a.type&&a.type.toLowerCase();if(\"checkbox\"==d||\"radio\"==d)b=\"checked\";b=!!a[b]}else b=false;return b?\"true\":null}var h=a.tagName&&\"A\"==a.tagName.toUpperCase();if(d==\"href\"&&h)b=J(a,c);else a[H[c]||c]===null||(b=a[H[c]||c]);if(d=b===undefined)d=J(a,c)!==null;if(d)b=J(a,c);return b||b===\"\"?b.toString():null}",
+L"var N=\"_\".split(\".\"),O=e;!(N[0]in O)&&O.execScript&&O.execScript(\"var \"+N[0]);for(var P;N.length&&(P=N.shift());)if(!N.length&&M!==undefined)O[P]=M;else O=O[P]?O[P]:O[P]={};; return _.apply(null,arguments);};",
 NULL
 };
 

@@ -145,7 +145,6 @@ Utils.getServer = function() {
 
 
 Utils.getActiveElement = function(doc) {
-
   var element;
   if (doc["activeElement"]) {
     element = doc.activeElement;
@@ -167,72 +166,6 @@ Utils.getActiveElement = function(doc) {
 
   return element;
 };
-
-
-function getTextFromNode(node, toReturn, textSoFar) {
-  if (node['tagName'] && node.tagName == "SCRIPT") {
-    return [toReturn, textSoFar];
-  }
-  var children = node.childNodes;
-
-  var bits;
-  for (var i = 0; i < children.length; i++) {
-    var child = children[i];
-
-    // Do we need to collapse the text so far?
-    if (child["tagName"] && child.tagName == "PRE") {
-      toReturn += collapseWhitespace(textSoFar);
-      textSoFar = "";
-      bits = getTextFromNode(child, toReturn, "", true);
-      toReturn += bits[1];
-      continue;
-    }
-
-    // Or is this just plain text?
-    if (child.nodeName == "#text") {
-      if (collapseWhitespace(child.nodeValue) == " ") {
-        textSoFar += " ";
-        continue;
-      }
-      
-      if (Utils.isDisplayed(child, false)) {
-        var textToAdd = child.nodeValue;
-        textToAdd =
-        textToAdd.replace(new RegExp(String.fromCharCode(160), "gm"), " ");
-        textSoFar += textToAdd;
-      }
-      continue;
-    }
-
-    // Treat as another child node.
-    bits = getTextFromNode(child, toReturn, textSoFar, false);
-    toReturn = bits[0];
-    textSoFar = bits[1];
-  }
-
-  if (isBlockLevel(node)) {
-    if (node["tagName"] && node.tagName != "PRE") {
-      toReturn += collapseWhitespace(textSoFar) + "\n";
-      textSoFar = "";
-    } else {
-      toReturn += "\n";
-    }
-  }
-  return [toReturn, textSoFar];
-}
-
-
-function isBlockLevel(node) {
-  if (node["tagName"] && node.tagName == "BR")
-    return true;
-
-  try {
-    // Should we think about getting hold of the current document?
-    return "block" == Utils.getStyleProperty(node, "display");
-  } catch (e) {
-    return false;
-  }
-}
 
 
 Utils.isInHead = function(element) {
@@ -327,38 +260,6 @@ Utils.getStyleProperty = function(element, propertyName) {
   }
 
   return value;
-};
-
-
-function collapseWhitespace(textSoFar) {
-  return textSoFar.replace(/\s+/g, " ");
-}
-
-
-function getPreformattedText(node) {
-  var textToAdd = "";
-  return getTextFromNode(node, "", textToAdd, true)[1];
-}
-
-
-function isWhiteSpace(character) {
-  return character == '\n' || character == ' ' || character == '\t' || character
-      == '\r';
-}
-
-
-Utils.getText = function(element) {
-  var bits = getTextFromNode(element, "", "", element.tagName == "PRE");
-  var text = bits[0] + collapseWhitespace(bits[1]);
-  var start = 0;
-  while (start < text.length && isWhiteSpace(text[start])) {
-    ++start;
-  }
-  var end = text.length;
-  while (end > start && isWhiteSpace(text[end - 1])) {
-    --end;
-  }
-  return text.slice(start, end);
 };
 
 
@@ -928,14 +829,17 @@ Utils.findForm = function(element) {
 };
 
 
-Utils.fireMouseEventOn = function(element, eventName) {
-  Utils.triggerMouseEvent(element, eventName, 0, 0);
+Utils.fireMouseEventOn = function(element, eventName, clientX, clientY) {
+  Utils.triggerMouseEvent(element, eventName, clientX, clientY);
 };
 
 
 Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
   var event = element.ownerDocument.createEvent("MouseEvents");
   var view = element.ownerDocument.defaultView;
+
+  clientX = clientX || 0;
+  clientY = clientY || 0;
 
   event.initMouseEvent(eventType, true, true, view, 1, 0, 0, clientX, clientY,
       false, false, false, false, 0, element);

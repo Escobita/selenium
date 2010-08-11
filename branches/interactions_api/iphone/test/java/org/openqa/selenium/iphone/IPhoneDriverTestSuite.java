@@ -17,22 +17,22 @@ limitations under the License.
 
 package org.openqa.selenium.iphone;
 
-import static org.openqa.selenium.Ignore.Driver.IPHONE;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
-import org.openqa.selenium.TestSuiteBuilder;
-import org.openqa.selenium.internal.FileHandler;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
 import java.io.File;
+
+import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.internal.FileHandler;
+
+import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
 
 public class IPhoneDriverTestSuite extends TestCase {
 
   public static Test suite() throws Exception {
     return new TestSuiteBuilder()
         .addSourceDir("iphone")
-        .addSourceDir("remote")
         .addSourceDir("common")
         .usingDriver(TestIPhoneSimulatorDriver.class)
         .exclude(IPHONE)

@@ -130,6 +130,7 @@ class Tasks
     src = fun.find_prebuilt(out)
     
     mkdir_p File.dirname(out)
+    puts "Falling back to #{src}"
     cp src, out
   end
   
@@ -150,7 +151,7 @@ class Tasks
   def zip(src, dest)
     out = File.expand_path(dest)
     
-    sh "cd #{src} && jar cMf #{out} *"
+    sh "cd \"#{src}\" && jar cMf \"#{out}\" *"
   end
 
   def to_filelist(dir, src)

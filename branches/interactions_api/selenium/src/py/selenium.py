@@ -198,19 +198,26 @@ class selenium:
 
     def do_command(self, verb, args):
         conn = httplib.HTTPConnection(self.host, self.port)
-        body = u'cmd=' + urllib.quote_plus(unicode(verb).encode('utf-8'))
-        for i in range(len(args)):
-            body += '&' + unicode(i+1) + '=' + urllib.quote_plus(unicode(args[i]).encode('utf-8'))
-        if (None != self.sessionId):
-            body += "&sessionId=" + unicode(self.sessionId)
-        headers = {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"}
-        conn.request("POST", "/selenium-server/driver/", body, headers)
+        try:
+            body = u'cmd=' + urllib.quote_plus(unicode(verb).encode('utf-8'))
+            for i in range(len(args)):
+                body += '&' + unicode(i+1) + '=' + \
+                        urllib.quote_plus(unicode(args[i]).encode('utf-8'))
+            if (None != self.sessionId):
+                body += "&sessionId=" + unicode(self.sessionId)
+            headers = {
+                "Content-Type":
+                "application/x-www-form-urlencoded; charset=utf-8"
+            }
+            conn.request("POST", "/selenium-server/driver/", body, headers)
 
-        response = conn.getresponse()
-        data = unicode(response.read(), "UTF-8")
-        if (not data.startswith('OK')):
-            raise Exception, data
-        return data
+            response = conn.getresponse()
+            data = unicode(response.read(), "UTF-8")
+            if (not data.startswith('OK')):
+                raise Exception, data
+            return data
+        finally:
+            conn.close()
 
     def get_string(self, verb, args):
         result = self.do_command(verb, args)
@@ -238,11 +245,11 @@ class selenium:
         return tokens
 
     def get_number(self, verb, args):
-        # Is there something I need to do here?
+        # FIXME: Talk to the group about this, it should return a number
         return self.get_string(verb, args)
-    
+
     def get_number_array(self, verb, args):
-        # Is there something I need to do here?
+        # FIXME: Talk to the group about this, it should return a number
         return self.get_string_array(verb, args)
 
     def get_boolean(self, verb, args):
@@ -252,7 +259,7 @@ class selenium:
         if ("false" == boolstr):
             return False
         raise ValueError, "result is neither 'true' nor 'false': " + boolstr
-    
+
     def get_boolean_array(self, verb, args):
         boolarr = self.get_string_array(verb, args)
         for i, boolstr in enumerate(boolarr):

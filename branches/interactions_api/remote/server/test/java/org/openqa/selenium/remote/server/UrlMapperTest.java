@@ -19,18 +19,19 @@ package org.openqa.selenium.remote.server;
 
 import junit.framework.TestCase;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import org.openqa.selenium.remote.server.rest.Handler;
 import org.openqa.selenium.remote.server.rest.ResultConfig;
 import org.openqa.selenium.remote.server.rest.ResultType;
 import org.openqa.selenium.remote.server.rest.UrlMapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 public class UrlMapperTest extends TestCase {
 
   public void testShouldBePossibleToBindAHandler() throws Exception {
-    UrlMapper mapper = new UrlMapper(new DriverSessions(), new NullLogTo());
+    UrlMapper mapper = new UrlMapper(new DefaultDriverSessions(), new NullLogTo());
 
     mapper.bind("/foo", StubHandler.class);
 
@@ -40,7 +41,7 @@ public class UrlMapperTest extends TestCase {
   }
 
   public void testShouldInjectDependenciesViaTheConstructor() throws Exception {
-    DriverSessions sessions = new DriverSessions();
+    DriverSessions sessions = new DefaultDriverSessions();
     UrlMapper mapper = new UrlMapper(sessions, new NullLogTo());
     mapper.bind("/example", SessionHandler.class);
 
