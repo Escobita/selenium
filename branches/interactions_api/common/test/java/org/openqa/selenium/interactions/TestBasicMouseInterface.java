@@ -20,11 +20,14 @@ package org.openqa.selenium.interactions;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasInputDevices;
+import org.openqa.selenium.Ignore;
 import org.openqa.selenium.JavascriptEnabled;
 import org.openqa.selenium.Mouse;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 
 /**
  * Tests operations that involve mouse and keyboard.
@@ -32,15 +35,14 @@ import org.openqa.selenium.WebElement;
  * @author eran.mes@gmail.com (Eran Mes)
  */
 public class TestBasicMouseInterface extends AbstractDriverTestCase {
-  @JavascriptEnabled
-  public void testDraggingElementWithMouse() {
+  private void performDragAndDropWithMouse() {
     driver.get(pages.draggableLists);
 
     WebElement dragReporter = driver.findElement(By.id("dragging_reports"));
 
     Mouse mouse = ((HasInputDevices) driver).getMouse();
     WebElement toDrag = driver.findElement(By.id("rightitem-3"));
-    WebElement dragInto = driver.findElement(By.id("sortable1")); 
+    WebElement dragInto = driver.findElement(By.id("sortable1"));
 
     MouseClickAndHoldAction holdItem = new MouseClickAndHoldAction(mouse, toDrag);
 
@@ -48,7 +50,7 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
         driver.findElement(By.id("leftitem-4")));
 
     MouseMoveAction moveToOtherList = new MouseMoveAction(mouse, dragInto);
-    
+
     MouseReleaseAction drop = new MouseReleaseAction(mouse, dragInto);
 
     assertEquals("Nothing happened.", dragReporter.getText());
@@ -57,15 +59,28 @@ public class TestBasicMouseInterface extends AbstractDriverTestCase {
     moveToSpecificItem.perform();
     moveToOtherList.perform();
 
-    System.out.println(driver.getPageSource());
     assertEquals("Nothing happened. DragOut", dragReporter.getText());
     drop.perform();
-
-    System.out.println(driver.getPageSource());
-    assertEquals(6, dragInto.findElements(By.tagName("li")).size());
-    //TODO: This is failing under HtmlUnit. Follow up.
-    //assertEquals("Nothing happened. DragOut DropIn RightItem 3", dragReporter.getText());
   }
+
+  @JavascriptEnabled
+  public void testDraggingElementWithMouseMovesItToAnotherList() {
+    performDragAndDropWithMouse();
+    WebElement dragInto = driver.findElement(By.id("sortable1"));
+    assertEquals(6, dragInto.findElements(By.tagName("li")).size());
+  }
+
+  @JavascriptEnabled
+  @Ignore({HTMLUNIT})
+  // This test is very similar to testDraggingElementWithMouse. The only
+  // difference is that this test also verifies the correct events were fired.
+  public void testDraggingElementWithMouseFiresEvents() {
+    performDragAndDropWithMouse();
+    WebElement dragReporter = driver.findElement(By.id("dragging_reports"));
+    // This is failing under HtmlUnit. A bug was filed.
+    assertEquals("Nothing happened. DragOut DropIn RightItem 3", dragReporter.getText());
+  }
+
 
   private boolean isElementAvailable(WebDriver driver, By locator) {
     try {
