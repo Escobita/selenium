@@ -140,6 +140,8 @@ public class ResultConfig {
 
   public void handle(String pathInfo, final HttpServletRequest request, final HttpServletResponse response)
       throws Exception {
+    long start = System.currentTimeMillis();
+
     final Handler handler = getHandler(pathInfo);
 
     if (handler instanceof JsonParametersAware) {
@@ -172,6 +174,9 @@ public class ResultConfig {
       request.setAttribute("exception", e);
     }
 
+    long mid = System.currentTimeMillis();
+    System.out.println("Time to handle request: " + (mid - start));
+
     Set<Result> results = resultToRender.get(result);
     Result tempToUse = null;
     for (Result res : results) {
@@ -194,6 +199,7 @@ public class ResultConfig {
     } else {
       toUse.getRenderer().render(request, response, handler);
     }
+    System.out.println("Time to render response: " + (System.currentTimeMillis() - mid));
   }
 
   @SuppressWarnings("unchecked")

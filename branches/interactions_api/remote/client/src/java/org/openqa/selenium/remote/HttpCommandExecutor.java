@@ -17,120 +17,59 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import static org.openqa.selenium.remote.DriverCommand.ADD_COOKIE;
-import static org.openqa.selenium.remote.DriverCommand.CLEAR_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.CLEAR_LOCAL_STORAGE;
-import static org.openqa.selenium.remote.DriverCommand.CLEAR_SESSION_STORAGE;
-import static org.openqa.selenium.remote.DriverCommand.CLICK_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.CLOSE;
-import static org.openqa.selenium.remote.DriverCommand.DELETE_ALL_COOKIES;
-import static org.openqa.selenium.remote.DriverCommand.DELETE_COOKIE;
-import static org.openqa.selenium.remote.DriverCommand.DRAG_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.ELEMENT_EQUALS;
-import static org.openqa.selenium.remote.DriverCommand.EXECUTE_SCRIPT;
-import static org.openqa.selenium.remote.DriverCommand.EXECUTE_SQL;
-import static org.openqa.selenium.remote.DriverCommand.FIND_CHILD_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.FIND_CHILD_ELEMENTS;
-import static org.openqa.selenium.remote.DriverCommand.FIND_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.FIND_ELEMENTS;
-import static org.openqa.selenium.remote.DriverCommand.GET;
-import static org.openqa.selenium.remote.DriverCommand.GET_ACTIVE_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.GET_ALL_COOKIES;
-import static org.openqa.selenium.remote.DriverCommand.GET_APP_CACHE;
-import static org.openqa.selenium.remote.DriverCommand.GET_APP_CACHE_STATUS;
-import static org.openqa.selenium.remote.DriverCommand.GET_CURRENT_URL;
-import static org.openqa.selenium.remote.DriverCommand.GET_CURRENT_WINDOW_HANDLE;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_ATTRIBUTE;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_LOCATION;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_SIZE;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_TAG_NAME;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_TEXT;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_VALUE;
-import static org.openqa.selenium.remote.DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY;
-import static org.openqa.selenium.remote.DriverCommand.GET_LOCAL_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.GET_LOCAL_STORAGE_KEYS;
-import static org.openqa.selenium.remote.DriverCommand.GET_LOCAL_STORAGE_SIZE;
-import static org.openqa.selenium.remote.DriverCommand.GET_LOCATION;
-import static org.openqa.selenium.remote.DriverCommand.GET_PAGE_SOURCE;
-import static org.openqa.selenium.remote.DriverCommand.GET_SESSION_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.GET_SESSION_STORAGE_KEYS;
-import static org.openqa.selenium.remote.DriverCommand.GET_SESSION_STORAGE_SIZE;
-import static org.openqa.selenium.remote.DriverCommand.GET_SPEED;
-import static org.openqa.selenium.remote.DriverCommand.GET_TITLE;
-import static org.openqa.selenium.remote.DriverCommand.GET_WINDOW_HANDLES;
-import static org.openqa.selenium.remote.DriverCommand.GO_BACK;
-import static org.openqa.selenium.remote.DriverCommand.GO_FORWARD;
-import static org.openqa.selenium.remote.DriverCommand.HOVER_OVER_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.IMPLICITLY_WAIT;
-import static org.openqa.selenium.remote.DriverCommand.IS_BROWSER_ONLINE;
-import static org.openqa.selenium.remote.DriverCommand.IS_BROWSER_VISIBLE;
-import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_DISPLAYED;
-import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_ENABLED;
-import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_SELECTED;
-import static org.openqa.selenium.remote.DriverCommand.NEW_SESSION;
-import static org.openqa.selenium.remote.DriverCommand.QUIT;
-import static org.openqa.selenium.remote.DriverCommand.REFRESH;
-import static org.openqa.selenium.remote.DriverCommand.REMOVE_LOCAL_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.REMOVE_SESSION_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
-import static org.openqa.selenium.remote.DriverCommand.SEND_KEYS_TO_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.SET_BROWSER_ONLINE;
-import static org.openqa.selenium.remote.DriverCommand.SET_BROWSER_VISIBLE;
-import static org.openqa.selenium.remote.DriverCommand.SET_ELEMENT_SELECTED;
-import static org.openqa.selenium.remote.DriverCommand.SET_LOCAL_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.SET_LOCATION;
-import static org.openqa.selenium.remote.DriverCommand.SET_SESSION_STORAGE_ITEM;
-import static org.openqa.selenium.remote.DriverCommand.SET_SPEED;
-import static org.openqa.selenium.remote.DriverCommand.SUBMIT_ELEMENT;
-import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_FRAME;
-import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_WINDOW;
-import static org.openqa.selenium.remote.DriverCommand.TOGGLE_ELEMENT;
-
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import com.google.common.collect.ImmutableMap;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.openqa.selenium.WebDriverException;
 
-import com.google.common.collect.ImmutableMap;
+import static org.apache.http.protocol.ExecutionContext.HTTP_TARGET_HOST;
+import static org.openqa.selenium.remote.DriverCommand.*;
 
 public class HttpCommandExecutor implements CommandExecutor {
 
   private final String remotePath;
+  private URL remoteServer;
 
   private enum HttpVerb {
 
     GET() {
-      public HttpMethod createMethod(String url) {
-        GetMethod getMethod = new GetMethod(url);
-        getMethod.setFollowRedirects(true);
+      public HttpUriRequest createMethod(String url) {
+        HttpGet getMethod = new HttpGet(url);
+//        getMethod.setFollowRedirects(true);
         return getMethod;
       }
     },
     POST() {
-      public HttpMethod createMethod(String url) {
-        return new PostMethod(url);
+      public HttpUriRequest createMethod(String url) {
+        return new HttpPost(url);
       }
     },
     DELETE() {
-      public HttpMethod createMethod(String url) {
-        return new DeleteMethod(url);
+      public HttpUriRequest createMethod(String url) {
+        return new HttpDelete(url);
       }
     };
 
-    public abstract HttpMethod createMethod(String url);
+    public abstract HttpUriRequest createMethod(String url);
   }
 
   private Map<String, CommandInfo> nameToUrl;
@@ -150,16 +89,11 @@ public class HttpCommandExecutor implements CommandExecutor {
         throw new IllegalArgumentException("You must specify a remote address to connect to");
     }
 
+    this.remoteServer = addressOfRemoteServer;
     this.remotePath = addressOfRemoteServer.getPath();
 
-    URI uri;
-    try {
-      uri = new URI(addressOfRemoteServer.toString(), false);
-    } catch (URIException e) {
-      throw new WebDriverException(e);
-    }
-    client = new HttpClient();
-    client.getHostConfiguration().setHost(uri);
+    client = new DefaultHttpClient();
+//    client.getConnectionManager().setHost(uri);
 
     nameToUrl = ImmutableMap.<String, CommandInfo>builder()
         .put(NEW_SESSION, post("/session"))
@@ -239,58 +173,65 @@ public class HttpCommandExecutor implements CommandExecutor {
   }
 
   public URL getAddressOfRemoteServer() {
-    try {
-      return new URL(client.getHostConfiguration().getHostURL());
-    } catch (MalformedURLException e) {
-      // This really should never happen.
-      throw new WebDriverException(e);
-    }
+    return remoteServer;
   }
 
   public Response execute(Command command) throws Exception {
     CommandInfo info = nameToUrl.get(command.getName());
-    HttpMethod httpMethod = info.getMethod(remotePath, command);
+    HttpUriRequest httpMethod = info.getMethod(remoteServer, command);
 
-    httpMethod.addRequestHeader("Accept", "application/json, image/png");
+    httpMethod.addHeader("Accept", "application/json, image/png");
 
     String payload = new BeanToJsonConverter().convert(command.getParameters());
 
-    if (httpMethod instanceof PostMethod) {
-      ((PostMethod) httpMethod)
-          .setRequestEntity(new StringRequestEntity(payload, "application/json", "UTF-8"));
+    if (httpMethod instanceof HttpPost) {
+      ((HttpPost) httpMethod).setEntity(new StringEntity(payload, "UTF-8"));
     }
 
-    client.executeMethod(httpMethod);
+    HttpContext context = new BasicHttpContext();
+    long start = System.currentTimeMillis();
+    HttpResponse response = client.execute(httpMethod, context);
+
+    long mid = System.currentTimeMillis();
 
     // TODO: SimonStewart: 2008-04-25: This is really shabby
-    if (isRedirect(httpMethod)) {
-      Header newLocation = httpMethod.getResponseHeader("location");
-      httpMethod = new GetMethod(newLocation.getValue());
-      httpMethod.setFollowRedirects(true);
-      httpMethod.addRequestHeader("Accept", "application/json, image/png");
-      client.executeMethod(httpMethod);
+    if (isRedirect(response)) {
+      Header newLocation = response.getFirstHeader("location");
+      httpMethod = new HttpGet(newLocation.getValue());
+      httpMethod.addHeader("Accept", "application/json, image/png");
+      response.getEntity().consumeContent();
+      response = client.execute(httpMethod, context);
     }
 
-    return createResponse(httpMethod);
+    Response res = createResponse(response, context);
+
+    long end = System.currentTimeMillis();
+
+    System.out.println(String.format("start -> mid: %d, mid -> end: %d", mid - start, end - mid));
+
+    return res;
   }
 
-  private Response createResponse(HttpMethod httpMethod) throws Exception {
+  private Response createResponse(HttpResponse httpResponse, HttpContext context) throws Exception {
     Response response;
 
-    Header header = httpMethod.getResponseHeader("Content-Type");
+    Header header = httpResponse.getFirstHeader("Content-Type");
 
     if (header != null && header.getValue().startsWith("application/json")) {
-      response = new JsonToBeanConverter().convert(Response.class, httpMethod.getResponseBodyAsString());
+      HttpEntity httpEntity = httpResponse.getEntity();
+      System.out.println("httpEntity = " + httpEntity);
+      response = new JsonToBeanConverter().convert(Response.class, EntityUtils.toString(httpEntity));
     } else {
       response = new Response();
 
       if (header != null && header.getValue().startsWith("image/png")) {
-        response.setValue(httpMethod.getResponseBody());
-      } else {
-        response.setValue(httpMethod.getResponseBodyAsString());
+        response.setValue(EntityUtils.toByteArray(httpResponse.getEntity()));
+      } else if (httpResponse.getEntity() != null) {
+        response.setValue(EntityUtils.toString(httpResponse.getEntity()));
       }
-      
-      String uri = httpMethod.getURI().toString();
+
+      HttpHost target = (HttpHost) context.getAttribute(HTTP_TARGET_HOST);
+      String uri = target.toURI();
       int sessionIndex = uri.indexOf("/session/");
       if (sessionIndex != -1) {
         sessionIndex += "/session/".length();
@@ -301,11 +242,12 @@ public class HttpCommandExecutor implements CommandExecutor {
       }
     }
 
-    if (!(httpMethod.getStatusCode() > 199 && httpMethod.getStatusCode() < 300)) {
+    int statusCode = httpResponse.getStatusLine().getStatusCode();
+    if (!(statusCode > 199 && statusCode < 300)) {
       // 4xx represents an unknown command or a bad request.
-      if (httpMethod.getStatusCode() > 399 && httpMethod.getStatusCode() < 500) {
+      if (statusCode > 399 && statusCode < 500) {
         response.setStatus(ErrorCodes.UNKNOWN_COMMAND);
-      } else if (httpMethod.getStatusCode() > 499 && httpMethod.getStatusCode() < 600) {
+      } else if (statusCode > 499 && statusCode < 600) {
         // 5xx represents an internal server error. The response status should already be set, but
         // if not, set it to a general error code.
         if (response.getStatus() == ErrorCodes.SUCCESS) {
@@ -327,10 +269,10 @@ public class HttpCommandExecutor implements CommandExecutor {
     return response;
   }
 
-  private boolean isRedirect(HttpMethod httpMethod) {
-    int code = httpMethod.getStatusCode();
+  private boolean isRedirect(HttpResponse response) {
+    int code = response.getStatusLine().getStatusCode();
     return (code == 301 || code == 302 || code == 303 || code == 307)
-           && httpMethod.getResponseHeader("location") != null;
+           && response.containsHeader("location");
   }
 
   private static CommandInfo get(String url) {
@@ -355,8 +297,11 @@ public class HttpCommandExecutor implements CommandExecutor {
       this.verb = verb;
     }
 
-    public HttpMethod getMethod(String base, Command command) {
-      StringBuilder urlBuilder = new StringBuilder(base);
+    public HttpUriRequest getMethod(URL base, Command command) {
+      StringBuilder urlBuilder = new StringBuilder();
+      urlBuilder.append(base.getProtocol()).append("://");
+      urlBuilder.append(base.getHost()).append(":").append(base.getPort());
+      urlBuilder.append(base.getPath());
       for (String part : url.split("/")) {
         if (part.length() == 0) {
           continue;
@@ -373,6 +318,7 @@ public class HttpCommandExecutor implements CommandExecutor {
         }
       }
 
+      System.out.println("urlBuilder = " + urlBuilder);
       return verb.createMethod(urlBuilder.toString());
     }
 

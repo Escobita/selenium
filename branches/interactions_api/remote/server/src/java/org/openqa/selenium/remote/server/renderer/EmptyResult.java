@@ -27,5 +27,7 @@ public class EmptyResult implements Renderer {
   public void render(HttpServletRequest request, HttpServletResponse response, Handler handler)
       throws Exception {
     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    response.setContentLength(0);
+    response.getOutputStream().flush();
   }
 }

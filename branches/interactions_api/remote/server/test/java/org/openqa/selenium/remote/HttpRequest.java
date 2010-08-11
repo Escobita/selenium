@@ -17,25 +17,33 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 public class HttpRequest {
   private String response;
 
   public HttpRequest(Method method, String url, Object payload) throws Exception {
     if (method == Method.POST) {
-      PostMethod post = new PostMethod(url);
-      post.addRequestHeader("Accept", "application/json");
+      HttpPost post = new HttpPost(url);
+      post.addHeader("Accept", "application/json");
 
       String content = new BeanToJsonConverter().convert(payload);
 
-      post.setRequestEntity(new StringRequestEntity(content, "application/json", "UTF-8"));
+      System.out.println("content = " + content);
 
-      new HttpClient().executeMethod(post);
+      try {
+      post.setEntity(new StringEntity(content, "UTF-8"));
+      } catch (Throwable e) {
+        e.printStackTrace();
+      }
 
-      response = post.getResponseBodyAsString();
+      HttpResponse httpResponse = new DefaultHttpClient().execute(post);
+
+      response = httpResponse.getEntity() == null ? null : EntityUtils.toString(httpResponse.getEntity()); 
       return;
     }
 

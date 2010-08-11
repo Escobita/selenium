@@ -40,6 +40,8 @@ public class JsonResult implements Renderer {
 
   public void render(HttpServletRequest request, HttpServletResponse response, Handler handler)
       throws Exception {
+    long start = System.currentTimeMillis();
+
     Object result = request.getAttribute(propertyName);
 
     String json = new BeanToJsonConverter().convert(result);
@@ -52,5 +54,9 @@ public class JsonResult implements Renderer {
     response.setCharacterEncoding("UTF-8");
     response.getOutputStream().write(data);
     response.getOutputStream().flush();
+
+    long end = System.currentTimeMillis();
+
+    System.out.println(String.format("Json: %d", end - start));
   }
 }
