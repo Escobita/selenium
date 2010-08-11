@@ -46,6 +46,7 @@ public class Pages {
   public String draggableLists;
   public String droppableItems;
   public String bodyTypingPage;
+  public String formSelectionPage;
 
   public Pages(AppServer appServer) {
     simpleTestPage = appServer.whereIs("simpleTest.html");
@@ -74,5 +75,6 @@ public class Pages {
     draggableLists = appServer.whereIs("draggableLists.html");
     droppableItems = appServer.whereIs("droppableItems.html");
     bodyTypingPage = appServer.whereIs("bodyTypingTest.html");
+    formSelectionPage = appServer.whereIs("formSelectionPage.html"); 
   }
 }
