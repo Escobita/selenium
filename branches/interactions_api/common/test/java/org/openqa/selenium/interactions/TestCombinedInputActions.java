@@ -62,4 +62,29 @@ public class TestCombinedInputActions extends AbstractDriverTestCase {
     assertEquals("Should have picked the last three options.", "roquefort parmigiano cheddar",
         resultElement.getText());
   }
+
+  @JavascriptEnabled
+  public void testSelectingMultipleItems() {
+    driver.get(pages.selectableItemsPage);
+
+    WebElement reportingElement = driver.findElement(By.id("infodiv"));
+
+    assertEquals("no info", reportingElement.getText());
+
+    Keyboard keyboard = ((HasInputDevices) driver).getKeyboard();
+    Mouse mouse = ((HasInputDevices) driver).getMouse();
+
+    List<WebElement> listItems = driver.findElements(By.tagName("li"));
+
+    CompositeAction selectThreeItems = new CompositeAction();
+    selectThreeItems.addAction(new KeyDownAction(keyboard, Keys.CONTROL))
+        .addAction(new ClickAction(mouse, listItems.get(1)))
+        .addAction(new ClickAction(mouse, listItems.get(3)))
+        .addAction(new ClickAction(mouse, listItems.get(5)))
+        .addAction(new KeyUpAction(keyboard, Keys.CONTROL));
+
+    selectThreeItems.perform();
+
+    assertEquals("#item2 #item4 #item6", reportingElement.getText());
+  }
 }
