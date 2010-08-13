@@ -123,7 +123,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
         element.mouseMove();
       }
 
-      element.click();
+      KeyboardModifiersState modifiersState = parent.getKeyboardModifiersState();
+      element.click(modifiersState.isShiftPressed(),
+          modifiersState.isCtrlPressed(), modifiersState.isAltPressed());
     } catch (IOException e) {
       throw new WebDriverException(e);
     } catch (ScriptException e) {
@@ -140,11 +142,8 @@ public class HtmlUnitWebElement implements RenderedWebElement,
       if (element instanceof HtmlForm) {
         submitForm((HtmlForm) element);
         return;
-      } else if (element instanceof HtmlSubmitInput) {
+      } else if ((element instanceof HtmlSubmitInput) || (element instanceof HtmlImageInput)) {
         element.click();
-        return;
-      } else if (element instanceof HtmlImageInput) {
-        ((HtmlImageInput) element).click();
         return;
       } else if (element instanceof HtmlInput) {
         submitForm(element.getEnclosingForm());

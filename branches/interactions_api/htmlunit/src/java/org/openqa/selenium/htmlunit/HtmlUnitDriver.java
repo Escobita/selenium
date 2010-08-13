@@ -443,7 +443,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Keyboard getKeyboard() {
-    return new HtmlUnitKeyboard(this, modifiersState);
+    return new HtmlUnitKeyboard(this);
   }
 
   public Mouse getMouse() {
@@ -1143,5 +1143,9 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
       Thread.sleep(ms);
     } catch (InterruptedException ignored) {
     }
+  }
+
+  public KeyboardModifiersState getKeyboardModifiersState() {
+    return modifiersState;
   }
 }
