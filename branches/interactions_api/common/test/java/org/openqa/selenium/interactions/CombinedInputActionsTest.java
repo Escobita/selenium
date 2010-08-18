@@ -34,8 +34,9 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 /**
  * @author eran.mes@google.com (Eran Mes)
  */
-public class TestCombinedInputActions extends AbstractDriverTestCase {
+public class CombinedInputActionsTest extends AbstractDriverTestCase {
 
+  //TODO: Check if this could work in any browser without native events. 
   @JavascriptEnabled
   @Ignore({HTMLUNIT})
   public void testClickingOnFormElements() {
@@ -86,5 +87,9 @@ public class TestCombinedInputActions extends AbstractDriverTestCase {
     selectThreeItems.perform();
 
     assertEquals("#item2 #item4 #item6", reportingElement.getText());
+
+    // Now click on another element, make sure that's the only one selected.
+    (new ClickAction(mouse, listItems.get(6))).perform();
+    assertEquals("#item7", reportingElement.getText());
   }
 }
