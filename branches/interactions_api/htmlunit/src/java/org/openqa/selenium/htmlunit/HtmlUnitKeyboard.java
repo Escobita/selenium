@@ -27,6 +27,7 @@ import org.openqa.selenium.WebElement;
  * @author eran.mes@gmail.com (Eran Mes)
  */
 public class HtmlUnitKeyboard implements Keyboard {
+  private KeyboardModifiersState modifiersState = new KeyboardModifiersState();
   private final HtmlUnitDriver parent;
 
   HtmlUnitKeyboard(HtmlUnitDriver parent) {
@@ -45,7 +46,7 @@ public class HtmlUnitKeyboard implements Keyboard {
   public void sendKeys(WebElement toElement, CharSequence... keysToSend) {
 
     HtmlUnitWebElement htmlElem = getElementToSend(toElement);
-    if (parent.getKeyboardModifiersState().isShiftPressed()) {
+    if (modifiersState.isShiftPressed()) {
       StringBuilder upperCaseKeys = new StringBuilder();
       for (CharSequence seq : keysToSend) {
         upperCaseKeys.append(seq.toString().toUpperCase());
@@ -59,13 +60,26 @@ public class HtmlUnitKeyboard implements Keyboard {
 
   public void pressKey(WebElement toElement, Keys keyToPress) {
     HtmlUnitWebElement htmlElement = getElementToSend(toElement);
-    parent.getKeyboardModifiersState().storeKeyDown(keyToPress);
+    modifiersState.storeKeyDown(keyToPress);
     htmlElement.sendKeyDownEvent(keyToPress);
   }
 
   public void releaseKey(WebElement toElement, Keys keyToRelease) {
     HtmlUnitWebElement htmlElement = getElementToSend(toElement);
-    parent.getKeyboardModifiersState().storeKeyUp(keyToRelease);
+    modifiersState.storeKeyUp(keyToRelease);
     htmlElement.sendKeyUpEvent(keyToRelease);
   }
+
+  public boolean isShiftPressed() {
+    return modifiersState.isShiftPressed();
+  }
+
+  public boolean isCtrlPressed() {
+    return modifiersState.isCtrlPressed();
+  }
+
+  public boolean isAltPressed() {
+    return modifiersState.isAltPressed();
+  }
+
 }

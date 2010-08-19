@@ -123,9 +123,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
         element.mouseMove();
       }
 
-      KeyboardModifiersState modifiersState = parent.getKeyboardModifiersState();
-      element.click(modifiersState.isShiftPressed(),
-          modifiersState.isCtrlPressed(), modifiersState.isAltPressed());
+      HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
+      element.click(keyboard.isShiftPressed(),
+          keyboard.isCtrlPressed(), keyboard.isAltPressed());
     } catch (IOException e) {
       throw new WebDriverException(e);
     } catch (ScriptException e) {

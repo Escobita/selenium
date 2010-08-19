@@ -54,7 +54,7 @@ public class SingleTestSuite extends TestCase {
         .keepDriverInstance()
         .includeJavascriptTests()
         .onlyRun("CombinedInputActionsTest")
-        .method("testSelectingMultipleItems")
+        //.method("testSelectingMultipleItems")
         .exclude(ALL)
         .exclude(Ignore.Driver.HTMLUNIT)
         .outputTestNames()

@@ -99,7 +99,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private final BrowserVersion version;
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
-  private KeyboardModifiersState modifiersState = new KeyboardModifiersState();
+  private HtmlUnitKeyboard keyboard;
 
   public HtmlUnitDriver(BrowserVersion version) {
     this.version = version;
@@ -137,6 +137,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
     // Now put us on the home page, like a real browser
     get(webClient.getHomePage());
+    keyboard = new HtmlUnitKeyboard(this);
   }
 
   public HtmlUnitDriver() {
@@ -443,7 +444,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Keyboard getKeyboard() {
-    return new HtmlUnitKeyboard(this);
+    return keyboard;
   }
 
   public Mouse getMouse() {
@@ -1143,9 +1144,5 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
       Thread.sleep(ms);
     } catch (InterruptedException ignored) {
     }
-  }
-
-  public KeyboardModifiersState getKeyboardModifiersState() {
-    return modifiersState;
   }
 }
