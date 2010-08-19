@@ -2,6 +2,7 @@ package org.openqa.selenium.safari;
 
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.TestSuiteBuilder;
@@ -22,8 +23,11 @@ public class SafariDriverTestSuite extends TestCase {
         .addSourceDir("common")
         .usingDriver(SafariDriver.class)
         .exclude(IPHONE)
+        .exclude(SAFARI)
         .exclude(REMOTE)
         .includeJavascriptTests()
+//        .onlyRun("WebElementTest")
+        .keepDriverInstance()
         .create();
   }
   public static void main(String[] args) throws Exception {

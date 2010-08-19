@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium;
 
 import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import org.openqa.selenium.internal.WrapsDriver;
@@ -34,8 +35,8 @@ public class WebElementTest extends AbstractDriverTestCase {
     WebElement parent = driver.findElement(By.id("containsSomeDiv"));
     assertTrue(parent instanceof WrapsDriver);
   }
-  
-  @Ignore(SELENESE)
+
+  @Ignore({SELENESE, SAFARI})  
   public void testElementReturnsOriginDriver() {
     driver.get(pages.simpleTestPage);
     WebElement parent = driver.findElement(By.id("containsSomeDiv"));

@@ -436,22 +436,10 @@ task :safari_extension => FileList['safari/src/objc/**'] do |t|
   end
 end
 
-t = zip(:name => :safari_extension_zip,
-    :src  => [],
-    :deps => [ :safari_extension ],
-    :resources => [
-                     :safari_extension 
-                  ],
-    :out => "safari-extension.zip")  
-
-java_jar(:name => "webdriver-safari",
-         :srcs  => [ "safari/src/java/**/*.java" ],
-         :deps => [
-                    :common,
-                    :remote_common,
-                    :remote_client
-                  ],
-         :resources => [t.prerequisites[0].to_s])
+file "build/safari-extension.zip" => [:safari_extension] do
+  sh "cd safari/build/Release && zip -r ../../../build/safari-extension.zip SafariExtension.bundle", :verbose => true
+end
+task "safari_extension_zip" => "build/safari-extension.zip"
 
 ### Android ###
 file 'build/android/server/server.jar' => FileList["android/server/src/java/**/*.java"] + [:remote, :support] do

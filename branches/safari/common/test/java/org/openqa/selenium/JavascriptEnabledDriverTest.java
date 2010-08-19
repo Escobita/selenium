@@ -32,6 +32,7 @@ import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import org.openqa.selenium.internal.Locatable;
@@ -204,7 +205,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, SAFARI})
   public void testIfNoElementHasFocusTheActiveElementIsTheBody() {
     driver.get(pages.simpleTestPage);
 

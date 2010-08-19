@@ -9,7 +9,7 @@ public class SafariDriverTest extends AbstractDriverTestCase {
   public void testSimpleOperations() throws Exception {
     driver.get("http://www.google.com/");
     
-    assertEquals("http://www.google.com/", driver.getCurrentUrl());
+    assertTrue(driver.getCurrentUrl().contains("http://www.google"));
     
     System.out.println("Page source length : " + driver.getPageSource().length());
     
@@ -19,7 +19,7 @@ public class SafariDriverTest extends AbstractDriverTestCase {
     
     driver.navigate().back();
     
-    assertEquals("http://www.google.com/", driver.getCurrentUrl());
+    assertEquals("Google", driver.getTitle());
     
     driver.navigate().forward();
     

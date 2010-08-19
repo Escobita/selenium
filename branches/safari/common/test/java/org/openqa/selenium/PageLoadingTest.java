@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import org.openqa.selenium.environment.GlobalTestEnvironment;
@@ -106,7 +107,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
     assertThat(driver.getTitle(), equalTo("We Leave From Here"));
   }
 
-  @Ignore(SELENESE)
+  @Ignore({SAFARI, SELENESE})
   public void testShouldBeAbleToNavigateBackInTheBrowserHistoryInPresenceOfIframes() {
     driver.get(pages.xhtmlTestPage);
 

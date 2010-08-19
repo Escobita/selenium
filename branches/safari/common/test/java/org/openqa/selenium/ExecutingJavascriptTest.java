@@ -40,6 +40,7 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 public class ExecutingJavascriptTest extends AbstractDriverTestCase {
@@ -104,7 +105,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @SuppressWarnings("unchecked")
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, SAFARI})
   public void testShouldBeAbleToExecuteSimpleJavascriptAndAStringsArray() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;

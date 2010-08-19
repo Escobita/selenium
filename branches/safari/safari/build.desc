@@ -1,0 +1,20 @@
+
+java_library(name = "safari",
+  srcs = [ "src/java/**/*.java" ],
+  resources = [
+    ":extension"
+  ],
+  deps = [
+    "//remote/client"
+  ])
+
+java_test(name = "test",
+  srcs = [ "test/java/**/*.java" ],
+  deps = [
+    ":safari",
+    "//remote/client:test"
+  ])
+
+rake_task(name = "extension",
+  task_name = "safari_extension_zip",
+  out = "build/safari-extension.zip")

@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
+import static org.openqa.selenium.Ignore.Driver.SAFARI;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 public class ElementAttributeTest extends AbstractDriverTestCase {
@@ -103,7 +104,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(disabledTextElement2.getText(), is(""));
   }
 
-  @Ignore(value = {FIREFOX, CHROME, SELENESE}, reason = "Issue 514")
+  @Ignore(value = {FIREFOX, CHROME, SAFARI, SELENESE}, reason = "Issue 514")
   public void testShouldNotBeAbleToSubmitFormsWithDisabledSubmitButtons() {
     driver.get(pages.formPage);
     WebElement disabledSubmitElement = driver.findElement(By.id("disabledSubmitElement"));
@@ -128,7 +129,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertFalse(disabled.isEnabled());
   }
 
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, SAFARI})
   public void testShouldReturnTheValueOfCheckedForACheckboxOnlyIfItIsChecked() {
     driver.get(pages.formPage);
     WebElement checkbox = driver.findElement(By.xpath("//input[@id='checky']"));
@@ -137,7 +138,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(checkbox.getAttribute("checked"), equalTo("true"));
   }
 
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, SAFARI})
   public void testShouldOnlyReturnTheValueOfSelectedForRadioButtonsIfItIsSet() {
     driver.get(pages.formPage);
     WebElement neverSelected = driver.findElement(By.id("cheese"));
@@ -154,7 +155,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(initiallySelected.getAttribute("selected"), equalTo(null));
   }
 
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, SAFARI})
   public void testShouldReturnTheValueOfSelectedForOptionsOnlyIfTheyAreSelected() {
     driver.get(pages.formPage);
     WebElement selectBox = driver.findElement(By.xpath("//select[@name='selectomatic']"));
