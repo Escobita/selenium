@@ -7,9 +7,12 @@ The iphone driver allows testing on a UIWebView (a webkit browser accessible for
 
 == Drawbacks ==
 
- * You must start the iphone application manually
- * To test on a device you need the iphone SDK and a provisioning profile
- * There is a known memory leak (?)
+ * To test on a device you need the iphone SDK and a provisioning profile (for running on an actual device)
+
+= Building =
+From the checked-out copy, run:
+./go iphone
+Which will build the iPhone driver and the application to be installed. It's easier to start up the SDK manually and run it.
 
 = Installing =
 
@@ -23,7 +26,7 @@ First, install the iphone SDK from here: http://developer.apple.com/iphone
 
 Download the source from [http://code.google.com/p/webdriver/source/checkout here] and open webdriver/iphone/iWebDriver.xcodeproj in xcode.
 
-Set your build configuration to Simulator / iPhone OS 2.2 / iWebDriver. This is done in a drop-down box in the top left of the project window.
+Set your build configuration to Simulator / iPhone OS 3.2 / iWebDriver. This is done in a drop-down box in the top left of the project window.
 
 Click Build & Go. After compiling, the iphone simulator should appear and the iWebDriver app will be installed in it.
 
@@ -43,4 +46,4 @@ Set your build configuration to Device / iPhone OS 2.2 / iWebDriver and click Bu
 
 *Q:* My build fails. It says it can't find JSON.h.
 
-*A:* This is a known issue and it will be fixed in an upcoming release. Clean then rebuild.
+*A:* This is a known issue and was fixed recently. Update the code, clean and rebuild.
