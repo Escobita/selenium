@@ -1,0 +1,11 @@
+#summary A list of Questions that need to be answered after someone checks out the source code.
+ 
+= Build Questions =
+
+  * Why do the docs say "type go"
+
+  * What do I need to type to build what I want?
+
+  * How do I build the Python bindings?
+
+  * How do I use the Python bindings?
