@@ -17,8 +17,17 @@ limitations under the License.
 
 package org.openqa.selenium.htmlunit;
 
+import java.io.IOException;
+
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
+import com.gargoylesoftware.htmlunit.javascript.host.Event;
+import com.gargoylesoftware.htmlunit.javascript.host.KeyboardEvent;
 import org.openqa.selenium.Keyboard;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -46,15 +55,28 @@ public class HtmlUnitKeyboard implements Keyboard {
   public void sendKeys(WebElement toElement, CharSequence... keysToSend) {
 
     HtmlUnitWebElement htmlElem = getElementToSend(toElement);
-    if (modifiersState.isShiftPressed()) {
-      StringBuilder upperCaseKeys = new StringBuilder();
-      for (CharSequence seq : keysToSend) {
-        upperCaseKeys.append(seq.toString().toUpperCase());
-        htmlElem.sendKeys(upperCaseKeys);
+    htmlElem.sendKeys(keysToSend);
+  }
+
+  public void sendKeys(HtmlElement element, String currentValue, InputKeysContainer keysToSend) {
+    keysToSend.setCapitalization(modifiersState.isShiftPressed());
+    
+    if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
+      try {
+        element.type(keysToSend.toString());
+      } catch (IOException e) {
+        throw new WebDriverException(e);
       }
+    } else if (element instanceof HtmlInput) {
+      HtmlInput input = (HtmlInput) element;
+
+      input.setValueAttribute((currentValue == null ? "" : currentValue) + keysToSend.toString());
+    } else if (element instanceof HtmlTextArea) {
+      ((HtmlTextArea) element).setText(
+          (currentValue == null ? "" : currentValue) + keysToSend.toString());
     } else {
-      // Send the keys without capitalizing anything.
-      htmlElem.sendKeys(keysToSend);
+      throw new UnsupportedOperationException(
+          "You may only set the value of elements that are input elements");
     }
   }
 
@@ -68,6 +90,16 @@ public class HtmlUnitKeyboard implements Keyboard {
     HtmlUnitWebElement htmlElement = getElementToSend(toElement);
     modifiersState.storeKeyUp(keyToRelease);
     htmlElement.sendKeyUpEvent(keyToRelease);
+  }
+
+  public void performSingleKeyAction(HtmlElement element, Keys modifierKey, String eventDescription) {
+    boolean shiftKey = modifierKey.equals(Keys.SHIFT);
+    boolean ctrlKey = modifierKey.equals(Keys.CONTROL);
+    boolean altKey = modifierKey.equals(Keys.ALT);
+
+    Event keyEvent = new KeyboardEvent(element, eventDescription, 0, shiftKey, ctrlKey, altKey);
+    element.fireEvent(keyEvent);
+
   }
 
   public boolean isShiftPressed() {

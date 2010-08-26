@@ -17,7 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium.htmlunit;
 
+import java.io.IOException;
+
+import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import org.openqa.selenium.Mouse;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -26,9 +32,38 @@ import org.openqa.selenium.WebElement;
  * @author eran.mes@gmail.com (Eran Mes)
  */
 public class HtmlUnitMouse implements Mouse {
+  private final HtmlUnitDriver parent;
+  private final HtmlUnitKeyboard keyboard;
+
+  public HtmlUnitMouse(HtmlUnitDriver parent, HtmlUnitKeyboard keyboard) {
+    this.parent = parent;
+    this.keyboard = keyboard;
+  }
+
   public void click(WebElement onElement) {
-    HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
-    htmlElem.click();
+    onElement.click();
+  }
+
+  public void click(HtmlElement element) {
+    try {
+      if (parent.isJavascriptEnabled()) {
+        if (!(element instanceof HtmlInput)) {
+          element.focus();
+        }
+
+        element.mouseOver();
+        element.mouseMove();
+      }
+
+      element.click(keyboard.isShiftPressed(),
+          keyboard.isCtrlPressed(), keyboard.isAltPressed());
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    } catch (ScriptException e) {
+      // TODO(simon): This isn't good enough.
+      System.out.println(e.getMessage());
+      // Press on regardless
+    }    
   }
 
   public void doubleClick(WebElement onElement) {
@@ -36,14 +71,43 @@ public class HtmlUnitMouse implements Mouse {
     htmlElem.doubleClick();    
   }
 
+  public void doubleClick(HtmlElement element) {
+    // Send the state of modifier keys to the dblClick method.
+    try {
+      element.dblClick(keyboard.isShiftPressed(),
+          keyboard.isCtrlPressed(), keyboard.isAltPressed());
+    } catch (IOException e) {
+      //TODO(eran.mes): What should we do in case of error?
+      e.printStackTrace();
+    }
+  }
+
+  public void contextClick(WebElement onElement) {
+    HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
+    htmlElem.mouseContextClick();
+  }
+
+  public void contextClick(HtmlElement element) {
+    element.rightClick(keyboard.isShiftPressed(),
+        keyboard.isCtrlPressed(), keyboard.isAltPressed());
+  }
+
   public void mouseDown(WebElement onElement) {
     HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
     htmlElem.mouseDown();
   }
 
+  public void mouseDown(HtmlElement element) {
+    element.mouseDown();
+  }
+    
   public void mouseUp(WebElement onElement) {
     HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
     htmlElem.mouseUp();
+  }
+
+  public void mouseUp(HtmlElement element) {
+    element.mouseUp();
   }
 
   public void mouseMove(WebElement toElement) {
@@ -51,13 +115,12 @@ public class HtmlUnitMouse implements Mouse {
     htmlElem.moveToHere();
   }
 
+  public void mouseMove(HtmlElement element) {
+    element.mouseMove();
+    element.mouseOver();
+  }
 
   public void mouseMove(long xOffset, long yOffset) {
     throw new UnsupportedOperationException("Moving to arbitrary X,Y coordinates not supported.");
-  }
-
-  public void contextClick(WebElement onElement) {
-    HtmlUnitWebElement htmlElem = (HtmlUnitWebElement) onElement;
-    htmlElem.mouseContextClick();
   }
 }

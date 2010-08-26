@@ -36,8 +36,6 @@ limitations under the License.
 package org.openqa.selenium.htmlunit;
 
 import com.gargoylesoftware.htmlunit.Page;
-
-import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.SgmlPage;
 import com.gargoylesoftware.htmlunit.html.DomNode;
@@ -45,7 +43,6 @@ import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlHtml;
 import com.gargoylesoftware.htmlunit.html.HtmlImageInput;
@@ -59,7 +56,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Event;
-import com.gargoylesoftware.htmlunit.javascript.host.KeyboardEvent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -81,14 +77,11 @@ import org.w3c.dom.NamedNodeMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.Point;
 import java.awt.Dimension;
 
-import static org.openqa.selenium.Keys.ENTER;
-import static org.openqa.selenium.Keys.RETURN;
 import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 
 public class HtmlUnitWebElement implements RenderedWebElement,
@@ -96,8 +89,8 @@ public class HtmlUnitWebElement implements RenderedWebElement,
 
   protected final HtmlUnitDriver parent;
   protected final HtmlElement element;
-  private final static char nbspChar = (char) 160;
-  private final static String[] blockLevelsTagNames =
+  private static final char nbspChar = (char) 160;
+  private static final String[] blockLevelsTagNames =
       {"p", "h1", "h2", "h3", "h4", "h5", "h6", "dl", "div", "noscript",
        "blockquote", "form", "hr", "table", "fieldset", "address", "ul", "ol", "pre", "br"};
   private String toString;
@@ -108,31 +101,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   public void click() {
-    assertElementNotStale();
-
-    if (!isDisplayed())
-      throw new ElementNotVisibleException("You may only click visible elements");
-
-    try {
-      if (parent.isJavascriptEnabled()) {
-        if (!(element instanceof HtmlInput)) {
-          element.focus();
-        }
-        
-        element.mouseOver();
-        element.mouseMove();
-      }
-
-      HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
-      element.click(keyboard.isShiftPressed(),
-          keyboard.isCtrlPressed(), keyboard.isAltPressed());
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    } catch (ScriptException e) {
-      // TODO(simon): This isn't good enough.
-      System.out.println(e.getMessage());
-      // Press on regardless
-    }
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.click(getElement());
   }
 
   public void submit() {
@@ -238,11 +209,12 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
   }
 
-  private void verifyKeysCanBeSent() {
+  private void verifyCanInteractWithElement() {
     assertElementNotStale();
 
-    if (!isDisplayed())
+    if (!isDisplayed()) {
       throw new ElementNotVisibleException("You may only sendKeys to visible elements");
+    }
   }
 
   private void switchFocusToThisIfNeeded() {
@@ -269,71 +241,29 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   private void sendSingleKeyEvent(Keys modifierKey, String eventDescription) {
-    verifyKeysCanBeSent();
+    verifyCanInteractWithElement();
     switchFocusToThisIfNeeded();
-    boolean shiftKey = modifierKey.equals(Keys.SHIFT);
-    boolean ctrlKey = modifierKey.equals(Keys.CONTROL);
-    boolean altKey = modifierKey.equals(Keys.ALT);
-
-    Event keyEvent = new KeyboardEvent(getElement(), eventDescription, 0, shiftKey, ctrlKey, altKey);
-    getElement().fireEvent(keyEvent);
+    HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
+    keyboard.performSingleKeyAction(getElement(), modifierKey, eventDescription);
   }
 
   public void sendKeys(CharSequence... value) {
-    verifyKeysCanBeSent();
+    verifyCanInteractWithElement();
 
-    StringBuilder builder = new StringBuilder();
-    for (CharSequence seq : value) {
-      builder.append(seq);
-    }
-
-    // If the element is an input element, and the string contains one of
-    // ENTER or RETURN, break the string at that point and submit the form
-    int indexOfSubmitKey = indexOfSubmitKey(element, builder);
-    if (indexOfSubmitKey != -1) {
-      builder.delete(indexOfSubmitKey, builder.length());
-    }
+    InputKeysContainer keysContainer = new InputKeysContainer(isInputElement(), value);
 
     switchFocusToThisIfNeeded();
 
-    if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
-      try {
-        element.type(builder.toString());
-      } catch (IOException e) {
-        throw new WebDriverException(e);
-      }
-    } else if (element instanceof HtmlInput) {
-      HtmlInput input = (HtmlInput) element;
+    HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
+    keyboard.sendKeys(element, getValue(), keysContainer);
 
-      String currentValue = getValue();
-      input.setValueAttribute((currentValue == null ? "" : currentValue) + builder.toString());
-    } else if (element instanceof HtmlTextArea) {
-      String currentValue = getValue();
-      ((HtmlTextArea) element).setText(
-          (currentValue == null ? "" : currentValue) + builder.toString());
-    } else {
-      throw new UnsupportedOperationException(
-          "You may only set the value of elements that are input elements");
-    }
-
-    if (indexOfSubmitKey != -1) {
+    if (isInputElement() && keysContainer.wasSubmitKeyFound()) {
       submit();
     }
   }
 
-  private int indexOfSubmitKey(HtmlElement element, StringBuilder builder) {
-    if (!(element instanceof HtmlInput))
-      return -1;
-
-    CharSequence[] terminators = { "\n", ENTER, RETURN };
-    for (CharSequence terminator : terminators) {
-      String needle = String.valueOf(terminator);
-      int index = builder.indexOf(needle);
-      if (index != -1) {
-        return index;
-      }
-    }
-    return -1;
+  private boolean isInputElement() {
+    return element instanceof HtmlInput;
   }
 
   public String getTagName() {
@@ -474,8 +404,10 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   public boolean isDisplayed() {
     assertElementNotStale();
 
-    if (!parent.isJavascriptEnabled())
+    if (!parent.isJavascriptEnabled()) {
       return true;
+    }
+
     return !(element instanceof HtmlHiddenInput) && element.isDisplayed();
   }
 
@@ -737,7 +669,7 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     assertElementNotStale();
 
     List<HtmlElement> elements = element.getHtmlElementsByTagName(name);
-    ArrayList<WebElement> toReturn = new ArrayList<WebElement>(elements.size());
+    List<WebElement> toReturn = new ArrayList<WebElement>(elements.size());
     for (HtmlElement element : elements) {
       toReturn.add(parent.newHtmlUnitWebElement(element));
     }
@@ -786,12 +718,12 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
 
     // We need to walk the DOM to determine if the element is actually attached
-    DomNode parent = element;
-    while (parent != null && !(parent instanceof HtmlHtml)) {
-      parent = parent.getParentNode();
+    DomNode parentElement = element;
+    while (parentElement != null && !(parentElement instanceof HtmlHtml)) {
+      parentElement = parentElement.getParentNode();
     }
 
-    if (parent == null) {
+    if (parentElement == null) {
       throw new StaleElementReferenceException("The element seems to be disconnected from the DOM. "
                                                + " This means that a user cannot interact with it.");
     }
@@ -883,38 +815,34 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   public void doubleClick() {
-    //TODO(eran.mes): Remember the state of modifier keys and send the correct state
-    // to the dblClick method.
-    try {
-      getElement().dblClick();
-    } catch (IOException e) {
-      //TODO(eran.mes): What should we do in case of error?
-      e.printStackTrace();
-    }
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.doubleClick(getElement());    
   }
 
   public void mouseDown() {
-    getElement().mouseDown();
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.mouseDown(getElement());
   }
 
   public void mouseUp() {
-    getElement().mouseUp();
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.mouseUp(getElement());
   }
 
   public void moveToHere() {
-    System.out.println(String.format("Element coordinates: left: %d top: %d right: %d bottom: %d",
-        readAndRound("left"), readAndRound("top"), readAndRound("right"), readAndRound("bottom")));
-    System.out.println(this.toString());
-    getElement().mouseMove();
-    getElement().mouseOver();
-  }
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
 
-  public void leaveHere() {
-    getElement().mouseOut();
-    getElement().mouseMove();
+    mouse.mouseMove(getElement());
   }
 
   public void mouseContextClick() {
-    getElement().rightClick();
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+
+    mouse.contextClick(getElement());
   }
 }

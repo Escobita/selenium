@@ -100,6 +100,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
   private HtmlUnitKeyboard keyboard;
+  private HtmlUnitMouse mouse;
 
   public HtmlUnitDriver(BrowserVersion version) {
     this.version = version;
@@ -138,6 +139,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     // Now put us on the home page, like a real browser
     get(webClient.getHomePage());
     keyboard = new HtmlUnitKeyboard(this);
+    mouse = new HtmlUnitMouse(this, keyboard);
   }
 
   public HtmlUnitDriver() {
@@ -448,7 +450,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Mouse getMouse() {
-    return new HtmlUnitMouse();
+    return mouse;
   }
 
   protected interface JavaScriptResultsCollection {
