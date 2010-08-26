@@ -162,7 +162,6 @@ wdSession.prototype.getWindow = function() {
 /** @return {nsIDOMDocument} This session's current document. */
 wdSession.prototype.getDocument = function() {
   return this.getWindow().document;
-  return this.window_.document;
 };
 
 
@@ -310,5 +309,11 @@ wdSessionModule.prototype.canUnload = function() {
  */
 function NSGetModule() {
   return new wdSessionModule();
+}
+
+wdSession.prototype.classID = wdSession.CLASS_ID
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+if (XPCOMUtils.generateNSGetFactory) {
+  const NSGetFactory = XPCOMUtils.generateNSGetFactory([wdSession]);
 }
 

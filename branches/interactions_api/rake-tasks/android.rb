@@ -51,7 +51,7 @@ def unpack_dependencies(args)
   FileList[File.join("third_party", "java", "jetty", "jetty-6.1.9.jar"),
            File.join("third_party", "java", "jetty", "jetty-util-6.1.9.jar"),
            File.join("third_party", "java", "servlet-api", "servlet-api-2.5-6.1.9.jar"),
-           File.join("third_party", "java", "google-collect", "google-collect-1.0.jar"),
+           File.join("third_party", "java", "guava-libraries", "guava-r06.jar"),
            File.join("build", "remote", "*", "*.jar"),
            File.join("build", "remote", "server", "src", "java", "org", "openqa", "jetty.jar"),
            File.join("build", "common", "common.jar"),
@@ -85,7 +85,7 @@ def android_java(args)
   FileList[File.join("third_party", "java", "jetty", "jetty-6.1.9.jar"),
            File.join("third_party", "java", "jetty", "jetty-util-6.1.9.jar"),
            File.join("third_party", "java", "servlet-api", "servlet-api-2.5-6.1.9.jar"),
-           File.join("third_party", "java", "google-collect", "google-collect-1.0.jar"),
+           File.join("third_party", "java", "guava-libraries", "guava-r06.jar"),
            File.join("build", "remote", "*", "*.jar"),
            File.join("build", "remote", "server", "src", "java", "org", "openqa", "jetty.jar"),
            File.join("build", "common", "common.jar"),
@@ -113,11 +113,13 @@ def android_java(args)
     end
   end
 end
-  
+
+# Generated Android bytecode from .class files. Converts the targets to Dalvik
+# executable format (.dex) so they can run on Android platform.
 def run_dx(args)
   puts "Running DX utility"
     outfile = File.expand_path(File.join("android", "server", "build", "classes.dex"))
-    cmd = "#{$dx} --dex --output=#{outfile} --core-library --positions=lines "
+    cmd = "#{$dx} -JXmx512M --dex --output=#{outfile} --core-library --positions=lines "
     cmd += File.expand_path(File.join("android", "server", "build", "classes"))+" " 
     cmd += File.expand_path(File.join("android", "server", "build", "generated-classes"))
     sh cmd, :verbose => true
@@ -132,7 +134,7 @@ def pack_resources(args)
 
 end
 
-def apk(args)
+def build_apk(args)
   puts "Build debug self signed for device"
   cmd = "#{$apkbuilder} #{$apkfile} -f #{$dexfile} -rj #{$lib_jetty} -rj #{$lib_jetty_util} -rj #{$lib_servlet_api} -rj #{$lib_google_collect} -rj #{$lib_remote_server_jetty} -rj #{$lib_remote_server} -rj #{$lib_remote_common} -rj #{$lib_remote_client} -rj #{$lib_common} -rj #{$lib_support} -z #{$resname}"
   sh cmd, :verbose => true
@@ -185,7 +187,7 @@ def clean_android_env()
   sh "#{$android} delete avd -n #{$avdname}"
 end
 
-def android_init() 
+def android_sdk_init() 
   prop = YAML.load_file( './properties.yml' )
   properties = prop["default"]["android"]
   if (prop[ENV["USER"]])
@@ -198,7 +200,7 @@ def android_init()
   $androidplatform =  properties["androidplatform"]
 
   # Targets
-  $apkfile = File.expand_path(File.join("android", "server", "build", "android-server-debug.apk"))
+  $apkfile = File.expand_path(File.join("build", "android-server.apk"))
   $resname = File.expand_path(File.join("android", "server", "build", "WebDriver.ap_"))
   $avdname = "debug_rake_#{$androidtarget}"
 
@@ -216,7 +218,7 @@ def android_init()
   $lib_jetty = File.expand_path(File.join("third_party", "java", "jetty", "jetty-6.1.9.jar"))
   $lib_jetty_util = File.expand_path(File.join("third_party", "java", "jetty", "jetty-util-6.1.9.jar"))
   $lib_servlet_api = File.expand_path(File.join("third_party", "java", "servlet-api", "servlet-api-2.5-6.1.9.jar"))
-  $lib_google_collect = File.expand_path(File.join("third_party", "java", "google-collect", "google-collect-1.0.jar"))
+  $lib_google_collect = File.expand_path(File.join("third_party", "java", "guava-libraries", "guava-r06.jar"))
   $lib_remote_server_jetty = File.expand_path(File.join("build", "remote", "server", "src", "java", "org", "openqa", "jetty.jar"))
   $lib_remote_server = File.expand_path(File.join("build", "remote", "server", "server.jar"))
   $lib_remote_common = File.expand_path(File.join("build", "remote", "common", "common.jar"))
@@ -234,20 +236,20 @@ def android_init()
   if windows?
     $apkbuilder=$apkbuilder.gsub(/\//,"\\")
     #Set Xmx 
-    $dx="java -Xmx256M -Djava.ext.dirs=#{File.join($androidsdkpath, "platforms", $androidplatform, "tools", "lib")} -jar #{File.join($androidsdkpath, "platforms", $androidplatform, "tools", "lib","dx.jar")} "
+    $dx="java -Djava.ext.dirs=#{File.join($androidsdkpath, "platforms", $androidplatform, "tools", "lib")} -jar #{File.join($androidsdkpath, "platforms", $androidplatform, "tools", "lib","dx.jar")} "
     $android=$android.gsub(/\//,"\\")
     $adb=$adb.gsub(/\//,"\\")
   end
 end
 
 def android_build(args)
-  android_init()
+  android_sdk_init()
   android_rjava()
   unpack_dependencies(args)
   android_java(args)
   run_dx(args)
   pack_resources(args)
-  apk(args)
+  build_apk(args)
 end
 
 

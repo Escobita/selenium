@@ -19,7 +19,6 @@ package org.openqa.selenium.remote.server;
 
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Ignore;
 import org.openqa.selenium.JavascriptEnabled;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -33,7 +32,7 @@ import org.openqa.selenium.remote.ScreenshotException;
 import static org.openqa.selenium.OutputType.BASE64;
 
 public class RemoteWebDriverTest extends AbstractDriverTestCase {
-  @Ignore(reason = "Looks like our unwrapping of exceptions is broken")
+
   public void testShouldBeAbleToGrabASnapshotOnException() {
     driver.get(pages.simpleTestPage);
 

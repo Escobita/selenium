@@ -11,7 +11,9 @@ import junit.framework.TestCase;
  * thrown at once during tearDown.</p>
  * 
  * @author Nelson Sproul (nsproul@bea.com) Mar 13-06
+ * @deprecated Please consider updating to junit 4 or above
  */
+@Deprecated
 public class SeleneseTestCase extends TestCase {
 
     private SeleneseTestBase stb = new SeleneseTestBase();
@@ -78,7 +80,19 @@ public class SeleneseTestCase extends TestCase {
         stb.setUp(url, browserString);
         selenium = stb.selenium;
     }
-    
+
+    /**
+     * Creates a new DefaultSelenium object and starts it using the specified baseURL, browser string and port
+     * @param url the baseUrl for your tests
+     * @param browserString the browser to use, e.g. *firefox
+     * @param port the port of Selenium RC
+     * @throws Exception 
+     */
+    public void setUp(String url, String browserString, int port){
+      stb.setUp(url, browserString, port);
+      selenium = stb.selenium;
+    }
+
     /** checks for verification errors and stops the browser */
     public void tearDown() throws Exception {
         stb.tearDown();

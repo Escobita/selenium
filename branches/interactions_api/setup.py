@@ -59,12 +59,6 @@ def find_longdesc():
     print("WARNING: Can't find index.rst")
     return ""
 
-def revision():
-    # svn_rev is updated by subversion using svn:keywords
-    svn_rev = "$Revision$"
-    match = re.search("\d+", svn_rev)
-    return match and match.group() or "unknown"
-
 def _copy_ext_file(driver, name):
     filename = join("build", driver, name)
     if not isfile(filename):
@@ -103,7 +97,7 @@ _copy_ie_dlls()
 setup(
     cmdclass={'install': install},
     name='selenium',
-    version="2.0-dev-%s" % revision(),
+    version="2.0a5",
     description='Python bindings for Selenium',
     long_description=find_longdesc(),
     url='http://code.google.com/p/selenium/',

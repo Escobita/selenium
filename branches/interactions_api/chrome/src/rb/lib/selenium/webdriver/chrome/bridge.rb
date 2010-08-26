@@ -8,7 +8,7 @@ module Selenium
         def initialize(opts = {})
           @launcher = Launcher.launcher(
             :default_profile => opts[:default_profile],
-            :secure_ssl => opts[:secure_ssl]
+            :secure_ssl      => opts[:secure_ssl]
           )
 
           @executor = CommandExecutor.new
@@ -67,6 +67,10 @@ module Selenium
 
         def setImplicitWaitTimeout(milliseconds)
           execute :implicitlyWait, :ms => milliseconds
+        end
+
+        def elementEquals(element, other)
+          element.ref == other.ref
         end
 
         private

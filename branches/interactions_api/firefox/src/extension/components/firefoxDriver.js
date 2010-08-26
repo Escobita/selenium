@@ -147,31 +147,21 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
 
   var runScript;
 
-  // Pre 2.0.0.15
-  if (window['alert'] && !window.wrappedJSObject) {
-    runScript = function(scriptSrc) {
-      return window.eval(scriptSrc);
-    };
-  } else {
-    runScript = function(scriptSrc, args) {
-      window = window.wrappedJSObject;
-      var sandbox = new Components.utils.Sandbox(window);
-      sandbox.window = window;
-      sandbox.__webdriverParams = args;
-      sandbox.document = window.document;
-      sandbox.unsafeWindow = window;
-      sandbox.__proto__ = window;
+  runScript = function(scriptSrc, args) {
+    window = window.wrappedJSObject;
+    var sandbox = new Components.utils.Sandbox(window);
+    sandbox.window = window;
+    sandbox.__webdriverParams = args;
 
-      return Components.utils.evalInSandbox(scriptSrc, sandbox);
-    };
-  }
+    return Components.utils.evalInSandbox(scriptSrc, sandbox);
+  };
 
   var converted = Utils.unwrapParameters(
       parameters.args, respond.session.getDocument());
 
   try {
-    var scriptSrc = "var __webdriverFunc = function(){" + parameters.script
-        + "};  __webdriverFunc.apply(window, __webdriverParams);";
+    var scriptSrc = "with(window) { var __webdriverFunc = function(){" + parameters.script +
+        "};  __webdriverFunc.apply(null, __webdriverParams); }";
     var result = runScript(scriptSrc, converted);
   } catch (e) {
     Utils.dumpn(JSON.stringify(e));

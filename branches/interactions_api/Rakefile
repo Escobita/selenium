@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
+require 'rake-tasks/files.rb'
 require 'yaml'
 require 'net/telnet.rb'
 
@@ -100,7 +101,9 @@ task :test_chrome => [ "//chrome:test:run" ]
 task :test_htmlunit => [ "//htmlunit:test:run" ]
 task :test_ie => [ "//jobbie:test:run" ]
 task :test_jobbie => [ "//jobbie:test:run" ]
-task :test_jsapi => ["//jsapi:atoms:run", "//jsapi:core:run", "//jsapi:test:run"]
+task :test_jsapi => [ "//jsapi:atoms:run",
+                      "//jsapi:selenium_core:run",
+                      "//jsapi:selenium_core_emulation:run" ]
 task :test_firefox => [ "//firefox:test:run" ]
 task :test_remote => [ "//remote/server:test:run" ]
 task :test_selenium => [ "//selenium:selenium_test:run", "//selenium:test-selenese:run", :'test_core']
@@ -159,9 +162,7 @@ task :clean do
   rm_rf 'build/'
   rm_rf 'iphone/build/'
   rm_rf 'android/server/bin/', :verbose => false
-  rm_rf 'android/server/gen/', :verbose => false
   rm_rf 'android/server/build/', :verbose => false
-  rm_rf 'android/client/build/', :verbose => false
 end
 
 dll(:name => "ie_win32_dll",
@@ -254,21 +255,18 @@ java_jar(:name => "selenium-core",
            "common/src/js/core"
          ])
 
-selenium_test(:name => "test_core_firefox",
-              :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [
-                "//remote/server",
-                :"selenium-core"
-              ],
-              :browser => "*chrome" )
-
-selenium_test(:name => "test_core_ie",
-              :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [
-                "//remote/server",
-                :"selenium-core"
-              ],
-              :browser => "*iexploreproxy")
+{"firefox" => "*chrome",
+ "ie" => "*iexploreproxy",
+ "opera" => "*opera",
+ "safari" => "*safari"}.each_pair do |k,v|
+  selenium_test(:name => "test_core_#{k}",
+                :srcs => [ "common/test/js/core/*.js" ],
+                :deps => [
+                  "//remote/server",
+                  :"selenium-core"
+                ],
+                :browser => v )
+end
 
 # Copy things around to make life easier when packaging IDE
 file "build/ide/selenium" => "//common:js_core" do
@@ -401,7 +399,7 @@ task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
     puts "Building iWebDriver iphone app"
-    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver >/dev/null"
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver", :verbose => false
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -429,8 +427,10 @@ file 'build/android/server/server.jar' => FileList["android/server/src/java/**/*
                            ],
                   :zip  => true
                  )
+    copy_to_prebuilt("build/android-server.apk", "android/server/prebuilt")
   else
-    puts "Android SDK could not be found. Set the SDK location in properties.yml"
+    puts "Did not build Android APK because the Android SDK could not be found. Set the SDK location in properties.yml"
+    copy_prebuilt("android/server/prebuilt/", "build/android-server.apk")
  end
 end
 task :android_server => 'build/android/server/server.jar'

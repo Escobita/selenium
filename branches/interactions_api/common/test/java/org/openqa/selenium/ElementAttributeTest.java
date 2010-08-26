@@ -39,6 +39,14 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(attribute, is(nullValue()));
   }
 
+  @Ignore(value = {FIREFOX, SELENESE}, reason = "Issue 758")
+  public void testShouldReturnNullWhenGettingSrcAttributeOfInvalidImgTag() {
+    driver.get(pages.simpleTestPage);
+    WebElement img = driver.findElement(By.id("invalidImgTag"));
+    String attribute = img.getAttribute("src");
+    assertThat(attribute, is(nullValue()));
+  }
+
   @Ignore(SELENESE)
   public void testShouldReturnEmptyAttributeValuesWhenPresentAndTheValueIsActuallyEmpty() {
     driver.get(pages.simpleTestPage);
@@ -47,7 +55,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfTheDisabledAttrbuteAsNullIfNotSet() {
+  public void testShouldReturnTheValueOfTheDisabledAttributeAsNullIfNotSet() {
     driver.get(pages.formPage);
     WebElement inputElement = driver.findElement(By.xpath("//input[@id='working']"));
     assertThat(inputElement.getAttribute("disabled"), equalTo(null));

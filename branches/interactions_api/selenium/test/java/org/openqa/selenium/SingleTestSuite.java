@@ -39,7 +39,7 @@ public class SingleTestSuite extends TestCase {
   private static final String SELENIUM = "org.openqa.selenium.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = HTML_UNIT_JS;
+    String driver = REMOTE;
 
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
@@ -53,10 +53,11 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("CombinedInputActionsTest")
-        //.method("testSelectingMultipleItems")
+        .onlyRun("ExecutingJavascriptTest")
+//        .method("testShouldBeAbleToCallFunctionsDefinedOnThePage")
+//        .method("testShouldBeAbleToSetAGlobalValue")
         .exclude(ALL)
-        .exclude(Ignore.Driver.HTMLUNIT)
+        .exclude(Ignore.Driver.FIREFOX)
         .outputTestNames()
         .leaveRunning()
         ;  // Yeah, this look strange :)
