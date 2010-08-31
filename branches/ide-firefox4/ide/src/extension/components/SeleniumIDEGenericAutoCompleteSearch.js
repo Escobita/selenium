@@ -1,5 +1,3 @@
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-
 function SeleniumIDEGenericAutoCompleteSearch() {
   this.candidates = {};
 }
@@ -40,9 +38,7 @@ SeleniumIDEGenericAutoCompleteSearch.prototype = {
       }
       Components.returnCode = Components.results.NS_ERROR_NO_INTERFACE;
       return null;
-  },
-  
-  classID: Components.ID("{E5226A0D-4698-4E15-9D6D-86771AE172C9}");
+  }
 
   // QueryInterface: XPCOMUtils.generateQI([Components.interfaces.nsIMyComponent]),
 };
@@ -133,19 +129,11 @@ var SeleniumIDEGenericAutoCompleteFactory = {
   }
 };
 
-// function NSGetModule(compMgr, fileSpec) {
-//     return SeleniumIDEGenericAutoCompleteModule;
-// }
-// 
-// function NSGetFactory(compMgr, fileSpec) {
-//     return SeleniumIDEGenericAutoCompleteFactory;
-// }
+function NSGetModule(compMgr, fileSpec) {
+    return SeleniumIDEGenericAutoCompleteModule;
+}
 
-/**
-* XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
-* XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
-*/
-if (XPCOMUtils.generateNSGetFactory)
-    var NSGetFactory = XPCOMUtils.generateNSGetFactory([SeleniumIDEGenericAutoCompleteSearch]);
-else
-    var NSGetModule = XPCOMUtils.generateNSGetModule([SeleniumIDEGenericAutoCompleteSearch]);
+function NSGetFactory(cid) {
+  if (cid.toString().toUpperCase() != COMPONENT_ID.toString().toUpperCase()) throw Components.results.NS_ERROR_FACTORY_NOT_REGISTERED;
+  return SeleniumIDEGenericAutoCompleteFactory;
+}
