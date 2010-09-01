@@ -8,6 +8,8 @@ CrazyFun is 'just' Rake. But there was some environment setup stuff to make it w
 
   * What do I need to type to build what I want?
 
+Well, that depends on what you are trying to build of course. Don't know? Since this is Rake... _go -T_ will list all the available tasks. And further, _go -h_ will list all the arguments you can use (but -T is by far the most common one -- unless you are working on actual CrazyFun stuff at which point -P becomes important too).
+
   * How do I build the Python bindings?
 
   * How do I use the Python bindings?
