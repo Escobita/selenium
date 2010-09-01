@@ -4,6 +4,8 @@
 
   * Why do the docs say "type go"
 
+CrazyFun is 'just' Rake. But there was some environment setup stuff to make it work in a self-contained manner so a shell / batch script was created. Those scripts needed to be something and since I (Adam Goucher) didn't write them they used something other than FlyingMonkey.bat.
+
   * What do I need to type to build what I want?
 
   * How do I build the Python bindings?
