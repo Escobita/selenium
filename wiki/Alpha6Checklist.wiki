@@ -2,6 +2,6 @@
 
 = TODO =
 
-Bamboo builds Green
+  * Bamboo builds Green
 
 = DONE =
