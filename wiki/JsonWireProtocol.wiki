@@ -764,10 +764,12 @@ JSON object with the following properties:
 || *Key* || *Type* || *Description* ||
 || name || string || The name of the cookie. ||
 || value || string || The cookie value. ||
-|| path || string || The cookie path. ||
-|| domain || string || The domain the cookie is visible to. ||
-|| secure || boolean || Whether the cookie is a secure cookie. ||
+|| path || string || (Optional) The cookie path.^1^ ||
+|| domain || string || (Optional) The domain the cookie is visible to.^1^ ||
+|| secure || boolean || (Optional) Whether the cookie is a secure cookie.^1^ ||
+|| expiry || number || (Optional) When the cookie expires, specified in seconds since midnight, January 1, 1970 UTC.^1^ ||
 
+^1^ Field should only be omitted if the server is incapable of providing the information.
 </dd>
 <dd>
 <dl>
@@ -799,11 +801,12 @@ JSON object with the following properties:
 properties:
 
 || *Key* || *Type* || *Description* ||
-|| name || string || The name of the cookie. ||
-|| value || string || The cookie value. ||
-|| path || string || The cookie path. ||
-|| domain || string || The domain the cookie is visible to. ||
-|| secure || boolean || Whether the cookie is a secure cookie. ||
+|| name || string || The name of the cookie; may not be an empty string. ||
+|| value || string || The cookie value; may be an empty string. ||
+|| path || string || (Optional) The cookie path; defaults to `"/"`. ||
+|| domain || string || (Optional) The domain the cookie is visible to; defaults to the domain of the current page. ||
+|| secure || boolean || (Optional) Whether the cookie is a secure cookie; defaults to false. ||
+|| expiry || number || (Optional) When the cookie expires, in seconds since midnight, January 1, 1970 UTC; if not provided, the cookie should be set to expire when the browser is closed. ||
 
 </dd>
 <dd>
@@ -1733,3 +1736,4 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
+
