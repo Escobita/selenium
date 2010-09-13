@@ -29,7 +29,7 @@ A: We believe that within a software application's development team, the people 
 
 A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
 
-We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://selenium.googlecode.com/svn/javadoc/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
+We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
 
 {{{
 WebDriver driver; // Assigned elsewhere
