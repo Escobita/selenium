@@ -1,9 +1,11 @@
+#summary WebDriver support for Mobile browsers.
 #labels Phase-Deploy,WebDriver,Mobile
-WebDriver support for Mobile browsers.
 
 = Introduction =
 
 We provide mobile drivers for two major mobile platforms: Android and iOS (iPhone & iPad).
+
+Android and iOS drivers both use the [http://code.google.com/p/selenium/wiki/RemoteWebDriver RemoteWebDriver]. They can be run on both emulator and real device. The application to be installed on the emulator or device embeds a [http://code.google.com/p/selenium/wiki/RemoteWebDriverServer RemoteWebDriver server] and a light-weight HTTP server. 
 
 = Getting Started =
 
@@ -13,6 +15,6 @@ We provide mobile drivers for two major mobile platforms: Android and iOS (iPhon
 
 = Known Supported Platforms =
 
-[http://code.google.com/p/webdriver-blackberry/ Blackberry WebDriver]
+[http://code.google.com/p/webdriver-blackberry/ Blackberry WebDriver], for BlackBerry 5.0 and onward.
 
-[http://code.google.com/p/webkitdriver/ Headless WebKit WebDriver]
+[http://code.google.com/p/webkitdriver/ Headless WebKit WebDriver]. Many mobile browsers are WebKit based. Headless WebKit provides a fast light-weight solution.
