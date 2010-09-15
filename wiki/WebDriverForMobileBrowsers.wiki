@@ -1,4 +1,4 @@
-#labels Featured,Phase-Deploy
+#labels Phase-Deploy,WebDriver,Mobile
 WebDriver support for Mobile browsers.
 
 = Introduction =
@@ -8,9 +8,11 @@ We provide mobile drivers for two major mobile platforms: Android and iOS (iPhon
 = Getting Started =
 
 [http://code.google.com/p/selenium/wiki/AndroidDriver Android Setup]
-[http://code.google.com/p/selenium/wiki/IPhoneDriveriPhone & iPad Setup]
+
+[http://code.google.com/p/selenium/wiki/IPhoneDriver iPhone & iPad Setup]
 
 = Known Supported Platforms =
 
 [http://code.google.com/p/webdriver-blackberry/ Blackberry WebDriver]
+
 [http://code.google.com/p/webkitdriver/ Headless WebKit WebDriver]
