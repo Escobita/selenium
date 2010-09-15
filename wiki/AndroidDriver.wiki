@@ -1,98 +1,148 @@
-#summary An overview of the design of the Android Remote Driver.
-#labels Phase-Deploy,Phase-Design,Phase-Implementation
+#summary Getting Started With Android Driver
+#labels Phase-Deploy,Phase-Design,Phase-Implementation,Mobile,WebDriver
 
 = Introduction =
 
-The Android Driver is new and not yet complete, however if you're willing to try it you might find these instructions useful. 
+The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriver RemoteWebDriver]. The client side is your test code. The server side is an application that gets installed on the android emulator or device. It uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriverServer RemoteWebDriver Server] component and embeds a light-weight HTTP server (Jetty). The client and the server communicate using the [http://code.google.com/p/selenium/wiki/JsonWireProtocol Wire Protocol] which consists of REST requests using JSON over HTTP. The application executes the tests in the context of an Android  WebView.
 
-= Details =
+= Pros & Cons =
+== Pros ==
+   * Runs in Android browser
+   * Uses native touch events to emulate user interaction
+   * Runs on emulator and device
 
-= Building and Installing the software =
-== Steps to build the software ==
-Install IJetty on the device:
-  * Download the source and build it following the instructions on the ijetty wiki page.
-  * Put ijetty apk anywhere web accessible.
-  * Download it from your android emulator or real device and install it.
+== Cons ==
+   * Slower than Headless WebKit Driver
+   * For SDK versions 2.2 and prior, XPath based queries are expensive (slow), because Android does not support XPath, so we inject an Xpath library in WebView
 
-Check out the code
+= Important System Properties =
+== Native events and Javascript ==
+We try to stay as close as possible to what the user interaction with the browser is. To do so we send native Android touch and key events for interacting with the page (WebElement.click(), WebElement.sendKeys(...), etc.).
+When questionning the page (WebElement.getValue(), WebElement.getText(), etc.) we use Javascript injection to poll the DOM.
 
-{{{$ svn co http://webdriver.googlecode.com/svn/trunk/ webdriver-source}}}
+== HTML5 Features ==
+_Documentation coming soon..._
+   * Application Cache
+   * WebStorage
+   * Web SQL Database
+   * Offline / Online Browser Mode
+   * Geolocation
 
-Build the code (everything but android)
+= Get Started =
+== Install the SDK ==
+Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it in a directory, say ~/android_sdk/ .
 
-{{{$ rake}}}
-
-Build android
-
-{{{$ mvn package -Dmaven.test.skip=true -Dandroid.home=/path/to/android_sdk/ -Dandroid-platform=platforms/android-1.5 -P android}}}
-
-
-== Installing the war package in ijetty ==
-  * Start ijetty once you've launched it on the phone / emulator.
-  * Make the {{{war}}} file available via a webserver, as ijetty needs to download the war file using http. Note: the war file  is located at {{{remote/server-android/target/}}} in the webdriver project.
-  * Install the android.war by downloading it through I-Jetty and set context path to {{{/hub}}}.
-  * Stop and Start I-Jetty so it loads the new path and war file. Note: you can use the web-based UI for I-Jetty on the device / emulator by visiting http://10.0.2.15/ 
-
-== Installing the Android Driver ==
-  * Install {{{androidwebdriver.apk}}} and download it on the android device or emulator. You can use the standard eclipse Android tools or the {{{adb}}} command from a command-line / terminal window.
-
-== Configure port forwarding on Android ==
-Port forwarding is necessary to allow incoming connections to ijetty e.g. from your webdriver tests.
-
-Note: The port number is available from the android emulator, on top of the window. The following example uses a port number of 5554
+== Setup the Emulator  ==
+=== Create An AVD ===
+Execute the following command to create a new Android Virtual Device (avd):
 {{{
-$ telnet localhost 5554  
-  redir add tcp:8080:8080
-  exit
+$cd ~/android_sdk/tools/
+$./android create avd -n my_android -t 12 -c 100M
 }}}
 
-If you're running the WebDriver tests on the same machine as the emulator then the URL for Android weebdriver is {{{http://localhost:8080/hub}}}
+-n or naming your android virtual device.
 
-= Example webdriver test using the remove Android Server =
-Create a new eclipse project, e.g. called {{{webdriver-all}}}
+-t for specifying the target. ("./android list targets" will give you a list of all available targets). Make sure the target level you selected corresponds to the latest API level.
 
-// Set up the run-time libraries (jars) for a project in eclipse:
+-c option is for the SD card storage space.
+
+When prompted "Do you wish to create a custom hardware profile [no]" enter "no".
+
+===Start the Emulator ===
+Start the emulator (this can take a while):
 {{{
-mkdir ~/eclipseworkspace/webdriver/webdroid/webdriver-all/lib
-LIB=~/eclipseworkspace/webdriver/webdroid/webdriver-all/lib/
-cp build/webdriver-all.jar $LIB
-cp */lib/runtime/*.jar $LIB
-ls $LIB
+$./emulator -avd my_android &
 }}}
 
-Set up your eclipse project
-  * Select all the dlls under $LIB in eclipse, right click and select "Build Path"> Add to build path.
-
-Code sample: {{{QuickTest.java}}}
-
+=== Install the Application ===
+Install Android WebDriver Application. Wait until the emulator has started and the home screen is ready. Install android-server.apk:
 {{{
-package com.google.testing.webdroid;
+$./adb -e install -r  android-server.apk
+}}}
 
+If you face an issue, make sure you are allowing installation of application not coming from Android Market (Android Emulator -> Settings -> Applications -> Unknown sources is checked)
+Open the application just installed.
+
+=== Setup Port Forwarding ===
+In a terminal type: 
+{{{
+$~/android_sdk/adb forward tcp:8080 tcp:8080
+}}}
+The port number is the port indicated on the top of the emulator window you just launched, for example: 5554:WebDriver where 5554 is the port number.
+
+=== Install Android WebDriver on Real Device ===
+
+Connect your device through USB to your machine.
+{{{
+$cd ~/android_sdk/tools/adb devices
+}}}
+
+This will give you the serial Id of your connected device. Now install the apk on the device:
+ {{{
+$./adb -s <serialId> -e install -r android-server.apk
+}}}
+
+Setup port forwarding:
+{{{
+$~/android_sdk/adb -s <serialId> forward tcp:8080 tcp:8080
+}}}
+
+Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations".
+
+== Run Your Tests ==
+{{{
 import junit.framework.TestCase;
 
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.android.AndroidDriver;
 
-import java.net.URL;
+public class OneTest extends TestCase {
 
-public class QuickTest extends TestCase {
-
-  private WebDriver driver;
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    DesiredCapabilities capabilities = new DesiredCapabilities();
-    capabilities.setPlatform(Platform.ANDROID);
-    driver = new RemoteWebDriver(new URL("http://localhost:8080/wb/hub"),
-        capabilities);
-  }
-
-  public void testGoToGoogle() {
+  public void testGoogle() throws Exception {
+    AndroidDriver driver = new AndroidDriver();
+    
+    // And now use this to visit Google
     driver.get("http://www.google.com");
+    
+    // Find the text input element by its name
+    WebElement element = driver.findElement(By.name("q"));
+    
+    // Enter something to search for
+    element.sendKeys("Cheese!");
+    
+    // Now submit the form. WebDriver will find the form for us from the element
+    element.submit();
+    
+    // Check the title of the page
+    System.out.println("Page title is: " + driver.getTitle());
   }
-}
+}.
+}}}
+= Get Involved =
+   * Check out the code:
+{{{
+$svn checkout https://selenium.googlecode.com/svn/trunk/ webdriver
+}}}
 
+== Build the Code ==
+{{{
+$cd webdriver
+}}}
+
+   * To build the client and the server
+{{{
+$./go android
+}}}
+   * To build the client
+{{{
+$./go android_client
+}}}
+   * To build the server
+{{{
+$./go android_server
+}}}
+   * To run the tests
+{{{
+$./go test_android
 }}}
