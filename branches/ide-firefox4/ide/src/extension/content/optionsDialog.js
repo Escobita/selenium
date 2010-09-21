@@ -17,20 +17,20 @@
 this.Preferences = SeleniumIDE.Preferences;
 
 function saveOptions() {
-	var options = this.options;
-	var name;
-	for (name in options) {
-		var e = document.getElementById(name);
-		if (e != null) {
-			options[name] = e.checked != undefined ? e.checked.toString() : e.value;
-		}
-	}
-	SeleniumIDE.Loader.getEditors().forEach(function(editor) {
-			editor.app.setOptions(options);
-		});
-	
-	Preferences.save(options);
-	return true;
+  var options = this.options;
+  var name;
+  for (name in options) {
+    var e = document.getElementById(name);
+    if (e != null) {
+      options[name] = e.checked != undefined ? e.checked.toString() : e.value;
+    }
+  }
+  SeleniumIDE.Loader.getEditors().forEach(function(editor) {
+      editor.app.setOptions(options);
+    });
+  updateFormatOptions();
+  Preferences.save(options);
+  return true;
 }
 
 function loadFromOptions(options) {
