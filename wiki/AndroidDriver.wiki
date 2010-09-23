@@ -32,6 +32,8 @@ _Documentation coming soon..._
 == Install the SDK ==
 Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it in a directory, say ~/android_sdk/ .
 
+Note: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
+
 == Setup the Emulator  ==
 === Create An AVD ===
 Execute the following command to create a new Android Virtual Device (avd):
@@ -68,7 +70,6 @@ In a terminal type:
 {{{
 $~/android_sdk/adb forward tcp:8080 tcp:8080
 }}}
-The port number is the port indicated on the top of the emulator window you just launched, for example: 5554:WebDriver where 5554 is the port number.
 
 === Install Android WebDriver on Real Device ===
 
@@ -119,13 +120,16 @@ public class OneTest extends TestCase {
   }
 }.
 }}}
+
+To compile and run this example you will need the Android Client library in {{{./webdriver/build/android/client/client.jar}}} (see below for details of how to build it), and selenium-server-standalone-2.0a5.jar (or the current version available on this site).
+
 = Get Involved =
    * Check out the code:
 {{{
 $svn checkout https://selenium.googlecode.com/svn/trunk/ webdriver
 }}}
 
-== Build the Code ==
+== Build the Android Driver Code ==
 {{{
 $cd webdriver
 }}}
