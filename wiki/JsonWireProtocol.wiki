@@ -259,6 +259,7 @@ will be returned in a JSON object with the following properties:
 || version || string || The desired browser version. ||
 || javascriptEnabled || boolean || Whether the session should support !JavaScript. ||
 || platform || string || A key specifying the desired platform to launch the browser on. Should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}` ||
+|| nativeEvents || boolean || Whether the browser has native events enabled. ||
 
 </dd>
 <dd>
@@ -1736,4 +1737,3 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
-
