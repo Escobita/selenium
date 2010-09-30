@@ -3,41 +3,60 @@
 
 =Introduction=
 
-The python bindings for WebDriver are now available in the trunk of WebDriver and are ready for use. The work is still in progress, your feedback would be welcome.
+The python bindings for Selenium are now available. The bindings include the full functionality of Selenium 1.x and include support for Selenium 2.x. The bindings are also compatible with Selenium Remote Control versions 1.0 and 2.0. The bindings for Selenium 2 support Remote, Firefox and Chrome natively.
 
-== Installation of the python bindings ==
+If you're planning on using the Selenium 1.x APIs, or the Remote WebDriver, be sure to [http://code.google.com/p/selenium/downloads/list download the Selenium Server jar] file, and run it via {{{java -jar selenium-server-standalone.jar}}} before attempting to run a test.
 
-{{{easy_install webdriver}}}
+== Quick Installation ==
 
-Job done.
+{{{(sudo) easy_install selenium}}} or {{{(sudo) pip install selenium}}}
 
-= Installation of the python bindings from source =
+= Installation From Source =
 
-Checkout the source code from http://code.google.com/p/selenium/source/checkout. The subversion location is http://selenium.googlecode.com/svn/trunk In the root directory of the downloaded code, run the following command from a command prompt:
+Checkout the source code from http://code.google.com/p/selenium/source/checkout. 
+The subversion repository is located at http://selenium.googlecode.com/svn/trunk. After the download is completed, cd to the root of the downloaded directory via terminal. Perform the following command: {{{(sudo) python setup.py install}}}. Upon completion of the command, the package should be installed successfully.
 
-{{{python setup.py install}}}
+==Testing Source==
 
-Set WEBDRIVER environment variable to your webdriver directory
+When developing Selenium, it is recommended you run the tests before and after making any changes to the code base. To perform these tests, enter {{{python py_test.py}}} in terminal while in the root directory of your local copy. Alternately, you can run {{{./go test_firefox_py}}} from the root of your local copy.
 
-And you need to have simplejson installed. Or add (webdriver_directory)/firefox/lib-src to your PYTHONPATH(the py_test script described below does this automatically).
+==Python Idioms==
 
-That's it :) However you may want to run some sanity tests... If so you can run {{{py_test.py}}} from the same root directory. All the tests should pass. 
+Depending on the functionality you wish to utilize, importing the module is performed by entering the following in your python shell:
 
-Alternatively, you can run the tests using:
+Selenium 1:
+{{{from selenium import selenium}}}
 
-{{{./go test_firefox_py}}}
+Selenium 2:
+{{{from selenium import FIREFOX}}}
+{{{from selenium import CHROME}}}
+{{{from selenium import REMOTE}}}
 
-If you are developing webdriver itself, we recommend you do this.
+===Viewing Available Functionality===
+
+To view all commands available to you, after importing perform:
+
+Selenium 1:
+dir(selenium)
+
+Selenium 2:
+dir(FIREFOX)
+dir(CHROME)
+dir(REMOTE)
+
+===Command Documentation===
+
+To view the docstrings (documentation text), perform {{{print 'functionname'.__doc__}}}, where functionname is the function you wish to view more information on. For example, {{{print selenium.open.__doc__}}}
 
 ==Comparison with Java Bindings==
 
 Here is a summary of the major differences between the python and Java bindings.
 
-=== Function names ===
+===Function Names===
 
-Function names separate compound terms with underscores, rather than using the Java camelCase e.g. {{{get_title()}}} in python vs. {{{getTitle()}}} in Java.
+Function names separate compound terms with underscores, rather than using Java's camelCase formatting. For example, in python {{{get_title()}}} is the equivalent of  {{{getTitle()}}} in Java.
 
-=== Flatter structures ===
+===Flatter Structures===
 
 To reflect pythonic behavior of flat object hierarchies the python bindings e.g. {{{find_element_by_xpath("//h1")}}} rather than {{{findElement(By.xpath("//h1"));}}}
 
@@ -49,24 +68,32 @@ The PageFactory in the Java Bindings makes extensive use of Java Annotations. At
 
 Decorators are used to provide the PageObject support. The decorator is {{{@require_loaded}}}
 
-== Browser supports ==
 
-All the browsers supported by the Java implementation are available on the Python binding. However, that's with the help of the remote driver. Currently only the Firefox driver is natively implemented in Python. As you can see from the picture below, the python remote driver connects to the Java remote driver, which then uses Java implementations to access the browser.
+==Browser Support==
 
-[http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0 http://sites.google.com/site/shareprortal/Home/WebDriverPythonbinding.png?attredirects=0]
+All of the browsers supported by the Java implementation of Selenium are available in the Python bindings. For example:
 
-=== Firefox ===
+With Selenium 1:
+For Internet Explorer,
+{{{
+from selenium import selenium
 
-There isn't any additional setup to use the firefox driver. For example usage, see http://code.google.com/p/selenium/source/browse/trunk/common/test/py/example2.py
+selenium = selenium("localhost", 4444, "*iexplore", "http://google.com/")
+selenium.start()
+}}}
 
-=== Other browsers via remote driver ===
+For Firefox,
+{{{
+from selenium import selenium
 
-You need to download and run a copy of the Selenium server which is [http://code.google.com/p/selenium/downloads/list available here]  Put it in your webdriver directory and run {{{java -jar  selenium-server-standalone.jar -port 8888}}} The number is the port you want the server to listen on and if it's not listed will default to port 4444. Then you can import {{{WebDriver}}} from webdriver_remote package and instantiate it like:
+selenium = selenium("localhost", 4444, "*firefox", "http://google.com/")
+selenium.start()
+}}}
 
-{{{driver = WebDriver("localhost:8888", "firefox", "ANY")}}}
+With Selenium 2:
+{{{
+from selenium.remote import connect
+from selenium import FIREFOX
 
-or
-
-{{{driver = WebDriver("localhost:8888", "internet explorer", "WINDOWS")}}}
-
-For other browsers set the last two parameters according to [http://www.google.com/codesearch/p?hl=en#WT2nGdYBQUk/trunk/remote/common/src/java/org/openqa/selenium/remote/DesiredCapabilities.java&q=Capabilities%20package:http://webdriver%5C.googlecode%5C.com DesiredCapabilities.java]
+wd = connect(FIREFOX, server="http://example.com:4444")
+}}}
