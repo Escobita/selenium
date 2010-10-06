@@ -4,12 +4,12 @@
 
 The Ruby bindings for the WebDriver API are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. 
 
-The bindings support Ruby 1.8.6 through 1.9.1 + JRuby.  
+The bindings support Ruby 1.8.7 through 1.9.1 + JRuby.  
 
   * [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html API docs]
   * [http://selenium.googlecode.com/svn/trunk/common/src/rb/CHANGES Changelog]
 
-= Details =
+= API Example =
 
 The bindings provide a slightly rubified version of the WebDriver API:
 
@@ -30,17 +30,104 @@ driver.quit
 
 The ruby bindings have drivers for Firefox, IE, Chrome and the remote server.
 
-The `WebDriver.for()` call is a shortcut for 
+== Remote ==
+
+The RemoteWebDriver makes it easy to control a browser running on another machine. Download the jar (from [http://code.google.com/p/selenium/downloads/list Downloads]) and launch the server:
+
+{{{java -jar selenium-server-standalone.jar}}}
+
+Then connect to it from Ruby
 
 {{{
-Selenium::WebDriver::Driver.new(Selenium::WebDriver::Firefox::Bridge.new)
+driver = Selenium::WebDriver.for(:remote)
 }}}
 
-Any extra arguments pass to `for()` (besides the driver symbol) will be passed to the Bridge's constructor. So to configure the remote driver:
+By default, this connects to the server running on localhost:4444 and opens Firefox. To connect to another machine, use the :url option:
+
+{{{
+driver = Selenium::WebDriver.for(:remote, :url => "http://myserver:4444/wd/hub")
+}}}
+
+To launch another browser, use the :desired_capabilities option:
+
+{{{
+driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
+}}}
+
+You can also pass an instance of Selenium::WebDriver::Remote::Capabilities, e.g.:
 
 {{{
 include Selenium
 
-driver = WebDriver.for(:remote, :url                  => "http://localhost:4444/wd/hub"
-                                :desired_capabilities => :firefox) # can also pass an instance of WebDriver::Remote::Capabilities
+caps = WebDriver::Remote::Capabilities.htmlunit
+caps.javascript_enabled = true
+
+driver = WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
+
+== Firefox ==
+
+The FirefoxDriver lets you configure the profile used to run tests.
+
+=== Adding an extension ===
+
+It's often useful to have Firebug available in the Firefox instance launched by WebDriver:
+
+{{{
+include Selenium
+
+profile = WebDriver::Firefox::Profile.new
+profile.add_extension("/path/to/firebug.xpi")
+
+driver = WebDriver.for :firefox, :profile => profile
+}}}
+
+=== Using an existing profile === 
+
+You can use an existing profile as a template for the WebDriver profile by passing the profile name (see `firefox -ProfileManager` to set up custom profiles.)
+
+{{{
+driver = Selenium::WebDriver.for(:firefox, :profile => "my-existing-profile")
+}}}
+
+=== Custom Firefox path ===
+
+If your Firefox executable is in a non-standard location:
+
+{{{
+Selenium::WebDriver::Firefox.path = "/path/to/firefox"
+driver = Selenium::WebDriver.for :firefox
+}}}
+
+== Timeouts ==
+
+=== Implicit waits ===
+
+WebDriver lets you configure implicit waits, so that a call to #find_element will wait for a specified amount of time before raising a NoSuchElementError:
+
+{{{
+  driver = Selenium::WebDriver.for :firefox
+  driver.manage.timeouts.implicit_wait = 3 # seconds
+}}}
+
+=== Internal timeouts ===
+
+Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, Net::HTTP from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
+
+{{{
+  Selenium::WebDriver::Remote::Http::Default.timeout = 120 # seconds
+  driver = Selenium::WebDriver.for(:remote)
+}}}  
+
+== Using Curb or your own HTTP client ==
+
+For internal HTTP communication, Net::HTTP is used by default. If you have the [https://rubygems.org/gems/curb Curb gem] installed, you can switch to it by doing:
+
+{{{
+require 'selenium/webdriver/remote/http/curb'
+include Selenium
+
+driver = WebDriver.for(:firefox, :http_client => WebDriver::Remote::Http::Curb)
+}}}
+
+ 
