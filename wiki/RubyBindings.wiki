@@ -67,7 +67,7 @@ driver = WebDriver.for(:remote, :desired_capabilities => caps)
 
 == Firefox ==
 
-The FirefoxDriver lets you configure the profile used to run tests.
+The FirefoxDriver lets you configure the profile used by WebDriver.
 
 === Adding an extension ===
 
@@ -89,6 +89,31 @@ You can use an existing profile as a template for the WebDriver profile by passi
 {{{
 driver = Selenium::WebDriver.for(:firefox, :profile => "my-existing-profile")
 }}}
+
+=== Tweaking Firefox preferences ===
+
+Use a SOCKS proxy:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile['network.proxy.socks'] = 'localhost'
+profile['network.proxy.socks_port'] = 12345
+profile['network.proxy.type'] = 1
+
+driver = Selenium::WebDriver.for :firefox, :profile => profile
+}}}
+
+Automatically download files to a given folder:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile['browser.download.dir'] = "/tmp/webdriver-downloads"
+profile['browser.download.folderList'] = 2
+profile['browser.helperApps.neverAsk.saveToDisk'] = "application/pdf"
+
+driver = Selenium::WebDriver.for :firefox, :profile => profile
+}}}
+
 
 === Custom Firefox path ===
 
