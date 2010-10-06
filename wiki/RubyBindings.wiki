@@ -124,6 +124,19 @@ Selenium::WebDriver::Firefox.path = "/path/to/firefox"
 driver = Selenium::WebDriver.for :firefox
 }}}
 
+=== Native events ===
+
+Native events are enabled by default on Windows. To turn them off:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile.native_events = false
+
+driver = Selenium::WebDriver.for(:firefox, :profile => profile)
+}}}
+
+Experimental support for native events is available on Linux. Set {{{profile.native_events = true}} to turn this on.
+
 == Timeouts ==
 
 === Implicit waits ===
