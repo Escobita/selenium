@@ -135,7 +135,7 @@ profile.native_events = false
 driver = Selenium::WebDriver.for(:firefox, :profile => profile)
 }}}
 
-Experimental support for native events is available on Linux. Set {{{profile.native_events = true}} to turn this on.
+Experimental support for native events is available on Linux. Set {{{profile.native_events = true}}} to turn this on.
 
 == Timeouts ==
 
