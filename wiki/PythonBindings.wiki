@@ -1,20 +1,28 @@
-#summary A summary of the python bindings for WebDriver.
+#summary A summary of the python bindings for Selenium/Webdriver.
 #labels Phase-Deploy,Phase-Support,WebDriver
 
 =Introduction=
 
-The python bindings for Selenium are now available. The bindings include the full functionality of Selenium 1.x and include support for Selenium 2.x. The bindings are also compatible with Selenium Remote Control versions 1.0 and 2.0. The bindings for Selenium 2 support Remote, Firefox and Chrome natively.
+The python bindings for Selenium 2 are now available. The bindings include the full functionality of Selenium 1.x and include partial support for Selenium 2.x. The bindings are also compatible with Selenium Remote Control versions 1.x and 2.x. The bindings for Selenium 2 currently support the Remote, Firefox and Chrome protocols natively.
 
-If you're planning on using the Selenium 1.x APIs, or the Remote WebDriver, be sure to [http://code.google.com/p/selenium/downloads/list download the Selenium Server jar] file, and run it via {{{java -jar selenium-server-standalone.jar}}} before attempting to run a test.
+Before attempting to run a test, be sure to [http://code.google.com/p/selenium/downloads/list download the Selenium Server jar] file, and run it via 
+
+{{{java -jar selenium-server-standalone.jar}}}
+
+in your terminal/cmd prompt, before attempting to run a test.
 
 == Quick Installation ==
 
-{{{(sudo) easy_install selenium}}} or {{{(sudo) pip install selenium}}}
+{{{[sudo] easy_install selenium}}} or {{{[sudo] pip install selenium}}}
 
 = Installation From Source =
 
 Checkout the source code from http://code.google.com/p/selenium/source/checkout. 
-The subversion repository is located at http://selenium.googlecode.com/svn/trunk. After the download is completed, cd to the root of the downloaded directory via terminal. Perform the following command: {{{(sudo) python setup.py install}}}. Upon completion of the command, the package should be installed successfully.
+The subversion repository is located at http://selenium.googlecode.com/svn/trunk. After the download is completed, cd to the root of the downloaded directory via terminal/cmd prompt. Perform the following command: 
+
+{{{(sudo) python setup.py install}}}. 
+
+Upon completion, the package should be installed successfully.
 
 ==Testing Source==
 
@@ -34,15 +42,15 @@ Selenium 2:
 
 ===Viewing Available Functionality===
 
-To view all commands available to you, after importing perform:
+To view all commands available to you [while inside your python shell], after importing perform:
 
 Selenium 1:
-dir(selenium)
+{{{dir(selenium)}}}
 
 Selenium 2:
-dir(FIREFOX)
-dir(CHROME)
-dir(REMOTE)
+{{{dir(FIREFOX)}}}
+{{{dir(CHROME)}}}
+{{{dir(REMOTE)}}}
 
 ===Command Documentation===
 
@@ -95,5 +103,5 @@ With Selenium 2:
 from selenium.remote import connect
 from selenium import FIREFOX
 
-wd = connect(FIREFOX, server="http://example.com:4444")
+wd = connect(FIREFOX, server="http://example.com:8888")
 }}}
