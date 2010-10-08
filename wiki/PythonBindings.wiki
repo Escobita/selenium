@@ -36,11 +36,11 @@ Selenium 1:
 {{{from selenium import selenium}}}
 
 Selenium 2:
-{{{from selenium import FIREFOX}}}
+{{{from selenium.firefox.webdriver import WebDriver}}}
 
-{{{from selenium import CHROME}}}
+{{{from selenium.chrome.webdriver import WebDriver}}}
 
-{{{from selenium import REMOTE}}}
+{{{from selenium.remote.webdriver import WebDriver}}}
 
 ===Viewing Available Functionality===
 
@@ -50,9 +50,7 @@ Selenium 1:
 {{{dir(selenium)}}}
 
 Selenium 2:
-{{{dir(FIREFOX)}}}
-{{{dir(CHROME)}}}
-{{{dir(REMOTE)}}}
+{{{dir(WebDriver)}}}
 
 ===Command Documentation===
 
@@ -79,12 +77,11 @@ The PageFactory in the Java Bindings makes extensive use of Java Annotations. At
 Decorators are used to provide the PageObject support. The decorator is {{{@require_loaded}}}
 
 
-==Browser Support==
+=Browser Support=
 
 All of the browsers supported by the Java implementation of Selenium are available in the Python bindings. For example:
 
-With Selenium 1:
-For Internet Explorer,
+===Selenium 1 - Internet Explorer===
 {{{
 from selenium import selenium
 
@@ -92,7 +89,7 @@ selenium = selenium("localhost", 4444, "*iexplore", "http://google.com/")
 selenium.start()
 }}}
 
-For Firefox,
+===Selenium 1 - Firefox===
 {{{
 from selenium import selenium
 
@@ -100,10 +97,23 @@ selenium = selenium("localhost", 4444, "*firefox", "http://google.com/")
 selenium.start()
 }}}
 
-With Selenium 2:
+===Selenium 2 - Firefox===
+{{{
+from selenium.firefox.webdriver import WebDriver
+
+wd = WebDriver()
+}}}
+
+===Selenium 2 - Chrome===
+{{{
+from selenium.chrome.webdriver import WebDriver
+
+wd = WebDriver()
+}}}
+===Selenium 2 - Remote===
 {{{
 from selenium.remote import connect
 from selenium import FIREFOX
 
-wd = connect(FIREFOX, server="http://example.com:8888")
+wd = connect(FIREFOX, server="http://example.com:4444")
 }}}
