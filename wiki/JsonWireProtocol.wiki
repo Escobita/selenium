@@ -206,7 +206,8 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId/element/:id/css/:propertyName || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
 || POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
 || POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
-
+|| GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
+|| POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation orientation)] ||
 
 == Command Detail ==
 
@@ -1732,6 +1733,64 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/orientation ===
+
+<dl>
+<dd>*GET /session/:sessionId/orientation*</dd>
+<dd>
+<dl>
+<dd>Get the current browser orientation. The server should return a valid orientation value as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The current browser orientation corresponding to a value defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/orientation*</dd>
+<dd>
+<dl>
+<dd>Set the browser orientation. The orientation should be specified as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`orientation` - `{string}` The new browser orientation as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)]</dd>
 </dl>
 </dd>
 </dl>
