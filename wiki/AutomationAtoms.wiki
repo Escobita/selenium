@@ -16,6 +16,22 @@ There are two ways to make use of the automation atoms.
 
 The first of these approaches is useful when constructing a monolithic application, such as Selenium Core. The second approach is used in those drivers that are implemented natively and wish to use the atoms to interrogate the DOM (such as the InternetExplorerDriver).
 
+== Testing Atoms ==
+
+If you're developing the Atoms, then the easiest way to test them is:
+
+{{{
+# Start the server
+./go //jsapi:debug:run &
+}}}
+
+Now point a browser at http://localhost:2310/js/test/bot/ and select the test you'd like to run. As you edit the atoms, so long as you don't change the "goog.require" or "goog.provides" statements then you can just refresh the page to see the tests run with your changes. If you do change either of those settings, kill the server and then run 
+
+{{{
+./go calcdeps
+./go //jsapi:debug:run &
+}}}
+
 == Atoms Summary ==
 
 Each of the atoms listed here is exposed via the list *method name*, which delegates directly through to the *implementation method*. For information about the order in which arguments are to be passed, and for additional documentation, view the jsdoc of the implementation method.
