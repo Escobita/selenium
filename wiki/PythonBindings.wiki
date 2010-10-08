@@ -37,7 +37,9 @@ Selenium 1:
 
 Selenium 2:
 {{{from selenium import FIREFOX}}}
+
 {{{from selenium import CHROME}}}
+
 {{{from selenium import REMOTE}}}
 
 ===Viewing Available Functionality===
