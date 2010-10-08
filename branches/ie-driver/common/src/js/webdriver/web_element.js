@@ -120,16 +120,16 @@ webdriver.element.getAttribute = function(element, attribute) {
 
   if (name == 'href' && isLink) {
     value = bot.dom.getAttribute(element, attribute);
-  } else if (bot.dom.hasProperty(element, attribute)) {
+  } else {
     value = bot.dom.getProperty(element, attribute);
   }
 
-  if (!goog.isDef(value) && bot.dom.hasAttribute(element, attribute)) {
+  if (!goog.isDefAndNotNull(value)) {
     value = bot.dom.getAttribute(element, attribute);
   }
 
   // The empty string is a valid return value.
-  return value || value === '' ? value.toString() : null;
+  return goog.isDefAndNotNull(value) ? value.toString() : null;
 };
 
 
@@ -140,7 +140,7 @@ webdriver.element.getAttribute = function(element, attribute) {
  * @return {goog.math.Rect} The bounding rectangle of the element.
  */
 webdriver.element.getLocation = function(element) {
-  if (!bot.style.isShown(element)) {
+  if (!bot.dom.isShown(element)) {
     return null;
   }
   return goog.style.getBounds(element);
@@ -177,5 +177,5 @@ webdriver.element.getText = function(element) {
     return '';
   }
 
-  return bot.style.getVisibleText(element);
+  return bot.dom.getVisibleText(element);
 };

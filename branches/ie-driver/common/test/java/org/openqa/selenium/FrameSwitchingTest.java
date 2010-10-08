@@ -28,12 +28,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 @Ignore(IPHONE)
 public class FrameSwitchingTest extends AbstractDriverTestCase {
+  private static final int TIMEOUT = 4000;
 
   @Override
   protected void tearDown() throws Exception {
@@ -46,7 +48,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore(SELENESE)
   public void testShouldContinueToReferToTheSameFrameOnceItHasBeenSelected() {
     driver.get(pages.framesetPage);
 
@@ -58,7 +59,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.xpath("//p")).getText(), equalTo("Success!"));
   }
 
-  @Ignore({SELENESE, ANDROID})
+  @Ignore(ANDROID)
   public void testShouldAutomaticallyUseTheFirstFrameOnAPage() {
     driver.get(pages.framesetPage);
 
@@ -67,7 +68,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(pageNumber.getText().trim(), equalTo("1"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldFocusOnTheReplacementWhenAFrameFollowsALinkToA_TopTargettedPage() throws Exception {
     driver.get(pages.framesetPage);
 
@@ -81,13 +81,11 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
                equalTo("XHTML Test Page"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldNotAutomaticallySwitchFocusToAnIFrameWhenAPageContainingThemIsLoaded() {
     driver.get(pages.iframePage);
     driver.findElement(By.id("iframe_page_heading"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldAllowAUserToSwitchFromAnIframeBackToTheMainContentOfThePage() {
     driver.get(pages.iframePage);
     driver.switchTo().frame(0);
@@ -100,17 +98,20 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore(value = {CHROME, SELENESE}, reason = "Can't execute script in iframe, track crbug 20773")
+  @Ignore(value = CHROME, reason = "Can't execute script in iframe, track crbug 20773")
   public void testShouldAllowTheUserToSwitchToAnIFrameAndRemainFocusedOnIt() {
     driver.get(pages.iframePage);
     driver.switchTo().frame(0);
 
     driver.findElement(By.id("submitButton")).click();
-    String hello = driver.findElement(By.id("greeting")).getText();
-    assertThat(hello, equalTo("Success!"));
+
+    assertThat(getTextOfGreetingElement(), equalTo("Success!"));
   }
 
-  @Ignore(SELENESE)
+  public String getTextOfGreetingElement() {
+    return TestWaitingUtility.waitForElementToExist(driver, "greeting").getText();
+  }
+
   public void testShouldBeAbleToClickInAFrame() {
     driver.get(pages.framesetPage);
     driver.switchTo().frame("third");
@@ -118,13 +119,13 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     // This should replace frame "third" ...
     driver.findElement(By.id("submitButton")).click();
     // driver should still be focused on frame "third" ...
-    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
+    assertThat(getTextOfGreetingElement(), equalTo("Success!"));
     // Make sure it was really frame "third" which was replaced ...
     driver.switchTo().defaultContent().switchTo().frame("third");
-    assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
+    assertThat(getTextOfGreetingElement(), equalTo("Success!"));
   }
 
-  @Ignore({CHROME, IE, SELENESE})
+  @Ignore({CHROME, IE})
   public void testShouldBeAbleToClickInASubFrame() {
     driver.get(pages.framesetPage);
     driver.switchTo().frame("sixth.iframe1");
@@ -138,7 +139,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("greeting")).getText(), equalTo("Success!"));
   }
 
-  @Ignore({SELENESE, ANDROID})
+  @Ignore({ANDROID, SELENESE})
   public void testShouldBeAbleToSelectAFrameByName() {
     driver.get(pages.framesetPage);
 
@@ -152,7 +153,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("2"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldSelectChildFramesByUsingADotSeparatedString() {
     driver.get(pages.framesetPage);
 
@@ -160,7 +160,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
   }
 
-  @Ignore({CHROME, FIREFOX, IE, SELENESE})
+  @Ignore({CHROME, FIREFOX, IE})
   public void testShouldSelectChildFramesByChainedCalls() {
     driver.get(pages.framesetPage);
 
@@ -168,7 +168,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldSwitchToChildFramesTreatingNumbersAsIndex() {
     driver.get(pages.framesetPage);
 
@@ -176,7 +175,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
   }
 
-  @Ignore({FIREFOX, SELENESE})
+  @Ignore(FIREFOX)
   public void testShouldSwitchToChildFramesTreatingParentAndChildNumbersAsIndex() {
     driver.get(pages.framesetPage);
 
@@ -184,7 +183,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("11"));
   }
 
-  @Ignore({CHROME, IE, SELENESE})
+  @Ignore({CHROME, IE})
   public void testShouldThrowFrameNotFoundExceptionLookingUpSubFramesWithSuperFrameNames() {
     driver.get(pages.framesetPage);
 
@@ -198,7 +197,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   @NoDriverAfterTest
-  @Ignore({IPHONE, SELENESE, CHROME})
+  @Ignore({IPHONE, CHROME})
   public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
     driver.get(pages.simpleTestPage);
     try {
@@ -213,7 +212,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore(SELENESE)
   public void testShouldBeAbleToFlipToAFrameIdentifiedByItsId() {
     driver.get(pages.framesetPage);
 
@@ -226,7 +224,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore(SELENESE)
   public void testShouldThrowAnExceptionWhenAFrameCannotBeFound() {
     driver.get(pages.xhtmlTestPage);
 
@@ -238,7 +235,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore(SELENESE)
   public void testShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex() {
     driver.get(pages.xhtmlTestPage);
 
@@ -250,14 +246,13 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     }
   }
   
-  @Ignore(reason = "As yet unimplemented", value = {SELENESE, IE})
+  @Ignore(reason = "As yet unimplemented", value = {IE, SELENESE})
   public void testShouldBeAbleToSwitchToTopLevelFrameWithDotInNameAssumingNoParentAndChildFrameExistWithTheSameName() {
     driver.get(pages.framesetPage);
     driver.switchTo().frame("seventh.withadot");
     assertThat(driver.findElement(By.id("pageNumber")).getText(), equalTo("3"));
   }
 
-  @Ignore(SELENESE)
   public void testShouldBeAbleToFindElementsInIframesByName() {
     driver.get(pages.iframePage);
 
@@ -267,7 +262,6 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertNotNull(element);
   }
 
-  @Ignore(SELENESE)
   public void testShouldBeAbleToFindElementsInIframesByXPath() {
     driver.get(pages.iframePage);
 
@@ -278,10 +272,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertNotNull(element);
   }
 
-  @Ignore(SELENESE)
   public void testGetCurrentUrl() {
-    AppServer appServer = GlobalTestEnvironment.get().getAppServer();
-
     driver.get(pages.framesetPage);
 
     driver.switchTo().frame("second");
@@ -297,5 +288,51 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     url = appServer.whereIs("formPage.html");
     driver.switchTo().frame("iframe1");
     assertThat(driver.getCurrentUrl(), equalTo(url));
+  }
+  
+  @Ignore(value = {IE, HTMLUNIT, CHROME}, reason = "Appears to uncover an HtmlUnit bug")
+  @JavascriptEnabled
+  public void testShouldBeAbleToCarryOnWorkingIfTheFrameIsDeletedFromUnderUs() {
+    driver.get(pages.deletingFrame);
+
+    driver.switchTo().frame("iframe1");
+
+    WebElement killIframe = driver.findElement(By.id("killIframe"));
+    killIframe.click();
+
+    assertFrameNotPresent(driver, "iframe1");
+
+    driver.switchTo().defaultContent();
+    WebElement addIFrame = driver.findElement(By.id("addBackFrame"));
+    addIFrame.click();
+
+    driver.switchTo().frame("iframe1");
+
+    try {
+      driver.findElement(By.id("checkbox"));
+    }
+    catch (WebDriverException web) {
+      fail("Could not find element after switching frame");
+    }
+  }
+  
+  public void testShouldReturnFrameTitleNotWindowTitle() {
+    driver.get(pages.framesetPage);
+    driver.switchTo().frame("third");
+    assertEquals("We Leave From Here", driver.getTitle());
+  }
+
+  private void assertFrameNotPresent(WebDriver driver, String locator) {
+    long end = System.currentTimeMillis() + TIMEOUT;
+
+    while (System.currentTimeMillis() < end) {
+      try {
+        driver.switchTo().frame(locator);
+      } catch (NoSuchFrameException e) {
+        return;
+      }
+    }
+
+    fail("Frame did not disappear");
   }
 }

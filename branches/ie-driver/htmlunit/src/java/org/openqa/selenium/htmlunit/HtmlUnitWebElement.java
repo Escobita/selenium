@@ -239,10 +239,12 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   public void sendKeys(CharSequence... value) {
     assertElementNotStale();
 
-    String originalValue = getValue();
-
     if (!isDisplayed())
       throw new ElementNotVisibleException("You may only sendKeys to visible elements");
+    
+    if (!isEnabled()) {
+      throw new UnsupportedOperationException("You may only sendKeys to enabled elements");
+    }
 
     StringBuilder builder = new StringBuilder();
     for (CharSequence seq : value) {
@@ -321,7 +323,7 @@ public class HtmlUnitWebElement implements RenderedWebElement,
       return ((HtmlInput)element).isChecked() ? "true" : null;
     }
     if ("disabled".equals(lowerName)) {
-      return isEnabled() ? null : "true";
+      return isEnabled() ? "false" : "true";
     }
     if ("selected".equals(lowerName)) {
       return (value.equalsIgnoreCase("selected") ? "true" : null);

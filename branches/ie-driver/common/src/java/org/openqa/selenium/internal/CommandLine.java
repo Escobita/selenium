@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.openqa.selenium.Platform;
@@ -38,6 +39,8 @@ public class CommandLine {
   private int exitCode;
   private boolean executed;
   private Process proc;
+  private String allInput;
+  private Map<String, String> env = new HashMap<String, String>();
 
   public CommandLine(String executable, String... args) {
     commandAndArgs = new String[args.length + 1];
@@ -45,6 +48,40 @@ public class CommandLine {
     int index = 1;
     for (String arg : args) {
       commandAndArgs[index++] = arg;
+    }
+  }
+
+  public CommandLine(String[] cmdarray) {
+    this.commandAndArgs = cmdarray;
+  }
+
+  public void setEnvironmentVariables(Map<String, String> environment) {
+    env.putAll(environment);
+  }
+
+  public void setEnvironmentVariable(String name, String value) {
+    env.put(name, value);
+  }
+
+  public void setDynamicLibraryPath(String newLibraryPath) {
+    setEnvironmentVariable(getLibraryPathPropertyName(), newLibraryPath);
+  }
+
+  /**
+   * @return The platform specific env property name which contains the library path.
+   */
+  public static String getLibraryPathPropertyName() {
+    switch (Platform.getCurrent()) {
+      case MAC:
+          return "DYLD_LIBRARY_PATH";
+
+      case WINDOWS:
+      case VISTA:
+      case XP:
+          return "PATH";
+
+      default:
+          return "LD_LIBRARY_PATH";
     }
   }
 
@@ -89,11 +126,19 @@ public class CommandLine {
 
       ProcessBuilder builder = new ProcessBuilder(commandAndArgs);
       builder.redirectErrorStream(true);
+      builder.environment().putAll(env);
+      
       proc = builder.start();
 
       drainer = new StreamDrainer(proc);
       Thread thread = new Thread(drainer, "Command line drainer: " + commandAndArgs[0]);
       thread.start();
+
+      if (allInput != null) {
+        byte[] bytes = allInput.getBytes();
+        proc.getOutputStream().write(bytes);
+        proc.getOutputStream().close();
+      }
 
       proc.waitFor();
       thread.join();
@@ -106,7 +151,7 @@ public class CommandLine {
     }
   }
 
-  public void executeAsync() {
+  public Process executeAsync() {
     new Thread() {
       @Override
       public void run() {
@@ -126,6 +171,16 @@ public class CommandLine {
         }
       }
     });
+
+    return proc;
+  }
+
+  public void waitFor() {
+    try {
+      proc.waitFor();
+    } catch (InterruptedException e) {
+      throw new WebDriverException(e);
+    }
   }
 
   public boolean isSuccessful() {
@@ -178,6 +233,17 @@ public class CommandLine {
     }
   }
 
+  public void setInput(String allInput) {
+    this.allInput = allInput;
+  }
+
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    for (String s : commandAndArgs) {
+      buf.append(s).append(' ');
+    }
+    return buf.toString();
+  }
 
   private static class StreamDrainer implements Runnable {
     private final Process toWatch;
@@ -199,7 +265,8 @@ public class CommandLine {
           inputOut.flush();
         }
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        // it's possible that the stream has been closed. That's okay.
+        // Swallow the exception        
       } finally {
         try {
           inputOut.close();

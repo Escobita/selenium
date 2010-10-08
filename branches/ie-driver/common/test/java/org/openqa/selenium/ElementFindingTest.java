@@ -22,8 +22,12 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaitingUtility.waitForPageTitle;
 
 public class ElementFindingTest extends AbstractDriverTestCase {
 
@@ -49,6 +53,9 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   public void testShouldBeAbleToClickOnLinkIdentifiedByText() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
+
+    waitForPageTitle(driver, "We Arrive Here");
+    
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -56,12 +63,18 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     driver.get(pages.formPage);
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
+
+    waitForPageTitle(driver, "We Arrive Here");
+    
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
   public void testshouldBeAbleToClickOnLinkIdentifiedById() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.id("linkId")).click();
+
+    waitForPageTitle(driver, "We Arrive Here");
+
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -339,6 +352,8 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     element.click();
 
     // if any exception is thrown, we won't get this far. Sanity check
+    waitForPageTitle(driver, "Changed");
+
     assertEquals("Changed", driver.getTitle());
   }
 
@@ -378,7 +393,12 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     driver.findElement(By.id("delete")).click();
 
     try {
-      toBeDeleted.isDisplayed();
+      long start = System.currentTimeMillis();
+      while (start + TestWaitingUtility.MAX_WAIT_TIME_MS > System.currentTimeMillis()) {
+        toBeDeleted.isDisplayed();
+        TestWaitingUtility.sleep();
+      }
+      
       fail("Element should be stale at this point");
     } catch (StaleElementReferenceException e) {
       // this is expected
@@ -391,30 +411,33 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     try {
       driver.findElement(By.xpath("//a[contains(.,'hello world')]"));
     } catch (Exception e) {
-      e.printStackTrace();
       fail("Should not have thrown an exception");
     }
   }
 
   @JavascriptEnabled
+  @Ignore({HTMLUNIT, REMOTE})
+  @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementByCssSelector() {
     driver.get(pages.xhtmlTestPage);
-    if (!supportsSelectorApi()) {
-      System.out.println("Skipping test: selector API not supported");
-      return;
-    }
     driver.findElement(By.cssSelector("div.content"));
   }
 
   @JavascriptEnabled
+  @Ignore({HTMLUNIT, REMOTE, SELENESE})
+  @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementsByCssSelector() {
     driver.get(pages.xhtmlTestPage);
-    if (!supportsSelectorApi()) {
-      System.out.println("Skipping test: selector API not supported");
-      return;
-    }
     driver.findElements(By.cssSelector("p"));
   }
-  
+
+  @Ignore(SELENESE)
+  public void testFindingByXPathShouldNotIncludeParentElementIfSameTagType() {
+    driver.get(pages.xhtmlTestPage);
+    WebElement parent = driver.findElement(By.id("my_span"));
+
+    assertEquals(2, parent.findElements(By.tagName("div")).size());
+    assertEquals(2, parent.findElements(By.tagName("span")).size());
+  }
   //TODO(danielwh): Add extensive CSS selector tests
 }

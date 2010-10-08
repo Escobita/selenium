@@ -20,14 +20,18 @@ package org.openqa.selenium.internal.seleniumemulation;
 import org.openqa.selenium.WebDriver;
 
 public class SelectOption extends SeleneseCommand<Void> {
+  private final AlertOverride alertOverride;
   private final SeleniumSelect select;
 
-  public SelectOption(SeleniumSelect select) {
+  public SelectOption(AlertOverride alertOverride, SeleniumSelect select) {
+    this.alertOverride = alertOverride;
     this.select = select;
   }
 
   @Override
   protected Void handleSeleneseCommand(WebDriver driver, String selectLocator, String optionLocator) {
+    alertOverride.replaceAlertMethod(driver);
+
     select.select(driver, selectLocator, optionLocator, true, true);
 
     return null;

@@ -3,6 +3,7 @@ package org.openqa.selenium.server.browserlaunchers.locators;
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
 import org.openqa.selenium.browserlaunchers.WindowsUtils;
+import org.openqa.selenium.internal.CommandLine;
 import org.openqa.selenium.server.browserlaunchers.*;
 
 import java.io.File;
@@ -85,7 +86,7 @@ public abstract class SingleBrowserLocator implements BrowserLocator {
     }
 
     public BrowserInstallation findFileInPath(String fileName) {
-        return retrieveValidInstallationPath(AsyncExecute.whichExec(fileName));
+        return retrieveValidInstallationPath(CommandLine.findExecutable(fileName));
     }
 
     protected String couldNotFindAnyInstallationMessage() {
@@ -164,7 +165,7 @@ public abstract class SingleBrowserLocator implements BrowserLocator {
         if (WindowsUtils.thisIsWindows()) {
             return null;
         }
-        libraryPathEnvironmentVariable = SystemUtils.libraryPathEnvironmentVariable();
+        libraryPathEnvironmentVariable = CommandLine.getLibraryPathPropertyName();
         currentLibraryPath = WindowsUtils.loadEnvironment().getProperty(libraryPathEnvironmentVariable);
 
         return currentLibraryPath + File.pathSeparator + launcherPath.getParent();

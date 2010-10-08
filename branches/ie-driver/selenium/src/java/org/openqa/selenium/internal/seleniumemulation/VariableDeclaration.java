@@ -15,17 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
 package org.openqa.selenium.internal.seleniumemulation;
 
 import java.util.regex.Pattern;
 
+/**
+ * Prepend a variable declaration to a script.
+ */
 public class VariableDeclaration implements ScriptMutator {
   private final Pattern pattern;
   private final String declaration;
 
   public VariableDeclaration(String raw, String declaration) {
     this.declaration = declaration;
-    raw.replace(".", "\\s*\\.\\s*")
+    raw = raw.replace(".", "\\s*\\.\\s*")
         .replace("(", "\\(")
         .replace(")", "\\)");
 

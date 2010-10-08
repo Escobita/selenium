@@ -17,6 +17,11 @@
 			<artifactId>selenium-remote-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
 		<!-- Test dependencies ... -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>

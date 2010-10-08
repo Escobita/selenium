@@ -21,11 +21,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +38,15 @@ import java.util.Map;
 public class JsonToBeanConverter {
 
   @SuppressWarnings("unchecked")
-  public <T> T convert(Class<T> clazz, Object text) throws Exception {
+  public <T> T convert(Class<T> clazz, Object text) throws JsonException {
+    try {
+      return actualConvert(clazz, text);
+    } catch (JSONException e) {
+      throw new JsonException(e);
+    }
+  }
+
+  protected <T> T actualConvert(Class<T> clazz, Object text) throws JSONException {
     if (text == null) {
       return null;
     }
@@ -155,10 +167,18 @@ public class JsonToBeanConverter {
       }
 
       if (object.has("deriveFrom")) {
-        pac.deriveFrom(new URI(object.getString("deriveFrom")));
+        try {
+          pac.deriveFrom(new URI(object.getString("deriveFrom")));
+        } catch (URISyntaxException e) {
+          throw new WebDriverException(e);
+        }
       }
 
       return (T) pac;
+    }
+
+    if (Date.class.equals(clazz)) {
+      return (T) new Date(Long.valueOf(String.valueOf(text)));
     }
 
     if (text != null && text instanceof String && !((String) text).startsWith("{") && Object.class
@@ -223,12 +243,12 @@ public class JsonToBeanConverter {
     return clazz.isEnum() || text instanceof Enum<?>;
   }
 
-  private Object convert(Object toConvert) throws Exception {
+  private Object convert(Object toConvert) {
     return toConvert;
   }
 
-  public <T> T convertBean(Class<T> clazz, JSONObject toConvert) throws Exception {
-    T t = clazz.newInstance();
+  public <T> T convertBean(Class<T> clazz, JSONObject toConvert) throws JSONException {
+    T t = newInstance(clazz);
     SimplePropertyDescriptor[] allProperties =
         SimplePropertyDescriptor.getPropertyDescriptors(clazz);
     for (SimplePropertyDescriptor property : allProperties) {
@@ -246,18 +266,35 @@ public class JsonToBeanConverter {
 
       try {
         write.invoke(t, convert(type, value));
-      } catch (Exception e) {
-        throw new Exception(
-            String.format("Property name: %s -> %s on class %s", property.getName(), value, type),
-            e);
+      } catch (IllegalAccessException e) {
+        throw propertyWriteException(property, value, type, e);
+      } catch (InvocationTargetException e) {
+        throw propertyWriteException(property, value, type, e);
       }
     }
 
     return t;
   }
 
+  private <T> T newInstance(Class<T> clazz) {
+    try {
+      return clazz.newInstance();
+    } catch (InstantiationException e) {
+      throw new WebDriverException(e);
+    } catch (IllegalAccessException e) {
+      throw new WebDriverException(e);
+    }
+  }
+
+  private WebDriverException propertyWriteException(
+      SimplePropertyDescriptor property, Object value, Class<?> type, Throwable cause) {
+    throw new WebDriverException(
+        String.format("Property name: %s -> %s on class %s", property.getName(), value, type),
+        cause);
+  }
+
   @SuppressWarnings("unchecked")
-  private Map convertMap(JSONObject toConvert) throws Exception {
+  private Map convertMap(JSONObject toConvert) throws JSONException {
     Map map = new HashMap();
 
     Iterator allEntries = toConvert.keys();
@@ -270,7 +307,7 @@ public class JsonToBeanConverter {
   }
 
   @SuppressWarnings("unchecked")
-  private List convertList(JSONArray toConvert) throws Exception {
+  private List convertList(JSONArray toConvert) throws JSONException {
     ArrayList list = new ArrayList(toConvert.length());
     for (int i = 0; i < toConvert.length(); i++) {
       list.add(convert(Object.class, toConvert.get(i)));

@@ -48,7 +48,7 @@ public interface WebElement extends SearchContext {
    * If this current element is a form, or an element within a form, then this will be submitted
    * to the remote server. If this causes the current page to change, then this method will block
    * until the new page is loaded.
-   *
+   * 
    * @throws NoSuchElementException If the given element is not within a form
    */
   void submit();
@@ -84,11 +84,26 @@ public interface WebElement extends SearchContext {
 
   /**
    * Get the value of a the given attribute of the element. Will return the current value, even if
-   * this has been modified after the page has been loaded. Note that the value of the attribute
-   * "checked" will return "checked" if the element is a input of type checkbox and there is no
-   * explicit "checked" attribute, and will also return "selected" for an option that is selected
-   * even if there is no explicit "selected" attribute. The expected value of "disabled" is also
-   * returned.
+   * this has been modified after the page has been loaded. More exactly, this method will return
+   * the value of the given attribute, unless that attribute is not present, in which case the
+   * value of the property with the same name is returned. If neither value is set, null is
+   * returned. The "style" attribute is converted as best can be to a text representation with a
+   * trailing semi-colon. The following are deemed to be "boolean" attributes, and will
+   * return either "true" or "false":
+   *
+   * async, autofocus, autoplay, checked, compact, complete, controls, declare, defaultchecked,
+   * defaultselected, defer, disabled, draggable, ended, formnovalidate, hidden, indeterminate,
+   * iscontenteditable, ismap, itemscope, loop, multiple, muted, nohref, noresize, noshade, novalidate,
+   * nowrap, open, paused, pubdate, readonly, required, reversed, scoped, seamless, seeking,
+   * selected, spellcheck, truespeed, willvalidate
+   *
+   * Finally, the following commonly mis-capitalized attribute/property names are evaluated as
+   * expected:
+   *
+   * <ul>
+   * <li>"class"
+     <li>"readonly"
+   * </ul>
    *
    * @param name The name of the attribute.
    * @return The attribute's current value or null if the value is not set.
@@ -135,19 +150,23 @@ public interface WebElement extends SearchContext {
   String getText();
 
   /**
-   * Find all elements within the current context using the given mechanism.
+   * Find all elements within the current context using the given mechanism. When using xpath be
+   * aware that webdriver follows standard conventions: a search prefixed with "//" will search
+   * the entire document, not just the children of this current node. Use ".//" to limit your
+   * search to the children of this WebElement.
    *
    * @param by The locating mechanism to use
-   * @return A list of all {@link WebElement}s, or an empty list if nothing matches
+   * @return A list of all {@link WebElement}s, or an empty list if nothing matches.
    * @see org.openqa.selenium.By
    */
   List<WebElement> findElements(By by);
 
   /**
-   * Find the first {@link WebElement} using the given method.
+   * Find the first {@link WebElement} using the given method. See the note in
+   * {@link #findElement(By)} about finding via XPath.
    *
    * @param by The locating mechanism
-   * @return The first matching element on the current context
+   * @return The first matching element on the current context.
    * @throws NoSuchElementException If no matching elements are found
    */
   WebElement findElement(By by);

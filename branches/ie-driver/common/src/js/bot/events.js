@@ -16,7 +16,7 @@
 /**
  * @fileoverview Functions to do with firing and simulating events.
  *
-*
+ *
  */
 
 
@@ -36,8 +36,8 @@ goog.require('goog.userAgent');
  * @enum {number}
  */
 bot.events.Button = {
-  LEFT: (goog.userAgent.IE ? 0 : 1),
-  MIDDLE: (goog.userAgent.IE ? 1 : 4),
+  LEFT: (goog.userAgent.IE ? 1 : 0),
+  MIDDLE: (goog.userAgent.IE ? 4 : 1),
   RIGHT: (goog.userAgent.IE ? 2 : 2)
 };
 
@@ -72,9 +72,9 @@ bot.events.MouseArgs;
  *
  * <dl>
  * <dt>x</dt>
- * <dd>The x value relative to the element.</dd>
+ * <dd>The x value relative to the client viewport.</dd>
  * <dt>y</dt>
- * <dd>The y value relative to the element.</dd>
+ * <dd>The y value relative to the client viewport.</dd>
  * <dt>button</dt>
  * <dd>The mouse button (from {@code bot.events.button}). Defaults to LEFT</dd>
  * <dt>bubble</dt>
@@ -94,7 +94,7 @@ bot.events.MouseArgs;
  * @param {!Element} element The element on which the event will be fired.
  * @param {!goog.events.EventType} type One of the goog.events.EventType values.
  * @param {!bot.events.MouseArgs} opt_args See above.
- * @return {!Object} An initialized mouse event, with fields populated from
+ * @return {!Event} An initialized mouse event, with fields populated from
  *   opt_args.
  * @private
  */
@@ -201,7 +201,7 @@ bot.events.HtmlArgs;
  * @param {!Element} element The element on which the event will be fired.
  * @param {!goog.events.EventType} type One of the goog.events.EventType values.
  * @param {!bot.events.HtmlArgs=} opt_args See above.
- * @return {!Object} An initialized event object, with fields populated from
+ * @return {!Event} An initialized event object, with fields populated from
  *   opt_args.
  * @private
  */
@@ -211,15 +211,16 @@ bot.events.newHtmlEvent_ = function(element, type, opt_args) {
 
   opt_args = opt_args || {};
 
-  var canBubble = opt_args['bubble'] || true;
+  var canBubble = opt_args['bubble'] !== false;
 
   var alt = !!opt_args['alt'];
   var control = !!opt_args['control'];
   var shift = !!opt_args['shift'];
   var meta = !!opt_args['meta'];
 
+  var event;
   if (element['fireEvent'] && doc && doc['createEventObject']) {
-    var event = doc.createEventObject();
+    event = doc.createEventObject();
     event.altKey = alt;
     event.ctrl = control;
     event.metaKey = meta;
@@ -254,6 +255,8 @@ bot.events.INIT_FUNCTIONS_[goog.events.EventType.MOUSEOVER] =
     bot.events.newMouseEvent_;
 bot.events.INIT_FUNCTIONS_[goog.events.EventType.MOUSEUP] =
     bot.events.newMouseEvent_;
+bot.events.INIT_FUNCTIONS_[goog.events.EventType.CLICK] =
+    bot.events.newMouseEvent_;
 
 /**
  * Dispatch the event in a browser-safe way.
@@ -261,6 +264,7 @@ bot.events.INIT_FUNCTIONS_[goog.events.EventType.MOUSEUP] =
  * @param {!Element} target The element on which this event will fire.
  * @param {!goog.events.EventType} type The type of event to fire.
  * @param {!Object} event The initialized event.
+ * @return {boolean} Whether the event fired successfully or was cancelled.
  * @private
  */
 bot.events.dispatchEvent_ = function(target, type, event) {
@@ -283,9 +287,9 @@ bot.events.dispatchEvent_ = function(target, type, event) {
       // work around for http://jira.openqa.org/browse/SEL-280 -- make
       // the event available somewhere:
     }
-    target.fireEvent('on' + type, event);
+    return target.fireEvent('on' + type, event);
   } else {
-    target.dispatchEvent((/**@type {Event} */event));
+    return target.dispatchEvent((/**@type {Event} */event));
   }
 };
 
@@ -296,12 +300,13 @@ bot.events.dispatchEvent_ = function(target, type, event) {
  * @param {!goog.events.EventType} type The type of event.
  * @param {!(bot.events.MouseArgs|bot.events.HtmlArgs)=} opt_args Arguments,
  *     used to initialize the event.
+ * @return {boolean} Whether the event fired successfully or was cancelled.
  */
 bot.events.fire = function(target, type, opt_args) {
   var init = bot.events.INIT_FUNCTIONS_[type] || bot.events.newHtmlEvent_;
 
   var event = init(target, type, opt_args);
 
-  bot.events.dispatchEvent_(target, type, event);
+  return bot.events.dispatchEvent_(target, type, event);
 };
 

@@ -138,6 +138,18 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.Firefox)]
+        [IgnoreBrowser(Browser.Chrome)]
+        public void ShouldSelectChildFramesByChainedCalls()
+        {
+            driver.Url = framesetPage;
+
+            driver.SwitchTo().Frame("fourth").SwitchTo().Frame("child2");
+            Assert.AreEqual("11", driver.FindElement(By.Id("pageNumber")).Text);
+        }
+
+        [Test]
         public void ShouldSwitchToChildFramesTreatingNumbersAsIndex()
         {
             driver.Url = framesetPage;
@@ -200,6 +212,15 @@ namespace OpenQA.Selenium
         }
 
         [Test]
+        [IgnoreBrowser(Browser.IE, "As yet unimplemented")]
+        public void ShouldBeAbleToSwitchToTopLevelFrameWithDotInNameAssumingNoParentAndChildFrameExistWithTheSameName()
+        {
+            driver.Url = framesetPage;
+            driver.SwitchTo().Frame("seventh.withadot");
+            Assert.AreEqual("3", driver.FindElement(By.Id("pageNumber")).Text);
+        }
+
+        [Test]
         public void ShouldBeAbleToFindElementsInIframesByName()
         {
             driver.Url = iframePage;
@@ -241,5 +262,58 @@ namespace OpenQA.Selenium
             driver.SwitchTo().Frame("iframe1");
             Assert.AreEqual(driver.Url, url);
         }
+
+        [Test]
+        [IgnoreBrowser(Browser.IE)]
+        [IgnoreBrowser(Browser.Chrome)]
+        public void ShouldBeAbleToCarryOnWorkingIfTheFrameIsDeletedFromUnderUs()
+        {
+            driver.Url = deletingFrame;
+            driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromMilliseconds(1000));
+            driver.SwitchTo().Frame("iframe1");
+            
+            IWebElement killIframe = driver.FindElement(By.Id("killIframe"));
+            killIframe.Click();
+
+            bool frameExists = true;
+            DateTime timeout = DateTime.Now.Add(TimeSpan.FromMilliseconds(4000));
+            while (DateTime.Now < timeout)
+            {
+                try
+                {
+                    driver.SwitchTo().Frame("iframe1");
+                }
+                catch (NoSuchFrameException)
+                {
+                    frameExists = false;
+                    break;
+                }
+            }
+
+            Assert.IsFalse(frameExists);
+
+            driver.SwitchTo().DefaultContent();
+            IWebElement addIFrame = driver.FindElement(By.Id("addBackFrame"));
+            addIFrame.Click();
+
+            driver.SwitchTo().Frame("iframe1");
+            try
+            {
+                driver.FindElement(By.Id("checkbox"));
+            }
+            catch (WebDriverException)
+            {
+                Assert.Fail("Could not find element after switching frame");
+            }
+        }
+
+        [Test]
+        public void ShouldReturnFrameTitleNotWindowTitle()
+        {
+            driver.Url = framesetPage;
+            driver.SwitchTo().Frame("third");
+            Assert.AreEqual("We Leave From Here", driver.Title);
+        }
+
     }
 }

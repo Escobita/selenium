@@ -18,6 +18,7 @@ namespace OpenQA.Selenium.Chrome
         private static readonly string[] chromePaths = new string[]
         {
             "/usr/bin/google-chrome",
+            "/usr/bin/chromium",
             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             string.Concat("/Users/", Environment.UserName, "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
         };
@@ -72,6 +73,10 @@ namespace OpenQA.Selenium.Chrome
             get { return listeningPort; }
         }
 
+        /// <summary>
+        /// Adds custom arguments to the command line.
+        /// </summary>
+        /// <param name="customArgs">The arguments to add.</param>
         public void AddCustomArgs(string customArgs)
         {
             this.customArgs.Append(" ").Append(customArgs);

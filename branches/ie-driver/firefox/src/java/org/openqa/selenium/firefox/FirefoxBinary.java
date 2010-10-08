@@ -19,6 +19,7 @@ package org.openqa.selenium.firefox;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,14 +61,15 @@ public class FirefoxBinary {
     return Platform.getCurrent().is(Platform.LINUX);
   }
 
-  public void startProfile(FirefoxProfile profile, String... commandLineFlags) throws IOException {
-    String profileAbsPath = profile.getProfileDir().getAbsolutePath();
+  public void startProfile(FirefoxProfile profile, File profileDir, String... commandLineFlags) throws IOException {
+    String profileAbsPath = profileDir.getAbsolutePath();
     setEnvironmentProperty("XRE_PROFILE_PATH", profileAbsPath);
     setEnvironmentProperty("MOZ_NO_REMOTE", "1");
+    setEnvironmentProperty("MOZ_CRASHREPORTER_DISABLE", "1"); // Disable Breakpad
 
     if (isOnLinux()
         && (profile.enableNativeEvents() || profile.alwaysLoadNoFocusLib())) {
-      modifyLinkLibraryPath(profile);
+      modifyLinkLibraryPath(profileDir);
     }
 
     List<String> commands = new ArrayList<String>();
@@ -107,14 +109,14 @@ public class FirefoxBinary {
     return Collections.unmodifiableMap(extraEnv);
   }
 
-  protected void modifyLinkLibraryPath(FirefoxProfile profile) {
+  protected void modifyLinkLibraryPath(File profileDir) {
     // Extract x_ignore_nofocus.so from x86, amd64 directories inside
     // the jar into a real place in the filesystem and change LD_LIBRARY_PATH
     // to reflect that.
 
     String existingLdLibPath = System.getenv("LD_LIBRARY_PATH");
     // The returned new ld lib path is terminated with ':'
-    String newLdLibPath = extractAndCheck(profile, NO_FOCUS_LIBRARY_NAME, "x86", "amd64");
+    String newLdLibPath = extractAndCheck(profileDir, NO_FOCUS_LIBRARY_NAME, "x86", "amd64");
     if (existingLdLibPath != null && !existingLdLibPath.equals("")) {
       newLdLibPath += existingLdLibPath;
     }
@@ -125,7 +127,7 @@ public class FirefoxBinary {
     setEnvironmentProperty("LD_PRELOAD", NO_FOCUS_LIBRARY_NAME);
   }
 
-  protected String extractAndCheck(FirefoxProfile profile, String noFocusSoName,
+  protected String extractAndCheck(File profileDir, String noFocusSoName,
                                    String jarPath32Bit, String jarPath64Bit) {
 
     // 1. Extract x86/x_ignore_nofocus.so to profile.getLibsDir32bit
@@ -142,9 +144,7 @@ public class FirefoxBinary {
     for (String path : pathsSet) {
       try {
 
-        FileHandler.copyResource(profile.getProfileDir(), getClass(), path +
-                                                                      File.separator
-                                                                      + noFocusSoName);
+        FileHandler.copyResource(profileDir, getClass(), path + File.separator + noFocusSoName);
 
       } catch (IOException e) {
         if (Boolean.getBoolean("webdriver.development")) {
@@ -155,7 +155,7 @@ public class FirefoxBinary {
         }
       } // End catch.
 
-      String outSoPath = profile.getProfileDir().getAbsolutePath() + File.separator + path;
+      String outSoPath = profileDir.getAbsolutePath() + File.separator + path;
 
       File file = new File(outSoPath, noFocusSoName);
       if (!file.exists()) {
@@ -267,8 +267,8 @@ public class FirefoxBinary {
     }
   }
 
-  public void clean(FirefoxProfile profile) throws IOException {
-    startProfile(profile, "-silent");
+  public void clean(FirefoxProfile profile, File profileDir) throws IOException {
+    startProfile(profile, profileDir, "-silent");
     try {
       waitFor();
     } catch (InterruptedException e) {
@@ -276,13 +276,13 @@ public class FirefoxBinary {
     }
 
     if (Platform.getCurrent().is(Platform.WINDOWS)) {
-      while (profile.isRunning()) {
+      while (profile.isRunning(profileDir)) {
         sleep(500);
       }
 
       do {
         sleep(500);
-      } while (profile.isRunning());
+      } while (profile.isRunning(profileDir));
     }
   }
 
@@ -308,7 +308,7 @@ public class FirefoxBinary {
   }
 
   private static class OutputWatcher implements Runnable {
-    private Process process;
+    private final Process process;
     private OutputStream stream;
 
     public OutputWatcher(Process process, OutputStream stream) {
@@ -317,13 +317,35 @@ public class FirefoxBinary {
     }
 
     public void run() {
-      int in = 0;
-      while (in != -1) {
-        try {
-          in = process.getInputStream().read();
-          stream.write(in);
-        } catch (IOException e) {
-          System.err.println(e);
+      InputStream stdoutOfWatchedProcess = null;
+      try {
+        stdoutOfWatchedProcess = process.getInputStream();
+        byte[] buffer = new byte[4096];
+        int n;
+        do {
+          n = stdoutOfWatchedProcess.read(buffer);
+          if (n > 0 && stream != null) {
+            try {
+              stream.write(buffer, 0, n);
+            } catch (IOException e) {
+              System.err.print("ERROR: Could not write to " + stream + ": ");
+              e.printStackTrace(System.err);
+              // We must continue to read from stdoutOfWatchedProcess
+              // (otherwise the process might block), therefore we can
+              // not break out of the loop here, instead we set stream
+              // to null, so that no further write attempts are made ...
+              stream = null;
+            }
+          }
+        } while (n != -1);
+      } catch (IOException e) {
+        System.err.print("ERROR: Could not read from stdout of " + process + ": ");
+        e.printStackTrace(System.err);
+      } finally {
+        if (stdoutOfWatchedProcess != null) {
+          try {
+            stdoutOfWatchedProcess.close();
+          } catch (IOException ignored) {}
         }
       }
     }

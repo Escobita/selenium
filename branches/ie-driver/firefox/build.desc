@@ -16,25 +16,6 @@ java_test(name = "test",
     "//common:test"
   ])
 
-ruby_library(name = "firefox",
-  srcs = [ "src/rb/lib/**/*.rb" ],
-  resources = [
-    { ":webdriver" : "lib/selenium/webdriver/firefox/extension/webdriver.xpi"},
-    { ":noblur"    : "lib/selenium/webdriver/firefox/native/linux/x86/x_ignore_nofocus.so" },
-    { ":noblur64"  : "lib/selenium/webdriver/firefox/native/linux/amd64/x_ignore_nofocus.so" }
-  ],
-  deps = [ "//remote/client:ruby" ]
-)
-
-ruby_test(name = "firefox",
-  srcs = [
-    "common/test/rb/spec/**/*_spec.rb",
-    "firefox/test/rb/spec/**/*_spec.rb"
-  ],
-  deps = [":ruby"],
-  include = [ "build/ruby/lib" ]
-)
-
 mozilla_xpt(name = "native_events_xpt",
   srcs = [ "src/cpp/webdriver-firefox/nsINativeEvents.idl" ])
 
@@ -65,8 +46,10 @@ mozilla_extension(name = "webdriver",
     { ":libwebdriver_firefox_so" : "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so" },
     { ":libwebdriver_firefox_so64" : "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so" },
     { ":atoms" : "resource/modules/atoms.js" },
-    { "src/js/errorcode.js" : "resource/modules/errorcode.js" },
-    { "src/js/utils.js" :     "resource/modules/utils.js" }
+    { ":utils" : "resource/modules/utils.js" },
+    { "src/js/timer.js" : "resource/modules/timer.js" },
+    { "src/js/evaluate.js" : "resource/evaluate.js" },
+    { "//third_party/js/sizzle" : "resource/sizzle.js" }
   ],
   chrome = "src/extension/chrome.manifest",
   install = "src/extension/install.rdf")
@@ -77,6 +60,16 @@ js_binary(name = "atoms",
   srcs = [ "src/js/exported_symbols.js" ],
   deps = [ "//common:atomic_driver" ])
 
+js_binary(name = "utils",
+  srcs = [
+    "src/js/errorcode.js",
+    "src/js/logging.js",
+    "src/js/utils.js",
+    "src/js/utils_exports.js"
+  ],
+  deps = [
+    "//common:atomic_driver"
+  ])
 
 gcc_library(name = "noblur",
   srcs = [ "src/cpp/linux-specific/*.c" ],

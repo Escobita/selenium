@@ -27,9 +27,12 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.HttpCommandProcessor;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+
+import org.json.JSONException;
 import org.openqa.selenium.firefox.internal.Executable;
 import org.openqa.selenium.internal.selenesedriver.ClearElement;
 import org.openqa.selenium.internal.selenesedriver.ClickElement;
+import org.openqa.selenium.internal.selenesedriver.Close;
 import org.openqa.selenium.internal.selenesedriver.ExecuteScript;
 import org.openqa.selenium.internal.selenesedriver.FindElement;
 import org.openqa.selenium.internal.selenesedriver.GetCurrentUrl;
@@ -49,16 +52,20 @@ import org.openqa.selenium.internal.selenesedriver.SeleneseFunction;
 import org.openqa.selenium.internal.selenesedriver.SendKeys;
 import org.openqa.selenium.internal.selenesedriver.SetElementSelected;
 import org.openqa.selenium.internal.selenesedriver.SubmitElement;
+import org.openqa.selenium.internal.selenesedriver.SwitchToFrame;
 import org.openqa.selenium.internal.selenesedriver.ToggleElement;
 import org.openqa.selenium.remote.BeanToJsonConverter;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.ErrorCodes;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.Response;
 
 import static org.openqa.selenium.remote.DriverCommand.*;
+import static org.openqa.selenium.remote.DriverCommand.CLOSE;
+import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_FRAME;
 
 public class SeleneseCommandExecutor implements CommandExecutor {
   private final ErrorCodes errorCodes;
@@ -86,10 +93,9 @@ public class SeleneseCommandExecutor implements CommandExecutor {
     return instance;
   }
 
-  public Response execute(Command command) throws Exception {
+  public Response execute(Command command) {
     SeleneseFunction function = functions.get(command.getName());
     if (function == null) {
-      System.out.println("command.getMethodName() = " + command.getName());
       throw new UnsupportedOperationException("cannot execute: " + command.getName());
     }
 
@@ -102,7 +108,7 @@ public class SeleneseCommandExecutor implements CommandExecutor {
     }
   }
 
-  private Response prepareExceptionResponse(Exception e) throws Exception {
+  private Response prepareExceptionResponse(Exception e) {
     Response response = new Response();
 
     Exception toUse = e;
@@ -129,6 +135,7 @@ public class SeleneseCommandExecutor implements CommandExecutor {
 
     addCommand(CLEAR_ELEMENT, new ClearElement());
     addCommand(CLICK_ELEMENT, new ClickElement());
+    addCommand(CLOSE, new Close());
     addCommand(GET_CURRENT_URL, new GetCurrentUrl());
     addCommand(EXECUTE_SCRIPT, new ExecuteScript());
     addCommand(FIND_ELEMENT, findElement);
@@ -146,6 +153,7 @@ public class SeleneseCommandExecutor implements CommandExecutor {
     addCommand(GET_PAGE_SOURCE, new GetPageSource());
     addCommand(SEND_KEYS_TO_ELEMENT, new SendKeys());
     addCommand(SET_ELEMENT_SELECTED, new SetElementSelected());
+    addCommand(SWITCH_TO_FRAME, new SwitchToFrame());
     addCommand(SUBMIT_ELEMENT, new SubmitElement());
     addCommand(TOGGLE_ELEMENT, new ToggleElement());
     addCommand(QUIT, new QuitSelenium());

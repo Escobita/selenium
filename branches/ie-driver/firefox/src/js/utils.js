@@ -16,9 +16,13 @@
  limitations under the License.
  */
 
-var EXPORTED_SYMBOLS = [ 'createSwitchFile', 'Utils', 'WebDriverError' ];
+goog.provide('Utils');
 
-Components.utils.import('resource://fxdriver/modules/errorcode.js');
+goog.require('bot.dom');
+goog.require('goog.style');
+goog.require('ErrorCode');
+goog.require('Logger');
+
 
 /**
  * A WebDriver error.
@@ -97,13 +101,9 @@ function createSwitchFile(file_content) {
     }
   } catch (e) {
     // Fine. Log it and continue
-    Utils.dumpn(e);
+    Logger.dumpn(e);
   }
 }
-
-function Utils() {
-}
-
 
 Utils.getUniqueId = function() {
   if (!Utils._generator) {
@@ -118,7 +118,7 @@ Utils.newInstance = function(className, interfaceName) {
   var clazz = Components.classes[className];
 
   if (!clazz) {
-    Utils.dumpn("Unable to find class: " + className);
+    Logger.dumpn("Unable to find class: " + className);
     return undefined;
   }
   var iface = Components.interfaces[interfaceName];
@@ -185,46 +185,8 @@ Utils.isInHead = function(element) {
 };
 
 
-/**
- * Checks that the element is not hidden by dimensions or CSS
- */
-Utils.isDisplayed = function(element, scrollIfNecessary) {
-  // Ensure that we're dealing with an element.
-  var el = element;
-  while (el.nodeType != 1 && !(el.nodeType >= 9 && el.nodeType <= 11)) {
-    el = el.parentNode;
-  }
-
-  if (!el) {
-    return false;
-  }
-
-  // Hidden input elements are, by definition, never displayed
-  if (el.tagName == "input" && el.type == "hidden") {
-    return false;
-  }
-
-  var box = scrollIfNecessary ? Utils.getLocationOnceScrolledIntoView(el) : Utils.getLocation(el);
-  // Elements with zero width or height are never displayed
-  if (box.width == 0 || box.height == 0) {
-    return false;
-  }
-
-  var visibility = Utils.getStyleProperty(el, "visibility");
-
-  var _isDisplayed = function(e) {
-    var display = e.ownerDocument.defaultView.getComputedStyle(e, null).
-        getPropertyValue("display");
-    if (display == "none") return display;
-    if (e && e.parentNode && e.parentNode.style) {
-      return _isDisplayed(e.parentNode);
-    }
-    return undefined;
-  };
-
-  var displayed = _isDisplayed(el);
-
-  return displayed != "none" && visibility != "hidden";
+Utils.isEnabled = function(element) {
+  return !!!element.disabled;
 };
 
 
@@ -321,7 +283,7 @@ Utils.shiftCount = 0;
 
 Utils.getNativeEvents = function() {
   try {
-    const cid = "@openqa.org/nativeevents;1";
+    var cid = "@openqa.org/nativeevents;1";
     var obj = Components.classes[cid].createInstance();
     return obj.QueryInterface(Components.interfaces.nsINativeEvents);
   } catch(e) {
@@ -348,6 +310,19 @@ Utils.getNodeForNativeEvents = function(element) {
   }
 };
 
+Utils.useNativeEvents = function() {
+  var prefs =
+    Utils.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
+  var enableNativeEvents =
+    prefs.prefHasUserValue("webdriver_enable_native_events") ?
+    prefs.getBoolPref("webdriver_enable_native_events") : false;
+
+  if (enableNativeEvents && Utils.getNativeEvents()) {
+      return true;
+  }
+
+  return false;
+}
 
 Utils.type = function(doc, element, text, opt_useNativeEvents) {
 
@@ -369,13 +344,13 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
 
   var obj = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
-  const thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
+  var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
 
   if (opt_useNativeEvents && obj && node && thmgr_cls) {
 
     // This indicates that a the page has been unloaded
     var pageHasBeenUnloaded = false;
-    
+
     // This is the standard indicator that a page has been unloaded, but
     // due to Firefox's caching policy, will occur only when Firefox works
     // *without* caching at all.
@@ -388,15 +363,16 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
     // https://developer.mozilla.org/En/Using_Firefox_1.5_caching
     element.ownerDocument.defaultView.addEventListener("pagehide",
         unloadFunction, false);
-
+    
     // Now do the native thing.
     obj.sendKeys(node, text);
+
 
     var hasEvents = {};
     var threadmgr =
         thmgr_cls.getService(Components.interfaces.nsIThreadManager);
     var thread = threadmgr.currentThread;
-    
+
     do {
 
       // This sleep is needed so that Firefox on Linux will manage to process
@@ -411,7 +387,7 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
         the_window.setTimeout(function() {
           doneNativeEventWait = true; }, 100);
       }
-      
+
       // Do it as long as the timeout function has not been called and the
       // page has not been unloaded. If the page has been unloaded, there is no
       // point in waiting for other native events to be processed in this page
@@ -425,7 +401,7 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
     } while ((hasEvents.value == true) && (!pageHasBeenUnloaded));
 
     if (pageHasBeenUnloaded) {
-        Utils.dumpn("Page has been reloaded while waiting for native events to "
+        Logger.dumpn("Page has been reloaded while waiting for native events to "
             + "be processed. Remaining events? " + hasEvents.value);
     } else {
         // Remove event listeners...
@@ -443,13 +419,13 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
     // The appropriate thing to do is process all the remaining JS events.
     // Only existing events in the queue should be processed - hence the call
     // to processNextEvent with false.
-    
+
     var numExtraEventsProcessed = 0;
     var hasMoreEvents = thread.processNextEvent(false);
     // A safety net to prevent the code from endlessly staying in this loop,
     // in case there is some source of events that's constantly generating them.
     var MAX_EXTRA_EVENTS_TO_PROCESS = 150;
-    
+
     while ((hasMoreEvents) &&
     		(numExtraEventsProcessed < MAX_EXTRA_EVENTS_TO_PROCESS)) {
     	hasMoreEvents = thread.processNextEvent(false);
@@ -459,7 +435,7 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
     return;
   }
 
-  Utils.dumpn("Doing sendKeys in a non-native way...")
+  Logger.dumpn("Doing sendKeys in a non-native way...")
   var controlKey = false;
   var shiftKey = false;
   var altKey = false;
@@ -891,98 +867,6 @@ Utils.findFrame = function(browser, frameId) {
 };
 
 
-Utils.dumpText = function(text) {
-  if (!Utils.dumpText.isLoggingInit_) {
-    var prefs =
-        Utils.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
-    Utils.dumpText.isLoggingInit_ = true;
-    Utils.dumpText.logToConsole_ =
-        prefs.prefHasUserValue("webdriver_log_to_console") &&
-        prefs.getBoolPref("webdriver_log_to_console");
-  }
-  var consoleService = Utils.getService(
-      "@mozilla.org/consoleservice;1", "nsIConsoleService");
-  if (consoleService) {
-    consoleService.logStringMessage(text);
-    if (Utils.dumpText.logToConsole_) {
-      dump(text);
-    }
-  } else {
-    dump(text);
-  }
-};
-
-
-Utils.dumpn = function(text) {
-  var stack = Components.stack.caller;
-  var filename = stack.filename.replace(/.*\//, '');
-  Utils.dumpText(filename + ":" + stack.lineNumber  + " - " + text + "\n");
-};
-
-
-Utils.dump = function(element) {
-  var dump = "=============\n";
-
-  var rows = [];
-
-  dump += "Supported interfaces: ";
-  for (var i in Components.interfaces) {
-    try {
-      var view = element.QueryInterface(Components.interfaces[i]);
-      dump += i + ", ";
-    } catch (e) {
-      // Doesn't support the interface
-    }
-  }
-  dump += "\n------------\n";
-
-  try {
-    Utils.dumpProperties(element, rows);
-  } catch (e) {
-    Utils.dumpText("caught an exception: " + e);
-  }
-
-  rows.sort();
-  for (var i in rows) {
-    dump += rows[i] + "\n";
-  }
-
-  dump += "=============\n\n\n";
-  Utils.dumpText(dump);
-};
-
-
-Utils.dumpProperties = function(view, rows) {
-  for (var i in view) {
-    var value = "\t" + i + ": ";
-    try {
-      if (typeof(view[i]) == typeof(Function)) {
-        value += " function()";
-      } else {
-        value += String(view[i]);
-      }
-    } catch (e) {
-      value += " Cannot obtain value";
-    }
-
-    rows.push(value);
-  }
-};
-
-
-Utils.stackTrace = function() {
-  var stack = Components.stack;
-  var i = 5;
-  var dump = "";
-  while (i && stack.caller) {
-    stack = stack.caller;
-    dump += stack + "\n";
-  }
-
-  Utils.dumpText(dump);
-};
-
-
 Utils.getElementLocation = function(element) {
   var x = element.offsetLeft;
   var y = element.offsetTop;
@@ -1040,9 +924,6 @@ Utils.findElementsByXPath = function (xpath, contextNode, doc) {
 
 
 Utils.getLocation = function(element) {
-  var retrieval = Utils.newInstance(
-      "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
-
   try {
     element = element.wrappedJSObject ? element.wrappedJSObject : element;
 
@@ -1071,7 +952,9 @@ Utils.getLocation = function(element) {
     }
 
     // Firefox 3.0, but lacking client rect
-    Utils.dumpn("Falling back to firefox3 mechanism");
+    Logger.dumpn("Falling back to firefox3 mechanism");
+    var retrieval = Utils.newInstance(
+      "@mozilla.org/accessibleRetrieval;1", "nsIAccessibleRetrieval");
     var accessible = retrieval.getAccessibleFor(element);
 
     var x = {}, y = {}, width = {}, height = {};
@@ -1084,43 +967,21 @@ Utils.getLocation = function(element) {
       height: height.value
     };
   } catch(e) {
-    Utils.dumpn(e);
+    Logger.dumpn(e);
     // Element doesn't have an accessibility node
+    Logger.dumpn("Falling back to using closure to find the location of the element");
+
+    var position = goog.style.getClientPosition(element);
+    var size = goog.style.getBorderBoxSize(element);
+    var shown = bot.dom.isShown(element);
+
+    return {
+      x: position.x,
+      y: position.y,
+      width: shown ? size.width : 0,
+      height: shown ? size.height : 0
+    };
   }
-
-  // Firefox 2.0
-
-  Utils.dumpn("Falling back to firefox2 mechanism");
-  // Fallback. Use the (deprecated) method to find out where the element is in
-  // the viewport. This should be fine to use because we only fall down this
-  // code path on older versions of Firefox (I think!)
-  var theDoc = element.ownerDocument;
-  var box = theDoc.getBoxObjectFor(element);
-
-  // We've seen cases where width is 0, despite the element actually having
-  // children with width.
-  // This happens particularly with GWT.
-  if (box.width == 0 || box.height == 0) {
-    // Check the child, and hope the user doesn't nest this stuff. Walk the
-    // children til we find an element. At this point, we know that width and
-    // height are a polite fiction
-    for (var i = 0; i < element.childNodes.length; i++) {
-      var c = element.childNodes[i];
-      if (c.nodeType == 1) {
-        Utils.dumpn(
-            "Width and height are ficticious values, based on child node");
-        box = theDoc.getBoxObjectFor(c);
-        break;
-      }
-    }
-  }
-
-  return {
-    x : box.x + 3,
-    y : box.y,
-    width: box.width,
-    height: box.height
-  };
 };
 
 
@@ -1172,16 +1033,20 @@ Utils.unwrapParameters = function(wrappedParameters, doc) {
 Utils.isArray_ = function(obj) {
   return (obj !== undefined &&
     obj.constructor.toString().indexOf("Array") != -1);
-}
+};
 
 
 Utils.isHtmlCollection_ = function(obj) {
   return (obj !== undefined && obj['length'] &&
     obj['item'] && obj['namedItem']); 
-}
+};
 
 
 Utils.wrapResult = function(result, doc) {
+  if (result && result.wrappedJSObject) {
+    result = result.wrappedJSObject;
+  }
+
   // Sophisticated.
   switch (typeof result) {
     case 'string':
@@ -1224,7 +1089,7 @@ Utils.wrapResult = function(result, doc) {
       return result;
   }
 };
-
+    
 /**
  * Gets canonical xpath of the passed element, e.g. /HTML[1]/BODY[1]/P[1]
  */
@@ -1235,7 +1100,7 @@ Utils.getXPathOfElement = function(element) {
     path = "/" + element.tagName + "[" + index + "]" + path;
   }
   return path;	
-}
+};
 
 /**
  * Returns n for the nth child of the parent of that element, of type element.tagName, starting at 1
@@ -1248,4 +1113,69 @@ Utils.getElementIndexForXPath_ = function (element) {
     }
   }
   return index;
-}
+};
+
+Utils.loadUrl = function(url) {
+  Logger.dumpn("Loading: " + url);
+  var ioService = Utils.getService("@mozilla.org/network/io-service;1", "nsIIOService");
+  var channel = ioService.newChannel(url, null, null);
+  var channelStream = channel.open();
+
+  var scriptableStream = Components.classes["@mozilla.org/scriptableinputstream;1"]
+                                 .createInstance(Components.interfaces.nsIScriptableInputStream);
+  scriptableStream.init(channelStream);
+
+  var converter = Utils.newInstance("@mozilla.org/intl/scriptableunicodeconverter",
+                      'nsIScriptableUnicodeConverter');
+  converter.charset = 'UTF-8';
+
+  var text = '';
+
+  // This doesn't feel right to me.
+  for (var chunk = scriptableStream.read(4096); chunk; chunk = scriptableStream.read(4096)) {
+    text += converter.ConvertToUnicode(chunk);
+  }
+
+  scriptableStream.close();
+  channelStream.close();
+
+  Logger.dumpn("Done reading: " + url);
+  return text;
+};
+
+Utils.findByCss = function(rootNode, theDocument, selector, singular, respond, executeScript) {
+    var findUsing = singular ? 'querySelector' : 'querySelectorAll';
+
+    if (rootNode[findUsing]) {
+      var element = rootNode[findUsing](selector);
+      respond.value = Utils.wrapResult(element, theDocument);
+      respond.send();
+    } else {
+      if (rootNode == theDocument) {
+        rootNode = theDocument.documentElement;
+      }
+      var node = Utils.wrapResult(rootNode, theDocument);
+      var params = {};
+      params['args'] = [selector, node];
+      // Inject sizzle if necessary
+      if (!(theDocument.Sizzle)) {
+        if (!Utils['SIZZLE_']) {
+          Utils.SIZZLE_ = Utils.loadUrl("resource://fxdriver/sizzle.js");
+          Logger.dumpn(Utils.SIZZLE_);
+        }
+        params['script'] = Utils.SIZZLE_ +
+            "; var results = []; Sizzle(arguments[0], arguments[1], results); delete Sizzle; ";
+      } else {
+        params['script'] =
+            "var results = []; Sizzle(arguments[0], arguments[1], results); ";
+      }
+
+      if (singular) {
+        params['script'] += "return results.length > 0 ? results[0] : null;";
+      } else {
+        params['script'] += "return results;";
+      }
+
+      executeScript(respond, params);
+    }
+};

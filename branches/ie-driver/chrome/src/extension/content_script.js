@@ -93,25 +93,9 @@ function parsePortMessage(message) {
       }
       response.value = {statusCode: 0};
       break;
-    case "deleteAllCookies":
-      response.value = deleteAllCookies();
-      response.wait = false;
-      break;
-    case "deleteCookie":
-      response.value = deleteCookie(message.request.name);
-      response.wait = false;
-      break;
     case "executeScript":
       execute(message.request.script, message.request.args);
       //Sends port message back to background page from its own callback
-      break;
-    case "getCookies":
-      response.value = getCookies();
-      response.wait = false;
-      break;
-    case "getCookie":
-      response.value = getCookieNamed(message.request.name);
-      response.wait = false;
       break;
     case "findChildElement":
     case "findChildElements":
@@ -251,126 +235,6 @@ function parsePortMessage(message) {
 }
 
 /**
- * Deletes all cookies accessible from the current page.
- */
-function deleteAllCookies() {
-  var cookies = getAllCookiesAsStrings();
-  for (var i = 0; i < cookies.length; ++i) {
-    var cookie = cookies[i].split("=");
-    deleteCookie(cookie[0]);
-  }
-  return {statusCode: 0};
-}
-
-/**
- * Deletes the cookie with the passed name, accessible from the current page (i.e. with path of the current directory or above)
- * @param cookieName name of the cookie to delete
- */
-function deleteCookie(cookieName) {
-  //It's possible we're trying to delete cookies within iframes.
-  //iframe stuff is unsupported in Chrome at the moment (track crbug.com/20773)
-  //But for the iframe to be loaded and have cookies, it must be of same origin,
-  //so we'll try deleting the cookie as if it was on this page anyway...
-  //(Yes, this is a hack)
-  //TODO(danielwh): Remove the cookieDocument stuff when Chrome fix frame support
-  try {
-    var fullpath = ChromeDriverContentScript.currentDocument.location.pathname;
-    var cookieDocument = ChromeDriverContentScript.currentDocument;
-  } catch (e) {
-    console.log("Falling back on non-iframe document to delete cookies");
-    var cookieDocument = document;
-    var fullpath = cookieDocument.location.pathname;
-  }
-  var hostParts = cookieDocument.location.hostname.split(".");
-
-  fullpath = fullpath.split('/');
-  fullpath.pop(); //Get rid of the file
-  //TODO(danielwh): Tidy up these loops and this repeated code
-  for (var segment in fullpath) {
-    var path = '';
-    for (var i = 0; i < segment; ++i) {
-      path += fullpath[i + 1] + '/';
-    }
-    //Delete cookie with trailing /
-    cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path;
-    //Delete cookie without trailing /
-    cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1);
-
-    var domain = "";
-    for (var i = hostParts.length - 1; i >= 0; --i) {
-      domain = "." + hostParts[i] + domain;
-      //Delete cookie with trailing /
-      cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path + ";domain=" + domain;
-
-      cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path + ";domain=" + domain;
-      //Delete cookie without trailing /
-      cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1) + ";domain=" + domain;
-
-      cookieDocument.cookie = cookieName + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + path.substring(0, path.length - 1) + ";domain=" + domain.substring(1);
-    }
-  }
-  return {statusCode: 0};
-}
-
-/**
- * Get all cookies accessible from the current page as an array of
- * {name: some name, value: some value, secure: false} values
- */
-function getCookies() {
-  var cookies = [];
-  var cookieStrings = getAllCookiesAsStrings();
-  for (var i = 0; i < cookieStrings.length; ++i) {
-    var cookie = cookieStrings[i].split("=");
-    cookies.push({type: "COOKIE", name: cookie[0], value: cookie[1], secure: false});
-  }
-  return {statusCode: 0, value: cookies};
-}
-
-/**
- * Get the cookie accessible from the current page with the passed name
- * @param name name of the cookie
- */
-function getCookieNamed(name) {
-  var cookies = [];
-  var cookieStrings = getAllCookiesAsStrings();
-  for (var i = 0; i < cookieStrings.length; ++i) {
-    var cookie = cookieStrings[i].split("=");
-    if (cookie[0] == name) {
-      return {statusCode: 0, value: {type: "COOKIE", name: cookie[0], value: cookie[1], secure: false}};
-    }
-  }
-  return {statusCode: 0, value: null};
-}
-
-/**
- * Gets all cookies accessible from the current page as an array of
- * key=value strings
- */
-function getAllCookiesAsStrings() {
-  //It's possible we're trying to delete cookies within iframes.
-  //iframe stuff is unsupported in Chrome at the moment (track crbug.com/20773)
-  //But for the iframe to be loaded and have cookies, it must be of same origin,
-  //so we'll try deleting the cookie as if it was on this page anyway...
-  //(Yes, this is a hack)
-  //TODO(danielwh): Remove the cookieDocument stuff when Chrome fix frame support
-  var cookieDocument = ChromeDriverContentScript.currentDocument;
-  try {
-    var tempFullpath = ChromeDriverContentScript.currentDocument.location.pathname;
-  } catch (e) {
-    cookieDocument = document;
-  }
-  var cookieStrings = cookieDocument.cookie.split('; ');
-  var cookies = [];
-  for (var i = 0; i < cookieStrings.length; ++i) {
-    if (cookieStrings[i] == '') {
-      break;
-    }
-     cookies.push(cookieStrings[i]);
-  }
-   return cookies;
-}
-
-/**
  * Add the passed cookie to the page's cookies
  * @param cookie org.openqa.selenium.Cookie to add
  */
@@ -402,8 +266,11 @@ function setCookie(cookie) {
             message: "You may only set cookies on html documents"}};
   } else {
     cookieDocument.cookie = cookie.name + '=' + escape(cookie.value) +
-        ((cookie.expiry == null || cookie.expiry === undefined) ?
-            '' : ';expires=' + (new Date(cookie.expiry.time)).toGMTString()) +
+        (cookie.expiry ? 
+            // Expiry is specified in seconds since January 1, 1970, UTC. We need it
+            // in milliseconds to create our Date object.
+            (';expires=' + (new Date(cookie.expiry * 1000)).toGMTString()) :
+            '') +
         ((cookie.path == null || cookie.path === undefined) ?
             '' : ';path=' + cookie.path);
     return {statusCode: 0};
@@ -532,13 +399,9 @@ function getElement(lookupBy, lookupValue, id) {
     elements = parent.querySelectorAll(lookupValue);
     break;
   case "xpath":
-    if (root != "" && lookupValue[0] != "/") {
-      //Because xpath is relative to the parent, if there is a parent, and the lookup seems to be implied sub-lookup, we add a /
-      root = root + "/";
-    }
-    var xpath = root + lookupValue;
+    var xpath = lookupValue;
     try {
-      elements = getElementsByXPath(xpath);
+      elements = getElementsByXPath(xpath, parent);
     } catch (e) {
       return {statusCode: 19, value: {message: "Could not look up element by xpath " + xpath}};
     }
@@ -672,7 +535,7 @@ function getElementAttribute(element, attribute) {
   var value = null;
   switch (attribute.toLowerCase()) {
   case "disabled":
-    value = (element.disabled ? element.disabled : null);
+    value = (element.disabled ? element.disabled : "false");
     break;
   case "selected":
     if (findWhetherElementIsSelected(element)) {
@@ -698,11 +561,17 @@ function getElementAttribute(element, attribute) {
  * Gets the source of the current document
  */
 function getSource() {
-  if (guessPageType() == "html") {
-    return {statusCode: 0, value: ChromeDriverContentScript.currentDocument.getElementsByTagName("html")[0].outerHTML};
-  } else if (guessPageType() == "text") {
-    return {statusCode: 0, value: ChromeDriverContentScript.currentDocument.getElementsByTagName("pre")[0].innerHTML};
+  var pageType = guessPageType();
+  if ("text" == pageType) {
+    return {
+      statusCode: 0,
+      value: ChromeDriverContentScript.currentDocument.getElementsByTagName("pre")[0].innerHTML
+    };
   }
+  return {
+    statusCode: 0,
+    value: new XMLSerializer().serializeToString(ChromeDriverContentScript.currentDocument)
+  };
 }
 
 /**
@@ -773,7 +642,8 @@ function selectElement(element) {
  */
 function sendElementKeys(element, keys, elementId) {
   try {
-    checkElementIsDisplayed(element)
+    checkElementIsDisplayed(element);
+    checkElementNotDisabled(element);
   } catch (e) {
     return e;
   }
@@ -1215,7 +1085,12 @@ function removeInjectedEmbed() {
  * Guesses whether we have an HTML document or a text file
  */
 function guessPageType() {
-  var source = ChromeDriverContentScript.currentDocument.getElementsByTagName("html")[0].outerHTML;
+  var htmlElement = ChromeDriverContentScript.currentDocument.getElementsByTagName("html")[0];
+  if (!htmlElement) {
+    return "xml";
+  }
+
+  var source = htmlElement.outerHTML;
   var textSourceBegins = '<html><body><pre style="word-wrap: break-word; white-space: pre-wrap;">';
   var textSourceEnds = '</pre></body></html>';
   
@@ -1230,9 +1105,10 @@ function guessPageType() {
 /**
  * Gets an array of elements which match the passed xpath string
  */
-function getElementsByXPath(xpath) {
+function getElementsByXPath(xpath, context) {
+  context = context || ChromeDriverContentScript.currentDocument;
   var elements = [];
-  var foundElements = ChromeDriverContentScript.currentDocument.evaluate(xpath, ChromeDriverContentScript.currentDocument, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var foundElements = ChromeDriverContentScript.currentDocument.evaluate(xpath, context, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
   var this_element = foundElements.iterateNext();
   while (this_element) {
     elements.push(this_element);

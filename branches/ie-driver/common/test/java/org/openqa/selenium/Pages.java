@@ -21,6 +21,7 @@ import org.openqa.selenium.environment.webserver.AppServer;
 
 public class Pages {
   public String simpleTestPage;
+  public String simpleXmlDocument;
   public String xhtmlTestPage;
   public String formPage;
   public String metaRedirectPage;
@@ -43,9 +44,12 @@ public class Pages {
   public String errorsPage;
   public String dynamicPage;
   public String slowIframes;
+  public String tables;
+  public String deletingFrame;
 
   public Pages(AppServer appServer) {
     simpleTestPage = appServer.whereIs("simpleTest.html");
+    simpleXmlDocument = appServer.whereIs("simple.xml");
     xhtmlTestPage = appServer.whereIs("xhtmlTest.html");
     formPage = appServer.whereIs("formPage.html");
     metaRedirectPage = appServer.whereIs("meta-redirect.html");
@@ -68,5 +72,7 @@ public class Pages {
     errorsPage = appServer.whereIs("errors.html");
     dynamicPage = appServer.whereIs("dynamic.html");
     slowIframes = appServer.whereIs("slow_loading_iframes.html");
+    tables = appServer.whereIs("tables.html");
+	deletingFrame = appServer.whereIs("deletingFrame.htm");
   }
 }

@@ -48,6 +48,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
     assertThat(driver.getTitle(), equalTo("Testing Javascript"));
     driver.findElement(By.linkText("Change the page title!")).click();
+    waitForTitleChange("Changed");
     assertThat(driver.getTitle(), equalTo("Changed"));
 
     String titleViaXPath = driver.findElement(By.xpath("/html/head/title")).getText();
@@ -63,8 +64,10 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     WebElement webElement = driver.findElement(By.linkText("Update a div"));
     webElement.click();
 
-    String newText = driver.findElement(By.xpath("//div[@id='dynamo']")).getText();
-    assertThat(newText, equalTo("Fish and chips!"));
+    WebElement dynamo = driver.findElement(By.xpath("//div[@id='dynamo']"));
+
+    TestWaitingUtility.waitUntilElementTextEquals(dynamo, "Fish and chips!");
+    assertThat(dynamo.getText(), equalTo("Fish and chips!"));
   }
 
 //    public void testShouldAllowTheUserToOkayConfirmAlerts() {
@@ -116,8 +119,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(value = {IE, SELENESE, CHROME_NON_WINDOWS, IPHONE},
       reason = "Chrome failing on OS X;\n  iPhone: does not detect that a new page loaded.")
-  public void testShouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad()
-      throws InterruptedException {
+  public void testShouldBeAbleToFindElementAfterJavascriptCausesANewPageToLoad() {
     driver.get(pages.formPage);
 
     driver.findElement(By.id("changeme")).setSelected();
@@ -166,7 +168,13 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     WebElement element = driver.findElement(By.id("jsSubmitButton"));
     element.click();
 
+    waitForTitleChange("We Arrive Here");
+
     assertThat(driver.getTitle(), Matchers.is("We Arrive Here"));
+  }
+
+  private void waitForTitleChange(String newTitle) {
+    TestWaitingUtility.waitForPageTitle(driver, newTitle);
   }
 
   @JavascriptEnabled
@@ -176,6 +184,8 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     WebElement element = driver.findElement(By.id("submittingButton"));
     element.click();
 
+    waitForTitleChange("We Arrive Here");
+    
     assertThat(driver.getTitle(), Matchers.is("We Arrive Here"));
   }
 
@@ -187,7 +197,9 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
     element.click();
 
-    assertEquals("Clicked", element.getValue());
+    String elementValue = TestWaitingUtility.waitUntilElementValueEquals(element, "Clicked");
+
+    assertEquals("Clicked", elementValue);
   }
 
   @JavascriptEnabled
@@ -202,7 +214,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, IPHONE})
   public void testIfNoElementHasFocusTheActiveElementIsTheBody() {
     driver.get(pages.simpleTestPage);
 
@@ -271,8 +283,17 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
     assertTrue(point.getY() > 1);
   }
 
-  @Ignore({IE, CHROME, SELENESE})
+
+  /*
+   * There's a weird issue with this test, which means that I've added the needs
+   * fresh driver annotation. To see it in action, try running the single test
+   * suite with only these tests running: "ImplicitWaitTest",
+   * "TemporaryFilesystemTest", "JavascriptEnabledDriverTest".
+   * SimonStewart 2010-10-04
+   */
+  @Ignore({IE, CHROME, SELENESE, IPHONE})
   @JavascriptEnabled
+  @NeedsFreshDriver
   public void testShouldBeAbleToClickALinkThatClosesAWindow() throws Exception {
     driver.get(pages.javascriptPage);
     

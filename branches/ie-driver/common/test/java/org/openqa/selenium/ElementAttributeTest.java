@@ -39,6 +39,14 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(attribute, is(nullValue()));
   }
 
+  @Ignore(value = {FIREFOX, SELENESE, IE}, reason = "Issue 758")
+  public void testShouldReturnNullWhenGettingSrcAttributeOfInvalidImgTag() {
+    driver.get(pages.simpleTestPage);
+    WebElement img = driver.findElement(By.id("invalidImgTag"));
+    String attribute = img.getAttribute("src");
+    assertThat(attribute, is(nullValue()));
+  }
+
   @Ignore(SELENESE)
   public void testShouldReturnEmptyAttributeValuesWhenPresentAndTheValueIsActuallyEmpty() {
     driver.get(pages.simpleTestPage);
@@ -47,14 +55,14 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(SELENESE)
-  public void testShouldReturnTheValueOfTheDisabledAttrbuteAsNullIfNotSet() {
+  public void testShouldReturnTheValueOfTheDisabledAttributeAsFalseIfNotSet() {
     driver.get(pages.formPage);
     WebElement inputElement = driver.findElement(By.xpath("//input[@id='working']"));
-    assertThat(inputElement.getAttribute("disabled"), equalTo(null));
+    assertThat(inputElement.getAttribute("disabled"), equalTo("false"));
     assertThat(inputElement.isEnabled(), equalTo(true));
     
     WebElement pElement = driver.findElement(By.id("peas"));
-    assertThat(pElement.getAttribute("disabled"), equalTo(null));
+    assertThat(pElement.getAttribute("disabled"), equalTo("false"));
     assertThat(pElement.isEnabled(), equalTo(true));
   }
 
@@ -88,25 +96,26 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertThat(disabledSubmitElement.isEnabled(), is(false));
   }
   
-  @Ignore(value = IE, reason = "Issue 514")
-  public void testShouldNotBeAbleToTypeToElementsIfTheyAreDisabledUsingRandomDisabledStrings() {
+  @Ignore(SELENESE)
+  public void testShouldThrowExceptionIfSendingKeysToElementDisabledUsingRandomDisabledStrings() {
     driver.get(pages.formPage);
     WebElement disabledTextElement1 = driver.findElement(By.id("disabledTextElement1"));
-    disabledTextElement1.sendKeys("foo");
+    try {
+      disabledTextElement1.sendKeys("foo");
+      fail("Should have thrown exception");
+    } catch (UnsupportedOperationException e) {
+      //Expected
+    }
     assertThat(disabledTextElement1.getText(), is(""));
 
     WebElement disabledTextElement2 = driver.findElement(By.id("disabledTextElement2"));
-    disabledTextElement2.sendKeys("bar");
+    try {
+      disabledTextElement2.sendKeys("bar");
+      fail("Should have thrown exception");
+    } catch (UnsupportedOperationException e) {
+      //Expected
+    }
     assertThat(disabledTextElement2.getText(), is(""));
-  }
-
-  @Ignore(value = {FIREFOX, CHROME, SELENESE}, reason = "Issue 514")
-  public void testShouldNotBeAbleToSubmitFormsWithDisabledSubmitButtons() {
-    driver.get(pages.formPage);
-    WebElement disabledSubmitElement = driver.findElement(By.id("disabledSubmitElement"));
-    assertThat(disabledSubmitElement.isEnabled(), is(false));
-    disabledSubmitElement.submit();
-    assertThat(driver.getTitle(), is("We Leave From Here"));
   }
 
   public void testShouldIndicateWhenATextAreaIsDisabled() {
@@ -209,5 +218,24 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
 
     System.out.println("style = " + style);
     assertTrue(style.toLowerCase().contains("background-color"));
+  }
+
+  public void testShouldCorrectlyReportValueOfColspan() {
+    driver.get(pages.tables);
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+
+    WebElement th1 = driver.findElement(By.id("th1"));
+    WebElement td2 = driver.findElement(By.id("td2"));
+
+    assertEquals("th1 id", "th1", th1.getAttribute("id"));
+    assertEquals("th1 colspan should be 3", "3", th1.getAttribute("colspan"));
+
+    assertEquals("td2 id", "td2", td2.getAttribute("id"));
+    assertEquals("td2 colspan should be 2", "2", td2.getAttribute("colspan"));
   }
 }

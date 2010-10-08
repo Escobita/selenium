@@ -18,9 +18,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.collections</groupId> 
-			<artifactId>google-collections</artifactId> 
-			<version>1.0</version>
+			<groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId> 
+			<version>r07</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -30,7 +35,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.8.1</version>
 		</dependency>
 		<!-- Test dependencies ... -->
 		<dependency>
@@ -38,6 +43,12 @@
 			<artifactId>selenium-common</artifactId>
 			<version>${project.version}</version>
 			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -18,15 +18,22 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import com.google.common.base.Throwables;
 import org.junit.Assert;
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.DevMode;
 import org.openqa.selenium.Ignore;
 import org.openqa.selenium.NeedsFreshDriver;
 import org.openqa.selenium.NoDriverAfterTest;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.ParallelTestRunner;
+import org.openqa.selenium.ParallelTestRunner.Worker;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
@@ -41,39 +48,35 @@ import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 
 
 public class FirefoxDriverTest extends AbstractDriverTestCase {
-    public void testShouldContinueToWorkIfUnableToFindElementById() {
-        driver.get(pages.formPage);
-
-        try {
-            driver.findElement(By.id("notThere"));
-          fail("Should not be able to select element by id here");
-        } catch (NoSuchElementException e) {
-            // This is expected
-        }
-
-        // Is this works, then we're golden
-        driver.get(pages.xhtmlTestPage);
+  public void testShouldContinueToWorkIfUnableToFindElementById() {
+    driver.get(pages.formPage);
+    try {
+      driver.findElement(By.id("notThere"));
+      fail("Should not be able to select element by id here");
+    } catch (NoSuchElementException e) {
+      // This is expected
     }
+      // Is this works, then we're golden
+      driver.get(pages.xhtmlTestPage);
+  }
 
-    @NeedsFreshDriver
-    @Ignore(value = FIREFOX, reason = "Need to figure out how to open a new browser instance mid-test")
-    public void testShouldWaitUntilBrowserHasClosedProperly() throws Exception {
-      driver.get(pages.simpleTestPage);
-      driver.close();
+  @NeedsFreshDriver
+  @Ignore(value = FIREFOX, reason = "Need to figure out how to open a new browser instance mid-test")
+  public void testShouldWaitUntilBrowserHasClosedProperly() throws Exception {
+    driver.get(pages.simpleTestPage);
+    driver.close();
+    setUp();
 
-      setUp();
-
-      driver.get(pages.formPage);
-      WebElement textarea = driver.findElement(By.id("withText"));
-      String expectedText = "I like cheese\n\nIt's really nice";
-      textarea.sendKeys(expectedText);
-
-      String seenText = textarea.getValue();
-      assertThat(seenText, equalTo(expectedText));
-    }
+    driver.get(pages.formPage);
+    WebElement textarea = driver.findElement(By.id("withText"));
+    String expectedText = "I like cheese\n\nIt's really nice";
+    textarea.sendKeys(expectedText);
+    String seenText = textarea.getValue();
+    assertThat(seenText, equalTo(expectedText));
+  }
 
   public void testShouldBeAbleToStartMoreThanOneInstanceOfTheFirefoxDriverSimultaneously() {
-    WebDriver secondDriver = new FirefoxDriver();
+    WebDriver secondDriver = newFirefoxDriver();
 
     driver.get(pages.xhtmlTestPage);
     secondDriver.get(pages.formPage);
@@ -89,7 +92,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       FirefoxProfile profile = new FirefoxProfile();
 
       try {
-        WebDriver secondDriver = new FirefoxDriver(profile);
+        WebDriver secondDriver = newFirefoxDriver(profile);
         secondDriver.quit();
       } catch (Exception e) {
         e.printStackTrace();
@@ -102,7 +105,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       profile.setPreference("browser.startup.homepage", pages.formPage);
 
       try {
-        WebDriver secondDriver = new FirefoxDriver(profile);
+        WebDriver secondDriver = newFirefoxDriver(profile);
         String title = secondDriver.getTitle();
         secondDriver.quit();
 
@@ -118,7 +121,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
 
     if (profile != null) {
-      WebDriver firefox = new FirefoxDriver(profile);
+      WebDriver firefox = newFirefoxDriver(profile);
       firefox.quit();
     } else {
       System.out.println("Not running start with named profile test: no default profile found");
@@ -258,7 +261,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
 
     WebDriver secondDriver = null;
     try {
-      secondDriver = new FirefoxDriver(profile);
+      secondDriver = newFirefoxDriver(profile);
       secondDriver.get(url);
       String gotTitle = secondDriver.getTitle();
       assertFalse("Hello WebDriver".equals(gotTitle));
@@ -277,7 +280,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     profile.setPreference("browser.startup.page", "1");
     profile.setPreference("browser.startup.homepage", pages.javascriptPage);
 
-    WebDriver driver2 = new FirefoxDriver(profile);
+    WebDriver driver2 = newFirefoxDriver(profile);
 
     try {
       assertEquals(pages.javascriptPage, driver2.getCurrentUrl());
@@ -297,12 +300,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       }
 
       public void run() {
-        if (isInDevMode()) {
-          myDriver = new FirefoxDriverTestSuite.TestFirefoxDriver();
-        } else {
-          myDriver = new FirefoxDriver();
-        }
-
+        myDriver = newFirefoxDriver();
         myDriver.get(url);
       }
 
@@ -336,5 +334,96 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       runnable2.quit();
     }
 
+  }
+
+  private static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!\"§$%&/()+*~#',.-_:;\\".toCharArray();
+  private static Random RANDOM = new Random();
+
+  private static String randomString() {
+    int n = 20 + RANDOM.nextInt(80);
+    StringBuilder sb = new StringBuilder(n);
+    for (int i = 0; i < n; ++i) {
+      sb.append(CHARS[RANDOM.nextInt(CHARS.length)]);
+    }
+    return sb.toString();
+  }
+
+  public void testMultipleFirefoxDriversRunningConcurrently() throws Exception {
+    int numThreads = 10;
+    final int numRoundsPerThread = 50;
+    WebDriver[] drivers = new WebDriver[numThreads];
+    List<Worker> workers = new ArrayList<Worker>(numThreads);
+    try {
+      for (int i = 0; i < numThreads; ++i) {
+        final WebDriver driver = (i == 0 ? super.driver : newFirefoxDriver());
+        drivers[i] = driver;
+        workers.add(new Worker() {
+          public void run() throws Exception {
+            driver.get(pages.formPage);
+            WebElement inputField = driver.findElement(By.id("working"));
+            for (int i = 0; i < numRoundsPerThread; ++i) {
+              String s = randomString();
+              inputField.clear();
+              inputField.sendKeys(s);
+              String value = inputField.getValue();
+              assertThat(value, is(s));
+            }
+          }
+        });
+      }
+      ParallelTestRunner parallelTestRunner = new ParallelTestRunner(workers);
+      parallelTestRunner.run();
+    } finally {
+      for (int i = 1; i < numThreads; ++i) {
+        if (drivers[i] != null) {
+          try {
+            drivers[i].quit();
+          } catch (RuntimeException ignored) {}
+        }
+      }
+    }
+  }
+
+  public void testShouldBeAbleToUseTheSameProfileMoreThanOnce() {
+    FirefoxProfile profile = new FirefoxProfile();
+
+    profile.setPreference("browser.startup.homepage", pages.formPage);
+
+    WebDriver one = null;
+    WebDriver two = null;
+
+    try {
+      one = newFirefoxDriver(profile);
+      two = newFirefoxDriver(profile);
+
+      // If we get this far, then both firefoxes have started. If this test
+      // two browsers will start, but the second won't have a valid port and an
+      // exception will be thrown. Hurrah! Test passes.
+    } finally {
+      if (one != null) one.quit();
+      if (two != null) two.quit();
+    }
+  }
+
+  public void testCanCallQuitTwiceWithoutThrowingAnException() {
+    WebDriver instance = newFirefoxDriver();
+
+    instance.quit();
+    instance.quit();
+  }
+
+  private WebDriver newFirefoxDriver() {
+    return newFirefoxDriver(new FirefoxProfile());
+  }
+
+  private WebDriver newFirefoxDriver(FirefoxProfile profile) {
+    if (DevMode.isInDevMode()) {
+      try {
+        return new FirefoxDriverTestSuite.TestFirefoxDriver(profile);
+      } catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+    }
+    return new FirefoxDriver(profile);
   }
 }

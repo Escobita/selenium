@@ -19,15 +19,18 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server.handler;
 
-import org.openqa.selenium.internal.ReturnedCookie;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public abstract class CookieHandler extends WebDriverHandler implements JsonParametersAware {
 
-  private Map<String, Object> rawCookie;
+  private volatile Map<String, Object> rawCookie;
 
   public CookieHandler(DriverSessions sessions) {
     super(sessions);
@@ -38,11 +41,11 @@ public abstract class CookieHandler extends WebDriverHandler implements JsonPara
     if (allParameters == null) {
       return;
     }
-
-    rawCookie = (Map<String, Object>) allParameters.get("cookie");
+    rawCookie =
+        new ConcurrentHashMap<String, Object>((Map<String, Object>) allParameters.get("cookie"));
   }
 
-  protected ReturnedCookie createCookie() {
+  protected Cookie createCookie() {
     if (rawCookie == null) {
       return null;
     }
@@ -53,7 +56,16 @@ public abstract class CookieHandler extends WebDriverHandler implements JsonPara
     String domain = (String) rawCookie.get("domain");
     Boolean secure = (Boolean) rawCookie.get("secure");
 
-    return new ReturnedCookie(name, value, domain, path, null, secure, getDriver().getCurrentUrl());
+    Number expiryNum = (Number) rawCookie.get("expiry");
+    Date expiry = expiryNum == null ? null : new Date(
+        TimeUnit.SECONDS.toMillis(expiryNum.longValue()));
+
+    return new Cookie.Builder(name, value)
+        .path(path)
+        .domain(domain)
+        .isSecure(secure)
+        .expiresOn(expiry)
+        .build();
   }
 
 }

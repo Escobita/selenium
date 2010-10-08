@@ -30,7 +30,7 @@ import org.openqa.selenium.WebElement;
 public class IsTextPresent extends SeleneseCommand<Boolean> {
   private static final Pattern TEXT_MATCHING_STRATEGY_AND_VALUE_PATTERN = Pattern.compile("^(\\p{Alpha}+):(.*)");
   private final Map<String, TextMatchingStrategy> textMatchingStrategies = Maps.newHashMap();
-  private JavascriptLibrary js;
+  private final JavascriptLibrary js;
 
   public IsTextPresent(JavascriptLibrary js) {
     this.js = js;
@@ -54,7 +54,7 @@ public class IsTextPresent extends SeleneseCommand<Boolean> {
     String strategyName = "implicit";
     String use = pattern;
     Matcher matcher = TEXT_MATCHING_STRATEGY_AND_VALUE_PATTERN.matcher(pattern);
-    if (matcher.matches()) {
+    if (matcher.matches() && textMatchingStrategies.containsKey(matcher.group(1))) {
       strategyName = matcher.group(1);
       use = matcher.group(2);
     }

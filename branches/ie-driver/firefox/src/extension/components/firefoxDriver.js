@@ -29,6 +29,7 @@ function FirefoxDriver(server, enableNativeEvents, win) {
   // https://groups.google.com/group/mozilla.dev.apps.firefox/browse_thread/thread/e178d41afa2ccc87?hl=en&pli=1#
   var resources = [
     "atoms.js",
+    "timer.js",
     "utils.js"
   ];
 
@@ -40,6 +41,8 @@ function FirefoxDriver(server, enableNativeEvents, win) {
       dump(e);
     }
   }
+
+  FirefoxDriver.listenerScript = Utils.loadUrl("resource://fxdriver/evaluate.js");
 }
 
 
@@ -104,7 +107,7 @@ FirefoxDriver.prototype.get = function(respond, parameters) {
   respond.session.getBrowser().loadURI(url);
 
   if (!loadEventExpected) {
-    Utils.dumpn("No load event expected");
+    Logger.dumpn("No load event expected");
     respond.send();
   }
 };
@@ -124,7 +127,7 @@ FirefoxDriver.prototype.close = function(respond) {
     createSwitchFile("close:" + browser.id);
     browser.contentWindow.close();
   } catch(e) {
-    dump(e);
+    Logger.dump(e);
   }
 
   // Send the response so the client doesn't get a connection refused socket
@@ -142,34 +145,92 @@ FirefoxDriver.prototype.close = function(respond) {
 
 
 FirefoxDriver.prototype.executeScript = function(respond, parameters) {
-  var window = respond.session.getWindow();
-  var doc = window.document;
+  var doc = respond.session.getDocument();
 
-  var runScript;
+  var rawScript = parameters['script'];
+  var converted = Utils.unwrapParameters(parameters['args'], doc);
 
-  runScript = function(scriptSrc, args) {
+  if (doc.designMode && "on" == doc.designMode.toLowerCase()) {
+    // See https://developer.mozilla.org/en/rich-text_editing_in_mozilla#Internet_Explorer_Differences
+    Logger.dumpn("Window in design mode, falling back to sandbox: " + doc.designMode);
+    var window = respond.session.getWindow();
     window = window.wrappedJSObject;
     var sandbox = new Components.utils.Sandbox(window);
     sandbox.window = window;
-    sandbox.__webdriverParams = args;
+    sandbox.__webdriverParams = converted;
 
-    return Components.utils.evalInSandbox(scriptSrc, sandbox);
-  };
-
-  var converted = Utils.unwrapParameters(
-      parameters.args, respond.session.getDocument());
-
-  try {
-    var scriptSrc = "with(window) { var __webdriverFunc = function(){" + parameters.script +
-        "};  __webdriverFunc.apply(null, __webdriverParams); }";
-    var result = runScript(scriptSrc, converted);
-  } catch (e) {
-    Utils.dumpn(JSON.stringify(e));
-    throw new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR, e);
+    try {
+      var scriptSrc = "with(window) { var __webdriverFunc = function(){" + parameters.script +
+          "};  __webdriverFunc.apply(null, __webdriverParams); }";
+      var res = Components.utils.evalInSandbox(scriptSrc, sandbox);
+      respond.value = Utils.wrapResult(res, doc);
+      respond.send();
+      return;
+    } catch (e) {
+      Logger.dumpn(JSON.stringify(e));
+      throw new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR, e);
+    }
   }
 
-  respond.value = Utils.wrapResult(result, respond.session.getDocument());
-  respond.send();
+  var docBodyLoadTimeOut = function() {
+    respond.sendError(new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR,
+        "waiting for doc.body failed"));
+  };
+
+  var scriptLoadTimeOut = function() {
+    respond.sendError(new WebDriverError(ErrorCode.UNEXPECTED_JAVASCRIPT_ERROR,
+        "waiting for evaluate.js load failed"));
+  };
+
+  var checkScriptLoaded = function() {
+    return !!doc.getUserData('webdriver-evaluate-attached');
+  };
+
+  var runScript = function() {
+    doc.setUserData('webdriver-evaluate-args', converted, null);
+
+    var script =
+        'var args = document.getUserData("webdriver-evaluate-args"); ' +
+            '(function() { ' + rawScript + '}).apply(null, args);';
+    doc.setUserData('webdriver-evaluate-script', script, null);
+
+    var handler = function(event) {
+        doc.removeEventListener('webdriver-evaluate-response', handler, true);
+
+        var unwrapped = doc.wrappedJSObject ? doc.wrappedJSObject : doc;
+        var result = unwrapped.getUserData('webdriver-evaluate-result');
+        respond.value = Utils.wrapResult(result, doc);
+        respond.status = doc.getUserData('webdriver-evaluate-code');
+
+        doc.setUserData('webdriver-evaluate-result', null, null);
+        doc.setUserData('webdriver-evaluate-code', null, null);
+
+        respond.send();
+    };
+    doc.addEventListener('webdriver-evaluate-response', handler, true);
+
+    var event = doc.createEvent('Events');
+    event.initEvent('webdriver-evaluate', true, false);
+    doc.dispatchEvent(event);
+  };
+
+  // Attach the listener to the DOM
+  var addListener = function() {
+    if (!doc.getUserData('webdriver-evaluate-attached')) {
+      var element = doc.createElement("script");
+      element.setAttribute("type", "text/javascript");
+      element.innerHTML = FirefoxDriver.listenerScript;
+      doc.body.appendChild(element);
+      element.parentNode.removeChild(element);
+    }
+    new Timer().runWhenTrue(checkScriptLoaded, runScript, 10000, scriptLoadTimeOut);
+  };
+
+  var checkDocBodyLoaded = function() {
+    return !!doc.body;
+  };
+
+  new Timer().runWhenTrue(checkDocBodyLoaded, addListener, 10000, docBodyLoadTimeOut);
 };
 
 
@@ -184,33 +245,28 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
 
 
 FirefoxDriver.prototype.getTitle = function(respond) {
-  respond.value = respond.session.getBrowser().contentTitle;
+  respond.value = respond.session.getDocument().title;
   respond.send();
 };
 
 
 FirefoxDriver.prototype.getPageSource = function(respond) {
-  var source = respond.session.getDocument().
-      getElementsByTagName("html")[0].innerHTML;
+  var win = respond.session.getWindow();
 
-  respond.value = "<html>" + source + "</html>";
+  // Don't pollute the response with annotations we place on the DOM.
+  var docElement = win.document.documentElement;
+  docElement.removeAttribute('webdriver');
+  docElement.removeAttribute('command');
+  docElement.removeAttribute('response');
+
+  var XMLSerializer = win.XMLSerializer;
+  respond.value = new XMLSerializer().serializeToString(win.document);
   respond.send();
-};
 
-var normalizeXPath = function(xpath, opt_contextNode) {
-  if (opt_contextNode && xpath) {
-    var parentXPath = Utils.getXPathOfElement(opt_contextNode);
-    if (parentXPath && parentXPath.length > 0) {
-      if (xpath[0] != '/' && xpath[0] != '(') {
-        return parentXPath + "/" + xpath;
-      } else {
-        return parentXPath + xpath;
-      }
-    }
-  }
-  return xpath;
+  // The command & response attributes we removed are on-shots, we only
+  // need to add back the webdriver attribute.
+  docElement.setAttribute('webdriver', 'true');
 };
-
 
 /**
  * Searches for the first element in {@code theDocument} matching the given
@@ -224,11 +280,7 @@ var normalizeXPath = function(xpath, opt_contextNode) {
  */
 FirefoxDriver.prototype.findElementByXPath_ = function(theDocument, xpath,
                                                        opt_contextNode) {
-  var contextNode = theDocument;
-  if (opt_contextNode) {
-    contextNode = opt_contextNode;
-    xpath = normalizeXPath(xpath, opt_contextNode);
-  }
+  var contextNode = opt_contextNode || theDocument;
   return theDocument.evaluate(xpath, contextNode, null,
       Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null).
       singleNodeValue;
@@ -247,11 +299,7 @@ FirefoxDriver.prototype.findElementByXPath_ = function(theDocument, xpath,
  */
 FirefoxDriver.prototype.findElementsByXPath_ = function(theDocument, xpath,
                                                         opt_contextNode) {
-  var contextNode = theDocument;
-  if (opt_contextNode) {
-    contextNode = opt_contextNode;
-    xpath = normalizeXPath(xpath, opt_contextNode);
-  }
+  var contextNode = opt_contextNode || theDocument;
   var result = theDocument.evaluate(xpath, contextNode, null,
       Components.interfaces.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
   var elements = [];
@@ -328,13 +376,18 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
       break;
 
     case FirefoxDriver.ElementLocator.CSS_SELECTOR:
-      if (rootNode['querySelector']) {
-        element = rootNode.querySelector(selector);
-      } else {
-        throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
-            "CSS Selectors not supported natively");
-      }
-      break;
+      var tempRespond = {
+        session: respond.session,
+        send: function() {
+          var found = tempRespond.value;
+          respond.value = found ? found : "Unable to find element using css: " + selector;
+          respond.status = found ? ErrorCode.SUCCESS : ErrorCode.NO_SUCH_ELEMENT;
+          respond.send();
+        }
+      };
+      var execute = goog.bind(this.executeScript, this);
+      Utils.findByCss(rootNode, theDocument, selector, true, tempRespond, execute);
+      return;
 
     case FirefoxDriver.ElementLocator.TAG_NAME:
       element = rootNode.getElementsByTagName(selector)[0];
@@ -378,15 +431,10 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
               selector: selector
           })));
     } else {
-      var self = this;
-      var timer = Components.classes['@mozilla.org/timer;1'].
-          createInstance(Components.interfaces.nsITimer);
-      timer.initWithCallback({
-        notify: function() {
-          self.findElementInternal_(respond, method, selector,
+      var callback = goog.bind(this.findElementInternal_, this, respond, method, selector,
               opt_parentElementId, startTime);
-        }
-      }, 10, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+
+      new Timer().setTimeout(callback, 10);
     }
   }
 };
@@ -465,13 +513,9 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
       break;
 
     case FirefoxDriver.ElementLocator.CSS_SELECTOR:
-      if (rootNode['querySelector']) {
-        elements = rootNode.querySelectorAll(selector);
-      } else {
-        throw new WebDriverError(ErrorCode.UNKNOWN_COMMAND,
-            "CSS Selectors not supported natively");
-      }
-      break;
+      var execute = goog.bind(this.executeScript, this);
+      Utils.findByCss(rootNode, theDocument, selector, false, respond, execute);
+      return;
 
     case FirefoxDriver.ElementLocator.TAG_NAME:
       elements = rootNode.getElementsByTagName(selector);
@@ -568,7 +612,9 @@ FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
   } else {
     var frameDoc = Utils.findDocumentInFrame(browser, parameters.id);
     if (frameDoc) {
-      respond.session.setWindow(frameDoc.defaultView);
+      // "something" keeps a string reference to the frame. Tag it so that we
+      // know later that everything is still fine.
+      respond.session.setWindow(frameDoc.defaultView, parameters.id);
     } else {
       throw new WebDriverError(ErrorCode.NO_SUCH_FRAME,
           "Cannot find frame with id: " + parameters.id);
@@ -624,16 +670,11 @@ FirefoxDriver.prototype.refresh = function(respond) {
 FirefoxDriver.prototype.addCookie = function(respond, parameters) {
   var cookie = parameters.cookie;
 
-  if (cookie.expiry) {
-    cookie.expiry = cookie.expiry.time ? new Date(cookie.expiry.time) :
-                                         new Date(cookie.expiry);
-  } else {
+  if (!cookie.expiry) {
     var date = new Date();
     date.setYear(2030);
-    cookie.expiry = date;
+    cookie.expiry = date.getTime() / 1000;  // Stored in seconds.
   }
-
-  cookie.expiry = cookie.expiry.getTime() / 1000; // Stored in seconds
 
   if (!cookie.domain) {
     var location = respond.session.getBrowser().contentWindow.location;
@@ -703,7 +744,7 @@ function getVisibleCookies(location) {
   }
 
   return results;
-};
+}
 
 FirefoxDriver.prototype.getCookies = function(respond) {
   var toReturn = [];
@@ -711,12 +752,19 @@ FirefoxDriver.prototype.getCookies = function(respond) {
       contentWindow.location);
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i];
+    var expires = cookie.expires;
+    if (expires == 0) {  // Session cookie, don't return an expiry.
+      expires = null;
+    } else if (expires == 1) { // Date before epoch time, cap to epoch.
+      expires = 0;
+    }
     toReturn.push({
       'name': cookie.name,
       'value': cookie.value,
       'path': cookie.path,
       'domain': cookie.host,
-      'secure': cookie.isSecure
+      'secure': cookie.isSecure,
+      'expiry': expires,
     });
   }
 

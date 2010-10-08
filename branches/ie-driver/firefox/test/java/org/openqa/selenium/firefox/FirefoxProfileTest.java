@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.internal.FileHandler;
+import org.openqa.selenium.internal.TemporaryFilesystem;
+import org.openqa.selenium.internal.Zip;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -131,18 +133,19 @@ public class FirefoxProfileTest extends TestCase {
 
     assertNotNull(json);
 
-    FirefoxProfile recovered = FirefoxProfile.fromJson(json);
+    File dir = TemporaryFilesystem.createTempDir("webdriver", "duplicated");
+    new Zip().unzip(json, dir);
 
-    File prefs = new File(recovered.getProfileDir(), "user.js");
+    File prefs = new File(dir, "user.js");
     assertTrue(prefs.exists());
     
     assertTrue(FileHandler.readAsString(prefs).contains("i.like.cheese"));
   }
 
   private List<String> readGeneratedProperties(FirefoxProfile profile) throws Exception {
-    profile.updateUserPrefs();
+    File generatedProfile = profile.layoutOnDisk();
 
-    File prefs = new File(profile.getProfileDir(), "user.js");
+    File prefs = new File(generatedProfile, "user.js");
     BufferedReader reader = new BufferedReader(new FileReader(prefs));
 
     List<String> prefLines = new ArrayList<String>();

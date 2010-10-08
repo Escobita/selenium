@@ -1562,15 +1562,7 @@ BrowserBot.prototype.findAttribute = function(locator) {
 
     // Find the element.
     var element = this.findElement(elementLocator);
-    var attributeValue = null;
-    
-    // IE returns an object for the "style" attribute
-    if (attributeName == 'style' && typeof(attributeValue) != 'string') {
-        attributeValue = attributeValue.cssText;
-    } else {
-        attributeValue = bot.dom.getAttribute(element, attributeName);
-    }
-
+    var attributeValue = bot.dom.getAttribute(element, attributeName);
     return attributeValue ? attributeValue.toString() : null;
 };
 
@@ -2320,7 +2312,7 @@ MozillaBrowserBot.prototype._fireEventOnElement = function(eventType, element, c
 
     // Perform the link action if preventDefault was set.
     // In chrome URL, the link action is already executed by triggerMouseEvent.
-    if (!browserVersion.isChrome && savedEvent != null && !savedEvent.getPreventDefault()) {
+    if (!browserVersion.isChrome && savedEvent != null && savedEvent.getPreventDefault && !savedEvent.getPreventDefault()) {
         var targetWindow = this.browserbot._getTargetWindow(element);
         if (element.href) {
             targetWindow.location.href = element.href;

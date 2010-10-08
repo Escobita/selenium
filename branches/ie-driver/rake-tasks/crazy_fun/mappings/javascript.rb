@@ -9,7 +9,8 @@ class JavascriptMappings
     fun.add_mapping("js_deps", Javascript::CreateTask.new)
     fun.add_mapping("js_deps", Javascript::CreateTaskShortName.new)
     fun.add_mapping("js_deps", Javascript::AddDependencies.new)
-    fun.add_mapping("js_deps", Javascript::TouchOutput.new)
+    fun.add_mapping("js_deps", Javascript::WriteOutput.new)
+    fun.add_mapping("js_deps", Javascript::CreateHeader.new)
     
     fun.add_mapping("js_binary", Javascript::CheckPreconditions.new)
     fun.add_mapping("js_binary", Javascript::CreateTask.new)
@@ -130,7 +131,7 @@ module Javascript
     end
   end
 
-  class TouchOutput < BaseJs
+  class WriteOutput < BaseJs
     def handle(fun, dir, args)
       output = js_name(dir, args[:name])
       
@@ -140,8 +141,11 @@ module Javascript
         js_files = build_deps(output, Rake::Task[output], []).uniq
         
         mkdir_p File.dirname(output)
-        f = File.new(output, 'w')
-        f.close
+        File.open(output, 'w') do |f|
+          js_files.each do |dep|
+            f << IO.read(dep)
+          end
+        end
       end
     end
   end

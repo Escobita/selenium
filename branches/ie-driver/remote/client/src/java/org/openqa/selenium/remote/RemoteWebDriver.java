@@ -18,6 +18,7 @@ limitations under the License.
 package org.openqa.selenium.remote;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,7 +41,6 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
-import org.openqa.selenium.internal.ReturnedCookie;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
 
@@ -327,6 +327,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     try {
       response = executor.execute(command);
 
+      if (response == null) {
+        return null;
+      }
+
       // Unwrap the response value by converting any JSON objects of the form
       // {"ELEMENT": id} to RemoteWebElements.
       Object value = converter.apply(response.getValue());
@@ -376,8 +380,17 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
           String path = (String) rawCookie.get("path");
           String domain = (String) rawCookie.get("domain");
           Boolean secure = (Boolean) rawCookie.get("secure");
-          toReturn.add(
-              new ReturnedCookie(name, value, domain, path, null, secure, getCurrentUrl()));
+
+          Number expiryNum = (Number) rawCookie.get("expiry");
+          Date expiry = expiryNum == null ? null : new Date(
+              TimeUnit.SECONDS.toMillis(expiryNum.longValue()));
+
+          toReturn.add(new Cookie.Builder(name, value)
+              .path(path)
+              .domain(domain)
+              .isSecure(secure)
+              .expiresOn(expiry)
+              .build());
         }
 
         return toReturn;

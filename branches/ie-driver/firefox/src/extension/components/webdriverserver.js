@@ -20,8 +20,6 @@
 function WebDriverServer() {
   // We do this here to work around an issue in the import function:
   // https://groups.google.com/group/mozilla.dev.apps.firefox/browse_thread/thread/e178d41afa2ccc87?hl=en&pli=1#
-  Components.utils.import('resource://fxdriver/modules/errorcode.js');
-//  var httpd = {}; Components.utils.import('resource://fxdriver/modules/httpd.js', httpd);
   Components.utils.import('resource://fxdriver/modules/utils.js');
 
   this.wrappedJSObject = this;
@@ -41,7 +39,7 @@ function WebDriverServer() {
   try {
   this.server_ = Utils.newInstance("@mozilla.org/server/jshttp;1", "nsIHttpServer");
   } catch (e) {
-      Utils.dumpn(e);
+      Logger.dumpn(e);
   }
 
   this.server_.registerGlobHandler(".*/hub/.*", { handle: function(request, response) {
@@ -56,11 +54,12 @@ WebDriverServer.prototype.newDriver = function(window) {
     var prefs =
         Utils.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
     if (!prefs.prefHasUserValue("webdriver_enable_native_events")) {
-      Utils.dumpn('webdriver_enable_native_events not set; defaulting to false');
+      Logger.dumpn('webdriver_enable_native_events not set; defaulting to false');
     }
     this.enableNativeEvents =
     prefs.prefHasUserValue("webdriver_enable_native_events") ?
-    prefs.getBoolPref("webdriver_enable_native_events") : false;
+      prefs.getBoolPref("webdriver_enable_native_events") : false;
+    Logger.dumpn('Using native events: ' + this.enableNativeEvents);
   }
   window.fxdriver = new FirefoxDriver(this, this.enableNativeEvents, window);
   return window.fxdriver;

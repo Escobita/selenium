@@ -22,6 +22,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.server.log.LoggingManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,19 +77,29 @@ public class DefaultDriverSessions implements DriverSessions {
   }
 
   public SessionId newSession(Capabilities desiredCapabilities) throws Exception {
-    Session session = new Session(factory, desiredCapabilities);
+    Session session = Session.createSession(factory, desiredCapabilities);
     
     SessionId sessionId = new SessionId(String.valueOf(System.currentTimeMillis()));
     sessionIdToDriver.put(sessionId, session);
+
+    // I'm not sure that this logging manager should have crept in here.
+    if (LoggingManager.perSessionLogHandler() != null) {
+      LoggingManager.perSessionLogHandler()
+          .copyThreadTempLogsToSessionLogs(sessionId.toString(), Thread.currentThread().getId());
+    }
+
     return sessionId;
   }
-  
+
   public Session get(SessionId sessionId) {
     return sessionIdToDriver.get(sessionId);
   }
 
   public void deleteSession(SessionId sessionId) {
-    sessionIdToDriver.remove(sessionId);
+      final Session removedSession = sessionIdToDriver.remove(sessionId);
+      if (removedSession != null){
+          removedSession.close();
+      }
   }
 
   public void registerDriver(Capabilities capabilities, Class<? extends WebDriver> implementation) {

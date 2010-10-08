@@ -44,17 +44,18 @@ public class SingleTestSuite extends TestCase {
     System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
     System.setProperty("webdriver.selenium.server.port", String.valueOf(findFreePort()));
-//    System.setProperty("webdriver.firefox.useExisting", "true");
+//    System.setProperty("webdriver.debug", "true");
 //    System.setProperty("webdriver.firefox.reap_profile", "false");
                                                       
     TestSuiteBuilder builder = new TestSuiteBuilder()
         .addSourceDir("common")
+        .addSourceDir("firefox")
         .addSourceDir("support")
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("ChildrenFindingTest")
-        .method("testfindElementByName")
+        .onlyRun("ElementFindingTest")
+        .method("testFindingByXPathShouldNotIncludeParentElementIfSameTagType")
         .exclude(ALL)
         .exclude(Ignore.Driver.IE)
         .outputTestNames()

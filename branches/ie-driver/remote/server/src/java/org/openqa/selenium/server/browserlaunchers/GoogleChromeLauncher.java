@@ -17,19 +17,21 @@
 
 package org.openqa.selenium.server.browserlaunchers;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.internal.CommandLine;
 import org.openqa.selenium.server.ApplicationRegistry;
 import org.openqa.selenium.server.BrowserConfigurationOptions;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.browserlaunchers.locators.GoogleChromeLocator;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Browser launcher for Google Chrome.
@@ -68,15 +70,10 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
     protected void launch(String url) {
         LOGGER.info("Launching Google Chrome...");
 
-        try {
-            createProfile(sessionId, url);
-            final String[] cmdArray = createCommandArray(url);
-            final AsyncExecute exe = new AsyncExecute();
-            exe.setCommandline(cmdArray);
-            process = exe.asyncSpawn();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        createProfile(sessionId, url);
+        final String[] cmdArray = createCommandArray(url);
+        CommandLine exe = new CommandLine(cmdArray);
+        process = exe.executeAsync();
     }
 
     public void close() {
@@ -104,11 +101,10 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
         return process;
     }
 
-    private String getSecurityMode() {
-        String mode = browserConfigurationOptions.get("mode");
-        if (mode != null && mode.equals("disableSecurity"))
-            return "--disable-web-security";
-        else 
+    private String getUntrustedCertificatesFlag() {
+        if (browserConfigurationOptions.is("trustAllSSLCertificates"))
+            return "--ignore-certificate-errors";
+        else
             return "";
     }
 
@@ -161,6 +157,16 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
     }
 
     private String[] createCommandArray(String url) {
+        String userDir = customProfileDir.getAbsolutePath();
+
+        // Thanks to issue #517: http://code.google.com/p/selenium/issues/detail?id=517
+        if (Platform.getCurrent().is(Platform.WINDOWS) && userDir.indexOf(' ') != -1) {
+          userDir = "\"" + userDir + "\"";
+        } else {
+          userDir = userDir.replace("\"", "\\\"");
+          userDir = "\"" + userDir + "\"";
+        }
+
         return new String[] {
                 browserInstallation.launcherFilePath(),
                 // Disable hang monitor dialogs in renderer process.
@@ -186,8 +192,8 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
                 // Disable same origin policy so the remote runner can control the application window
                 "--disable-web-security",
                 // Set the user data (i.e. profile) directory.
-                "--user-data-dir=\"" + customProfileDir.getAbsolutePath() + "\"",
-                getSecurityMode(),
+                "--user-data-dir=" + userDir,
+                getUntrustedCertificatesFlag(),
                 getCommandLineFlags(),
                 url
         };

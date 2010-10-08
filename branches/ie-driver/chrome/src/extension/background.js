@@ -502,6 +502,28 @@ function parseRequest(request) {
     ChromeDriver.implicitWait_ = request.ms || 0;
     sendResponseToParsedRequest({status: 0});
     break;
+  case "deleteCookie":
+    chrome.cookies.remove({url: ChromeDriver.currentUrl, name: request.name});
+    sendResponseToParsedRequest({status: 0});
+    break;
+  case "deleteAllCookies":
+    chrome.cookies.getAll({url: ChromeDriver.currentUrl}, deleteAllCookies);
+    break;
+  case "getCookie":
+    chrome.cookies.get({url: ChromeDriver.currentUrl, name: request.name}, getCookieCallback);
+    break;
+  case "getCookies":
+    chrome.cookies.getAll({url: ChromeDriver.currentUrl}, getAllCookiesCallback);
+    break;
+  //TODO: Use this code-path when http://crbug.com/56211 is fixed
+  /*case "addCookie":
+    if (hasNoPage()) {
+      console.log("Not got a page, but asked to set cookie");
+      sendResponseToParsedRequest({status: 25, value: 'Cannot set a cookie when not on a page'});
+      break;
+    }
+    addCookie(request.cookie);
+    break;*/
   case "clickElement":
   case "hoverOverElement":
     // Falling through, as native events are handled the same
@@ -535,15 +557,6 @@ function parseRequest(request) {
     if (hasNoPage()) {
       console.log("Not got a page, but asked for elements, so returning no elements");
       sendResponseToParsedRequest({status: 0, value: []});
-      break;
-    }
-    // Falling through, as if we do have a page, we want to treat this like a
-    // normal request
-  case "deleteAllCookies":
-  case "deleteCookie":
-    if (hasNoPage()) {
-      console.log("Not got a page, but asked to delete cookies, so returning ok");
-      sendResponseToParsedRequest({status: 0});
       break;
     }
     // Falling through, as if we do have a page, we want to treat this like a
@@ -1017,6 +1030,55 @@ function setActivePortByWindowName(handle) {
   sendResponseToParsedRequest({status: 23, value: {message: 'Could not find window to switch to by handle: ' + handle}}, false);
 }
 
+function addCookie(passedCookie) {
+  ChromeDriver.isWaitingForCookieToBeSet = true;
+  var cookie = {};
+  cookie.url = ChromeDriver.currentUrl;
+  cookie.name = passedCookie.name;
+  if (passedCookie.value !== undefined) {
+    cookie.value = passedCookie.value;
+  }
+  if (passedCookie.domain !== undefined) {
+    cookie.domain = passedCookie.domain;
+  }
+  if (passedCookie.path !== undefined) {
+    cookie.path = passedCookie.path;
+  }
+  if (passedCookie.isSecure !== undefined) {
+    cookie.secure = passedCookie.isSecure;
+  }
+  //TODO: Set expires
+  /*if (passedCookie.expirationDate !== undefined) {
+    cookie.path = passedCookie.path;
+  }*/
+  
+  console.log(passedCookie);
+  console.log(cookie);
+  chrome.cookies.set(cookie);
+}
+
+function formatCookie(cookie) {
+  return {name: cookie.name, value: cookie.value, path: cookie.path, domain: cookie.domain, expiry: cookie.expirationDate, secure: cookie.secure};
+}
+
+function getAllCookiesCallback(cookies) {
+  var cookiesToReturn = [];
+  for (var c in cookies) {
+    cookiesToReturn.push(formatCookie(cookies[c]));
+  }
+  sendResponseToParsedRequest({status: 0, value: cookiesToReturn});
+}
+
+function getCookieCallback(cookie) {
+  sendResponseToParsedRequest({status: 0, value: formatCookie(cookie)});
+}
+
+function deleteAllCookies(cookies) {
+  for (var cookie in cookies) {
+    chrome.cookies.remove({url: ChromeDriver.currentUrl, name: cookies[cookie].name});
+  }
+  sendResponseToParsedRequest({status: 0});
+}
 
 /**
  * @return {boolean} Whether there is currently no active page.

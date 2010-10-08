@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONException;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.NoAlertPresentException;
@@ -91,7 +92,6 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   private FirefoxAlert currentAlert;
 
   protected FirefoxBinary binary;
-  protected FirefoxProfile profile;
 
   public FirefoxDriver() {
     this(new FirefoxBinary(), null);
@@ -140,7 +140,6 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   public FirefoxDriver(FirefoxBinary binary, FirefoxProfile profile) {
     super(new LazyCommandExecutor(binary, profile), DesiredCapabilities.firefox());
     this.binary = binary;
-    this.profile = profile;
     setElementConverter(new JsonToWebElementConverter(this) {
       @Override
       protected RemoteWebElement newRemoteWebElement() {
@@ -153,7 +152,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   protected void startClient() {
     LazyCommandExecutor exe = (LazyCommandExecutor) getCommandExecutor();
     FirefoxProfile profileToUse = getProfile(exe.profile);
-    profileToUse.addWebDriverExtensionIfNeeded(false);
+    profileToUse.addWebDriverExtensionIfNeeded();
 
     // TODO(simon): Make this not sinfully ugly
     ExtensionConnection connection = connectTo(exe.binary, profileToUse, "localhost");
@@ -179,12 +178,10 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
 
   protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile,
                                           String host) {
-    int profilePort = profile.getPort() == 0 ? DEFAULT_PORT : profile.getPort();
-    Lock lock = new SocketLock(profilePort - 1);
+    Lock lock = new SocketLock(DEFAULT_PORT - 1);
     try {
       FirefoxBinary bin = binary == null ? new FirefoxBinary() : binary;
       
-
       return new NewProfileExtensionConnection(lock, bin, profile, host);
     } catch (Exception e) {
       throw new WebDriverException(e);
@@ -235,6 +232,10 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
     }
 
     Response response = super.execute(driverCommand, parameters);
+
+    if (response == null) {
+      return null;
+    }
 
     Object rawResponse = response.getValue();
     if (rawResponse instanceof Map) {
@@ -336,7 +337,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
       connection.quit();
     }
 
-    public Response execute(Command command) throws Exception {
+    public Response execute(Command command) throws IOException {
       return connection.execute(command);
     }
   }

@@ -836,6 +836,14 @@ Editor.prototype.loadExtensions = function() {
 			this.showAlert("error loading Selenium IDE extensions: " + error);
 		}
 	}
+	//Samit: Enh: add support for plugin provided IDE extensions 
+	if (this.getOptions().pluginProvidedIDEExtensions) {
+		try {
+			ExtensionsLoader.loadSubScript(subScriptLoader, this.getOptions().pluginProvidedIDEExtensions, window);
+		} catch (error) {
+			this.showAlert("error loading Selenium IDE extensions: " + error);
+		}
+	}
 }
 
 Editor.prototype.loadSeleniumAPI = function() {
@@ -1318,15 +1326,15 @@ Editor.LogView.prototype.onAppendEntry = function(entry) {
     var entryValue = levels[entry.level];
     var filterValue = parseInt(this.filterValue);
     if (filterValue <= entryValue) {
-        if (!this.isHidden()) {
-			var newEntry = this.view.contentDocument.createElement('li');
-			newEntry.className = entry.level;
-			newEntry.appendChild(this.view.contentDocument.createTextNode(entry.line()));
-			this.getLogElement().appendChild(newEntry);
-			newEntry.scrollIntoView();
-        } else {
+        //Samit: Fix: If another pane is active, the entry is lost
+        if (this.isHidden()) {
             this.panel.switchView(this);
         }
+        var newEntry = this.view.contentDocument.createElement('li');
+        newEntry.className = entry.level;
+        newEntry.appendChild(this.view.contentDocument.createTextNode(entry.line()));
+        this.getLogElement().appendChild(newEntry);
+        newEntry.scrollIntoView();
     }
 }
 

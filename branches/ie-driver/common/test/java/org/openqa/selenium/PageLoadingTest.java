@@ -111,6 +111,9 @@ public class PageLoadingTest extends AbstractDriverTestCase {
     driver.get(pages.xhtmlTestPage);
 
     driver.findElement(By.name("sameWindow")).click();
+
+    TestWaitingUtility.waitForPageTitle(driver, "This page has iframes");
+
     assertThat(driver.getTitle(), equalTo("This page has iframes"));
 
     driver.navigate().back();

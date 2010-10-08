@@ -99,7 +99,7 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
   @SuppressWarnings("unchecked")
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, IPHONE})
   public void testShouldBeAbleToExecuteSimpleJavascriptAndAStringsArray() {
     if (!(driver instanceof JavascriptExecutor)) {
       return;
@@ -472,7 +472,8 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
 
     assertTrue(resultsList.size() > 0);
   }
-  
+
+  @JavascriptEnabled
   @NeedsFreshDriver
   @NoDriverAfterTest
   @Ignore //Reason for ignore: Failure indicates hang condition,
@@ -485,5 +486,16 @@ public class ExecutingJavascriptTest extends AbstractDriverTestCase {
       return;
     }
     fail("Expected exception to be thrown");
+  }
+
+  @JavascriptEnabled
+  public void testShouldBeAbleToCreateAPersistentValue() {
+    driver.get(pages.formPage);
+
+    executeScript("document.alerts = []");
+    executeScript("document.alerts.push('hello world');");
+    String text = (String) executeScript("return document.alerts.shift()");
+
+    assertEquals("hello world", text);
   }
 }

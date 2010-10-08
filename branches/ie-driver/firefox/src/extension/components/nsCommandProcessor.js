@@ -218,7 +218,7 @@ DelayedCommand.prototype.shouldDelayExecutionForPendingRequest_ = function() {
       }
 
       if (numPending && !hasOnLoadBlocker) {
-        Utils.dumpn('Ignoring pending about:document-onload-blocker request');
+        Logger.dumpn('Ignoring pending about:document-onload-blocker request');
         // If we only have one pending request and it is not a
         // document-onload-blocker, we need to wait.  We do not wait for
         // document-onload-blocker requests since these are created when
@@ -229,7 +229,7 @@ DelayedCommand.prototype.shouldDelayExecutionForPendingRequest_ = function() {
       }
     }
   } catch(e) {
-    Utils.dumpn('Problem while checking if we should delay execution: ' + e);
+    Logger.dumpn('Problem while checking if we should delay execution: ' + e);
     return true;
   }
 
@@ -265,7 +265,7 @@ DelayedCommand.prototype.executeInternal_ = function() {
           this.response_, this.command_.parameters);
     } catch (e) {
       if (!e.isWebDriverError) {
-        Utils.dumpn(
+        Logger.dumpn(
             'Exception caught by driver: ' + this.command_.name +
             '(' + this.command_.parameters + ')\n' + e);
       }
@@ -282,7 +282,6 @@ DelayedCommand.prototype.executeInternal_ = function() {
  * @constructor
  */
 var nsCommandProcessor = function() {
-  Components.utils.import('resource://fxdriver/modules/errorcode.js');
   Components.utils.import('resource://fxdriver/modules/utils.js');
 
   this.wrappedJSObject = this;
@@ -312,7 +311,7 @@ nsCommandProcessor.prototype.implementationLanguage =
  */
 nsCommandProcessor.logError = function(message) {
   // TODO(jleyba): This should log an error and not a generic message.
-  Utils.dumpn(message);
+  Logger.dumpn(message);
   throw Components.results.NS_ERROR_FAILURE;
 };
 
@@ -411,6 +410,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, parameters,
   var lookFor = parameters.name;
   var matches = function(win, lookFor) {
     return !win.closed &&
+           (win.top && win.top.fxdriver) &&
            (win.content && win.content.name == lookFor) ||
            (win.top && win.top.fxdriver && win.top.fxdriver.id == lookFor);
   };
@@ -420,7 +420,7 @@ nsCommandProcessor.prototype.switchToWindow = function(response, parameters,
       // Create a switch indicator file so the native events library
       // will know a window switch is in progress and will indeed
       // switch focus.
-      createSwitchFile("switch:" + win.fxdriver.id);
+      createSwitchFile("switch: " + win.top.fxdriver.id);
 
       win.focus();
       if (win.top.fxdriver) {
@@ -542,7 +542,8 @@ nsCommandProcessor.prototype.getSessionCapabilities = function(response) {
     'javascriptEnabled': true,
     'platform': xulRuntime.OS,          // same as Platform.valueOf("name");
     'cssSelectorsEnabled': true,
-    'takesScreenshot': true
+    'takesScreenshot': true,
+    'nativeEvents': Utils.useNativeEvents()
   };
 
   response.send();

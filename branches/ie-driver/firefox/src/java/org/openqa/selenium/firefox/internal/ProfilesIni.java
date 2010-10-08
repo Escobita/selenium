@@ -17,32 +17,30 @@ limitations under the License.
 
 package org.openqa.selenium.firefox.internal;
 
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.internal.FileHandler;
-import org.openqa.selenium.internal.TemporaryFilesystem;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.internal.FileHandler;
+import org.openqa.selenium.internal.TemporaryFilesystem;
+
 public class ProfilesIni {
-  private Map<String, FirefoxProfile> profiles = new HashMap<String, FirefoxProfile>();
+  private Map<String, File> profiles = Maps.newHashMap();
   
   public ProfilesIni() {
     File appData = locateAppDataDirectory(Platform.getCurrent());
     profiles = readProfiles(appData);
   }
   
-  protected Map<String, FirefoxProfile> readProfiles(File appData) {
-    Map<String, FirefoxProfile> toReturn = new HashMap<String, FirefoxProfile>();
+  protected Map<String, File> readProfiles(File appData) {
+    Map<String, File> toReturn = Maps.newHashMap();
 
     File profilesIni = new File(appData, "profiles.ini");
     if (!profilesIni.exists()) {
@@ -62,7 +60,7 @@ public class ProfilesIni {
 
         while (line != null) {
           if (line.startsWith("[Profile")) {
-            FirefoxProfile profile = newProfile(name, appData, path, isRelative);
+            File profile = newProfile(name, appData, path, isRelative);
             if (profile != null) 
               toReturn.put(name, profile);
             
@@ -83,7 +81,7 @@ public class ProfilesIni {
     } finally {
         try {
             if (reader != null) {
-              FirefoxProfile profile = newProfile(name, appData, path, isRelative);
+              File profile = newProfile(name, appData, path, isRelative);
               if (profile != null) 
                 toReturn.put(name, profile);
               
@@ -97,29 +95,23 @@ public class ProfilesIni {
     return toReturn;
   }
   
-  protected FirefoxProfile newProfile(String name, File appData, String path, boolean isRelative) {
+  protected File newProfile(String name, File appData, String path, boolean isRelative) {
     if (name != null && path != null) {
       File profileDir = isRelative ? new File(appData, path) : new File(path);
-      return new ProfileFromDirectory(profileDir);
+      return profileDir;
     }
     return null;
   }
 
-  private static class ProfileFromDirectory extends FirefoxProfile {
-    public ProfileFromDirectory(File dir) {
-      super(dir);
-    }
-  }
-
   public FirefoxProfile getProfile(String profileName) {
-    FirefoxProfile liveProfile = profiles.get(profileName);
-    if (liveProfile == null)
+    File profileDir = profiles.get(profileName);
+    if (profileDir == null)
       return null;
 
     // Make a copy of the profile to use
     File tempDir = TemporaryFilesystem.createTempDir("userprofile", "copy");
     try {
-      FileHandler.copy(liveProfile.getProfileDir(), tempDir);
+      FileHandler.copy(profileDir, tempDir);
 
       // Delete the old compreg.dat file so that our new extension is registered
       File compreg = new File(tempDir, "compreg.dat");
@@ -132,16 +124,7 @@ public class ProfilesIni {
       throw new WebDriverException(e);
     }
 
-    FirefoxProfile profile = new ProfileFromDirectory(tempDir);
-
-    if (profile.getPort() == 0)
-      profile.setPort(FirefoxDriver.DEFAULT_PORT);
-    
-    return profile;
-  }
-  
-  public Collection<FirefoxProfile> getExistingProfiles() {
-    return profiles.values();
+    return new FirefoxProfile(tempDir);
   }
   
   protected File locateAppDataDirectory(Platform os) {

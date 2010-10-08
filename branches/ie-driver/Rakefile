@@ -9,6 +9,7 @@ verbose false
 
 # The CrazyFun build grammar. There's no magic here, just ruby
 require 'rake-tasks/crazy_fun'
+require 'rake-tasks/crazy_fun/mappings/android'
 require 'rake-tasks/crazy_fun/mappings/gcc'
 require 'rake-tasks/crazy_fun/mappings/java'
 require 'rake-tasks/crazy_fun/mappings/javascript'
@@ -27,9 +28,8 @@ require 'rake-tasks/iphone'
 require 'rake-tasks/selenium'
 require 'rake-tasks/se-ide'
 require 'rake-tasks/ie_code_generator'
-require 'rake-tasks/android'
 
-version = "2.0a5"
+version = "2.0a6"
 ide_version = "1.0.8-SNAPSHOT"
 
 # The build system used by webdriver is layered on top of rake, and we call it
@@ -49,6 +49,7 @@ crazy_fun = CrazyFun.new
 #
 # If crazy fun doesn't know how to handle a particular output type ("java_library"
 # in the example above) then it will throw an exception, stopping the build
+AndroidMappings.new.add_all(crazy_fun)
 GccMappings.new.add_all(crazy_fun)
 JavaMappings.new.add_all(crazy_fun)
 JavascriptMappings.new.add_all(crazy_fun)
@@ -60,7 +61,7 @@ RubyMappings.new.add_all(crazy_fun)
 # need to fall back to prebuilt binaries. The prebuilt binaries are stored in
 # a directory structure identical to that used in the "build" folder, but
 # rooted at one of the following locations:
-["chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt", "ide/prebuilt"].each do |pre|
+["android/server/prebuilt", "chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt", "ide/prebuilt"].each do |pre|
   crazy_fun.prebuilt_roots << pre
 end
 
@@ -96,12 +97,15 @@ task :iphone => [:iphone_server, :iphone_client]
 task :'selenium-server-standalone' => ["//remote/server:server:uber"]
 task :ide => [ "//ide:selenium-ide" ]
 
+task :test_android => ["//android/client:test:run"]
 task :test_common => [ "//common:test" ]
 task :test_chrome => [ "//chrome:test:run" ]
 task :test_htmlunit => [ "//htmlunit:test:run" ]
 task :test_ie => [ "//jobbie:test:run" ]
 task :test_jobbie => [ "//jobbie:test:run" ]
-task :test_jsapi => ["//jsapi:atoms:run", "//jsapi:core:run", "//jsapi:test:run"]
+task :test_jsapi => [ "//jsapi:atoms:run",
+                      "//jsapi:selenium_core:run",
+                      "//jsapi:selenium_core_emulation:run" ]
 task :test_firefox => [ "//firefox:test:run" ]
 task :test_remote => [ "//remote/server:test:run" ]
 task :test_selenium => [ "//selenium:selenium_test:run", "//selenium:test-selenese:run", :'test_core']
@@ -110,6 +114,7 @@ task :test_iphone_client => [:'webdriver-iphone-client-test']
 task :test_iphone => [:test_iphone_server, :test_iphone_client]
 task :android => [:android_client, :android_server]
 task :android_client => ['//android/client']
+task :android_server => ['//android/server:android-server']
 
 if (windows?)
   task :test_core => [:'test_core_ie']
@@ -131,10 +136,10 @@ task :test_java => [
 ]
 
 task :test_rb => [
-  "//firefox:ruby-test:jruby",
-  "//remote/client:ruby-test:jruby",
- ("//jobbie:ruby-test:jruby" if windows?),
-  "//chrome:ruby-test:jruby"
+  "//rb:firefox-test:jruby",
+  "//rb:remote-test:jruby",
+ ("//rb:ie-test:jruby" if windows?),
+#  "//rb:chrome-test:jruby"  # Just not stable enough
 ].compact
 
 task :test_py => [
@@ -159,16 +164,19 @@ task :build => [:all, :iphone, :remote, :selenium]
 task :clean do
   rm_rf 'build/'
   rm_rf 'iphone/build/'
-  rm_rf 'android/server/bin/', :verbose => false
-  rm_rf 'android/server/build/', :verbose => false
+  rm_rf 'android/server/bin/'
+  rm_rf 'android/server/build/'
+  Android::Clean.new()
 end
 
+task "ie_win32_dll" => [ "atomic_header", "sizzle_header" ]
 dll(:name => "ie_win32_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "jobbie/src/cpp/InternetExplorerDriver/**/*" ],
     :solution => "WebDriver.sln",
     :out  => "Win32/Release/InternetExplorerDriver.dll",
     :prebuilt => "jobbie/prebuilt")
 
+task "ie_x64_dll" => [ "atomic_header", "sizzle_header" ]
 dll(:name => "ie_x64_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "jobbie/src/cpp/InternetExplorerDriver/**/*" ],
     :solution => "WebDriver.sln",
@@ -208,7 +216,7 @@ dll(:name => "firefox_dll",
 gecko_sdk = "third_party/gecko-1.9.0.11/linux/"
 
 dll(:name => "libwebdriver_firefox_so",
-    :src  => FileList.new('common/src/cpp/webdriver-interactions/*_linux.cpp') +
+    :src  => FileList.new('common/src/cpp/webdriver-interactions/*_linux*.cpp') +
              FileList.new('firefox/src/cpp/webdriver-firefox/*.cpp'),
     :arch => "i386",
     :args => " -DXPCOM_GLUE  -DXPCOM_GLUE_USE_NSPR -I common/src/cpp/webdriver-interactions -I #{gecko_sdk}include -I /usr/include/nspr " + "`pkg-config gtk+-2.0 --cflags`",
@@ -219,15 +227,28 @@ dll(:name => "libwebdriver_firefox_so",
 # There is no official 64 bit gecko SDK. Fall back to trying to use the one on
 # system, but be ready for this to fail. I have a Ubuntu machine, so that's
 # what I'm basing this on. I understand that's a Bad Idea
+begin
+  pkg_config_gecko = sh "pkg-config --exists libxul"
+rescue
+  pkg_config_gecko = false
+end
 
-gecko_devels = FileList.new("/usr/lib/xulrunner-devel-1.9.*/sdk")
-local_gecko = gecko_devels.empty? ? "" : gecko_devels.to_a[0] + "/"
+if pkg_config_gecko
+  libs_cmd = open("| pkg-config --libs libxul")
+  local_gecko_libs = libs_cmd.readline.gsub "\n", ""
+  cflags_cmd = open("| pkg-config --cflags libxul")
+  local_gecko_include = cflags_cmd.readline.gsub "\n", ""
+else
+  print 'No Gecko sdk detected. Install xulrunner-dev to compile 64-bit Firefox extension.'
+  local_gecko_include = ""
+  local_gecko_libs = ""
+end
 
 dll(:name => "libwebdriver_firefox_so64",
-    :src  => FileList.new('common/src/cpp/webdriver-interactions/*_linux.cpp') + FileList.new('firefox/src/cpp/webdriver-firefox/native_events.cpp'),
+    :src  => FileList.new('common/src/cpp/webdriver-interactions/*_linux*.cpp') + FileList.new('firefox/src/cpp/webdriver-firefox/native_events.cpp'),
     :arch => "amd64",
-    :args => " -DXPCOM_GLUE  -DXPCOM_GLUE_USE_NSPR -fPIC -fshort-wchar -I common/src/cpp/webdriver-interactions -I #{local_gecko}include -I /usr/include/nspr `pkg-config gtk+-2.0 --cflags` ",
-    :link_args => "-Wall -Os -L#{local_gecko}lib -L#{local_gecko}bin -Wl,-rpath-link,#{local_gecko}bin -lxpcomglue_s -lxpcom -lnspr4 -lrt `pkg-config gtk+-2.0 --libs` -fno-rtti -fno-exceptions -shared  -fPIC",
+    :args => " -DXPCOM_GLUE  -DXPCOM_GLUE_USE_NSPR -fPIC -fshort-wchar -I common/src/cpp/webdriver-interactions #{local_gecko_include} `pkg-config gtk+-2.0 --cflags` ",
+    :link_args => "-Wall -Os #{local_gecko_libs} -lrt `pkg-config gtk+-2.0 --libs` -fno-rtti -fno-exceptions -shared  -fPIC",
     :prebuilt => "firefox/prebuilt",
     :out  => "linux64/Release/libwebdriver-firefox.so")
 
@@ -253,21 +274,18 @@ java_jar(:name => "selenium-core",
            "common/src/js/core"
          ])
 
-selenium_test(:name => "test_core_firefox",
-              :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [
-                "//remote/server",
-                :"selenium-core"
-              ],
-              :browser => "*chrome" )
-
-selenium_test(:name => "test_core_ie",
-              :srcs => [ "common/test/js/core/*.js" ],
-              :deps => [
-                "//remote/server",
-                :"selenium-core"
-              ],
-              :browser => "*iexploreproxy")
+{"firefox" => "*chrome",
+ "ie" => "*iexploreproxy",
+ "opera" => "*opera",
+ "safari" => "*safari"}.each_pair do |k,v|
+  selenium_test(:name => "test_core_#{k}",
+                :srcs => [ "common/test/js/core/*.js" ],
+                :deps => [
+                  "//remote/server",
+                  :"selenium-core"
+                ],
+                :browser => v )
+end
 
 # Copy things around to make life easier when packaging IDE
 file "build/ide/selenium" => "//common:js_core" do
@@ -399,8 +417,8 @@ iphone_test(:name => "webdriver-iphone-client-test",
 task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
-    puts "Building iWebDriver iphone app"
-    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver >/dev/null"
+    puts "Building iWebDriver iphone app."
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver CONFIGURATION_BUILD_DIR=../build/iphone", :verbose => false
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -413,55 +431,6 @@ task :test_iphone_server do
     sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target Tests"
   else
     puts "XCode and/or iPhoneSDK not found. Not testing iphone_server."
-  end
-end
-
-### Android ###
-file 'build/android/server/server.jar' => FileList["android/server/src/java/**/*.java"] + [:remote, :support] do
-  if AndroidSDK?
-    android_build(:name => "android-server",
-                  :srcs  => [ "android/server/src/java/**/*.java" ],
-                  :deps => [ :common,
-                             :remote,
-                             :support,
-                             :remote_common,
-                           ],
-                  :zip  => true
-                 )
-    copy_to_prebuilt("build/android-server-debug.apk", "android/server/prebuilt")
-  else
-    puts "Did not build Android APK because the Android SDK could not be found. Set the SDK location in properties.yml"
-    copy_prebuilt("android/server/prebuilt/", "build/android-server-debug.apk")
- end
-end
-task :android_server => 'build/android/server/server.jar'
-
-java_test(:name => "webdriver-android-client-test",
-          :srcs => ["android/client/test/java/**/*.java"],
-          :deps => [
-                     :test_common,
-                     :remote_client,
-                     :android_client
-                   ])
-
-task :test_android_init => [:android_server, :remote_server] do
-  if AndroidSDK?
-    #puts "Starting"
-    android_init()
-    run_emulator()
-    install_application()
-    start_application()
-    add_port_redir()
-  else
-    puts "Android SDK could not be found. Set the SDK location in properties.yml"
-  end
-end
-
-# This runs the tests on Android emulator
-task :test_android => [:test_android_init, :'webdriver-android-client-test'] do
-  if AndroidSDK?
-  else
-    puts "Android SDK could not be found. Set the SDK location in properties.yml"
   end
 end
 
@@ -478,6 +447,11 @@ file "jobbie/src/cpp/InternetExplorerDriver/atoms.h" => [
   end
 end
 task :atomic_header => [ "jobbie/src/cpp/InternetExplorerDriver/atoms.h" ]
+
+file "jobbie/src/cpp/InternetExplorerDriver/sizzle.h" => [ "//third_party/js/sizzle:sizzle:header" ] do
+  cp "build/third_party/js/sizzle/sizzle.h", "jobbie/src/cpp/InternetExplorerDriver/sizzle.h"
+end
+task :sizzle_header => [ "jobbie/src/cpp/InternetExplorerDriver/sizzle.h" ]
 
 file "common/test/js/deps.js" => FileList["third_party/closure/goog/**/*.js", "common/src/js/**/*.js"] do
   our_cmd = "java -jar third_party/py/jython.jar third_party/closure/bin/calcdeps.py "

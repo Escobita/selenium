@@ -120,6 +120,11 @@ WdCertOverrideService.prototype.certificateIssuerUntrusted_ = function
       ((verification_result & theCert.CERT_NOT_TRUSTED) != 0) ||
       ((verification_result & theCert.INVALID_CA) != 0)) {
     localdump("Certificate issuer unknown.");
+    localdump("Unknown: " + (theCert.ISSUER_UNKNOWN & verification_result));
+    localdump("Issuer not trusted: " + (theCert.ISSUER_NOT_TRUSTED & verification_result));
+    localdump("Cert not trusted: " + (theCert.CERT_NOT_TRUSTED & verification_result));
+    localdump("Invalid CA: " + (theCert.INVALID_CA & verification_result));
+
     return this.ERROR_UNTRUSTED;
   }
 
@@ -130,7 +135,7 @@ WdCertOverrideService.prototype.certificateIssuerUntrusted_ = function
 // and the hostname the certificate was issued for, 0 otherwise.
 WdCertOverrideService.prototype.certificateHostnameMismatch_ = function
   (theCert, aHost) {
-  commonNameRE = new RegExp(theCert.commonName.replace('*', '\\w+'));
+  commonNameRE = new RegExp("^" + theCert.commonName.replace('*', '\\w+') + "$", "i");
   if (aHost.match(commonNameRE) === null) {
     localdump("Host name mismatch: cert: " + theCert.commonName + " get: " + aHost);
     return this.ERROR_MISMATCH;
@@ -155,9 +160,19 @@ WdCertOverrideService.prototype.fillNeededBits = function(aCert, aHost) {
 
   return_bits = return_bits | this.certificateExpiredBit_(
       aCert, verification_bits);
-  return_bits = return_bits | this.certificateIssuerUntrusted_(
-      aCert, verification_bits);
   return_bits = return_bits | this.certificateHostnameMismatch_(aCert, aHost);
+
+  // Return bits will be 0 here only if:
+  // 1. Both checks above returned 0.
+  // 2. shouldAssumeUntrustedIssuer is false (otherwise this.default_bits = 1)
+  // It has been observed that if there's a host name mismatch then it
+  // may not be required to check the trust status of the certificate issuer.
+  if (return_bits == 0) {
+    localdump("Checking issuer since certificate has not expired or has a host name mismatch.");
+    return_bits = return_bits | this.certificateIssuerUntrusted_(
+        aCert, verification_bits);
+  }
+
   localdump("return_bits now: " + return_bits);
   return return_bits;
 };

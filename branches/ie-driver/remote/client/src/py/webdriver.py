@@ -279,6 +279,10 @@ class WebDriver(object):
     def forward(self):
         """Goes forward in browser history."""
         self._execute(Command.GO_FORWARD)
+
+    def refresh(self):
+        """Refreshes the current page."""
+        self._execute(Command.REFRESH)
     # Options
     def get_cookies(self):
         """Gets all the cookies. Return a set of dicts."""
@@ -313,15 +317,17 @@ class WebDriver(object):
 
     def get_screenshot_as_file(self, filename):
         """Gets the screenshot of the current window. Returns False if there is 
-        any IOError, else returns True."""
+        any IOError, else returns True. Use full paths in your filename."""
         png = self._execute(Command.SCREENSHOT)['value']
-        f = None
         try:
             f = open(filename, 'w')
-            f.write(base64.decode(png))
+            f.write(base64.decodestring(png))
             f.close()
         except IOError:
             return False
+
+        finally:
+            del png
 
         return True
 

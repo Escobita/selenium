@@ -17,21 +17,14 @@ limitations under the License.
 
 package org.openqa.selenium.android;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.google.common.collect.Sets;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.jetty.util.IO;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Rotatable;
+import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.TakesScreenshot;
@@ -40,10 +33,11 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.android.app.R;
 import org.openqa.selenium.android.intents.Action;
+import org.openqa.selenium.android.intents.FutureExecutor;
 import org.openqa.selenium.android.intents.IntentReceiver;
+import org.openqa.selenium.android.intents.IntentReceiver.IntentReceiverListener;
 import org.openqa.selenium.android.intents.IntentReceiverRegistrar;
 import org.openqa.selenium.android.intents.IntentSender;
-import org.openqa.selenium.android.intents.IntentReceiver.IntentReceiverListener;
 import org.openqa.selenium.android.sessions.SessionCookieManager;
 import org.openqa.selenium.android.util.JsUtil;
 import org.openqa.selenium.android.util.SimpleTimer;
@@ -54,47 +48,59 @@ import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Context;
+import android.os.SystemClock;
+import android.util.Log;
+
+import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, JavascriptExecutor,
     FindsById, FindsByLinkText, FindsByName, FindsByXPath, TakesScreenshot,
-    IntentReceiverListener {
+    IntentReceiverListener, Rotatable {
 
   public static final String LOG_TAG = AndroidDriver.class.getName();
+  
+  // Timeouts in milliseconds
+  public static final long INTENT_TIMEOUT = 10000L;
+  public static final long LOADING_TIMEOUT = 30000L;
+  public static final long START_LOADING_TIMEOUT = 800L;
+  public static final long WAIT_FOR_RESPONSE_TIMEOUT = 20000L;
+  public static final long FOCUS_TIMEOUT = 1000L;
   
   public static final String ERROR = "_ERROR:";  // Prefixes JS result when returning an error
   public static final String TYPE = "_TYPE";  // Prefixes JS result to be converted
   public static final String WEBELEMENT_TYPE = TYPE + "1:"; // Convert to WebElement
   private static final String WINDOW_HANDLE = "windowOne";
-  // Timeouts in milliseconds
-  public static final long INTENT_TIMEOUT = 10000L;
-  public static final long LOADING_TIMEOUT = 60000L;
-  public static final long START_LOADING_TIMEOUT = 800L;
-  public static final long WAIT_FOR_RESPONSE_TIMEOUT = 15000L;
 
+  private static final String NOT_DONE_INDICATOR = Long.toString(SystemClock.uptimeMillis());
   private static Context context;
-  private final ExecutorService executor;
   private final SimpleTimer timer;
   private final IntentReceiverRegistrar intentRegistrar;
   private final AndroidWebElement element;
   private final JavascriptDomAccessor domAccessor;
-  private boolean pageHasLoaded = false;
-  private boolean pageHasStartedLoading = false;
-  private String jsResult;
+  private final IntentSender sender;
+  private volatile boolean pageHasLoaded = false;
+  private volatile boolean pageHasStartedLoading = false;
+  private volatile boolean editableAreaIsFocused = false;
+  private volatile String jsResult;
   private String jsonLibrary;
   private String currentFrame;
-  private long implicitWait = 0;  
+  private long implicitWait = 0;
   
   public AndroidDriver() {
     Log.e(LOG_TAG, "AndroidDriver constructor: " + getContext().getPackageName());
@@ -103,12 +109,11 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     initJsonLibrary();
     intentRegistrar = new IntentReceiverRegistrar(getContext());
     timer = new SimpleTimer();
-    
+    sender = new IntentSender();
     // TODO(berrada): This object is stateless, think about isolating the JS and
     // provide helper functions.
     domAccessor = new JavascriptDomAccessor(this);
     element = new AndroidWebElement(this);
-    executor = Executors.newSingleThreadExecutor();
     initIntentReceivers();
   }
 
@@ -118,19 +123,20 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     intentRegistrar.registerReceiver(receiver, Action.JAVASCRIPT_RESULT_AVAILABLE);
     intentRegistrar.registerReceiver(receiver, Action.PAGE_LOADED);
     intentRegistrar.registerReceiver(receiver, Action.PAGE_STARTED_LOADING);
+    intentRegistrar.registerReceiver(receiver, Action.EDITABLE_AERA_FOCUSED);
   }
 
   private void initJsonLibrary() {
     // Unfortunately JSON is not natively supported until Android 1.6
     // TODO(berrada): Only do this if we're on <1.6
-    InputStream in = null;
+    InputStream stream = null;
     try {
-      in = getContext().getResources().openRawResource(R.raw.json);
-      jsonLibrary = IO.toString(in);
-    } catch (Exception e) {
-      throw new WebDriverException("Could not read JSON library.", e);
+      stream = getContext().getResources().openRawResource(R.raw.json);
+      jsonLibrary = new String(ByteStreams.toByteArray(stream));
+    } catch (IOException e) {
+      throw new WebDriverException(e);
     } finally {
-      IO.close(in);
+      Closeables.closeQuietly(stream);
     }
   }
 
@@ -152,7 +158,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
 
   public String getTitle() {
     Log.d(LOG_TAG, "getTitle");
-    if ("window".equals(currentFrame)) {
+    if (!"window".equals(currentFrame)) {
       return (String) executeScript("return " + currentFrame + ".document.title");
     }
     return (String) sendIntent(Action.GET_TITLE);
@@ -164,8 +170,9 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
 
   public String getPageSource() {
     Log.d(LOG_TAG, "getPageSource");
-    executeScript("return " + currentFrame + ".documentElement.outerHTML");
-    return jsResult;
+    return (String) executeScript(
+        "return (new XMLSerializer()).serializeToString("
+            + currentFrame + ".document.documentElement);");
   }
 
   public void close() {
@@ -178,6 +185,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   public void quit() {
     Log.d(LOG_TAG, "Quitting..");
     intentRegistrar.unregisterAllReceivers();
+    // TODO(berrada): Close webview and shutdown server.
   }
 
   public WebElement findElement(By by) {
@@ -213,7 +221,8 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   private static void sleepQuietly(long ms) {
     try {
       Thread.sleep(ms);
-    } catch (InterruptedException ignored) {
+    } catch (InterruptedException cause) {
+      Log.e(LOG_TAG, "Sleep, interupted: " + cause.getMessage());
     }
   }
 
@@ -268,14 +277,12 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   }
 
   public WebElement findElementByPartialLinkText(String using) {
-    Log.d(LOG_TAG, "Searching for element by partial link text: "
-        + using);
+    Log.d(LOG_TAG, "Searching for element by partial link text: " + using);
     return element.findElementByPartialLinkText(using);
   }
 
   public List<WebElement> findElementsByPartialLinkText(String using) {
-    Log.d(LOG_TAG, "Searching for elements by partial link text: "
-        + using);
+    Log.d(LOG_TAG, "Searching for elements by partial link text: " + using);
     return element.findElementsByPartialLinkText(using);
   }
 
@@ -380,7 +387,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     
     // jsResult is updated by the intent receiver when the JS result is ready. 
     Object res = checkResultAndConvert(jsResult);
-    Log.d(LOG_TAG, String.format("executeScript Converted result from %s, to %s.", jsResult, res));
+    Log.d(LOG_TAG, String.format("executeScript Converted result from %s, to %s.", jsResult, res));    
     return res;
   }
 
@@ -438,21 +445,22 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   }
 
   /**
-   * Executes the given Javascript in the WebView and wait until it is done executing.
+   * Executes the given Javascript in the WebView and 
+   * wait until it is done executing.
    * If the Javascript executed returns a value, the later is updated in the
    * class variable jsResult when the event is broadcasted.
    * 
    * @param args the Javascript to be executed
    */
   private void executeJavascriptInWebView(Object... args) {
-    jsResult = "";
+    jsResult = NOT_DONE_INDICATOR;
     timer.start();
     sendIntent(Action.EXECUTE_JAVASCRIPT, args);
     
-    executeFuture(new Callable<Void>() {
+    FutureExecutor.executeFuture(new Callable<Void>() {
       public Void call() {
-        while (jsResult.equals("")) {
-          continue;
+        while (NOT_DONE_INDICATOR.equals(jsResult)) {
+          sleepQuietly(50);
         }
         return null;
       }
@@ -586,7 +594,6 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
       implicitWait = TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit);
       return this;
     }
-    
   }
   
   public void doNavigation(String intentName) {
@@ -595,7 +602,6 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   
   private void doNavigation(String intentName, String url) {
     timer.start();
-    pageHasLoaded = false;
     sendIntent(intentName, url);
     waitUntilPageFinishedLoading();
     currentFrame = "window";
@@ -603,15 +609,27 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   }
   
   public void waitUntilPageFinishedLoading() {
-    executeFuture(new Callable<Boolean>() {
-      public Boolean call() throws Exception {
+    FutureExecutor.executeFuture(new Callable<Void>() {
+      public Void call() throws Exception {
         while (!pageHasLoaded) {
-          continue;
+          sleepQuietly(50);
         }
-        return pageHasLoaded;
+        return null;
       }
       
     }, LOADING_TIMEOUT);
+  }
+  
+  public void waitUntilEditableAreaFocused() {
+    FutureExecutor.executeFuture(new Callable<Void>() {
+      public Void call() throws Exception {
+        while (!editableAreaIsFocused) {
+          sleepQuietly(50);
+        }
+        return null;
+      }
+      
+    }, FOCUS_TIMEOUT);
   }
   
   public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
@@ -619,42 +637,33 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     String base64Png = new Base64Encoder().encode(rawPng);
     return target.convertFromBase64Png(base64Png);
   }
+
+  public ScreenOrientation getOrientation() {
+    return (ScreenOrientation) sendIntent(Action.GET_SCREEN_ORIENTATION);
+  }
+
+  public void rotate(ScreenOrientation orientation) {
+    sendIntent(Action.ROTATE_SCREEN, orientation);
+  }
   
   public Object sendIntent(String action, Object... args) {
     resetPageHasLoaded();
     resetPageHasStartedLoading();
-    IntentSender broadcaster = IntentSender.getInstance();
-    broadcaster.broadcast(getContext(), action, args);
-    return executeFuture(broadcaster, INTENT_TIMEOUT);
-  }
-
-  public Object executeFuture(Callable callable, long timeout) {
-    Future<Object> future = executor.submit(callable);
-    Object toReturn = null;
-    try {
-      toReturn = future.get(timeout, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      Log.e(LOG_TAG, "InterruptedException Future interupted, restauring state. "
-          + e.getMessage());
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      executor.shutdown();
-      throw new WebDriverException("ExecutionException: Future task shutdown. ",
-          e.getCause());
-    } catch (TimeoutException e) {
-      Log.e(LOG_TAG, "TimeoutException Future: " + e.getMessage());
-    }
-    return toReturn;
+    editableAreaIsFocused = false;
+    sender.broadcast(getContext(), action, args);
+    return FutureExecutor.executeFuture(sender, INTENT_TIMEOUT);
   }
 
   public Object onReceiveBroadcast(String action, Object... args) {
     Log.e(LOG_TAG, "onBroadcastWithResult handling: " + action);
-    if (action.equals(Action.JAVASCRIPT_RESULT_AVAILABLE)) {
+    if (Action.JAVASCRIPT_RESULT_AVAILABLE.equals(action)) {
       jsResult = (String) args[0];
-    } else if (action.equals(Action.PAGE_LOADED)) {
+    } else if (Action.PAGE_LOADED.equals(action)) {
       pageHasLoaded = true;
-    } else if (action.equals(Action.PAGE_STARTED_LOADING)) {
+    } else if (Action.PAGE_STARTED_LOADING.equals(action)) {
       pageHasStartedLoading = true;
+    } else if (Action.EDITABLE_AERA_FOCUSED.equals(action)) {
+      editableAreaIsFocused = true;
     }
     return null;
   }

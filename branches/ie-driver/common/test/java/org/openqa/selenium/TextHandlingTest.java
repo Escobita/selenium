@@ -148,7 +148,11 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     driver.get(pages.formPage);
     WebElement textarea = driver.findElement(By.id("withText"));
     textarea.clear();
+
+    TestWaitingUtility.waitUntilElementValueEquals(textarea, "");
+
     String expectedText = "I like cheese" + newLine + newLine + "It's really nice";
+
     textarea.sendKeys(expectedText);
 
     String seenText = textarea.getValue();
@@ -263,5 +267,15 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 
     assertEquals("", empty);
     assertEquals("sub-element that is explicitly visible", explicit);
+  }
+
+  public void testShouldGetTextFromTableCells() {
+    driver.get(pages.tables);
+
+    WebElement tr = driver.findElement(By.id("hidden_text"));
+    String text = tr.getText();
+
+    assertTrue(text.contains("some text"));
+    assertFalse(text.contains("some more text"));
   }
 }

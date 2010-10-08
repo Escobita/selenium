@@ -366,24 +366,24 @@ class RunTests < BaseJava
       else
         tests.each do |test|
           CrazyFunJava.ant.project.getBuildListeners().get(0).setMessageOutputLevel(2) if ENV['log']
-  	      CrazyFunJava.ant.junit(:fork => true, :forkmode => 'once', :showoutput => true,
-	  	                          :printsummary => 'on', :haltonerror => true, :haltonfailure => true) do |ant|
-  	        ant.classpath do |ant_cp|
-	            cp.all.each do |jar|
+          CrazyFunJava.ant.junit(:fork => true, :forkmode =>  'once', :showoutput => true,
+                                 :printsummary => 'on', :haltonerror => true, :haltonfailure => true) do |ant|
+            ant.classpath do |ant_cp|
+              cp.all.each do |jar|
                 ant_cp.pathelement(:location => jar)
               end
-  	        end
-
-	          ant.formatter(:type => 'plain')
-  	        ant.formatter(:type => 'xml')
-
-	          class_name = test.gsub('\\', '/').split('/')[-1]
-  	        name = "#{package_name(test)}.#{class_name}".gsub('\\', '/').gsub('/', '.').gsub('.java', '')
-	        
-	          if name =~ /^\./
-	            name = test
             end
-	        
+
+            ant.formatter(:type => 'plain')
+            ant.formatter(:type => 'xml')
+
+            class_name = test.gsub('\\', '/').split('/')[-1]
+            name = "#{package_name(test)}.#{class_name}".gsub('\\', '/').gsub('/', '.').gsub('.java', '')
+
+            if name =~ /^\./
+              name = test
+            end
+
             ant.test(:name => name, :todir => 'build/test_logs')
           end
           CrazyFunJava.ant.project.getBuildListeners().get(0).setMessageOutputLevel(verbose ? 2 : 0)
@@ -438,7 +438,10 @@ class ClassPath
       end
       
       if Rake::Task.task_defined? dep
-        build_classpath(cp, Rake::Task[dep])
+        parent = Rake::Task[dep]
+        if !((parent.to_s =~ /\.apk/))
+          build_classpath(cp, parent)
+        end
       end
     end
     
@@ -483,7 +486,8 @@ class CreateUberJar < BaseJava
       deps = jar_name(dir, args[:name])
     else
       deps = args[:deps].collect do |dep|
-        task_name(dir, dep)
+        real_file = File.join(dir, dep.to_s)
+        File.exists?(real_file) ? real_file : task_name(dir, dep)
       end
     end
     

@@ -117,6 +117,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.findElement(By.id("mousedown")).click();
 
     String result = driver.findElement(By.id("result")).getText();
+    assertEventFired("mouse down");
     assertThat(result, equalTo("mouse down"));
   }
 
@@ -135,8 +136,9 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mouseup")).click();
 
-    String result = driver.findElement(By.id("result")).getText();
-    assertThat(result, equalTo("mouse up"));
+    WebElement result = driver.findElement(By.id("result"));
+    TestWaitingUtility.waitUntilElementTextEquals(result, "mouse up");
+    assertThat(result.getText(), equalTo("mouse up"));
   }
 
   @JavascriptEnabled
@@ -145,8 +147,9 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("child")).click();
 
-    String result = driver.findElement(By.id("result")).getText();
-    assertThat(result, equalTo("mouse down"));
+    WebElement result = driver.findElement(By.id("result"));
+    TestWaitingUtility.waitUntilElementTextEquals(result, "mouse down");
+    assertThat(result.getText(), equalTo("mouse down"));
   }
 
   @JavascriptEnabled
@@ -261,6 +264,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
       try {
         Thread.sleep(200);
       } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     }
     if (!focused) {
@@ -318,6 +322,10 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     assertThat(result.getText(), equalTo("changed"));
   }
 
+  private String getTextFromElementOnceAvailable(String elementId) {
+    return TestWaitingUtility.waitForElementToExist(driver,(elementId)).getText();
+  }
+
   @Ignore({CHROME, HTMLUNIT, SELENESE})
   public void testShouldReportTheXAndYCoordinatesWhenClicking() {
     driver.get(pages.javascriptPage);
@@ -325,8 +333,8 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     WebElement element = driver.findElement(By.id("eventish"));
     element.click();
 
-    String clientX = driver.findElement(By.id("clientX")).getText();
-    String clientY = driver.findElement(By.id("clientY")).getText();
+    String clientX = getTextFromElementOnceAvailable("clientX");
+    String clientY = getTextFromElementOnceAvailable("clientY");
 
     assertFalse("0".equals(clientX));
     assertFalse("0".equals(clientY));
@@ -338,8 +346,11 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
   private void assertEventFired(String eventName) {
     WebElement result = driver.findElement(By.id("result"));
-    String text = result.getText();
-    assertTrue("No " + eventName + " fired: " + text, text.contains(eventName));
+
+    String text = TestWaitingUtility.waitUntilElementTextContains(result, eventName);
+    boolean conditionMet = text.contains(eventName);
+
+    assertTrue("No " + eventName + " fired: " + text, conditionMet);
   }
   
   private void assertEventNotFired(String eventName) {

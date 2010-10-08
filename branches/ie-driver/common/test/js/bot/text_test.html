@@ -18,12 +18,11 @@ limitations under the License.
 <html>
 <head>
   <title>text_test.html</title>
-  <script type="text/javascript" src="../webdriver-bootstrap.js">
-  </script>
-  <script type="text/javascript" src="deps.js"></script>
+  <script src="../webdriver-bootstrap.js"></script>
+  <script src="deps.js"></script>
   <script type="text/javascript">
+    goog.require('bot.dom');
     goog.require('bot.locators');
-    goog.require('bot.style');
     goog.require('goog.testing.jsunit');
   </script>
 
@@ -71,7 +70,7 @@ limitations under the License.
 
     function getVisibleTextByElementId(id) {
       var e = bot.locators.findElement({id: id});
-      return bot.style.getVisibleText(e);
+      return bot.dom.getVisibleText(e);
     }
 
     function testGetVisibleTextShouldCollapseNonBreakingSpaces() {
@@ -134,6 +133,19 @@ limitations under the License.
       assertEquals("line has text", text);
     }
 
+    function testGetVisibleTextShouldHandleLackOfSpacesBetweenInlineElements() {
+      var text = getVisibleTextByElementId("inlinenospaces");
+      assertEquals("oooOooo", text);
+      var text2 = getVisibleTextByElementId("inlinenospaces2");
+      assertEquals("A B", text2);
+    }
+
+    function testGetVisibleTextShouldNotAddExtraSpaces() {
+      var text = getVisibleTextByElementId("descartes");
+
+      assertEquals("Dubito, ergo cogito, ergo sum.", text);
+    }
+
     function testGetVisibleTestGetTextWithLineBreakForInlineElement() {
       var text = getVisibleTextByElementId("label1");
       assertContains("foo\nbar", text);
@@ -152,6 +164,12 @@ limitations under the License.
 
       assertEquals("link with leading space " + "link with trailing space " +
           "link with formatting tags", text);
+    }
+
+    function testKeepsNonBreakingSpacesBeforeATag() {
+      var text = getVisibleTextByElementId("id2");
+
+      assertEquals("this is the second element", text);
     }
 
     function assertContains(expectedText, text) {
@@ -219,6 +237,9 @@ limitations under the License.
 
   <div id="collapsingtext"><span></span><div>Hello, world</div><span></span></div>
 
+  <div id="inlinenospaces">ooo<strong>O</strong>ooo</div>
+  <div id="inlinenospaces2"><span>A <span></span>B</span></div>
+
   <form action="resultPage.html">
       <p>
           <input type="checkbox" id="checkbox1">
@@ -239,5 +260,8 @@ limitations under the License.
       </tbody>
   </table>
 
+  <span><strong id="descartes">Dubito, <em>ergo cogito</em>, ergo sum.</strong></span>
+
+  <a id="id2" >this is the&nbsp;<b>second</b> <span>element</span></a>
 </body>
 </html>
