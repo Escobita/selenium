@@ -62,7 +62,7 @@ More often, you'll want to log directly in to the VMs to perform maintenance on 
  * Windows Vista
    * Remote Desktop to localhost:3400 with the username *openqa* and the standard OpenQA password.
  * OS X 10.5 Server
-   * VNC to 5910 (display port 10) with the standard OpenQA password.
+   * VNC to 5910 (display port 10) with username *openqa* and the standard OpenQA password.
    * SSH to localhost port 1122 with the username openqa and the standard OpenQA password.
  * Ubuntu
    * VNC to 5911 (display port 11) with the standard OpenQA password.
