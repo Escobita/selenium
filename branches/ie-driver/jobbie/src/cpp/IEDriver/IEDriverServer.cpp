@@ -28,7 +28,10 @@ std::string IEDriverServer::processRequest(struct mg_connection *conn, const str
 
 	std::wstring locatorParameters = L"";
 	int command = this->lookupCommand(request_info->uri, httpVerb, &locatorParameters);
-	if (command != CommandValue::NoCommand)
+	if (command == CommandValue::NoCommand)
+	{
+	}
+	else
 	{
 		// Compile the serialized JSON representation of the command by hand.
 		std::wstringstream commandStream;
@@ -213,11 +216,11 @@ int IEDriverServer::lookupCommand(std::string uri, std::string httpVerb, std::ws
 	{
 		std::vector<std::string> locatorParamNames;
 		std::string urlCandidate = (*it).first;
-		int paramStartPos = urlCandidate.find_first_of(":");
+		size_t paramStartPos = urlCandidate.find_first_of(":");
 		while (paramStartPos != std::string.npos)
 		{
-			int paramLen = std::string.npos;
-			int paramEndPos = urlCandidate.find_first_of("/", paramStartPos);
+			size_t paramLen = std::string.npos;
+			size_t paramEndPos = urlCandidate.find_first_of("/", paramStartPos);
 			if (paramEndPos != std::string.npos)
 			{
 				paramLen = paramEndPos - paramStartPos;
@@ -241,7 +244,7 @@ int IEDriverServer::lookupCommand(std::string uri, std::string httpVerb, std::ws
 				value = it->second[httpVerb];
 				std::stringstream paramStream;
 				paramStream << "{";
-				int paramCount = locatorParamNames.size();
+				size_t paramCount = locatorParamNames.size();
 				for (int i = 0; i < paramCount; i++)
 				{
 					if (i != 0)

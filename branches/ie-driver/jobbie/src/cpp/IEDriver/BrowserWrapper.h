@@ -63,19 +63,15 @@ public:
 	STDMETHOD_(void, OnQuit)();
 	STDMETHOD_(void, NewWindow3)(IDispatch *pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
 
-	void runCommand(WebDriverCommand command, WebDriverResponse *response);
 	std::string getWindowName();
 	void Wait(void);
+	int GoToUrl(std::string url);
+	int GetCurrentUrl(std::string *currentUrl);
 
 private:
+	CComPtr<IWebBrowser2> m_pBrowser;
 	bool m_pendingWait;
-	std::queue<WebDriverCommand> m_pendingCommands;
-	std::queue<WebDriverResponse> m_pendingResponses;
-	void dispatchCommand(WebDriverCommand command);
-	void ProcessPendingCommands();
 	void AttachEvents();
 	void DetachEvents();
-	CComPtr<IWebBrowser2> m_pBrowser;
-	int GetUrl(std::map<std::string, std::string> locator, Json::Value body, Json::Value& result);
 	void WaitInternal(void);
 };

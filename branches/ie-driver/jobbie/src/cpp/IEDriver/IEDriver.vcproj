@@ -195,7 +195,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="$(SolutionDir)jobbie\src\cpp\JSON\include\json"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -449,10 +449,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\SwitchToWindowCommandHandler.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\WebDriverCommand.cpp"
 				>
 			</File>
@@ -491,11 +487,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetAllWindowHandlesCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetCurrentWindowHandleCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GoToUrlCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IEDriverServer.h"
 				>
 			</File>
 			<File
 				RelativePath=".\mongoose.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewSessionCommandHandler.h"
 				>
 			</File>
 			<File

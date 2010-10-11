@@ -31,45 +31,16 @@ BrowserWrapper::~BrowserWrapper(void)
 {
 }
 
-void BrowserWrapper::runCommand(WebDriverCommand command, WebDriverResponse *response)
+int BrowserWrapper::GoToUrl(std::string url)
 {
-	this->m_pendingCommands.push(command);
-	while (this->m_pendingCommands.size() > 0)
+	CComVariant *pVarUrl = new CComVariant(url.c_str());
+
+	HRESULT hr = m_pBrowser->Navigate2(pVarUrl, NULL, NULL, NULL, NULL);
+	while (!this->m_pendingWait)
 	{
-		WebDriverCommand currentCommand = this->m_pendingCommands.front();
-		this->dispatchCommand(currentCommand);
-		this->m_pendingCommands.pop();
+		::Sleep(200);
 	}
 
-	while (this->m_pendingResponses.size() > 0)
-	{
-		WebDriverResponse pendingResponse = this->m_pendingResponses.front();
-		if (!pendingResponse.m_isInternalResponse)
-		{
-			response = &pendingResponse;
-		}
-
-		this->m_pendingResponses.pop();
-	}
-}
-
-void BrowserWrapper::dispatchCommand(WebDriverCommand command)
-{
-	WebDriverResponse response;
-	switch (command.m_commandValue)
-	{
-		default:
-			break;
-	}
-
-	this->m_pendingResponses.push(response);
-}
-
-int BrowserWrapper::GetUrl(std::map<std::string, std::string> locator, Json::Value body, Json::Value& result)
-{
-	CComVariant *url = new CComVariant(body.get("url", Json::Value::null).asCString());
-
-	HRESULT hr = m_pBrowser->Navigate2(url, NULL, NULL, NULL, NULL);
 	return SUCCESS;
 }
 

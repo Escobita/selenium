@@ -1,6 +1,7 @@
 #pragma once
 #include "StdAfx.h"
 #include "BrowserWrapper.h"
+#include "WebDriverCommandHandler.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -25,16 +26,15 @@ public:
 
 	void NewBrowserEventHandler(BrowserWrapper wrapper);
 	void BrowserQuittingEventHandler(std::wstring browserId);
+	WebDriverResponse DispatchCommand(WebDriverCommand* command);
 
 private:
 	static DWORD WINAPI ThreadProc(LPVOID lpParameter);
 	void Start(void);
+	void PopulateCommandHandlerRepository(void);
 
 	int m_newBrowserEventId;
 	int m_browserQuittingEventId;
-	WebDriverResponse DispatchCommand(WebDriverCommand* command);
-	Json::Value GetCurrentWindowHandle();
-	Json::Value GetAllWindowHandles();
-	void SwitchToWindow(std::map<std::string, std::string> locator, WebDriverResponse *response);
+	std::map<int, WebDriverCommandHandler*> m_commandHandlerRepository;
 };
 }

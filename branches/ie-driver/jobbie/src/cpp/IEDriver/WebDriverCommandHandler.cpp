@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "WebDriverCommandHandler.h"
+#include "BrowserManager.h"
 
 WebDriverCommandHandler::WebDriverCommandHandler(void)
 {

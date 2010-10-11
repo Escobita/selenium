@@ -1,9 +1,13 @@
 #pragma once
-#include "BrowserManager.h"
 #include <map>
 #include <string>
 
 using namespace std;
+
+// Forward declaration of classes to avoid
+// circular include files.
+class BrowserManager;
+class WebDriverResponse;
 
 class WebDriverCommandHandler
 {
