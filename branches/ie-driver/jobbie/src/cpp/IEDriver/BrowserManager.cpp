@@ -1,12 +1,15 @@
 #include "StdAfx.h"
 #include "BrowserManager.h"
-#include "SwitchToWindowCommandHandler.h"
-#include "GetCurrentWindowHandleCommandHandler.h"
+#include "CloseWindowCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
+#include "GetCurrentWindowHandleCommandHandler.h"
+#include "GetSessionCapabilitiesCommandHandler.h"
 #include "GoToUrlCommandHandler.h"
 #include "NewSessionCommandHandler.h"
+#include "SwitchToWindowCommandHandler.h"
+#include "QuitCommandHandler.h"
 
-BrowserManager::BrowserManager(void)
+BrowserManager::BrowserManager(int port)
 {
 	// NOTE: Use UuidCreate here to avoid unnecessarily initializing COM
 	// on this thread. It will be initialized on the named pipe worker
@@ -18,13 +21,15 @@ BrowserManager::BrowserManager(void)
 
 	// RPC_WSTR is currently typedef'd in RpcDce.h (pulled in by rpc.h)
 	// as unsigned short*. It needs to be typedef'd as wchar_t* 
-	wchar_t* pwStr = reinterpret_cast<wchar_t*>( pszUuid );
+	wchar_t* pwStr = reinterpret_cast<wchar_t*>(pszUuid);
 	m_managerId = pwStr;
 
 	::RpcStringFree(&pszUuid);
 
 	this->PopulateCommandHandlerRepository();
 	this->m_currentBrowser = L"";
+	this->m_port = port;
+	this->m_factory = new BrowserFactory;
 }
 
 BrowserManager::~BrowserManager(void)
@@ -106,52 +111,26 @@ WebDriverResponse BrowserManager::DispatchCommand(WebDriverCommand* command)
 	{
 		this->m_commandHandlerRepository[command->m_commandValue]->Execute(this, command->m_locatorParameters, command->m_commandParameters, &response);
 	}
-	//std::string value = command->m_commandParameters["value"];
-	//switch (command->m_commandValue)
-	//{
-	//	case CommandValue::NewSession:
-	//		std::transform(value.begin(), value.end(), value.begin(), ::toupper);
-	//		response.m_statusCode = 0;
-	//		response.m_value["upperValue"] = value;
-	//		break;
-
-	//	case CommandValue::Quit:
-	//		break;
-
-	//	case CommandValue::GetSpeed:
-	//		break;
-
-	//	case CommandValue::SetSpeed:
-	//		break;
-
-	//	case CommandValue::ImplicitlyWait:
-	//		break;
-
-	//	case CommandValue::Get:
-	//		std::transform(value.begin(), value.end(), value.begin(), ::toupper);
-	//		response.m_statusCode = 0;
-	//		response.m_value = "Received value " + value;
-	//		break;
-
-	//	default:
-	//		//this->m_trackedBrowsers[this->m_currentBrowser].runCommand(*command, &response);
-	//		break;
-	//}
 
 	return response;
+}
+
+void BrowserManager::AddWrapper(BrowserWrapper wrapper)
+{
+	this->m_trackedBrowsers[wrapper.m_browserId] = wrapper;
+	this->m_newBrowserEventId = wrapper.NewWindow.attach(this, &BrowserManager::NewBrowserEventHandler);
+	this->m_browserQuittingEventId = wrapper.Quitting.attach(this, &BrowserManager::BrowserQuittingEventHandler);
+	if (this->m_currentBrowser == L"")
+	{
+		this->m_currentBrowser = wrapper.m_browserId;
+	}
 }
 
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper wrapper)
 {
 	if (this->m_trackedBrowsers.find(wrapper.m_browserId) == this->m_trackedBrowsers.end())
 	{
-		this->m_trackedBrowsers[wrapper.m_browserId] = wrapper;
-		this->m_newBrowserEventId = wrapper.NewWindow.attach(this, &BrowserManager::NewBrowserEventHandler);
-		this->m_browserQuittingEventId = wrapper.Quitting.attach(this, &BrowserManager::BrowserQuittingEventHandler);
-		if (this->m_currentBrowser == L"")
-		{
-			this->m_currentBrowser = wrapper.m_browserId;
-		}
+		this->AddWrapper(wrapper);
 	}
 }
 
@@ -181,4 +160,7 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::SwitchToWindow] = new SwitchToWindowCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Get] = new GoToUrlCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::NewSession] = new NewSessionCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::Close] = new CloseWindowCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::Quit] = new QuitCommandHandler;
 }

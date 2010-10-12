@@ -1,4 +1,5 @@
 #pragma once
+#include "json.h"
 #include <map>
 #include <string>
 
@@ -14,10 +15,10 @@ class WebDriverCommandHandler
 public:
 	WebDriverCommandHandler(void);
 	virtual ~WebDriverCommandHandler(void);
-	void Execute(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, std::string> commandParameters, WebDriverResponse * response);
+	void Execute(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response);
 
 protected:
 	bool m_ignorePreExecutionWait;
 	bool m_ignorePostExecutionWait;
-	virtual void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, std::string> commandParameters, WebDriverResponse * response);
+	virtual void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response);
 };

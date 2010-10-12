@@ -12,6 +12,8 @@
 #include <exdisp.h>
 #include <mshtml.h>
 
+#define WAIT_TIME_IN_MILLISECONDS 200
+
 using namespace std;
 
 class BrowserWrapper :
@@ -67,11 +69,16 @@ public:
 	void Wait(void);
 	int GoToUrl(std::string url);
 	int GetCurrentUrl(std::string *currentUrl);
+	int CloseBrowser(void);
 
 private:
+	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
+	bool m_navStarted;
 	bool m_pendingWait;
-	void AttachEvents();
-	void DetachEvents();
-	void WaitInternal(void);
+	void AttachEvents(void);
+	void DetachEvents(void);
+	int WaitInternal(UINT64 waitStartTime);
+	UINT64 getTime(void);
+	int getElapsedMilliseconds(UINT64 startTime);
 };

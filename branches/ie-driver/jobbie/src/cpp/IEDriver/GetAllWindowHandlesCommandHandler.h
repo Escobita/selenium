@@ -17,7 +17,7 @@ public:
 
 protected:
 
-	void GetAllWindowHandlesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, std::string> commandParameters, WebDriverResponse * response)
+	void GetAllWindowHandlesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		Json::Value handles;
 		std::map<std::wstring, BrowserWrapper>::iterator end = manager->m_trackedBrowsers.end();

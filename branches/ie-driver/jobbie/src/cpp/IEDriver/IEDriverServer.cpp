@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "IEDriverServer.h"
 
-IEDriverServer::IEDriverServer(void)
+IEDriverServer::IEDriverServer(int port)
 {
-	this->m_manager = new BrowserManager();
+	this->m_manager = new BrowserManager(port);
 	this->m_manager->StartManager();
 	this->populateCommandRepository();
 }
@@ -12,8 +12,9 @@ IEDriverServer::~IEDriverServer(void)
 {
 }
 
-std::string IEDriverServer::processRequest(struct mg_connection *conn, const struct mg_request_info *request_info)
+int IEDriverServer::processRequest(struct mg_connection *conn, const struct mg_request_info *request_info)
 {
+	int returnCode = NULL;
 	std::string httpVerb = request_info->request_method;
 	std::wstring requestBody = L"";
 	if (httpVerb == "POST")
@@ -26,40 +27,81 @@ std::string IEDriverServer::processRequest(struct mg_connection *conn, const str
 		requestBody = &outputBuffer[0];
 	}
 
-	std::wstring locatorParameters = L"";
-	int command = this->lookupCommand(request_info->uri, httpVerb, &locatorParameters);
-	if (command == CommandValue::NoCommand)
+	if (strcmp(request_info->uri, "/") == 0)
 	{
+		this->SendWelcomePage(conn, request_info);
+		returnCode = 200;
 	}
 	else
 	{
-		// Compile the serialized JSON representation of the command by hand.
-		std::wstringstream commandStream;
-		commandStream << L"{ \"command\" : " << command;
-		commandStream << L", \"locator\" : " << locatorParameters;
-		commandStream << L", \"parameters\" : " << requestBody << L" }";
-		std::wstring serializedCommand = commandStream.str();
-		std::wstring serializedResponse = this->sendCommandToManager(serializedCommand);
-		if (serializedCommand.length() > 0)
+		std::wstring locatorParameters = L"";
+		int command = this->lookupCommand(request_info->uri, httpVerb, &locatorParameters);
+		if (command == CommandValue::NoCommand)
 		{
-			WebDriverResponse response(serializedCommand);
-			if (response.m_statusCode == 0)
+		}
+		else
+		{
+			// Compile the serialized JSON representation of the command by hand.
+			std::wstringstream commandStream;
+			commandStream << L"{ \"command\" : " << command;
+			commandStream << L", \"locator\" : " << locatorParameters;
+			commandStream << L", \"parameters\" : ";
+			if (requestBody.length() > 0)
 			{
-				this->SendHttpOk(conn, request_info, serializedResponse);
-			}
-			else if (response.m_statusCode == 302)
-			{
-				std::string location = response.m_value.asString();
-				this->SendHttpSeeOther(conn, request_info, location);
+				commandStream << requestBody;
 			}
 			else
 			{
-				this->SendHttpInternalError(conn, request_info, serializedResponse);
+				commandStream << "{}";
+			}
+			
+			commandStream << L" }";
+			std::wstring serializedCommand = commandStream.str();
+			std::wstring serializedResponse = this->sendCommandToManager(serializedCommand);
+			if (serializedCommand.length() > 0)
+			{
+				WebDriverResponse response(serializedResponse);
+				if (response.m_statusCode == 0)
+				{
+					this->SendHttpOk(conn, request_info, serializedResponse);
+					returnCode = 200;
+				}
+				else if (response.m_statusCode == 303)
+				{
+					std::string location = response.m_value.asString();
+					response.m_statusCode = 0;
+					this->SendHttpSeeOther(conn, request_info, location);
+					returnCode = 303;
+				}
+				else
+				{
+					this->SendHttpInternalError(conn, request_info, serializedResponse);
+					returnCode = 500;
+				}
 			}
 		}
 	}
 
-	return "";
+	return returnCode;
+}
+
+void IEDriverServer::SendWelcomePage(struct mg_connection* connection,
+                const struct mg_request_info* request_info)
+{
+	std::string pageBody(SERVER_DEFAULT_PAGE);
+	std::ostringstream out;
+	out << "HTTP/1.1 200 OK\r\n"
+		<< "Content-Length: " << strlen(pageBody.c_str()) << "\r\n"
+		<< "Content-Type: text/html; charset=UTF-8\r\n"
+		<< "Vary: Accept-Charset, Accept-Encoding, Accept-Language, Accept\r\n"
+		<< "Accept-Ranges: bytes\r\n"
+		<< "Connection: close\r\n\r\n";
+	if (strcmp(request_info->request_method, "HEAD") != 0)
+	{
+		out << pageBody << "\r\n";
+	}
+
+	mg_printf(connection, "%s", out.str().c_str());
 }
 
 // The standard HTTP Status codes are implemented below.  Chrome uses
@@ -269,7 +311,7 @@ int IEDriverServer::lookupCommand(std::string uri, std::string httpVerb, std::ws
 
 void IEDriverServer::populateCommandRepository()
 {
-	this->m_commandRepository["/session"]["GET"] = CommandValue::NewSession;
+	this->m_commandRepository["/session"]["POST"] = CommandValue::NewSession;
 	this->m_commandRepository["/session/:sessionid"]["GET"] = CommandValue::GetSessionCapabilities;
 	this->m_commandRepository["/session/:sessionid"]["DELETE"] = CommandValue::Quit;
 	this->m_commandRepository["/session/:sessionid/window_handle"]["GET"] = CommandValue::GetCurrentWindowHandle;
@@ -330,12 +372,13 @@ void * event_handler(enum mg_event event_raised,
 								struct mg_connection *conn, 
 								const struct mg_request_info *request_info)
 {
+	int returnCode = NULL;
 	if (event_raised == MG_NEW_REQUEST)
 	{
-		server->processRequest(conn, request_info);
+		returnCode = server->processRequest(conn, request_info);
 	}
 
-	return NULL;
+	return &returnCode;
 }
 
 IEDriverServer* StartServer(int port)
@@ -343,7 +386,7 @@ IEDriverServer* StartServer(int port)
 	char buffer[6];
 	_itoa(port, buffer, 10);
 	char* options[] = { "listening_ports", buffer, NULL };
-	server = new IEDriverServer;
+	server = new IEDriverServer(port);
 	ctx = mg_start(event_handler, (const char **)options);
 	return server;
 }

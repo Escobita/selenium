@@ -12,5 +12,5 @@ public:
 	void populate(std::string jsonCommand);
 	int m_commandValue;
 	std::map<std::string, std::string> m_locatorParameters;
-	std::map<std::string, std::string> m_commandParameters;
+	std::map<std::string, Json::Value> m_commandParameters;
 };

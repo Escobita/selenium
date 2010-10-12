@@ -7,6 +7,8 @@
 #include "BrowserManager.h"
 #include "mongoose.h"
 
+#define SERVER_DEFAULT_PAGE "<html><head><title>WebDriver</title></head><body>This is the initial start page for the IE WebDriver.</body></html>"
+
 using namespace std;
 
 extern "C"
@@ -14,16 +16,17 @@ extern "C"
 class IEDriverServer
 {
 public:
-	IEDriverServer(void);
+	IEDriverServer(int port);
 	virtual ~IEDriverServer(void);
 	BrowserManager* m_manager;
-	std::string processRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
+	int processRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
 
 private:
 	int lookupCommand(std::string uri, std::string httpVerb, std::wstring *locator);
 	std::map<std::string, std::map<std::string, int>> m_commandRepository;
 	void populateCommandRepository(void);
 	std::wstring sendCommandToManager(std::wstring serializedCommand);
+	void SendWelcomePage(mg_connection *connection, const mg_request_info *request_info);
 	void SendHttpOk(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
 	void SendHttpInternalError(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
 	void SendHttpSeeOther(mg_connection *connection, const mg_request_info *request_info, std::string body);

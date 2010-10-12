@@ -38,9 +38,15 @@ int BrowserWrapper::GoToUrl(std::string url)
 	HRESULT hr = m_pBrowser->Navigate2(pVarUrl, NULL, NULL, NULL, NULL);
 	while (!this->m_pendingWait)
 	{
-		::Sleep(200);
+		::Sleep(WAIT_TIME_IN_MILLISECONDS);
 	}
 
+	return SUCCESS;
+}
+
+int BrowserWrapper::CloseBrowser(void)
+{
+	HRESULT hr = m_pBrowser->Quit();
 	return SUCCESS;
 }
 
@@ -72,7 +78,16 @@ std::string BrowserWrapper::getWindowName()
 void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
 VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
 {
-};
+	if (this->m_pNavDisp.p == NULL)
+	{
+		this->m_navStarted = true;
+		this->m_pNavDisp.Attach(pObject);
+		if (!this->m_pendingWait)
+		{
+			this->m_pendingWait = true;
+		}
+	}
+}
 
 void __stdcall BrowserWrapper::OnQuit()
 {
@@ -80,10 +95,14 @@ void __stdcall BrowserWrapper::OnQuit()
 
 void __stdcall BrowserWrapper::NewWindow3(IDispatch * pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
 {
-};
+}
 
 void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)
 {
+	if (this->m_pNavDisp.p != NULL && this->m_pNavDisp.IsEqualObject(pDisp))
+	{
+		this->m_pNavDisp.Detach();
+	}
 }
 
 void BrowserWrapper::AttachEvents()
@@ -102,14 +121,44 @@ void BrowserWrapper::DetachEvents()
 
 void BrowserWrapper::Wait()
 {
-	// TODO: Set up a timeout for this.
-	while (this->m_pendingWait)
+	int errorCode;
+	UINT64 waitStartTime = this->getTime();
+	while (this->m_pendingWait && errorCode == SUCCESS)
 	{
-		this->WaitInternal();
+		errorCode = this->WaitInternal(waitStartTime);
+	}
+
+	// If we did not successfully complete our wait
+	// (for example, due to a timeout) reset the pending
+	// wait flag.
+	if (errorCode != SUCCESS)
+	{
+		this->m_pendingWait = false;
 	}
 }
 
-void BrowserWrapper::WaitInternal()
+int BrowserWrapper::WaitInternal(UINT64 waitStartTime)
 {
 	this->m_pendingWait = false;
+	return SUCCESS;
 }
+
+int BrowserWrapper::getElapsedMilliseconds(UINT64 startTime)
+{
+	UINT64 currentTime = this->getTime();
+	return (currentTime - startTime) / 10000;
+}
+
+UINT64 BrowserWrapper::getTime() 
+{ 
+    SYSTEMTIME st; 
+    GetSystemTime(&st); 
+ 
+    FILETIME ft; 
+    SystemTimeToFileTime(&st, &ft);  // converts to file time format 
+    ULARGE_INTEGER ui; 
+    ui.LowPart=ft.dwLowDateTime; 
+    ui.HighPart=ft.dwHighDateTime; 
+ 
+    return ui.QuadPart; 
+} 

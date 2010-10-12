@@ -17,7 +17,7 @@ public:
 
 protected:
 
-	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, std::string> commandParameters, WebDriverResponse * response)
+	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		std::string currentHandle(CW2A(manager->m_currentBrowser.c_str()));
 		Json::Value value(currentHandle);

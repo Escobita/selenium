@@ -44,7 +44,7 @@ void WebDriverCommand::populate(std::string jsonCommand)
 		for (Json::Value::iterator it = commandParamObject.begin(); it != end; ++it)
 		{
 			std::string key = it.key().asString();
-			std::string value = commandParamObject[key].asString();
+			Json::Value value = commandParamObject[key];
 			this->m_commandParameters[key] = value;
 		}
 	}

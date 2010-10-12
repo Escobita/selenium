@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "WebDriverResponse.h"
 
-WebDriverResponse::WebDriverResponse(void)
+WebDriverResponse::WebDriverResponse(void) : m_statusCode(0)
 {
 }
 

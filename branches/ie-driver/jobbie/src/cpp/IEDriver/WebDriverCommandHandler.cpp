@@ -10,7 +10,7 @@ WebDriverCommandHandler::~WebDriverCommandHandler(void)
 {
 }
 
-void WebDriverCommandHandler::Execute(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string,std::string> commandParameters, WebDriverResponse *response)
+void WebDriverCommandHandler::Execute(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse *response)
 {
 	if (!this->m_ignorePreExecutionWait)
 	{
@@ -25,6 +25,6 @@ void WebDriverCommandHandler::Execute(BrowserManager *manager, std::map<std::str
 	}
 }
 
-void WebDriverCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string,std::string> commandParameters, WebDriverResponse *response)
+void WebDriverCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse *response)
 {
 }

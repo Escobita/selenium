@@ -17,7 +17,7 @@ public:
 
 protected:
 
-	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, std::string> commandParameters, WebDriverResponse * response)
+	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("name") == locatorParameters.end())
 		{
@@ -52,14 +52,7 @@ protected:
 			}
 			else
 			{
-				// The NoCommand value will act as a no-op, causing the
-				// driver to wait until the target browsers finish processing
-				// before returning.
-				WebDriverCommand waitCommand;
-				waitCommand.m_commandValue = CommandValue::NoCommand;
-				manager->DispatchCommand(&waitCommand);
 				manager->m_currentBrowser = foundBrowserHandle;
-				manager->DispatchCommand(&waitCommand);
 			}
 		}
 	}

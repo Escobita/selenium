@@ -214,7 +214,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib Rpcrt4.lib"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -332,6 +332,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\BrowserFactory.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\BrowserManager.cpp"
 				>
@@ -467,6 +471,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\BrowserFactory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\BrowserManager.h"
 				>
 			</File>
@@ -476,6 +484,10 @@
 			</File>
 			<File
 				RelativePath=".\BrowserWrapperEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CloseWindowCommandHandler.h"
 				>
 			</File>
 			<File
@@ -495,6 +507,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetSessionCapabilitiesCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GoToUrlCommandHandler.h"
 				>
 			</File>
@@ -508,6 +524,10 @@
 			</File>
 			<File
 				RelativePath=".\NewSessionCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\QuitCommandHandler.h"
 				>
 			</File>
 			<File
