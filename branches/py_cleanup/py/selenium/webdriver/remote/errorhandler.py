@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from selenium.common.exceptions import ElementNotSelectableException
-from selenium.common.exceptions import ElementNotVisibleException
-from selenium.common.exceptions import InvalidCookieDomainException
-from selenium.common.exceptions import InvalidElementStateException
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoSuchFrameException
-from selenium.common.exceptions import NoSuchWindowException
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.common.exceptions import UnableToSetCookieException
-from selenium.common.exceptions import ErrorInResponseException
+from selenium.webdriver.exceptions import ElementNotSelectableException
+from selenium.webdriver.exceptions import ElementNotVisibleException
+from selenium.webdriver.exceptions import InvalidCookieDomainException
+from selenium.webdriver.exceptions import InvalidElementStateException
+from selenium.webdriver.exceptions import NoSuchElementException
+from selenium.webdriver.exceptions import NoSuchFrameException
+from selenium.webdriver.exceptions import NoSuchWindowException
+from selenium.webdriver.exceptions import StaleElementReferenceException
+from selenium.webdriver.exceptions import UnableToSetCookieException
+from selenium.webdriver.exceptions import ErrorInResponseException
 
 
 class ErrorCode(object):

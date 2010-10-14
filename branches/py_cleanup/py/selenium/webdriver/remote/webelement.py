@@ -16,7 +16,7 @@
 """WebElement implementation."""
 from command import Command
 
-from selenium.common.exceptions import NoSuchAttributeException
+from selenium.webdriver.exceptions import NoSuchAttributeException
 
 class WebElement(object):
     """Represents an HTML element.
