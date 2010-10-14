@@ -6,6 +6,7 @@
 #include "ErrorCodes.h"
 #include "json.h"
 #include <string>
+#include <iostream>
 #include <queue>
 #include <rpc.h>
 #include <exdispid.h>
@@ -21,12 +22,12 @@ class BrowserWrapper :
 
 {
 public:
-	BrowserWrapper();
+	//BrowserWrapper();
 	BrowserWrapper(CComPtr<IWebBrowser2> browser);
 	virtual ~BrowserWrapper(void);
 
 	std::wstring m_browserId;
-	BrowserWrapperEvent<BrowserWrapper> NewWindow;
+	BrowserWrapperEvent<BrowserWrapper*> NewWindow;
 	BrowserWrapperEvent<std::wstring> Quitting;
 	static int CreateBrowser();
 
@@ -71,11 +72,12 @@ public:
 	int GetCurrentUrl(std::string *currentUrl);
 	int CloseBrowser(void);
 
-private:
 	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
 	bool m_navStarted;
 	bool m_pendingWait;
+
+private:
 	void AttachEvents(void);
 	void DetachEvents(void);
 	int WaitInternal(UINT64 waitStartTime);

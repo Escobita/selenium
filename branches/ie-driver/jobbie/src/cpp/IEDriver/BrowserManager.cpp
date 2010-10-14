@@ -6,14 +6,23 @@
 #include "GetSessionCapabilitiesCommandHandler.h"
 #include "GoToUrlCommandHandler.h"
 #include "NewSessionCommandHandler.h"
+#include "SwitchToFrameCommandHandler.h"
 #include "SwitchToWindowCommandHandler.h"
 #include "QuitCommandHandler.h"
 
-BrowserManager::BrowserManager(int port)
+LRESULT BrowserManager::OnInit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	// NOTE: Use UuidCreate here to avoid unnecessarily initializing COM
-	// on this thread. It will be initialized on the named pipe worker
-	// thread.
+	// If we wanted to be a little more clever, we could create a struct 
+	// containing the HWND and the port number and pass them into the
+	// ThreadProc via lpParameter and avoid this message handler altogether.
+	this->m_port = (int)wParam;
+	return 0;
+}
+
+LRESULT BrowserManager::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	// NOTE: COM should be initialized on this thread, so we
+	// could use CoCreateGuid() and StringFromGUID2() instead.
 	UUID idGuid;
 	RPC_WSTR pszUuid = NULL;
 	::UuidCreate(&idGuid);
@@ -22,113 +31,122 @@ BrowserManager::BrowserManager(int port)
 	// RPC_WSTR is currently typedef'd in RpcDce.h (pulled in by rpc.h)
 	// as unsigned short*. It needs to be typedef'd as wchar_t* 
 	wchar_t* pwStr = reinterpret_cast<wchar_t*>(pszUuid);
-	m_managerId = pwStr;
+	this->m_managerId = pwStr;
 
 	::RpcStringFree(&pszUuid);
+	this->SetWindowText(this->m_managerId.c_str());
 
 	this->PopulateCommandHandlerRepository();
 	this->m_currentBrowser = L"";
-	this->m_port = port;
 	this->m_factory = new BrowserFactory;
+	this->m_command = new WebDriverCommand;
+	this->m_serializedResponse = L"";
+	return 0;
 }
 
-BrowserManager::~BrowserManager(void)
+LRESULT BrowserManager::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	this->DestroyWindow();
+	return 0;
+}
+
+LRESULT BrowserManager::OnSetCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	LPCTSTR lpRawCommand = (LPCTSTR)lParam;
+	std::wstring jsonCommand(lpRawCommand);
+
+	// JsonCpp only understands narrow strings, so we have to convert.
+	std::string convertedCommand(CW2A(jsonCommand.c_str()));
+	this->m_command->populate(convertedCommand);
+	return 0;
+}
+
+LRESULT BrowserManager::OnExecCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	this->DispatchCommand();
+	return 0;
+}
+
+LRESULT BrowserManager::OnGetResponseLength(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return this->m_serializedResponse.size();
+}
+
+LRESULT BrowserManager::OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	LPWSTR str = (LPWSTR)lParam;
+	this->m_serializedResponse.copy(str, this->m_serializedResponse.size());
+
+	// Reset the serialized response for the next command.
+	this->m_serializedResponse = L"";
+	return 0;
 }
 
 DWORD WINAPI BrowserManager::ThreadProc(LPVOID lpParameter)
 {
-	BrowserManager* pManager = reinterpret_cast<BrowserManager*>(lpParameter);
-	pManager->Start();
+	// Optional TODO: Create a struct to pass in via lpParameter
+	// instead of just a pointer to an HWND. That way, we could
+	// pass the mongoose server port via a single call, rather than
+	// having to send an init message after the window is created.
+	HWND *paramHwnd = (HWND *)lpParameter;
+	DWORD error = 0;
+	HRESULT hr = ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	BrowserManager manager;
+	HWND managerHwnd = manager.Create(HWND_MESSAGE, CWindow::rcDefault);
+	if (managerHwnd == NULL)
+	{
+		error = ::GetLastError();
+	}
+
+	// Return the HWND back through lpParameter, and signal that the
+	// window is ready for messages.
+	*paramHwnd = managerHwnd;
+	HANDLE hEvent = ::OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME);
+	::SetEvent(hEvent);
+	::CloseHandle(hEvent);
+
+    // Run the message loop
+	MSG msg;
+	while (::GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		::TranslateMessage(&msg);
+		::DispatchMessage(&msg);
+	}
+
+	::CoUninitialize();
 	return 0;
 }
 
-void BrowserManager::Start(void)
-{
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	std::basic_string<TCHAR> pipeName = L"\\\\.\\pipe\\" + this->m_managerId;
-	HANDLE hPipe = ::CreateNamedPipe(pipeName.c_str(), 
-								PIPE_ACCESS_DUPLEX, 
-								PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 
-								PIPE_UNLIMITED_INSTANCES,
-								1024,
-								1024,
-								0,
-								NULL);
-
-	if (hPipe == INVALID_HANDLE_VALUE)
-	{
-		DWORD dwError = ::GetLastError();
-	}
-
-	this->m_isRunning = true;
-	WebDriverCommand* browserCommand = new WebDriverCommand();
-	while (browserCommand->m_commandValue != CommandValue::Quit)
-	{
-		DWORD errCode = 0;
-		BOOL result = ::ConnectNamedPipe(hPipe, NULL);
-		vector<CHAR> inputBuffer(1024);
-		DWORD bytesRead = 0;
-
-		::ReadFile(hPipe, &inputBuffer[0], 1024, &bytesRead, NULL);
-		int bytesRequired = ::MultiByteToWideChar(CP_UTF8, 0, &inputBuffer[0], -1, NULL, 0);
-		vector<TCHAR> outputBuffer(bytesRequired);
-		bytesRequired = ::MultiByteToWideChar(CP_UTF8, 0, &inputBuffer[0], -1, &outputBuffer[0], bytesRequired);
-
-		std::wstring jsoncommand = &outputBuffer[0];
-		std::string narrowCmd(CW2A(jsoncommand.c_str()));
-		browserCommand->populate(narrowCmd);
-
-		WebDriverResponse response = DispatchCommand(browserCommand);
-		std::wstring serializedResponse = response.serialize();
-
-		int bytesWritten = ::WideCharToMultiByte(CP_UTF8, 0, serializedResponse.c_str(), -1, NULL, 0, NULL, NULL);
-		vector<CHAR> convertBuffer(bytesWritten);
-		bytesWritten = ::WideCharToMultiByte(CP_UTF8, 0, serializedResponse.c_str(), -1, &convertBuffer[0], bytesWritten, NULL, NULL);
-		if (bytesWritten == 0)
-		{
-			errCode = ::GetLastError();
-		}
-
-		::WriteFile(hPipe, &convertBuffer[0], bytesWritten, &bytesRead, NULL);
-		::FlushFileBuffers(hPipe);
-		::DisconnectNamedPipe(hPipe);
-	}
-
-	this->m_isRunning = false;
-	::CloseHandle(hPipe);
-	CoUninitialize();
-}
-
-WebDriverResponse BrowserManager::DispatchCommand(WebDriverCommand* command)
+void BrowserManager::DispatchCommand()
 {
 	WebDriverResponse response;
-	if (this->m_commandHandlerRepository.find(command->m_commandValue) == this->m_commandHandlerRepository.end())
+	if (this->m_commandHandlerRepository.find(this->m_command->m_commandValue) == this->m_commandHandlerRepository.end())
 	{
 		response.m_statusCode = 501;
 	}
 	else
 	{
-		this->m_commandHandlerRepository[command->m_commandValue]->Execute(this, command->m_locatorParameters, command->m_commandParameters, &response);
+		this->m_commandHandlerRepository[this->m_command->m_commandValue]->Execute(this, this->m_command->m_locatorParameters, this->m_command->m_commandParameters, &response);
 	}
 
-	return response;
+	this->m_serializedResponse = response.serialize();
 }
 
-void BrowserManager::AddWrapper(BrowserWrapper wrapper)
+void BrowserManager::AddWrapper(BrowserWrapper *wrapper)
 {
-	this->m_trackedBrowsers[wrapper.m_browserId] = wrapper;
-	this->m_newBrowserEventId = wrapper.NewWindow.attach(this, &BrowserManager::NewBrowserEventHandler);
-	this->m_browserQuittingEventId = wrapper.Quitting.attach(this, &BrowserManager::BrowserQuittingEventHandler);
+	this->m_trackedBrowsers[wrapper->m_browserId] = wrapper;
+	
+	this->m_newBrowserEventId = wrapper->NewWindow.attach(this, &BrowserManager::NewBrowserEventHandler);
+	this->m_browserQuittingEventId = wrapper->Quitting.attach(this, &BrowserManager::BrowserQuittingEventHandler);
 	if (this->m_currentBrowser == L"")
 	{
-		this->m_currentBrowser = wrapper.m_browserId;
+		this->m_currentBrowser = wrapper->m_browserId;
 	}
 }
 
-void BrowserManager::NewBrowserEventHandler(BrowserWrapper wrapper)
+void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
 {
-	if (this->m_trackedBrowsers.find(wrapper.m_browserId) == this->m_trackedBrowsers.end())
+	if (this->m_trackedBrowsers.find(wrapper->m_browserId) == this->m_trackedBrowsers.end())
 	{
 		this->AddWrapper(wrapper);
 	}
@@ -138,18 +156,10 @@ void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 {
 	if (this->m_trackedBrowsers.find(browserId) != this->m_trackedBrowsers.end())
 	{
-		this->m_trackedBrowsers[browserId].NewWindow.detach(this->m_newBrowserEventId);
-		this->m_trackedBrowsers[browserId].Quitting.detach(this->m_browserQuittingEventId);
+		this->m_trackedBrowsers[browserId]->NewWindow.detach(this->m_newBrowserEventId);
+		this->m_trackedBrowsers[browserId]->Quitting.detach(this->m_browserQuittingEventId);
 		this->m_trackedBrowsers.erase(browserId);
 	}
-}
-
-std::wstring BrowserManager::StartManager()
-{
-	DWORD dwThreadId;
-	HANDLE hThread = ::CreateThread(NULL, 0, &BrowserManager::ThreadProc, (LPVOID)this, 0, &dwThreadId);
-	::CloseHandle(hThread);
-	return this->m_managerId;
 }
 
 void BrowserManager::PopulateCommandHandlerRepository()
@@ -158,6 +168,7 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GetCurrentWindowHandle] = new GetCurrentWindowHandleCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetWindowHandles] = new GetAllWindowHandlesCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SwitchToWindow] = new SwitchToWindowCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::SwitchToFrame] = new SwitchToFrameCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Get] = new GoToUrlCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::NewSession] = new NewSessionCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;

@@ -3,8 +3,16 @@
 
 IEDriverServer::IEDriverServer(int port)
 {
-	this->m_manager = new BrowserManager(port);
-	this->m_manager->StartManager();
+	DWORD dwThreadId;
+	HWND managerHwnd = NULL;
+	HANDLE hEvent = ::CreateEvent(NULL, TRUE, FALSE, EVENT_NAME);
+	HANDLE hThread = ::CreateThread(NULL, 0, &BrowserManager::ThreadProc, (LPVOID)&managerHwnd, 0, &dwThreadId);
+	::WaitForSingleObject(hEvent, INFINITE);
+	::CloseHandle(hEvent);
+	::CloseHandle(hThread);
+
+	::SendMessage(managerHwnd, WD_INIT, (WPARAM)port, NULL);
+	this->m_managerHwnd = managerHwnd;
 	this->populateCommandRepository();
 }
 
@@ -163,90 +171,26 @@ void IEDriverServer::SendHttpSeeOther(struct mg_connection* connection,
 
 std::wstring IEDriverServer::sendCommandToManager(std::wstring serializedCommand)
 {
-	HANDLE hPipe = NULL;
-	BOOL fSuccess = FALSE;
-	BOOL isConnected = FALSE;
-	std::basic_string<TCHAR> lpszPipename = L"\\\\.\\pipe\\" + this->m_manager->m_managerId;
-
-	// Try to open a named pipe; wait for it, if necessary.
-	while (!isConnected) 
-	{ 
-		hPipe = ::CreateFile( 
-			lpszPipename.c_str(),			// pipe name 
-			GENERIC_READ | GENERIC_WRITE,	// read and write access 
-			0,								// no sharing 
-			NULL,							// default security attributes
-			OPEN_EXISTING,					// opens existing pipe 
-			0,								// default attributes 
-			NULL);							// no template file 
- 
-		// Break if the pipe handle is valid. 
-		if (hPipe != INVALID_HANDLE_VALUE)
-		{
-			isConnected = TRUE;
-		}
-		else
-		{
-			// Exit if an error other than ERROR_PIPE_BUSY occurs. 
-			if (::GetLastError() != ERROR_PIPE_BUSY)
-			{
-				return L"";
-			}
-
-			// All pipe instances are busy, so wait for 20 seconds. 
-			if (!::WaitNamedPipe(lpszPipename.c_str(), 20000)) 
-			{ 
-				return L"";
-			} 
-		}
-	} 
- 
-	// The pipe connected; change to message-read mode. 
-	DWORD dwMode = PIPE_READMODE_MESSAGE; 
-	fSuccess = ::SetNamedPipeHandleState( 
-		hPipe,    // pipe handle 
-		&dwMode,  // new pipe mode 
-		NULL,     // don't set maximum bytes 
-		NULL);    // don't set maximum time 
-
-	if (!fSuccess) 
-	{
-		return L"";
-	}
- 
-	// Send a message to the pipe server.
-	int cbToWrite = ::WideCharToMultiByte(CP_UTF8, 0, serializedCommand.c_str(), -1, NULL, 0, NULL, NULL);
-	vector<CHAR> convertBuffer(cbToWrite);
-	cbToWrite = ::WideCharToMultiByte(CP_UTF8, 0, serializedCommand.c_str(), -1, &convertBuffer[0], cbToWrite, NULL, NULL);
-	if (cbToWrite == 0)
-	{
-		return L"";
-	}
-
-	DWORD cbWritten;
-	fSuccess = WriteFile( 
-		hPipe,                  // pipe handle 
-		&convertBuffer[0],      // message 
-		cbToWrite,              // message length 
-		&cbWritten,             // bytes written 
-		NULL);                  // not overlapped 
-
-	if (!fSuccess) 
-	{
-		return L"";
-	}
- 
-	// Read from the pipe. 
-	vector<CHAR> inputBuffer(1024);
-	DWORD bytesRead = 0;
-	::ReadFile(hPipe, &inputBuffer[0], 1024, &bytesRead, NULL);
+	// Sending a command consists of four actions:
+	// 1. Setting the command to be executed
+	// 2. Executing the command
+	// 3. Waiting for the response to be populated
+	// 4. Retrieving the response
+	::SendMessage(this->m_managerHwnd, WD_SET_COMMAND, NULL, (LPARAM)serializedCommand.c_str());
+	::PostMessage(this->m_managerHwnd, WD_EXEC_COMMAND, NULL, NULL);
 	
-	cbToWrite = ::MultiByteToWideChar(CP_UTF8, 0, &inputBuffer[0], -1, NULL, 0);
-	vector<TCHAR> outputBuffer(cbToWrite);
-	::MultiByteToWideChar(CP_UTF8, 0, &inputBuffer[0], bytesRead, &outputBuffer[0], cbToWrite);
+	int responseLength = (int)::SendMessage(this->m_managerHwnd, WD_GET_RESPONSE_LENGTH, NULL, NULL);
+	while (responseLength == 0)
+	{
+		::Sleep(100);
+		responseLength = (int)::SendMessage(this->m_managerHwnd, WD_GET_RESPONSE_LENGTH, NULL, NULL);
+	}
 
-	std::wstring serializedResponse = &outputBuffer[0];
-	::CloseHandle(hPipe); 
+	// Must add one to the length to handle the terminating character.
+	std::vector<TCHAR> responseBuffer(responseLength + 1);
+	::SendMessage(this->m_managerHwnd, WD_GET_RESPONSE, NULL, (LPARAM)&responseBuffer[0]);
+	std::wstring serializedResponse(&responseBuffer[0]);
+	responseBuffer.clear();
 	return serializedResponse;
 }
 
@@ -393,5 +337,6 @@ IEDriverServer* StartServer(int port)
 
 void StopServer(IEDriverServer *server)
 {
+	::SendMessage(server->m_managerHwnd, WM_CLOSE, NULL, NULL);
 	mg_stop(ctx);
 }

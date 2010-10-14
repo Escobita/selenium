@@ -97,7 +97,7 @@ CComPtr<IWebBrowser2> BrowserFactory::AttachToBrowser(int processId)
 				   }
 				}
 			}
-			::FreeLibrary( hInst );
+			::FreeLibrary(hInst);
 		}
 	} // else Active Accessibility is not installed
 

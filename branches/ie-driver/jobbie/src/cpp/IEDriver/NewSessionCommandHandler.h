@@ -10,6 +10,7 @@ public:
 	NewSessionCommandHandler(void)
 	{
 		this->m_ignorePreExecutionWait = true;
+		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~NewSessionCommandHandler(void)
@@ -22,7 +23,7 @@ protected:
 	{
 		DWORD dwProcId = manager->m_factory->LaunchBrowserProcess(manager->m_port);
 		CComPtr<IWebBrowser2> pBrowser = manager->m_factory->AttachToBrowser(dwProcId);
-		BrowserWrapper wrapper(pBrowser);
+		BrowserWrapper *wrapper = new BrowserWrapper(pBrowser);
 		manager->AddWrapper(wrapper);
 		response->m_statusCode = 303;
 		std::string id = CW2A(manager->m_managerId.c_str());

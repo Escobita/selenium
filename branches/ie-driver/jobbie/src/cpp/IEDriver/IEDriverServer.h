@@ -18,7 +18,7 @@ class IEDriverServer
 public:
 	IEDriverServer(int port);
 	virtual ~IEDriverServer(void);
-	BrowserManager* m_manager;
+	HWND m_managerHwnd;
 	int processRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
 
 private:

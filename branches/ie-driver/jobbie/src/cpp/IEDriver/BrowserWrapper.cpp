@@ -1,16 +1,10 @@
 #include "StdAfx.h"
 #include "BrowserWrapper.h"
 
-BrowserWrapper::BrowserWrapper()
-{
-}
-
 BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser)
 {
-	this->m_pendingWait = true;
-
-	// NOTE: COM should already be initialized on the thread creating the
-	// but we'll use this method instead.
+	// NOTE: COM should be initialized on this thread, so we
+	// could use CoCreateGuid() and StringFromGUID2() instead.
 	UUID idGuid;
 	RPC_WSTR pszUuid = NULL;
 	::UuidCreate(&idGuid);
@@ -18,7 +12,7 @@ BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser)
 
 	// RPC_WSTR is currently typedef'd in RpcDce.h (pulled in by rpc.h)
 	// as unsigned short*. It needs to be typedef'd as wchar_t* 
-	wchar_t* pwStr = reinterpret_cast<wchar_t*>( pszUuid );
+	wchar_t* pwStr = reinterpret_cast<wchar_t*>(pszUuid);
 	this->m_browserId = pwStr;
 
 	::RpcStringFree(&pszUuid);
@@ -33,9 +27,10 @@ BrowserWrapper::~BrowserWrapper(void)
 
 int BrowserWrapper::GoToUrl(std::string url)
 {
-	CComVariant *pVarUrl = new CComVariant(url.c_str());
+	CComVariant pVarUrl(url.c_str());
+	CComVariant dummy;
 
-	HRESULT hr = m_pBrowser->Navigate2(pVarUrl, NULL, NULL, NULL, NULL);
+	HRESULT hr = m_pBrowser->Navigate2(&pVarUrl, &dummy, &dummy, &dummy, &dummy);
 	while (!this->m_pendingWait)
 	{
 		::Sleep(WAIT_TIME_IN_MILLISECONDS);
@@ -48,6 +43,54 @@ int BrowserWrapper::CloseBrowser(void)
 {
 	HRESULT hr = m_pBrowser->Quit();
 	return SUCCESS;
+}
+
+void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
+VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
+{
+	std::cout << "BeforeNavigate2\r\n";
+	//if (this->m_pNavDisp.p == NULL)
+	//{
+	//	this->m_navStarted = true;
+	//	this->m_pNavDisp.Attach(pObject);
+	//	if (!this->m_pendingWait)
+	//	{
+	//		this->m_pendingWait = true;
+	//	}
+	//}
+}
+
+void __stdcall BrowserWrapper::OnQuit()
+{
+	std::cout << "OnQuit\r\n";
+}
+
+void __stdcall BrowserWrapper::NewWindow3(IDispatch * pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
+{
+	std::cout << "NewWindow\r\n";
+}
+
+void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)
+{
+	std::cout << "DocumentComplete\r\n";
+	//if (this->m_pNavDisp.p != NULL && this->m_pNavDisp.IsEqualObject(pDisp))
+	//{
+	//	this->m_pNavDisp.Detach();
+	//}
+}
+
+void BrowserWrapper::AttachEvents()
+{
+	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
+	CComPtr<IUnknown> pUnk(pDisp);
+	HRESULT hr = this->DispEventAdvise(pUnk);
+}
+
+void BrowserWrapper::DetachEvents()
+{
+	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
+	CComPtr<IUnknown> pUnk(pDisp);
+	HRESULT hr = this->DispEventUnadvise(pUnk);
 }
 
 std::string BrowserWrapper::getWindowName()
@@ -75,53 +118,10 @@ std::string BrowserWrapper::getWindowName()
 	return name;
 }
 
-void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
-VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
-{
-	if (this->m_pNavDisp.p == NULL)
-	{
-		this->m_navStarted = true;
-		this->m_pNavDisp.Attach(pObject);
-		if (!this->m_pendingWait)
-		{
-			this->m_pendingWait = true;
-		}
-	}
-}
-
-void __stdcall BrowserWrapper::OnQuit()
-{
-}
-
-void __stdcall BrowserWrapper::NewWindow3(IDispatch * pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
-{
-}
-
-void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)
-{
-	if (this->m_pNavDisp.p != NULL && this->m_pNavDisp.IsEqualObject(pDisp))
-	{
-		this->m_pNavDisp.Detach();
-	}
-}
-
-void BrowserWrapper::AttachEvents()
-{
-	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
-	CComPtr<IUnknown> pUnk(pDisp);
-	this->DispEventAdvise(pUnk);
-}
-
-void BrowserWrapper::DetachEvents()
-{
-	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
-	CComPtr<IUnknown> pUnk(pDisp);
-	this->DispEventUnadvise(pUnk);
-}
 
 void BrowserWrapper::Wait()
 {
-	int errorCode;
+	int errorCode = SUCCESS;
 	UINT64 waitStartTime = this->getTime();
 	while (this->m_pendingWait && errorCode == SUCCESS)
 	{

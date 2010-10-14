@@ -9,6 +9,8 @@ public:
 
 	SwitchToWindowCommandHandler(void)
 	{
+		this->m_ignorePreExecutionWait = false;
+		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~SwitchToWindowCommandHandler(void)
@@ -28,10 +30,10 @@ protected:
 		{
 			std::wstring foundBrowserHandle = L"";
 			std::string desiredName = locatorParameters["name"];
-			std::map<std::wstring, BrowserWrapper>::iterator end = manager->m_trackedBrowsers.end();
-			for (std::map<std::wstring, BrowserWrapper>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
+			std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
+			for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
 			{
-				std::string browserName = it->second.getWindowName();
+				std::string browserName = it->second->getWindowName();
 				if (browserName == desiredName)
 				{
 					foundBrowserHandle = it->first;

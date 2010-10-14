@@ -14,14 +14,14 @@ void WebDriverCommandHandler::Execute(BrowserManager *manager, std::map<std::str
 {
 	if (!this->m_ignorePreExecutionWait)
 	{
-		manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
+		//manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
 	}
 
 	this->ExecuteInternal(manager, locatorParameters, commandParameters, response);
 
 	if (!this->m_ignorePostExecutionWait)
 	{
-		manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
+		//manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
 	}
 }
 
