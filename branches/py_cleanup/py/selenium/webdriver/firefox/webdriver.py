@@ -15,9 +15,9 @@
 
 import base64
 import httplib
-from selenium.common.exceptions import ErrorInResponseException
-from selenium.remote.command import Command
-from selenium.remote.webdriver import WebDriver as RemoteWebDriver
+from selenium.webdriver.exceptions import ErrorInResponseException
+from selenium.webdriver.remote.command import Command
+from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from webelement import WebElement
 from firefoxlauncher import FirefoxLauncher
 from firefox_profile import FirefoxProfile

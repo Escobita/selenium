@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from selenium.remote.webelement import WebElement as RemoteWebElement
+from selenium.webdriver.remote.webelement import WebElement as RemoteWebElement
 
 class WebElement(RemoteWebElement):
     """Represents an HTML element.
