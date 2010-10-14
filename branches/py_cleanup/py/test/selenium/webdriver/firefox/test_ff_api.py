@@ -13,9 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from selenium.firefox.webdriver import WebDriver
-from selenium.common_tests import api_examples
-from selenium.common.webserver import SimpleWebServer
+
+from selenium.webdriver.firefox import FirefoxDriver
+from test.selenium.webdriver import api_examples
+from test.webserver import SimpleWebServer
 
 
 def setup_module(module):

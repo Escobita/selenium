@@ -28,7 +28,7 @@ def updir():
     return dirname(dirname(__file__))
 
 WEBDRIVER = os.environ.get("WEBDRIVER", updir())
-HTML_ROOT = os.path.join(WEBDRIVER, "common_web")
+HTML_ROOT = os.path.join(WEBDRIVER, "../common/src/web")
 if not os.path.isdir(HTML_ROOT):
     message = ("Can't find 'common_web' directory, try setting WEBDRIVER"
                " environment variable")

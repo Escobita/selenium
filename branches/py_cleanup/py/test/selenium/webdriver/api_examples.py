@@ -22,8 +22,8 @@ import tempfile
 import time
 import shutil
 import unittest
-from selenium.common.exceptions import NoSuchElementException
-import selenium.remote.webdriver
+from selenium.webdriver.exceptions import NoSuchElementException
+import selenium.webdriver.remote.webdriver
 
 
 def not_available_on_remote(func):
@@ -262,3 +262,7 @@ class ApiExampleTest (unittest.TestCase):
 
     def _loadPage(self, name):
         self.driver.get(self._pageURL(name))
+
+
+if __name__ == '__main__':
+    unittest.main()
