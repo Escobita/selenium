@@ -23,13 +23,13 @@ from sys import platform
 from platform import machine
 
 try:
-    from selenium.common.exceptions import NoSuchElementException
+    from selenium.webdriver.exceptions import NoSuchElementException
 except (ImportError, ValueError):
     class NoSuchElementException(Exception):
         pass
 
 try:
-    from selenium.common.exceptions import ErrorInResponseException
+    from selenium.webdriver.exceptions import ErrorInResponseException
 except (ImportError, ValueError):
     class ErrorInResponseException(Exception):
         pass
