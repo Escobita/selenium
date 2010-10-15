@@ -1,7 +1,11 @@
 #pragma once
 #include "StdAfx.h"
 #include "BrowserWrapper.h"
+#include "ElementWrapper.h"
+#include "ElementFinder.h"
 #include "BrowserFactory.h"
+#include "WebDriverCommand.h"
+#include "WebDriverResponse.h"
 #include "WebDriverCommandHandler.h"
 #include <string>
 #include <map>
@@ -55,6 +59,8 @@ public:
 	void AddWrapper(BrowserWrapper* wrapper);
 	std::wstring m_currentBrowser;
 	std::map<std::wstring, BrowserWrapper*> m_trackedBrowsers;
+	std::map<std::wstring, ElementWrapper*> m_knownElements;
+	std::map<std::wstring, ElementFinder*> m_elementFinders;
 	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
 
 private:
@@ -63,6 +69,7 @@ private:
 	void DispatchCommand(void);
 
 	void PopulateCommandHandlerRepository(void);
+	void PopulateElementFinderRepository(void);
 
 	WebDriverCommand *m_command;
 	std::wstring m_serializedResponse;

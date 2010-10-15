@@ -1,5 +1,4 @@
 #pragma once
-#include "WebDriverCommandHandler.h"
 #include "BrowserManager.h"
 
 class ExecuteScriptCommandHandler :
@@ -18,9 +17,9 @@ protected:
 
 	void ExecuteScriptCommandHandler::PopulateArgumentArray(SAFEARRAY * args, Json::Value jsonArgs)
 	{
-		for (int argIndex = 0; argIndex < jsonArgs.size(); ++argIndex)
+		for (UINT argIndex = 0; argIndex < jsonArgs.size(); ++argIndex)
 		{
-			LONG index = argIndex;
+			LONG index = (LONG)argIndex;
 			Json::Value arg = jsonArgs[argIndex];
 			if (arg.isString())
 			{

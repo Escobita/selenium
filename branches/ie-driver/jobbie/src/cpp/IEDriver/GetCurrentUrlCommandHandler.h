@@ -1,5 +1,4 @@
 #pragma once
-#include "WebDriverCommandHandler.h"
 #include "BrowserManager.h"
 
 class GetCurrentUrlCommandHandler :

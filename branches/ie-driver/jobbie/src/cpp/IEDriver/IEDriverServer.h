@@ -7,7 +7,7 @@
 #include "BrowserManager.h"
 #include "mongoose.h"
 
-#define SERVER_DEFAULT_PAGE "<html><head><title>WebDriver</title></head><body>This is the initial start page for the IE WebDriver.</body></html>"
+#define SERVER_DEFAULT_PAGE "<html><head><title>WebDriver</title></head><body><p id='main'>This is the initial start page for the IE WebDriver.</p></body></html>"
 
 using namespace std;
 

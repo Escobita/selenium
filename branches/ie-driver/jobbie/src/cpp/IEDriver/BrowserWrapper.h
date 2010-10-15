@@ -1,7 +1,5 @@
 #pragma once
 #include "BrowserWrapperEvent.h"
-#include "WebDriverCommand.h"
-#include "WebDriverResponse.h"
 #include "CommandValues.h"
 #include "ErrorCodes.h"
 #include "json.h"
@@ -30,14 +28,14 @@ public:
 	BrowserWrapperEvent<std::wstring> Quitting;
 
 	static inline _ATL_FUNC_INFO* BeforeNavigate2Info() {
-	  static _ATL_FUNC_INFO kBeforeNavigate2 = { CC_STDCALL, VT_EMPTY, 7,
-        { VT_DISPATCH, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_BOOL | VT_BYREF } };
+		static _ATL_FUNC_INFO kBeforeNavigate2 = { CC_STDCALL, VT_EMPTY, 7,
+			{ VT_DISPATCH, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_BOOL | VT_BYREF } };
 	  return &kBeforeNavigate2;
 	}
 
 	static inline _ATL_FUNC_INFO* DocumentCompleteInfo() {
-      static _ATL_FUNC_INFO kDocumentComplete = { CC_STDCALL, VT_EMPTY, 2, { VT_DISPATCH, VT_VARIANT|VT_BYREF } };
-	  return &kDocumentComplete;
+		static _ATL_FUNC_INFO kDocumentComplete = { CC_STDCALL, VT_EMPTY, 2, { VT_DISPATCH, VT_VARIANT|VT_BYREF } };
+		return &kDocumentComplete;
 	}
 
 	static inline _ATL_FUNC_INFO* NoArgumentsInfo() {
@@ -46,16 +44,16 @@ public:
 	}
 
 	static inline _ATL_FUNC_INFO* NewWindow3Info() {
-	  static _ATL_FUNC_INFO kNewWindow3 = { CC_STDCALL, VT_EMPTY, 5,
-        { VT_DISPATCH, VT_BOOL | VT_BYREF, VT_I4, VT_BSTR, VT_BSTR } };
-	  return &kNewWindow3;
+		static _ATL_FUNC_INFO kNewWindow3 = { CC_STDCALL, VT_EMPTY, 5,
+			{ VT_DISPATCH, VT_BOOL | VT_BYREF, VT_I4, VT_BSTR, VT_BSTR } };
+		return &kNewWindow3;
 	}
 
 	BEGIN_SINK_MAP(BrowserWrapper)
-	 SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_BEFORENAVIGATE2, BeforeNavigate2, BeforeNavigate2Info())
-	 SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_DOCUMENTCOMPLETE, DocumentComplete, DocumentCompleteInfo())
-	 SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_ONQUIT, OnQuit, NoArgumentsInfo())
-	 SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_NEWWINDOW3, NewWindow3, NewWindow3Info())
+		SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_BEFORENAVIGATE2, BeforeNavigate2, BeforeNavigate2Info())
+		SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_DOCUMENTCOMPLETE, DocumentComplete, DocumentCompleteInfo())
+		SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_ONQUIT, OnQuit, NoArgumentsInfo())
+		SINK_ENTRY_INFO(1, DIID_DWebBrowserEvents2, DISPID_NEWWINDOW3, NewWindow3, NewWindow3Info())
 	END_SINK_MAP()
 
 	STDMETHOD_(void, BeforeNavigate2)(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags,

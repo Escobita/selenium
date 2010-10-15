@@ -214,7 +214,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

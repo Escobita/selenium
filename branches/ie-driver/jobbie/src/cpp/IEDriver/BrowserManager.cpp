@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include "BrowserManager.h"
+#include "FindByIdElementFinder.h"
 #include "CloseWindowCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
+#include "FindElementCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
 #include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
@@ -41,6 +43,7 @@ LRESULT BrowserManager::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	this->SetWindowText(this->m_managerId.c_str());
 
 	this->PopulateCommandHandlerRepository();
+	this->PopulateElementFinderRepository();
 	this->m_currentBrowser = L"";
 	this->m_factory = new BrowserFactory;
 	this->m_command = new WebDriverCommand;
@@ -172,6 +175,11 @@ void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 	}
 }
 
+void BrowserManager::PopulateElementFinderRepository(void)
+{
+	this->m_elementFinders[L"id"] = new FindByIdElementFinder;
+}
+
 void BrowserManager::PopulateCommandHandlerRepository()
 {
 	this->m_commandHandlerRepository[CommandValue::NoCommand] = new WebDriverCommandHandler;
@@ -188,4 +196,5 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GetPageSource] = new GetPageSourceCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetCurrentUrl] = new GetCurrentUrlCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::ExecuteScript] = new ExecuteScriptCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::FindElement] = new FindElementCommandHandler;
 }

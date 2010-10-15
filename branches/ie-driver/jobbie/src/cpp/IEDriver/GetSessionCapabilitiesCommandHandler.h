@@ -1,5 +1,4 @@
 #pragma once
-#include "WebDriverCommandHandler.h"
 #include "BrowserManager.h"
 
 class GetSessionCapabilitiesCommandHandler :
@@ -26,10 +25,5 @@ protected:
 		response->m_value["javascriptEnabled"] = true;
 		response->m_value["platform"] = "WINDOWS";
 		response->m_value["nativeEvents"] = true;
-
-		//std::string value = commandParameters["value"];
-		//std::transform(value.begin(), value.end(), value.begin(), ::toupper);
-		//response->m_statusCode = 0;
-		//response->m_value["upperValue"] = value;
 	}
 };
