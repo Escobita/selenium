@@ -1,9 +1,13 @@
 #include "StdAfx.h"
 #include "BrowserManager.h"
 #include "CloseWindowCommandHandler.h"
+#include "ExecuteScriptCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
+#include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
 #include "GetSessionCapabilitiesCommandHandler.h"
+#include "GetPageSourceCommandHandler.h"
+#include "GetTitleCommandHandler.h"
 #include "GoToUrlCommandHandler.h"
 #include "NewSessionCommandHandler.h"
 #include "SwitchToFrameCommandHandler.h"
@@ -132,6 +136,12 @@ void BrowserManager::DispatchCommand()
 	this->m_serializedResponse = response.serialize();
 }
 
+int BrowserManager::GetCurrentBrowser(BrowserWrapper **ppWrapper)
+{
+	*ppWrapper = this->m_trackedBrowsers[this->m_currentBrowser];
+	return SUCCESS;
+}
+
 void BrowserManager::AddWrapper(BrowserWrapper *wrapper)
 {
 	this->m_trackedBrowsers[wrapper->m_browserId] = wrapper;
@@ -174,4 +184,8 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Close] = new CloseWindowCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Quit] = new QuitCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetTitle] = new GetTitleCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetPageSource] = new GetPageSourceCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetCurrentUrl] = new GetCurrentUrlCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ExecuteScript] = new ExecuteScriptCommandHandler;
 }

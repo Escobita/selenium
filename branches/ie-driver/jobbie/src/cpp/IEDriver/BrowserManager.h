@@ -48,24 +48,21 @@ public:
 	LRESULT OnGetResponseLength(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	std::wstring StartManager();
-	
 	std::wstring m_managerId;
 	int m_port;
 	static DWORD WINAPI ThreadProc(LPVOID lpParameter);
-	std::wstring m_currentBrowser;
-	std::map<std::wstring, BrowserWrapper*> m_trackedBrowsers;
 	BrowserFactory *m_factory;
 	void AddWrapper(BrowserWrapper* wrapper);
+	std::wstring m_currentBrowser;
+	std::map<std::wstring, BrowserWrapper*> m_trackedBrowsers;
+	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
 
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);
 	void BrowserQuittingEventHandler(std::wstring browserId);
 	void DispatchCommand(void);
 
-	void Start(void);
 	void PopulateCommandHandlerRepository(void);
-	int LaunchBrowser();
 
 	WebDriverCommand *m_command;
 	std::wstring m_serializedResponse;

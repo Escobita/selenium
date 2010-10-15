@@ -28,8 +28,20 @@ protected:
 		}
 		else
 		{
-			int result = manager->m_trackedBrowsers[manager->m_currentBrowser]->GoToUrl(commandParameters["url"].asString());
-			response->m_statusCode = result;
+			BrowserWrapper *pWrapper;
+			manager->GetCurrentBrowser(&pWrapper);
+			std::string url = commandParameters["url"].asString();
+			CComVariant pVarUrl(url.c_str());
+			CComVariant dummy;
+
+			HRESULT hr = pWrapper->m_pBrowser->Navigate2(&pVarUrl, &dummy, &dummy, &dummy, &dummy);
+			while (!pWrapper->m_pendingWait)
+			{
+				::Sleep(WAIT_TIME_IN_MILLISECONDS);
+			}
+
+			pWrapper->m_pathToFrame = L"";
+			response->m_statusCode = SUCCESS;
 		}
 	}
 };

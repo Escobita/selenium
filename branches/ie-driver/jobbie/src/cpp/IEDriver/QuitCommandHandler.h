@@ -31,7 +31,7 @@ protected:
 		std::vector<std::wstring>::iterator handleEnd = trackedBrowserHandles.end();
 		for (std::vector<std::wstring>::iterator handleIt = trackedBrowserHandles.begin(); handleIt != handleEnd; ++handleIt)
 		{
-			int result = manager->m_trackedBrowsers[*handleIt]->CloseBrowser();
+			HRESULT hr = manager->m_trackedBrowsers[*handleIt]->m_pBrowser->Quit();
 		}
 
 		response->m_statusCode = SUCCESS;

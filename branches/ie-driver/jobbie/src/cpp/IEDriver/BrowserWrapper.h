@@ -22,14 +22,12 @@ class BrowserWrapper :
 
 {
 public:
-	//BrowserWrapper();
 	BrowserWrapper(CComPtr<IWebBrowser2> browser);
 	virtual ~BrowserWrapper(void);
 
 	std::wstring m_browserId;
 	BrowserWrapperEvent<BrowserWrapper*> NewWindow;
 	BrowserWrapperEvent<std::wstring> Quitting;
-	static int CreateBrowser();
 
 	static inline _ATL_FUNC_INFO* BeforeNavigate2Info() {
 	  static _ATL_FUNC_INFO kBeforeNavigate2 = { CC_STDCALL, VT_EMPTY, 7,
@@ -66,21 +64,25 @@ public:
 	STDMETHOD_(void, OnQuit)();
 	STDMETHOD_(void, NewWindow3)(IDispatch *pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
 
-	std::string getWindowName();
 	void Wait(void);
-	int GoToUrl(std::string url);
-	int GetCurrentUrl(std::string *currentUrl);
-	int CloseBrowser(void);
+	void GetDocument(IHTMLDocument2 **ppDoc);
+	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
 
 	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
 	bool m_navStarted;
 	bool m_pendingWait;
+	std::wstring m_pathToFrame;
 
 private:
-	void AttachEvents(void);
-	void DetachEvents(void);
-	int WaitInternal(UINT64 waitStartTime);
+	void attachEvents(void);
+	void detachEvents(void);
+	int waitInternal(UINT64 waitStartTime);
 	UINT64 getTime(void);
 	int getElapsedMilliseconds(UINT64 startTime);
+	void findCurrentFrameWindow(IHTMLWindow2 **ppWindow);
+	void getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 **ppWindow);
+	bool getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* pAdded);
+	void removeScript(IHTMLDocument2* pDoc);
+	bool createAnonymousFunction(IDispatch* pScriptEngine, DISPID evalId, const std::wstring *script, VARIANT* pResult);
 };

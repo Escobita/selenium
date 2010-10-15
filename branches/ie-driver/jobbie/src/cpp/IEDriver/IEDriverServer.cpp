@@ -109,7 +109,7 @@ void IEDriverServer::SendWelcomePage(struct mg_connection* connection,
 		out << pageBody << "\r\n";
 	}
 
-	mg_printf(connection, "%s", out.str().c_str());
+	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
 // The standard HTTP Status codes are implemented below.  Chrome uses
@@ -133,7 +133,7 @@ void IEDriverServer::SendHttpOk(struct mg_connection* connection,
 		out << narrowBody << "\r\n";
 	}
 
-	mg_printf(connection, "%s", out.str().c_str());
+	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
 void IEDriverServer::SendHttpInternalError(struct mg_connection* connection,
@@ -153,7 +153,7 @@ void IEDriverServer::SendHttpInternalError(struct mg_connection* connection,
 		out << narrowBody << "\r\n";
 	}
 
-	mg_printf(connection, "%s", out.str().c_str());
+	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
 void IEDriverServer::SendHttpSeeOther(struct mg_connection* connection,
@@ -166,7 +166,7 @@ void IEDriverServer::SendHttpSeeOther(struct mg_connection* connection,
 		<< "Content-Type: text/html\r\n"
 		<< "Content-Length: 0\r\n\r\n";
 
-	mg_printf(connection, "%s", out.str().c_str());
+	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
 std::wstring IEDriverServer::sendCommandToManager(std::wstring serializedCommand)
@@ -329,7 +329,7 @@ IEDriverServer* StartServer(int port)
 {
 	char buffer[6];
 	_itoa(port, buffer, 10);
-	char* options[] = { "listening_ports", buffer, NULL };
+	char* options[] = { "listening_ports", buffer, "access_control_list", "-0.0.0.0/0,+127.0.0.1", NULL };
 	server = new IEDriverServer(port);
 	ctx = mg_start(event_handler, (const char **)options);
 	return server;

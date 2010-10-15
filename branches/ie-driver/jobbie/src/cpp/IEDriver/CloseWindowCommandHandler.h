@@ -21,7 +21,9 @@ protected:
 
 	void CloseWindowCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
-		int result = manager->m_trackedBrowsers[manager->m_currentBrowser]->CloseBrowser();
-		response->m_statusCode = result;
+		BrowserWrapper *pWrapper;
+		manager->GetCurrentBrowser(&pWrapper);
+		HRESULT hr = pWrapper->m_pBrowser->Quit();
+		response->m_statusCode = SUCCESS;
 	}
 };

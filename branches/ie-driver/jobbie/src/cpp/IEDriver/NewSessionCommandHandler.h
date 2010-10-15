@@ -28,10 +28,5 @@ protected:
 		response->m_statusCode = 303;
 		std::string id = CW2A(manager->m_managerId.c_str());
 		response->m_value = "/session/" + id;
-
-		//std::string value = commandParameters["value"];
-		//std::transform(value.begin(), value.end(), value.begin(), ::toupper);
-		//response->m_statusCode = 0;
-		//response->m_value["upperValue"] = value;
 	}
 };
