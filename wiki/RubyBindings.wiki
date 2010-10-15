@@ -4,7 +4,7 @@
 
 The Ruby bindings for the WebDriver API are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. 
 
-The bindings support Ruby 1.8.7 through 1.9.1 + JRuby.  
+The bindings support Ruby 1.8.7 through 1.9.1, JRuby and Rubinius.  
 
   * [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html API docs]
   * [http://selenium.googlecode.com/svn/trunk/common/src/rb/CHANGES Changelog]
