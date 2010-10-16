@@ -32,4 +32,24 @@ HtmlUnitDriver driver = new HtmlUnitDriver();
 driver.setJavascriptEnabled(true);
 }}}
 
+or 
+
+{{{
+HtmlUnitDriver driver = new HtmlUnitDriver(true);
+}}}
+
 This will cause the HtmlUnitDriver to emulate IE's Javascript handling by default. 
+
+== Emulating a Specific Browser ==
+
+Notwithstanding other considerations above, it is possible to get HtmlUnitDriver to emulate a specific browser.  You should not really be doing this, as web-applications are better coded to be neutral of which reasonably recent browser you are using.  There are two more constructors for HtmlUnitDriver that take allow us to indicate a browser to emulate. One takes a browser version directly:  
+
+{{{
+HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_3);
+}}}
+
+The other uses a broader capabilities mechanism:
+
+{{{
+HtmlUnitDriver driver = new HtmlUnitDriver(capabilities);
+}}}
