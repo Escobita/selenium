@@ -98,7 +98,7 @@
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			UseOfATL="1"
+			UseOfATL="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -120,7 +120,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)JSON\include\json&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib Rpcrt4.lib"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib iepmapi.lib version.lib comsuppw.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -495,7 +495,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ElementFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ElementFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ElementWrapper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ElementWrapper.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ErrorCodes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExecuteScriptCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindByIdElementFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindElementCommandHandler.h"
 				>
 			</File>
 			<File
@@ -503,11 +531,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetCurrentUrlCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GetCurrentWindowHandleCommandHandler.h"
 				>
 			</File>
 			<File
+				RelativePath=".\GetPageSourceCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GetSessionCapabilitiesCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetTitleCommandHandler.h"
 				>
 			</File>
 			<File
@@ -532,6 +572,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SwitchToFrameCommandHandler.h"
 				>
 			</File>
 			<File
