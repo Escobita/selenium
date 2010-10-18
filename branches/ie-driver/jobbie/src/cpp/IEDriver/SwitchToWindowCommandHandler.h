@@ -35,15 +35,19 @@ protected:
 			return false;
 		}
 
+		std::string name("");
 		CComBSTR windowName;
-		window->get_name(&windowName);
-		std::string name = CW2A(BSTR(windowName));
+		hr = window->get_name(&windowName);
+		if (windowName)
+		{
+			name = CW2A((BSTR)windowName);
+		}
 		return name;
 	}
 
 	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
-		if (locatorParameters.find("name") == locatorParameters.end())
+		if (commandParameters.find("name") == commandParameters.end())
 		{
 			response->m_statusCode = 400;
 			response->m_value = "name";
@@ -51,7 +55,7 @@ protected:
 		else
 		{
 			std::wstring foundBrowserHandle = L"";
-			std::string desiredName = locatorParameters["name"];
+			std::string desiredName = commandParameters["name"].asString();
 			std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
 			for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
 			{

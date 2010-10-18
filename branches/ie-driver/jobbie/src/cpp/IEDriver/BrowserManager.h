@@ -3,7 +3,6 @@
 #include "BrowserWrapper.h"
 #include "ElementWrapper.h"
 #include "ElementFinder.h"
-#include "BrowserFactory.h"
 #include "WebDriverCommand.h"
 #include "WebDriverResponse.h"
 #include "WebDriverCommandHandler.h"
@@ -62,6 +61,7 @@ public:
 	std::map<std::wstring, ElementWrapper*> m_knownElements;
 	std::map<std::wstring, ElementFinder*> m_elementFinders;
 	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
+	int GetSpeed(void);
 
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);

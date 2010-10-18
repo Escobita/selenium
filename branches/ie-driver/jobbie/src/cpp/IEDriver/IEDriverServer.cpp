@@ -289,6 +289,7 @@ void IEDriverServer::populateCommandRepository()
 	this->m_commandRepository["/session/:sessionid/element/:id/text"]["GET"] = CommandValue::GetElementText;
 	this->m_commandRepository["/session/:sessionid/element/:id/submit"]["POST"] = CommandValue::SubmitElement;
 	this->m_commandRepository["/session/:sessionid/element/:id/value"]["GET"] = CommandValue::GetElementValue;
+	this->m_commandRepository["/session/:sessionid/element/:id/value"]["POST"] = CommandValue::SendKeysToElement;
 	this->m_commandRepository["/session/:sessionid/element/:id/name"]["GET"] = CommandValue::GetElementTagName;
 	this->m_commandRepository["/session/:sessionid/element/:id/clear"]["POST"] = CommandValue::ClearElement;
 	this->m_commandRepository["/session/:sessionid/element/:id/selected"]["GET"] = CommandValue::IsElementSelected;

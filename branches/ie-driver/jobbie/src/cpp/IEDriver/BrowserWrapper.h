@@ -1,5 +1,6 @@
 #pragma once
 #include "BrowserWrapperEvent.h"
+#include "BrowserFactory.h"
 #include "CommandValues.h"
 #include "ErrorCodes.h"
 #include "json.h"
@@ -20,10 +21,11 @@ class BrowserWrapper :
 
 {
 public:
-	BrowserWrapper(CComPtr<IWebBrowser2> browser);
+	BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, BrowserFactory *factory);
 	virtual ~BrowserWrapper(void);
 
 	std::wstring m_browserId;
+	BrowserFactory *m_factory;
 	BrowserWrapperEvent<BrowserWrapper*> NewWindow;
 	BrowserWrapperEvent<std::wstring> Quitting;
 
@@ -45,7 +47,7 @@ public:
 
 	static inline _ATL_FUNC_INFO* NewWindow3Info() {
 		static _ATL_FUNC_INFO kNewWindow3 = { CC_STDCALL, VT_EMPTY, 5,
-			{ VT_DISPATCH, VT_BOOL | VT_BYREF, VT_I4, VT_BSTR, VT_BSTR } };
+			{ VT_DISPATCH | VT_BYREF, VT_BOOL | VT_BYREF, VT_I4, VT_BSTR, VT_BSTR } };
 		return &kNewWindow3;
 	}
 
@@ -60,11 +62,12 @@ public:
         VARIANT * pvarTargetFrame, VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel);
     STDMETHOD_(void, DocumentComplete)(IDispatch *pDisp,VARIANT *URL);
 	STDMETHOD_(void, OnQuit)();
-	STDMETHOD_(void, NewWindow3)(IDispatch *pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
+	STDMETHOD_(void, NewWindow3)(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
 
 	void Wait(void);
 	void GetDocument(IHTMLDocument2 **ppDoc);
 	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
+	HWND GetHwnd();
 
 	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
@@ -73,6 +76,7 @@ public:
 	std::wstring m_pathToFrame;
 
 private:
+	HWND m_hwnd;
 	void attachEvents(void);
 	void detachEvents(void);
 	int waitInternal(UINT64 waitStartTime);

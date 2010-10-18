@@ -45,11 +45,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)JSON\include\json&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -120,11 +120,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib Rpcrt4.lib iepmapi.lib version.lib comsuppw.lib"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -195,7 +195,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -272,8 +272,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -290,6 +291,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -324,6 +326,10 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}"
 			RelativePathToProject=".\jobbie\src\cpp\JSON\JSON.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{87FA39A1-958E-478A-8AB9-6D5E5AAA3886}"
+			RelativePathToProject=".\common\src\cpp\webdriver-interactions\webdriver-interactions.vcproj"
 		/>
 	</References>
 	<Files>
@@ -423,6 +429,14 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
@@ -492,6 +506,10 @@
 			</File>
 			<File
 				RelativePath=".\BrowserWrapperEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ClickElementCommandHandler.h"
 				>
 			</File>
 			<File
@@ -596,6 +614,10 @@
 			</File>
 			<File
 				RelativePath=".\QuitCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SendKeysCommandHandler.h"
 				>
 			</File>
 			<File

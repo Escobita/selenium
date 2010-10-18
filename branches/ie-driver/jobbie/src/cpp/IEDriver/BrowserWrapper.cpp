@@ -2,7 +2,7 @@
 #include "BrowserWrapper.h"
 #include <comutil.h>
 
-BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser)
+BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, BrowserFactory *factory)
 {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.
@@ -18,6 +18,8 @@ BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser)
 
 	::RpcStringFree(&pszUuid);
 
+	this->m_factory = factory;
+	this->m_hwnd = hwnd;
 	this->m_pBrowser = browser;
 	this->attachEvents();
 }
@@ -553,6 +555,16 @@ void BrowserWrapper::getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 
 	frameHolder.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**) ppWindow);
 }
 
+HWND BrowserWrapper::GetHwnd()
+{
+	if (this->m_hwnd == NULL)
+	{
+		this->m_hwnd =this->m_factory->GetTabWindowHandle(this->m_pBrowser);
+	}
+
+	return this->m_hwnd;
+}
+
 void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
 VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
 {
@@ -570,12 +582,15 @@ VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
 
 void __stdcall BrowserWrapper::OnQuit()
 {
-	std::cout << "OnQuit\r\n";
+	this->Quitting.raise(this->m_browserId);
 }
 
-void __stdcall BrowserWrapper::NewWindow3(IDispatch * pDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
+void __stdcall BrowserWrapper::NewWindow3(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
 {
-	std::cout << "NewWindow\r\n";
+	IWebBrowser2 *pBrowser = this->m_factory->CreateBrowser();
+	BrowserWrapper *newWindowWrapper = new BrowserWrapper(pBrowser, NULL, this->m_factory);
+	*ppDisp = pBrowser;
+	this->NewWindow.raise(newWindowWrapper);
 }
 
 void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)

@@ -30,7 +30,12 @@ protected:
 		std::vector<std::wstring>::iterator handleEnd = trackedBrowserHandles.end();
 		for (std::vector<std::wstring>::iterator handleIt = trackedBrowserHandles.begin(); handleIt != handleEnd; ++handleIt)
 		{
-			HRESULT hr = manager->m_trackedBrowsers[*handleIt]->m_pBrowser->Quit();
+			BrowserWrapper *pWrapper(manager->m_trackedBrowsers[*handleIt]);
+			HRESULT hr = pWrapper->m_pBrowser->Quit();
+			if (FAILED(hr))
+			{
+				cout << "Quit failed: " << hr << "\r\n";
+			}
 		}
 
 		response->m_statusCode = SUCCESS;

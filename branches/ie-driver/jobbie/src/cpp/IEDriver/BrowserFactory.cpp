@@ -39,24 +39,20 @@ DWORD BrowserFactory::LaunchBrowserProcess(int port)
 	return processId;
 }
 
-CComPtr<IWebBrowser2> BrowserFactory::AttachToBrowser(int processId)
+void BrowserFactory::AttachToBrowser(ProcessWindowInfo *procWinInfo)
 {
-	CComPtr<IWebBrowser2> pBrowser;
-	ProcessWindowInfo procWinInfo;
-	procWinInfo.dwProcessId = processId;
-	procWinInfo.hwndBrowser = NULL;
-	while (procWinInfo.hwndBrowser == NULL)
+	while (procWinInfo->hwndBrowser == NULL)
 	{
 		// TODO: create a timeout for this. We shouldn't need it, since
 		// we got a valid process ID, but we should bulletproof it.
-		::EnumWindows(&BrowserFactory::FindTopLevelWindows, (LPARAM)&procWinInfo);
-		if (procWinInfo.hwndBrowser == NULL)
+		::EnumWindows(&BrowserFactory::FindBrowserWindow, (LPARAM)procWinInfo);
+		if (procWinInfo->hwndBrowser == NULL)
 		{
 			::Sleep(250);
 		}
 	}
 
-	if (procWinInfo.hwndBrowser != NULL)
+	if (procWinInfo->hwndBrowser != NULL)
 	{
 		// Explicitly load MSAA so we know if it's installed
 		HINSTANCE hInst = ::LoadLibrary(_T("OLEACC.DLL"));
@@ -65,7 +61,7 @@ CComPtr<IWebBrowser2> BrowserFactory::AttachToBrowser(int processId)
 			CComPtr<IHTMLDocument2> spDoc;
 			LRESULT lRes;
 			UINT nMsg = ::RegisterWindowMessage(_T("WM_HTML_GETOBJECT"));
-			::SendMessageTimeout(procWinInfo.hwndBrowser, nMsg, 0L, 0L, SMTO_ABORTIFHUNG, 1000, (PDWORD_PTR)&lRes);
+			::SendMessageTimeout(procWinInfo->hwndBrowser, nMsg, 0L, 0L, SMTO_ABORTIFHUNG, 1000, (PDWORD_PTR)&lRes);
 
 			LPFNOBJECTFROMLRESULT pfObjectFromLresult =  reinterpret_cast<LPFNOBJECTFROMLRESULT>(::GetProcAddress(hInst, "ObjectFromLresult"));
 			if (pfObjectFromLresult != NULL)
@@ -90,7 +86,7 @@ CComPtr<IWebBrowser2> BrowserFactory::AttachToBrowser(int processId)
 								hr = childProvider->QueryService(SID_SWebBrowserApp, IID_IWebBrowser2, reinterpret_cast<void **>(&browser));
 								if (SUCCEEDED(hr))
 								{
-									pBrowser = browser;
+									procWinInfo->pBrowser = browser;
 								}
 							}
 						}
@@ -100,14 +96,12 @@ CComPtr<IWebBrowser2> BrowserFactory::AttachToBrowser(int processId)
 			::FreeLibrary(hInst);
 		}
 	} // else Active Accessibility is not installed
-
-	return pBrowser;
 }
 
-CComPtr<IWebBrowser2> BrowserFactory::CreateBrowser()
+IWebBrowser2* BrowserFactory::CreateBrowser()
 {
 	// TODO: Error and exception handling and return value checking.
-	CComPtr<IWebBrowser2> pBrowser;
+	IWebBrowser2 *pBrowser;
 	this->SetThreadIntegrityLevel();
 	DWORD context = CLSCTX_LOCAL_SERVER;
 	if (this->m_ieMajorVersion == 7 && this->m_windowsMajorVersion == 6)
@@ -117,7 +111,8 @@ CComPtr<IWebBrowser2> BrowserFactory::CreateBrowser()
 		context = context | CLSCTX_ENABLE_CLOAKING;
 	}
 
-	pBrowser.CoCreateInstance(CLSID_InternetExplorer, NULL, context);
+	//pBrowser.CoCreateInstance(CLSID_InternetExplorer, NULL, context);
+	::CoCreateInstance(CLSID_InternetExplorer, NULL, context, IID_IWebBrowser2, (void**)&pBrowser);
 	pBrowser->put_Visible(VARIANT_TRUE);
 	this->ResetThreadIntegrityLevel();
 	return pBrowser;
@@ -129,10 +124,10 @@ void BrowserFactory::SetThreadIntegrityLevel()
 	// TODO: Error handling and return value checking.
 	HANDLE hProcToken = NULL;
 	HANDLE hProc = ::GetCurrentProcess();
-	::OpenProcessToken(hProc, TOKEN_DUPLICATE, &hProcToken);
+	BOOL result = ::OpenProcessToken(hProc, TOKEN_DUPLICATE, &hProcToken);
 
 	HANDLE hThreadToken = NULL;
-	::DuplicateTokenEx(
+	result = ::DuplicateTokenEx(
 		hProcToken, 
 		TOKEN_QUERY | TOKEN_IMPERSONATE | TOKEN_ADJUST_DEFAULT,
 		NULL, 
@@ -140,21 +135,22 @@ void BrowserFactory::SetThreadIntegrityLevel()
 		TokenImpersonation,
 		&hThreadToken);
 
-	PSID pSid;
-	::ConvertStringSidToSid(SDDL_ML_LOW, &pSid);
+	PSID pSid = NULL;
+	result = ::ConvertStringSidToSid(SDDL_ML_LOW, &pSid);
 
 	TOKEN_MANDATORY_LABEL tml;
 	tml.Label.Attributes = SE_GROUP_INTEGRITY | SE_GROUP_INTEGRITY_ENABLED;
 	tml.Label.Sid = pSid;
 
-	::SetTokenInformation(hThreadToken, TokenIntegrityLevel, &tml, sizeof(tml) + ::GetLengthSid(pSid));
+	result = ::SetTokenInformation(hThreadToken, TokenIntegrityLevel, &tml, sizeof(tml) + ::GetLengthSid(pSid));
+	::LocalFree(pSid);
 
 	HANDLE hThread = ::GetCurrentThread();
-	::SetThreadToken(&hThread, hThreadToken);
-	::ImpersonateLoggedOnUser(hThreadToken);
+	result = ::SetThreadToken(&hThread, hThreadToken);
+	result = ::ImpersonateLoggedOnUser(hThreadToken);
 
-	::CloseHandle(hThreadToken);
-	::CloseHandle(hProcToken);
+	result = ::CloseHandle(hThreadToken);
+	result = ::CloseHandle(hProcToken);
 }
 
 void BrowserFactory::ResetThreadIntegrityLevel()
@@ -162,7 +158,39 @@ void BrowserFactory::ResetThreadIntegrityLevel()
 	::RevertToSelf();
 }
 
-BOOL CALLBACK BrowserFactory::FindTopLevelWindows(HWND hwnd, LPARAM arg)
+HWND BrowserFactory::GetTabWindowHandle(IWebBrowser2 *pBrowser)
+{
+	ProcessWindowInfo procWinInfo;
+	procWinInfo.pBrowser = pBrowser;
+	procWinInfo.hwndBrowser = NULL;
+
+	HWND hwnd = NULL;
+	CComQIPtr<IServiceProvider> pServiceProvider;
+	HRESULT hr = pBrowser->QueryInterface(IID_IServiceProvider, reinterpret_cast<void **>(&pServiceProvider));
+	if (SUCCEEDED(hr))
+	{
+		CComPtr<IOleWindow> pWindow;
+		hr = pServiceProvider->QueryService(SID_SShellBrowser, IID_IOleWindow, reinterpret_cast<void **>(&pWindow));
+		if (SUCCEEDED(hr))
+		{
+			// This gets the TabWindowClass window in IE 7 and 8,
+			// and the top-level window frame in IE 6. The window
+			// we need is the InternetExplorer_Server window.
+			pWindow->GetWindow(&hwnd);
+
+			DWORD dwProcessId;
+			::GetWindowThreadProcessId(hwnd, &dwProcessId);
+			procWinInfo.dwProcessId = dwProcessId;
+
+			::EnumChildWindows(hwnd, &BrowserFactory::FindChildWindowForProcess, (LPARAM)&procWinInfo);
+			hwnd = procWinInfo.hwndBrowser;
+		}
+	}
+
+	return hwnd;
+}
+
+BOOL CALLBACK BrowserFactory::FindBrowserWindow(HWND hwnd, LPARAM arg)
 {
 	// Could this be an IE instance?
 	// 8 == "IeFrame\0"

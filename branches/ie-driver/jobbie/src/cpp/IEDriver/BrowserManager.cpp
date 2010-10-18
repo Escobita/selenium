@@ -6,6 +6,7 @@
 #include "FindByNameElementFinder.h"
 #include "FindByPartialLinkTextElementFinder.h"
 #include "FindByTagNameElementFinder.h"
+#include "ClickElementCommandHandler.h"
 #include "CloseWindowCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
 #include "FindElementCommandHandler.h"
@@ -19,6 +20,7 @@
 #include "GetTitleCommandHandler.h"
 #include "GoToUrlCommandHandler.h"
 #include "NewSessionCommandHandler.h"
+#include "SendKeysCommandHandler.h"
 #include "SwitchToFrameCommandHandler.h"
 #include "SwitchToWindowCommandHandler.h"
 #include "QuitCommandHandler.h"
@@ -164,8 +166,15 @@ void BrowserManager::AddWrapper(BrowserWrapper *wrapper)
 	}
 }
 
+int BrowserManager::GetSpeed()
+{
+	return 0;
+}
+
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
 {
+	std::string tmp(CW2A(wrapper->m_browserId.c_str()));
+	std::cout << "NewWindow found with id " << tmp << "\r\n";
 	if (this->m_trackedBrowsers.find(wrapper->m_browserId) == this->m_trackedBrowsers.end())
 	{
 		this->AddWrapper(wrapper);
@@ -174,6 +183,8 @@ void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
 
 void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 {
+	std::string tmp(CW2A(browserId.c_str()));
+	std::cout << "OnQuit from " << tmp << "\r\n";
 	if (this->m_trackedBrowsers.find(browserId) != this->m_trackedBrowsers.end())
 	{
 		this->m_trackedBrowsers[browserId]->NewWindow.detach(this->m_newBrowserEventId);
@@ -211,4 +222,6 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::FindElement] = new FindElementCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElements] = new FindElementsCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetElementTagName] = new GetElementTagNameCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ClickElement] = new ClickElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::SendKeysToElement] = new SendKeysCommandHandler;
 }

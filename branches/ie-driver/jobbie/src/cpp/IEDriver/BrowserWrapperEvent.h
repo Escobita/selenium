@@ -1,4 +1,5 @@
 #include <map>
+#include <vector>
 
 template <typename T>
 class EventHandlerBase
@@ -60,10 +61,23 @@ public:
 
 	void raise(T param)
 	{
+		// Cache the keys to the map. The event handler might
+		// detach itself from the event, which would invalidate
+		// an iterator directly on the map.
+		std::vector<int> eventIdList;
 		HandlersMap::iterator it = m_handlers.begin();
 		for(; it != m_handlers.end(); it++)
 		{
-			it->second->raise(param);
+			eventIdList.push_back(it->first);
+		}
+
+		for(int i = 0; i < eventIdList.size(); ++i)
+		{
+			it = m_handlers.find(eventIdList[i]);
+			if(it != m_handlers.end())
+			{
+				it->second->raise(param);
+			}
 		}
 	}
 };

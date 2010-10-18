@@ -16,6 +16,7 @@ struct ProcessWindowInfo
 {
 	DWORD dwProcessId;
 	HWND hwndBrowser;
+	IWebBrowser2 *pBrowser;
 };
 
 class BrowserFactory
@@ -25,10 +26,11 @@ public:
 	virtual ~BrowserFactory(void);
 
 	DWORD LaunchBrowserProcess(int port);
-	CComPtr<IWebBrowser2> CreateBrowser();
-	CComPtr<IWebBrowser2> AttachToBrowser(int processId);
+	IWebBrowser2* CreateBrowser();
+	void AttachToBrowser(ProcessWindowInfo *procWinInfo);
+	HWND GetTabWindowHandle(IWebBrowser2* pBrowser);
 
-	static BOOL CALLBACK FindTopLevelWindows(HWND hwnd, LPARAM param);
+	static BOOL CALLBACK FindBrowserWindow(HWND hwnd, LPARAM param);
 	static BOOL CALLBACK FindChildWindowForProcess(HWND hwnd, LPARAM arg);
 
 private:
