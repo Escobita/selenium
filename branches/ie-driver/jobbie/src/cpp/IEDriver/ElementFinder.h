@@ -24,7 +24,8 @@ protected:
 	void extractHtmlDocument3FromDomNode(const IHTMLDOMNode* pExtractionNode, IHTMLDocument3** ppDoc);
 	bool isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
 	bool isUnder(const IHTMLDOMNode* root, IHTMLElement* child);
-	std::wstring convertVariantToWString(CComVariant toConvert); 
+	std::wstring convertVariantToWString(CComVariant toConvert);
+	std::wstring StripTrailingWhitespace(std::wstring input);
 
 private:
 	int getParentElement(BrowserManager *pManager, ElementWrapper *pParentElementWrapper, IHTMLElement **ppParentElement);

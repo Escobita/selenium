@@ -385,6 +385,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ElementFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ElementWrapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\IEDriverServer.cpp"
 				>
 			</File>
@@ -495,15 +503,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ElementFinder.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ElementFinder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ElementWrapper.cpp"
 				>
 			</File>
 			<File
@@ -519,11 +519,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FindByClassNameElementFinder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FindByIdElementFinder.h"
 				>
 			</File>
 			<File
+				RelativePath=".\FindByLinkTextElementFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindByNameElementFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindByPartialLinkTextElementFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindByTagNameElementFinder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FindElementCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindElementsCommandHandler.h"
 				>
 			</File>
 			<File
@@ -536,6 +560,10 @@
 			</File>
 			<File
 				RelativePath=".\GetCurrentWindowHandleCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementTagNameCommandHandler.h"
 				>
 			</File>
 			<File

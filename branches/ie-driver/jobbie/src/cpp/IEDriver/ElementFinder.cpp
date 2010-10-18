@@ -181,3 +181,21 @@ std::wstring ElementFinder::convertVariantToWString(CComVariant toConvert)
 
 	return toReturn.str();
 }
+
+std::wstring ElementFinder::StripTrailingWhitespace(std::wstring input)
+{
+	// TODO: make the whitespace finder more comprehensive.
+	std::wstring whitespace = L" \t\n\f\v\r";
+	if (input.length() == 0)
+	{
+		return input; 
+	}
+
+	size_t pos = input.find_last_not_of(whitespace); 
+	if ((pos + 1) == input.length() || pos == std::string::npos)
+	{
+		return input; 
+	}
+
+	return input.substr(0, (pos + 1)); 
+}

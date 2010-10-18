@@ -1,12 +1,19 @@
 #include "StdAfx.h"
 #include "BrowserManager.h"
+#include "FindByClassNameElementFinder.h"
 #include "FindByIdElementFinder.h"
+#include "FindByLinkTextElementFinder.h"
+#include "FindByNameElementFinder.h"
+#include "FindByPartialLinkTextElementFinder.h"
+#include "FindByTagNameElementFinder.h"
 #include "CloseWindowCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
 #include "FindElementCommandHandler.h"
+#include "FindElementsCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
 #include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
+#include "GetElementTagNameCommandHandler.h"
 #include "GetSessionCapabilitiesCommandHandler.h"
 #include "GetPageSourceCommandHandler.h"
 #include "GetTitleCommandHandler.h"
@@ -178,6 +185,11 @@ void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 void BrowserManager::PopulateElementFinderRepository(void)
 {
 	this->m_elementFinders[L"id"] = new FindByIdElementFinder;
+	this->m_elementFinders[L"name"] = new FindByNameElementFinder;
+	this->m_elementFinders[L"tag name"] = new FindByTagNameElementFinder;
+	this->m_elementFinders[L"link text"] = new FindByLinkTextElementFinder;
+	this->m_elementFinders[L"partial link text"] = new FindByPartialLinkTextElementFinder;
+	this->m_elementFinders[L"class name"] = new FindByClassNameElementFinder;
 }
 
 void BrowserManager::PopulateCommandHandlerRepository()
@@ -197,4 +209,6 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GetCurrentUrl] = new GetCurrentUrlCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::ExecuteScript] = new ExecuteScriptCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElement] = new FindElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::FindElements] = new FindElementsCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementTagName] = new GetElementTagNameCommandHandler;
 }
