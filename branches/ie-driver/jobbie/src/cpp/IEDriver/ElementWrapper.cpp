@@ -1,6 +1,9 @@
 #include "StdAfx.h"
 #include "ElementWrapper.h"
+#include "BrowserWrapper.h"
 #include "ErrorCodes.h"
+#include "atoms.h"
+#include "interactions.h"
 
 ElementWrapper::ElementWrapper(CComPtr<IHTMLElement> element)
 {
@@ -35,21 +38,7 @@ Json::Value ElementWrapper::ConvertToJson()
 
 int ElementWrapper::IsDisplayed(bool *result)
 {
-	CComQIPtr<IHTMLInputHiddenElement> hidden(this->m_pElement);
-	if (hidden) {
-		*result = false;
-		return SUCCESS;
-	}
-
-	bool displayed;
-	int value = this->StyleIndicatesDisplayed(this->m_pElement, &displayed);
-
-	if (value != SUCCESS) {
-		return value;
-	}
-
-	*result = displayed && this->StyleIndicatesVisible(this->m_pElement);
-	return SUCCESS;
+	return this->IsElementDisplayed(this->m_pElement, result);
 }
 
 bool ElementWrapper::IsEnabled()
@@ -62,6 +51,111 @@ bool ElementWrapper::IsEnabled()
 	elem3->get_disabled(&isDisabled);
 	return !isDisabled;
 }
+
+int ElementWrapper::Click(HWND containingHwnd)
+{
+	long x = 0, y = 0, w = 0, h = 0;
+	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+
+	if (statusCode == SUCCESS)
+	{
+		long clickX = x + (w ? w / 2 : 0);
+		long clickY = y + (h ? h / 2 : 0);
+
+		// Create a mouse move, mouse down, mouse up OS event
+		LRESULT lresult = mouseMoveTo(containingHwnd, 10, x, y, clickX, clickY);
+		
+		lresult = clickAt(containingHwnd, clickX, clickY);
+	}
+	return statusCode;
+}
+
+int ElementWrapper::Hover(HWND containingHwnd)
+{
+	long x = 0, y = 0, w = 0, h = 0;
+	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+
+	if (statusCode == SUCCESS)
+	{
+		long clickX = x + (w ? w / 2 : 0);
+		long clickY = y + (h ? h / 2 : 0);
+
+		// Create a mouse move, mouse down, mouse up OS event
+		LRESULT lresult = mouseMoveTo(containingHwnd, 100, x, y, clickX, clickY);
+	}
+	return statusCode;
+}
+
+int ElementWrapper::DragBy(HWND containingHwnd, int offsetX, int offsetY)
+{
+	long x = 0, y = 0, w = 0, h = 0;
+	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+
+	if (statusCode == SUCCESS)
+	{
+		long clickX = x + (w ? w / 2 : 0);
+		long clickY = y + (h ? h / 2 : 0);
+
+		// Create a mouse move, mouse down, mouse up OS event
+		LRESULT lresult = mouseDownAt(containingHwnd, clickX, clickY);
+		lresult = mouseMoveTo(containingHwnd, 100, clickX, clickY, clickX + offsetX, clickY + offsetY);
+		lresult = mouseUpAt(containingHwnd, clickX + offsetX, clickY + offsetY);
+	}
+	return statusCode;
+}
+
+int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, std::wstring *attributeValue)
+{
+	int statusCode = SUCCESS;
+	std::wstring script(L"(function() { return function(){ ");
+
+	// Read in all the scripts
+	for (int j = 0; WD_GET_ATTRIBUTE[j]; j++) {
+		script += WD_GET_ATTRIBUTE[j];
+		script += L"\n";
+	}
+
+	// Now for the magic
+	script += L"var element = arguments[0];\n";
+	script += L"var attributeName = arguments[1];\n";
+	script += L"return wdGetAttribute(element, attributeName);\n";
+
+	// Close things
+	script += L"};})();";
+
+	SAFEARRAY *args;
+	SAFEARRAYBOUND bounds;
+	bounds.cElements = 2;
+	bounds.lLbound = 0;
+	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+
+	long argIndex(0);
+	VARIANT varElement;
+	varElement.vt = VT_DISPATCH;
+	varElement.pdispVal = this->m_pElement;
+	::SafeArrayPutElement(args, &argIndex, &varElement);
+
+	argIndex++;
+	CComVariant varName(attributeName.c_str());
+	::SafeArrayPutElement(args, &argIndex, &varName);
+
+	CComVariant scriptResult;
+	statusCode = pBrowser->ExecuteScript(&script, args, &scriptResult);
+	::SafeArrayDestroy(args);
+
+	if (statusCode != SUCCESS) 
+	{
+		return statusCode;
+	}
+
+	if (scriptResult.vt != VT_EMPTY && scriptResult.vt != VT_NULL)
+	{
+		*attributeValue = pBrowser->ConvertVariantToWString(&scriptResult);
+	}
+
+	return SUCCESS;
+}
+
 
 int ElementWrapper::GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y, long *width, long *height)
 {
@@ -397,4 +491,293 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
 	*bottom = b;
 
 	return SUCCESS;
+}
+
+std::wstring ElementWrapper::GetText()
+{
+	CComBSTR tagName;
+	this->m_pElement->get_tagName(&tagName);
+	bool isPre = tagName == L"PRE";
+
+	CComQIPtr<IHTMLDOMNode> node(this->m_pElement);
+	std::wstring toReturn(L"");
+	this->ExtractElementText(toReturn, node, isPre);
+
+	/* Trim leading and trailing whitespace and line breaks. */
+	std::wstring::const_iterator itStart = toReturn.begin();
+	while (itStart != toReturn.end() && iswspace(*itStart)) {
+		++itStart;
+	}
+
+	std::wstring::const_iterator itEnd = toReturn.end();
+	while (itStart < itEnd) {
+		--itEnd;
+		if (!iswspace(*itEnd)) {
+			++itEnd;
+			break;
+		}
+	}
+
+	return std::wstring(itStart, itEnd);
+}
+
+bool ElementWrapper::IsSelected()
+{
+	CComQIPtr<IHTMLOptionElement> option(this->m_pElement);
+	if (option) {
+		VARIANT_BOOL isSelected;
+		option->get_selected(&isSelected);
+		return isSelected == VARIANT_TRUE;
+	}
+
+	if (this->IsCheckBox() || this->IsRadioButton()) {
+		CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+
+		VARIANT_BOOL isChecked;
+		input->get_checked(&isChecked);
+		return isChecked == VARIANT_TRUE;
+	}
+
+	return false;
+}
+
+bool ElementWrapper::IsCheckBox()
+{
+	CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+	if (!input) {
+		return false;
+	}
+
+	CComBSTR typeName;
+	input->get_type(&typeName);
+	return _wcsicmp((LPCWSTR)((BSTR)typeName), L"checkbox") == 0;
+}
+
+bool ElementWrapper::IsRadioButton()
+{
+	CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+	if (!input) {
+		return false;
+	}
+
+	CComBSTR typeName;
+	input->get_type(&typeName);
+	return _wcsicmp((LPCWSTR)((BSTR)typeName), L"radio") == 0;
+}
+
+void ElementWrapper::ExtractElementText(std::wstring& toReturn, IHTMLDOMNode* node, bool isPreformatted)
+{
+	if (this->IsBlockLevel(node)) {
+		this->CollapsingAppend(toReturn, L"\r\n");
+	}
+
+	CComPtr<IDispatch> dispatch;
+	node->get_childNodes(&dispatch);
+	CComQIPtr<IHTMLDOMChildrenCollection> children(dispatch);
+
+	if (!children)
+		return;
+
+	long length = 0;
+	children->get_length(&length);
+	bool displayed;
+	
+
+	for (long i = 0; i < length; i++)
+	{
+		CComPtr<IDispatch> dispatch2;
+		children->item(i, &dispatch2);
+		CComQIPtr<IHTMLDOMNode> child(dispatch2);
+
+		CComBSTR childName;
+		child->get_nodeName(&childName);
+
+		CComQIPtr<IHTMLDOMTextNode> textNode(child);
+		
+		this->IsNodeDisplayed(node, &displayed);
+		if (textNode && displayed) {
+			CComBSTR text;
+			textNode->get_data(&text);
+
+			for (unsigned int i = 0; i < text.Length(); i++) {
+				if (text[i] == 160) {
+					text[i] = L' ';
+				}
+			}
+
+			this->CollapsingAppend(toReturn, isPreformatted ?
+				std::wstring((BSTR)text) // bstr2wstring(text)
+				: this->CollapseWhitespace(text));
+		} else if (wcscmp((BSTR)childName, L"PRE") == 0) {
+			this->ExtractElementText(toReturn, child, true);
+		} else {
+			this->ExtractElementText(toReturn, child, false);
+		}
+	}
+
+	if (this->IsBlockLevel(node)) {
+		this->CollapsingAppend(toReturn, L"\r\n");
+	}
+}
+
+// Append s2 to s, collapsing intervening whitespace.
+// Assumes that s and s2 have already been internally collapsed.
+void ElementWrapper::CollapsingAppend(std::wstring& s, const std::wstring& s2)
+{
+	if (s.empty() || s2.empty()) {
+		s += s2;
+		return;
+	}
+
+	// \r\n abutting \r\n collapses.
+	if (s.length() >= 2 && s2.length() >= 2) {
+		if (s[s.length() - 2] == L'\r' && s[s.length() - 1] == L'\n' &&
+			s2[0] == L'\r' && s2[1] == L'\n') {
+			s += s2.substr(2);
+			return;
+		}
+	}
+
+	// wspace abutting wspace collapses into a space character.
+	if ((iswspace(s[s.length() - 1]) && s[s.length() - 1] != L'\n') &&
+		(iswspace(s2[0]) && s[0] != L'\r')) {
+		s += s2.substr(1);
+		return;
+	}
+
+	s += s2;
+}
+
+std::wstring ElementWrapper::CollapseWhitespace(CComBSTR& comtext)
+{
+	std::wstring toReturn(L"");
+	int previousWasSpace = false;
+	wchar_t previous = L'X';
+	bool newlineAlreadyAppended = false;
+
+	std::wstring text((BSTR)comtext);
+
+	// Need to keep an eye out for '\r\n'
+	for (unsigned int i = 0; i < text.size(); i++) {
+		wchar_t c = text[i];
+		int currentIsSpace = iswspace(c);
+
+		// Append the character if the previous was not whitespace
+		if (!(currentIsSpace && previousWasSpace)) {
+			toReturn += c;
+			newlineAlreadyAppended = false;
+		} else if (previous == L'\r' && c == L'\n' && !newlineAlreadyAppended) {
+			// If the previous char was '\r' and current is '\n'
+			// and we've not already appended '\r\n' append '\r\n'.
+
+			// The previous char was '\r' and has already been appended and
+			// the current character is '\n'. Just appended that.
+			toReturn += c;
+			newlineAlreadyAppended = true;
+		}
+
+		previousWasSpace = currentIsSpace;
+		previous = c;
+	}
+
+	return toReturn;
+}
+
+bool ElementWrapper::IsBlockLevel(IHTMLDOMNode *node)
+{
+	CComQIPtr<IHTMLElement> e(node);
+
+	if (e) {
+		CComBSTR tagName;
+		e->get_tagName(&tagName);
+
+		bool isBreak = false;
+		if (!wcscmp(L"BR", tagName)) {
+			isBreak = true;
+		}
+
+		if (isBreak) {
+			return true;
+		}
+	}
+
+	CComQIPtr<IHTMLElement2> element2(node);
+	if (!element2) {
+		return false;
+	}
+
+	CComPtr<IHTMLCurrentStyle> style;
+	element2->get_currentStyle(&style);
+
+	if (!style) {
+		return false;
+	}
+
+	CComQIPtr<IHTMLCurrentStyle2> style2(style);
+
+	if (!style2) {
+		return false;
+	}
+
+	VARIANT_BOOL isBlock;
+	style2->get_isBlock(&isBlock);
+
+	return isBlock == VARIANT_TRUE;
+}
+
+int ElementWrapper::IsNodeDisplayed(IHTMLDOMNode *node, bool* result) 
+{
+	if (!node) {
+		*result = false;
+		return SUCCESS;
+	}
+
+	// Walk up the parents of the node until we either find an element or null
+	CComQIPtr<IHTMLElement> element(node);
+	if (!element) {
+		CComPtr<IHTMLDOMNode> parent;
+		node->get_parentNode(&parent);
+		return this->IsNodeDisplayed(parent, result);
+	}
+	return this->IsElementDisplayed(element, result);
+}
+
+int ElementWrapper::IsElementDisplayed(IHTMLElement *element, bool *result)
+{
+	CComQIPtr<IHTMLInputHiddenElement> hidden(element);
+	if (hidden) {
+		*result = false;
+		return SUCCESS;
+	}
+
+	bool displayed;
+	int value = this->StyleIndicatesDisplayed(element, &displayed);
+
+	if (value != SUCCESS) {
+		return value;
+	}
+
+	*result = displayed && this->StyleIndicatesVisible(element);
+	return SUCCESS;
+}
+
+void ElementWrapper::FireEvent(IHTMLDOMNode* fireEventOn, LPCWSTR eventName)
+{
+	CComPtr<IDispatch> dispatch;
+	this->m_pElement->get_document(&dispatch);
+	CComQIPtr<IHTMLDocument4> doc(dispatch);
+
+	CComPtr<IHTMLEventObj> eventObject;
+	CComVariant empty;
+	doc->createEventObject(&empty, &eventObject);
+
+	CComVariant eventref;
+	V_VT(&eventref) = VT_DISPATCH;
+	V_DISPATCH(&eventref) = eventObject;
+
+	CComBSTR onChange(eventName);
+	VARIANT_BOOL cancellable;
+
+	CComQIPtr<IHTMLElement3> element3(fireEventOn);
+	element3->fireEvent(onChange, &eventref, &cancellable);
 }

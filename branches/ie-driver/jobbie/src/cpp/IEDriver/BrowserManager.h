@@ -20,6 +20,10 @@
 
 #define EVENT_NAME L"WD_START_EVENT"
 
+#define SPEED_SLOW "SLOW"
+#define SPEED_MEDIUM "MEDIUM"
+#define SPEED_FAST "FAST"
+
 using namespace std;
 
 extern "C"
@@ -62,6 +66,7 @@ public:
 	std::map<std::wstring, ElementFinder*> m_elementFinders;
 	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
 	int GetSpeed(void);
+	void SetSpeed(int speed);
 
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);
@@ -70,6 +75,9 @@ private:
 
 	void PopulateCommandHandlerRepository(void);
 	void PopulateElementFinderRepository(void);
+
+	int m_speed;
+	int m_implicitWaitTimeout;
 
 	WebDriverCommand *m_command;
 	std::wstring m_serializedResponse;

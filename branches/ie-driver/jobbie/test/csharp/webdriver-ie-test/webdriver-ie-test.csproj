@@ -66,6 +66,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\remote\client\src\csharp\webdriver-remote-client\WebDriver.Remote.csproj">
+      <Project>{32122F8D-CD64-495A-B9B0-5516FF67C79F}</Project>
+      <Name>WebDriver.Remote</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\remote\common\src\csharp\webdriver-remote-common\WebDriver.Remote.Common.csproj">
+      <Project>{C2A1DAE4-BB20-4367-8ADC-D32EEA392D17}</Project>
+      <Name>WebDriver.Remote.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\csharp\webdriver-ie\WebDriver.IE.csproj">
       <Project>{388643B5-2270-4E89-99CC-DA761E4E4AC1}</Project>
       <Name>WebDriver.IE</Name>

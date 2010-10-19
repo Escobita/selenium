@@ -16,8 +16,10 @@ int ElementFinder::FindElement(BrowserManager *pManager, ElementWrapper *pParent
 	statusCode = this->getParentElement(pManager, pParentWrapper, &pParentElement);
 	if (statusCode == SUCCESS)
 	{
+		BrowserWrapper *pBrowser;
+		pManager->GetCurrentBrowser(&pBrowser);
 		CComPtr<IHTMLElement> pElement;
-		statusCode = this->FindElementInternal(pManager, pParentElement, criteria, &pElement);
+		statusCode = this->FindElementInternal(pBrowser, pParentElement, criteria, &pElement);
 		if (statusCode == SUCCESS)
 		{
 			ElementWrapper *wrapper = new ElementWrapper(pElement);
@@ -35,8 +37,10 @@ int ElementFinder::FindElements(BrowserManager *pManager, ElementWrapper *pParen
 	statusCode = this->getParentElement(pManager, pParentWrapper, &pParentElement);
 	if (statusCode == SUCCESS)
 	{
+		BrowserWrapper *pBrowser;
+		pManager->GetCurrentBrowser(&pBrowser);
 		std::vector<IHTMLElement*> rawElements;
-		statusCode = this->FindElementsInternal(pManager, pParentElement, criteria, &rawElements);
+		statusCode = this->FindElementsInternal(pBrowser, pParentElement, criteria, &rawElements);
 		std::vector<IHTMLElement*>::iterator begin = rawElements.begin();
 		std::vector<IHTMLElement*>::iterator end = rawElements.end();
 		for (std::vector<IHTMLElement*>::iterator it = begin; it != end; ++it)
@@ -49,12 +53,12 @@ int ElementFinder::FindElements(BrowserManager *pManager, ElementWrapper *pParen
 	return statusCode;
 }
 
-int ElementFinder::FindElementInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+int ElementFinder::FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 {
 	return ENOSUCHELEMENT;
 }
 
-int ElementFinder::FindElementsInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+int ElementFinder::FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 {
 	return ENOSUCHELEMENT;
 }
@@ -146,40 +150,6 @@ bool ElementFinder::isUnder(const IHTMLDOMNode* root, IHTMLElement* child)
 {
 	CComQIPtr<IHTMLDOMNode> childNode(child);
 	return isOrUnder(root, child) && root != childNode;
-}
-
-std::wstring ElementFinder::convertVariantToWString(CComVariant toConvert) 
-{
-	VARTYPE type = toConvert.vt;
-	std::wstringstream toReturn;
-
-	switch(type) 
-	{
-		case VT_BOOL:
-			toReturn << (toConvert.boolVal == VARIANT_TRUE ? L"true" : L"false");
-			break;
-
-		case VT_BSTR:
-			toReturn << (LPCWSTR)toConvert.bstrVal;
-			break;
-
-		case VT_I4:
-			toReturn << toConvert.lVal;
-			break;
-
-		case VT_EMPTY:
-			break;
-
-		case VT_NULL:
-			// TODO(shs96c): This should really return NULL.
-			break;
-
-		// This is lame
-		case VT_DISPATCH:
-			break;
-	}
-
-	return toReturn.str();
 }
 
 std::wstring ElementFinder::StripTrailingWhitespace(std::wstring input)

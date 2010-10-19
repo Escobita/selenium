@@ -7,22 +7,44 @@
 #include "FindByPartialLinkTextElementFinder.h"
 #include "FindByTagNameElementFinder.h"
 #include "ClickElementCommandHandler.h"
+#include "ClearElementCommandHandler.h"
 #include "CloseWindowCommandHandler.h"
+#include "DragElementCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
+#include "FindChildElementCommandHandler.h"
+#include "FindChildElementsCommandHandler.h"
 #include "FindElementCommandHandler.h"
 #include "FindElementsCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
 #include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
+#include "GetElementAttributeCommandHandler.h"
+#include "GetElementLocationCommandHandler.h"
+#include "GetElementLocationOnceScrolledIntoViewCommandHandler.h"
+#include "GetElementSizeCommandHandler.h"
 #include "GetElementTagNameCommandHandler.h"
+#include "GetElementTextCommandHandler.h"
+#include "GetElementValueCommandHandler.h"
+#include "GetElementValueOfCssPropertyCommandHandler.h"
 #include "GetSessionCapabilitiesCommandHandler.h"
+#include "GetSpeedCommandHandler.h"
 #include "GetPageSourceCommandHandler.h"
 #include "GetTitleCommandHandler.h"
+#include "GoBackCommandHandler.h"
+#include "GoForwardCommandHandler.h"
 #include "GoToUrlCommandHandler.h"
+#include "HoverOverElementCommandHandler.h"
+#include "IsElementDisplayedCommandHandler.h"
+#include "IsElementEnabledCommandHandler.h"
+#include "IsElementSelectedCommandHandler.h"
 #include "NewSessionCommandHandler.h"
 #include "SendKeysCommandHandler.h"
+#include "SetSpeedCommandHandler.h"
+#include "SetElementSelectedCommandHandler.h"
+#include "SubmitElementCommandHandler.h"
 #include "SwitchToFrameCommandHandler.h"
 #include "SwitchToWindowCommandHandler.h"
+#include "ToggleElementCommandHandler.h"
 #include "QuitCommandHandler.h"
 
 LRESULT BrowserManager::OnInit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -57,6 +79,8 @@ LRESULT BrowserManager::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	this->m_factory = new BrowserFactory;
 	this->m_command = new WebDriverCommand;
 	this->m_serializedResponse = L"";
+	this->m_speed = 0;
+	this->m_implicitWaitTimeout = 0;
 	return 0;
 }
 
@@ -136,6 +160,8 @@ DWORD WINAPI BrowserManager::ThreadProc(LPVOID lpParameter)
 void BrowserManager::DispatchCommand()
 {
 	WebDriverResponse response;
+	std::string sessionId(CW2A(this->m_managerId.c_str()));
+	response.m_sessionId = sessionId;
 	if (this->m_commandHandlerRepository.find(this->m_command->m_commandValue) == this->m_commandHandlerRepository.end())
 	{
 		response.m_statusCode = 501;
@@ -168,7 +194,12 @@ void BrowserManager::AddWrapper(BrowserWrapper *wrapper)
 
 int BrowserManager::GetSpeed()
 {
-	return 0;
+	return this->m_speed;
+}
+
+void BrowserManager::SetSpeed(int speed)
+{
+	this->m_speed = speed;
 }
 
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
@@ -211,6 +242,10 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::SwitchToWindow] = new SwitchToWindowCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SwitchToFrame] = new SwitchToFrameCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Get] = new GoToUrlCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GoForward] = new GoForwardCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GoBack] = new GoBackCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetSpeed] = new GetSpeedCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::SetSpeed] = new SetSpeedCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::NewSession] = new NewSessionCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Close] = new CloseWindowCommandHandler;
@@ -221,7 +256,25 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::ExecuteScript] = new ExecuteScriptCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElement] = new FindElementCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElements] = new FindElementsCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::FindChildElement] = new FindChildElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::FindChildElements] = new FindChildElementsCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetElementTagName] = new GetElementTagNameCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementLocation] = new GetElementLocationCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementSize] = new GetElementSizeCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementLocationOnceScrolledIntoView] = new GetElementLocationOnceScrolledIntoViewCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementAttribute] = new GetElementAttributeCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementText] = new GetElementTextCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementValueOfCssProperty] = new GetElementValueOfCssPropertyCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetElementValue] = new GetElementValueCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::ClickElement] = new ClickElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ClearElement] = new ClearElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::SubmitElement] = new SubmitElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ToggleElement] = new ToggleElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::HoverOverElement] = new HoverOverElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::DragElement] = new DragElementCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::SetElementSelected] = new SetElementSelectedCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::IsElementDisplayed] = new IsElementDisplayedCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::IsElementSelected] = new IsElementSelectedCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::IsElementEnabled] = new IsElementEnabledCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SendKeysToElement] = new SendKeysCommandHandler;
 }

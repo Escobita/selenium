@@ -15,7 +15,7 @@ public:
 	}
 
 protected:
-	int FindElementInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+	int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		if (!node) 
@@ -68,7 +68,7 @@ protected:
 				continue;
 			}
 
-			if (wcscmp(this->convertVariantToWString(value).c_str(), criteria.c_str()) == 0 && this->isOrUnder(node, element)) 
+			if (wcscmp(pBrowser->ConvertVariantToWString(&value).c_str(), criteria.c_str()) == 0 && this->isOrUnder(node, element)) 
 			{
 				element.CopyTo(ppElement);
 				return SUCCESS;
@@ -78,7 +78,7 @@ protected:
 		return ENOSUCHELEMENT;
 	}
 
-	int FindElementsInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+	int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		if (!node) 
@@ -132,7 +132,7 @@ protected:
 				continue;
 			}
 
-			if (wcscmp(this->convertVariantToWString(value).c_str(), criteria.c_str()) == 0 && this->isOrUnder(node, element)) 
+			if (wcscmp(pBrowser->ConvertVariantToWString(&value).c_str(), criteria.c_str()) == 0 && this->isOrUnder(node, element)) 
 			{
 				IHTMLElement *pDom = NULL;
 				element.CopyTo(&pDom);

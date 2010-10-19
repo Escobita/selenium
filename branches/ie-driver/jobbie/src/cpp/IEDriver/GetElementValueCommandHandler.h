@@ -1,22 +1,22 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class GetElementValueCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	GetElementValueCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~GetElementValueCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void GetElementValueCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
@@ -25,6 +25,7 @@ protected:
 		}
 		else
 		{
+			std::wstring text(L"");
 			int statusCode = SUCCESS;
 			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
 
@@ -36,7 +37,13 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
+				std::wstring value;
+				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, L"value", &value);
+				if (statusCode == SUCCESS)
+				{
+					std::string valueStr(CW2A(value.c_str()));
+					response->m_value = valueStr;
+				}
 			}
 
 			response->m_statusCode = statusCode;

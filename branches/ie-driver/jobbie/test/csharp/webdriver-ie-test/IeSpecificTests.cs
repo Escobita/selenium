@@ -18,19 +18,19 @@ namespace OpenQA.Selenium
             }
         }
 
-        [Test]
-        public void ShouldSwitchBrowserVisibility()
-        {
-            /* 
-             * This way we can be sure the visibility
-             * is switched at least once
-             */
-            ((InternetExplorerDriver)driver).Visible = true;
-            Assert.IsTrue(((InternetExplorerDriver)driver).Visible);
-            ((InternetExplorerDriver)driver).Visible = false;
-            Assert.IsFalse(((InternetExplorerDriver)driver).Visible);
-            ((InternetExplorerDriver)driver).Visible = true;
-            Assert.IsTrue(((InternetExplorerDriver)driver).Visible);
-        }
+        //[Test]
+        //public void ShouldSwitchBrowserVisibility()
+        //{
+        //    /* 
+        //     * This way we can be sure the visibility
+        //     * is switched at least once
+        //     */
+        //    ((InternetExplorerDriver)driver).Visible = true;
+        //    Assert.IsTrue(((InternetExplorerDriver)driver).Visible);
+        //    ((InternetExplorerDriver)driver).Visible = false;
+        //    Assert.IsFalse(((InternetExplorerDriver)driver).Visible);
+        //    ((InternetExplorerDriver)driver).Visible = true;
+        //    Assert.IsTrue(((InternetExplorerDriver)driver).Visible);
+        //}
     }
 }

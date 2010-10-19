@@ -17,14 +17,13 @@ public:
 	int FindElements(BrowserManager *pManager, ElementWrapper *pParentWrapper, std::wstring criteria, std::vector<ElementWrapper*> *pFoundElements);
 
 protected:
-	virtual int FindElementInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement);
-	virtual int FindElementsInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements);
+	virtual int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement);
+	virtual int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements);
 	void getHtmlDocument3(BrowserManager *pManager, IHTMLDocument3 **ppDoc3);
 	void extractHtmlDocument2FromDomNode(const IHTMLDOMNode* pExtractionNode, IHTMLDocument2** ppDoc);
 	void extractHtmlDocument3FromDomNode(const IHTMLDOMNode* pExtractionNode, IHTMLDocument3** ppDoc);
 	bool isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
 	bool isUnder(const IHTMLDOMNode* root, IHTMLElement* child);
-	std::wstring convertVariantToWString(CComVariant toConvert);
 	std::wstring StripTrailingWhitespace(std::wstring input);
 
 private:

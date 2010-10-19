@@ -15,8 +15,9 @@ public:
 	}
 protected:
 
-	void ExecuteScriptCommandHandler::PopulateArgumentArray(SAFEARRAY * args, Json::Value jsonArgs)
+	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, SAFEARRAY * args, Json::Value jsonArgs)
 	{
+		int statusCode = SUCCESS;
 		for (UINT argIndex = 0; argIndex < jsonArgs.size(); ++argIndex)
 		{
 			LONG index = (LONG)argIndex;
@@ -25,7 +26,7 @@ protected:
 			{
 				std::wstring value(CA2W(arg.asString().c_str()));
 				CComVariant destStr(value.c_str());
-				SafeArrayPutElement(args, &index, &destStr);
+				::SafeArrayPutElement(args, &index, &destStr);
 			}
 			else if (arg.isInt())
 			{
@@ -33,7 +34,7 @@ protected:
 				VARIANT destInt;
 				destInt.vt = VT_I4;
 				destInt.lVal = (LONG) intNumber;	
-				SafeArrayPutElement(args, &index, &destInt);
+				::SafeArrayPutElement(args, &index, &destInt);
 			}
 			else if (arg.isDouble())
 			{
@@ -41,7 +42,7 @@ protected:
 				VARIANT destDbl;
 				destDbl.vt = VT_R8;
 				destDbl.lVal = (LONG) dblNumber;	
-				SafeArrayPutElement(args, &index, &destDbl);
+				::SafeArrayPutElement(args, &index, &destDbl);
 			}
 			else if (arg.isBool())
 			{
@@ -49,13 +50,25 @@ protected:
 				VARIANT destBool;
 				destBool.vt = VT_BOOL;
 				destBool.boolVal = boolArg;
-				SafeArrayPutElement(args, &index, &destBool);
+				::SafeArrayPutElement(args, &index, &destBool);
 			}
 			else if (arg.isObject() && arg.isMember("ELEMENT"))
 			{
-				// TODO: unwrap and populate.
+				std::wstring elementId(CA2W(arg["ELEMENT"].asString().c_str()));
+
+				ElementWrapper *pElementWrapper;
+				statusCode = this->GetElement(manager, elementId, &pElementWrapper);
+				if (statusCode == SUCCESS)
+				{
+					VARIANT destDisp;
+					destDisp.vt = VT_DISPATCH;
+					destDisp.pdispVal = pElementWrapper->m_pElement;
+					::SafeArrayPutElement(args, &index, &destDisp);
+				}
 			}
 		}
+
+		return statusCode;
 	}
 
 	int ConvertScriptResult(CComVariant result, Json::Value *value)
@@ -142,12 +155,14 @@ protected:
 			bounds.lLbound = 0;
 			args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
 
-			this->PopulateArgumentArray(args, commandParameters["args"]);
+			this->PopulateArgumentArray(manager, args, commandParameters["args"]);
 
 			CComVariant result;
 			BrowserWrapper *pWrapper;
 			manager->GetCurrentBrowser(&pWrapper);
 			int statusCode = pWrapper->ExecuteScript(&script, args, &result);
+			::SafeArrayDestroy(args);
+
 			if (statusCode != SUCCESS)
 			{
 				response->m_statusCode = statusCode;

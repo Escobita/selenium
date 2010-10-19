@@ -1,22 +1,22 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class HoverOverElementCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	HoverOverElementCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~HoverOverElementCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void HoverOverElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
@@ -36,9 +36,8 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
+				statusCode = pElementWrapper->Hover(hwnd);
 			}
-
 			response->m_statusCode = statusCode;
 		}
 	}

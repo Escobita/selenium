@@ -1,22 +1,22 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class IsElementEnabledCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	IsElementEnabledCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~IsElementEnabledCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void IsElementEnabledCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
@@ -30,13 +30,12 @@ protected:
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
-			HWND hwnd = pBrowserWrapper->GetHwnd();
 
 			ElementWrapper *pElementWrapper;
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
+				response->m_value = pElementWrapper->IsEnabled();
 			}
 
 			response->m_statusCode = statusCode;

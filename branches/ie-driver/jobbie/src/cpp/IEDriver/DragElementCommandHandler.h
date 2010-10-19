@@ -1,32 +1,45 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class DragElementCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	DragElementCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~DragElementCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void DragElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
 			response->m_statusCode = 400;
 			response->m_value = "id";
 		}
+		else if (commandParameters.find("x") == commandParameters.end())
+		{
+			response->m_statusCode = 400;
+			response->m_value = "x";
+		}
+		else if (commandParameters.find("y") == commandParameters.end())
+		{
+			response->m_statusCode = 400;
+			response->m_value = "y";
+		}
 		else
 		{
 			int statusCode = SUCCESS;
 			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+
+			int x = commandParameters["x"].asInt();
+			int y = commandParameters["y"].asInt();
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
@@ -36,9 +49,7 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
 			}
-
 			response->m_statusCode = statusCode;
 		}
 	}

@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfATL="1"
 			CharacterSet="1"
@@ -45,14 +45,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				MinimalRebuild="false"
+				ExceptionHandling="2"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -68,7 +69,10 @@
 				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				AssemblyDebug="1"
+				SubSystem="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -95,8 +99,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfATL="0"
 			CharacterSet="1"
@@ -120,12 +124,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				MinimalRebuild="false"
+				ExceptionHandling="2"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -143,7 +148,10 @@
 				AdditionalDependencies="ws2_32.lib Rpcrt4.lib version.lib iepmapi.lib comsuppw.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				AssemblyDebug="1"
+				SubSystem="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -170,8 +178,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -194,11 +202,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				EnableIntrinsicFunctions="false"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				ExceptionHandling="2"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -246,8 +255,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)build\intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -271,11 +280,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;"
+				EnableIntrinsicFunctions="false"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
+				ExceptionHandling="2"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
+				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -509,6 +519,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ClearElementCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ClickElementCommandHandler.h"
 				>
 			</File>
@@ -518,6 +532,10 @@
 			</File>
 			<File
 				RelativePath=".\CommandValues.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DragElementCommandHandler.h"
 				>
 			</File>
 			<File
@@ -561,6 +579,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FindChildElementCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FindChildElementsCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FindElementCommandHandler.h"
 				>
 			</File>
@@ -581,7 +607,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetElementAttributeCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementLocationCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementLocationOnceScrolledIntoViewCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementSizeCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GetElementTagNameCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementTextCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementValueCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GetElementValueOfCssPropertyCommandHandler.h"
 				>
 			</File>
 			<File
@@ -593,7 +647,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetSpeedCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GetTitleCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GoBackCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GoForwardCommandHandler.h"
 				>
 			</File>
 			<File
@@ -601,7 +667,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HoverOverElementCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IEDriverServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IsElementDisplayedCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IsElementEnabledCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IsElementSelectedCommandHandler.h"
 				>
 			</File>
 			<File
@@ -621,7 +703,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SetElementSelectedCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SetSpeedCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SubmitElementCommandHandler.h"
 				>
 			</File>
 			<File
@@ -634,6 +728,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ToggleElementCommandHandler.h"
 				>
 			</File>
 			<File

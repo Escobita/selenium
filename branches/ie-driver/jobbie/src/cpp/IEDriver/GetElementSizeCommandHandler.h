@@ -1,22 +1,22 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class GetElementSizeCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	GetElementSizeCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~GetElementSizeCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void GetElementSizeCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
@@ -36,7 +36,16 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
+				bool displayed;
+				statusCode = pElementWrapper->IsDisplayed(&displayed);
+				if (statusCode == SUCCESS)
+				{
+					long height, width;
+					pElementWrapper->m_pElement->get_offsetHeight(&height);
+					pElementWrapper->m_pElement->get_offsetWidth(&width);
+					response->m_value["width"] = width;
+					response->m_value["height"] = height;
+				}
 			}
 
 			response->m_statusCode = statusCode;

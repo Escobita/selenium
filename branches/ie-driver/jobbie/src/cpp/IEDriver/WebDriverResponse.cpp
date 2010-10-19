@@ -12,6 +12,7 @@ WebDriverResponse::WebDriverResponse(std::wstring json)
 	std::string input(CW2A(json.c_str()));
 	reader.parse(input, responseObject);
 	this->m_statusCode = responseObject["status"].asInt();
+	this->m_sessionId = responseObject["sessionId"].asString();
 	this->m_value = responseObject["value"];
 }
 
@@ -23,6 +24,7 @@ std::wstring WebDriverResponse::serialize(void)
 {
 	Json::Value jsonObject;
 	jsonObject["status"] = m_statusCode;
+	jsonObject["sessionId"] = m_sessionId;
 	jsonObject["value"] = m_value;
 	Json::FastWriter writer;
 	std::string output(writer.write(jsonObject));

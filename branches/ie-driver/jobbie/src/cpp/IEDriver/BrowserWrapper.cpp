@@ -214,6 +214,113 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	return SUCCESS;
 }
 
+std::wstring BrowserWrapper::GetTitle()
+{
+	CComPtr<IHTMLDocument2> pDoc;
+	GetDocument(&pDoc);
+
+	if (!pDoc) 
+	{
+		return L"";
+	}
+
+	CComBSTR title;
+	HRESULT hr = pDoc->get_title(&title);
+	if (FAILED(hr))
+	{
+		//LOGHR(WARN, hr) << "Unable to get document title";
+		return L"";
+	}
+
+	std::wstring titleStr = (BSTR)title;
+	return titleStr;
+}
+
+//int BrowserWrapper::GetElementAttribute(IHTMLElement *element, std::wstring attributeName, std::wstring *attributeValue)
+//{
+//	int statusCode = SUCCESS;
+//	std::wstring script(L"(function() { return function(){ ");
+//
+//	// Read in all the scripts
+//	for (int j = 0; WD_GET_ATTRIBUTE[j]; j++) {
+//		script += WD_GET_ATTRIBUTE[j];
+//		script += L"\n";
+//	}
+//
+//	// Now for the magic
+//	script += L"var element = arguments[0];\n";
+//	script += L"var attributeName = arguments[1];\n";
+//	script += L"return wdGetAttribute(element, attributeName);\n";
+//
+//	// Close things
+//	script += L"};})();";
+//
+//	SAFEARRAY *args;
+//	SAFEARRAYBOUND bounds;
+//	bounds.cElements = 2;
+//	bounds.lLbound = 0;
+//	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+//
+//	long argIndex(0);
+//	VARIANT varElement;
+//	varElement.vt = VT_DISPATCH;
+//	varElement.pdispVal = element;
+//	::SafeArrayPutElement(args, &argIndex, &varElement);
+//
+//	argIndex++;
+//	CComVariant varName(attributeName.c_str());
+//	::SafeArrayPutElement(args, &argIndex, &varName);
+//
+//	CComVariant scriptResult;
+//	statusCode = this->ExecuteScript(&script, args, &scriptResult);
+//	::SafeArrayDestroy(args);
+//
+//	if (statusCode != SUCCESS) 
+//	{
+//		return statusCode;
+//	}
+//
+//	if (scriptResult.vt != VT_EMPTY && scriptResult.vt != VT_NULL)
+//	{
+//		*attributeValue = this->ConvertVariantToWString(&scriptResult);
+//	}
+//
+//	return SUCCESS;
+//}
+//
+std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
+{
+	VARTYPE type = toConvert->vt;
+
+	switch(type)
+	{
+		case VT_BOOL:
+			return toConvert->boolVal == VARIANT_TRUE ? L"true" : L"false";
+
+		case VT_BSTR:
+			return (BSTR)toConvert->bstrVal;
+    
+		case VT_I4:
+			{
+				wchar_t *buffer = (wchar_t *)malloc(sizeof(wchar_t) * MAX_DIGITS_OF_NUMBER);
+				_i64tow_s(toConvert->lVal, buffer, MAX_DIGITS_OF_NUMBER, BASE_TEN_BASE);
+				return buffer;
+			}
+
+	    case VT_EMPTY:
+			return L"";
+
+		case VT_NULL:
+			// TODO(shs96c): This should really return NULL.
+			return L"";
+
+		// This is lame
+		case VT_DISPATCH:
+			return L"";
+	}
+	return L"";
+}
+
 bool BrowserWrapper::getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* pAdded)
 {
 	CComPtr<IDispatch> scriptEngine;

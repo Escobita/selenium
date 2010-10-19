@@ -1,22 +1,22 @@
 #pragma once
 #include "BrowserManager.h"
 
-class ClickElementCommandHandler :
+class GetElementLocationOnceScrolledIntoViewCommandHandler :
 	public WebDriverCommandHandler
 {
 public:
 
-	ClickElementCommandHandler(void)
+	GetElementLocationOnceScrolledIntoViewCommandHandler(void)
 	{
 	}
 
-	virtual ~ClickElementCommandHandler(void)
+	virtual ~GetElementLocationOnceScrolledIntoViewCommandHandler(void)
 	{
 	}
 
 protected:
 
-	void ClickElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void GetElementLocationOnceScrolledIntoViewCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
 	{
 		if (locatorParameters.find("id") == locatorParameters.end())
 		{
@@ -36,7 +36,13 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				statusCode = pElementWrapper->Click(hwnd);
+				long x, y, width, height;
+				statusCode = pElementWrapper->GetLocationOnceScrolledIntoView(hwnd, &x, &y, &width, &height);
+				if (statusCode == SUCCESS)
+				{
+					response->m_value["x"] = x;
+					response->m_value["y"] = y;
+				}
 			}
 
 			response->m_statusCode = statusCode;

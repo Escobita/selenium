@@ -15,13 +15,10 @@ public:
 	}
 
 protected:
-	int FindElementInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+	int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 	{
 		// Will use getElementsByTagName to get the elements,
 		// so need the root document pointer for an IHTMLDocument3/
-		BrowserWrapper *pBrowser;
-		pManager->GetCurrentBrowser(&pBrowser);
-
 		CComPtr<IHTMLDocument2> pDoc;
 		pBrowser->GetDocument(&pDoc);
 
@@ -82,13 +79,10 @@ protected:
 		return ENOSUCHELEMENT;
 	}
 
-	int FindElementsInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+	int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 	{
 		// Will use getElementsByTagName to get the elements,
 		// so need the root document pointer for an IHTMLDocument3
-		BrowserWrapper *pBrowser;
-		pManager->GetCurrentBrowser(&pBrowser);
-
 		CComPtr<IHTMLDocument2> pDoc;
 		pBrowser->GetDocument(&pDoc);
 

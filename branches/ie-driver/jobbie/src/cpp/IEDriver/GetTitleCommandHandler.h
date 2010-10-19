@@ -21,26 +21,8 @@ protected:
 	{
 		BrowserWrapper *pWrapper;
 		manager->GetCurrentBrowser(&pWrapper);
+		std::string title(CW2A(pWrapper->GetTitle().c_str()));
 
-		CComPtr<IHTMLDocument2> pDoc;
-		pWrapper->GetDocument(&pDoc);
-
-		if (!pDoc) 
-		{
-			response->m_value = "";
-			return;
-		}
-
-		CComBSTR title;
-		HRESULT hr = pDoc->get_title(&title);
-		if (FAILED(hr))
-		{
-			//LOGHR(WARN, hr) << "Unable to get document title";
-			response->m_value = "";
-			return;
-		}
-
-		std::string titleStr = CW2A((LPCWSTR)title);
-		response->m_value = titleStr;
+		response->m_value = title;
 	}
 };

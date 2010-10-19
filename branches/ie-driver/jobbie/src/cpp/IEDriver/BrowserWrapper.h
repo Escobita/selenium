@@ -14,6 +14,15 @@
 
 #define WAIT_TIME_IN_MILLISECONDS 200
 
+#define SCRIPT_ARGTYPE_STRING 0
+#define SCRIPT_ARGTYPE_INT 1
+#define SCRIPT_ARGTYPE_DOUBLE 2
+#define SCRIPT_ARGTYPE_BOOL 3
+#define SCRIPT_ARGTYPE_ELEMENT 4
+
+#define BASE_TEN_BASE 10
+#define MAX_DIGITS_OF_NUMBER 22
+
 using namespace std;
 
 class BrowserWrapper :
@@ -67,13 +76,16 @@ public:
 	void Wait(void);
 	void GetDocument(IHTMLDocument2 **ppDoc);
 	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
-	HWND GetHwnd();
+	HWND GetHwnd(void);
+	//int GetElementAttribute(IHTMLElement *element, std::wstring attributeName, std::wstring *attributeValue);
+	std::wstring GetTitle(void);
 
 	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
 	bool m_navStarted;
 	bool m_pendingWait;
 	std::wstring m_pathToFrame;
+	std::wstring ConvertVariantToWString(VARIANT *toConvert);
 
 private:
 	HWND m_hwnd;
