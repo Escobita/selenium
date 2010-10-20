@@ -15,7 +15,7 @@ public:
 	}
 
 protected:
-	int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+	int FindByLinkTextElementFinder::FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		CComQIPtr<IHTMLElement2> element2(pParentElement);
@@ -75,7 +75,7 @@ protected:
 		return ENOSUCHELEMENT;
 	}
 
-	int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+	int FindByLinkTextElementFinder::FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		CComQIPtr<IHTMLElement2> element2(pParentElement);

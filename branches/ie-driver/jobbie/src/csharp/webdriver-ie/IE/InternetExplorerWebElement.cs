@@ -23,11 +23,25 @@ namespace OpenQA.Selenium.IE
     /// }
     /// </code>
     /// </example>
-    public class InternetExplorerWebElement : RenderedRemoteWebElement
+    public class InternetExplorerWebElement : RenderedRemoteWebElement, IFindsByCssSelector
     {
         InternetExplorerWebElement(InternetExplorerDriver parent, string id)
             : base(parent, id)
         {
         }
+
+        #region IFindsByCssSelector Members
+
+        public IWebElement FindElementByCssSelector(string cssSelector)
+        {
+            return FindElement("css selector", cssSelector);
+        }
+
+        public ReadOnlyCollection<IWebElement> FindElementsByCssSelector(string cssSelector)
+        {
+            return FindElements("css selector", cssSelector);
+        }
+
+        #endregion
     }
 }

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace OpenQA.Selenium.IE
 {
-    public class InternetExplorerDriver : RemoteWebDriver
+    public class InternetExplorerDriver : RemoteWebDriver, IFindsByCssSelector
     {
         private const int ServerPort = 5555;
 
@@ -35,5 +35,19 @@ namespace OpenQA.Selenium.IE
         {
             StopServer(nativeServer);
         }
+
+        #region IFindsByCssSelector Members
+
+        public IWebElement FindElementByCssSelector(string cssSelector)
+        {
+            return FindElement("css selector", cssSelector);
+        }
+
+        public ReadOnlyCollection<IWebElement> FindElementsByCssSelector(string cssSelector)
+        {
+            return FindElements("css selector", cssSelector);
+        }
+
+        #endregion
     }
 }

@@ -1,11 +1,13 @@
 #include "StdAfx.h"
 #include "BrowserManager.h"
 #include "FindByClassNameElementFinder.h"
+#include "FindByCssSelectorElementFinder.h"
 #include "FindByIdElementFinder.h"
 #include "FindByLinkTextElementFinder.h"
 #include "FindByNameElementFinder.h"
 #include "FindByPartialLinkTextElementFinder.h"
 #include "FindByTagNameElementFinder.h"
+#include "FindByXPathElementFinder.h"
 #include "ClickElementCommandHandler.h"
 #include "ClearElementCommandHandler.h"
 #include "CloseWindowCommandHandler.h"
@@ -232,6 +234,8 @@ void BrowserManager::PopulateElementFinderRepository(void)
 	this->m_elementFinders[L"link text"] = new FindByLinkTextElementFinder;
 	this->m_elementFinders[L"partial link text"] = new FindByPartialLinkTextElementFinder;
 	this->m_elementFinders[L"class name"] = new FindByClassNameElementFinder;
+	this->m_elementFinders[L"xpath"] = new FindByXPathElementFinder;
+	this->m_elementFinders[L"css selector"] = new FindByCssSelectorElementFinder;
 }
 
 void BrowserManager::PopulateCommandHandlerRepository()

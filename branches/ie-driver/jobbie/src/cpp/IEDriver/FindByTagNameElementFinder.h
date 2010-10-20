@@ -15,7 +15,7 @@ public:
 	}
 
 protected:
-	int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+	int FindByTagNameElementFinder::FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 	{
 		// Will use getElementsByTagName to get the elements,
 		// so need the root document pointer for an IHTMLDocument3/
@@ -79,7 +79,7 @@ protected:
 		return ENOSUCHELEMENT;
 	}
 
-	int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+	int FindByTagNameElementFinder::FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 	{
 		// Will use getElementsByTagName to get the elements,
 		// so need the root document pointer for an IHTMLDocument3

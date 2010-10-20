@@ -29,6 +29,9 @@ DWORD BrowserFactory::LaunchBrowserProcess(int port)
 	}
 	else
 	{
+		// Expressly use IELaunchURL, which will guarantee a new session.
+		// Simply using CoCreateInstance to create the browser will merge
+		// sessions, making separate cookie handling impossible.
 		::IELaunchURL(initialUrl.c_str(), &procInfo, NULL);
 	}
 
