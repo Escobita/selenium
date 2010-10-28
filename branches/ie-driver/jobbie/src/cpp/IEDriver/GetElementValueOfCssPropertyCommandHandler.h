@@ -196,6 +196,10 @@ protected:
 				std::string propertyValue(CW2A(value.c_str()));
 				response->m_value = propertyValue;
 			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
+			}
 			response->m_statusCode = statusCode;
 		}
 	}

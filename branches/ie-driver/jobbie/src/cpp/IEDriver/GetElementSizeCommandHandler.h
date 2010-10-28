@@ -47,6 +47,10 @@ protected:
 					response->m_value["height"] = height;
 				}
 			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
+			}
 
 			response->m_statusCode = statusCode;
 		}

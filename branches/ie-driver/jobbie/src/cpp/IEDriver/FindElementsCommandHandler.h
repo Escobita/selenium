@@ -37,10 +37,13 @@ protected:
 			int statusCode = pFinder->FindElements(manager, NULL, value, &foundElements);
 			if (statusCode == SUCCESS)
 			{
+				Json::Value elementArray(Json::arrayValue);
 				for (int i = 0; i < foundElements.size(); ++i)
 				{
-					response->m_value[i] = foundElements[i]->ConvertToJson();
+					elementArray[i] = foundElements[i]->ConvertToJson();
 				}
+
+				response->m_value = elementArray;
 			}
 
 			response->m_statusCode = statusCode;

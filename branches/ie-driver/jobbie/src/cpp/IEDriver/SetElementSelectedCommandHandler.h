@@ -42,6 +42,7 @@ protected:
 				if (!pElementWrapper->IsEnabled())
 				{
 					statusCode = EELEMENTNOTENABLED;
+					response->m_value["message"] = "Cannot select disabled element";
 				}
 				else
 				{
@@ -50,17 +51,17 @@ protected:
 					if (statusCode != SUCCESS || !displayed) 
 					{
 						statusCode = EELEMENTNOTDISPLAYED;
+						response->m_value["message"] = "Cannot select hidden element";
 					}
 					else
 					{
-						// Assume falure.
-						statusCode = EELEMENTNOTSELECTED;
 						/* TODO(malcolmr): Why not: if (isSelected()) return; ? Do we really need to
 						   re-set 'checked=true' for checkbox and do effectively nothing for select?
 						   Maybe we should check for disabled elements first? */
 
 						if (pElementWrapper->IsCheckBox()) {
 							statusCode = SUCCESS;
+							response->m_value = Json::Value::null;
 							if (!pElementWrapper->IsSelected()) {
 								pElementWrapper->Click(hwnd);
 							}
@@ -108,9 +109,18 @@ protected:
 									pElementWrapper->FireEvent(parent, L"onchange");
 								}
 							}
+							else
+							{
+								statusCode = EELEMENTNOTSELECTED;
+								response->m_value["message"] = "Element type not selectable";
+							}
 						}
 					}
 				}
+			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
 			}
 
 			response->m_statusCode = statusCode;

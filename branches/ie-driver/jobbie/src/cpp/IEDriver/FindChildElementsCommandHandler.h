@@ -48,14 +48,21 @@ protected:
 			if (statusCode == SUCCESS)
 			{
 				std::vector<ElementWrapper *> foundElements;
-				int statusCode = pFinder->FindElements(manager, pParentElementWrapper, value, &foundElements);
+				statusCode = pFinder->FindElements(manager, pParentElementWrapper, value, &foundElements);
 				if (statusCode == SUCCESS)
 				{
+					Json::Value elementArray(Json::arrayValue);
 					for (int i = 0; i < foundElements.size(); ++i)
 					{
-						response->m_value[i] = foundElements[i]->ConvertToJson();
+						elementArray[i] = foundElements[i]->ConvertToJson();
 					}
+
+					response->m_value = elementArray;
 				}
+			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
 			}
 
 			response->m_statusCode = statusCode;

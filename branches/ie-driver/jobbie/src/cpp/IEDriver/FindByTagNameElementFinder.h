@@ -69,7 +69,7 @@ protected:
 			}
 
 			// Check to see if the element is contained return if it is
-			if (this->isOrUnder(node, pParentElement))
+			if (this->isOrUnder(node, element))
 			{
 				element.CopyTo(ppElement);
 				return SUCCESS;

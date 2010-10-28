@@ -53,6 +53,10 @@ protected:
 					response->m_value = elementText;
 				}
 			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
+			}
 
 			response->m_statusCode = statusCode;
 		}

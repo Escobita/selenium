@@ -39,7 +39,19 @@ protected:
 			Json::Value keyArray(commandParameters["value"]);
 			for (int i = 0; i < keyArray.size(); ++i )
 			{
-				keys.append(CA2W(keyArray[i].asString().c_str()));
+				std::string key(keyArray[i].asString());
+				if (key.length() > 1)
+				{
+					int outputBufferSize = ::MultiByteToWideChar(CP_UTF8, 0, &key.c_str()[0], -1, NULL, 0);
+					vector<TCHAR> outputBuffer(outputBufferSize);
+					::MultiByteToWideChar(CP_UTF8, 0, &key.c_str()[0], -1, &outputBuffer[0], outputBufferSize);
+					std::wstring wideChar = &outputBuffer[0];
+					keys.append(wideChar);
+				}
+				else
+				{
+					keys.append(CA2W(key.c_str()));
+				}
 			}
 
 			BrowserWrapper *pBrowserWrapper;
@@ -49,77 +61,83 @@ protected:
 			ElementWrapper *pElementWrapper;
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 
-			bool displayed;
-			statusCode = pElementWrapper->IsDisplayed(&displayed);
-			if (statusCode != SUCCESS || !displayed)
+			if (statusCode == SUCCESS)
 			{
-				response->m_statusCode = EELEMENTNOTDISPLAYED;
-				return;
-			}
-
-			if (!pElementWrapper->IsEnabled())
-			{
-				response->m_statusCode = EELEMENTNOTDISPLAYED;
-				return;
-			}
-
-			CComQIPtr<IHTMLElement> element(pElementWrapper->m_pElement);
-			//checkValidDOM(element);
-
-			//const HWND hWnd = getHwnd();
-			//const HWND ieWindow = getIeServerWindow(hWnd);
-
-			//keyboardData keyData;
-			//keyData.main = hWnd;  // IE's main window
-			//keyData.hwnd = ieWindow;
-			//keyData.text = newValue;
-
-			element->scrollIntoView(CComVariant(VARIANT_TRUE));
-
-			//CComQIPtr<IHTMLInputFileElement> file(element);
-			//if (file) {
-			//	DWORD threadId;
-			//	tryTransferEventReleaserToNotifyNavigCompleted(&SC);
-			//	keyData.hdl_EventToNotifyWhenNavigationCompleted = m_EventToNotifyWhenNavigationCompleted;
-			//	::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) setFileValue, (void *) &keyData, 0, &threadId);
-
-			//	element->click();
-			//	// We're now blocked until the dialog closes.
-			//	return;
-			//}
-
-			CComQIPtr<IHTMLElement2> element2(element);
-			element2->focus();
-
-			// Check we have focused the element.
-			CComPtr<IDispatch> dispatch;
-			element->get_document(&dispatch);
-			CComQIPtr<IHTMLDocument2> document(dispatch);
-
-			bool hasFocus = false;
-			clock_t maxWait = clock() + 1000;
-			for (int i = clock(); i < maxWait; i = clock())
-			{
-				wait(1);
-				CComPtr<IHTMLElement> activeElement;
-				if (document->get_activeElement(&activeElement) == S_OK)
+				bool displayed;
+				statusCode = pElementWrapper->IsDisplayed(&displayed);
+				if (statusCode != SUCCESS || !displayed)
 				{
-					CComQIPtr<IHTMLElement2> activeElement2(activeElement);
-					if (element2.IsEqualObject(activeElement2))
+					response->m_statusCode = EELEMENTNOTDISPLAYED;
+					return;
+				}
+
+				if (!pElementWrapper->IsEnabled())
+				{
+					response->m_statusCode = EELEMENTNOTDISPLAYED;
+					return;
+				}
+
+				CComQIPtr<IHTMLElement> element(pElementWrapper->m_pElement);
+				//checkValidDOM(element);
+
+				//const HWND hWnd = getHwnd();
+				//const HWND ieWindow = getIeServerWindow(hWnd);
+
+				//keyboardData keyData;
+				//keyData.main = hWnd;  // IE's main window
+				//keyData.hwnd = ieWindow;
+				//keyData.text = newValue;
+
+				element->scrollIntoView(CComVariant(VARIANT_TRUE));
+
+				//CComQIPtr<IHTMLInputFileElement> file(element);
+				//if (file) {
+				//	DWORD threadId;
+				//	tryTransferEventReleaserToNotifyNavigCompleted(&SC);
+				//	keyData.hdl_EventToNotifyWhenNavigationCompleted = m_EventToNotifyWhenNavigationCompleted;
+				//	::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) setFileValue, (void *) &keyData, 0, &threadId);
+
+				//	element->click();
+				//	// We're now blocked until the dialog closes.
+				//	return;
+				//}
+
+				CComQIPtr<IHTMLElement2> element2(element);
+				element2->focus();
+
+				// Check we have focused the element.
+				CComPtr<IDispatch> dispatch;
+				element->get_document(&dispatch);
+				CComQIPtr<IHTMLDocument2> document(dispatch);
+
+				bool hasFocus = false;
+				clock_t maxWait = clock() + 1000;
+				for (int i = clock(); i < maxWait; i = clock())
+				{
+					wait(1);
+					CComPtr<IHTMLElement> activeElement;
+					if (document->get_activeElement(&activeElement) == S_OK)
 					{
-						hasFocus = true;
-						break;
+						CComQIPtr<IHTMLElement2> activeElement2(activeElement);
+						if (element2.IsEqualObject(activeElement2))
+						{
+							hasFocus = true;
+							break;
+						}
 					}
 				}
-			}
 
-			if (!hasFocus)
+				if (!hasFocus)
+				{
+					//cerr << "We don't have focus on element." << endl;
+				}
+
+				sendKeys(hwnd, keys.c_str(), manager->GetSpeed());
+			}
+			else
 			{
-				//cerr << "We don't have focus on element." << endl;
+				response->m_value["message"] = "Element is no longer valid";
 			}
-
-			sendKeys(hwnd, keys.c_str(), manager->GetSpeed());
-
 			response->m_statusCode = statusCode;
 		}
 	}

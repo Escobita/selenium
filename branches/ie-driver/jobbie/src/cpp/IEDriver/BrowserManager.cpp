@@ -41,8 +41,9 @@
 #include "IsElementSelectedCommandHandler.h"
 #include "NewSessionCommandHandler.h"
 #include "SendKeysCommandHandler.h"
-#include "SetSpeedCommandHandler.h"
 #include "SetElementSelectedCommandHandler.h"
+#include "SetImplicitWaitTimeoutCommandHandler.h"
+#include "SetSpeedCommandHandler.h"
 #include "SubmitElementCommandHandler.h"
 #include "SwitchToFrameCommandHandler.h"
 #include "SwitchToWindowCommandHandler.h"
@@ -208,10 +209,13 @@ void BrowserManager::DispatchCommand()
 
 		BrowserWrapper *pWrapper;
 		this->GetCurrentBrowser(&pWrapper);
-		this->m_wait = pWrapper->m_waitRequired;
-		if (this->m_wait)
+		if (pWrapper)
 		{
-			::PostMessage(this->m_hWnd, WD_WAIT, NULL, NULL);
+			this->m_wait = pWrapper->m_waitRequired;
+			if (this->m_wait)
+			{
+				::PostMessage(this->m_hWnd, WD_WAIT, NULL, NULL);
+			}
 		}
 	}
 
@@ -244,6 +248,16 @@ int BrowserManager::GetSpeed()
 void BrowserManager::SetSpeed(int speed)
 {
 	this->m_speed = speed;
+}
+
+int BrowserManager::GetImplicitWaitTimeout()
+{
+	return this->m_implicitWaitTimeout;
+}
+
+void BrowserManager::SetImplicitWaitTimeout(int timeout)
+{
+	this->m_implicitWaitTimeout = timeout;
 }
 
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
@@ -292,6 +306,7 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GoBack] = new GoBackCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetSpeed] = new GetSpeedCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SetSpeed] = new SetSpeedCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ImplicitlyWait] = new SetImplicitWaitTimeoutCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::NewSession] = new NewSessionCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::Close] = new CloseWindowCommandHandler;

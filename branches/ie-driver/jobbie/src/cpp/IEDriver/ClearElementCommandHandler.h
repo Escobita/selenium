@@ -71,6 +71,10 @@ protected:
 					::SendMessageTimeoutW(hwnd, WM_SETTEXT, 0, (LPARAM) L"", SMTO_ABORTIFHUNG, 3000, (PDWORD_PTR)&lr);
 				}
 			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
+			}
 
 			response->m_statusCode = statusCode;
 		}

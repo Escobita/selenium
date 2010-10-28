@@ -39,6 +39,10 @@ protected:
 			{
 				response->m_value = pFoundElement->ConvertToJson();
 			}
+			else
+			{
+				response->m_value["message"] = "No element found";
+			}
 
 			response->m_statusCode = statusCode;
 		}

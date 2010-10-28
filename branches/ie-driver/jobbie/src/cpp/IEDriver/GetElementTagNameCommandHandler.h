@@ -37,6 +37,10 @@ protected:
 				std::string returnValue(CW2A(tagName.c_str()));
 				response->m_value = returnValue;
 			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
+			}
 
 			response->m_statusCode = statusCode;
 		}

@@ -71,8 +71,12 @@ public:
 	std::map<std::wstring, ElementWrapper*> m_knownElements;
 	std::map<std::wstring, ElementFinder*> m_elementFinders;
 	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
+
 	int GetSpeed(void);
 	void SetSpeed(int speed);
+
+	int GetImplicitWaitTimeout(void);
+	void SetImplicitWaitTimeout(int timeout);
 
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);

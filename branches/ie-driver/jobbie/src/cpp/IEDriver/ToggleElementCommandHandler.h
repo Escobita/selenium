@@ -49,12 +49,21 @@ protected:
 				if ((tagName != L"OPTION") && !pElementWrapper->IsCheckBox()) 
 				{
 					response->m_statusCode = ENOTIMPLEMENTED;
+					response->m_value["message"] = "cannot toggle element that is not an option or check box";
 					return;
 				}
 
 				int statusCode = pElementWrapper->Click(hwnd);
 				if (statusCode == SUCCESS || statusCode != EELEMENTNOTDISPLAYED) {
 					response->m_statusCode = statusCode;
+					if (statusCode == SUCCESS)
+					{
+						response->m_value = pElementWrapper->IsSelected();
+					}
+					else
+					{
+						response->m_value["message"] = "cannot toggle element";
+					}
 					return;
 				} 
 
@@ -102,7 +111,12 @@ protected:
 
 					pElementWrapper->FireEvent(parent, L"onchange");
 					statusCode = SUCCESS;
+					response->m_value = pElementWrapper->IsSelected();
 				}
+			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
 			}
 
 			response->m_statusCode = statusCode;

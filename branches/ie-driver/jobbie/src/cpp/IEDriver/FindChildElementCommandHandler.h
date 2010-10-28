@@ -48,11 +48,19 @@ protected:
 			if (statusCode == SUCCESS)
 			{
 				ElementWrapper *pFoundElement;
-				int statusCode = pFinder->FindElement(manager, pParentElementWrapper, value, &pFoundElement);
+				statusCode = pFinder->FindElement(manager, pParentElementWrapper, value, &pFoundElement);
 				if (statusCode == SUCCESS)
 				{
 					response->m_value = pFoundElement->ConvertToJson();
 				}
+				else
+				{
+					response->m_value["message"] = "No element found";
+				}
+			}
+			else
+			{
+				response->m_value["message"] = "Element is no longer valid";
 			}
 
 			response->m_statusCode = statusCode;
