@@ -12,17 +12,7 @@ WebDriverCommandHandler::~WebDriverCommandHandler(void)
 
 void WebDriverCommandHandler::Execute(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse *response)
 {
-	if (!this->m_ignorePreExecutionWait)
-	{
-		//manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
-	}
-
 	this->ExecuteInternal(manager, locatorParameters, commandParameters, response);
-
-	if (!this->m_ignorePostExecutionWait)
-	{
-		//manager->m_trackedBrowsers[manager->m_currentBrowser].Wait();
-	}
 }
 
 void WebDriverCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string,std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse *response)
@@ -54,7 +44,7 @@ int WebDriverCommandHandler::GetElement(BrowserManager *manager, std::wstring el
 			}
 
 			CComPtr<IHTMLElement> next;
-			parent->get_parentElement(&next);
+			HRESULT hr = parent->get_parentElement(&next);
 			parent = next;
 		}
 	}

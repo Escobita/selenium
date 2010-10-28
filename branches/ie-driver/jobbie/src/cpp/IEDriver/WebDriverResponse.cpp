@@ -20,7 +20,7 @@ WebDriverResponse::~WebDriverResponse(void)
 {
 }
 
-std::wstring WebDriverResponse::serialize(void)
+std::wstring WebDriverResponse::Serialize(void)
 {
 	Json::Value jsonObject;
 	jsonObject["status"] = m_statusCode;

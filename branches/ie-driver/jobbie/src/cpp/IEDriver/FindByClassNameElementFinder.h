@@ -13,7 +13,9 @@ public:
 	virtual ~FindByClassNameElementFinder(void)
 	{
 	}
-	int FindByClassNameElementFinder::FindElementInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
+
+protected:
+	int FindByClassNameElementFinder::FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		if (!node) 
@@ -87,7 +89,7 @@ public:
 		return ENOSUCHELEMENT;
 	}
 
-	int FindByClassNameElementFinder::FindElementsInternal(BrowserManager *pManager, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
+	int FindByClassNameElementFinder::FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements)
 	{
 		CComQIPtr<IHTMLDOMNode> node(pParentElement);
 		if (!node) 

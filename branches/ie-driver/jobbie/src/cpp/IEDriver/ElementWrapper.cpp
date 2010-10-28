@@ -5,7 +5,7 @@
 #include "atoms.h"
 #include "interactions.h"
 
-ElementWrapper::ElementWrapper(CComPtr<IHTMLElement> element)
+ElementWrapper::ElementWrapper(IHTMLElement *element)
 {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.

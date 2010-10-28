@@ -25,7 +25,7 @@ namespace OpenQA.Selenium.IE
     /// </example>
     public class InternetExplorerWebElement : RenderedRemoteWebElement, IFindsByCssSelector
     {
-        InternetExplorerWebElement(InternetExplorerDriver parent, string id)
+        public InternetExplorerWebElement(InternetExplorerDriver parent, string id)
             : base(parent, id)
         {
         }

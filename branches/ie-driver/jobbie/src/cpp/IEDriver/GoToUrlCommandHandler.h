@@ -8,8 +8,6 @@ public:
 
 	GoToUrlCommandHandler(void)
 	{
-		this->m_ignorePreExecutionWait = false;
-		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~GoToUrlCommandHandler(void)
@@ -34,10 +32,7 @@ protected:
 			CComVariant dummy;
 
 			HRESULT hr = pWrapper->m_pBrowser->Navigate2(&pVarUrl, &dummy, &dummy, &dummy, &dummy);
-			while (!pWrapper->m_pendingWait)
-			{
-				::Sleep(WAIT_TIME_IN_MILLISECONDS);
-			}
+			pWrapper->m_waitRequired = true;
 
 			pWrapper->m_pathToFrame = L"";
 			response->m_statusCode = SUCCESS;

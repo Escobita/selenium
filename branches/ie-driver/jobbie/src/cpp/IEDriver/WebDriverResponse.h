@@ -13,5 +13,5 @@ public:
 	int m_statusCode;
 	std::string m_sessionId;
 	Json::Value m_value;
-	std::wstring serialize(void);
+	std::wstring Serialize(void);
 };

@@ -19,8 +19,6 @@ public:
 	void Execute(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response);
 
 protected:
-	bool m_ignorePreExecutionWait;
-	bool m_ignorePostExecutionWait;
 	virtual void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response);
 	int GetElement(BrowserManager *manager, std::wstring elementId, ElementWrapper **ppElementWrapper);
 };

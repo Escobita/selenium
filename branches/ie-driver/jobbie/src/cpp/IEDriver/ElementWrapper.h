@@ -9,10 +9,10 @@ class BrowserWrapper;
 class ElementWrapper
 {
 public:
-	ElementWrapper(CComPtr<IHTMLElement> element);
+	ElementWrapper(IHTMLElement *element);
 	virtual ~ElementWrapper(void);
 	std::wstring m_elementId;
-	CComPtr<IHTMLElement> m_pElement;
+	IHTMLElement *m_pElement;
 	Json::Value ConvertToJson(void);
 	int GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y, long *width, long *height);
 	int GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, std::wstring *attributeValue);

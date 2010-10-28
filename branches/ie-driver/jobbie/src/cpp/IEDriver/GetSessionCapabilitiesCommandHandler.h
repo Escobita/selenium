@@ -8,8 +8,6 @@ public:
 
 	GetSessionCapabilitiesCommandHandler(void)
 	{
-		this->m_ignorePreExecutionWait = true;
-		this->m_ignorePostExecutionWait = true;
 	}
 
 	virtual ~GetSessionCapabilitiesCommandHandler(void)

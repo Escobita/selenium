@@ -48,6 +48,16 @@ namespace OpenQA.Selenium.IE
             return FindElements("css selector", cssSelector);
         }
 
+        /// <summary>
+        /// Creates a <see cref="RemoteWebElement"/> with the specified ID.
+        /// </summary>
+        /// <param name="elementId">The ID of this element.</param>
+        /// <returns>A <see cref="RemoteWebElement"/> with the specified ID. For the FirefoxDriver this will be a <see cref="FirefoxWebElement"/>.</returns>
+        protected override RemoteWebElement CreateElement(string elementId)
+        {
+            return new InternetExplorerWebElement(this, elementId);
+        }
+
         #endregion
     }
 }

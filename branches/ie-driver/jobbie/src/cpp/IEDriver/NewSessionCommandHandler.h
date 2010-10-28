@@ -8,8 +8,6 @@ public:
 
 	NewSessionCommandHandler(void)
 	{
-		this->m_ignorePreExecutionWait = true;
-		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~NewSessionCommandHandler(void)

@@ -18,6 +18,8 @@ BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, Browser
 
 	::RpcStringFree(&pszUuid);
 
+	this->m_waitRequired = false;
+	this->m_navStarted = false;
 	this->m_factory = factory;
 	this->m_hwnd = hwnd;
 	this->m_pBrowser = browser;
@@ -26,24 +28,6 @@ BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, Browser
 
 BrowserWrapper::~BrowserWrapper(void)
 {
-}
-
-void BrowserWrapper::Wait()
-{
-	int errorCode = SUCCESS;
-	UINT64 waitStartTime = this->getTime();
-	while (this->m_pendingWait && errorCode == SUCCESS)
-	{
-		errorCode = this->waitInternal(waitStartTime);
-	}
-
-	// If we did not successfully complete our wait
-	// (for example, due to a timeout) reset the pending
-	// wait flag.
-	if (errorCode != SUCCESS)
-	{
-		this->m_pendingWait = false;
-	}
 }
 
 void BrowserWrapper::GetDocument(IHTMLDocument2 **ppDoc)
@@ -123,7 +107,7 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	// Grab the "call" method out of the returned function
 	DISPID callid;
 	OLECHAR FAR* szCallMember = L"call";
-    hr = tempFunction.pdispVal->GetIDsOfNames(IID_NULL, &szCallMember, 1, LOCALE_USER_DEFAULT, &callid);
+	hr = tempFunction.pdispVal->GetIDsOfNames(IID_NULL, &szCallMember, 1, LOCALE_USER_DEFAULT, &callid);
 	if (FAILED(hr))
 	{
 		if (added) 
@@ -159,13 +143,13 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	VariantCopy(&(vargs[nargs]), &CComVariant(win));
 
 	long index;
-    for (int i = 0; i < nargs; i++)
-    {
+	for (int i = 0; i < nargs; i++)
+	{
 		index = i;
 		CComVariant v;
 		SafeArrayGetElement(args, &index, (void*) &v);
 		VariantCopy(&(vargs[nargs - 1 - i]), &v);
-    }
+	}
 
 	callParameters.rgvarg = vargs;
 
@@ -204,6 +188,17 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 		wcout << _bstr_t(exception.bstrDescription) << endl;
 	}
 
+	// If the script returned an IHTMLElement, we need to copy it to make it valid.
+	if( VT_DISPATCH == result->vt )
+	{
+		CComQIPtr<IHTMLElement> element(result->pdispVal);
+		if(element)
+		{
+			IHTMLElement* &pDom = * (IHTMLElement**) &(result->pdispVal);
+			element.CopyTo(&pDom);
+		}
+	}
+
 	if (added) 
 	{ 
 		removeScript(doc); 
@@ -236,58 +231,6 @@ std::wstring BrowserWrapper::GetTitle()
 	return titleStr;
 }
 
-//int BrowserWrapper::GetElementAttribute(IHTMLElement *element, std::wstring attributeName, std::wstring *attributeValue)
-//{
-//	int statusCode = SUCCESS;
-//	std::wstring script(L"(function() { return function(){ ");
-//
-//	// Read in all the scripts
-//	for (int j = 0; WD_GET_ATTRIBUTE[j]; j++) {
-//		script += WD_GET_ATTRIBUTE[j];
-//		script += L"\n";
-//	}
-//
-//	// Now for the magic
-//	script += L"var element = arguments[0];\n";
-//	script += L"var attributeName = arguments[1];\n";
-//	script += L"return wdGetAttribute(element, attributeName);\n";
-//
-//	// Close things
-//	script += L"};})();";
-//
-//	SAFEARRAY *args;
-//	SAFEARRAYBOUND bounds;
-//	bounds.cElements = 2;
-//	bounds.lLbound = 0;
-//	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
-//
-//	long argIndex(0);
-//	VARIANT varElement;
-//	varElement.vt = VT_DISPATCH;
-//	varElement.pdispVal = element;
-//	::SafeArrayPutElement(args, &argIndex, &varElement);
-//
-//	argIndex++;
-//	CComVariant varName(attributeName.c_str());
-//	::SafeArrayPutElement(args, &argIndex, &varName);
-//
-//	CComVariant scriptResult;
-//	statusCode = this->ExecuteScript(&script, args, &scriptResult);
-//	::SafeArrayDestroy(args);
-//
-//	if (statusCode != SUCCESS) 
-//	{
-//		return statusCode;
-//	}
-//
-//	if (scriptResult.vt != VT_EMPTY && scriptResult.vt != VT_NULL)
-//	{
-//		*attributeValue = this->ConvertVariantToWString(&scriptResult);
-//	}
-//
-//	return SUCCESS;
-//}
-//
 std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
 {
 	VARTYPE type = toConvert->vt;
@@ -298,8 +241,13 @@ std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
 			return toConvert->boolVal == VARIANT_TRUE ? L"true" : L"false";
 
 		case VT_BSTR:
+			if (!toConvert->bstrVal)
+			{
+				return L"";
+			}
+			
 			return (BSTR)toConvert->bstrVal;
-    
+	
 		case VT_I4:
 			{
 				wchar_t *buffer = (wchar_t *)malloc(sizeof(wchar_t) * MAX_DIGITS_OF_NUMBER);
@@ -307,7 +255,7 @@ std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
 				return buffer;
 			}
 
-	    case VT_EMPTY:
+		case VT_EMPTY:
 			return L"";
 
 		case VT_NULL:
@@ -327,7 +275,7 @@ bool BrowserWrapper::getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* 
 	pDoc->get_Script(&scriptEngine);
 
 	OLECHAR FAR* evalName = L"eval";
-    HRESULT hr = scriptEngine->GetIDsOfNames(IID_NULL, &evalName, 1, LOCALE_USER_DEFAULT, pEvalId);
+	HRESULT hr = scriptEngine->GetIDsOfNames(IID_NULL, &evalName, 1, LOCALE_USER_DEFAULT, pEvalId);
 	if (FAILED(hr)) {
 		*pAdded = true;
 		// Start the script engine by adding a script tag to the page
@@ -366,7 +314,7 @@ bool BrowserWrapper::createAnonymousFunction(IDispatch* pScriptEngine, DISPID ev
 {
 	CComVariant script_variant(script->c_str());
 	DISPPARAMS parameters = {0};
-    memset(&parameters, 0, sizeof parameters);
+	memset(&parameters, 0, sizeof parameters);
 	parameters.cArgs      = 1;
 	parameters.rgvarg     = &script_variant;
 	parameters.cNamedArgs = 0;
@@ -675,16 +623,7 @@ HWND BrowserWrapper::GetHwnd()
 void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
 VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
 {
-	std::cout << "BeforeNavigate2\r\n";
-	//if (this->m_pNavDisp.p == NULL)
-	//{
-	//	this->m_navStarted = true;
-	//	this->m_pNavDisp.Attach(pObject);
-	//	if (!this->m_pendingWait)
-	//	{
-	//		this->m_pendingWait = true;
-	//	}
-	//}
+	// std::cout << "BeforeNavigate2\r\n";
 }
 
 void __stdcall BrowserWrapper::OnQuit()
@@ -702,11 +641,9 @@ void __stdcall BrowserWrapper::NewWindow3(IDispatch **ppDisp, VARIANT_BOOL * pbC
 
 void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)
 {
-	std::cout << "DocumentComplete\r\n";
-	//if (this->m_pNavDisp.p != NULL && this->m_pNavDisp.IsEqualObject(pDisp))
-	//{
-	//	this->m_pNavDisp.Detach();
-	//}
+	// Flag the browser as navigation having started.
+	// std::cout << "DocumentComplete\r\n";
+	this->m_navStarted = true;
 }
 
 void BrowserWrapper::attachEvents()
@@ -723,10 +660,143 @@ void BrowserWrapper::detachEvents()
 	HRESULT hr = this->DispEventUnadvise(pUnk);
 }
 
-int BrowserWrapper::waitInternal(UINT64 waitStartTime)
+bool BrowserWrapper::Wait()
 {
-	this->m_pendingWait = false;
-	return SUCCESS;
+	bool isNavigating(true);
+
+	//std::cout << "Navigate Events Completed.\r\n";
+	this->m_navStarted = false;
+
+	// Navigate events completed. Waiting for browser.Busy != false...
+	isNavigating = this->m_navStarted;
+	VARIANT_BOOL isBusy(VARIANT_FALSE);
+	HRESULT hr = this->m_pBrowser->get_Busy(&isBusy);
+	if (isNavigating || FAILED(hr) || isBusy)
+	{
+		//std::cout << "Browser busy property is true.\r\n";
+		return false;
+	}
+
+	// Waiting for browser.ReadyState == READYSTATE_COMPLETE...;
+	isNavigating = this->m_navStarted;
+	READYSTATE readyState;
+	hr = this->m_pBrowser->get_ReadyState(&readyState);
+	if (isNavigating || FAILED(hr) || readyState != READYSTATE_COMPLETE)
+	{
+		//std::cout << "readyState is not 'Complete'.\r\n";
+		return false;
+	}
+
+	// Waiting for document property != null...
+	isNavigating = this->m_navStarted;
+	CComQIPtr<IDispatch> ppDisp;
+	hr = this->m_pBrowser->get_Document(&ppDisp);
+	if (isNavigating && FAILED(hr) && !ppDisp)
+	{
+		//std::cout << "Get Document failed.\r\n";
+		return false;
+	}
+
+	// Waiting for document to complete...
+	CComPtr<IHTMLDocument2> pDoc;
+	hr = ppDisp->QueryInterface(&pDoc);
+	if (SUCCEEDED(hr))
+	{
+		isNavigating = this->isDocumentNavigating(pDoc);
+	}
+
+	if (!isNavigating)
+	{
+		this->m_waitRequired = false;
+	}
+
+	return !isNavigating;
+}
+
+bool BrowserWrapper::isDocumentNavigating(IHTMLDocument2 *pDoc)
+{
+	bool isNavigating(true);
+	// Starting WaitForDocumentComplete()
+	isNavigating = this->m_navStarted;
+	CComBSTR readyState;
+	HRESULT hr = pDoc->get_readyState(&readyState);
+	if (FAILED(hr) || isNavigating || _wcsicmp(readyState, L"complete") != 0)
+	{
+		//std::cout << "readyState is not complete\r\n";
+		return true;
+	}
+	else
+	{
+		isNavigating = false;
+	}
+
+	// document.readyState == complete
+	isNavigating = this->m_navStarted;
+	CComPtr<IHTMLFramesCollection2> frames;
+	hr = pDoc->get_frames(&frames);
+	if (isNavigating || FAILED(hr))
+	{
+		//std::cout << "could not get frames\r\n";
+		return true;
+	}
+
+	if (frames != NULL)
+	{
+		long frameCount = 0;
+		hr = frames->get_length(&frameCount);
+
+		CComVariant index;
+		index.vt = VT_I4;
+		for (long i = 0; i < frameCount; ++i)
+		{
+			// Waiting on each frame
+			index.lVal = i;
+			CComVariant result;
+			hr = frames->item(&index, &result);
+			if (FAILED(hr))
+			{
+				return true;
+			}
+
+			CComQIPtr<IHTMLWindow2> window(result.pdispVal);
+			if (!window)
+			{
+				// Frame is not an HTML frame.
+				continue;
+			}
+
+			CComPtr<IHTMLDocument2> frameDocument;
+			hr = window->get_document(&frameDocument);
+			if (hr == E_ACCESSDENIED)
+			{
+				// Cross-domain documents may throw Access Denied. If so,
+				// get the document through the IWebBrowser2 interface.
+				CComPtr<IWebBrowser2> frameBrowser;
+				CComQIPtr<IServiceProvider> pServiceProvider(window);
+				hr = pServiceProvider->QueryService(IID_IWebBrowserApp, &frameBrowser);
+				if (SUCCEEDED(hr))
+				{
+					CComQIPtr<IDispatch> frameDocDisp;
+					hr = frameBrowser->get_Document(&frameDocDisp);
+					hr = frameDocDisp->QueryInterface(&frameDocument);
+				}
+			}
+
+			isNavigating = this->m_navStarted;
+			if (isNavigating)
+			{
+				break;
+			}
+
+			// Recursively call to wait for the frame document to complete
+			isNavigating = this->isDocumentNavigating(frameDocument);
+			if (isNavigating)
+			{
+				break;
+			}
+		}
+	}
+	return isNavigating;
 }
 
 int BrowserWrapper::getElapsedMilliseconds(UINT64 startTime)
@@ -737,14 +807,14 @@ int BrowserWrapper::getElapsedMilliseconds(UINT64 startTime)
 
 UINT64 BrowserWrapper::getTime() 
 { 
-    SYSTEMTIME st; 
-    GetSystemTime(&st); 
+	SYSTEMTIME st; 
+	GetSystemTime(&st); 
  
-    FILETIME ft; 
-    SystemTimeToFileTime(&st, &ft);  // converts to file time format 
-    ULARGE_INTEGER ui; 
-    ui.LowPart=ft.dwLowDateTime; 
-    ui.HighPart=ft.dwHighDateTime; 
+	FILETIME ft; 
+	SystemTimeToFileTime(&st, &ft);  // converts to file time format 
+	ULARGE_INTEGER ui; 
+	ui.LowPart=ft.dwLowDateTime; 
+	ui.HighPart=ft.dwHighDateTime; 
  
-    return ui.QuadPart; 
+	return ui.QuadPart; 
 } 

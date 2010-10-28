@@ -96,12 +96,12 @@ protected:
 			CComQIPtr<IHTMLElement> curr(disp);
 			if (curr)
 			{
-				CComVariant value;
-				if (!SUCCEEDED(curr->getAttribute(CComBSTR(L"id"), 0, &value))) 
+				CComVariant currElementIdValue;
+				if (!SUCCEEDED(curr->getAttribute(CComBSTR(L"id"), 0, &currElementIdValue))) 
 				{
 					continue;
 				}
-				if (wcscmp(pBrowser->ConvertVariantToWString(&value).c_str(), criteria.c_str())==0) 
+				if (wcscmp(pBrowser->ConvertVariantToWString(&currElementIdValue).c_str(), criteria.c_str())==0) 
 				{
 					if (this->isOrUnder(node, curr)) 
 					{

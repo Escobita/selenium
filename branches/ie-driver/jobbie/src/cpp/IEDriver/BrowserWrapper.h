@@ -12,8 +12,6 @@
 #include <exdisp.h>
 #include <mshtml.h>
 
-#define WAIT_TIME_IN_MILLISECONDS 200
-
 #define SCRIPT_ARGTYPE_STRING 0
 #define SCRIPT_ARGTYPE_INT 1
 #define SCRIPT_ARGTYPE_DOUBLE 2
@@ -68,30 +66,28 @@ public:
 	END_SINK_MAP()
 
 	STDMETHOD_(void, BeforeNavigate2)(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags,
-        VARIANT * pvarTargetFrame, VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel);
-    STDMETHOD_(void, DocumentComplete)(IDispatch *pDisp,VARIANT *URL);
+		VARIANT * pvarTargetFrame, VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel);
+	STDMETHOD_(void, DocumentComplete)(IDispatch *pDisp,VARIANT *URL);
 	STDMETHOD_(void, OnQuit)();
 	STDMETHOD_(void, NewWindow3)(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
 
-	void Wait(void);
+	bool Wait(void);
 	void GetDocument(IHTMLDocument2 **ppDoc);
 	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
 	HWND GetHwnd(void);
-	//int GetElementAttribute(IHTMLElement *element, std::wstring attributeName, std::wstring *attributeValue);
+	bool m_waitRequired;
 	std::wstring GetTitle(void);
 
-	CComPtr<IDispatch> m_pNavDisp;
 	CComPtr<IWebBrowser2> m_pBrowser;
-	bool m_navStarted;
-	bool m_pendingWait;
 	std::wstring m_pathToFrame;
 	std::wstring ConvertVariantToWString(VARIANT *toConvert);
 
 private:
 	HWND m_hwnd;
+	bool m_navStarted;
 	void attachEvents(void);
 	void detachEvents(void);
-	int waitInternal(UINT64 waitStartTime);
+	bool isDocumentNavigating(IHTMLDocument2 *pDoc);
 	UINT64 getTime(void);
 	int getElapsedMilliseconds(UINT64 startTime);
 	void findCurrentFrameWindow(IHTMLWindow2 **ppWindow);

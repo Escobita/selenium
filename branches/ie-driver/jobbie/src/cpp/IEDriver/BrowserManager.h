@@ -17,6 +17,9 @@
 #define WD_EXEC_COMMAND WM_APP + 3
 #define WD_GET_RESPONSE_LENGTH WM_APP + 4
 #define WD_GET_RESPONSE WM_APP + 5
+#define WD_WAIT WM_APP + 6
+
+#define WAIT_TIME_IN_MILLISECONDS 300
 
 #define EVENT_NAME L"WD_START_EVENT"
 
@@ -45,6 +48,7 @@ public:
 		MESSAGE_HANDLER(WD_EXEC_COMMAND, OnExecCommand)
 		MESSAGE_HANDLER(WD_GET_RESPONSE_LENGTH, OnGetResponseLength)
 		MESSAGE_HANDLER(WD_GET_RESPONSE, OnGetResponse)
+		MESSAGE_HANDLER(WD_WAIT, OnWait)
 	END_MSG_MAP()
 
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -54,10 +58,12 @@ public:
 	LRESULT OnExecCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnGetResponseLength(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnWait(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	std::wstring m_managerId;
 	int m_port;
 	static DWORD WINAPI ThreadProc(LPVOID lpParameter);
+	static DWORD WINAPI WaitThreadProc(LPVOID lpParameter);
 	BrowserFactory *m_factory;
 	void AddWrapper(BrowserWrapper* wrapper);
 	std::wstring m_currentBrowser;
@@ -84,5 +90,6 @@ private:
 	int m_newBrowserEventId;
 	int m_browserQuittingEventId;
 	std::map<int, WebDriverCommandHandler*> m_commandHandlerRepository;
+	bool m_wait;
 };
 }

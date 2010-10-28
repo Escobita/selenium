@@ -12,13 +12,13 @@ ElementFinder::~ElementFinder(void)
 int ElementFinder::FindElement(BrowserManager *pManager, ElementWrapper *pParentWrapper, std::wstring criteria, ElementWrapper **ppFoundElement)
 {
 	int statusCode(SUCCESS);
-	CComPtr<IHTMLElement> pParentElement;
+	IHTMLElement *pParentElement;
 	statusCode = this->getParentElement(pManager, pParentWrapper, &pParentElement);
 	if (statusCode == SUCCESS)
 	{
 		BrowserWrapper *pBrowser;
 		pManager->GetCurrentBrowser(&pBrowser);
-		CComPtr<IHTMLElement> pElement;
+		IHTMLElement *pElement;
 		statusCode = this->FindElementInternal(pBrowser, pParentElement, criteria, &pElement);
 		if (statusCode == SUCCESS)
 		{
@@ -33,7 +33,7 @@ int ElementFinder::FindElement(BrowserManager *pManager, ElementWrapper *pParent
 int ElementFinder::FindElements(BrowserManager *pManager, ElementWrapper *pParentWrapper, std::wstring criteria, std::vector<ElementWrapper*> *pFoundElements)
 {
 	int statusCode(SUCCESS);
-	CComPtr<IHTMLElement> pParentElement;
+	IHTMLElement *pParentElement;
 	statusCode = this->getParentElement(pManager, pParentWrapper, &pParentElement);
 	if (statusCode == SUCCESS)
 	{

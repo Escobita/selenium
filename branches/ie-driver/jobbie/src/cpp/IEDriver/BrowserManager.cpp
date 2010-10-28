@@ -111,7 +111,12 @@ LRESULT BrowserManager::OnExecCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
 LRESULT BrowserManager::OnGetResponseLength(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	return this->m_serializedResponse.size();
+	int responseLength(0);
+	if (!this->m_wait)
+	{
+		responseLength = this->m_serializedResponse.size();
+	}
+	return responseLength;
 }
 
 LRESULT BrowserManager::OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -123,6 +128,34 @@ LRESULT BrowserManager::OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	this->m_serializedResponse = L"";
 	return 0;
 }
+
+LRESULT BrowserManager::OnWait(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	BrowserWrapper *pBrowser;
+	this->GetCurrentBrowser(&pBrowser);
+	this->m_wait = !(pBrowser->Wait());
+	if (this->m_wait)
+	{
+		// If we are still waiting, we need to wait a bit then post a message to
+		// ourselves to run the wait again. However, we can't wait using Sleep()
+		// on this thread. This call happens in a message loop, and we would be 
+		// unable to process the COM events in the browser if we put this thread
+		// to sleep.
+		DWORD dwThreadId;
+		HANDLE hThread = ::CreateThread(NULL, 0, &BrowserManager::WaitThreadProc, (LPVOID)this->m_hWnd, 0, &dwThreadId);
+		::CloseHandle(hThread);
+	}
+	return 0;
+}
+
+DWORD WINAPI BrowserManager::WaitThreadProc(LPVOID lpParameter)
+{
+	HWND window_handle = (HWND)lpParameter;
+	::Sleep(WAIT_TIME_IN_MILLISECONDS);
+	::PostMessage(window_handle, WD_WAIT, NULL, NULL);
+	return 0;
+}
+
 
 DWORD WINAPI BrowserManager::ThreadProc(LPVOID lpParameter)
 {
@@ -170,10 +203,19 @@ void BrowserManager::DispatchCommand()
 	}
 	else
 	{
-		this->m_commandHandlerRepository[this->m_command->m_commandValue]->Execute(this, this->m_command->m_locatorParameters, this->m_command->m_commandParameters, &response);
+		WebDriverCommandHandler *commandToExecute = this->m_commandHandlerRepository[this->m_command->m_commandValue];
+		commandToExecute->Execute(this, this->m_command->m_locatorParameters, this->m_command->m_commandParameters, &response);
+
+		BrowserWrapper *pWrapper;
+		this->GetCurrentBrowser(&pWrapper);
+		this->m_wait = pWrapper->m_waitRequired;
+		if (this->m_wait)
+		{
+			::PostMessage(this->m_hWnd, WD_WAIT, NULL, NULL);
+		}
 	}
 
-	this->m_serializedResponse = response.serialize();
+	this->m_serializedResponse = response.Serialize();
 }
 
 int BrowserManager::GetCurrentBrowser(BrowserWrapper **ppWrapper)

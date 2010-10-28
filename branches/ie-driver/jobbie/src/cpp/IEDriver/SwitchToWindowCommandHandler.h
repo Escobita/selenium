@@ -8,8 +8,6 @@ public:
 
 	SwitchToWindowCommandHandler(void)
 	{
-		this->m_ignorePreExecutionWait = false;
-		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~SwitchToWindowCommandHandler(void)

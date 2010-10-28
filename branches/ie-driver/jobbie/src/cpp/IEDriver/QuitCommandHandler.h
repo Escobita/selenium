@@ -8,8 +8,6 @@ public:
 
 	QuitCommandHandler(void)
 	{
-		this->m_ignorePreExecutionWait = false;
-		this->m_ignorePostExecutionWait = false;
 	}
 
 	virtual ~QuitCommandHandler(void)
