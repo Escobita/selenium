@@ -17,6 +17,7 @@
 #include "FindChildElementsCommandHandler.h"
 #include "FindElementCommandHandler.h"
 #include "FindElementsCommandHandler.h"
+#include "GetActiveElementCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
 #include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
@@ -315,6 +316,7 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::GetPageSource] = new GetPageSourceCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::GetCurrentUrl] = new GetCurrentUrlCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::ExecuteScript] = new ExecuteScriptCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetActiveElement] = new GetActiveElementCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElement] = new FindElementCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindElements] = new FindElementsCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::FindChildElement] = new FindChildElementCommandHandler;

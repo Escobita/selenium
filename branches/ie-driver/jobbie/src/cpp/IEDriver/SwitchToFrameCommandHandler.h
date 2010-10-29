@@ -43,6 +43,7 @@ protected:
 		{
 			pWrapper->m_pathToFrame = L"";
 			response->m_statusCode = ENOSUCHFRAME;
+			response->m_value["message"] = "No frame found";
 		}
 		else
 		{

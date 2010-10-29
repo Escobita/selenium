@@ -595,6 +595,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GetActiveElementCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GetAllWindowHandlesCommandHandler.h"
 				>
 			</File>
