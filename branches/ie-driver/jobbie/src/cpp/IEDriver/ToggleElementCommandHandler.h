@@ -54,7 +54,8 @@ protected:
 				}
 
 				int statusCode = pElementWrapper->Click(hwnd);
-				if (statusCode == SUCCESS || statusCode != EELEMENTNOTDISPLAYED) {
+				if (statusCode == SUCCESS || statusCode != EELEMENTNOTDISPLAYED)
+				{
 					response->m_statusCode = statusCode;
 					if (statusCode == SUCCESS)
 					{
@@ -66,10 +67,17 @@ protected:
 					}
 					return;
 				} 
+				else
+				{
+					response->m_statusCode = statusCode;
+					response->m_value["message"] = "cannot toggle invisible element";
+					return;
+				}
 
 				if (tagName == L"OPTION") {
 					CComQIPtr<IHTMLOptionElement> option(pElementWrapper->m_pElement);
-					if (!option) {
+					if (!option) 
+					{
 						//LOG(ERROR) << "Cannot convert an element to an option, even though the tag name is right";
 						response->m_statusCode = ENOSUCHELEMENT;
 						return;
@@ -77,7 +85,8 @@ protected:
 
 					VARIANT_BOOL selected;
 					hr = option->get_selected(&selected);
-					if (FAILED(hr)) {
+					if (FAILED(hr))
+					{
 						//LOGHR(WARN, hr) << "Cannot tell whether or not the element is selected";
 						response->m_statusCode = ENOSUCHELEMENT;
 						return;
@@ -88,7 +97,8 @@ protected:
 					} else {
 						hr = option->put_selected(VARIANT_TRUE);
 					}
-					if (FAILED(hr)) {
+					if (FAILED(hr))
+					{
 						//LOGHR(WARN, hr) << "Failed to set selection";
 						response->m_statusCode = EEXPECTEDERROR;
 						return;
@@ -96,14 +106,16 @@ protected:
 
 					//Looks like we'll need to fire the event on the select element and not the option. Assume for now that the parent node is a select. Which is dumb
 					CComQIPtr<IHTMLDOMNode> node(pElementWrapper->m_pElement);
-					if (!node) {
+					if (!node)
+					{
 						//LOG(WARN) << "Current element is not an DOM node";
 						response->m_statusCode = ENOSUCHELEMENT;
 						return;
 					}
 					CComPtr<IHTMLDOMNode> parent;
 					hr = node->get_parentNode(&parent);
-					if (FAILED(hr)) {
+					if (FAILED(hr))
+					{
 						//LOGHR(WARN, hr) << "Cannot get parent node";
 						response->m_statusCode = ENOSUCHELEMENT;
 						return;

@@ -28,7 +28,7 @@ class BrowserWrapper :
 
 {
 public:
-	BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, BrowserFactory *factory);
+	BrowserWrapper(IWebBrowser2* browser, HWND hwnd, BrowserFactory *factory);
 	virtual ~BrowserWrapper(void);
 
 	std::wstring m_browserId;

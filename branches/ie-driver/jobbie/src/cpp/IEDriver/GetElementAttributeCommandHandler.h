@@ -41,10 +41,18 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				std::wstring value;
-				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, name, &value);
-				std::string attributeValue(CW2A(value.c_str()));
-				response->m_value = attributeValue;
+				CComVariant valueVariant;
+				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, name, &valueVariant);
+				if (valueVariant.vt != VT_EMPTY && valueVariant.vt != VT_NULL)
+				{
+					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
+					std::string valueStr(CW2A(value.c_str()));
+					response->m_value = valueStr;
+				}
+				else
+				{
+					response->m_value = Json::Value::null;
+				}
 			}
 			else
 			{

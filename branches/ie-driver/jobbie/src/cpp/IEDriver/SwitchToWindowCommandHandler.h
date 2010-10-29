@@ -20,17 +20,17 @@ protected:
 		CComPtr<IDispatch> dispatch;
 		HRESULT hr = browser->get_Document(&dispatch);
 		if (FAILED(hr)) {
-			return false;
+			return "";
 		}
 		CComQIPtr<IHTMLDocument2> doc(dispatch);
 		if (!doc) {
-			return false;
+			return "";
 		}
 
 		CComPtr<IHTMLWindow2> window;
 		hr = doc->get_parentWindow(&window);
 		if (FAILED(hr)) {
-			return false;
+			return "";
 		}
 
 		std::string name("");
@@ -75,13 +75,17 @@ protected:
 			if (foundBrowserHandle == L"")
 			{
 				response->m_statusCode = ENOSUCHWINDOW;
+				response->m_value["message"] = "No window found";
 			}
 			else
 			{
 				// Reset the path to the focused frame before switching window context.
 				BrowserWrapper *pWrapper;
-				manager->GetCurrentBrowser(&pWrapper);
-				pWrapper->m_pathToFrame = L"";
+				int statusCode = manager->GetCurrentBrowser(&pWrapper);
+				if (statusCode == SUCCESS)
+				{
+					pWrapper->m_pathToFrame = L"";
+				}
 
 				manager->m_currentBrowser = foundBrowserHandle;
 			}

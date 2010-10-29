@@ -37,10 +37,11 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				std::wstring value;
-				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, L"value", &value);
+				CComVariant valueVariant;
+				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, L"value", &valueVariant);
 				if (statusCode == SUCCESS)
 				{
+					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
 					std::string valueStr(CW2A(value.c_str()));
 					response->m_value = valueStr;
 				}

@@ -245,8 +245,8 @@ int IEDriverServer::lookupCommand(std::string uri, std::string httpVerb, std::ws
 				std::string param = paramStream.str();
 				std::wstring wideParam(param.begin(), param.end());
 				locator->append(wideParam);
+				break;
 			}
-			break;
 		}
 	}
 

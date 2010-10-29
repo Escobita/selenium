@@ -37,6 +37,10 @@ protected:
 			if (statusCode == SUCCESS)
 			{
 				statusCode = pElementWrapper->Click(hwnd);
+				if (statusCode != SUCCESS)
+				{
+					response->m_value["message"] = "Cannot click on element";
+				}
 			}
 			else
 			{

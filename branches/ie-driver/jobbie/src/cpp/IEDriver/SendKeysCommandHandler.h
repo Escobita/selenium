@@ -68,12 +68,14 @@ protected:
 				if (statusCode != SUCCESS || !displayed)
 				{
 					response->m_statusCode = EELEMENTNOTDISPLAYED;
+					response->m_value["message"] = "Element is not displayed";
 					return;
 				}
 
 				if (!pElementWrapper->IsEnabled())
 				{
-					response->m_statusCode = EELEMENTNOTDISPLAYED;
+					response->m_statusCode = EELEMENTNOTENABLED;
+					response->m_value["message"] = "Element is not enabled";
 					return;
 				}
 

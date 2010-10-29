@@ -86,7 +86,7 @@ int ElementWrapper::Hover(HWND containingHwnd)
 	return statusCode;
 }
 
-int ElementWrapper::DragBy(HWND containingHwnd, int offsetX, int offsetY)
+int ElementWrapper::DragBy(HWND containingHwnd, int offsetX, int offsetY, int dragSpeed)
 {
 	long x = 0, y = 0, w = 0, h = 0;
 	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
@@ -98,13 +98,13 @@ int ElementWrapper::DragBy(HWND containingHwnd, int offsetX, int offsetY)
 
 		// Create a mouse move, mouse down, mouse up OS event
 		LRESULT lresult = mouseDownAt(containingHwnd, clickX, clickY);
-		lresult = mouseMoveTo(containingHwnd, 100, clickX, clickY, clickX + offsetX, clickY + offsetY);
+		lresult = mouseMoveTo(containingHwnd, (long)dragSpeed, clickX, clickY, clickX + offsetX, clickY + offsetY);
 		lresult = mouseUpAt(containingHwnd, clickX + offsetX, clickY + offsetY);
 	}
 	return statusCode;
 }
 
-int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, std::wstring *attributeValue)
+int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, VARIANT *attributeValue)
 {
 	int statusCode = SUCCESS;
 	std::wstring script(L"(function() { return function(){ ");
@@ -148,10 +148,7 @@ int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring att
 		return statusCode;
 	}
 
-	if (scriptResult.vt != VT_EMPTY && scriptResult.vt != VT_NULL)
-	{
-		*attributeValue = pBrowser->ConvertVariantToWString(&scriptResult);
-	}
+	VariantCopy(attributeValue, &scriptResult);
 
 	return SUCCESS;
 }

@@ -49,6 +49,7 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
+				pElementWrapper->DragBy(hwnd, x, y, manager->GetSpeed());
 			}
 			else
 			{

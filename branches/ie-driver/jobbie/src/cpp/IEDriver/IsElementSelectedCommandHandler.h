@@ -37,10 +37,11 @@ protected:
 			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
 			{
-				std::wstring value;
-				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, L"selected", &value);
+				CComVariant valueVariant;
+				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, L"selected", &valueVariant);
 				if (statusCode == SUCCESS)
 				{
+					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
 					bool selected = wcscmp(L"true", value.c_str()) == 0 ? 1 : 0;
 					response->m_value = selected;
 				}

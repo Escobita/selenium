@@ -2,7 +2,7 @@
 #include "BrowserWrapper.h"
 #include <comutil.h>
 
-BrowserWrapper::BrowserWrapper(CComPtr<IWebBrowser2> browser, HWND hwnd, BrowserFactory *factory)
+BrowserWrapper::BrowserWrapper(IWebBrowser2 *browser, HWND hwnd, BrowserFactory *factory)
 {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.

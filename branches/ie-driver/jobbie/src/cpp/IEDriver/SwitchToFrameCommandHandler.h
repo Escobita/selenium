@@ -29,7 +29,8 @@ protected:
 		std::wstringstream pathStream;
 		if (frameId.isString())
 		{
-			pathStream << CA2W(frameId.asString().c_str());
+			std::wstring path(CA2W(frameId.asString().c_str())); 
+			pathStream << path;
 		}
 		else if(frameId.isIntegral())
 		{

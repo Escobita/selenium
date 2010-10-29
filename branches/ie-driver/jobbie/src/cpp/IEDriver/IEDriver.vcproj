@@ -539,6 +539,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ElementEqualsCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ElementFinder.h"
 				>
 			</File>

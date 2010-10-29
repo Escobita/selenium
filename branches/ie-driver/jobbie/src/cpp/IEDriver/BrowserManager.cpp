@@ -12,6 +12,7 @@
 #include "ClearElementCommandHandler.h"
 #include "CloseWindowCommandHandler.h"
 #include "DragElementCommandHandler.h"
+#include "ElementEqualsCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
 #include "FindChildElementCommandHandler.h"
 #include "FindChildElementsCommandHandler.h"
@@ -209,8 +210,8 @@ void BrowserManager::DispatchCommand()
 		commandToExecute->Execute(this, this->m_command->m_locatorParameters, this->m_command->m_commandParameters, &response);
 
 		BrowserWrapper *pWrapper;
-		this->GetCurrentBrowser(&pWrapper);
-		if (pWrapper)
+		int statusCode = this->GetCurrentBrowser(&pWrapper);
+		if (statusCode == SUCCESS)
 		{
 			this->m_wait = pWrapper->m_waitRequired;
 			if (this->m_wait)
@@ -225,6 +226,11 @@ void BrowserManager::DispatchCommand()
 
 int BrowserManager::GetCurrentBrowser(BrowserWrapper **ppWrapper)
 {
+	if (this->m_currentBrowser == L"" || this->m_trackedBrowsers.find(this->m_currentBrowser) == this->m_trackedBrowsers.end())
+	{
+		return ENOSUCHDRIVER;
+	}
+
 	*ppWrapper = this->m_trackedBrowsers[this->m_currentBrowser];
 	return SUCCESS;
 }
@@ -280,6 +286,10 @@ void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 		this->m_trackedBrowsers[browserId]->NewWindow.detach(this->m_newBrowserEventId);
 		this->m_trackedBrowsers[browserId]->Quitting.detach(this->m_browserQuittingEventId);
 		this->m_trackedBrowsers.erase(browserId);
+		if (this->m_trackedBrowsers.size() == 0)
+		{
+			this->m_currentBrowser = L"";
+		}
 	}
 }
 
@@ -340,4 +350,5 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::IsElementSelected] = new IsElementSelectedCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::IsElementEnabled] = new IsElementEnabledCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SendKeysToElement] = new SendKeysCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::ElementEquals] = new ElementEqualsCommandHandler;
 }

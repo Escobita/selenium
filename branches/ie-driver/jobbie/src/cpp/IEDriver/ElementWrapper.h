@@ -15,7 +15,7 @@ public:
 	IHTMLElement *m_pElement;
 	Json::Value ConvertToJson(void);
 	int GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y, long *width, long *height);
-	int GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, std::wstring *attributeValue);
+	int GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, VARIANT *attributeValue);
 	int IsDisplayed(bool *result);
 	bool IsEnabled(void);
 	bool IsSelected(void);
@@ -24,7 +24,7 @@ public:
 	std::wstring GetText(void);
 	int Click(HWND containingHwnd);
 	int Hover(HWND containingHwnd);
-	int DragBy(HWND containingHwnd, int offsetX, int offsetY);
+	int DragBy(HWND containingHwnd, int offsetX, int offsetY, int dragSpeed);
 	void FireEvent(IHTMLDOMNode* fireEventOn, LPCWSTR eventName);
 
 private:
