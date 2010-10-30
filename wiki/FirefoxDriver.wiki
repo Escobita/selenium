@@ -40,6 +40,15 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 
 By default, the Firefox driver creates an anonymous profile
 
+== Running with firebug ==
+
+Download the firebug xpi file from mozilla and start the profile as follows:
+{{{
+   File file = new File("firebug-1.5.4.xpi");
+   FirefoxProfile firefoxProfile = new FirefoxProfile();
+   firefoxProfile.addExtension(file);
+   WebDriver driver = new FirefoxDriver(firefoxProfile);
+}}}
 == Installing a Downloaded Binary ==
 
 The "wedriver-all.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
