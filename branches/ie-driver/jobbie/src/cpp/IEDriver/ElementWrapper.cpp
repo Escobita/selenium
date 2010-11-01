@@ -81,7 +81,7 @@ int ElementWrapper::Hover(HWND containingHwnd)
 		long clickY = y + (h ? h / 2 : 0);
 
 		// Create a mouse move, mouse down, mouse up OS event
-		LRESULT lresult = mouseMoveTo(containingHwnd, 100, x, y, clickX, clickY);
+		LRESULT lresult = mouseMoveTo(containingHwnd, 100, 0, 0, clickX, clickY);
 	}
 	return statusCode;
 }

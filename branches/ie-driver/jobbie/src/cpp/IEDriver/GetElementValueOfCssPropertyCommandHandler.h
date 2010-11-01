@@ -173,16 +173,16 @@ protected:
 			response->m_statusCode = 400;
 			response->m_value = "id";
 		}
-		else if (locatorParameters.find("name") == locatorParameters.end())
+		else if (locatorParameters.find("propertyName") == locatorParameters.end())
 		{
 			response->m_statusCode = 400;
-			response->m_value = "name";
+			response->m_value = "propertyName";
 		}
 		else
 		{
 			int statusCode = SUCCESS;
 			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
-			std::wstring name(CA2W(locatorParameters["name"].c_str()));
+			std::wstring name(CA2W(locatorParameters["propertyName"].c_str()));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);

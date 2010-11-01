@@ -67,7 +67,8 @@ protected:
 					}
 					return;
 				} 
-				else
+				
+				if (statusCode == EELEMENTNOTDISPLAYED)
 				{
 					response->m_statusCode = statusCode;
 					response->m_value["message"] = "cannot toggle invisible element";

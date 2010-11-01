@@ -211,10 +211,10 @@ namespace OpenQA.Selenium
         public void ShouldBeAbleToFindAnElementByCssSelector()
         {
             driver.Url = nestedPage;
-            if (!SupportsSelectorApi())
-            {
-                Assert.Ignore("Skipping test: selector API not supported");
-            }
+            //if (!SupportsSelectorApi())
+            //{
+            //    Assert.Ignore("Skipping test: selector API not supported");
+            //}
 
             IWebElement parent = driver.FindElement(By.Name("form2"));
 
@@ -229,10 +229,10 @@ namespace OpenQA.Selenium
         public void ShouldBeAbleToFindAnElementsByCssSelector()
         {
             driver.Url = nestedPage;
-            if (!SupportsSelectorApi())
-            {
-                Assert.Ignore("Skipping test: selector API not supported");
-            }
+            //if (!SupportsSelectorApi())
+            //{
+            //    Assert.Ignore("Skipping test: selector API not supported");
+            //}
 
             IWebElement parent = driver.FindElement(By.Name("form2"));
 

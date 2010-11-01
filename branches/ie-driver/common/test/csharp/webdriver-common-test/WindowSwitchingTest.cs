@@ -243,7 +243,7 @@ namespace OpenQA.Selenium
         {
             try
             {
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(2000);
             }
             catch (Exception)
             {
