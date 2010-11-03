@@ -63,9 +63,17 @@ int ElementWrapper::Click(HWND containingHwnd)
 		long clickY = y + (h ? h / 2 : 0);
 
 		// Create a mouse move, mouse down, mouse up OS event
-		LRESULT lresult = mouseMoveTo(containingHwnd, 10, x, y, clickX, clickY);
+		LRESULT result = mouseMoveTo(containingHwnd, 10, x, y, clickX, clickY);
+		if (result != SUCCESS) {
+			return result;
+		}
 		
-		lresult = clickAt(containingHwnd, clickX, clickY);
+		result = clickAt(containingHwnd, clickX, clickY);
+		if (result != SUCCESS) {
+			return result;
+		}
+
+		wait(50);
 	}
 	return statusCode;
 }
@@ -418,7 +426,7 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
 {
 	*top, *left, *bottom, *right = 0;
 
-	wait(100);
+	//wait(100);
 
 	// getBoundingClientRect. Note, the docs talk about this possibly being off by 2,2
     // and Jon Resig mentions some problems too. For now, we'll hope for the best
