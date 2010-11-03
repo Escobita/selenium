@@ -24,7 +24,7 @@ protected:
 			response->m_value = "name";
 		}
 
-		std::wstring cookieName(CA2W(locatorParameters["name"].c_str()));
+		std::wstring cookieName(CA2W(locatorParameters["name"].c_str(), CP_UTF8));
 		BrowserWrapper *pBrowserWrapper;
 		manager->GetCurrentBrowser(&pBrowserWrapper);
 		int statusCode = pBrowserWrapper->DeleteCookie(cookieName);

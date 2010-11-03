@@ -51,7 +51,7 @@ protected:
 		BrowserWrapper *pBrowserWrapper;
 		manager->GetCurrentBrowser(&pBrowserWrapper);
 
-		std::wstring cookie(CA2W(cookieString.c_str()));
+		std::wstring cookie(CA2W(cookieString.c_str(), CP_UTF8));
 		int statusCode = pBrowserWrapper->AddCookie(cookie);
 		if (statusCode != SUCCESS)
 		{

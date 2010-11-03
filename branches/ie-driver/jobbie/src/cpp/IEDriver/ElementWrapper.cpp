@@ -31,7 +31,7 @@ ElementWrapper::~ElementWrapper(void)
 Json::Value ElementWrapper::ConvertToJson()
 {
 	Json::Value jsonWrapper;
-	std::string id(CW2A(this->m_elementId.c_str()));
+	std::string id(CW2A(this->m_elementId.c_str(), CP_UTF8));
 	jsonWrapper["ELEMENT"] = id;
 	return jsonWrapper;
 }
@@ -418,7 +418,7 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
 {
 	*top, *left, *bottom, *right = 0;
 
-	::Sleep(100);
+	wait(100);
 
 	// getBoundingClientRect. Note, the docs talk about this possibly being off by 2,2
     // and Jon Resig mentions some problems too. For now, we'll hope for the best

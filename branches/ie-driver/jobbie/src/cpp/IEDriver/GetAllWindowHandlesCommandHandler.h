@@ -22,7 +22,7 @@ protected:
 		std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
 		for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
 		{
-			std::string handle(CW2A(it->first.c_str()));
+			std::string handle(CW2A(it->first.c_str(), CP_UTF8));
 			handles.append(handle);
 		}
 

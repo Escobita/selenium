@@ -19,7 +19,7 @@ protected:
 	{
 		BrowserWrapper *pWrapper;
 		manager->GetCurrentBrowser(&pWrapper);
-		std::string title(CW2A(pWrapper->GetTitle().c_str()));
+		std::string title(CW2A(pWrapper->GetTitle().c_str(), CP_UTF8));
 
 		response->m_value = title;
 	}

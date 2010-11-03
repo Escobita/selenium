@@ -27,7 +27,7 @@ protected:
 		BrowserWrapper *wrapper = new BrowserWrapper(procWinInfo.pBrowser, procWinInfo.hwndBrowser, manager->m_factory);
 		manager->AddWrapper(wrapper);
 		response->m_statusCode = 303;
-		std::string id = CW2A(manager->m_managerId.c_str());
+		std::string id = CW2A(manager->m_managerId.c_str(), CP_UTF8);
 		response->m_value = "/session/" + id;
 	}
 };

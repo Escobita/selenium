@@ -181,8 +181,8 @@ protected:
 		else
 		{
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
-			std::wstring name(CA2W(locatorParameters["propertyName"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+			std::wstring name(CA2W(locatorParameters["propertyName"].c_str(), CP_UTF8));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
@@ -193,7 +193,7 @@ protected:
 			{
 				std::wstring value(this->GetPropertyValue(pBrowserWrapper, pElementWrapper->m_pElement, name.c_str()));
 
-				std::string propertyValue(CW2A(value.c_str()));
+				std::string propertyValue(CW2A(value.c_str(), CP_UTF8));
 				response->m_value = propertyValue;
 			}
 			else

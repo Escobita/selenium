@@ -26,7 +26,7 @@ protected:
 		{
 			std::wstring text(L"");
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
@@ -43,13 +43,13 @@ protected:
 				if (isTitle)
 				{
 					text = pBrowserWrapper->GetTitle();
-					std::string title(CW2A(text.c_str()));
+					std::string title(CW2A(text.c_str(), CP_UTF8));
 					response->m_value = title;
 				}
 				else
 				{
 					text = pElementWrapper->GetText();
-					std::string elementText(CW2A(text.c_str()));
+					std::string elementText(CW2A(text.c_str(), CP_UTF8));
 					response->m_value = elementText;
 				}
 			}

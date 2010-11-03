@@ -38,7 +38,7 @@ protected:
 		hr = window->get_name(&windowName);
 		if (windowName)
 		{
-			name = CW2A((BSTR)windowName);
+			name = CW2A((BSTR)windowName, CP_UTF8);
 		}
 		return name;
 	}
@@ -64,7 +64,7 @@ protected:
 					break;
 				}
 
-				std::string browserHandle = CW2A(it->first.c_str());
+				std::string browserHandle = CW2A(it->first.c_str(), CP_UTF8);
 				if (browserHandle == desiredName)
 				{
 					foundBrowserHandle = it->first;

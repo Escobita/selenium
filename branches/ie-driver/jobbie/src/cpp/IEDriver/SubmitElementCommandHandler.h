@@ -44,7 +44,7 @@ protected:
 		else
 		{
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);

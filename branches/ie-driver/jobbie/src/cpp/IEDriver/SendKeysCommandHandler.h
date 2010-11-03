@@ -33,25 +33,14 @@ protected:
 		else
 		{
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 
 			std::wstring keys(L"");
 			Json::Value keyArray(commandParameters["value"]);
 			for (int i = 0; i < keyArray.size(); ++i )
 			{
 				std::string key(keyArray[i].asString());
-				if (key.length() > 1)
-				{
-					int outputBufferSize = ::MultiByteToWideChar(CP_UTF8, 0, &key.c_str()[0], -1, NULL, 0);
-					vector<TCHAR> outputBuffer(outputBufferSize);
-					::MultiByteToWideChar(CP_UTF8, 0, &key.c_str()[0], -1, &outputBuffer[0], outputBufferSize);
-					std::wstring wideChar = &outputBuffer[0];
-					keys.append(wideChar);
-				}
-				else
-				{
-					keys.append(CA2W(key.c_str()));
-				}
+				keys.append(CA2W(key.c_str(), CP_UTF8));
 			}
 
 			BrowserWrapper *pBrowserWrapper;

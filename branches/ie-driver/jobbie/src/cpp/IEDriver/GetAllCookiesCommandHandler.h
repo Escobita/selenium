@@ -46,8 +46,8 @@ protected:
 	Json::Value GetAllCookiesCommandHandler::CreateJsonValueForCookie(std::wstring cookie)
 	{
 		size_t cookieElementSeparatorPos(cookie.find_first_of(L"="));
-		std::string cookieElementName(CW2A(cookie.substr(0, cookieElementSeparatorPos).c_str()));
-		std::string cookieElementValue(CW2A(cookie.substr(cookieElementSeparatorPos + 1).c_str()));
+		std::string cookieElementName(CW2A(cookie.substr(0, cookieElementSeparatorPos).c_str(), CP_UTF8));
+		std::string cookieElementValue(CW2A(cookie.substr(cookieElementSeparatorPos + 1).c_str(), CP_UTF8));
 		Json::Value cookieValue;
 		cookieValue["name"] = cookieElementName;
 		cookieValue["value"] = cookieElementValue;

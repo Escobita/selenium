@@ -25,7 +25,7 @@ protected:
 		}
 		else
 		{
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 			ElementWrapper *pElementWrapper;
 			int statusCode = this->GetElement(manager, elementId, &pElementWrapper);
 			if (statusCode == SUCCESS)
@@ -34,7 +34,7 @@ protected:
 				pElementWrapper->m_pElement->get_tagName(&temp);
 				std::wstring tagName((BSTR)temp);
 				std::transform(tagName.begin(), tagName.end(), tagName.begin(), tolower);
-				std::string returnValue(CW2A(tagName.c_str()));
+				std::string returnValue(CW2A(tagName.c_str(), CP_UTF8));
 				response->m_value = returnValue;
 			}
 			else

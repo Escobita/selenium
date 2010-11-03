@@ -54,7 +54,7 @@ protected:
 			return;
 		}
 
-		std::string pageSource = CW2A((LPCWSTR)html);
+		std::string pageSource = CW2A((LPCWSTR)html, CP_UTF8);
 		response->m_value = pageSource;
 	}
 };

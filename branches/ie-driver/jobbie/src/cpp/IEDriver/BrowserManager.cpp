@@ -105,7 +105,7 @@ LRESULT BrowserManager::OnSetCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 	std::wstring jsonCommand(lpRawCommand);
 
 	// JsonCpp only understands narrow strings, so we have to convert.
-	std::string convertedCommand(CW2A(jsonCommand.c_str()));
+	std::string convertedCommand(CW2A(jsonCommand.c_str(), CP_UTF8));
 	this->m_command->populate(convertedCommand);
 	return 0;
 }
@@ -202,7 +202,7 @@ DWORD WINAPI BrowserManager::ThreadProc(LPVOID lpParameter)
 void BrowserManager::DispatchCommand()
 {
 	WebDriverResponse response;
-	std::string sessionId(CW2A(this->m_managerId.c_str()));
+	std::string sessionId(CW2A(this->m_managerId.c_str(), CP_UTF8));
 	response.m_sessionId = sessionId;
 	if (this->m_commandHandlerRepository.find(this->m_command->m_commandValue) == this->m_commandHandlerRepository.end())
 	{
@@ -273,7 +273,7 @@ void BrowserManager::SetImplicitWaitTimeout(int timeout)
 
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
 {
-	std::string tmp(CW2A(wrapper->m_browserId.c_str()));
+	std::string tmp(CW2A(wrapper->m_browserId.c_str(), CP_UTF8));
 	std::cout << "NewWindow found with id " << tmp << "\r\n";
 	if (this->m_trackedBrowsers.find(wrapper->m_browserId) == this->m_trackedBrowsers.end())
 	{
@@ -283,7 +283,7 @@ void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper)
 
 void BrowserManager::BrowserQuittingEventHandler(std::wstring browserId)
 {
-	std::string tmp(CW2A(browserId.c_str()));
+	std::string tmp(CW2A(browserId.c_str(), CP_UTF8));
 	std::cout << "OnQuit from " << tmp << "\r\n";
 	if (this->m_trackedBrowsers.find(browserId) != this->m_trackedBrowsers.end())
 	{

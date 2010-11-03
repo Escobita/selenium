@@ -27,7 +27,7 @@ protected:
 		{
 			std::wstring text(L"");
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
@@ -42,7 +42,7 @@ protected:
 				if (statusCode == SUCCESS)
 				{
 					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
-					std::string valueStr(CW2A(value.c_str()));
+					std::string valueStr(CW2A(value.c_str(), CP_UTF8));
 					response->m_value = valueStr;
 				}
 			}

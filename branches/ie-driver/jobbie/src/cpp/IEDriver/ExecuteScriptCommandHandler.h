@@ -63,7 +63,7 @@ protected:
 			Json::Value arg = jsonArgs[argIndex];
 			if (arg.isString())
 			{
-				std::wstring value(CA2W(arg.asString().c_str()));
+				std::wstring value(CA2W(arg.asString().c_str(), CP_UTF8));
 				CComVariant destStr(value.c_str());
 				::SafeArrayPutElement(args, &index, &destStr);
 			}
@@ -93,7 +93,7 @@ protected:
 			}
 			else if (arg.isObject() && arg.isMember("ELEMENT"))
 			{
-				std::wstring elementId(CA2W(arg["ELEMENT"].asString().c_str()));
+				std::wstring elementId(CA2W(arg["ELEMENT"].asString().c_str(), CP_UTF8));
 
 				ElementWrapper *pElementWrapper;
 				statusCode = this->GetElement(manager, elementId, &pElementWrapper);
@@ -115,7 +115,7 @@ protected:
 		std::string strVal;
 		switch (result.vt) {
 			case VT_BSTR:
-				strVal = CW2A(result.bstrVal);
+				strVal = CW2A(result.bstrVal, CP_UTF8);
 				*value = strVal;
 				break;
 
@@ -236,7 +236,7 @@ protected:
 		}
 		else
 		{
-			std::wstring scriptBody(CA2W(commandParameters["script"].asString().c_str()));
+			std::wstring scriptBody(CA2W(commandParameters["script"].asString().c_str(), CP_UTF8));
 			wstringstream scriptStream;
 			scriptStream << L"(function() { return function(){";
 			scriptStream << scriptBody;

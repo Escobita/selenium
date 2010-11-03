@@ -9,7 +9,7 @@ WebDriverResponse::WebDriverResponse(std::wstring json)
 {
 	Json::Value responseObject;
 	Json::Reader reader;
-	std::string input(CW2A(json.c_str()));
+	std::string input(CW2A(json.c_str(), CP_UTF8));
 	reader.parse(input, responseObject);
 	this->m_statusCode = responseObject["status"].asInt();
 	this->m_sessionId = responseObject["sessionId"].asString();
@@ -28,6 +28,6 @@ std::wstring WebDriverResponse::Serialize(void)
 	jsonObject["value"] = m_value;
 	Json::FastWriter writer;
 	std::string output(writer.write(jsonObject));
-	std::wstring response(CA2W(output.c_str()));
+	std::wstring response(CA2W(output.c_str(), CP_UTF8));
 	return response;
 }

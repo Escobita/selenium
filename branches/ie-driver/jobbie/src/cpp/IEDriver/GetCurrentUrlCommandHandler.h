@@ -38,7 +38,7 @@ protected:
 			return;
 		}
 
-		std::string urlStr = CW2A((LPCWSTR)url);
+		std::string urlStr = CW2A((LPCWSTR)url, CP_UTF8);
 		response->m_value = urlStr;
 	}
 };

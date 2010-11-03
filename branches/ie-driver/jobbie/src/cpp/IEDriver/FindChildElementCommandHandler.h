@@ -1,5 +1,6 @@
 #pragma once
 #include "BrowserManager.h"
+#include <ctime>
 
 class FindChildElementCommandHandler :
 	public WebDriverCommandHandler
@@ -36,11 +37,11 @@ protected:
 		else
 		{
 			int statusCode = SUCCESS;
-			std::wstring mechanism = CA2W(commandParameters["using"].asString().c_str());
-			std::wstring value = CA2W(commandParameters["value"].asString().c_str());
+			std::wstring mechanism = CA2W(commandParameters["using"].asString().c_str(), CP_UTF8);
+			std::wstring value = CA2W(commandParameters["value"].asString().c_str(), CP_UTF8);
 			ElementFinder *pFinder(manager->m_elementFinders[mechanism]);
 
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
 
 			ElementWrapper *pParentElementWrapper;
 			statusCode = this->GetElement(manager, elementId, &pParentElementWrapper);
@@ -48,7 +49,24 @@ protected:
 			if (statusCode == SUCCESS)
 			{
 				ElementWrapper *pFoundElement;
-				statusCode = pFinder->FindElement(manager, pParentElementWrapper, value, &pFoundElement);
+
+				int timeout(manager->GetImplicitWaitTimeout());
+				clock_t end = clock() + (timeout / 1000 * CLOCKS_PER_SEC);
+				if (timeout > 0 && timeout < 1000) 
+				{
+					end += 1 * CLOCKS_PER_SEC;
+				}
+
+				do
+				{
+					statusCode = pFinder->FindElement(manager, pParentElementWrapper, value, &pFoundElement);
+					if (statusCode == SUCCESS)
+					{
+						break;
+					}
+				}
+				while (clock() < end);
+
 				if (statusCode == SUCCESS)
 				{
 					response->m_value = pFoundElement->ConvertToJson();

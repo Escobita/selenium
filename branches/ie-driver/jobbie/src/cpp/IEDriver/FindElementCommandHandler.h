@@ -1,5 +1,6 @@
 #pragma once
 #include "BrowserManager.h"
+#include <ctime>
 
 class FindElementCommandHandler :
 	public WebDriverCommandHandler
@@ -31,10 +32,29 @@ protected:
 		else
 		{
 			ElementWrapper *pFoundElement;
-			std::wstring mechanism = CA2W(commandParameters["using"].asString().c_str());
-			std::wstring value = CA2W(commandParameters["value"].asString().c_str());
+			std::wstring mechanism = CA2W(commandParameters["using"].asString().c_str(), CP_UTF8);
+			std::wstring value = CA2W(commandParameters["value"].asString().c_str(), CP_UTF8);
 			ElementFinder *pFinder(manager->m_elementFinders[mechanism]);
-			int statusCode = pFinder->FindElement(manager, NULL, value, &pFoundElement);
+
+			int timeout(manager->GetImplicitWaitTimeout());
+			clock_t end = clock() + (timeout / 1000 * CLOCKS_PER_SEC);
+			if (timeout > 0 && timeout < 1000) 
+			{
+				end += 1 * CLOCKS_PER_SEC;
+			}
+
+
+			int statusCode = SUCCESS;
+			do
+			{
+				statusCode = pFinder->FindElement(manager, NULL, value, &pFoundElement);
+				if (statusCode == SUCCESS)
+				{
+					break;
+				}
+			}
+			while (clock() < end);
+			
 			if (statusCode == SUCCESS)
 			{
 				response->m_value = pFoundElement->ConvertToJson();

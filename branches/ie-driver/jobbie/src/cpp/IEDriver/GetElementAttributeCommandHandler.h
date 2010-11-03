@@ -31,8 +31,8 @@ protected:
 		else
 		{
 			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str()));
-			std::wstring name(CA2W(locatorParameters["name"].c_str()));
+			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+			std::wstring name(CA2W(locatorParameters["name"].c_str(), CP_UTF8));
 
 			BrowserWrapper *pBrowserWrapper;
 			manager->GetCurrentBrowser(&pBrowserWrapper);
@@ -46,7 +46,7 @@ protected:
 				if (valueVariant.vt != VT_EMPTY && valueVariant.vt != VT_NULL)
 				{
 					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
-					std::string valueStr(CW2A(value.c_str()));
+					std::string valueStr(CW2A(value.c_str(), CP_UTF8));
 					response->m_value = valueStr;
 				}
 				else
