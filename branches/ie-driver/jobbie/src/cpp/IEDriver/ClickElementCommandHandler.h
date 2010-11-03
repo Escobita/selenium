@@ -37,6 +37,7 @@ protected:
 			if (statusCode == SUCCESS)
 			{
 				statusCode = pElementWrapper->Click(hwnd);
+				pBrowserWrapper->m_waitRequired = true;
 				if (statusCode != SUCCESS)
 				{
 					response->m_value["message"] = "Cannot click on element";

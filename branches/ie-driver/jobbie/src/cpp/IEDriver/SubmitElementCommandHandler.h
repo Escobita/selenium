@@ -67,6 +67,7 @@ protected:
 						if (_wcsicmp(L"submit", type.c_str()) == 0 || _wcsicmp(L"image", type.c_str()) == 0) {
 							HWND hwnd = pBrowserWrapper->GetHwnd();
 							pElementWrapper->Click(hwnd);
+							pBrowserWrapper->m_waitRequired = true;
 						} else {
 							CComPtr<IHTMLFormElement> form2;
 							input->get_form(&form2);

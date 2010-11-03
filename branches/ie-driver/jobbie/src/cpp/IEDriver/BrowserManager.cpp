@@ -8,9 +8,12 @@
 #include "FindByPartialLinkTextElementFinder.h"
 #include "FindByTagNameElementFinder.h"
 #include "FindByXPathElementFinder.h"
+#include "AddCookieCommandHandler.h"
 #include "ClickElementCommandHandler.h"
 #include "ClearElementCommandHandler.h"
 #include "CloseWindowCommandHandler.h"
+#include "DeleteAllCookiesCommandHandler.h"
+#include "DeleteCookieCommandHandler.h"
 #include "DragElementCommandHandler.h"
 #include "ElementEqualsCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
@@ -19,6 +22,7 @@
 #include "FindElementCommandHandler.h"
 #include "FindElementsCommandHandler.h"
 #include "GetActiveElementCommandHandler.h"
+#include "GetAllCookiesCommandHandler.h"
 #include "GetAllWindowHandlesCommandHandler.h"
 #include "GetCurrentUrlCommandHandler.h"
 #include "GetCurrentWindowHandleCommandHandler.h"
@@ -351,4 +355,8 @@ void BrowserManager::PopulateCommandHandlerRepository()
 	this->m_commandHandlerRepository[CommandValue::IsElementEnabled] = new IsElementEnabledCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::SendKeysToElement] = new SendKeysCommandHandler;
 	this->m_commandHandlerRepository[CommandValue::ElementEquals] = new ElementEqualsCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::AddCookie] = new AddCookieCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::GetAllCookies] = new GetAllCookiesCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::DeleteCookie] = new DeleteCookieCommandHandler;
+	this->m_commandHandlerRepository[CommandValue::DeleteAllCookies] = new DeleteAllCookiesCommandHandler;
 }

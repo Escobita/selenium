@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "BrowserWrapper.h"
+#include "cookies.h"
 #include <comutil.h>
 
 BrowserWrapper::BrowserWrapper(IWebBrowser2 *browser, HWND hwnd, BrowserFactory *factory)
@@ -267,6 +268,94 @@ std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
 			return L"";
 	}
 	return L"";
+}
+
+std::wstring BrowserWrapper::GetCookies()
+{
+	CComPtr<IHTMLDocument2> doc;
+	this->GetDocument(&doc);
+
+	if (!doc)
+	{
+		return L"";
+	}
+
+	CComBSTR cookie;
+	HRESULT hr = doc->get_cookie(&cookie);
+	if (!cookie)
+	{
+		cookie = L"";
+	}
+
+	std::wstring cookieString((BSTR)cookie);
+	return cookieString;
+}
+
+int BrowserWrapper::AddCookie(std::wstring cookie)
+{
+	CComBSTR cookieBstr(cookie.c_str());
+
+	CComPtr<IHTMLDocument2> doc;
+	this->GetDocument(&doc);
+
+	if (!doc) 
+	{
+		return EUNHANDLEDERROR;
+	}
+
+	if (!this->isHtmlPage(doc)) 
+	{
+		return ENOSUCHDOCUMENT;
+	}
+
+	if (!SUCCEEDED(doc->put_cookie(cookieBstr))) 
+	{
+		return EUNHANDLEDERROR;
+	}
+
+	return SUCCESS;
+}
+
+int BrowserWrapper::DeleteCookie(std::wstring cookieName)
+{
+	// Inject the XPath engine
+	std::wstring script;
+	for (int i = 0; DELETECOOKIES[i]; i++) {
+		script += DELETECOOKIES[i];
+	}
+
+	SAFEARRAY *args;
+	SAFEARRAYBOUND bounds;
+	bounds.cElements = 1;
+	bounds.lLbound = 0;
+	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+
+	long index = 0;
+	CComVariant name(cookieName.c_str());
+	::SafeArrayPutElement(args, &index, &name);
+
+	CComVariant result;
+	int statusCode = this->ExecuteScript(&script, args, &result);
+	::SafeArrayDestroy(args);
+
+	return statusCode;
+}
+
+bool BrowserWrapper::isHtmlPage(IHTMLDocument2* pDoc) 
+{
+	CComBSTR type;
+	if (!SUCCEEDED(pDoc->get_mimeType(&type))) 
+	{
+		return false;
+	}
+
+	if (!SUCCEEDED(type.ToLower())) 
+	{
+		return false;
+	}
+
+	std::wstring typeString((BSTR)type);
+	return wcsstr(typeString.c_str(), L"html") != NULL;
 }
 
 bool BrowserWrapper::getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* pAdded)

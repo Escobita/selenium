@@ -54,6 +54,7 @@ protected:
 				}
 
 				int statusCode = pElementWrapper->Click(hwnd);
+				pBrowserWrapper->m_waitRequired = true;
 				if (statusCode == SUCCESS || statusCode != EELEMENTNOTDISPLAYED)
 				{
 					response->m_statusCode = statusCode;
@@ -67,15 +68,9 @@ protected:
 					}
 					return;
 				} 
-				
-				if (statusCode == EELEMENTNOTDISPLAYED)
-				{
-					response->m_statusCode = statusCode;
-					response->m_value["message"] = "cannot toggle invisible element";
-					return;
-				}
 
-				if (tagName == L"OPTION") {
+				if (tagName == L"OPTION")
+				{
 					CComQIPtr<IHTMLOptionElement> option(pElementWrapper->m_pElement);
 					if (!option) 
 					{
@@ -125,6 +120,13 @@ protected:
 					pElementWrapper->FireEvent(parent, L"onchange");
 					statusCode = SUCCESS;
 					response->m_value = pElementWrapper->IsSelected();
+				}
+				else
+				{
+					// Element is not an OPTION element, and it's not visible.
+					response->m_statusCode = statusCode;
+					response->m_value["message"] = "cannot toggle invisible element";
+					return;
 				}
 			}
 			else

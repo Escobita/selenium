@@ -75,8 +75,11 @@ public:
 	void GetDocument(IHTMLDocument2 **ppDoc);
 	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
 	HWND GetHwnd(void);
-	bool m_waitRequired;
 	std::wstring GetTitle(void);
+	std::wstring GetCookies(void);
+	int AddCookie(std::wstring cookie);
+	int DeleteCookie(std::wstring cookieName);
+	bool m_waitRequired;
 
 	CComPtr<IWebBrowser2> m_pBrowser;
 	std::wstring m_pathToFrame;
@@ -89,6 +92,7 @@ private:
 	void detachEvents(void);
 	bool isDocumentNavigating(IHTMLDocument2 *pDoc);
 	UINT64 getTime(void);
+	bool isHtmlPage(IHTMLDocument2 *pDoc);
 	int getElapsedMilliseconds(UINT64 startTime);
 	void findCurrentFrameWindow(IHTMLWindow2 **ppWindow);
 	void getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 **ppWindow);

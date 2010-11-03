@@ -64,6 +64,7 @@ protected:
 							response->m_value = Json::Value::null;
 							if (!pElementWrapper->IsSelected()) {
 								pElementWrapper->Click(hwnd);
+								pBrowserWrapper->m_waitRequired = true;
 							}
 
 							CComBSTR checked(L"checked");
@@ -80,6 +81,7 @@ protected:
 							statusCode = SUCCESS;
 							if (!pElementWrapper->IsSelected()) {
 								pElementWrapper->Click(hwnd);
+								pBrowserWrapper->m_waitRequired = true;
 							}
 
 							CComBSTR selected(L"selected");

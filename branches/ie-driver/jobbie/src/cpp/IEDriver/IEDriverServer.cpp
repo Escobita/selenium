@@ -120,7 +120,7 @@ void IEDriverServer::SendHttpOk(struct mg_connection* connection,
                 const struct mg_request_info* request_info,
 				std::wstring body)
 {
-	std::string narrowBody(CW2A(body.c_str()));
+	std::string narrowBody(CW2A(body.c_str(), CP_UTF8));
 	std::ostringstream out;
 	out << "HTTP/1.1 200 OK\r\n"
 		<< "Content-Length: " << strlen(narrowBody.c_str()) << "\r\n"
@@ -133,6 +133,7 @@ void IEDriverServer::SendHttpOk(struct mg_connection* connection,
 		out << narrowBody << "\r\n";
 	}
 
+	std::string outStr(out.str());
 	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
