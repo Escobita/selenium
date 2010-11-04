@@ -16,10 +16,10 @@ When developing WebDriver, it is common to want to run a single test rather than
 
 == Using Rake ==
 
-Rake is very similar to using other build tools such as "make" or "ant". You can specify a "target" to run by adding it as a parameter, and you can add more than one target at a time. For example, in order to clean the build and then build and run the HtmlUnitDriver tests:
+Rake is very similar to using other build tools such as "make" or "ant". You can specify a "target" to run by adding it as a parameter, and you can add more than one target at a time. Note that since WebDriver does not rely on ruby being installed and uses JRuby, rake should *not* be involved directly - use the _go_ script instead. For example, in order to clean the build and then build and run the HtmlUnitDriver tests:
 
 {{{
-rake clean test_htmlunit
+./go clean test_htmlunit
 }}}
 
 The default target that's used will compile the code and run all the tests. More interesting targets are:
