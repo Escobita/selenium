@@ -1,61 +1,52 @@
-#pragma once
+#ifndef WEBDRIVER_IE_DRAGELEMENTCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_DRAGELEMENTCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class DragElementCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	DragElementCommandHandler(void)
-	{
+class DragElementCommandHandler : public WebDriverCommandHandler {
+public:
+	DragElementCommandHandler(void) {
 	}
 
-	virtual ~DragElementCommandHandler(void)
-	{
+	virtual ~DragElementCommandHandler(void) {
 	}
 
 protected:
-
-	void DragElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void DragElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else if (commandParameters.find("x") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
+		} else if (command_parameters.find("x") == command_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "x";
-		}
-		else if (commandParameters.find("y") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
+		} else if (command_parameters.find("y") == command_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "y";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
-			int x = commandParameters["x"].asInt();
-			int y = commandParameters["y"].asInt();
+			int x = command_parameters["x"].asInt();
+			int y = command_parameters["y"].asInt();
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
-			HWND hwnd = pBrowserWrapper->GetHwnd();
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+			HWND window_handle = browser_wrapper->GetWindowHandle();
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
-				pElementWrapper->DragBy(hwnd, x, y, manager->GetSpeed());
-			}
-			else
-			{
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
+				element_wrapper->DragBy(window_handle, x, y, manager->speed());
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_DRAGELEMENTCOMMANDHANDLER_H_

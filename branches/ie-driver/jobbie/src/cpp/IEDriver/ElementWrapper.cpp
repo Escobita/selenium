@@ -5,116 +5,106 @@
 #include "atoms.h"
 #include "interactions.h"
 
-ElementWrapper::ElementWrapper(IHTMLElement *element)
-{
+namespace webdriver {
+
+ElementWrapper::ElementWrapper(IHTMLElement *element) {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.
-	UUID idGuid;
-	RPC_WSTR pszUuid = NULL;
-	::UuidCreate(&idGuid);
-	::UuidToString(&idGuid, &pszUuid);
+	UUID guid;
+	RPC_WSTR guid_string = NULL;
+	::UuidCreate(&guid);
+	::UuidToString(&guid, &guid_string);
 
 	// RPC_WSTR is currently typedef'd in RpcDce.h (pulled in by rpc.h)
 	// as unsigned short*. It needs to be typedef'd as wchar_t* 
-	wchar_t* pwStr = reinterpret_cast<wchar_t*>(pszUuid);
-	this->m_elementId = pwStr;
+	wchar_t* cast_guid_string = reinterpret_cast<wchar_t*>(guid_string);
+	this->element_id_ = cast_guid_string;
 
-	::RpcStringFree(&pszUuid);
+	::RpcStringFree(&guid_string);
 
-	this->m_pElement = element;
+	this->element_ = element;
 }
 
-ElementWrapper::~ElementWrapper(void)
-{
+ElementWrapper::~ElementWrapper(void) {
 }
 
-Json::Value ElementWrapper::ConvertToJson()
-{
-	Json::Value jsonWrapper;
-	std::string id(CW2A(this->m_elementId.c_str(), CP_UTF8));
-	jsonWrapper["ELEMENT"] = id;
-	return jsonWrapper;
+Json::Value ElementWrapper::ConvertToJson() {
+	Json::Value json_wrapper;
+	std::string id(CW2A(this->element_id_.c_str(), CP_UTF8));
+	json_wrapper["ELEMENT"] = id;
+	return json_wrapper;
 }
 
-int ElementWrapper::IsDisplayed(bool *result)
-{
-	return this->IsElementDisplayed(this->m_pElement, result);
+int ElementWrapper::IsDisplayed(bool *result) {
+	return this->IsElementDisplayed(this->element_, result);
 }
 
-bool ElementWrapper::IsEnabled()
-{
-	CComQIPtr<IHTMLElement3> elem3(this->m_pElement);
+bool ElementWrapper::IsEnabled() {
+	CComQIPtr<IHTMLElement3> elem3(this->element_);
 	if (!elem3) {
 		return false;
 	}
-	VARIANT_BOOL isDisabled;
-	elem3->get_disabled(&isDisabled);
-	return !isDisabled;
+	VARIANT_BOOL is_disabled;
+	elem3->get_disabled(&is_disabled);
+	return !is_disabled;
 }
 
-int ElementWrapper::Click(HWND containingHwnd)
-{
+int ElementWrapper::Click(HWND containing_window_handle) {
 	long x = 0, y = 0, w = 0, h = 0;
-	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
 
-	if (statusCode == SUCCESS)
-	{
-		long clickX = x + (w ? w / 2 : 0);
-		long clickY = y + (h ? h / 2 : 0);
+	if (status_code == SUCCESS) {
+		long click_x = x + (w ? w / 2 : 0);
+		long click_y = y + (h ? h / 2 : 0);
 
 		// Create a mouse move, mouse down, mouse up OS event
-		LRESULT result = mouseMoveTo(containingHwnd, 10, x, y, clickX, clickY);
+		LRESULT result = mouseMoveTo(containing_window_handle, 10, x, y, click_x, click_y);
 		if (result != SUCCESS) {
 			return result;
 		}
 		
-		result = clickAt(containingHwnd, clickX, clickY);
+		result = clickAt(containing_window_handle, click_x, click_y);
 		if (result != SUCCESS) {
 			return result;
 		}
 
 		wait(50);
 	}
-	return statusCode;
+	return status_code;
 }
 
-int ElementWrapper::Hover(HWND containingHwnd)
-{
+int ElementWrapper::Hover(HWND containing_window_handle) {
 	long x = 0, y = 0, w = 0, h = 0;
-	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
 
-	if (statusCode == SUCCESS)
-	{
-		long clickX = x + (w ? w / 2 : 0);
-		long clickY = y + (h ? h / 2 : 0);
+	if (status_code == SUCCESS) {
+		long click_x = x + (w ? w / 2 : 0);
+		long click_y = y + (h ? h / 2 : 0);
 
 		// Create a mouse move, mouse down, mouse up OS event
-		LRESULT lresult = mouseMoveTo(containingHwnd, 100, 0, 0, clickX, clickY);
+		LRESULT lresult = mouseMoveTo(containing_window_handle, 100, 0, 0, click_x, click_y);
 	}
-	return statusCode;
+	return status_code;
 }
 
-int ElementWrapper::DragBy(HWND containingHwnd, int offsetX, int offsetY, int dragSpeed)
-{
+int ElementWrapper::DragBy(HWND containing_window_handle, int offset_x, int offset_y, int drag_speed) {
 	long x = 0, y = 0, w = 0, h = 0;
-	int statusCode = this->GetLocationOnceScrolledIntoView(containingHwnd, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
 
-	if (statusCode == SUCCESS)
-	{
-		long clickX = x + (w ? w / 2 : 0);
-		long clickY = y + (h ? h / 2 : 0);
+	if (status_code == SUCCESS) {
+		long click_x = x + (w ? w / 2 : 0);
+		long click_y = y + (h ? h / 2 : 0);
 
 		// Create a mouse move, mouse down, mouse up OS event
-		LRESULT lresult = mouseDownAt(containingHwnd, clickX, clickY);
-		lresult = mouseMoveTo(containingHwnd, (long)dragSpeed, clickX, clickY, clickX + offsetX, clickY + offsetY);
-		lresult = mouseUpAt(containingHwnd, clickX + offsetX, clickY + offsetY);
+		LRESULT lresult = mouseDownAt(containing_window_handle, click_x, click_y);
+		lresult = mouseMoveTo(containing_window_handle, (long)drag_speed, click_x, click_y, click_x + offset_x, click_y + offset_y);
+		lresult = mouseUpAt(containing_window_handle, click_x + offset_x, click_y + offset_y);
 	}
-	return statusCode;
+	return status_code;
 }
 
-int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring attributeName, VARIANT *attributeValue)
-{
-	int statusCode = SUCCESS;
+int ElementWrapper::GetAttributeValue(BrowserWrapper *browser, std::wstring attribute_name, VARIANT *attribute_value) {
+	int status_code = SUCCESS;
 	std::wstring script(L"(function() { return function(){ ");
 
 	// Read in all the scripts
@@ -137,90 +127,80 @@ int ElementWrapper::GetAttributeValue(BrowserWrapper *pBrowser, std::wstring att
 	bounds.lLbound = 0;
 	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
 
-	long argIndex(0);
-	VARIANT varElement;
-	varElement.vt = VT_DISPATCH;
-	varElement.pdispVal = this->m_pElement;
-	::SafeArrayPutElement(args, &argIndex, &varElement);
+	long arg_index(0);
+	VARIANT element_variant;
+	element_variant.vt = VT_DISPATCH;
+	element_variant.pdispVal = this->element_;
+	::SafeArrayPutElement(args, &arg_index, &element_variant);
 
-	argIndex++;
-	CComVariant varName(attributeName.c_str());
-	::SafeArrayPutElement(args, &argIndex, &varName);
+	arg_index++;
+	CComVariant name_variant(attribute_name.c_str());
+	::SafeArrayPutElement(args, &arg_index, &name_variant);
 
-	CComVariant scriptResult;
-	statusCode = pBrowser->ExecuteScript(&script, args, &scriptResult);
+	CComVariant script_result;
+	status_code = browser->ExecuteScript(&script, args, &script_result);
 	::SafeArrayDestroy(args);
 
-	if (statusCode != SUCCESS) 
-	{
-		return statusCode;
+	if (status_code != SUCCESS) {
+		return status_code;
 	}
 
-	VariantCopy(attributeValue, &scriptResult);
+	::VariantCopy(attribute_value, &script_result);
 
 	return SUCCESS;
 }
 
 
-int ElementWrapper::GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y, long *width, long *height)
-{
+int ElementWrapper::GetLocationOnceScrolledIntoView(HWND containing_window_handle, long *x, long *y, long *width, long *height) {
     CComPtr<IHTMLDOMNode2> node;
-	HRESULT hr = this->m_pElement->QueryInterface(&node);
+	HRESULT hr = this->element_->QueryInterface(&node);
 
-    if (FAILED(hr))
-	{
+    if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Cannot cast html element to node";
 		return ENOSUCHELEMENT;
     }
 
     bool displayed;
 	int result = this->IsDisplayed(&displayed);
-	if (result != SUCCESS)
-	{
+	if (result != SUCCESS) {
 		return result;
 	} 
 
-	if (!displayed)
-	{
+	if (!displayed) {
         return EELEMENTNOTDISPLAYED;
     }
 
-    if (!this->IsEnabled())
-	{
+    if (!this->IsEnabled()) {
         return EELEMENTNOTENABLED;
     }
 
 	long top, left, bottom, right = 0;
-	result = this->GetLocation(hwnd, &left, &right, &top, &bottom);
-	if (result != SUCCESS)
-	{
+	result = this->GetLocation(containing_window_handle, &left, &right, &top, &bottom);
+	if (result != SUCCESS) {
 		// Scroll the element into view
 		//LOG(DEBUG) << "Will need to scroll element into view";
-		HRESULT hr = this->m_pElement->scrollIntoView(CComVariant(VARIANT_TRUE));
-		if (FAILED(hr))
-		{
+		HRESULT hr = this->element_->scrollIntoView(CComVariant(VARIANT_TRUE));
+		if (FAILED(hr)) {
 			// LOGHR(WARN, hr) << "Cannot scroll element into view";
 			return EOBSOLETEELEMENT;
 		}
 
-		result = this->GetLocation(hwnd, &left, &right, &top, &bottom);
+		result = this->GetLocation(containing_window_handle, &left, &right, &top, &bottom);
 	}
 
-	if (result != SUCCESS)
-	{
+	if (result != SUCCESS) {
 		return result;
 	}
 
-	long elementWidth = right - left;
-	long elementHeight = bottom - top;
+	long element_width = right - left;
+	long element_height = bottom - top;
 
-    long clickX = left;
-	long clickY = top;
+    long click_x = left;
+	long click_y = top;
 
 	//LOG(DEBUG) << "(x, y, w, h): " << clickX << ", " << clickY << ", " << elementWidth << ", " << elementHeight << endl;
 
-    if (elementHeight == 0 || elementWidth == 0) 
-	{
+    if (element_height == 0 || element_width == 0)  {
         //LOG(DEBUG) << "Element would not be visible because it lacks height and/or width.";
         return EELEMENTNOTDISPLAYED;
     }
@@ -232,54 +212,49 @@ int ElementWrapper::GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y,
 	//	clickY += 2;
 	//}
 
-	*x = clickX;
-	*y = clickY;
-	*width = elementWidth;
-	*height = elementHeight;
+	*x = click_x;
+	*y = click_y;
+	*width = element_width;
+	*height = element_height;
 
 
-    CComPtr<IDispatch> ownerDocDispatch;
-    hr = node->get_ownerDocument(&ownerDocDispatch);
-	if (FAILED(hr))
-	{
+    CComPtr<IDispatch> owner_doc_dispatch;
+    hr = node->get_ownerDocument(&owner_doc_dispatch);
+	if (FAILED(hr)) {
 		//LOG(WARN) << "Unable to locate owning document";
 		return ENOSUCHDOCUMENT;
 	}
-    CComQIPtr<IHTMLDocument3> ownerDoc(ownerDocDispatch);
-	if (!ownerDoc)
-	{
+    CComQIPtr<IHTMLDocument3> owner_doc(owner_doc_dispatch);
+	if (!owner_doc) {
 		//LOG(WARN) << "Found document but it's not the expected type";
 		return ENOSUCHDOCUMENT;
 	}
 
-    CComPtr<IHTMLElement> docElement;
-    hr = ownerDoc->get_documentElement(&docElement);
-	if (FAILED(hr))
-	{
+    CComPtr<IHTMLElement> doc_element;
+    hr = owner_doc->get_documentElement(&doc_element);
+	if (FAILED(hr)) {
 		//LOG(WARN) << "Unable to locate document element";
 		return ENOSUCHDOCUMENT;
 	}
 
-    CComQIPtr<IHTMLElement2> e2(docElement);
-    if (!e2)
-	{
+    CComQIPtr<IHTMLElement2> e2(doc_element);
+    if (!e2) {
         //LOG(WARN) << "Unable to get underlying html element from the document";
         return EUNHANDLEDERROR;
     }
 
-    CComQIPtr<IHTMLDocument2> doc2(ownerDoc);
-	if (!doc2)
-	{
+    CComQIPtr<IHTMLDocument2> doc2(owner_doc);
+	if (!doc2) {
 		//LOG(WARN) << "Have the owning document, but unable to process";
 		return ENOSUCHDOCUMENT;
 	}
 
-    long clientLeft, clientTop;
-    e2->get_clientLeft(&clientLeft);
-    e2->get_clientTop(&clientTop);
+    long client_left, client_top;
+    e2->get_clientLeft(&client_left);
+    e2->get_clientTop(&client_top);
 
-    clickX += clientLeft;
-    clickY += clientTop;
+    click_x += client_left;
+    click_y += client_top;
 
     // We now know the location of the element within its frame.
     // Where is the frame in relation to the HWND, though?
@@ -287,48 +262,43 @@ int ElementWrapper::GetLocationOnceScrolledIntoView(HWND hwnd, long *x, long *y,
     // so if we know its location, we can subtract the screenLeft and screenTop
     // of the window.
 
-    WINDOWINFO winInfo;
-    GetWindowInfo(hwnd, &winInfo);
-    clickX -= winInfo.rcWindow.left;
-    clickY -= winInfo.rcWindow.top;
+    WINDOWINFO win_info;
+    GetWindowInfo(containing_window_handle, &win_info);
+    click_x -= win_info.rcWindow.left;
+    click_y -= win_info.rcWindow.top;
 
     CComPtr<IHTMLWindow2> win2;
     hr = doc2->get_parentWindow(&win2);
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		//LOG(WARN) << "Cannot obtain parent window";
 		return ENOSUCHWINDOW;
 	}
     CComQIPtr<IHTMLWindow3> win3(win2);
-	if (!win3)
-	{
+	if (!win3) {
 		//LOG(WARN) << "Can't obtain parent window";
 		return ENOSUCHWINDOW;
 	}
-    long screenLeft, screenTop;
-    hr = win3->get_screenLeft(&screenLeft);
-	if (FAILED(hr))
-	{
+    long screen_left, screen_top;
+    hr = win3->get_screenLeft(&screen_left);
+	if (FAILED(hr)) {
 		//LOG(WARN) << "Unable to determine left corner of window";
 		return ENOSUCHWINDOW;
 	}
-    hr = win3->get_screenTop(&screenTop);
-	if (FAILED(hr))
-	{
+    hr = win3->get_screenTop(&screen_top);
+	if (FAILED(hr)) {
 		//LOG(WARN) << "Unable to determine top edge of window";
 		return ENOSUCHWINDOW;
 	}
 
-    clickX += screenLeft;
-    clickY += screenTop;
+    click_x += screen_left;
+    click_y += screen_top;
 
-    *x = clickX;
-    *y = clickY;
+    *x = click_x;
+    *y = click_y;
 	return SUCCESS;
 }
 
-int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* displayed) 
-{
+int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* displayed) {
 	CComQIPtr<IHTMLElement2> e2(element);
 	if (!e2) {
 		return EOBSOLETEELEMENT;
@@ -338,14 +308,13 @@ int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* display
 	CComBSTR display;
 
 	e2->get_currentStyle(&style);
-	if(!style)
-	{
+	if(!style) {
 		return EOBSOLETEELEMENT;
 	}
 	style->get_display(&display);
-	std::wstring displayValue = (BSTR)display;
+	std::wstring display_value = (BSTR)display;
 
-	if (_wcsicmp(L"none", displayValue.c_str()) == 0) {
+	if (_wcsicmp(L"none", display_value.c_str()) == 0) {
 		*displayed = false;
 		return SUCCESS;
 	}
@@ -353,8 +322,7 @@ int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* display
 	CComPtr<IHTMLElement> parent;
 	element->get_parentElement(&parent);
 
-	if (!parent)
-	{
+	if (!parent) {
 		*displayed = true;
 		return SUCCESS;
 	}
@@ -362,11 +330,10 @@ int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* display
 	// Check that parent has style
 	CComQIPtr<IHTMLElement2> parent2(parent);
 
-	CComPtr<IHTMLCurrentStyle> parentStyle;
-	parent2->get_currentStyle(&parentStyle);
+	CComPtr<IHTMLCurrentStyle> parent_style;
+	parent2->get_currentStyle(&parent_style);
 
-	if (parentStyle)
-	{
+	if (parent_style) {
 		return this->StyleIndicatesDisplayed(parent, displayed);
 	}
 
@@ -374,56 +341,48 @@ int ElementWrapper::StyleIndicatesDisplayed(IHTMLElement *element, bool* display
 }
 
 
-bool ElementWrapper::StyleIndicatesVisible(IHTMLElement* element) 
-{
+bool ElementWrapper::StyleIndicatesVisible(IHTMLElement* element) {
 	CComQIPtr<IHTMLElement2> e2(element);
-	if (!e2)
-	{
+	if (!e2) {
 		return false;
 	}
 	CComPtr<IHTMLCurrentStyle> curr;
 	CComBSTR visible;
 
 	e2->get_currentStyle(&curr);
-	if(!curr)
-	{
+	if(!curr) {
 		throw std::wstring(L"appears to manipulate obsolete DOM element.");
 	}
 	curr->get_visibility(&visible);
 
-	std::wstring visibleValue = (BSTR)visible;
+	std::wstring visible_value = (BSTR)visible;
 
-	int isVisible = _wcsicmp(L"hidden", visibleValue.c_str());
-	if (isVisible == 0)
-	{
+	int is_visible = _wcsicmp(L"hidden", visible_value.c_str());
+	if (is_visible == 0) {
 		return false;
 	}
 
 	// If the style attribute was set on this class and contained visibility, then stop
 	CComPtr<IHTMLStyle> style;
 	element->get_style(&style);
-	if (style)
-	{
-		CComBSTR visibleStyle;
-		style->get_visibility(&visibleStyle);
-		if (visibleStyle)
-		{
+	if (style) {
+		CComBSTR visible_style;
+		style->get_visibility(&visible_style);
+		if (visible_style) {
 			return true;  // because we'd have returned false earlier, otherwise
 		}
 	}
 
 	CComPtr<IHTMLElement> parent;
 	element->get_parentElement(&parent);
-	if (parent)
-	{
+	if (parent) {
 		return this->StyleIndicatesVisible(parent);
 	}
 
 	return true;
 }
 
-int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, long* bottom)
-{
+int ElementWrapper::GetLocation(HWND containing_window_handle, long* left, long* right, long* top, long* bottom) {
 	*top, *left, *bottom, *right = 0;
 
 	//wait(100);
@@ -433,17 +392,15 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
     // http://ejohn.org/blog/getboundingclientrect-is-awesome/
 
     CComPtr<IHTMLElement2> element2;
-	HRESULT hr = this->m_pElement->QueryInterface(&element2);
-	if (FAILED(hr)) 
-	{
+	HRESULT hr = this->element_->QueryInterface(&element2);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to cast element to correct type";
 		return EOBSOLETEELEMENT;
 	}
 
     CComPtr<IHTMLRect> rect;
 	hr = element2->getBoundingClientRect(&rect);
-    if (FAILED(hr)) 
-	{
+    if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Cannot figure out where the element is on screen";
 		return EUNHANDLEDERROR;
     }
@@ -467,25 +424,22 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
 	// The element has a location, but is it in the viewport?
 	// Turns out that the dimensions given (at least on IE 8 on vista)
 	// are relative to the view port so get the dimensions of the window
-	WINDOWINFO winInfo;
-	if (!::GetWindowInfo(hwnd, &winInfo))
-	{
+	WINDOWINFO win_info;
+	if (!::GetWindowInfo(containing_window_handle, &win_info)) {
 		//LOG(WARN) << "Cannot determine size of window";
 		return EELEMENTNOTDISPLAYED;
 	}
-    long winWidth = winInfo.rcClient.right - winInfo.rcClient.left;
-    long winHeight = winInfo.rcClient.bottom - winInfo.rcClient.top;
+    long win_width = win_info.rcClient.right - win_info.rcClient.left;
+    long win_height = win_info.rcClient.bottom - win_info.rcClient.top;
 
 	// Hurrah! Now we know what the visible area of the viewport is
 	// Is the element visible in the X axis?
-	if (l < 0 || l > winWidth)
-	{
+	if (l < 0 || l > win_width) {
 		return EELEMENTNOTDISPLAYED;
 	}
 
 	// And in the Y?
-	if (t < 0 || t > winHeight)
-	{
+	if (t < 0 || t > win_height) {
 		return EELEMENTNOTDISPLAYED;
 	}
 
@@ -498,82 +452,77 @@ int ElementWrapper::GetLocation(HWND hwnd, long* left, long* right, long* top, l
 	return SUCCESS;
 }
 
-std::wstring ElementWrapper::GetText()
-{
-	CComBSTR tagName;
-	this->m_pElement->get_tagName(&tagName);
-	bool isPre = tagName == L"PRE";
+std::wstring ElementWrapper::GetText() {
+	CComBSTR tag_name;
+	this->element_->get_tagName(&tag_name);
+	bool is_pre = tag_name == L"PRE";
 
-	CComQIPtr<IHTMLDOMNode> node(this->m_pElement);
-	std::wstring toReturn(L"");
-	this->ExtractElementText(toReturn, node, isPre);
+	CComQIPtr<IHTMLDOMNode> node(this->element_);
+	std::wstring to_return(L"");
+	this->ExtractElementText(to_return, node, is_pre);
 
 	/* Trim leading and trailing whitespace and line breaks. */
-	std::wstring::const_iterator itStart = toReturn.begin();
-	while (itStart != toReturn.end() && iswspace(*itStart)) {
-		++itStart;
+	std::wstring::const_iterator it_start = to_return.begin();
+	while (it_start != to_return.end() && iswspace(*it_start)) {
+		++it_start;
 	}
 
-	std::wstring::const_iterator itEnd = toReturn.end();
-	while (itStart < itEnd) {
-		--itEnd;
-		if (!iswspace(*itEnd)) {
-			++itEnd;
+	std::wstring::const_iterator it_end = to_return.end();
+	while (it_start < it_end) {
+		--it_end;
+		if (!iswspace(*it_end)) {
+			++it_end;
 			break;
 		}
 	}
 
-	return std::wstring(itStart, itEnd);
+	return std::wstring(it_start, it_end);
 }
 
-bool ElementWrapper::IsSelected()
-{
-	CComQIPtr<IHTMLOptionElement> option(this->m_pElement);
+bool ElementWrapper::IsSelected() {
+	CComQIPtr<IHTMLOptionElement> option(this->element_);
 	if (option) {
-		VARIANT_BOOL isSelected;
-		option->get_selected(&isSelected);
-		return isSelected == VARIANT_TRUE;
+		VARIANT_BOOL is_selected;
+		option->get_selected(&is_selected);
+		return is_selected == VARIANT_TRUE;
 	}
 
 	if (this->IsCheckBox() || this->IsRadioButton()) {
-		CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+		CComQIPtr<IHTMLInputElement> input(this->element_);
 
-		VARIANT_BOOL isChecked;
-		input->get_checked(&isChecked);
-		return isChecked == VARIANT_TRUE;
+		VARIANT_BOOL is_checked;
+		input->get_checked(&is_checked);
+		return is_checked == VARIANT_TRUE;
 	}
 
 	return false;
 }
 
-bool ElementWrapper::IsCheckBox()
-{
-	CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+bool ElementWrapper::IsCheckBox() {
+	CComQIPtr<IHTMLInputElement> input(this->element_);
 	if (!input) {
 		return false;
 	}
 
-	CComBSTR typeName;
-	input->get_type(&typeName);
-	return _wcsicmp((LPCWSTR)((BSTR)typeName), L"checkbox") == 0;
+	CComBSTR type_name;
+	input->get_type(&type_name);
+	return _wcsicmp((LPCWSTR)((BSTR)type_name), L"checkbox") == 0;
 }
 
-bool ElementWrapper::IsRadioButton()
-{
-	CComQIPtr<IHTMLInputElement> input(this->m_pElement);
+bool ElementWrapper::IsRadioButton() {
+	CComQIPtr<IHTMLInputElement> input(this->element_);
 	if (!input) {
 		return false;
 	}
 
-	CComBSTR typeName;
-	input->get_type(&typeName);
-	return _wcsicmp((LPCWSTR)((BSTR)typeName), L"radio") == 0;
+	CComBSTR type_name;
+	input->get_type(&type_name);
+	return _wcsicmp((LPCWSTR)((BSTR)type_name), L"radio") == 0;
 }
 
-void ElementWrapper::ExtractElementText(std::wstring& toReturn, IHTMLDOMNode* node, bool isPreformatted)
-{
+void ElementWrapper::ExtractElementText(std::wstring& to_return, IHTMLDOMNode* node, bool is_preformatted) {
 	if (this->IsBlockLevel(node)) {
-		this->CollapsingAppend(toReturn, L"\r\n");
+		this->CollapsingAppend(to_return, L"\r\n");
 	}
 
 	CComPtr<IDispatch> dispatch;
@@ -588,21 +537,20 @@ void ElementWrapper::ExtractElementText(std::wstring& toReturn, IHTMLDOMNode* no
 	bool displayed;
 	
 
-	for (long i = 0; i < length; i++)
-	{
+	for (long i = 0; i < length; i++) {
 		CComPtr<IDispatch> dispatch2;
 		children->item(i, &dispatch2);
 		CComQIPtr<IHTMLDOMNode> child(dispatch2);
 
-		CComBSTR childName;
-		child->get_nodeName(&childName);
+		CComBSTR child_name;
+		child->get_nodeName(&child_name);
 
-		CComQIPtr<IHTMLDOMTextNode> textNode(child);
+		CComQIPtr<IHTMLDOMTextNode> text_node(child);
 		
 		this->IsNodeDisplayed(node, &displayed);
-		if (textNode && displayed) {
+		if (text_node && displayed) {
 			CComBSTR text;
-			textNode->get_data(&text);
+			text_node->get_data(&text);
 
 			for (unsigned int i = 0; i < text.Length(); i++) {
 				if (text[i] == 160) {
@@ -610,25 +558,24 @@ void ElementWrapper::ExtractElementText(std::wstring& toReturn, IHTMLDOMNode* no
 				}
 			}
 
-			this->CollapsingAppend(toReturn, isPreformatted ?
+			this->CollapsingAppend(to_return, is_preformatted ?
 				std::wstring((BSTR)text) // bstr2wstring(text)
 				: this->CollapseWhitespace(text));
-		} else if (wcscmp((BSTR)childName, L"PRE") == 0) {
-			this->ExtractElementText(toReturn, child, true);
+		} else if (wcscmp((BSTR)child_name, L"PRE") == 0) {
+			this->ExtractElementText(to_return, child, true);
 		} else {
-			this->ExtractElementText(toReturn, child, false);
+			this->ExtractElementText(to_return, child, false);
 		}
 	}
 
 	if (this->IsBlockLevel(node)) {
-		this->CollapsingAppend(toReturn, L"\r\n");
+		this->CollapsingAppend(to_return, L"\r\n");
 	}
 }
 
 // Append s2 to s, collapsing intervening whitespace.
 // Assumes that s and s2 have already been internally collapsed.
-void ElementWrapper::CollapsingAppend(std::wstring& s, const std::wstring& s2)
-{
+void ElementWrapper::CollapsingAppend(std::wstring& s, const std::wstring& s2) {
 	if (s.empty() || s2.empty()) {
 		s += s2;
 		return;
@@ -653,55 +600,53 @@ void ElementWrapper::CollapsingAppend(std::wstring& s, const std::wstring& s2)
 	s += s2;
 }
 
-std::wstring ElementWrapper::CollapseWhitespace(CComBSTR& comtext)
-{
-	std::wstring toReturn(L"");
-	int previousWasSpace = false;
+std::wstring ElementWrapper::CollapseWhitespace(CComBSTR& comtext) {
+	std::wstring to_return(L"");
+	int previous_was_space = false;
 	wchar_t previous = L'X';
-	bool newlineAlreadyAppended = false;
+	bool newline_already_appended = false;
 
 	std::wstring text((BSTR)comtext);
 
 	// Need to keep an eye out for '\r\n'
 	for (unsigned int i = 0; i < text.size(); i++) {
 		wchar_t c = text[i];
-		int currentIsSpace = iswspace(c);
+		int current_is_space = iswspace(c);
 
 		// Append the character if the previous was not whitespace
-		if (!(currentIsSpace && previousWasSpace)) {
-			toReturn += c;
-			newlineAlreadyAppended = false;
-		} else if (previous == L'\r' && c == L'\n' && !newlineAlreadyAppended) {
+		if (!(current_is_space && previous_was_space)) {
+			to_return += c;
+			newline_already_appended = false;
+		} else if (previous == L'\r' && c == L'\n' && !newline_already_appended) {
 			// If the previous char was '\r' and current is '\n'
 			// and we've not already appended '\r\n' append '\r\n'.
 
 			// The previous char was '\r' and has already been appended and
 			// the current character is '\n'. Just appended that.
-			toReturn += c;
-			newlineAlreadyAppended = true;
+			to_return += c;
+			newline_already_appended = true;
 		}
 
-		previousWasSpace = currentIsSpace;
+		previous_was_space = current_is_space;
 		previous = c;
 	}
 
-	return toReturn;
+	return to_return;
 }
 
-bool ElementWrapper::IsBlockLevel(IHTMLDOMNode *node)
-{
+bool ElementWrapper::IsBlockLevel(IHTMLDOMNode *node) {
 	CComQIPtr<IHTMLElement> e(node);
 
 	if (e) {
-		CComBSTR tagName;
-		e->get_tagName(&tagName);
+		CComBSTR tag_name;
+		e->get_tagName(&tag_name);
 
-		bool isBreak = false;
-		if (!wcscmp(L"BR", tagName)) {
-			isBreak = true;
+		bool is_break = false;
+		if (!wcscmp(L"BR", tag_name)) {
+			is_break = true;
 		}
 
-		if (isBreak) {
+		if (is_break) {
 			return true;
 		}
 	}
@@ -724,14 +669,13 @@ bool ElementWrapper::IsBlockLevel(IHTMLDOMNode *node)
 		return false;
 	}
 
-	VARIANT_BOOL isBlock;
-	style2->get_isBlock(&isBlock);
+	VARIANT_BOOL is_block;
+	style2->get_isBlock(&is_block);
 
-	return isBlock == VARIANT_TRUE;
+	return is_block == VARIANT_TRUE;
 }
 
-int ElementWrapper::IsNodeDisplayed(IHTMLDOMNode *node, bool* result) 
-{
+int ElementWrapper::IsNodeDisplayed(IHTMLDOMNode *node, bool* result) {
 	if (!node) {
 		*result = false;
 		return SUCCESS;
@@ -747,8 +691,7 @@ int ElementWrapper::IsNodeDisplayed(IHTMLDOMNode *node, bool* result)
 	return this->IsElementDisplayed(element, result);
 }
 
-int ElementWrapper::IsElementDisplayed(IHTMLElement *element, bool *result)
-{
+int ElementWrapper::IsElementDisplayed(IHTMLElement *element, bool *result) {
 	CComQIPtr<IHTMLInputHiddenElement> hidden(element);
 	if (hidden) {
 		*result = false;
@@ -766,23 +709,24 @@ int ElementWrapper::IsElementDisplayed(IHTMLElement *element, bool *result)
 	return SUCCESS;
 }
 
-void ElementWrapper::FireEvent(IHTMLDOMNode* fireEventOn, LPCWSTR eventName)
-{
+void ElementWrapper::FireEvent(IHTMLDOMNode* fire_event_on, LPCWSTR event_name) {
 	CComPtr<IDispatch> dispatch;
-	this->m_pElement->get_document(&dispatch);
+	this->element_->get_document(&dispatch);
 	CComQIPtr<IHTMLDocument4> doc(dispatch);
 
-	CComPtr<IHTMLEventObj> eventObject;
+	CComPtr<IHTMLEventObj> event_object;
 	CComVariant empty;
-	doc->createEventObject(&empty, &eventObject);
+	doc->createEventObject(&empty, &event_object);
 
 	CComVariant eventref;
 	V_VT(&eventref) = VT_DISPATCH;
-	V_DISPATCH(&eventref) = eventObject;
+	V_DISPATCH(&eventref) = event_object;
 
-	CComBSTR onChange(eventName);
+	CComBSTR on_change(event_name);
 	VARIANT_BOOL cancellable;
 
-	CComQIPtr<IHTMLElement3> element3(fireEventOn);
-	element3->fireEvent(onChange, &eventref, &cancellable);
+	CComQIPtr<IHTMLElement3> element3(fire_event_on);
+	element3->fireEvent(on_change, &eventref, &cancellable);
 }
+
+} // namespace webdriver

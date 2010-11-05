@@ -1,8 +1,12 @@
-#pragma once
+#ifndef WEBDRIVER_IE_ELEMENTFINDER_H_
+#define WEBDRIVER_IE_ELEMENTFINDER_H_
+
 #include <string>
 #include <vector>
 
 using namespace std;
+
+namespace webdriver {
 
 // Forward declaration of classes to avoid
 // circular include files.
@@ -13,19 +17,23 @@ class ElementFinder
 public:
 	ElementFinder(void);
 	virtual ~ElementFinder(void);
-	int FindElement(BrowserManager *pManager, ElementWrapper *pParentWrapper, std::wstring criteria, ElementWrapper **ppFoundElement);
-	int FindElements(BrowserManager *pManager, ElementWrapper *pParentWrapper, std::wstring criteria, std::vector<ElementWrapper*> *pFoundElements);
+	int FindElement(BrowserManager *manager, ElementWrapper *parent_wrapper, std::wstring criteria, ElementWrapper **found_element);
+	int FindElements(BrowserManager *manager, ElementWrapper *parent_wrapper, std::wstring criteria, std::vector<ElementWrapper*> *found_elements);
 
 protected:
-	virtual int FindElementInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, IHTMLElement **ppElement);
-	virtual int FindElementsInternal(BrowserWrapper *pBrowser, IHTMLElement *pParentElement, std::wstring criteria, std::vector<IHTMLElement*> *pElements);
-	void getHtmlDocument3(BrowserManager *pManager, IHTMLDocument3 **ppDoc3);
-	void extractHtmlDocument2FromDomNode(const IHTMLDOMNode* pExtractionNode, IHTMLDocument2** ppDoc);
-	void extractHtmlDocument3FromDomNode(const IHTMLDOMNode* pExtractionNode, IHTMLDocument3** ppDoc);
-	bool isOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
-	bool isUnder(const IHTMLDOMNode* root, IHTMLElement* child);
+	virtual int FindElementInternal(BrowserWrapper *browser, IHTMLElement *parent_element, std::wstring criteria, IHTMLElement **found_element);
+	virtual int FindElementsInternal(BrowserWrapper *browser, IHTMLElement *parent_element, std::wstring criteria, std::vector<IHTMLElement*> *found_elements);
+	void GetHtmlDocument3(BrowserManager *manager, IHTMLDocument3 **doc3);
+	void ExtractHtmlDocument2FromDomNode(const IHTMLDOMNode* extraction_node, IHTMLDocument2** doc);
+	void ExtractHtmlDocument3FromDomNode(const IHTMLDOMNode* extraction_node, IHTMLDocument3** doc);
+	bool IsOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
+	bool IsUnder(const IHTMLDOMNode* root, IHTMLElement* child);
 	std::wstring StripTrailingWhitespace(std::wstring input);
 
 private:
-	int getParentElement(BrowserManager *pManager, ElementWrapper *pParentElementWrapper, IHTMLElement **ppParentElement);
+	int GetParentElement(BrowserManager *manager, ElementWrapper *parent_wrapper, IHTMLElement **parent_element);
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_ELEMENTFINDER_H_

@@ -1,52 +1,46 @@
 #include "StdAfx.h"
 #include "WebDriverCommand.h"
 
-WebDriverCommand::WebDriverCommand()
-{
-	this->m_commandValue = 0;
+namespace webdriver {
+
+WebDriverCommand::WebDriverCommand() : command_value_(0) {
 }
 
-WebDriverCommand::~WebDriverCommand(void)
-{
+WebDriverCommand::~WebDriverCommand(void) {
 }
 
-void WebDriverCommand::populate(std::string jsonCommand)
-{
+void WebDriverCommand::Populate(std::string json_command) {
 	// Clear the existing maps.
-	this->m_commandParameters.clear();
-	this->m_locatorParameters.clear();
+	this->command_parameters_.clear();
+	this->locator_parameters_.clear();
 	
 	Json::Value root;
 	Json::Reader reader;
-	BOOL successfulParse = reader.parse(jsonCommand, root);
-	if (!successfulParse)
-	{
+	BOOL successful_parse = reader.parse(json_command, root);
+	if (!successful_parse) {
 		// report to the user the failure and their locations in the document.
 		std::cout  << "Failed to parse configuration\n"
 				   << reader.getFormatedErrorMessages();
 	}
 
-	Json::Value cmdVal = root.get("command", "0");
-	m_commandValue = root.get("command", 0).asInt();
-	if (m_commandValue != 0)
-	{
-		Json::Value locatorParamObject = root["locator"];
-		Json::Value::iterator end = locatorParamObject.end();
-		for (Json::Value::iterator it = locatorParamObject.begin(); it != end; ++it)
-		{
+	this->command_value_ = root.get("command", 0).asInt();
+	if (this->command_value_ != 0) {
+		Json::Value locator_parameter_object = root["locator"];
+		Json::Value::iterator end = locator_parameter_object.end();
+		for (Json::Value::iterator it = locator_parameter_object.begin(); it != end; ++it) {
 			std::string key = it.key().asString();
-			std::string value = locatorParamObject[key].asString();
-			this->m_locatorParameters[key] = value;
+			std::string value = locator_parameter_object[key].asString();
+			this->locator_parameters_[key] = value;
 		}
 
-		Json::Value commandParamObject = root["parameters"];
-		end = commandParamObject.end();
-		for (Json::Value::iterator it = commandParamObject.begin(); it != end; ++it)
-		{
+		Json::Value command_parameter_object = root["parameters"];
+		end = command_parameter_object.end();
+		for (Json::Value::iterator it = command_parameter_object.begin(); it != end; ++it) {
 			std::string key = it.key().asString();
-			Json::Value value = commandParamObject[key];
-			this->m_commandParameters[key] = value;
+			Json::Value value = command_parameter_object[key];
+			this->command_parameters_[key] = value;
 		}
 	}
 }
 
+} // namespace webdriver

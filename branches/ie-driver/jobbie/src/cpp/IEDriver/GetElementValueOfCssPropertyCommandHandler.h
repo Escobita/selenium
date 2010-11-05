@@ -1,17 +1,17 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETELEMENTVALUEOFCSSPROPERTYCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETELEMENTVALUEOFCSSPROPERTYCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-#define BSTR_VALUE(method, cssName)     if (_wcsicmp(cssName, propertyName) == 0) { CComBSTR bstr; method(&bstr); resultStr = (BSTR)bstr; return resultStr;}
-#define VARIANT_VALUE(method, cssName)  if (_wcsicmp(cssName, propertyName) == 0) { CComVariant var; method(&var); resultStr = mangleColour(propertyName, pBrowser->ConvertVariantToWString(&var)); return resultStr;}
-#define ADD_COLOR(index, name, hex)		this->colourNames2hex[index][0] = name; this->colourNames2hex[index][1] = hex;
+#define BSTR_VALUE(method, css_name)     if (_wcsicmp(css_name, property_name) == 0) { CComBSTR bstr; method(&bstr); result_str = (BSTR)bstr; return result_str;}
+#define VARIANT_VALUE(method, css_name)  if (_wcsicmp(css_name, property_name) == 0) { CComVariant var; method(&var); result_str = this->MangleColour(property_name, browser_wrapper->ConvertVariantToWString(&var)); return result_str;}
+#define ADD_COLOR(index, name, hex)		this->colour_names_hex_code_map[index][0] = name; this->colour_names_hex_code_map[index][1] = hex;
 
-class GetElementValueOfCssPropertyCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class GetElementValueOfCssPropertyCommandHandler : public WebDriverCommandHandler {
 public:
-
-	GetElementValueOfCssPropertyCommandHandler(void)
-	{
+	GetElementValueOfCssPropertyCommandHandler(void) {
 		ADD_COLOR(0, L"aqua", L"#00ffff");
 		ADD_COLOR(1, L"black", L"#000000");
 		ADD_COLOR(2, L"blue", L"#0000ff");
@@ -31,36 +31,63 @@ public:
 		ADD_COLOR(16, NULL, NULL);
 	}
 
-	virtual ~GetElementValueOfCssPropertyCommandHandler(void)
-	{
+	virtual ~GetElementValueOfCssPropertyCommandHandler(void) {
+	}
+
+protected:
+	void GetElementValueOfCssPropertyCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
+			response->m_value = "id";
+		} else if (locator_parameters.find("propertyName") == locator_parameters.end()) {
+			response->set_status_code(400);
+			response->m_value = "propertyName";
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
+			std::wstring name(CA2W(locator_parameters["propertyName"].c_str(), CP_UTF8));
+
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
+				std::wstring value(this->GetPropertyValue(browser_wrapper, element_wrapper->element(), name.c_str()));
+
+				std::string property_value(CW2A(value.c_str(), CP_UTF8));
+				response->m_value = property_value;
+			} else {
+				response->m_value["message"] = "Element is no longer valid";
+			}
+			response->set_status_code(status_code);
+		}
 	}
 
 private:
-	const wchar_t* colourNames2hex[17][2];
-
-	std::wstring mangleColour(LPCWSTR propertyName, std::wstring toMangle)
-	{
-		if (wcsstr(propertyName, L"color") == NULL)
-			return toMangle;
+	std::wstring MangleColour(LPCWSTR property_name, std::wstring to_mangle) {
+		if (wcsstr(property_name, L"color") == NULL) {
+			return to_mangle;
+		}
 
 		// Look for each of the named colours and mangle them.
-		for (int i = 0; colourNames2hex[i][0]; i++) {
-			if (_wcsicmp(colourNames2hex[i][0], toMangle.c_str()) == 0)
-				return colourNames2hex[i][1];
+		for (int i = 0; colour_names_hex_code_map[i][0]; i++) {
+			if (_wcsicmp(colour_names_hex_code_map[i][0], to_mangle.c_str()) == 0) {
+				return colour_names_hex_code_map[i][1];
+			}
 		}
 
-		return toMangle;
+		return to_mangle;
 	}
 
-	std::wstring GetElementValueOfCssPropertyCommandHandler::GetPropertyValue(BrowserWrapper *pBrowser, IHTMLElement *pElement, LPCWSTR propertyName)
-	{
-		std::wstring resultStr(L"");
-		CComQIPtr<IHTMLElement2> styled(pElement);
+	std::wstring GetElementValueOfCssPropertyCommandHandler::GetPropertyValue(BrowserWrapper *browser_wrapper, IHTMLElement *element, LPCWSTR property_name) {
+		std::wstring result_str(L"");
+		CComQIPtr<IHTMLElement2> styled(element);
 		if (!styled) {
-			return resultStr;
+			return result_str;
 		}
 
-		CComBSTR name(propertyName);
+		CComBSTR name(property_name);
 
 		CComPtr<IHTMLCurrentStyle> style;
 		styled->get_currentStyle(&style);
@@ -159,48 +186,12 @@ private:
 		VARIANT_VALUE(	style->get_width,						L"width");
 		VARIANT_VALUE(	style->get_zIndex,						L"z-index");
 
-		return resultStr;
+		return result_str;
 	}
 
-
-
-protected:
-
-	void GetElementValueOfCssPropertyCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
-			response->m_value = "id";
-		}
-		else if (locatorParameters.find("propertyName") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
-			response->m_value = "propertyName";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
-			std::wstring name(CA2W(locatorParameters["propertyName"].c_str(), CP_UTF8));
-
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
-
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
-				std::wstring value(this->GetPropertyValue(pBrowserWrapper, pElementWrapper->m_pElement, name.c_str()));
-
-				std::string propertyValue(CW2A(value.c_str(), CP_UTF8));
-				response->m_value = propertyValue;
-			}
-			else
-			{
-				response->m_value["message"] = "Element is no longer valid";
-			}
-			response->m_statusCode = statusCode;
-		}
-	}
+	const wchar_t* colour_names_hex_code_map[17][2];
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETELEMENTVALUEOFCSSPROPERTYCOMMANDHANDLER_H_

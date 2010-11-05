@@ -1,26 +1,28 @@
-#pragma once
+#ifndef WEBDRIVER_IE_CLOSEWINDOWCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_CLOSEWINDOWCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class CloseWindowCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	CloseWindowCommandHandler(void)
-	{
+class CloseWindowCommandHandler : public WebDriverCommandHandler {
+public:
+	CloseWindowCommandHandler(void) {
 	}
 
-	virtual ~CloseWindowCommandHandler(void)
-	{
+	virtual ~CloseWindowCommandHandler(void) {
 	}
 
 protected:
-
-	void CloseWindowCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void CloseWindowCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
-		HRESULT hr = pWrapper->m_pBrowser->Quit();
-		response->m_statusCode = SUCCESS;
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
+		HRESULT hr = browser_wrapper->browser()->Quit();
+		response->set_status_code(SUCCESS);
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_CLOSEWINDOWCOMMANDHANDLER_H_

@@ -1,31 +1,32 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETALLWINDOWHANDLESCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETALLWINDOWHANDLESCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetAllWindowHandlesCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetAllWindowHandlesCommandHandler(void)
-	{
+class GetAllWindowHandlesCommandHandler : public WebDriverCommandHandler {
+public:
+	GetAllWindowHandlesCommandHandler(void) {
 	}
 
-	virtual ~GetAllWindowHandlesCommandHandler(void)
-	{
+	virtual ~GetAllWindowHandlesCommandHandler(void) {
 	}
 
 protected:
-
-	void GetAllWindowHandlesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		Json::Value handles;
-		std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
-		for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
-		{
-			std::string handle(CW2A(it->first.c_str(), CP_UTF8));
+	void GetAllWindowHandlesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		Json::Value handles(Json::arrayValue);
+		std::vector<std::wstring> handle_list;
+		manager->GetManagedBrowserHandles(&handle_list);
+		for (int i = 0; i < handle_list.size(); ++i) {
+			std::string handle(CW2A(handle_list[i].c_str(), CP_UTF8));
 			handles.append(handle);
 		}
 
 		response->m_value = handles;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETALLWINDOWHANDLESCOMMANDHANDLER_H_

@@ -1,25 +1,25 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETCURRENTWINDOWHANDLECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETCURRENTWINDOWHANDLECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetCurrentWindowHandleCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetCurrentWindowHandleCommandHandler(void)
-	{
+class GetCurrentWindowHandleCommandHandler : public WebDriverCommandHandler {
+public:
+	GetCurrentWindowHandleCommandHandler(void) {
 	}
 
-	virtual ~GetCurrentWindowHandleCommandHandler(void)
-	{
+	virtual ~GetCurrentWindowHandleCommandHandler(void) {
 	}
 
 protected:
-
-	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		std::string currentHandle(CW2A(manager->m_currentBrowser.c_str(), CP_UTF8));
-		Json::Value value(currentHandle);
-		response->m_value = value;
+	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		std::string current_handle(CW2A(manager->current_browser_id().c_str(), CP_UTF8));
+		response->m_value = current_handle;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETCURRENTWINDOWHANDLECOMMANDHANDLER_H_

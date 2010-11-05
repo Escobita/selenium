@@ -1,22 +1,70 @@
-#pragma once
+#ifndef WEBDRIVER_IE_SWITCHTOWINDOWCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_SWITCHTOWINDOWCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class SwitchToWindowCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	SwitchToWindowCommandHandler(void)
-	{
+class SwitchToWindowCommandHandler : public WebDriverCommandHandler {
+public:
+	SwitchToWindowCommandHandler(void) {
 	}
 
-	virtual ~SwitchToWindowCommandHandler(void)
-	{
+	virtual ~SwitchToWindowCommandHandler(void) {
 	}
 
 protected:
-	std::string GetWindowName(IWebBrowser2* browser)
-	{
+	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (command_parameters.find("name") == command_parameters.end()) {
+			response->set_status_code(400);
+			response->m_value = "name";
+		} else {
+			std::wstring found_browser_handle = L"";
+			std::string desired_name = command_parameters["name"].asString();
+
+			std::vector<std::wstring> handle_list;
+			manager->GetManagedBrowserHandles(&handle_list);
+			for (int i = 0; i < handle_list.size(); ++i)
+			{
+				BrowserWrapper *browser_wrapper;
+				manager->GetManagedBrowser(handle_list[i], &browser_wrapper);
+				std::string browser_name = this->GetWindowName(browser_wrapper->browser());
+				if (browser_name == desired_name)
+				{
+					found_browser_handle = handle_list[i];
+					break;
+				}
+
+				std::string browser_handle(CW2A(handle_list[i].c_str(), CP_UTF8));
+				if (browser_handle == desired_name)
+				{
+					found_browser_handle = handle_list[i];
+					break;
+				}
+			}
+
+			if (found_browser_handle == L"")
+			{
+				response->set_status_code(ENOSUCHWINDOW);
+				response->m_value["message"] = "No window found";
+			}
+			else
+			{
+				// Reset the path to the focused frame before switching window context.
+				BrowserWrapper *current_browser;
+				int statusCode = manager->GetCurrentBrowser(&current_browser);
+				if (statusCode == SUCCESS)
+				{
+					current_browser->set_path_to_frame(L"");
+				}
+
+				manager->set_current_browser_id(found_browser_handle);
+			}
+		}
+	}
+
+private:
+	std::string GetWindowName(IWebBrowser2* browser) {
 		CComPtr<IDispatch> dispatch;
 		HRESULT hr = browser->get_Document(&dispatch);
 		if (FAILED(hr)) {
@@ -34,61 +82,15 @@ protected:
 		}
 
 		std::string name("");
-		CComBSTR windowName;
-		hr = window->get_name(&windowName);
-		if (windowName)
-		{
-			name = CW2A((BSTR)windowName, CP_UTF8);
+		CComBSTR window_name;
+		hr = window->get_name(&window_name);
+		if (window_name) {
+			name = CW2A((BSTR)window_name, CP_UTF8);
 		}
 		return name;
 	}
-
-	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (commandParameters.find("name") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
-			response->m_value = "name";
-		}
-		else
-		{
-			std::wstring foundBrowserHandle = L"";
-			std::string desiredName = commandParameters["name"].asString();
-			std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
-			for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
-			{
-				std::string browserName = this->GetWindowName(it->second->m_pBrowser);
-				if (browserName == desiredName)
-				{
-					foundBrowserHandle = it->first;
-					break;
-				}
-
-				std::string browserHandle = CW2A(it->first.c_str(), CP_UTF8);
-				if (browserHandle == desiredName)
-				{
-					foundBrowserHandle = it->first;
-					break;
-				}
-			}
-
-			if (foundBrowserHandle == L"")
-			{
-				response->m_statusCode = ENOSUCHWINDOW;
-				response->m_value["message"] = "No window found";
-			}
-			else
-			{
-				// Reset the path to the focused frame before switching window context.
-				BrowserWrapper *pWrapper;
-				int statusCode = manager->GetCurrentBrowser(&pWrapper);
-				if (statusCode == SUCCESS)
-				{
-					pWrapper->m_pathToFrame = L"";
-				}
-
-				manager->m_currentBrowser = foundBrowserHandle;
-			}
-		}
-	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_SWITCHTOWINDOWCOMMANDHANDLER_H_

@@ -1,41 +1,37 @@
-#pragma once
+#ifndef WEBDRIVER_IE_QUITCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_QUITCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class QuitCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	QuitCommandHandler(void)
-	{
+class QuitCommandHandler : public WebDriverCommandHandler {
+public:
+	QuitCommandHandler(void) {
 	}
 
-	virtual ~QuitCommandHandler(void)
-	{
+	virtual ~QuitCommandHandler(void) {
 	}
 
 protected:
+	void QuitCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		std::vector<std::wstring> managed_browser_handles;
+		manager->GetManagedBrowserHandles(&managed_browser_handles);
 
-	void QuitCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		std::vector<std::wstring> trackedBrowserHandles;
-		std::map<std::wstring, BrowserWrapper*>::iterator end = manager->m_trackedBrowsers.end();
-		for (std::map<std::wstring, BrowserWrapper*>::iterator it = manager->m_trackedBrowsers.begin(); it != end; ++it)
-		{
-			trackedBrowserHandles.push_back(it->first);
-		}
-
-		std::vector<std::wstring>::iterator handleEnd = trackedBrowserHandles.end();
-		for (std::vector<std::wstring>::iterator handleIt = trackedBrowserHandles.begin(); handleIt != handleEnd; ++handleIt)
-		{
-			BrowserWrapper *pWrapper(manager->m_trackedBrowsers[*handleIt]);
-			HRESULT hr = pWrapper->m_pBrowser->Quit();
-			if (FAILED(hr))
-			{
+		std::vector<std::wstring>::iterator end = managed_browser_handles.end();
+		for (std::vector<std::wstring>::iterator it = managed_browser_handles.begin(); it != end; ++it) {
+			BrowserWrapper *browser_wrapper;
+			manager->GetManagedBrowser(*it, &browser_wrapper);
+			HRESULT hr = browser_wrapper->browser()->Quit();
+			if (FAILED(hr)) {
 				cout << "Quit failed: " << hr << "\r\n";
 			}
 		}
 
-		response->m_statusCode = SUCCESS;
+		response->set_status_code(SUCCESS);
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_QUITCOMMANDHANDLER_H_

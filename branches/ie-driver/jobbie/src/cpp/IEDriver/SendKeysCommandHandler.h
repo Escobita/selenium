@@ -1,7 +1,9 @@
-#pragma once
+#ifndef WEBDRIVER_IE_SENDKEYSCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_SENDKEYSCOMMANDHANDLER_H_
+
 #include <ctime>
-#include "BrowserManager.h"
 #include "interactions.h"
+#include "BrowserManager.h"
 
 const LPCTSTR fileDialogNames[] = {
 	_T("#32770"),
@@ -11,9 +13,9 @@ const LPCTSTR fileDialogNames[] = {
 	NULL
 };
 
-class SendKeysCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class SendKeysCommandHandler : public WebDriverCommandHandler {
 public:
 	struct FileNameData {
 		HWND main;
@@ -22,204 +24,73 @@ public:
 		const wchar_t* text;
 	};
 
-
-	SendKeysCommandHandler(void)
-	{
-
+	SendKeysCommandHandler(void) {
 	}
 
-	virtual ~SendKeysCommandHandler(void)
-	{
+	virtual ~SendKeysCommandHandler(void) {
 	}
 
-private:
-	static WORD WINAPI SendKeysCommandHandler::SetFileValue(FileNameData *data)
-	{
-		Sleep(200);
-		HWND ieMain = data->main;
-		HWND dialogHwnd = ::GetLastActivePopup(ieMain);
-
-		int maxWait = 10;
-		while ((dialogHwnd == ieMain) && --maxWait)
-		{
-			::Sleep(200);
-			dialogHwnd = ::GetLastActivePopup(ieMain);
-		}
-
-		if (!dialogHwnd || (dialogHwnd == ieMain))
-		{
-			// No dialog directly owned by the top-level window.
-			// Look for a dialog belonging to the same process as
-			// the IE server window. This isn't perfect, but it's
-			// all we have for now.
-			maxWait = 10;
-			while ((dialogHwnd == ieMain) && --maxWait)
-			{
-				ProcessWindowInfo procWinInfo;
-				procWinInfo.dwProcessId = data->ieProcId;
-				::EnumWindows(SendKeysCommandHandler::FindDialogWindowForProcess, (LPARAM)&procWinInfo);
-				if (procWinInfo.hwndBrowser != NULL)
-				{
-					dialogHwnd = procWinInfo.hwndBrowser;
-				}
-			}
-		}
-
-		if (!dialogHwnd || (dialogHwnd == ieMain))
-		{
-			//LOG(WARN) << "No dialog found";
-			return false;
-		}
-
-		return sendKeysToFileUploadAlert(dialogHwnd, data->text);
-	}
-
-	static BOOL CALLBACK SendKeysCommandHandler::FindDialogWindowForProcess(HWND hwnd, LPARAM arg)
-	{
-		ProcessWindowInfo *procWinInfo = (ProcessWindowInfo *)arg;
-
-		// Could this be an Internet Explorer Server window?
-		// 7 == "#32770\0"
-		char name[7];
-		if (GetClassNameA(hwnd, name, 7) == 0)
-		{
-			// No match found. Skip
-			return TRUE;
-		}
-		
-		if (strcmp("#32770", name) != 0)
-		{
-			return TRUE;
-		}
-		else
-		{
-			DWORD dwProcessId = NULL;
-			::GetWindowThreadProcessId(hwnd, &dwProcessId);
-			if (procWinInfo->dwProcessId == dwProcessId)
-			{
-				// Once we've found the first Internet Explorer_Server window
-				// for the process we want, we can stop.
-				procWinInfo->hwndBrowser = hwnd;
-				return FALSE;
-			}
-		}
-
-		return TRUE;
-	}
-
-	static bool sendKeysToFileUploadAlert(HWND dialogHwnd, const wchar_t* value) 
-	{
-		HWND editHwnd = NULL;
-		int maxWait = 10;
-		while (!editHwnd && --maxWait)
-		{
-			wait(200);
-			editHwnd = dialogHwnd;
-			for (int i = 1; fileDialogNames[i]; ++i)
-			{
-				editHwnd = getChildWindow(editHwnd, fileDialogNames[i]);
-			}
-		}
-
-		if (editHwnd)
-		{
-			// Attempt to set the value, looping until we succeed.
-			const wchar_t* filename = value;
-			size_t expected = wcslen(filename);
-			size_t curr = 0;
-
-			while (expected != curr)
-			{
-				::SendMessage(editHwnd, WM_SETTEXT, 0, (LPARAM) filename);
-				wait(1000);
-				curr = ::SendMessage(editHwnd, WM_GETTEXTLENGTH, 0, 0);
-			}
-
-			HWND openHwnd = ::FindWindowExW(dialogHwnd, NULL, L"Button", L"&Open");
-			if (openHwnd)
-			{
-				::SendMessage(openHwnd, WM_LBUTTONDOWN, 0, 0);
-				::SendMessage(openHwnd, WM_LBUTTONUP, 0, 0);
-			}
-
-			return true;
-		}
-
-		//LOG(WARN) << "No edit found";
-		return false;
-	}
 protected:
-
-	void SendKeysCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void SendKeysCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else if (commandParameters.find("value") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
+		} else if (command_parameters.find("value") == command_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "value";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			std::wstring keys(L"");
-			Json::Value keyArray(commandParameters["value"]);
-			for (int i = 0; i < keyArray.size(); ++i )
-			{
-				std::string key(keyArray[i].asString());
+			Json::Value key_array(command_parameters["value"]);
+			for (size_t i = 0; i < key_array.size(); ++i ) {
+				std::string key(key_array[i].asString());
 				keys.append(CA2W(key.c_str(), CP_UTF8));
 			}
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
-			HWND hwnd = pBrowserWrapper->GetHwnd();
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+			HWND window_handle = browser_wrapper->GetWindowHandle();
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
 
-			if (statusCode == SUCCESS)
-			{
+			if (status_code == SUCCESS) {
 				bool displayed;
-				statusCode = pElementWrapper->IsDisplayed(&displayed);
-				if (statusCode != SUCCESS || !displayed)
-				{
-					response->m_statusCode = EELEMENTNOTDISPLAYED;
+				status_code = element_wrapper->IsDisplayed(&displayed);
+				if (status_code != SUCCESS || !displayed) {
+					response->set_status_code(EELEMENTNOTDISPLAYED);
 					response->m_value["message"] = "Element is not displayed";
 					return;
 				}
 
-				if (!pElementWrapper->IsEnabled())
-				{
-					response->m_statusCode = EELEMENTNOTENABLED;
+				if (!element_wrapper->IsEnabled()) {
+					response->set_status_code(EELEMENTNOTENABLED);
 					response->m_value["message"] = "Element is not enabled";
 					return;
 				}
 
-				CComQIPtr<IHTMLElement> element(pElementWrapper->m_pElement);
+				CComQIPtr<IHTMLElement> element(element_wrapper->element());
 
 				element->scrollIntoView(CComVariant(VARIANT_TRUE));
 
 				CComQIPtr<IHTMLInputFileElement> file(element);
-				if (file)
-				{
-					DWORD ieProcId;
-					::GetWindowThreadProcessId(hwnd, &ieProcId);
-					HWND topLevelHwnd = NULL;
-					pBrowserWrapper->m_pBrowser->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&topLevelHwnd));
+				if (file) {
+					DWORD ie_process_id;
+					::GetWindowThreadProcessId(window_handle, &ie_process_id);
+					HWND top_level_window_handle = NULL;
+					browser_wrapper->browser()->get_HWND(reinterpret_cast<SHANDLE_PTR*>(&top_level_window_handle));
 
-					FileNameData keyData;
-					keyData.main = topLevelHwnd;
-					keyData.hwnd = hwnd;
-					keyData.text = keys.c_str();
-					keyData.ieProcId = ieProcId;
+					FileNameData key_data;
+					key_data.main = top_level_window_handle;
+					key_data.hwnd = window_handle;
+					key_data.text = keys.c_str();
+					key_data.ieProcId = ie_process_id;
 
-					DWORD threadId;
-					::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) &SendKeysCommandHandler::SetFileValue, (void *) &keyData, 0, &threadId);
+					DWORD thread_id;
+					::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) &SendKeysCommandHandler::SetFileValue, (void *) &key_data, 0, &thread_id);
 
 					element->click();
 					// We're now blocked until the dialog closes.
@@ -234,35 +105,135 @@ protected:
 				element->get_document(&dispatch);
 				CComQIPtr<IHTMLDocument2> document(dispatch);
 
-				bool hasFocus = false;
-				clock_t maxWait = clock() + 1000;
-				for (int i = clock(); i < maxWait; i = clock())
-				{
+				bool has_focus = false;
+				clock_t max_wait = clock() + 1000;
+				for (int i = clock(); i < max_wait; i = clock()) {
 					wait(1);
-					CComPtr<IHTMLElement> activeElement;
-					if (document->get_activeElement(&activeElement) == S_OK)
-					{
-						CComQIPtr<IHTMLElement2> activeElement2(activeElement);
-						if (element2.IsEqualObject(activeElement2))
-						{
-							hasFocus = true;
+					CComPtr<IHTMLElement> active_element;
+					if (document->get_activeElement(&active_element) == S_OK) {
+						CComQIPtr<IHTMLElement2> active_element2(active_element);
+						if (element2.IsEqualObject(active_element2)) {
+							has_focus = true;
 							break;
 						}
 					}
 				}
 
-				if (!hasFocus)
+				if (!has_focus)
 				{
 					//cerr << "We don't have focus on element." << endl;
 				}
 
-				sendKeys(hwnd, keys.c_str(), manager->GetSpeed());
+				sendKeys(window_handle, keys.c_str(), manager->speed());
 			}
 			else
 			{
 				response->m_value["message"] = "Element is no longer valid";
 			}
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
+private:
+	static WORD WINAPI SendKeysCommandHandler::SetFileValue(FileNameData *data) {
+		::Sleep(200);
+		HWND ie_main_window_handle = data->main;
+		HWND dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
+
+		int max_wait = 10;
+		while ((dialog_window_handle == ie_main_window_handle) && --max_wait) {
+			::Sleep(200);
+			dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
+		}
+
+		if (!dialog_window_handle || (dialog_window_handle == ie_main_window_handle)) {
+			// No dialog directly owned by the top-level window.
+			// Look for a dialog belonging to the same process as
+			// the IE server window. This isn't perfect, but it's
+			// all we have for now.
+			max_wait = 10;
+			while ((dialog_window_handle == ie_main_window_handle) && --max_wait) {
+				ProcessWindowInfo process_win_info;
+				process_win_info.dwProcessId = data->ieProcId;
+				::EnumWindows(SendKeysCommandHandler::FindDialogWindowForProcess, (LPARAM)&process_win_info);
+				if (process_win_info.hwndBrowser != NULL) {
+					dialog_window_handle = process_win_info.hwndBrowser;
+				}
+			}
+		}
+
+		if (!dialog_window_handle || (dialog_window_handle == ie_main_window_handle)) {
+			//LOG(WARN) << "No dialog found";
+			return false;
+		}
+
+		return SendKeysToFileUploadAlert(dialog_window_handle, data->text);
+	}
+
+	static BOOL CALLBACK SendKeysCommandHandler::FindDialogWindowForProcess(HWND window_handle, LPARAM arg) {
+		ProcessWindowInfo *process_win_info = (ProcessWindowInfo *)arg;
+
+		// Could this be an Internet Explorer Server window?
+		// 7 == "#32770\0"
+		char name[7];
+		if (GetClassNameA(window_handle, name, 7) == 0) {
+			// No match found. Skip
+			return TRUE;
+		}
+		
+		if (strcmp("#32770", name) != 0) {
+			return TRUE;
+		} else {
+			DWORD process_id = NULL;
+			::GetWindowThreadProcessId(window_handle, &process_id);
+			if (process_win_info->dwProcessId == process_id) {
+				// Once we've found the first Internet Explorer_Server window
+				// for the process we want, we can stop.
+				process_win_info->hwndBrowser = window_handle;
+				return FALSE;
+			}
+		}
+
+		return TRUE;
+	}
+
+	static bool SendKeysToFileUploadAlert(HWND dialog_window_handle, const wchar_t* value) 
+	{
+		HWND edit_field_window_handle = NULL;
+		int maxWait = 10;
+		while (!edit_field_window_handle && --maxWait) {
+			wait(200);
+			edit_field_window_handle = dialog_window_handle;
+			for (int i = 1; fileDialogNames[i]; ++i) {
+				edit_field_window_handle = getChildWindow(edit_field_window_handle, fileDialogNames[i]);
+			}
+		}
+
+		if (edit_field_window_handle) {
+			// Attempt to set the value, looping until we succeed.
+			const wchar_t* filename = value;
+			size_t expected = wcslen(filename);
+			size_t curr = 0;
+
+			while (expected != curr) {
+				::SendMessage(edit_field_window_handle, WM_SETTEXT, 0, (LPARAM) filename);
+				wait(1000);
+				curr = ::SendMessage(edit_field_window_handle, WM_GETTEXTLENGTH, 0, 0);
+			}
+
+			HWND open_window_handle = ::FindWindowExW(dialog_window_handle, NULL, L"Button", L"&Open");
+			if (open_window_handle) {
+				::SendMessage(open_window_handle, WM_LBUTTONDOWN, 0, 0);
+				::SendMessage(open_window_handle, WM_LBUTTONUP, 0, 0);
+			}
+
+			return true;
+		}
+
+		//LOG(WARN) << "No edit found";
+		return false;
+	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_SENDKEYSCOMMANDHANDLER_H_

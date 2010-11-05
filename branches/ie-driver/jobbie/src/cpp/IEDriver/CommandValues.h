@@ -1,3 +1,8 @@
+#ifndef WEBDRIVER_IE_COMMANDVALUES_H_
+#define WEBDRIVER_IE_COMMANDVALUES_H_
+
+namespace webdriver {
+
 enum CommandValue
 {
 	NoCommand,
@@ -54,3 +59,7 @@ enum CommandValue
 	Screenshot, 
 	ImplicitlyWait
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_COMMANDVALUES_H_

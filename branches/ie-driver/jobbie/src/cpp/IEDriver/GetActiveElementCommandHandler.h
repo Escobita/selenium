@@ -1,32 +1,28 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETACTIVEELEMENTCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETACTIVEELEMENTCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetActiveElementCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetActiveElementCommandHandler(void)
-	{
+class GetActiveElementCommandHandler : public WebDriverCommandHandler {
+public:
+	GetActiveElementCommandHandler(void) 	{
 	}
 
-	virtual ~GetActiveElementCommandHandler(void)
-	{
+	virtual ~GetActiveElementCommandHandler(void) {
 	}
 
 protected:
-	void GetActiveElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		response->m_statusCode = SUCCESS;
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
-
-		IHTMLElement* pDom;
+	void GetActiveElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		response->set_status_code(SUCCESS);
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
 
 		CComPtr<IHTMLDocument2> doc;
-		pWrapper->GetDocument(&doc);
+		browser_wrapper->GetDocument(&doc);
 		if (!doc) {
-			response->m_statusCode = ENOSUCHDOCUMENT;
+			response->set_status_code(ENOSUCHDOCUMENT);
 			response->m_value["message"] = "Document not found";
 			return;
 		}
@@ -39,12 +35,16 @@ protected:
 			doc->get_body(&element);
 		}
 
-		if (element)
-		{
-			element.CopyTo(&pDom);
-			ElementWrapper *pElementWrapper = new ElementWrapper(pDom);
-			manager->m_knownElements[pElementWrapper->m_elementId] = pElementWrapper;
-			response->m_value = pElementWrapper->ConvertToJson();
+		if (element) {
+			IHTMLElement* dom_element;
+			element.CopyTo(&dom_element);
+			ElementWrapper *element_wrapper = new ElementWrapper(dom_element);
+			manager->AddManagedElement(element_wrapper);
+			response->m_value = element_wrapper->ConvertToJson();
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETACTIVEELEMENTCOMMANDHANDLER_H_

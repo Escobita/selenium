@@ -1,45 +1,37 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETELEMENTLOCATIONCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETELEMENTLOCATIONCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetElementLocationCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetElementLocationCommandHandler(void)
-	{
+class GetElementLocationCommandHandler : public WebDriverCommandHandler {
+public:
+	GetElementLocationCommandHandler(void) {
 	}
 
-	virtual ~GetElementLocationCommandHandler(void)
-	{
+	virtual ~GetElementLocationCommandHandler(void) {
 	}
 
 protected:
-
-	void GetElementLocationCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void GetElementLocationCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
-			HWND hwnd = pBrowserWrapper->GetHwnd();
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+			HWND window_handle = browser_wrapper->GetWindowHandle();
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
-				CComQIPtr<IHTMLElement2> element2(pElementWrapper->m_pElement);
-				if (!element2)
-				{
-					statusCode = EUNHANDLEDERROR;
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
+				CComQIPtr<IHTMLElement2> element2(element_wrapper->element());
+				if (!element2) {
+					status_code = EUNHANDLEDERROR;
 				}
 				CComPtr<IHTMLRect> rect;
 				element2->getBoundingClientRect(&rect);
@@ -49,30 +41,32 @@ protected:
 				rect->get_top(&y);
 
 				CComQIPtr<IHTMLDOMNode2> node(element2);
-				CComPtr<IDispatch> ownerDocDispatch;
-				node->get_ownerDocument(&ownerDocDispatch);
-				CComQIPtr<IHTMLDocument3> ownerDoc(ownerDocDispatch);
+				CComPtr<IDispatch> owner_document_dispatch;
+				node->get_ownerDocument(&owner_document_dispatch);
+				CComQIPtr<IHTMLDocument3> owner_doc(owner_document_dispatch);
 
-				CComPtr<IHTMLElement> tempDoc;
-				ownerDoc->get_documentElement(&tempDoc);
+				CComPtr<IHTMLElement> temp_doc;
+				owner_doc->get_documentElement(&temp_doc);
 
-				CComQIPtr<IHTMLElement2> docElement(tempDoc);
+				CComQIPtr<IHTMLElement2> document_element(temp_doc);
 				long left = 0, top = 0;
-				docElement->get_scrollLeft(&left);
-				docElement->get_scrollTop(&top);
+				document_element->get_scrollLeft(&left);
+				document_element->get_scrollTop(&top);
 
 				x += left;
 				y += top;
 
 				response->m_value["x"] = x;
 				response->m_value["y"] = y;
-			}
-			else
-			{
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
 
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETELEMENTLOCATIONCOMMANDHANDLER_H_

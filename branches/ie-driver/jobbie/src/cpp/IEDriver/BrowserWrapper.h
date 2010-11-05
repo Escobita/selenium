@@ -1,16 +1,18 @@
-#pragma once
-#include "BrowserWrapperEvent.h"
-#include "BrowserFactory.h"
-#include "CommandValues.h"
-#include "ErrorCodes.h"
-#include "json.h"
-#include <string>
-#include <iostream>
-#include <queue>
-#include <rpc.h>
+#ifndef WEBDRIVER_IE_BROWSERWRAPPER_H_
+#define WEBDRIVER_IE_BROWSERWRAPPER_H_
+
 #include <exdispid.h>
 #include <exdisp.h>
 #include <mshtml.h>
+#include <rpc.h>
+#include <iostream>
+#include <queue>
+#include <string>
+#include "json.h"
+#include "BrowserFactory.h"
+#include "BrowserWrapperEvent.h"
+#include "CommandValues.h"
+#include "ErrorCodes.h"
 
 #define SCRIPT_ARGTYPE_STRING 0
 #define SCRIPT_ARGTYPE_INT 1
@@ -23,16 +25,13 @@
 
 using namespace std;
 
-class BrowserWrapper :
-	public IDispEventSimpleImpl<1, BrowserWrapper, &DIID_DWebBrowserEvents2>
+namespace webdriver {
 
-{
+class BrowserWrapper : public IDispEventSimpleImpl<1, BrowserWrapper, &DIID_DWebBrowserEvents2> {
 public:
 	BrowserWrapper(IWebBrowser2* browser, HWND hwnd, BrowserFactory *factory);
 	virtual ~BrowserWrapper(void);
 
-	std::wstring m_browserId;
-	BrowserFactory *m_factory;
 	BrowserWrapperEvent<BrowserWrapper*> NewWindow;
 	BrowserWrapperEvent<std::wstring> Quitting;
 
@@ -72,31 +71,45 @@ public:
 	STDMETHOD_(void, NewWindow3)(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
 
 	bool Wait(void);
-	void GetDocument(IHTMLDocument2 **ppDoc);
+	void GetDocument(IHTMLDocument2 **doc);
 	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
-	HWND GetHwnd(void);
+	HWND GetWindowHandle(void);
 	std::wstring GetTitle(void);
 	std::wstring GetCookies(void);
 	int AddCookie(std::wstring cookie);
-	int DeleteCookie(std::wstring cookieName);
-	bool m_waitRequired;
+	int DeleteCookie(std::wstring cookie_name);
 
-	CComPtr<IWebBrowser2> m_pBrowser;
-	std::wstring m_pathToFrame;
-	std::wstring ConvertVariantToWString(VARIANT *toConvert);
+	std::wstring ConvertVariantToWString(VARIANT *to_convert);
+
+	IWebBrowser2 *browser(void) { return this->browser_; }
+	std::wstring browser_id(void) { return this->browser_id_; }
+
+	std::wstring path_to_frame(void) { return this->path_to_frame_; }
+	void set_path_to_frame(std::wstring path) { this->path_to_frame_ = path; }
+
+	bool wait_required(void) { return this->wait_required_; }
+	void set_wait_required(bool value) { this->wait_required_ = value; }
 
 private:
-	HWND m_hwnd;
-	bool m_navStarted;
-	void attachEvents(void);
-	void detachEvents(void);
-	bool isDocumentNavigating(IHTMLDocument2 *pDoc);
-	UINT64 getTime(void);
-	bool isHtmlPage(IHTMLDocument2 *pDoc);
-	int getElapsedMilliseconds(UINT64 startTime);
-	void findCurrentFrameWindow(IHTMLWindow2 **ppWindow);
-	void getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 **ppWindow);
-	bool getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* pAdded);
-	void removeScript(IHTMLDocument2* pDoc);
-	bool createAnonymousFunction(IDispatch* pScriptEngine, DISPID evalId, const std::wstring *script, VARIANT* pResult);
+	void AttachEvents(void);
+	void DetachEvents(void);
+	bool IsDocumentNavigating(IHTMLDocument2 *doc);
+	bool IsHtmlPage(IHTMLDocument2 *doc);
+	void FindCurrentFrameWindow(IHTMLWindow2 **window);
+	void GetDefaultContentWindow(IHTMLDocument2 *doc, IHTMLWindow2 **window);
+	bool GetEvalMethod(IHTMLDocument2* doc, DISPID* eval_id, bool* added);
+	void RemoveScript(IHTMLDocument2* doc);
+	bool CreateAnonymousFunction(IDispatch* script_engine, DISPID eval_id, const std::wstring *script, VARIANT* result);
+
+	CComPtr<IWebBrowser2> browser_;
+	BrowserFactory *factory_;
+	HWND window_handle_;
+	std::wstring browser_id_;
+	std::wstring path_to_frame_;
+	bool is_navigation_started_;
+	bool wait_required_;
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_BROWSERWRAPPER_H_

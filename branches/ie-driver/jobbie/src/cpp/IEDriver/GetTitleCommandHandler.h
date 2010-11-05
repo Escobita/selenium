@@ -1,26 +1,28 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETTITLECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETTITLECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetTitleCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class GetTitleCommandHandler : public WebDriverCommandHandler {
 public:
-
-	GetTitleCommandHandler(void)
-	{
+	GetTitleCommandHandler(void) {
 	}
 
-	virtual ~GetTitleCommandHandler(void)
-	{
+	virtual ~GetTitleCommandHandler(void) {
 	}
+
 protected:
-
-	void GetTitleCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
-		std::string title(CW2A(pWrapper->GetTitle().c_str(), CP_UTF8));
+	void GetTitleCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
+		std::string title(CW2A(browser_wrapper->GetTitle().c_str(), CP_UTF8));
 
 		response->m_value = title;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETTITLECOMMANDHANDLER_H_

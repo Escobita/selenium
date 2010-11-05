@@ -1,30 +1,69 @@
-#pragma once
+#ifndef WEBDRIVER_IE_EXECUTESCRIPTCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_EXECUTESCRIPTCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class ExecuteScriptCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class ExecuteScriptCommandHandler : public WebDriverCommandHandler {
 public:
-
-	ExecuteScriptCommandHandler(void)
-	{
+	ExecuteScriptCommandHandler(void) {
 	}
 
-	virtual ~ExecuteScriptCommandHandler(void)
-	{
+	virtual ~ExecuteScriptCommandHandler(void) {
 	}
+
 protected:
-	std::wstring ExecuteScriptCommandHandler::GetScriptResultObjectType(CComVariant* scriptResult)
+	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
-		CComQIPtr<IHTMLElementCollection> isCol(scriptResult->pdispVal);
-		if (isCol) 
-		{
+		if (command_parameters.find("script") == command_parameters.end()) {
+			response->set_status_code(400);
+			response->m_value = "script";
+		} else if (command_parameters.find("args") == command_parameters.end()) {
+			response->set_status_code(400);
+			response->m_value = "args";
+		} else {
+			std::wstring script_body(CA2W(command_parameters["script"].asString().c_str(), CP_UTF8));
+			wstringstream script_stream;
+			script_stream << L"(function() { return function(){";
+			script_stream << script_body;
+			script_stream << L"};})();";
+			const std::wstring script(script_stream.str());
+
+			Json::Value json_args(command_parameters["args"]);
+
+			SAFEARRAY *args;
+			SAFEARRAYBOUND bounds;
+			bounds.cElements = json_args.size();
+			bounds.lLbound = 0;
+			args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+
+			this->PopulateArgumentArray(manager, args, json_args);
+
+			CComVariant result;
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = browser_wrapper->ExecuteScript(&script, args, &result);
+			::SafeArrayDestroy(args);
+
+			if (status_code != SUCCESS) {
+				response->set_status_code(status_code);
+				response->m_value["message"] = "JavaScript error";
+			} else {
+				response->set_status_code(this->ConvertScriptResult(result, manager, &response->m_value));
+			}
+		}
+	}
+
+private:
+	std::wstring ExecuteScriptCommandHandler::GetScriptResultObjectType(CComVariant* script_result) {
+		CComQIPtr<IHTMLElementCollection> is_collection(script_result->pdispVal);
+		if (is_collection) {
 			return L"HtmlCollection";
 		}
 
-		CComQIPtr<IHTMLElement> isElem(scriptResult->pdispVal);
-		if (isElem) 
-		{
+		CComQIPtr<IHTMLElement> is_element(script_result->pdispVal);
+		if (is_element) {
 			return L"HtmlElement";
 		}
 
@@ -32,21 +71,19 @@ protected:
 		// The distinction is not important for now.
 
 		CComPtr<ITypeInfo> typeinfo;
-		HRESULT getTypeInfoRes = scriptResult->pdispVal->GetTypeInfo(0, LOCALE_USER_DEFAULT, &typeinfo);
-		TYPEATTR* typeAttr;
+		HRESULT get_type_info_result = script_result->pdispVal->GetTypeInfo(0, LOCALE_USER_DEFAULT, &typeinfo);
+		TYPEATTR* type_attr;
 		CComBSTR name;
-		if (SUCCEEDED(getTypeInfoRes) && SUCCEEDED(typeinfo->GetTypeAttr(&typeAttr))
-			&& SUCCEEDED(typeinfo->GetDocumentation(-1, &name, 0, 0, 0)))
-		{
+		if (SUCCEEDED(get_type_info_result) && SUCCEEDED(typeinfo->GetTypeAttr(&type_attr))
+			&& SUCCEEDED(typeinfo->GetDocumentation(-1, &name, 0, 0, 0))) {
 			// If the name is JScriptTypeInfo then *assume* this is a Javascript array.
 			// Note that Javascript can return functions which will have the same
 			// type - the only way to be sure is to run some more Javascript code to
 			// see if this object has a length attribute. This does not seem necessary
 			// now.
 			// (For future reference, GUID is {C59C6B12-F6C1-11CF-8835-00A0C911E8B2})
-			typeinfo->ReleaseTypeAttr(typeAttr);
-			if (name == L"JScriptTypeInfo")
-			{
+			typeinfo->ReleaseTypeAttr(type_attr);
+			if (name == L"JScriptTypeInfo") {
 				return L"JavascriptArray";
 			}
 		}
@@ -54,64 +91,53 @@ protected:
 		return L"Unknown";
 	}
 
-	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, SAFEARRAY * args, Json::Value jsonArgs)
-	{
-		int statusCode = SUCCESS;
-		for (UINT argIndex = 0; argIndex < jsonArgs.size(); ++argIndex)
+	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, SAFEARRAY * args, Json::Value json_args) {
+		int status_code = SUCCESS;
+		for (UINT arg_index = 0; arg_index < json_args.size(); ++arg_index)
 		{
-			LONG index = (LONG)argIndex;
-			Json::Value arg = jsonArgs[argIndex];
-			if (arg.isString())
-			{
+			LONG index = (LONG)arg_index;
+			Json::Value arg = json_args[arg_index];
+			if (arg.isString()) {
 				std::wstring value(CA2W(arg.asString().c_str(), CP_UTF8));
-				CComVariant destStr(value.c_str());
-				::SafeArrayPutElement(args, &index, &destStr);
-			}
-			else if (arg.isInt())
-			{
-				int intNumber(arg.asInt());
-				VARIANT destInt;
-				destInt.vt = VT_I4;
-				destInt.lVal = (LONG) intNumber;	
-				::SafeArrayPutElement(args, &index, &destInt);
-			}
-			else if (arg.isDouble())
-			{
-				double dblNumber(arg.asDouble());
-				VARIANT destDbl;
-				destDbl.vt = VT_R8;
-				destDbl.dblVal = dblNumber;	
-				::SafeArrayPutElement(args, &index, &destDbl);
-			}
-			else if (arg.isBool())
-			{
-				bool boolArg(arg.asBool());
-				VARIANT destBool;
-				destBool.vt = VT_BOOL;
-				destBool.boolVal = boolArg;
-				::SafeArrayPutElement(args, &index, &destBool);
-			}
-			else if (arg.isObject() && arg.isMember("ELEMENT"))
-			{
-				std::wstring elementId(CA2W(arg["ELEMENT"].asString().c_str(), CP_UTF8));
+				CComVariant dest_str(value.c_str());
+				::SafeArrayPutElement(args, &index, &dest_str);
+			} else if (arg.isInt()) {
+				int int_number(arg.asInt());
+				VARIANT dest_int;
+				dest_int.vt = VT_I4;
+				dest_int.lVal = (LONG) int_number;	
+				::SafeArrayPutElement(args, &index, &dest_int);
+			} else if (arg.isDouble()) {
+				double dbl_number(arg.asDouble());
+				VARIANT dest_dbl;
+				dest_dbl.vt = VT_R8;
+				dest_dbl.dblVal = dbl_number;	
+				::SafeArrayPutElement(args, &index, &dest_dbl);
+			} else if (arg.isBool()) {
+				bool bool_arg(arg.asBool());
+				VARIANT dest_bool;
+				dest_bool.vt = VT_BOOL;
+				dest_bool.boolVal = bool_arg;
+				::SafeArrayPutElement(args, &index, &dest_bool);
+			} else if (arg.isObject() && arg.isMember("ELEMENT")) {
+				std::wstring element_id(CA2W(arg["ELEMENT"].asString().c_str(), CP_UTF8));
 
-				ElementWrapper *pElementWrapper;
-				statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-				if (statusCode == SUCCESS)
+				ElementWrapper *element_wrapper;
+				status_code = this->GetElement(manager, element_id, &element_wrapper);
+				if (status_code == SUCCESS)
 				{
-					VARIANT destDisp;
-					destDisp.vt = VT_DISPATCH;
-					destDisp.pdispVal = pElementWrapper->m_pElement;
-					::SafeArrayPutElement(args, &index, &destDisp);
+					VARIANT dest_disp;
+					dest_disp.vt = VT_DISPATCH;
+					dest_disp.pdispVal = element_wrapper->element();
+					::SafeArrayPutElement(args, &index, &dest_disp);
 				}
 			}
 		}
 
-		return statusCode;
+		return status_code;
 	}
 
-	int ConvertScriptResult(CComVariant result, BrowserManager *pManager, Json::Value *value)
-	{
+	int ConvertScriptResult(CComVariant result, BrowserManager *manager, Json::Value *value) {
 		std::string strVal;
 		switch (result.vt) {
 			case VT_BSTR:
@@ -128,76 +154,70 @@ protected:
 				*value = result.boolVal == VARIANT_TRUE;
 				break;
 
-			case VT_DISPATCH:
-				{
+			case VT_DISPATCH: {
 					std::wstring itemType = this->GetScriptResultObjectType(&result);
-					if (itemType == L"JavascriptArray" || itemType == L"HtmlCollection")
-					{
-						BrowserWrapper *pBrowser;
-						pManager->GetCurrentBrowser(&pBrowser);
-						Json::Value resultArray(Json::arrayValue);
+					if (itemType == L"JavascriptArray" || itemType == L"HtmlCollection") {
+						BrowserWrapper *browser_wrapper;
+						manager->GetCurrentBrowser(&browser_wrapper);
+						Json::Value result_array(Json::arrayValue);
 						// Prepare an array for the Javascript execution, containing only one
 						// element - the original returned array from a JS execution.
-						SAFEARRAYBOUND lengthQuery;
-						lengthQuery.cElements = 1;
-						lengthQuery.lLbound = 0;
+						SAFEARRAYBOUND length_query;
+						length_query.cElements = 1;
+						length_query.lLbound = 0;
 
-						SAFEARRAY* lengthArgs = SafeArrayCreate(VT_VARIANT, 1, &lengthQuery);
+						SAFEARRAY* length_args = SafeArrayCreate(VT_VARIANT, 1, &length_query);
 						LONG index = 0;
-						SafeArrayPutElement(lengthArgs, &index, &result);
+						SafeArrayPutElement(length_args, &index, &result);
 
-						CComVariant lengthVar;
-						std::wstring getLengthScript(L"(function(){return function() {return arguments[0].length;}})();");
-						int lengthResult = pBrowser->ExecuteScript(
-							&getLengthScript,
-							lengthArgs, &lengthVar);
+						CComVariant length_variant;
+						std::wstring get_length_script(L"(function(){return function() {return arguments[0].length;}})();");
+						int length_result = browser_wrapper->ExecuteScript(
+							&get_length_script,
+							length_args, &length_variant);
 
-						SafeArrayDestroy(lengthArgs);
+						SafeArrayDestroy(length_args);
 						// Expect the return type to be an integer. A non-integer means this was
 						// not an array after all.
-						if (lengthVar.vt != VT_I4) 
-						{
+						if (length_variant.vt != VT_I4) {
 							return EUNEXPECTEDJSERROR;
 						}
 
-						LONG length = lengthVar.lVal;
+						LONG length = length_variant.lVal;
 
 						// Prepare an array for the Javascript execution, containing only one
 						// element - the original returned array from a JS execution.
-						SAFEARRAYBOUND itemQuery;
-						itemQuery.cElements = 2;
-						itemQuery.lLbound = 0;
+						SAFEARRAYBOUND item_query;
+						item_query.cElements = 2;
+						item_query.lLbound = 0;
 
-						for (LONG i = 0; i < length; ++i)
-						{
-							SAFEARRAY* itemArgs = SafeArrayCreate(VT_VARIANT, 1, &itemQuery);
+						for (LONG i = 0; i < length; ++i) {
+							SAFEARRAY* item_args = SafeArrayCreate(VT_VARIANT, 1, &item_query);
 							LONG index = 0;
-							SafeArrayPutElement(itemArgs, &index, &result);
+							::SafeArrayPutElement(item_args, &index, &result);
 
-							CComVariant indexVar;
-							indexVar.vt = VT_I4;
-							indexVar.lVal = i;	
+							CComVariant index_variant;
+							index_variant.vt = VT_I4;
+							index_variant.lVal = i;	
 							index++;
-							SafeArrayPutElement(itemArgs, &index, &indexVar);
+							::SafeArrayPutElement(item_args, &index, &index_variant);
 
-							CComVariant itemVar;
-							std::wstring getArrayItemScript(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
-							int lengthResult = pBrowser->ExecuteScript(&getArrayItemScript,
-								itemArgs, &itemVar);
+							CComVariant item_variant;
+							std::wstring get_array_item_script(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
+							int lengthResult = browser_wrapper->ExecuteScript(&get_array_item_script,
+								item_args, &item_variant);
 
-							SafeArrayDestroy(itemArgs);
-							Json::Value arrayItemResult;
-							int arrayItemStatus = this->ConvertScriptResult(itemVar, pManager, &arrayItemResult);
-							resultArray[i] = arrayItemResult;
+							::SafeArrayDestroy(item_args);
+							Json::Value array_item_result;
+							int array_item_status = this->ConvertScriptResult(item_variant, manager, &array_item_result);
+							result_array[i] = array_item_result;
 						}
-						*value = resultArray;
-					}
-					else
-					{
+						*value = result_array;
+					} else {
 						IHTMLElement *node = (IHTMLElement*) result.pdispVal;
-						ElementWrapper *pElement = new ElementWrapper(node);
-						pManager->m_knownElements[pElement->m_elementId] = pElement;
-						*value = pElement->ConvertToJson();
+						ElementWrapper *element_wrapper = new ElementWrapper(node);
+						manager->AddManagedElement(element_wrapper);
+						*value = element_wrapper->ConvertToJson();
 					}
 				}
 				break;
@@ -221,53 +241,8 @@ protected:
 		}
 		return SUCCESS;
 	}
-
-	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (commandParameters.find("script") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
-			response->m_value = "script";
-		}
-		else if (commandParameters.find("args") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
-			response->m_value = "args";
-		}
-		else
-		{
-			std::wstring scriptBody(CA2W(commandParameters["script"].asString().c_str(), CP_UTF8));
-			wstringstream scriptStream;
-			scriptStream << L"(function() { return function(){";
-			scriptStream << scriptBody;
-			scriptStream << L"};})();";
-			const std::wstring script(scriptStream.str());
-
-			Json::Value jsonArgs(commandParameters["args"]);
-
-			SAFEARRAY *args;
-			SAFEARRAYBOUND bounds;
-			bounds.cElements = jsonArgs.size();
-			bounds.lLbound = 0;
-			args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
-
-			this->PopulateArgumentArray(manager, args, commandParameters["args"]);
-
-			CComVariant result;
-			BrowserWrapper *pWrapper;
-			manager->GetCurrentBrowser(&pWrapper);
-			int statusCode = pWrapper->ExecuteScript(&script, args, &result);
-			::SafeArrayDestroy(args);
-
-			if (statusCode != SUCCESS)
-			{
-				response->m_statusCode = statusCode;
-				response->m_value["message"] = "JavaScript error";
-			}
-			else
-			{
-				response->m_statusCode = this->ConvertScriptResult(result, manager, &response->m_value);
-			}
-		}
-	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_EXECUTESCRIPTCOMMANDHANDLER_H_

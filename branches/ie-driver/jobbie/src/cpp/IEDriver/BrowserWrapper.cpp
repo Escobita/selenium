@@ -3,206 +3,178 @@
 #include "cookies.h"
 #include <comutil.h>
 
-BrowserWrapper::BrowserWrapper(IWebBrowser2 *browser, HWND hwnd, BrowserFactory *factory)
-{
+namespace webdriver {
+
+BrowserWrapper::BrowserWrapper(IWebBrowser2 *browser, HWND hwnd, BrowserFactory *factory) {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.
-	UUID idGuid;
-	RPC_WSTR pszUuid = NULL;
-	::UuidCreate(&idGuid);
-	::UuidToString(&idGuid, &pszUuid);
+	UUID guid;
+	RPC_WSTR guid_string = NULL;
+	::UuidCreate(&guid);
+	::UuidToString(&guid, &guid_string);
 
 	// RPC_WSTR is currently typedef'd in RpcDce.h (pulled in by rpc.h)
 	// as unsigned short*. It needs to be typedef'd as wchar_t* 
-	wchar_t* pwStr = reinterpret_cast<wchar_t*>(pszUuid);
-	this->m_browserId = pwStr;
+	wchar_t* cast_guid_string = reinterpret_cast<wchar_t*>(guid_string);
+	this->browser_id_ = cast_guid_string;
 
-	::RpcStringFree(&pszUuid);
+	::RpcStringFree(&guid_string);
 
-	this->m_waitRequired = false;
-	this->m_navStarted = false;
-	this->m_factory = factory;
-	this->m_hwnd = hwnd;
-	this->m_pBrowser = browser;
-	this->attachEvents();
+	this->wait_required_ = false;
+	this->is_navigation_started_ = false;
+	this->factory_ = factory;
+	this->window_handle_ = hwnd;
+	this->browser_ = browser;
+	this->AttachEvents();
 }
 
-BrowserWrapper::~BrowserWrapper(void)
-{
+BrowserWrapper::~BrowserWrapper(void) {
 }
 
-void BrowserWrapper::GetDocument(IHTMLDocument2 **ppDoc)
-{
+void BrowserWrapper::GetDocument(IHTMLDocument2 **doc) {
 	CComPtr<IHTMLWindow2> window;
-	this->findCurrentFrameWindow(&window);
+	this->FindCurrentFrameWindow(&window);
 
-	if (window) 
-	{
-		HRESULT hr = window->get_document(ppDoc);
-		if (FAILED(hr))
-		{
+	if (window) {
+		HRESULT hr = window->get_document(doc);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Cannot get document";
 		}
 	}
 }
 
-int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result)
-{
-	VariantClear(result);
+int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result) {
+	::VariantClear(result);
 
 	CComPtr<IHTMLDocument2> doc;
 	this->GetDocument(&doc);
-	if (!doc)
-	{
+	if (!doc) {
 		// LOG(WARN) << "Unable to get document reference";
 		return EUNEXPECTEDJSERROR;
 	}
 
-	CComPtr<IDispatch> scriptEngine;
-	HRESULT hr = doc->get_Script(&scriptEngine);
-	if (FAILED(hr))
-	{
+	CComPtr<IDispatch> script_engine;
+	HRESULT hr = doc->get_Script(&script_engine);
+	if (FAILED(hr)) {
 		// LOGHR(WARN, hr) << "Cannot obtain script engine";
 		return EUNEXPECTEDJSERROR;
 	}
 
-	DISPID evalId;
+	DISPID eval_id;
 	bool added;
-	bool ok = this->getEvalMethod(doc, &evalId, &added);
+	bool ok = this->GetEvalMethod(doc, &eval_id, &added);
 
-	if (!ok)
-	{
+	if (!ok) {
 		// LOG(WARN) << "Unable to locate eval method";
-		if (added)
-		{ 
-			removeScript(doc); 
+		if (added) { 
+			this->RemoveScript(doc); 
 		}
 		return EUNEXPECTEDJSERROR;
 	}
 
-	CComVariant tempFunction;
-	if (!createAnonymousFunction(scriptEngine, evalId, script, &tempFunction))
-	{
+	CComVariant temp_function;
+	if (!this->CreateAnonymousFunction(script_engine, eval_id, script, &temp_function)) {
 		// Debug level since this is normally the point we find out that 
 		// a page refresh has occured. *sigh*
 		//LOG(DEBUG) << "Cannot create anonymous function: " << _bstr_t(script) << endl;
-		if (added)
-		{ 
-			removeScript(doc); 
+		if (added) { 
+			this->RemoveScript(doc); 
 		}
 		return EUNEXPECTEDJSERROR;
 	}
 
-	if (tempFunction.vt != VT_DISPATCH)
-	{
+	if (temp_function.vt != VT_DISPATCH) {
 		// No return value that we care about
-		VariantClear(result);
+		::VariantClear(result);
 		result->vt = VT_EMPTY;
-		if (added)
-		{ 
-			removeScript(doc); 
+		if (added) { 
+			this->RemoveScript(doc); 
 		}
 		return SUCCESS;
 	}
 
 	// Grab the "call" method out of the returned function
-	DISPID callid;
-	OLECHAR FAR* szCallMember = L"call";
-	hr = tempFunction.pdispVal->GetIDsOfNames(IID_NULL, &szCallMember, 1, LOCALE_USER_DEFAULT, &callid);
-	if (FAILED(hr))
-	{
-		if (added) 
-		{ 
-			removeScript(doc); 
+	DISPID call_member_id;
+	OLECHAR FAR* call_member_name = L"call";
+	hr = temp_function.pdispVal->GetIDsOfNames(IID_NULL, &call_member_name, 1, LOCALE_USER_DEFAULT, &call_member_id);
+	if (FAILED(hr)) {
+		if (added) { 
+			this->RemoveScript(doc); 
 		}
 		//LOGHR(DEBUG, hr) << "Cannot locate call method on anonymous function: " << _bstr_t(script) << endl;
 		return EUNEXPECTEDJSERROR;
 	}
 
-	DISPPARAMS callParameters = { 0 };
-	memset(&callParameters, 0, sizeof callParameters);
+	DISPPARAMS call_parameters = { 0 };
+	memset(&call_parameters, 0, sizeof call_parameters);
 
 	long lower = 0;
-	SafeArrayGetLBound(args, 1, &lower);
+	::SafeArrayGetLBound(args, 1, &lower);
 	long upper = 0;
-	SafeArrayGetUBound(args, 1, &upper);
+	::SafeArrayGetUBound(args, 1, &upper);
 	long nargs = 1 + upper - lower;
-	callParameters.cArgs = nargs + 1;
+	call_parameters.cArgs = nargs + 1;
 
 	CComPtr<IHTMLWindow2> win;
 	hr = doc->get_parentWindow(&win);
-	if (FAILED(hr))
-	{
-		if (added) 
-		{ 
-			removeScript(doc); 
+	if (FAILED(hr)) {
+		if (added) { 
+			this->RemoveScript(doc); 
 		}
 		//LOGHR(WARN, hr) << "Cannot get parent window";
 		return EUNEXPECTEDJSERROR;
 	}
 	_variant_t *vargs = new _variant_t[nargs + 1];
-	VariantCopy(&(vargs[nargs]), &CComVariant(win));
+	::VariantCopy(&(vargs[nargs]), &CComVariant(win));
 
 	long index;
-	for (int i = 0; i < nargs; i++)
-	{
+	for (int i = 0; i < nargs; i++) {
 		index = i;
 		CComVariant v;
-		SafeArrayGetElement(args, &index, (void*) &v);
-		VariantCopy(&(vargs[nargs - 1 - i]), &v);
+		::SafeArrayGetElement(args, &index, (void*) &v);
+		::VariantCopy(&(vargs[nargs - 1 - i]), &v);
 	}
 
-	callParameters.rgvarg = vargs;
+	call_parameters.rgvarg = vargs;
 
 	EXCEPINFO exception;
 	memset(&exception, 0, sizeof exception);
-	hr = tempFunction.pdispVal->Invoke(callid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &callParameters, 
+	hr = temp_function.pdispVal->Invoke(call_member_id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &call_parameters, 
 		result,
 		&exception, 0);
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		CComBSTR errorDescription(exception.bstrDescription);
-		if (DISP_E_EXCEPTION == hr) 
-		{
+		if (DISP_E_EXCEPTION == hr)  {
 			//LOG(INFO) << "Exception message was: " << _bstr_t(exception.bstrDescription);
-		}
-		else
-		{
+		} else {
 			//LOGHR(DEBUG, hr) << "Failed to execute: " << _bstr_t(script);
-			if (added)
-			{ 
-				removeScript(doc); 
+			if (added) { 
+				this->RemoveScript(doc); 
 			}
 			return EUNEXPECTEDJSERROR;
 		}
 
-		VariantClear(result);
+		::VariantClear(result);
 		result->vt = VT_USERDEFINED;
-		if (exception.bstrDescription != NULL)
-		{
+		if (exception.bstrDescription != NULL) {
 			result->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
-		}
-		else
-		{
+		} else {
 			result->bstrVal = ::SysAllocStringByteLen(NULL, 0);
 		}
 		wcout << _bstr_t(exception.bstrDescription) << endl;
 	}
 
 	// If the script returned an IHTMLElement, we need to copy it to make it valid.
-	if( VT_DISPATCH == result->vt )
-	{
+	if( VT_DISPATCH == result->vt ) {
 		CComQIPtr<IHTMLElement> element(result->pdispVal);
-		if(element)
-		{
-			IHTMLElement* &pDom = * (IHTMLElement**) &(result->pdispVal);
-			element.CopyTo(&pDom);
+		if(element) {
+			IHTMLElement* &dom_element = * (IHTMLElement**) &(result->pdispVal);
+			element.CopyTo(&dom_element);
 		}
 	}
 
-	if (added) 
-	{ 
-		removeScript(doc); 
+	if (added) { 
+		this->RemoveScript(doc); 
 	}
 
 	delete[] vargs;
@@ -210,49 +182,44 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	return SUCCESS;
 }
 
-std::wstring BrowserWrapper::GetTitle()
-{
-	CComPtr<IHTMLDocument2> pDoc;
-	GetDocument(&pDoc);
+std::wstring BrowserWrapper::GetTitle() {
+	CComPtr<IHTMLDocument2> doc;
+	GetDocument(&doc);
 
-	if (!pDoc) 
-	{
+	if (!doc) {
 		return L"";
 	}
 
 	CComBSTR title;
-	HRESULT hr = pDoc->get_title(&title);
-	if (FAILED(hr))
-	{
+	HRESULT hr = doc->get_title(&title);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to get document title";
 		return L"";
 	}
 
-	std::wstring titleStr = (BSTR)title;
-	return titleStr;
+	std::wstring title_string = (BSTR)title;
+	return title_string;
 }
 
-std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
-{
-	VARTYPE type = toConvert->vt;
+std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *to_convert) {
+	VARTYPE type = to_convert->vt;
 
-	switch(type)
-	{
+	switch(type) {
 		case VT_BOOL:
-			return toConvert->boolVal == VARIANT_TRUE ? L"true" : L"false";
+			return to_convert->boolVal == VARIANT_TRUE ? L"true" : L"false";
 
 		case VT_BSTR:
-			if (!toConvert->bstrVal)
+			if (!to_convert->bstrVal)
 			{
 				return L"";
 			}
 			
-			return (BSTR)toConvert->bstrVal;
+			return (BSTR)to_convert->bstrVal;
 	
 		case VT_I4:
 			{
 				wchar_t *buffer = (wchar_t *)malloc(sizeof(wchar_t) * MAX_DIGITS_OF_NUMBER);
-				_i64tow_s(toConvert->lVal, buffer, MAX_DIGITS_OF_NUMBER, BASE_TEN_BASE);
+				_i64tow_s(to_convert->lVal, buffer, MAX_DIGITS_OF_NUMBER, BASE_TEN_BASE);
 				return buffer;
 			}
 
@@ -270,54 +237,46 @@ std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *toConvert)
 	return L"";
 }
 
-std::wstring BrowserWrapper::GetCookies()
-{
+std::wstring BrowserWrapper::GetCookies() {
 	CComPtr<IHTMLDocument2> doc;
 	this->GetDocument(&doc);
 
-	if (!doc)
-	{
+	if (!doc) {
 		return L"";
 	}
 
 	CComBSTR cookie;
 	HRESULT hr = doc->get_cookie(&cookie);
-	if (!cookie)
-	{
+	if (!cookie) {
 		cookie = L"";
 	}
 
-	std::wstring cookieString((BSTR)cookie);
-	return cookieString;
+	std::wstring cookie_string((BSTR)cookie);
+	return cookie_string;
 }
 
-int BrowserWrapper::AddCookie(std::wstring cookie)
-{
-	CComBSTR cookieBstr(cookie.c_str());
+int BrowserWrapper::AddCookie(std::wstring cookie) {
+	CComBSTR cookie_bstr(cookie.c_str());
 
 	CComPtr<IHTMLDocument2> doc;
 	this->GetDocument(&doc);
 
-	if (!doc) 
-	{
+	if (!doc) {
 		return EUNHANDLEDERROR;
 	}
 
-	if (!this->isHtmlPage(doc)) 
-	{
+	if (!this->IsHtmlPage(doc)) {
 		return ENOSUCHDOCUMENT;
 	}
 
-	if (!SUCCEEDED(doc->put_cookie(cookieBstr))) 
-	{
+	if (!SUCCEEDED(doc->put_cookie(cookie_bstr))) {
 		return EUNHANDLEDERROR;
 	}
 
 	return SUCCESS;
 }
 
-int BrowserWrapper::DeleteCookie(std::wstring cookieName)
-{
+int BrowserWrapper::DeleteCookie(std::wstring cookie_name) {
 	// Inject the XPath engine
 	std::wstring script;
 	for (int i = 0; DELETECOOKIES[i]; i++) {
@@ -331,7 +290,7 @@ int BrowserWrapper::DeleteCookie(std::wstring cookieName)
 	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
 
 	long index = 0;
-	CComVariant name(cookieName.c_str());
+	CComVariant name(cookie_name.c_str());
 	::SafeArrayPutElement(args, &index, &name);
 
 	CComVariant result;
@@ -341,57 +300,51 @@ int BrowserWrapper::DeleteCookie(std::wstring cookieName)
 	return statusCode;
 }
 
-bool BrowserWrapper::isHtmlPage(IHTMLDocument2* pDoc) 
-{
+bool BrowserWrapper::IsHtmlPage(IHTMLDocument2* doc) {
 	CComBSTR type;
-	if (!SUCCEEDED(pDoc->get_mimeType(&type))) 
-	{
+	if (!SUCCEEDED(doc->get_mimeType(&type))) {
 		return false;
 	}
 
-	if (!SUCCEEDED(type.ToLower())) 
-	{
+	if (!SUCCEEDED(type.ToLower())) {
 		return false;
 	}
 
-	std::wstring typeString((BSTR)type);
-	return wcsstr(typeString.c_str(), L"html") != NULL;
+	std::wstring type_string((BSTR)type);
+	return wcsstr(type_string.c_str(), L"html") != NULL;
 }
 
-bool BrowserWrapper::getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* pAdded)
-{
-	CComPtr<IDispatch> scriptEngine;
-	pDoc->get_Script(&scriptEngine);
+bool BrowserWrapper::GetEvalMethod(IHTMLDocument2* doc, DISPID* eval_id, bool* added) {
+	CComPtr<IDispatch> script_engine;
+	doc->get_Script(&script_engine);
 
-	OLECHAR FAR* evalName = L"eval";
-	HRESULT hr = scriptEngine->GetIDsOfNames(IID_NULL, &evalName, 1, LOCALE_USER_DEFAULT, pEvalId);
+	OLECHAR FAR* eval_method_name = L"eval";
+	HRESULT hr = script_engine->GetIDsOfNames(IID_NULL, &eval_method_name, 1, LOCALE_USER_DEFAULT, eval_id);
 	if (FAILED(hr)) {
-		*pAdded = true;
+		*added = true;
 		// Start the script engine by adding a script tag to the page
-		CComPtr<IHTMLElement> scriptTag;
-		hr = pDoc->createElement(L"span", &scriptTag);
-		if (FAILED(hr))
-		{
+		CComPtr<IHTMLElement> script_tag;
+		hr = doc->createElement(L"span", &script_tag);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Failed to create span tag";
 		}
-		CComBSTR addMe(L"<span id='__webdriver_private_span'>&nbsp;<script defer></script></span>");
-		scriptTag->put_innerHTML(addMe);
+		CComBSTR element_html(L"<span id='__webdriver_private_span'>&nbsp;<script defer></script></span>");
+		script_tag->put_innerHTML(element_html);
 
 		CComPtr<IHTMLElement> body;
-		pDoc->get_body(&body);
+		doc->get_body(&body);
 		CComQIPtr<IHTMLDOMNode> node(body);
-		CComQIPtr<IHTMLDOMNode> scriptNode(scriptTag);
+		CComQIPtr<IHTMLDOMNode> script_node(script_tag);
 
-		CComPtr<IHTMLDOMNode> generatedChild;
-		node->appendChild(scriptNode, &generatedChild);
+		CComPtr<IHTMLDOMNode> generated_child;
+		node->appendChild(script_node, &generated_child);
 
-		scriptEngine.Release();
-		pDoc->get_Script(&scriptEngine);
-		hr = scriptEngine->GetIDsOfNames(IID_NULL, &evalName, 1, LOCALE_USER_DEFAULT, pEvalId);
+		script_engine.Release();
+		doc->get_Script(&script_engine);
+		hr = script_engine->GetIDsOfNames(IID_NULL, &eval_method_name, 1, LOCALE_USER_DEFAULT, eval_id);
 
-		if (FAILED(hr))
-		{
-			removeScript(pDoc);
+		if (FAILED(hr)) {
+			this->RemoveScript(doc);
 			return false;
 		}
 	}
@@ -399,8 +352,7 @@ bool BrowserWrapper::getEvalMethod(IHTMLDocument2* pDoc, DISPID* pEvalId, bool* 
 	return true;
 }
 
-bool BrowserWrapper::createAnonymousFunction(IDispatch* pScriptEngine, DISPID evalId, const std::wstring *script, VARIANT* pResult)
-{
+bool BrowserWrapper::CreateAnonymousFunction(IDispatch* script_engine, DISPID eval_id, const std::wstring *script, VARIANT* result) {
 	CComVariant script_variant(script->c_str());
 	DISPPARAMS parameters = {0};
 	memset(&parameters, 0, sizeof parameters);
@@ -411,28 +363,21 @@ bool BrowserWrapper::createAnonymousFunction(IDispatch* pScriptEngine, DISPID ev
 	EXCEPINFO exception;
 	memset(&exception, 0, sizeof exception);
 
-	HRESULT hr = pScriptEngine->Invoke(evalId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, pResult, &exception, 0);
-	if (FAILED(hr)) 
-	{
+	HRESULT hr = script_engine->Invoke(eval_id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &parameters, result, &exception, 0);
+	if (FAILED(hr)) {
 		if (DISP_E_EXCEPTION == hr) 
 		{
 			// LOGHR(INFO, hr) << "Exception message was: " << _bstr_t(exception.bstrDescription) << ": " << _bstr_t(script);
-		} 
-		else 
-		{
+		} else {
 			// LOGHR(DEBUG, hr) << "Failed to compile: " << script;
 		}
 
-		if (pResult)
-		{
-			pResult->vt = VT_USERDEFINED;
-			if (exception.bstrDescription != NULL)
-			{
-				pResult->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
-			}
-			else
-			{
-				pResult->bstrVal = ::SysAllocStringByteLen(NULL, 0);
+		if (result) {
+			result->vt = VT_USERDEFINED;
+			if (exception.bstrDescription != NULL) {
+				result->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
+			} else {
+				result->bstrVal = ::SysAllocStringByteLen(NULL, 0);
 			}
 		}
 
@@ -442,80 +387,66 @@ bool BrowserWrapper::createAnonymousFunction(IDispatch* pScriptEngine, DISPID ev
 	return true;
 }
 
-void BrowserWrapper::removeScript(IHTMLDocument2 *pDoc)
-{
-	CComQIPtr<IHTMLDocument3> doc3(pDoc);
+void BrowserWrapper::RemoveScript(IHTMLDocument2 *doc) {
+	CComQIPtr<IHTMLDocument3> doc3(doc);
 
-	if (!doc3)
-	{
+	if (!doc3) {
 		return;
 	}
 
 	CComPtr<IHTMLElement> element;
 	CComBSTR id(L"__webdriver_private_span");
 	HRESULT hr = doc3->getElementById(id, &element);
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		// LOGHR(WARN, hr) << "Cannot find the script tag. Bailing.";
 		return;
 	}
 
-	CComQIPtr<IHTMLDOMNode> elementNode(element);
+	CComQIPtr<IHTMLDOMNode> element_node(element);
 
-	if (elementNode)
-	{
+	if (element_node) {
 		CComPtr<IHTMLElement> body;
-		hr = pDoc->get_body(&body);
-		if (FAILED(hr))
-		{
+		hr = doc->get_body(&body);
+		if (FAILED(hr)) {
 			// LOGHR(WARN, hr) << "Cannot locate body of document";
 			return;
 		}
-		CComQIPtr<IHTMLDOMNode> bodyNode(body);
-		if (!bodyNode)
-		{
+		CComQIPtr<IHTMLDOMNode> body_node(body);
+		if (!body_node) {
 			// LOG(WARN) << "Cannot cast body to a standard html node";
 			return;
 		}
 		CComPtr<IHTMLDOMNode> removed;
-		hr = bodyNode->removeChild(elementNode, &removed);
-		if (FAILED(hr))
-		{
+		hr = body_node->removeChild(element_node, &removed);
+		if (FAILED(hr)) {
 			// LOGHR(DEBUG, hr) << "Cannot remove child node. Shouldn't matter. Bailing";
 		}
 	}
 }
 
-void BrowserWrapper::findCurrentFrameWindow(IHTMLWindow2 **ppWindow)
-{
+void BrowserWrapper::FindCurrentFrameWindow(IHTMLWindow2 **window) {
 	// Frame location is from _top. This is a good start
 	CComPtr<IDispatch> dispatch;
-	HRESULT hr = m_pBrowser->get_Document(&dispatch);
-	if (FAILED(hr)) 
-	{
+	HRESULT hr = this->browser_->get_Document(&dispatch);
+	if (FAILED(hr)) {
 		//LOGHR(DEBUG, hr) << "Unable to get document";
 		return;
 	}
 
 	CComPtr<IHTMLDocument2> doc;
 	hr = dispatch->QueryInterface(&doc);
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Have document but cannot cast";
 	}
 
 	// If the current frame path is null or empty, find the default content
 	// The default content is either the first frame in a frameset or the body
 	// of the current _top doc, even if there are iframes.
-	if (0 == wcscmp(L"", this->m_pathToFrame.c_str()))
-	{
-		this->getDefaultContentWindow(doc, ppWindow);
-		if (ppWindow)
-		{
+	if (0 == wcscmp(L"", this->path_to_frame_.c_str())) {
+		this->GetDefaultContentWindow(doc, window);
+		if (window) {
 			return;
-		} 
-		else 
-		{
+		} else {
 			//cerr << "Cannot locate default content." << endl;
 			// What can we do here?
 			return;
@@ -524,17 +455,15 @@ void BrowserWrapper::findCurrentFrameWindow(IHTMLWindow2 **ppWindow)
 
 	// Otherwise, tokenize the current frame and loop, finding the
 	// child frame in turn
-	size_t len = this->m_pathToFrame.length() + 1;
+	size_t len = this->path_to_frame_.size() + 1;
 	wchar_t *path = new wchar_t[len];
-	wcscpy_s(path, len, this->m_pathToFrame.c_str());
+	wcscpy_s(path, len, this->path_to_frame_.c_str());
 	wchar_t *next_token;
-	CComQIPtr<IHTMLWindow2> interimResult;
+	CComQIPtr<IHTMLWindow2> interim_result;
 	for (wchar_t* fragment = wcstok_s(path, L".", &next_token);
 		 fragment;
-		 fragment = wcstok_s(NULL, L".", &next_token))
-	{
-		if (!doc)
-		{
+		 fragment = wcstok_s(NULL, L".", &next_token)) {
+		if (!doc) {
 			// This is seriously Not Good but what can you do?
 			break;
 		}
@@ -542,47 +471,40 @@ void BrowserWrapper::findCurrentFrameWindow(IHTMLWindow2 **ppWindow)
 		CComQIPtr<IHTMLFramesCollection2> frames;
 		doc->get_frames(&frames);
 
-		if (frames == NULL)
-		{ 
+		if (frames == NULL) { 
 			// pathToFrame does not match. Exit.
 			break;
 		}
 
 		long length = 0;
 		frames->get_length(&length);
-		if (!length)
-		{ 
+		if (!length) { 
 			// pathToFrame does not match. Exit.
 			break; 
 		} 
 
-		CComBSTR frameName(fragment);
+		CComBSTR frame_name(fragment);
 		CComVariant index;
 		// Is this fragment a number? If so, the index will be a VT_I4
-		int frameIndex = _wtoi(fragment);
-		if (frameIndex > 0 || wcscmp(L"0", fragment) == 0)
-		{
+		int frame_index = _wtoi(fragment);
+		if (frame_index > 0 || wcscmp(L"0", fragment) == 0) {
 			index.vt = VT_I4;
-			index.lVal = frameIndex;
-		} 
-		else 
-		{
+			index.lVal = frame_index;
+		} else {
 			// Alternatively, it's a name
-			frameName.CopyTo(&index);
+			frame_name.CopyTo(&index);
 		}
 
 		// Find the frame
-		CComVariant frameHolder;
-		hr = frames->item(&index, &frameHolder);
+		CComVariant frame_holder;
+		hr = frames->item(&index, &frame_holder);
 
-		interimResult.Release();
-		if (!FAILED(hr))
-		{
-			interimResult = frameHolder.pdispVal;
+		interim_result.Release();
+		if (!FAILED(hr)) {
+			interim_result = frame_holder.pdispVal;
 		}
 
-		if (!interimResult)
-		{
+		if (!interim_result) {
 			// pathToFrame does not match. Exit.
 			break; 
 		}
@@ -590,39 +512,33 @@ void BrowserWrapper::findCurrentFrameWindow(IHTMLWindow2 **ppWindow)
 		// TODO: Check to see if a collection of frames were returned. Grab the 0th element if there was.
 
 		// Was there only one result? Next time round, please.
-		CComQIPtr<IHTMLWindow2> window(interimResult);
-		if (!window)
-		{ 
+		CComQIPtr<IHTMLWindow2> result_window(interim_result);
+		if (!result_window) { 
 			// pathToFrame does not match. Exit.
 			break; 
 		} 
 
 		doc.Detach();
-		window->get_document(&doc);
+		result_window->get_document(&doc);
 	}
 
-	if (interimResult)
-	{
-		*ppWindow = interimResult.Detach();
+	if (interim_result) {
+		*window = interim_result.Detach();
 	}
 	delete[] path;
 }
 
-void BrowserWrapper::getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 **ppWindow)
-{
+void BrowserWrapper::GetDefaultContentWindow(IHTMLDocument2 *doc, IHTMLWindow2 **window) {
 	CComQIPtr<IHTMLFramesCollection2> frames;
-	HRESULT hr = pDoc->get_frames(&frames);
-	if (FAILED(hr))
-	{
+	HRESULT hr = doc->get_frames(&frames);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to get frames from document";
 		return;
 	}
 
-	if (frames == NULL) 
-	{
-		hr = pDoc->get_parentWindow(ppWindow);
-		if (FAILED(hr))
-		{
+	if (frames == NULL) {
+		hr = doc->get_parentWindow(window);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get parent window.";
 		}
 		return;
@@ -630,56 +546,47 @@ void BrowserWrapper::getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 
 
 	long length = 0;
 	hr = frames->get_length(&length);
-	if (FAILED(hr)) 
-	{
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Cannot determine length of frames";
 	}
 
-	if (!length)
-	{
-		hr = pDoc->get_parentWindow(ppWindow);
-		if (FAILED(hr)) 
-		{
+	if (!length) {
+		hr = doc->get_parentWindow(window);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get parent window.";
 		}
 		return;
 	}
 
 	CComPtr<IHTMLDocument3> doc3;
-	hr = pDoc->QueryInterface(&doc3);
-	if (FAILED(hr))
-	{
+	hr = doc->QueryInterface(&doc3);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Have document, but it's not the right type";
-		hr = pDoc->get_parentWindow(ppWindow);
-		if (FAILED(hr))
-		{
+		hr = doc->get_parentWindow(window);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get parent window.";
 		}
 		return;
 	}
 
-	CComPtr<IHTMLElementCollection> bodyTags;
-	CComBSTR bodyTagName(L"BODY");
-	hr = doc3->getElementsByTagName(bodyTagName, &bodyTags);
-	if (FAILED(hr))
-	{
+	CComPtr<IHTMLElementCollection> body_tags;
+	CComBSTR body_tag_name(L"BODY");
+	hr = doc3->getElementsByTagName(body_tag_name, &body_tags);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Cannot locate body";
 		return;
 	}
 
-	long numberOfBodyTags = 0;
-	hr = bodyTags->get_length(&numberOfBodyTags);
-	if (FAILED(hr))
-	{
+	long number_of_body_tags = 0;
+	hr = body_tags->get_length(&number_of_body_tags);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to establish number of tags seen";
 	}
 
-	if (numberOfBodyTags)
-	{
+	if (number_of_body_tags) {
 		// Not in a frameset. Return the current window
-		hr = pDoc->get_parentWindow(ppWindow);
-		if (FAILED(hr)) 
-		{
+		hr = doc->get_parentWindow(window);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get parent window.";
 		}
 		return;
@@ -689,221 +596,176 @@ void BrowserWrapper::getDefaultContentWindow(IHTMLDocument2 *pDoc, IHTMLWindow2 
 	index.vt = VT_I4;
 	index.lVal = 0;
 
-	CComVariant frameHolder;
-	hr = frames->item(&index, &frameHolder);
-	if (FAILED(hr)) 
-	{
+	CComVariant frame_holder;
+	hr = frames->item(&index, &frame_holder);
+	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to get frame at index 0";
 	}
 
-	frameHolder.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**) ppWindow);
+	frame_holder.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**) window);
 }
 
-HWND BrowserWrapper::GetHwnd()
-{
-	if (this->m_hwnd == NULL)
-	{
-		this->m_hwnd =this->m_factory->GetTabWindowHandle(this->m_pBrowser);
+HWND BrowserWrapper::GetWindowHandle() {
+	if (this->window_handle_ == NULL) {
+		this->window_handle_ = this->factory_->GetTabWindowHandle(this->browser_);
 	}
 
-	return this->m_hwnd;
+	return this->window_handle_;
 }
 
 void __stdcall BrowserWrapper::BeforeNavigate2(IDispatch * pObject, VARIANT * pvarUrl, VARIANT * pvarFlags, VARIANT * pvarTargetFrame,
-VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel)
-{
+VARIANT * pvarData, VARIANT * pvarHeaders, VARIANT_BOOL * pbCancel) {
 	// std::cout << "BeforeNavigate2\r\n";
 }
 
-void __stdcall BrowserWrapper::OnQuit()
-{
-	this->Quitting.raise(this->m_browserId);
+void __stdcall BrowserWrapper::OnQuit() {
+	this->Quitting.raise(this->browser_id_);
 }
 
-void __stdcall BrowserWrapper::NewWindow3(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl)
-{
-	IWebBrowser2 *pBrowser = this->m_factory->CreateBrowser();
-	BrowserWrapper *newWindowWrapper = new BrowserWrapper(pBrowser, NULL, this->m_factory);
-	*ppDisp = pBrowser;
-	this->NewWindow.raise(newWindowWrapper);
+void __stdcall BrowserWrapper::NewWindow3(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl) {
+	IWebBrowser2 *browser = this->factory_->CreateBrowser();
+	BrowserWrapper *new_window_wrapper = new BrowserWrapper(browser, NULL, this->factory_);
+	*ppDisp = browser;
+	this->NewWindow.raise(new_window_wrapper);
 }
 
-void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL)
-{
+void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL) {
 	// Flag the browser as navigation having started.
 	// std::cout << "DocumentComplete\r\n";
-	this->m_navStarted = true;
+	this->is_navigation_started_ = true;
 }
 
-void BrowserWrapper::attachEvents()
-{
-	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
-	CComPtr<IUnknown> pUnk(pDisp);
-	HRESULT hr = this->DispEventAdvise(pUnk);
+void BrowserWrapper::AttachEvents() {
+	CComQIPtr<IDispatch> dispatch(this->browser_);
+	CComPtr<IUnknown> unknown(dispatch);
+	HRESULT hr = this->DispEventAdvise(unknown);
 }
 
-void BrowserWrapper::detachEvents()
-{
-	CComQIPtr<IDispatch> pDisp(this->m_pBrowser);
-	CComPtr<IUnknown> pUnk(pDisp);
-	HRESULT hr = this->DispEventUnadvise(pUnk);
+void BrowserWrapper::DetachEvents() {
+	CComQIPtr<IDispatch> dispatch(this->browser_);
+	CComPtr<IUnknown> unknown(dispatch);
+	HRESULT hr = this->DispEventUnadvise(unknown);
 }
 
-bool BrowserWrapper::Wait()
-{
-	bool isNavigating(true);
+bool BrowserWrapper::Wait() {
+	bool is_navigating = true;
 
 	//std::cout << "Navigate Events Completed.\r\n";
-	this->m_navStarted = false;
+	this->is_navigation_started_ = false;
 
 	// Navigate events completed. Waiting for browser.Busy != false...
-	isNavigating = this->m_navStarted;
-	VARIANT_BOOL isBusy(VARIANT_FALSE);
-	HRESULT hr = this->m_pBrowser->get_Busy(&isBusy);
-	if (isNavigating || FAILED(hr) || isBusy)
-	{
+	is_navigating = this->is_navigation_started_;
+	VARIANT_BOOL is_busy(VARIANT_FALSE);
+	HRESULT hr = this->browser_->get_Busy(&is_busy);
+	if (is_navigating || FAILED(hr) || is_busy) {
 		//std::cout << "Browser busy property is true.\r\n";
 		return false;
 	}
 
 	// Waiting for browser.ReadyState == READYSTATE_COMPLETE...;
-	isNavigating = this->m_navStarted;
-	READYSTATE readyState;
-	hr = this->m_pBrowser->get_ReadyState(&readyState);
-	if (isNavigating || FAILED(hr) || readyState != READYSTATE_COMPLETE)
-	{
+	is_navigating = this->is_navigation_started_;
+	READYSTATE ready_state;
+	hr = this->browser_->get_ReadyState(&ready_state);
+	if (is_navigating || FAILED(hr) || ready_state != READYSTATE_COMPLETE) {
 		//std::cout << "readyState is not 'Complete'.\r\n";
 		return false;
 	}
 
 	// Waiting for document property != null...
-	isNavigating = this->m_navStarted;
-	CComQIPtr<IDispatch> ppDisp;
-	hr = this->m_pBrowser->get_Document(&ppDisp);
-	if (isNavigating && FAILED(hr) && !ppDisp)
-	{
+	is_navigating = this->is_navigation_started_;
+	CComQIPtr<IDispatch> document_dispatch;
+	hr = this->browser_->get_Document(&document_dispatch);
+	if (is_navigating && FAILED(hr) && !document_dispatch) {
 		//std::cout << "Get Document failed.\r\n";
 		return false;
 	}
 
 	// Waiting for document to complete...
-	CComPtr<IHTMLDocument2> pDoc;
-	hr = ppDisp->QueryInterface(&pDoc);
-	if (SUCCEEDED(hr))
-	{
-		isNavigating = this->isDocumentNavigating(pDoc);
+	CComPtr<IHTMLDocument2> doc;
+	hr = document_dispatch->QueryInterface(&doc);
+	if (SUCCEEDED(hr)) {
+		is_navigating = this->IsDocumentNavigating(doc);
 	}
 
-	if (!isNavigating)
-	{
-		this->m_waitRequired = false;
+	if (!is_navigating) {
+		this->wait_required_ = false;
 	}
 
-	return !isNavigating;
+	return !is_navigating;
 }
 
-bool BrowserWrapper::isDocumentNavigating(IHTMLDocument2 *pDoc)
-{
-	bool isNavigating(true);
+bool BrowserWrapper::IsDocumentNavigating(IHTMLDocument2 *doc) {
+	bool is_navigating = true;
 	// Starting WaitForDocumentComplete()
-	isNavigating = this->m_navStarted;
-	CComBSTR readyState;
-	HRESULT hr = pDoc->get_readyState(&readyState);
-	if (FAILED(hr) || isNavigating || _wcsicmp(readyState, L"complete") != 0)
-	{
+	is_navigating = this->is_navigation_started_;
+	CComBSTR ready_state;
+	HRESULT hr = doc->get_readyState(&ready_state);
+	if (FAILED(hr) || is_navigating || _wcsicmp(ready_state, L"complete") != 0) {
 		//std::cout << "readyState is not complete\r\n";
 		return true;
-	}
-	else
-	{
-		isNavigating = false;
+	} else {
+		is_navigating = false;
 	}
 
 	// document.readyState == complete
-	isNavigating = this->m_navStarted;
+	is_navigating = this->is_navigation_started_;
 	CComPtr<IHTMLFramesCollection2> frames;
-	hr = pDoc->get_frames(&frames);
-	if (isNavigating || FAILED(hr))
-	{
+	hr = doc->get_frames(&frames);
+	if (is_navigating || FAILED(hr)) {
 		//std::cout << "could not get frames\r\n";
 		return true;
 	}
 
-	if (frames != NULL)
-	{
-		long frameCount = 0;
-		hr = frames->get_length(&frameCount);
+	if (frames != NULL) {
+		long frame_count = 0;
+		hr = frames->get_length(&frame_count);
 
 		CComVariant index;
 		index.vt = VT_I4;
-		for (long i = 0; i < frameCount; ++i)
-		{
+		for (long i = 0; i < frame_count; ++i) {
 			// Waiting on each frame
 			index.lVal = i;
 			CComVariant result;
 			hr = frames->item(&index, &result);
-			if (FAILED(hr))
-			{
+			if (FAILED(hr)) {
 				return true;
 			}
 
 			CComQIPtr<IHTMLWindow2> window(result.pdispVal);
-			if (!window)
-			{
+			if (!window) {
 				// Frame is not an HTML frame.
 				continue;
 			}
 
-			CComPtr<IHTMLDocument2> frameDocument;
-			hr = window->get_document(&frameDocument);
-			if (hr == E_ACCESSDENIED)
-			{
+			CComPtr<IHTMLDocument2> frame_document;
+			hr = window->get_document(&frame_document);
+			if (hr == E_ACCESSDENIED) {
 				// Cross-domain documents may throw Access Denied. If so,
 				// get the document through the IWebBrowser2 interface.
-				CComPtr<IWebBrowser2> frameBrowser;
-				CComQIPtr<IServiceProvider> pServiceProvider(window);
-				hr = pServiceProvider->QueryService(IID_IWebBrowserApp, &frameBrowser);
+				CComPtr<IWebBrowser2> frame_browser;
+				CComQIPtr<IServiceProvider> service_provider(window);
+				hr = service_provider->QueryService(IID_IWebBrowserApp, &frame_browser);
 				if (SUCCEEDED(hr))
 				{
-					CComQIPtr<IDispatch> frameDocDisp;
-					hr = frameBrowser->get_Document(&frameDocDisp);
-					hr = frameDocDisp->QueryInterface(&frameDocument);
+					CComQIPtr<IDispatch> frame_document_dispatch;
+					hr = frame_browser->get_Document(&frame_document_dispatch);
+					hr = frame_document_dispatch->QueryInterface(&frame_document);
 				}
 			}
 
-			isNavigating = this->m_navStarted;
-			if (isNavigating)
-			{
+			is_navigating = this->is_navigation_started_;
+			if (is_navigating) {
 				break;
 			}
 
 			// Recursively call to wait for the frame document to complete
-			isNavigating = this->isDocumentNavigating(frameDocument);
-			if (isNavigating)
-			{
+			is_navigating = this->IsDocumentNavigating(frame_document);
+			if (is_navigating) {
 				break;
 			}
 		}
 	}
-	return isNavigating;
+	return is_navigating;
 }
 
-int BrowserWrapper::getElapsedMilliseconds(UINT64 startTime)
-{
-	UINT64 currentTime = this->getTime();
-	return (currentTime - startTime) / 10000;
-}
-
-UINT64 BrowserWrapper::getTime() 
-{ 
-	SYSTEMTIME st; 
-	GetSystemTime(&st); 
- 
-	FILETIME ft; 
-	SystemTimeToFileTime(&st, &ft);  // converts to file time format 
-	ULARGE_INTEGER ui; 
-	ui.LowPart=ft.dwLowDateTime; 
-	ui.HighPart=ft.dwHighDateTime; 
- 
-	return ui.QuadPart; 
-} 
+} // namespace webdriver

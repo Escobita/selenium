@@ -1,28 +1,26 @@
-#pragma once
+#ifndef WEBDRIVER_IE_SUBMITELEMENTCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_SUBMITELEMENTCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class SubmitElementCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	SubmitElementCommandHandler(void)
-	{
+class SubmitElementCommandHandler : public WebDriverCommandHandler {
+public:
+	SubmitElementCommandHandler(void) {
 	}
 
-	virtual ~SubmitElementCommandHandler(void)
-	{
+	virtual ~SubmitElementCommandHandler(void) {
 	}
 
 private:
-	void SubmitElementCommandHandler::FindParentForm(IHTMLElement *pElement, IHTMLFormElement **pform)
-	{
-		CComQIPtr<IHTMLElement> current(pElement);
+	void SubmitElementCommandHandler::FindParentForm(IHTMLElement *element, IHTMLFormElement **form_element) {
+		CComQIPtr<IHTMLElement> current(element);
 
 		while (current) {
 			CComQIPtr<IHTMLFormElement> form(current);
 			if (form) {
-				*pform = form.Detach();
+				*form_element = form.Detach();
 				return;
 			}
 
@@ -33,61 +31,57 @@ private:
 	}
 
 protected:
-
-	void SubmitElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void SubmitElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
-				CComQIPtr<IHTMLFormElement> form(pElementWrapper->m_pElement);
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
+				CComQIPtr<IHTMLFormElement> form(element_wrapper->element());
 				if (form) {
 					form->submit();
 				} else {
-					CComQIPtr<IHTMLInputElement> input(pElementWrapper->m_pElement);
+					CComQIPtr<IHTMLInputElement> input(element_wrapper->element());
 					if (input) {
-						CComBSTR typeName;
-						input->get_type(&typeName);
+						CComBSTR type_name;
+						input->get_type(&type_name);
 
-						std::wstring type((BSTR)typeName);
+						std::wstring type((BSTR)type_name);
 
 						if (_wcsicmp(L"submit", type.c_str()) == 0 || _wcsicmp(L"image", type.c_str()) == 0) {
-							HWND hwnd = pBrowserWrapper->GetHwnd();
-							pElementWrapper->Click(hwnd);
-							pBrowserWrapper->m_waitRequired = true;
+							HWND hwnd = browser_wrapper->GetWindowHandle();
+							element_wrapper->Click(hwnd);
+							browser_wrapper->set_wait_required(true);
 						} else {
 							CComPtr<IHTMLFormElement> form2;
 							input->get_form(&form2);
 							form2->submit();
 						}
 					} else {
-						this->FindParentForm(pElementWrapper->m_pElement, &form);
+						this->FindParentForm(element_wrapper->element(), &form);
 						if (!form) {
-							statusCode = EUNHANDLEDERROR;
+							status_code = EUNHANDLEDERROR;
 							response->m_value = "Unable to find the containing form";
 						}
 						form->submit();
 					}
 				}
-			}
-			else
-			{
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_SUBMITELEMENTCOMMANDHANDLER_H_

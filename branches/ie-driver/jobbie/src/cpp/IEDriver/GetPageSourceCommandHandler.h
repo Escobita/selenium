@@ -1,60 +1,58 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETPAGESOURCECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETPAGESOURCECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetPageSourceCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class GetPageSourceCommandHandler : public WebDriverCommandHandler {
 public:
-
-	GetPageSourceCommandHandler(void)
-	{
+	GetPageSourceCommandHandler(void) {
 	}
 
-	virtual ~GetPageSourceCommandHandler(void)
-	{
+	virtual ~GetPageSourceCommandHandler(void) {
 	}
+
 protected:
+	void GetPageSourceCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
 
-	void GetPageSourceCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
-
-		CComPtr<IHTMLDocument2> pDoc;
-		pWrapper->GetDocument(&pDoc);
+		CComPtr<IHTMLDocument2> doc;
+		browser_wrapper->GetDocument(&doc);
 		
-		CComPtr<IHTMLDocument3> pDoc3;
-		CComQIPtr<IHTMLDocument3> pQIDoc(pDoc);
-		if (pQIDoc)
-		{
-			pDoc3 = pQIDoc.Detach();
+		CComPtr<IHTMLDocument3> doc3;
+		CComQIPtr<IHTMLDocument3> doc_qi_pointer(doc);
+		if (doc_qi_pointer) {
+			doc3 = doc_qi_pointer.Detach();
 		}
 
-		if (!pDoc3)
-		{
+		if (!doc3) {
 			response->m_value = "";
 			return;
 		}
 
-		CComPtr<IHTMLElement> pDocElement;
-		HRESULT hr = pDoc3->get_documentElement(&pDocElement);
-		if (FAILED(hr))
-		{
+		CComPtr<IHTMLElement> document_element;
+		HRESULT hr = doc3->get_documentElement(&document_element);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get document element from page";
 			response->m_value = "";
 			return;
 		}
 
 		CComBSTR html;
-		hr = pDocElement->get_outerHTML(&html);
-		if (FAILED(hr))
-		{
+		hr = document_element->get_outerHTML(&html);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Have document element but cannot read source.";
 			response->m_value = "";
 			return;
 		}
 
-		std::string pageSource = CW2A((LPCWSTR)html, CP_UTF8);
-		response->m_value = pageSource;
+		std::string page_source = CW2A((LPCWSTR)html, CP_UTF8);
+		response->m_value = page_source;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETPAGESOURCECOMMANDHANDLER_H_

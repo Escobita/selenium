@@ -1,82 +1,77 @@
-#pragma once
+#ifndef WEBDRIVER_IE_CLEARELEMENTCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_CLEARELEMENTCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class ClearElementCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	ClearElementCommandHandler(void)
-	{
+class ClearElementCommandHandler : public WebDriverCommandHandler {
+public:
+	ClearElementCommandHandler(void) {
 	}
 
-	virtual ~ClearElementCommandHandler(void)
-	{
+	virtual ~ClearElementCommandHandler(void) {
 	}
 
 protected:
-
-	void ClearElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void ClearElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else
-		{
+		} else {
 			std::wstring text(L"");
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
-			HWND hwnd = pBrowserWrapper->GetHwnd();
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
+			HWND window_handle = browser_wrapper->GetWindowHandle();
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS)
 			{
-				CComQIPtr<IHTMLElement2> element2(pElementWrapper->m_pElement);
+				CComQIPtr<IHTMLElement2> element2(element_wrapper->element());
 				if (!element2) {
-					statusCode = EUNHANDLEDERROR;
+					status_code = EUNHANDLEDERROR;
 					response->m_value = "Cannot cast element to IHTMLElement2";
-				}
-				else
-				{
-					CComQIPtr<IHTMLTextAreaElement> textArea(pElementWrapper->m_pElement);
-					CComQIPtr<IHTMLInputElement> inputElement(pElementWrapper->m_pElement);
+				} else {
+					CComQIPtr<IHTMLTextAreaElement> text_area(element_wrapper->element());
+					CComQIPtr<IHTMLInputElement> input_element(element_wrapper->element());
 					CComBSTR v;
-					if (textArea) {
-						textArea->get_value(&v);
+					if (text_area) {
+						text_area->get_value(&v);
 					}
-					if (inputElement) {
-						inputElement->get_value(&v);
+					if (input_element) {
+						input_element->get_value(&v);
 					}
-					bool fireChange = v.Length() > 0;
+					bool fire_change = v.Length() > 0;
 
 					element2->focus();
 
-					if (textArea) textArea->put_value(L"");
-					if (inputElement) inputElement->put_value(L"");
+					CComBSTR empty_value(L"");
+					if (text_area) text_area->put_value(empty_value);
+					if (input_element) input_element->put_value(empty_value);
 					
-					if (fireChange) {
-						CComQIPtr<IHTMLDOMNode> node(pElementWrapper->m_pElement);
-						pElementWrapper->FireEvent(node, L"onchange");
+					if (fire_change) {
+						CComQIPtr<IHTMLDOMNode> node(element_wrapper->element());
+						element_wrapper->FireEvent(node, L"onchange");
 					}
 
 					element2->blur();
 
 					LRESULT lr;
-					::SendMessageTimeoutW(hwnd, WM_SETTEXT, 0, (LPARAM) L"", SMTO_ABORTIFHUNG, 3000, (PDWORD_PTR)&lr);
+					::SendMessageTimeoutW(window_handle, WM_SETTEXT, 0, (LPARAM) L"", SMTO_ABORTIFHUNG, 3000, (PDWORD_PTR)&lr);
 				}
-			}
-			else
-			{
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
 
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_CLEARELEMENTCOMMANDHANDLER_H_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBDRIVER_IE_ERRORCODES_H_
+#define WEBDRIVER_IE_ERRORCODES_H_
 
 #define SUCCESS 0
 
@@ -27,3 +28,5 @@
 #define ENOSUCHWINDOW        23
 #define EINVALIDCOOKIEDOMAIN 24
 #define EUNABLETOSETCOOKIE   25
+
+#endif // WEBDRIVER_IE_ERRORCODES_H_

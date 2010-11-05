@@ -1,49 +1,47 @@
-#pragma once
+#ifndef WEBDRIVER_IE_DELETEALLCOOKIESCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_DELETEALLCOOKIESCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class DeleteAllCookiesCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	DeleteAllCookiesCommandHandler(void)
-	{
+class DeleteAllCookiesCommandHandler : public WebDriverCommandHandler {
+public:
+	DeleteAllCookiesCommandHandler(void) {
 	}
 
-	virtual ~DeleteAllCookiesCommandHandler(void)
-	{
+	virtual ~DeleteAllCookiesCommandHandler(void) {
 	}
 
 protected:
-
-	void DeleteAllCookiesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
+	void DeleteAllCookiesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
-		BrowserWrapper *pBrowserWrapper;
-		manager->GetCurrentBrowser(&pBrowserWrapper);
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
 
-		std::wstring cookieString = pBrowserWrapper->GetCookies();
-		while (cookieString.size() > 0)
-		{
-			size_t cookieDelimiterPos = cookieString.find(L"; ");
-			std::wstring cookieElement(cookieString.substr(0, cookieDelimiterPos));
-			if (cookieDelimiterPos == std::wstring::npos)
-			{
-				cookieString = L"";
-			}
-			else
-			{
-				cookieString = cookieString.substr(cookieDelimiterPos + 2);
+		std::wstring cookie_string = browser_wrapper->GetCookies();
+		while (cookie_string.size() > 0) {
+			size_t cookie_delimiter_pos = cookie_string.find(L"; ");
+			std::wstring cookie_element(cookie_string.substr(0, cookie_delimiter_pos));
+			if (cookie_delimiter_pos == std::wstring::npos) {
+				cookie_string = L"";
+			} else {
+				cookie_string = cookie_string.substr(cookie_delimiter_pos + 2);
 			}
 
-			std::wstring cookieName(this->GetCookieName(cookieElement));
-			pBrowserWrapper->DeleteCookie(cookieName);
+			std::wstring cookie_name(this->GetCookieName(cookie_element));
+			browser_wrapper->DeleteCookie(cookie_name);
 		}
 	}
 
-	std::wstring DeleteAllCookiesCommandHandler::GetCookieName(std::wstring cookie)
-	{
-		size_t cookieSeparatorPos(cookie.find_first_of(L"="));
-		std::wstring cookieName(cookie.substr(0, cookieSeparatorPos));
-		return cookieName;
+private:
+	std::wstring DeleteAllCookiesCommandHandler::GetCookieName(std::wstring cookie) {
+		size_t cookie_separator_pos(cookie.find_first_of(L"="));
+		std::wstring cookie_name(cookie.substr(0, cookie_separator_pos));
+		return cookie_name;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_DELETEALLCOOKIESCOMMANDHANDLER_H_

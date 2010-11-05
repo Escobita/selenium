@@ -1,33 +1,27 @@
-#pragma once
+#ifndef WEBDRIVER_IE_NEWSESSIONCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_NEWSESSIONCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class NewSessionCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	NewSessionCommandHandler(void)
-	{
+class NewSessionCommandHandler : public WebDriverCommandHandler {
+public:
+	NewSessionCommandHandler(void) {
 	}
 
-	virtual ~NewSessionCommandHandler(void)
-	{
+	virtual ~NewSessionCommandHandler(void) {
 	}
 
 protected:
-
-	void NewSessionCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		DWORD dwProcId = manager->m_factory->LaunchBrowserProcess(manager->m_port);
-		ProcessWindowInfo procWinInfo;
-		procWinInfo.dwProcessId = dwProcId;
-		procWinInfo.hwndBrowser = NULL;
-		procWinInfo.pBrowser = NULL;
-		manager->m_factory->AttachToBrowser(&procWinInfo);
-		BrowserWrapper *wrapper = new BrowserWrapper(procWinInfo.pBrowser, procWinInfo.hwndBrowser, manager->m_factory);
-		manager->AddWrapper(wrapper);
-		response->m_statusCode = 303;
-		std::string id = CW2A(manager->m_managerId.c_str(), CP_UTF8);
+	void NewSessionCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		manager->CreateNewBrowser();
+		response->set_status_code(303);
+		std::string id = CW2A(manager->manager_id().c_str(), CP_UTF8);
 		response->m_value = "/session/" + id;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_NEWSESSIONCOMMANDHANDLER_H_

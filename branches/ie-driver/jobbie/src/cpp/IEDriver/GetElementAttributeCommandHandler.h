@@ -1,64 +1,54 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETELEMENTATTRIBUTECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETELEMENTATTRIBUTECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetElementAttributeCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetElementAttributeCommandHandler(void)
-	{
+class GetElementAttributeCommandHandler : public WebDriverCommandHandler {
+public:
+	GetElementAttributeCommandHandler(void) {
 	}
 
-	virtual ~GetElementAttributeCommandHandler(void)
-	{
+	virtual ~GetElementAttributeCommandHandler(void) {
 	}
 
 protected:
-
-	void GetElementAttributeCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void GetElementAttributeCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else if (locatorParameters.find("name") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+		} else if (locator_parameters.find("name") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "name";
-		}
-		else
-		{
-			int statusCode = SUCCESS;
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
-			std::wstring name(CA2W(locatorParameters["name"].c_str(), CP_UTF8));
+		} else {
+			int status_code = SUCCESS;
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
+			std::wstring name(CA2W(locator_parameters["name"].c_str(), CP_UTF8));
 
-			BrowserWrapper *pBrowserWrapper;
-			manager->GetCurrentBrowser(&pBrowserWrapper);
+			BrowserWrapper *browser_wrapper;
+			manager->GetCurrentBrowser(&browser_wrapper);
 
-			ElementWrapper *pElementWrapper;
-			statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
-				CComVariant valueVariant;
-				statusCode = pElementWrapper->GetAttributeValue(pBrowserWrapper, name, &valueVariant);
-				if (valueVariant.vt != VT_EMPTY && valueVariant.vt != VT_NULL)
-				{
-					std::wstring value(pBrowserWrapper->ConvertVariantToWString(&valueVariant));
-					std::string valueStr(CW2A(value.c_str(), CP_UTF8));
-					response->m_value = valueStr;
-				}
-				else
-				{
+			ElementWrapper *element_wrapper;
+			status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
+				CComVariant value_variant;
+				status_code = element_wrapper->GetAttributeValue(browser_wrapper, name, &value_variant);
+				if (value_variant.vt != VT_EMPTY && value_variant.vt != VT_NULL) {
+					std::wstring value(browser_wrapper->ConvertVariantToWString(&value_variant));
+					std::string value_str(CW2A(value.c_str(), CP_UTF8));
+					response->m_value = value_str;
+				} else {
 					response->m_value = Json::Value::null;
 				}
-			}
-			else
-			{
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETELEMENTATTRIBUTECOMMANDHANDLER_H_

@@ -1,37 +1,36 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETSPEEDCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETSPEEDCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetSpeedCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetSpeedCommandHandler(void)
-	{
+class GetSpeedCommandHandler : public WebDriverCommandHandler {
+public:
+	GetSpeedCommandHandler(void) {
 	}
 
-	virtual ~GetSpeedCommandHandler(void)
-	{
+	virtual ~GetSpeedCommandHandler(void) {
 	}
 
 protected:
-
-	void GetSpeedCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		BrowserWrapper *pWrapper;
-		int speed = manager->GetSpeed();
-		switch (speed)
-		{
-		case 1000:
+	void GetSpeedCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		int speed = manager->speed();
+		switch (speed) {
+		  case 1000:
 			response->m_value = "SLOW";
 			break;
-		case 500:
+		  case 500:
 			response->m_value = "MEDIUM";
 			break;
-		default:
+		  default:
 			response->m_value = "FAST";
 			break;
 		}
-		response->m_statusCode = SUCCESS;
+		response->set_status_code(SUCCESS);
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE__H_

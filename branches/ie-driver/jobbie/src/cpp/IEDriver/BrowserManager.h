@@ -1,16 +1,18 @@
-#pragma once
+#ifndef WEBDRIVER_IE_BROWSERMANAGER_H_
+#define WEBDRIVER_IE_BROWSERMANAGER_H_
+
 #include "StdAfx.h"
+#include <Objbase.h>
+#include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 #include "BrowserWrapper.h"
 #include "ElementWrapper.h"
 #include "ElementFinder.h"
 #include "WebDriverCommand.h"
-#include "WebDriverResponse.h"
 #include "WebDriverCommandHandler.h"
-#include <string>
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <Objbase.h>
+#include "WebDriverResponse.h"
 
 #define WD_INIT WM_APP + 1
 #define WD_SET_COMMAND WM_APP + 2
@@ -29,14 +31,13 @@
 
 using namespace std;
 
-extern "C"
-{
+namespace webdriver {
+
 // We use a CWindowImpl (creating a hidden window) here because we
 // want to synchronize access to the command handler. For that we
 // use SendMessage() most of the time, and SendMessage() requires
 // a window handle.
-class BrowserManager : public CWindowImpl<BrowserManager>
-{
+class BrowserManager : public CWindowImpl<BrowserManager> {
 public:
 	DECLARE_WND_CLASS(L"WebDriverWndClass")
 
@@ -60,40 +61,61 @@ public:
 	LRESULT OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnWait(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	std::wstring m_managerId;
-	int m_port;
+	std::wstring manager_id(void) { return this->manager_id_; }
+
 	static DWORD WINAPI ThreadProc(LPVOID lpParameter);
 	static DWORD WINAPI WaitThreadProc(LPVOID lpParameter);
-	BrowserFactory *m_factory;
-	void AddWrapper(BrowserWrapper* wrapper);
-	std::wstring m_currentBrowser;
-	std::map<std::wstring, BrowserWrapper*> m_trackedBrowsers;
-	std::map<std::wstring, ElementWrapper*> m_knownElements;
-	std::map<std::wstring, ElementFinder*> m_elementFinders;
-	int GetCurrentBrowser(BrowserWrapper **ppWrapper);
 
-	int GetSpeed(void);
-	void SetSpeed(int speed);
+	std::wstring current_browser_id(void) { return this->current_browser_id_; }
+	void set_current_browser_id(std::wstring browser_id) { this->current_browser_id_ = browser_id; }
 
-	int GetImplicitWaitTimeout(void);
-	void SetImplicitWaitTimeout(int timeout);
+	void CreateNewBrowser(void);
+
+	void AddManagedBrowser(BrowserWrapper* browser_wrapper);
+	int GetManagedBrowser(std::wstring browser_id, BrowserWrapper **browser_wrapper);
+	int GetCurrentBrowser(BrowserWrapper **browser_wrapper);
+	void GetManagedBrowserHandles(std::vector<std::wstring> *managed_browser_handles);
+
+	void AddManagedElement(ElementWrapper *element_wrapper);
+	int GetManagedElement(std::wstring element_id, ElementWrapper **element_wrapper);
+
+	int GetElementFinder(std::wstring mechanism, ElementFinder **finder);
+
+	int speed(void) { return this->speed_; }
+	void set_speed(int speed) { this->speed_ = speed; }
+
+	int implicit_wait_timeout(void) { return this->implicit_wait_timeout_; }
+	void set_implicit_wait_timeout(int timeout) { this->implicit_wait_timeout_ = timeout; }
 
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);
-	void BrowserQuittingEventHandler(std::wstring browserId);
+	void BrowserQuittingEventHandler(std::wstring browser_id);
 	void DispatchCommand(void);
 
 	void PopulateCommandHandlerRepository(void);
 	void PopulateElementFinderRepository(void);
 
-	int m_speed;
-	int m_implicitWaitTimeout;
+	std::map<std::wstring, BrowserWrapper*> managed_browsers_;
+	std::map<std::wstring, ElementWrapper*> managed_elements_;
+	std::map<std::wstring, ElementFinder*> element_finders_;
 
-	WebDriverCommand *m_command;
-	std::wstring m_serializedResponse;
-	int m_newBrowserEventId;
-	int m_browserQuittingEventId;
-	std::map<int, WebDriverCommandHandler*> m_commandHandlerRepository;
-	bool m_wait;
+	BrowserFactory *factory_;
+	std::wstring current_browser_id_;
+
+	int speed_;
+	int implicit_wait_timeout_;
+
+	std::wstring manager_id_;
+	int port_;
+
+	WebDriverCommand *current_command_;
+	std::wstring serialized_response_;
+	int new_browser_event_id_;
+	int browser_quitting_event_id_;
+	std::map<int, WebDriverCommandHandler*> command_handlers_;
+	bool is_waiting_;
 };
-}
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_BROWSERMANAGER_H_

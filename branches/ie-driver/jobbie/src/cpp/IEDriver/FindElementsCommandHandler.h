@@ -1,72 +1,64 @@
-#pragma once
-#include "BrowserManager.h"
+#ifndef WEBDRIVER_IE_FINDELEMENTSCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_FINDELEMENTSCOMMANDHANDLER_H_
+
 #include <ctime>
+#include "BrowserManager.h"
 
-class FindElementsCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class FindElementsCommandHandler : public WebDriverCommandHandler {
 public:
-
-	FindElementsCommandHandler(void)
-	{
+	FindElementsCommandHandler(void) {
 	}
 
-	virtual ~FindElementsCommandHandler(void)
-	{
+	virtual ~FindElementsCommandHandler(void) {
 	}
 
 protected:
-
-	void FindElementsCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (commandParameters.find("using") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
+	void FindElementsCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (command_parameters.find("using") == command_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "using";
-		}
-		else if (commandParameters.find("value") == commandParameters.end())
-		{
-			response->m_statusCode = 400;
+		} else if (command_parameters.find("value") == command_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "value";
-		}
-		else
-		{
-			std::vector<ElementWrapper *> foundElements;
-			std::wstring mechanism = CA2W(commandParameters["using"].asString().c_str(), CP_UTF8);
-			std::wstring value = CA2W(commandParameters["value"].asString().c_str(), CP_UTF8);
-			ElementFinder *pFinder(manager->m_elementFinders[mechanism]);
+		} else {
+			std::vector<ElementWrapper *> found_elements;
+			std::wstring mechanism = CA2W(command_parameters["using"].asString().c_str(), CP_UTF8);
+			std::wstring value = CA2W(command_parameters["value"].asString().c_str(), CP_UTF8);
 
-			int timeout(manager->GetImplicitWaitTimeout());
+			ElementFinder *finder;
+			manager->GetElementFinder(mechanism, &finder);
+
+			int timeout(manager->implicit_wait_timeout());
 			clock_t end = clock() + (timeout / 1000 * CLOCKS_PER_SEC);
-			if (timeout > 0 && timeout < 1000) 
-			{
+			if (timeout > 0 && timeout < 1000)  {
 				end += 1 * CLOCKS_PER_SEC;
 			}
 
 
-			int statusCode = SUCCESS;
-			do
-			{
-				statusCode = pFinder->FindElements(manager, NULL, value, &foundElements);
-				if (statusCode == SUCCESS && foundElements.size() > 0)
-				{
+			int status_code = SUCCESS;
+			do {
+				status_code = finder->FindElements(manager, NULL, value, &found_elements);
+				if (status_code == SUCCESS && found_elements.size() > 0) {
 					break;
 				}
-			}
-			while (clock() < end);
+			} while (clock() < end);
 
-			if (statusCode == SUCCESS)
-			{
-				Json::Value elementArray(Json::arrayValue);
-				for (int i = 0; i < foundElements.size(); ++i)
-				{
-					elementArray[i] = foundElements[i]->ConvertToJson();
+			if (status_code == SUCCESS) {
+				Json::Value element_array(Json::arrayValue);
+				for (int i = 0; i < found_elements.size(); ++i) {
+					element_array[i] = found_elements[i]->ConvertToJson();
 				}
 
-				response->m_value = elementArray;
+				response->m_value = element_array;
 			}
 
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_FINDELEMENTSCOMMANDHANDLER_H_

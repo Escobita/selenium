@@ -1,42 +1,39 @@
-#pragma once
-#include <string>
+#ifndef WEBDRIVER_IE_IEDRIVERSERVER_H_
+#define WEBDRIVER_IE_IEDRIVERSERVER_H_
+
 #include <vector>
 #include <map>
 #include <regex>
 #include <sstream>
-#include "BrowserManager.h"
+#include <string>
 #include "mongoose.h"
+#include "BrowserManager.h"
 
 #define SERVER_DEFAULT_PAGE "<html><head><title>WebDriver</title></head><body><p id='main'>This is the initial start page for the IE WebDriver.</p></body></html>"
 
 using namespace std;
 
-extern "C"
-{
-class IEDriverServer
-{
+namespace webdriver {
+
+class IEDriverServer {
 public:
 	IEDriverServer(int port);
 	virtual ~IEDriverServer(void);
-	HWND m_managerHwnd;
-	int processRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
+	int ProcessRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
+	HWND manager_window_handle(void) { return this->manager_window_handle_; }
 
 private:
-	int lookupCommand(std::string uri, std::string httpVerb, std::wstring *locator);
-	std::map<std::string, std::map<std::string, int>> m_commandRepository;
-	void populateCommandRepository(void);
-	std::wstring sendCommandToManager(std::wstring serializedCommand);
+	int LookupCommand(std::string uri, std::string http_verb, std::wstring *locator);
+	void PopulateCommandRepository(void);
+	std::wstring SendCommandToManager(std::wstring serialized_command);
 	void SendWelcomePage(mg_connection *connection, const mg_request_info *request_info);
 	void SendHttpOk(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
 	void SendHttpInternalError(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
 	void SendHttpSeeOther(mg_connection *connection, const mg_request_info *request_info, std::string body);
+	HWND manager_window_handle_;
+	std::map<std::string, std::map<std::string, int>> command_repository_;
 };
-	IEDriverServer* server;
-	static void * event_handler(enum mg_event event_raised, 
-								struct mg_connection *conn, 
-								const struct mg_request_info *request_info);
 
-	struct mg_context *ctx;
-	__declspec(dllexport) IEDriverServer* StartServer(int port);
-	__declspec(dllexport) void StopServer(IEDriverServer* server);
-}
+} //namespace WebDriver
+
+#endif // WEBDRIVER_IE_IEDRIVERSERVER_H_

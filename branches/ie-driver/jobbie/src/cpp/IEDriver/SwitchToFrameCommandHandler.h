@@ -1,54 +1,44 @@
-#pragma once
+#ifndef WEBDRIVER_IE_SWITCHTOFRAMECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_SWITCHTOFRAMECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class SwitchToFrameCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	SwitchToFrameCommandHandler(void)
-	{
+class SwitchToFrameCommandHandler : public WebDriverCommandHandler {
+public:
+	SwitchToFrameCommandHandler(void) {
 	}
 
-	virtual ~SwitchToFrameCommandHandler(void)
-	{
+	virtual ~SwitchToFrameCommandHandler(void) {
 	}
 
 protected:
-
-	void SwitchToFrameCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		//std::string value = commandParameters["value"].asString();
-		//std::transform(value.begin(), value.end(), value.begin(), ::toupper);
-		//response->m_statusCode = 0;
-		//response->m_value = "Received value " + value;
-
-		Json::Value frameId = commandParameters["id"];
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
-		std::wstringstream pathStream;
-		if (frameId.isString())
-		{
-			std::wstring path(CA2W(frameId.asString().c_str(), CP_UTF8)); 
-			pathStream << path;
-		}
-		else if(frameId.isIntegral())
-		{
-			pathStream << frameId.asInt();
+	void SwitchToFrameCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		Json::Value frame_id = command_parameters["id"];
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
+		std::wstringstream path_stream;
+		if (frame_id.isString()) {
+			std::wstring path(CA2W(frame_id.asString().c_str(), CP_UTF8)); 
+			path_stream << path;
+		} else if(frame_id.isIntegral()) {
+			path_stream << frame_id.asInt();
 		}
 
-		pWrapper->m_pathToFrame = pathStream.str();
-		CComPtr<IHTMLDocument2> pDoc;
-		pWrapper->GetDocument(&pDoc);
-		if (!pDoc)
-		{
-			pWrapper->m_pathToFrame = L"";
-			response->m_statusCode = ENOSUCHFRAME;
+		browser_wrapper->set_path_to_frame(path_stream.str());
+		CComPtr<IHTMLDocument2> doc;
+		browser_wrapper->GetDocument(&doc);
+		if (!doc) {
+			browser_wrapper->set_path_to_frame(L"");
+			response->set_status_code(ENOSUCHFRAME);
 			response->m_value["message"] = "No frame found";
-		}
-		else
-		{
-			response->m_statusCode = SUCCESS;
+		} else {
+			response->set_status_code(SUCCESS);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_SWITCHTOFRAMECOMMANDHANDLER_H_

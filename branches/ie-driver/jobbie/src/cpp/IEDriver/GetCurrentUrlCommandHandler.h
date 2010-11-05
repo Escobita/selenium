@@ -1,44 +1,44 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETCURRENTURLCOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETCURRENTURLCOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetCurrentUrlCommandHandler :
-	public WebDriverCommandHandler
-{
+namespace webdriver {
+
+class GetCurrentUrlCommandHandler : public WebDriverCommandHandler {
 public:
-
-	GetCurrentUrlCommandHandler(void)
-	{
+	GetCurrentUrlCommandHandler(void) {
 	}
 
-	virtual ~GetCurrentUrlCommandHandler(void)
-	{
+	virtual ~GetCurrentUrlCommandHandler(void) {
 	}
+
 protected:
+	void GetCurrentUrlCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		BrowserWrapper *browser_wrapper;
+		manager->GetCurrentBrowser(&browser_wrapper);
 
-	void GetCurrentUrlCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		BrowserWrapper *pWrapper;
-		manager->GetCurrentBrowser(&pWrapper);
+		CComPtr<IHTMLDocument2> doc;
+		browser_wrapper->GetDocument(&doc);
 
-		CComPtr<IHTMLDocument2> pDoc;
-		pWrapper->GetDocument(&pDoc);
-
-		if (!pDoc) 
-		{
+		if (!doc) {
 			response->m_value = "";
 			return;
 		}
 
 		CComBSTR url;
-		HRESULT hr = pDoc->get_URL(&url);
-		if (FAILED(hr))
-		{
+		HRESULT hr = doc->get_URL(&url);
+		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get current URL";
 			response->m_value = "";
 			return;
 		}
 
-		std::string urlStr = CW2A((LPCWSTR)url, CP_UTF8);
-		response->m_value = urlStr;
+		std::string url_str = CW2A((LPCWSTR)url, CP_UTF8);
+		response->m_value = url_str;
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETCURRENTURLCOMMANDHANDLER_H_

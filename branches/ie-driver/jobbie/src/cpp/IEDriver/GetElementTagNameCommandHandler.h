@@ -1,48 +1,43 @@
-#pragma once
+#ifndef WEBDRIVER_IE_GETELEMENTTAGNAMECOMMANDHANDLER_H_
+#define WEBDRIVER_IE_GETELEMENTTAGNAMECOMMANDHANDLER_H_
+
 #include "BrowserManager.h"
 
-class GetElementTagNameCommandHandler :
-	public WebDriverCommandHandler
-{
-public:
+namespace webdriver {
 
-	GetElementTagNameCommandHandler(void)
-	{
+class GetElementTagNameCommandHandler : public WebDriverCommandHandler {
+public:
+	GetElementTagNameCommandHandler(void) {
 	}
 
-	virtual ~GetElementTagNameCommandHandler(void)
-	{
+	virtual ~GetElementTagNameCommandHandler(void) {
 	}
 
 protected:
-
-	void GetElementTagNameCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locatorParameters, std::map<std::string, Json::Value> commandParameters, WebDriverResponse * response)
-	{
-		if (locatorParameters.find("id") == locatorParameters.end())
-		{
-			response->m_statusCode = 400;
+	void GetElementTagNameCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+		if (locator_parameters.find("id") == locator_parameters.end()) {
+			response->set_status_code(400);
 			response->m_value = "id";
-		}
-		else
-		{
-			std::wstring elementId(CA2W(locatorParameters["id"].c_str(), CP_UTF8));
-			ElementWrapper *pElementWrapper;
-			int statusCode = this->GetElement(manager, elementId, &pElementWrapper);
-			if (statusCode == SUCCESS)
-			{
+		} else {
+			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
+			ElementWrapper *element_wrapper;
+			int status_code = this->GetElement(manager, element_id, &element_wrapper);
+			if (status_code == SUCCESS) {
 				CComBSTR temp;
-				pElementWrapper->m_pElement->get_tagName(&temp);
-				std::wstring tagName((BSTR)temp);
-				std::transform(tagName.begin(), tagName.end(), tagName.begin(), tolower);
-				std::string returnValue(CW2A(tagName.c_str(), CP_UTF8));
-				response->m_value = returnValue;
-			}
-			else
-			{
+				element_wrapper->element()->get_tagName(&temp);
+				std::wstring tag_name((BSTR)temp);
+				std::transform(tag_name.begin(), tag_name.end(), tag_name.begin(), tolower);
+				std::string return_value(CW2A(tag_name.c_str(), CP_UTF8));
+				response->m_value = return_value;
+			} else {
 				response->m_value["message"] = "Element is no longer valid";
 			}
 
-			response->m_statusCode = statusCode;
+			response->set_status_code(status_code);
 		}
 	}
 };
+
+} // namespace webdriver
+
+#endif // WEBDRIVER_IE_GETELEMENTTAGNAMECOMMANDHANDLER_H_
