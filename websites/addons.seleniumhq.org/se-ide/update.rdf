@@ -7,6 +7,20 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
+            <em:version>1.0.8</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>1.5</em:minVersion> 
+                <em:maxVersion>3.*</em:maxVersion> 
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.0.8/selenium-ide-1.0.8.xpi</em:updateLink>
+                <em:updateHash>sha1:853bb1ffa6b87bd4d5dbfcd0109945812850c2bb</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
             <em:version>1.0.7</em:version>
             <em:targetApplication>
               <RDF:Description>
