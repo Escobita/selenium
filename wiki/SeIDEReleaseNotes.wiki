@@ -1,6 +1,30 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.8==
+
+This release is primarily to get FF4 support out into the wild since it is getting to the advanced beta phase, but there is also a fair bit of other bug fixes in there as well.
+ 
+  * BUG - There was an annoying bug where 'clickAndWait' would be saved as click, but has been fixed. see http://code.google.com/p/selenium/issues/detail?id=419
+  * NEW -This could arguably be considered a bug fix, but if you changed format from HTML to something else then made an edit and switched back again to HTML your script contents would be lost. At its heart, the HTML -> something conversion is one way and so there is now a warning about possibly losing your code. The warning only happens the first time though so you can still shoot yourself in the foot; its just harder
+  * BUG - element locator works for table rows. see http://code.google.com/p/selenium/issues/detail?id=485
+  * BUG - the default timeout setting of se-ide is now actually used. see http://code.google.com/p/selenium/issues/detail?id=552
+  * NEW - the 'run in the selenium testrunner' option has been removed. The supported methods in se-ide are the play single, play suite and if you need more there is always se-rc with a language binding or -htmlSuite
+  * BUG - the base url wouldn't change on occasion, much to the frustration of many
+  * NEW - a JUnit 4 formatter was added
+  * BUG - the RSpec formatter had some additional tweaks
+  * BUG - test suite html can now have tests from different folders
+  * BUG - test suite saving triggers got a bit of attention so add/delete/modify is a little more robust
+  * NEW - if you resize your se-ide and/or move it around your screen, the size and position are saved between sessions
+  * BUG - the logic around when to prompt for saving wasn't really that nice, but its been fixed
+  * NEW - uses 'browser atoms' like the rest of Selenium
+  * NEW - CSS locator execution is handled through Sizzle
+  * NEW - can now add multiple test cases to a suite at once
+  * NEW - addition to the se-ide plugin api to add se-ide extensions to manipulate how recording is done - http://reallysimplethings.wordpress.com/2010/10/11/the-selenium-ide-1-x-plugin-api-part-12-adding-locator-builders/
+  * NEW - the case of the missing log messages is now solved
+  * NEW - Firefox 4 support
+  
+
 ==1.0.7==
 
 Only a couple of things of note in this release to end-users which is somewhat silly since it is a month overdue, but that was due to some build changes that took a bit of work to get the kinks worked out. Should be ok now though.
