@@ -17,23 +17,42 @@ DWORD BrowserFactory::LaunchBrowserProcess(int port) {
 	STARTUPINFO start_info;
 	PROCESS_INFORMATION proc_info;
 
+	::ZeroMemory( &start_info, sizeof(start_info) );
+    start_info.cb = sizeof(start_info);
+	::ZeroMemory( &proc_info, sizeof(proc_info) );
+
 	std::wstringstream url_stream;
 	url_stream << L"http://localhost:" << port << L"/";
 	std::wstring initial_url(url_stream.str());
 
-	// If we are running IE 6 or earlier, or are on XP or earlier...
-	if (this->ie_major_version_ < 7 || this->windows_major_version_ < 6) {
-		::CreateProcess(this->ie_executable_location_.c_str(), &initial_url[0], NULL, NULL, FALSE, 0, NULL, NULL, &start_info, &proc_info);
-	} else {
-		// Expressly use IELaunchURL, which will guarantee a new session.
-		// Simply using CoCreateInstance to create the browser will merge
-		// sessions, making separate cookie handling impossible.
+	HMODULE library_handle = ::LoadLibrary(L"ieframe.dll");
+	FARPROC proc_address = ::GetProcAddress(library_handle, "IELaunchURL");
+	if (proc_address != 0) {
+		// If we have the IELaunchURL API, expressly use it. This will
+		// guarantee a new session. Simply using CoCreateInstance to 
+		// create the browser will merge sessions, making separate cookie
+		// handling impossible.
 		::IELaunchURL(initial_url.c_str(), &proc_info, NULL);
+	} else {
+		LPWSTR url = new WCHAR[initial_url.size() + 1];
+		wcscpy_s(url, initial_url.size() + 1, initial_url.c_str());
+		url[initial_url.size()] = L'\0';
+		::CreateProcess(this->ie_executable_location_.c_str(), url, NULL, NULL, FALSE, 0, NULL, NULL, &start_info, &proc_info);
 	}
 
 	process_id = proc_info.dwProcessId;
-	::CloseHandle(proc_info.hThread);
-	::CloseHandle(proc_info.hProcess);
+
+	if (proc_info.hThread != NULL) {
+		::CloseHandle(proc_info.hThread);
+	}
+
+	if (proc_info.hProcess != NULL) {
+		::CloseHandle(proc_info.hProcess);
+	}
+
+	if (library_handle != NULL) {
+		::FreeLibrary(library_handle);
+	}
 
 	return process_id;
 }
@@ -89,18 +108,26 @@ void BrowserFactory::AttachToBrowser(ProcessWindowInfo *process_window_info) {
 IWebBrowser2* BrowserFactory::CreateBrowser() {
 	// TODO: Error and exception handling and return value checking.
 	IWebBrowser2 *browser;
-	this->SetThreadIntegrityLevel();
+	if (this->windows_major_version_ >= 6) {
+		// Only Windows Vista and above have mandatory integrity levels.
+		this->SetThreadIntegrityLevel();
+	}
+
 	DWORD context = CLSCTX_LOCAL_SERVER;
-	if (this->ie_major_version_ == 7 && this->windows_major_version_ == 6) {
+	if (this->ie_major_version_ == 7 && this->windows_major_version_ >= 6) {
 		// ONLY for IE 7 on Windows Vista. XP and below do not have Protected Mode;
 		// Windows 7 shipped with IE8.
 		context = context | CLSCTX_ENABLE_CLOAKING;
 	}
 
-	//pBrowser.CoCreateInstance(CLSID_InternetExplorer, NULL, context);
 	::CoCreateInstance(CLSID_InternetExplorer, NULL, context, IID_IWebBrowser2, (void**)&browser);
 	browser->put_Visible(VARIANT_TRUE);
-	this->ResetThreadIntegrityLevel();
+
+	if (this->windows_major_version_ >= 6) {
+		// Only Windows Vista and above have mandatory integrity levels.
+		this->ResetThreadIntegrityLevel();
+	}
+
 	return browser;
 }
 
