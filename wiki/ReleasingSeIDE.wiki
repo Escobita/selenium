@@ -30,3 +30,4 @@ The steps to releasing Se-IDE (because I keep forgetting something)
   # merge your changes from the branch to trunk so a reversion exists with just the clean version
   # increment the version with -SNAPSHOT
   # disable branch build in bamboo
+  # upload to google code downloads page
