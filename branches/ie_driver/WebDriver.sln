@@ -67,6 +67,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webdriver-support-tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDriver.Android", "android\client\src\csharp\WebDriver.Android.csproj", "{EA8B657E-0801-4BE4-837F-DBBB2B4D765E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JSON", "jobbie\src\cpp\JSON\JSON.vcproj", "{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEDriver", "jobbie\src\cpp\IEDriver\IEDriver.vcproj", "{BB72383B-427F-4191-B692-E4345A30E33C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|.NET = Debug|.NET
@@ -455,6 +459,42 @@ Global
 		{EA8B657E-0801-4BE4-837F-DBBB2B4D765E}.Release|Win32.ActiveCfg = Release|Any CPU
 		{EA8B657E-0801-4BE4-837F-DBBB2B4D765E}.Release|x64.ActiveCfg = Release|Any CPU
 		{EA8B657E-0801-4BE4-837F-DBBB2B4D765E}.Release|x86.ActiveCfg = Release|Any CPU
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|.NET.ActiveCfg = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|Win32.Build.0 = Debug|Win32
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|x64.ActiveCfg = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|x64.Build.0 = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Debug|x86.ActiveCfg = Debug|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|.NET.ActiveCfg = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|Any CPU.ActiveCfg = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|Mixed Platforms.Build.0 = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|Win32.ActiveCfg = Release|Win32
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|Win32.Build.0 = Release|Win32
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|x64.ActiveCfg = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|x64.Build.0 = Release|x64
+		{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}.Release|x86.ActiveCfg = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|.NET.ActiveCfg = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|Win32.Build.0 = Debug|Win32
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|x64.ActiveCfg = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|x64.Build.0 = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Debug|x86.ActiveCfg = Debug|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|.NET.ActiveCfg = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|Any CPU.ActiveCfg = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|Mixed Platforms.Build.0 = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|Win32.ActiveCfg = Release|Win32
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|Win32.Build.0 = Release|Win32
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|x64.ActiveCfg = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|x64.Build.0 = Release|x64
+		{BB72383B-427F-4191-B692-E4345A30E33C}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
