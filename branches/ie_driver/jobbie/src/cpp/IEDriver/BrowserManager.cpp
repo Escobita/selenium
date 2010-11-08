@@ -224,6 +224,8 @@ int BrowserManager::GetManagedBrowser(std::wstring browser_id, BrowserWrapper **
 }
 
 void BrowserManager::GetManagedBrowserHandles(std::vector<std::wstring> *managed_browser_handles) {
+	// TODO: Enumerate windows looking for browser windows
+	// created by showModalDialog().
 	std::map<std::wstring, BrowserWrapper*>::iterator end = this->managed_browsers_.end();
 	for (std::map<std::wstring, BrowserWrapper*>::iterator it = this->managed_browsers_.begin(); it != end; ++it) {
 		managed_browser_handles->push_back(it->first);
@@ -274,16 +276,16 @@ int BrowserManager::GetElementFinder(std::wstring mechanism, ElementFinder **fin
 }
 
 void BrowserManager::NewBrowserEventHandler(BrowserWrapper *wrapper) {
-	std::string tmp(CW2A(wrapper->browser_id().c_str(), CP_UTF8));
-	std::cout << "NewWindow found with id " << tmp << "\r\n";
+	//std::string tmp(CW2A(wrapper->browser_id().c_str(), CP_UTF8));
+	//std::cout << "NewWindow found with id " << tmp << "\r\n";
 	if (this->managed_browsers_.find(wrapper->browser_id()) == this->managed_browsers_.end()) {
 		this->AddManagedBrowser(wrapper);
 	}
 }
 
 void BrowserManager::BrowserQuittingEventHandler(std::wstring browser_id) {
-	std::string tmp(CW2A(browser_id.c_str(), CP_UTF8));
-	std::cout << "OnQuit from " << tmp << "\r\n";
+	//std::string tmp(CW2A(browser_id.c_str(), CP_UTF8));
+	//std::cout << "OnQuit from " << tmp << "\r\n";
 	if (this->managed_browsers_.find(browser_id) != this->managed_browsers_.end()) {
 		this->managed_browsers_[browser_id]->NewWindow.detach(this->new_browser_event_id_);
 		this->managed_browsers_[browser_id]->Quitting.detach(this->browser_quitting_event_id_);

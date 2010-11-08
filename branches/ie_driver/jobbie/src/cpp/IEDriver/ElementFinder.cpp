@@ -10,38 +10,40 @@ ElementFinder::~ElementFinder(void) {
 }
 
 int ElementFinder::FindElement(BrowserManager *manager, ElementWrapper *parent_wrapper, std::wstring criteria, ElementWrapper **found_element) {
-	int status_code = SUCCESS;
-	IHTMLElement *parent_element;
-	status_code = this->GetParentElement(manager, parent_wrapper, &parent_element);
+	BrowserWrapper *browser;
+	int status_code = manager->GetCurrentBrowser(&browser);
 	if (status_code == SUCCESS) {
-		BrowserWrapper *browser;
-		manager->GetCurrentBrowser(&browser);
-		IHTMLElement *element;
-		status_code = this->FindElementInternal(browser, parent_element, criteria, &element);
+		IHTMLElement *parent_element;
+		status_code = this->GetParentElement(browser, parent_wrapper, &parent_element);
 		if (status_code == SUCCESS) {
-			ElementWrapper *wrapper = new ElementWrapper(element);
-			manager->AddManagedElement(wrapper);
-			*found_element = wrapper;
+			IHTMLElement *element;
+			status_code = this->FindElementInternal(browser, parent_element, criteria, &element);
+			if (status_code == SUCCESS) {
+				ElementWrapper *wrapper = new ElementWrapper(element);
+				manager->AddManagedElement(wrapper);
+				*found_element = wrapper;
+			}
 		}
 	}
 	return status_code;
 }
 
 int ElementFinder::FindElements(BrowserManager *manager, ElementWrapper *parent_wrapper, std::wstring criteria, std::vector<ElementWrapper*> *found_elements) {
-	int status_code = SUCCESS;
-	IHTMLElement *parent_element;
-	status_code = this->GetParentElement(manager, parent_wrapper, &parent_element);
+	BrowserWrapper *browser;
+	int status_code = manager->GetCurrentBrowser(&browser);
 	if (status_code == SUCCESS) {
-		BrowserWrapper *browser;
-		manager->GetCurrentBrowser(&browser);
-		std::vector<IHTMLElement*> raw_elements;
-		status_code = this->FindElementsInternal(browser, parent_element, criteria, &raw_elements);
-		std::vector<IHTMLElement*>::iterator begin = raw_elements.begin();
-		std::vector<IHTMLElement*>::iterator end = raw_elements.end();
-		for (std::vector<IHTMLElement*>::iterator it = begin; it != end; ++it) {
-			ElementWrapper *wrapper = new ElementWrapper(*it);
-			manager->AddManagedElement(wrapper);
-			found_elements->push_back(wrapper);
+		IHTMLElement *parent_element;
+		status_code = this->GetParentElement(browser, parent_wrapper, &parent_element);
+		if (status_code == SUCCESS) {
+			std::vector<IHTMLElement*> raw_elements;
+			status_code = this->FindElementsInternal(browser, parent_element, criteria, &raw_elements);
+			std::vector<IHTMLElement*>::iterator begin = raw_elements.begin();
+			std::vector<IHTMLElement*>::iterator end = raw_elements.end();
+			for (std::vector<IHTMLElement*>::iterator it = begin; it != end; ++it) {
+				ElementWrapper *wrapper = new ElementWrapper(*it);
+				manager->AddManagedElement(wrapper);
+				found_elements->push_back(wrapper);
+			}
 		}
 	}
 	return status_code;
@@ -55,10 +57,7 @@ int ElementFinder::FindElementsInternal(BrowserWrapper *browser, IHTMLElement *p
 	return ENOSUCHELEMENT;
 }
 
-void ElementFinder::GetHtmlDocument3(BrowserManager *manager, IHTMLDocument3 **doc3) {
-	BrowserWrapper *browser;
-	manager->GetCurrentBrowser(&browser);
-	
+void ElementFinder::GetHtmlDocument3(BrowserWrapper *browser, IHTMLDocument3 **doc3) {
 	CComPtr<IHTMLDocument2> doc;
 	browser->GetDocument(&doc);
 
@@ -88,7 +87,7 @@ void ElementFinder::ExtractHtmlDocument2FromDomNode(const IHTMLDOMNode* extracti
 	*doc = doc_qi_pointer.Detach();
 }
 
-int ElementFinder::GetParentElement(BrowserManager *manager, ElementWrapper *parent_wrapper, IHTMLElement **parent_element) {
+int ElementFinder::GetParentElement(BrowserWrapper *browser, ElementWrapper *parent_wrapper, IHTMLElement **parent_element) {
 	int status_code = SUCCESS;
 	if (parent_wrapper != NULL) {
 		*parent_element = parent_wrapper->element();
@@ -96,7 +95,7 @@ int ElementFinder::GetParentElement(BrowserManager *manager, ElementWrapper *par
 		// No parent element specified, so get the root document
 		// element as the parent element.
 		CComPtr<IHTMLDocument3> root_doc;
-		this->GetHtmlDocument3(manager, &root_doc);
+		this->GetHtmlDocument3(browser, &root_doc);
 		if (!root_doc) {
 			status_code = ENOSUCHDOCUMENT;
 		} else {

@@ -68,7 +68,7 @@ int ElementWrapper::Click(HWND containing_window_handle) {
 			return result;
 		}
 
-		wait(50);
+		//wait(50);
 	}
 	return status_code;
 }

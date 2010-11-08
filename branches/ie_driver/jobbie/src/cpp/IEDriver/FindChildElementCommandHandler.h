@@ -58,7 +58,7 @@ protected:
 				if (status_code == SUCCESS) {
 					response->m_value = found_element->ConvertToJson();
 				} else {
-					response->m_value["message"] = "No element found";
+					response->m_value["message"] = "Unable to find element with " + command_parameters["using"].asString() + " " + command_parameters["value"].asString();
 				}
 			} else {
 				response->m_value["message"] = "Element is no longer valid";

@@ -623,6 +623,10 @@ void __stdcall BrowserWrapper::OnQuit() {
 }
 
 void __stdcall BrowserWrapper::NewWindow3(IDispatch **ppDisp, VARIANT_BOOL * pbCancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl) {
+	// Handle the NewWindow3 event to allow us to immediately hook
+	// the events of the new browser window opened by the user action.
+	// This will not allow us to handle windows created by the JavaScript
+	// showModalDialog function().
 	IWebBrowser2 *browser = this->factory_->CreateBrowser();
 	BrowserWrapper *new_window_wrapper = new BrowserWrapper(browser, NULL, this->factory_);
 	*ppDisp = browser;

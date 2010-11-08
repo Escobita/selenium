@@ -52,13 +52,15 @@ protected:
 			{
 				// Reset the path to the focused frame before switching window context.
 				BrowserWrapper *current_browser;
-				int statusCode = manager->GetCurrentBrowser(&current_browser);
-				if (statusCode == SUCCESS)
+				int status_code = manager->GetCurrentBrowser(&current_browser);
+				if (status_code == SUCCESS)
 				{
 					current_browser->set_path_to_frame(L"");
 				}
 
 				manager->set_current_browser_id(found_browser_handle);
+				status_code = manager->GetCurrentBrowser(&current_browser);
+				current_browser->set_wait_required(true);
 			}
 		}
 	}

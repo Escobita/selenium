@@ -23,7 +23,7 @@ public:
 protected:
 	virtual int FindElementInternal(BrowserWrapper *browser, IHTMLElement *parent_element, std::wstring criteria, IHTMLElement **found_element);
 	virtual int FindElementsInternal(BrowserWrapper *browser, IHTMLElement *parent_element, std::wstring criteria, std::vector<IHTMLElement*> *found_elements);
-	void GetHtmlDocument3(BrowserManager *manager, IHTMLDocument3 **doc3);
+	void GetHtmlDocument3(BrowserWrapper *browser, IHTMLDocument3 **doc3);
 	void ExtractHtmlDocument2FromDomNode(const IHTMLDOMNode* extraction_node, IHTMLDocument2** doc);
 	void ExtractHtmlDocument3FromDomNode(const IHTMLDOMNode* extraction_node, IHTMLDocument3** doc);
 	bool IsOrUnder(const IHTMLDOMNode* root, IHTMLElement* child);
@@ -31,7 +31,7 @@ protected:
 	std::wstring StripTrailingWhitespace(std::wstring input);
 
 private:
-	int GetParentElement(BrowserManager *manager, ElementWrapper *parent_wrapper, IHTMLElement **parent_element);
+	int GetParentElement(BrowserWrapper *browser, ElementWrapper *parent_wrapper, IHTMLElement **parent_element);
 };
 
 } // namespace webdriver

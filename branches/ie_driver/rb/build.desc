@@ -1,5 +1,5 @@
 rubygem(
-  version = "0.0.30.dev",
+  version = "0.1.0.dev",
   name = "selenium-webdriver",
   dir = "build/rb",
   deps = [
@@ -15,7 +15,7 @@ rubygem(
   gemdeps = [
     { "json_pure"    : ">= 0"     },
     { "rubyzip"      : ">= 0"     },
-    { "childprocess" : "0.1.3" },
+    { "childprocess" : "0.1.4" },
     { "ffi"          : "~> 0.6.3" }
   ],
   devdeps = [
@@ -73,8 +73,7 @@ ruby_test(name = "android",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/android/**/*_spec.rb"
   ],
-  include = ["rb/spec/integration"],
-  gemfile = "build/rb/Gemfile" ,
+  include = ["rb/spec/integration", "build/rb/lib"],
   deps = [ ":android"  ]
 )
 
@@ -97,8 +96,7 @@ ruby_test(name = "chrome",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/chrome/**/*_spec.rb"
   ],
-  include = ["rb/spec/integration"],
-  gemfile = "build/rb/Gemfile" ,
+  include = ["rb/spec/integration", "build/rb/lib"],
   deps = [ ":chrome"  ]
 )
 
@@ -120,9 +118,8 @@ ruby_test(name = "firefox",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/firefox/**/*_spec.rb"
   ],
-  include = ["rb/spec/integration"],
-  deps = [":firefox"],
-  gemfile = "build/rb/Gemfile"
+  include = ["rb/spec/integration", "build/rb/lib"],
+  deps = [":firefox"]
 )
 
 ruby_library(name = "ie",
@@ -145,8 +142,7 @@ ruby_test(name = "ie",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/ie/**/*_spec.rb"
   ],
-  include = ["rb/spec/integration"],
-  gemfile = "build/rb/Gemfile",
+  include = ["rb/spec/integration", "build/rb/lib"],
   deps = [ ":ie" ]
 )
 
@@ -166,8 +162,7 @@ ruby_test(name = "iphone",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/iphone/**/*_spec.rb"
   ],
-  include = ["rb/spec/integration"],
-  gemfile = "build/rb/Gemfile",
+  include = ["rb/spec/integration", "build/rb/lib"],
   deps = [ ":iphone" ]
 )
 
@@ -186,8 +181,7 @@ ruby_test(name = "remote",
     "spec/integration/selenium/webdriver/*_spec.rb",
     "spec/integration/selenium/webdriver/remote/**/*_spec.rb"
   ],
-  gemfile = "build/rb/Gemfile",
-  include = ["rb/spec/integration"],
+  include = ["rb/spec/integration", "build/rb/lib"],
   deps = [
     "//remote/server:server:uber",
     "//remote/server:test",
@@ -213,8 +207,7 @@ ruby_test(name = "unit",
     "spec/unit/selenium/rake/*_spec.rb",
     "spec/unit/selenium/*_spec.rb",
   ],
-  gemfile = "build/rb/Gemfile",
-  include = ["rb/spec/unit"],
+  include = ["rb/spec/unit", "build/rb/lib"],
   deps = [
     ":chrome",
     ":common",
