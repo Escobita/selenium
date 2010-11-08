@@ -7,6 +7,8 @@ module Selenium
       #
       class Capabilities
 
+        attr_reader :proxy
+
         attr_accessor :css_selectors_enabled,
                       :javascript_enabled,
                       :native_events,
@@ -14,8 +16,7 @@ module Selenium
                       :takes_screenshot,
                       :rotatable,
                       :version,
-                      :browser_name,
-                      :proxy
+                      :browser_name
 
         alias_method :css_selectors_enabled?, :css_selectors_enabled
         alias_method :javascript_enabled?   , :javascript_enabled
@@ -93,7 +94,7 @@ module Selenium
               :takes_screenshot      => data["takesScreenshot"],
               :native_events         => data["nativeEvents"],
               :rotatable             => data["rotatable"],
-              :proxy                 => Proxy.json_create(data['proxy'])
+              :proxy                 => (Proxy.json_create(data['proxy']) if data['proxy'])
             )
           end
         end
@@ -120,14 +121,14 @@ module Selenium
           @native_events         = opts[:native_events]         || false
           @rotatable             = opts[:rotatable]             || false
 
-          self.proxy             = opts[:proxy] if opts.has_key? :proxy
+          self.proxy             = opts[:proxy]
         end
 
         def proxy=(proxy)
           case proxy
           when Hash
             @proxy = Proxy.new(proxy)
-          when Proxy
+          when Proxy, nil
             @proxy = proxy
           else
             raise TypeError, "expected Hash or #{Proxy.name}, got #{proxy.inspect}:#{proxy.class}"
@@ -149,7 +150,7 @@ module Selenium
             "rotatable"           => rotatable?
           }
 
-          hash["proxy"] = proxy.as_json if @proxy
+          hash["proxy"] = proxy.as_json if proxy
 
           hash
         end
@@ -157,6 +158,12 @@ module Selenium
         def to_json(*args)
           as_json.to_json(*args)
         end
+
+        def ==(other)
+          return false unless other.kind_of? self.class
+          as_json == other.as_json
+        end
+        alias_method :eql?, :==
 
       end # Capabilities
     end # Remote

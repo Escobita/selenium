@@ -2,7 +2,8 @@
  * Format for Selenium Remote Control .NET (C#) client.
  */
 
-load('remoteControl.js');
+var subScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+subScriptLoader.loadSubScript('chrome://selenium-ide/content/formats/remoteControl.js');
 
 this.name = "cs-rc";
 
@@ -73,34 +74,34 @@ function assertOrVerifyFailure(line, isAssert) {
 
 Equals.prototype.toString = function() {
 	return this.e1.toString() + " == " + this.e2.toString();
-}
+};
 
 NotEquals.prototype.toString = function() {
 	return this.e1.toString() + " != " + this.e2.toString();
-}
+};
 
 Equals.prototype.assert = function() {
 	return "Assert.AreEqual(" + this.e1.toString() + ", " + this.e2.toString() + ");";
-}
+};
 
 Equals.prototype.verify = function() {
 	return verify(this.assert());
-}
+};
 
 NotEquals.prototype.assert = function() {
 	return "Assert.AreNotEqual(" + this.e1.toString() + ", " + this.e2.toString() + ");";
-}
+};
 
 NotEquals.prototype.verify = function() {
 	return verify(this.assert());
-}
+};
 
 RegexpMatch.prototype.toString = function() {
 	return "Regex.IsMatch(" + this.expression + ", " + string(this.pattern) + ")";
-}
+};
 
 function pause(milliseconds) {
-	return "Thread.Sleep(" + parseInt(milliseconds) + ");";
+	return "Thread.Sleep(" + parseInt(milliseconds, 10) + ");";
 }
 
 function echo(message) {
@@ -143,7 +144,7 @@ CallSelenium.prototype.toString = function() {
 	}
 	result += ')';
 	return result;
-}
+};
 
 function formatComment(comment) {
 	return comment.comment.replace(/.+/mg, function(str) {
