@@ -12,9 +12,9 @@ class WebDriverResponse {
 public:
 	WebDriverResponse(void);
 	WebDriverResponse(std::string session_id);
-	WebDriverResponse(std::wstring json);
 	virtual ~WebDriverResponse(void);
 	std::wstring Serialize(void);
+	void Deserialize(std::wstring json);
 
 	int status_code(void) { return this->status_code_; }
 	void set_status_code(int value) { this->status_code_ = value; }

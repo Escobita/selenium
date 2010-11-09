@@ -3,7 +3,8 @@
  * Thanks to Sonic.
  */
 
-load('remoteControl.js');
+var subScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+subScriptLoader.loadSubScript('chrome://selenium-ide/content/formats/remoteControl.js');
 
 this.name = "php-rc";
 
@@ -96,7 +97,7 @@ RegexpNotMatch.prototype.toString = function() {
 };
 
 function pause(milliseconds) {
-    return "sleep(" + (parseInt(milliseconds) / 1000) + ");";
+    return "sleep(" + (parseInt(milliseconds, 10) / 1000) + ");";
 };
 
 function echo(message) {

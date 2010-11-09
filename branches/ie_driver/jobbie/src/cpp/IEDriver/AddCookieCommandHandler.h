@@ -2,6 +2,7 @@
 #define WEBDRIVER_IE_ADDCOOKIECOMMANDHANDLER_H_
 
 #include "BrowserManager.h"
+#include <ctime>
 
 namespace webdriver {
 
@@ -32,6 +33,31 @@ protected:
 		}
 		cookie_value.removeMember("secure");
 
+		Json::Value expiry = cookie_value.get("expiry", Json::Value::null);
+		if (!expiry.isNull()) {
+			cookie_value.removeMember("expiry");
+			if (expiry.isDouble()) {
+				time_t expiration_time = expiry.asDouble();
+				char raw_formatted_time[30];
+				tm * time_info;
+				time_info = gmtime(&expiration_time);
+				std::string month = this->GetMonthName(time_info->tm_mon);
+				std::string weekday = this->GetWeekdayName(time_info->tm_wday);
+				std::string format_string = weekday + ", %d " + month + " %Y %H:%M:%S GMT";
+				strftime(raw_formatted_time, 30 , format_string.c_str(), time_info);
+				std::string formatted_time(&raw_formatted_time[0]);
+				cookie_string += "expires=" + formatted_time + "; ";
+			}
+
+			// If a test sends both "expiry" and "expires", remove "expires"
+			// from the cookie so that it doesn't get added when the string
+			// properties of the JSON object are processed.
+			Json::Value expires_value = cookie_value.get("expires", Json::Value::null);
+			if (!expires_value.isNull()) {
+				cookie_value.removeMember("expires");
+			}
+		}
+
 		Json::Value::iterator it = cookie_value.begin();
 		for (; it != cookie_value.end(); ++it) {
 			std::string key = it.key().asString();
@@ -51,6 +77,61 @@ protected:
 		}
 
 		response->set_status_code(status_code);
+	}
+
+private:
+	std::string AddCookieCommandHandler::GetMonthName(int month_name) {
+		// NOTE: can cookie dates used with put_cookie be localized?
+		// If so, this function is not needed and a simple call to 
+		// strftime() will suffice.
+		switch (month_name) {
+			case 0:
+				return "Jan";
+			case 1:
+				return "Feb";
+			case 2:
+				return "Mar";
+			case 3:
+				return "Apr";
+			case 4:
+				return "May";
+			case 5:
+				return "Jun";
+			case 6:
+				return "Jul";
+			case 7:
+				return "Aug";
+			case 8:
+				return "Sep";
+			case 9:
+				return "Oct";
+			case 10:
+				return "Nov";
+			case 11:
+				return "Dec";
+		}
+	}
+
+	std::string AddCookieCommandHandler::GetWeekdayName(int weekday_name) {
+		// NOTE: can cookie dates used with put_cookie be localized?
+		// If so, this function is not needed and a simple call to 
+		// strftime() will suffice.
+		switch (weekday_name) {
+			case 0:
+				return "Sun";
+			case 1:
+				return "Mon";
+			case 2:
+				return "Tue";
+			case 3:
+				return "Wed";
+			case 4:
+				return "Thu";
+			case 5:
+				return "Fri";
+			case 6:
+				return "Sat";
+		}
 	}
 };
 

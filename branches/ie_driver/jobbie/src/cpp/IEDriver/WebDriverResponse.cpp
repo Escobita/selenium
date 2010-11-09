@@ -11,26 +11,26 @@ WebDriverResponse::WebDriverResponse(std::string session_id) {
 	this->status_code_ = 0;
 }
 
-WebDriverResponse::WebDriverResponse(std::wstring json) {
-	Json::Value responseObject;
-	Json::Reader reader;
-	std::string input(CW2A(json.c_str(), CP_UTF8));
-	reader.parse(input, responseObject);
-	this->status_code_ = responseObject["status"].asInt();
-	this->session_id_ = responseObject["sessionId"].asString();
-	this->m_value = responseObject["value"];
-}
-
 WebDriverResponse::~WebDriverResponse(void) {
 }
 
+void WebDriverResponse::Deserialize(std::wstring json) {
+	Json::Value response_object;
+	Json::Reader reader;
+	std::string input(CW2A(json.c_str(), CP_UTF8));
+	reader.parse(input, response_object);
+	this->status_code_ = response_object["status"].asInt();
+	this->session_id_ = response_object["sessionId"].asString();
+	this->m_value = response_object["value"];
+}
+
 std::wstring WebDriverResponse::Serialize(void) {
-	Json::Value jsonObject;
-	jsonObject["status"] = this->status_code_;
-	jsonObject["sessionId"] = this->session_id_;
-	jsonObject["value"] = this->m_value;
+	Json::Value json_object;
+	json_object["status"] = this->status_code_;
+	json_object["sessionId"] = this->session_id_;
+	json_object["value"] = this->m_value;
 	Json::FastWriter writer;
-	std::string output(writer.write(jsonObject));
+	std::string output(writer.write(json_object));
 	std::wstring response(CA2W(output.c_str(), CP_UTF8));
 	return response;
 }

@@ -28,8 +28,12 @@ private:
 	std::wstring SendCommandToManager(std::wstring serialized_command);
 	void SendWelcomePage(mg_connection *connection, const mg_request_info *request_info);
 	void SendHttpOk(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
+	void SendHttpBadRequest(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
 	void SendHttpInternalError(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
-	void SendHttpSeeOther(mg_connection *connection, const mg_request_info *request_info, std::string body);
+	void SendHttpMethodNotAllowed(mg_connection *connection, const mg_request_info *request_info, std::wstring allowed_methods);
+	void SendHttpNotFound(mg_connection *connection, const mg_request_info *request_info, std::wstring body);
+	void SendHttpNotImplemented(mg_connection *connection, const mg_request_info *request_info, std::string body);
+	void SendHttpSeeOther(mg_connection *connection, const mg_request_info *request_info, std::string location);
 	HWND manager_window_handle_;
 	std::map<std::string, std::map<std::string, int>> command_repository_;
 };

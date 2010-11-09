@@ -40,6 +40,11 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 		std::wstring locator_parameters = L"";
 		int command = this->LookupCommand(request_info->uri, http_verb, &locator_parameters);
 		if (command == NoCommand) {
+			if (locator_parameters.size() != 0) {
+				this->SendHttpMethodNotAllowed(conn, request_info, locator_parameters);
+			} else {
+				this->SendHttpNotImplemented(conn, request_info, "Command not implemented");
+			}
 		} else {
 			// Compile the serialized JSON representation of the command by hand.
 			std::wstringstream command_stream;
@@ -56,7 +61,8 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 			std::wstring serialized_command = command_stream.str();
 			std::wstring serialized_response = this->SendCommandToManager(serialized_command);
 			if (serialized_command.length() > 0) {
-				WebDriverResponse response(serialized_response);
+				WebDriverResponse response;
+				response.Deserialize(serialized_response);
 				if (response.status_code() == 0) {
 					this->SendHttpOk(conn, request_info, serialized_response);
 					return_code = 200;
@@ -65,6 +71,12 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 					response.set_status_code(0);
 					this->SendHttpSeeOther(conn, request_info, location);
 					return_code = 303;
+				} else if (response.status_code() == 400) {
+					this->SendHttpBadRequest(conn, request_info, serialized_response);
+				} else if (response.status_code() == 404) {
+					this->SendHttpNotFound(conn, request_info, serialized_response);
+				} else if (response.status_code() == 501) {
+					this->SendHttpNotImplemented(conn, request_info, "Command not implemented");
 				} else {
 					this->SendHttpInternalError(conn, request_info, serialized_response);
 					return_code = 500;
@@ -115,6 +127,24 @@ void IEDriverServer::SendHttpOk(struct mg_connection* connection,
 	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
+void IEDriverServer::SendHttpBadRequest(struct mg_connection* const connection,
+                        const struct mg_request_info* const request_info,
+				        std::wstring body) {
+	std::string narrow_body(CW2A(body.c_str(), CP_UTF8));
+	std::ostringstream out;
+	out << "HTTP/1.1 400 Bad Request\r\n"
+		<< "Content-Length: " << strlen(narrow_body.c_str()) << "\r\n"
+		<< "Content-Type: application/json; charset=UTF-8\r\n"
+		<< "Vary: Accept-Charset, Accept-Encoding, Accept-Language, Accept\r\n"
+		<< "Accept-Ranges: bytes\r\n"
+		<< "Connection: close\r\n\r\n";
+	if (strcmp(request_info->request_method, "HEAD") != 0) {
+		out << narrow_body << "\r\n";
+	}
+
+	mg_printf(connection, "%s", out.str().c_str());
+}
+
 void IEDriverServer::SendHttpInternalError(struct mg_connection* connection,
                            const struct mg_request_info* request_info,
 						   std::wstring body) {
@@ -129,6 +159,49 @@ void IEDriverServer::SendHttpInternalError(struct mg_connection* connection,
 	if (strcmp(request_info->request_method, "HEAD") != 0) {
 		out << narrow_body << "\r\n";
 	}
+
+	mg_write(connection, out.str().c_str(), out.str().size());
+}
+
+void IEDriverServer::SendHttpNotFound(struct mg_connection* const connection,
+                      const struct mg_request_info* const request_info,
+				      std::wstring body) {
+	std::string narrow_body(CW2A(body.c_str(), CP_UTF8));
+	std::ostringstream out;
+	out << "HTTP/1.1 404 Not Found\r\n"
+		<< "Content-Length: " << strlen(narrow_body.c_str()) << "\r\n"
+		<< "Content-Type: application/json; charset=UTF-8\r\n"
+		<< "Vary: Accept-Charset, Accept-Encoding, Accept-Language, Accept\r\n"
+		<< "Accept-Ranges: bytes\r\n"
+		<< "Connection: close\r\n\r\n";
+	if (strcmp(request_info->request_method, "HEAD") != 0) {
+		out << narrow_body << "\r\n";
+	}
+
+	mg_printf(connection, "%s", out.str().c_str());
+}
+
+void IEDriverServer::SendHttpMethodNotAllowed(struct mg_connection* connection,
+							const struct mg_request_info* request_info,
+							std::wstring allowed_methods) {
+	std::string narrow_body(CW2A(allowed_methods.c_str(), CP_UTF8));
+	std::ostringstream out;
+	out << "HTTP/1.1 405 Method Not Allowed\r\n"
+		<< "Content-Type: text/html\r\n"
+		<< "Content-Length: 0\r\n"
+		<< "Allow: " << narrow_body << "\r\n\r\n";
+
+	mg_write(connection, out.str().c_str(), out.str().size());
+}
+
+void IEDriverServer::SendHttpNotImplemented(struct mg_connection* connection,
+							const struct mg_request_info* request_info,
+							std::string body) {
+	std::ostringstream out;
+	out << "HTTP/1.1 501 Not Implemented\r\n"
+		<< "Content-Type: text/html\r\n"
+		<< "Content-Length: 0\r\n"
+		<< "Allow: " << body << "\r\n\r\n";
 
 	mg_write(connection, out.str().c_str(), out.str().size());
 }
@@ -213,6 +286,14 @@ int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::w
 				std::wstring wide_param(param.begin(), param.end());
 				locator->append(wide_param);
 				break;
+			} else {
+				std::map<std::string, int>::iterator verb_iterator = it->second.begin();
+				for (; verb_iterator != it->second.end(); ++verb_iterator) {
+					if (locator->size() != 0) {
+						locator->append(L",");
+					}
+					locator->append(CA2W(verb_iterator->first.c_str(), CP_UTF8));
+				}
 			}
 		}
 	}
@@ -230,7 +311,7 @@ void IEDriverServer::PopulateCommandRepository() {
 	this->command_repository_["/session/:sessionid/url"]["POST"] = Get;
 	this->command_repository_["/session/:sessionid/forward"]["POST"] = GoForward;
 	this->command_repository_["/session/:sessionid/back"]["POST"] = GoBack;
-	this->command_repository_["/session/:sessionid/refresh"]["POST"] = Refresh;
+	//this->command_repository_["/session/:sessionid/refresh"]["POST"] = Refresh;
 	this->command_repository_["/session/:sessionid/speed"]["GET"] = GetSpeed;
 	this->command_repository_["/session/:sessionid/speed"]["POST"] = SetSpeed;
 	this->command_repository_["/session/:sessionid/execute"]["POST"] = ExecuteScript;
