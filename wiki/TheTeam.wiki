@@ -6,4 +6,4 @@ If you've ever wondered who to thank (or blame!) for Selenium, then you've come 
 
 *SimonStewart*: Original WebDriver developer and leading the Selenium 2 effort. He works mainly with Java and can be seen all over the code base, patching holes and adding features. By day he works as a Software Engineer in Test at Google. By night, he hacks on the crazy fun build grammar.
 
-*DavidBurns*: .NET developer on the Selenium 2 effort but can be seen making changes to all but the Ruby bindings. Currently working as a Software Engineer in Test at Mozilla and author of an upcoming Selenium book to be released in December 2010!
+*Julian Harty*: Dabbled with `WebDriver` since 2007 mainly finding ways to make the code real and useful by testing it, and by documenting it. Currently working at eBay to find ways to make software testing more efficient and effective. He's also involved in various [http://code.google.com/u/julianharty open source initiatives], accessibility software, and writing material. Search for "Julian Harty" in your favorite search engine to track down his public work.
