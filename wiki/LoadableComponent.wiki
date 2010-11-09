@@ -268,13 +268,18 @@ This shows that the components are all "nested" within each other. A call to `ge
 
 {{{
 public class FooTest {
+  private EditIssue editIssue;
+
+  @Before
+  public void prepareComponents() {
+    ProjectPage project = new ProjectPage(driver, "selenium");
+    SecuredPage securedPage = new SecuredPage(driver, project, "example", "top secret");
+    editIssue = new EditIssue(driver, securedPage);
+  }
+
   @Test
   public void demonstrateNestedLoadableComponents() {
     WebDriver driver = new FirefoxDriver();
-
-    ProjectPage project = new ProjectPage(driver, "selenium");
-    SecuredPage securedPage = new SecuredPage(driver, project, "example", "top secret");
-    EditIssue editIssue = new EditIssue(driver, securedPage);
 
     editIssue.get();
 
@@ -284,4 +289,4 @@ public class FooTest {
 }
 }}}
 
-If you're using a library such as Guiceberry in your tests, the preamble of setting up the PageObjects can be omitted, leading to nice, clear, readable tests.
+If you're using a library such as [http://code.google.com/p/guiceberry/ Guiceberry] in your tests, the preamble of setting up the PageObjects can be omitted leading to nice, clear, readable tests.
