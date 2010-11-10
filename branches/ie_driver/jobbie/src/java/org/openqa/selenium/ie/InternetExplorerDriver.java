@@ -13,7 +13,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package org.openqa.selenium.ie;
 
@@ -43,32 +43,33 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.win32.StdCallLibrary;
 
-public class InternetExplorerDriver extends RemoteWebDriver implements FindsByCssSelector {
+public class InternetExplorerDriver extends RemoteWebDriver implements
+    FindsByCssSelector {
   private Pointer server;
   private IEServer lib;
   private int port;
   private WindowsProxyManager proxyManager;
-  
+
   public InternetExplorerDriver() {
     setup();
   }
-  
+
   public InternetExplorerDriver(DesiredCapabilities capabilities) {
     proxyManager = new WindowsProxyManager(true, "webdriver-ie", 0, 0);
     prepareProxy(capabilities);
     setup();
   }
-  
+
   public InternetExplorerDriver(int port) {
     this.port = port;
     setup();
   }
-  
+
   private void setup() {
     if (port == 0) {
       port = PortProber.findFreePort();
     }
-	startClient();
+    startClient();
     setCommandExecutor(new HttpCommandExecutor(getServerUrl(port)));
     setElementConverter(new JsonToWebElementConverter(this) {
       @Override
@@ -78,26 +79,26 @@ public class InternetExplorerDriver extends RemoteWebDriver implements FindsByCs
     });
     startSession(DesiredCapabilities.internetExplorer());
   }
-  
+
   public WebElement findElementByCssSelector(String cssSelector) {
     return findElement("css selector", cssSelector);
   }
-  
+
   public List<WebElement> findElementsByCssSelector(String cssSelector) {
     return findElements("css selector", cssSelector);
   }
-  
+
   protected void startClient() {
     initializeLib();
     server = lib.StartServer(port);
   }
-  
+
   protected void stopClient() {
     if (server != null) {
       lib.StopServer(server);
     }
   }
-  
+
   private static URL getServerUrl(int port) {
     try {
       return new URL("http://localhost:" + port);
@@ -105,55 +106,65 @@ public class InternetExplorerDriver extends RemoteWebDriver implements FindsByCs
       throw new WebDriverException(e);
     }
   }
-  
+
   private void initializeLib() {
     synchronized (this) {
       if (lib != null) {
         return;
       }
 
-      File parentDir = TemporaryFilesystem.createTempDir("webdriver", "libs");
+      File parentDir = TemporaryFilesystem.createTempDir("webdriver",
+          "libs");
       try {
-        if (!Boolean.getBoolean("webdriver.development")) {
-          FileHandler.copyResource(parentDir, getClass(), "IEDriver.dll");
-        } else {
-          String arch = System.getProperty("os.arch", "").contains("64") ? "x64" : "Win32";
-          List<String> sourcePaths = new ArrayList<String>();
-          sourcePaths.add("..\\build\\" + arch + "\\Debug");
-          sourcePaths.add("..\\..\\build\\" + arch + "\\Debug");
-          boolean copied = false;
-          for (String path : sourcePaths) {
-            File sourceFile = new File(path, "IEDriver.dll");
-            System.out.println("Trying: " + sourceFile.getCanonicalPath());
-            if (sourceFile.exists()) {
-              FileHandler.copy(sourceFile, new File(parentDir, "IEDriver.dll"));
-              copied = true;
-              break;
+        FileHandler.copyResource(parentDir, getClass(), "IEDriver.dll");
+      } catch (IOException ioe) {
+        try {
+          if (Boolean.getBoolean("webdriver.development")) {
+            String arch = System.getProperty("os.arch", "")
+                .contains("64") ? "x64" : "Win32";
+            List<String> sourcePaths = new ArrayList<String>();
+            sourcePaths.add("..\\build\\" + arch + "\\Debug");
+            sourcePaths.add("..\\..\\build\\" + arch + "\\Debug");
+            boolean copied = false;
+            for (String path : sourcePaths) {
+              File sourceFile = new File(path, "IEDriver.dll");
+              if (sourceFile.exists()) {
+                FileHandler.copy(sourceFile, new File(
+                    parentDir, "IEDriver.dll"));
+                copied = true;
+                break;
+              }
             }
+            if (!copied) {
+              throw new WebDriverException(
+                  "Couldn't find IEDriver.dll");
+            }
+          } else {
+            throw new WebDriverException(ioe);
           }
-          if (!copied) {
-            throw new WebDriverException("Couldn't find IEDriver.dll");
-          }
+        } catch (IOException ioe2) {
+          throw new WebDriverException(ioe2);
         }
-      } catch (IOException e) {
-        throw new WebDriverException(e);
       }
-      System.setProperty("jna.library.path", System.getProperty("jna.library.path", "") + File.pathSeparator + parentDir);
+      System.setProperty("jna.library.path",
+          System.getProperty("jna.library.path", "")
+              + File.pathSeparator + parentDir);
 
       try {
-        lib = (IEServer)Native.loadLibrary("IEDriver", IEServer.class);
+        lib = (IEServer) Native.loadLibrary("IEDriver", IEServer.class);
       } catch (UnsatisfiedLinkError e) {
-        System.out.println("new File(\".\").getAbsolutePath() = " + new File(".").getAbsolutePath());
+        System.out.println("new File(\".\").getAbsolutePath() = "
+            + new File(".").getAbsolutePath());
         throw new WebDriverException(e);
       }
     }
   }
-  
+
   private void prepareProxy(DesiredCapabilities caps) {
     if (caps == null || caps.getCapability(PROXY) == null) {
       return;
     }
-    
+
     // Because of the way that the proxying is currently implemented,
     // we can only set a single host.
     try {
@@ -171,9 +182,10 @@ public class InternetExplorerDriver extends RemoteWebDriver implements FindsByCs
     };
     Runtime.getRuntime().addShutdownHook(cleanupThread);
   }
-  
+
   private interface IEServer extends StdCallLibrary {
     Pointer StartServer(int port);
+
     void StopServer(Pointer server);
   }
 }
