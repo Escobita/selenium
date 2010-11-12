@@ -227,8 +227,8 @@ private:
 						*value = result_array;
 					} else {
 						IHTMLElement *node = (IHTMLElement*) result.pdispVal;
-						ElementWrapper *element_wrapper = new ElementWrapper(node);
-						manager->AddManagedElement(element_wrapper);
+						ElementWrapper *element_wrapper;
+						manager->AddManagedElement(node, &element_wrapper);
 						*value = element_wrapper->ConvertToJson();
 					}
 				}

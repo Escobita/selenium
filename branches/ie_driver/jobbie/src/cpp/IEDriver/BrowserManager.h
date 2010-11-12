@@ -76,8 +76,10 @@ public:
 	int GetCurrentBrowser(BrowserWrapper **browser_wrapper);
 	void GetManagedBrowserHandles(std::vector<std::wstring> *managed_browser_handles);
 
-	void AddManagedElement(ElementWrapper *element_wrapper);
+	void AddManagedElement(IHTMLElement *element, ElementWrapper **element_wrapper);
 	int GetManagedElement(std::wstring element_id, ElementWrapper **element_wrapper);
+	void RemoveManagedElement(std::wstring element_id);
+	void ListManagedElements(void);
 
 	int GetElementFinder(std::wstring mechanism, ElementFinder **finder);
 

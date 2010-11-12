@@ -18,6 +18,8 @@
 #include <atlcom.h>
 #include <atlstr.h>
 #include <atlwin.h>
+#include <comdef.h>
+#include <comutil.h>
 
 // TODO: reference additional headers your program requires here
 

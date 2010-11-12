@@ -19,8 +19,8 @@ int ElementFinder::FindElement(BrowserManager *manager, ElementWrapper *parent_w
 			IHTMLElement *element;
 			status_code = this->FindElementInternal(browser, parent_element, criteria, &element);
 			if (status_code == SUCCESS) {
-				ElementWrapper *wrapper = new ElementWrapper(element);
-				manager->AddManagedElement(wrapper);
+				ElementWrapper *wrapper;
+				manager->AddManagedElement(element, &wrapper);
 				*found_element = wrapper;
 			}
 		}
@@ -40,8 +40,8 @@ int ElementFinder::FindElements(BrowserManager *manager, ElementWrapper *parent_
 			std::vector<IHTMLElement*>::iterator begin = raw_elements.begin();
 			std::vector<IHTMLElement*>::iterator end = raw_elements.end();
 			for (std::vector<IHTMLElement*>::iterator it = begin; it != end; ++it) {
-				ElementWrapper *wrapper = new ElementWrapper(*it);
-				manager->AddManagedElement(wrapper);
+				ElementWrapper *wrapper;
+				manager->AddManagedElement(*it, &wrapper);
 				found_elements->push_back(wrapper);
 			}
 		}

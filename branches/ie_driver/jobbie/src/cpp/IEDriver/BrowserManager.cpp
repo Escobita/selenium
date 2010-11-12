@@ -262,8 +262,39 @@ int BrowserManager::GetManagedElement(std::wstring element_id, ElementWrapper **
 	return SUCCESS;
 }
 
-void BrowserManager::AddManagedElement(ElementWrapper *element_wrapper) {
-	this->managed_elements_[element_wrapper->element_id()] = element_wrapper;
+void BrowserManager::AddManagedElement(IHTMLElement *element, ElementWrapper **element_wrapper) {
+	bool element_already_managed(false);
+	std::map<std::wstring, ElementWrapper*>::iterator it = this->managed_elements_.begin();
+	for (; it != this->managed_elements_.end(); ++it) {
+		IHTMLElement* iterated_element = it->second->element();
+		if (it->second->element() == element) {
+			*element_wrapper = it->second;
+			element_already_managed = true;
+			break;
+		}
+	}
+
+	if (!element_already_managed) {
+		ElementWrapper *new_wrapper = new ElementWrapper(element);
+		this->managed_elements_[new_wrapper->element_id()] = new_wrapper;
+		*element_wrapper = new_wrapper;
+	}
+}
+
+void BrowserManager::RemoveManagedElement(std::wstring element_id) {
+	if (this->managed_elements_.find(element_id) != this->managed_elements_.end()) {
+		ElementWrapper *element_wrapper = this->managed_elements_[element_id];
+		this->managed_elements_.erase(element_id);
+		delete element_wrapper;
+	}
+}
+
+void BrowserManager::ListManagedElements() {
+	std::map<std::wstring, ElementWrapper*>::iterator it = this->managed_elements_.begin();
+	for (; it != this->managed_elements_.end(); ++it) {
+		std::string id(CW2A(it->first.c_str(), CP_UTF8));
+		std::cout << id << "\n";
+	}
 }
 
 int BrowserManager::GetElementFinder(std::wstring mechanism, ElementFinder **finder) {

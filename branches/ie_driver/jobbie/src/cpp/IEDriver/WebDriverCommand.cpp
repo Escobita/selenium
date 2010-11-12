@@ -19,9 +19,9 @@ void WebDriverCommand::Populate(std::string json_command) {
 	BOOL successful_parse = reader.parse(json_command, root);
 	if (!successful_parse) {
 		// report to the user the failure and their locations in the document.
-		std::cout  << "\nFailed to parse configuration\n"
-				   << reader.getFormatedErrorMessages()
-				   << "\nJSON: " << json_command << "\n";
+		//std::cout  << "\nFailed to parse configuration\n"
+		//		   << reader.getFormatedErrorMessages()
+		//		   << "\nJSON: " << json_command << "\n";
 	}
 
 	this->command_value_ = root.get("command", 0).asInt();
