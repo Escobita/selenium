@@ -1,4 +1,4 @@
-0.1.0 (2010-11-??)
+0.1.0 (2010-11-11)
 ===================
 
 * selenium-client code (Se1/RC client) is now included in the gem (require "selenium/client").
@@ -9,6 +9,7 @@
 * Various Firefox driver improvements (GC race conditions ++).
 * IE::Bridge#initialize now takes an options hash like the other bridges.
 * Added basic iPhone and Android driver classes.
+* Firefox driver now works on FreeBSD.
 
 
 0.0.29 (2010-10-09)

@@ -419,8 +419,11 @@ namespace OpenQA.Selenium
 
         private bool SupportsSelectorApi()
         {
-            return driver is IFindsByCssSelector &&
-                (bool)((IJavaScriptExecutor)driver).ExecuteScript("return document['querySelector'] !== undefined;");
+            IJavaScriptExecutor javascriptDriver = driver as IJavaScriptExecutor;
+            IFindsByCssSelector cssSelectorDriver = driver as IFindsByCssSelector;
+            return (cssSelectorDriver != null) && (javascriptDriver != null);
+            //return driver is IFindsByCssSelector &&
+            //    (bool)((IJavaScriptExecutor)driver).ExecuteScript("return document['querySelector'] !== undefined;");
         }
     }
 }
