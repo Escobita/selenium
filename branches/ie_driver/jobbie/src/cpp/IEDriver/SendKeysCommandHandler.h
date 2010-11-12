@@ -34,13 +34,12 @@ protected:
 	void SendKeysCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else if (command_parameters.find("value") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "value";
+			response->SetErrorResponse(400, "Missing parameter: value");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			std::wstring keys(L"");
@@ -51,7 +50,11 @@ protected:
 			}
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
 			HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
@@ -61,14 +64,12 @@ protected:
 				bool displayed;
 				status_code = element_wrapper->IsDisplayed(&displayed);
 				if (status_code != SUCCESS || !displayed) {
-					response->set_status_code(EELEMENTNOTDISPLAYED);
-					response->m_value["message"] = "Element is not displayed";
+					response->SetErrorResponse(EELEMENTNOTDISPLAYED, "Element is not displayed");
 					return;
 				}
 
 				if (!element_wrapper->IsEnabled()) {
-					response->set_status_code(EELEMENTNOTENABLED);
-					response->m_value["message"] = "Element is not enabled";
+					response->SetErrorResponse(EELEMENTNOTENABLED, "Element is not enabled");
 					return;
 				}
 
@@ -119,18 +120,17 @@ protected:
 					}
 				}
 
-				if (!has_focus)
-				{
+				if (!has_focus) {
 					//cerr << "We don't have focus on element." << endl;
 				}
 
 				sendKeys(window_handle, keys.c_str(), manager->speed());
+				response->SetResponse(SUCCESS, Json::Value::null);
+				return;
+			} else {
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-			else
-			{
-				response->m_value["message"] = "Element is no longer valid";
-			}
-			response->set_status_code(status_code);
 		}
 	}
 private:

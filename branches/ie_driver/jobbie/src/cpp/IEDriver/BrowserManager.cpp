@@ -191,7 +191,7 @@ void BrowserManager::DispatchCommand() {
 	std::string session_id = CW2A(this->manager_id_.c_str(), CP_UTF8);
 	WebDriverResponse response(session_id);
 	if (this->command_handlers_.find(this->current_command_->command_value()) == this->command_handlers_.end()) {
-		response.set_status_code(501);
+		response.SetErrorResponse(501, "Command not implemented");
 	} else {
 		WebDriverCommandHandler *commandToExecute = this->command_handlers_[this->current_command_->command_value()];
 		commandToExecute->Execute(this, this->current_command_->locator_parameters(), this->current_command_->command_parameters(), &response);

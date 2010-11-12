@@ -35,4 +35,14 @@ std::wstring WebDriverResponse::Serialize(void) {
 	return response;
 }
 
+void WebDriverResponse::SetResponse(int status_code, Json::Value response_value) {
+	this->status_code_ = status_code;
+	this->m_value = response_value;
+}
+
+void WebDriverResponse::SetErrorResponse(int status_code, std::string message) {
+	this->status_code_ = status_code;
+	this->m_value["message"] = message;
+}
+
 } // namespace webdriver

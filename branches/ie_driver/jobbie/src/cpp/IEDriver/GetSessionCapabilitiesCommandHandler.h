@@ -15,11 +15,13 @@ public:
 
 protected:
 	void GetSessionCapabilitiesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
-		response->m_value["browserName"] = "internet explorer";
-		response->m_value["version"] = "0";
-		response->m_value["javascriptEnabled"] = true;
-		response->m_value["platform"] = "WINDOWS";
-		response->m_value["nativeEvents"] = true;
+		Json::Value capabilities;
+		capabilities["browserName"] = "internet explorer";
+		capabilities["version"] = "0";
+		capabilities["javascriptEnabled"] = true;
+		capabilities["platform"] = "WINDOWS";
+		capabilities["nativeEvents"] = true;
+		response->SetResponse(SUCCESS, capabilities);
 	}
 };
 

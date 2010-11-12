@@ -16,15 +16,17 @@ public:
 protected:
 	void ToggleElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
-			std::wstring text(L"");
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
 			HWND hwnd = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
@@ -35,24 +37,22 @@ protected:
 				HRESULT hr = element_wrapper->element()->get_tagName(&tag_name);
 				if (FAILED(hr)) {
 					// LOGHR(WARN, hr) << "Unable to get tag name";
-					response->set_status_code(ENOSUCHELEMENT);
+					response->SetErrorResponse(ENOSUCHELEMENT, "Unable to get tag name");
 					return;
 				}
 
 				if ((tag_name != L"OPTION") && !element_wrapper->IsCheckBox())  {
-					response->set_status_code(ENOTIMPLEMENTED);
-					response->m_value["message"] = "cannot toggle element that is not an option or check box";
+					response->SetErrorResponse(ENOTIMPLEMENTED, "cannot toggle element that is not an option or check box");
 					return;
 				}
 
 				status_code = element_wrapper->Click(hwnd);
 				browser_wrapper->set_wait_required(true);
 				if (status_code == SUCCESS || status_code != EELEMENTNOTDISPLAYED) {
-					response->set_status_code(status_code);
 					if (status_code == SUCCESS) {
-						response->m_value = element_wrapper->IsSelected();
+						response->SetResponse(SUCCESS, element_wrapper->IsSelected());
 					} else {
-						response->m_value["message"] = "cannot toggle element";
+						response->SetErrorResponse(status_code, "cannot toggle element");
 					}
 					return;
 				} 
@@ -61,7 +61,7 @@ protected:
 					CComQIPtr<IHTMLOptionElement> option(element_wrapper->element());
 					if (!option) {
 						//LOG(ERROR) << "Cannot convert an element to an option, even though the tag name is right";
-						response->set_status_code(ENOSUCHELEMENT);
+						response->SetErrorResponse(ENOSUCHELEMENT, "Cannot convert an element to an option, even though the tag name is right");
 						return;
 					}
 
@@ -69,7 +69,7 @@ protected:
 					hr = option->get_selected(&selected);
 					if (FAILED(hr)) {
 						//LOGHR(WARN, hr) << "Cannot tell whether or not the element is selected";
-						response->set_status_code(ENOSUCHELEMENT);
+						response->SetErrorResponse(ENOSUCHELEMENT, "Cannot tell whether or not the element is selected");
 						return;
 					}
 
@@ -81,7 +81,7 @@ protected:
 
 					if (FAILED(hr)) {
 						//LOGHR(WARN, hr) << "Failed to set selection";
-						response->set_status_code(EEXPECTEDERROR);
+						response->SetErrorResponse(EEXPECTEDERROR, "Failed to set selection");
 						return;
 					}
 
@@ -89,31 +89,28 @@ protected:
 					CComQIPtr<IHTMLDOMNode> node(element_wrapper->element());
 					if (!node) {
 						//LOG(WARN) << "Current element is not an DOM node";
-						response->set_status_code(ENOSUCHELEMENT);
+						response->SetErrorResponse(ENOSUCHELEMENT, "Current element is not an DOM node");
 						return;
 					}
 					CComPtr<IHTMLDOMNode> parent;
 					hr = node->get_parentNode(&parent);
 					if (FAILED(hr)) {
 						//LOGHR(WARN, hr) << "Cannot get parent node";
-						response->set_status_code(ENOSUCHELEMENT);
+						response->SetErrorResponse(ENOSUCHELEMENT, "cannot get parent node");
 						return;
 					}
 
 					element_wrapper->FireEvent(parent, L"onchange");
-					status_code = SUCCESS;
-					response->m_value = element_wrapper->IsSelected();
+					response->SetResponse(SUCCESS, element_wrapper->IsSelected());
 				} else {
 					// Element is not an OPTION element, and it's not visible.
-					response->set_status_code(status_code);
-					response->m_value["message"] = "cannot toggle invisible element";
+					response->SetErrorResponse(status_code, "cannot toggle invisible element");
 					return;
 				}
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

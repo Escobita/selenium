@@ -16,51 +16,47 @@ public:
 protected:
 	void ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (command_parameters.find("name") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "name";
+			response->SetErrorResponse(400, "Missing parameter: name");
+			return;
 		} else {
 			std::wstring found_browser_handle = L"";
 			std::string desired_name = command_parameters["name"].asString();
 
 			std::vector<std::wstring> handle_list;
 			manager->GetManagedBrowserHandles(&handle_list);
-			for (int i = 0; i < handle_list.size(); ++i)
-			{
+			for (int i = 0; i < handle_list.size(); ++i) {
 				BrowserWrapper *browser_wrapper;
-				manager->GetManagedBrowser(handle_list[i], &browser_wrapper);
-				std::string browser_name = this->GetWindowName(browser_wrapper->browser());
-				if (browser_name == desired_name)
-				{
-					found_browser_handle = handle_list[i];
-					break;
-				}
+				int get_handle_loop_status_code = manager->GetManagedBrowser(handle_list[i], &browser_wrapper);
+				if (get_handle_loop_status_code == SUCCESS) {
+					std::string browser_name = this->GetWindowName(browser_wrapper->browser());
+					if (browser_name == desired_name) {
+						found_browser_handle = handle_list[i];
+						break;
+					}
 
-				std::string browser_handle(CW2A(handle_list[i].c_str(), CP_UTF8));
-				if (browser_handle == desired_name)
-				{
-					found_browser_handle = handle_list[i];
-					break;
+					std::string browser_handle(CW2A(handle_list[i].c_str(), CP_UTF8));
+					if (browser_handle == desired_name) {
+						found_browser_handle = handle_list[i];
+						break;
+					}
 				}
 			}
 
-			if (found_browser_handle == L"")
-			{
-				response->set_status_code(ENOSUCHWINDOW);
-				response->m_value["message"] = "No window found";
-			}
-			else
-			{
+			if (found_browser_handle == L"") {
+				response->SetErrorResponse(ENOSUCHWINDOW, "No window found");
+				return;
+			} else {
 				// Reset the path to the focused frame before switching window context.
 				BrowserWrapper *current_browser;
 				int status_code = manager->GetCurrentBrowser(&current_browser);
-				if (status_code == SUCCESS)
-				{
+				if (status_code == SUCCESS) {
 					current_browser->set_path_to_frame(L"");
 				}
 
 				manager->set_current_browser_id(found_browser_handle);
 				status_code = manager->GetCurrentBrowser(&current_browser);
 				current_browser->set_wait_required(true);
+				response->SetResponse(SUCCESS, Json::Value::null);
 			}
 		}
 	}

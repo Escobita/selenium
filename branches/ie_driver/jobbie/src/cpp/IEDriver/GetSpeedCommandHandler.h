@@ -18,16 +18,15 @@ protected:
 		int speed = manager->speed();
 		switch (speed) {
 		  case 1000:
-			response->m_value = "SLOW";
+			response->SetResponse(SUCCESS, "SLOW");
 			break;
 		  case 500:
-			response->m_value = "MEDIUM";
+			response->SetResponse(SUCCESS, "MEDIUM");
 			break;
 		  default:
-			response->m_value = "FAST";
+			response->SetResponse(SUCCESS, "FAST");
 			break;
 		}
-		response->set_status_code(SUCCESS);
 	}
 };
 

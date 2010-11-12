@@ -16,8 +16,8 @@ public:
 protected:
 	void SetSpeedCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (command_parameters.find("speed") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "speed";
+			response->SetErrorResponse(400, "Missing parameter: speed");
+			return;
 		} else {
 			std::string speed = command_parameters["speed"].asString();
 			if (strcmp(speed.c_str(), SPEED_SLOW) == 0) {
@@ -27,7 +27,7 @@ protected:
 			} else {
 				manager->set_speed(0);
 			}
-			response->set_status_code(SUCCESS);
+			response->SetResponse(SUCCESS, Json::Value::null);
 		}
 	}
 };

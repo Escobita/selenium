@@ -25,12 +25,32 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 	std::string http_verb = request_info->request_method;
 	std::wstring request_body = L"";
 	if (http_verb == "POST") {
-		std::vector<char> input_buffer(1024);
-		int bytes_read = mg_read(conn, &input_buffer[0], 1024);
-		int output_buffer_size = ::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, NULL, 0);
-		vector<TCHAR> output_buffer(output_buffer_size);
-		::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, &output_buffer[0], output_buffer_size);
-		request_body = &output_buffer[0];
+		int content_length = 0;
+		for (int header_index = 0; header_index < 64; ++header_index) {
+			if (request_info->http_headers[header_index].name == NULL) {
+				break;
+			}
+			if (strcmp(request_info->http_headers[header_index].name, "Content-Length") == 0) {
+				content_length = atoi(request_info->http_headers[header_index].value);
+				break;
+			}
+		}
+		if (content_length == 0) {
+			request_body = L"{}";
+		} else {
+			std::vector<char> input_buffer(content_length + 1);
+			int bytes_read = 0;
+			while (bytes_read < content_length) {
+				bytes_read += mg_read(conn, &input_buffer[bytes_read], content_length - bytes_read);
+			}
+			input_buffer[content_length] = '\0';
+			int output_buffer_size = ::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, NULL, 0);
+			vector<TCHAR> output_buffer(output_buffer_size);
+			::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, &output_buffer[0], output_buffer_size);
+			request_body.append(&output_buffer[0], bytes_read);
+		}
+	} else {
+		request_body = L"{}";
 	}
 
 	if (strcmp(request_info->uri, "/") == 0) {
@@ -47,18 +67,24 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 			}
 		} else {
 			// Compile the serialized JSON representation of the command by hand.
-			std::wstringstream command_stream;
-			command_stream << L"{ \"command\" : " << command;
-			command_stream << L", \"locator\" : " << locator_parameters;
-			command_stream << L", \"parameters\" : ";
-			if (request_body.length() > 0) {
-				command_stream << request_body;
-			} else {
-				command_stream << "{}";
-			}
-			
-			command_stream << L" }";
-			std::wstring serialized_command = command_stream.str();
+			//std::wstringstream command_stream;
+			//command_stream << L"{ \"command\" : " << command;
+			//command_stream << L", \"locator\" : " << locator_parameters;
+			//command_stream << L", \"parameters\" : ";
+			//if (request_body.length() > 0) {
+			//	command_stream << request_body;
+			//} else {
+			//	command_stream << "{}";
+			//}
+			//
+			//command_stream << L" }";
+
+			//std::wstring serialized_command = command_stream.str();
+			std::wstringstream command_value_stream;
+			command_value_stream << command;
+			std::wstring command_value = command_value_stream.str();
+
+			std::wstring serialized_command = L"{ \"command\" : " + command_value + L", \"locator\" : " + locator_parameters + L", \"parameters\" : " + request_body + L" }";
 			std::wstring serialized_response = this->SendCommandToManager(serialized_command);
 			if (serialized_command.length() > 0) {
 				WebDriverResponse response;
@@ -67,8 +93,8 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 					this->SendHttpOk(conn, request_info, serialized_response);
 					return_code = 200;
 				} else if (response.status_code() == 303) {
-					std::string location = response.m_value.asString();
-					response.set_status_code(0);
+					std::string location = response.value().asString();
+					response.SetResponse(SUCCESS, response.value());
 					this->SendHttpSeeOther(conn, request_info, location);
 					return_code = 303;
 				} else if (response.status_code() == 400) {

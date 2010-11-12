@@ -16,7 +16,11 @@ public:
 protected:
 	void GetPageSourceCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		BrowserWrapper *browser_wrapper;
-		manager->GetCurrentBrowser(&browser_wrapper);
+		int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+		if (status_code != SUCCESS) {
+			response->SetErrorResponse(status_code, "Unable to get browser");
+			return;
+		}
 
 		CComPtr<IHTMLDocument2> doc;
 		browser_wrapper->GetDocument(&doc);
@@ -28,7 +32,7 @@ protected:
 		}
 
 		if (!doc3) {
-			response->m_value = "";
+			response->SetErrorResponse(ENOSUCHDOCUMENT, "Unable to get document");
 			return;
 		}
 
@@ -36,7 +40,7 @@ protected:
 		HRESULT hr = doc3->get_documentElement(&document_element);
 		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Unable to get document element from page";
-			response->m_value = "";
+			response->SetResponse(SUCCESS, "");
 			return;
 		}
 
@@ -44,12 +48,12 @@ protected:
 		hr = document_element->get_outerHTML(&html);
 		if (FAILED(hr)) {
 			//LOGHR(WARN, hr) << "Have document element but cannot read source.";
-			response->m_value = "";
+			response->SetResponse(SUCCESS, "");
 			return;
 		}
 
 		std::string page_source = CW2A((LPCWSTR)html, CP_UTF8);
-		response->m_value = page_source;
+		response->SetResponse(SUCCESS,page_source);
 	}
 };
 

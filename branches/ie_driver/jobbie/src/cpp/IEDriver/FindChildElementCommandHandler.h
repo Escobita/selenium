@@ -17,21 +17,24 @@ public:
 protected:
 	void FindChildElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else if (command_parameters.find("using") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "using";
+			response->SetErrorResponse(400, "Missing parameter: using");
+			return;
 		} else if (command_parameters.find("value") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "value";
+			response->SetErrorResponse(400, "Missing parameter: value");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring mechanism = CA2W(command_parameters["using"].asString().c_str(), CP_UTF8);
 			std::wstring value = CA2W(command_parameters["value"].asString().c_str(), CP_UTF8);
 
 			ElementFinder *finder;
-			manager->GetElementFinder(mechanism, &finder);
+			int status_code = manager->GetElementFinder(mechanism, &finder);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unknown finder mechanism: " + command_parameters["using"].asString());
+				return;
+			}
 
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
@@ -56,15 +59,16 @@ protected:
 				} while (clock() < end);
 
 				if (status_code == SUCCESS) {
-					response->m_value = found_element->ConvertToJson();
+					response->SetResponse(SUCCESS, found_element->ConvertToJson());
+					return;
 				} else {
-					response->m_value["message"] = "Unable to find element with " + command_parameters["using"].asString() + " " + command_parameters["value"].asString();
+					response->SetErrorResponse(status_code, "Unable to find element with " + command_parameters["using"].asString() + " == " + command_parameters["value"].asString());
+					return;
 				}
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

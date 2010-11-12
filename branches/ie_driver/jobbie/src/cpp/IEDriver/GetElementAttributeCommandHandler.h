@@ -16,35 +16,45 @@ public:
 protected:
 	void GetElementAttributeCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else if (locator_parameters.find("name") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "name";
+			response->SetErrorResponse(400, "Missing parameter in URL: name");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 			std::wstring name(CA2W(locator_parameters["name"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
 				CComVariant value_variant;
 				status_code = element_wrapper->GetAttributeValue(browser_wrapper, name, &value_variant);
-				if (value_variant.vt != VT_EMPTY && value_variant.vt != VT_NULL) {
-					std::wstring value(browser_wrapper->ConvertVariantToWString(&value_variant));
-					std::string value_str(CW2A(value.c_str(), CP_UTF8));
-					response->m_value = value_str;
+				if (status_code != SUCCESS) {
+					response->SetErrorResponse(status_code, "Unable to get attribute");
+					return;
 				} else {
-					response->m_value = Json::Value::null;
+					if (value_variant.vt != VT_EMPTY && value_variant.vt != VT_NULL) {
+						std::wstring value(browser_wrapper->ConvertVariantToWString(&value_variant));
+						std::string value_str(CW2A(value.c_str(), CP_UTF8));
+						response->SetResponse(SUCCESS, value_str);
+						return;
+					} else {
+						response->SetResponse(SUCCESS, Json::Value::null);
+						return;
+					}
 				}
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-			response->set_status_code(status_code);
 		}
 	}
 };

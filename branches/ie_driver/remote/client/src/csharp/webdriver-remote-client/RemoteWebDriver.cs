@@ -333,7 +333,7 @@ namespace OpenQA.Selenium.Remote
             }
 
             // Escape the quote marks
-            script = script.Replace("\"", "\\\"");
+            //script = script.Replace("\"", "\\\"");
 
             object[] convertedArgs = ConvertArgumentsToJavaScriptObjects(args);
 

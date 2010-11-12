@@ -17,11 +17,11 @@ protected:
 	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
 		if (command_parameters.find("script") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "script";
+			response->SetErrorResponse(400, "Missing parameter: script");
+			return;
 		} else if (command_parameters.find("args") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "args";
+			response->SetErrorResponse(400, "Missing parameter: args");
+			return;
 		} else {
 			std::wstring script_body(CA2W(command_parameters["script"].asString().c_str(), CP_UTF8));
 			wstringstream script_stream;
@@ -32,25 +32,37 @@ protected:
 
 			Json::Value json_args(command_parameters["args"]);
 
+			BrowserWrapper *browser_wrapper;
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
+
 			SAFEARRAY *args;
 			SAFEARRAYBOUND bounds;
 			bounds.cElements = json_args.size();
 			bounds.lLbound = 0;
 			args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
 
-			this->PopulateArgumentArray(manager, args, json_args);
+			status_code = this->PopulateArgumentArray(manager, args, json_args);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to populate argument array");
+				return;
+			}
 
 			CComVariant result;
-			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
-			int status_code = browser_wrapper->ExecuteScript(&script, args, &result);
+			status_code = browser_wrapper->ExecuteScript(&script, args, &result);
 			::SafeArrayDestroy(args);
 
 			if (status_code != SUCCESS) {
-				response->set_status_code(status_code);
-				response->m_value["message"] = "JavaScript error";
+				response->SetErrorResponse(status_code, "JavaScript error");
+				return;
 			} else {
-				response->set_status_code(this->ConvertScriptResult(result, manager, &response->m_value));
+				Json::Value script_result;
+				this->ConvertScriptResult(result, manager, &script_result);
+				response->SetResponse(SUCCESS, script_result);
+				return;
 			}
 		}
 	}

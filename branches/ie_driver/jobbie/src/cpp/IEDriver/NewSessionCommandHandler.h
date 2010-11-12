@@ -16,9 +16,8 @@ public:
 protected:
 	void NewSessionCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		manager->CreateNewBrowser();
-		response->set_status_code(303);
 		std::string id = CW2A(manager->manager_id().c_str(), CP_UTF8);
-		response->m_value = "/session/" + id;
+		response->SetResponse(303, "/session/" + id);
 	}
 };
 

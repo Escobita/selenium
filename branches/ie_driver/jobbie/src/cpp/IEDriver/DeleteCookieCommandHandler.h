@@ -16,19 +16,24 @@ public:
 protected:
 	void DeleteCookieCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("name") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "name";
+			response->SetErrorResponse(400, "Missing parameter in URL: name");
+			return;
 		}
 
 		std::wstring cookie_name(CA2W(locator_parameters["name"].c_str(), CP_UTF8));
 		BrowserWrapper *browser_wrapper;
-		manager->GetCurrentBrowser(&browser_wrapper);
-		int status_code = browser_wrapper->DeleteCookie(cookie_name);
+		int status_code = manager->GetCurrentBrowser(&browser_wrapper);
 		if (status_code != SUCCESS) {
-			response->m_value["message"] = "Unable to delete cookie";
+			response->SetErrorResponse(status_code, "Unable to get browser");
+			return;
+		}
+		status_code = browser_wrapper->DeleteCookie(cookie_name);
+		if (status_code != SUCCESS) {
+			response->SetErrorResponse(status_code, "Unable to delete cookie");
+			return;
 		}
 
-		response->set_status_code(status_code);
+		response->SetResponse(SUCCESS, Json::Value::null);
 	}
 };
 

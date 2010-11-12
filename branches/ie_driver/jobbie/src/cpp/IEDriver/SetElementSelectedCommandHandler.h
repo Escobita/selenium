@@ -16,15 +16,17 @@ public:
 protected:
 	void SetElementSelectedCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
-			std::wstring text(L"");
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
 			HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
@@ -33,22 +35,20 @@ protected:
 				bool currently_selected = element_wrapper->IsSelected();
 
 				if (!element_wrapper->IsEnabled()) {
-					status_code = EELEMENTNOTENABLED;
-					response->m_value["message"] = "Cannot select disabled element";
+					response->SetErrorResponse(EELEMENTNOTENABLED, "Cannot select disabled element");
+					return;
 				} else {
 					bool displayed;
 					status_code = element_wrapper->IsDisplayed(&displayed);
 					if (status_code != SUCCESS || !displayed) {
-						status_code = EELEMENTNOTDISPLAYED;
-						response->m_value["message"] = "Cannot select hidden element";
+						response->SetErrorResponse(EELEMENTNOTDISPLAYED, "Cannot select hidden element");
+						return;
 					} else {
 						/* TODO(malcolmr): Why not: if (isSelected()) return; ? Do we really need to
 						   re-set 'checked=true' for checkbox and do effectively nothing for select?
 						   Maybe we should check for disabled elements first? */
 
 						if (element_wrapper->IsCheckBox()) {
-							status_code = SUCCESS;
-							response->m_value = Json::Value::null;
 							if (!element_wrapper->IsSelected()) {
 								element_wrapper->Click(window_handle);
 								browser_wrapper->set_wait_required(true);
@@ -63,8 +63,9 @@ protected:
 								CComQIPtr<IHTMLDOMNode> check_box_node(element_wrapper->element());
 								element_wrapper->FireEvent(check_box_node, L"onchange");
 							}
+							response->SetResponse(SUCCESS, Json::Value::null);
+							return;
 						} else if (element_wrapper->IsRadioButton()) {
-							status_code = SUCCESS;
 							if (!element_wrapper->IsSelected()) {
 								element_wrapper->Click(window_handle);
 								browser_wrapper->set_wait_required(true);
@@ -79,8 +80,9 @@ protected:
 								CComQIPtr<IHTMLDOMNode> radio_button_node(element_wrapper->element());
 								element_wrapper->FireEvent(radio_button_node, L"onchange");
 							}
+							response->SetResponse(SUCCESS, Json::Value::null);
+							return;
 						} else {
-							status_code = SUCCESS;
 							CComQIPtr<IHTMLOptionElement> option(element_wrapper->element());
 							if (option) {
 								option->put_selected(VARIANT_TRUE);
@@ -94,18 +96,19 @@ protected:
 								if (currently_selected != element_wrapper->IsSelected()) {
 									element_wrapper->FireEvent(parent, L"onchange");
 								}
+								response->SetResponse(SUCCESS, Json::Value::null);
+								return;
 							} else {
-								status_code = EELEMENTNOTSELECTED;
-								response->m_value["message"] = "Element type not selectable";
+								response->SetErrorResponse(EELEMENTNOTSELECTED, "Element type not selectable");
+								return;
 							}
 						}
 					}
 				}
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

@@ -20,11 +20,9 @@ protected:
 
 		result = this->InjectXPathEngine(browser);
 		// TODO(simon): Why does the injecting sometimes fail?
-		/*
 		if (result != SUCCESS) {
 			return result;
 		}
-		*/
 
 		// Call it
 		std::wstring query;
@@ -74,11 +72,9 @@ protected:
 
 		result = this->InjectXPathEngine(browser);
 		// TODO(simon): Why does the injecting sometimes fail?
-		/*
 		if (result != SUCCESS) {
 			return result;
 		}
-		*/
 
 		// Call it
 		std::wstring query;

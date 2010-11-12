@@ -13,34 +13,20 @@ public:
 	virtual ~SubmitElementCommandHandler(void) {
 	}
 
-private:
-	void SubmitElementCommandHandler::FindParentForm(IHTMLElement *element, IHTMLFormElement **form_element) {
-		CComQIPtr<IHTMLElement> current(element);
-
-		while (current) {
-			CComQIPtr<IHTMLFormElement> form(current);
-			if (form) {
-				*form_element = form.Detach();
-				return;
-			}
-
-			CComPtr<IHTMLElement> temp;
-			current->get_parentElement(&temp);
-			current = temp;
-		}
-	}
-
 protected:
 	void SubmitElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
@@ -68,16 +54,35 @@ protected:
 					} else {
 						this->FindParentForm(element_wrapper->element(), &form);
 						if (!form) {
-							status_code = EUNHANDLEDERROR;
-							response->m_value = "Unable to find the containing form";
+							response->SetErrorResponse(EUNHANDLEDERROR, "Unable to find the containing form");
+							return;
 						}
 						form->submit();
 					}
 				}
+				response->SetResponse(SUCCESS, Json::Value::null);
+				return;
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-			response->set_status_code(status_code);
+		}
+	}
+
+private:
+	void SubmitElementCommandHandler::FindParentForm(IHTMLElement *element, IHTMLFormElement **form_element) {
+		CComQIPtr<IHTMLElement> current(element);
+
+		while (current) {
+			CComQIPtr<IHTMLFormElement> form(current);
+			if (form) {
+				*form_element = form.Detach();
+				return;
+			}
+
+			CComPtr<IHTMLElement> temp;
+			current->get_parentElement(&temp);
+			current = temp;
 		}
 	}
 };

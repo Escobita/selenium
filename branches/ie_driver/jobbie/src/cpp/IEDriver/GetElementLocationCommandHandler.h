@@ -16,23 +16,29 @@ public:
 protected:
 	void GetElementLocationCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
-			HWND window_handle = browser_wrapper->GetWindowHandle();
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
+			//HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
 				CComQIPtr<IHTMLElement2> element2(element_wrapper->element());
 				if (!element2) {
-					status_code = EUNHANDLEDERROR;
+					response->SetErrorResponse(EUNHANDLEDERROR, "Unable to unwrap element");
+					return;
 				}
+
+				// TODO: Check HRESULT return codes for errors.
 				CComPtr<IHTMLRect> rect;
 				element2->getBoundingClientRect(&rect);
 
@@ -56,13 +62,15 @@ protected:
 				x += left;
 				y += top;
 
-				response->m_value["x"] = x;
-				response->m_value["y"] = y;
+				Json::Value response_value;
+				response_value["x"] = x;
+				response_value["y"] = y;
+				response->SetResponse(SUCCESS, response_value);
+				return;
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

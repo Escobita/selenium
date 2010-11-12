@@ -17,7 +17,11 @@ protected:
 	void DeleteAllCookiesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
 		BrowserWrapper *browser_wrapper;
-		manager->GetCurrentBrowser(&browser_wrapper);
+		int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+		if (status_code != SUCCESS) {
+			response->SetErrorResponse(status_code, "Unable to get browser");
+			return;
+		}
 
 		std::wstring cookie_string = browser_wrapper->GetCookies();
 		while (cookie_string.size() > 0) {
@@ -30,8 +34,15 @@ protected:
 			}
 
 			std::wstring cookie_name(this->GetCookieName(cookie_element));
-			browser_wrapper->DeleteCookie(cookie_name);
+			status_code = browser_wrapper->DeleteCookie(cookie_name);
+			if (status_code != SUCCESS) {
+				std::string error_cookie_name(CW2A(cookie_name.c_str(), CP_UTF8));
+				response->SetErrorResponse(status_code, "Unable to delete cookie with name '" + error_cookie_name + "'");
+				return;
+			}
 		}
+
+		response->SetResponse(SUCCESS, Json::Value::null);
 	}
 
 private:

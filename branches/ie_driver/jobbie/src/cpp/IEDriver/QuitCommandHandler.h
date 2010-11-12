@@ -28,7 +28,7 @@ protected:
 			}
 		}
 
-		response->set_status_code(SUCCESS);
+		response->SetResponse(SUCCESS, Json::Value::null);
 	}
 };
 

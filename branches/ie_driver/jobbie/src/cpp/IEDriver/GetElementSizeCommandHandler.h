@@ -16,15 +16,18 @@ public:
 protected:
 	void GetElementSizeCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
-			int status_code = SUCCESS;
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 
 			BrowserWrapper *browser_wrapper;
-			manager->GetCurrentBrowser(&browser_wrapper);
-			HWND hwnd = browser_wrapper->GetWindowHandle();
+			int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unable to get browser");
+				return;
+			}
+			//HWND hwnd = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
@@ -35,14 +38,19 @@ protected:
 					long height, width;
 					element_wrapper->element()->get_offsetHeight(&height);
 					element_wrapper->element()->get_offsetWidth(&width);
-					response->m_value["width"] = width;
-					response->m_value["height"] = height;
+					Json::Value response_value;
+					response_value["width"] = width;
+					response_value["height"] = height;
+					response->SetResponse(SUCCESS, response_value);
+					return;
+				} else {
+					response->SetErrorResponse(status_code, "Element is not displayed.");
+					return;
 				}
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

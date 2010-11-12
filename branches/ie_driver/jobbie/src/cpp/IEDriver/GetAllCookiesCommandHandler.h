@@ -17,7 +17,11 @@ protected:
 	void GetAllCookiesCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		Json::Value response_value(Json::arrayValue);
 		BrowserWrapper *browser_wrapper;
-		manager->GetCurrentBrowser(&browser_wrapper);
+		int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+		if (status_code != SUCCESS) {
+			response->SetErrorResponse(status_code, "Unable to get browser");
+			return;
+		}
 
 		std::wstring cookie_string = browser_wrapper->GetCookies();
 		while (cookie_string.size() > 0)
@@ -37,7 +41,7 @@ protected:
 			response_value.append(cookie_value);
 		}
 
-		response->m_value = response_value;
+		response->SetResponse(SUCCESS, response_value);
 	}
 
 private:

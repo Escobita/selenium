@@ -23,7 +23,7 @@ protected:
 			handles.append(handle);
 		}
 
-		response->m_value = handles;
+		response->SetResponse(SUCCESS, handles);
 	}
 };
 

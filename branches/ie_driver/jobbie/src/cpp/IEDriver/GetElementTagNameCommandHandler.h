@@ -16,8 +16,8 @@ public:
 protected:
 	void GetElementTagNameCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (locator_parameters.find("id") == locator_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "id";
+			response->SetErrorResponse(400, "Missing parameter in URL: id");
+			return;
 		} else {
 			std::wstring element_id(CA2W(locator_parameters["id"].c_str(), CP_UTF8));
 			ElementWrapper *element_wrapper;
@@ -28,12 +28,12 @@ protected:
 				std::wstring tag_name((BSTR)temp);
 				std::transform(tag_name.begin(), tag_name.end(), tag_name.begin(), tolower);
 				std::string return_value(CW2A(tag_name.c_str(), CP_UTF8));
-				response->m_value = return_value;
+				response->SetResponse(SUCCESS, return_value);
+				return;
 			} else {
-				response->m_value["message"] = "Element is no longer valid";
+				response->SetErrorResponse(status_code, "Element is no longer valid");
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

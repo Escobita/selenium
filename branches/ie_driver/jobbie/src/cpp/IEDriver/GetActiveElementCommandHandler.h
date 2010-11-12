@@ -15,15 +15,17 @@ public:
 
 protected:
 	void GetActiveElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
-		response->set_status_code(SUCCESS);
 		BrowserWrapper *browser_wrapper;
-		manager->GetCurrentBrowser(&browser_wrapper);
+		int status_code = manager->GetCurrentBrowser(&browser_wrapper);
+		if (status_code != SUCCESS) {
+			response->SetErrorResponse(status_code, "Unable to get browser");
+			return;
+		}
 
 		CComPtr<IHTMLDocument2> doc;
 		browser_wrapper->GetDocument(&doc);
 		if (!doc) {
-			response->set_status_code(ENOSUCHDOCUMENT);
-			response->m_value["message"] = "Document not found";
+			response->SetErrorResponse(ENOSUCHDOCUMENT, "Document not found");
 			return;
 		}
 
@@ -40,7 +42,7 @@ protected:
 			element.CopyTo(&dom_element);
 			ElementWrapper *element_wrapper = new ElementWrapper(dom_element);
 			manager->AddManagedElement(element_wrapper);
-			response->m_value = element_wrapper->ConvertToJson();
+			response->SetResponse(SUCCESS, element_wrapper->ConvertToJson());
 		}
 	}
 };

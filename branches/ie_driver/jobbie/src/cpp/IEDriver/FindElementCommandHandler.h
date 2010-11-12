@@ -17,18 +17,22 @@ public:
 protected:
 	void FindElementCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (command_parameters.find("using") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "using";
+			response->SetErrorResponse(400, "Missing parameter: using");
+			return;
 		} else if (command_parameters.find("value") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "value";
+			response->SetErrorResponse(400, "Missing parameter: value");
+			return;
 		} else {
 			ElementWrapper *found_element;
 			std::wstring mechanism = CA2W(command_parameters["using"].asString().c_str(), CP_UTF8);
 			std::wstring value = CA2W(command_parameters["value"].asString().c_str(), CP_UTF8);
 
 			ElementFinder *finder;
-			manager->GetElementFinder(mechanism, &finder);
+			int status_code = manager->GetElementFinder(mechanism, &finder);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Unknown finder mechanism: " + command_parameters["using"].asString());
+				return;
+			}
 
 			int timeout(manager->implicit_wait_timeout());
 			clock_t end = clock() + (timeout / 1000 * CLOCKS_PER_SEC);
@@ -36,7 +40,6 @@ protected:
 				end += 1 * CLOCKS_PER_SEC;
 			}
 
-			int status_code = SUCCESS;
 			do {
 				status_code = finder->FindElement(manager, NULL, value, &found_element);
 				if (status_code == SUCCESS) {
@@ -45,12 +48,12 @@ protected:
 			} while (clock() < end);
 			
 			if (status_code == SUCCESS) {
-				response->m_value = found_element->ConvertToJson();
-			} else 			{
-				response->m_value["message"] = "Unable to find element with " + command_parameters["using"].asString() + " " + command_parameters["value"].asString();
+				response->SetResponse(SUCCESS, found_element->ConvertToJson());
+				return;
+			} else {
+				response->SetErrorResponse(status_code, "Unable to find element with " + command_parameters["using"].asString() + " == " + command_parameters["value"].asString());
+				return;
 			}
-
-			response->set_status_code(status_code);
 		}
 	}
 };

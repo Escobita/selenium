@@ -18,8 +18,8 @@ protected:
 	void AddCookieCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
 	{
 		if (command_parameters.find("cookie") == command_parameters.end()) {
-			response->set_status_code(400);
-			response->m_value = "cookie";
+			response->SetErrorResponse(400, "Missing parameter: cookie");
+			return;
 		}
 
 		Json::Value cookie_value = command_parameters["cookie"];
@@ -73,10 +73,10 @@ protected:
 		std::wstring cookie(CA2W(cookie_string.c_str(), CP_UTF8));
 		int status_code = browser_wrapper->AddCookie(cookie);
 		if (status_code != SUCCESS) {
-			response->m_value["message"] = L"Unable to add cookie to page";
+			response->SetErrorResponse(status_code, "Unable to add cookie to page");
 		}
 
-		response->set_status_code(status_code);
+		response->SetResponse(SUCCESS, Json::Value::null);
 	}
 
 private:
@@ -110,6 +110,8 @@ private:
 			case 11:
 				return "Dec";
 		}
+
+		return "";
 	}
 
 	std::string AddCookieCommandHandler::GetWeekdayName(int weekday_name) {
@@ -132,6 +134,8 @@ private:
 			case 6:
 				return "Sat";
 		}
+
+		return "";
 	}
 };
 
