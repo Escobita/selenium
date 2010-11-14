@@ -67,19 +67,19 @@ Command responses shall be sent as [http://www.w3.org/Protocols/rfc2616/rfc2616-
 The wire protocol will inherit its status codes from those used by the InternetExplorerDriver:
 
 || *Code* || *Summary* || *Detail* ||
-|| 0 || Success || The command executed successfully. ||
-|| 7 || No such element || An element could not be located on the page using the given search parameters. ||
-|| 8 || No such frame || A request to switch to a frame could not be satisfied because the frame could not be found. ||
-|| 9 || Unknown command || The requested resource could not be found, or a request was received using an HTTP method that is not supported by the mapped resource. ||
-|| 10 || Stale element reference || An element command failed because the referenced element is no longer attached to the DOM. ||
-|| 11 || Element not visible || An element command could not be completed because the element is not visible on the page. ||
-|| 12 || Invalid element state || An element command could not be completed because the element is in an invalid state (e.g. attempting to click a disabled element). ||
-|| 13 || Unknown error || An unknown server-side error occurred while processing the command. ||
-|| 15 || Element is not selectable || An attempt was made to select an element that cannot be selected. ||
-|| 19 || XPath look up error || An error occurred while searching for an element by XPath. ||
-|| 23 || No such window || A request to switch to a different window could not be satisfied because the window could not be found. ||
-|| 24 || Invalid cookie domain || An illegal attempt was made to set a cookie under a different domain than the current page. ||
-|| 25 || Unable to set cookie || A request to set a cookie's value could not be satisfied. ||
+|| 0 || `Success` || The command executed successfully. ||
+|| 7 || `NoSuchElement` || An element could not be located on the page using the given search parameters. ||
+|| 8 || `NoSuchFrame` || A request to switch to a frame could not be satisfied because the frame could not be found. ||
+|| 9 || `UnknownCommand` || The requested resource could not be found, or a request was received using an HTTP method that is not supported by the mapped resource. ||
+|| 10 || `StaleElementReference` || An element command failed because the referenced element is no longer attached to the DOM. ||
+|| 11 || `ElementNotVisible` || An element command could not be completed because the element is not visible on the page. ||
+|| 12 || `InvalidElementState` || An element command could not be completed because the element is in an invalid state (e.g. attempting to click a disabled element). ||
+|| 13 || `UnknownError` || An unknown server-side error occurred while processing the command. ||
+|| 15 || `ElementIsNotSelectable` || An attempt was made to select an element that cannot be selected. ||
+|| 19 || `XPathLookupError` || An error occurred while searching for an element by XPath. ||
+|| 23 || `NoSuchWindow` || A request to switch to a different window could not be satisfied because the window could not be found. ||
+|| 24 || `InvalidCookieDomain` || An illegal attempt was made to set a cookie under a different domain than the current page. ||
+|| 25 || `UnableToSetCookie` || A request to set a cookie's value could not be satisfied. ||
 
 The client should interpret a 404 Not Found response from the server as an "Unknown command" response. All other 4xx and 5xx responses from the server that do not define a status field should be interpreted as "Unknown error" responses.
 
@@ -188,7 +188,7 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
 || POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
 || POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
-|| GET || /session/:sessionId/element/:id/text || Get the `innerText` of the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
+|| GET || /session/:sessionId/element/:id/text || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
 || GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
 || POST || /session/:sessionId/element/:id/value || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
 || GET || /session/:sessionId/element/:id/name || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
@@ -207,7 +207,8 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
 || POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
 || GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
-|| POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation orientation)] ||
+|| POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
+
 
 == Command Detail ==
 
@@ -566,6 +567,12 @@ arguments. Likewise, any !WebElements in the script result will be returned to t
 </dd>
 <dd>
 <dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is no attached to the page's DOM.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)]</dd>
 </dl>
@@ -629,6 +636,12 @@ should switch to the page's default content.</dd>
 </dd>
 <dd>
 <dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchFrame` - If the frame specified by `id` cannot be found.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)]</dd>
 </dl>
@@ -678,6 +691,12 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the window specified by `name` cannot be found.</dd>
 </dl>
 </dd>
 <dd>
@@ -846,6 +865,13 @@ properties:
 </dd>
 <dd>
 <dl>
+<dt>*Potential Errors:*</dt>
+<dd>`InvalidCookieDomain` - If the cookie's `domain` is not visible from the current page.</dd>
+<dd>`UnableToSetCookie` - If attempting to set a cookie on a page that does not support cookies (e.g. pages with mime-type `text/plain`).</dd>
+</dl>
+</dd>
+<dd>
+<dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()]</dd>
 </dl>
@@ -973,6 +999,13 @@ such cookie visible to the current page.</dd>
 </dd>
 <dd>
 <dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchElement` - If the element cannot be found.</dd>
+<dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.#findElement(By)]</dd>
 </dl>
@@ -1007,6 +1040,12 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{Array.<{ELEMENT:string}>}` A list of WebElement JSON objects for the located elements.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
 </dd>
 <dd>
@@ -1065,7 +1104,13 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to describe.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 </dl>
@@ -1085,7 +1130,7 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to search under.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
@@ -1099,6 +1144,14 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{ELEMENT:string}` A WebElement JSON object for the located element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`NoSuchElement` - If the element cannot be found.</dd>
+<dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
 </dd>
 <dd>
@@ -1124,7 +1177,7 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to search under.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
@@ -1138,6 +1191,13 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{Array.<{ELEMENT:string}>}` A list of WebElement JSON objects for the located elements.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
 </dd>
 <dd>
@@ -1163,7 +1223,14 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 </dl>
 </dd>
 <dd>
@@ -1189,7 +1256,13 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1210,12 +1283,18 @@ such cookie visible to the current page.</dd>
 <dd>*GET /session/:sessionId/element/:id/text*</dd>
 <dd>
 <dl>
-<dd>Get the `innerText` of the element.</dd>
+<dd>Returns the visible text for the element.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1241,13 +1320,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string|null}` The element's value, or `null` if it does not have a `value` attribute.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1269,13 +1354,20 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`value` - `{Array.<string>}` The sequence of keys to type. An array must be provided. The server should flatten the array items to a single string to be typed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 </dl>
 </dd>
 <dd>
@@ -1301,13 +1393,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string}` The element's tag name, as a lowercase string.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1333,7 +1431,15 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
 </dl>
 </dd>
 <dd>
@@ -1359,13 +1465,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{boolean}` Whether the element is selected.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1387,7 +1499,16 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementIsNotSelectable` - If the referenced element cannot be selected.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
 </dl>
 </dd>
 <dd>
@@ -1413,13 +1534,22 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{boolean}` Whether the element is selected after toggling its state.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementIsNotSelectable` - If the referenced element cannot be selected.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
 </dl>
 </dd>
 <dd>
@@ -1445,13 +1575,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{boolean}` Whether the element is enabled.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1477,13 +1613,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string|null}` The value of the attribute, or null if it is not set on the element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1509,14 +1651,20 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - First element ID to test in the pair</dd>
-<dd>`:other` - Second element ID to test in the pair</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+<dd>`:other` - ID of the element to compare against.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{boolean}` Whether the two IDs refer to the same element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If either the element refered to by `:id` or `:other` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 </dl>
@@ -1536,13 +1684,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{boolean}` Whether the element is displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1568,13 +1722,19 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{x:number, y:number}` The X and Y coordinates for the element on the page.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1603,13 +1763,19 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{x:number, y:number}` The X and Y coordinates for the element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 </dl>
@@ -1629,13 +1795,19 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{width:number, height:number}` The width and height of the element, in pixels.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1661,13 +1833,19 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string}` The value of the specified CSS property.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
 <dd>
@@ -1693,7 +1871,15 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to manipulate.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
 </dl>
 </dd>
 <dd>
@@ -1719,7 +1905,7 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to query.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
@@ -1727,6 +1913,14 @@ location for correctly generating native events.</dd>
 <dt>*JSON Parameters:*</dt>
 <dd>`x` - `{number}` The number of pixels to drag the element in the horizontal direction. A positive value indicates the element should be dragged to the right, while a negative value indicates that it should be dragged to the left.</dd>
 <dd>`y` - `{number}` The number of pixels to drag the element in the vertical direction. A positive value indicates the element should be dragged down towards the bottom of the screen, while a negative value indicates that it should be dragged towards the top of the screen.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
 </dl>
 </dd>
 <dd>
@@ -1796,3 +1990,4 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
+
