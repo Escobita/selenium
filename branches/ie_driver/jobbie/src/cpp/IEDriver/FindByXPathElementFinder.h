@@ -162,6 +162,9 @@ private:
 			script += XPATHJS[i];
 		}
 
+		//std::string jsx(CW2A(script.c_str(), CP_UTF8));
+		//std::cout << "\n\n" << jsx << "\n\n";
+
 		SAFEARRAY *args;
 		SAFEARRAYBOUND bounds;
 		bounds.cElements = 0;

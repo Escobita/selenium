@@ -4,12 +4,24 @@ using System.Text;
 using NUnit.Framework;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Internal;
+using OpenQA.Selenium.Environment;
 
 namespace OpenQA.Selenium
 {
     [TestFixture]
     public class ElementFindingTest : DriverTestFixture
     {
+        [Test]
+        public void ShouldBeAbleToInjectXPathEngineIfNeeded()
+        {
+            driver.Url = alertsPage;
+            driver.FindElement(By.XPath("//body"));
+            driver.FindElement(By.XPath("//h1"));
+            driver.FindElement(By.XPath("//div"));
+            driver.FindElement(By.XPath("//p"));
+            driver.FindElement(By.XPath("//a"));
+        }
+
         [Test]
         public void ShouldReturnTitleOfPageIfSet()
         {
