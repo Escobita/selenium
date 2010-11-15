@@ -70,7 +70,12 @@ namespace OpenQA.Selenium
         /// <summary>
         /// Any version of the Linux operating system.
         /// </summary>
-        Linux
+        Linux,
+		
+        /// <summary>
+        /// Any version using the Darwin packaging system (OS X).
+        /// </summary>
+		Darwin
     }
 
     /// <summary>
@@ -190,7 +195,7 @@ namespace OpenQA.Selenium
 
                 // Thanks to a bug in Mono Mac and Linux need to be treated the same  https://bugzilla.novell.com/show_bug.cgi?id=515570 but adding this in case
                 case PlatformType.MacOSX:
-                    platformIsType = platformTypeValue == PlatformType.MacOSX;
+                    platformIsType = platformTypeValue == PlatformType.MacOSX || platformTypeValue == PlatformType.Darwin;
                     break;
 
                 case PlatformType.Linux:

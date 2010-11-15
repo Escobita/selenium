@@ -18,6 +18,8 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.concurrent.Callable;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
@@ -25,6 +27,7 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
 
 public class VisibilityTest extends AbstractDriverTestCase {
 
@@ -69,11 +72,8 @@ public class VisibilityTest extends AbstractDriverTestCase {
     assertTrue(element.isDisplayed());
 
     element.click();
-    TestWaitingUtility.startSleep();
 
-    while (TestWaitingUtility.shouldSleep() && element.isDisplayed()) {
-      TestWaitingUtility.sleep();
-    }
+    waitFor(elementNotToDisplayed(element));
 
     assertFalse(element.isDisplayed());
   }
@@ -165,4 +165,12 @@ public class VisibilityTest extends AbstractDriverTestCase {
     assertFalse(zeroWidth.isDisplayed());
   }
 
+  private Callable<Boolean> elementNotToDisplayed(final RenderedWebElement element) {
+    return new Callable<Boolean>() {
+
+      public Boolean call() throws Exception {
+        return !element.isDisplayed();
+      }
+    };
+  }
 }

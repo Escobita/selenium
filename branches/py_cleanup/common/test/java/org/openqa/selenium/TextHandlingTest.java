@@ -37,6 +37,7 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
 
 public class TextHandlingTest extends AbstractDriverTestCase {
 
@@ -149,7 +150,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     WebElement textarea = driver.findElement(By.id("withText"));
     textarea.clear();
 
-    TestWaitingUtility.waitUntilElementValueEquals(textarea, "");
+    waitFor(WaitingConditions.elementValueToEqual(textarea, ""));
 
     String expectedText = "I like cheese" + newLine + newLine + "It's really nice";
 
@@ -277,5 +278,18 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 
     assertTrue(text.contains("some text"));
     assertFalse(text.contains("some more text"));
+  }
+  
+  public void testShouldGetTextWhichIsAValidJSONObject() {
+    driver.get(pages.simpleTestPage);
+    WebElement element = driver.findElement(By.id("simpleJsonText"));
+    assertEquals("{a=\"b\", c=1, d=true}", element.getText());
+    //assertEquals("{a=\"b\", \"c\"=d, e=true, f=\\123\\\\g\\\\\"\"\"\\\'}", element.getText());
+  }
+  
+  public void testShouldGetTextWhichIsAValidComplexJSONObject() {
+    driver.get(pages.simpleTestPage);
+    WebElement element = driver.findElement(By.id("complexJsonText"));
+    assertEquals("{a=\"\\\\b\\\\\\\"\'\\\'\"}", element.getText());
   }
 }

@@ -101,6 +101,7 @@ class RubyMappings
         rubyzip.jar
         childprocess.jar
         ci_reporter.jar
+        rack.jar
       ].map { |jar| File.join("third_party/jruby", jar) }
 
       desc "Run ruby tests for #{args[:name]} (jruby)"
@@ -108,9 +109,6 @@ class RubyMappings
         puts "Running: #{args[:name]} ruby tests (jruby)"
 
         ENV['WD_SPEC_DRIVER'] = args[:name]
-
-        # TODO: fix gemfile vs include when jruby-complete.jar understands bundler
-        args[:include] << args[:gemfile].sub("Gemfile", "lib")
 
         jruby :include     => args[:include],
               :require     => requires,
@@ -125,12 +123,13 @@ class RubyMappings
 
   class MRITest < Tasks
     def handle(fun, dir, args)
+      deps = []
+
       desc "Run ruby tests for #{args[:name]} (mri)"
-      task task_name(dir, "#{args[:name]}-test:mri") => args[:gemfile] do
+      task task_name(dir, "#{args[:name]}-test:mri") => deps do
         puts "Running: #{args[:name]} ruby tests (mri)"
 
         ENV['WD_SPEC_DRIVER'] = args[:name]
-        ENV['BUNDLE_GEMFILE'] = args[:gemfile]
 
         ruby :require => args[:require],
              :include => args[:include],
@@ -191,8 +190,9 @@ class RubyMappings
         define_clean_task     dir, args
         define_build_task     dir, args
         define_release_task   dir, args
-        define_bundler_tasks  dir, args
       end
+
+      define_gem_install_task dir, args
     end
 
     def has_gem_task?
@@ -256,6 +256,17 @@ class RubyMappings
       end
     end
 
+    def define_gem_install_task(dir, args)
+      desc 'Install gem dependencies for the current Ruby'
+      task "//#{dir}:install-gems" do
+        dependencies = Array(args[:gemdeps]) + Array(args[:devdeps])
+        dependencies.each do |dep|
+          name, version = dep.shift
+          ruby :command => "gem", :args => ["install", name, "--version", version, "--no-rdoc", "--no-ri"]
+        end
+      end
+    end
+
     def gemspec(args)
       Gem::Specification.new do |s|
         s.name        = args[:name]
@@ -272,39 +283,6 @@ class RubyMappings
       end
     end
 
-    def define_bundler_tasks(dir, args)
-      gemfile = File.join(args[:dir], "Gemfile")
-      gemspec = File.join(args[:dir], "#{args[:name]}.gemspec")
-
-      file(gemfile => gemspec) { create_gemfile(gemfile) }
-
-      desc 'Install dependencies for user/MRI'
-      task "//#{dir}:bundle-mri" => gemfile do
-        bundle_install :ruby, gemfile
-      end
-
-      # desc 'Install dependencies for JRuby'
-      # task "//#{dir}:bundle-jruby" do
-      #   bundle_install :jruby, gemfile
-      # end
-    end
-
-    def create_gemfile(file)
-      mkdir_p File.dirname(file)
-      File.open(file, "w") { |file|
-        file << "source :rubygems\ngemspec\n"
-      }
-    end
-
-    def bundle_install(ruby, file)
-      args = ["install", "--gemfile", file]
-      args += ["--path", ENV['BUNDLE_PATH']] if ENV['BUNDLE_PATH']
-
-      RubyRunner.run ruby,
-        :command => "bundle",
-        :args    => args
-    end
-
   end # RubyGem
 end # RubyMappings
 
@@ -313,12 +291,13 @@ class RubyRunner
   JRUBY_JAR = "third_party/jruby/jruby-complete.jar"
 
   def self.run(impl, opts)
-    cmd = ["ruby"]
-
     if impl.to_sym == :jruby
       JRuby.runtime.instance_config.run_ruby_in_process = true
+
+      cmd = ["ruby"]
       cmd << "-J-Djava.awt.headless=true" if opts[:headless]
     else
+      cmd = [find_ruby]
       JRuby.runtime.instance_config.run_ruby_in_process = false
     end
 
@@ -342,6 +321,19 @@ class RubyRunner
     puts cmd.join(' ')
 
     sh(*cmd)
+  end
+
+  def self.find_ruby
+    return "ruby" unless windows?
+
+    # work around windows/jruby bug by searching the PATH ourselves
+    paths = ENV['PATH'].split(File::PATH_SEPARATOR)
+    paths.each do |path|
+      exe = File.join(path, "ruby.exe")
+      return exe if File.executable?(exe)
+    end
+
+    raise "could not find ruby.exe"
   end
 end
 

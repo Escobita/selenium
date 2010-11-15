@@ -22,13 +22,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
@@ -38,12 +37,14 @@ import static org.openqa.selenium.Platform.WINDOWS;
 public class CommandLine {
   private static final Method JDK6_CAN_EXECUTE = findJdk6CanExecuteMethod();
   private final String[] commandAndArgs;
-  private StreamDrainer drainer;
-  private int exitCode;
-  private boolean executed;
-  private Process proc;
-  private String allInput;
-  private Map<String, String> env = new HashMap<String, String>();
+  private volatile StreamDrainer drainer;
+  private volatile OutputStream drainTo;
+  private volatile Thread drainerThread;
+  private volatile int exitCode;
+  private volatile boolean executed;
+  private volatile Process proc;
+  private volatile String allInput;
+  private Map<String, String> env = new ConcurrentHashMap<String, String>();
 
   public CommandLine(String executable, String... args) {
     commandAndArgs = new String[args.length + 1];
@@ -58,13 +59,13 @@ public class CommandLine {
     this.commandAndArgs = cmdarray;
   }
 
-  @VisibleForTesting
   Map<String, String> getEnvironment() {
-    return ImmutableMap.copyOf(env);
+    return new HashMap<String, String>(env);
   }
 
   /**
    * Adds the specified environment variables.
+   * @param environment the variables to add
    *
    * @throws IllegalArgumentException if any value given is null (unsupported)
    */
@@ -77,6 +78,8 @@ public class CommandLine {
   /**
    * Adds the specified environment variable.
    *
+   * @param name the name of the environment variable
+   * @param value  the value of the environment variable
    * @throws IllegalArgumentException if the value given is null (unsupported)
    */
   public void setEnvironmentVariable(String name, String value) {
@@ -150,44 +153,24 @@ public class CommandLine {
   }
 
   public void execute() {
-    try {
-      executed = true;
-
-      ProcessBuilder builder = new ProcessBuilder(commandAndArgs);
-      builder.redirectErrorStream(true);
-      builder.environment().putAll(env);
-      
-      proc = builder.start();
-
-      drainer = new StreamDrainer(proc);
-      Thread thread = new Thread(drainer, "Command line drainer: " + commandAndArgs[0]);
-      thread.start();
-
-      if (allInput != null) {
-        byte[] bytes = allInput.getBytes();
-        proc.getOutputStream().write(bytes);
-        proc.getOutputStream().close();
-      }
-
-      proc.waitFor();
-      thread.join();
-
-      exitCode = proc.exitValue();
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    } catch (InterruptedException e) {
-      throw new WebDriverException(e);
-    }
+      createProcess();
+      setupDrainer();
+      waitFor();
   }
 
   public Process executeAsync() {
+    createProcess();
+
     new Thread() {
       @Override
       public void run() {
-        execute();
+        setupDrainer();
+        waitFor();
       }
     }.start();
 
+    // FIXME: we're leaking the Process instance here
+    // This hook should be removed altogether as it's just hiding bugs.
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
@@ -204,10 +187,44 @@ public class CommandLine {
     return proc;
   }
 
-  public void waitFor() {
+  private void waitFor() {
     try {
       proc.waitFor();
+      if(drainerThread != null) {
+          drainerThread.join();
+      }
+
+      exitCode = proc.exitValue();
     } catch (InterruptedException e) {
+      throw new WebDriverException(e);
+    }
+  }
+
+  private void setupDrainer() {
+    try {
+      drainer = new StreamDrainer(proc, drainTo);
+      drainerThread = new Thread(drainer, "Command line drainer: " + commandAndArgs[0]);
+      drainerThread.start();
+
+      if (allInput != null) {
+        byte[] bytes = allInput.getBytes();
+        proc.getOutputStream().write(bytes);
+        proc.getOutputStream().close();
+      }
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
+  }
+
+  private void createProcess() {
+    try {
+      ProcessBuilder builder = new ProcessBuilder(commandAndArgs);
+      builder.redirectErrorStream(true);
+      builder.environment().putAll(env);
+
+      proc = builder.start();
+      executed = true;
+    } catch (IOException e) {
       throw new WebDriverException(e);
     }
   }
@@ -239,6 +256,7 @@ public class CommandLine {
     }
 
     proc.destroy();
+    proc = null;
   }
 
   private static boolean canExecute(File file) {
@@ -274,17 +292,23 @@ public class CommandLine {
     return buf.toString();
   }
 
+  public void copyOutputTo(OutputStream out) {
+    drainTo = out;
+  }
+
   private static class StreamDrainer implements Runnable {
     private final Process toWatch;
-    private ByteArrayOutputStream inputOut;
+    private final ByteArrayOutputStream inputOut;
+    private final OutputStream drainTo;
 
-    StreamDrainer(Process toWatch) {
+    StreamDrainer(Process toWatch, OutputStream drainTo) {
       this.toWatch = toWatch;
+      this.drainTo = drainTo;
+      this.inputOut = new ByteArrayOutputStream();
     }
 
     public void run() {
       InputStream inputStream = new BufferedInputStream(toWatch.getInputStream());
-      inputOut = new ByteArrayOutputStream();
       byte[] buffer = new byte[2048];
 
       try {
@@ -292,6 +316,11 @@ public class CommandLine {
         while ((read = inputStream.read(buffer)) > 0) {
           inputOut.write(buffer, 0, read);
           inputOut.flush();
+
+          if (drainTo != null) {
+            drainTo.write(buffer, 0, read);
+            drainTo.flush();
+          }
         }
       } catch (IOException e) {
         // it's possible that the stream has been closed. That's okay.

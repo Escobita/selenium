@@ -29,6 +29,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.pageTitleToBe;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class FormHandlingTest extends AbstractDriverTestCase {
   public void testShouldClickOnSubmitInputElements() {
     driver.get(pages.formPage);
     driver.findElement(By.id("submitButton")).click();
+    waitFor(pageTitleToBe(driver, "We Arrive Here"));
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -55,6 +58,7 @@ public class FormHandlingTest extends AbstractDriverTestCase {
   public void testShouldBeAbleToClickImageButtons() {
     driver.get(pages.formPage);
     driver.findElement(By.id("imageButton")).click();
+    waitFor(pageTitleToBe(driver, "We Arrive Here"));
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -280,6 +284,29 @@ public class FormHandlingTest extends AbstractDriverTestCase {
 
     File value = new File(uploadElement.getValue());
     assertThat(value.getCanonicalPath(), equalTo(file.getCanonicalPath()));
+  }
+
+  @Ignore(value = {CHROME, SELENESE, IPHONE, ANDROID},
+      reason = "Does not yet support file uploads")
+  public void testShouldBeAbleToUploadTheSameFileTwice() throws IOException {
+    File file = File.createTempFile("test", "txt");
+    file.deleteOnExit();
+
+    driver.get(pages.formPage);
+    WebElement uploadElement = driver.findElement(By.id("upload"));
+    assertThat(uploadElement.getValue(), equalTo(""));
+
+    uploadElement.sendKeys(file.getAbsolutePath());
+    uploadElement.submit();
+
+    driver.get(pages.formPage);
+    uploadElement = driver.findElement(By.id("upload"));
+    assertThat(uploadElement.getValue(), equalTo(""));
+
+    uploadElement.sendKeys(file.getAbsolutePath());
+    uploadElement.submit();
+
+    // If we get this far, then we're all good.
   }
 
   public void testShouldThrowAnExceptionWhenSelectingAnUnselectableElement() {

@@ -36,17 +36,17 @@ limitations under the License.
 package org.openqa.selenium.htmlunit;
 
 import com.gargoylesoftware.htmlunit.Page;
-
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.SgmlPage;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomText;
+import com.gargoylesoftware.htmlunit.html.HtmlBody;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 import com.gargoylesoftware.htmlunit.html.HtmlHtml;
 import com.gargoylesoftware.htmlunit.html.HtmlImageInput;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -56,16 +56,20 @@ import com.gargoylesoftware.htmlunit.html.HtmlScript;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
-import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
+
+import com.gargoylesoftware.htmlunit.javascript.host.Event;
+import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.RenderedWebElement;
-import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByTagName;
@@ -75,26 +79,25 @@ import org.openqa.selenium.internal.WrapsElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
-import java.awt.Point;
-import java.awt.Dimension;
+import java.util.regex.Pattern;
 
-import static org.openqa.selenium.Keys.ENTER;
-import static org.openqa.selenium.Keys.RETURN;
-import net.sourceforge.htmlunit.corejs.javascript.Undefined;
 
-public class HtmlUnitWebElement implements RenderedWebElement,
-    FindsById, FindsByLinkText, FindsByXPath, FindsByTagName, WrapsDriver {
+public class HtmlUnitWebElement implements RenderedWebElement, WrapsDriver,
+    FindsById, FindsByLinkText, FindsByXPath, FindsByTagName,
+    FindsByCssSelector {
 
   protected final HtmlUnitDriver parent;
   protected final HtmlElement element;
-  private final static char nbspChar = (char) 160;
-  private final static String[] blockLevelsTagNames =
+  private static final char nbspChar = (char) 160;
+  private static final String[] blockLevelsTagNames =
       {"p", "h1", "h2", "h3", "h4", "h5", "h6", "dl", "div", "noscript",
        "blockquote", "form", "hr", "table", "fieldset", "address", "ul", "ol", "pre", "br"};
   private String toString;
@@ -105,29 +108,9 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   }
 
   public void click() {
-    assertElementNotStale();
-
-    if (!isDisplayed())
-      throw new ElementNotVisibleException("You may only click visible elements");
-
-    try {
-      if (parent.isJavascriptEnabled()) {
-        if (!(element instanceof HtmlInput)) {
-          element.focus();
-        }
-        
-        element.mouseOver();
-        element.mouseMove();
-      }
-
-      element.click();
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    } catch (ScriptException e) {
-      // TODO(simon): This isn't good enough.
-      System.out.println(e.getMessage());
-      // Press on regardless
-    }
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.click(getElement());
   }
 
   public void submit() {
@@ -137,11 +120,8 @@ public class HtmlUnitWebElement implements RenderedWebElement,
       if (element instanceof HtmlForm) {
         submitForm((HtmlForm) element);
         return;
-      } else if (element instanceof HtmlSubmitInput) {
+      } else if ((element instanceof HtmlSubmitInput) || (element instanceof HtmlImageInput)) {
         element.click();
-        return;
-      } else if (element instanceof HtmlImageInput) {
-        ((HtmlImageInput) element).click();
         return;
       } else if (element instanceof HtmlInput) {
         submitForm(element.getEnclosingForm());
@@ -236,74 +216,75 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
   }
 
-  public void sendKeys(CharSequence... value) {
+  private void verifyCanInteractWithElement() {
     assertElementNotStale();
 
-    if (!isDisplayed())
+    Boolean displayed = parent.implicitlyWaitFor(new Callable<Boolean>() {
+      public Boolean call() throws Exception {
+        return isDisplayed();
+      }
+    });
+
+    if (displayed == null || !displayed.booleanValue()) {
       throw new ElementNotVisibleException("You may only sendKeys to visible elements");
+    }
     
     if (!isEnabled()) {
       throw new UnsupportedOperationException("You may only sendKeys to enabled elements");
     }
+  }
 
-    StringBuilder builder = new StringBuilder();
-    for (CharSequence seq : value) {
-      builder.append(seq);
-    }
-
-    // If the element is an input element, and the string contains one of
-    // ENTER or RETURN, break the string at that point and submit the form
-    int indexOfSubmitKey = indexOfSubmitKey(element, builder);
-    if (indexOfSubmitKey != -1) {
-      builder.delete(indexOfSubmitKey, builder.length());
-    }
-
+  private void switchFocusToThisIfNeeded() {
     HtmlUnitWebElement oldActiveElement =
         ((HtmlUnitWebElement)parent.switchTo().activeElement());
-    if (parent.isJavascriptEnabled() &&
-        !oldActiveElement.equals(this) &&
-        !oldActiveElement.getTagName().toLowerCase().equals("body")) {
+
+    boolean jsEnabled = parent.isJavascriptEnabled();
+    boolean oldActiveEqualsCurrent = oldActiveElement.equals(this);
+    boolean isBody = oldActiveElement.getTagName().toLowerCase().equals("body");
+    if (jsEnabled &&
+        !oldActiveEqualsCurrent &&
+        !isBody) {
       oldActiveElement.element.blur();
       element.focus();
     }
-    if (parent.isJavascriptEnabled() && !(element instanceof HtmlFileInput)) {
-      try {
-        element.type(builder.toString());
-      } catch (IOException e) {
-        throw new WebDriverException(e);
-      }
-    } else if (element instanceof HtmlInput) {
-      HtmlInput input = (HtmlInput) element;
+  }
 
-      String currentValue = getValue();
-      input.setValueAttribute((currentValue == null ? "" : currentValue) + builder.toString());
-    } else if (element instanceof HtmlTextArea) {
-      String currentValue = getValue();
-      ((HtmlTextArea) element).setText(
-          (currentValue == null ? "" : currentValue) + builder.toString());
+  public void sendKeyDownEvent(Keys modifierKey) {
+    sendSingleKeyEvent(modifierKey, Event.TYPE_KEY_DOWN);
+  }
+
+  public void sendKeyUpEvent(Keys modifierKey) {
+    sendSingleKeyEvent(modifierKey, Event.TYPE_KEY_UP);
+  }
+
+  private void sendSingleKeyEvent(Keys modifierKey, String eventDescription) {
+    verifyCanInteractWithElement();
+    switchFocusToThisIfNeeded();
+    HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
+    keyboard.performSingleKeyAction(getElement(), modifierKey, eventDescription);
+  }
+
+  public void sendKeys(CharSequence... value) {
+    verifyCanInteractWithElement();
+
+    InputKeysContainer keysContainer = new InputKeysContainer(isInputElement(), value);
+
+    switchFocusToThisIfNeeded();
+
+    HtmlUnitKeyboard keyboard = (HtmlUnitKeyboard) parent.getKeyboard();
+    if (element instanceof HtmlBody && value.length == 1 && value[0] == Keys.F5) {
+      parent.navigate().refresh();
     } else {
-      throw new UnsupportedOperationException(
-          "You may only set the value of elements that are input elements");
+      keyboard.sendKeys(element, getValue(), keysContainer);
     }
 
-    if (indexOfSubmitKey != -1) {
+    if (isInputElement() && keysContainer.wasSubmitKeyFound()) {
       submit();
     }
   }
 
-  private int indexOfSubmitKey(HtmlElement element, StringBuilder builder) {
-    if (!(element instanceof HtmlInput))
-      return -1;
-
-    CharSequence[] terminators = { "\n", ENTER, RETURN };
-    for (CharSequence terminator : terminators) {
-      String needle = String.valueOf(terminator);
-      int index = builder.indexOf(needle);
-      if (index != -1) {
-        return index;
-      }
-    }
-    return -1;
+  private boolean isInputElement() {
+    return element instanceof HtmlInput;
   }
 
   public String getTagName() {
@@ -444,8 +425,10 @@ public class HtmlUnitWebElement implements RenderedWebElement,
   public boolean isDisplayed() {
     assertElementNotStale();
 
-    if (!parent.isJavascriptEnabled())
+    if (!parent.isJavascriptEnabled()) {
       return true;
+    }
+
     return !(element instanceof HtmlHiddenInput) && element.isDisplayed();
   }
 
@@ -621,6 +604,36 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     return findElementsByXPath(".//*[@id = '" + id + "']");
   }
 
+  public List<WebElement> findElementsByCssSelector(String using) {
+    List<WebElement> allElements = parent.findElementsByCssSelector(using);
+
+    return findChildNodes(allElements);
+  }
+
+  public WebElement findElementByCssSelector(String using) {
+    List<WebElement> allElements = parent.findElementsByCssSelector(using);
+
+    allElements = findChildNodes(allElements);
+
+    if (allElements.size() == 0) {
+      throw new NoSuchElementException("Cannot find child element using css: " + using);
+    }
+
+    return allElements.get(0);
+  }
+
+  private List<WebElement> findChildNodes(List<WebElement> allElements) {
+    List<WebElement> toReturn = new LinkedList<WebElement>();
+
+    for (WebElement current : allElements) {
+      if (element.isAncestorOf(((HtmlUnitWebElement) current).element)) {
+        toReturn.add(current);
+      }
+    }
+
+    return toReturn;
+  }
+
   public WebElement findElementByXPath(String xpathExpr) {
     assertElementNotStale();
 
@@ -707,7 +720,7 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     assertElementNotStale();
 
     List<HtmlElement> elements = element.getHtmlElementsByTagName(name);
-    ArrayList<WebElement> toReturn = new ArrayList<WebElement>(elements.size());
+    List<WebElement> toReturn = new ArrayList<WebElement>(elements.size());
     for (HtmlElement element : elements) {
       toReturn.add(parent.newHtmlUnitWebElement(element));
     }
@@ -756,12 +769,12 @@ public class HtmlUnitWebElement implements RenderedWebElement,
     }
 
     // We need to walk the DOM to determine if the element is actually attached
-    DomNode parent = element;
-    while (parent != null && !(parent instanceof HtmlHtml)) {
-      parent = parent.getParentNode();
+    DomNode parentElement = element;
+    while (parentElement != null && !(parentElement instanceof HtmlHtml)) {
+      parentElement = parentElement.getParentNode();
     }
 
-    if (parent == null) {
+    if (parentElement == null) {
       throw new StaleElementReferenceException("The element seems to be disconnected from the DOM. "
                                                + " This means that a user cannot interact with it.");
     }
@@ -850,5 +863,37 @@ public class HtmlUnitWebElement implements RenderedWebElement,
    */
   public WebDriver getWrappedDriver() {
     return parent;
+  }
+
+  public void doubleClick() {
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.doubleClick(getElement());    
+  }
+
+  public void mouseDown() {
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.mouseDown(getElement());
+  }
+
+  public void mouseUp() {
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+    mouse.mouseUp(getElement());
+  }
+
+  public void moveToHere() {
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+
+    mouse.mouseMove(getElement());
+  }
+
+  public void mouseContextClick() {
+    verifyCanInteractWithElement();
+    HtmlUnitMouse mouse = (HtmlUnitMouse) parent.getMouse();
+
+    mouse.contextClick(getElement());
   }
 }

@@ -161,6 +161,8 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
     window = window.wrappedJSObject;
     var sandbox = new Components.utils.Sandbox(window);
     sandbox.window = window;
+    sandbox.document = doc.wrappedJSObject ? doc.wrappedJSObject : doc;
+    sandbox.navigator = window.navigator;
     sandbox.__webdriverParams = converted;
 
     try {
@@ -563,14 +565,10 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
   var wait = respond.session.getImplicitWait();
   if (wait && !elementIds.length && new Date().getTime() - startTime <= wait) {
     var self = this;
-    var timer = Components.classes['@mozilla.org/timer;1'].
-        createInstance(Components.interfaces.nsITimer);
-    timer.initWithCallback({
-      notify: function() {
-        self.findElementsInternal_(respond, method, selector,
-            opt_parentElementId, startTime);
-      }
-    }, 10, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+    var callback = function() {
+        self.findElementsInternal_(respond, method, selector, opt_parentElementId, startTime);
+    };
+    this.jsTimer.setTimeout(callback, 10);
   } else {
     respond.value = elementIds;
     respond.send();

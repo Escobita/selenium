@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Resources;
+import org.apache.commons.logging.Log;
+import org.openqa.jetty.log.LogFactory;
 import org.openqa.jetty.util.IO;
 import org.openqa.jetty.util.URLResource;
 
@@ -46,7 +46,7 @@ class SessionExtensionJsResource extends URLResource {
      */
     @Override
     public long lastModified() {
-        return System.currentTimeMillis() + (1000l * 3600l * 24l * 365l * 12l);
+        return System.currentTimeMillis() + (1000L * 3600L * 24L * 365L * 12L);
     }
     
     @Override
@@ -64,7 +64,7 @@ class SessionExtensionJsResource extends URLResource {
         // TODO(flight): I think this is equivalent.
         // The original code used a StringInputStream from Ant
 
-        InputStream in = new FileInputStream(extensionJs);
+        InputStream in = new ByteArrayInputStream(extensionJs.getBytes());
 
         try {
             in.skip(start);

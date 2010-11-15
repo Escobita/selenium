@@ -21,25 +21,14 @@ package org.openqa.selenium.firefox.internal;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.json.JSONException;
-import org.openqa.selenium.NetworkUtils;
-import org.openqa.selenium.Platform;
+import org.openqa.selenium.networkutils.NetworkUtils;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.ExtensionConnection;
 import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.remote.Command;
@@ -48,10 +37,13 @@ import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.internal.CircularOutputStream;
 
-import static org.openqa.selenium.firefox.FirefoxDriver.DEFAULT_PORT;
 import static org.openqa.selenium.firefox.FirefoxProfile.PORT_PREFERENCE;
+import static org.openqa.selenium.firefox.internal.SocketLock.DEFAULT_PORT;
 
 public class NewProfileExtensionConnection implements CommandExecutor, ExtensionConnection {
+  private final static int BUFFER_SIZE = 4096;
+
+  private static final NetworkUtils networkUtils =  new NetworkUtils();
   private final long connectTimeout;
   private final FirefoxBinary process;
   private final FirefoxProfile profile;
@@ -59,7 +51,7 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
   private final Lock lock;
   private File profileDir;
 
-  private final int bufferSize = 4096;
+
   private HttpCommandExecutor delegate;
 
   public NewProfileExtensionConnection(Lock lock, FirefoxBinary binary, FirefoxProfile profile,
@@ -71,22 +63,27 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
     this.process = binary;
   }
 
+  @SuppressWarnings({"StringConcatenationInsideStringBufferAppend"})
   public void start() throws IOException {
     int port = 0;
 
     lock.lock(connectTimeout);
     try {
       port = determineNextFreePort(DEFAULT_PORT);
+      profile.setPreference(PORT_PREFERENCE, port);
+
+      profileDir = profile.layoutOnDisk();
+
+      process.clean(profile, profileDir);
+
       delegate = new HttpCommandExecutor(buildUrl(host, port));
       String firefoxLogFile = System.getProperty("webdriver.firefox.logfile");
       File logFile = firefoxLogFile == null ? null : new File(firefoxLogFile);
-      this.process.setOutputWatcher(new CircularOutputStream(logFile, bufferSize));
+      process.setOutputWatcher(new CircularOutputStream(logFile, BUFFER_SIZE));
 
-      profile.setPreference(PORT_PREFERENCE, port);
-      profileDir = profile.layoutOnDisk();
+      process.startProfile(profile, profileDir);
 
-      this.process.clean(profile, profileDir);
-      this.process.startProfile(profile, profileDir);
+      // Just for the record; the critical section is all along while firefox is starting with the profile. 
 
       // There is currently no mechanism for the profile to notify us when it has started
       // successfully and is ready for requests.  Instead, we must loop until we're able to
@@ -167,21 +164,11 @@ public class NewProfileExtensionConnection implements CommandExecutor, Extension
    * @return The URL of the Firefox extension.
    */
   private static URL buildUrl(String host, int port) {
-    if ("localhost".equals(host)) {
-      for (InetSocketAddress address : NetworkUtils.obtainLoopbackAddresses(port)) {
-        try {
-          return new URL("http", address.getHostName(), address.getPort(), "/hub");
-        } catch (MalformedURLException ignored) {
-          // Do nothing; loop and try next address.
-        }
-      }
-      throw new WebDriverException("Unable to find loopback address for localhost");
-    } else {
-      try {
-        return new URL("http", host, port, "/hub");
-      } catch (MalformedURLException e) {
-        throw new WebDriverException(e);
-      }
+    String hostToUse = "localhost".equals(host) ? networkUtils.obtainLoopbackIp4Address() : host;
+    try {
+      return new URL("http", hostToUse, port, "/hub");
+    } catch (MalformedURLException e) {
+      throw new WebDriverException(e);
     }
   }
 

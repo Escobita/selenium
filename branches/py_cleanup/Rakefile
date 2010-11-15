@@ -30,8 +30,8 @@ require 'rake-tasks/selenium'
 require 'rake-tasks/se-ide'
 require 'rake-tasks/ie_code_generator'
 
-version = "2.0a6"
-ide_version = "1.0.8-SNAPSHOT"
+version = "2.0a7"
+ide_version = "1.0.9-SNAPSHOT"
 
 # The build system used by webdriver is layered on top of rake, and we call it
 # "crazy fun" for no readily apparent reason.
@@ -62,7 +62,7 @@ RubyMappings.new.add_all(crazy_fun)
 # need to fall back to prebuilt binaries. The prebuilt binaries are stored in
 # a directory structure identical to that used in the "build" folder, but
 # rooted at one of the following locations:
-["android/server/prebuilt", "chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt", "ide/prebuilt"].each do |pre|
+["android/server/prebuilt", "chrome/prebuilt", "common/prebuilt", "firefox/prebuilt", "jobbie/prebuilt", "ide/main/prebuilt"].each do |pre|
   crazy_fun.prebuilt_roots << pre
 end
 
@@ -137,6 +137,8 @@ task :test_java => [
 ]
 
 task :test_rb => [
+  "//rb:unit-test:jruby",
+  "//rb:rc-client-unit-test:jruby",
   "//rb:firefox-test:jruby",
   "//rb:remote-test:jruby",
  ("//rb:ie-test:jruby" if windows?),
@@ -420,7 +422,7 @@ task :iphone_server do
   sdk = iPhoneSDK?
   if sdk != nil then
     puts "Building iWebDriver iphone app."
-    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver CONFIGURATION_BUILD_DIR=../build/iphone", :verbose => false
+    sh "cd iphone && xcodebuild -sdk #{sdk} ARCHS=i386 -target iWebDriver", :verbose => false
   else
     puts "XCode not found. Not building the iphone driver."
   end
@@ -437,7 +439,7 @@ task :test_iphone_server do
 end
 
 file "jobbie/src/cpp/InternetExplorerDriver/atoms.h" => [
-  "//common:wd_get_attribute:header",
+  "//common/src/js/webdriver:get_attribute:header",
 ] do |task|
   puts "Writing: #{task}"
   File.open('jobbie/src/cpp/InternetExplorerDriver/atoms.h', 'w') do |f|

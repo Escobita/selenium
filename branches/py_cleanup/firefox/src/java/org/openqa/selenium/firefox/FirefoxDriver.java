@@ -23,12 +23,12 @@ import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONException;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.NoAlertPresentException;
@@ -73,7 +73,6 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   public static final String BINARY = "firefox_binary";
   public static final String PROFILE = "firefox_profile";
 
-  public static final int DEFAULT_PORT = 7055;
   // For now, only enable native events on Windows
   public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
       Platform.getCurrent()
@@ -178,7 +177,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
 
   protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile,
                                           String host) {
-    Lock lock = new SocketLock(DEFAULT_PORT - 1);
+    Lock lock = obtainLock();
     try {
       FirefoxBinary bin = binary == null ? new FirefoxBinary() : binary;
       
@@ -188,6 +187,10 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
     } finally {
       lock.unlock();
     }
+  }
+
+  protected Lock obtainLock() {
+    return new SocketLock();
   }
 
   @Override
@@ -238,8 +241,8 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
     }
 
     Object rawResponse = response.getValue();
-    if (rawResponse instanceof Map) {
-      Map map = (Map) rawResponse;
+    if (rawResponse instanceof Map<?, ?>) {
+      Map<?, ?> map = (Map<?, ?>) rawResponse;
       if (map.containsKey("__webdriverType")) {
         // Looks like have an alert. construct it
         currentAlert = new FirefoxAlert((String) map.get("text"));

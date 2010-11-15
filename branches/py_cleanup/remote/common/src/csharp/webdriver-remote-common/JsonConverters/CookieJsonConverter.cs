@@ -24,9 +24,10 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="reader">JSON Reader instance</param>
         /// <param name="objectType">Object type being read</param>
+        /// <param name="existingValue">The exisiting value of the object</param>
         /// <param name="serializer">JSON Serializer instance</param>
         /// <returns>Platform from JSON reader</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             Platform platformValue = null;
             if (reader.TokenType == JsonToken.String)
@@ -77,8 +78,11 @@ namespace OpenQA.Selenium.Remote
                 writer.WritePropertyName("expiry");
                 if (cookieValue.Expiry != null)
                 {
-                    string dateValue = cookieValue.Expiry.Value.ToUniversalTime().ToString("ddd MM/dd/yyyy hh:mm:ss UTC", CultureInfo.InvariantCulture);
-                    writer.WriteValue(dateValue);
+                    //string dateValue = cookieValue.Expiry.Value.ToUniversalTime().ToString("ddd MM/dd/yyyy hh:mm:ss UTC", CultureInfo.InvariantCulture);
+                    //writer.WriteValue(dateValue);
+                    DateTime zeroDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    TimeSpan span = cookieValue.Expiry.Value.ToUniversalTime().Subtract(zeroDate);
+                    writer.WriteValue(span.TotalSeconds);
                 }
                 else
                 {

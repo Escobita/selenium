@@ -35,6 +35,9 @@ import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.elementTextToEqual;
+import static org.openqa.selenium.WaitingConditions.elementValueToEqual;
 
 /**
  * Test case for browsers that support using Javascript
@@ -66,7 +69,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
     WebElement dynamo = driver.findElement(By.xpath("//div[@id='dynamo']"));
 
-    TestWaitingUtility.waitUntilElementTextEquals(dynamo, "Fish and chips!");
+    waitFor(elementTextToEqual(dynamo, "Fish and chips!"));
     assertThat(dynamo.getText(), equalTo("Fish and chips!"));
   }
 
@@ -174,7 +177,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
   }
 
   private void waitForTitleChange(String newTitle) {
-    TestWaitingUtility.waitForPageTitle(driver, newTitle);
+    waitFor(WaitingConditions.pageTitleToBe(driver, newTitle));
   }
 
   @JavascriptEnabled
@@ -197,7 +200,7 @@ public class JavascriptEnabledDriverTest extends AbstractDriverTestCase {
 
     element.click();
 
-    String elementValue = TestWaitingUtility.waitUntilElementValueEquals(element, "Clicked");
+    String elementValue = waitFor(elementValueToEqual(element, "Clicked"));
 
     assertEquals("Clicked", elementValue);
   }

@@ -6,7 +6,6 @@ import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
-import org.openqa.selenium.remote.JsonException;
 import org.openqa.selenium.remote.JsonToBeanConverter;
 import org.openqa.selenium.remote.Response;
 
@@ -149,7 +148,7 @@ public class ChromeCommandExecutor implements CommandExecutor {
     // This is dumb, but temporary until we add sessions to the ChromeDriver
     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
     capabilities.setJavascriptEnabled(true);
-    Map capabilitiesMap;
+    Map<?, ?> capabilitiesMap;
     try {
       capabilitiesMap = new JsonToBeanConverter()
           .convert(Map.class, new BeanToJsonConverter().convert(capabilities));

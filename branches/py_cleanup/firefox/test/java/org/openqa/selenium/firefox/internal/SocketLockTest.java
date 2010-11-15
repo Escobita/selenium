@@ -19,11 +19,16 @@ package org.openqa.selenium.firefox.internal;
 
 import junit.framework.TestCase;
 
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.internal.PortProber;
 
 /**
  * Tests for the {@link SocketLock} to make sure I'm not batshit crazy.
@@ -31,26 +36,33 @@ import org.openqa.selenium.WebDriverException;
  * @author gregory.block@gmail.com (Gregory Block)
  */
 public class SocketLockTest extends TestCase {
+  private int freePort;
+  private final Random portRandom = new Random();
+
+  @Override
+  protected void setUp() throws Exception {
+    freePort = PortProber.findFreePort();
+  }
 
   @Test
-  public void wellKnownLockLocation() {
-    Lock lock = new SocketLock(12345);
+  public void testWellKnownLockLocation() {
+    Lock lock = new SocketLock(freePort);
     lock.lock(TimeUnit.SECONDS.toMillis(1));
     lock.unlock();
   }
   
   @Test
-  public void serialLockOnSamePort() {
+  public void testSerialLockOnSamePort() {
     for (int i = 0; i < 20; i++) {
-      Lock lock = new SocketLock(34567);
+      Lock lock = new SocketLock(freePort);
       lock.lock(TimeUnit.SECONDS.toMillis(1));
       lock.unlock();
     }
   }
   
   @Test
-  public void attemptToReuseLocksFails() {
-    Lock lock = new SocketLock(23456);
+  public void testAttemptToReuseLocksFails() {
+    Lock lock = new SocketLock(freePort);
     lock.lock(TimeUnit.SECONDS.toMillis(1));
     lock.unlock();
     try {

@@ -46,6 +46,7 @@ public class Session {
   private final ThreadPoolExecutor executor;
   private final Capabilities capabilities;
   private volatile String base64EncodedImage;
+  private volatile long lastAccess;
   private final BrowserCreator browserCreator;
 
   //This method is to avoid constructor escape of partially constructed session object
@@ -70,6 +71,18 @@ public class Session {
     // Ensure that the browser is created on the single thread.
     this.driver = execute(webDriverFutureTask);
     this.capabilities = browserCreator.getCapabilityDescription();
+    updateLastAccessTime();
+  }
+
+  /**
+   * Touches the session.
+   */
+  void updateLastAccessTime() {
+    lastAccess = System.currentTimeMillis();
+  }
+
+  boolean isTimedOut(int timeout){
+     return (lastAccess + timeout) < System.currentTimeMillis();
   }
 
   public void close(){
@@ -82,6 +95,7 @@ public class Session {
   }
 
   public WebDriver getDriver() {
+    updateLastAccessTime();
     return driver;
   }
 

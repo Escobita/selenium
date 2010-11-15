@@ -20,9 +20,6 @@ package org.openqa.selenium;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.openqa.selenium.environment.GlobalTestEnvironment;
-import org.openqa.selenium.environment.webserver.AppServer;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
@@ -32,6 +29,8 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.elementToExist;
 
 @Ignore(IPHONE)
 public class FrameSwitchingTest extends AbstractDriverTestCase {
@@ -109,7 +108,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   public String getTextOfGreetingElement() {
-    return TestWaitingUtility.waitForElementToExist(driver, "greeting").getText();
+    return waitFor(elementToExist(driver, "greeting")).getText();
   }
 
   public void testShouldBeAbleToClickInAFrame() {

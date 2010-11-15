@@ -17,20 +17,10 @@
 
 package org.openqa.selenium.server.browserlaunchers;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Map;
-
-import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.openqa.jetty.log.LogFactory;
-import org.openqa.selenium.Platform;
+import org.openqa.selenium.ProcessUtils;
 import org.openqa.selenium.browserlaunchers.WindowsUtils;
-import org.openqa.selenium.internal.CommandLine;
-
-import static org.openqa.selenium.Platform.WINDOWS;
 
 /**
  * Spawn a process and return the process handle so you can close it yourself
@@ -41,12 +31,6 @@ import static org.openqa.selenium.Platform.WINDOWS;
 public class AsyncExecute {
 
   static Log log = LogFactory.getLog(AsyncExecute.class);
-
-
-  private final Map<String, String> environmentBuilder = Maps.newHashMap();
-  // This class was derived from Ant. Emulate the old behavior for now
-  private Map<String, String> antEnv;
-  private Process process;
 
   /**
    * Sleeps without explicitly throwing an InterruptedException
@@ -74,49 +58,24 @@ public class AsyncExecute {
 
 
   /**
-   * Waits the specified timeout for the process to die
-   */
-  public static int waitForProcessDeath(Process p, long timeout) {
-//    ProcessWaiter pw = new ProcessWaiter(p);
-//    Thread waiter = new Thread(pw);
-//    waiter.start();
-//    try {
-//      waiter.join(timeout);
-//    } catch (InterruptedException e) {
-//      throw new RuntimeException("Bug? Main interrupted while waiting for process", e);
-//    }
-//    if (waiter.isAlive()) {
-//      waiter.interrupt();
-//    }
-//    try {
-//      waiter.join();
-//    } catch (InterruptedException e) {
-//      throw new RuntimeException("Bug? Main interrupted while waiting for dead process waiter", e);
-//    }
-//    InterruptedException ie = pw.getException();
-//    if (ie != null) {
-//      throw new ProcessStillAliveException("Timeout waiting for process to die", ie);
-//    }
-//    return p.exitValue();
-    return 0;
-  }
-
-  /**
    * Forcibly kills a process, using OS tools like "kill" as a last resort
+   *
+   * @param process The process to kill.
+   * @return The exit value of the process.
    */
   public static int killProcess(Process process) {
     process.destroy();
     int exitValue;
     try {
-      exitValue = AsyncExecute.waitForProcessDeath(process, 10000);
-    } catch (ProcessStillAliveException ex) {
+      exitValue = ProcessUtils.waitForProcessDeath(process, 10000);
+    } catch (ProcessUtils.ProcessStillAliveException ex) {
       if (WindowsUtils.thisIsWindows()) {
         throw ex;
       }
       try {
         log.info("Process didn't die after 10 seconds");
         UnixUtils.kill9(process);
-        exitValue = AsyncExecute.waitForProcessDeath(process, 10000);
+        exitValue = ProcessUtils.waitForProcessDeath(process, 10000);
       } catch (Exception e) {
         log.error("Process refused to die after 10 seconds, and couldn't kill9 it", e);
         throw new RuntimeException(
@@ -125,28 +84,5 @@ public class AsyncExecute {
       }
     }
     return exitValue;
-  }
-
-  /**
-   * Thrown when a process remains alive after attempting to destroy it
-   */
-  public static class ProcessStillAliveException extends RuntimeException {
-
-    public ProcessStillAliveException() {
-      super();
-    }
-
-    public ProcessStillAliveException(String message, Throwable cause) {
-      super(message, cause);
-    }
-
-    public ProcessStillAliveException(String message) {
-      super(message);
-    }
-
-    public ProcessStillAliveException(Throwable cause) {
-      super(cause);
-    }
-
   }
 }

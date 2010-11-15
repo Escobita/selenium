@@ -209,6 +209,7 @@ module Javascript
         # TODO(simon): Don't hard code things. That's Not Smart
         cmd = calcdeps +
             "-o compiled " <<
+            "-f \"--create_name_map_files=true\" " <<
             "-f \"--third_party=true\" " <<
             "-f \"--js_output_file=#{output}\" " <<
             "-f \"--output_wrapper='#{wrapper}'\" " <<
@@ -246,7 +247,7 @@ module Javascript
          File.open(js, "r") do |from|
            File.open(out, "w") do |to|
              to << "/* AUTO GENERATED - Do not edit by hand. */\n"
-             to << "/* See rake-tasts/crazy_fun/mappings/javascript.rb for generator. */\n\n"
+             to << "/* See rake-tasks/crazy_fun/mappings/javascript.rb for generator. */\n\n"
              to << "#ifndef #{upper}_H\n"
              to << "#define #{upper}_H\n\n"
              to << "const wchar_t* #{upper}[] = {\n"

@@ -31,7 +31,7 @@ public class AddRotatable implements AugmenterProvider {
 
   public InterfaceImplementation getImplementation(Object value) {
     return new InterfaceImplementation() {
-      public Object invoke(ExecuteMethod executeMethod, Method method, Object... args) {
+      public Object invoke(ExecuteMethod executeMethod, Object self, Method method, Object... args) {
         if ("rotate".equals(method.getName())) {
           return executeMethod.execute(DriverCommand.SET_SCREEN_ORIENTATION,
               ImmutableMap.of("orientation", args[0]));

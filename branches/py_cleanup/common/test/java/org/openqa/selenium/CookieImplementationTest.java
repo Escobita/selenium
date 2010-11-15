@@ -26,6 +26,7 @@ import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
 
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -197,7 +198,7 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
     assertNull(String.valueOf(cookie), cookie);
   }
 
-  @Ignore({SELENESE, IE})
+  @Ignore({SELENESE, IE, FIREFOX})
   public void testShouldBeAbleToAddToADomainWhichIsRelatedToTheCurrentDomain() {
     String name = gotoValidDomainAndClearCookies();
     if (name == null || name.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")) {
@@ -216,7 +217,7 @@ public class CookieImplementationTest extends AbstractDriverTestCase {
     assertNotNull(driver.manage().getCookieNamed("name"));
   }
 
-  @Ignore({REMOTE, SELENESE, IE})
+  @Ignore({REMOTE, SELENESE, IE, FIREFOX})
   public void testShouldBeAbleToIncludeLeadingPeriodInDomainName() throws Exception {
     String name = gotoValidDomainAndClearCookies();
     if (name == null || name.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")) {

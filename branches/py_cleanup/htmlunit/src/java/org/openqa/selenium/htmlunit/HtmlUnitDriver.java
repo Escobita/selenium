@@ -29,15 +29,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.CookieManager;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import com.gargoylesoftware.htmlunit.IncorrectnessListener;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ProxyConfig;
-import com.gargoylesoftware.htmlunit.RefreshHandler;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.SgmlPage;
 import com.gargoylesoftware.htmlunit.TopLevelWindow;
@@ -48,6 +47,8 @@ import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.WebWindowEvent;
 import com.gargoylesoftware.htmlunit.WebWindowListener;
 import com.gargoylesoftware.htmlunit.WebWindowNotFoundException;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.FrameWindow;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -60,14 +61,14 @@ import net.sourceforge.htmlunit.corejs.javascript.Function;
 import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
 import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
 import net.sourceforge.htmlunit.corejs.javascript.Undefined;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.HasInputDevices;
 import org.openqa.selenium.InvalidCookieDomainException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keyboard;
+import org.openqa.selenium.Mouse;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
@@ -80,6 +81,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.browserlaunchers.CapabilityType;
 import org.openqa.selenium.browserlaunchers.Proxies;
+import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
@@ -89,8 +91,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
-    FindsById, FindsByLinkText, FindsByXPath, FindsByName,
-    FindsByTagName {
+    FindsById, FindsByLinkText, FindsByXPath, FindsByName, FindsByCssSelector,
+    FindsByTagName, HasInputDevices {
 
   private WebClient webClient;
   private WebWindow currentWindow;
@@ -100,6 +102,8 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private final BrowserVersion version;
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
+  private HtmlUnitKeyboard keyboard;
+  private HtmlUnitMouse mouse;
 
   public HtmlUnitDriver(BrowserVersion version) {
     this.version = version;
@@ -137,6 +141,8 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
     // Now put us on the home page, like a real browser
     get(webClient.getHomePage());
+    keyboard = new HtmlUnitKeyboard(this);
+    mouse = new HtmlUnitMouse(this, keyboard);
   }
 
   public HtmlUnitDriver() {
@@ -146,11 +152,6 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   public HtmlUnitDriver(boolean enableJavascript) {
     this(BrowserVersion.getDefault());
     setJavascriptEnabled(enableJavascript);
-  }
-
-  private HtmlUnitDriver(boolean enableJavascript, WebWindow currentWindow) {
-    this(enableJavascript);
-    this.currentWindow = currentWindow;
   }
 
   public HtmlUnitDriver(Capabilities capabilities) {
@@ -203,7 +204,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     client.setHomePage(WebClient.URL_ABOUT_BLANK.toString());
     client.setThrowExceptionOnFailingStatusCode(false);
     client.setPrintContentOnFailingStatusCode(false);
-    client.setJavaScriptEnabled(false);
+    client.setJavaScriptEnabled(enableJavascript);
     client.setRedirectEnabled(true);
     client.setRefreshHandler(new WaitingRefreshHandler());
 
@@ -324,7 +325,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     WebResponse response = page.getWebResponse();
-    return response.getRequestSettings().getUrl().toString();
+    return response.getWebRequest().getUrl().toString();
   }
 
   public String getTitle() {
@@ -443,6 +444,14 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     } else {
       return arg;
     }
+  }
+
+  public Keyboard getKeyboard() {
+    return keyboard;
+  }
+
+  public Mouse getMouse() {
+    return mouse;
   }
 
   protected interface JavaScriptResultsCollection {
@@ -601,6 +610,40 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
   public List<WebElement> findElementsById(String id) {
     return findElementsByXPath("//*[@id='" + id + "']");
+  }
+
+  public WebElement findElementByCssSelector(String using) {
+    if (!(lastPage() instanceof HtmlPage)) {
+      throw new NoSuchElementException("Unable to locate element using css: " + lastPage());
+    }
+
+    DomNode node = ((HtmlPage) lastPage()).querySelector(using);
+
+    if (node instanceof HtmlElement) {
+      return newHtmlUnitWebElement((HtmlElement) node);
+    }
+
+    throw new NoSuchElementException("Returned node was not an HTML element");
+  }
+
+  public List<WebElement> findElementsByCssSelector(String using) {
+        if (!(lastPage() instanceof HtmlPage)) {
+      throw new NoSuchElementException("Unable to locate element using css: " + lastPage());
+    }
+
+    DomNodeList<DomNode> allNodes = ((HtmlPage) lastPage()).querySelectorAll(using);
+
+    List<WebElement> toReturn = new ArrayList<WebElement>();
+
+    for (DomNode node : allNodes) {
+      if (node instanceof HtmlElement) {
+        toReturn.add(newHtmlUnitWebElement((HtmlElement) node));
+      } else {
+        throw new NoSuchElementException("Returned node was not an HTML element");
+      }
+    }
+
+    return toReturn;
   }
 
   public WebElement findElementByName(String name) {
@@ -875,29 +918,40 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
       throw new NoSuchElementException("Unable to locate element with focus or body tag");
     }
-
-    public Alert alert() {
-      return null;
-    }
   }
 
-  protected WebDriver findActiveWindow() {
-    WebWindow window = webClient.getCurrentWindow();
-    HtmlPage page = (HtmlPage) window.getEnclosedPage();
+  protected <X> X implicitlyWaitFor(Callable<X> condition) {
+    long end = System.currentTimeMillis() + implicitWait;
+    Exception lastException = null;
 
-    if (page != null && page.getFrames().size() > 0) {
-      FrameWindow frame = page.getFrames().get(0);
-      if (!(frame.getFrameElement() instanceof HtmlInlineFrame)) {
-        return new HtmlUnitDriver(isJavascriptEnabled(), frame);
+    do {
+      X toReturn = null;
+      try {
+        toReturn = condition.call();
+      } catch (Exception e) {
+        lastException = e;
       }
+
+      if (toReturn instanceof Boolean && !(Boolean) toReturn) {
+        continue;
+      }
+
+      if (toReturn != null) {
+        return toReturn;
+      }
+
+      sleepQuietly(200);
+    } while (System.currentTimeMillis() < end);
+
+    if (lastException != null) {
+      if (lastException instanceof RuntimeException) {
+        throw (RuntimeException) lastException;
+      }
+      throw new WebDriverException(lastException);
     }
 
-    if (currentWindow != null && currentWindow.equals(window)) {
-      return this;
-    }
-    return new HtmlUnitDriver(isJavascriptEnabled(), window);
+    return null;
   }
-
 
   protected WebClient getWebClient() {
     return webClient;
@@ -1006,7 +1060,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     public void deleteCookieNamed(String name) {
       CookieManager cookieManager = webClient.getCookieManager();
 
-      URL url = lastPage().getWebResponse().getRequestSettings().getUrl();
+      URL url = lastPage().getUrl();
       Set<com.gargoylesoftware.htmlunit.util.Cookie> rawCookies =
           webClient.getCookieManager().getCookies(url);
       for (com.gargoylesoftware.htmlunit.util.Cookie cookie : rawCookies) {
@@ -1025,7 +1079,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     public Set<Cookie> getCookies() {
-      URL url = lastPage().getWebResponse().getRequestSettings().getUrl();
+      URL url = lastPage().getUrl();
+
+      // The about:blank URL (the default in case no navigation took place)
+      // does not have a valid 'hostname' part and cannot be used for creating
+      // cookies based on it - return an empty set.
 
       if (!url.toString().startsWith("http")) {
         return new HashSet<Cookie>();
@@ -1037,7 +1095,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
       Set<Cookie> retCookies = new HashSet<Cookie>();
       for (com.gargoylesoftware.htmlunit.util.Cookie c : rawCookies) {
-        if (c.getPath() != null && getPath().startsWith(c.getPath())) {
+        if (c.getPath() != null && getPath().toLowerCase().startsWith(c.getPath())) {
           retCookies.add(new Cookie.Builder(c.getName(), c.getValue())
               .domain(c.getDomain())
               .path(c.getPath())
@@ -1049,12 +1107,8 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
       return retCookies;
     }
 
-    private String getHostName() {
-      return lastPage().getWebResponse().getRequestUrl().getHost().toLowerCase();
-    }
-
     private String getPath() {
-      return lastPage().getWebResponse().getRequestUrl().getPath();
+      return lastPage().getUrl().getPath();
     }
 
     public Speed getSpeed() {
@@ -1073,7 +1127,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     }
 
     private String getDomainForCookie() {
-      URL current = lastPage().getWebResponse().getRequestUrl();
+      URL current = lastPage().getUrl();
       return current.getHost();
     }
 
@@ -1118,31 +1172,25 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     return elements;
   }
 
-  WebElement findElement(By locator, SearchContext context) {
-    long start = System.currentTimeMillis();
-    while (true) {
-      try {
-        return locator.findElement(context);
-      } catch (NoSuchElementException e) {
-        if (System.currentTimeMillis() - start > implicitWait) {
-          throw e;
-        }
-        sleepQuietly(100);
+  WebElement findElement(final By locator, final SearchContext context) {
+    return implicitlyWaitFor(new Callable<WebElement>() {
+
+      public WebElement call() throws Exception {
+          return locator.findElement(context);
       }
-    }
+    });
   }
 
-  List<WebElement> findElements(By by, SearchContext context) {
-    long start = System.currentTimeMillis();
+  List<WebElement> findElements(final By by, final SearchContext context) {
+    long end = System.currentTimeMillis() + implicitWait;
     List<WebElement> found;
     do {
       found = by.findElements(context);
-      if (found.isEmpty()) {
-        sleepQuietly(100);
-      } else {
-        break;
+      if (!found.isEmpty()) {
+        return found;
       }
-    } while (System.currentTimeMillis() - start <= implicitWait);
+    } while (System.currentTimeMillis() < end);
+
     return found;
   }
 

@@ -18,16 +18,17 @@ limitations under the License.
 package org.openqa.selenium;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
-import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-import static org.openqa.selenium.TestWaitingUtility.waitForPageTitle;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.pageTitleToBe;
 
 public class ElementFindingTest extends AbstractDriverTestCase {
 
@@ -54,8 +55,8 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
 
-    waitForPageTitle(driver, "We Arrive Here");
-    
+    waitFor(pageTitleToBe(driver, "We Arrive Here"));
+
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -64,8 +65,8 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.linkText("click me")).click();
 
-    waitForPageTitle(driver, "We Arrive Here");
-    
+    waitFor(pageTitleToBe(driver, "We Arrive Here"));
+
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
 
@@ -73,7 +74,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.id("linkId")).click();
 
-    waitForPageTitle(driver, "We Arrive Here");
+    waitFor(pageTitleToBe(driver, "We Arrive Here"));
 
     assertThat(driver.getTitle(), equalTo("We Arrive Here"));
   }
@@ -352,7 +353,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     element.click();
 
     // if any exception is thrown, we won't get this far. Sanity check
-    waitForPageTitle(driver, "Changed");
+    waitFor(pageTitleToBe(driver, "Changed"));
 
     assertEquals("Changed", driver.getTitle());
   }
@@ -392,18 +393,22 @@ public class ElementFindingTest extends AbstractDriverTestCase {
 
     driver.findElement(By.id("delete")).click();
 
-    try {
-      TestWaitingUtility.startSleep();
+    boolean wasStale = waitFor(elementToBeStale(toBeDeleted));
+    assertTrue("Element should be stale at this point", wasStale);
+  }
 
-      while (TestWaitingUtility.shouldSleep()) {
-        toBeDeleted.isDisplayed();
-        TestWaitingUtility.sleep();
+  private Callable<Boolean> elementToBeStale(final RenderedWebElement element) {
+    return new Callable<Boolean>() {
+
+      public Boolean call() throws Exception {
+        try {
+          element.isDisplayed();
+          return false;
+        } catch (StaleElementReferenceException e) {
+          return true;
+        }
       }
-      
-      fail("Element should be stale at this point");
-    } catch (StaleElementReferenceException e) {
-      // this is expected
-    }
+    };
   }
 
   public void testFindingALinkByXpathUsingContainsKeywordShouldWork() {
@@ -417,7 +422,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({HTMLUNIT, REMOTE})
+  @Ignore({REMOTE})
   @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementByCssSelector() {
     driver.get(pages.xhtmlTestPage);
@@ -425,7 +430,7 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({HTMLUNIT, REMOTE, SELENESE})
+  @Ignore({REMOTE, SELENESE})
   @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementsByCssSelector() {
     driver.get(pages.xhtmlTestPage);
@@ -440,5 +445,6 @@ public class ElementFindingTest extends AbstractDriverTestCase {
     assertEquals(2, parent.findElements(By.tagName("div")).size());
     assertEquals(2, parent.findElements(By.tagName("span")).size());
   }
+  
   //TODO(danielwh): Add extensive CSS selector tests
 }

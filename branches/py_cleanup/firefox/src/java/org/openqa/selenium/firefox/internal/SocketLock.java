@@ -30,27 +30,47 @@ import java.net.Socket;
  * @author gregory.block@gmail.com (Gregory Block)
  */
 public class SocketLock implements Lock {
+  public static final int DEFAULT_PORT = 7055;
   private static final long DELAY_BETWEEN_SOCKET_CHECKS = 100;
+
+  private static final InetSocketAddress localhost = new InetSocketAddress("localhost", DEFAULT_PORT - 1);
   
-  private final int lockPort;
   private final Socket lockSocket;
+  private final InetSocketAddress address;
+
+  /**
+   * Constructs a new SocketLock using the default port.  Attempts to lock the
+   * lock will block until the default port becomes free.
+   */
+  public SocketLock() {
+    this(localhost);
+  }
 
   /**
    * Constructs a new SocketLock.  Attempts to lock the lock will attempt to acquire the
    * specified port number, and wait for it to become free.
-   * 
+   *
    * @param lockPort the port number to lock
    */
   public SocketLock(int lockPort) {
-    this.lockPort = lockPort;
-    lockSocket = new Socket();
+    this(new InetSocketAddress("localhost", lockPort));
+  }
+
+  /**
+   * Constructs a new SocketLock.  Attempts to lock the lock will attempt to acquire the
+   * specified port number, and wait for it to become free.
+   *
+   * @param address The port to lock.
+   */
+  public SocketLock(InetSocketAddress address) {
+    this.lockSocket = new Socket();
+    this.address = address;
   }
 
   /**
    * @inheritDoc
    */
   public void lock(long timeoutInMillis) throws WebDriverException {
-    InetSocketAddress address = new InetSocketAddress("localhost", lockPort);
 
     // Calculate the 'exit time' for our wait loop.
     long maxWait = System.currentTimeMillis() + timeoutInMillis;
@@ -69,7 +89,7 @@ public class SocketLock implements Lock {
     } while (System.currentTimeMillis() < maxWait);
 
     throw new WebDriverException(
-        String.format("Unable to bind to locking port %d within %d ms", lockPort, timeoutInMillis));
+        String.format("Unable to bind to locking port %d within %d ms", address.getPort(), timeoutInMillis));
   }
 
   /**

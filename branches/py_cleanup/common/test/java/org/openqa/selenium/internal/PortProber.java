@@ -21,13 +21,19 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+@SuppressWarnings({"UtilityClass"})
 public class PortProber {
-  private final static Random random = new Random();
+  private static final Random random = new Random();
+
+  private PortProber() {
+  }
 
   public static int findFreePort() {
     for (int i = 0; i < 5; i++) {
@@ -38,6 +44,18 @@ public class PortProber {
       }
     }
     throw new RuntimeException("Unable to find a free port");
+  }
+
+  public static Callable<Integer> freeLocalPort(final int port) {
+    return new Callable<Integer>() {
+
+      public Integer call() throws Exception {
+        if (checkPortIsFree(port) != -1) {
+          return port;
+        }
+        return null;
+      }
+    };
   }
 
   private static int createAcceptablePort() {
@@ -77,7 +95,9 @@ public class PortProber {
         return true;
       } catch (ConnectException e) {
         // Ignore this
-      } catch (Exception e) {
+      } catch (UnknownHostException e) {
+        throw new RuntimeException(e);
+      } catch (IOException e) {
         throw new RuntimeException(e);
       }
     }

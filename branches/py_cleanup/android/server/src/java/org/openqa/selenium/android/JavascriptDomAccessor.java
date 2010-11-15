@@ -48,7 +48,7 @@ public class JavascriptDomAccessor {
   // TODO(berrada): Look at atoms in shared_js and reuse when possible.
   
   // This determines the context in which the Javascript is executed.
-  // By default element id 0 represents the document.
+  // By default element id 0 respresents the document.
   private static final String CONTEXT_NODE = 
       "var contextNode = contextNode = doc.androiddriver_elements[arguments[1]];";
 
@@ -82,7 +82,7 @@ public class JavascriptDomAccessor {
       "}";
 
   private static final String IS_SELECTED =
-      "var isSelected = false;" +
+      "var isSelected = null;" +
       "var element = doc.androiddriver_elements[arguments[0]];" +
       "if (element.tagName.toLowerCase() == 'option') {" +
         "isSelected = element.selected;" +
@@ -91,7 +91,6 @@ public class JavascriptDomAccessor {
       "}";
   
   public JavascriptDomAccessor(AndroidDriver driver) {
-    Log.d(LOG_TAG, "Javascript Dom Accessor constructor.");
     this.driver = driver;
   }
   
@@ -408,7 +407,7 @@ public class JavascriptDomAccessor {
         "return '" + STALE + "';",
         elementId, attribute);
     throwExceptionIfFailed(String.valueOf(result));
-    return String.valueOf(result);
+    return (result == null) ? null : String.valueOf(result);
   }
 
   public Point getSize(String elementId) {
@@ -561,8 +560,7 @@ public class JavascriptDomAccessor {
         "  event.initEvent('change', true, true);" +
         "  element.dispatchEvent(event);" +
         "}" +
-        "return 'true';" +
-        "} else {return '" + STALE + "';}",
+        "return 'true';",
         elementId);
     throwExceptionIfFailed(result);
   }
@@ -614,7 +612,7 @@ public class JavascriptDomAccessor {
         isElementStaleJs() +
         "if (isStale == false) {" +
           isDisplayedJs(driver.getCurrentFrame()) +
-          "return isDiaplayed;" +
+          "return isDisplayed;" +
         "}" +
         "return '" + STALE + "';",
         elementId);
@@ -699,23 +697,27 @@ public class JavascriptDomAccessor {
    */
   private String isElementStaleJs() {
     return
-        "var isStale;" +
+        "var isStale = false;" +
         "var doc = " + driver.getCurrentFrame() + ".document.documentElement;" +
         "if (arguments[0] in doc.androiddriver_elements) {" +
         "  var element = doc.androiddriver_elements[arguments[0]];" +
-        "  var parent = element;" +
-        "  while (parent && parent != doc) {" +
-        "    parent = parent.parentNode;" +
-        "  }" +
-        "  if (parent !== doc) {" +
-        "    delete doc.androiddriver_elements[arguments[0]];" +
-        "    isStale = true;" +
+        "  if (!element) {" +
+        "    isStale = true;" + 
         "  } else {" +
-        "    isStale = false;" +
+        "    var parent = element;" +
+        "    while (parent && parent != doc) {" +
+        "      parent = parent.parentNode;" +
+        "    }" +
+        "    if (parent !== doc) {" +
+        "      delete doc.androiddriver_elements[arguments[0]];" +
+        "      isStale = true;" +
+        "    } else {" +
+        "      isStale = false;" +
+        "    }" +
         "  }" +
-        "} else {" +
-        "  isStale = true;" +
-        "}";
+        "} else { " +
+        "    isStale = true;" +
+        "};";
   }
 
   private String getTopLeftCoordinatesJS() {
@@ -770,7 +772,6 @@ public class JavascriptDomAccessor {
       }
       return elements;
     } catch (NumberFormatException e) {
-      Log.e(LOG_TAG, "could not process id", e);
       throw new InternalError("Javascript injection failed. Got result: " + ids);
     }
   }
@@ -781,10 +782,10 @@ public class JavascriptDomAccessor {
       Object scriptResult = driver.executeScript(toExecute, using, elementId);
       if (scriptResult instanceof String && ((String) scriptResult).startsWith(FAILED)) {
         try {
-          Log.d(LOG_TAG, "executeAndRetry Script: " + toExecute);
+          Logger.log(Log.DEBUG, LOG_TAG, "executeAndRetry Script: " + toExecute);
           Thread.sleep(XPATH_RETRY_TIMEOUT);
         } catch (InterruptedException e) {
-          Log.d(LOG_TAG, "executeAndRetry InterruptedException: " + e.getMessage());
+          Logger.log(Log.ERROR, LOG_TAG, "executeAndRetry InterruptedException: " + e.getMessage());
           break;
         }
       } else {
@@ -792,7 +793,7 @@ public class JavascriptDomAccessor {
           result = (List) scriptResult;
           break;
         } else {
-          Log.e(LOG_TAG, "Not expected type " + scriptResult);
+          Logger.log(Log.DEBUG, LOG_TAG, "Not expected type " + scriptResult);
         }
       }
     }
@@ -809,7 +810,7 @@ public class JavascriptDomAccessor {
     } else if (DISABLED.equals(result)) {
       throw new UnsupportedOperationException("Cannot select disabled element.");
     } else if (UNSUPPORTED.equals(result)) {
-      throw new UnsupportedOperationException("Cannot toogle a radio button.");
+      throw new UnsupportedOperationException("Cannot toggle a radio button.");
     }
   }
   
@@ -817,7 +818,7 @@ public class JavascriptDomAccessor {
     if (elements.size() > 0) {
       return elements.get(0);
     }
-    throw new NoSuchElementException("Element not found with.");
+    throw new NoSuchElementException("Element not found.");
   }
   
   private Boolean getBoolean(Object result) {

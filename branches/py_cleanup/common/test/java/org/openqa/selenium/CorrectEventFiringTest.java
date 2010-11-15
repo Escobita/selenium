@@ -30,10 +30,15 @@ import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.elementTextToContain;
+import static org.openqa.selenium.WaitingConditions.elementTextToEqual;
+import static org.openqa.selenium.WaitingConditions.elementToExist;
+import static org.openqa.selenium.WaitingConditions.elementValueToEqual;
 
 public class CorrectEventFiringTest extends AbstractDriverTestCase {
 
-  @Ignore(value = {CHROME, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
+  @Ignore(value = {CHROME, FIREFOX, ANDROID}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
   public void testShouldFireFocusEventWhenClicking() {
     driver.get(pages.javascriptPage);
@@ -43,6 +48,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     assertEventFired("focus");
   }
 
+  @Ignore(ANDROID)
   @JavascriptEnabled
   public void testShouldFireClickEventWhenClicking() {
     driver.get(pages.javascriptPage);
@@ -53,7 +59,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, ANDROID})
   public void testShouldFireMouseDownEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
@@ -63,7 +69,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, ANDROID})
   public void testShouldFireMouseUpEventWhenClicking() {
     driver.get(pages.javascriptPage);
 
@@ -92,7 +98,8 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     assertEventFired("mousemove");
   }
 
-  @Ignore(value = {CHROME, SELENESE, FIREFOX}, reason = "Webkit bug 22261. Firefox 3.6 wants focus")
+  @Ignore(value = {CHROME, SELENESE, FIREFOX, ANDROID},
+      reason = "Webkit bug 22261. Firefox 3.6 wants focus")
   @JavascriptEnabled
   public void testShouldFireEventsInTheRightOrder() {
     driver.get(pages.javascriptPage);
@@ -111,13 +118,13 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore({SELENESE, ANDROID})
   public void testsShouldIssueMouseDownEvents() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mousedown")).click();
 
-    String result = driver.findElement(By.id("result")).getText();
     assertEventFired("mouse down");
+    String result = driver.findElement(By.id("result")).getText();
     assertThat(result, equalTo("mouse down"));
   }
 
@@ -127,7 +134,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.findElement(By.id("mouseclick")).click();
 
     WebElement result = driver.findElement(By.id("result"));
-    TestWaitingUtility.waitUntilElementTextEquals(result, "mouse down");
+    waitFor(elementTextToEqual(result, "mouse click"));
     assertThat(result.getText(), equalTo("mouse click"));
   }
 
@@ -138,7 +145,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.findElement(By.id("mouseup")).click();
 
     WebElement result = driver.findElement(By.id("result"));
-    TestWaitingUtility.waitUntilElementTextEquals(result, "mouse up");
+    waitFor(elementTextToEqual(result, "mouse up"));
     assertThat(result.getText(), equalTo("mouse up"));
   }
 
@@ -149,7 +156,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.findElement(By.id("child")).click();
 
     WebElement result = driver.findElement(By.id("result"));
-    TestWaitingUtility.waitUntilElementTextEquals(result, "mouse down");
+    waitFor(elementTextToEqual(result, "mouse down"));
     assertThat(result.getText(), equalTo("mouse down"));
   }
 
@@ -191,10 +198,11 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     WebElement clicker = driver.findElement(By.id("clickField"));
     clicker.click();
 
-    TestWaitingUtility.waitUntilElementValueEquals(clicker, "Clicked");
+    waitFor(elementValueToEqual(clicker, "Clicked"));
     assertThat(clicker.getValue(), equalTo("Clicked"));
   }
 
+  @Ignore(ANDROID)
   @JavascriptEnabled
   public void testClearingAnElementShouldCauseTheOnChangeHandlerToFire() {
     driver.get(pages.javascriptPage);
@@ -226,7 +234,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
   
   @JavascriptEnabled
-  @Ignore(value = {SELENESE, CHROME, IPHONE},
+  @Ignore(value = {SELENESE, CHROME, IPHONE, ANDROID},
       reason = ": Non-native event firing is broken in Chrome.\n"
                + "  Selenese: Fails when running in firefox.\n"
                + "  iPhone: sendKeys implementation is incorrect")
@@ -325,10 +333,10 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   private String getTextFromElementOnceAvailable(String elementId) {
-    return TestWaitingUtility.waitForElementToExist(driver,(elementId)).getText();
+    return waitFor(elementToExist(driver, elementId)).getText();
   }
 
-  @Ignore({CHROME, HTMLUNIT, SELENESE})
+  @Ignore({CHROME, HTMLUNIT, SELENESE, ANDROID})
   public void testShouldReportTheXAndYCoordinatesWhenClicking() {
     driver.get(pages.javascriptPage);
 
@@ -349,7 +357,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   private void assertEventFired(String eventName) {
     WebElement result = driver.findElement(By.id("result"));
 
-    String text = TestWaitingUtility.waitUntilElementTextContains(result, eventName);
+    String text = waitFor(elementTextToContain(result, eventName));
     boolean conditionMet = text.contains(eventName);
 
     assertTrue("No " + eventName + " fired: " + text, conditionMet);

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenQA.Selenium.Support</RootNamespace>
     <AssemblyName>OpenQA.Selenium.Support</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -54,6 +54,8 @@ $(SolutionDir)build\x64\$(ConfigurationName)
 copy /y $(TargetDir) $(SolutionDir)build\x64\$(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
 </Project>

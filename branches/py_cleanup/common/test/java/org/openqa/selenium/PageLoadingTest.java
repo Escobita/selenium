@@ -26,6 +26,8 @@ import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestWaiter.waitFor;
+import static org.openqa.selenium.WaitingConditions.pageTitleToBe;
 
 public class PageLoadingTest extends AbstractDriverTestCase {
 
@@ -112,7 +114,7 @@ public class PageLoadingTest extends AbstractDriverTestCase {
 
     driver.findElement(By.name("sameWindow")).click();
 
-    TestWaitingUtility.waitForPageTitle(driver, "This page has iframes");
+    waitFor(pageTitleToBe(driver, "This page has iframes"));
 
     assertThat(driver.getTitle(), equalTo("This page has iframes"));
 

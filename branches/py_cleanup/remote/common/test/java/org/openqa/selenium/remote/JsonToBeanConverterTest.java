@@ -29,13 +29,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Ignore;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.browserlaunchers.DoNotUseProxyPac;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 public class JsonToBeanConverterTest extends TestCase {
@@ -54,6 +59,8 @@ public class JsonToBeanConverterTest extends TestCase {
 
     Map<String, String> map = new JsonToBeanConverter().convert(Map.class, toConvert.toString());
     assertThat(map.size(), is(2));
+    assertThat(map, hasEntry("cheese", "brie"));
+    assertThat(map, hasEntry("foodstuff", "cheese"));
   }
 
   @SuppressWarnings("unchecked")
@@ -279,6 +286,25 @@ public class JsonToBeanConverterTest extends TestCase {
     converted.outputTo(derived);
 
     assertEquals(source.toString(), derived.toString());
+  }
+
+  public void testShouldNotParseQuotedJsonObjectsAsActualJsonObjects() throws JSONException {
+    JSONObject inner = new JSONObject()
+        .put("color", "green")
+        .put("number", 123);
+
+    JSONObject outer = new JSONObject()
+        .put("inner", inner.toString());
+
+    String jsonStr = outer.toString();
+
+    Object convertedOuter = new JsonToBeanConverter().convert(Map.class, jsonStr);
+    assertThat(convertedOuter, instanceOf(Map.class));
+
+    Object convertedInner = ((Map) convertedOuter).get("inner");
+    assertNotNull(convertedInner);
+    assertThat(convertedInner, instanceOf(String.class));
+    assertThat(convertedInner.toString(), equalTo(inner.toString()));
   }
 
   public static class SimpleBean {

@@ -17,8 +17,10 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import java.util.Iterator;
 import java.util.List;
 
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -238,4 +240,24 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertEquals("td2 id", "td2", td2.getAttribute("id"));
     assertEquals("td2 colspan should be 2", "2", td2.getAttribute("colspan"));
   }
+
+  // This is a test-case re-creating issue 900.
+  @SuppressWarnings("unchecked")
+  @Ignore(SELENESE)
+  public void testShouldReturnValueOfOnClickAttribute() {
+    driver.get(pages.javascriptPage);
+
+    WebElement mouseclickDiv = driver.findElement(By.id("mouseclick"));
+
+    String onClickValue = mouseclickDiv.getAttribute("onclick");
+    String expectedOnClickValue = "displayMessage('mouse click');";
+    assertThat("Javascript code expected", onClickValue, anyOf(
+        equalTo("javascript:" + expectedOnClickValue), //Non-IE
+        equalTo("function anonymous()\n{\n" + expectedOnClickValue + "\n}"), // IE
+        equalTo("function onclick()\n{\n" + expectedOnClickValue + "\n}"))); //IE
+
+    WebElement mousedownDiv = driver.findElement(By.id("mousedown"));
+    assertEquals(null, mousedownDiv.getAttribute("onclick"));
+  }
+
 }

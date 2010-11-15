@@ -1,4 +1,3 @@
-build/
 projectFilesBackup/
 *.iws
 .DS_Store
@@ -8,3 +7,15 @@ mockpiframe.log.lck
 junitvmwatcher*.properties
 test-output/
 .*.swp
+common/build
+firefox/build
+htmlunit/build
+jobbie/build
+selenium/build
+support/build
+iphone/lib/buildtime-src/cocoahttpserver/build/CocoaHTTPServerLibrary.build/Release-iphonesimulator/CocoaHTTPServer.build
+iphone/lib/buildtime-src/build/
+iphone/build/
+/build/
+android/client/bin/
+android/server/bin/

@@ -33,7 +33,7 @@ if not hasattr(json, 'dumps'):
 
 from time import sleep, time
 from urllib import urlopen
-from os.path import expanduser, join, dirname, abspath, isdir, isfile
+from os.path import expanduser, join, dirname, abspath, isdir, isfile, exists
 from sys import platform
 from tempfile import mkdtemp
 from shutil import copytree, rmtree, copy
@@ -128,11 +128,29 @@ def _default_windows_location():
 def _windows_chrome():
     return _find_chrome_in_registry() or _default_windows_location()
 
+def _linux_chrome():
+    locations = ["/usr/bin/google-chrome","/usr/bin/chromium","/usr/bin/chromium-browser"]
+    return _start_cmd(locations)
+
+def _mac_chrome():
+    locations = ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+    import getpass
+    locations.append(join("/Users/", getpass.getuser(), "Applications", "Google Chrome.app", "Contents", "MacOS", "Google Chrome"))
+    return _start_cmd(locations)
+
+def _start_cmd(locations):
+    cmd = ""
+    for cmd_path in locations:
+      if exists(cmd_path):
+        cmd = cmd_path
+    if cmd=="":
+      raise RuntimeError("Unable to find browser")
+    return cmd
 
 _BINARY = {
     "win32" : _windows_chrome,
-    "darwin" : lambda: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "linux2" : lambda: "/usr/bin/google-chrome"
+    "darwin" : _mac_chrome,
+    "linux2" : _linux_chrome 
 }
 
 def chrome_exe():
@@ -144,7 +162,7 @@ def touch(filename):
 
 def _copy_zipped_extension(extension_zip):
     extension_dir = utils.unzip_to_temp_dir(extension_zip)
-        return extension_dir
+    return extension_dir
 
 def create_extension_dir():
     extension_dir = _copy_zipped_extension("chrome-extension.zip")
@@ -167,13 +185,7 @@ def create_extension_dir():
     # copytree need to create the directory
     rmtree(path)
     copytree(extdir, path)
-    dll = join(dirname(__file__), "npchromedriver.dll")
 
-    if not isfile(dll): # In source
-        dll = r"..\..\prebuilt\Win32\Release\npchromedriver.dll"
-        assert isfile(dll), "can't find dll"
-
-    copy(dll, path)
     return path
 
 def create_profile_dir():
@@ -185,7 +197,7 @@ def create_profile_dir():
 # FIXME: Find a free one dinamically
 PORT = 33292
 
-def run_chrome(extension_dir, profile_dir, port):
+def run_chrome(extension_dir, profile_dir, port,untrusted_certificates, custom_args):
     command = [
         chrome_exe(),
         "--load-extension=%s" % extension_dir,
@@ -197,7 +209,9 @@ def run_chrome(extension_dir, profile_dir, port):
         "--disable-popup-blocking",
         "--disable-prompt-on-repost",
         "--no-default-browser-check",
-        "http://localhost:%s/chromeCommandExecutor" % port]
+        "http://localhost:%s/chromeCommandExecutor" % port,
+        untrusted_certificates,
+        custom_args]
     return Popen(command)
 
 def run_server(timeout=10):
@@ -221,18 +235,21 @@ def run_server(timeout=10):
     return server
 
 class ChromeDriver:
-    def __init__(self):
+    def __init__(self,custom_profile=None, untrusted_certificates=False, custom_args=""):
         self._server = None
-        self._profile_dir = None
+        self._profile_dir = custom_profile
         self._extension_dir = None
         self._chrome = None
+        self._untrusted_certificates = " --ignore-certificate-errors " if untrusted_certificates else ""
+        self._custom_args = custom_args
 
     def start(self):
         self._extension_dir = create_extension_dir()
-        self._profile_dir = create_profile_dir()
+        self._profile_dir = create_profile_dir() if self._profile_dir else self._profile_dir
         self._server = run_server()
         self._chrome = run_chrome(self._extension_dir, self._profile_dir,
-                                  self._server.server_port)
+                                  self._server.server_port, self._untrusted_certificates,
+                                  self._custom_args)
 
     def stop(self):
         if self._chrome:

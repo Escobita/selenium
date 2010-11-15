@@ -29,7 +29,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.servlet.MultiPartFilter;
-import org.openqa.selenium.NetworkUtils;
+import org.openqa.selenium.networkutils.NetworkUtils;
 
 import static org.openqa.selenium.internal.PortProber.findFreePort;
 
@@ -41,6 +41,8 @@ public class Jetty6AppServer implements AppServer {
   private static final String THIRD_PARTY_JS_CONTEXT_PATH =
       "/third_party/closure/goog";
 
+  private static final NetworkUtils networkUtils =  new NetworkUtils();
+
   private int port;
   private int securePort;
   private File path;
@@ -50,9 +52,9 @@ public class Jetty6AppServer implements AppServer {
   private final Server server;
   private WebAppContext context;
   private final String hostName;
-  
+
   public Jetty6AppServer() {
-    this("localhost");
+    this(networkUtils.getNonLoopbackAddressOfThisMachine());
   }
   
   public Jetty6AppServer(String hostName) {
@@ -149,7 +151,7 @@ public class Jetty6AppServer implements AppServer {
   }
 
   public String getAlternateHostName() {
-    return NetworkUtils.getPrivateLocalAddress();
+    return networkUtils.getPrivateLocalAddress();
   }
 
   public String whereIs(String relativeUrl) {

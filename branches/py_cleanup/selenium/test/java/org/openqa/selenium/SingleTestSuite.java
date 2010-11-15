@@ -41,25 +41,25 @@ public class SingleTestSuite extends TestCase {
   public static Test suite() throws Exception {
     String driver = IE;
 
-    System.setProperty("webdriver.development", "true");
     System.setProperty("jna.library.path", "..\\build;build");
     System.setProperty("webdriver.selenium.server.port", String.valueOf(findFreePort()));
 //    System.setProperty("webdriver.debug", "true");
 //    System.setProperty("webdriver.firefox.reap_profile", "false");
-                                                      
+
     TestSuiteBuilder builder = new TestSuiteBuilder()
         .addSourceDir("common")
         .addSourceDir("firefox")
+        .addSourceDir("selenium")
         .addSourceDir("support")
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("ElementFindingTest")
-        .method("testFindingByXPathShouldNotIncludeParentElementIfSameTagType")
+        .onlyRun("ElementAttributeTest")
+//        .method("testShouldReturnValueOfOnClickAttribute")
         .exclude(ALL)
         .exclude(Ignore.Driver.IE)
         .outputTestNames()
-        .leaveRunning()
+        //.leaveRunning()
         ;  // Yeah, this look strange :)
 
     if (REMOTE.equals(driver) || REMOTE_IE.equals(driver)) {

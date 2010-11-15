@@ -197,45 +197,63 @@ DelayedCommand.prototype.execute = function(ms) {
  *     command for a pending request in the current window's nsILoadGroup.
  */
 DelayedCommand.prototype.shouldDelayExecutionForPendingRequest_ = function() {
-  try {
-    if (this.loadGroup_.isPending()) {
-      var hasOnLoadBlocker = false;
-      var numPending = 0;
-      var requests = this.loadGroup_.requests;
-      while (requests.hasMoreElements()) {
-        var request =
-            requests.getNext().QueryInterface(Components.interfaces.nsIRequest);
-        if (request.isPending()) {
-          numPending += 1;
-          hasOnLoadBlocker = hasOnLoadBlocker ||
-                             (request.name == 'about:document-onload-blocker');
-
-          if (numPending > 1) {
-            // More than one pending request, need to wait.
-            return true;
-          }
-        }
-      }
-
-      if (numPending && !hasOnLoadBlocker) {
-        Logger.dumpn('Ignoring pending about:document-onload-blocker request');
-        // If we only have one pending request and it is not a
-        // document-onload-blocker, we need to wait.  We do not wait for
-        // document-onload-blocker requests since these are created when
-        // one of document.[open|write|writeln] is called. If document.close is
-        // never called, the document-onload-blocker request will not be
-        // completed.
+  if (this.loadGroup_.isPending()) {
+    var hasOnLoadBlocker = false;
+    var numPending = 0;
+    var requests = this.loadGroup_.requests;
+    while (requests.hasMoreElements()) {
+      var request = requests.getNext().QueryInterface(Components.interfaces.nsIRequest);
+      var isPending = false;
+      try {
+        isPending = request.isPending();
+      } catch(e) {
+          // Normal during page load, which means we should just return "true"
         return true;
       }
-    }
-  } catch(e) {
-    Logger.dumpn('Problem while checking if we should delay execution: ' + e);
-    return true;
-  }
+      if (isPending) {
+        numPending += 1;
+        hasOnLoadBlocker = hasOnLoadBlocker ||
+                         (request.name == 'about:document-onload-blocker');
 
+        if (numPending > 1) {
+          // More than one pending request, need to wait.
+          return true;
+        }
+      }
+    }
+
+    if (numPending && !hasOnLoadBlocker) {
+      Logger.dumpn('Ignoring pending about:document-onload-blocker request');
+      // If we only have one pending request and it is not a
+      // document-onload-blocker, we need to wait.  We do not wait for
+      // document-onload-blocker requests since these are created when
+      // one of document.[open|write|writeln] is called. If document.close is
+      // never called, the document-onload-blocker request will not be
+      // completed.
+      return true;
+    }
+  }
   return false;
 };
 
+
+DelayedCommand.prototype.checkPreconditions_ = function(preconditions, respond, parameters) {
+  if (!preconditions) {
+    return;
+  }
+
+  var toThrow = null;
+  var length = preconditions.length;
+
+  Logger.dumpn('length: ' + length);
+
+  for (var i = 0; i < length; i++) {
+    toThrow = preconditions[i](respond.session.getDocument(), parameters);
+    if (toThrow) {
+      throw toThrow;
+    }
+  }
+};
 
 /**
  * Attempts to execute the command.  If the window is not ready for the command
@@ -261,8 +279,41 @@ DelayedCommand.prototype.executeInternal_ = function() {
       // TODO(simon): This is never cleared, but _should_ be okay, because send wipes itself
       this.driver_.response_ = this.response_;
 
-      this.driver_[this.command_.name](
-          this.response_, this.command_.parameters);
+      var response = this.response_;
+      var timer = new Timer();
+      var startTime = new Date().getTime();
+      var endTime = startTime + this.response_.session.getImplicitWait();
+      var name = this.command_.name;
+      var driverFunction = this.driver_[name];
+      var parameters = this.command_.parameters;
+
+      Logger.dumpn('name: ' + name);
+      Logger.dumpn('driverFunction: ' + driverFunction);
+      Logger.dumpn('preconditions: ' + driverFunction.preconditions);
+
+      var func = goog.bind(driverFunction, this.driver_,
+          this.response_, parameters);
+      var guards = goog.bind(this.checkPreconditions_, this,
+          driverFunction.preconditions, this.response_, parameters);
+      
+      var toExecute = function() {
+        try {
+          guards();
+          func();
+        } catch (e) {
+          if (new Date().getTime() < endTime) {
+            timer.setTimeout(toExecute, 100);
+          } else {
+            if (!e.isWebDriverError) {
+              Logger.dumpn(
+                  'Exception caught by driver: ' + name +
+                      '(' + parameters + ')\n' + e);
+            }
+            response.sendError(e);
+          }
+        }
+      };
+      toExecute();
     } catch (e) {
       if (!e.isWebDriverError) {
         Logger.dumpn(
@@ -282,6 +333,8 @@ DelayedCommand.prototype.executeInternal_ = function() {
  * @constructor
  */
 var nsCommandProcessor = function() {
+  Components.utils.import('resource://fxdriver/modules/atoms.js');
+  Components.utils.import('resource://fxdriver/modules/timer.js');
   Components.utils.import('resource://fxdriver/modules/utils.js');
 
   this.wrappedJSObject = this;
@@ -576,21 +629,17 @@ nsCommandProcessor.prototype.quit = function(response) {
   response.send();
 
   // Use an nsITimer to give the response time to go out.
-  var event = {
-    notify: function(timer) {
+  var event = function(timer) {
       // Create a switch file so the native events library will
       // let all events through in case of a close.
       createSwitchFile("close:<ALL>");
       Components.classes['@mozilla.org/toolkit/app-startup;1'].
           getService(Components.interfaces.nsIAppStartup).
           quit(Components.interfaces.nsIAppStartup.eForceQuit);
-    }
   };
 
-  var timer = Components.classes['@mozilla.org/timer;1'].
-      createInstance(Components.interfaces.nsITimer);
-  timer.initWithCallback(event, 500,  // milliseconds
-      Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+  this.nstimer = new Timer();
+  this.nstimer.setTimeout(event, 500);
 };
 
 

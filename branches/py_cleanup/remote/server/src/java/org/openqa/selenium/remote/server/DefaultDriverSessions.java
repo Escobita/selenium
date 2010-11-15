@@ -24,12 +24,17 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.server.log.LoggingManager;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultDriverSessions implements DriverSessions {
   private final DriverFactory factory;
+
+  private static final AtomicLong sessionKeyFactory = new AtomicLong(System.currentTimeMillis());
 
   private final Map<SessionId, Session> sessionIdToDriver =
       new ConcurrentHashMap<SessionId, Session>();
@@ -42,7 +47,7 @@ public class DefaultDriverSessions implements DriverSessions {
   }};
 
   public DefaultDriverSessions() {
-    this(Platform.getCurrent(), new DriverFactory());
+    this(Platform.getCurrent(), new DefaultDriverFactory());
   }
 
   protected DefaultDriverSessions(Platform runningOn, DriverFactory factory) {
@@ -79,7 +84,7 @@ public class DefaultDriverSessions implements DriverSessions {
   public SessionId newSession(Capabilities desiredCapabilities) throws Exception {
     Session session = Session.createSession(factory, desiredCapabilities);
     
-    SessionId sessionId = new SessionId(String.valueOf(System.currentTimeMillis()));
+    SessionId sessionId = new SessionId(String.valueOf(sessionKeyFactory.getAndIncrement()));
     sessionIdToDriver.put(sessionId, session);
 
     // I'm not sure that this logging manager should have crept in here.
@@ -104,5 +109,9 @@ public class DefaultDriverSessions implements DriverSessions {
 
   public void registerDriver(Capabilities capabilities, Class<? extends WebDriver> implementation) {
     factory.registerDriver(capabilities, implementation);
+  }
+
+  public Set<SessionId> getSessions(){
+    return Collections.unmodifiableSet(sessionIdToDriver.keySet());
   }
 }
