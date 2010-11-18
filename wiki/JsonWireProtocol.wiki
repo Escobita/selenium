@@ -191,7 +191,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId/element/:id/text || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
 || GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
 || POST || /session/:sessionId/element/:id/value || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
-|| POST || /session/:sessionId/element/:id/value/modifier || Send a modifier key down / up to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keyboard.html#pressKey(org.openqa.selenium.Keys) pressKey(org.openqa.selenium.Keys)] ||
+|| POST || /session/:sessionId/modifier || Send a modifier key down / up to the active element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keyboard.html#pressKey(org.openqa.selenium.Keys) pressKey(org.openqa.selenium.Keys)] ||
 || GET || /session/:sessionId/element/:id/name || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
 || POST || /session/:sessionId/element/:id/clear || Clear a `TEXTAREA` or `text INPUT` element's value. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear() WebElement#clear()] ||
 || GET || /session/:sessionId/element/:id/selected || Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isSelected() WebElement#isSelected()] ||
@@ -1383,18 +1383,17 @@ such cookie visible to the current page.</dd>
 
 ----
 
-=== /session/:sessionId/element/:id/value/modifier ===
+=== /session/:sessionId/modifier ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/value/modifier*</dd>
+<dd>*POST /session/:sessionId/modifier*</dd>
 <dd>
 <dl>
-<dd>Send a modifier key down / up to an element.</dd>
+<dd>Send a modifier key down / up to the active element.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
 </dl>
 </dd>
 <dd>
@@ -1402,13 +1401,6 @@ such cookie visible to the current page.</dd>
 <dt>*JSON Parameters:*</dt>
 <dd>`value` - `{string}` The modifier key event to be sent.The Keys enum specifies the values to send for shift / ctrl / alt.</dd>
 <dd>`isdown` - `{boolean}` Whether to generate a key down or key up.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 </dl>
 </dd>
 <dd>
