@@ -16,7 +16,7 @@ In order to do this you need to...
 or 
 go.bat se_ide:setup_proxy
 }}}
-  # in your profile's extension directory, create a file called {a6fd85ed-e919-4a43-a5af-8da18bda539f} and in it put the complete path to the trunk/ide/src/extension directory
+  # in your profile's extension directory, create a file called editor@seleniumhq.org and in it put the complete path to the trunk/ide/main/src directory
   # restart firefox
 
 *DO NOT* aggressively do an _svn add_ when running in the proxy mode and commit. It will make people cranky. A good habit is to do an _ se_ide:remove_proxy _ and then _svn status_ and _svn add_.
