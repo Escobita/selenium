@@ -33,7 +33,7 @@ protected:
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
 				CComVariant value_variant;
-				status_code = element_wrapper->GetAttributeValue(browser_wrapper, L"selected", &value_variant);
+				status_code = element_wrapper->GetAttributeValue(L"selected", &value_variant);
 				if (status_code == SUCCESS) {
 					std::wstring value(browser_wrapper->ConvertVariantToWString(&value_variant));
 					bool selected = wcscmp(L"true", value.c_str()) == 0 ? 1 : 0;

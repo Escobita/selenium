@@ -27,7 +27,6 @@ protected:
 				response->SetErrorResponse(status_code, "Unable to get browser");
 				return;
 			}
-			HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
@@ -50,7 +49,7 @@ protected:
 
 						if (element_wrapper->IsCheckBox()) {
 							if (!element_wrapper->IsSelected()) {
-								element_wrapper->Click(window_handle);
+								element_wrapper->Click();
 								browser_wrapper->set_wait_required(true);
 							}
 
@@ -67,7 +66,7 @@ protected:
 							return;
 						} else if (element_wrapper->IsRadioButton()) {
 							if (!element_wrapper->IsSelected()) {
-								element_wrapper->Click(window_handle);
+								element_wrapper->Click();
 								browser_wrapper->set_wait_required(true);
 							}
 

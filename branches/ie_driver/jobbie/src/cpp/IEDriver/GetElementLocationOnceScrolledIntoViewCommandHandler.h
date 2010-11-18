@@ -25,13 +25,12 @@ protected:
 				response->SetErrorResponse(status_code, "Unable to get browser");
 				return;
 			}
-			HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
 				long x, y, width, height;
-				status_code = element_wrapper->GetLocationOnceScrolledIntoView(window_handle, &x, &y, &width, &height);
+				status_code = element_wrapper->GetLocationOnceScrolledIntoView(&x, &y, &width, &height);
 				if (status_code == SUCCESS) {
 					Json::Value response_value;
 					response_value["x"] = x;

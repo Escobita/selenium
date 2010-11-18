@@ -12,20 +12,20 @@ class BrowserWrapper;
 
 class ElementWrapper {
 public:
-	ElementWrapper(IHTMLElement *element);
+	ElementWrapper(IHTMLElement *element, BrowserWrapper *browser);
 	virtual ~ElementWrapper(void);
 	Json::Value ConvertToJson(void);
-	int GetLocationOnceScrolledIntoView(HWND containing_window_handle, long *x, long *y, long *width, long *height);
-	int GetAttributeValue(BrowserWrapper *browser, std::wstring attribute_name, VARIANT *attribute_value);
+	int GetLocationOnceScrolledIntoView(long *x, long *y, long *width, long *height);
+	int GetAttributeValue(std::wstring attribute_name, VARIANT *attribute_value);
 	int IsDisplayed(bool *result);
 	bool IsEnabled(void);
 	bool IsSelected(void);
 	bool IsCheckBox(void);
 	bool IsRadioButton(void);
 	std::wstring GetText(void);
-	int Click(HWND containing_window_handle);
-	int Hover(HWND containing_window_handle);
-	int DragBy(HWND containing_window_handle, int offset_x, int offset_y, int drag_speed);
+	int Click(void);
+	int Hover(void);
+	int DragBy(int offset_x, int offset_y, int drag_speed);
 	void FireEvent(IHTMLDOMNode* fire_event_on, LPCWSTR event_name);
 
 	std::wstring element_id(void) { return this->element_id_; }
@@ -44,6 +44,7 @@ private:
 
 	std::wstring element_id_;
 	IHTMLElement *element_;
+	BrowserWrapper *browser_;
 };
 
 } // namespace webdriver

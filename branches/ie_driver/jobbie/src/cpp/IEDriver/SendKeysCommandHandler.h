@@ -56,6 +56,8 @@ protected:
 				return;
 			}
 			HWND window_handle = browser_wrapper->GetWindowHandle();
+			TCHAR pszClassName[25];
+			::GetClassName(window_handle, pszClassName, 25);
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
@@ -75,6 +77,7 @@ protected:
 
 				CComQIPtr<IHTMLElement> element(element_wrapper->element());
 
+				browser_wrapper->AttachToWindowInputQueue();
 				element->scrollIntoView(CComVariant(VARIANT_TRUE));
 
 				CComQIPtr<IHTMLInputFileElement> file(element);
@@ -98,31 +101,7 @@ protected:
 					return;
 				}
 
-				CComQIPtr<IHTMLElement2> element2(element);
-				element2->focus();
-
-				// Check we have focused the element.
-				CComPtr<IDispatch> dispatch;
-				element->get_document(&dispatch);
-				CComQIPtr<IHTMLDocument2> document(dispatch);
-
-				bool has_focus = false;
-				clock_t max_wait = clock() + 1000;
-				for (int i = clock(); i < max_wait; i = clock()) {
-					wait(1);
-					CComPtr<IHTMLElement> active_element;
-					if (document->get_activeElement(&active_element) == S_OK) {
-						CComQIPtr<IHTMLElement2> active_element2(active_element);
-						if (element2.IsEqualObject(active_element2)) {
-							has_focus = true;
-							break;
-						}
-					}
-				}
-
-				if (!has_focus) {
-					//cerr << "We don't have focus on element." << endl;
-				}
+				this->WaitUntilElementFocused(element);
 
 				sendKeys(window_handle, keys.c_str(), manager->speed());
 				response->SetResponse(SUCCESS, Json::Value::null);
@@ -231,6 +210,36 @@ private:
 
 		//LOG(WARN) << "No edit found";
 		return false;
+	}
+
+	bool SendKeysCommandHandler::WaitUntilElementFocused(IHTMLElement *element) {
+		CComQIPtr<IHTMLElement2> element2(element);
+		element2->focus();
+
+		// Check we have focused the element.
+		CComPtr<IDispatch> dispatch;
+		element->get_document(&dispatch);
+		CComQIPtr<IHTMLDocument2> document(dispatch);
+
+		bool has_focus = false;
+		clock_t max_wait = clock() + 1000;
+		for (int i = clock(); i < max_wait; i = clock()) {
+			wait(1);
+			CComPtr<IHTMLElement> active_element;
+			if (document->get_activeElement(&active_element) == S_OK) {
+				CComQIPtr<IHTMLElement2> active_element2(active_element);
+				if (element2.IsEqualObject(active_element2)) {
+					has_focus = true;
+					break;
+				}
+			}
+		}
+
+		if (!has_focus) {
+			cout << "We don't have focus on element." << endl;
+		}
+
+		return has_focus;
 	}
 };
 

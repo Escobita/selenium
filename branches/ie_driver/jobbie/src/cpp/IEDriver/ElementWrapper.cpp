@@ -1,13 +1,12 @@
 #include "StdAfx.h"
 #include "ElementWrapper.h"
 #include "BrowserWrapper.h"
-#include "ErrorCodes.h"
 #include "atoms.h"
 #include "interactions.h"
 
 namespace webdriver {
 
-ElementWrapper::ElementWrapper(IHTMLElement *element) {
+ElementWrapper::ElementWrapper(IHTMLElement *element, BrowserWrapper *browser) {
 	// NOTE: COM should be initialized on this thread, so we
 	// could use CoCreateGuid() and StringFromGUID2() instead.
 	UUID guid;
@@ -23,6 +22,7 @@ ElementWrapper::ElementWrapper(IHTMLElement *element) {
 	::RpcStringFree(&guid_string);
 
 	this->element_ = element;
+	this->browser_ = browser;
 }
 
 ElementWrapper::~ElementWrapper(void) {
@@ -49,9 +49,10 @@ bool ElementWrapper::IsEnabled() {
 	return !is_disabled;
 }
 
-int ElementWrapper::Click(HWND containing_window_handle) {
+int ElementWrapper::Click() {
+	HWND containing_window_handle(this->browser_->GetWindowHandle());
 	long x = 0, y = 0, w = 0, h = 0;
-	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(&x, &y, &w, &h);
 
 	if (status_code == SUCCESS) {
 		long click_x = x + (w ? w / 2 : 0);
@@ -73,9 +74,10 @@ int ElementWrapper::Click(HWND containing_window_handle) {
 	return status_code;
 }
 
-int ElementWrapper::Hover(HWND containing_window_handle) {
+int ElementWrapper::Hover() {
+	HWND containing_window_handle(this->browser_->GetWindowHandle());
 	long x = 0, y = 0, w = 0, h = 0;
-	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(&x, &y, &w, &h);
 
 	if (status_code == SUCCESS) {
 		long click_x = x + (w ? w / 2 : 0);
@@ -87,9 +89,10 @@ int ElementWrapper::Hover(HWND containing_window_handle) {
 	return status_code;
 }
 
-int ElementWrapper::DragBy(HWND containing_window_handle, int offset_x, int offset_y, int drag_speed) {
+int ElementWrapper::DragBy(int offset_x, int offset_y, int drag_speed) {
+	HWND containing_window_handle(this->browser_->GetWindowHandle());
 	long x = 0, y = 0, w = 0, h = 0;
-	int status_code = this->GetLocationOnceScrolledIntoView(containing_window_handle, &x, &y, &w, &h);
+	int status_code = this->GetLocationOnceScrolledIntoView(&x, &y, &w, &h);
 
 	if (status_code == SUCCESS) {
 		long click_x = x + (w ? w / 2 : 0);
@@ -103,7 +106,7 @@ int ElementWrapper::DragBy(HWND containing_window_handle, int offset_x, int offs
 	return status_code;
 }
 
-int ElementWrapper::GetAttributeValue(BrowserWrapper *browser, std::wstring attribute_name, VARIANT *attribute_value) {
+int ElementWrapper::GetAttributeValue(std::wstring attribute_name, VARIANT *attribute_value) {
 	int status_code = SUCCESS;
 	std::wstring script(L"(function() { return function(){ ");
 
@@ -138,7 +141,7 @@ int ElementWrapper::GetAttributeValue(BrowserWrapper *browser, std::wstring attr
 	::SafeArrayPutElement(args, &arg_index, &name_variant);
 
 	CComVariant script_result;
-	status_code = browser->ExecuteScript(&script, args, &script_result);
+	status_code = this->browser_->ExecuteScript(&script, args, &script_result);
 	::SafeArrayDestroy(args);
 
 	if (status_code != SUCCESS) {
@@ -151,7 +154,7 @@ int ElementWrapper::GetAttributeValue(BrowserWrapper *browser, std::wstring attr
 }
 
 
-int ElementWrapper::GetLocationOnceScrolledIntoView(HWND containing_window_handle, long *x, long *y, long *width, long *height) {
+int ElementWrapper::GetLocationOnceScrolledIntoView(long *x, long *y, long *width, long *height) {
     CComPtr<IHTMLDOMNode2> node;
 	HRESULT hr = this->element_->QueryInterface(&node);
 
@@ -173,6 +176,9 @@ int ElementWrapper::GetLocationOnceScrolledIntoView(HWND containing_window_handl
     if (!this->IsEnabled()) {
         return EELEMENTNOTENABLED;
     }
+
+	this->browser_->AttachToWindowInputQueue();
+	HWND containing_window_handle(this->browser_->GetWindowHandle());
 
 	long top, left, bottom, right = 0;
 	result = this->GetLocation(containing_window_handle, &left, &right, &top, &bottom);

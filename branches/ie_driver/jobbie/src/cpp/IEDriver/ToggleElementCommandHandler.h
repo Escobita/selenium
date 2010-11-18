@@ -27,7 +27,6 @@ protected:
 				response->SetErrorResponse(status_code, "Unable to get browser");
 				return;
 			}
-			HWND hwnd = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
@@ -46,7 +45,7 @@ protected:
 					return;
 				}
 
-				status_code = element_wrapper->Click(hwnd);
+				status_code = element_wrapper->Click();
 				browser_wrapper->set_wait_required(true);
 				if (status_code == SUCCESS || status_code != EELEMENTNOTDISPLAYED) {
 					if (status_code == SUCCESS) {

@@ -65,6 +65,7 @@ protected:
 					}
 
 					hr = element2->blur();
+					browser_wrapper->AttachToWindowInputQueue();
 
 					LRESULT lr;
 					::SendMessageTimeoutW(window_handle, WM_SETTEXT, 0, (LPARAM) L"", SMTO_ABORTIFHUNG, 3000, (PDWORD_PTR)&lr);

@@ -43,8 +43,7 @@ protected:
 						std::wstring type((BSTR)type_name);
 
 						if (_wcsicmp(L"submit", type.c_str()) == 0 || _wcsicmp(L"image", type.c_str()) == 0) {
-							HWND hwnd = browser_wrapper->GetWindowHandle();
-							element_wrapper->Click(hwnd);
+							element_wrapper->Click();
 							browser_wrapper->set_wait_required(true);
 						} else {
 							CComPtr<IHTMLFormElement> form2;

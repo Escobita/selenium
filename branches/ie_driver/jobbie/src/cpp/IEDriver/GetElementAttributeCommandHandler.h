@@ -36,7 +36,7 @@ protected:
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
 				CComVariant value_variant;
-				status_code = element_wrapper->GetAttributeValue(browser_wrapper, name, &value_variant);
+				status_code = element_wrapper->GetAttributeValue(name, &value_variant);
 				if (status_code != SUCCESS) {
 					response->SetErrorResponse(status_code, "Unable to get attribute");
 					return;

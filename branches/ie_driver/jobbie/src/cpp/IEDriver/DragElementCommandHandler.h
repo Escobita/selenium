@@ -36,12 +36,11 @@ protected:
 				response->SetErrorResponse(status_code, "Unable to get browser");
 				return;
 			}
-			HWND window_handle = browser_wrapper->GetWindowHandle();
 
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
-				status_code = element_wrapper->DragBy(window_handle, x, y, manager->speed());
+				status_code = element_wrapper->DragBy(x, y, manager->speed());
 				if (status_code == SUCCESS) {
 					response->SetResponse(SUCCESS, Json::Value::null);
 					return;

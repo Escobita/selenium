@@ -29,12 +29,10 @@ protected:
 				return;
 			}
 
-			HWND window_handle = browser_wrapper->GetWindowHandle();
-
 			ElementWrapper *element_wrapper;
 			status_code = this->GetElement(manager, element_id, &element_wrapper);
 			if (status_code == SUCCESS) {
-				status_code = element_wrapper->Click(window_handle);
+				status_code = element_wrapper->Click();
 				browser_wrapper->set_wait_required(true);
 				if (status_code != SUCCESS) {
 					response->SetErrorResponse(status_code, "Cannot click on element");

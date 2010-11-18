@@ -78,6 +78,7 @@ public:
 	std::wstring GetCookies(void);
 	int AddCookie(std::wstring cookie);
 	int DeleteCookie(std::wstring cookie_name);
+	void AttachToWindowInputQueue(void);
 
 	std::wstring ConvertVariantToWString(VARIANT *to_convert);
 
