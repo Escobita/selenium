@@ -127,8 +127,6 @@ public class JettyService extends Service {
 
   /**
    * Get a reference to the Jetty Server instance
-   * 
-   * @return
    */
   public Server getServer() {
     return server;
@@ -177,7 +175,7 @@ public class JettyService extends Service {
             }
           }
           Logger.log(Log.DEBUG, LOG_TAG,
-              "loading resource took " + (System.currentTimeMillis()-a) + " ms");
+              "Loading resource took " + (System.currentTimeMillis()-a) + " ms");
         }
       }), "/*");
       

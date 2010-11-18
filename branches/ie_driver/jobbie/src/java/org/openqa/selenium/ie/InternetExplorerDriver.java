@@ -49,6 +49,7 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   private IEServer lib;
   private int port;
   private WindowsProxyManager proxyManager;
+  private InternetExplorerKeyboard keyboard;
 
   public InternetExplorerDriver() {
     setup();
@@ -63,6 +64,7 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   public InternetExplorerDriver(int port) {
     this.port = port;
     setup();
+    keyboard = new InternetExplorerKeyboard(this, lib);
   }
 
   private void setup() {
