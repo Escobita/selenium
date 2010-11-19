@@ -44,10 +44,14 @@ protected:
 
 		++index;
 		if (parent_element) {
-			VARIANT parentVar;
-			parentVar.vt = VT_DISPATCH;
-			parentVar.pdispVal = parent_element;
-			::SafeArrayPutElement(args, &index, &parentVar);
+			// Use a copy for the parent element?
+			CComPtr<IHTMLElement> parent(parent_element);
+			IHTMLElement* parent_element_copy;
+			parent.CopyTo(&parent_element_copy);
+			VARIANT parent_variant;
+			parent_variant.vt = VT_DISPATCH;
+			parent_variant.pdispVal = parent_element;
+			::SafeArrayPutElement(args, &index, &parent_variant);
 		}
 
 		CComVariant query_result;
@@ -96,9 +100,13 @@ protected:
 
 		++index;
 		if (parent_element) {
+			// Use a copy for the parent element?
+			CComPtr<IHTMLElement> parent(parent_element);
+			IHTMLElement* parent_element_copy;
+			parent.CopyTo(&parent_element_copy);
 			CComVariant parent_variant;
 			parent_variant.vt = VT_DISPATCH;
-			parent_variant.pdispVal = parent_element;
+			parent_variant.pdispVal = parent_element_copy;
 			::SafeArrayPutElement(query_args, &index, &parent_variant);
 		}
 
@@ -106,8 +114,10 @@ protected:
 		result = browser->ExecuteScript(&query, query_args, &snapshot);
 		::SafeArrayDestroy(query_args);
 
-		bounds.cElements = 1;
-		SAFEARRAY* length_args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+		SAFEARRAYBOUND length_bounds;
+		length_bounds.cElements = 1;
+		length_bounds.lLbound = 0;
+		SAFEARRAY* length_args = ::SafeArrayCreate(VT_VARIANT, 1, &length_bounds);
 		index = 0;
 		::SafeArrayPutElement(length_args, &index, &snapshot);
 		CComVariant length_variant;
