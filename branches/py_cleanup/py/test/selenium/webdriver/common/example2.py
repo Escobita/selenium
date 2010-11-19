@@ -15,7 +15,7 @@
 
 import unittest
 from google_one_box import GoogleOneBox
-from selenium.firefox.webdriver import WebDriver
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 class ExampleTest2(unittest.TestCase):
     """This example shows how to use the page object pattern.

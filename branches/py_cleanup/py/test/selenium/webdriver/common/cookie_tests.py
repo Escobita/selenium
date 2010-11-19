@@ -1,9 +1,8 @@
 import calendar
-import datetime
 import time
 import unittest
-from selenium.common_tests import utils
-from selenium.common_tests.utils import require_online
+from selenium.tests.selenium.webdriver.common import utils
+from selenium.tests.selenium.webdriver.common.utils import require_online
 
 
 class CookieTest(unittest.TestCase):

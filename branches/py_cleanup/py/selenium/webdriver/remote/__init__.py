@@ -1,5 +1,5 @@
-# Copyright 2010 WebDriver committers
-# Copyright 2010 Google Inc.
+# Copyright 2008-2009 WebDriver committers
+# Copyright 2008-2009 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from webdriver import connect
-from webdriver import WebDriver
-from webelement import WebElement
+from selenium.webdriver.remote.webdriver import connect
 

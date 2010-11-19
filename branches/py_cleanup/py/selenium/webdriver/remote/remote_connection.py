@@ -186,8 +186,7 @@ class RemoteConnection(object):
             Command.GET_SPEED: ('GET', '/session/$sessionId/speed'),
             Command.SET_SPEED: ('POST', '/session/$sessionId/speed'),
             Command.GET_ELEMENT_VALUE_OF_CSS_PROPERTY:
-                ('GET',  '/session/$sessionId/element/$id/css/$propertyName')
-        }
+                ('GET',  '/session/$sessionId/element/$id/css/$propertyName')}
 
     def execute(self, command, params):
         """Send a command to the remote server.

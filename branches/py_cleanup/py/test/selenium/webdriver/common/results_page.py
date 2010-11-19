@@ -32,3 +32,4 @@ class ResultsPage(object):
             if term in e.get_text():
                 return True
         return False
+

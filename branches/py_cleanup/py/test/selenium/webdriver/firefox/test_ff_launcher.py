@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright 2008-2009 WebDriver committers
 # Copyright 2008-2009 Google Inc.
 #
@@ -15,14 +16,14 @@
 
 import unittest
 import logging
-from selenium.firefox.webdriver import WebDriver
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 
 class FirefoxLauncherTests (unittest.TestCase):
 
     def testLaunchAndCloseBrowser(self):
-         self.webdriver = WebDriver()
-         self.webdriver.quit()
+        self.webdriver = WebDriver()
+        self.webdriver.quit()
 
     def testDoubleClose(self):
         self.webdriver = WebDriver()
@@ -33,3 +34,4 @@ class FirefoxLauncherTests (unittest.TestCase):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     unittest.main()
+

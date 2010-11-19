@@ -13,14 +13,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from selenium.firefox.webdriver import WebDriver
-from selenium.common_tests import cookie_tests
-from selenium.common.webserver import SimpleWebServer
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.test.common import cookie_tests
+from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
 
 
 def setup_module(module):
     webserver = SimpleWebServer()
-    webserver.start()
+    webserver = webserver.start()
     FirefoxCookieTest.webserver = webserver
     FirefoxCookieTest.driver = WebDriver()
 
@@ -32,3 +32,4 @@ class FirefoxCookieTest(cookie_tests.CookieTest):
 def teardown_module(module):
     FirefoxCookieTest.driver.quit()
     FirefoxCookieTest.webserver.stop()
+

@@ -337,8 +337,7 @@ class WebDriver(object):
         return self._execute(Command.SCREENSHOT)['value']
 
 
-def connect(name, version="", server="http://localhost:4444", platform=None,
-            javascript_enabled=True, path="/wd/hub"):
+def connect(driver_name, server_address, path, browser_name, version, platform, javascript_enabled):
     """Convenience function to connect to a server
        Args:
            name - A string indicating which browser to request a new
@@ -356,9 +355,6 @@ def connect(name, version="", server="http://localhost:4444", platform=None,
                JavaScript.  Defaults to True.
            path - path in server url. Defaults to "/wd/hub/"
     """
-    if not path.startswith("/"):
-        path = "/" + path
-    url = "%s%s" % (server, path)
-    wd = WebDriver(url, name, platform, version, javascript_enabled)
-
+    url = "%s%s" % (server_address, path)
+    wd = WebDriver(url, browser_name, platform, version, javascript_enabled)
     return wd

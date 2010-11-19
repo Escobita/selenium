@@ -16,7 +16,8 @@
 """WebElement implementation."""
 from command import Command
 
-from selenium.webdriver.exceptions import NoSuchAttributeException
+from selenium.webdriver.common.exceptions import NoSuchAttributeException
+
 
 class WebElement(object):
     """Represents an HTML element.
@@ -50,12 +51,12 @@ class WebElement(object):
     def get_attribute(self, name):
         """Gets the attribute value."""
         try:
-            resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name':name})
+            resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name': name})
             return str(resp['value'])
-        # FIXME: This is a hack around selenium server bad response, remove this
-        #        code when it's fixed
+        # FIXME: This is a hack around selenium server bad response,
+        # remove this code when it's fixed
         except AssertionError, e:
-            raise NoSuchAttributeException(name)
+            raise NoSuchAttributeException(name, e)
 
     def toggle(self):
         """Toggles the element state."""
@@ -128,7 +129,7 @@ class WebElement(object):
 
     def send_keys(self, *value):
         """Simulates typing into the element."""
-        self._execute(Command.SEND_KEYS_TO_ELEMENT, {'value':value})
+        self._execute(Command.SEND_KEYS_TO_ELEMENT, {'value': value})
 
     @property
     def parent(self):

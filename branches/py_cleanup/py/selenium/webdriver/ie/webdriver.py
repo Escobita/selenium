@@ -1,5 +1,7 @@
-# Copyright 2008-2009 WebDriver committers
-# Copyright 2008-2009 Google Inc.
+#!/usr/bin/python
+#
+# Copyright 2008-2010 WebDriver committers
+# Copyright 2008-2010 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 __all__ = [ "WebDriver", "WebDriverError", "NoSuchElementException" ]
 
 import ctypes
@@ -23,13 +24,13 @@ from sys import platform
 from platform import machine
 
 try:
-    from selenium.webdriver.exceptions import NoSuchElementException
+    from selenium.webdriver.common.exceptions import NoSuchElementException
 except (ImportError, ValueError):
     class NoSuchElementException(Exception):
         pass
 
 try:
-    from selenium.webdriver.exceptions import ErrorInResponseException
+    from selenium.webdriver.common.exceptions import ErrorInResponseException
 except (ImportError, ValueError):
     class ErrorInResponseException(Exception):
         pass

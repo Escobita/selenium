@@ -14,9 +14,9 @@
 # limitations under the License.
 
 from __future__ import with_statement
-
-from selenium.common.exceptions import RemoteDriverServerException
-from selenium.remote import utils
+import os
+from selenium.webdriver.common.exceptions import RemoteDriverServerException
+from selenium.webdriver.remote import utils
 from subprocess import Popen
 import httplib
 from BaseHTTPServer import HTTPServer
@@ -27,16 +27,13 @@ try:
     import json
 except ImportError:
     import simplejson as json
-
-if not hasattr(json, 'dumps'):
-    import simplejson as json
-
 from time import sleep, time
 from urllib import urlopen
-from os.path import expanduser, join, dirname, abspath, isdir, isfile, exists
+from os.path import expanduser, join, dirname, abspath, isdir, exists
 from sys import platform
 from tempfile import mkdtemp
-from shutil import copytree, rmtree, copy
+import shutil
+#from shutil import shutil.copytree, shutil.rmtree, copy
 from os import environ
 
 INITIAL_HTML = '''
@@ -58,7 +55,6 @@ INITIAL_HTML = '''
 class RequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         self.respond(INITIAL_HTML, "text/html")
-
     # From my (Miki Tebeka) understanding, the driver works by sending a POST http
     # request to the server, the server replies with the command to execute and the
     # next POST reply will have the result. So we hold a command and result
@@ -181,17 +177,13 @@ def create_extension_dir():
     if not isdir(extdir):
         extdir = join(dirname(dirname(abspath(__file__))), "extension")
         assert isdir(extdir), "can't find extension"
-
-    # copytree need to create the directory
-    rmtree(path)
-    copytree(extdir, path)
-
+    # shutil.copytree need to create the directory
+    shutil.rmtree(path)
+    shutil.copytree(extdir, path)
     return path
 
 def create_profile_dir():
     path = mkdtemp()
-    touch(join(path, "First Run"))
-    touch(join(path, "First Run Dev"))
     return path
 
 # FIXME: Find a free one dinamically
@@ -266,12 +258,14 @@ class ChromeDriver:
             self._server = None
 
         for path in (self._profile_dir, self._extension_dir):
+            print path
             if not path:
                 continue
-            try:
-                rmtree(path)
-            except IOError:
-                pass
+            for i in xrange(5):
+                if os.path.exists(path):
+                    shutil.rmtree(path)
+            if os.path.exists(path):
+                return "Couldn't delete profile. Please try manually."
 
     def execute(self, command, params):
         to_send = params.copy()

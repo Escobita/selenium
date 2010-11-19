@@ -330,14 +330,14 @@ task :webdriver_py => [:chrome, :firefox, "//firefox:webdriver", :remote_client]
     sh "build/python/bin/pip install simplejson py", :verbose => true
 
     # Copy browser extensions over to src so setup.py will pick them up. This is such a hack.
-    cp 'build/chrome/chrome-extension.zip', "chrome/src/py/", :verbose => true
-    cp 'build/firefox/webdriver.xpi', "firefox/src/py/", :verbose => true
+    cp 'build/chrome/chrome-extension.zip', "py/selenium/webdriver/chrome", :verbose => true
+    cp 'build/firefox/webdriver.xpi', "py/selenium/webdriver/firefox", :verbose => true
 
     sh "build/python/bin/python setup.py build", :verbose => true
 
     # Remove the extensions we copied to src.
-    rm "chrome/src/py/chrome-extension.zip", :verbose => true
-    rm "firefox/src/py/webdriver.xpi", :verbose => true
+    rm "py/selenium/webdriver/chrome/chrome-extension.zip", :verbose => true
+    rm "py/selenium/webdriver/firefox/webdriver.xpi", :verbose => true
   end
 end
 

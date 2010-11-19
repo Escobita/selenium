@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.exceptions import NoSuchElementException
 from results_page import ResultsPage
 from page_loader import require_loaded
 class GoogleOneBox(object):
@@ -39,3 +39,4 @@ class GoogleOneBox(object):
         element.send_keys(search_term)
         element.submit()
         return ResultsPage(self._driver)
+

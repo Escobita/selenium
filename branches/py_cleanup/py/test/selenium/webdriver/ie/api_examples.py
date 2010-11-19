@@ -16,8 +16,9 @@
 # limitations under the License.
 
 
-from webdriver.common_tests import api_examples
-from webdriver.ie.webdriver import WebDriver
+from selenium.test.selenium.webdriver.common import api_examples
+from selenium import webdriver
 
 if __name__ == "__main__":
-    api_examples.run_tests(WebDriver())
+    api_examples.run_tests(webdriver.connect('ie'))
+

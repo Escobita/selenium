@@ -27,3 +27,4 @@ def require_loaded(func):
         assert page.is_loaded(), "page should be loaded by now"
         return func(page, *params, **kwds)
     return load_page
+

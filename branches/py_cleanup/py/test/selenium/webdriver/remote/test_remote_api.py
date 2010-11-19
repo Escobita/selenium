@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright 2008-2009 WebDriver committers
 # Copyright 2008-2009 Google Inc.
 #
@@ -13,19 +13,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 import os
 import socket
 import subprocess
 import time
 import urllib
-from selenium.common.webserver import SimpleWebServer
-from selenium.common_tests import api_examples
-from selenium.remote.webdriver import WebDriver
+from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
+from selenium.test.selenium.webdriver.common import api_examples
+from selenium.webdriver.remote.webdriver import WebDriver
 
 SERVER_ADDR = "localhost"
 DEFAULT_PORT = 4444
+
 
 def wait_for_server(url, timeout):
     start = time.time()
@@ -37,6 +36,7 @@ def wait_for_server(url, timeout):
             time.sleep(0.2)
 
     return 0
+
 
 def setup_module(module):
     _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,8 +59,10 @@ def setup_module(module):
     RemoteApiExampleTest.webserver = webserver
     RemoteApiExampleTest.driver = WebDriver(url, "firefox", "ANY")
 
+
 class RemoteApiExampleTest(api_examples.ApiExampleTest):
     pass
+
 
 def teardown_module(module):
     try:
@@ -70,8 +72,7 @@ def teardown_module(module):
     try:
         RemoteApiExampleTest.webserver.stop()
     except AttributeError:
-        pass
-    
+        pass    
     # FIXME: This does not seem to work, the server process lingers
     try:
         os.kill(RemoteApiExampleTest.server_proc.pid, 9)

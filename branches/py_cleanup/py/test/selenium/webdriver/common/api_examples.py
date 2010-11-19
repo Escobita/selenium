@@ -22,14 +22,13 @@ import tempfile
 import time
 import shutil
 import unittest
-from selenium.webdriver.exceptions import NoSuchElementException
-import selenium.webdriver.remote.webdriver
+from selenium.webdriver.common.exceptions import NoSuchElementException
 
 
 def not_available_on_remote(func):
-
     def testMethod(self):
-        if type(self.driver) == selenium.remote.webdriver.WebDriver:
+        print self.driver
+        if type(self.driver) == 'remote':
             return lambda x: None
         else:
             return func(self)
@@ -37,7 +36,6 @@ def not_available_on_remote(func):
 
 
 class ApiExampleTest (unittest.TestCase):
-
     def testGetTitle(self):
         self._loadSimplePage()
         title = self.driver.get_title()
@@ -46,8 +44,7 @@ class ApiExampleTest (unittest.TestCase):
     def testGetCurrentUrl(self):
         self._loadSimplePage()
         url = self.driver.get_current_url()
-        self.assertEquals("http://localhost:%d/simpleTest.html"
-                          % self.webserver.port, url)
+        self.assertEquals("http://localhost:%d/simpleTest.html" % self.webserver.port, url)
 
     def testFindElementsByXPath(self):
         self._loadSimplePage()
@@ -152,7 +149,7 @@ class ApiExampleTest (unittest.TestCase):
 
     def testSwitchFrameByName(self):
         self._loadPage("frameset")
-        self.driver.switch_to_frame("third");
+        self.driver.switch_to_frame("third")
         checkbox = self.driver.find_element_by_id("checky")
         checkbox.toggle()
         checkbox.submit()
@@ -160,7 +157,7 @@ class ApiExampleTest (unittest.TestCase):
     def testGetPageSource(self):
         self._loadSimplePage()
         source = self.driver.get_page_source()
-        matches = re.findall(r'<html>.*</html>', source, re.DOTALL|re.I)
+        matches = re.findall(r'<html>.*</html>', source, re.DOTALL | re.I)
         self.assertTrue(len(matches) > 0)
 
     def testIsEnabled(self):
@@ -263,6 +260,3 @@ class ApiExampleTest (unittest.TestCase):
     def _loadPage(self, name):
         self.driver.get(self._pageURL(name))
 
-
-if __name__ == '__main__':
-    unittest.main()

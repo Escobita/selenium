@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
-# Copyright 2008-2009 WebDriver committers
-# Copyright 2008-2009 Google Inc.
+# Copyright 2008-2010 WebDriver committers
+# Copyright 2008-2010 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 # limitations under the License.
 
 
-from selenium.common_tests import api_examples
-from selenium.chrome.webdriver import WebDriver
-from selenium.common.webserver import SimpleWebServer
+from selenium.test.selenium.webdriver.common import api_examples
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
 
 
 def setup_module(module):
@@ -35,3 +35,4 @@ class ChromeApiExampleTest(api_examples.ApiExampleTest):
 def teardown_module(module):
     ChromeApiExampleTest.driver.quit()
     ChromeApiExampleTest.webserver.stop()
+
