@@ -17,7 +17,7 @@
 
 
 from selenium.test.selenium.webdriver.common import api_examples
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium import webdriver
 from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
 
 
@@ -25,7 +25,7 @@ def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     ChromeApiExampleTest.webserver = webserver
-    ChromeApiExampleTest.driver = WebDriver()
+    ChromeApiExampleTest.driver = webdriver.connect('chrome')
 
 
 class ChromeApiExampleTest(api_examples.ApiExampleTest):

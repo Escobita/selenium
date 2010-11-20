@@ -16,13 +16,13 @@
 
 import unittest
 import logging
-from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium import webdriver
 
 
 class FirefoxLauncherTests (unittest.TestCase):
 
     def testLaunchAndCloseBrowser(self):
-        self.webdriver = WebDriver()
+        self.webdriver = webdriver.connect('firefox')
         self.webdriver.quit()
 
     def testDoubleClose(self):
