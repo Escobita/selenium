@@ -356,7 +356,7 @@ task :test_chrome_py => :webdriver_py do
     else
         py_test = 'py.test'
     end
-    test_dir = Dir.glob('build/lib**/selenium/chrome_tests').first
+    test_dir = Dir.glob('build/lib**/selenium/test/selenium/webdriver/chrome').first
     sh py_test, test_dir, :verbose => true
   end
 end

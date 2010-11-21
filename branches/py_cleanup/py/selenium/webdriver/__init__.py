@@ -28,16 +28,16 @@ def connect(driver_name, server_address='http://127.0.0.1:4444', browser_name=''
     """
     driver_name = driver_name.strip('*').lower()
     path = '/wd/hub'
-    if driver_name.startswith('f'):
+    if driver_name.lower() == 'firefox':
         from firefox.webdriver import WebDriver as firefox_driver
         return firefox_driver()
-    if driver_name.startswith('i'):
+    if driver_name.lower() == 'ie':
         from ie.webdriver import WebDriver as ie_driver
         return ie_driver()
-    if driver_name.startswith('c'):
+    if driver_name.lower() == 'c':
         from chrome.webdriver import WebDriver as chrome_driver
         return chrome_driver()
-    if driver_name.startswith('r'):
+    if driver_name.lower() == 'remote':
         if not path.startswith("/"):
             path = "/" + path
         if not server_address.startswith("http://"):
