@@ -376,7 +376,7 @@ task :test_firefox_py => :webdriver_py do
     else
         py_test = 'py.test'
     end
-    test_dir = Dir.glob('build/lib**/selenium/firefox_tests').first
+    test_dir = Dir.glob('build/lib**/selenium/test/selenium/webdriver/firefox').first
     sh py_test, test_dir, :verbose => true
   end
 end
@@ -396,7 +396,7 @@ task :test_remote_py => [:webdriver_py, :'selenium-server-standalone'] do
     else
         py_test = 'py.test'
     end
-    test_dir = Dir.glob('build/lib**/selenium/remote_tests').first
+    test_dir = Dir.glob('build/lib**/selenium/test/selenium/webdriver/remote').first
     sh py_test, test_dir, :verbose => true
   end
 end
