@@ -67,19 +67,6 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 			}
 		} else {
 			// Compile the serialized JSON representation of the command by hand.
-			//std::wstringstream command_stream;
-			//command_stream << L"{ \"command\" : " << command;
-			//command_stream << L", \"locator\" : " << locator_parameters;
-			//command_stream << L", \"parameters\" : ";
-			//if (request_body.length() > 0) {
-			//	command_stream << request_body;
-			//} else {
-			//	command_stream << "{}";
-			//}
-			//
-			//command_stream << L" }";
-
-			//std::wstring serialized_command = command_stream.str();
 			std::wstringstream command_value_stream;
 			command_value_stream << command;
 			std::wstring command_value = command_value_stream.str();
@@ -285,7 +272,11 @@ int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::w
 			// Skip the colon
 			std::string param_name = url_candidate.substr(param_start_pos + 1, param_len - 1);
 			locator_param_names.push_back(param_name);
-			url_candidate.replace(param_start_pos, param_len, "([^/]+)");
+			if (param_name == "sessionid" || param_name == "id") {
+				url_candidate.replace(param_start_pos, param_len, "([0-9a-fA-F-]+)");
+			} else {
+				url_candidate.replace(param_start_pos, param_len, "([^/]+)");
+			}
 			param_start_pos = url_candidate.find_first_of(":");
 		}
 
