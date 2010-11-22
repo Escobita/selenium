@@ -59,11 +59,21 @@ You can also pass an instance of Selenium::WebDriver::Remote::Capabilities, e.g.
 {{{
 include Selenium
 
-caps = WebDriver::Remote::Capabilities.htmlunit
-caps.javascript_enabled = true
-
+caps = WebDriver::Remote::Capabilities.htmlunit(:javascript_enabled => true)
 driver = WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
+
+You may want to set the proxy settings of a remote browser (this currently only works for firefox)
+
+{{{
+include Selenium
+
+caps = WebDriver::Remote::Capabilities.firefox(:proxy => {:type => :manual, :http => "myproxyaddress:8080"})
+driver = WebDriver.for(:remote, :desired_capabilities => caps)
+}}}
+
+see [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb Selenium::WebDriver::Proxy] for more options
+
 
 == Firefox ==
 
