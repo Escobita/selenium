@@ -341,6 +341,26 @@ task :webdriver_py => [:chrome, :firefox, "//firefox:webdriver", :remote_client]
   end
 end
 
+task :test_ie_py => :webdriver_py do
+  if python? then
+    sh "virtualenv build/python", :verbose => true do |ok, res|
+        if ! ok
+            puts ""
+            puts "PYTHON DEPENDENCY ERROR: Virtualenv not found."
+            puts "Please run '[sudo] pip install virtualenv'"
+            puts ""
+        end
+    end
+    if File.exists?('build/python/bin/py.test')
+        py_test = 'build/python/bin/py.test'
+    else
+        py_test = 'py.test'
+    end
+    test_dir = Dir.glob('build/lib**/selenium/test/selenium/webdriver/ie').first
+    sh py_test, test_dir, :verbose => true
+  end
+end
+
 task :test_chrome_py => :webdriver_py do
   if python? then
     sh "virtualenv build/python", :verbose => true do |ok, res|
