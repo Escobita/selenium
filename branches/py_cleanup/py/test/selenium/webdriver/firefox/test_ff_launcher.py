@@ -26,7 +26,7 @@ class FirefoxLauncherTests (unittest.TestCase):
         self.webdriver.quit()
 
     def testDoubleClose(self):
-        self.webdriver = WebDriver()
+        self.webdriver = webdriver.connect('firefox')
         self.webdriver.close()
         self.webdriver.close()
         self.webdriver.quit()
