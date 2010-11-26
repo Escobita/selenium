@@ -1,6 +1,28 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.9==
+
+What started out as a pretty major change in terms of packaging ended up including two significant bug fixes. Hopefully we avoid that sort of thing with the release. Not that I don't expect it. :)
+
+  * BUG - Sizzle CSS library not included
+  * BUG - Recording works with FF 4.0b7
+
+What 1.0.9 was supposed to have was...
+
+  * NEW - Formatters are *all* plugins. This effectively separates the development of an individual format from the development of the editor. Now, this means that when you install things for the first time you get a tonne of addons. That is ok. Don't panic. Oh, and it also means if you don't want them you have the option to. Not only does this mean fixes to formats get distributed sooner (PHP, I'm looking at you) but 3rd parties will be able to make better packaging choices by having the editor plus their formatters.
+
+Other stuff
+
+  * BUG - the JUnit 4 formatter doesn't try to use a string as the port number
+  * BUG - the window when creating new formats properly closes now
+  * BUG - removed the 'find' button if on OSX since it doesn't do anything on this platform (its a FF bug)
+  * BUG - some hard coded strings have been internationalized
+  * NEW - autocomplete has been enhanced somewhat - see http://code.google.com/p/selenium/issues/detail?id=992
+  * BUG - when switching build systems, the icons for menus and such got left out of the package
+  * BUG - commands are trimmed of whitespace before executing which was sometimes a source of great confusion
+  * BUG - now use a fixed-width font for displaying diffs in the log
+
 ==1.0.8==
 
 This release is primarily to get FF4 support out into the wild since it is getting to the advanced beta phase, but there is also a fair bit of other bug fixes in there as well. About 75% of the fixes in the release are directly the work of Samit Badle and the vast remainder by Jérémy Hérault.
