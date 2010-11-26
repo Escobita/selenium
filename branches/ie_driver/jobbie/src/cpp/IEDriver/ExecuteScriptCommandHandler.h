@@ -39,29 +39,19 @@ protected:
 				return;
 			}
 
-			SAFEARRAY *args;
-			SAFEARRAYBOUND bounds;
-			bounds.cElements = json_args.size();
-			bounds.lLbound = 0;
-			args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+			ScriptWrapper *script_wrapper = new ScriptWrapper(script, json_args.size());
+			status_code = this->PopulateArgumentArray(manager, script_wrapper, json_args);
 
-			status_code = this->PopulateArgumentArray(manager, args, json_args);
-			if (status_code != SUCCESS) {
-				response->SetErrorResponse(status_code, "Unable to populate argument array");
-				return;
-			}
-
-			CComVariant result;
-			status_code = browser_wrapper->ExecuteScript(&script, args, &result);
-			::SafeArrayDestroy(args);
+			status_code = browser_wrapper->ExecuteScript(script_wrapper);
 
 			if (status_code != SUCCESS) {
 				response->SetErrorResponse(status_code, "JavaScript error");
 				return;
 			} else {
 				Json::Value script_result;
-				this->ConvertScriptResult(result, manager, &script_result);
+				this->ConvertScriptResult(script_wrapper, manager, &script_result);
 				response->SetResponse(SUCCESS, script_result);
+				delete script_wrapper;
 				return;
 			}
 		}
@@ -103,45 +93,30 @@ private:
 		return L"Unknown";
 	}
 
-	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, SAFEARRAY * args, Json::Value json_args) {
+	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, ScriptWrapper *script_wrapper, Json::Value json_args) {
 		int status_code = SUCCESS;
-		for (UINT arg_index = 0; arg_index < json_args.size(); ++arg_index)
-		{
+		for (UINT arg_index = 0; arg_index < json_args.size(); ++arg_index) {
 			LONG index = (LONG)arg_index;
 			Json::Value arg = json_args[arg_index];
 			if (arg.isString()) {
 				std::wstring value(CA2W(arg.asString().c_str(), CP_UTF8));
-				CComVariant dest_str(value.c_str());
-				::SafeArrayPutElement(args, &index, &dest_str);
+				script_wrapper->AddArgument(value);
 			} else if (arg.isInt()) {
 				int int_number(arg.asInt());
-				VARIANT dest_int;
-				dest_int.vt = VT_I4;
-				dest_int.lVal = (LONG) int_number;	
-				::SafeArrayPutElement(args, &index, &dest_int);
+				script_wrapper->AddArgument(int_number);
 			} else if (arg.isDouble()) {
 				double dbl_number(arg.asDouble());
-				VARIANT dest_dbl;
-				dest_dbl.vt = VT_R8;
-				dest_dbl.dblVal = dbl_number;	
-				::SafeArrayPutElement(args, &index, &dest_dbl);
+				script_wrapper->AddArgument(dbl_number);
 			} else if (arg.isBool()) {
 				bool bool_arg(arg.asBool());
-				VARIANT dest_bool;
-				dest_bool.vt = VT_BOOL;
-				dest_bool.boolVal = bool_arg;
-				::SafeArrayPutElement(args, &index, &dest_bool);
+				script_wrapper->AddArgument(bool_arg);
 			} else if (arg.isObject() && arg.isMember("ELEMENT")) {
 				std::wstring element_id(CA2W(arg["ELEMENT"].asString().c_str(), CP_UTF8));
 
 				ElementWrapper *element_wrapper;
 				status_code = this->GetElement(manager, element_id, &element_wrapper);
-				if (status_code == SUCCESS)
-				{
-					VARIANT dest_disp;
-					dest_disp.vt = VT_DISPATCH;
-					dest_disp.pdispVal = element_wrapper->element();
-					::SafeArrayPutElement(args, &index, &dest_disp);
+				if (status_code == SUCCESS) {
+					script_wrapper->AddArgument(element_wrapper);
 				}
 			}
 		}
@@ -149,109 +124,68 @@ private:
 		return status_code;
 	}
 
-	int ConvertScriptResult(CComVariant result, BrowserManager *manager, Json::Value *value) {
-		std::string strVal;
-		switch (result.vt) {
-			case VT_BSTR:
-				strVal = CW2A(result.bstrVal, CP_UTF8);
-				*value = strVal;
-				break;
+	int ConvertScriptResult(ScriptWrapper *script_wrapper, BrowserManager *manager, Json::Value *value) {
+		int status_code = SUCCESS;
+		CComVariant result(script_wrapper->result());
+		if (script_wrapper->ResultIsString()) { 
+			std::string string_value;
+			string_value = CW2A(script_wrapper->result().bstrVal, CP_UTF8);
+			*value = string_value;
+		} else if (script_wrapper->ResultIsInteger()) {
+			*value = script_wrapper->result().lVal;
+		} else if (script_wrapper->ResultIsDouble()) {
+			*value = script_wrapper->result().dblVal;
+		} else if (script_wrapper->ResultIsBoolean()) {
+			*value = script_wrapper->result().boolVal == VARIANT_TRUE;
+		} else if (script_wrapper->ResultIsEmpty()) {
+			*value = Json::Value::null;
+		} else if (script_wrapper->ResultIsIDispatch()) {
+			if (script_wrapper->ResultIsArray() || script_wrapper->ResultIsElementCollection()) {
+				BrowserWrapper *browser_wrapper;
+				manager->GetCurrentBrowser(&browser_wrapper);
+				Json::Value result_array(Json::arrayValue);
 
-			case VT_I4:
-			case VT_I8:
-				*value = result.lVal;
-				break;
+				// Prepare an array for the Javascript execution, containing only one
+				// element - the original returned array from a JS execution.
+				std::wstring get_length_script(L"(function(){return function() {return arguments[0].length;}})();");
+				ScriptWrapper *get_length_script_wrapper = new ScriptWrapper(get_length_script, 1);
+				get_length_script_wrapper->AddArgument(script_wrapper->result());
+				int length_result = browser_wrapper->ExecuteScript(get_length_script_wrapper);
 
-			case VT_BOOL:
-				*value = result.boolVal == VARIANT_TRUE;
-				break;
-
-			case VT_DISPATCH: {
-					std::wstring itemType = this->GetScriptResultObjectType(&result);
-					if (itemType == L"JavascriptArray" || itemType == L"HtmlCollection") {
-						BrowserWrapper *browser_wrapper;
-						manager->GetCurrentBrowser(&browser_wrapper);
-						Json::Value result_array(Json::arrayValue);
-						// Prepare an array for the Javascript execution, containing only one
-						// element - the original returned array from a JS execution.
-						SAFEARRAYBOUND length_query;
-						length_query.cElements = 1;
-						length_query.lLbound = 0;
-
-						SAFEARRAY* length_args = SafeArrayCreate(VT_VARIANT, 1, &length_query);
-						LONG index = 0;
-						SafeArrayPutElement(length_args, &index, &result);
-
-						CComVariant length_variant;
-						std::wstring get_length_script(L"(function(){return function() {return arguments[0].length;}})();");
-						int length_result = browser_wrapper->ExecuteScript(
-							&get_length_script,
-							length_args, &length_variant);
-
-						SafeArrayDestroy(length_args);
-						// Expect the return type to be an integer. A non-integer means this was
-						// not an array after all.
-						if (length_variant.vt != VT_I4) {
-							return EUNEXPECTEDJSERROR;
-						}
-
-						LONG length = length_variant.lVal;
-
-						// Prepare an array for the Javascript execution, containing only one
-						// element - the original returned array from a JS execution.
-						SAFEARRAYBOUND item_query;
-						item_query.cElements = 2;
-						item_query.lLbound = 0;
-
-						for (LONG i = 0; i < length; ++i) {
-							SAFEARRAY* item_args = SafeArrayCreate(VT_VARIANT, 1, &item_query);
-							LONG index = 0;
-							::SafeArrayPutElement(item_args, &index, &result);
-
-							CComVariant index_variant;
-							index_variant.vt = VT_I4;
-							index_variant.lVal = i;	
-							index++;
-							::SafeArrayPutElement(item_args, &index, &index_variant);
-
-							CComVariant item_variant;
-							std::wstring get_array_item_script(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
-							int lengthResult = browser_wrapper->ExecuteScript(&get_array_item_script,
-								item_args, &item_variant);
-
-							::SafeArrayDestroy(item_args);
-							Json::Value array_item_result;
-							int array_item_status = this->ConvertScriptResult(item_variant, manager, &array_item_result);
-							result_array[i] = array_item_result;
-						}
-						*value = result_array;
-					} else {
-						IHTMLElement *node = (IHTMLElement*) result.pdispVal;
-						ElementWrapper *element_wrapper;
-						manager->AddManagedElement(node, &element_wrapper);
-						*value = element_wrapper->ConvertToJson();
-					}
+				// Expect the return type to be an integer. A non-integer means this was
+				// not an array after all.
+				if (!get_length_script_wrapper->ResultIsInteger()) {
+					return EUNEXPECTEDJSERROR;
 				}
-				break;
 
-			case VT_EMPTY:
-				*value = Json::Value::null;
-				break;
+				LONG length = get_length_script_wrapper->result().lVal;
+				delete get_length_script_wrapper;
 
-			case VT_USERDEFINED:
-				// TODO: Handle exceptions
-				//*type = TYPE_EXCEPTION;
-				break;
+				// Prepare an array for the Javascript execution, containing only one
+				// element - the original returned array from a JS execution.
+				for (LONG i = 0; i < length; ++i) {
+					std::wstring get_array_item_script(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
+					ScriptWrapper *get_array_item_script_wrapper = new ScriptWrapper(get_array_item_script, 2);
+					get_array_item_script_wrapper->AddArgument(script_wrapper->result());
+					get_array_item_script_wrapper->AddArgument(i);
+					int get_item_result = browser_wrapper->ExecuteScript(get_array_item_script_wrapper);
 
-			case VT_R4:
-			case VT_R8:
-				*value = result.dblVal;
-				break;
-
-			default:
-				return EUNKNOWNSCRIPTRESULT;
+					Json::Value array_item_result;
+					int array_item_status = this->ConvertScriptResult(get_array_item_script_wrapper, manager, &array_item_result);
+					result_array[i] = array_item_result;
+					delete get_array_item_script_wrapper;
+				}
+				*value = result_array;
+			} else {
+				IHTMLElement *node = (IHTMLElement*) script_wrapper->result().pdispVal;
+				ElementWrapper *element_wrapper;
+				manager->AddManagedElement(node, &element_wrapper);
+				*value = element_wrapper->ConvertToJson();
+			}
+		} else {
+			status_code = EUNKNOWNSCRIPTRESULT;
 		}
-		return SUCCESS;
+		return status_code;
 	}
 };
 

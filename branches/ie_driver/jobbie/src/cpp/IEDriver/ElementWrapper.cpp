@@ -124,31 +124,16 @@ int ElementWrapper::GetAttributeValue(std::wstring attribute_name, VARIANT *attr
 	// Close things
 	script += L"};})();";
 
-	SAFEARRAY *args;
-	SAFEARRAYBOUND bounds;
-	bounds.cElements = 2;
-	bounds.lLbound = 0;
-	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+	ScriptWrapper *script_wrapper = new ScriptWrapper(script, 2);
+	script_wrapper->AddArgument(this->element_);
+	script_wrapper->AddArgument(attribute_name);
+	status_code = this->browser_->ExecuteScript(script_wrapper);
 
-	long arg_index(0);
-	VARIANT element_variant;
-	element_variant.vt = VT_DISPATCH;
-	element_variant.pdispVal = this->element_;
-	::SafeArrayPutElement(args, &arg_index, &element_variant);
-
-	arg_index++;
-	CComVariant name_variant(attribute_name.c_str());
-	::SafeArrayPutElement(args, &arg_index, &name_variant);
-
-	CComVariant script_result;
-	status_code = this->browser_->ExecuteScript(&script, args, &script_result);
-	::SafeArrayDestroy(args);
-
-	if (status_code != SUCCESS) {
-		return status_code;
+	if (status_code == SUCCESS) {
+		::VariantCopy(attribute_value, &script_wrapper->result());
 	}
 
-	::VariantCopy(attribute_value, &script_result);
+	delete script_wrapper;
 
 	return SUCCESS;
 }

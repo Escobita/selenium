@@ -13,6 +13,7 @@
 #include "BrowserWrapperEvent.h"
 #include "CommandValues.h"
 #include "ErrorCodes.h"
+#include "ScriptWrapper.h"
 
 #define SCRIPT_ARGTYPE_STRING 0
 #define SCRIPT_ARGTYPE_INT 1
@@ -72,7 +73,8 @@ public:
 
 	bool Wait(void);
 	void GetDocument(IHTMLDocument2 **doc);
-	int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
+	//int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
+	int ExecuteScript(ScriptWrapper *script_wrapper);
 	HWND GetWindowHandle(void);
 	std::wstring GetTitle(void);
 	std::wstring GetCookies(void);

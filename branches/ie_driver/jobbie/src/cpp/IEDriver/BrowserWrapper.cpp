@@ -43,8 +43,147 @@ void BrowserWrapper::GetDocument(IHTMLDocument2 **doc) {
 	}
 }
 
-int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result) {
-	::VariantClear(result);
+//int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result) {
+//	::VariantClear(result);
+//
+//	CComPtr<IHTMLDocument2> doc;
+//	this->GetDocument(&doc);
+//	if (!doc) {
+//		// LOG(WARN) << "Unable to get document reference";
+//		return EUNEXPECTEDJSERROR;
+//	}
+//
+//	CComPtr<IDispatch> script_engine;
+//	HRESULT hr = doc->get_Script(&script_engine);
+//	if (FAILED(hr)) {
+//		// LOGHR(WARN, hr) << "Cannot obtain script engine";
+//		return EUNEXPECTEDJSERROR;
+//	}
+//
+//	DISPID eval_id;
+//	bool added;
+//	bool ok = this->GetEvalMethod(doc, &eval_id, &added);
+//
+//	if (!ok) {
+//		// LOG(WARN) << "Unable to locate eval method";
+//		if (added) { 
+//			this->RemoveScript(doc); 
+//		}
+//		return EUNEXPECTEDJSERROR;
+//	}
+//
+//	CComVariant temp_function;
+//	if (!this->CreateAnonymousFunction(script_engine, eval_id, script, &temp_function)) {
+//		// Debug level since this is normally the point we find out that 
+//		// a page refresh has occured. *sigh*
+//		//LOG(DEBUG) << "Cannot create anonymous function: " << _bstr_t(script) << endl;
+//		if (added) { 
+//			this->RemoveScript(doc); 
+//		}
+//		return EUNEXPECTEDJSERROR;
+//	}
+//
+//	if (temp_function.vt != VT_DISPATCH) {
+//		// No return value that we care about
+//		::VariantClear(result);
+//		result->vt = VT_EMPTY;
+//		if (added) { 
+//			this->RemoveScript(doc); 
+//		}
+//		return SUCCESS;
+//	}
+//
+//	// Grab the "call" method out of the returned function
+//	DISPID call_member_id;
+//	OLECHAR FAR* call_member_name = L"call";
+//	hr = temp_function.pdispVal->GetIDsOfNames(IID_NULL, &call_member_name, 1, LOCALE_USER_DEFAULT, &call_member_id);
+//	if (FAILED(hr)) {
+//		if (added) { 
+//			this->RemoveScript(doc); 
+//		}
+//		//LOGHR(DEBUG, hr) << "Cannot locate call method on anonymous function: " << _bstr_t(script) << endl;
+//		return EUNEXPECTEDJSERROR;
+//	}
+//
+//	DISPPARAMS call_parameters = { 0 };
+//	memset(&call_parameters, 0, sizeof call_parameters);
+//
+//	long lower = 0;
+//	::SafeArrayGetLBound(args, 1, &lower);
+//	long upper = 0;
+//	::SafeArrayGetUBound(args, 1, &upper);
+//	long nargs = 1 + upper - lower;
+//	call_parameters.cArgs = nargs + 1;
+//
+//	CComPtr<IHTMLWindow2> win;
+//	hr = doc->get_parentWindow(&win);
+//	if (FAILED(hr)) {
+//		if (added) { 
+//			this->RemoveScript(doc); 
+//		}
+//		//LOGHR(WARN, hr) << "Cannot get parent window";
+//		return EUNEXPECTEDJSERROR;
+//	}
+//	_variant_t *vargs = new _variant_t[nargs + 1];
+//	::VariantCopy(&(vargs[nargs]), &CComVariant(win));
+//
+//	long index;
+//	for (int i = 0; i < nargs; i++) {
+//		index = i;
+//		CComVariant v;
+//		::SafeArrayGetElement(args, &index, (void*) &v);
+//		::VariantCopy(&(vargs[nargs - 1 - i]), &v);
+//	}
+//
+//	call_parameters.rgvarg = vargs;
+//
+//	EXCEPINFO exception;
+//	memset(&exception, 0, sizeof exception);
+//	hr = temp_function.pdispVal->Invoke(call_member_id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &call_parameters, 
+//		result,
+//		&exception, 0);
+//	if (FAILED(hr)) {
+//		CComBSTR errorDescription(exception.bstrDescription);
+//		if (DISP_E_EXCEPTION == hr)  {
+//			//LOG(INFO) << "Exception message was: " << _bstr_t(exception.bstrDescription);
+//		} else {
+//			//LOGHR(DEBUG, hr) << "Failed to execute: " << _bstr_t(script);
+//			if (added) { 
+//				this->RemoveScript(doc); 
+//			}
+//			return EUNEXPECTEDJSERROR;
+//		}
+//
+//		::VariantClear(result);
+//		result->vt = VT_USERDEFINED;
+//		if (exception.bstrDescription != NULL) {
+//			result->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
+//		} else {
+//			result->bstrVal = ::SysAllocStringByteLen(NULL, 0);
+//		}
+//		wcout << _bstr_t(exception.bstrDescription) << endl;
+//	}
+//
+//	// If the script returned an IHTMLElement, we need to copy it to make it valid.
+//	if( VT_DISPATCH == result->vt ) {
+//		CComQIPtr<IHTMLElement> element(result->pdispVal);
+//		if(element) {
+//			IHTMLElement* &dom_element = * (IHTMLElement**) &(result->pdispVal);
+//			element.CopyTo(&dom_element);
+//		}
+//	}
+//
+//	if (added) { 
+//		this->RemoveScript(doc); 
+//	}
+//
+//	delete[] vargs;
+//
+//	return SUCCESS;
+//}
+//
+int BrowserWrapper::ExecuteScript(ScriptWrapper *script_wrapper) {
+	VARIANT result;
 
 	CComPtr<IHTMLDocument2> doc;
 	this->GetDocument(&doc);
@@ -73,7 +212,7 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	}
 
 	CComVariant temp_function;
-	if (!this->CreateAnonymousFunction(script_engine, eval_id, script, &temp_function)) {
+	if (!this->CreateAnonymousFunction(script_engine, eval_id, &script_wrapper->script(), &temp_function)) {
 		// Debug level since this is normally the point we find out that 
 		// a page refresh has occured. *sigh*
 		//LOG(DEBUG) << "Cannot create anonymous function: " << _bstr_t(script) << endl;
@@ -85,8 +224,8 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 
 	if (temp_function.vt != VT_DISPATCH) {
 		// No return value that we care about
-		::VariantClear(result);
-		result->vt = VT_EMPTY;
+		::VariantClear(&result);
+		result.vt = VT_EMPTY;
 		if (added) { 
 			this->RemoveScript(doc); 
 		}
@@ -109,9 +248,9 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	memset(&call_parameters, 0, sizeof call_parameters);
 
 	long lower = 0;
-	::SafeArrayGetLBound(args, 1, &lower);
+	::SafeArrayGetLBound(script_wrapper->arguments(), 1, &lower);
 	long upper = 0;
-	::SafeArrayGetUBound(args, 1, &upper);
+	::SafeArrayGetUBound(script_wrapper->arguments(), 1, &upper);
 	long nargs = 1 + upper - lower;
 	call_parameters.cArgs = nargs + 1;
 
@@ -131,7 +270,7 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	for (int i = 0; i < nargs; i++) {
 		index = i;
 		CComVariant v;
-		::SafeArrayGetElement(args, &index, (void*) &v);
+		::SafeArrayGetElement(script_wrapper->arguments(), &index, (void*) &v);
 		::VariantCopy(&(vargs[nargs - 1 - i]), &v);
 	}
 
@@ -140,7 +279,7 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 	EXCEPINFO exception;
 	memset(&exception, 0, sizeof exception);
 	hr = temp_function.pdispVal->Invoke(call_member_id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &call_parameters, 
-		result,
+		&result,
 		&exception, 0);
 	if (FAILED(hr)) {
 		CComBSTR errorDescription(exception.bstrDescription);
@@ -154,24 +293,26 @@ int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, V
 			return EUNEXPECTEDJSERROR;
 		}
 
-		::VariantClear(result);
-		result->vt = VT_USERDEFINED;
+		::VariantClear(&result);
+		result.vt = VT_USERDEFINED;
 		if (exception.bstrDescription != NULL) {
-			result->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
+			result.bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
 		} else {
-			result->bstrVal = ::SysAllocStringByteLen(NULL, 0);
+			result.bstrVal = ::SysAllocStringByteLen(NULL, 0);
 		}
 		wcout << _bstr_t(exception.bstrDescription) << endl;
 	}
 
 	// If the script returned an IHTMLElement, we need to copy it to make it valid.
-	if( VT_DISPATCH == result->vt ) {
-		CComQIPtr<IHTMLElement> element(result->pdispVal);
+	if(VT_DISPATCH == result.vt) {
+		CComQIPtr<IHTMLElement> element(result.pdispVal);
 		if(element) {
-			IHTMLElement* &dom_element = * (IHTMLElement**) &(result->pdispVal);
+			IHTMLElement* &dom_element = * (IHTMLElement**) &(result.pdispVal);
 			element.CopyTo(&dom_element);
 		}
 	}
+
+	script_wrapper->set_result(result);
 
 	if (added) { 
 		this->RemoveScript(doc); 
@@ -283,21 +424,12 @@ int BrowserWrapper::DeleteCookie(std::wstring cookie_name) {
 		script += DELETECOOKIES[i];
 	}
 
-	SAFEARRAY *args;
-	SAFEARRAYBOUND bounds;
-	bounds.cElements = 1;
-	bounds.lLbound = 0;
-	args = ::SafeArrayCreate(VT_VARIANT, 1, &bounds);
+	ScriptWrapper *script_wrapper = new ScriptWrapper(script, 1);
+	script_wrapper->AddArgument(cookie_name);
+	int status_code = this->ExecuteScript(script_wrapper);
+	delete script_wrapper;
 
-	long index = 0;
-	CComVariant name(cookie_name.c_str());
-	::SafeArrayPutElement(args, &index, &name);
-
-	CComVariant result;
-	int statusCode = this->ExecuteScript(&script, args, &result);
-	::SafeArrayDestroy(args);
-
-	return statusCode;
+	return status_code;
 }
 
 void BrowserWrapper::AttachToWindowInputQueue() {

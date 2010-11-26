@@ -411,6 +411,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ScriptWrapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -694,6 +698,10 @@
 			</File>
 			<File
 				RelativePath=".\QuitCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScriptWrapper.h"
 				>
 			</File>
 			<File
