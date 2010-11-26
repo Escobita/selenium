@@ -34,7 +34,7 @@ def connect(driver_name, server_address='http://127.0.0.1:4444', browser_name=''
     if driver_name.lower() == 'ie':
         from ie.webdriver import WebDriver as ie_driver
         return ie_driver()
-    if driver_name.lower() == 'c':
+    if driver_name.lower() == 'chrome':
         from chrome.webdriver import WebDriver as chrome_driver
         return chrome_driver()
     if driver_name.lower() == 'remote':
