@@ -51,11 +51,10 @@ If you need to access the main xserve ui (for instance, to play with VMWare) you
 Bamboo is running on the host server as the user *bamboo*. Once SSH'd in to your personal account (using the above SSH config, ideally), you can switch over to this account with the following command:
 
 {{{
-sudo su - builduser
+sudo su - bamboo
 }}}
 
 To control bamboo itself you use the */Applications/Bamboo/bamboo.sh* script which is a standard sys v one so start, stop, etc. are all supported.
-
 
 There is another important user to be aware of: *admin*. This user's password is stored locally on the server at /var/root/ADMIN_PASSWORD and can be read by switching to root from your user account (ie: sudo su - ) and then reading that file.
 
@@ -77,6 +76,10 @@ More often, you'll want to log directly in to the VMs to perform maintenance on 
    * SSH to localhost port 1123 with the username openqa and the standard OpenQA password.
 
 Note: the "standard OpenQA password" can be obtained by talking to PatrickLightbody or any other developer who already has access.
+
+= Build Server =
+
+Anyone currently can access build artifacts or see the state of the world inside Bamboo. There is another category of user who can configure builds and start manual ones. If you think you need access to do either of these things, let us know.
 
 = Agents =
 
