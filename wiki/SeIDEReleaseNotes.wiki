@@ -3,12 +3,12 @@
 
 ==1.0.9==
 
-What started out as a pretty major change in terms of packaging ended up including two significant bug fixes. Hopefully we avoid that sort of thing with the release. Not that I don't expect it. :)
+What started out as a pretty major change in terms of packaging ended up including two significant bug fixes as well. Hopefully we avoid that sort of thing with the release. Not that I don't expect it. :)
 
   * BUG - Sizzle CSS library not included
   * BUG - Recording works with FF 4.0b7
 
-What 1.0.9 was supposed to have was...
+What 1.0.9 was supposed to only have was...
 
   * NEW - Formatters are *all* plugins. This effectively separates the development of an individual format from the development of the editor. Now, this means that when you install things for the first time you get a tonne of addons. That is ok. Don't panic. Oh, and it also means if you don't want them you have the option to. Not only does this mean fixes to formats get distributed sooner (PHP, I'm looking at you) but 3rd parties will be able to make better packaging choices by having the editor plus their formatters.
 
