@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.ie;
 
+import static java.lang.String.format;
 import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 
 import java.io.File;
@@ -56,6 +57,8 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   }
 
   public InternetExplorerDriver(DesiredCapabilities capabilities) {
+    assertOnWindows();
+
     proxyManager = new WindowsProxyManager(true, "webdriver-ie", 0, 0);
     prepareProxy(capabilities);
     setup();

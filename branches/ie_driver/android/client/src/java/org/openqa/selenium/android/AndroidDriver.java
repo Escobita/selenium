@@ -23,6 +23,7 @@ import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.browserlaunchers.CapabilityType;
+import org.openqa.selenium.html5.BrowserConnection;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -35,7 +36,8 @@ import java.net.URL;
 /**
  * A driver for running tests on an Android device or emulator.
  */
-public class AndroidDriver extends RemoteWebDriver implements TakesScreenshot, Rotatable {
+public class AndroidDriver extends RemoteWebDriver implements TakesScreenshot, Rotatable,
+    BrowserConnection {
   
   /**
    * The default constructor assumes the remote server is listening at
@@ -58,10 +60,19 @@ public class AndroidDriver extends RemoteWebDriver implements TakesScreenshot, R
     return target.convertFromBase64Png(base64Png);
   }
 
+  public boolean isOnline() {
+    return (Boolean) execute(DriverCommand.IS_BROWSER_ONLINE).getValue();
+  }
+
+  public void setOnline(boolean online) throws WebDriverException {
+    execute(DriverCommand.SET_BROWSER_ONLINE, ImmutableMap.of("state", online));
+  }
+
   private static DesiredCapabilities getAndroidCapabilities() {
     DesiredCapabilities caps = DesiredCapabilities.android();
     caps.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
     caps.setCapability(CapabilityType.ROTATABLE, true);
+    caps.setCapability(CapabilityType.SUPPORTS_BROWSER_CONNECTION, true);
     return caps;
   }
 

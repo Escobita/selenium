@@ -17,10 +17,13 @@ limitations under the License.
 
 package org.openqa.selenium.android;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
 import android.content.Context;
-import android.os.SystemClock;
+import android.content.Intent;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -31,6 +34,7 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rotatable;
 import org.openqa.selenium.ScreenOrientation;
@@ -49,6 +53,7 @@ import org.openqa.selenium.android.intents.IntentSender;
 import org.openqa.selenium.android.sessions.SessionCookieManager;
 import org.openqa.selenium.android.util.JsUtil;
 import org.openqa.selenium.android.util.SimpleTimer;
+import org.openqa.selenium.html5.BrowserConnection;
 import org.openqa.selenium.internal.Base64Encoder;
 import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByLinkText;
@@ -65,7 +70,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, JavascriptExecutor,
     FindsById, FindsByLinkText, FindsByName, FindsByXPath, TakesScreenshot,
-    IntentReceiverListener, Rotatable {
+    IntentReceiverListener, Rotatable, BrowserConnection {
 
   public static final String LOG_TAG = AndroidDriver.class.getName();
   
@@ -80,8 +85,6 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   public static final String TYPE = "_TYPE";  // Prefixes JS result to be converted
   public static final String WEBELEMENT_TYPE = TYPE + "1:"; // Convert to WebElement
   
-  private static final String WINDOW_HANDLE = "windowOne";
-  private static final String NOT_DONE_INDICATOR = Long.toString(SystemClock.uptimeMillis());
   private static Context context;
   private final SimpleTimer timer;
   private final IntentReceiverRegistrar intentRegistrar;
@@ -102,7 +105,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     currentFrame = "window";
     intentRegistrar = new IntentReceiverRegistrar(getContext());
     timer = new SimpleTimer();
-    sender = new IntentSender();
+    sender = new IntentSender(getContext());
     // TODO(berrada): This object is stateless, think about isolating the JS and
     // provide helper functions.
     domAccessor = new JavascriptDomAccessor(this);
@@ -171,7 +174,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
         if (timer.getTimeElapsedInMillisSinceStart() > implicitWait) {
           throw e;
         }
-        sleepQuietly(100);
+        Sleeper.sleepQuietly(100);
       }
     }
   }
@@ -182,21 +185,12 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     do {
       found = by.findElements(this);
       if (found.isEmpty()) {
-        sleepQuietly(100);
+        Sleeper.sleepQuietly(100);
       } else {
         break;
       }
     } while (timer.getTimeElapsedInMillisSinceStart() <= implicitWait);
     return found;
-  }
-
-  private static void sleepQuietly(long ms) {
-    try {
-      Thread.sleep(ms);
-    } catch (InterruptedException cause) {
-      Logger.log(Log.ERROR, LOG_TAG,
-          "Sleep, interupted: " + cause.getMessage());
-    }
   }
 
   public WebElement findElementByLinkText(String using) {
@@ -248,13 +242,16 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   }
 
   public Set<String> getWindowHandles() {
-    Set<String> toReturn = Sets.newHashSet();
-    toReturn.add(WINDOW_HANDLE);
-    return toReturn;
+    String result = (String) sendIntent(Action.GET_ALL_WINDOW_HANDLES);
+    Iterable<String> iterable = Splitter.on(",")
+        .trimResults()
+        .omitEmptyStrings()
+        .split(result.substring(1, result.length() -1));
+    return Sets.newHashSet(iterable);
   }
 
   public String getWindowHandle() {
-    return WINDOW_HANDLE;
+    return (String) sendIntent(Action.GET_CURRENT_WINDOW_HANDLE);
   }
 
   public TargetLocator switchTo() {
@@ -297,7 +294,11 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     }
 
     public WebDriver window(String nameOrHandle) {
-      throw new UnsupportedOperationException("Only one window can be opened at a time.");
+      boolean success = (Boolean) sendIntent(Action.SWITCH_TO_WINDOW, nameOrHandle);
+      if (!success) {
+        throw new NoSuchWindowException(String.format("Invalid window name \"%s\".", nameOrHandle));
+      }
+      return AndroidDriver.this;
     }
     
     private void setCurrentFrame(String frameNameOrId) {
@@ -403,14 +404,14 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
    * @param args the Javascript to be executed
    */
   private void executeJavascriptInWebView(Object... args) {
-    jsResult = NOT_DONE_INDICATOR;
+    jsResult = Action.NOT_DONE_INDICATOR;
     timer.start();
     sendIntent(Action.EXECUTE_JAVASCRIPT, args);
     
     FutureExecutor.executeFuture(new Callable<Void>() {
       public Void call() {
-        while (NOT_DONE_INDICATOR.equals(jsResult)) {
-          sleepQuietly(10);
+        while (Action.NOT_DONE_INDICATOR.equals(jsResult)) {
+          Sleeper.sleepQuietly(10);
         }
         return null;
       }
@@ -562,7 +563,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     FutureExecutor.executeFuture(new Callable<Void>() {
       public Void call() throws Exception {
         while (!pageHasLoaded) {
-          sleepQuietly(50);
+          Sleeper.sleepQuietly(50);
         }
         return null;
       }
@@ -574,7 +575,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     FutureExecutor.executeFuture(new Callable<Void>() {
       public Void call() throws Exception {
         while (!editableAreaIsFocused) {
-          sleepQuietly(50);
+          Sleeper.sleepQuietly(50);
         }
         return null;
       }
@@ -600,7 +601,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     resetPageHasLoaded();
     resetPageHasStartedLoading();
     editableAreaIsFocused = false;
-    sender.broadcast(getContext(), action, args);
+    sender.broadcast(action, args);
     return FutureExecutor.executeFuture(sender, INTENT_TIMEOUT);
   }
 
@@ -644,5 +645,18 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
       }
     }
     return pageHasStartedLoading;
+  }
+
+  public boolean isOnline() {
+    return Settings.System.getInt(getContext().getContentResolver(),
+        Settings.System.AIRPLANE_MODE_ON, 0) == 0;
+  }
+
+  public void setOnline(boolean online) throws WebDriverException {
+    Settings.System.putInt(getContext().getContentResolver(),
+        Settings.System.AIRPLANE_MODE_ON, online ? 0 : 1);
+    Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+    intent.putExtra("state", !online);
+    getContext().sendBroadcast(intent);
   }
 }
