@@ -20,7 +20,7 @@ import time
 import urllib
 from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
 from selenium.test.selenium.webdriver.common import api_examples
-from selenium.webdriver.remote.webdriver import WebDriver
+from selenium import webdriver
 
 SERVER_ADDR = "localhost"
 DEFAULT_PORT = 4444
@@ -57,7 +57,7 @@ def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     RemoteApiExampleTest.webserver = webserver
-    RemoteApiExampleTest.driver = WebDriver(url, "firefox", "ANY")
+    RemoteApiExampleTest.driver = webdriver.connect("remote", browser_name="firefox", platform="ANY")
 
 
 class RemoteApiExampleTest(api_examples.ApiExampleTest):
