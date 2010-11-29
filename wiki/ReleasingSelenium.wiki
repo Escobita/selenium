@@ -59,12 +59,13 @@
 
 == selenium-webdriver ==
 
- # Release gem, replace A.B.C with the appropriate version. You will need to be registered as a gem owner on rubygems.org.
-  # `go //rb:gem:release VERSION=A.B.C`
- # Update docs
-  # `rake rubydocs`
-  # `cp -r build/rubydocs/* docs/api/rb`
-  # Commit new docs.
+ # To release a new gem you will need to be registered as a gem owner on rubygems.org.
+  # Bump the version number in rb/build.desc.
+  # Update rb/CHANGES with a summary of changes since the last release.
+  # Update docs: `rm -rf docs/api/rb && ./go //rb:docs` (you'll need the YARD gem installed)
+  # Commit the changes.
+  # `./go //rb:gem:release`
+  # Bump version number in rb/build.desc to "X.X.X.dev" and commit the change.
 
 = Areas to Improve =
 
