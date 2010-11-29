@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
-# Copyright 2008-2009 WebDriver committers
-# Copyright 2008-2009 Google Inc.
+# Copyright 2008-2010 WebDriver committers
+# Copyright 2008-2010 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,21 @@
 # limitations under the License.
 
 
-from selenium.test.selenium.webdriver.common import api_examples
 from selenium import webdriver
+from selenium.test.selenium.webdriver.common import api_examples
+from selenium.test.selenium.webdriver.common.webserver import SimpleWebServer
 
-if __name__ == "__main__":
-    api_examples.run_tests(webdriver.connect('ie'))
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    IeApiExampleTest.webserver = webserver
+    IeApiExampleTest.driver = webdriver.connect('ie')
 
+
+class IeApiExampleTest(api_examples.ApiExampleTest):
+    pass
+
+
+def teardown_module(module):
+    IeApiExampleTest.driver.quit()
+    IeApiExampleTest.webserver.stop()
