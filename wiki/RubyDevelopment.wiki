@@ -7,7 +7,7 @@ This page details how to build and test the Ruby code in Selenium.
 
 = Details =
 
-The CrazyFunBuild used to build Selenium runs on a bundled JRuby jar and is based on Rake. Use the 'go' Rake wrapper to run the targets. Unfortunately, rvm sets GEM_HOME and causes trouble for our jruby-complete.jar. If you use rvm, you should disable it (`rvm use system`) before using the go script.
+The CrazyFunBuild runs on a bundled JRuby jar and is based on Rake. Use the 'go' Rake wrapper to run the targets. Unfortunately, rvm sets GEM_HOME and causes trouble for our jruby-complete.jar. If you use rvm, you should disable it (`rvm use system`) before using the go script.
 
 Since this is just a wrapper for Rake, familiar commands (like `go -T` to list targets) all work.
 
