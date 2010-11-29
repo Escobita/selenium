@@ -1,0 +1,42 @@
+#summary Developing the Ruby bindings
+#labels Phase-Implementation
+
+= Introduction =
+
+This page details how to build and test the Ruby code in Selenium.
+
+= Details =
+
+The CrazyFunBuild used to build Selenium runs on a bundled JRuby jar and is based on Rake. Use the 'go' Rake wrapper to run the targets. Unfortunately, rvm sets GEM_HOME and causes trouble for our jruby-complete.jar. If you use rvm, you should disable it (`rvm use system`) before using the go script.
+
+Since this is just a wrapper for Rake, familiar commands (like `go -T` to list targets) all work.
+
+== Building ==
+
+After making changes, you need to build the code (this is needed since we depend on other parts of the project):
+
+  * `./go //rb:firefox`
+  * `./go //rb:chrome`
+etc.
+
+Build results go in the `build/rb` directory. You can play with your changes in irb from there:
+
+  `irb -I build/rb/lib -r selenium-webdriver`
+
+Using/requiring the ruby code from `rb/lib` directly is not recommended.
+
+== Testing ==
+
+Most of the test targets can be run on either the bundled JRuby environment (includes gem dependencies) or your local Ruby installation. For the local install, it's a good idea to run `./go //rb:install-gems` to make sure you have the dependencies installed.  If you want to use the bundled JRuby instead, replace 'mri' with 'jruby' in the commands below.
+
+  * `./go //rb:unit-test:mri` - Run unit tests for WebDriver.
+  * `./go //rb:firefox-test:mri` - Run integration tests for Firefox - replace "firefox" with any driver.
+  * `./go //rb:rc-client-unit-test:mri` - Run unit tests for selenium-client (Se 1.x/RC)
+  * `./go //rb:rc-client-integration-test:mri` - Run integration tests for selenium-client (Se 1.x/RC)
+
+== Contributing == 
+
+  * Make your feature addition or bug fix.
+  * Add tests for it. This is important so we don't break it in a future version unintentionally.
+  * Create a patch: `svn diff > my-feature.patch`
+  * Create a [http://code.google.com/p/selenium/issues/entry new issue], attach the patch and add the Lang-Ruby label.
