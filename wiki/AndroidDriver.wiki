@@ -123,7 +123,7 @@ public class OneTest extends TestCase {
 }.
 }}}
 
-To compile and run this example you will need the Android Client library in {{{./webdriver/build/android/client/client.jar}}} (see below for details of how to build it), and selenium-server-standalone-2.0a5.jar (or the current version available on this site).
+To compile and run this example you will need the selenium-java-X.jar (client side piece of selenium).
 
 = Get Involved =
    * Check out the code:
