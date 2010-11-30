@@ -21,7 +21,7 @@ Other stuff
   * NEW - autocomplete has been enhanced somewhat - see http://code.google.com/p/selenium/issues/detail?id=992
   * BUG - when switching build systems, the icons for menus and such got left out of the package
   * BUG - commands are trimmed of whitespace before executing which was sometimes a source of great confusion
-  * BUG - now use a fixed-width font for displaying diffs in the log
+  * BUG - now preserves whitespace when displaying diffs in the log
 
 ==1.0.8==
 
