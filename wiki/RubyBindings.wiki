@@ -63,21 +63,32 @@ caps = WebDriver::Remote::Capabilities.htmlunit(:javascript_enabled => true)
 driver = WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
 
-You may want to set the proxy settings of a remote browser (this currently only works for firefox)
+You may want to set the proxy settings of the remote browser (this currently only works for firefox)
 
 {{{
 include Selenium
 
-caps = WebDriver::Remote::Capabilities.firefox(:proxy => {:type => :manual, :http => "myproxyaddress:8080"})
+caps = WebDriver::Remote::Capabilities.firefox(:proxy => WebDriver::Proxy.new(:http => "myproxyaddress:8080"))
 driver = WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
+
+Or if you have a proxy in front of the remote server:
+
+{{{
+include Selenium
+
+client = WebDriver::Remote::Http::Default.new
+client.proxy = Proxy.new(:http => "http://proxy.org:8080")
+
+driver = WebDriver.for(:remote, :http_client => client)
+}}} 
 
 see [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb Selenium::WebDriver::Proxy] for more options
 
 
 == Firefox ==
 
-The FirefoxDriver lets you configure the profile used by WebDriver.
+The FirefoxDriver lets you configure the profile used.
 
 === Adding an extension ===
 
@@ -102,13 +113,12 @@ driver = Selenium::WebDriver.for(:firefox, :profile => "my-existing-profile")
 
 === Tweaking Firefox preferences ===
 
-Use a SOCKS proxy:
+Use a proxy:
 
 {{{
 profile = Selenium::WebDriver::Firefox::Profile.new
-profile['network.proxy.socks'] = 'localhost'
-profile['network.proxy.socks_port'] = 12345
-profile['network.proxy.type'] = 1
+proxy = Selenium::WebDriver::Proxy.new(:http => "http://proxy.org:8080")
+profile.proxy = proxy
 
 driver = Selenium::WebDriver.for :firefox, :profile => profile
 }}}
@@ -158,24 +168,25 @@ WebDriver lets you configure implicit waits, so that a call to #find_element wil
   driver.manage.timeouts.implicit_wait = 3 # seconds
 }}}
 
-=== Internal timeouts ===
-
-Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, Net::HTTP from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
-
-{{{
-  Selenium::WebDriver::Remote::Http::Default.timeout = 120 # seconds
-  driver = Selenium::WebDriver.for(:remote)
-}}}  
-
 == Using Curb or your own HTTP client ==
 
-For internal HTTP communication, Net::HTTP is used by default. If you have the [https://rubygems.org/gems/curb Curb gem] installed, you can switch to it by doing:
+For internal HTTP communication, Net::HTTP is used by default. If you e.g. have the [https://rubygems.org/gems/curb Curb gem] installed, you can switch to it by doing:
 
 {{{
 require 'selenium/webdriver/remote/http/curb'
 include Selenium
 
-driver = WebDriver.for(:firefox, :http_client => WebDriver::Remote::Http::Curb)
+client = WebDriver::Remote::Http::Curb.new
+driver = WebDriver.for(:firefox, :http_client => client)
 }}}
 
- 
+
+=== Internal timeouts ===
+
+Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, Net::HTTP from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
+
+{{{
+  client = Selenium::WebDriver::Remote::Http::Default.new
+  client.timeout = 120 # seconds
+  driver = Selenium::WebDriver.for(:remote, :http_client => client)
+}}}  
