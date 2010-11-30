@@ -32,7 +32,9 @@ _Documentation coming soon..._
 == Install the SDK ==
 Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it in a directory, say ~/android_sdk/ .
 
-Note: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
+Note 1: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
+
+Note2: On Linux, android SDK is distributed for 32-bits machine. If you have a 64-bit machine you will need to install ia32-libs http://developer.android.com/sdk/installing.html#troubleshooting
 
 == Setup the Emulator  ==
 === Create An AVD ===
