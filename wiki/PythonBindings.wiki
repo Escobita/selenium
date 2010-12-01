@@ -24,6 +24,26 @@ The subversion repository is located at http://selenium.googlecode.com/svn/trunk
 
 Upon completion, the package should be installed successfully.
 
+One advantage of using trunk as of writing, is the reorganization of the package, and the addition of a webdriver.connect() function, which allows reuse of test cases in multiple browsers.
+
+Previously, to initialize a browser you had to perform,
+
+{{{
+from selenium.firefox.webdriver import WebDriver
+
+driver = WebDriver()
+}}}
+
+This has been changed, so now all that is required is:
+
+{{{
+from selenium import webdriver
+
+driver = webdriver.connect('firefox')
+
+}}}
+
+
 ==Testing Source==
 
 When developing Selenium, it is recommended you run the tests before and after making any changes to the code base. To perform these tests, enter {{{python py_test.py}}} in terminal while in the root directory of your local copy. Alternately, you can run {{{./go test_firefox_py}}} from the root of your local copy.
