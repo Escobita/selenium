@@ -65,3 +65,9 @@ If you're doing development work on the ChromeDriver itself, the test suites are
 The underlying assumption is that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
 
 {{{System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");}}}
+
+= The New ChromeDriver = 
+
+There is a new chrome driver being implemented as part of the Chromium project. This is expected to become the standard version once it's complete. To build it, check out the chromium tree, then run `make chromedriver`. This will generate a new `chromedriver` executable in the same directory as `chrome` which can be run to start a server that understands the JsonWireProtocol and can be used with the RemoteWebDriver.
+
+As it stands, the new ChromeDriver lacks functionality. You can apply the patches [http://codereview.chromium.org/user/Joe here] to add this missing functionality.
