@@ -40,6 +40,33 @@ Finally, you can get even more verbose logging by modifying the Rakefile and com
 
 {{{verbose false}}}
 
+The logs are kept in the "build/test_logs" folder.
+
+= Tips =
+
+== Building Selenium Server ==
+
+You'll get a long way with just: 
+
+{{{go //remote/server:server:uber //remote/client:combined:project}}}
+
+
+You can replace that second target with: 
+
+
+{{{//remote/client:combined:uber}}}
+
+
+That'll build the standalone "selenium server" jar and the client 
+library too. The build output will tell you where the output files are 
+being placed. 
+
+
+"//remote/client:combined:uber" contains just the client-side pieces 
+and dependencies. "//remote/server:server:uber" contains not only 
+that, but also the server-side code, including the remote webdriver 
+server and the original selenium server.
+
 = Common Problems =
 
 == Nothing Compiles ==
