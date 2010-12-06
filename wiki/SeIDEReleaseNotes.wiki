@@ -1,6 +1,14 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.10==
+
+Another packaging problem broke the various things that used getText(). Which of course is one of the most commonly used bits of the API.
+
+  * BUG - properly including se-core atoms
+
+As a result, we've started to rebuild the test suite for things. It's going to take awhile to get the coverage we're hoping for, but it'll be worth it if we can go at least 2 days after a release before becoming embarrassed.
+
 ==1.0.9==
 
 What started out as a pretty major change in terms of packaging ended up including two significant bug fixes as well. Hopefully we avoid that sort of thing with the release. Not that I don't expect it. :)
