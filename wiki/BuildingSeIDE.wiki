@@ -10,11 +10,11 @@ Most of the time people reading this will want to use it in a 'development' mode
 In order to do this you need to...
 
   # configure your Firefox profile along the lines of https://developer.mozilla.org/en/Setting_up_extension_development_environment
-  # move code around in your local copy to be 'proxy' friendly. To do this you can use the _ se_ide:setup_proxy _ task
+  # move code around in your local copy to be 'proxy' friendly. To do this you can use the _ s ide_proxy_setup _ task
 {{{
-./go se_ide:setup_proxy
+./go ide_proxy_setup
 or 
-go.bat se_ide:setup_proxy
+go.bat ide_proxy_setup
 }}}
   # in your profile's extension directory, create a file called editor@seleniumhq.org and in it put the complete path to the trunk/ide/main/src directory
   # restart firefox
