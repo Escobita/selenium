@@ -114,13 +114,13 @@ protected:
 	}
 private:
 	static WORD WINAPI SendKeysCommandHandler::SetFileValue(FileNameData *data) {
-		::Sleep(200);
+		::Sleep(WAIT_TIME_IN_MILLISECONDS);
 		HWND ie_main_window_handle = data->main;
 		HWND dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
 
 		int max_wait = 10;
 		while ((dialog_window_handle == ie_main_window_handle) && --max_wait) {
-			::Sleep(200);
+			::Sleep(WAIT_TIME_IN_MILLISECONDS);
 			dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
 		}
 

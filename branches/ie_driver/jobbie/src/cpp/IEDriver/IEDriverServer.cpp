@@ -242,7 +242,6 @@ std::wstring IEDriverServer::SendCommandToManager(std::wstring serialized_comman
 	
 	int response_length = (int)::SendMessage(this->manager_window_handle_, WD_GET_RESPONSE_LENGTH, NULL, NULL);
 	while (response_length == 0) {
-		::Sleep(100);
 		response_length = (int)::SendMessage(this->manager_window_handle_, WD_GET_RESPONSE_LENGTH, NULL, NULL);
 	}
 
@@ -254,11 +253,10 @@ std::wstring IEDriverServer::SendCommandToManager(std::wstring serialized_comman
 	return serialized_response;
 }
 
-int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::wstring *locator)
-{
+int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::wstring *locator) {
 	int value = NoCommand;
-	std::map<std::string, map<std::string, int>>::iterator end = this->command_repository_.end();
-	for (std::map<std::string, map<std::string, int>>::iterator it = this->command_repository_.begin(); it != end; ++it) {
+	std::map<std::string, map<std::string, int>>::iterator it = this->command_repository_.begin();
+	for (; it != this->command_repository_.end(); ++it) {
 		std::vector<std::string> locator_param_names;
 		std::string url_candidate = (*it).first;
 		size_t param_start_pos = url_candidate.find_first_of(":");

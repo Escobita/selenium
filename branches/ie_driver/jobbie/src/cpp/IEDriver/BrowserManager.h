@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "BrowserWrapper.h"
 #include "ElementWrapper.h"
 #include "ElementFinder.h"
@@ -21,7 +22,7 @@
 #define WD_GET_RESPONSE WM_APP + 5
 #define WD_WAIT WM_APP + 6
 
-#define WAIT_TIME_IN_MILLISECONDS 300
+#define WAIT_TIME_IN_MILLISECONDS 100
 
 #define EVENT_NAME L"WD_START_EVENT"
 
@@ -97,9 +98,9 @@ private:
 	void PopulateCommandHandlerRepository(void);
 	void PopulateElementFinderRepository(void);
 
-	std::map<std::wstring, BrowserWrapper*> managed_browsers_;
-	std::map<std::wstring, ElementWrapper*> managed_elements_;
-	std::map<std::wstring, ElementFinder*> element_finders_;
+	std::tr1::unordered_map<std::wstring, BrowserWrapper*> managed_browsers_;
+	std::tr1::unordered_map<std::wstring, ElementWrapper*> managed_elements_;
+	std::tr1::unordered_map<std::wstring, ElementFinder*> element_finders_;
 
 	BrowserFactory *factory_;
 	std::wstring current_browser_id_;
@@ -114,7 +115,7 @@ private:
 	std::wstring serialized_response_;
 	int new_browser_event_id_;
 	int browser_quitting_event_id_;
-	std::map<int, WebDriverCommandHandler*> command_handlers_;
+	std::tr1::unordered_map<int, WebDriverCommandHandler*> command_handlers_;
 	bool is_waiting_;
 };
 
