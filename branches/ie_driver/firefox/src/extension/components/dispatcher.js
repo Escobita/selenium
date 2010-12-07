@@ -52,7 +52,7 @@ Dispatcher.executeAs = function(name) {
     var json = {
       'name': name,
       'sessionId': {
-        'value': request.getAttribute('sessionId') 
+        'value': request.getAttribute('sessionId')
       },
       'parameters': JSON.parse(request.getBody() || '{}')
     };
@@ -143,13 +143,23 @@ Dispatcher.prototype.init_ = function() {
 
   this.bind_('/session/:sessionId/timeouts/implicit_wait').
       on(Request.Method.POST, Dispatcher.executeAs('implicitlyWait'));
+  this.bind_('/session/:sessionId/timeouts/async_script').
+      on(Request.Method.POST, Dispatcher.executeAs('setScriptTimeout'));
 
   this.bind_('/session/:sessionId/url').
       on(Request.Method.GET, Dispatcher.executeAs('getCurrentUrl')).
       on(Request.Method.POST, Dispatcher.executeAs('get'));
 
+  this.bind_('/session/:sessionId/accept_alert').
+    on(Request.Method.POST, Dispatcher.executeAs('acceptAlert'));
   this.bind_('/session/:sessionId/dismiss_alert').
     on(Request.Method.POST, Dispatcher.executeAs('dismissAlert'));
+  this.bind_('/session/:sessionId/alert_text').
+    on(Request.Method.GET, Dispatcher.executeAs('getAlertText')).
+    on(Request.Method.POST, Dispatcher.executeAs('setAlertValue'));
+
+  this.bind_('/session/:sessionId/alert_text').
+    on(Request.Method.GET, Dispatcher.executeAs('getAlertText'));
 
   this.bind_('/session/:sessionId/forward').
       on(Request.Method.POST, Dispatcher.executeAs('goForward'));
@@ -160,6 +170,8 @@ Dispatcher.prototype.init_ = function() {
 
   this.bind_('/session/:sessionId/execute').
       on(Request.Method.POST, Dispatcher.executeAs('executeScript'));
+  this.bind_('/session/:sessionId/execute_async').
+      on(Request.Method.POST, Dispatcher.executeAs('executeAsyncScript'));
 
   this.bind_('/session/:sessionId/source').
       on(Request.Method.GET, Dispatcher.executeAs('getPageSource'));

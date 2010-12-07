@@ -6,16 +6,10 @@ const CI = Components.interfaces;
 
 const CONSOLE = CC["@mozilla.org/consoleservice;1"].getService(CI["nsIConsoleService"]);
 
-function dumpn(message) {
-  try {
-    CONSOLE.logStringMessage(message + "\n");
-  } catch (e) {
-    dump(message + "\n");
-  }
-}
-
 // Spoof implementation
 function DrivenPromptService() {
+  Components.utils.import('resource://fxdriver/modules/utils.js');
+
   // as defined in nsPromptService.h
   var ORIGINAL_PARENT_SERVICE_ID = "{A2112D6A-0E28-421f-B46A-25C0B308CBD0}";
 
@@ -26,7 +20,7 @@ function DrivenPromptService() {
         originalService.QueryInterface(Components.interfaces.nsIPromptService);
   }
 
-  dumpn("Spoofing prompt service");
+  Logger.dumpn("Spoofing prompt service");
 }
 
 // Constants from nsIPromtService.idl
@@ -95,46 +89,60 @@ DrivenPromptService.prototype.findAssociatedDriver_ = function(window) {
   return undefined;
 };
 
-DrivenPromptService.prototype.alert = function(aParent, aDialogTitle, aText) {
+DrivenPromptService.prototype.signalOpenModal_ = function(parent, title, text) {
   // Try to grab the top level window
-  var driver = this.findAssociatedDriver_(aParent);
+  var driver = this.findAssociatedDriver_(parent);
 
   if (driver && driver.response_) {
+    webdriver.modals.setFlag(driver, text);
+
     var res = driver.response_;
     res.value = {
-      title: aDialogTitle,
-      text: aText,
-      __webdriverType: 'alert'
+      title: title,
+      text: text
     };
+    res.statusCode = ErrorCode.MODAL_DIALOG_OPENED;
     res.send();
-  } else {
-    // TODO(simon): we should prevent the next command from blocking.
   }
+};
+
+DrivenPromptService.prototype.alert = function(aParent, aDialogTitle, aText) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
 
   return this.originalPromptService_.alert(aParent, aDialogTitle, aText);
 };
 
 DrivenPromptService.prototype.alertCheck =
 function(aParent, aDialogTitle, aText, aCheckMsg, aCheckState) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
+
   return this.originalPromptService_.alertCheck(aParent, aDialogTitle, aText, aCheckMsg, aCheckState);
 };
 
 DrivenPromptService.prototype.confirm = function(aParent, aDialogTitle, aText) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
+
   return this.originalPromptService_.confirm(aParent, aDialogTitle, aText);
 };
 
 DrivenPromptService.prototype.confirmCheck =
 function(aParent, aDialogTitle, aText, aCheckMsg, aCheckState) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
+
   return this.originalPromptService_.confirmCheck(aParent, aDialogTitle, aText, aCheckMsg, aCheckState);
 };
 
 DrivenPromptService.prototype.confirmEx =
 function(aParent, aDialogTitle, aText, aButtonFlags, aButton0Title, aButton1Title, aButton2Title, aCheckMsg, aCheckState) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
+
   return this.originalPromptService_.confirmEx(aParent, aDialogTitle, aText, aButtonFlags, aButton0Title, aButton1Title, aButton2Title, aCheckMsg, aCheckState);
 };
 
 DrivenPromptService.prototype.prompt =
 function(aParent, aDialogTitle, aText, aValue, aCheckMsg, aCheckState) {
+  this.signalOpenModal_(aParent, aDialogTitle, aText);
+
   return this.originalPromptService_.prompt(aParent, aDialogTitle, aText, aValue, aCheckMsg, aCheckState);
 };
 
@@ -184,7 +192,7 @@ PromptServiceSpoofModule.prototype.registerSelf = function(aCompMgr, aFileSpec, 
 };
 
 PromptServiceSpoofModule.prototype.unregisterSelf = function(aCompMgr, aLocation, aType) {
-  dumpn("Unregistering\n");
+  Logger.dumpn("Unregistering\n");
   aCompMgr =
   aCompMgr.QueryInterface(Components.interfaces.nsIComponentRegistrar);
   aCompMgr.unregisterFactoryLocation(DRIVEN_PROMPT_SERVICE_CLASS_ID, aLocation);

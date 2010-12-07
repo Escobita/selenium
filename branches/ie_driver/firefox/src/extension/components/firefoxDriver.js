@@ -124,6 +124,34 @@ FirefoxDriver.prototype.close = function(respond) {
       "@mozilla.org/toolkit/app-startup;1", "nsIAppStartup");
   var forceQuit = Components.interfaces.nsIAppStartup.eForceQuit;
 
+  var numOpenWindows = 0;
+  var allWindows = wm.getEnumerator("navigator:browser");
+  while (allWindows.hasMoreElements()) {
+    numOpenWindows += 1;
+    allWindows.getNext();
+  }
+
+  // If we're on a Mac we may close all the windows but not quit, so
+  // ensure that we do actually quit. For Windows, if we don't quit,
+  // Firefox will crash. So, whatever the case may be, if that's the last
+  // window - just quit Firefox.
+  if (numOpenWindows == 1) {
+    respond.send();
+
+    // Use an nsITimer to give the response time to go out.
+    var event = function(timer) {
+        // Create a switch file so the native events library will
+        // let all events through in case of a close.
+        createSwitchFile("close:<ALL>");
+        appService.quit(forceQuit);
+    };
+
+    this.nstimer = new Timer();
+    this.nstimer.setTimeout(event, 500);
+    
+    return;  // The client should catch the fact that the socket suddenly closes
+  }
+
   // Here we go!
   try {
     var browser = respond.session.getBrowser();
@@ -136,25 +164,26 @@ FirefoxDriver.prototype.close = function(respond) {
   // Send the response so the client doesn't get a connection refused socket
   // error.
   respond.send();
-
-  // If we're on a Mac we might have closed all the windows but not quit, so
-  // ensure that we do actually quit :)
-  var allWindows = wm.getEnumerator("navigator:browser");
-  if (!allWindows.hasMoreElements()) {
-    appService.quit(forceQuit);
-    return;  // The client should catch the fact that the socket suddenly closes
-  }
 };
 
 
-FirefoxDriver.prototype.executeScript = function(respond, parameters) {
+function injectAndExecuteScript(respond, parameters, isAsync, timer) {
   var doc = respond.session.getDocument();
 
-  var rawScript = parameters['script'];
+  var script = parameters['script'];
   var converted = Utils.unwrapParameters(parameters['args'], doc);
-  var me = this;
 
   if (doc.designMode && "on" == doc.designMode.toLowerCase()) {
+    if (isAsync) {
+      respond.sendError(
+          'Document designMode is enabled; advanced operations, ' +
+          'like asynchronous script execution, are not supported. ' +
+          'For more information, see ' +
+          'https://developer.mozilla.org/en/rich-text_editing_in_mozilla#' +
+          'Internet_Explorer_Differences');
+      return;
+    }
+
     // See https://developer.mozilla.org/en/rich-text_editing_in_mozilla#Internet_Explorer_Differences
     Logger.dumpn("Window in design mode, falling back to sandbox: " + doc.designMode);
     var window = respond.session.getWindow();
@@ -194,11 +223,10 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
 
   var runScript = function() {
     doc.setUserData('webdriver-evaluate-args', converted, null);
-
-    var script =
-        'var args = document.getUserData("webdriver-evaluate-args"); ' +
-            '(function() { ' + rawScript + '}).apply(null, args);';
+    doc.setUserData('webdriver-evaluate-async', isAsync, null);
     doc.setUserData('webdriver-evaluate-script', script, null);
+    doc.setUserData('webdriver-evaluate-timeout',
+        respond.session.getScriptTimeout(), null);
 
     var handler = function(event) {
         doc.removeEventListener('webdriver-evaluate-response', handler, true);
@@ -229,14 +257,24 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
       doc.body.appendChild(element);
       element.parentNode.removeChild(element);
     }
-    me.jsTimer.runWhenTrue(checkScriptLoaded, runScript, 10000, scriptLoadTimeOut);
+    timer.runWhenTrue(checkScriptLoaded, runScript, 10000, scriptLoadTimeOut);
   };
 
   var checkDocBodyLoaded = function() {
     return !!doc.body;
   };
 
-  me.jsTimer.runWhenTrue(checkDocBodyLoaded, addListener, 10000, docBodyLoadTimeOut);
+  timer.runWhenTrue(checkDocBodyLoaded, addListener, 10000, docBodyLoadTimeOut);
+};
+
+
+FirefoxDriver.prototype.executeScript = function(respond, parameters) {
+  injectAndExecuteScript(respond, parameters, false, this.jsTimer);
+};
+
+
+FirefoxDriver.prototype.executeAsyncScript = function(respond, parameters) {
+  injectAndExecuteScript(respond, parameters, true, this.jsTimer);
 };
 
 
@@ -251,7 +289,7 @@ FirefoxDriver.prototype.getCurrentUrl = function(respond) {
 
 
 FirefoxDriver.prototype.getTitle = function(respond) {
-  respond.value = respond.session.getDocument().title;
+  respond.value = respond.session.getBrowser().contentTitle;
   respond.send();
 };
 
@@ -840,6 +878,12 @@ FirefoxDriver.prototype.implicitlyWait = function(respond, parameters) {
 };
 
 
+FirefoxDriver.prototype.setScriptTimeout = function(respond, parameters) {
+  respond.session.setScriptTimeout(parameters.ms);
+  respond.send();
+};
+
+
 FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
   var window = respond.session.getBrowser().contentWindow;
   try {
@@ -866,23 +910,30 @@ FirefoxDriver.prototype.screenshot = function(respond) {
   } catch (e) {
     throw new WebDriverError(ErrorCode.UNHANDLED_ERROR,
         'Could not take screenshot of current page - ' + e);
-  }
+  }         
   respond.send();
 };
 
-FirefoxDriver.prototype.dismissAlert = function(respond, parameters) {
-  var alertText = parameters.text;
-  // TODO(simon): Is there a type for alerts?
-  var wm = Utils.getService("@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator");
-  var allWindows = wm.getEnumerator("");
-  while (allWindows.hasMoreElements()) {
-    var alert = allWindows.getNext();
-    var doc = alert.document;
-    if (doc && doc.documentURI == "chrome://global/content/commonDialog.xul") {
-      var dialog = doc.getElementsByTagName("dialog")[0];
-      dialog.getButton("accept").click();
-      break;
-    }
-  }
+FirefoxDriver.prototype.dismissAlert = function(respond) {
+  Logger.dumpn('Dismissing alert');
+  webdriver.modals.dismissAlert(this);
+  respond.send();
+};
+
+FirefoxDriver.prototype.acceptAlert = function(respond) {
+  Logger.dumpn('Accepting alert');
+  webdriver.modals.acceptAlert(this);
+  respond.send();
+};
+
+FirefoxDriver.prototype.getAlertText = function(respond) {
+  Logger.dumpn('Getting alert text');
+  respond.value = webdriver.modals.getText(this);
+  respond.send();
+};
+
+FirefoxDriver.prototype.setAlertValue = function(respond, parameters) {
+  Logger.dumpn('Setting alert text');
+  respond.value = webdriver.modals.setValue(this, parameters['text']);
   respond.send();
 };

@@ -197,8 +197,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   @NoDriverAfterTest
-  @Ignore({FIREFOX, IPHONE, CHROME, IE_NEW})
-  //Firefox: Issue 882
+  @Ignore({IPHONE, CHROME})
   public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
     driver.get(pages.simpleTestPage);
     try {
@@ -317,11 +316,12 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
       fail("Could not find element after switching frame");
     }
   }
-  
-  public void testShouldReturnFrameTitleNotWindowTitle() {
+
+  @Ignore(value = {IE, CHROME, SELENESE}, reason = "These drivers still return frame title.")
+  public void testShouldReturnWindowTitleInAFrameset() {
     driver.get(pages.framesetPage);
     driver.switchTo().frame("third");
-    assertEquals("We Leave From Here", driver.getTitle());
+    assertEquals("Unique title", driver.getTitle());
   }
 
   private void assertFrameNotPresent(WebDriver driver, String locator) {

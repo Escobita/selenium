@@ -30,6 +30,7 @@ import java.util.List;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
+import org.openqa.selenium.internal.AsyncJavascriptExecutor;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.PortProber;
@@ -51,6 +52,9 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   private int port;
   private WindowsProxyManager proxyManager;
   private InternetExplorerKeyboard keyboard;
+
+  private final AsyncJavascriptExecutor asyncJsExecutor =
+      new AsyncJavascriptExecutor(this, 0, TimeUnit.MILLISECONDS);
 
   public InternetExplorerDriver() {
     setup();

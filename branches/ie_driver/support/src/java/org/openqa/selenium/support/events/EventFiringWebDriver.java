@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium.support.events;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.HasInputDevices;
@@ -192,6 +193,17 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
       dispatcher.beforeScript(script, driver);
       Object[] usedArgs = unpackWrappedArgs(args);
       Object result = ((JavascriptExecutor) driver).executeScript(script, usedArgs);
+      dispatcher.afterScript(script, driver);
+      return result;
+    }
+    throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
+  }
+
+  public Object executeAsyncScript(String script, Object... args) {
+    if (driver instanceof JavascriptExecutor) {
+      dispatcher.beforeScript(script, driver);
+      Object[] usedArgs = unpackWrappedArgs(args);
+      Object result = ((JavascriptExecutor) driver).executeAsyncScript(script, usedArgs);
       dispatcher.afterScript(script, driver);
       return result;
     }
@@ -503,6 +515,11 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
       timeouts.implicitlyWait(time, unit);
       return this;
     }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      timeouts.setScriptTimeout(time, unit);
+      return this;
+    }
   }
 
   private class EventFiringTargetLocator implements TargetLocator {
@@ -530,6 +547,10 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
 
     public WebElement activeElement() {
       return targetLocator.activeElement();
+    }
+
+    public Alert alert() {
+      return targetLocator.alert();
     }
   }
 }

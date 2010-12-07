@@ -68,6 +68,7 @@ public interface DriverCommand {
   String GET_TITLE = "getTitle";
 
   String EXECUTE_SCRIPT = "executeScript";
+  String EXECUTE_ASYNC_SCRIPT = "executeAsyncScript";
 
   String GET_SPEED = "getSpeed";
   String SET_SPEED = "setSpeed";
@@ -91,9 +92,15 @@ public interface DriverCommand {
   String ELEMENT_EQUALS = "elementEquals";
 
   String SCREENSHOT = "screenshot";
+
+  String ACCEPT_ALERT = "acceptAlert";
   String DISMISS_ALERT = "dismissAlert";
+  String GET_ALERT_TEXT = "getAlertText";
+  String SET_ALERT_VALUE = "setAlertValue";
+
   String IMPLICITLY_WAIT = "implicitlyWait";
-  
+  String SET_SCRIPT_TIMEOUT = "setScriptTimeout";
+
   String EXECUTE_SQL = "executeSQL";
   String GET_LOCATION = "getLocation";
   String SET_LOCATION = "setLocation";

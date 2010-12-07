@@ -18,19 +18,33 @@ limitations under the License.
 
 package org.openqa.selenium.htmlunit;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.HasInputDevices;
+import org.openqa.selenium.InvalidCookieDomainException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keyboard;
+import org.openqa.selenium.Mouse;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.Proxy;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.Speed;
+import org.openqa.selenium.UnableToSetCookieException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.browserlaunchers.CapabilityType;
+import org.openqa.selenium.browserlaunchers.Proxies;
+import org.openqa.selenium.internal.FindsByCssSelector;
+import org.openqa.selenium.internal.FindsById;
+import org.openqa.selenium.internal.FindsByLinkText;
+import org.openqa.selenium.internal.FindsByName;
+import org.openqa.selenium.internal.FindsByTagName;
+import org.openqa.selenium.internal.FindsByXPath;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.CookieManager;
@@ -61,34 +75,22 @@ import net.sourceforge.htmlunit.corejs.javascript.Function;
 import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
 import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
 import net.sourceforge.htmlunit.corejs.javascript.Undefined;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.HasInputDevices;
-import org.openqa.selenium.InvalidCookieDomainException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keyboard;
-import org.openqa.selenium.Mouse;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchFrameException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.Speed;
-import org.openqa.selenium.UnableToSetCookieException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.browserlaunchers.CapabilityType;
-import org.openqa.selenium.browserlaunchers.Proxies;
-import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.internal.FindsById;
-import org.openqa.selenium.internal.FindsByLinkText;
-import org.openqa.selenium.internal.FindsByName;
-import org.openqa.selenium.internal.FindsByTagName;
-import org.openqa.selenium.internal.FindsByXPath;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
     FindsById, FindsByLinkText, FindsByXPath, FindsByName, FindsByCssSelector,
@@ -102,6 +104,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private final BrowserVersion version;
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
+  private long scriptTimeout = 0;
   private HtmlUnitKeyboard keyboard;
   private HtmlUnitMouse mouse;
 
@@ -332,6 +335,10 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     if (page == null || !(page instanceof HtmlPage)) {
       return null; // no page so there is no title
     }
+    if (currentWindow instanceof FrameWindow) {
+      page = ((FrameWindow) currentWindow).getTopWindow().getEnclosedPage();
+    }
+    
     return ((HtmlPage) page).getTitleText();
   }
 
@@ -386,16 +393,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Object executeScript(String script, Object... args) {
-    if (!(lastPage() instanceof HtmlPage)) {
-      throw new UnsupportedOperationException("Cannot execute JS against a plain text page");
-    }
-
-    HtmlPage page = (HtmlPage) lastPage();
-
-    if (!isJavascriptEnabled()) {
-      throw new UnsupportedOperationException(
-          "Javascript is not enabled for this HtmlUnitDriver instance");
-    }
+    HtmlPage page = getPageToInjectScriptInto();
 
     Object[] parameters = new Object[args.length];
 
@@ -414,6 +412,28 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         page.getDocumentElement());
 
     return parseNativeJavascriptResult(result);
+  }
+
+  public Object executeAsyncScript(String script, Object... args) {
+    HtmlPage page = getPageToInjectScriptInto();
+
+    Object result = new AsyncScriptExecutor(page, scriptTimeout)
+        .execute(script, args);
+
+    return parseNativeJavascriptResult(result);
+  }
+
+  private HtmlPage getPageToInjectScriptInto() {
+    if (!isJavascriptEnabled()) {
+      throw new UnsupportedOperationException(
+          "Javascript is not enabled for this HtmlUnitDriver instance");
+    }
+
+    if (!(lastPage() instanceof HtmlPage)) {
+      throw new UnsupportedOperationException("Cannot execute JS against a plain text page");
+    }
+
+    return (HtmlPage) lastPage();
   }
 
   private Object parseArgumentIntoJavsacriptParameter(Object arg) {
@@ -917,6 +937,10 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
 
       throw new NoSuchElementException("Unable to locate element with focus or body tag");
     }
+
+    public Alert alert() {
+      throw new UnsupportedOperationException("alert()");
+    }
   }
 
   protected <X> X implicitlyWaitFor(Callable<X> condition) {
@@ -1149,6 +1173,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     public Timeouts implicitlyWait(long time, TimeUnit unit) {
       HtmlUnitDriver.this.implicitWait =
           TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit);
+      return this;
+    }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      HtmlUnitDriver.this.scriptTimeout = TimeUnit.MILLISECONDS.convert(time, unit);
       return this;
     }
   }

@@ -17,15 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import java.net.URL;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
@@ -39,25 +36,26 @@ import org.openqa.selenium.Speed;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FindsByClassName;
-import org.openqa.selenium.internal.FindsById;
-import org.openqa.selenium.internal.FindsByLinkText;
-import org.openqa.selenium.internal.FindsByName;
-import org.openqa.selenium.internal.FindsByTagName;
-import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.internal.*;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.net.URL;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName, FindsByTagName, FindsByXPath,
     HasInputDevices {
 
   private final ErrorHandler errorHandler = new ErrorHandler();
+  private final AsyncJavascriptExecutor asyncJsExecutor =
+      new AsyncJavascriptExecutor(this, 0, TimeUnit.MILLISECONDS);
 
   private CommandExecutor executor;
   private Capabilities capabilities;
@@ -156,7 +154,8 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   public String getTitle() {
     Response response = execute(DriverCommand.GET_TITLE);
-    return response.getValue().toString();
+    Object value = response.getValue();
+    return value == null ? "" : value.toString();
   }
 
   public String getCurrentUrl() {
@@ -172,6 +171,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   }
 
   protected WebElement findElement(String by, String using) {
+    if (using == null) {
+      throw new IllegalArgumentException("Cannot find elements when the selector is null.");
+    }
+
     Response response = execute(DriverCommand.FIND_ELEMENT,
         ImmutableMap.of("using", by, "value", using));
     return (WebElement) response.getValue();
@@ -179,6 +182,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   @SuppressWarnings("unchecked")
   protected List<WebElement> findElements(String by, String using) {
+    if (using == null) {
+      throw new IllegalArgumentException("Cannot find elements when the selector is null.");
+    }
+
     Response response = execute(DriverCommand.FIND_ELEMENTS,
         ImmutableMap.of("using", by, "value", using));
     return (List<WebElement>) response.getValue();
@@ -289,6 +296,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return execute(DriverCommand.EXECUTE_SCRIPT, params).getValue();
   }
 
+  public Object executeAsyncScript(String script, Object... args) {
+    return asyncJsExecutor.executeScript(script, args);
+  }
+
   public boolean isJavascriptEnabled() {
     return capabilities.isJavascriptEnabled();
   }
@@ -370,7 +381,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
         " remote WebDriver.");
   }
 
-  private class RemoteWebDriverOptions implements Options {
+  protected class RemoteWebDriverOptions implements Options {
 
     public void addCookie(Cookie cookie) {
       execute(DriverCommand.ADD_COOKIE, ImmutableMap.of("cookie", cookie));
@@ -454,6 +465,11 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
           TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit)));
       return this;
     }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      asyncJsExecutor.setTimeout(time, unit);
+      return this;
+    }
   }
 
   private class RemoteNavigation implements Navigation {
@@ -506,6 +522,29 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     public WebElement activeElement() {
       Response response = execute(DriverCommand.GET_ACTIVE_ELEMENT);
       return (WebElement) response.getValue();
+    }
+
+    public Alert alert() {
+      return new RemoteAlert();
+    }
+  }
+
+  private class RemoteAlert implements Alert {
+    public void dismiss() {
+      execute(DriverCommand.DISMISS_ALERT);
+    }
+
+    public void accept() {
+      execute(DriverCommand.ACCEPT_ALERT);
+    }
+
+    public String getText() {
+      Response response = execute(DriverCommand.GET_ALERT_TEXT);
+      return response.getValue().toString();
+    }
+
+    public void sendKeys(String keysToSend) {
+      execute(DriverCommand.SET_ALERT_VALUE, ImmutableMap.of("text", keysToSend));
     }
   }
 

@@ -18,33 +18,26 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import static org.openqa.selenium.OutputType.FILE;
-import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.browserlaunchers.Proxies;
-import org.openqa.selenium.internal.Lock;
 import org.openqa.selenium.firefox.internal.NewProfileExtensionConnection;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.internal.SocketLock;
 import org.openqa.selenium.internal.FileHandler;
 import org.openqa.selenium.internal.FindsByCssSelector;
+import org.openqa.selenium.internal.Lock;
+import org.openqa.selenium.internal.SocketLock;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -52,9 +45,17 @@ import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
-
-import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
+import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static org.openqa.selenium.OutputType.FILE;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 
 
 /**
@@ -81,13 +82,6 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   // Assume that the untrusted certificates will come from untrusted issuers
   // or will be self signed.
   public static final boolean ASSUME_UNTRUSTED_ISSUER = true;
-
-  // Commands we can execute with needing to dismiss an active alert
-  private final Set<String> alertWhiteListedCommands = new HashSet<String>() {{
-    add(DriverCommand.DISMISS_ALERT);
-  }};
-
-  private FirefoxAlert currentAlert;
 
   protected FirefoxBinary binary;
 
@@ -203,70 +197,35 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
   }
 
   public WebElement findElementByCssSelector(String using) {
-    if (using == null) {
-      throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
-    }
-
     return findElement("css selector", using);
   }
 
   public List<WebElement> findElementsByCssSelector(String using) {
-    if (using == null) {
-      throw new IllegalArgumentException("Cannot find elements when the css selector is null.");
-    }
-
     return findElements("css selector", using);
   }
 
   @Override
-  public TargetLocator switchTo() {
-    return new FirefoxTargetLocator();
-  }
-
-  @Override
-  protected Response execute(String driverCommand, Map<String, ?> parameters) {
-    if (currentAlert != null) {
-      if (!alertWhiteListedCommands.contains(driverCommand)) {
-        ((FirefoxTargetLocator) switchTo()).alert()
-            .dismiss();
-        throw new UnhandledAlertException(driverCommand.toString());
-      }
+  public Object executeAsyncScript(String script, Object... args) {
+    if (!isJavascriptEnabled()) {
+      throw new UnsupportedOperationException("You must be using an underlying instance of " +
+          "WebDriver that supports executing javascript");
     }
 
-    Response response = super.execute(driverCommand, parameters);
+    // Escape the quote marks
+    script = script.replaceAll("\"", "\\\"");
 
-    if (response == null) {
-      return null;
-    }
+    Iterable<Object> convertedArgs = Iterables.transform(
+        Lists.newArrayList(args), new WebElementToJsonConverter());
 
-    Object rawResponse = response.getValue();
-    if (rawResponse instanceof Map<?, ?>) {
-      Map<?, ?> map = (Map<?, ?>) rawResponse;
-      if (map.containsKey("__webdriverType")) {
-        // Looks like have an alert. construct it
-        currentAlert = new FirefoxAlert((String) map.get("text"));
-        response.setValue(null);
-      }
-    }
+    Map<String, ?> params = ImmutableMap.of(
+        "script", script, "args", Lists.newArrayList(convertedArgs));
 
-    return response;
+    return execute(DriverCommand.EXECUTE_ASYNC_SCRIPT, params).getValue();
   }
 
   @Override
   public boolean isJavascriptEnabled() {
     return true;
-  }
-
-  private class FirefoxTargetLocator extends RemoteTargetLocator {
-    // TODO: this needs to be on an interface
-
-    public Alert alert() {
-      if (currentAlert != null) {
-        return currentAlert;
-      }
-
-      throw new NoAlertPresentException();
-    }
   }
 
   public <X> X getScreenshotAs(OutputType<X> target) {
@@ -301,23 +260,25 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot, F
     }
   }
 
-  private class FirefoxAlert implements Alert {
-    private String text;
+  // TODO(jleyba): Get rid of this once all RemoteWebDrivers handle async scripts.
+  @Override
+  public Options manage() {
+    return new FirefoxOptions();
+  }
 
-    public FirefoxAlert(String text) {
-      this.text = text;
+  private class FirefoxOptions extends RemoteWebDriverOptions {
+    @Override
+    public Timeouts timeouts() {
+      return new FirefoxTimeouts();
     }
+  }
 
-    public void dismiss() {
-      execute(DriverCommand.DISMISS_ALERT, ImmutableMap.of("text", text));
-      currentAlert = null;
-    }
-
-    public void accept() {
-    }
-
-    public String getText() {
-      return text;
+  private class FirefoxTimeouts extends RemoteTimeouts {
+    @Override
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      execute(DriverCommand.SET_SCRIPT_TIMEOUT,
+          ImmutableMap.of("ms", TimeUnit.MILLISECONDS.convert(time, unit)));
+      return this;
     }
   }
 
