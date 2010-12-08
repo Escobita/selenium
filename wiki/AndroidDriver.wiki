@@ -123,7 +123,8 @@ public class OneTest extends TestCase {
 }.
 }}}
 
-To compile and run this example you will need the selenium-java-X.jar (client side piece of selenium).
+To compile and run this example you will need the selenium-java-X.zip (client side piece of selenium).
+Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/downloads/list download page], unzip and included all jars in your eclipse project (Right click on project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars)
 
 = Get Involved =
    * Check out the code:
