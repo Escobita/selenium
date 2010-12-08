@@ -126,6 +126,12 @@ public class OneTest extends TestCase {
 To compile and run this example you will need the selenium-java-X.zip (client side piece of selenium).
 Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/downloads/list download page], unzip and included all jars in your eclipse project (Right click on project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars)
 
+== Tips ==
+  * Avoid using XPath: XPath is not yet natively supported in Android WebView, so we inject our own XPath library in the browser which makes looking up element by XPath an expensive operation. Rather prefer looking up elements by ID, name, tag name, etc.
+  * Keep the same emulator instance: Starting an Android emulator is an expensive operation which can take up to 2 minute depending on your machine specifications. Do this once for your entire test suite. If you need a fresh instance of the driver call WebDriver#quit() which flushes the WebView cache, cookies, user data, etc.
+  * Avoid requesting the entire page source, if all you need is to verify that it contains a string or an element. Rather lookup elements by their IDs, name, etc.
+  * Prefer window handles to window names:  (e.g. String current = driver.getWindowHandle(); driver.switchTo().window(current);).  Switching to a window by it's name property is more expensive because it requires injecting Javascript in every open window. While handles are saved in map which provides faster lookup times. 
+
 = Get Involved =
    * Check out the code:
 {{{
