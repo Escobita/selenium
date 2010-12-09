@@ -9,6 +9,9 @@ Another packaging problem broke the various things that used getText(). Which of
 
 As a result, we've started to rebuild the test suite for things. It's going to take awhile to get the coverage we're hoping for, but it'll be worth it if we can go at least 2 days after a release before becoming embarrassed.
 
+Upgrade Notes:
+  * Due to the atoms being included properly, some of the behaviour around accessing boolean attributes has changed. See http://seleniumhq.wordpress.com/2010/12/09/atoms-have-come-to-selenium-ide/ for details.
+
 ==1.0.9==
 
 What started out as a pretty major change in terms of packaging ended up including two significant bug fixes as well. Hopefully we avoid that sort of thing with the release. Not that I don't expect it. :)
@@ -53,9 +56,6 @@ This release is primarily to get FF4 support out into the wild since it is getti
   * NEW - addition to the se-ide plugin api to add se-ide extensions to manipulate how recording is done - http://reallysimplethings.wordpress.com/2010/10/11/the-selenium-ide-1-x-plugin-api-part-12-adding-locator-builders/
   * NEW - the case of the missing log messages is now solved
   * NEW - Firefox 4 support
-  
-Upgrade Notes:
-  * It has been pointed out that the switch to Sizzle has resulted in an incompatibility in scripts that are using assertAttribute to check whether a checkbox or radio button is 'checked'. To fix this, convert the broken liked to use assertChecked (or assertNotChecked) -- this is the 'proper' way to handle this situation and hides the implementation details from your scripts.
 
 ==1.0.7==
 
