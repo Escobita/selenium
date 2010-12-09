@@ -288,7 +288,7 @@ int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::w
 				std::stringstream param_stream;
 				param_stream << "{";
 				size_t param_count = locator_param_names.size();
-				for (int i = 0; i < param_count; i++) {
+				for (unsigned int i = 0; i < param_count; i++) {
 					if (i != 0) {
 						param_stream << ",";
 					}

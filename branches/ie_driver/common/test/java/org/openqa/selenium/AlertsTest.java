@@ -22,7 +22,9 @@ import java.lang.reflect.Method;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
 
+import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -40,7 +42,7 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldBeAbleToOverrideTheWindowAlertMethod() {
     driver.get(alertPage);
 
@@ -49,7 +51,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     driver.findElement(By.id("alert")).click();
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowUsersToAcceptAnAlertManually() throws InterruptedException {
     driver.get(alertPage);
 
@@ -62,7 +65,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     assertEquals("Testing Alerts", driver.getTitle());
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowUsersToDismissAnAlertManually() {
     driver.get(alertPage);
 
@@ -75,7 +79,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     assertEquals("Testing Alerts", driver.getTitle());
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowAUserToAcceptAPrompt() {
     driver.get(alertPage);
 
@@ -88,7 +93,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     assertEquals("Testing Alerts", driver.getTitle());
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowAUserToDismissAPrompt() {
     driver.get(alertPage);
 
@@ -101,7 +107,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     assertEquals("Testing Alerts", driver.getTitle());
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowAUserToSetTheValueOfAPrompt() {
     driver.get(alertPage);
 
@@ -115,7 +122,8 @@ public class AlertsTest extends AbstractDriverTestCase {
     assertEquals("cheese", result);
   }
 
-  @Ignore
+  @JavascriptEnabled
+  @Ignore({ANDROID, HTMLUNIT, IE, IPHONE, SELENESE, CHROME_NON_WINDOWS})
   public void testShouldAllowTheUserToGetTheTextOfAnAlert() {
     driver.get(alertPage);
 

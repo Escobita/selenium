@@ -37,14 +37,14 @@ protected:
 		if (!expiry.isNull()) {
 			cookie_value.removeMember("expiry");
 			if (expiry.isDouble()) {
-				time_t expiration_time = expiry.asDouble();
+				time_t expiration_time = static_cast<time_t>(expiry.asDouble());
 				char raw_formatted_time[30];
-				tm * time_info;
-				time_info = gmtime(&expiration_time);
-				std::string month = this->GetMonthName(time_info->tm_mon);
-				std::string weekday = this->GetWeekdayName(time_info->tm_wday);
+				tm time_info;
+				gmtime_s(&time_info, &expiration_time);
+				std::string month = this->GetMonthName(time_info.tm_mon);
+				std::string weekday = this->GetWeekdayName(time_info.tm_wday);
 				std::string format_string = weekday + ", %d " + month + " %Y %H:%M:%S GMT";
-				strftime(raw_formatted_time, 30 , format_string.c_str(), time_info);
+				strftime(raw_formatted_time, 30 , format_string.c_str(), &time_info);
 				std::string formatted_time(&raw_formatted_time[0]);
 				cookie_string += "expires=" + formatted_time + "; ";
 			}

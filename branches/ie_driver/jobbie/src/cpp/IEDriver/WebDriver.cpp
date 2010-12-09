@@ -4,17 +4,17 @@
 void * event_handler(enum mg_event event_raised, 
 					 struct mg_connection *conn, 
 					 const struct mg_request_info *request_info) {
-	int returnCode = NULL;
+	handler_result_code = NULL;
 	if (event_raised == MG_NEW_REQUEST) {
-		returnCode = server->ProcessRequest(conn, request_info);
+		handler_result_code = server->ProcessRequest(conn, request_info);
 	}
 
-	return &returnCode;
+	return &handler_result_code;
 }
 
 webdriver::IEDriverServer* StartServer(int port) {
 	char buffer[6];
-	_itoa(port, buffer, 10);
+	_itoa_s(port, buffer, 10, 10);
 	char* options[] = { "listening_ports", buffer, "access_control_list", "-0.0.0.0/0,+127.0.0.1", NULL };
 	server = new webdriver::IEDriverServer(port);
 	ctx = mg_start(event_handler, (const char **)options);

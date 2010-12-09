@@ -65,7 +65,7 @@ public:
 			event_id_list.push_back(it->first);
 		}
 
-		for(int i = 0; i < event_id_list.size(); ++i) {
+		for(unsigned int i = 0; i < event_id_list.size(); ++i) {
 			it = m_handlers.find(event_id_list[i]);
 			if(it != m_handlers.end()) {
 				it->second->raise(param);

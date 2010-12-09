@@ -15,6 +15,7 @@ static void * event_handler(enum mg_event event_raised,
 							const struct mg_request_info *request_info);
 
 struct mg_context *ctx;
+int handler_result_code;
 EXPORT webdriver::IEDriverServer* StartServer(int port);
 EXPORT void StopServer(webdriver::IEDriverServer* server);
 

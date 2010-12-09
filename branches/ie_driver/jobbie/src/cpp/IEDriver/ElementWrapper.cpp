@@ -61,12 +61,12 @@ int ElementWrapper::Click() {
 		// Create a mouse move, mouse down, mouse up OS event
 		LRESULT result = mouseMoveTo(containing_window_handle, 10, x, y, click_x, click_y);
 		if (result != SUCCESS) {
-			return result;
+			return static_cast<int>(result);
 		}
 		
 		result = clickAt(containing_window_handle, click_x, click_y, MOUSEBUTTON_LFET);
 		if (result != SUCCESS) {
-			return result;
+			return static_cast<int>(result);
 		}
 
 		//wait(50);

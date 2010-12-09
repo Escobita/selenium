@@ -44,7 +44,6 @@ protected:
 
 						if (_wcsicmp(L"submit", type.c_str()) == 0 || _wcsicmp(L"image", type.c_str()) == 0) {
 							element_wrapper->Click();
-							browser_wrapper->set_wait_required(true);
 						} else {
 							CComPtr<IHTMLFormElement> form2;
 							input->get_form(&form2);
@@ -59,6 +58,7 @@ protected:
 						form->submit();
 					}
 				}
+				browser_wrapper->set_wait_required(true);
 				response->SetResponse(SUCCESS, Json::Value::null);
 				return;
 			} else {

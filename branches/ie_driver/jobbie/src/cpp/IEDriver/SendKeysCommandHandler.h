@@ -44,7 +44,7 @@ protected:
 
 			std::wstring keys(L"");
 			Json::Value key_array(command_parameters["value"]);
-			for (size_t i = 0; i < key_array.size(); ++i ) {
+			for (unsigned int i = 0; i < key_array.size(); ++i ) {
 				std::string key(key_array[i].asString());
 				keys.append(CA2W(key.c_str(), CP_UTF8));
 			}
@@ -114,13 +114,13 @@ protected:
 	}
 private:
 	static WORD WINAPI SendKeysCommandHandler::SetFileValue(FileNameData *data) {
-		::Sleep(WAIT_TIME_IN_MILLISECONDS);
+		::Sleep(100);
 		HWND ie_main_window_handle = data->main;
 		HWND dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
 
 		int max_wait = 10;
 		while ((dialog_window_handle == ie_main_window_handle) && --max_wait) {
-			::Sleep(WAIT_TIME_IN_MILLISECONDS);
+			::Sleep(100);
 			dialog_window_handle = ::GetLastActivePopup(ie_main_window_handle);
 		}
 

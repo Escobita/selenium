@@ -24,7 +24,7 @@ protected:
 
 			std::vector<std::wstring> handle_list;
 			manager->GetManagedBrowserHandles(&handle_list);
-			for (int i = 0; i < handle_list.size(); ++i) {
+			for (unsigned int i = 0; i < handle_list.size(); ++i) {
 				BrowserWrapper *browser_wrapper;
 				int get_handle_loop_status_code = manager->GetManagedBrowser(handle_list[i], &browser_wrapper);
 				if (get_handle_loop_status_code == SUCCESS) {

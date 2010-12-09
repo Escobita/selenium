@@ -60,7 +60,7 @@ protected:
 
 				if (status_code == SUCCESS) {
 					Json::Value element_array(Json::arrayValue);
-					for (int i = 0; i < found_elements.size(); ++i) {
+					for (unsigned int i = 0; i < found_elements.size(); ++i) {
 						element_array[i] = found_elements[i]->ConvertToJson();
 					}
 

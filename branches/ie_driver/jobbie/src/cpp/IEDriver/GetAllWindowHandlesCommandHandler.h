@@ -18,7 +18,7 @@ protected:
 		Json::Value handles(Json::arrayValue);
 		std::vector<std::wstring> handle_list;
 		manager->GetManagedBrowserHandles(&handle_list);
-		for (int i = 0; i < handle_list.size(); ++i) {
+		for (unsigned int i = 0; i < handle_list.size(); ++i) {
 			std::string handle(CW2A(handle_list[i].c_str(), CP_UTF8));
 			handles.append(handle);
 		}

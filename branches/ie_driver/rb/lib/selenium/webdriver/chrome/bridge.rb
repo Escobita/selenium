@@ -2,7 +2,7 @@ module Selenium
   module WebDriver
     module Chrome
 
-      # @private
+      # @api private
       class Bridge < Remote::Bridge
 
         def initialize(opts = {})
@@ -71,6 +71,10 @@ module Selenium
 
         def elementEquals(element, other)
           element.ref == other.ref
+        end
+
+        %w[acceptAlert dismissAlert setAlertValue getAlertText].each do |m|
+          define_method(m) { |*args| raise NotImplementedError }
         end
 
         private

@@ -123,7 +123,7 @@ LRESULT BrowserManager::OnGetResponseLength(UINT uMsg, WPARAM wParam, LPARAM lPa
 
 LRESULT BrowserManager::OnGetResponse(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	LPWSTR str = (LPWSTR)lParam;
-	this->serialized_response_.copy(str, this->serialized_response_.size());
+	wcscpy_s(str, this->serialized_response_.size() + 1, this->serialized_response_.c_str());
 
 	// Reset the serialized response for the next command.
 	this->serialized_response_ = L"";
