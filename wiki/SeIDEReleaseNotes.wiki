@@ -54,6 +54,8 @@ This release is primarily to get FF4 support out into the wild since it is getti
   * NEW - the case of the missing log messages is now solved
   * NEW - Firefox 4 support
   
+Upgrade Notes:
+  * It has been pointed out that the switch to Sizzle has resulted in an incompatibility in scripts that are using assertAttribute to check whether a checkbox or radio button is 'checked'. To fix this, convert the broken liked to use assertChecked (or assertNotChecked) -- this is the 'proper' way to handle this situation and hides the implementation details from your scripts.
 
 ==1.0.7==
 
