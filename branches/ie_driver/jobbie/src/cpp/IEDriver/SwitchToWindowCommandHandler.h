@@ -50,7 +50,7 @@ protected:
 				BrowserWrapper *current_browser;
 				int status_code = manager->GetCurrentBrowser(&current_browser);
 				if (status_code == SUCCESS) {
-					current_browser->set_path_to_frame(L"");
+					current_browser->SetFocusedFrameByElement(NULL);
 				}
 
 				manager->set_current_browser_id(found_browser_handle);

@@ -27,25 +27,49 @@ protected:
 				return;
 			}
 
-			std::wstringstream path_stream;
+			//std::wstringstream path_stream;
 			if (frame_id.isString()) {
-				std::wstring path(CA2W(frame_id.asString().c_str(), CP_UTF8)); 
-				path_stream << path;
+				std::wstring frame_name(CA2W(frame_id.asString().c_str(), CP_UTF8));
+				status_code = browser_wrapper->SetFocusedFrameByName(frame_name);
+				//path_stream << path;
 			} else if(frame_id.isIntegral()) {
-				path_stream << frame_id.asInt();
+				//path_stream << frame_id.asInt();
+				int frame_index(frame_id.asInt());
+				status_code = browser_wrapper->SetFocusedFrameByIndex(frame_index);
+			} else if (frame_id.isNull()) {
+				status_code = browser_wrapper->SetFocusedFrameByElement(NULL);
+			} else if (frame_id.isObject()) {
+				Json::Value element_id = frame_id.get("ELEMENT", Json::Value::null);
+				if (element_id.isNull()) {
+					status_code = ENOSUCHFRAME;
+				} else {
+					std::wstring frame_element_id(CA2W(element_id.asString().c_str(), CP_UTF8));
+
+					ElementWrapper *frame_element_wrapper;
+					status_code = this->GetElement(manager, frame_element_id, &frame_element_wrapper);
+					if (status_code == SUCCESS) {
+						status_code = browser_wrapper->SetFocusedFrameByElement(frame_element_wrapper->element());
+					}
+				}
 			}
 
-			browser_wrapper->set_path_to_frame(path_stream.str());
-			CComPtr<IHTMLDocument2> doc;
-			browser_wrapper->GetDocument(&doc);
-			if (!doc) {
-				browser_wrapper->set_path_to_frame(L"");
-				response->SetErrorResponse(ENOSUCHFRAME, "No frame found");
-				return;
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "No frame found");
 			} else {
 				response->SetResponse(SUCCESS, Json::Value::null);
-				return;
 			}
+
+			//browser_wrapper->set_path_to_frame(path_stream.str());
+			//CComPtr<IHTMLDocument2> doc;
+			//browser_wrapper->GetDocument(&doc);
+			//if (!doc) {
+			//	browser_wrapper->set_path_to_frame(L"");
+			//	response->SetErrorResponse(ENOSUCHFRAME, "No frame found");
+			//	return;
+			//} else {
+			//	response->SetResponse(SUCCESS, Json::Value::null);
+			//	return;
+			//}
 		}
 	}
 };

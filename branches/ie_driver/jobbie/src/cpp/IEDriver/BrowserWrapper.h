@@ -73,7 +73,6 @@ public:
 
 	bool Wait(void);
 	void GetDocument(IHTMLDocument2 **doc);
-	//int ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result);
 	int ExecuteScript(ScriptWrapper *script_wrapper);
 	HWND GetWindowHandle(void);
 	std::wstring GetTitle(void);
@@ -81,14 +80,14 @@ public:
 	int AddCookie(std::wstring cookie);
 	int DeleteCookie(std::wstring cookie_name);
 	void AttachToWindowInputQueue(void);
+	int SetFocusedFrameByIndex(int frame_index);
+	int SetFocusedFrameByName(std::wstring frame_name);
+	int SetFocusedFrameByElement(IHTMLElement *frame_element);
 
 	std::wstring ConvertVariantToWString(VARIANT *to_convert);
 
 	IWebBrowser2 *browser(void) { return this->browser_; }
 	std::wstring browser_id(void) { return this->browser_id_; }
-
-	std::wstring path_to_frame(void) { return this->path_to_frame_; }
-	void set_path_to_frame(std::wstring path) { this->path_to_frame_ = path; }
 
 	bool wait_required(void) { return this->wait_required_; }
 	void set_wait_required(bool value) { this->wait_required_ = value; }
@@ -98,17 +97,15 @@ private:
 	void DetachEvents(void);
 	bool IsDocumentNavigating(IHTMLDocument2 *doc);
 	bool IsHtmlPage(IHTMLDocument2 *doc);
-	void FindCurrentFrameWindow(IHTMLWindow2 **window);
-	void GetDefaultContentWindow(IHTMLDocument2 *doc, IHTMLWindow2 **window);
 	bool GetEvalMethod(IHTMLDocument2* doc, DISPID* eval_id, bool* added);
 	void RemoveScript(IHTMLDocument2* doc);
 	bool CreateAnonymousFunction(IDispatch* script_engine, DISPID eval_id, const std::wstring *script, VARIANT* result);
 
+	CComPtr<IHTMLWindow2> focused_frame_window_;
 	CComPtr<IWebBrowser2> browser_;
 	BrowserFactory *factory_;
 	HWND window_handle_;
 	std::wstring browser_id_;
-	std::wstring path_to_frame_;
 	bool is_navigation_started_;
 	bool wait_required_;
 };

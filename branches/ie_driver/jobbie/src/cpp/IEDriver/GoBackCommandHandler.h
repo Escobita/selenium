@@ -22,6 +22,7 @@ protected:
 			return;
 		}
 		HRESULT hr = browser_wrapper->browser()->GoBack();
+		browser_wrapper->set_wait_required(true);
 		response->SetResponse(SUCCESS, Json::Value::null);
 	}
 };

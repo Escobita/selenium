@@ -25,6 +25,7 @@ BrowserWrapper::BrowserWrapper(IWebBrowser2 *browser, HWND hwnd, BrowserFactory 
 	this->factory_ = factory;
 	this->window_handle_ = hwnd;
 	this->browser_ = browser;
+	this->focused_frame_window_ = NULL;
 	this->AttachEvents();
 }
 
@@ -32,8 +33,27 @@ BrowserWrapper::~BrowserWrapper(void) {
 }
 
 void BrowserWrapper::GetDocument(IHTMLDocument2 **doc) {
-	CComPtr<IHTMLWindow2> window;
-	this->FindCurrentFrameWindow(&window);
+	IHTMLWindow2 *window;
+
+	if (this->focused_frame_window_ == NULL) {
+		CComPtr<IDispatch> dispatch;
+		HRESULT hr = this->browser_->get_Document(&dispatch);
+		if (FAILED(hr)) {
+			//LOGHR(DEBUG, hr) << "Unable to get document";
+			return;
+		}
+
+		CComPtr<IHTMLDocument2> doc;
+		hr = dispatch->QueryInterface(&doc);
+		if (FAILED(hr)) {
+			//LOGHR(WARN, hr) << "Have document but cannot cast";
+			return;
+		}
+
+		doc->get_parentWindow(&window);
+	} else {
+		window = this->focused_frame_window_;
+	}
 
 	if (window) {
 		HRESULT hr = window->get_document(doc);
@@ -43,145 +63,6 @@ void BrowserWrapper::GetDocument(IHTMLDocument2 **doc) {
 	}
 }
 
-//int BrowserWrapper::ExecuteScript(const std::wstring *script, SAFEARRAY *args, VARIANT *result) {
-//	::VariantClear(result);
-//
-//	CComPtr<IHTMLDocument2> doc;
-//	this->GetDocument(&doc);
-//	if (!doc) {
-//		// LOG(WARN) << "Unable to get document reference";
-//		return EUNEXPECTEDJSERROR;
-//	}
-//
-//	CComPtr<IDispatch> script_engine;
-//	HRESULT hr = doc->get_Script(&script_engine);
-//	if (FAILED(hr)) {
-//		// LOGHR(WARN, hr) << "Cannot obtain script engine";
-//		return EUNEXPECTEDJSERROR;
-//	}
-//
-//	DISPID eval_id;
-//	bool added;
-//	bool ok = this->GetEvalMethod(doc, &eval_id, &added);
-//
-//	if (!ok) {
-//		// LOG(WARN) << "Unable to locate eval method";
-//		if (added) { 
-//			this->RemoveScript(doc); 
-//		}
-//		return EUNEXPECTEDJSERROR;
-//	}
-//
-//	CComVariant temp_function;
-//	if (!this->CreateAnonymousFunction(script_engine, eval_id, script, &temp_function)) {
-//		// Debug level since this is normally the point we find out that 
-//		// a page refresh has occured. *sigh*
-//		//LOG(DEBUG) << "Cannot create anonymous function: " << _bstr_t(script) << endl;
-//		if (added) { 
-//			this->RemoveScript(doc); 
-//		}
-//		return EUNEXPECTEDJSERROR;
-//	}
-//
-//	if (temp_function.vt != VT_DISPATCH) {
-//		// No return value that we care about
-//		::VariantClear(result);
-//		result->vt = VT_EMPTY;
-//		if (added) { 
-//			this->RemoveScript(doc); 
-//		}
-//		return SUCCESS;
-//	}
-//
-//	// Grab the "call" method out of the returned function
-//	DISPID call_member_id;
-//	OLECHAR FAR* call_member_name = L"call";
-//	hr = temp_function.pdispVal->GetIDsOfNames(IID_NULL, &call_member_name, 1, LOCALE_USER_DEFAULT, &call_member_id);
-//	if (FAILED(hr)) {
-//		if (added) { 
-//			this->RemoveScript(doc); 
-//		}
-//		//LOGHR(DEBUG, hr) << "Cannot locate call method on anonymous function: " << _bstr_t(script) << endl;
-//		return EUNEXPECTEDJSERROR;
-//	}
-//
-//	DISPPARAMS call_parameters = { 0 };
-//	memset(&call_parameters, 0, sizeof call_parameters);
-//
-//	long lower = 0;
-//	::SafeArrayGetLBound(args, 1, &lower);
-//	long upper = 0;
-//	::SafeArrayGetUBound(args, 1, &upper);
-//	long nargs = 1 + upper - lower;
-//	call_parameters.cArgs = nargs + 1;
-//
-//	CComPtr<IHTMLWindow2> win;
-//	hr = doc->get_parentWindow(&win);
-//	if (FAILED(hr)) {
-//		if (added) { 
-//			this->RemoveScript(doc); 
-//		}
-//		//LOGHR(WARN, hr) << "Cannot get parent window";
-//		return EUNEXPECTEDJSERROR;
-//	}
-//	_variant_t *vargs = new _variant_t[nargs + 1];
-//	::VariantCopy(&(vargs[nargs]), &CComVariant(win));
-//
-//	long index;
-//	for (int i = 0; i < nargs; i++) {
-//		index = i;
-//		CComVariant v;
-//		::SafeArrayGetElement(args, &index, (void*) &v);
-//		::VariantCopy(&(vargs[nargs - 1 - i]), &v);
-//	}
-//
-//	call_parameters.rgvarg = vargs;
-//
-//	EXCEPINFO exception;
-//	memset(&exception, 0, sizeof exception);
-//	hr = temp_function.pdispVal->Invoke(call_member_id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &call_parameters, 
-//		result,
-//		&exception, 0);
-//	if (FAILED(hr)) {
-//		CComBSTR errorDescription(exception.bstrDescription);
-//		if (DISP_E_EXCEPTION == hr)  {
-//			//LOG(INFO) << "Exception message was: " << _bstr_t(exception.bstrDescription);
-//		} else {
-//			//LOGHR(DEBUG, hr) << "Failed to execute: " << _bstr_t(script);
-//			if (added) { 
-//				this->RemoveScript(doc); 
-//			}
-//			return EUNEXPECTEDJSERROR;
-//		}
-//
-//		::VariantClear(result);
-//		result->vt = VT_USERDEFINED;
-//		if (exception.bstrDescription != NULL) {
-//			result->bstrVal = ::SysAllocStringByteLen((char*)exception.bstrDescription, ::SysStringByteLen(exception.bstrDescription));
-//		} else {
-//			result->bstrVal = ::SysAllocStringByteLen(NULL, 0);
-//		}
-//		wcout << _bstr_t(exception.bstrDescription) << endl;
-//	}
-//
-//	// If the script returned an IHTMLElement, we need to copy it to make it valid.
-//	if( VT_DISPATCH == result->vt ) {
-//		CComQIPtr<IHTMLElement> element(result->pdispVal);
-//		if(element) {
-//			IHTMLElement* &dom_element = * (IHTMLElement**) &(result->pdispVal);
-//			element.CopyTo(&dom_element);
-//		}
-//	}
-//
-//	if (added) { 
-//		this->RemoveScript(doc); 
-//	}
-//
-//	delete[] vargs;
-//
-//	return SUCCESS;
-//}
-//
 int BrowserWrapper::ExecuteScript(ScriptWrapper *script_wrapper) {
 	VARIANT result;
 
@@ -324,15 +205,22 @@ int BrowserWrapper::ExecuteScript(ScriptWrapper *script_wrapper) {
 }
 
 std::wstring BrowserWrapper::GetTitle() {
-	CComPtr<IHTMLDocument2> doc;
-	GetDocument(&doc);
+	CComPtr<IDispatch> dispatch;
+	HRESULT hr = this->browser_->get_Document(&dispatch);
+	if (FAILED(hr)) {
+		//LOGHR(DEBUG, hr) << "Unable to get document";
+		return L"";
+	}
 
-	if (!doc) {
+	CComPtr<IHTMLDocument2> doc;
+	hr = dispatch->QueryInterface(&doc);
+	if (FAILED(hr)) {
+		//LOGHR(WARN, hr) << "Have document but cannot cast";
 		return L"";
 	}
 
 	CComBSTR title;
-	HRESULT hr = doc->get_title(&title);
+	hr = doc->get_title(&title);
 	if (FAILED(hr)) {
 		//LOGHR(WARN, hr) << "Unable to get document title";
 		return L"";
@@ -350,8 +238,7 @@ std::wstring BrowserWrapper::ConvertVariantToWString(VARIANT *to_convert) {
 			return to_convert->boolVal == VARIANT_TRUE ? L"true" : L"false";
 
 		case VT_BSTR:
-			if (!to_convert->bstrVal)
-			{
+			if (!to_convert->bstrVal) {
 				return L"";
 			}
 			
@@ -442,15 +329,13 @@ void BrowserWrapper::AttachToWindowInputQueue() {
 
 	DWORD ie_thread_id = ::GetWindowThreadProcessId(top_level_window_handle, NULL);
 	DWORD current_thread_id = ::GetCurrentThreadId();
-    if( ie_thread_id != current_thread_id )
-    {
+    if( ie_thread_id != current_thread_id ) {
 		::AttachThreadInput(current_thread_id, ie_thread_id, true);
     }
 
 	::SetActiveWindow(top_level_window_handle);
 
-	if(ie_thread_id != current_thread_id )
-    {
+	if(ie_thread_id != current_thread_id ) {
 		::AttachThreadInput(current_thread_id, ie_thread_id, false);
     }
 }
@@ -579,185 +464,113 @@ void BrowserWrapper::RemoveScript(IHTMLDocument2 *doc) {
 	}
 }
 
-void BrowserWrapper::FindCurrentFrameWindow(IHTMLWindow2 **window) {
-	// Frame location is from _top. This is a good start
-	CComPtr<IDispatch> dispatch;
-	HRESULT hr = this->browser_->get_Document(&dispatch);
-	if (FAILED(hr)) {
-		//LOGHR(DEBUG, hr) << "Unable to get document";
-		return;
+int BrowserWrapper::SetFocusedFrameByElement(IHTMLElement *frame_element) {
+	HRESULT hr = S_OK;
+	if (!frame_element) {
+		this->focused_frame_window_.Detach();
+		this->focused_frame_window_ = NULL;
+		return SUCCESS;
 	}
 
-	CComPtr<IHTMLDocument2> doc;
-	hr = dispatch->QueryInterface(&doc);
-	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Have document but cannot cast";
+	CComQIPtr<IHTMLFrameBase2> frame_base(frame_element);
+	if (!frame_base) {
+		// IHTMLElement is not a FRAME or IFRAME element.
+		return ENOSUCHFRAME;
 	}
 
-	// If the current frame path is null or empty, find the default content
-	// The default content is either the first frame in a frameset or the body
-	// of the current _top doc, even if there are iframes.
-	if (0 == wcscmp(L"", this->path_to_frame_.c_str())) {
-		this->GetDefaultContentWindow(doc, window);
-		if (window) {
-			return;
-		} else {
-			//cerr << "Cannot locate default content." << endl;
-			// What can we do here?
-			return;
-		}
-	}
-
-	// Otherwise, tokenize the current frame and loop, finding the
-	// child frame in turn
-	size_t len = this->path_to_frame_.size() + 1;
-	wchar_t *path = new wchar_t[len];
-	wcscpy_s(path, len, this->path_to_frame_.c_str());
-	wchar_t *next_token;
 	CComQIPtr<IHTMLWindow2> interim_result;
-	for (wchar_t* fragment = wcstok_s(path, L".", &next_token);
-		 fragment;
-		 fragment = wcstok_s(NULL, L".", &next_token)) {
-		if (!doc) {
-			// This is seriously Not Good but what can you do?
-			break;
-		}
-
-		CComQIPtr<IHTMLFramesCollection2> frames;
-		doc->get_frames(&frames);
-
-		if (frames == NULL) { 
-			// pathToFrame does not match. Exit.
-			break;
-		}
-
-		long length = 0;
-		frames->get_length(&length);
-		if (!length) { 
-			// pathToFrame does not match. Exit.
-			break; 
-		} 
-
-		CComBSTR frame_name(fragment);
-		CComVariant index;
-		// Is this fragment a number? If so, the index will be a VT_I4
-		int frame_index = _wtoi(fragment);
-		if (frame_index > 0 || wcscmp(L"0", fragment) == 0) {
-			index.vt = VT_I4;
-			index.lVal = frame_index;
-		} else {
-			// Alternatively, it's a name
-			frame_name.CopyTo(&index);
-		}
-
-		// Find the frame
-		CComVariant frame_holder;
-		hr = frames->item(&index, &frame_holder);
-
-		interim_result.Release();
-		if (!FAILED(hr)) {
-			interim_result = frame_holder.pdispVal;
-		}
-
-		if (!interim_result) {
-			// pathToFrame does not match. Exit.
-			break; 
-		}
-
-		// TODO: Check to see if a collection of frames were returned. Grab the 0th element if there was.
-
-		// Was there only one result? Next time round, please.
-		CComQIPtr<IHTMLWindow2> result_window(interim_result);
-		if (!result_window) { 
-			// pathToFrame does not match. Exit.
-			break; 
-		} 
-
-		doc.Detach();
-		result_window->get_document(&doc);
+	hr = frame_base->get_contentWindow(&interim_result);
+	if (FAILED(hr)) {
+		// Cannot get contentWindow from IHTMLFrameBase2.
+		return ENOSUCHFRAME;
 	}
 
-	if (interim_result) {
-		*window = interim_result.Detach();
-	}
-	delete[] path;
+	this->focused_frame_window_ = interim_result.Detach();
+	return SUCCESS;
 }
 
-void BrowserWrapper::GetDefaultContentWindow(IHTMLDocument2 *doc, IHTMLWindow2 **window) {
+int BrowserWrapper::SetFocusedFrameByName(std::wstring frame_name) {
+	CComPtr<IHTMLDocument2> doc;
+	this->GetDocument(&doc);
+
 	CComQIPtr<IHTMLFramesCollection2> frames;
 	HRESULT hr = doc->get_frames(&frames);
-	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Unable to get frames from document";
-		return;
-	}
 
-	if (frames == NULL) {
-		hr = doc->get_parentWindow(window);
-		if (FAILED(hr)) {
-			//LOGHR(WARN, hr) << "Unable to get parent window.";
-		}
-		return;
+	if (frames == NULL) { 
+		// No frames in document. Exit.
+		return ENOSUCHFRAME;
 	}
 
 	long length = 0;
-	hr = frames->get_length(&length);
+	frames->get_length(&length);
+	if (!length) { 
+		// No frames in document. Exit.
+		return ENOSUCHFRAME;
+	}
+
+	CComVariant name;
+	CComBSTR name_bstr(frame_name.c_str());
+	name_bstr.CopyTo(&name);
+
+	// Find the frame
+	CComVariant frame_holder;
+	hr = frames->item(&name, &frame_holder);
+
 	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Cannot determine length of frames";
+		// Error retrieving frame. Exit.
+		return ENOSUCHFRAME;
 	}
 
-	if (!length) {
-		hr = doc->get_parentWindow(window);
-		if (FAILED(hr)) {
-			//LOGHR(WARN, hr) << "Unable to get parent window.";
-		}
-		return;
+	CComQIPtr<IHTMLWindow2> interim_result = frame_holder.pdispVal;
+	if (!interim_result) {
+		// Error retrieving frame. Exit.
+		return ENOSUCHFRAME;
 	}
 
-	CComPtr<IHTMLDocument3> doc3;
-	hr = doc->QueryInterface(&doc3);
-	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Have document, but it's not the right type";
-		hr = doc->get_parentWindow(window);
-		if (FAILED(hr)) {
-			//LOGHR(WARN, hr) << "Unable to get parent window.";
-		}
-		return;
+	this->focused_frame_window_ = interim_result.Detach();
+	return SUCCESS;
+}
+
+int BrowserWrapper::SetFocusedFrameByIndex(int frame_index) {
+	CComPtr<IHTMLDocument2> doc;
+	this->GetDocument(&doc);
+
+	CComQIPtr<IHTMLFramesCollection2> frames;
+	HRESULT hr = doc->get_frames(&frames);
+
+	if (frames == NULL) { 
+		// No frames in document. Exit.
+		return ENOSUCHFRAME;
 	}
 
-	CComPtr<IHTMLElementCollection> body_tags;
-	CComBSTR body_tag_name(L"BODY");
-	hr = doc3->getElementsByTagName(body_tag_name, &body_tags);
-	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Cannot locate body";
-		return;
-	}
-
-	long number_of_body_tags = 0;
-	hr = body_tags->get_length(&number_of_body_tags);
-	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Unable to establish number of tags seen";
-	}
-
-	if (number_of_body_tags) {
-		// Not in a frameset. Return the current window
-		hr = doc->get_parentWindow(window);
-		if (FAILED(hr)) {
-			//LOGHR(WARN, hr) << "Unable to get parent window.";
-		}
-		return;
+	long length = 0;
+	frames->get_length(&length);
+	if (!length) { 
+		// No frames in document. Exit.
+		return ENOSUCHFRAME;
 	}
 
 	CComVariant index;
 	index.vt = VT_I4;
-	index.lVal = 0;
+	index.lVal = frame_index;
 
+	// Find the frame
 	CComVariant frame_holder;
 	hr = frames->item(&index, &frame_holder);
+
 	if (FAILED(hr)) {
-		//LOGHR(WARN, hr) << "Unable to get frame at index 0";
+		// Error retrieving frame. Exit.
+		return ENOSUCHFRAME;
 	}
 
-	frame_holder.pdispVal->QueryInterface(__uuidof(IHTMLWindow2), (void**) window);
+	CComQIPtr<IHTMLWindow2> interim_result = frame_holder.pdispVal;
+	if (!interim_result) {
+		// Error retrieving frame. Exit.
+		return ENOSUCHFRAME;
+	}
+
+	this->focused_frame_window_ = interim_result.Detach();
+	return SUCCESS;
 }
 
 HWND BrowserWrapper::GetWindowHandle() {
@@ -792,6 +605,21 @@ void __stdcall BrowserWrapper::DocumentComplete(IDispatch *pDisp, VARIANT *URL) 
 	// Flag the browser as navigation having started.
 	// std::cout << "DocumentComplete\r\n";
 	this->is_navigation_started_ = true;
+
+	// DocumentComplete fires last for the top-level frame. If it fires
+	// for the top-level frame and the focused_frame_window_ member variable
+	// is not NULL, we assume we have navigated from within a frameset to a
+	// link that has a target of "_top", which replaces the frameset with the
+	// target page. On a top-level navigation, we are supposed to reset the
+	// focused frame to the top-level, so we do that here.
+	// NOTE: This is a possible source of unreliability if the above 
+	// assumptions turn out to be wrong and/or the event firing doesn't work
+	// the way we expect it to.
+	CComPtr<IDispatch> dispatch(this->browser_);
+	if (dispatch.IsEqualObject(pDisp) && this->focused_frame_window_ != NULL) {
+		this->focused_frame_window_.Detach();
+		this->focused_frame_window_ = NULL;
+	}
 }
 
 void BrowserWrapper::AttachEvents() {

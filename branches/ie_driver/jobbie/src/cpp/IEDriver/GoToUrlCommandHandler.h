@@ -33,7 +33,8 @@ protected:
 			HRESULT hr = browser_wrapper->browser()->Navigate2(&url_variant, &dummy, &dummy, &dummy, &dummy);
 			browser_wrapper->set_wait_required(true);
 
-			browser_wrapper->set_path_to_frame(L"");
+			//browser_wrapper->set_path_to_frame(L"");
+			browser_wrapper->SetFocusedFrameByElement(NULL);
 			response->SetResponse(SUCCESS, Json::Value::null);
 		}
 	}
