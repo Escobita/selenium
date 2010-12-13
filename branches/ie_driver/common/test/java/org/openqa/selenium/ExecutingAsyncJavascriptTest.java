@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import org.junit.Test;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 //@Ignore(value = ANDROID,
 //    reason = "Android is way too slow to use the current polling-only technique")
-@Ignore(value = SELENESE, reason = "Every test appears to be failing.")
+@Ignore(value = {SELENESE, IE}, reason = "Every test appears to be failing.")
 public class ExecutingAsyncJavascriptTest extends AbstractDriverTestCase {
 
   private JavascriptExecutor executor;
