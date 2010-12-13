@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestQuickOpen extends SeleneseTestNgHelper {
-	@Test public void testQuickOpen() throws Exception {
+public class TestQuickOpen extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testQuickOpen() throws Exception {
 		// <tr>
 		//       <td>setTimeout</td>
 		//       <td>5000</td>

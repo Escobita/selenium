@@ -199,6 +199,17 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
     throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
   }
 
+  public Object executeAsyncScript(String script, Object... args) {
+    if (driver instanceof JavascriptExecutor) {
+      dispatcher.beforeScript(script, driver);
+      Object[] usedArgs = unpackWrappedArgs(args);
+      Object result = ((JavascriptExecutor) driver).executeAsyncScript(script, usedArgs);
+      dispatcher.afterScript(script, driver);
+      return result;
+    }
+    throw new UnsupportedOperationException("Underlying driver instance does not support executing javascript");
+  }
+
   public boolean isJavascriptEnabled() {
     if (driver instanceof JavascriptExecutor) {
       return ((JavascriptExecutor) driver).isJavascriptEnabled();
@@ -504,6 +515,11 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
       timeouts.implicitlyWait(time, unit);
       return this;
     }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      timeouts.setScriptTimeout(time, unit);
+      return this;
+    }
   }
 
   private class EventFiringTargetLocator implements TargetLocator {
@@ -519,6 +535,10 @@ public class EventFiringWebDriver implements WebDriver, JavascriptExecutor, Take
 
     public WebDriver frame(String frameName) {
       return targetLocator.frame(frameName);
+    }
+
+    public WebDriver frame(WebElement frameElement) {
+      return targetLocator.frame(frameElement);
     }
 
     public WebDriver window(String windowName) {

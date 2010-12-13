@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestType extends SeleneseTestNgHelper {
-	@Test public void testType() throws Exception {
+public class TestType extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testType() throws Exception {
 		selenium.open("../tests/html/test_type_page1.html");
 		verifyEquals(selenium.getValue("username"), "");
 		selenium.shiftKeyDown();

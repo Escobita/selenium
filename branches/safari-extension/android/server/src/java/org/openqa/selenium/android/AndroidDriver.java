@@ -17,18 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.android;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
-
-import android.content.Context;
-import android.content.Intent;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
-import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -42,6 +30,7 @@ import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.Speed;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -61,6 +50,16 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+
+import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
+import android.util.Log;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -100,7 +99,8 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   private volatile String jsResult;
   private String currentFrame;
   private long implicitWait = 0;
-  
+  private long asyncScriptTimeout = 0;
+
   public AndroidDriver() {
     // By default currentFrame is the root, i.e. window
     currentFrame = "window";
@@ -127,21 +127,11 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     return domAccessor;
   }
   
-  public String getCurrentFrame() {
-    return currentFrame;
-  }
-  
   public String getCurrentUrl() {
-    if ("window".equals(currentFrame)) {
-      return (String) executeScript("return " + currentFrame + ".location.href");
-    }
     return (String) sendIntent(Action.GET_URL);
   }
 
   public String getTitle() {
-    if (!"window".equals(currentFrame)) {
-      return (String) executeScript("return " + currentFrame + ".document.title");
-    }
     return (String) sendIntent(Action.GET_TITLE);
   }
 
@@ -151,8 +141,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
 
   public String getPageSource() {
     return (String) executeScript(
-        "return (new XMLSerializer()).serializeToString("
-            + currentFrame + ".document.documentElement);");
+        "return (new XMLSerializer()).serializeToString(document.documentElement);");
   }
 
   public void close() {
@@ -263,7 +252,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     public WebElement activeElement() {
       Object element = executeScript(
         "try {" +
-          "return " + currentFrame + ".document.activeElement;" +
+          "return document.activeElement;" +
         "} catch (err) {" +
         "  return 'failed_' + err;" +
         "}");
@@ -294,6 +283,37 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
       return AndroidDriver.this;
     }
 
+    public WebDriver frame(WebElement frameElement) {
+      String tagName = frameElement.getTagName();
+      if (!tagName.equalsIgnoreCase("iframe") && !tagName.equalsIgnoreCase("frame")) {
+        throw new NoSuchFrameException(
+            "Element is not a frame element: " + frameElement.getTagName());
+      }
+
+      int index = (Integer) executeScript(
+          "var element = arguments[0];" +
+          "var targetWindow = element.contentWindow;" +
+          "if (!targetWindow) { throw Error('No such window!'); }" +
+          // NOTE: this script executes in the context of the current frame, so
+          // window === currentFrame
+          "var numFrames = window.frames.length;" +
+          "for (var i = 0; i < numFrames; i++) {" +
+          "  if (targetWindow == window.frames[i]) {" +
+          "    return i;" +
+          "  }" +
+          "}" +
+          "return -1;",
+          frameElement);
+
+      if (index < 0) {
+        throw new NoSuchFrameException("Unable to locate frame: " + tagName
+            + "; current window: " + currentFrame);
+      }
+
+      currentFrame += ".frames[" + index + "]";
+      return AndroidDriver.this;
+    }
+
     public WebDriver window(String nameOrHandle) {
       boolean success = (Boolean) sendIntent(Action.SWITCH_TO_WINDOW, nameOrHandle);
       if (!success) {
@@ -305,27 +325,47 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     private void setCurrentFrame(String frameNameOrId) {
       if (frameNameOrId == null) {
         currentFrame = "window";
-      } else if (isFrameNameOrIdValid(frameNameOrId)) {
-        currentFrame += "." + frameNameOrId;
       } else {
-        throw new NoSuchFrameException("Frame not found: " + frameNameOrId);
+        currentFrame += ".frames[" + getIndexForFrameWithNameOrId(frameNameOrId) + "]";
       }
     }
-    
-    private boolean isFrameNameOrIdValid(String name) {
-      return (Boolean) executeScript(
-        "try {" +
-           currentFrame + "." + name + ".document;" +
-        "  return true;" +
-        "} catch(err) {" +
-        "  return false;" +
-        "}");
+
+    private int getIndexForFrameWithNameOrId(String name) {
+      int index = (Integer) executeScript(
+          "try {" +
+          "  var foundById = null;" +
+          // NOTE: this script executes in the context of the current frame, so
+          // window === currentFrame
+          "  var frames = window.frames;" +
+          "  var numFrames = frames.length;" +
+          "  for (var i = 0; i < numFrames; i++) {" +
+          "    if (frames[i].name == arguments[0]) {" +
+          "      return i;" +
+          "    } else if (null == foundById && frames[i].frameElement.id == arguments[0]) {" +
+          "      foundById = i;" +
+          "    }" +
+          "  }" +
+          "  if (foundById != null) {" +
+          "    return foundById;" +
+          "  }" +
+          "} catch (ignored) {" +
+          "}" +
+          "return -1;",
+          name);
+
+      if (index < 0) {
+        throw new NoSuchFrameException("Frame not found: " + name);
+      }
+
+      return index;
     }
-    
+
     private boolean isFrameIndexValid(int index) {
       return (Boolean) executeScript(
         "try {" +
-           currentFrame + ".frames[arguments[0]].document;" +
+        // NOTE: this script executes in the context of the current frame, so
+        // window === currentFrame
+        "  window.frames[arguments[0]].document;" +
         "  return true;" +
         "} catch(err) {" +
         "  return false;" +
@@ -346,7 +386,7 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   }
 
   public Object executeScript(String script, Object... args) {
-    String jsFunction = embedScriptInJsFunction(script, args);
+    String jsFunction = embedScriptInJsFunction(script, false, args);
     executeJavascriptInWebView(jsFunction);
 
     // jsResult is updated by the intent receiver when the JS result is ready. 
@@ -354,50 +394,95 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     return res;
   }
 
-  private String embedScriptInJsFunction(String script, Object... args) {
-    String funcName = "func_" + System.currentTimeMillis();
-    String objName = "obj_" + System.currentTimeMillis();
-    StringBuilder jsFunction = new StringBuilder();
-    jsFunction.append(" try {");
-    StringBuilder toExecute = new StringBuilder();
-    toExecute.append(" var ")
-        .append(objName)
-        .append("=(function(){")
-        .append(script)
-        .append("})(");
-    for (int i = 0; i < args.length; i++) {
-      toExecute.append(JsUtil.convertArgumentToJsObject(args[i])).append(
-          (i == args.length - 1) ? "" : ",");
-    }
-    toExecute.append("); ");
+  public Object executeAsyncScript(String script, Object... args) {
+    String jsFunction = embedScriptInJsFunction(script, true, args);
+    executeJavascriptInWebView(jsFunction);
 
+    // jsResult is updated by the intent receiver when the JS result is ready.
+    Object res = checkResultAndConvert(jsResult);
+    return res;
+  }
+
+  private String embedScriptInJsFunction(String script, boolean isAsync, Object... args) {
+    String finalScript = new StringBuilder("(function() {")
+        .append("var isAsync=").append(isAsync).append(";")
+        .append("var timeout=").append(asyncScriptTimeout).append(", timeoutId;")
+        .append("var win=").append(currentFrame).append(";")
+        .append("function sendResponse(value, isError) {")
+        .append("  if (isAsync) {")
+        .append("    win.clearTimeout(timeoutId);")
+        .append("    win.removeEventListener('unload', onunload, false);")
+        .append("  }")
+        .append("  if (isError) {")
+        .append("    window.webdriver.resultMethod('").append(ERROR).append("'+value);")
+        .append("  } else {")
+        .append(wrapAndReturnJsResult("value"))
+        .append("  }")
+        .append("}")
+        .append("function onunload() {")
+        .append("  sendResponse('Detected a page unload event; async script execution")
+        .append("does not work across page loads', true);")
+        .append("}")
+        .append("if (isAsync) {")
+        .append("  win.addEventListener('unload', onunload, false);")
+        .append("}")
+        .append("var startTime = new Date().getTime();")
+        .append("try {")
+        .append("  var result=(function(){with(win){").append(script).append("}})(")
+        .append(getArgsString(isAsync, args)).append(");")
+        .append("  if (isAsync) {")
+        .append("    timeoutId = win.setTimeout(function() {")
+        .append("      sendResponse('Timed out waiting for async script after ' +")
+        .append("(new Date().getTime() - startTime) + 'ms', true);")
+        .append("    }, timeout);")
+        .append("  } else {")
+        .append("    sendResponse(result, false);")
+        .append("  }")
+        .append("} catch (e) {")
+        .append("  sendResponse(e, true);")
+        .append("}")
+        .append("})()")
+        .toString();
+
+    Logger.log(Log.DEBUG, LOG_TAG, "executeScript executing: " + finalScript);
+    return finalScript;
+  }
+
+  private String getArgsString(boolean isAsync, Object... args) {
+    StringBuilder argsString = new StringBuilder();
+    for (int i = 0; i < args.length; i++) {
+      argsString.append(JsUtil.convertArgumentToJsObject(args[i]))
+          .append((i == args.length - 1) ? "" : ",");
+    }
+    if (isAsync) {
+      if (args.length > 0) {
+        argsString.append(",");
+      }
+      argsString.append("function(value){sendResponse(value,false);}");
+    }
+    return argsString.toString();
+  }
+
+  private String wrapAndReturnJsResult(String objName) {
     // TODO(berrada): Extract this as an atom
-    toExecute.append("if (")
-        .append(objName)
-        .append(" instanceof HTMLElement) {")
-        .append(JavascriptDomAccessor.initCacheJs(currentFrame))
-        .append(" var result = []; result.push(" + objName + ");")
+    return new StringBuilder()
+        .append("if (").append(objName).append(" instanceof HTMLElement) {")
+        .append("with(").append(currentFrame).append(") {")
+        .append(JavascriptDomAccessor.initCacheJs())
+        .append(" var result = []; result.push(").append(objName).append(");")
         .append(JavascriptDomAccessor.ADD_TO_CACHE)
         .append(objName).append("='")
         .append(WEBELEMENT_TYPE)
         .append("'+indices;")
-        .append("}");
-
-    toExecute.append("else {")
+        .append("}")
+        .append("} else {")
         .append(objName)
         .append("='{" + TYPE + ":'+JSON.stringify(")
         .append(objName).append(")+'}';")
-        .append("}");
-
-    // Callback to get the result passed from JS to Java
-    toExecute.append("window.webdriver.resultMethod(").append(objName).append(");");
-
-    Logger.log(Log.DEBUG, LOG_TAG, "executeScript executing: " + toExecute);
-    jsFunction.append(toExecute);
-
-    // Catch errors
-    jsFunction.append("}catch(err){window.webdriver.resultMethod('" + ERROR + "'+err);}");
-    return jsFunction.toString();
+        .append("}")
+        // Callback to get the result passed from JS to Java
+        .append("window.webdriver.resultMethod(").append(objName).append(");")
+        .toString();
   }
 
   /**
@@ -435,6 +520,9 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
     if (jsResult == null) {
       return null;
     } else if (jsResult.startsWith(ERROR)) {
+      if (jsResult.startsWith(ERROR + "Timed out waiting for async script")) {
+        throw new TimeoutException(jsResult);
+      }
       throw new WebDriverException(jsResult);
     } else if (jsResult.startsWith(WEBELEMENT_TYPE)) {
       return new AndroidWebElement(this, jsResult.substring(7));
@@ -548,6 +636,11 @@ public class AndroidDriver implements WebDriver, SearchContext, FindsByTagName, 
   class AndroidTimeouts implements Timeouts {
     public Timeouts implicitlyWait(long time, TimeUnit unit) {
       implicitWait = TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit);
+      return this;
+    }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      asyncScriptTimeout = TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit);
       return this;
     }
   }

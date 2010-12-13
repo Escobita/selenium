@@ -18,50 +18,6 @@ limitations under the License.
 
 package org.openqa.selenium.htmlunit;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.CookieManager;
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.ProxyConfig;
-import com.gargoylesoftware.htmlunit.ScriptResult;
-import com.gargoylesoftware.htmlunit.SgmlPage;
-import com.gargoylesoftware.htmlunit.TopLevelWindow;
-import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.WebWindow;
-import com.gargoylesoftware.htmlunit.WebWindowEvent;
-import com.gargoylesoftware.htmlunit.WebWindowListener;
-import com.gargoylesoftware.htmlunit.WebWindowNotFoundException;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.FrameWindow;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlFrame;
-import com.gargoylesoftware.htmlunit.html.HtmlInlineFrame;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLCollection;
-import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLElement;
-import net.sourceforge.htmlunit.corejs.javascript.Function;
-import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
-import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
-import net.sourceforge.htmlunit.corejs.javascript.Undefined;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -89,8 +45,52 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.CookieManager;
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.ProxyConfig;
+import com.gargoylesoftware.htmlunit.ScriptResult;
+import com.gargoylesoftware.htmlunit.SgmlPage;
+import com.gargoylesoftware.htmlunit.TopLevelWindow;
+import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.WebWindow;
+import com.gargoylesoftware.htmlunit.WebWindowEvent;
+import com.gargoylesoftware.htmlunit.WebWindowListener;
+import com.gargoylesoftware.htmlunit.WebWindowNotFoundException;
+import com.gargoylesoftware.htmlunit.html.BaseFrame;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
+import com.gargoylesoftware.htmlunit.html.FrameWindow;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLCollection;
+import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLElement;
+import net.sourceforge.htmlunit.corejs.javascript.Function;
+import net.sourceforge.htmlunit.corejs.javascript.NativeArray;
+import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject;
+import net.sourceforge.htmlunit.corejs.javascript.Undefined;
+import org.openqa.selenium.internal.WrapsElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecutor,
     FindsById, FindsByLinkText, FindsByXPath, FindsByName, FindsByCssSelector,
@@ -104,6 +104,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private final BrowserVersion version;
   private Speed speed = Speed.FAST;
   private long implicitWait = 0;
+  private long scriptTimeout = 0;
   private HtmlUnitKeyboard keyboard;
   private HtmlUnitMouse mouse;
 
@@ -301,22 +302,6 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     if (currentWindow == null) {
       currentWindow = webClient.getCurrentWindow();
     }
-    Page page = currentWindow.getEnclosedPage();
-
-    if (page == null) {
-      return;
-    }
-
-    if (!(page instanceof HtmlPage)) {
-      return;
-    }
-
-    if (((HtmlPage) page).getFrames().size() > 0) {
-      FrameWindow frame = ((HtmlPage) page).getFrames().get(0);
-      if (!(frame.getFrameElement() instanceof HtmlInlineFrame)) {
-        switchTo().frame(0);
-      }
-    }
   }
 
   public String getCurrentUrl() {
@@ -392,16 +377,7 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   }
 
   public Object executeScript(String script, Object... args) {
-    if (!(lastPage() instanceof HtmlPage)) {
-      throw new UnsupportedOperationException("Cannot execute JS against a plain text page");
-    }
-
-    HtmlPage page = (HtmlPage) lastPage();
-
-    if (!isJavascriptEnabled()) {
-      throw new UnsupportedOperationException(
-          "Javascript is not enabled for this HtmlUnitDriver instance");
-    }
+    HtmlPage page = getPageToInjectScriptInto();
 
     Object[] parameters = new Object[args.length];
 
@@ -420,6 +396,28 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         page.getDocumentElement());
 
     return parseNativeJavascriptResult(result);
+  }
+
+  public Object executeAsyncScript(String script, Object... args) {
+    HtmlPage page = getPageToInjectScriptInto();
+
+    Object result = new AsyncScriptExecutor(page, scriptTimeout)
+        .execute(script, args);
+
+    return parseNativeJavascriptResult(result);
+  }
+
+  private HtmlPage getPageToInjectScriptInto() {
+    if (!isJavascriptEnabled()) {
+      throw new UnsupportedOperationException(
+          "Javascript is not enabled for this HtmlUnitDriver instance");
+    }
+
+    if (!(lastPage() instanceof HtmlPage)) {
+      throw new UnsupportedOperationException("Cannot execute JS against a plain text page");
+    }
+
+    return (HtmlPage) lastPage();
   }
 
   private Object parseArgumentIntoJavsacriptParameter(Object arg) {
@@ -537,17 +535,6 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
   private void switchToDefaultContentOfWindow(WebWindow window) {
     Page page = window.getEnclosedPage();
     if (page instanceof HtmlPage) {
-      // Check for frames
-      List<FrameWindow> frames = ((HtmlPage) page).getFrames();
-      if (frames.size() > 0) {
-        FrameWindow frameWindow = frames.get(0);
-        if (HtmlFrame.class.isAssignableFrom(frameWindow.getFrameElement().getClass())) {
-          currentWindow = frameWindow;
-          return;
-        }
-      }
-
-      // Lovely. We're on a normal page
       currentWindow = window;
     }
   }
@@ -755,111 +742,54 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
         // 1.) try to find frame in current window ...
         currentWindow = currentPage.getFrames().get(index);
       } catch (IndexOutOfBoundsException ignored) {
-        // 2.) try to find frame in top window ...
-        final WebWindow topWindow = currentWindow.getTopWindow();
-        final HtmlPage topPage = (HtmlPage) topWindow.getEnclosedPage();
-        try {
-          currentWindow = topPage.getFrames().get(index);
-        } catch (IndexOutOfBoundsException e) {
-          throw new NoSuchFrameException("Cannot find frame: " + index);
-        }
+        throw new NoSuchFrameException("Cannot find frame: " + index);
       }
       return HtmlUnitDriver.this;
     }
 
-    /**
-     * Switches to a given frame according to name or numeric ID.
-     * Since the method can receive a concatenation of identifiers (separated
-     * by a dot), it traverses the frames, each time looking for a frame with
-     * the current identifier. For example:
-     * <p/>
-     * frame("foo.1.bar") will switch to frame "foo", than frame number 1 under
-     * frame "foo", then frame "bar" under frame number 1.
-     *
-     * @param nameOrIdOrIndex Frame name, id, (zero-based) index, or a concatenation of frame identifiers
-     *                        that uniquely point to a specific frame.
-     * @return This instance.
-     */
-    public WebDriver frame(final String nameOrIdOrIndex) {
-      try {
-        // 1.) try to find frame in current window ...
-        currentWindow = findFrame(currentWindow, nameOrIdOrIndex);
-      } catch (NoSuchFrameException ignored) {
-        // 2.) try to find frame in top window ...
-        final WebWindow topWindow = currentWindow.getTopWindow();
-        currentWindow = findFrame(topWindow, nameOrIdOrIndex);
-      }
-      return HtmlUnitDriver.this;
-    }
-
-    private WebWindow findFrame(WebWindow startWindow, String nameOrIdOrIndex) {
-      // 1.) Check if there is a frame with the given name or id ...
-      final HtmlPage startPage = (HtmlPage) startWindow.getEnclosedPage();
+    public WebDriver frame(final String nameOrId) {
+      // First check for a frame with the matching name.
+      HtmlPage startPage = (HtmlPage) currentWindow.getEnclosedPage();
       for (final FrameWindow frameWindow : startPage.getFrames()) {
-        final String frameName = frameWindow.getName();
-        final String frameId = frameWindow.getFrameElement().getId();
-        if (frameName.equals(nameOrIdOrIndex) || frameId.equals(nameOrIdOrIndex)) {
-          return frameWindow;
+        if (frameWindow.getName().equals(nameOrId)) {
+          currentWindow = frameWindow;
+          return HtmlUnitDriver.this;
         }
       }
-      // 2.) Check if the given nameOrIdOrIndex string is actually an index ...
-      if (isNumericFrameIdValid(nameOrIdOrIndex, startPage)) {
-        return getWindowByNumericFrameId(nameOrIdOrIndex, startPage);
+
+      // Next, check fora  frame with a matching ID.  For simplicity, assume the ID is unique.
+      // Users can still switch to frames with non-unique IDs using a WebElement switch:
+      //   WebElement frameElement = driver.findElement(By.xpath("//frame[@id=\"foo\"]"));
+      //   driver.switchTo().frame(frameElement);
+      try {
+        HtmlUnitWebElement element =
+            (HtmlUnitWebElement) HtmlUnitDriver.this.findElementById(nameOrId);
+        HtmlElement domElement = element.getElement();
+        if (domElement instanceof BaseFrame) {
+          currentWindow = ((BaseFrame) domElement).getEnclosedWindow();
+          return HtmlUnitDriver.this;
+        }
+      } catch (NoSuchElementException ignored) {
       }
-      // 3.) Fall back to old behaviour: nameOrIdOrIndex might be a concatenation
-      //     of several '.' separated names, ids, or indexes ...
-      WebWindow window = startWindow;
-      // Walk over all parts of the frame identifier, each time looking for a frame
-      // with a name or ID matching this part of the identifier (separated by '.').
-      final String[] frames = nameOrIdOrIndex.split("\\.");
-      for (int i = 0; i < frames.length; ++i) {
-        final String currentFrameId = frames[i];
-        final HtmlPage page = (HtmlPage) window.getEnclosedPage();
 
-        if (isNumericFrameIdValid(currentFrameId, page)) {
-          window = getWindowByNumericFrameId(currentFrameId, page);
-        } else {
-          // Numeric frame ID is not valid - could be either because the identifier
-          // was numeric and not valid OR the number that was given is actually a frame
-          // name, not an index.
-
-          boolean nextFrameFound = false;
-          for (final FrameWindow frameWindow : page.getFrames()) {
-            final String frameName = frameWindow.getName();
-            final String frameId = frameWindow.getFrameElement().getId();
-            final String remainingFrameId = joinFrom(frames, i, '.');
-            if (frameName.equals(remainingFrameId) || frameId.equals(remainingFrameId)) {
-              return frameWindow;
-            }
-            if (frameName.equals(currentFrameId) || frameId.equals(currentFrameId)) {
-              window = frameWindow;
-              nextFrameFound = true;
-            }
-          } // End for.
-
-          if (!nextFrameFound) {
-            throw new NoSuchFrameException("Cannot find frame: " + nameOrIdOrIndex);
-          }
-        } // End else
-
-      } // End for
-
-      return window;
+      throw new NoSuchFrameException("Unable to locate frame with name or ID: " + nameOrId);
     }
 
-    private String joinFrom(String[] frames, int initial, char joiner) {
-      StringBuilder builder = new StringBuilder();
-      for (int i = initial; i < frames.length; ++i) {
-        builder.append(frames[i]).append(joiner);
+    public WebDriver frame(WebElement frameElement) {
+      while (frameElement instanceof WrapsElement) {
+        frameElement = ((WrapsElement) frameElement).getWrappedElement();
       }
-      if (builder.length() > 0) {
-        builder.deleteCharAt(builder.length() - 1);
-      }
-      return builder.toString();
-    }
 
-    private boolean isNumericFrameIdValid(String currentFrameId, HtmlPage page) {
-      return getWindowByNumericFrameId(currentFrameId, page) != null;
+      HtmlUnitWebElement webElement = (HtmlUnitWebElement) frameElement;
+      webElement.assertElementNotStale();
+
+      HtmlElement domElement = webElement.getElement();
+      if (!(domElement instanceof BaseFrame)) {
+        throw new NoSuchFrameException(webElement.getTagName() + " is not a frame element.");
+      }
+
+      currentWindow = ((BaseFrame) domElement).getEnclosedWindow();
+      return HtmlUnitDriver.this;
     }
 
     private WebWindow getWindowByNumericFrameId(String currentFrameId, HtmlPage page) {
@@ -1159,6 +1089,11 @@ public class HtmlUnitDriver implements WebDriver, SearchContext, JavascriptExecu
     public Timeouts implicitlyWait(long time, TimeUnit unit) {
       HtmlUnitDriver.this.implicitWait =
           TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit);
+      return this;
+    }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      HtmlUnitDriver.this.scriptTimeout = TimeUnit.MILLISECONDS.convert(time, unit);
       return this;
     }
   }

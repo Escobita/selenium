@@ -1,10 +1,11 @@
 package org.openqa.selenium.thirdparty;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestGomezSuppliedScripts extends SeleneseTestNgHelper {
-    @Test
+public class TestGomezSuppliedScripts extends InternalSelenseTestNgBase {
+    @Test(dataProvider = "system-properties")
     public void RC108() throws Exception {
         selenium.open("http://www.hrs.com");
         selenium.type("document.searchForm.location", "Frankfurt Airport");
@@ -41,25 +42,25 @@ public class TestGomezSuppliedScripts extends SeleneseTestNgHelper {
         assertTrue(selenium.isTextPresent("compare 2 marked hotels"));
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void RC112() throws Exception {
         selenium.open("https://www.webperform.com/ui/");
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void RC169() throws Exception {
         selenium.open("http://www.friendster.com/join.php");
         selenium.click("link=Log In");
         selenium.waitForPageToLoad("30000");
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void RC188() throws Exception {
         selenium.open("http://www.google.com");
         assertTrue(selenium.isVisible("q"));
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void RC210() throws Exception {
         selenium.open("http://www.google.cn/");
         selenium.keyPress("q", "t");
@@ -71,7 +72,7 @@ public class TestGomezSuppliedScripts extends SeleneseTestNgHelper {
         assertTrue(selenium.isTextPresent("test"));
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void RC294() throws Exception {
         selenium.open("http://www.frontierairlines.com/frontier/home.do");
         selenium.type("flying-from", "LAS");

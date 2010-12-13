@@ -22,6 +22,9 @@ function FirefoxDriver(server, enableNativeEvents, win) {
   this.enableNativeEvents = enableNativeEvents;
   this.window = win;
 
+  // Default to a two second timeout.
+  this.alertTimeout = 2000;
+
   this.currentX = 0;
   this.currentY = 0;
 
@@ -29,7 +32,6 @@ function FirefoxDriver(server, enableNativeEvents, win) {
   // https://groups.google.com/group/mozilla.dev.apps.firefox/browse_thread/thread/e178d41afa2ccc87?hl=en&pli=1#
   var resources = [
     "atoms.js",
-    "timer.js",
     "utils.js"
   ];
 
@@ -45,7 +47,6 @@ function FirefoxDriver(server, enableNativeEvents, win) {
   FirefoxDriver.listenerScript = Utils.loadUrl("resource://fxdriver/evaluate.js");
 
   this.jsTimer = new Timer();
-
 }
 
 
@@ -98,7 +99,6 @@ FirefoxDriver.prototype.get = function(respond, parameters) {
 
   if (loadEventExpected) {
     new WebLoadingListener(respond.session.getBrowser(), function() {
-      // TODO: Rescue the URI and response code from the event
       var responseText = "";
       // Focus on the top window.
       respond.session.setWindow(respond.session.getBrowser().contentWindow);
@@ -124,10 +124,10 @@ FirefoxDriver.prototype.close = function(respond) {
       "@mozilla.org/toolkit/app-startup;1", "nsIAppStartup");
   var forceQuit = Components.interfaces.nsIAppStartup.eForceQuit;
 
-  var numOpenWindwos = 0;
+  var numOpenWindows = 0;
   var allWindows = wm.getEnumerator("navigator:browser");
   while (allWindows.hasMoreElements()) {
-    numOpenWindwos += 1;
+    numOpenWindows += 1;
     allWindows.getNext();
   }
 
@@ -135,10 +135,21 @@ FirefoxDriver.prototype.close = function(respond) {
   // ensure that we do actually quit. For Windows, if we don't quit,
   // Firefox will crash. So, whatever the case may be, if that's the last
   // window - just quit Firefox.
-  if (numOpenWindwos == 1) {
+  if (numOpenWindows == 1) {
     respond.send();
-    appService.quit(forceQuit);
-    return;  // The client should catch the fact that the socket suddenly closes    
+
+    // Use an nsITimer to give the response time to go out.
+    var event = function(timer) {
+        // Create a switch file so the native events library will
+        // let all events through in case of a close.
+        createSwitchFile("close:<ALL>");
+        appService.quit(forceQuit);
+    };
+
+    this.nstimer = new Timer();
+    this.nstimer.setTimeout(event, 500);
+    
+    return;  // The client should catch the fact that the socket suddenly closes
   }
 
   // Here we go!
@@ -156,14 +167,23 @@ FirefoxDriver.prototype.close = function(respond) {
 };
 
 
-FirefoxDriver.prototype.executeScript = function(respond, parameters) {
+function injectAndExecuteScript(respond, parameters, isAsync, timer) {
   var doc = respond.session.getDocument();
 
-  var rawScript = parameters['script'];
+  var script = parameters['script'];
   var converted = Utils.unwrapParameters(parameters['args'], doc);
-  var me = this;
 
   if (doc.designMode && "on" == doc.designMode.toLowerCase()) {
+    if (isAsync) {
+      respond.sendError(
+          'Document designMode is enabled; advanced operations, ' +
+          'like asynchronous script execution, are not supported. ' +
+          'For more information, see ' +
+          'https://developer.mozilla.org/en/rich-text_editing_in_mozilla#' +
+          'Internet_Explorer_Differences');
+      return;
+    }
+
     // See https://developer.mozilla.org/en/rich-text_editing_in_mozilla#Internet_Explorer_Differences
     Logger.dumpn("Window in design mode, falling back to sandbox: " + doc.designMode);
     var window = respond.session.getWindow();
@@ -203,11 +223,10 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
 
   var runScript = function() {
     doc.setUserData('webdriver-evaluate-args', converted, null);
-
-    var script =
-        'var args = document.getUserData("webdriver-evaluate-args"); ' +
-            '(function() { ' + rawScript + '}).apply(null, args);';
+    doc.setUserData('webdriver-evaluate-async', isAsync, null);
     doc.setUserData('webdriver-evaluate-script', script, null);
+    doc.setUserData('webdriver-evaluate-timeout',
+        respond.session.getScriptTimeout(), null);
 
     var handler = function(event) {
         doc.removeEventListener('webdriver-evaluate-response', handler, true);
@@ -238,14 +257,24 @@ FirefoxDriver.prototype.executeScript = function(respond, parameters) {
       doc.body.appendChild(element);
       element.parentNode.removeChild(element);
     }
-    me.jsTimer.runWhenTrue(checkScriptLoaded, runScript, 10000, scriptLoadTimeOut);
+    timer.runWhenTrue(checkScriptLoaded, runScript, 10000, scriptLoadTimeOut);
   };
 
   var checkDocBodyLoaded = function() {
     return !!doc.body;
   };
 
-  me.jsTimer.runWhenTrue(checkDocBodyLoaded, addListener, 10000, docBodyLoadTimeOut);
+  timer.runWhenTrue(checkDocBodyLoaded, addListener, 10000, docBodyLoadTimeOut);
+};
+
+
+FirefoxDriver.prototype.executeScript = function(respond, parameters) {
+  injectAndExecuteScript(respond, parameters, false, this.jsTimer);
+};
+
+
+FirefoxDriver.prototype.executeAsyncScript = function(respond, parameters) {
+  injectAndExecuteScript(respond, parameters, true, this.jsTimer);
 };
 
 
@@ -616,22 +645,59 @@ FirefoxDriver.prototype.findChildElements = function(respond, parameters) {
 };
 
 
+/**
+ * Changes the command session's focus to a new frame.
+ * @param {Response} respond Object to send the command response with.
+ * @param {{id:?(string|number|{ELEMENT:string})}} parameters A JSON object
+ *     specifying which frame to switch to.
+ */
 FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
-  var browser = respond.session.getBrowser();
-  if (parameters.id == null) {
-    respond.session.setWindow(respond.session.getBrowser().contentWindow);
-  } else {
-    var frameDoc = Utils.findDocumentInFrame(browser, parameters.id);
-    if (frameDoc) {
-      // "something" keeps a string reference to the frame. Tag it so that we
-      // know later that everything is still fine.
-      respond.session.setWindow(frameDoc.defaultView, parameters.id);
+  var currentWindow = respond.session.getWindow();
+
+  var newWindow = null;
+  if (!goog.isDef(parameters.id) || goog.isNull(parameters.id)) {
+    Logger.dumpn("Switching to default content (topmost frame)");
+    newWindow = respond.session.getBrowser().contentWindow;
+  } else if (goog.isString(parameters.id)) {
+    Logger.dumpn("Switching to frame with name or ID: " + parameters.id);
+    var foundById;
+    var numFrames = currentWindow.frames.length;
+    for (var i = 0; i < numFrames; i++) {
+      var frame = currentWindow.frames[i];
+      var frameElement = frame.frameElement;
+      if (frameElement.name == parameters.id) {
+        newWindow = frame;
+        break;
+      } else if (!foundById && frameElement.id == parameters.id) {
+        foundById = frame;
+      }
+    }
+
+    if (!newWindow && foundById) {
+      newWindow = foundById;
+    }
+  } else if (goog.isNumber(parameters.id)) {
+    Logger.dumpn("Switching to frame by index: " + parameters.id);
+    newWindow = currentWindow.frames[parameters.id];
+  } else if (goog.isObject(parameters.id) && 'ELEMENT' in parameters.id) {
+    Logger.dumpn("Switching to frame by element: " + parameters.id['ELEMENT']);
+    var element = Utils.getElementAt(parameters.id['ELEMENT'],
+        currentWindow.document);
+    if (/^i?frame$/i.test(element.tagName)) {
+      newWindow = element.contentWindow;
     } else {
       throw new WebDriverError(ErrorCode.NO_SUCH_FRAME,
-          "Cannot find frame with id: " + parameters.id);
+          'Element is not a frame element: ' + element.tagName);
     }
   }
-  respond.send();
+
+  if (newWindow) {
+    respond.session.setWindow(newWindow);
+    respond.send();
+  } else {
+    throw new WebDriverError(ErrorCode.NO_SUCH_FRAME,
+        'Unable to locate frame: ' + parameters.id);
+  }
 };
 
 
@@ -849,6 +915,12 @@ FirefoxDriver.prototype.implicitlyWait = function(respond, parameters) {
 };
 
 
+FirefoxDriver.prototype.setScriptTimeout = function(respond, parameters) {
+  respond.session.setScriptTimeout(parameters.ms);
+  respond.send();
+};
+
+
 FirefoxDriver.prototype.saveScreenshot = function(respond, pngFile) {
   var window = respond.session.getBrowser().contentWindow;
   try {
@@ -879,26 +951,33 @@ FirefoxDriver.prototype.screenshot = function(respond) {
   respond.send();
 };
 
+
 FirefoxDriver.prototype.dismissAlert = function(respond) {
-  Logger.dumpn('Dismissing alert');
-  webdriver.modals.dismissAlert(this);
-  respond.send();
+  webdriver.modals.dismissAlert(this, this.alertTimeout,
+      webdriver.modals.success(respond),
+      webdriver.modals.errback(respond));
 };
 
 FirefoxDriver.prototype.acceptAlert = function(respond) {
-  Logger.dumpn('Accepting alert');
-  webdriver.modals.acceptAlert(this);
-  respond.send();
+  webdriver.modals.acceptAlert(this, this.alertTimeout,
+      webdriver.modals.success(respond),
+      webdriver.modals.errback(respond));
 };
 
 FirefoxDriver.prototype.getAlertText = function(respond) {
-  Logger.dumpn('Getting alert text');
-  respond.value = webdriver.modals.getText(this);
-  respond.send();
+  var success = function(text) {
+    respond.value = text;
+    respond.send();
+  };
+  respond.value = webdriver.modals.getText(this, this.alertTimeout,
+      success,
+      webdriver.modals.errback(respond));
 };
 
 FirefoxDriver.prototype.setAlertValue = function(respond, parameters) {
-  Logger.dumpn('Setting alert text');
-  respond.value = webdriver.modals.setValue(this, parameters['text']);
-  respond.send();
+  respond.value = webdriver.modals.setValue(this, this.alertTimeout,
+      parameters['text'],
+      webdriver.modals.success(respond),
+      webdriver.modals.errback(respond));
 };
+

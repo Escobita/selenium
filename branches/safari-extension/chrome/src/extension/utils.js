@@ -177,18 +177,32 @@ Utils.getText = function(element) {
 /**
  * Fires the event using Utils.fireEvent, and if the event returned true,
  * perform callback, which will be passed on arguments
+ * @param {!Element} element The element to fire the event on.
+ * @param {string} type The type of event to fire.
+ * @param {function()} callback The function to call if the fired event was not
+ *     cancelled by an event listener.
  */
-Utils.fireHtmlEventAndConditionallyPerformAction = function(element, eventName, callback) {
-    Utils.fireHtmlEvent(element, eventName, function(evt) { if (JSON.parse(evt.newValue).value) { callback(); } });
+Utils.fireHtmlEventAndConditionallyPerformAction = function(element, type, callback) {
+    Utils.fireHtmlEvent(element, type, function(response) {
+      if (!response.statusCode) {
+        callback();
+      }
+    });
 };
 
-Utils.fireHtmlEvent = function(element, eventName, callback) {
-    if (callback === undefined) {
-      callback = function() {};
-    }
+
+/**
+ * Fires a HTMLEvents category event on a DOM element.
+ * @param {!Element} element The element to fire the event on.
+ * @param {string} type The type of event to fire.
+ * @param {function({statusCode:number, value:*})=} opt_callback Function to
+ *     call when the script to fire the event has completed.
+ */
+Utils.fireHtmlEvent = function(element, type, opt_callback) {
+    var callback = opt_callback || function() {};
     var args = [
       {"ELEMENT": addElementToInternalArray(element)},
-      eventName
+      type
     ];
 
     // We need to do this because event handlers refer to functions that
@@ -198,33 +212,9 @@ Utils.fireHtmlEvent = function(element, eventName, callback) {
       + "e.initEvent(arguments[1], true, true); " 
       + "return arguments[0].dispatchEvent(e);";
 
-    execute_(script, args, callback);
+    execute_(script, args, -1, callback);
 };
 
-
-Utils.fireMouseEventOn = function(element, eventName) {
-    Utils.triggerMouseEvent(element, eventName, 0, 0);
-};
-
-Utils.triggerMouseEvent = function(element, eventType, clientX, clientY) {
-    var args = [
-      {"ELEMENT": addElementToInternalArray(element)},
-      eventType,
-      clientX,
-      clientY
-    ];
-
-    // We need to do this because event handlers refer to functions that
-    // the content script can't reah. See:
-    // http://code.google.com/p/chromium/issues/detail?id=29071
-    var script =
-        "var event = arguments[0].ownerDocument.createEvent('MouseEvents'); "
-        + "var view = arguments[0].ownerDocument.defaultView; "
-        + "event.initMouseEvent(arguments[1], true, true, view, 1, 0, 0, arguments[2], arguments[3], false, false, false, false, 0, arguments[0]);"
-        + " arguments[0].dispatchEvent(event);";
-
-    execute_(script, args, function(){});
-};
 
 Utils.trim = function(str) {
     return str.replace(/^\s*/, "").replace(/\s*$/, "");

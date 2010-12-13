@@ -1,11 +1,11 @@
 package org.openqa.selenium;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestFifteenSecondSleep extends SeleneseTestNgHelper
+public class TestFifteenSecondSleep extends InternalSelenseTestNgBase
 {
-   @Test
+   @Test(dataProvider = "system-properties")
    public void testFifteenSecondSleep() throws Throwable {
 
         selenium.open("/selenium-server/tests/html/test_open.html");

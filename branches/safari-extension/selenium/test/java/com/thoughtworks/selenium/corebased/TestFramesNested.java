@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestFramesNested extends SeleneseTestNgHelper {
-	@Test public void testFramesNested() throws Exception {
+public class TestFramesNested extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testFramesNested() throws Exception {
 		selenium.open("../tests/html/NestedFrames.html");
 		verifyEquals(selenium.getTitle(), "NestedFrames");
 		verifyFalse(selenium.isTextPresent("This is a test"));

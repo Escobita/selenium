@@ -7,7 +7,7 @@ module Selenium
       #
       # Low level bridge to the remote server, through which the rest of the API works.
       #
-      # @private
+      # @api private
       #
 
       class Bridge
@@ -102,6 +102,26 @@ module Selenium
 
         def setImplicitWaitTimeout(milliseconds)
           execute :setImplicitWaitTimeout, {}, :ms => milliseconds
+        end
+
+        def setScriptTimeout(milliseconds)
+          execute :setScriptTimeout, {}, :ms => milliseconds
+        end
+
+        def acceptAlert
+          execute :acceptAlert
+        end
+
+        def dismissAlert
+          execute :dismissAlert
+        end
+
+        def setAlertValue(keys)
+          execute :setAlertValue, {}, :text => keys.to_s
+        end
+
+        def getAlertText
+          execute :getAlertText
         end
 
         def goBack

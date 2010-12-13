@@ -126,7 +126,7 @@ namespace OpenQA.Selenium.Remote
             get
             {
                 Response commandResponse = Execute(DriverCommand.GetTitle, null);
-                object returnedTitle = commandResponse.Value.ToString();
+                object returnedTitle = commandResponse != null ? commandResponse.Value : "";
                 return returnedTitle.ToString();
             }
         }
@@ -1250,6 +1250,7 @@ namespace OpenQA.Selenium.Remote
             /// </summary>
             public void Refresh()
             {
+                //driver.SwitchTo().DefaultContent();
                 driver.Execute(DriverCommand.Refresh, null);
             }
             #endregion
@@ -1299,6 +1300,33 @@ namespace OpenQA.Selenium.Remote
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", frameName);
+                driver.Execute(DriverCommand.SwitchToFrame, parameters);
+                return driver;
+            }
+
+            /// <summary>
+            /// Move to a frame element.
+            /// </summary>
+            /// <param name="frameElement">a previously found FRAME or IFRAME element.</param>
+            /// <returns>A WebDriver instance that is currently in use.</returns>
+            public IWebDriver Frame(IWebElement frameElement)
+            {
+                if (frameElement == null)
+                {
+                    throw new ArgumentNullException("frameElement", "Frame element cannot be null");
+                }
+
+                RemoteWebElement convertedElement = frameElement as RemoteWebElement;
+                if (convertedElement == null)
+                {
+                    throw new ArgumentException("frameElement cannot be converted to RemoteWebElement", "frameElement");
+                }
+
+                Dictionary<string, object> elementDictionary = new Dictionary<string, object>();
+                elementDictionary.Add("ELEMENT", convertedElement.InternalElementId);
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+                parameters.Add("id", elementDictionary);
                 driver.Execute(DriverCommand.SwitchToFrame, parameters);
                 return driver;
             }

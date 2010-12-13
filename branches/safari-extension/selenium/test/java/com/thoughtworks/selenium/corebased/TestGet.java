@@ -2,11 +2,12 @@ package com.thoughtworks.selenium.corebased;
 
 import java.util.regex.Pattern;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestGet extends SeleneseTestNgHelper {
-	@Test public void testGet() throws Exception {
+public class TestGet extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testGet() throws Exception {
 		//  test API getters 
 		selenium.open("../tests/html/test_get.html");
 		//  IE uppercases the property names of the style. Both Opera and Firefox

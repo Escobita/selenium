@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestAddLocationStrategy extends SeleneseTestNgHelper {
-	@Test public void testAddLocationStrategy() throws Exception {
+public class TestAddLocationStrategy extends InternalSelenseTestNgBase {
+  @Test(dataProvider = "system-properties")
+	 public void testAddLocationStrategy() throws Exception {
 		selenium.open("../tests/html/test_click_page1.html");
 		selenium.addLocationStrategy("foo", "return inDocument.getElementById(locator);");
 		assertTrue(selenium.isElementPresent("foo=link"));

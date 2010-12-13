@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestMultiSelect extends SeleneseTestNgHelper {
-	@Test public void testMultiSelect() throws Exception {
+public class TestMultiSelect extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testMultiSelect() throws Exception {
 		selenium.open("../tests/html/test_multiselect.html");
 		assertEquals(join(selenium.getSelectedLabels("theSelect"), ','), "Second Option");
 		selenium.select("theSelect", "index=4");

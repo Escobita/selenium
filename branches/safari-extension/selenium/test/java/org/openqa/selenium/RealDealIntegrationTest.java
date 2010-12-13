@@ -17,7 +17,7 @@
 
 package org.openqa.selenium;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.SeleniumLogLevels;
 import org.testng.annotations.Test;
@@ -26,9 +26,9 @@ import org.testng.annotations.Test;
  * @author Paul Hammant
  * @version $Revision: 131 $
  */
-public class RealDealIntegrationTest extends SeleneseTestNgHelper {
+public class RealDealIntegrationTest extends InternalSelenseTestNgBase {
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void testWithJavaScript() {
         selenium.setContext("A real test, using the real Selenium on the browser side served by Jetty, driven from Java");
         selenium.setBrowserLogLevel(SeleniumLogLevels.DEBUG);
@@ -46,12 +46,12 @@ public class RealDealIntegrationTest extends SeleneseTestNgHelper {
         assertTrue(selenium.getLocation().endsWith("/selenium-server/tests/html/test_click_page1.html"));
     }
     
-    @Test
+    @Test(dataProvider = "system-properties")
     public void testAgain() {
         testWithJavaScript();
     }
     
-    @Test
+    @Test(dataProvider = "system-properties")
     public void testFailure() {
         selenium.setContext("A real negative test, using the real Selenium on the browser side served by Jetty, driven from Java");
         selenium.open("/selenium-server/tests/html/test_click_page1.html");

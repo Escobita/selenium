@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestVerifications extends SeleneseTestNgHelper {
-	@Test public void testVerifications() throws Exception {
+public class TestVerifications extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testVerifications() throws Exception {
 		selenium.open("../tests/html/test_verifications.html?foo=bar");
 		verifyTrue(selenium.getLocation().matches("^[\\s\\S]*/tests/html/test_verifications\\.html[\\s\\S]*$"));
 		verifyTrue(selenium.getLocation().matches("^[\\s\\S]*/tests/html/test_verifications\\.html[\\s\\S]foo=bar$"));

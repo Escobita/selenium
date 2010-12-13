@@ -17,11 +17,6 @@ limitations under the License.
 
 package org.openqa.selenium.remote;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -44,6 +39,11 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.net.URL;
 import java.util.Date;
@@ -299,6 +299,24 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return execute(DriverCommand.EXECUTE_SCRIPT, params).getValue();
   }
 
+  public Object executeAsyncScript(String script, Object... args) {
+    if (!isJavascriptEnabled()) {
+      throw new UnsupportedOperationException("You must be using an underlying instance of " +
+          "WebDriver that supports executing javascript");
+    }
+
+    // Escape the quote marks
+    script = script.replaceAll("\"", "\\\"");
+
+    Iterable<Object> convertedArgs = Iterables.transform(
+        Lists.newArrayList(args), new WebElementToJsonConverter());
+
+    Map<String, ?> params = ImmutableMap.of(
+        "script", script, "args", Lists.newArrayList(convertedArgs));
+
+    return execute(DriverCommand.EXECUTE_ASYNC_SCRIPT, params).getValue();
+  }
+
   public boolean isJavascriptEnabled() {
     return capabilities.isJavascriptEnabled();
   }
@@ -380,7 +398,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
         " remote WebDriver.");
   }
 
-  private class RemoteWebDriverOptions implements Options {
+  protected class RemoteWebDriverOptions implements Options {
 
     public void addCookie(Cookie cookie) {
       execute(DriverCommand.ADD_COOKIE, ImmutableMap.of("cookie", cookie));
@@ -464,6 +482,12 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
           TimeUnit.MILLISECONDS.convert(Math.max(0, time), unit)));
       return this;
     }
+
+    public Timeouts setScriptTimeout(long time, TimeUnit unit) {
+      execute(DriverCommand.SET_SCRIPT_TIMEOUT,
+          ImmutableMap.of("ms", TimeUnit.MILLISECONDS.convert(time, unit)));
+      return this;
+    }
   }
 
   private class RemoteNavigation implements Navigation {
@@ -498,6 +522,12 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
     public WebDriver frame(String frameName) {
       execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", frameName));
+      return RemoteWebDriver.this;
+    }
+
+    public WebDriver frame(WebElement frameElement) {
+      Object elementAsJson = new WebElementToJsonConverter().apply(frameElement);
+      execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", elementAsJson));
       return RemoteWebDriver.this;
     }
 

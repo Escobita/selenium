@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestSelectPopUp extends SeleneseTestNgHelper {
-	@Test public void testSelectPopUp() throws Exception {
+public class TestSelectPopUp extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testSelectPopUp() throws Exception {
 		selenium.open("../tests/html/test_select_window.html");
 		selenium.click("popupPage");
 		selenium.waitForPopUp("myPopupWindow", "");

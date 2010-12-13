@@ -18,9 +18,9 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import com.google.common.collect.ImmutableMap;
+import static org.openqa.selenium.OutputType.FILE;
+import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
@@ -47,9 +47,6 @@ import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import static org.openqa.selenium.OutputType.FILE;
-import static org.openqa.selenium.browserlaunchers.CapabilityType.PROXY;
 
 
 /**

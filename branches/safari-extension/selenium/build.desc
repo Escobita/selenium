@@ -4,7 +4,8 @@ java_library(name = "selenium",
     "//chrome",
     "//jobbie",
     "//firefox",
-    "//support"
+    "//support",
+    "//third_party/java/testng",
   ],
   resources = [
     { "src/java/org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" : "org/openqa/selenium/internal/seleniumemulation/injectableSelenium.js" },
@@ -26,33 +27,48 @@ java_library(name = "test",
     "//common:test",
     "//selenium:server-with-tests:uber",
     "//third_party/java/easymock",
-    "//third_party/java/testng"
   ])
 
 java_test(name = "test-selenese",
   srcs = [ "test/java/**/*.java" ],
   deps = [
-    "//common:test",
-    "//firefox:test",
-    "//htmlunit",
-    "//selenium:server-with-tests:uber",
-    "//third_party/java/easymock",
-    "//third_party/java/testng"])
+    ":test"
+  ])
 
 java_test(name = "selenium_test",
-  srcs = [ "test/java/**/*.java" ],
-  resources = [
-    { "test/java/com/thoughtworks/selenium/testHelpers.js" : "com/thoughtworks/selenium/testHelpers.js" }
-  ],
   deps = [
-    "//common:test",
-    "//htmlunit",
-    "//selenium:server-with-tests:uber",
-    "//third_party/java/easymock",
-    "//third_party/java/testng"
+    ":test",
   ],
   main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "org.openqa.selenium.firefox.FirefoxDriver" },
+  ],
   args = "selenium/test/java/webdriver-selenium-suite.xml")
+
+java_test(name = "firefox-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  
+  sysproperties = [
+    { "selenium.browser" : "*chrome" },
+  ],
+  args = "selenium/test/java/testng.xml")
+
+java_test(name = "ie-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*iexplore" },
+  ],
+  args = "selenium/test/java/testng.xml")
+
+java_test(name = "safari-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*safari" },
+  ],
+  args = "selenium/test/java/testng.xml")
 
 java_test(name = "single",
   srcs = [ "test/java/org/openqa/selenium/SingleTestSuite.java" ],

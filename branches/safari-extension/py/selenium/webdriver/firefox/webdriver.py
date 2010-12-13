@@ -64,7 +64,7 @@ class WebDriver(RemoteWebDriver):
             # an error
             if command != Command.QUIT:
                 raise e
-
+    
     def set_preference(self, name, value):
         """
         Set a preference in about:config via user.js. Format is name, value.

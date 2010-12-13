@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestModalDialog extends SeleneseTestNgHelper {
-	@Test public void testModalDialog() throws Exception {
+public class TestModalDialog extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties")
+  public void testModalDialog() throws Exception {
 		selenium.open("../tests/html/test_modal_dialog.html");
 		verifyTrue(selenium.getLocation().matches("^[\\s\\S]*/tests/html/test_modal_dialog\\.html$"));
 		verifyEquals(selenium.getTitle(), "Modal Dialog Host Window");

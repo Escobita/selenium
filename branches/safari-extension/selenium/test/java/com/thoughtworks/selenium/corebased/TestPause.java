@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestPause extends SeleneseTestNgHelper {
-	@Test public void testPause() throws Exception {
+public class TestPause extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testPause() throws Exception {
 		selenium.open("../tests/html/test_reload_onchange_page.html");
 		//  Make sure we can pause even when the page doesn't change 
 		Thread.sleep(100);

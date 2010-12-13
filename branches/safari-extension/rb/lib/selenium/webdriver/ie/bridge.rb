@@ -3,7 +3,7 @@ module Selenium
     module IE
 
       #
-      # @private
+      # @api private
       #
 
       class Bridge
@@ -86,6 +86,10 @@ module Selenium
         end
 
         def switchToFrame(id)
+          if id.kind_of? Element
+            raise NotImplementedError
+          end
+
           check_error_code Lib.wdSwitchToFrame(@driver_pointer, wstring_ptr(id)),
                            "unable to locate frame #{id.inspect}"
         end
@@ -472,6 +476,14 @@ module Selenium
 
           Dimension.new width.get_int(0), height.get_int(0)
         end
+
+        %w[acceptAlert dismissAlert setAlertValue getAlertText].each do |m|
+          define_method(m) { |*args| raise NotImplementedError }
+        end
+
+        #
+        # @api private
+        #
 
         def finalize(element_pointer)
           check_error_code Lib.wdeFreeElement(element_pointer),

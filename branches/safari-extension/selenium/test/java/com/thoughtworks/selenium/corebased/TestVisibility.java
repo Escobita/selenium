@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestVisibility extends SeleneseTestNgHelper {
-	@Test public void testVisibility() throws Exception {
+public class TestVisibility extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testVisibility() throws Exception {
 		selenium.open("../tests/html/test_visibility.html");
 		verifyTrue(selenium.isVisible("visibleParagraph"));
 		verifyFalse(selenium.isVisible("hiddenParagraph"));

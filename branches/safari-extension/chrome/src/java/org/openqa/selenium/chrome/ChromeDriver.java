@@ -1,7 +1,6 @@
 package org.openqa.selenium.chrome;
 
-import java.util.List;
-import java.util.Map;
+import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -14,8 +13,10 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 
-import static org.openqa.selenium.remote.DriverCommand.SCREENSHOT;
 import com.google.common.collect.ImmutableMap;
+
+import java.util.List;
+import java.util.Map;
 
 public class ChromeDriver extends RemoteWebDriver implements  TakesScreenshot, FindsByCssSelector {
   

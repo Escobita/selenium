@@ -21,6 +21,7 @@ limitations under the License.
 
 goog.provide('core.LocatorStrategies');
 
+goog.require('bot.inject.cache');
 goog.require('bot.locators');
 goog.require('core.Error');
 goog.require('core.filters');
@@ -160,6 +161,23 @@ core.LocatorStrategies.name_ = function(locator, opt_doc) {
 
 
 /**
+ * Find an element by the value of an opaque key.
+ *
+ * @param {string} locator The value of the locator to use.
+ * @param {Document=} opt_doc The document to start the search from.
+ * @return {Element} The located element.
+ * @private
+ */
+core.LocatorStrategies.stored_ = function(locator, opt_doc) {
+  try {
+    return bot.inject.cache.getElement(locator, opt_doc);
+  } catch (e) {
+    return null;
+  }
+};
+
+
+/**
  * Find an element using xpath.
  *
  * @param {string} locator The value of the locator to use.
@@ -187,5 +205,5 @@ core.LocatorStrategies['id'] = core.LocatorStrategies.id_;
 core.LocatorStrategies['identifier'] = core.LocatorStrategies.identifier_;
 core.LocatorStrategies['implicit'] = core.LocatorStrategies.implicit_;
 core.LocatorStrategies['name'] = core.LocatorStrategies.name_;
+core.LocatorStrategies['stored'] = core.LocatorStrategies.stored_;
 core.LocatorStrategies['xpath'] = core.LocatorStrategies.xpath_;
-

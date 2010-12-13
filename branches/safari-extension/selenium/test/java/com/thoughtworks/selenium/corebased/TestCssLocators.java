@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestCssLocators extends SeleneseTestNgHelper {
-	@Test public void testCssLocators() throws Exception {
+public class TestCssLocators extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testCssLocators() throws Exception {
 
 		//         Unimplemented features:
 		//             namespace

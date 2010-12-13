@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestGetTextContent extends SeleneseTestNgHelper {
-	@Test public void testGetTextContent() throws Exception {
+public class TestGetTextContent extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testGetTextContent() throws Exception {
 		selenium.open("../tests/html/test_gettextcontent.html");
 		verifyTrue(selenium.isTextPresent("Text1"));
 		verifyFalse(selenium.isTextPresent("Text2"));

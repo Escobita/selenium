@@ -1,13 +1,13 @@
 package org.openqa.selenium.thirdparty;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class BestBuyTest extends SeleneseTestNgHelper {
+public class BestBuyTest extends InternalSelenseTestNgBase {
 
     public static String TIMEOUT = "30000";
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void searchAndSignup() {
         selenium.open("http://www.bestbuy.com/");
         selenium.type("st", "Wii");

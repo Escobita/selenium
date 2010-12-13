@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestCheckUncheck extends SeleneseTestNgHelper {
-	@Test public void testCheckUncheck() throws Exception {
+public class TestCheckUncheck extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testCheckUncheck() throws Exception {
 		selenium.open("../tests/html/test_check_uncheck.html");
 		verifyTrue(selenium.isChecked("base-spud"));
 		verifyFalse(selenium.isChecked("base-rice"));

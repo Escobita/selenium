@@ -1,10 +1,12 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestImplicitLocators extends SeleneseTestNgHelper {
-	@Test public void testImplicitLocators() throws Exception {
+public class TestImplicitLocators extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties")
+  public void testImplicitLocators() throws Exception {
 		selenium.open("../tests/html/test_locators.html");
 		verifyEquals(selenium.getText("id1"), "this is the first element");
 		verifyEquals(selenium.getAttribute("id1@class"), "a1");

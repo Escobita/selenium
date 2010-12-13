@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestFramesOpen extends SeleneseTestNgHelper {
-	@Test public void testFramesOpen() throws Exception {
+public class TestFramesOpen extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testFramesOpen() throws Exception {
 		selenium.open("../tests/html/Frames.html");
 		selenium.selectFrame("mainFrame");
 		verifyTrue(selenium.getLocation().matches("^[\\s\\S]*/tests/html/test_open\\.html$"));

@@ -171,7 +171,7 @@ class WebDriver(object):
     def get_title(self):
         """Gets the title of the current page."""
         resp = self._execute(Command.GET_TITLE)
-        return resp['value']
+        return resp['value'] if resp['value'] is not None else ""
 
     def find_element_by_id(self, id_):
         """Finds element by id."""
@@ -225,6 +225,14 @@ class WebDriver(object):
         """Finds elements by their class name."""
         return self._find_elements_by("class name", name)
 
+    def find_element_by_css_selector(self, css_selector):
+        """Find and return an element by CSS selector."""
+        return self._find_element_by("css selector", css_selector)
+    
+    def find_elements_by_css_selector(self, css_selector):
+        """Find and return list of multiple elements by CSS selector."""
+        return self._find_elements_by("css selector", css_selector)
+
     def execute_script(self, script, *args):
         if len(args) == 1:
             converted_args = args[0]
@@ -259,7 +267,8 @@ class WebDriver(object):
 
     def get_window_handles(self):
         return self._execute(Command.GET_WINDOW_HANDLES)['value']
-        
+    
+    #Target Locators
     def switch_to_active_element(self):
         """Returns the element with focus, or BODY if nothing has focus."""
         return self._execute(Command.GET_ACTIVE_ELEMENT)['value']
@@ -272,6 +281,11 @@ class WebDriver(object):
         """Switches focus to a frame by index or name."""
         self._execute(Command.SWITCH_TO_FRAME, {'id': index_or_name})
 
+    def switch_to_default_content(self):
+        """Switch to the default frame"""
+        self._execute(Command.SWITCH_TO_FRAME, {'id': None})
+
+    #Navigation 
     def back(self):
         """Goes back in browser history."""
         self._execute(Command.GO_BACK)
@@ -283,6 +297,7 @@ class WebDriver(object):
     def refresh(self):
         """Refreshes the current page."""
         self._execute(Command.REFRESH)
+
     # Options
     def get_cookies(self):
         """Gets all the cookies. Return a set of dicts."""
@@ -306,6 +321,11 @@ class WebDriver(object):
 
     def add_cookie(self, cookie_dict):
         self._execute(Command.ADD_COOKIE, {'cookie': cookie_dict})
+    
+    # Timeouts
+    def implicitly_wait(self, time_to_wait):
+        """Get the driver to poll for the element """
+        self._execute(Command.IMPLICIT_WAIT, {'ms': time_to_wait*1000})
 
     def _find_element_by(self, by, value):
         return self._execute(Command.FIND_ELEMENT,

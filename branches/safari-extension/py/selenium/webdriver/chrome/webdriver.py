@@ -25,7 +25,7 @@ class WebDriver(RemoteWebDriver):
             command_executor=ChromeDriver(),
             browser_name='chrome', platform='ANY', version='',
             javascript_enabled=True)
-
+    
     def start_client(self):
         self.command_executor.start()
 

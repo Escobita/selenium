@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestFramesSpecialTargets extends SeleneseTestNgHelper {
-	@Test public void testFramesSpecialTargets() throws Exception {
+public class TestFramesSpecialTargets extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testFramesSpecialTargets() throws Exception {
 		selenium.openWindow("../tests/html/Frames.html", "SpecialTargets");
 		selenium.waitForPopUp("SpecialTargets", "10000");
 		selenium.selectWindow("SpecialTargets");

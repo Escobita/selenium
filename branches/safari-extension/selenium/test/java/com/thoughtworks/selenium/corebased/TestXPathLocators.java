@@ -1,10 +1,11 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestXPathLocators extends SeleneseTestNgHelper {
-	@Test public void testXPathLocators() throws Exception {
+public class TestXPathLocators extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testXPathLocators() throws Exception {
 		selenium.open("../tests/html/test_locators.html");
 		verifyEquals(selenium.getText("xpath=//a"), "this is the first element");
 		verifyEquals(selenium.getText("xpath=//a[@class='a2']"), "this is the second element");

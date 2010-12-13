@@ -19,6 +19,7 @@ goog.addDependency("../../../js/src/bot/error.js", ['bot.Error', 'bot.ErrorCode'
 goog.addDependency("../../../js/src/bot/events.js", ['bot.events'], ['bot.dom', 'goog.dom', 'goog.events.EventType', 'goog.userAgent']);
 goog.addDependency("../../../js/src/bot/inject.js", ['bot.inject', 'bot.inject.cache'], ['bot.Error', 'bot.ErrorCode', 'goog.array', 'goog.dom', 'goog.dom.NodeType', 'goog.object']);
 goog.addDependency("../../../js/src/bot/keys.js", ['bot.keys'], ['bot.Error', 'bot.ErrorCode', 'bot.action', 'bot.events', 'goog.events.EventType', 'goog.events.KeyCodes', 'goog.userAgent']);
+goog.addDependency("../../../js/src/bot/script.js", ['bot.script'], ['bot.Error', 'bot.ErrorCode', 'goog.events', 'goog.events.EventType']);
 goog.addDependency("../../../js/src/bot/locators/locators.js", ['bot.locators'], ['bot', 'bot.locators.strategies', 'goog.array']);
 goog.addDependency("../../../js/src/bot/locators/strategies/classname.js", ['bot.locators.strategies.className'], ['goog.array', 'goog.dom', 'goog.dom.DomHelper', 'goog.string']);
 goog.addDependency("../../../js/src/bot/locators/strategies/css.js", ['bot.locators.strategies.css'], ['goog.array', 'goog.dom', 'goog.dom.NodeType', 'goog.object', 'goog.string', 'goog.userAgent']);
@@ -73,8 +74,9 @@ goog.addDependency("../../../js/src/jsunit/app/xbDebug.js", [], []);
 goog.addDependency("../../../js/src/selenium/browserbot.js", ['core.browserbot'], ['bot.locators', 'bot.dom', 'core.locators', 'core.patternMatcher']);
 goog.addDependency("../../../js/src/selenium/core.js", ['core.Error'], []);
 goog.addDependency("../../../js/src/selenium/filters.js", ['core.filters'], ['bot.dom', 'core.Error', 'goog.array']);
-goog.addDependency("../../../js/src/selenium/locator_strategies.js", ['core.LocatorStrategies'], ['bot.locators', 'core.Error', 'core.filters', 'goog.string']);
+goog.addDependency("../../../js/src/selenium/locator_strategies.js", ['core.LocatorStrategies'], ['bot.inject.cache', 'bot.locators', 'core.Error', 'core.filters', 'goog.string']);
 goog.addDependency("../../../js/src/selenium/pattern_matcher.js", ['core.patternMatcher'], []);
+goog.addDependency("../../../js/src/selenium/script.js", ['core.script'], ['bot.script']);
 goog.addDependency("../../../js/src/selenium/se_element.js", ['core.element'], ['bot.dom', 'core.Error', 'core.locators']);
 goog.addDependency("../../../js/src/selenium/se_locators.js", ['core.locators', 'core.locators.Locator'], ['core.Error', 'core.LocatorStrategies', 'goog.dom.NodeType', 'goog.string']);
 goog.addDependency("../../../js/src/selenium/testbase.js", [], []);

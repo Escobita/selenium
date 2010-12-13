@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestDomainCookie extends SeleneseTestNgHelper {
-	@Test public void testDomainCookie() throws Exception {
+public class TestDomainCookie extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testDomainCookie() throws Exception {
 		String host = selenium.getEval("parseUrl(canonicalize(absolutify(\"html\", selenium.browserbot.baseUrl))).host;");
 		System.out.println(host);
 		assertTrue(selenium.getExpression(host).matches("^[\\s\\S]*\\.[\\s\\S]*\\.[\\s\\S]*$"));

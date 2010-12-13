@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestRollup extends SeleneseTestNgHelper {
-	@Test public void testRollup() throws Exception {
+public class TestRollup extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testRollup() throws Exception {
 		selenium.addScript("", "rollup");
 		selenium.open("../tests/html/test_rollup.html");
 		selenium.rollup("cake", "");

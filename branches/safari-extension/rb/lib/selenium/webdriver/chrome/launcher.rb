@@ -2,7 +2,7 @@ module Selenium
   module WebDriver
     module Chrome
 
-      # @private
+      # @api private
       class Launcher
         include FileUtils
 
@@ -21,7 +21,7 @@ module Selenium
         end
 
         #
-        # @private
+        # @api private
         #
         # @see Chrome.path=
         #
@@ -58,8 +58,10 @@ module Selenium
         end
 
         def launch_chrome(server_url)
+          path = self.class.binary_path
+
           args = [
-            Platform.wrap_in_quotes_if_necessary(self.class.binary_path),
+            Platform.wrap_in_quotes_if_necessary(path),
             "--load-extension=#{Platform.wrap_in_quotes_if_necessary(tmp_extension_dir)}",
             "--activate-on-launch",
             "--disable-hang-monitor",
@@ -138,13 +140,17 @@ module Selenium
           end
 
           def windows_paths
-            [
+            paths = [
               windows_registry_path,
               "#{ENV['USERPROFILE']}\\Local Settings\\Application Data\\Google\\Chrome\\Application\\chrome.exe",
               "#{ENV['USERPROFILE']}\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
               "#{Platform.home}\\Local Settings\\Application Data\\Google\\Chrome\\Application\\chrome.exe",
               "#{Platform.home}\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
             ].compact
+
+            paths.map! { |path| Platform.cygwin_path(path) } if Platform.cygwin?
+
+            paths
           end
 
           def windows_registry_path

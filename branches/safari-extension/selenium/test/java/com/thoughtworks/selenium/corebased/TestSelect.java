@@ -1,10 +1,10 @@
 package com.thoughtworks.selenium.corebased;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class TestSelect extends SeleneseTestNgHelper {
-	@Test public void testSelect() throws Exception {
+public class TestSelect extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testSelect() throws Exception {
 		selenium.open("../tests/html/test_select.html");
 		assertTrue(selenium.isSomethingSelected("theSelect"));
 		assertEquals(selenium.getSelectedLabel("theSelect"), "Second Option");;

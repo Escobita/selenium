@@ -1,7 +1,7 @@
 package org.openqa.selenium;
 
 import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
 import org.testng.annotations.AfterMethod;
@@ -10,7 +10,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-public class SessionExtensionJsTest extends SeleneseTestNgHelper {
+public class SessionExtensionJsTest extends InternalSelenseTestNgBase {
 
     private Selenium privateSelenium;
     private String host, browser;
@@ -33,7 +33,7 @@ public class SessionExtensionJsTest extends SeleneseTestNgHelper {
         if (privateSelenium != null) privateSelenium.stop();
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void expectFailureWhenExtensionNotSet() {
         try {
             runCommands(privateSelenium);
@@ -44,7 +44,7 @@ public class SessionExtensionJsTest extends SeleneseTestNgHelper {
         }
     }
     
-    @Test
+    @Test(dataProvider = "system-properties")
     public void loadSimpleExtensionJs() {
         // everything is peachy when the extension is set
         privateSelenium.setExtensionJs("var comeGetSome = 'in';");

@@ -19,7 +19,7 @@
 
 
 /**
- * An active FirefoxDriver session.  
+ * An active FirefoxDriver session.
  * @constructor
  */
 function wdSession() {
@@ -103,6 +103,17 @@ wdSession.prototype.inputSpeed_ = 1;
 wdSession.prototype.implicitWait_ = 0;
 
 
+/**
+ * The amount of time, in milliseconds, this session should wait for
+ * asynchronous scripts to finish executing. If set to 0, then the timeout will
+ * not fire until the next event loop after the script is executed. This will
+ * give scripts that employ a 0-based setTimeout to finish.
+ * @type {number}
+ * @private
+ */
+wdSession.prototype.scriptTimeout_ = 0;
+
+
 /** @see nsISupports.QueryInterface */
 wdSession.prototype.QueryInterface = function(aIID) {
   if (aIID.equals(Components.interfaces.nsISupports)) {
@@ -158,16 +169,6 @@ wdSession.prototype.getWindow = function() {
     this.setWindow(win);
   }
 
-  // If we have a frame locator, apply it to verify that the frame is there.
-  if (this.frameLocator_ != null) {
-    var frame = Utils.findFrame(this.chromeWindow_.getBrowser(), this.frameLocator_);
-    if (!frame) {
-      Logger.dumpn("Focused frame has gone, falling back to default content");
-      win = this.chromeWindow_.getBrowser().contentWindow;
-      this.setWindow(win);
-    }
-  }
-
   return win;
 };
 
@@ -190,19 +191,11 @@ wdSession.prototype.setChromeWindow = function(win) {
 
 
 /**
- * Set this session's current window. If the selected window is a frameset,
- * the current window will be adjusted to focus on the first frame.
+ * Set this session's current window.
  * @param {nsIDOMWindow} win The new window.
  */
-wdSession.prototype.setWindow = function(win, opt_frameLocator) {
-  this.frameLocator = opt_frameLocator || null;
-
+wdSession.prototype.setWindow = function(win) {
   this.window_ =  Components.utils.getWeakReference(win);
-  var frames = win.frames;
-  if (frames && frames.length && 'FRAME' == frames[0].frameElement.tagName) {
-    this.window_ = Components.utils.getWeakReference(frames[0]);
-    this.frameLocator_ = 0;
-  }
 };
 
 
@@ -239,6 +232,25 @@ wdSession.prototype.getImplicitWait = function() {
  */
 wdSession.prototype.setImplicitWait = function(wait) {
   this.implicitWait_ = Math.max(wait, 0);
+};
+
+
+/**
+ * @return {number} the amount of time, in milliseconds, that asynchronous
+ *     scripts are allowed to run before timing out.
+ */
+wdSession.prototype.getScriptTimeout = function() {
+  return this.scriptTimeout_;
+};
+
+
+/**
+ * Sets the amount of time, in milliseconds, that asynchronous scripts are
+ *     allowed to run before timing out.
+ * @param {number} The new timeout.
+ */
+wdSession.prototype.setScriptTimeout = function(timeout) {
+  this.scriptTimeout_ = Math.max(timeout, 0);
 };
 
 
@@ -295,7 +307,7 @@ wdSessionModule.prototype.registerSelf = function(aCompMgr, aFileSpec, aLocation
 };
 
 
-/** @see nsIModule.unregisterSelf */ 
+/** @see nsIModule.unregisterSelf */
 wdSessionModule.prototype.unregisterSelf = function(aCompMgr, aLocation) {
   aCompMgr.QueryInterface(Components.interfaces.nsIComponentRegistrar).
       unregisterFactoryLocation(wdSession.CLASS_ID, aLocation);

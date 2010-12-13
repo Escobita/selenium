@@ -1,11 +1,11 @@
 package com.thoughtworks.selenium.thirdparty;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.annotations.Test;
 
-public class GoogleVideoTest extends SeleneseTestNgHelper {
+public class GoogleVideoTest extends InternalSelenseTestNgBase {
     
-    @Test
+    @Test(dataProvider = "system-properties")
     public void testGoogle() {
         selenium.open("http://video.google.com");
         selenium.type("q", "hello world");

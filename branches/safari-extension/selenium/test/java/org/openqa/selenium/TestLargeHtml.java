@@ -1,11 +1,11 @@
 package org.openqa.selenium;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestLargeHtml extends SeleneseTestNgHelper {
-    @Test public void testLargeHtml() {
+public class TestLargeHtml extends InternalSelenseTestNgBase {
+    @Test(dataProvider = "system-properties") public void testLargeHtml() {
         selenium.open("/selenium-server/tests/html/test_large_html.html");
         String source = selenium.getHtmlSource().trim();
         String expectedEndsWith = "</body>";

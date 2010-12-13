@@ -20,6 +20,7 @@ import urllib2
 from command import Command
 import utils
 
+LOGGER = logging.getLogger(__name__)
 
 class Request(urllib2.Request):
     """Extends the urllib2.Request to support all HTTP request types."""
@@ -186,7 +187,8 @@ class RemoteConnection(object):
             Command.GET_SPEED: ('GET', '/session/$sessionId/speed'),
             Command.SET_SPEED: ('POST', '/session/$sessionId/speed'),
             Command.GET_ELEMENT_VALUE_OF_CSS_PROPERTY:
-                ('GET',  '/session/$sessionId/element/$id/css/$propertyName')}
+                ('GET',  '/session/$sessionId/element/$id/css/$propertyName'),
+            Command.IMPLICIT_WAIT: ('POST', '/session/$sessionId/timeouts/implicit_wait')}
 
     def execute(self, command, params):
         """Send a command to the remote server.
@@ -217,7 +219,7 @@ class RemoteConnection(object):
         Returns:
           A dictionary with the server's parsed JSON response.
         """
-        logging.debug('%s %s %s' % (method, url, data))
+        LOGGER.debug('%s %s %s' % (method, url, data))
 
         request = Request(url, data=data, method=method)
         request.add_header('Accept', 'application/json')

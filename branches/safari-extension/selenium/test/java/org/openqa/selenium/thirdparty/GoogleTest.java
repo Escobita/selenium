@@ -1,15 +1,16 @@
 package org.openqa.selenium.thirdparty;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class GoogleTest extends SeleneseTestNgHelper {
-    @Test
+public class GoogleTest extends InternalSelenseTestNgBase {
+    @Test(dataProvider = "system-properties")
     public void homepage() {
         selenium.open("http://www.google.com");
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void simpleSearch() {
         selenium.open("http://www.google.com");
         selenium.type("q", "OpenQA");
@@ -18,7 +19,7 @@ public class GoogleTest extends SeleneseTestNgHelper {
         assertTrue(selenium.getBodyText().contains("Open source test automation tool for executing scenarios against web applications to validate browser compatibility and system functionality."));
     }
 
-    @Test(enabled = false)
+    @Test(dataProvider = "system-properties", enabled = false)
     // DGF this test is too brittle
     public void testMaps() throws InterruptedException {
         selenium.open("http://maps.google.com");
@@ -208,7 +209,7 @@ public class GoogleTest extends SeleneseTestNgHelper {
         selenium.dragAndDrop("//img[contains(@src, 'v=w2t.66&x=37495&s=&y=50144')]", "-600,0");
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void finance() throws InterruptedException {
         selenium.open("http://finance.google.com");
         selenium.typeKeys("searchbox", "Cis");
@@ -219,7 +220,7 @@ public class GoogleTest extends SeleneseTestNgHelper {
         assertTrue(selenium.isTextPresent("Cisco Systems, Inc"));
     }
 
-    @Test
+    @Test(dataProvider = "system-properties")
     public void suggest() throws InterruptedException {
         selenium.open("http://www.google.com/webhp?complete=1&hl=en");
         selenium.typeKeys("q", "g");

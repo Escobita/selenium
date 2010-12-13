@@ -2,11 +2,12 @@ package com.thoughtworks.selenium.corebased;
 
 import java.util.regex.Pattern;
 
-import com.thoughtworks.selenium.SeleneseTestNgHelper;
+import com.thoughtworks.selenium.InternalSelenseTestNgBase;
+
 import org.testng.annotations.Test;
 
-public class TestWaitForNot extends SeleneseTestNgHelper {
-	@Test public void testWaitForNot() throws Exception {
+public class TestWaitForNot extends InternalSelenseTestNgBase {
+	@Test(dataProvider = "system-properties") public void testWaitForNot() throws Exception {
 		selenium.open("../tests/html/test_async_event.html");
 		assertEquals(selenium.getValue("theField"), "oldValue");
 		selenium.click("theButton");
