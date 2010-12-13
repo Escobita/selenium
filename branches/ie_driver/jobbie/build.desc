@@ -2,16 +2,16 @@
 java_library(name = "jobbie",
   srcs  = [ "src/java/**/*.java" ],
   resources = [
-    {":ie_win32_dll" : "x86/InternetExplorerDriver.dll"},
-    {":ie_x64_dll" : "amd64/InternetExplorerDriver.dll"}
+    {":ieserver_win32_dll" : "x86/IEDriver.dll"},
+    {":ieserver_x64_dll" : "amd64/IEDriver.dll"}
   ],
   deps = [
     ":atoms",
     ":ie_result_type_cpp",
     ":ie_result_type_java",
     ":sizzle",
-    "//common",
-    "//third_party/java/jna"
+    "//remote/client",
+    "//third_party/java/jna",
   ])
 
 java_test(name = "test",
@@ -60,6 +60,31 @@ visualc_library(name = "ie_x64_dll",
   target = "InternetExplorerDriver",
   out = "x64/Release/InternetExplorerDriver.dll"
 )
+
+visualc_library(name = "ieserver_win32_dll",
+  deps = [
+    ":atoms",
+    ":ie_result_type_cpp",
+    ":sizzle"
+  ],
+  platform = "Win32",
+  solution = "WebDriver.sln",
+  target = "IEDriver",
+  out = "Win32/Release/IEDriver.dll"
+)
+
+visualc_library(name = "ieserver_x64_dll",
+  deps = [
+    ":atoms",
+    ":ie_result_type_cpp",
+    ":sizzle"
+  ],
+  platform = "x64",
+  solution = "WebDriver.sln",
+  target = "IEDriver",
+  out = "x64/Release/IEDriver.dll"
+)
+
 
 #rake_task(name = "ie_win32_dll",
 #  task_name = "ie_win32_dll",

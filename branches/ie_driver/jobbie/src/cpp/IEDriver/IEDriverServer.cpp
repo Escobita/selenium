@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <regex>
 #include "IEDriverServer.h"
 
 namespace webdriver {

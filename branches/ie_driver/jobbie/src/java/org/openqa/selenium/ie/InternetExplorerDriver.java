@@ -26,7 +26,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
@@ -51,7 +53,6 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   private IEServer lib;
   private int port;
   private WindowsProxyManager proxyManager;
-  private InternetExplorerKeyboard keyboard;
 
   private final AsyncJavascriptExecutor asyncJsExecutor =
       new AsyncJavascriptExecutor(this, 0, TimeUnit.MILLISECONDS);
@@ -71,7 +72,14 @@ public class InternetExplorerDriver extends RemoteWebDriver implements
   public InternetExplorerDriver(int port) {
     this.port = port;
     setup();
-    keyboard = new InternetExplorerKeyboard(this, lib);
+  }
+
+  protected void assertOnWindows() {
+    Platform current = Platform.getCurrent();
+      if (!current.is(Platform.WINDOWS)) {
+        throw new WebDriverException(
+          String.format("You appear to be running %s. The IE driver only runs on Windows.", current)); 
+      }
   }
 
   private void setup() {
