@@ -14,8 +14,7 @@ public:
 	}
 
 protected:
-	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response)
-	{
+	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (command_parameters.find("script") == command_parameters.end()) {
 			response->SetErrorResponse(400, "Missing parameter: script");
 			return;

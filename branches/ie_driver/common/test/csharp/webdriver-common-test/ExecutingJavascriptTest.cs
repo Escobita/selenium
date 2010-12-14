@@ -9,7 +9,6 @@ namespace OpenQA.Selenium
     [TestFixture]
     public class ExecutingJavascriptTest : DriverTestFixture
     {
-
         [Test]
         [Category("Javascript")]
         public void ShouldBeAbleToExecuteSimpleJavascriptAndReturnAString()

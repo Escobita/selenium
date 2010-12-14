@@ -45,6 +45,7 @@ namespace OpenQA.Selenium.Remote
         private ICommandExecutor executor;
         private ICapabilities capabilities;
         private SessionId sessionId;
+        private AsyncJavaScriptExecutor asyncExecutor;
         #endregion
 
         #region Constructors
@@ -58,6 +59,7 @@ namespace OpenQA.Selenium.Remote
             executor = commandExecutor;
             StartClient();
             StartSession(desiredCapabilities);
+            asyncExecutor = new AsyncJavaScriptExecutor(this);
         }
 
         /// <summary>
@@ -325,7 +327,7 @@ namespace OpenQA.Selenium.Remote
         /// <param name="script">The JavaScript code to execute.</param>
         /// <param name="args">The arguments to the script.</param>
         /// <returns>The value returned by the script.</returns>
-        public object ExecuteScript(string script, object[] args)
+        public object ExecuteScript(string script, params object[] args)
         {
             if (!Capabilities.IsJavaScriptEnabled)
             {
@@ -351,6 +353,17 @@ namespace OpenQA.Selenium.Remote
 
             Response commandResponse = Execute(DriverCommand.ExecuteScript, parameters);
             return ParseJavaScriptReturnValue(commandResponse.Value);
+        }
+
+        /// <summary>
+        /// Executes JavaScript asynchronously in the context of the currently selected frame or window.
+        /// </summary>
+        /// <param name="script">The JavaScript code to execute.</param>
+        /// <param name="args">The arguments to the script.</param>
+        /// <returns>The value returned by the script.</returns>
+        public object ExecuteAsyncScript(string script, params object[] args)
+        {
+            return asyncExecutor.ExecuteScript(script, args);
         }
         #endregion
 
@@ -957,7 +970,7 @@ namespace OpenQA.Selenium.Remote
                     toReturn.Add(parsedItem);
                 }
 
-                if (allElementsAreWebElements)
+                if (toReturn.Count > 0 && allElementsAreWebElements)
                 {
                     List<IWebElement> elementList = new List<IWebElement>();
                     foreach (object listItem in toReturn)
@@ -1182,6 +1195,17 @@ namespace OpenQA.Selenium.Remote
                     Dictionary<string, object> parameters = new Dictionary<string, object>();
                     parameters.Add("ms", timeToWait.TotalMilliseconds);
                     Response response = driver.Execute(DriverCommand.ImplicitlyWait, parameters);
+                    return this;
+                }
+
+                /// <summary>
+                /// Specifies the amount of time the driver should wait when executing JavaScript asynchronously.
+                /// </summary>
+                /// <param name="timeToWait">A <see cref="TimeSpan"/> structure defining the amount of time to wait.</param>
+                /// <returns>A self reference</returns>
+                public ITimeouts SetScriptTimeout(TimeSpan timeToWait)
+                {
+                    driver.asyncExecutor.Timeout = timeToWait;
                     return this;
                 }
                 #endregion

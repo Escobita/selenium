@@ -50,6 +50,7 @@ namespace OpenQA.Selenium
         public string dynamicPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("dynamic.html");
         public string tables = EnvironmentManager.Instance.UrlBuilder.WhereIs("tables.html");
         public string deletingFrame = EnvironmentManager.Instance.UrlBuilder.WhereIs("deletingFrame.htm");
+        public string ajaxyPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("ajaxy_page.html");
 
         protected IWebDriver driver;
 

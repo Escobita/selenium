@@ -80,6 +80,7 @@
     <Compile Include="Environment\EnvironmentManager.cs" />
     <Compile Include="Environment\TestWebServer.cs" />
     <Compile Include="Environment\UrlBuilder.cs" />
+    <Compile Include="ExecutingAsyncJavascriptTest.cs" />
     <Compile Include="ExecutingJavascriptTest.cs" />
     <Compile Include="FormHandlingTests.cs" />
     <Compile Include="FrameSwitchingTest.cs" />
