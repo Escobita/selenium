@@ -6,7 +6,7 @@
 	ProjectGUID="{BB72383B-427F-4191-B692-E4345A30E33C}"
 	RootNamespace="IEDriver"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\json-cpp\include\json&quot;;&quot;$(ProjectDir)..\mongoose&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				MinimalRebuild="false"
 				ExceptionHandling="2"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\json-cpp\include\json&quot;;&quot;$(ProjectDir)..\mongoose&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				MinimalRebuild="false"
 				ExceptionHandling="2"
@@ -204,7 +204,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="false"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\json-cpp\include\json&quot;;&quot;$(ProjectDir)..\mongoose&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				ExceptionHandling="2"
 				RuntimeLibrary="0"
@@ -283,7 +283,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="false"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\JSON\include\json&quot;;&quot;$(SolutionDir)\common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\json-cpp\include\json&quot;;&quot;$(ProjectDir)..\mongoose&quot;;&quot;$(SolutionDir)common\src\cpp\webdriver-interactions&quot;;&quot;$(ProjectDir)..\InternetExplorerDriver&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;IEDRIVER_EXPORTS"
 				ExceptionHandling="2"
 				RuntimeLibrary="0"
@@ -336,12 +336,16 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}"
-			RelativePathToProject=".\jobbie\src\cpp\JSON\JSON.vcproj"
-		/>
-		<ProjectReference
 			ReferencedProjectIdentifier="{87FA39A1-958E-478A-8AB9-6D5E5AAA3886}"
 			RelativePathToProject=".\common\src\cpp\webdriver-interactions\webdriver-interactions.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{320F3BBE-8223-4E7F-ABEE-18D3BD57B1FD}"
+			RelativePathToProject=".\jobbie\src\cpp\json-cpp\json-cpp.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{9AEBD612-232D-40CB-BE2C-F2B911FD6228}"
+			RelativePathToProject=".\jobbie\src\cpp\mongoose\mongoose.vcproj"
 		/>
 	</References>
 	<Files>
@@ -373,42 +377,6 @@
 			<File
 				RelativePath=".\IEDriverServer.cpp"
 				>
-			</File>
-			<File
-				RelativePath=".\mongoose.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ScriptWrapper.cpp"
@@ -686,10 +654,6 @@
 			</File>
 			<File
 				RelativePath=".\IsElementSelectedCommandHandler.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mongoose.h"
 				>
 			</File>
 			<File
