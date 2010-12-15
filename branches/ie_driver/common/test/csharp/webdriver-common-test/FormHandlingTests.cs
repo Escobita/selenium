@@ -29,7 +29,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = formsPage;
             driver.FindElement(By.Id("imageButton")).Click();
-            driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromMilliseconds(500));
+            System.Threading.Thread.Sleep(500);
             Assert.AreEqual(driver.Title, "We Arrive Here");
         }
 

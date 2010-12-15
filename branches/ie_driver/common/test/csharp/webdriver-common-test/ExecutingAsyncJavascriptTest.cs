@@ -11,18 +11,20 @@ namespace OpenQA.Selenium
     public class ExecutingAsyncJavascriptTest : DriverTestFixture
     {
         private IJavaScriptExecutor executor;
+
         [SetUp]
-        public void SetUpEnv()
+        public void SetUpEnvironment()
         {
             if (driver is IJavaScriptExecutor)
             {
                 executor = (IJavaScriptExecutor)driver;
             }
+
             driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromMilliseconds(0));
         }
 
         [Test]
-        public void shouldNotTimeoutIfCallbackInvokedImmediately()
+        public void ShouldNotTimeoutIfCallbackInvokedImmediately()
         {
             driver.Url = ajaxyPage;
             object result = executor.ExecuteAsyncScript("arguments[arguments.length - 1](123);");
@@ -31,7 +33,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnJavascriptPrimitivesFromAsyncScripts()
+        public void ShouldBeAbleToReturnJavascriptPrimitivesFromAsyncScripts()
         {
             driver.Url = ajaxyPage;
             Assert.IsNull(executor.ExecuteAsyncScript("arguments[arguments.length - 1](null);"));
@@ -43,7 +45,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnAnArrayLiteralFromAnAsyncScript()
+        public void ShouldBeAbleToReturnAnArrayLiteralFromAnAsyncScript()
         {
             driver.Url = ajaxyPage;
 
@@ -54,7 +56,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnAnArrayObjectFromAnAsyncScript()
+        public void ShouldBeAbleToReturnAnArrayObjectFromAnAsyncScript()
         {
             driver.Url = ajaxyPage;
 
@@ -65,12 +67,11 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnArraysOfPrimitivesFromAsyncScripts()
+        public void ShouldBeAbleToReturnArraysOfPrimitivesFromAsyncScripts()
         {
             driver.Url = ajaxyPage;
 
-            Object result = executor.ExecuteAsyncScript("arguments[arguments.length - 1]([null, 123, 'abc', true, false]);");
-
+            object result = executor.ExecuteAsyncScript("arguments[arguments.length - 1]([null, 123, 'abc', true, false]);");
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(typeof(ReadOnlyCollection<object>), result);
             ReadOnlyCollection<object> resultList = result as ReadOnlyCollection<object>;
@@ -83,7 +84,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnWebElementsFromAsyncScripts()
+        public void ShouldBeAbleToReturnWebElementsFromAsyncScripts()
         {
             driver.Url = ajaxyPage;
 
@@ -93,7 +94,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldBeAbleToReturnArraysOfWebElementsFromAsyncScripts()
+        public void ShouldBeAbleToReturnArraysOfWebElementsFromAsyncScripts()
         {
             driver.Url = ajaxyPage;
 
@@ -110,7 +111,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [ExpectedException(typeof(TimeoutException))]
-        public void shouldTimeoutIfScriptDoesNotInvokeCallback()
+        public void ShouldTimeoutIfScriptDoesNotInvokeCallback()
         {
             driver.Url = ajaxyPage;
             executor.ExecuteAsyncScript("return 1 + 2;");
@@ -125,7 +126,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        public void shouldNotTimeoutIfScriptCallsbackInsideAZeroTimeout()
+        public void ShouldNotTimeoutIfScriptCallsbackInsideAZeroTimeout()
         {
             driver.Url = ajaxyPage;
             executor.ExecuteAsyncScript(
@@ -135,7 +136,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [ExpectedException(typeof(TimeoutException))]
-        public void shouldTimeoutIfScriptDoesNotInvokeCallbackWithLongTimeout()
+        public void ShouldTimeoutIfScriptDoesNotInvokeCallbackWithLongTimeout()
         {
             driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromMilliseconds(500));
             driver.Url = ajaxyPage;
@@ -146,7 +147,7 @@ namespace OpenQA.Selenium
 
         [Test]
         [ExpectedException(typeof(WebDriverException))]
-        public void shouldDetectPageLoadsWhileWaitingOnAnAsyncScriptAndReturnAnError()
+        public void ShouldDetectPageLoadsWhileWaitingOnAnAsyncScriptAndReturnAnError()
         {
             driver.Url = ajaxyPage;
             driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromMilliseconds(100));
@@ -154,15 +155,15 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [ExpectedException(typeof(WebDriverException))]
-        public void shouldCatchErrorsWhenExecutingInitialScript()
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void ShouldCatchErrorsWhenExecutingInitialScript()
         {
             driver.Url = ajaxyPage;
             executor.ExecuteAsyncScript("throw Error('you should catch this!');");
         }
 
         [Test]
-        public void shouldBeAbleToExecuteAsynchronousScripts()
+        public void ShouldBeAbleToExecuteAsynchronousScripts()
         {
             driver.Url = ajaxyPage;
 
@@ -173,7 +174,7 @@ namespace OpenQA.Selenium
             driver.FindElement(By.Id("red")).Click();
             driver.FindElement(By.Name("submit")).Click();
 
-            Assert.AreEqual(1, getNumDivElements(), "There should only be 1 DIV at this point, which is used for the butter message");
+            Assert.AreEqual(1, GetNumberOfDivElements(), "There should only be 1 DIV at this point, which is used for the butter message");
 
             driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(10));
             string text = (string)executor.ExecuteAsyncScript(
@@ -182,11 +183,11 @@ namespace OpenQA.Selenium
             Assert.AreEqual("bob", text);
             Assert.AreEqual("", typer.Value);
 
-            Assert.AreEqual(2, getNumDivElements(), "There should be 1 DIV (for the butter message) + 1 DIV (for the new label)");
+            Assert.AreEqual(2, GetNumberOfDivElements(), "There should be 1 DIV (for the butter message) + 1 DIV (for the new label)");
         }
 
         [Test]
-        public void shouldBeAbleToPassMultipleArgumentsToAsyncScripts()
+        public void ShouldBeAbleToPassMultipleArgumentsToAsyncScripts()
         {
             driver.Url = ajaxyPage;
             long result = (long)executor.ExecuteAsyncScript("arguments[arguments.length - 1](arguments[0] + arguments[1]);", 1, 2);
@@ -194,7 +195,7 @@ namespace OpenQA.Selenium
         }
 
         //[Test]
-        public void shouldBeAbleToMakeXMLHttpRequestsAndWaitForTheResponse()
+        public void ShouldBeAbleToMakeXMLHttpRequestsAndWaitForTheResponse()
         {
             string script =
                 "var url = arguments[0];" +
@@ -221,15 +222,14 @@ namespace OpenQA.Selenium
 
             driver.Url = ajaxyPage;
             driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(3));
-            //string response = (string)executor.ExecuteAsyncScript(script, sleepingPage + "?time=2");
-            //Assert.AreEqual("<html><head><title>Done</title></head><body>Slept for 2s</body></html>", response.Trim());
+            string response = (string)executor.ExecuteAsyncScript(script, sleepingPage + "?time=2");
+            Assert.AreEqual("<html><head><title>Done</title></head><body>Slept for 2s</body></html>", response.Trim());
         }
 
-        private long getNumDivElements()
+        private long GetNumberOfDivElements()
         {
             IJavaScriptExecutor jsExecutor = driver as IJavaScriptExecutor;
             // Selenium does not support "findElements" yet, so we have to do this through a script.
-            object d = jsExecutor.ExecuteScript("return document.getElementsByTagName('div').length;");
             return (long)jsExecutor.ExecuteScript("return document.getElementsByTagName('div').length;");
         }
     }
