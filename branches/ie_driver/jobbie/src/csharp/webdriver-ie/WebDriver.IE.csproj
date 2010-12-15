@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IE\InternetExplorerCommandExecutor.cs" />
     <Compile Include="IE\NativeMethods.cs" />
     <Compile Include="IE\InternetExplorerDriver.cs" />
     <Compile Include="IE\InternetExplorerWebElement.cs" />

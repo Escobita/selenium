@@ -2,38 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Remote;
-using System.Runtime.InteropServices;
 
 namespace OpenQA.Selenium.IE
 {
     public class InternetExplorerDriver : RemoteWebDriver, IFindsByCssSelector, ITakesScreenshot
     {
-        private const int ServerPort = 5555;
+        //private const int ServerPort = 5555;
 
-        [DllImport("IEDriver.dll")]
-        private static extern IntPtr StartServer(int port);
+        //[DllImport("IEDriver.dll")]
+        //private static extern IntPtr StartServer(int port);
 
-        [DllImport("IEDriver.dll")]
-        private static extern void StopServer(IntPtr server);
+        //[DllImport("IEDriver.dll")]
+        //private static extern void StopServer(IntPtr server);
 
-        private IntPtr nativeServer;
+        //private IntPtr nativeServer;
+        //private NativeDriverLibrary nativeServer;
 
         public InternetExplorerDriver()
-            : base(new Uri("http://localhost:" + ServerPort.ToString()), DesiredCapabilities.InternetExplorer())
+            : base(new InternetExplorerCommandExecutor(FindFreePort()), DesiredCapabilities.InternetExplorer())
         {
         }
 
         protected override void StartClient()
         {
-            nativeServer = StartServer(ServerPort);
+            ((InternetExplorerCommandExecutor)this.CommandExecutor).StartServer();
         }
 
         protected override void StopClient()
         {
-            StopServer(nativeServer);
+            ((InternetExplorerCommandExecutor)this.CommandExecutor).StopServer();
         }
 
         #region IFindsByCssSelector Members
@@ -73,5 +76,19 @@ namespace OpenQA.Selenium.IE
         }
 
         #endregion
+
+        private static int FindFreePort()
+        {
+            // Locate a free port on the local machine by binding a socket to
+            // an IPEndPoint using IPAddress.Any and port 0. The socket will
+            // select a free port.
+            Socket portSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPEndPoint socketEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            portSocket.Bind(socketEndPoint);
+            socketEndPoint = (IPEndPoint)portSocket.LocalEndPoint;
+            int listeningPort = socketEndPoint.Port;
+            portSocket.Close();
+            return listeningPort;
+        }
     }
 }
