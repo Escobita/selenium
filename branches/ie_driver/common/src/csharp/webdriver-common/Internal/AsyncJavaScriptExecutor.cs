@@ -17,8 +17,8 @@ namespace OpenQA.Selenium.Internal
     /// </summary>
     public class AsyncJavaScriptExecutor
     {
-        private IJavaScriptExecutor _executor;
-        private TimeSpan _timeout = TimeSpan.FromMilliseconds(0);
+        private IJavaScriptExecutor executor;
+        private TimeSpan timeout = TimeSpan.FromMilliseconds(0);
 
         private const string AsyncScriptTemplate = @"document.__$webdriverPageId = '{0}';
 var timeoutId = window.setTimeout(function() {{
@@ -58,7 +58,7 @@ if (document.__$webdriverPageId != '{1}') {{
         /// <param name="executor">An <see cref="IJavaScriptExecutor"/> object capable of executing JavaScript.</param>
         public AsyncJavaScriptExecutor(IJavaScriptExecutor executor)
         {
-            _executor = executor;
+            this.executor = executor;
         }
 
         /// <summary>
@@ -66,8 +66,8 @@ if (document.__$webdriverPageId != '{1}') {{
         /// </summary>
         public TimeSpan Timeout
         {
-            get { return _timeout; }
-            set { _timeout = value; }
+            get { return timeout; }
+            set { timeout = value; }
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ if (document.__$webdriverPageId != '{1}') {{
         /// <exception cref="TimeoutException">if the timeout expires during the JavaScript execution.</exception>
         public object ExecuteScript(string script, object[] args)
         {
-            if (!_executor.IsJavaScriptEnabled)
+            if (!executor.IsJavaScriptEnabled)
             {
                 throw new InvalidOperationException(
                     "The underlying JavascriptExecutor must have JavaScript enabled");
@@ -91,7 +91,7 @@ if (document.__$webdriverPageId != '{1}') {{
             // loaded while waiting for the script result.
             string pageId = Guid.NewGuid().ToString();
 
-            string asyncScript = string.Format(AsyncScriptTemplate, pageId, _timeout.TotalMilliseconds, script);
+            string asyncScript = string.Format(AsyncScriptTemplate, pageId, timeout.TotalMilliseconds, script);
 
             // This is used by our polling function to return a result that indicates the script has
             // neither finished nor timed out yet.
@@ -101,7 +101,7 @@ if (document.__$webdriverPageId != '{1}') {{
 
             // Execute the async script.
             DateTime startTime = DateTime.Now;
-            _executor.ExecuteScript(asyncScript, args);
+            executor.ExecuteScript(asyncScript, args);
 
             // Finally, enter a loop running the poll function. This loop will run until one of the
             // following occurs:
@@ -111,7 +111,7 @@ if (document.__$webdriverPageId != '{1}') {{
             // javascript event loop.
             while (true)
             {
-                object result = _executor.ExecuteScript(pollFunction);
+                object result = executor.ExecuteScript(pollFunction);
                 ReadOnlyCollection<object> resultList = result as ReadOnlyCollection<object>;
                 if (resultList != null && resultList.Count == 2 && pendingId == resultList[0].ToString())
                 {

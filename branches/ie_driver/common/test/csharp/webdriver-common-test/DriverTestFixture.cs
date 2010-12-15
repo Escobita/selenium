@@ -51,6 +51,7 @@ namespace OpenQA.Selenium
         public string tables = EnvironmentManager.Instance.UrlBuilder.WhereIs("tables.html");
         public string deletingFrame = EnvironmentManager.Instance.UrlBuilder.WhereIs("deletingFrame.htm");
         public string ajaxyPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("ajaxy_page.html");
+        public string sleepingPage = EnvironmentManager.Instance.UrlBuilder.WhereIs("sleeping.html");
 
         protected IWebDriver driver;
 
