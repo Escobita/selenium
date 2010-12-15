@@ -5,7 +5,20 @@
     <em:updates>
       <RDF:Seq>
         <!-- one li for each new release; newest first according to some sources -->
-<!--
+        <RDF:li>
+          <RDF:Description>
+            <em:version>1.0.10</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>1.5</em:minVersion> 
+                <em:maxVersion>4.0b8pre</em:maxVersion> 
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.0.10/selenium-ide-1.0.10.xpi</em:updateLink>
+                <em:updateHash>sha1:b7ca52f1b2c5aaab887b1f46762e4759671fcbc6</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
         <RDF:li>
           <RDF:Description>
             <em:version>1.0.9</em:version>
@@ -20,7 +33,6 @@
             </em:targetApplication>
           </RDF:Description>
         </RDF:li>
--->
         <RDF:li>
           <RDF:Description>
             <em:version>1.0.8</em:version>
