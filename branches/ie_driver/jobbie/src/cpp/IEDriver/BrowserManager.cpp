@@ -46,6 +46,7 @@
 #include "IsElementEnabledCommandHandler.h"
 #include "IsElementSelectedCommandHandler.h"
 #include "NewSessionCommandHandler.h"
+#include "ScreenshotCommandHandler.h"
 #include "SendKeysCommandHandler.h"
 #include "SetElementSelectedCommandHandler.h"
 #include "SetImplicitWaitTimeoutCommandHandler.h"
@@ -405,6 +406,7 @@ void BrowserManager::PopulateCommandHandlerRepository() {
 	this->command_handlers_[GetAllCookies] = new GetAllCookiesCommandHandler;
 	this->command_handlers_[DeleteCookie] = new DeleteCookieCommandHandler;
 	this->command_handlers_[DeleteAllCookies] = new DeleteAllCookiesCommandHandler;
+	this->command_handlers_[Screenshot] = new ScreenshotCommandHandler;
 }
 
 } // namespace webdriver

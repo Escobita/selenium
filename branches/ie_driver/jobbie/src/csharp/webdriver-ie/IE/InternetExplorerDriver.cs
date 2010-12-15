@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace OpenQA.Selenium.IE
 {
-    public class InternetExplorerDriver : RemoteWebDriver, IFindsByCssSelector
+    public class InternetExplorerDriver : RemoteWebDriver, IFindsByCssSelector, ITakesScreenshot
     {
         private const int ServerPort = 5555;
 
@@ -56,6 +56,20 @@ namespace OpenQA.Selenium.IE
         protected override RemoteWebElement CreateElement(string elementId)
         {
             return new InternetExplorerWebElement(this, elementId);
+        }
+
+        #endregion
+
+        #region ITakesScreenshot Members
+
+        public Screenshot GetScreenshot()
+        {
+            // Get the screenshot as base64.
+            Response screenshotResponse = Execute(DriverCommand.Screenshot, null);
+            string base64 = screenshotResponse.Value.ToString();
+
+            // ... and convert it.
+            return new Screenshot(base64);
         }
 
         #endregion

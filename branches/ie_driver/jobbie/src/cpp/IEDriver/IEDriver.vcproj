@@ -665,6 +665,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ScreenshotCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ScriptWrapper.h"
 				>
 			</File>

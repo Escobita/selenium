@@ -368,6 +368,7 @@ void IEDriverServer::PopulateCommandRepository() {
 	this->command_repository_["/session/:sessionid/element/:id/equals/:other"]["GET"] = ElementEquals;
 	this->command_repository_["/session/:sessionid/element/:id/hover"]["POST"] = HoverOverElement;
 	this->command_repository_["/session/:sessionid/element/:id/drag"]["POST"] = DragElement;
+	this->command_repository_["/session/:sessionid/screenshot"]["GET"] = Screenshot;
 
 	/*
 	commandDictionary.Add(DriverCommand.DefineDriverMapping, new CommandInfo(CommandInfo.PostCommand, "/config/drivers"));
