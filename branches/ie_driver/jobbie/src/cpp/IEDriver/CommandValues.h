@@ -38,6 +38,7 @@ enum CommandValue
 	GetPageSource,
 	GetTitle,
 	ExecuteScript,
+	ExecuteAsyncScript,
 	GetSpeed,
 	SetSpeed,
 	SetBrowserVisible,
@@ -57,7 +58,8 @@ enum CommandValue
 	GetElementValueOfCssProperty,
 	ElementEquals,
 	Screenshot, 
-	ImplicitlyWait
+	ImplicitlyWait,
+	SetAsyncScriptTimeout
 };
 
 } // namespace webdriver

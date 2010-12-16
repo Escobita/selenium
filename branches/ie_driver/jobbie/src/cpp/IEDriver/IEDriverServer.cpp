@@ -391,6 +391,7 @@ void IEDriverServer::PopulateCommandRepository() {
 	this->command_repository_["/session/:sessionid/speed"]["GET"] = GetSpeed;
 	this->command_repository_["/session/:sessionid/speed"]["POST"] = SetSpeed;
 	this->command_repository_["/session/:sessionid/execute"]["POST"] = ExecuteScript;
+	this->command_repository_["/session/:sessionid/execute_async"]["POST"] = ExecuteAsyncScript;
 	this->command_repository_["/session/:sessionid/screenshot"]["GET"] = Screenshot;
 	this->command_repository_["/session/:sessionid/frame"]["POST"] = SwitchToFrame;
 	this->command_repository_["/session/:sessionid/window"]["POST"] = SwitchToWindow;
@@ -404,6 +405,7 @@ void IEDriverServer::PopulateCommandRepository() {
 	this->command_repository_["/session/:sessionid/element"]["POST"] = FindElement;
 	this->command_repository_["/session/:sessionid/elements"]["POST"] = FindElements;
 	this->command_repository_["/session/:sessionid/timeouts/implicit_wait"]["POST"] = ImplicitlyWait;
+	this->command_repository_["/session/:sessionid/timeouts/async_script"]["POST"] = SetAsyncScriptTimeout;
 	this->command_repository_["/session/:sessionid/element/active"]["POST"] = GetActiveElement;
 	this->command_repository_["/session/:sessionid/element/:id/element"]["POST"] = FindChildElement;
 	this->command_repository_["/session/:sessionid/element/:id/elements"]["POST"] = FindChildElements;

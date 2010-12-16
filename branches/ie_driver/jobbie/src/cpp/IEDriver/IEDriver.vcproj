@@ -505,6 +505,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExecuteAsyncScriptCommandHandler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ExecuteScriptCommandHandler.h"
 				>
 			</File>
@@ -674,6 +678,10 @@
 			</File>
 			<File
 				RelativePath=".\SendKeysCommandHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SetAsyncScriptTimeoutCommandHandler.h"
 				>
 			</File>
 			<File

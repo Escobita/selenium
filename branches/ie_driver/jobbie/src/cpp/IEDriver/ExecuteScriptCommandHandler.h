@@ -14,7 +14,7 @@ public:
 	}
 
 protected:
-	void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
+	virtual void ExecuteScriptCommandHandler::ExecuteInternal(BrowserManager *manager, std::map<std::string, std::string> locator_parameters, std::map<std::string, Json::Value> command_parameters, WebDriverResponse * response) {
 		if (command_parameters.find("script") == command_parameters.end()) {
 			response->SetErrorResponse(400, "Missing parameter: script");
 			return;
@@ -23,11 +23,7 @@ protected:
 			return;
 		} else {
 			std::wstring script_body(CA2W(command_parameters["script"].asString().c_str(), CP_UTF8));
-			wstringstream script_stream;
-			script_stream << L"(function() { return function(){";
-			script_stream << script_body;
-			script_stream << L"};})();";
-			const std::wstring script(script_stream.str());
+			const std::wstring script = L"(function() { return function(){" + script_body + L"};})();";
 
 			Json::Value json_args(command_parameters["args"]);
 
@@ -40,6 +36,10 @@ protected:
 
 			ScriptWrapper *script_wrapper = new ScriptWrapper(script, json_args.size());
 			status_code = this->PopulateArgumentArray(manager, script_wrapper, json_args);
+			if (status_code != SUCCESS) {
+				response->SetErrorResponse(status_code, "Error setting arguments for script");
+				return;
+			}
 
 			status_code = browser_wrapper->ExecuteScript(script_wrapper);
 
@@ -54,42 +54,6 @@ protected:
 				return;
 			}
 		}
-	}
-
-private:
-	std::wstring ExecuteScriptCommandHandler::GetScriptResultObjectType(CComVariant* script_result) {
-		CComQIPtr<IHTMLElementCollection> is_collection(script_result->pdispVal);
-		if (is_collection) {
-			return L"HtmlCollection";
-		}
-
-		CComQIPtr<IHTMLElement> is_element(script_result->pdispVal);
-		if (is_element) {
-			return L"HtmlElement";
-		}
-
-		// Other possible interfaces: IHTMLFrameBase, IHTMLFrameElement
-		// The distinction is not important for now.
-
-		CComPtr<ITypeInfo> typeinfo;
-		HRESULT get_type_info_result = script_result->pdispVal->GetTypeInfo(0, LOCALE_USER_DEFAULT, &typeinfo);
-		TYPEATTR* type_attr;
-		CComBSTR name;
-		if (SUCCEEDED(get_type_info_result) && SUCCEEDED(typeinfo->GetTypeAttr(&type_attr))
-			&& SUCCEEDED(typeinfo->GetDocumentation(-1, &name, 0, 0, 0))) {
-			// If the name is JScriptTypeInfo then *assume* this is a Javascript array.
-			// Note that Javascript can return functions which will have the same
-			// type - the only way to be sure is to run some more Javascript code to
-			// see if this object has a length attribute. This does not seem necessary
-			// now.
-			// (For future reference, GUID is {C59C6B12-F6C1-11CF-8835-00A0C911E8B2})
-			typeinfo->ReleaseTypeAttr(type_attr);
-			if (name == L"JScriptTypeInfo") {
-				return L"JavascriptArray";
-			}
-		}
-
-		return L"Unknown";
 	}
 
 	int ExecuteScriptCommandHandler::PopulateArgumentArray(BrowserManager *manager, ScriptWrapper *script_wrapper, Json::Value json_args) {
@@ -114,16 +78,17 @@ private:
 
 				ElementWrapper *element_wrapper;
 				status_code = this->GetElement(manager, element_id, &element_wrapper);
-				if (status_code == SUCCESS) {
-					script_wrapper->AddArgument(element_wrapper);
+				if (status_code != SUCCESS) {
+					break;
 				}
+				script_wrapper->AddArgument(element_wrapper);
 			}
 		}
 
 		return status_code;
 	}
 
-	int ConvertScriptResult(ScriptWrapper *script_wrapper, BrowserManager *manager, Json::Value *value) {
+	int ExecuteScriptCommandHandler::ConvertScriptResult(ScriptWrapper *script_wrapper, BrowserManager *manager, Json::Value *value) {
 		int status_code = SUCCESS;
 		CComVariant result(script_wrapper->result());
 		if (script_wrapper->ResultIsString()) { 
@@ -144,35 +109,13 @@ private:
 				manager->GetCurrentBrowser(&browser_wrapper);
 				Json::Value result_array(Json::arrayValue);
 
-				// Prepare an array for the Javascript execution, containing only one
-				// element - the original returned array from a JS execution.
-				std::wstring get_length_script(L"(function(){return function() {return arguments[0].length;}})();");
-				ScriptWrapper *get_length_script_wrapper = new ScriptWrapper(get_length_script, 1);
-				get_length_script_wrapper->AddArgument(script_wrapper->result());
-				int length_result = browser_wrapper->ExecuteScript(get_length_script_wrapper);
+				long length = 0;
+				this->GetArrayLength(script_wrapper, browser_wrapper, &length);
 
-				// Expect the return type to be an integer. A non-integer means this was
-				// not an array after all.
-				if (!get_length_script_wrapper->ResultIsInteger()) {
-					return EUNEXPECTEDJSERROR;
-				}
-
-				LONG length = get_length_script_wrapper->result().lVal;
-				delete get_length_script_wrapper;
-
-				// Prepare an array for the Javascript execution, containing only one
-				// element - the original returned array from a JS execution.
-				for (LONG i = 0; i < length; ++i) {
-					std::wstring get_array_item_script(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
-					ScriptWrapper *get_array_item_script_wrapper = new ScriptWrapper(get_array_item_script, 2);
-					get_array_item_script_wrapper->AddArgument(script_wrapper->result());
-					get_array_item_script_wrapper->AddArgument(i);
-					int get_item_result = browser_wrapper->ExecuteScript(get_array_item_script_wrapper);
-
+				for (long i = 0; i < length; ++i) {
 					Json::Value array_item_result;
-					int array_item_status = this->ConvertScriptResult(get_array_item_script_wrapper, manager, &array_item_result);
+					int array_item_status = this->GetArrayItem(script_wrapper, browser_wrapper, manager, i, &array_item_result);
 					result_array[i] = array_item_result;
-					delete get_array_item_script_wrapper;
 				}
 				*value = result_array;
 			} else {
@@ -185,6 +128,46 @@ private:
 			status_code = EUNKNOWNSCRIPTRESULT;
 		}
 		return status_code;
+	}
+
+private:
+	int ExecuteScriptCommandHandler::GetArrayLength(ScriptWrapper *array_script_wrapper, BrowserWrapper *browser_wrapper, long *length) {
+		// Prepare an array for the Javascript execution, containing only one
+		// element - the original returned array from a JS execution.
+		std::wstring get_length_script(L"(function(){return function() {return arguments[0].length;}})();");
+		ScriptWrapper *get_length_script_wrapper = new ScriptWrapper(get_length_script, 1);
+		get_length_script_wrapper->AddArgument(array_script_wrapper->result());
+		int length_result = browser_wrapper->ExecuteScript(get_length_script_wrapper);
+
+		if (length_result != SUCCESS) {
+			return length_result;
+		}
+
+		// Expect the return type to be an integer. A non-integer means this was
+		// not an array after all.
+		if (!get_length_script_wrapper->ResultIsInteger()) {
+			return EUNEXPECTEDJSERROR;
+		}
+
+		*length = get_length_script_wrapper->result().lVal;
+		delete get_length_script_wrapper;
+		return SUCCESS;
+	}
+
+	int ExecuteScriptCommandHandler::GetArrayItem(ScriptWrapper *array_script_wrapper, BrowserWrapper *browser_wrapper, BrowserManager *manager, long index, Json::Value *item){
+		std::wstring get_array_item_script(L"(function(){return function() {return arguments[0][arguments[1]];}})();"); 
+		ScriptWrapper *get_array_item_script_wrapper = new ScriptWrapper(get_array_item_script, 2);
+		get_array_item_script_wrapper->AddArgument(array_script_wrapper->result());
+		get_array_item_script_wrapper->AddArgument(index);
+		int get_item_result = browser_wrapper->ExecuteScript(get_array_item_script_wrapper);
+		if (get_item_result != SUCCESS) {
+			return get_item_result;
+		}
+
+		Json::Value array_item_result;
+		int array_item_status = this->ConvertScriptResult(get_array_item_script_wrapper, manager, item);
+		delete get_array_item_script_wrapper;
+		return SUCCESS;
 	}
 };
 

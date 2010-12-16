@@ -146,7 +146,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [ExpectedException(typeof(WebDriverException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void ShouldDetectPageLoadsWhileWaitingOnAnAsyncScriptAndReturnAnError()
         {
             driver.Url = ajaxyPage;

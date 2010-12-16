@@ -90,6 +90,9 @@ public:
 	int implicit_wait_timeout(void) { return this->implicit_wait_timeout_; }
 	void set_implicit_wait_timeout(int timeout) { this->implicit_wait_timeout_ = timeout; }
 
+	int async_script_timeout(void) { return this->async_script_timeout_; }
+	void set_async_script_timeout(int timeout) { this->async_script_timeout_ = timeout; }
+
 private:
 	void NewBrowserEventHandler(BrowserWrapper* wrapper);
 	void BrowserQuittingEventHandler(std::wstring browser_id);
@@ -107,6 +110,7 @@ private:
 
 	int speed_;
 	int implicit_wait_timeout_;
+	int async_script_timeout_;
 
 	std::wstring manager_id_;
 	int port_;

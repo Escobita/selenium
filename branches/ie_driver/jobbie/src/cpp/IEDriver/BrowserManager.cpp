@@ -8,6 +8,7 @@
 #include "DeleteCookieCommandHandler.h"
 #include "DragElementCommandHandler.h"
 #include "ElementEqualsCommandHandler.h"
+#include "ExecuteAsyncScriptCommandHandler.h"
 #include "ExecuteScriptCommandHandler.h"
 #include "FindByClassNameElementFinder.h"
 #include "FindByCssSelectorElementFinder.h"
@@ -48,6 +49,7 @@
 #include "NewSessionCommandHandler.h"
 #include "ScreenshotCommandHandler.h"
 #include "SendKeysCommandHandler.h"
+#include "SetAsyncScriptTimeoutCommandHandler.h"
 #include "SetElementSelectedCommandHandler.h"
 #include "SetImplicitWaitTimeoutCommandHandler.h"
 #include "SetSpeedCommandHandler.h"
@@ -369,6 +371,7 @@ void BrowserManager::PopulateCommandHandlerRepository() {
 	this->command_handlers_[GetSpeed] = new GetSpeedCommandHandler;
 	this->command_handlers_[SetSpeed] = new SetSpeedCommandHandler;
 	this->command_handlers_[ImplicitlyWait] = new SetImplicitWaitTimeoutCommandHandler;
+	this->command_handlers_[SetAsyncScriptTimeout] = new SetAsyncScriptTimeoutCommandHandler;
 	this->command_handlers_[NewSession] = new NewSessionCommandHandler;
 	this->command_handlers_[GetSessionCapabilities] = new GetSessionCapabilitiesCommandHandler;
 	this->command_handlers_[Close] = new CloseWindowCommandHandler;
@@ -376,6 +379,7 @@ void BrowserManager::PopulateCommandHandlerRepository() {
 	this->command_handlers_[GetTitle] = new GetTitleCommandHandler;
 	this->command_handlers_[GetPageSource] = new GetPageSourceCommandHandler;
 	this->command_handlers_[GetCurrentUrl] = new GetCurrentUrlCommandHandler;
+	this->command_handlers_[ExecuteAsyncScript] = new ExecuteAsyncScriptCommandHandler;
 	this->command_handlers_[ExecuteScript] = new ExecuteScriptCommandHandler;
 	this->command_handlers_[GetActiveElement] = new GetActiveElementCommandHandler;
 	this->command_handlers_[FindElement] = new FindElementCommandHandler;
