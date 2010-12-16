@@ -17,7 +17,7 @@ namespace OpenQA.Selenium.IE
     /// <summary>
     /// Provides a wrapper for the native-code Internet Explorer driver library.
     /// </summary>
-    internal class InternetExplorerCommandExecutor : HttpCommandExecutor
+    internal class NativeDriverLibrary
     {
         #region Private constants
         private const string LibraryName = "IEDriver.dll";
@@ -26,11 +26,13 @@ namespace OpenQA.Selenium.IE
         #endregion
 
         #region Private member variables
+        private static NativeDriverLibrary libraryInstance;
+        private static object lockObject = new object();
         private static Random tempFileGenerator = new Random();
 
         private IntPtr nativeLibraryHandle = IntPtr.Zero;
         private IntPtr serverHandle = IntPtr.Zero;
-        private int listeningPort;
+        private int refCount;
         #endregion
 
         #region Constructor/Destructor
@@ -39,20 +41,7 @@ namespace OpenQA.Selenium.IE
         /// </summary>
         /// <remarks>This is a singleton class, so it does not require instantiation by consumers. They
         /// should use the Instance property instead.</remarks>
-        internal InternetExplorerCommandExecutor(int port)
-            : base(new Uri("http://localhost:" + port.ToString()))
-        {
-            listeningPort = port;
-        }
-        #endregion
-
-        #region Private delegates
-        private delegate IntPtr StartServerFunction(int port);
-
-        private delegate void StopServerFunction(IntPtr serverHandle);
-        #endregion
-
-        public void StartServer()
+        private NativeDriverLibrary()
         {
             string nativeLibraryPath = GetNativeLibraryPath();
             nativeLibraryHandle = NativeMethods.LoadLibrary(nativeLibraryPath);
@@ -62,17 +51,66 @@ namespace OpenQA.Selenium.IE
                 throw new WebDriverException(string.Format(CultureInfo.InvariantCulture, "An error (code: {0}) occured while attempting to load the native code library", errorCode));
             }
 
-            IntPtr functionPointer = NativeMethods.GetProcAddress(nativeLibraryHandle, StartServerFunctionName);
-            StartServerFunction startServerFunction = Marshal.GetDelegateForFunctionPointer(functionPointer, typeof(StartServerFunction)) as StartServerFunction;
-            serverHandle = startServerFunction(listeningPort);
+        }
+        #endregion
+
+        #region Private delegates
+        private delegate IntPtr StartServerFunction(int port);
+        private delegate void StopServerFunction(IntPtr serverHandle);
+        //private delegate void StartServerFunction(int port);
+        //private delegate void StopServerFunction();
+        #endregion
+
+        #region Singleton instance property
+        /// <summary>
+        /// Gets the singleton instance of the <see cref="NativeDriverLibrary"/> class.
+        /// </summary>
+        internal static NativeDriverLibrary Instance
+        {
+            get
+            {
+                lock (lockObject)
+                {
+                    if (libraryInstance == null)
+                    {
+                        libraryInstance = new NativeDriverLibrary();
+                    }
+
+                    return libraryInstance;
+                }
+            }
+        }
+        #endregion
+
+        public void StartServer(int port)
+        {
+            //if (serverHandle == IntPtr.Zero || refCount == 0)
+            if (refCount == 0)
+            {
+                IntPtr functionPointer = NativeMethods.GetProcAddress(nativeLibraryHandle, StartServerFunctionName);
+                StartServerFunction startServerFunction = Marshal.GetDelegateForFunctionPointer(functionPointer, typeof(StartServerFunction)) as StartServerFunction;
+                //startServerFunction(port);
+                serverHandle = startServerFunction(port);
+                if (serverHandle == IntPtr.Zero)
+                {
+                    throw new WebDriverException("An error occured while attempting to start the HTTP server");
+                }
+            }
+
+            refCount++;
         }
 
         public void StopServer()
         {
-            IntPtr functionPointer = NativeMethods.GetProcAddress(nativeLibraryHandle, StopServerFunctionName);
-            StopServerFunction stopServerFunction = Marshal.GetDelegateForFunctionPointer(functionPointer, typeof(StopServerFunction)) as StopServerFunction;
-            stopServerFunction(serverHandle);
-            // NativeMethods.FreeLibrary(nativeLibraryHandle);
+            refCount--;
+            if (refCount == 0)
+            {
+                IntPtr functionPointer = NativeMethods.GetProcAddress(nativeLibraryHandle, StopServerFunctionName);
+                StopServerFunction stopServerFunction = Marshal.GetDelegateForFunctionPointer(functionPointer, typeof(StopServerFunction)) as StopServerFunction;
+                stopServerFunction(serverHandle);
+                //stopServerFunction();
+                serverHandle = IntPtr.Zero;
+            }
         }
 
         #region Private methods

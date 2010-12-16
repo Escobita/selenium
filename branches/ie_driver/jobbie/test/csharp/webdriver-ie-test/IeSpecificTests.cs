@@ -18,7 +18,7 @@ namespace OpenQA.Selenium
         }
 
         [Test]
-        [Ignore("Temporarily ignoring test until automatic port finding is enabled")]
+        //[Ignore("Temporarily ignoring test until automatic port finding is enabled")]
         public void ShouldBeAbleToStartMoreThanOneInstanceOfTheIEDriverSimultaneously()
         {
             IWebDriver secondDriver = new InternetExplorerDriver();

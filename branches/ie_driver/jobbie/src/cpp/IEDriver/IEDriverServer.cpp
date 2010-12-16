@@ -5,6 +5,25 @@
 namespace webdriver {
 
 IEDriverServer::IEDriverServer(int port) {
+	this->port_ = port;
+	this->PopulateCommandRepository();
+}
+
+IEDriverServer::~IEDriverServer(void) {
+	if (this->sessions_.size() > 0) {
+		vector<std::wstring> session_ids;
+		std::map<std::wstring, HWND>::iterator it = this->sessions_.begin();
+		for (; it != this->sessions_.end(); ++it) {
+			session_ids.push_back(it->first);
+		}
+
+		for (size_t index = 0; index < session_ids.size(); ++index) {
+			this->ShutDown(session_ids[index]);
+		}
+	}
+}
+
+std::wstring IEDriverServer::CreateBrowserManager() {
 	DWORD thread_id;
 	HWND manager_window_handle = NULL;
 	HANDLE event_handle = ::CreateEvent(NULL, TRUE, FALSE, EVENT_NAME);
@@ -13,12 +32,22 @@ IEDriverServer::IEDriverServer(int port) {
 	::CloseHandle(event_handle);
 	::CloseHandle(thread_handle);
 
-	::SendMessage(manager_window_handle, WD_INIT, (WPARAM)port, NULL);
-	this->manager_window_handle_ = manager_window_handle;
-	this->PopulateCommandRepository();
+	::SendMessage(manager_window_handle, WD_INIT, (WPARAM)this->port_, NULL);
+
+	vector<TCHAR> window_text_buffer(37);
+	::GetWindowText(manager_window_handle, &window_text_buffer[0], 37);
+	std::wstring manager_id = &window_text_buffer[0];
+
+	this->sessions_[manager_id] = manager_window_handle;
+	return manager_id;
 }
 
-IEDriverServer::~IEDriverServer(void) {
+void IEDriverServer::ShutDown(std::wstring session_id) {
+	std::map<std::wstring, HWND>::iterator it = this->sessions_.find(session_id);
+	if (it != this->sessions_.end()) {
+		::SendMessage(it->second, WM_CLOSE, NULL, NULL);
+		this->sessions_.erase(session_id);
+	}
 }
 
 int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_request_info *request_info) {
@@ -58,8 +87,9 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 		this->SendWelcomePage(conn, request_info);
 		return_code = 200;
 	} else {
+		std::wstring session_id = L"";
 		std::wstring locator_parameters = L"";
-		int command = this->LookupCommand(request_info->uri, http_verb, &locator_parameters);
+		int command = this->LookupCommand(request_info->uri, http_verb, &session_id, &locator_parameters);
 		if (command == NoCommand) {
 			if (locator_parameters.size() != 0) {
 				this->SendHttpMethodNotAllowed(conn, request_info, locator_parameters);
@@ -67,38 +97,84 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 				this->SendHttpNotImplemented(conn, request_info, "Command not implemented");
 			}
 		} else {
+			if (command == NewSession) {
+				session_id = this->CreateBrowserManager();                                             
+			}
+
 			// Compile the serialized JSON representation of the command by hand.
 			std::wstringstream command_value_stream;
 			command_value_stream << command;
 			std::wstring command_value = command_value_stream.str();
 
 			std::wstring serialized_command = L"{ \"command\" : " + command_value + L", \"locator\" : " + locator_parameters + L", \"parameters\" : " + request_body + L" }";
-			std::wstring serialized_response = this->SendCommandToManager(serialized_command);
-			if (serialized_command.length() > 0) {
-				WebDriverResponse response;
-				response.Deserialize(serialized_response);
-				if (response.status_code() == 0) {
-					this->SendHttpOk(conn, request_info, serialized_response);
-					return_code = 200;
-				} else if (response.status_code() == 303) {
-					std::string location = response.value().asString();
-					response.SetResponse(SUCCESS, response.value());
-					this->SendHttpSeeOther(conn, request_info, location);
-					return_code = 303;
-				} else if (response.status_code() == 400) {
-					this->SendHttpBadRequest(conn, request_info, serialized_response);
-				} else if (response.status_code() == 404) {
-					this->SendHttpNotFound(conn, request_info, serialized_response);
-				} else if (response.status_code() == 501) {
-					this->SendHttpNotImplemented(conn, request_info, "Command not implemented");
-				} else {
-					this->SendHttpInternalError(conn, request_info, serialized_response);
-					return_code = 500;
-				}
+			std::wstring serialized_response = this->SendCommandToManager(session_id, serialized_command);
+			return_code = this->SendResponseToBrowser(conn, request_info, serialized_response);
+
+			if (command == Quit) {
+				this->ShutDown(session_id);
 			}
 		}
 	}
 
+	return return_code;
+}
+
+std::wstring IEDriverServer::SendCommandToManager(std::wstring session_id, std::wstring serialized_command) {
+	// Sending a command consists of four actions:
+	// 1. Setting the command to be executed
+	// 2. Executing the command
+	// 3. Waiting for the response to be populated
+	// 4. Retrieving the response
+	std::map<std::wstring, HWND>::iterator it = this->sessions_.find(session_id);
+	if (it == this->sessions_.end()) {
+		// Hand-code the response for an invalid session id
+		return L"{ status : 404, sessionId : \"" + session_id + L"\", value : \"session " + session_id + L" does not exist\" }";
+	}
+
+	HWND manager_window_handle = it->second;
+	::SendMessage(manager_window_handle, WD_SET_COMMAND, NULL, (LPARAM)serialized_command.c_str());
+	::PostMessage(manager_window_handle, WD_EXEC_COMMAND, NULL, NULL);
+	
+	int response_length = (int)::SendMessage(manager_window_handle, WD_GET_RESPONSE_LENGTH, NULL, NULL);
+	while (response_length == 0) {
+		response_length = (int)::SendMessage(manager_window_handle, WD_GET_RESPONSE_LENGTH, NULL, NULL);
+	}
+
+	// Must add one to the length to handle the terminating character.
+	std::vector<TCHAR> response_buffer(response_length + 1);
+	::SendMessage(manager_window_handle, WD_GET_RESPONSE, NULL, (LPARAM)&response_buffer[0]);
+	std::wstring serialized_response(&response_buffer[0]);
+	response_buffer.clear();
+	return serialized_response;
+}
+
+int IEDriverServer::SendResponseToBrowser(struct mg_connection *conn, const struct mg_request_info *request_info, std::wstring serialized_response) {
+	int return_code = 0;
+	if (serialized_response.size() > 0) {
+		WebDriverResponse response;
+		response.Deserialize(serialized_response);
+		if (response.status_code() == 0) {
+			this->SendHttpOk(conn, request_info, serialized_response);
+			return_code = 200;
+		} else if (response.status_code() == 303) {
+			std::string location = response.value().asString();
+			response.SetResponse(SUCCESS, response.value());
+			this->SendHttpSeeOther(conn, request_info, location);
+			return_code = 303;
+		} else if (response.status_code() == 400) {
+			this->SendHttpBadRequest(conn, request_info, serialized_response);
+			return_code = 400;
+		} else if (response.status_code() == 404) {
+			this->SendHttpNotFound(conn, request_info, serialized_response);
+			return_code = 404;
+		} else if (response.status_code() == 501) {
+			this->SendHttpNotImplemented(conn, request_info, "Command not implemented");
+			return_code = 501;
+		} else {
+			this->SendHttpInternalError(conn, request_info, serialized_response);
+			return_code = 500;
+		}
+	}
 	return return_code;
 }
 
@@ -232,29 +308,7 @@ void IEDriverServer::SendHttpSeeOther(struct mg_connection* connection,
 	mg_write(connection, out.str().c_str(), out.str().size());
 }
 
-std::wstring IEDriverServer::SendCommandToManager(std::wstring serialized_command) {
-	// Sending a command consists of four actions:
-	// 1. Setting the command to be executed
-	// 2. Executing the command
-	// 3. Waiting for the response to be populated
-	// 4. Retrieving the response
-	::SendMessage(this->manager_window_handle_, WD_SET_COMMAND, NULL, (LPARAM)serialized_command.c_str());
-	::PostMessage(this->manager_window_handle_, WD_EXEC_COMMAND, NULL, NULL);
-	
-	int response_length = (int)::SendMessage(this->manager_window_handle_, WD_GET_RESPONSE_LENGTH, NULL, NULL);
-	while (response_length == 0) {
-		response_length = (int)::SendMessage(this->manager_window_handle_, WD_GET_RESPONSE_LENGTH, NULL, NULL);
-	}
-
-	// Must add one to the length to handle the terminating character.
-	std::vector<TCHAR> response_buffer(response_length + 1);
-	::SendMessage(this->manager_window_handle_, WD_GET_RESPONSE, NULL, (LPARAM)&response_buffer[0]);
-	std::wstring serialized_response(&response_buffer[0]);
-	response_buffer.clear();
-	return serialized_response;
-}
-
-int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::wstring *locator) {
+int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::wstring *session_id, std::wstring *locator) {
 	int value = NoCommand;
 	std::map<std::string, map<std::string, int>>::iterator it = this->command_repository_.begin();
 	for (; it != this->command_repository_.end(); ++it) {
@@ -294,7 +348,11 @@ int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::w
 						param_stream << ",";
 					}
 
-					param_stream << " \"" << locator_param_names[i] << "\" : \"" << matches[i + 1] << "\"";
+					std::string locator_param_value(matches[i + 1].first, matches[i + 1].second);
+					param_stream << " \"" << locator_param_names[i] << "\" : \"" << locator_param_value << "\"";
+					if (locator_param_names[i] == "sessionid") {
+						session_id->append(CA2W(locator_param_value.c_str()));
+					}
 				}
 
 				param_stream << " }";

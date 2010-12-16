@@ -17,7 +17,6 @@ public:
 	void Deserialize(std::wstring json);
 
 	int status_code(void) { return this->status_code_; }
-	//void set_status_code(int value) { this->status_code_ = value; }
 
 	Json::Value value(void) { return this->m_value; }
 

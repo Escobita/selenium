@@ -13,30 +13,21 @@ namespace OpenQA.Selenium.IE
 {
     public class InternetExplorerDriver : RemoteWebDriver, IFindsByCssSelector, ITakesScreenshot
     {
-        //private const int ServerPort = 5555;
-
-        //[DllImport("IEDriver.dll")]
-        //private static extern IntPtr StartServer(int port);
-
-        //[DllImport("IEDriver.dll")]
-        //private static extern void StopServer(IntPtr server);
-
-        //private IntPtr nativeServer;
-        //private NativeDriverLibrary nativeServer;
+        private static int port = FindFreePort();
 
         public InternetExplorerDriver()
-            : base(new InternetExplorerCommandExecutor(FindFreePort()), DesiredCapabilities.InternetExplorer())
+            : base(new Uri("http://localhost:" + port.ToString()), DesiredCapabilities.InternetExplorer())
         {
         }
 
         protected override void StartClient()
         {
-            ((InternetExplorerCommandExecutor)this.CommandExecutor).StartServer();
+            NativeDriverLibrary.Instance.StartServer(port);
         }
 
         protected override void StopClient()
         {
-            ((InternetExplorerCommandExecutor)this.CommandExecutor).StopServer();
+            NativeDriverLibrary.Instance.StopServer();
         }
 
         #region IFindsByCssSelector Members

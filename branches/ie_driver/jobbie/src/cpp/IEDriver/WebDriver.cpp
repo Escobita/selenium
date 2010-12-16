@@ -14,14 +14,19 @@ void * event_handler(enum mg_event event_raised,
 
 webdriver::IEDriverServer* StartServer(int port) {
 	char buffer[6];
-	_itoa_s(port, buffer, 10, 10);
-	char* options[] = { "listening_ports", buffer, "access_control_list", "-0.0.0.0/0,+127.0.0.1", NULL };
-	server = new webdriver::IEDriverServer(port);
-	ctx = mg_start(event_handler, (const char **)options);
+	if (server == NULL) {
+		_itoa_s(port, buffer, 10, 10);
+		char* options[] = { "listening_ports", buffer, "access_control_list", "-0.0.0.0/0,+127.0.0.1", NULL };
+		server = new webdriver::IEDriverServer(port);
+		ctx = mg_start(event_handler, (const char **)options);
+	}
 	return server;
 }
 
-void StopServer(webdriver::IEDriverServer *server) {
-	::SendMessage(server->manager_window_handle(), WM_CLOSE, NULL, NULL);
+void StopServer(webdriver::IEDriverServer *myserver) {
+	//::SendMessage(server->manager_window_handle(), WM_CLOSE, NULL, NULL);
+	//server->ShutDown();
 	mg_stop(ctx);
+	delete server;
+	server = NULL;
 }

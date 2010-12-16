@@ -17,7 +17,7 @@ static void * event_handler(enum mg_event event_raised,
 struct mg_context *ctx;
 int handler_result_code;
 EXPORT webdriver::IEDriverServer* StartServer(int port);
-EXPORT void StopServer(webdriver::IEDriverServer* server);
+EXPORT void StopServer(webdriver::IEDriverServer* myserver);
 
 #ifdef __cplusplus
 }
