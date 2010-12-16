@@ -168,7 +168,8 @@ class WebDriver(object):
         """Loads a web page in the current browser."""
         self._execute(Command.GET, {'url': url})
 
-    def get_title(self):
+    @property
+    def title(self):
         """Gets the title of the current page."""
         resp = self._execute(Command.GET_TITLE)
         return resp['value'] if resp['value'] is not None else ""
@@ -176,6 +177,10 @@ class WebDriver(object):
     def find_element_by_id(self, id_):
         """Finds element by id."""
         return self._find_element_by("id", id_)
+
+    def find_elements_by_id(self, id_):
+        """Finds element by id."""
+        return self._find_elements_by("id", id_)
 
     def find_elements_by_xpath(self, xpath):
         """Finds multiple elements by xpath."""
@@ -243,7 +248,8 @@ class WebDriver(object):
             Command.EXECUTE_SCRIPT,
             {'script': script, 'args':converted_args})['value']
 
-    def get_current_url(self):
+    @property
+    def current_url(self):
         """Gets the current url."""
         return self._execute(Command.GET_CURRENT_URL)['value']
 
@@ -321,6 +327,11 @@ class WebDriver(object):
 
     def add_cookie(self, cookie_dict):
         self._execute(Command.ADD_COOKIE, {'cookie': cookie_dict})
+    
+    # Timeouts
+    def implicitly_wait(self, time_to_wait):
+        """Get the driver to poll for the element """
+        self._execute(Command.IMPLICIT_WAIT, {'ms': time_to_wait*1000})
 
     def _find_element_by(self, by, value):
         return self._execute(Command.FIND_ELEMENT,

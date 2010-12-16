@@ -36,19 +36,39 @@ java_test(name = "test-selenese",
   ])
 
 java_test(name = "selenium_test",
-  srcs = [ "test/java/**/*.java" ],
-  resources = [
-    { "test/java/com/thoughtworks/selenium/testHelpers.js" : "com/thoughtworks/selenium/testHelpers.js" }
-  ],
   deps = [
-    "//common:test",
-    "//htmlunit",
-    "//selenium:server-with-tests:uber",
-    "//third_party/java/easymock",
-    "//third_party/java/testng"
+    ":test",
   ],
   main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "org.openqa.selenium.firefox.FirefoxDriver" },
+  ],
   args = "selenium/test/java/webdriver-selenium-suite.xml")
+
+java_test(name = "firefox-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  
+  sysproperties = [
+    { "selenium.browser" : "*chrome" },
+  ],
+  args = "selenium/test/java/testng.xml")
+
+java_test(name = "ie-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*iexplore" },
+  ],
+  args = "selenium/test/java/testng.xml")
+
+java_test(name = "safari-rc-tests",
+  deps = [ ":test" ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*safari" },
+  ],
+  args = "selenium/test/java/testng.xml")
 
 java_test(name = "single",
   srcs = [ "test/java/org/openqa/selenium/SingleTestSuite.java" ],
@@ -74,3 +94,31 @@ java_library(name = "server-with-tests",
     "//common:test",
     "//remote/server"
   ])
+
+dotnet_library(name = "dotnet-core",
+  srcs = "src/csharp/Core/**/*.cs",
+  refs = [
+    "System.dll",
+    "System.Core.dll",
+    "System.Data.dll",
+    "System.Xml.dll",
+    "System.Web.dll"
+  ],
+  out = "build/dotnet/ThoughtWorks.Selenium.Core.dll"
+)
+
+dotnet_library(name = "dotnet",
+  srcs = "src/csharp/WebdriverBackedSelenium/**/*.cs",
+  deps = ["//selenium:dotnet-core"],
+  refs = [
+    "System.dll",
+    "System.Core.dll",
+    "System.Data.dll",
+    "System.Drawing.dll",
+    "System.Xml.dll",
+    "System.Web.dll",
+    "//common:dotnet",
+    "//selenium:dotnet-core"
+  ],
+  out = "build/dotnet/WebDriverBackedSelenium.dll"
+)

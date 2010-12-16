@@ -199,7 +199,7 @@ end
 #               :target => "BuildManagedCode")
 
 #task :dotnet => [ :ie_win32_dll, :ie_x64_dll, :firefox, :chrome, :'dotnet_assemblies' ]
-task :dotnet => [ "//jobbie:dotnet", "//remote/client:dotnet", "//firefox:dotnet", "//chrome:dotnet" ]
+task :dotnet => [ "//jobbie:dotnet", "//remote/client:dotnet", "//firefox:dotnet", "//chrome:dotnet", "//selenium:dotnet" ]
 
 # Generate a C++ Header file for mapping between magic numbers and #defines
 # in the C++ code.
@@ -325,7 +325,7 @@ end
 # Installs the webdriver python bindings using virtualenv for testing.
 task :webdriver_py do
   if python? then
-    virtualenv = "virtualenv build/python"
+    virtualenv = "virtualenv --no-site-packages build/python"
     pip_install = 'build/python/bin/' + "pip install simplejson py pytest"
     if (windows?) then
        virtualenv = "virtualenv build\\python"

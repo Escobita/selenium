@@ -17,70 +17,30 @@ limitations under the License.
 
 package org.openqa.selenium.internal.selenesedriver;
 
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriverException;
-
 import com.google.common.collect.ImmutableMap;
 import com.thoughtworks.selenium.Selenium;
+import org.openqa.selenium.NoSuchElementException;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 
-public class FindElement implements SeleneseFunction<Map<String, String>> {
+public class FindElement extends AbstractElementFinder<Map<String, String>> {
 
-  private long implicitlyWait = 0;
+  private final static String SCRIPT =
+      "var by = {}; by['%s'] = '%s'; " +
+      "var e = bot.locators.findElement(by, selenium.browserbot.getDocument());" +
+      "bot.inject.cache.addElement(e);";
 
-  public Map<String, String> apply(Selenium selenium, Map<String, ?> args) {
-    String how = (String) args.get("using");
-    String using = (String) args.get("value");
+  @Override
+  protected Map<String, String> executeFind(Selenium selenium, String how, String using) {
+    String locator = String.format(SCRIPT, how, using);
 
-    String locator = null;
-    if ("class name".equals(how)) {
-      locator = "css=." + using;
-    } else if ("css selector".equals(how)) {
-      locator = "css=" + using;
-    } else if ("id".equals(how)) {
-      locator = "id=" + using;
-    } else if ("link text".equals(how)) {
-      locator = "link=" + using; 
-    } else if ("name".equals(how)) {
-      locator = "name=" + using;
-    } else if ("tag name".equals(how)) {
-      locator = "xpath=//" + using;
-    } else if ("xpath".equals(how)) {
-      locator = "xpath=" + using;
-    } else {
-      throw new WebDriverException("Cannot determine locator mechanism from: " + how);
-    }
-
-    if (locator != null) {
-      long startTime = System.currentTimeMillis();
-      do {
-        if (selenium.isElementPresent(locator)) {
-          // Escape the locator
-          try {
-            locator = URLEncoder.encode(locator, "utf-8");
-          } catch (UnsupportedEncodingException e) {
-            // Deeply unlikely if we're running on a conforming JVM
-            throw new RuntimeException(e);
-          }
-          return ImmutableMap.of("ELEMENT", locator);
-        }
-      } while (System.currentTimeMillis() - startTime <= implicitlyWait);
-    }
-
-    throw new NoSuchElementException("Cannot find element using " + locator);
+    String key = selenium.getEval(locator);
+    return newElement(key);
   }
 
-  public ImplicitWait implicitlyWait() {
-    return new ImplicitWait();
-  }
-
-  public class ImplicitWait implements SeleneseFunction<Object> {
-    public Object apply(Selenium selenium, Map<String, ?> args) {
-      FindElement.this.implicitlyWait = ((Number) args.get("ms")).longValue();
-      return null;
-    }
+  @Override
+  protected Map<String, String> onFailure(String how, String using) {
+    throw new NoSuchElementException(
+        String.format("No elements were found: %s=%s ", how, using));
   }
 }

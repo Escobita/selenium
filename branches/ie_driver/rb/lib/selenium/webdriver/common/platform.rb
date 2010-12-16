@@ -27,7 +27,7 @@ module Selenium
         @os ||= (
           host_os = RbConfig::CONFIG['host_os']
           case host_os
-          when /mswin|msys|mingw32/
+          when /mswin|msys|mingw32|cygwin/
             :windows
           when /darwin|mac os/
             :macosx
@@ -83,8 +83,16 @@ module Selenium
         os == :linux
       end
 
+      def cygwin?
+        RUBY_PLATFORM =~ /cygwin/
+      end
+
       def wrap_in_quotes_if_necessary(str)
-        win? ? %{"#{str}"} : str
+        win? && !cygwin? ? %{"#{str}"} : str
+      end
+
+      def cygwin_path(path)
+        `cygpath "#{path}"`.strip
       end
 
       def make_writable(file)

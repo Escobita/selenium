@@ -28,7 +28,8 @@ class WebElement(object):
         self._parent = parent
         self._id = id_
 
-    def get_text(self):
+    @property
+    def text(self):
         """Gets the text of the element."""
         return self._execute(Command.GET_ELEMENT_TEXT)['value']
 
@@ -40,7 +41,8 @@ class WebElement(object):
         """Submits a form."""
         self._execute(Command.SUBMIT_ELEMENT)
 
-    def get_value(self):
+    @property
+    def value(self):
         """Gets the value of the element's value attribute."""
         return self._execute(Command.GET_ELEMENT_VALUE)['value']
 
@@ -50,24 +52,28 @@ class WebElement(object):
 
     def get_attribute(self, name):
         """Gets the attribute value."""
-        try:
-            resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name': name})
-            return str(resp['value'])
-        # FIXME: This is a hack around selenium server bad response,
-        # remove this code when it's fixed
-        except AssertionError, e:
-            raise NoSuchAttributeException(name, e)
+        resp = self._execute(Command.GET_ELEMENT_ATTRIBUTE, {'name': name})
+        attributeValue = ''
+        if resp['value'] is None:
+            attributeValue = None
+        else:
+            attributeValue = str(resp['value'])
+            if type(resp['value']) is bool:
+                attributeValue = attributeValue.lower()
+
+        return attributeValue
 
     def toggle(self):
         """Toggles the element state."""
-        self._execute(Command.TOGGLE_ELEMENT)
+        resp = self._execute(Command.TOGGLE_ELEMENT)
+        return resp['value']
 
     def is_selected(self):
         """Whether the element is selected."""
         return self._execute(Command.IS_ELEMENT_SELECTED)['value']
 
-    def set_selected(self):
-        """Selects an elmeent."""
+    def select(self):
+        """Selects an element."""
         self._execute(Command.SET_ELEMENT_SELECTED)
 
     def is_enabled(self):
