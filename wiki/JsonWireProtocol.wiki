@@ -95,10 +95,12 @@ The wire protocol will inherit its status codes from those used by the InternetE
 || 12 || `InvalidElementState` || An element command could not be completed because the element is in an invalid state (e.g. attempting to click a disabled element). ||
 || 13 || `UnknownError` || An unknown server-side error occurred while processing the command. ||
 || 15 || `ElementIsNotSelectable` || An attempt was made to select an element that cannot be selected. ||
+|| 17 || `JavaScriptError` || An error occurred while executing user supplied !JavaScript. ||
 || 19 || `XPathLookupError` || An error occurred while searching for an element by XPath. ||
 || 23 || `NoSuchWindow` || A request to switch to a different window could not be satisfied because the window could not be found. ||
 || 24 || `InvalidCookieDomain` || An illegal attempt was made to set a cookie under a different domain than the current page. ||
 || 25 || `UnableToSetCookie` || A request to set a cookie's value could not be satisfied. ||
+|| 28 || `Timeout` || A command did not complete before its timeout expired. ||
 
 The client should interpret a 404 Not Found response from the server as an "Unknown command" response. All other 4xx and 5xx responses from the server that do not define a status field should be interpreted as "Unknown error" responses.
 
@@ -179,6 +181,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId || Retrieve the capabilities of the specified session. || _N/A_ ||
 || DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
 || POST || /session/:sessionId/timeouts/implicit_wait || Set the amount of time the driver should wait when searching for elements. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)] ||
+|| POST || /session/:sessionId/timeouts/async_script || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. || _N/A_ ||
 || GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
 || GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
 || GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
@@ -186,7 +189,8 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/forward || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
 || POST || /session/:sessionId/back || Navigate backwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#back() WebDriver.Navigation#back()] ||
 || POST || /session/:sessionId/refresh || Refresh the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#refresh() WebDriver.Navigation#refresh()] ||
-|| POST || /session/:sessionId/execute || Inject a snippet of !JavaScript into the page and return its result. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
+|| POST || /session/:sessionId/execute || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
+|| POST || /session/:sessionId/execute_async || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || _N/A_ ||
 || GET || /session/:sessionId/screenshot || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
 || POST || /session/:sessionId/frame || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
 || POST || /session/:sessionId/window || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
@@ -352,6 +356,31 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/timeouts/async_script ===
+
+<dl>
+<dd>*POST /session/:sessionId/timeouts/async_script*</dd>
+<dd>
+<dl>
+<dd>Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`ms` - `{number}` The amount of time, in milliseconds, that time-limited commands are permitted to run.</dd>
 </dl>
 </dd>
 </dl>
@@ -562,10 +591,11 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dd>
 <dl>
 <dd>
-Inject a snippet of !JavaScript into the page and return its result.  WebElements that should be
-passed to the script as an argument should be specified in the arguments array as WebElement JSON
-arguments. Likewise, any !WebElements in the script result will be returned to the client as
-!WebElement JSON objects.</dd>
+Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. The executed script is assumed to be synchronous and the result of evaluating the script is returned to the client.
+
+The `script` argument defines the script to execute in the form of a function body.  The value returned by that function will be returned to the client.  The function will be invoked with the provided `args` array and the values may be accessed via the `arguments` object in the order specified.
+
+Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that define a !WebElement reference will be converted to the corresponding DOM element. Likewise, any !WebElements in the script result will be returned to the client as !WebElement JSON objects.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -588,13 +618,61 @@ arguments. Likewise, any !WebElements in the script result will be returned to t
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is no attached to the page's DOM.</dd>
+<dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is not attached to the page's DOM.</dd>
+<dd>`JavaScriptError` - If the script throws an Error.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/execute_async ===
+
+<dl>
+<dd>*POST /session/:sessionId/execute_async*</dd>
+<dd>
+<dl>
+<dd>
+Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. The executed script is assumed to be asynchronous and must signal that is done by invoking the provided callback, which is always provided as the final argument to the function.  The value to this callback will be returned to the client.
+
+Asynchronous script commands may not span page loads.  If an `unload` event is fired while waiting for a script result, an error should be returned to the client.
+
+The `script` argument defines the script to execute in teh form of a function body.  The function will be invoked with the provided `args` array and the values may be accessed via the `arguments` object in the order specified. The final argument will always be a callback function that must be invoked to signal that the script has finished.
+
+Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that define a !WebElement reference will be converted to the corresponding DOM element. Likewise, any !WebElements in the script result will be returned to the client as !WebElement JSON objects.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`script` - `{string}` The script to execute.</dd>
+<dd>`args` - `{Array.<*>}` The script arguments.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{*}` The script result.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is not attached to the page's DOM.</dd>
+<dd>`Timeout` - If the script callback is not invoked before the timout expires. Timeouts are controlled by the `/session/:sessionId/timeout/async_script` command.</dd>
+<dd>`JavaScriptError` - If the script throws an Error or if an `unload` event is fired while waiting for the script to finish.</dd>
 </dl>
 </dd>
 </dl>
