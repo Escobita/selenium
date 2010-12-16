@@ -137,6 +137,7 @@ std::wstring IEDriverServer::SendCommandToManager(std::wstring session_id, std::
 	
 	int response_length = (int)::SendMessage(manager_window_handle, WD_GET_RESPONSE_LENGTH, NULL, NULL);
 	while (response_length == 0) {
+		// Sleep a short time to prevent thread starvation on single-core machines.
 		::Sleep(10);
 		response_length = (int)::SendMessage(manager_window_handle, WD_GET_RESPONSE_LENGTH, NULL, NULL);
 	}
