@@ -96,11 +96,11 @@ visualc_library(name = "ieserver_x64_dll",
 
 dotnet_library(name = "dotnet",
   deps = [
-    "//common:dotnet"
+    "//remote/client:dotnet"
   ],
   resources = [
-    {":ie_win32_dll" : "WebDriver.InternetExplorerDriver.x86.dll"},
-    {":ie_x64_dll" : "WebDriver.InternetExplorerDriver.x64.dll"}
+    {":ieserver_win32_dll" : "WebDriver.InternetExplorerDriver.x86.dll"},
+    {":ieserver_x64_dll" : "WebDriver.InternetExplorerDriver.x64.dll"}
   ],
   srcs = "src/csharp/**/*.cs",
   refs = [
@@ -108,7 +108,9 @@ dotnet_library(name = "dotnet",
     "System.Data.dll",
     "System.Drawing.dll",
     "System.Xml.dll",
-    "//common:dotnet"
+    "//common:dotnet",
+    "//remote/common:dotnet",
+    "//remote/client:dotnet",
   ],
   out = "build/dotnet/WebDriver.IE.dll",
   doc = "build/dotnet/WebDriver.IE.xml"
@@ -128,6 +130,8 @@ dotnet_test(name = "dotnet-test",
     "System.Xml.dll",
     "//common:dotnet",
     "//common:dotnet-test",
+    "//remote/common:dotnet",
+    "//remote/client:dotnet",
     "//jobbie:dotnet",
     "third_party/csharp/nunit-2.4.8/bin/nunit.framework.dll"
   ],

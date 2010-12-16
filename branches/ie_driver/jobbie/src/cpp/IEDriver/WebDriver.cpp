@@ -24,8 +24,6 @@ webdriver::IEDriverServer* StartServer(int port) {
 }
 
 void StopServer(webdriver::IEDriverServer *myserver) {
-	//::SendMessage(server->manager_window_handle(), WM_CLOSE, NULL, NULL);
-	//server->ShutDown();
 	mg_stop(ctx);
 	delete server;
 	server = NULL;

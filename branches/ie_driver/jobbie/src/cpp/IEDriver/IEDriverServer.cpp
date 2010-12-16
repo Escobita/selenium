@@ -18,12 +18,12 @@ IEDriverServer::~IEDriverServer(void) {
 		}
 
 		for (size_t index = 0; index < session_ids.size(); ++index) {
-			this->ShutDown(session_ids[index]);
+			this->ShutDownSession(session_ids[index]);
 		}
 	}
 }
 
-std::wstring IEDriverServer::CreateBrowserManager() {
+std::wstring IEDriverServer::CreateSession() {
 	DWORD thread_id;
 	HWND manager_window_handle = NULL;
 	HANDLE event_handle = ::CreateEvent(NULL, TRUE, FALSE, EVENT_NAME);
@@ -42,7 +42,7 @@ std::wstring IEDriverServer::CreateBrowserManager() {
 	return manager_id;
 }
 
-void IEDriverServer::ShutDown(std::wstring session_id) {
+void IEDriverServer::ShutDownSession(std::wstring session_id) {
 	std::map<std::wstring, HWND>::iterator it = this->sessions_.find(session_id);
 	if (it != this->sessions_.end()) {
 		::SendMessage(it->second, WM_CLOSE, NULL, NULL);
@@ -50,37 +50,42 @@ void IEDriverServer::ShutDown(std::wstring session_id) {
 	}
 }
 
+std::wstring IEDriverServer::ReadRequestBody(struct mg_connection *conn, const struct mg_request_info *request_info) {
+	std::wstring request_body = L"";
+	int content_length = 0;
+	for (int header_index = 0; header_index < 64; ++header_index) {
+		if (request_info->http_headers[header_index].name == NULL) {
+			break;
+		}
+		if (strcmp(request_info->http_headers[header_index].name, "Content-Length") == 0) {
+			content_length = atoi(request_info->http_headers[header_index].value);
+			break;
+		}
+	}
+	if (content_length == 0) {
+		request_body = L"{}";
+	} else {
+		std::vector<char> input_buffer(content_length + 1);
+		int bytes_read = 0;
+		while (bytes_read < content_length) {
+			bytes_read += mg_read(conn, &input_buffer[bytes_read], content_length - bytes_read);
+		}
+		input_buffer[content_length] = '\0';
+		int output_buffer_size = ::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, NULL, 0);
+		vector<TCHAR> output_buffer(output_buffer_size);
+		::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, &output_buffer[0], output_buffer_size);
+		request_body.append(&output_buffer[0], bytes_read);
+	}
+
+	return request_body;
+}
+
 int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_request_info *request_info) {
 	int return_code = NULL;
 	std::string http_verb = request_info->request_method;
-	std::wstring request_body = L"";
+	std::wstring request_body = L"{}";
 	if (http_verb == "POST") {
-		int content_length = 0;
-		for (int header_index = 0; header_index < 64; ++header_index) {
-			if (request_info->http_headers[header_index].name == NULL) {
-				break;
-			}
-			if (strcmp(request_info->http_headers[header_index].name, "Content-Length") == 0) {
-				content_length = atoi(request_info->http_headers[header_index].value);
-				break;
-			}
-		}
-		if (content_length == 0) {
-			request_body = L"{}";
-		} else {
-			std::vector<char> input_buffer(content_length + 1);
-			int bytes_read = 0;
-			while (bytes_read < content_length) {
-				bytes_read += mg_read(conn, &input_buffer[bytes_read], content_length - bytes_read);
-			}
-			input_buffer[content_length] = '\0';
-			int output_buffer_size = ::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, NULL, 0);
-			vector<TCHAR> output_buffer(output_buffer_size);
-			::MultiByteToWideChar(CP_UTF8, 0, &input_buffer[0], -1, &output_buffer[0], output_buffer_size);
-			request_body.append(&output_buffer[0], bytes_read);
-		}
-	} else {
-		request_body = L"{}";
+		request_body = this->ReadRequestBody(conn, request_info);
 	}
 
 	if (strcmp(request_info->uri, "/") == 0) {
@@ -98,7 +103,7 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 			}
 		} else {
 			if (command == NewSession) {
-				session_id = this->CreateBrowserManager();                                             
+				session_id = this->CreateSession();                                             
 			}
 
 			// Compile the serialized JSON representation of the command by hand.
@@ -111,7 +116,7 @@ int IEDriverServer::ProcessRequest(struct mg_connection *conn, const struct mg_r
 			return_code = this->SendResponseToBrowser(conn, request_info, serialized_response);
 
 			if (command == Quit) {
-				this->ShutDown(session_id);
+				this->ShutDownSession(session_id);
 			}
 		}
 	}
@@ -342,23 +347,21 @@ int IEDriverServer::LookupCommand(std::string uri, std::string http_verb, std::w
 		if (std::tr1::regex_search(uri_start, uri_end, matches, matcher)) {
 			if (it->second.find(http_verb) != it->second.end()) {
 				value = it->second[http_verb];
-				std::stringstream param_stream;
-				param_stream << "{";
+				std::string param = "{";
 				size_t param_count = locator_param_names.size();
 				for (unsigned int i = 0; i < param_count; i++) {
 					if (i != 0) {
-						param_stream << ",";
+						param += ",";
 					}
 
 					std::string locator_param_value(matches[i + 1].first, matches[i + 1].second);
-					param_stream << " \"" << locator_param_names[i] << "\" : \"" << locator_param_value << "\"";
+					param += " \"" + locator_param_names[i] + "\" : \"" + locator_param_value + "\"";
 					if (locator_param_names[i] == "sessionid") {
-						session_id->append(CA2W(locator_param_value.c_str()));
+						session_id->append(CA2W(locator_param_value.c_str(), CP_UTF8));
 					}
 				}
 
-				param_stream << " }";
-				std::string param = param_stream.str();
+				param += " }";
 				std::wstring wide_param(param.begin(), param.end());
 				locator->append(wide_param);
 				break;

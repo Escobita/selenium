@@ -25,18 +25,33 @@ namespace OpenQA.Selenium.IE
     /// </example>
     public class InternetExplorerWebElement : RenderedRemoteWebElement, IFindsByCssSelector
     {
+        /// <summary>
+        /// Initializes a new instance of the InternetExplorerWebElement class.
+        /// </summary>
+        /// <param name="parent">Driver in use.</param>
+        /// <param name="id">ID of the element.</param>
         public InternetExplorerWebElement(InternetExplorerDriver parent, string id)
             : base(parent, id)
         {
         }
 
         #region IFindsByCssSelector Members
-
+        /// <summary>
+        /// Finds the first child element matching the specified CSS selector.
+        /// </summary>
+        /// <param name="cssSelector">The CSS selector to match.</param>
+        /// <returns>The first child <see cref="IWebElement"/> matching the criteria.</returns>
         public IWebElement FindElementByCssSelector(string cssSelector)
         {
             return FindElement("css selector", cssSelector);
         }
 
+        /// <summary>
+        /// Finds all child elements matching the specified CSS selector.
+        /// </summary>
+        /// <param name="cssSelector">The CSS selector to match.</param>
+        /// <returns>A <see cref="ReadOnlyCollection{T}"/> containing all child
+        /// <see cref="IWebElement">IWebElements</see> matching the criteria.</returns>
         public ReadOnlyCollection<IWebElement> FindElementsByCssSelector(string cssSelector)
         {
             return FindElements("css selector", cssSelector);

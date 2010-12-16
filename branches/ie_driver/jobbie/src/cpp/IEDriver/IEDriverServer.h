@@ -20,11 +20,12 @@ public:
 	IEDriverServer(int port);
 	virtual ~IEDriverServer(void);
 	int ProcessRequest(struct mg_connection *conn, const struct mg_request_info *request_info);
-	void ShutDown(std::wstring session_id);
 
 private:
 	int LookupCommand(std::string uri, std::string http_verb, std::wstring *session_id, std::wstring *locator);
-	std::wstring CreateBrowserManager(void);
+	std::wstring CreateSession(void);
+	void ShutDownSession(std::wstring session_id);
+	std::wstring ReadRequestBody(struct mg_connection *conn, const struct mg_request_info *request_info);
 	std::wstring SendCommandToManager(std::wstring session_id, std::wstring serialized_command);
 	int SendResponseToBrowser(struct mg_connection *conn, const struct mg_request_info *request_info, std::wstring serialized_response);
 	void PopulateCommandRepository(void);
