@@ -108,7 +108,11 @@ int ElementWrapper::DragBy(int offset_x, int offset_y, int drag_speed) {
 
 int ElementWrapper::GetAttributeValue(std::wstring attribute_name, VARIANT *attribute_value) {
 	int status_code = SUCCESS;
-	std::wstring script(L"(function() { return function(){ ");
+
+	// The atom is just the definition of an anonymous
+	// function: "function() {...}"; Wrap it in another function so we can
+	// invoke it with our arguments without polluting the current namespace.
+	std::wstring script(L"(function() { return (");
 
 	// Read in all the scripts
 	for (int j = 0; GET_ATTRIBUTE[j]; j++) {
@@ -116,13 +120,8 @@ int ElementWrapper::GetAttributeValue(std::wstring attribute_name, VARIANT *attr
 		script += L"\n";
 	}
 
-	// Now for the magic
-	script += L"var element = arguments[0];\n";
-	script += L"var attributeName = arguments[1];\n";
-	script += L"return getAttribute(element, attributeName);\n";
-
-	// Close things
-	script += L"};})();";
+	// Now for the magic and to close things
+	script += L")})();";
 
 	ScriptWrapper *script_wrapper = new ScriptWrapper(script, 2);
 	script_wrapper->AddArgument(this->element_);
