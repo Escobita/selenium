@@ -27,12 +27,14 @@ Using/requiring the ruby code from `rb/lib` directly is not recommended.
 
 == Testing ==
 
-Most of the test targets can be run on either the bundled JRuby environment (includes gem dependencies) or your local Ruby installation. For the local install, it's a good idea to run `./go //rb:install-gems` to make sure you have the dependencies installed.  If you want to use the bundled JRuby instead, replace 'mri' with 'jruby' in the commands below.
+Most of the Ruby targets should work on both MRI (using `rake //rb:<target>`) or the bundled JRuby jar (using `./go //rb:<target>`). One notable exception is the //rb:remote-test target, which relies on being able to compile the server jar. You can however do the build with JRuby/go, then use rake to run the tests. 
 
-|| `./go //rb:unit-test:mri` || Run unit tests for WebDriver. ||
-|| `./go //rb:firefox-test:mri` || Run integration tests for Firefox - replace "firefox" with any driver. ||
-|| `./go //rb:rc-client-unit-test:mri` || Run unit tests for selenium-client (Se 1.x/RC) ||
-|| `./go //rb:rc-client-integration-test:mri` || Run integration tests for selenium-client (Se 1.x/RC) ||
+For MRI, it's a good idea to run `rake //rb:install-gems` to make sure you have the dependencies installed. 
+
+|| `./go //rb:unit-test` || Run unit tests for WebDriver. ||
+|| `./go //rb:firefox-test` || Run integration tests for Firefox - replace "firefox" with any driver. ||
+|| `./go //rb:rc-client-unit-test` || Run unit tests for selenium-client (Se 1.x/RC) ||
+|| `./go //rb:rc-client-integration-test` || Run integration tests for selenium-client (Se 1.x/RC) ||
 
 == Contributing == 
 
