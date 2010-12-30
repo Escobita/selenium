@@ -180,8 +180,8 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session || Create a new session. || _N/A_ ||
 || GET || /session/:sessionId || Retrieve the capabilities of the specified session. || _N/A_ ||
 || DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
-|| POST || /session/:sessionId/timeouts/implicit_wait || Set the amount of time the driver should wait when searching for elements. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)] ||
 || POST || /session/:sessionId/timeouts/async_script || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. || _N/A_ ||
+|| POST || /session/:sessionId/timeouts/implicit_wait || Set the amount of time the driver should wait when searching for elements. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)] ||
 || GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
 || GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
 || GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
@@ -210,6 +210,10 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/element || Search for an element on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)] ||
 || POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
 || POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
+|| POST || /session/:sessionId/element/:id/buttondown || Click and hold the mouse button on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
+|| POST || /session/:sessionId/element/:id/buttonup || Releases the mouse button previously held, on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()] ||
+|| POST || /session/:sessionId/element/:id/doubleclick || Double-clicks on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()] ||
+|| POST || /session/:sessionId/element/:id/contextclick || Clicking on an element in a way that would bring up contextual menu. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ContextClickAction.html#perform() ContextClickAction#perform()] ||
 || POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
 || GET || /session/:sessionId/element/:id/text || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
 || GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
@@ -229,6 +233,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId/element/:id/size || Determine an element's size in pixels. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()] ||
 || GET || /session/:sessionId/element/:id/css/:propertyName || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
 || POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
+|| POST || /session/:sessionId/element/:id/movehere || Move the mouse to the specified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
 || POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
 || GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
 || POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
@@ -327,6 +332,31 @@ will be returned in a JSON object with the following properties:
 
 ----
 
+=== /session/:sessionId/timeouts/async_script ===
+
+<dl>
+<dd>*POST /session/:sessionId/timeouts/async_script*</dd>
+<dd>
+<dl>
+<dd>Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`ms` - `{number}` The amount of time, in milliseconds, that time-limited commands are permitted to run.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
 === /session/:sessionId/timeouts/implicit_wait ===
 
 <dl>
@@ -356,31 +386,6 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/timeouts/async_script ===
-
-<dl>
-<dd>*POST /session/:sessionId/timeouts/async_script*</dd>
-<dd>
-<dl>
-<dd>Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*JSON Parameters:*</dt>
-<dd>`ms` - `{number}` The amount of time, in milliseconds, that time-limited commands are permitted to run.</dd>
 </dl>
 </dd>
 </dl>
@@ -1343,6 +1348,138 @@ such cookie visible to the current page.</dd>
 
 ----
 
+=== /session/:sessionId/element/:id/buttondown ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/buttondown*</dd>
+<dd>
+<dl>
+<dd>Click and hold the mouse button on an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/buttonup ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/buttonup*</dd>
+<dd>
+<dl>
+<dd>Releases the mouse button previously held, on an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/doubleclick ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/doubleclick*</dd>
+<dd>
+<dl>
+<dd>Double-clicks on an element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/contextclick ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/contextclick*</dd>
+<dd>
+<dl>
+<dd>Clicking on an element in a way that would bring up contextual menu.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ContextClickAction.html#perform() ContextClickAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
 === /session/:sessionId/element/:id/submit ===
 
 <dl>
@@ -2101,6 +2238,40 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/element/:id/movehere ===
+
+<dl>
+<dd>*POST /session/:sessionId/element/:id/movehere*</dd>
+<dd>
+<dl>
+<dd>Move the mouse to the specified element.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:id` - ID of the element to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
+<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
+<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()]</dd>
 </dl>
 </dd>
 </dl>
