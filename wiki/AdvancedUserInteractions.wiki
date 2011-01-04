@@ -1,0 +1,70 @@
+#summary How to use the Advanced User Interactions API
+
+= Introduction =
+
+The Advanced User Interactions API is a new, more comprehensive API for describing actions a user can perform on a web page. This includes actions such as drag and drop or clicking multiple elements while holding down the Control key. 
+
+== Getting started (short how-to) ==
+In order to generate a sequence of actions, use the [http://code.google.com/p/selenium/source/browse/trunk/common/src/java/org/openqa/selenium/interactions/ActionChainsGenerator.java ActionChainsGenerator] to build it. First, configure it:
+{{{
+   ActionChainsGenerator builder = new ActionChainsGenerator(driver);
+
+   builder.keyDown(Keys.CONTROL)
+       .click(someElement)
+       .click(someOtherElement)
+       .keyUp(Keys.CONTROL);
+
+}}}
+
+Then get the action:
+{{{
+   Action selectMultiple = builder.build();
+}}}
+
+And execute it:
+{{{
+   selectMultiple.perform();
+}}}
+
+The sequence of actions should be short - it's better to perform a short sequence of actions and verify that the page is in the right state before the rest of the sequence takes place. The next section lists all available actions and how can they be extended.
+
+= Outline =
+== A single action ==
+All actions implement the [http://code.google.com/p/selenium/source/browse/trunk/common/src/java/org/openqa/selenium/interactions/Action.java Action] interface. This action only has one method: `perform()`. The idea being that each action gets the required information passed in the Constructor. When invoked, the action then figures out how it should interact with the page (for example, finding out the active element to send the key to or calculating the screen coordinates of an element for a click) and calls the underlying implementation to actually carry out the interaction.
+
+There are currently several actions:
+ * ButtonReleaseAction - Releasing a held mouse button.
+ * ClickAction - Equivalent to `WebElement.click()`
+ * ClickAndHoldAction - Holding down the left mouse button.
+ * ContextClickAction - Clicking the mouse button that (usually) brings up the contextual menu.
+ * DoubleClickAction - double-clicking an element.
+ * KeyDownAction - Holding down a modifier key.
+ * KeyUpAction - Releasing a modifier key.
+ * MoveMouseAction - Moving the mouse from its current location to another element.
+ * MoveToOffsetAction - Moving the mouse to an offset from an element (The offset could be negative and the element could be the same element that the mouse has just moved to).
+ * SendKeysAction - Equivalent to `WebElement.sendKey(...)`
+
+The CompositeAction contains other actions and when its perform method is invoked, it will invoke the perform method of each of the actions it contains. Usually, the actions should not created directly - the `ActionChainsGenerator` should take care of that.
+
+== Generating Action chains ==
+The ActionChainsGenerator implements the [http://en.wikipedia.org/wiki/Builder_pattern Builder] pattern to create a CompositeAction containing a group of other actions. This should ease building actions by configuring an ActionChainsGenerator instance and invoking it's `build()` method to get the complex action:
+{{{
+   ActionChainsGenerator builder = new ActionChainsGenerator(driver);
+
+   Action dragAndDrop = builder.clickAndHold(someElement)
+       .moveToElement(otherElement)
+       .release(otherElement)
+       .build();
+
+   dragAndDrop.perform();
+}}}
+
+A planned extension to the ActionChainsGenerator is adding a method that will append any Action to the current list of actions it holds. This will allow adding extended actions without manually creating the CompositeAction. On extending actions, see below.
+ 
+== Guidelines for extending the Action interface ==
+Thie `Action` interface only has one action - `perform()`. In addition to the actual interaction itself, any evaluation of conditions should be performed in this method. It's possible that the page state has changed between creation of the action and when it was actually performed - so things like element's visibility and coordinates shouldn't be found out in the Action constructor.
+
+== Underlying interfaces ==
+=== A word of warning ===
+=== Keyboard ===
+=== Mouse ===
