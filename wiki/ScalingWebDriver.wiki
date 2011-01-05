@@ -1,0 +1,30 @@
+#summary Describes additional issues that have to be handled when running concurrent Se2
+
+= Running parallel Selenium2 =
+
+This page tries to summarize additional constraints that arise when running Selenium2 in parallel. 
+
+==WebDriver instantiation==
+While an individual WebDriver instance cannot be shared among threads, it is easy to create multiple WebDriver instances.
+
+==Ephemeral sockets==
+There is a general problem of TCP/IP v4, where the TCP/IP stack uses ephemeral ports when making a connection between two sockets. The typical symptom of this is that connection failures start appearing after a short time of running, often a minute or two. The message will vary somewhat but it always appears after some time, and if you reduce the number of browsers it will eventually work fine. 
+
+[http://en.wikipedia.org/wiki/Ephemeral_port Wikipedia on Ephemeral ports] or a quick google of "ephemeral sockets <your os name>" will tell you what your current OS delivers and how to set it.
+
+Currently (2.0b1) it seems like a firefox running at full blast consumes something in the range of 2000 ephemeral ports per firefox; your mileage will vary here. This means you can 
+run out of ephemeral port on Windows XP with as litttle as 3 browsers, maybe even 2.
+
+
+===Will it be fixed ?===
+The solution to the ephemeral socket problem is HTTP1.1 keep alive on the connections. WebDriver spans across a *large* amount of technology platforms (multiple clients, multiple browsers). Some of the current browser support (firefox) will probably 
+need new technology stacks to support keep-alive, which means you probably won't see it for 2.0. Some other combinations will probably be fixed.
+
+If you are using the old versions of Windows (<=2003, inc XP) you should not be 
+waiting for port usage to get low enough to fit in this space. That may simply never happen, although some combinations probably will. See http://support.microsoft.com/kb/196271 on how to adjust it.
+
+If you for technical reasons cannot adjust the port range on your Windows machine you will not be able to run more than 2-3 firefox browsers.
+
+==Native events==
+
+Due to a shared file in the native events logic, the firefox driver should probably not be using native events when running concurrently.
