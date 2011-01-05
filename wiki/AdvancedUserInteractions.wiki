@@ -1,5 +1,7 @@
 #summary How to use the Advanced User Interactions API
 
+<wiki:toc depth=2>
+
 = Introduction =
 
 The Advanced User Interactions API is a new, more comprehensive API for describing actions a user can perform on a web page. This includes actions such as drag and drop or clicking multiple elements while holding down the Control key. 
@@ -27,6 +29,9 @@ And execute it:
 }}}
 
 The sequence of actions should be short - it's better to perform a short sequence of actions and verify that the page is in the right state before the rest of the sequence takes place. The next section lists all available actions and how can they be extended.
+
+= Current status =
+The API is (mostly) finalized for the actions and actions generator. It is fully implemented for HtmlUnit and in the process of being implemented for IE.
 
 = Outline =
 == A single action ==
@@ -64,7 +69,26 @@ A planned extension to the ActionChainsGenerator is adding a method that will ap
 == Guidelines for extending the Action interface ==
 Thie `Action` interface only has one action - `perform()`. In addition to the actual interaction itself, any evaluation of conditions should be performed in this method. It's possible that the page state has changed between creation of the action and when it was actually performed - so things like element's visibility and coordinates shouldn't be found out in the Action constructor.
 
-== Underlying interfaces ==
-=== A word of warning ===
-=== Keyboard ===
-=== Mouse ===
+= Implementation details =
+To achieve separation between the operations each action is performing and the actual implementation of the operations, all actions rely on two interfaces: `Mouse` and `Keyboard`. These interfaces are implemented by every driver that supports the advanced user interactions. Note that these interfaces are designated to be used by the actions - not by end users - the information in this section is only useful for developers planning to extend WebDriver.
+
+== A word of warning ==
+The keyboard and mouse interface are designed to be used by the various action classes. For this reason, their API is less stable than that of the ActionChainsGenerator. Directly using these interfaces may not yield the expected results, as the actions themselves do additional work to make sure the right conditions are met before events are actually generated. Such preliminary work includes focusing on the right element or making sure the element is visible before any mouse interaction. 
+
+== Keyboard ==
+The `Keyboard` interface has three methods:
+ * `void sendKeys(CharSequence... keysToSend)` - Similar to the existing `sendKeys(...)` method.
+ * `void pressKey(Keys keyToPress)` - Sends a key press only, without releasing it. Should only be implemented for modifier keys (Control, Alt and Shift).
+ * `void releaseKey(Keys keyToRelease)` - Releases a modifier key.
+
+It is the implementation's responsibility to store the state of modifier keys between calls. The element which will receive those events is the active element.
+
+== Mouse ==
+The `Mouse` interface includes the following methods (This interface will change soon):
+ * `void click(WebElement onElement)` - Similar to the existing `click()` method.
+ * `void doubleClick(WebElement onElement)` - Double-clicks an element.
+ * `void mouseDown(WebElement onElement)` - Holds down the left mouse button on an element.
+ * `void mouseUp(WebElement onElement)` - Releases the mouse button on an element.
+ * `void mouseMove(WebElement toElement)` - Move (from the current location) to another element.
+ * `void mouseMove(WebElement toElement, long xOffset, long yOffset)` - Move (from the current location) to new coordinates: (X coordinates of toElement + xOffset, Y coordinates of toElement + yOffset).
+ * `void contextClick(WebElement onElement)` - Performs a context-click (right click) on an element.
