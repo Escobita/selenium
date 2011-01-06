@@ -2,7 +2,7 @@
 java_library(name = "selenium",
   deps = [
     ":webdriver-api",
-    "//java/com/thoughtworks/selenium",
+    "//java/com/thoughtworks/selenium:api",
     "//java/org/openqa/selenium/browserlaunchers",
     "//java/org/openqa/selenium/interactions",
     "//java/org/openqa/selenium/internal",

@@ -2,6 +2,6 @@
 java_library(name = "browserlaunchers",
   srcs = [ "*.java" ],
   deps = [
-    "//java/com/thoughtworks/selenium",
+    "//java/com/thoughtworks/selenium:api",
     "//java/org/openqa/selenium/internal",
   ])

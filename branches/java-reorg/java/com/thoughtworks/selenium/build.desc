@@ -1,5 +1,7 @@
 
-java_library(name = "selenium",
+java_library(name = "api",
   srcs = [
-    "*.java"
+    "CommandProcessor.java",
+    "Selenium.java",
+    "SeleniumException.java",
   ])
