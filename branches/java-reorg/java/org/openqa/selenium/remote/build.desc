@@ -1,0 +1,21 @@
+
+java_library(name = "common",
+  srcs = [
+    "BeanToJsonConverter.java",
+    "Command.java",
+    "DesiredCapabilities.java",
+    "DriverCommand.java",
+    "ErrorCodes.java",
+    "JsonException.java",
+    "JsonToBeanConverter.java",
+    "PropertyMunger.java",
+    "Response.java",
+    "SessionId.java",
+    "SimplePropertyDescriptor.java",
+  ],
+  deps = [
+    "//java/org/openqa/selenium:webdriver-api",
+    "//java/org/openqa/selenium/browserlaunchers",
+    "//third_party/java/guava-libraries",
+    "//third_party/java/json",
+  ])

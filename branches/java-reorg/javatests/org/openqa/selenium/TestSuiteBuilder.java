@@ -173,6 +173,10 @@ public class TestSuiteBuilder {
       return;
     }
 
+    if (!withDriver && NeedsDriver.class.isAssignableFrom(clazz)) {
+      return;
+    }
+
     boolean include = true;
     if (patterns.size() >0) {
       include = false;
