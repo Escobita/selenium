@@ -1,3 +1,11 @@
+java_library(name = "selenium",
+  srcs = [
+    ":base",
+    "//java/org/openqa/selenium/htmlunit",
+    "//java/org/openqa/selenium/firefox",
+    "//java/org/openqa/selenium/iphone",
+    "//java/org/openqa/selenium/remote:client",
+  ])
 
 java_library(name = "base",
   srcs = [
