@@ -63,3 +63,22 @@ java_library(name = "webdriver-api",
     "//java/org/openqa/selenium/internal:api",
   ])
 
+# TODO(simon): Break out the selenium emulation from the v1 implementation.
+java_library(name = "selenium-api",
+  srcs = [
+    "ExplodingSupplier.java",
+    "SuppliesWebDriver.java",
+    "WebDriverCommandProcessor.java",
+    "internal/seleniumemulation/**/*.java",
+  ],
+  deps = [
+    ":webdriver-api",
+    "//java/com/thoughtworks/selenium:api",
+    "//java/com/thoughtworks/selenium:support",
+    "//java/org/openqa/selenium/chrome",
+    "//java/org/openqa/selenium/firefox",
+    "//java/org/openqa/selenium/ie",
+    "//java/org/openqa/selenium/internal",
+    "//third_party/java/guava-libraries",
+    "//third_party/java/json",
+  ])

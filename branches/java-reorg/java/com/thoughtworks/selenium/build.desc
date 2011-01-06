@@ -5,3 +5,32 @@ java_library(name = "api",
     "Selenium.java",
     "SeleniumException.java",
   ])
+
+java_library(name = "selenium",
+  srcs = [
+    "BrowserConfigurationOptions.java",
+    "DefaultRemoteCommand.java",
+    "DefaultSelenium.java",
+    "HttpCommandProcessor.java",
+    "RemoteCommand.java",
+    "ScreenshotListener.java",
+    "SeleneseTestBase.java",
+    "SeleneseTestCase.java",
+    "SeleneseTestNgHelper.java",
+    "SeleniumLogLevels.java",
+  ],
+  deps = [
+    ":api",
+    "//java/org/openqa/selenium/remote:common",
+    "//java/org/openqa/selenium:selenium-api",
+    "//third_party/java/junit",
+    "//third_party/java/testng",
+  ])
+
+java_library(name = "support",
+  srcs = [
+    "Wait.java",
+  ],
+  deps = [
+    ":api",
+  ])
