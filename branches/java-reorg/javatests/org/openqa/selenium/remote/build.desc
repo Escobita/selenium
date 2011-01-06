@@ -12,3 +12,16 @@ java_test(name = "common-tests",
     "//javatests/org/openqa/selenium:tests",
     "//third_party/java/junit",
   ])
+
+java_test(name = "client-tests",
+  srcs = [
+    "AugmenterTest.java",
+    "ErrorHandlerTest.java",
+    "RemoteClientTestSuite.java",
+    "internal/CircularOutputStreamTest.java",
+  ],
+  deps = [
+    "//java/org/openqa/selenium/remote:client",
+    "//javatests/org/openqa/selenium:tests",
+    "//third_party/java/junit",  
+  ])
