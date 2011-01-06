@@ -1,0 +1,33 @@
+
+java_library(name = "base",
+  srcs = [
+    "AbstractDriverTestCase.java",
+    "Ignore.java",
+    "NeedsDriver.java",
+    "Pages.java",
+  ], 
+  deps = [
+    "//java/org/openqa/selenium",
+    "//javatests/org/openqa/selenium/environment",
+    "//third_party/java/junit",
+    "//third_party/java/hamcrest",
+  ])
+
+java_library(name = "tests",
+  srcs = [
+    "*Test.java",
+    "JavascriptEnabled.java",
+    "Messages.java",
+    "NeedsFreshDriver.java",
+    "TestWaiter.java",
+    "WaitingConditions.java",
+    "html5/*Test.java",
+    "interactions/*Test.java",
+  ],
+  deps = [
+    ":base",
+    "//javatests/org/openqa/selenium/environment",
+    "//third_party/java/commons-io",
+    "//third_party/java/jmock",
+    "//third_party/java/junit",
+  ])
