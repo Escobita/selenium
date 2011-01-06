@@ -218,7 +218,7 @@ ie_generate_type_mapping(:name => "ie_result_type_cpp",
 ie_generate_type_mapping(:name => "ie_result_type_java",
                          :src => "jobbie/src/common/result_types.txt",
                          :type => "java",
-                         :out => "java/org/openqa/selenium/ie/IeReturnTypes.java")
+                         :out => "../../java/org/openqa/selenium/ie/IeReturnTypes.java")
 
 dll(:name => "firefox_dll",
     :src  => [ "common/src/cpp/webdriver-interactions/**/*", "jobbie/src/cpp/webdriver-firefox/**/*" ],
