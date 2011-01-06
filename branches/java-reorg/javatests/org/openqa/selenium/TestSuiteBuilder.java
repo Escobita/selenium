@@ -32,6 +32,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import org.openqa.selenium.internal.InProject;
+
 public class TestSuiteBuilder {
 
   private File baseDir;
@@ -52,25 +54,17 @@ public class TestSuiteBuilder {
   private boolean outputTestNames = false;
 
   public TestSuiteBuilder() {
-    baseDir = new File(".").getAbsoluteFile();
-
-    while (baseDir != null && !(new File(baseDir, "Rakefile").exists())) {
-      baseDir = baseDir.getParentFile();
-    }
-
-    assertThat(baseDir, notNullValue());
-    assertThat(baseDir.exists(), is(true));
+    baseDir = InProject.locate("Rakefile").getParentFile();
 
     jsTestDir = new File(baseDir, "common/test/js");
     assertThat(jsTestDir.isDirectory(), is(true));
+
+    sourceDirs.add(new File(baseDir, "javatests"));
   }
 
   public TestSuiteBuilder addSourceDir(String dirName) {
-    File dir = new File(baseDir, dirName + "/test/java");
-
-    if (dir.exists()) {
-      sourceDirs.add(dir);
-    }
+    // no-op. Bwhahahaha.
+    // TODO(simon): Delete this method.
 
     return this;
   }
