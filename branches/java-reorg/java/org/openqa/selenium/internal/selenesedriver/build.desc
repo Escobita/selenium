@@ -1,0 +1,8 @@
+
+java_library(name = "selenium-backed-driver",
+  srcs = [
+    "internal/selenesedriver/**/*.java",
+  ],
+  deps = [
+    "//java/com/thoughtworks/selenium",
+  ])
