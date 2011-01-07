@@ -1,10 +1,17 @@
 
 java_test(name = "test",
   srcs = [
+    "InternalSelenseTestNgBase.java",
     "WaitTest.java",
     "WaitTestSuite.java",
   ],
   deps = [
+    "//java/org/openqa/selenium:webdriver-backed-selenium",
+    "//java/org/openqa/selenium/firefox",
+    "//java/org/openqa/selenium/ie",
     "//javatests/com/thoughtworks/selenium/condition:test",
+    "//javatests/org/openqa/selenium/v1:environment",
+    "//third_party/java/guava-libraries",
     "//third_party/java/junit",
+    "//third_party/java/testng",
   ])

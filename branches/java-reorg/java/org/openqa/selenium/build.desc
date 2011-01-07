@@ -73,12 +73,21 @@ java_library(name = "selenium-api",
   ],
   deps = [
     ":webdriver-api",
-    "//java/com/thoughtworks/selenium:api",
-    "//java/com/thoughtworks/selenium:support",
+    "//java/com/thoughtworks/selenium:wait",
     "//java/org/openqa/selenium/chrome",
     "//java/org/openqa/selenium/firefox",
     "//java/org/openqa/selenium/ie",
     "//java/org/openqa/selenium/internal",
     "//third_party/java/guava-libraries",
     "//third_party/java/json",
+  ])
+
+# Circular dependency avoidance technique
+java_library(name = "webdriver-backed-selenium",
+  srcs = [
+    "WebDriverBackedSelenium.java",
+  ],
+  deps = [
+    ":selenium-api",
+    "//java/com/thoughtworks/selenium",
   ])
