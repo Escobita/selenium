@@ -1,4 +1,4 @@
-package org.openqa.selenium;
+package org.openqa.selenium.rc;
 
 import junit.framework.TestCase;
 

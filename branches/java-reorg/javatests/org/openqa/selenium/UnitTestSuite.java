@@ -4,6 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.openqa.selenium.browserlaunchers.WindowsProxyManagerUnitTest;
 import org.openqa.selenium.browserlaunchers.WindowsUtilsUnitTest;
+import org.openqa.selenium.rc.BrowserResponseSequencerUnitTest;
+import org.openqa.selenium.rc.HTMLSuiteResultUnitTest;
 import org.openqa.selenium.server.BrowserConfigurationOptionsTest;
 import org.openqa.selenium.server.BrowserSessionFactoryUnitTest;
 import org.openqa.selenium.server.ClasspathResourceLocatorUnitTest;

@@ -1,9 +1,10 @@
-package org.openqa.selenium;
+package org.openqa.selenium.rc;
 
 import junit.framework.TestCase;
 
 import java.net.MalformedURLException;
 
+import org.openqa.selenium.*;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.InProcessTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
@@ -19,6 +20,8 @@ import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.Platform.MAC;
 import static org.openqa.selenium.firefox.FirefoxDriver.PROFILE;
+
+// TODO(reorg): This test is never run. It must be.
 
 @Ignore(value = {HTMLUNIT, IE, IPHONE, CHROME, CHROME_NON_WINDOWS, SELENESE},
     reason = "Firefox specific test, but needs to be in remote")

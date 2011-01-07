@@ -2,7 +2,7 @@
  * Created on Oct 12, 2006
  *
  */
-package org.openqa.selenium;
+package org.openqa.selenium.rc;
 
 import junit.framework.TestCase;
 

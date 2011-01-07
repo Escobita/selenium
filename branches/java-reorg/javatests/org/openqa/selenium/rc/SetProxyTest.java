@@ -1,7 +1,8 @@
-package org.openqa.selenium;
+package org.openqa.selenium.rc;
 
 import junit.framework.TestCase;
 
+import org.openqa.selenium.*;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.InProcessTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;

@@ -1,5 +1,5 @@
 java_library(name = "selenium",
-  srcs = [
+  deps = [
     ":base",
     "//java/org/openqa/selenium/htmlunit",
     "//java/org/openqa/selenium/firefox",

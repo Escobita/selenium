@@ -14,7 +14,7 @@ import org.openqa.selenium.server.SeleniumServer;
 import static org.openqa.selenium.DevMode.isInDevMode;
 import static org.openqa.selenium.internal.PortProber.pollPort;
 
-class SeleniumServerInstance {
+public class SeleniumServerInstance {
   private SeleniumServer seleniumServer;
   private int serverPort;
 
