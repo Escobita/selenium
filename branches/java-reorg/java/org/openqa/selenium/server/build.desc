@@ -1,0 +1,43 @@
+java_library(name = "server",
+  main = "org.openqa.selenium.server.SeleniumServer",
+  deps = [
+    "//java/org/openqa/selenium/chrome",
+    "//java/org/openqa/selenium/firefox",
+    "//java/org/openqa/selenium/htmlunit",
+    "//java/org/openqa/selenium/ie",
+    "//java/org/openqa/selenium/iphone",
+    ":server_lite"
+  ])
+
+# Light version of the server for drivers that don't need to depend on all other drivers.
+java_library(name = "server_lite",
+  srcs = [ 
+    "**/*.java",
+    "//java/cybervillains",
+  ],
+  main = "org.openqa.selenium.server.SeleniumServer",
+  resources = [
+    "customProfileDirCUSTFF",
+    "customProfileDirCUSTFFCHROME",
+    "hudsuckr",
+    "killableprocess",
+    "konqueror",
+    "opera",
+    "sslSupport",
+    "VERSION.txt",
+    "//common:js_core",
+    "//common:js_jsunit",
+    {
+      "//common:test_runner_html" : "core/TestRunner.hta",
+      "//common:remote_runner_html" : "core/RemoteRunner.hta",
+      "//common/src/js/selenium:core" : "core/scripts/atoms.js",
+      "//third_party/js/sizzle" : "core/lib/sizzle.js"
+    }
+  ],
+  deps = [
+    "//java/org/openqa/selenium/remote/server",
+    "//java/org/openqa/selenium/networkutils",
+    "//java/org/openqa/selenium/support",
+    "//java/org/openqa/jetty",
+    "//third_party/java/servlet-api"
+  ])

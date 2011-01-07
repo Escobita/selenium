@@ -22,7 +22,6 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.server.log.LoggingManager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,12 +86,6 @@ public class DefaultDriverSessions implements DriverSessions {
     
     SessionId sessionId = new SessionId(String.valueOf(sessionKeyFactory.getAndIncrement()));
     sessionIdToDriver.put(sessionId, session);
-
-    // I'm not sure that this logging manager should have crept in here.
-    if (LoggingManager.perSessionLogHandler() != null) {
-      LoggingManager.perSessionLogHandler()
-          .copyThreadTempLogsToSessionLogs(sessionId.toString(), Thread.currentThread().getId());
-    }
 
     return sessionId;
   }
