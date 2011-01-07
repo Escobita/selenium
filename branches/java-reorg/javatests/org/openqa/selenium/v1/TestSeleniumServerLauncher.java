@@ -1,4 +1,4 @@
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.SeleniumServer;

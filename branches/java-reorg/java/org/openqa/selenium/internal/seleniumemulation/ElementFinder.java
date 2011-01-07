@@ -51,7 +51,7 @@ public class ElementFinder {
     lookupStrategies.put(strategyName, lookupStrategy);
   }
    
-  protected LookupStrategy findStrategy(String locator) {
+  public LookupStrategy findStrategy(String locator) {
     String strategyName = "implicit";
 
     Matcher matcher = STRATEGY_AND_VALUE_PATTERN.matcher(locator);
@@ -66,7 +66,7 @@ public class ElementFinder {
     return strategy;
   }
 
-  protected String determineWebDriverLocator(String locator) {
+  public String determineWebDriverLocator(String locator) {
     String use = locator;
 
     Matcher matcher = STRATEGY_AND_VALUE_PATTERN.matcher(locator);

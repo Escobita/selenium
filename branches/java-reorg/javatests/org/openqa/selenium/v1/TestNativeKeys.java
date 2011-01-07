@@ -1,4 +1,4 @@
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import java.awt.event.KeyEvent;
 

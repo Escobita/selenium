@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import org.openqa.selenium.TestSuiteBuilder;
 
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.internal.PortProber.findFreePort;

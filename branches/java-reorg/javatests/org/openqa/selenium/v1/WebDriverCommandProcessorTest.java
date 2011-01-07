@@ -15,9 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import junit.framework.TestCase;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StubDriver;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverCommandProcessor;
 
 public class WebDriverCommandProcessorTest extends TestCase {
   public void testRequiresAJavascriptEnabledDriver() {

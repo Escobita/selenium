@@ -6,10 +6,10 @@ import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.SeleniumTestEnvironment;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
+import org.openqa.selenium.v1.SeleniumTestEnvironment;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;

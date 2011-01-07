@@ -15,12 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import java.io.File;
 import java.io.IOException;
 
 import com.google.common.io.Files;
+import org.openqa.selenium.Build;
+import org.openqa.selenium.DevMode;
 import org.openqa.selenium.environment.TestEnvironment;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.internal.CommandLine;

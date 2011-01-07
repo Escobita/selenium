@@ -1,4 +1,4 @@
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;

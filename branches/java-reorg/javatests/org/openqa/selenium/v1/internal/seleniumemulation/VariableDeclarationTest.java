@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.internal.seleniumemulation;
+package org.openqa.selenium.v1.internal.seleniumemulation;
 
 import junit.framework.TestCase;
+import org.openqa.selenium.internal.seleniumemulation.VariableDeclaration;
 
 public class VariableDeclarationTest extends TestCase {
 

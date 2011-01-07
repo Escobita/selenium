@@ -15,7 +15,7 @@
  *
  */
 
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import com.thoughtworks.selenium.SeleniumException;

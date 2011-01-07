@@ -1,4 +1,4 @@
-package org.openqa.selenium.support;
+package org.openqa.selenium.v1.support;
 
 import junit.framework.TestCase;
 
@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
+import org.openqa.selenium.support.PageFactory;
 
 public class DecoratedWebElementTest extends TestCase {
   public void testDecoratedElementsShouldBeUnwrapped() {

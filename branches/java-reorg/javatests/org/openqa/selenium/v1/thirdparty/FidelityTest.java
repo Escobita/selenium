@@ -1,4 +1,4 @@
-package org.openqa.selenium.thirdparty;
+package org.openqa.selenium.v1.thirdparty;
 
 import com.thoughtworks.selenium.InternalSelenseTestNgBase;
 import com.thoughtworks.selenium.Wait;

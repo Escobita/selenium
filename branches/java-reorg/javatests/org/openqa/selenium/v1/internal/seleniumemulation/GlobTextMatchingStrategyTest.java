@@ -16,9 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.internal.seleniumemulation;
+package org.openqa.selenium.v1.internal.seleniumemulation;
 
 import junit.framework.TestCase;
+import org.openqa.selenium.internal.seleniumemulation.GlobTextMatchingStrategy;
 
 
 public class GlobTextMatchingStrategyTest extends TestCase {
@@ -58,7 +59,7 @@ public class GlobTextMatchingStrategyTest extends TestCase {
 
     // The second text contains the nbsp character.
 		boolean result = glob.isAMatch("this is the span",
-        "this is the span    first option second option third,,option Line 1 Line 2  th1th2abcdf1f2 ");
+        "this is theï¿½span    first option second option third,,option Line 1 Line 2  th1th2abcdf1f2ï¿½");
 		assertTrue(result);
   }
 }

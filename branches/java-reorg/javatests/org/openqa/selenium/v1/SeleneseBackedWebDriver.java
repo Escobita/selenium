@@ -15,8 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.SeleneseCommandExecutor;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;

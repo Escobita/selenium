@@ -1,4 +1,4 @@
-package org.openqa.selenium;
+package org.openqa.selenium.v1;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Build;
 import org.openqa.selenium.internal.CommandLine;
 import org.openqa.selenium.internal.PortProber;
 import org.openqa.selenium.networkutils.NetworkUtils;
