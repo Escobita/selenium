@@ -379,6 +379,10 @@ module CrazyFunJava
           end
         end
 
+        if tests.empty?
+
+        end
+
         cp = ClassPath.new(task_name)
         cp.push jar_name(dir, args[:name])
 

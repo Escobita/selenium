@@ -1,0 +1,9 @@
+
+java_library(name = "support",
+  srcs = [
+    "FakeClock.java",
+    "TickingClock.java",
+  ],
+  deps = [
+    "//java/org/openqa/selenium/support/ui:clock",
+  ])

@@ -1,0 +1,10 @@
+
+java_test(name = "test",
+  srcs = [
+    "WaitTest.java",
+    "WaitTestSuite.java",
+  ],
+  deps = [
+    "//javatests/com/thoughtworks/selenium/condition:test",
+    "//third_party/java/junit",
+  ])
