@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.intents;
+package org.openqa.selenium.android.server.intents;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,7 +26,7 @@ import android.util.Log;
 import com.google.common.collect.Sets;
 
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.android.Logger;
+import org.openqa.selenium.android.server.Logger;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -73,8 +73,8 @@ public class IntentReceiver extends BroadcastReceiver {
     res.putSerializable(action, (Serializable) result);
 
     Logger.log(Log.DEBUG, LOG_TAG,
-        String.format("Received intent: %s, from context: %s. Returning: %s",
-            action, context, result));
+            String.format("Received intent: %s, from context: %s. Returning: %s",
+                    action, context, result));
     this.setResultExtras(res);
   }
 

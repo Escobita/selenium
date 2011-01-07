@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.intents;
+package org.openqa.selenium.android.server.intents;
 
 import com.google.common.base.Splitter;
 
@@ -26,7 +26,7 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.util.Log;
 
-import org.openqa.selenium.android.Logger;
+import org.openqa.selenium.android.server.Logger;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
@@ -50,7 +50,7 @@ public class IntentSender extends BroadcastReceiver implements Callable {
   
   public synchronized void broadcast(String action, Object... args) {
     Logger.log(Log.DEBUG, LOG_TAG, String.format("Context: %s, Sending Intent: %s, Args: %s",
-        sender.toString(), action, args.length));
+            sender.toString(), action, args.length));
     received = false;
     this.action = action;
     Intent intent = new Intent(action);

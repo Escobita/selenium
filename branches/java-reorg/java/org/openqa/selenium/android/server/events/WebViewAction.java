@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.events;
+package org.openqa.selenium.android.server.events;
 
 import com.google.common.collect.Lists;
 
@@ -25,7 +25,7 @@ import android.view.KeyEvent;
 import android.webkit.WebView;
 
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.android.Platform;
+import org.openqa.selenium.android.server.Platform;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

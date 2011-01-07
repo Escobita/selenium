@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.events;
+package org.openqa.selenium.android.server.events;
 
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -23,7 +23,7 @@ import android.webkit.WebView;
 
 import com.google.common.collect.Lists;
 
-import org.openqa.selenium.android.Platform;
+import org.openqa.selenium.android.server.Platform;
 
 import java.util.List;
 

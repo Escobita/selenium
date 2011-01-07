@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android;
+package org.openqa.selenium.android.server;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -34,15 +34,15 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.android.intents.Action;
-import org.openqa.selenium.android.intents.FutureExecutor;
-import org.openqa.selenium.android.intents.IntentReceiver;
-import org.openqa.selenium.android.intents.IntentReceiver.IntentReceiverListener;
-import org.openqa.selenium.android.intents.IntentReceiverRegistrar;
-import org.openqa.selenium.android.intents.IntentSender;
-import org.openqa.selenium.android.sessions.SessionCookieManager;
-import org.openqa.selenium.android.util.JsUtil;
-import org.openqa.selenium.android.util.SimpleTimer;
+import org.openqa.selenium.android.server.intents.Action;
+import org.openqa.selenium.android.server.intents.FutureExecutor;
+import org.openqa.selenium.android.server.intents.IntentReceiver;
+import org.openqa.selenium.android.server.intents.IntentReceiver.IntentReceiverListener;
+import org.openqa.selenium.android.server.intents.IntentReceiverRegistrar;
+import org.openqa.selenium.android.server.intents.IntentSender;
+import org.openqa.selenium.android.server.sessions.SessionCookieManager;
+import org.openqa.selenium.android.server.util.JsUtil;
+import org.openqa.selenium.android.server.util.SimpleTimer;
 import org.openqa.selenium.html5.BrowserConnection;
 import org.openqa.selenium.internal.Base64Encoder;
 import org.openqa.selenium.internal.FindsById;

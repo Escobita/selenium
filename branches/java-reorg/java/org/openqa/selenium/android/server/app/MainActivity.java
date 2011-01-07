@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.app;
+package org.openqa.selenium.android.server.app;
 
-import org.openqa.selenium.android.intents.Action;
-import org.openqa.selenium.android.intents.IntentReceiver;
-import org.openqa.selenium.android.intents.IntentReceiver.IntentReceiverListener;
-import org.openqa.selenium.android.intents.IntentReceiverRegistrar;
+import org.openqa.selenium.android.server.intents.Action;
+import org.openqa.selenium.android.server.intents.IntentReceiver;
+import org.openqa.selenium.android.server.intents.IntentReceiver.IntentReceiverListener;
+import org.openqa.selenium.android.server.intents.IntentReceiverRegistrar;
 import org.openqa.selenium.android.server.JettyService;
 
 import android.app.Activity;

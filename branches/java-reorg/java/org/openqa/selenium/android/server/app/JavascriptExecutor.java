@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.app;
+package org.openqa.selenium.android.server.app;
 
 import android.util.Log;
 
-import org.openqa.selenium.android.Logger;
-import org.openqa.selenium.android.intents.Action;
+import org.openqa.selenium.android.server.Logger;
+import org.openqa.selenium.android.server.intents.Action;
 
 /**
  * Class that wraps synchronization housekeeping of execution of JavaScript code within WebView.

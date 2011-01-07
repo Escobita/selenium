@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.intents;
+package org.openqa.selenium.android.server.intents;
 
 import android.util.Log;
 
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.android.Logger;
+import org.openqa.selenium.android.server.Logger;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;

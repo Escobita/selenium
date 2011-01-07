@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.app;
+package org.openqa.selenium.android.server.app;
 
 import android.graphics.Bitmap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.openqa.selenium.android.intents.Action;
+import org.openqa.selenium.android.server.intents.Action;
 
 /**
  * This class overrides WebView default behavior when loading new URL. It makes sure that the URL

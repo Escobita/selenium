@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.util;
+package org.openqa.selenium.android.server.util;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.android.AndroidWebElement;
+import org.openqa.selenium.android.server.AndroidWebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
 import java.util.Collection;

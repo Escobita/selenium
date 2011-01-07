@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android;
+package org.openqa.selenium.android.server;
 
 import org.openqa.selenium.WebDriver.Navigation;
-import org.openqa.selenium.android.intents.Action;
+import org.openqa.selenium.android.server.intents.Action;
 
 import java.net.URL;
 

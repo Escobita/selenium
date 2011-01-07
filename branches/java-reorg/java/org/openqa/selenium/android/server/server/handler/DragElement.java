@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.server.handler;
+package org.openqa.selenium.android.server.server.handler;
 
-import org.openqa.selenium.android.AndroidWebElement;
+import org.openqa.selenium.android.server.AndroidWebElement;
 import org.openqa.selenium.remote.server.DriverSessions;
 import org.openqa.selenium.remote.server.JsonParametersAware;
 import org.openqa.selenium.remote.server.rest.ResultType;

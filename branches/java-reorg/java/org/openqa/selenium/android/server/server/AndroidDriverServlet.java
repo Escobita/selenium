@@ -15,16 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.server;
+package org.openqa.selenium.android.server.server;
 
 import javax.servlet.ServletException;
 
-import org.openqa.selenium.android.server.handler.DragElement;
-import org.openqa.selenium.android.server.handler.GetCssProperty;
-import org.openqa.selenium.android.server.handler.GetElementDisplayed;
-import org.openqa.selenium.android.server.handler.GetElementLocation;
-import org.openqa.selenium.android.server.handler.GetElementSize;
-import org.openqa.selenium.android.server.handler.HoverOverElement;
+import org.openqa.selenium.android.server.server.handler.DragElement;
+import org.openqa.selenium.android.server.server.handler.GetCssProperty;
+import org.openqa.selenium.android.server.server.handler.GetElementDisplayed;
+import org.openqa.selenium.android.server.server.handler.GetElementLocation;
+import org.openqa.selenium.android.server.server.handler.GetElementSize;
+import org.openqa.selenium.android.server.server.handler.HoverOverElement;
 import org.openqa.selenium.remote.server.DriverServlet;
 import org.openqa.selenium.remote.server.renderer.EmptyResult;
 import org.openqa.selenium.remote.server.renderer.JsonResult;

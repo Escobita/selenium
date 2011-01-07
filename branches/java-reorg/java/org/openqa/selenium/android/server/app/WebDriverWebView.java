@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.app;
+package org.openqa.selenium.android.server.app;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -24,8 +24,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.openqa.selenium.android.Sleeper;
-import org.openqa.selenium.android.intents.Action;
+import org.openqa.selenium.android.server.Sleeper;
+import org.openqa.selenium.android.server.intents.Action;
 
 import java.util.UUID;
 

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.events;
+package org.openqa.selenium.android.server.events;
 
 import android.view.KeyEvent;
 

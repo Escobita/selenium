@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.server.handler;
+package org.openqa.selenium.android.server.server.handler;
 
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;

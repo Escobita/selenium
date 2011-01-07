@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.app;
+package org.openqa.selenium.android.server.app;
 
 import com.google.common.collect.Iterables;
 
@@ -33,15 +33,15 @@ import android.webkit.CookieManager;
 
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.ScreenOrientation;
-import org.openqa.selenium.android.Logger;
-import org.openqa.selenium.android.events.TouchScreen;
-import org.openqa.selenium.android.events.WebViewAction;
-import org.openqa.selenium.android.intents.Action;
-import org.openqa.selenium.android.intents.IntentReceiver;
-import org.openqa.selenium.android.intents.IntentReceiver.IntentReceiverListener;
-import org.openqa.selenium.android.intents.IntentReceiverRegistrar;
-import org.openqa.selenium.android.intents.IntentSender;
-import org.openqa.selenium.android.sessions.SessionCookieManager;
+import org.openqa.selenium.android.server.Logger;
+import org.openqa.selenium.android.server.events.TouchScreen;
+import org.openqa.selenium.android.server.events.WebViewAction;
+import org.openqa.selenium.android.server.intents.Action;
+import org.openqa.selenium.android.server.intents.IntentReceiver;
+import org.openqa.selenium.android.server.intents.IntentReceiver.IntentReceiverListener;
+import org.openqa.selenium.android.server.intents.IntentReceiverRegistrar;
+import org.openqa.selenium.android.server.intents.IntentSender;
+import org.openqa.selenium.android.server.sessions.SessionCookieManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

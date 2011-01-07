@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium.android.util;
+package org.openqa.selenium.android.server.util;
 
 import android.util.Log;
 
-import org.openqa.selenium.android.Logger;
+import org.openqa.selenium.android.server.Logger;
 
 /**
  * Simple timer class used to time actions executed.
@@ -45,7 +45,7 @@ public class SimpleTimer {
     end = System.currentTimeMillis();
     isRunning = false;
     Logger.log(Log.DEBUG, LOG_TAG,
-        String.format("%s: %d milliseconds.", description, getElapsedTimeInMillis()));
+            String.format("%s: %d milliseconds.", description, getElapsedTimeInMillis()));
   }
   
   public long getElapsedTimeInMillis() {
