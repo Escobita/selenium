@@ -41,7 +41,7 @@ public class SeleniumTestEnvironment implements TestEnvironment {
         copyAtomsToSeleniumBuildDir();
       }
 
-      File seleniumJar = InProject.locate("build/selenium/server-with-tests-standalone.jar");
+      File seleniumJar = InProject.locate("build/java/org/openqa/selenium/server/server-with-tests-standalone.jar");
       command = new CommandLine("java", "-jar", seleniumJar.getAbsolutePath(), "-port", "" + port);
       command.executeAsync();
 

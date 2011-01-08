@@ -21,7 +21,7 @@ import static org.openqa.selenium.internal.PortProber.pollPort;
 public class SeleniumServerStarter extends TestSetup {
 
   private static final NetworkUtils networkUtils = new NetworkUtils();
-  private static final String SELENIUM_JAR = "build/remote/server/server-standalone.jar";
+  private static final String SELENIUM_JAR = "build/java/org/openqa/selenium/server/server-with-tests-standalone.jar";
   private CommandLine command;
 
   public SeleniumServerStarter(Test test) {

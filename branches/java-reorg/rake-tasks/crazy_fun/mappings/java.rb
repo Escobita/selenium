@@ -65,7 +65,7 @@ module CrazyFunJava
       ant.project.setProperty 'XmlLogger.file', 'build/build_log.xml'
       ant.project.setProperty 'build.compiler', 'org.eclipse.jdt.core.JDTCompilerAdapter'
 
-      ant.project.getBuildListeners().get(0).setMessageOutputLevel(verbose ? 2 : 0)
+#      ant.project.getBuildListeners().get(0).setMessageOutputLevel(verbose ? 2 : 0)
 
       ant
     )
@@ -149,39 +149,20 @@ module CrazyFunJava
       paths.join(".")
     end
 
-    def ant_java_task(task_name, classname, classpath, args = nil, properties = nil)
-      # Ugly. We do this because CrazyFunJava.ant.java complains about too many arguments
-      path = Java.org.apache.tools.ant.types.Path.new(CrazyFunJava.ant.project)
-      classpath.all.each do |jar|
-        elem = path.createPathElement()
-        elem.setPath(jar)
-        path.add(elem)
-      end
-
-      task = Java.org.apache.tools.ant.taskdefs.Java.new()
-      task.setProject(CrazyFunJava.ant.project)
-      task.setTaskName(task_name)
-      task.setFork(true)
-      task.setClassname(classname)
-      task.setClasspath(path)
-
-      if properties
-        properties.each do |map|
-          map.each do |key, value|
-            v = Java.org.apache.tools.ant.types.Environment::Variable.new()
-            v.setKey(key)
-            v.setValue(value)
-            task.addSysproperty(v)
+    def ant_java_task(task_name, classname, cp, args = nil, props = {})
+      CrazyFunJava.ant.java :classname => classname, :fork => true do
+        arg :line => args
+        
+        classpath do
+          cp.all.each do |jar|
+            pathelement :location => jar
           end
         end
+        
+        props.each do |key, value|
+          sysproperty :key => key, :value => value
+        end
       end
-
-      if (args)
-        arg = task.createArg()
-        arg.setLine(args)
-      end
-
-      task.execute()
     end
 
   end

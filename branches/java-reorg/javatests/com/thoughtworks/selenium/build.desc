@@ -15,3 +15,25 @@ java_test(name = "test",
     "//third_party/java/junit",
     "//third_party/java/testng",
   ])
+
+java_library(name = "rc-tests",
+   srcs = [
+     "*.java",
+   ],
+   deps = [
+     "//java/com/thoughtworks/selenium",
+     "//java/org/openqa/selenium/server:base",
+     "//javatests/com/thoughtworks/selenium/corebased",
+     "//third_party/java/easymock",
+   ])
+
+java_test(name = "firefox-emulation-test",
+  deps = [
+    ":rc-tests",
+    "//java/org/openqa/selenium/server:server-with-tests:uber",
+  ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "org.openqa.selenium.firefox.FirefoxDriver" },
+  ],
+  args = "javatests/com/thoughtworks/selenium/webdriver-selenium-suite.xml")
