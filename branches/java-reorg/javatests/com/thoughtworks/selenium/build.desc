@@ -22,7 +22,7 @@ java_library(name = "rc-tests",
    ],
    deps = [
      "//java/com/thoughtworks/selenium",
-     "//java/org/openqa/selenium/server:base",
+     "//java/org/openqa/selenium/server:server-with-tests:uber",
      "//javatests/com/thoughtworks/selenium/corebased",
      "//third_party/java/easymock",
    ])
@@ -30,10 +30,29 @@ java_library(name = "rc-tests",
 java_test(name = "firefox-emulation-test",
   deps = [
     ":rc-tests",
-    "//java/org/openqa/selenium/server:server-with-tests:uber",
   ],
   main = "org.testng.TestNG",
   sysproperties = [
     { "selenium.browser" : "org.openqa.selenium.firefox.FirefoxDriver" },
   ],
   args = "javatests/com/thoughtworks/selenium/webdriver-selenium-suite.xml")
+
+java_test(name = "ie-emulation-test",
+  deps = [
+    ":rc-tests",
+  ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "org.openqa.selenium.ie.InternetExplorerDriver" },
+  ],
+  args = "javatests/com/thoughtworks/selenium/webdriver-selenium-suite.xml")
+
+java_test(name = "firefox-rc-test",
+  deps = [
+    ":rc-tests",
+  ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*firefox" },
+  ],
+  args = "javatests/com/thoughtworks/selenium/testng.xml")

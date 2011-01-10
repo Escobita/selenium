@@ -7,7 +7,7 @@ java_library(name = "lift",
   ],
   deps = [
     "//java/org/openqa/selenium/support/ui:wait",
-    "//javatests/org/openqa/selenium/support/ui:support",
+    "//javatests/org/openqa/selenium/support/ui:clock",
     "//third_party/java/hamcrest",
     "//third_party/java/junit",
   ])
