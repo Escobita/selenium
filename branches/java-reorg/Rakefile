@@ -80,7 +80,6 @@ crazy_fun.create_tasks(Dir["**/build.desc"])
 task :default => [:test]
 
 
-# TODO(simon): Shatter the build file into subdirectories, then remove these
 task :all => [:'selenium-java', :'android']
 task :all_zip => [:'selenium-java_zip']
 task :chrome => [ "//java/org/openqa/selenium/chrome" ]
@@ -94,30 +93,35 @@ task :jsapi => "//jsapi:debug:run"
 task :remote => [:remote_common, :remote_server, :remote_client]
 task :remote_common => ["//java/org/openqa/selenium/remote:common"]
 task :remote_client => ["//java/org/openqa/selenium/remote:client"]
-task :remote_server => ["//java/org/openqa/selenium/remote:server"]
-task :selenium => [ "//selenium" ]
-task :support => [ "//support" ]
+task :remote_server => ["//java/org/openqa/selenium/remote/server"]
+task :selenium => [ "//java/org/openqa/selenium" ]
+task :support => [
+  "//java/org/openqa/selenium/lift",
+  "//java/org/openqa/selenium/support",
+]
 task :iphone_client => ['//java/org/openqa/selenium/iphone']
 task :iphone => [:iphone_server, :iphone_client]
-task :'selenium-server-standalone' => ["//remote/server:server:uber"]
+task :'selenium-server-standalone' => ["//java/org/openqa/selenium/remote/server:server:uber"]
 
 task :ide => [ "//ide:selenium-ide" ]
 task :ide_proxy_setup => [ "//common/src/js/selenium:core", "se_ide:setup_proxy" ]
 task :ide_proxy_remove => [ "se_ide:remove_proxy" ]
 
 task :test_android => ["//android/client:android_test:run"]
-task :test_common => [ "//common:test" ]
-task :test_chrome => [ "//chrome:test:run" ]
+task :test_chrome => [ "//javatests/org/openqa/selenium/chrome:test:run" ]
 task :test_htmlunit => [ "//javatests/org/openqa/selenium/htmlunit:test:run" ]
-task :test_ie => [ "//jobbie:test:run" ]
-task :test_jobbie => [ "//jobbie:test:run" ]
+task :test_ie => [ "//javatests/org/openqa/selenium/ie:test:run" ]
+task :test_jobbie => [ :test_ie ]
 task :test_jsapi => [ "//jsapi:atoms:run",
                       "//jsapi:selenium_core:run",
                       "//jsapi:selenium_core_emulation:run" ]
 task :test_firefox => [ "//javatests/org/openqa/selenium/firefox:test:run" ]
 task :test_remote => [ "//remote/server:test:run" ]
 task :test_selenium => [ :'test-selenium-emulation', "//selenium:test-selenese:run", :'test_core']
-task :test_support => [ "//support:test:run" ]
+task :test_support => [
+  "//javatests/org/openqa/selenium/lift:test:run",
+  "//javatests/org/openqa/selenium/support:test:run"
+]
 task :test_iphone_client => [:'webdriver-iphone-client-test']
 task :test_iphone => [:test_iphone_server, :test_iphone_client]
 task :android => [:android_client, :android_server]
