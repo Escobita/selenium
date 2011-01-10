@@ -30,7 +30,10 @@ java_library(name = "base",
     "TestSuiteBuilder.java",
     "TestWaiter.java",
     "WaitingConditions.java",
-  ], 
+  ],
+  resources = [
+    { "messages.properties" : "org/openqa/selenium/messages.properties" },
+  ],
   deps = [
     "//java/org/openqa/selenium",
     "//javatests/org/openqa/selenium/environment",
@@ -54,3 +57,13 @@ java_library(name = "tests",
     "//third_party/java/jmock",
     "//third_party/java/junit",
   ])
+
+java_library(name = "server-with-tests",
+  main = "org.openqa.selenium.server.SeleniumServer",
+  resources = [
+    { "../../../../../selenium/src/web/tests" : "./" },
+  ],
+  deps = [
+    "//java/org/openqa/selenium/server",
+  ])
+

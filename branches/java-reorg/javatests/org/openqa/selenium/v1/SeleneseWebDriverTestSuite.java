@@ -35,7 +35,7 @@ public class SeleneseWebDriverTestSuite extends TestCase {
         .exclude(SELENESE)
         .includeJavascriptTests()
         .keepDriverInstance()
-        .addSuiteDecorator("org.openqa.selenium.SeleniumServerStarter")
+        .addSuiteDecorator("org.openqa.selenium.v1.SeleniumServerStarter")
         .create();
   }
 }

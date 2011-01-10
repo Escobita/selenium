@@ -1,7 +1,7 @@
 
-java_library(name = "selenium-backed-driver",
+java_library(name = "selenesedriver",
   srcs = [
-    "internal/selenesedriver/**/*.java",
+    "*.java",
   ],
   deps = [
     "//java/com/thoughtworks/selenium",

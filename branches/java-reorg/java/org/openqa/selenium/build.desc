@@ -100,3 +100,13 @@ java_library(name = "webdriver-backed-selenium",
     ":selenium-api",
     "//java/com/thoughtworks/selenium",
   ])
+
+java_library(name = "selenium-backed-webdriver",
+  srcs = [
+    "SeleneseCommandExecutor.java",
+  ],
+  deps = [
+    "//java/org/openqa/selenium/internal/selenesedriver",
+    "//java/org/openqa/selenium/remote:client",
+  ])
+
