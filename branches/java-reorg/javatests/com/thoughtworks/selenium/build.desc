@@ -20,6 +20,9 @@ java_library(name = "rc-tests",
    srcs = [
      "*.java",
    ],
+   resources = [
+     { "testHelpers.js" : "com/thoughtworks/selenium/testHelpers.js" }
+   ],
    deps = [
      "//java/com/thoughtworks/selenium",
      "//java/org/openqa/selenium/server:server-with-tests:uber",

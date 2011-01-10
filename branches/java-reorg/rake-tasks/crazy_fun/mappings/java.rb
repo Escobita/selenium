@@ -159,8 +159,10 @@ module CrazyFunJava
           end
         end
         
-        props.each do |key, value|
-          sysproperty :key => key, :value => value
+        props.each do |map|
+          map.each do |key, value|
+            sysproperty :key => key, :value => value
+          end
         end
       end
     end
@@ -335,7 +337,7 @@ module CrazyFunJava
 
         CrazyFunJava.ant.project.getBuildListeners().get(0).setMessageOutputLevel(2) if ENV['log']
 
-        ant_java_task(task_name, args[:main], cp, args[:sysproperties])
+        ant_java_task(task_name, args[:main], cp, nil, args[:sysproperties])
 
         CrazyFunJava.ant.project.getBuildListeners().get(0).setMessageOutputLevel(verbose ? 2 : 0)
       end
