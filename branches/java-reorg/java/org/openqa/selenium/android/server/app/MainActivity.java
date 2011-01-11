@@ -21,7 +21,7 @@ import org.openqa.selenium.android.server.intents.Action;
 import org.openqa.selenium.android.server.intents.IntentReceiver;
 import org.openqa.selenium.android.server.intents.IntentReceiver.IntentReceiverListener;
 import org.openqa.selenium.android.server.intents.IntentReceiverRegistrar;
-import org.openqa.selenium.android.server.JettyService;
+import org.openqa.selenium.android.server.server.JettyService;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -148,11 +148,11 @@ end
 
 
 task :test_java => [
-  "//java/org/openqa/selenium/support:test:run",
-  "//java/org/openqa/selenium/htmlunit:test:run",
-  "//java/org/openqa/selenium/firefox:test:run",
-  "//java/org/openqa/selenium/ie:test:run",
-  "//java/org/openqa/selenium/remote/server:test:run",
+  "//javatests/org/openqa/selenium/support:test:run",
+  "//javatests/org/openqa/selenium/htmlunit:test:run",
+  "//javatests/org/openqa/selenium/firefox:test:run",
+  "//javatests/org/openqa/selenium/ie:test:run",
+  "//javatests/org/openqa/selenium/remote/server:test:run",
   :test_selenium,
 # Can't be sure that android is installed.
 #  :test_android,

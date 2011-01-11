@@ -28,6 +28,7 @@ import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.environment.webserver.Jetty7AppServer;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.internal.InProject;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpRequest;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -87,15 +88,14 @@ public class RemoteWebDriverTestSuite extends TestCase {
     protected void setUp() throws Exception {
       appServer = new Jetty7AppServer() {
         protected File findRootOfWebApp() {
-          File common = super.findRootOfWebApp();
-          File file = new File(common, "../../../remote/server/src/web");
+          File file = InProject.locate("remote/server/src/web");
           System.out.println(
               String.format("file exists %s and is: %s", file.exists(), file.getAbsolutePath()));
           return file;
         }
 
         protected File getKeyStore() {
-          return new File(findRootOfWebApp(), "../../../../common/test/java/keystore");
+          return InProject.locate("javatests/keystore");
         }
       };
       appServer.listenOn(6000);
