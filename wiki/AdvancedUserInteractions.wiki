@@ -9,7 +9,7 @@ The Advanced User Interactions API is a new, more comprehensive API for describi
 == Getting started (short how-to) ==
 In order to generate a sequence of actions, use the [http://code.google.com/p/selenium/source/browse/trunk/common/src/java/org/openqa/selenium/interactions/ActionChainsGenerator.java ActionChainsGenerator] to build it. First, configure it:
 {{{
-   ActionChainsGenerator builder = new ActionChainsGenerator(driver);
+   ActionChainsGenerator builder = ((HasInputDevices) driver).actionsBuilder();
 
    builder.keyDown(Keys.CONTROL)
        .click(someElement)
@@ -29,6 +29,16 @@ And execute it:
 }}}
 
 The sequence of actions should be short - it's better to perform a short sequence of actions and verify that the page is in the right state before the rest of the sequence takes place. The next section lists all available actions and how can they be extended.
+
+== Keyboard interactions ==
+Until now, keyboard interaction took place through a specific element and WebDriver made sure the element is in the proper state for this interaction. This mainly consisted of scrolling the element into the viewport and focusing on the element.
+
+Since the new Interactions API takes a user-oriented approach, it is more logical to explicitly interact with the element before sending text to it, like a user would. This means clicking on an element or sending a Keys.TAB when focused on an adjacent element.
+
+The new interactions API will (first) support keyboard actions without a provided element . The additional work to focus on an element before sending it keyboard events will be added later on.
+
+== Mouse interactions ==
+Mouse actions have a context - the current location of the mouse. So when setting a context for several mouse actions (using `onElement`), the first action will be relative to the location of the element used as context, the next action will be relative to the location of the mouse at the end of the last action, etc.
 
 = Current status =
 The API is (mostly) finalized for the actions and actions generator. It is fully implemented for HtmlUnit and in the process of being implemented for IE.
@@ -54,7 +64,7 @@ The CompositeAction contains other actions and when its perform method is invoke
 == Generating Action chains ==
 The ActionChainsGenerator implements the [http://en.wikipedia.org/wiki/Builder_pattern Builder] pattern to create a CompositeAction containing a group of other actions. This should ease building actions by configuring an ActionChainsGenerator instance and invoking it's `build()` method to get the complex action:
 {{{
-   ActionChainsGenerator builder = new ActionChainsGenerator(driver);
+   ActionChainsGenerator builder = ((HasInputDevices) driver).actionsBuilder();
 
    Action dragAndDrop = builder.clickAndHold(someElement)
        .moveToElement(otherElement)
