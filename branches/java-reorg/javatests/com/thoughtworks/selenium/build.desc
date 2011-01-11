@@ -59,3 +59,24 @@ java_test(name = "firefox-rc-test",
     { "selenium.browser" : "*firefox" },
   ],
   args = "javatests/com/thoughtworks/selenium/testng.xml")
+
+java_test(name = "ie-rc-test",
+  deps = [
+    ":rc-tests",
+  ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*iexplore" },
+  ],
+  args = "javatests/com/thoughtworks/selenium/testng.xml")
+
+java_test(name = "safari-rc-test",
+  deps = [
+    ":rc-tests",
+  ],
+  main = "org.testng.TestNG",
+  sysproperties = [
+    { "selenium.browser" : "*safari" },
+  ],
+  args = "javatests/com/thoughtworks/selenium/testng.xml")
+
