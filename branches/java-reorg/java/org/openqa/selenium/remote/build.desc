@@ -55,3 +55,16 @@ java_library(name = "client",
     "//third_party/java/apache-httpclient",
     "//third_party/java/cglib",
   ])
+
+java_library(name = "client-combined",
+  deps = [
+    ":client",
+    "//java/org/openqa/selenium/android",
+    "//java/org/openqa/selenium/chrome",
+    "//java/org/openqa/selenium/htmlunit",
+    "//java/org/openqa/selenium/firefox",
+    "//java/org/openqa/selenium/htmlunit",
+    "//java/org/openqa/selenium/ie",
+    "//java/org/openqa/selenium/iphone",
+    "//java/org/openqa/selenium/support",
+  ])

@@ -554,7 +554,7 @@ def version
   `svn info | grep Revision | awk -F: '{print $2}' | tr -d '[:space:]' | tr -d '\n'`
 end
 
-task :release => ['//remote/server:server:zip', '//remote/client:combined:zip'] do |t|
+task :release => ['//java/org/openqa/selenium/server:server:zip', '//java/org/openqa/selenium/remote:client-combined:zip'] do |t|
   # Unzip each of the deps and rename the pieces that need renaming
   renames = {
     "combined-nodeps-srcs.jar" => "selenium-java-#{version}-srcs.jar",
