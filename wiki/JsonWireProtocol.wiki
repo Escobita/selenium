@@ -210,10 +210,6 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/element || Search for an element on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)] ||
 || POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
 || POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
-|| POST || /session/:sessionId/element/:id/buttondown || Click and hold the mouse button on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
-|| POST || /session/:sessionId/element/:id/buttonup || Releases the mouse button previously held, on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()] ||
-|| POST || /session/:sessionId/element/:id/doubleclick || Double-clicks on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()] ||
-|| POST || /session/:sessionId/element/:id/contextclick || Clicking on an element in a way that would bring up contextual menu. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ContextClickAction.html#perform() ContextClickAction#perform()] ||
 || POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
 || GET || /session/:sessionId/element/:id/text || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
 || GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
@@ -233,10 +229,14 @@ Given these mappings, the server should always route requests whose final path s
 || GET || /session/:sessionId/element/:id/size || Determine an element's size in pixels. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()] ||
 || GET || /session/:sessionId/element/:id/css/:propertyName || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
 || POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
-|| POST || /session/:sessionId/element/:id/movehere || Move the mouse to the specified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
 || POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
 || GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
 || POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
+|| POST || /session/:sessionId/moveto || Move the mouse by an offset of the specificed element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
+|| POST || /session/:sessionId/click || Click any mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAction.html#perform() ClickAction#perform()] ||
+|| POST || /session/:sessionId/buttondown || Click and hold the left mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
+|| POST || /session/:sessionId/buttonup || Releases the mouse button previously held (where the mouse is currently at). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()] ||
+|| POST || /session/:sessionId/doubleclick || Double-clicks at the current mouse coordinates (set by moveto). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()] ||
 
 
 == Command Detail ==
@@ -1348,138 +1348,6 @@ such cookie visible to the current page.</dd>
 
 ----
 
-=== /session/:sessionId/element/:id/buttondown ===
-
-<dl>
-<dd>*POST /session/:sessionId/element/:id/buttondown*</dd>
-<dd>
-<dl>
-<dd>Click and hold the mouse button on an element.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/element/:id/buttonup ===
-
-<dl>
-<dd>*POST /session/:sessionId/element/:id/buttonup*</dd>
-<dd>
-<dl>
-<dd>Releases the mouse button previously held, on an element.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/element/:id/doubleclick ===
-
-<dl>
-<dd>*POST /session/:sessionId/element/:id/doubleclick*</dd>
-<dd>
-<dl>
-<dd>Double-clicks on an element.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/element/:id/contextclick ===
-
-<dl>
-<dd>*POST /session/:sessionId/element/:id/contextclick*</dd>
-<dd>
-<dl>
-<dd>Clicking on an element in a way that would bring up contextual menu.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ContextClickAction.html#perform() ContextClickAction#perform()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
 === /session/:sessionId/element/:id/submit ===
 
 <dl>
@@ -2246,40 +2114,6 @@ location for correctly generating native events.</dd>
 
 ----
 
-=== /session/:sessionId/element/:id/movehere ===
-
-<dl>
-<dd>*POST /session/:sessionId/element/:id/movehere*</dd>
-<dd>
-<dl>
-<dd>Move the mouse to the specified element.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-<dd>`:id` - ID of the element to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Potential Errors:*</dt>
-<dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
-<dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
-<dd>`InvalidElementState` - If the referenced element is disabled.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
 === /session/:sessionId/element/:id/drag ===
 
 <dl>
@@ -2371,6 +2205,145 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/moveto ===
+
+<dl>
+<dd>*POST /session/:sessionId/moveto*</dd>
+<dd>
+<dl>
+<dd>Move the mouse by an offset of the specificed element. If no element is specified, the move is relative to the current mouse cursor. If an element is provided but no offset, the mouse will be moved to the center of the element. If the element is not visible, it will be scrolled into view.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element to move to. If not specified or is null, the offset is relative to current position of the mouse.</dd>
+<dd>`xoffset` - `{number}` X offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</dd>
+<dd>`yoffset` - `{number}` Y offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/click ===
+
+<dl>
+<dd>*POST /session/:sessionId/click*</dd>
+<dd>
+<dl>
+<dd>Click any mouse button (at the coordinates set by the last moveto command). Note that calling this command after calling buttondown and before calling button up (or any out-of-order interactions sequence) will yield undefined behaviour).</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`button` - `{number}` Which button, enum: `{LEFT = 0, MIDDLE = 1 , RIGHT = 2}`. Defaults to the left mouse button if not specified.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAction.html#perform() ClickAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/buttondown ===
+
+<dl>
+<dd>*POST /session/:sessionId/buttondown*</dd>
+<dd>
+<dl>
+<dd>Click and hold the left mouse button (at the coordinates set by the last moveto command). Note that the next mouse-related command that should follow is buttondown . Any other mouse command (such as click or another call to buttondown) will yield undefined behaviour.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/buttonup ===
+
+<dl>
+<dd>*POST /session/:sessionId/buttonup*</dd>
+<dd>
+<dl>
+<dd>Releases the mouse button previously held (where the mouse is currently at). Must be called once for every buttondown command issued. See the note in click and buttondown about implications of out-of-order commands.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/doubleclick ===
+
+<dl>
+<dd>*POST /session/:sessionId/doubleclick*</dd>
+<dd>
+<dl>
+<dd>Double-clicks at the current mouse coordinates (set by moveto).</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()]</dd>
 </dl>
 </dd>
 </dl>
