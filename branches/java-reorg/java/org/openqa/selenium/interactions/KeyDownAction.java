@@ -18,7 +18,7 @@ limitations under the License.
 package org.openqa.selenium.interactions;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.internal.interactions.SingleKeyAction;
+import org.openqa.selenium.interactions.internal.SingleKeyAction;
 
 /**
  * Emulates key press only, without the release.

@@ -19,7 +19,7 @@ package org.openqa.selenium.interactions;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.interactions.BaseAction;
+import org.openqa.selenium.interactions.internal.BaseAction;
 
 /**
  * Double-clicks an element.

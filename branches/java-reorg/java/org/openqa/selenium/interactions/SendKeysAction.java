@@ -20,7 +20,7 @@ package org.openqa.selenium.interactions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Keyboard;
-import org.openqa.selenium.internal.interactions.KeysRelatedAction;
+import org.openqa.selenium.interactions.internal.KeysRelatedAction;
 
 /**
  * Sending a sequence of keys to an element.
