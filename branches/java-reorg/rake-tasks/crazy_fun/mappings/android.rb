@@ -226,22 +226,22 @@ module Android
         sh "#{$adb} start-server"
         sleep 5
 
-        android_target = properties["androidtarget"].to_s
+        android_target = $properties["androidtarget"].to_s
         puts "Using Android target: " + android_target
         avdname = "debug_rake_#{android_target}"
         sh "echo no | #{$android} create avd --name #{avdname} --target #{android_target} -c 100M --force"
 
         emulator_image = "#{$platform}-userdata-qemu.img"
 
-	puts "Starting emulator: #{emulator}"
+        puts "Starting emulator: #{$emulator}"
 
         # We create the emulator with a pre-generated emulator image.	
         emulator_options = ""
         if !linux?
           emulator_options += "-no-boot-anim"
         end
-	command = "#{$emulator} -avd #{avdname} -data build/android/#{emulator_image} -no-audio #{emulator_options}"
-	puts "COMMAND: #{command}"
+        command = "#{$emulator} -avd #{avdname} -data build/android/#{emulator_image} -no-audio #{emulator_options}"
+        puts "COMMAND: #{command}"
         Thread.new{ sh "#{$emulator} -avd #{avdname} -data build/android/#{emulator_image} -no-audio #{emulator_options}"}
 
         puts "Waiting for emulator to get started"
@@ -256,7 +256,7 @@ module Android
           puts "Failed to load (emulator not ready?), retrying..."
           sleep 5
           count += 1
-          theoutput = `#{adb} -e install -r "#{apk}"`
+          theoutput = `#{$adb} -e install -r "#{apk}"`
         end
         puts "Loading complete."
         
