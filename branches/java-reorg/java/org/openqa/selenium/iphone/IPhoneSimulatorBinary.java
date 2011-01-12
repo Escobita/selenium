@@ -51,7 +51,7 @@ public class IPhoneSimulatorBinary extends SubProcess {
   private static final String IPHONE_SDK_PROPERTY = "webdriver.iphone.sdk";
 
   /** The default iPhone SDK to use. */
-  private static final String DEFAULT_SDK = "3.1.2";
+  private static final String DEFAULT_SDK = "3.2";
 
   private static final String SDK_LOCATION_FORMAT =
       "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.sdk";
