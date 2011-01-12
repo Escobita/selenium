@@ -1,7 +1,7 @@
 default: 
   android:
     # Path to the android sdk
-    androidsdkpath : "../android_sdk/"
+    androidsdkpath : "../../../android-sdk-mac_86/"
     # Target id. To get a list of all targets do "./android list targets".
     # We want whatever matches android 2.2 (API level 8)
     # Note: Android WebDriver will not work on Gingerbread (SDK 2.3) emulator because of
