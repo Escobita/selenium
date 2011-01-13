@@ -3,9 +3,21 @@
 
 = The RemoteWebDriver Server =
 
-The RemoteWebDriver is composed of two pieces: a client and a server. The server is simply a Java servlet, which can be hosted in any modern JEE app server. In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
+The RemoteWebDriver is composed of two pieces: a client and a server. The client is your WebDriver test and the server is simply a Java servlet, which can be hosted in any modern JEE app server. The server will always run on the machine with the browser you want to test. There are two ways to user the server: command line or configured in code.
 
-== Details ==
+== Starting the Server from The Command Line ==
+
+Once you have downloaded selenium-server-standalone-2.0.jar place it on the computer with the browser you want to test. Then from the directory with the jar run the following
+
+{{{
+java -jar selenium-server-standalone-2.0b1.jar
+}}}
+
+==Configuring the Server in Code ==
+
+In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
+
+=== Details ===
 
   # Download the "webdriver-remote-server.zip" and unpack. Put the JARs on the CLASSPATH
   # Create a new class called "AppServer". Here, I'm using Jetty, so you'll need to download that as well:
@@ -40,4 +52,6 @@ public class AppServer {
   }
 }
 }}}
-  # Once this is done, start the server up. You can now connect to at using {{{new RemoteWebDriver(new URL("http://localhost:3000/wd", DesiredCapabilities.firefox());}}}
+
+== Using the RemoteWebDriver ==
+See the RemoteWebDriver client page for more information on using the client.
