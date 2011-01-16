@@ -168,19 +168,6 @@ WebDriver lets you configure implicit waits, so that a call to #find_element wil
   driver.manage.timeouts.implicit_wait = 3 # seconds
 }}}
 
-== Using Curb or your own HTTP client ==
-
-For internal HTTP communication, Net::HTTP is used by default. If you e.g. have the [https://rubygems.org/gems/curb Curb gem] installed, you can switch to it by doing:
-
-{{{
-require 'selenium/webdriver/remote/http/curb'
-include Selenium
-
-client = WebDriver::Remote::Http::Curb.new
-driver = WebDriver.for(:firefox, :http_client => client)
-}}}
-
-
 === Internal timeouts ===
 
 Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, Net::HTTP from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
@@ -192,7 +179,7 @@ Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the Js
 }}}
 
 
-=== Javascript Alert/Confirm ===
+== Javascript Alert/Confirm ==
 
 You can use webdriver to handle javascript alert and confirm dialogs.
 The implementation for both is the same.
@@ -213,4 +200,16 @@ else
   a.accept
 end
 
+}}}
+
+== Using Curb or your own HTTP client ==
+
+For internal HTTP communication, Net::HTTP is used by default. If you e.g. have the [https://rubygems.org/gems/curb Curb gem] installed, you can switch to it by doing:
+
+{{{
+require 'selenium/webdriver/remote/http/curb'
+include Selenium
+
+client = WebDriver::Remote::Http::Curb.new
+driver = WebDriver.for(:firefox, :http_client => client)
 }}}
