@@ -189,4 +189,28 @@ Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the Js
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.timeout = 120 # seconds
   driver = Selenium::WebDriver.for(:remote, :http_client => client)
-}}}  
+}}}
+
+
+=== Javascript Alert/Confirm ===
+
+You can use webdriver to handle javascript alert and confirm dialogs.
+The implementation for both is the same.
+
+Note: At this time the API is only available in Firefox (or in Firefox using the remote server), and only alert/confirms that are generated post load can be captured. 
+
+{{{
+require "selenium-webdriver"
+
+driver = Selenium::WebDriver.for :firefox
+driver.navigate.to "http://mysite.com/page_with_alert.html"
+
+driver.find_element(:name, 'element_with_alert_javascript').click
+a = driver.switch_to.alert
+if a.text == 'A value you are looking for'
+  a.dismiss
+else
+  a.accept
+end
+
+}}}
