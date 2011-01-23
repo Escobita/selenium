@@ -44,3 +44,5 @@ Each of the atoms listed here is exposed via the list *method name*, which deleg
 || getLocation || Get the absolute location of an element in the DOM || bot.dom.getLocation ||
 || getSize || Get the size of an element || bot.dom.getSize ||
 || isSelected || Would a user consider this element selected? || bot.dom.isSelected ||
+
+The canonical list of atoms that are implemented for the webdriver APIs are located in this [http://code.google.com/p/selenium/source/browse/trunk/common/src/js/webdriver/build.desc build file]. The names of the `js_fragment` rules relate to the names of the methods.

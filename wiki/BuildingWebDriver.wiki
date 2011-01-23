@@ -8,14 +8,14 @@
 For all versions of WebDriver:
 
   * The Java JDK 5 or above (download it from [http://java.sun.com/javase/downloads/?intcmp=1281 Oracle's site] if it's not already on your computer)
-  * Ruby (on Windows, take a look at the [http://rubyforge.org/frs/?group_id=167 One Click Installer], which also  includes Rake. If you're using OS X 10.5 or above the default versions of ruby and rake are fine)
-  * [http://rake.rubyforge.org/ Rake], which is a ruby build tool
   * The source code (you may need to CheckOut the source from source control)
 
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
 
   * Visual Studio 2008, with the 32 and 64 bit cross compilers for C++ and C# installed
   * "msbuild" should both be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from that Start menu.
+
+The build is based on rake, a well-known Ruby build tool. Provided you have all the gems required you can use that for building the project, though this isn't the recommended way to build.
 
 == Building ==
 
@@ -34,13 +34,13 @@ There are more detailed instructions about how the build system works in the Cra
 
 By default, the output of the build is somewhat terse. A log of the java compilation stages is kept in "build/build_log.xml". You can also get more verbose output by adding "log=true" to the build targets. eg:
 
-{{{./go //support:test:test log=true}}}
+{{{./go //javatests/org/openqa/selenium/support:test:run log=true}}}
 
 Finally, you can get even more verbose logging by modifying the Rakefile and commenting out the line that reads:
 
 {{{verbose false}}}
 
-The logs are kept in the "build/test_logs" folder.
+The test logs are kept in the "build/test_logs" folder.
 
 = Tips =
 
@@ -48,24 +48,40 @@ The logs are kept in the "build/test_logs" folder.
 
 You'll get a long way with just: 
 
-{{{go //remote/server:server:uber //remote/client:combined:project}}}
+{{{go //java/org/openqa/selenium/remote/server:server:uber //java/org/openqa/selenium/remote:client-combined:project}}}
 
+That'll build the standalone "selenium server" jar and the client library too. The build output will tell you where the output files are being placed.
 
 You can replace that second target with: 
 
 
-{{{//remote/client:combined:uber}}}
+{{{//java/org/openqa/selenium/remote:client-combined:uber}}}
 
+The "uber" implicit targets build a single "uber jar" containing all the compiled java from the project, as well as all third party dependencies. The "project" implicit target is similar, but excludes third party dependencies.
 
-That'll build the standalone "selenium server" jar and the client 
-library too. The build output will tell you where the output files are 
-being placed. 
+= Useful Targets =
 
+All of these should be run using the "go" executable.
 
-"//remote/client:combined:uber" contains just the client-side pieces 
-and dependencies. "//remote/server:server:uber" contains not only 
-that, but also the server-side code, including the remote webdriver 
-server and the original selenium server.
+For everything:
+
+|| *Target* || *Purpose* ||  
+|| clean || Delete all built artefacts ||
+
+For Java:
+
+|| *Target* || *Purpose* ||  
+|| test_java || Run every applicable Java test ||
+|| test_htmlunit || Run all the HtmlUnitDriver tests ||
+|| test_ie || Run all the InternetExplorerDriver tests ||
+|| test_firefox || Run all the FirefoxDriver tests ||
+|| remote-server-standalone || Build the standalone server ||
+
+For Javascript:
+
+|| *Target* || *Purpose* ||
+|| //jsapi:debug:run || Run the test server (useful for working) ||
+|| calcdeps || Recalculate dependencies once a goog.provide or goog.require changes ||
 
 = Common Problems =
 
@@ -86,7 +102,7 @@ Although it was necessary in the early days of webdriver development, it is now 
 
 == The Build Works, but It's Very Slow ==
 
-There have been reports of problems involving slow builds. Every test that runs does a DNS lookup to determine an alternative host name. If your network is not configured correctly, then this lookup might be very slow. To rectify this, modify the {{{getAlternateHostName}}} method in {{{org.openqa.selenium.environment.webserver.Jetty6AppServer}}} and hard code it to return a string that resolves to your machine that isn't "localhost"
+There have been reports of problems involving slow builds. Every test that runs does a DNS lookup to determine an alternative host name. If your network is not configured correctly, then this lookup might be very slow. To rectify this, modify the {{{getAlternateHostName}}} method in {{{org.openqa.selenium.environment.webserver.Jetty7AppServer}}} and hard code it to return a string that resolves to your machine that isn't "localhost"
 
 == I've Followed the Steps Above and All the Firefox Tests Still Fail ==
 
