@@ -154,3 +154,18 @@ public class GoogleSearchPage {
   * If you use the PageFactory, you can assume that the fields are initialised. If you don't use the PageFactory, then NullPointerExceptions will be thrown if you make the assumption that the fields are already initialised.
   * WebElements are evaluated lazily. That is, if you never use a WebElement field in a PageObject, there will never be a call to "findElement" for it.
   * The functionality works using dynamic proxies. This means that you shouldn't expect a WebElement to be a particular subclass, even if you know the type of the driver. For example, if you are using the HtmlUnitDriver, you shouldn't expect the WebElement field to be initialised with an instance of HtmlUnitWebElement.
+ * WebElements will not be castable to RenderedWebElements - if you would like to treat the field like a RenderedWebElement, it should be declared with that type, i.e.
+
+{{{
+public class GoogleSearchPage {
+    @FindBy(how = How.NAME, using = "q")
+    @CacheLookup
+    private RenderedWebElement searchBox;
+
+    public void searchFor(String text) {
+        if (searchBox.isDisplayed()) {
+            //Act
+        }
+    }
+} 
+}}}
