@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration>
+	<!--
+		an appender is an output destination, such as e.g. the console or a
+		file; names of appenders are arbitrarily chosen
+	-->
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%X{testCaseName} - %d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+	</appender>
+
+
+
+	
+
+	<logger name="org.apache.commons.httpclient">
+		<level value="error" />
+	</logger>
+
+	<logger name="org.openqa.selenium.remote.server.DriverServlet">
+		<level value="error" />
+	</logger>
+	
+
+
+
+
+	<root><!-- the root category -->
+		<!--
+			all log messages of level debug or more serious will be logged,
+			unless defined otherwise
+		-->
+		<!--
+			all log messages will be logged to the appender 'stdout', unless
+			defined otherwise
+		-->
+		<level value="error" />
+		<appender-ref ref="stdout" />
+	</root>
+</log4j:configuration>
