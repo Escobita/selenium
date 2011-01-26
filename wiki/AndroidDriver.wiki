@@ -120,7 +120,7 @@ public class OneTest extends TestCase {
     // Check the title of the page
     System.out.println("Page title is: " + driver.getTitle());
   }
-}.
+}
 }}}
 
 To compile and run this example you will need the selenium-java-X.zip (client side piece of selenium).
