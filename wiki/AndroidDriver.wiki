@@ -13,7 +13,7 @@ The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDri
 
 == Cons ==
    * Slower than Headless WebKit Driver
-   * For SDK versions 2.2 and prior, XPath based queries are expensive (slow), because Android does not support XPath, so we inject an Xpath library in WebView
+   * Support for SDK versions 2.2 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
 
 = Important System Properties =
 == Native events and Javascript ==
@@ -52,6 +52,7 @@ $./android create avd -n my_android -t 12 -c 100M
 
 When prompted "Do you wish to create a custom hardware profile [no]" enter "no".
 
+*Note: an issue has been discovered with the Java-to-JavaScript bridge in version 2.3 of the emulator which causes problems for the Android Driver. Currently we recommend using version of the Android platform 2.2 for AVDs.*
 ===Start the Emulator ===
 Start the emulator (this can take a while):
 {{{
@@ -65,7 +66,6 @@ $./adb -e install -r  android-server.apk
 }}}
 
 If you face an issue, make sure you are allowing installation of application not coming from Android Market (Android Emulator -> Settings -> Applications -> Unknown sources is checked)
-Open the application just installed.
 
 === Setup Port Forwarding ===
 In a terminal type: 
@@ -90,8 +90,12 @@ Setup port forwarding:
 $~/android_sdk/adb -s <serialId> forward tcp:8080 tcp:8080
 }}}
 
-Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations".
+=== Start the WebDriver Server on the device or emulator ===
+Start the WebDriver application just installed in the device or emulator.
 
+=== Tips ===
+   * Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations".
+   * Restart adb if you have networking errors reported when your tests run. Sometimes there are issues connecting to the device / emulator after switching devices. run {{{adb kill-server}}} followed by {{{adb start-server}}} then setup port forwarding again for the device you want to use. 
 == Run Your Tests ==
 {{{
 import junit.framework.TestCase;
