@@ -71,7 +71,7 @@ public class RegistrationListenerTest {
 	/**
 	 * this proxy will throw an exception on registration the first time.
 	 * 
-	 * @author François Reynaud
+	 * @author FranÐ·ois Reynaud
 	 * 
 	 */
 	class MyBuggyRemoteProxy extends RemoteProxy implements RegistrationListener {

@@ -78,7 +78,7 @@ public class SessionListenerTest {
 	 * buggy proxy that will throw an exception the first time beforeSession is
 	 * called.
 	 * 
-	 * @author François Reynaud
+	 * @author FranÐ·ois Reynaud
 	 * 
 	 */
 	class MyBuggyBeforeRemoteProxy extends RemoteProxy implements TestSessionListener {
@@ -135,7 +135,7 @@ public class SessionListenerTest {
 	 * buggy proxy that will throw an exception the first time beforeSession is
 	 * called.
 	 * 
-	 * @author François Reynaud
+	 * @author FranÐ·ois Reynaud
 	 * 
 	 */
 	class MyBuggyAfterRemoteProxy extends RemoteProxy implements TestSessionListener {

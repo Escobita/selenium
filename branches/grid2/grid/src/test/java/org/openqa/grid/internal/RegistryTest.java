@@ -127,7 +127,7 @@ public class RegistryTest {
 	 * try to simulate a real proxy. The proxy registration takes up to 1 sec to
 	 * register, and crashes in 10% of the case.
 	 * 
-	 * @author François Reynaud
+	 * @author FranÐ·ois Reynaud
 	 * 
 	 */
 	class MyRemoteProxy extends RemoteProxy implements RegistrationListener {

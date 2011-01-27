@@ -38,11 +38,11 @@ public class RegistrationRequestTest {
 	public void json() {
 		RegistrationRequest req = new RegistrationRequest();
 		req.setId("id");
-		req.setName("François");
+		req.setName("FranÐ·ois");
 		req.setDescription("a\nb\nc");
 
 		String name = "%super !";
-		String value = "%ç // \\";
+		String value = "%Ð· // \\";
 
 		Map<String, Object> config = new HashMap<String, Object>();
 		config.put(name, value);
