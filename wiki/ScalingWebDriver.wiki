@@ -1,4 +1,4 @@
-#summary Describes additional issues that have to be handled when running concurrent Se2
+#summary Describes issues that have to be handled when running concurrent Se2
 
 = Running parallel Selenium2 =
 
@@ -28,7 +28,9 @@ If you for technical reasons cannot adjust the port range on your Windows machin
 ==Avoiding the socket lock==
 Starting new browsers between each test class/test method is slow, and the socket lock also uses Ephemeral sockets, worsening the problem described above.
 
-If you're using a suite-less test setup (like many JUnit4 users), you often start/stop the browsers in @BeforeClass/@AfterClass methods. Another option is to start the browsers in @BeforeClass and use something like JUnit/TestNG run listeners to shut down all the browsers at the end of the test run.  Maven surefire supports run listeners for both JUnit and TestNG,
+If you're using a suite-less test setup (like many JUnit4 users), you often start/stop the browsers in @BeforeClass/@AfterClass methods. Another option is to start the browsers in @BeforeClass and use something like JUnit/TestNG run listeners to shut down all the browsers at the end of the test run.  Maven surefire supports run listeners for both JUnit and TestNG.
+
+(TODO: Strategies for disabling the socket lock and manage ports yourself) 
 
 ==Native events==
 
