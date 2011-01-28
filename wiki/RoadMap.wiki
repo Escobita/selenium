@@ -10,17 +10,16 @@ At least the following issues need to be completed before an alpha release:
 || [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started || Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=31 31] || Update mechanism for finding elements |||||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide |||||||| Started ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=14 14]  || Block on AJAX calls || n/a || Not Started || Not Started || Not started ||
 
 Additional changes that are required for a beta release
 
 || *Issue* || Summary  || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* || *ChromeDriver Progress* ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=10 10]  || Add CSS Selectors for finding elements |||||||| Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=10 10]  || Add CSS Selectors for finding elements |||||||| Not Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=33 33]  || Speed improvements in the InternetExplorerDriver |||||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=34 34]  || Support HTTP Basic and Digest Authentication |||||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=20 20]  || Cookie management |||||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation |||||||| Done for Java and C# ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Not Started || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Done || Not Started ||
 || none  || Example tests |||||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=38 38]  || Python bindings |||||||| Done ||
 || [http://code.google.com/p/webdriver/issues/detail?id=39 39]  || Ruby bindings |||||||| Done ||
