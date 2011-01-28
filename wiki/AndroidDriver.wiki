@@ -77,7 +77,7 @@ $~/android_sdk/adb forward tcp:8080 tcp:8080
 
 Connect your device through USB to your machine.
 {{{
-$cd ~/android_sdk/tools/adb devices
+$~/android_sdk/tools/adb devices
 }}}
 
 This will give you the serial Id of your connected device. Now install the apk on the device:
@@ -123,6 +123,12 @@ public class OneTest extends TestCase {
     
     // Check the title of the page
     System.out.println("Page title is: " + driver.getTitle());
+    // Remember to close the WebDriver connection to free up resources on the
+    // Android device (or emulator). Pause for 30 seconds first so we can see
+    // the results of the search.
+    Thread.sleep(30000L);
+    driver.quit();
+
   }
 }
 }}}
