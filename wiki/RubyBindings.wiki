@@ -213,3 +213,5 @@ include Selenium
 client = WebDriver::Remote::Http::Curb.new
 driver = WebDriver.for(:firefox, :http_client => client)
 }}}
+
+If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of WebDriver, which is useful in [ScalingWebdriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive). 
