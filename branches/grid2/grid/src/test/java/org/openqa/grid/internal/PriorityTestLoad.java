@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 @Test(timeOut = 10000)
 public class PriorityTestLoad {
 
-	private final static int MAX = 1000;
+	private final static int MAX = 100;
 
 	private Registry registry = Registry.getNewInstanceForTestOnly();
 

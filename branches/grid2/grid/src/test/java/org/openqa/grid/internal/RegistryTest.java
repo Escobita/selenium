@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 @Test(timeOut=10000)
 public class RegistryTest {
 	
-	private static final int TOTAL_THREADS = 1000;
+	private static final int TOTAL_THREADS = 100;
 	
 	
 	RemoteProxy p1 = RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine1:4444/");
