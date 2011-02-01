@@ -48,10 +48,10 @@ If you need to access the main xserve ui (for instance, to play with VMWare) you
 
 = Host Details =
 
-Bamboo is running on the host server as the user *builduser*. Once SSH'd in to your personal account (using the above SSH config, ideally), you can switch over to this account with the following command:
+Bamboo is running on the host server as the user *admin*. Once SSH'd in to your personal account (using the above SSH config, ideally), you can switch over to this account with the following command:
 
 {{{
-sudo su - builduser
+sudo su - admin
 }}}
 
 To control bamboo itself you use the */Applications/Bamboo/bamboo.sh* script which is a standard sys v one so start, stop, etc. are all supported.
