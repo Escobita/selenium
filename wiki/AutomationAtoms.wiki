@@ -37,12 +37,22 @@ Now point a browser at http://localhost:2310/js/test/bot/ and select the test yo
 Each of the atoms listed here is exposed via the list *method name*, which delegates directly through to the *implementation method*. For information about the order in which arguments are to be passed, and for additional documentation, view the jsdoc of the implementation method.
 
 || *Method Name* || *Description* || *Implementation Method* ||
+|| clear || ||
+|| click || ||
+|| executeScript || ||
+
 || findElement || Find the first matching element in the DOM || bot.locators.findElement ||
 || findElements || Find all matching elements in the DOM || bot.locators.findElements ||
 || fire || Fire a specific, synthesized event || bot.events.fire ||
 || getAttribute || Get the value of an attribute or property of an element || bot.dom.getAttribute ||
 || getLocation || Get the absolute location of an element in the DOM || bot.dom.getLocation ||
 || getSize || Get the size of an element || bot.dom.getSize ||
+|| isDisplayed || ||
+|| isEnabled || ||
 || isSelected || Would a user consider this element selected? || bot.dom.isSelected ||
+|| setSelected || ||
+|| submit || ||
+|| toggle || ||
+|| type || ||
 
 The canonical list of atoms that are implemented for the webdriver APIs are located in this [http://code.google.com/p/selenium/source/browse/trunk/common/src/js/webdriver/build.desc build file]. The names of the `js_fragment` rules relate to the names of the methods.
