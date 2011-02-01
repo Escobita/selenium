@@ -40,7 +40,6 @@ Each of the atoms listed here is exposed via the list *method name*, which deleg
 || clear || ||
 || click || ||
 || executeScript || ||
-
 || findElement || Find the first matching element in the DOM || bot.locators.findElement ||
 || findElements || Find all matching elements in the DOM || bot.locators.findElements ||
 || fire || Fire a specific, synthesized event || bot.events.fire ||
