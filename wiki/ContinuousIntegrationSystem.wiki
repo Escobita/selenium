@@ -60,6 +60,8 @@ There is another important user to be aware of: *admin*. This user's password is
 
 Armed with that password, if you need to interact with the actual OS X desktop, you can do so by VNC'ing in to xserve.openqa.org with the username *admin* and that password.
 
+Once restarted, you need to also manually [re]connect all the agents to the server.
+
 = VM Details = 
 
 More often, you'll want to log directly in to the VMs to perform maintenance on them. Using the SSH configuration supplied above, you connect to the VMs like so:
