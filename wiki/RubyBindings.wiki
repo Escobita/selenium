@@ -85,6 +85,7 @@ driver = WebDriver.for(:remote, :http_client => client)
 
 see [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb Selenium::WebDriver::Proxy] for more options
 
+For the remote firefox driver you can configure the profile - See the section Tweaking Firefox preferences
 
 == Firefox ==
 
@@ -134,6 +135,15 @@ profile['browser.helperApps.neverAsk.saveToDisk'] = "application/pdf"
 driver = Selenium::WebDriver.for :firefox, :profile => profile
 }}}
 
+If you are using the remote driver you can still configure the firefox profile:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile['foo.bar'] = true
+  
+capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+driver = Selenium::WebDriver.for :remote, :desired_capabilities => capabilities
+}}}
 
 === Custom Firefox path ===
 
