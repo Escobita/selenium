@@ -6,11 +6,11 @@
 The following issues need to be resolved before the final release:
 
 || *Issue* || *Summary* || *HtmlUnitDriver Progress* || *FirefoxDriver Progress* || *InternetExplorerDriver Progress* || *ChromeDriver Progress* ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Not Started || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=27 27]  || Handle alerts in Javascript-enabled browsers || n/a || Started || Started || Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=32 32] || User guide |||||||| Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=34 34]  || Support HTTP Basic and Digest Authentication |||||||| Not Started ||
 || [http://code.google.com/p/webdriver/issues/detail?id=35 35]  || [http://www.openqa.org/selenium-rc Selenium] emulation |||||||| Done for Java and C# ||
-|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Done || Not Started ||
+|| [http://code.google.com/p/webdriver/issues/detail?id=36 36] || Support for drag and drop behaviour || n/a || Done || Done || Started ||
 || none  || Example tests |||||||| Not Started ||
 
 A final release will be made once these are implemented in Firefox, IE and at least one webkit-based browser.
