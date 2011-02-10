@@ -171,13 +171,17 @@ public class DesiredCapabilities implements Serializable, Capabilities {
   public static DesiredCapabilities iphone() {
     return new DesiredCapabilities("iphone", "", Platform.MAC);
   }
-  
+
   public static DesiredCapabilities chrome() {
     return new DesiredCapabilities("chrome", "", Platform.ANY);
   }
 
   public static DesiredCapabilities android() {
     return new DesiredCapabilities("android", "", Platform.ANDROID);
+  }
+
+  public static DesiredCapabilities safari() {
+    return new DesiredCapabilities("safari", "", Platform.ANY);
   }
 
   @Override

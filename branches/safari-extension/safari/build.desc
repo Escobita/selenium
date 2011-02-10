@@ -1,0 +1,28 @@
+# js_binary(name = "global",
+#  srcs = [
+#    "src/js/global.js",
+# ])
+
+js_binary(name = "injected",
+  srcs = [
+    "src/js/injected.js",
+    "src/js/pagedriver.js",
+  ],
+  deps = [
+    "//common:atoms",
+  ])
+
+js_binary(name = "extension",
+  srcs = [
+    "src/js/extension.js",
+  ])
+
+java_library(name = "safari",
+  srcs = [ "src/java/**/*.java" ],
+  deps = [
+           "//common",
+           "//remote/client",
+           "//remote/server:server_lite",
+           "//third_party/java/jetty",
+         ])
+

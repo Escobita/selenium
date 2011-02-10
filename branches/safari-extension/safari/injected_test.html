@@ -1,0 +1,41 @@
+<html>
+<head>
+</head>
+<body>
+<script type="text/javascript" src="../build/safari/injected.js">
+</script>
+
+<div id="blah">Blah</div>
+
+<div id="debug"></div>
+<script>
+var pageDriver = injected.pageDriver_;
+
+function print(msg) {
+  document.getElementById('debug').innerHTML += msg + "<br/>";
+}
+
+function test_findById_twice() {
+  print("<hr/>test_findById_twice");  
+
+  var x = pageDriver.findElement({'id': 'blah'});
+  print("Found id=blah at " + x);
+  
+  x = pageDriver.findElement({'id': 'blah'});
+  print("Found id=blah at " + x);
+}
+
+function test_readAttribute() {
+  print("<hr/>test_readAttribute");  
+ 
+  var x = pageDriver.findElement({'id': 'blah'});
+  print("Found id=blah at " + x);
+
+  //pageDriver.getAttribute
+}
+
+test_findById_twice();
+test_readAttribute();
+</script>
+</body>
+</html>
