@@ -1,0 +1,398 @@
+require 'open3'
+require 'rake-tasks/crazy_fun/mappings/common'
+require 'rake-tasks/crazy_fun/mappings/java'
+
+class JavascriptMappings
+  def add_all(fun)
+    fun.add_mapping("js_deps", Javascript::CheckPreconditions.new)
+    fun.add_mapping("js_deps", Javascript::CreateTask.new)
+    fun.add_mapping("js_deps", Javascript::CreateTaskShortName.new)
+    fun.add_mapping("js_deps", Javascript::AddDependencies.new)
+    fun.add_mapping("js_deps", Javascript::WriteOutput.new)
+    fun.add_mapping("js_deps", Javascript::CreateHeader.new)
+    
+    fun.add_mapping("js_binary", Javascript::CheckPreconditions.new)
+    fun.add_mapping("js_binary", Javascript::CreateTask.new)
+    fun.add_mapping("js_binary", Javascript::CreateTaskShortName.new)
+    fun.add_mapping("js_binary", Javascript::AddDependencies.new)
+    fun.add_mapping("js_binary", Javascript::Compile.new)
+
+    fun.add_mapping("js_fragment", Javascript::CheckPreconditions.new)
+    fun.add_mapping("js_fragment", Javascript::CreateTask.new)
+    fun.add_mapping("js_fragment", Javascript::CreateTaskShortName.new)
+    fun.add_mapping("js_fragment", Javascript::AddDependencies.new)
+    fun.add_mapping("js_fragment", Javascript::CompileFragment.new)
+
+    # Compiles a list of |js_fragments| into a C++ header file.
+    # Arguments:
+    #   name - A unique name for the build target.
+    #   deps - A list of js_fragment dependencies that should be compiled.
+    #   utf8 - Whether to use char or wchar_t for the generated header. Defaults
+    #          to wchar_t.
+    fun.add_mapping("js_fragment_header", Javascript::CheckFragmentPreconditions.new)
+    fun.add_mapping("js_fragment_header", Javascript::CreateTask.new)
+    fun.add_mapping("js_fragment_header", Javascript::CreateTaskShortName.new)
+    fun.add_mapping("js_fragment_header", Javascript::AddDependencies.new)
+    fun.add_mapping("js_fragment_header", Javascript::ConcatenateHeaders.new)
+    fun.add_mapping("js_fragment_header", Javascript::CopyHeader.new)
+  end
+end
+
+module Javascript
+  # CrazyFunJava.ant.taskdef :name      => "jscomp",
+  #                          :classname => "com.google.javascript.jscomp.ant.CompileTask",
+  #                          :classpath => "third_party/closure/bin/compiler-20100616.jar"
+
+  class BaseJs < Tasks
+    attr_reader :calcdeps
+
+    def initialize()
+      py = "java -jar third_party/py/jython.jar"
+      if (python?) 
+        py = "python"
+      end
+      @calcdeps = "#{py} third_party/closure/bin/calcdeps.py " +
+                  "-c third_party/closure/bin/compiler-20100616.jar "
+    end
+
+    def js_name(dir, name)
+      name = task_name(dir, name)
+      js = "build/" + (name.slice(2 ... name.length))
+      js = js.sub(":", "/")
+      js << ".js"
+
+      Platform.path_for js
+    end
+    
+    def build_deps(ignore, task, deps)
+      prereqs = task.prerequisites
+      prereqs.each do |p| 
+        if (File.exists?(p) and p.to_s =~ /\.js/)
+          deps.push p.to_s unless p.to_s == ignore or p.to_s =~ /^build/
+        end
+        if Rake::Task.task_defined? p
+          build_deps ignore, Rake::Task[p], deps
+        end
+      end
+      
+      deps
+    end
+
+    def execute(cmd)
+      stdin, out, err = Open3.popen3(cmd)
+      stdin.close
+
+      # ignore stdout --- the commands we use log to stderr
+      # this also causes the command to actually execute
+
+      output = err.read
+      if output =~ /ERROR/m
+        STDERR.puts output
+        exit(2)
+      end
+    end
+  end
+
+  class CheckPreconditions
+    def handle(fun, dir, args)
+      raise StandardError, ":name must be set" if args[:name].nil?
+      raise StandardError, ":srcs must be set" if args[:srcs].nil? and args[:deps].nil?
+    end
+  end
+  
+  class CheckFragmentPreconditions
+    def handle(fun, dir, args)
+      raise StandardError, ":name must be set" if args[:name].nil?
+      raise StandardError, ":deps must be set" if args[:deps].nil?
+    end
+  end
+
+  class CreateTaskShortName < BaseJs
+    def handle(fun, dir, args)
+      name = task_name(dir, args[:name])
+
+      if (name.end_with? "/#{args[:name]}:#{args[:name]}")
+        name = name.sub(/:.*$/, "")
+
+        task name => task_name(dir, args[:name])
+
+        Rake::Task[name].out = js_name(dir, args[:name])
+      end
+    end
+  end
+
+  class CreateTask < BaseJs
+    def handle(fun, dir, args)
+      name = js_name(dir, args[:name])
+      task_name = task_name(dir, args[:name])
+
+      file name
+
+      desc "Compile and optimize #{name}"
+      task task_name => name
+      
+      Rake::Task[task_name].out = name
+    end
+  end
+    
+  class AddDependencies < BaseJs
+    def handle(fun, dir, args)
+      task = Rake::Task[js_name(dir, args[:name])]
+      add_dependencies(task, dir, args[:deps])
+      add_dependencies(task, dir, args[:srcs])
+    end
+  end
+ 
+  class AddTestDependencies < BaseJs
+    def handle(fun, dir, args) 
+      task = Rake::Task[js_name(dir, args[:name])]
+      add_dependencies(task, dir, args[:deps])
+      add_dependencies(task, dir, args[:srcs])
+
+      task.enhance [ "//jsapi:test:uber" ]
+    end
+  end
+
+  class WriteOutput < BaseJs
+    def handle(fun, dir, args)
+      output = js_name(dir, args[:name])
+      
+      file output do
+        t = Rake::Task[task_name(dir, args[:name])]
+        
+        js_files = build_deps(output, Rake::Task[output], []).uniq
+
+        mkdir_p File.dirname(output)
+        File.open(output, 'w') do |f|
+          js_files.each do |dep|
+            f << IO.read(dep)
+          end
+        end
+      end
+    end
+  end
+  
+  class Compile < BaseJs
+    def handle(fun, dir, args)
+      output = js_name(dir, args[:name])
+      
+      file output do
+        puts "Compiling: #{task_name(dir, args[:name])} as #{output}"
+        
+        t = Rake::Task[task_name(dir, args[:name])]
+
+        js_files = build_deps(output, Rake::Task[output], []).uniq
+        
+        dirs = {} 
+        js_files.each do |js|
+          dirs[File.dirname(js)] = 1 
+        end
+        dirs = dirs.keys
+
+        cmd = calcdeps +
+           " -o compiled " <<
+           '-f "--third_party=true" ' <<
+           '-f "--formatting=PRETTY_PRINT" ' <<
+           "-f \"--js_output_file=#{output}\" " <<
+           "-i " <<
+           js_files.join(" -i ") <<
+           " -p third_party/closure/goog -p " <<
+           dirs.join(" -p ")
+
+        mkdir_p File.dirname(output)
+
+        execute cmd
+      end
+    end    
+  end
+
+  class CompileFragment < BaseJs
+    def handle(fun, dir, args)
+      output = js_name(dir, args[:name])
+
+      file output do
+        puts "Compiling: #{task_name(dir, args[:name])} as #{output}"
+
+        temp = "#{output}.tmp.js"
+
+        mkdir_p File.dirname(output)
+        js_files = build_deps(output, Rake::Task[output], []).uniq
+
+        rm_f "#{output}.tmp"
+
+        File.open(temp, "w") do |file|
+          file << "goog.require('#{args[:module]}'); goog.exportSymbol('_', #{args[:function]});"
+        end
+
+        # Naming convention is CamelCase, not snake_case
+        name = args[:name].gsub(/_(.)/) {|match| $1.upcase}
+        wrapper = "function(){%output%; return _.apply(null,arguments);}"
+
+        # TODO(simon): Don't hard code things. That's Not Smart
+        cmd = calcdeps +
+            "-o compiled " <<
+            "-f \"--create_name_map_files=true\" " <<
+            "-f \"--third_party=true\" " <<
+            "-f \"--js_output_file=#{output}\" " <<
+            "-f \"--output_wrapper='#{wrapper}'\" " <<
+            "-f \"--compilation_level=ADVANCED_OPTIMIZATIONS\" " <<
+            "-p third_party/closure/goog/ " <<
+            "-p javascript " <<
+            "-p iphone/src/js " <<
+            "-i #{temp} "
+
+        mkdir_p File.dirname(output)
+
+        execute cmd
+
+        rm_f temp
+
+        # Strip out the license comments.
+        result = IO.read(output)
+        result = result.gsub(/\/\*.*?\*\//m, '')
+        File.open(output, 'w') do |f| f.write(result); end
+      end
+    end
+  end
+
+  class GenerateHeader < BaseJs
+
+    MAX_LINE_LENGTH = 80
+    MAX_STR_LENGTH = MAX_LINE_LENGTH - "    L\"\"\n".length
+
+    def write_atom_string_literal(to_file, dir, atom, utf8)
+      # Check that the |atom| task actually generates a JavaScript file.
+      if (File.exists?(atom))
+        atom_file = atom
+      else
+        atom_task = task_name(dir, atom)
+        atom_file = Rake::Task[atom_task].out
+      end
+      raise StandardError,
+          "#{atom_file} is not a JavaScript file" unless atom_file =~ /\.js$/
+
+      puts "Generating header for #{atom_file}"
+
+      # Convert camelCase and snake_case to BIG_SNAKE_CASE
+      uc = File.basename(atom_file).sub(/\.js$/, '')
+      uc.gsub!(/(.)([A-Z][a-z]+)/, '\1_\2')
+      uc.gsub!(/([a-z0-9])([A-Z])/, '\1_\2')
+      atom_upper = uc.upcase
+
+      # Each fragment file should be small (<= 20KB), so just read it all in.
+      contents = IO.read(atom_file).strip
+
+      # Escape the contents of the file so it can be stored as a literal.
+      contents.gsub!(/\\/, "\\\\\\")
+      contents.gsub!(/\t/, "\\t")
+      contents.gsub!(/\n/, "\\n")
+      contents.gsub!(/\f/, "\\f")
+      contents.gsub!(/\r/, "\\r")
+      contents.gsub!(/"/, "\\\"")
+      contents.gsub!(/'/, "'")
+
+      atom_type = utf8 ? "char" : "wchar_t"
+      max_str_length = MAX_STR_LENGTH
+      max_str_length += 1 if utf8  # Don't need the 'L' on each line for UTF8.
+      line_format = utf8 ? "    \"%s\"" : "    L\"%s\""
+
+      to_file << "\n"
+      to_file << "const #{atom_type}* const #{atom_upper} =\n"
+
+      # Make the header file play nicely in a terminal: limit lines to 80
+      # characters, but make sure we don't cut off a line in the middle
+      # of an escape sequence.
+      while contents.length > max_str_length do
+        diff = max_str_length
+        diff -= 1 while contents[diff-1, 1] =~ /\\/
+
+        line = contents[0, diff]
+        contents.slice!(0..diff - 1)
+        to_file << line_format % line
+        to_file << "\n"
+      end
+
+      to_file << line_format % contents if contents.length > 0
+      to_file << ";\n"
+    end
+
+    def generate_header(dir, name, task_name, output, js_files, utf8)
+      file output => js_files do
+        puts "Preparing: #{task_name} as #{output}"
+        define_guard = "WEBDRIVER_#{name.upcase}_H_"
+
+        output_dir = File.dirname(output)
+        mkdir_p output_dir unless File.exists?(output_dir)
+
+        File.open(output, 'w') do |out|
+          out << "// Copyright 2011 WebDriver committers\n"
+          out << "// Licensed under the Apache License, Version 2.0 (the \"License\");\n"
+          out << "// you may not use this file except in compliance with the License.\n"
+          out << "// You may obtain a copy of the License at\n"
+          out << "//\n"
+          out << "//     http://www.apache.org/licenses/LICENSE-2.0\n"
+          out << "//\n"
+          out << "// Unless required by applicable law or agreed to in writing, software\n"
+          out << "// distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+          out << "// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+          out << "// See the License for the specific language governing permissions and\n"
+          out << "// limitations under the License.\n"
+          out << "\n"
+          out << "/* AUTO GENERATED - DO NOT EDIT BY HAND */\n"
+          out << "#ifndef #{define_guard}\n"
+          out << "#define #{define_guard}\n"
+          out << "\n"
+          out << "#include <stddef.h>  // For wchar_t.\n" unless utf8
+          out << "\n" unless utf8
+          out << "namespace webdriver {\n"
+          out << "namespace atoms {\n"
+
+          js_files.each do |js_file|
+            write_atom_string_literal(out, dir, js_file, utf8)
+          end
+
+          out << "\n"
+          out << "}  // namespace atoms\n"
+          out << "}  // namespace webdriver\n"
+          out << "\n"
+          out << "#endif  // #{define_guard}\n"
+        end
+      end
+    end
+  end
+
+  class ConcatenateHeaders < GenerateHeader
+    def handle(fun, dir, args)
+      js = js_name(dir, args[:name])
+      output = js.sub(/\.js$/, '.h')
+      task_name = task_name(dir, args[:name])
+      generate_header(dir, args[:name], task_name, output, args[:deps],
+                      args[:utf8])
+      task task_name => [output]
+    end
+  end
+  
+  class CopyHeader < BaseJs
+    def handle(fun, dir, args)
+      return unless args[:out]
+      
+      js = js_name(dir, args[:name])
+      output = js.sub(/\.js$/, '.h')
+      task_name = task_name(dir, args[:name])
+      task task_name do
+        puts "Writing: #{args[:out]}"
+        cp output, args[:out]
+      end
+    end
+  end
+
+  class CreateHeader < GenerateHeader
+    def handle(fun, dir, args)
+      js = js_name(dir, args[:name])
+      out = js.sub(/\.js$/, '.h')
+      task_name = task_name(dir, args[:name]) + ":header"
+      generate_header(dir, args[:name], task_name, out, [js], false)
+      task task_name => [out]
+    end
+  end
+end
