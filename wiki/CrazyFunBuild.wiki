@@ -146,3 +146,26 @@ The following attributes are commonly used:
 || name || string || As above ||
 || task_name || string || The ordinary rake target to call ||
 || out || string || The file that is generated, relative to the Rakefile ||
+
+
+== gcc_library ==
+
+  * *Output:* Shared library file named after the "name" attribute if the "srcs" attribute is set.
+  * *Implicit Targets:* None.
+  * *Required Attributes:* "name" and "srcs".
+
+|| *Attribute Name* || *Type* || *Meaning* ||
+|| srcs || array || As above ||
+|| arch || string || "amd64" for 64-bit builds, "i386" for 32-bit builds. ||
+|| args || string || Arguments to the compiler (-I flags, for example). ||
+|| link_args || string || Arguments to the linker (-l flags, for example) ||
+
+Note: When building a new library for the first time, the build will succeed but copying to pre-built will fail with a similar message:
+
+{{{
+cp build/cpp/amd64/libimetesthandler64.so 
+go aborted!
+can't convert nil into String
+}}}
+
+Solution: Copy the just-built library to the appropriate prebuilt folder (cpp/prebuilt/arch/).
