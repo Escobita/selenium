@@ -71,6 +71,13 @@
   # `./go //rb:gem:release`
   # Bump version number in rb/build.desc to "X.X.X.dev" and commit the change.
 
+= For Python =
+# To release a new version you need to be registered as a Owner/Maintener on pypi.python.org
+ # Bump the version number in setup.py 
+ # `./go //py_release`
+ # Bump the version number to the next version with dev e.g. 2.0b3dev and commit changes
+
+
 = Areas to Improve =
 
   * We should really automate the version number bumps.
