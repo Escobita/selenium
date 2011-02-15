@@ -30,6 +30,10 @@ driver.quit
 
 The ruby bindings have drivers for Firefox, IE, Chrome and the remote server.
 
+== IE ==
+
+Make sure that Internet Options -> Security has the same Protected Mode setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
+
 == Remote ==
 
 The RemoteWebDriver makes it easy to control a browser running on another machine. Download the jar (from [http://code.google.com/p/selenium/downloads/list Downloads]) and launch the server:
