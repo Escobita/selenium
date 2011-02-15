@@ -47,9 +47,10 @@
    # `./go //java/client/src/org/openqa/selenium:client-combined:project`
    # `./go //java/server/src/org/openqa/selenium/server:server:project`
    # `cd maven`
-   # vmvn -Dtest=skip -DfailIfNoTests=false install`
+   # `mvn -Dtest=skip -DfailIfNoTests=false install`
  # Now all maven artifacts are installed in your local repository -- test them -- this is important, we should not deploy broken Maven artifacts!
- # When everything is fine, execute `mvn source:jar javadoc:jar -Dtest=skip -DfailIfNoTests=false -Dgpg.passphrase=_your-GnuPG-key-passphrase_ -Psign deploy`                
+ # When everything is fine, execute:
+   `mvn source:jar javadoc:jar -Dtest=skip -DfailIfNoTests=false -Dgpg.passphrase=_your-GnuPG-key-passphrase_ -Psign deploy`                
  # Finally goto http://oss.sonatype.org, log in, close the staging repository, and promote it to the releases repository.
 
 = For .NET =
