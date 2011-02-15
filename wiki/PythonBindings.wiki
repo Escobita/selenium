@@ -27,7 +27,7 @@ The first version, is the latest official release, which is available on the Pyt
 The second version, is the current code from trunk. To use this, checkout the trunk repository at http://code.google.com/p/selenium/source/checkout. 
 After the download is completed, cd to the root of the downloaded directory via terminal/cmd prompt, then cd to the `py` folder. Perform the following command: 
 
-{{{(sudo) python setup.py install}}}. 
+{{{(sudo) ./go py_install}}}. 
 
 Upon completion, the package should be installed successfully.
 
@@ -72,19 +72,6 @@ Selenium 2:
 
 Using the latest official release:
 {{{
-from selenium.firefox.webdriver import WebDriver
-}}}
-
-{{{
-from selenium.chrome.webdriver import WebDriver
-}}}
-
-{{{
-from selenium.remote.webdriver import WebDriver
-}}}
-
-Using trunk:
-{{{
 from selenium import webdriver
 }}}
 
@@ -121,7 +108,7 @@ Here is a summary of the major differences between the python and Java bindings.
 
 Function names separate compound terms with underscores, rather than using Java's camelCase formatting. For example, in python 
 {{{
-get_title()
+title
 }}}
 is the equivalent of 
 {{{
@@ -139,6 +126,8 @@ rather than
 {{{
 findElement(By.xpath("//h1"));
 }}}
+
+but it does give you the freedom of doing find_element(by=By.XPATH, value='//h1')
 
 =Browser Support=
 
@@ -163,11 +152,6 @@ selenium.start()
 ===Selenium 2 - Firefox===
 Latest Official Release:
 {{{
-from selenium.webdriver.firefox import WebDriver
-driver = WebDriver()
-}}}
-Trunk:
-{{{
 from selenium import webdriver
 
 driver = webdriver.Firefox()
@@ -176,12 +160,6 @@ driver = webdriver.Firefox()
 ===Selenium 2 - Chrome===
 Latest Official Release:
 {{{
-from selenium.chrome.webdriver import WebDriver
-
-driver = WebDriver()
-}}}
-Trunk:
-{{{
 from selenium import webdriver
 
 driver = webdriver.Chrome()
@@ -189,25 +167,12 @@ driver = webdriver.Chrome()
 ===Selenium 2 - Remote===
 Latest Official Release:
 {{{
-from selenium.remote import connect
-from selenium import FIREFOX
-
-wd = connect(FIREFOX, server="http://example.com:4444")
-}}}
-Trunk:
-{{{
 from selenium import webdriver
 
-driver = webdriver.Remote("http://localhost:4444", browser_name, platform, version, javascript_enabled)
+driver = webdriver.Remote( browser_name="firefox", platform="any")
 }}}
 ===Selenium 2 - IE===
 Latest Official Release:
-{{{
-from selenium.ie.webdriver import WebDriver
-
-driver = WebDriver
-}}}
-Trunk:
 {{{
 from selenium import webdriver
 
