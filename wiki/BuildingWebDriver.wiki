@@ -75,7 +75,7 @@ For Java:
 || test_htmlunit || Run all the HtmlUnitDriver tests ||
 || test_ie || Run all the InternetExplorerDriver tests ||
 || test_firefox || Run all the FirefoxDriver tests ||
-|| remote-server-standalone || Build the standalone server ||
+|| selenium-server-standalone || Build the standalone server ||
 || //java/client/test/org/openqa/selenium:single:run || Run the SingleTestSuite ||
 
 For Javascript:
