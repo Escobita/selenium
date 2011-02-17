@@ -14,6 +14,7 @@ The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDri
 == Cons ==
    * Slower than Headless WebKit Driver
    * Support for SDK versions 2.2 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
+   * Does not work on emulators running 2.3 because of an emulator bug that should be fixed soon by Android. However it works on Devices running 2.3 and higher (and runs much faster on those).
 
 = Important System Properties =
 == Native events and Javascript ==
@@ -123,10 +124,6 @@ public class OneTest extends TestCase {
     
     // Check the title of the page
     System.out.println("Page title is: " + driver.getTitle());
-    // Remember to close the WebDriver connection to free up resources on the
-    // Android device (or emulator). Pause for 30 seconds first so we can see
-    // the results of the search.
-    Thread.sleep(30000L);
     driver.quit();
 
   }
@@ -169,3 +166,18 @@ $./go android_server
 {{{
 $./go test_android
 }}}
+
+= FAQ =
+== How to start jetty ==
+Jetty is started by the application installed. So it should start when you first start the application.
+
+== I get "Page not Available" ==
+Sometimes the Android emulator does not detect the connection of the host machine it runs on. The solution in this case is to restart the emulator.
+
+== The emulator is too slow, what can I do ==
+Couple things, you can start the emulator with the following options:
+-no-window
+-no-audio
+-no-boot-anim
+
+Alternatively, newer devices using 2.3 (Gingerbread) and higher are much faster than emulators.
