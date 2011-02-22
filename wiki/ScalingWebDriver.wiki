@@ -39,8 +39,8 @@ Starting new browsers between each test class/test method is slow, and the socke
 
 If you're using a suite-less test setup (like many JUnit4 users), you often start/stop the browsers in @BeforeClass/@AfterClass methods. Another option is to start the browsers in @BeforeClass and use something like JUnit/TestNG run listeners to shut down all the browsers at the end of the test run.  Maven surefire supports run listeners for both JUnit and TestNG.
 
-(TODO: Strategies for disabling the socket lock and manage ports yourself) 
+(TODO: Strategies to disable the socket lock and manage the ports yourself) 
 
 ==Native events==
 
-Due to a shared file in the native events logic, the firefox driver should probably not be using native events when running concurrently.
+Due to a shared file in the native events logic, the firefox driver should probably not be using native events when running concurrently. (Watch [http://code.google.com/p/selenium/issues/detail?id=1326 this issue]).
