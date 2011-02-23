@@ -39,11 +39,12 @@ public class SingleTestSuite extends TestCase {
   private static final String SELENIUM = "org.openqa.selenium.v1.SeleneseBackedWebDriver";
 
   public static Test suite() throws Exception {
-    String driver = IE;
+    String driver = FIREFOX;
 
     System.setProperty("jna.library.path", "..\\build;build");
     System.setProperty("webdriver.selenium.server.port", String.valueOf(findFreePort()));
     System.setProperty("webdriver.development", "true");
+    System.setProperty("webdriver.firefox.logfile", "/dev/stdout");
 //    System.setProperty("webdriver.debug", "true");
 //    System.setProperty("webdriver.firefox.reap_profile", "false");
 
@@ -52,8 +53,8 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("PageLoadingTest")
-//        .method("testShouldBeAbleToRefreshAPage")
+        .onlyRun("TypingTest")
+        .method("testShouldFireKeyPressEvents")
 //        .method("testShouldNotTrimSpacesWhenLineWraps")
         .exclude(ALL)
         .exclude(Ignore.Driver.IE)

@@ -19,6 +19,8 @@ limitations under the License.
 package org.openqa.selenium.firefox;
 
 import static org.openqa.selenium.OutputType.FILE;
+import static org.openqa.selenium.Platform.MAC;
+import static org.openqa.selenium.Platform.WINDOWS;
 import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
 import org.openqa.selenium.Capabilities;
@@ -63,8 +65,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
 
   // For now, only enable native events on Windows
   public static final boolean DEFAULT_ENABLE_NATIVE_EVENTS =
-      Platform.getCurrent()
-          .is(Platform.WINDOWS);
+      Platform.getCurrent().is(WINDOWS) || Platform.getCurrent().is(MAC);
   // Accept untrusted SSL certificates.
   public static final boolean ACCEPT_UNTRUSTED_CERTIFICATES = true;
   // Assume that the untrusted certificates will come from untrusted issuers

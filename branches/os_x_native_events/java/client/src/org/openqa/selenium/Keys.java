@@ -91,7 +91,7 @@ public enum Keys implements CharSequence {
 	META         ('\uE03D'),
 	COMMAND      ('\uE03D'),  // Alias
 
-    ZENKAKU_HANKAKU ('\uE040'),
+  ZENKAKU_HANKAKU ('\uE040'),
 	;
 
 	private Keys(char keyCode) {

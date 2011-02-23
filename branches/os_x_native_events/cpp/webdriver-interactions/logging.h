@@ -78,8 +78,8 @@ template <class _LOGGER> class Logger {
   std::ostringstream& Stream(LogLevel level) {
     static char severity[] = { 'F', 'E', 'W', 'I', 'D' };
     os_ << severity[level] << Time();
-    if (level == logFATAL)
-      fatal_ = true, os_ << L"FATAL ";
+//    if (level == logFATAL)
+//      fatal_ = true, os_ << L"FATAL ";
     return os_;
   }
 

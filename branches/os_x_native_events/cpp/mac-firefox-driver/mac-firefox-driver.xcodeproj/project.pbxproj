@@ -18,6 +18,7 @@
 		EF46BABD1314EDD50089754E /* nsIConsoleService.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BABC1314EDD50089754E /* nsIConsoleService.h */; };
 		EF46BACA1314EE550089754E /* nsIConsoleListener.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAC81314EE550089754E /* nsIConsoleListener.h */; };
 		EF46BACB1314EE550089754E /* nsIConsoleMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAC91314EE550089754E /* nsIConsoleMessage.h */; };
+		EF46BC68131534150089754E /* nsIXULWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BC67131534150089754E /* nsIXULWindow.h */; };
 		EF89D5A11314BB440028D9A7 /* errorcodes.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D5991314BB440028D9A7 /* errorcodes.h */; };
 		EF89D5A71314BB440028D9A7 /* interactions.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D59F1314BB440028D9A7 /* interactions.h */; };
 		EF89D5A81314BB440028D9A7 /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D5A01314BB440028D9A7 /* logging.h */; };
@@ -462,6 +463,7 @@
 		EF46BABC1314EDD50089754E /* nsIConsoleService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleService.h; sourceTree = "<group>"; };
 		EF46BAC81314EE550089754E /* nsIConsoleListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleListener.h; sourceTree = "<group>"; };
 		EF46BAC91314EE550089754E /* nsIConsoleMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleMessage.h; sourceTree = "<group>"; };
+		EF46BC67131534150089754E /* nsIXULWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIXULWindow.h; sourceTree = "<group>"; };
 		EF89D5991314BB440028D9A7 /* errorcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errorcodes.h; path = "../webdriver-interactions/errorcodes.h"; sourceTree = SOURCE_ROOT; };
 		EF89D59F1314BB440028D9A7 /* interactions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interactions.h; path = "../webdriver-interactions/interactions.h"; sourceTree = SOURCE_ROOT; };
 		EF89D5A01314BB440028D9A7 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logging.h; path = "../webdriver-interactions/logging.h"; sourceTree = SOURCE_ROOT; };
@@ -1002,6 +1004,14 @@
 			path = xpcom;
 			sourceTree = "<group>";
 		};
+		EF46BC66131534150089754E /* appshell */ = {
+			isa = PBXGroup;
+			children = (
+				EF46BC67131534150089754E /* nsIXULWindow.h */,
+			);
+			path = appshell;
+			sourceTree = "<group>";
+		};
 		EF89D5961314BB1E0028D9A7 /* interactions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1062,6 +1072,7 @@
 		EF89D5CF1314BEA40028D9A7 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				EF46BC66131534150089754E /* appshell */,
 				EF46BAB21314EB7F0089754E /* xpcom */,
 				EF46BAA51314EAAB0089754E /* gfx */,
 				EF46BA731314E8A90089754E /* widget */,
@@ -1982,6 +1993,7 @@
 				EF46BABD1314EDD50089754E /* nsIConsoleService.h in Headers */,
 				EF46BACA1314EE550089754E /* nsIConsoleListener.h in Headers */,
 				EF46BACB1314EE550089754E /* nsIConsoleMessage.h in Headers */,
+				EF46BC68131534150089754E /* nsIXULWindow.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
