@@ -22,14 +22,14 @@ If you're developing the Atoms, then the easiest way to test them is:
 
 {{{
 # Start the server
-./go //jsapi:debug:run &
+./go debug-server &
 }}}
 
 Now point a browser at http://localhost:2310/js/test/bot/ and select the test you'd like to run. As you edit the atoms, so long as you don't change the "goog.require" or "goog.provides" statements then you can just refresh the page to see the tests run with your changes. If you do change either of those settings, kill the server and then run 
 
 {{{
 ./go calcdeps
-./go //jsapi:debug:run &
+./go debug-server &
 }}}
 
 == Atoms Summary ==
@@ -54,4 +54,4 @@ Each of the atoms listed here is exposed via the list *method name*, which deleg
 || toggle || ||
 || type || ||
 
-The canonical list of atoms that are implemented for the webdriver APIs are located in this [http://code.google.com/p/selenium/source/browse/trunk/common/src/js/webdriver/build.desc build file]. The names of the `js_fragment` rules relate to the names of the methods.
+The canonical list of atoms that are implemented for the webdriver APIs are located in this [http://code.google.com/p/selenium/source/browse/trunk/javascript/webdriver-atoms/build.desc build file]. The names of the `js_fragment` rules relate to the names of the methods.
