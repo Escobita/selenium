@@ -25,7 +25,7 @@ If you're developing the Atoms, then the easiest way to test them is:
 ./go debug-server &
 }}}
 
-Now point a browser at http://localhost:2310/js/test/bot/ and select the test you'd like to run. As you edit the atoms, so long as you don't change the "goog.require" or "goog.provides" statements then you can just refresh the page to see the tests run with your changes. If you do change either of those settings, kill the server and then run 
+Now point a browser at http://localhost:2310/javascript/atoms/test and select the test you'd like to run. As you edit the atoms, so long as you don't change the "goog.require" or "goog.provides" statements then you can just refresh the page to see the tests run with your changes. If you do change either of those settings, kill the server and then run 
 
 {{{
 ./go calcdeps
