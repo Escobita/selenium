@@ -7,10 +7,13 @@
 #include "logging.h"
 #include "native_events.h"
 #include "nsIGenericFactory.h"
-#include "nsIComponentManager.h"
-#include "nsComponentManagerUtils.h"
 #include <assert.h>
-//#include <nsIAccessNode.h>
+#include "nsIConsoleService.h"
+#include "nsServiceManagerUtils.h"
+#include "nsComponentManagerUtils.h"
+#include "nsIComponentManager.h"
+#include "nsStringAPI.h"
+
 
 // For Debugging purpose
 #include <nsStringAPI.h>
@@ -40,6 +43,11 @@ nsNativeEvents::~nsNativeEvents()
 NS_IMETHODIMP nsNativeEvents::SendKeys(nsISupports *aNode,
                                        const PRUnichar *value)
 {
+	nsCOMPtr<nsIConsoleService> aConsoleService =
+    do_GetService( "@mozilla.org/consoleservice;1" );
+	
+	aConsoleService->LogStringMessage(NS_LITERAL_STRING( "Starting to send keys. First of all, process the node").get());
+
         LOG(DEBUG) << "---------- Got to start of callback. aNode: " << aNode
                    << " ----------";
         NS_LossyConvertUTF16toASCII ascii_keys(value);
@@ -51,15 +59,18 @@ NS_IMETHODIMP nsNativeEvents::SendKeys(nsISupports *aNode,
           i++;
         }
 
-        AccessibleDocumentWrapper doc(aNode);
-
-        WINDOW_HANDLE windowHandle = doc.getWindowHandle();
-
-        if (!windowHandle) {
-          LOG(WARN) << "Sorry, window handle is null.";
-          return NS_ERROR_NULL_POINTER;
-        }
-
+		WINDOW_HANDLE windowHandle = aNode;
+//		if (aNode) {
+//			AccessibleDocumentWrapper doc(aNode);
+//
+//			WINDOW_HANDLE windowHandle = doc.getWindowHandle();
+//
+//			if (!windowHandle) {
+//				LOG(WARN) << "Sorry, window handle is null.";
+//				return NS_ERROR_NULL_POINTER;
+//			}
+//		}
+	
         // Note that it's OK to send wchar_t even though wchar_t is *usually*
         // 32 bit, because this code (and any code that links with it) *MUST*
         // be compiled with -fshort-wchar, so it's actually 16 bit and,

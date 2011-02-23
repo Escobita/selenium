@@ -336,6 +336,20 @@ Utils.getNodeForNativeEvents = function(element) {
         accessible.QueryInterface(Components.interfaces.nsIAccessibleDocument);
     return accessibleDoc.QueryInterface(Components.interfaces.nsISupports);
   } catch(e) {
+    Logger.dumpn("Unable to grab node through accessibility: " + e);
+
+    try {
+      var win = element.ownerDocument.defaultView;
+      return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+                .getInterface(Components.interfaces.nsIWebNavigation)
+                .QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+                .treeOwner
+                .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+                .getInterface(Components.interfaces.nsIBaseWindow);
+    } catch (e) {
+      Logger.dumpn(e);
+    }
+
     // Unable to retrieve the accessible doc
     return undefined;
   }
@@ -373,12 +387,14 @@ Utils.type = function(doc, element, text, opt_useNativeEvents) {
     }
   }
 
+  var xulRuntime = Components.classes['@mozilla.org/xre/app-info;1'].
+      getService(Components.interfaces.nsIXULRuntime);
   var obj = Utils.getNativeEvents();
   var node = Utils.getNodeForNativeEvents(element);
   var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
 
-  if (opt_useNativeEvents && obj && node && thmgr_cls) {
-
+  if (opt_useNativeEvents && thmgr_cls && obj && node) {
+    Logger.dumpn("Native route");
     var pageUnloadedIndicator = Utils.getPageUnloadedIndicator(element);
 
     // Now do the native thing.
@@ -1130,7 +1146,7 @@ Utils.installWindowCloseListener = function (respond) {
 
 Utils.installClickListener = function(respond, WebLoadingListener) {
   var browser = respond.session.getBrowser();
-  var currentWindow = respond.session.getWindow()
+  var currentWindow = respond.session.getWindow();
 
   var clickListener = new WebLoadingListener(browser, function(webProgress) {
     Logger.dumpn("New page loading.");

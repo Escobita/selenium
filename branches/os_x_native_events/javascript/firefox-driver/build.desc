@@ -24,6 +24,7 @@ mozilla_extension(name = "webdriver",
     { "//cpp:firefox_dll" : "platform/WINNT_x86-msvc/components/webdriver-firefox.dll" },
     { "//cpp:libwebdriver_firefox_so" : "platform/Linux_x86-gcc3/components/libwebdriver-firefox.so" },
     { "//cpp:libwebdriver_firefox_so64" : "platform/Linux_x86_64-gcc3/components/libwebdriver-firefox.so" },
+    { "//cpp/mac-firefox-driver" : "platform/Darwin_x86-gcc3/components/libwebdriver-firefox.dylib" },
     { ":atoms" : "resource/modules/atoms.js" },
     { ":utils" : "resource/modules/utils.js" },
     { "js/timer.js" : "resource/modules/timer.js" },
@@ -32,6 +33,7 @@ mozilla_extension(name = "webdriver",
   ],
   chrome = "extension/chrome.manifest",
   install = "extension/install.rdf")
+
 
 # Needed because the closure library doesn't have the EXPORTED_SYMBOLS variable
 # required by the loader in firefox

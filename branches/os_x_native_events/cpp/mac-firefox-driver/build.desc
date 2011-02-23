@@ -1,0 +1,5 @@
+
+rake_task(name = "mac-firefox-driver",
+  task_name = "mac_firefox_driver",
+  out = "cpp/mac-firefox-driver/build/Debug/libmac-firefox-driver.dylib")
+  

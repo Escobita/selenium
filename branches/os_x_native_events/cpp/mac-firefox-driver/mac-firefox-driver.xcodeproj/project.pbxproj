@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EF46BA2A1314DF150089754E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF46BA291314DF150089754E /* AppKit.framework */; };
+		EF46BA751314E8A90089754E /* nsIBaseWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BA741314E8A90089754E /* nsIBaseWindow.h */; };
+		EF46BA8E1314E9E20089754E /* nsIWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BA8D1314E9E20089754E /* nsIWidget.h */; };
+		EF46BAA81314EAAB0089754E /* nsColor.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAA61314EAAB0089754E /* nsColor.h */; };
+		EF46BAA91314EAAB0089754E /* nsCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAA71314EAAB0089754E /* nsCoord.h */; };
+		EF46BAAD1314EAE00089754E /* nsEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAAC1314EAE00089754E /* nsEvent.h */; };
+		EF46BAB11314EB590089754E /* gfxCore.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAB01314EB590089754E /* gfxCore.h */; };
+		EF46BAB41314EB7F0089754E /* nsMathUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAB31314EB7F0089754E /* nsMathUtils.h */; };
+		EF46BABD1314EDD50089754E /* nsIConsoleService.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BABC1314EDD50089754E /* nsIConsoleService.h */; };
+		EF46BACA1314EE550089754E /* nsIConsoleListener.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAC81314EE550089754E /* nsIConsoleListener.h */; };
+		EF46BACB1314EE550089754E /* nsIConsoleMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = EF46BAC91314EE550089754E /* nsIConsoleMessage.h */; };
 		EF89D5A11314BB440028D9A7 /* errorcodes.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D5991314BB440028D9A7 /* errorcodes.h */; };
 		EF89D5A71314BB440028D9A7 /* interactions.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D59F1314BB440028D9A7 /* interactions.h */; };
 		EF89D5A81314BB440028D9A7 /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = EF89D5A01314BB440028D9A7 /* logging.h */; };
@@ -440,6 +451,17 @@
 
 /* Begin PBXFileReference section */
 		D2AAC0630554660B00DB518D /* libmac-firefox-driver.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libmac-firefox-driver.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF46BA291314DF150089754E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		EF46BA741314E8A90089754E /* nsIBaseWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIBaseWindow.h; sourceTree = "<group>"; };
+		EF46BA8D1314E9E20089754E /* nsIWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIWidget.h; sourceTree = "<group>"; };
+		EF46BAA61314EAAB0089754E /* nsColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsColor.h; sourceTree = "<group>"; };
+		EF46BAA71314EAAB0089754E /* nsCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsCoord.h; sourceTree = "<group>"; };
+		EF46BAAC1314EAE00089754E /* nsEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsEvent.h; sourceTree = "<group>"; };
+		EF46BAB01314EB590089754E /* gfxCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gfxCore.h; sourceTree = "<group>"; };
+		EF46BAB31314EB7F0089754E /* nsMathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsMathUtils.h; sourceTree = "<group>"; };
+		EF46BABC1314EDD50089754E /* nsIConsoleService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleService.h; sourceTree = "<group>"; };
+		EF46BAC81314EE550089754E /* nsIConsoleListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleListener.h; sourceTree = "<group>"; };
+		EF46BAC91314EE550089754E /* nsIConsoleMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nsIConsoleMessage.h; sourceTree = "<group>"; };
 		EF89D5991314BB440028D9A7 /* errorcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errorcodes.h; path = "../webdriver-interactions/errorcodes.h"; sourceTree = SOURCE_ROOT; };
 		EF89D59F1314BB440028D9A7 /* interactions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interactions.h; path = "../webdriver-interactions/interactions.h"; sourceTree = SOURCE_ROOT; };
 		EF89D5A01314BB440028D9A7 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logging.h; path = "../webdriver-interactions/logging.h"; sourceTree = SOURCE_ROOT; };
@@ -915,6 +937,7 @@
 				EF89D93A1314BF2F0028D9A7 /* libnss3.dylib in Frameworks */,
 				EF89D93C1314BF2F0028D9A7 /* libxpcom.dylib in Frameworks */,
 				EF89D93E1314BF2F0028D9A7 /* libxpcomglue_s.a in Frameworks */,
+				EF46BA2A1314DF150089754E /* AppKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -948,6 +971,37 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EF46BA731314E8A90089754E /* widget */ = {
+			isa = PBXGroup;
+			children = (
+				EF46BAAC1314EAE00089754E /* nsEvent.h */,
+				EF46BA8D1314E9E20089754E /* nsIWidget.h */,
+				EF46BA741314E8A90089754E /* nsIBaseWindow.h */,
+			);
+			path = widget;
+			sourceTree = "<group>";
+		};
+		EF46BAA51314EAAB0089754E /* gfx */ = {
+			isa = PBXGroup;
+			children = (
+				EF46BAB01314EB590089754E /* gfxCore.h */,
+				EF46BAA61314EAAB0089754E /* nsColor.h */,
+				EF46BAA71314EAAB0089754E /* nsCoord.h */,
+			);
+			path = gfx;
+			sourceTree = "<group>";
+		};
+		EF46BAB21314EB7F0089754E /* xpcom */ = {
+			isa = PBXGroup;
+			children = (
+				EF46BAC81314EE550089754E /* nsIConsoleListener.h */,
+				EF46BAC91314EE550089754E /* nsIConsoleMessage.h */,
+				EF46BABC1314EDD50089754E /* nsIConsoleService.h */,
+				EF46BAB31314EB7F0089754E /* nsMathUtils.h */,
+			);
+			path = xpcom;
+			sourceTree = "<group>";
+		};
 		EF89D5961314BB1E0028D9A7 /* interactions */ = {
 			isa = PBXGroup;
 			children = (
@@ -955,6 +1009,7 @@
 				EF89D59F1314BB440028D9A7 /* interactions.h */,
 				EF89D5A01314BB440028D9A7 /* logging.h */,
 				EF89D95D1314C99B0028D9A7 /* interactions_mac.mm */,
+				EF46BA291314DF150089754E /* AppKit.framework */,
 			);
 			name = interactions;
 			sourceTree = "<group>";
@@ -1007,6 +1062,9 @@
 		EF89D5CF1314BEA40028D9A7 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				EF46BAB21314EB7F0089754E /* xpcom */,
+				EF46BAA51314EAAB0089754E /* gfx */,
+				EF46BA731314E8A90089754E /* widget */,
 				EF89D5D01314BEA40028D9A7 /* base64.h */,
 				EF89D5D11314BEA40028D9A7 /* blapit.h */,
 				EF89D5D21314BEA40028D9A7 /* cert.h */,
@@ -1914,6 +1972,16 @@
 				EF89D92D1314BEA50028D9A7 /* utilrename.h in Headers */,
 				EF89D92E1314BEA50028D9A7 /* watcomfx.h in Headers */,
 				EF89D92F1314BEA50028D9A7 /* xpcom-config.h in Headers */,
+				EF46BA751314E8A90089754E /* nsIBaseWindow.h in Headers */,
+				EF46BA8E1314E9E20089754E /* nsIWidget.h in Headers */,
+				EF46BAA81314EAAB0089754E /* nsColor.h in Headers */,
+				EF46BAA91314EAAB0089754E /* nsCoord.h in Headers */,
+				EF46BAAD1314EAE00089754E /* nsEvent.h in Headers */,
+				EF46BAB11314EB590089754E /* gfxCore.h in Headers */,
+				EF46BAB41314EB7F0089754E /* nsMathUtils.h in Headers */,
+				EF46BABD1314EDD50089754E /* nsIConsoleService.h in Headers */,
+				EF46BACA1314EE550089754E /* nsIConsoleListener.h in Headers */,
+				EF46BACB1314EE550089754E /* nsIConsoleMessage.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
