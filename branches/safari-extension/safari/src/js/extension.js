@@ -124,6 +124,10 @@ selenium.safari.Extension.prototype.onWSMessage_ = function(event) {
   }
 };
 
+selenium.safari.Extension.prototype.getCurrentWindow_ = function() {
+  return safari.application.activeBrowserWindow.tabs[0];
+};
+
 // WebDriver implementation methods.
 
 selenium.safari.Extension.prototype.initBindings_ = function() {
@@ -131,6 +135,7 @@ selenium.safari.Extension.prototype.initBindings_ = function() {
   this.bindings_.quit = goog.bind(this.quit_, this);
   this.bindings_.get = goog.bind(this.get_, this);
   this.bindings_.getCurrentUrl = goog.bind(this.getCurrentUrl_, this);
+  this.bindings_.getTitle = goog.bind(this.getTitle_, this);
 };
 
 selenium.safari.Extension.prototype.newSession_ = function(json) {
@@ -144,18 +149,23 @@ selenium.safari.Extension.prototype.newSession_ = function(json) {
 };
 
 selenium.safari.Extension.prototype.quit_ = function(json) {
+  this.addLog_('Quit command received.');
   this.sessionId_ = null;
   this.sendResponse_(0, null);
 };
 
 selenium.safari.Extension.prototype.get_ = function(json) {
-  safari.application.activeBrowserWindow.tabs[0].url = json.url;
+  this.getCurrentWindow_().url = json.url;
   // TODO(kurniady): Add a wait until loaded here.
   this.sendResponse_(0, null);
 };
 
 selenium.safari.Extension.prototype.getCurrentUrl_ = function(json) {
-  this.sendResponse_(0, safari.application.activeBrowserWindow.tabs[0].url);
+  this.sendResponse_(0, this.getCurrentWindow_().url);
+};
+
+selenium.safari.Extension.prototype.getTitle_ = function(json) {
+  this.sendResponse_(0, this.getCurrentWindow_().title);
 };
 
 // Initialization.

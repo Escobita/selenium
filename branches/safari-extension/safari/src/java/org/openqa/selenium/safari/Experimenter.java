@@ -16,16 +16,18 @@ public class Experimenter {
       driver.get("http://www.google.com");
       Thread.sleep(1000);
       System.err.println("Current URL is : " + driver.getCurrentUrl());
+      System.err.println("Current title is : " + driver.getTitle());
       Thread.sleep(1000);
       driver.get("http://code.google.com");
       Thread.sleep(1000);
       System.err.println("Current URL is : " + driver.getCurrentUrl());
+      System.err.println("Current title is : " + driver.getTitle());
       Thread.sleep(1000);
     }
 
     System.err.println("Done, idle sleep...");
 
-    Thread.sleep(60000);
+    Thread.sleep(600000);
 
     driver.quit();
   }
