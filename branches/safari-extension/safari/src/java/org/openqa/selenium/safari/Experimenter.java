@@ -15,7 +15,11 @@ public class Experimenter {
     for (int i=0;i<10;i++) {
       driver.get("http://www.google.com");
       Thread.sleep(1000);
-      driver.get("http://www.kurniady.net");
+      System.err.println("Current URL is : " + driver.getCurrentUrl());
+      Thread.sleep(1000);
+      driver.get("http://code.google.com");
+      Thread.sleep(1000);
+      System.err.println("Current URL is : " + driver.getCurrentUrl());
       Thread.sleep(1000);
     }
 

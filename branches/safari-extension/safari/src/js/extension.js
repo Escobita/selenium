@@ -1,5 +1,7 @@
 goog.provide('selenium.safari.Extension');
 
+goog.require('goog.debug.Console');
+goog.require('goog.debug.Logger');
 
 //selenium.safari.Extension.SESSION_ID = 'safariSession';
 
@@ -31,7 +33,12 @@ selenium.safari.Extension = function() {
    */
   this.bindings_ = {};
 
-  this.logs = Array();
+
+  this.logger_ = goog.debug.Logger.getLogger('selenium.safari.Extension');
+  this.logger_.setLevel(goog.debug.Logger.Level.FINEST);
+
+  this.logConsole_ = new goog.debug.Console();
+  this.logConsole_.setCapturing(true);
 };
 
 /**
@@ -39,11 +46,12 @@ selenium.safari.Extension = function() {
  * @private
  */
 selenium.safari.Extension.prototype.init = function() {
+
   var hostPort = "localhost:7055";
   var firstUrl = safari.application.activeBrowserWindow.tabs[0].url;
   if (!firstUrl || firstUrl.indexOf("init_webdriver") == -1) {
-     safari.extension.bars[0].contentWindow.document.getElementById('topStatus').innerHTML = "inactive.";
-     return;
+    safari.extension.bars[0].contentWindow.document.getElementById('topStatus').innerHTML = "inactive.";
+    return;
   }
 
   hostPort = firstUrl.split("\/")[2];
@@ -59,12 +67,6 @@ selenium.safari.Extension.prototype.init = function() {
 
 };
 
-selenium.safari.Extension.prototype.initBindings_ = function() {
-  this.bindings_.newSession = goog.bind(this.newSession_, this);
-  this.bindings_.quit = goog.bind(this.quit_, this);
-  this.bindings_.get = goog.bind(this.get_, this);
-};
-
 selenium.safari.Extension.prototype.setStatus_ = function(status) {
   safari.extension.bars[0].contentWindow.document.getElementById('status')
     .innerHTML = status;
@@ -73,30 +75,62 @@ selenium.safari.Extension.prototype.setStatus_ = function(status) {
 selenium.safari.Extension.prototype.addLog_ = function(message) {
   // TODO(kurniady): make this multiple-entry-capable
   safari.extension.bars[0].contentWindow.document.getElementById('log')
-    .innerHTML = message;
-  this.logs.push(message);
+    .innerHTML = "Last log entry: " + message;
+  this.logger_.info(message);
 };
 
-selenium.safari.Extension.prototype.sendResponse_ = function(status, message, opt_sessionId) {
+selenium.safari.Extension.prototype.sendResponse_ = function(status, payload, opt_sessionId) {
+
+  if (!payload) {
+    payload = {};
+  }
 
   var response = {
         "status": status,
         "sessionId": (opt_sessionId ? opt_sessionId : this.sessionId_),
-        "value": {"message": message}
+        "value": payload
       };
 
   // Scrub nulls.
   if (response.sessionId == null) {
     delete(response.sessionId);
   }
-  if (response.message == null) {
-    delete(response.message);
-  }
 
   var responseString = JSON.stringify(response);
   this.ws_.send(responseString);
   this.addLog_("Sent response: " + responseString);
   // TODO(kurniady): Status indicator fade-out here.
+};
+
+selenium.safari.Extension.prototype.onWSOpen_ = function() {
+  this.setStatus_("Connected to " + this.wsUrl_);
+  this.addLog_("Connected to " + this.wsUrl_);
+};
+
+selenium.safari.Extension.prototype.onWSMessage_ = function(event) {
+  // TODO(kurniady): status indicator fade-in here.
+  this.addLog_("Received " + event.data);
+  var data = JSON.parse(event.data);
+
+  if (data.sessionId && data.sessionId != this.sessionId_) {
+    this.sendResponse_(500, {message: "Unknown session " + data.sessionId}, data.sessionId);
+  }
+
+  var target = this.bindings_[data.command];
+  if (target) {
+    target(data);
+  } else {
+    this.sendResponse_(501, {message: data.command + " not implemented yet."});
+  }
+};
+
+// WebDriver implementation methods.
+
+selenium.safari.Extension.prototype.initBindings_ = function() {
+  this.bindings_.newSession = goog.bind(this.newSession_, this);
+  this.bindings_.quit = goog.bind(this.quit_, this);
+  this.bindings_.get = goog.bind(this.get_, this);
+  this.bindings_.getCurrentUrl = goog.bind(this.getCurrentUrl_, this);
 };
 
 selenium.safari.Extension.prototype.newSession_ = function(json) {
@@ -120,27 +154,11 @@ selenium.safari.Extension.prototype.get_ = function(json) {
   this.sendResponse_(0, null);
 };
 
-selenium.safari.Extension.prototype.onWSOpen_ = function() {
-  this.setStatus_("Connected to " + this.wsUrl_);
-  this.addLog_("Connected to " + this.wsUrl_);
+selenium.safari.Extension.prototype.getCurrentUrl_ = function(json) {
+  this.sendResponse_(0, safari.application.activeBrowserWindow.tabs[0].url);
 };
 
-selenium.safari.Extension.prototype.onWSMessage_ = function(event) {
-  // TODO(kurniady): status indicator fade-in here.
-  this.addLog_("Received " + event.data);
-  var data = JSON.parse(event.data);
-
-  if (data.sessionId && data.sessionId != this.sessionId_) {
-    this.sendResponse_(500, "Unknown session " + data.sessionId, data.sessionId);
-  }
-
-  var target = this.bindings_[data.command];
-  if (target) {
-    target(data);
-  } else {
-    this.sendResponse_(501, data.command + " not implemented yet.");
-  }
-};
+// Initialization.
 
 var extension = new selenium.safari.Extension();
 setTimeout("extension.init()", 1000);

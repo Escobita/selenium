@@ -2,6 +2,14 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../remote">
+      <sourceFolder url="file://$MODULE_DIR$/../remote/client/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../remote/client/test/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../remote/common/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../remote/common/test/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../remote/server/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../remote/server/test/java" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/js" isTestSource="false" />
