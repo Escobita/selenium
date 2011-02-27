@@ -20,7 +20,7 @@ package org.openqa.selenium.htmlunit;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 

@@ -23,7 +23,7 @@ import junit.framework.TestSuite;
 
 import org.openqa.selenium.EmptyTest;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Platform.WINDOWS;

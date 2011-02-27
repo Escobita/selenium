@@ -26,8 +26,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.openqa.selenium.DriverTestDecorator;
-import org.openqa.selenium.EnvironmentStarter;
+import org.openqa.selenium.testing.junit.DriverTestDecorator;
+import org.openqa.selenium.testing.junit.EnvironmentStarter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.internal.InProject;
 

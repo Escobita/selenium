@@ -15,10 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.testing.junit;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
+import org.openqa.selenium.NeedsDriver;
+import org.openqa.selenium.WebDriver;
 
 public class DriverTestDecorator extends TestSetup {
 

@@ -15,8 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.testing.junit;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -25,29 +27,31 @@ import java.io.File;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertTrue;
 
+import org.openqa.selenium.*;
 import org.openqa.selenium.internal.InProject;
 
 public class TestSuiteBuilder {
 
-  private Set<File> sourceDirs = new HashSet<File>();
-  private Set<Ignore.Driver> ignored = new HashSet<Ignore.Driver>();
+  private Set<File> sourceDirs = Sets.newHashSet();
+  private Set<Ignore.Driver> ignored = Sets.newHashSet();
   private Class<? extends WebDriver> driverClass;
   private boolean keepDriver;
   private boolean includeJavascript;
   private boolean withDriver = true;
   private boolean withEnvironment = true;
-  private List<String> onlyRun = new ArrayList<String>();
-  private Set<String> patterns = new HashSet<String>();
-  private Set<String> excludePatterns = new HashSet<String>();
-  private Set<String> testMethodNames = new HashSet<String>();
-  private Set<String> decorators = new LinkedHashSet<String>();
+  private List<String> onlyRun = Lists.newArrayList();
+  private Set<String> patterns = Sets.newHashSet();
+  private Set<String> excludePatterns = Sets.newHashSet();
+  private Set<String> testMethodNames = Sets.newHashSet();
+  private Set<String> decorators = Sets.newLinkedHashSet();
   private boolean outputTestNames = false;
   private File baseDir;
 

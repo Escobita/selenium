@@ -20,7 +20,7 @@ package org.openqa.selenium.lift;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 
 public class LiftTestSuite extends TestCase {
   public static Test suite() throws Exception {

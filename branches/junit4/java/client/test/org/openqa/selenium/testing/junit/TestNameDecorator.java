@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.openqa.selenium;
+package org.openqa.selenium.testing.junit;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;

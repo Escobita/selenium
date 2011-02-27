@@ -22,7 +22,7 @@ import static org.openqa.selenium.Ignore.Driver.CHROME_NON_WINDOWS;
 
 import org.openqa.selenium.Build;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.io.FileHandler;
 import org.openqa.selenium.internal.InProject;

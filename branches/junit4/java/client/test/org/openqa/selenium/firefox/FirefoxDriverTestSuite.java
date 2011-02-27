@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import org.openqa.selenium.Build;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 import org.openqa.selenium.internal.InProject;
 import org.openqa.selenium.remote.DesiredCapabilities;
 

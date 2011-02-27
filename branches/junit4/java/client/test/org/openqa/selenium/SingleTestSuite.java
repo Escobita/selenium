@@ -19,6 +19,7 @@ package org.openqa.selenium;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 
 import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.net.PortProber.findFreePort;
@@ -69,7 +70,7 @@ public class SingleTestSuite extends TestCase {
           "org.openqa.selenium.v1.SeleniumServerStarter");
     }
 
-    builder.addSuiteDecorator("org.openqa.selenium.TestNameDecorator");
+    builder.addSuiteDecorator("org.openqa.selenium.testing.junit.TestNameDecorator");
 
     return builder.create();
   }

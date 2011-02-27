@@ -20,7 +20,7 @@ package org.openqa.selenium.android;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.openqa.selenium.TestSuiteBuilder;
+import org.openqa.selenium.testing.junit.TestSuiteBuilder;
 import org.openqa.selenium.android.environment.AndroidTestEnvironment;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.environment.TestEnvironment;
