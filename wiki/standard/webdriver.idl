@@ -1,0 +1,133 @@
+
+// TODO: Add exceptions to methods
+
+exception WebDriverException {
+};
+
+exception NotFoundException : WebDriverException {
+};
+
+exception NoSuchElementException : NotFoundException {
+};
+
+exception NoSuchWindowException : NotFoundException {
+};
+
+exception NoSuchFrameException : NotFoundException {
+};
+
+exception NoSuchAlertException : NotFoundException {
+};
+
+
+interface WebElementList {
+  readonly attribute unsigned long length;
+  caller getter WebElement item(in unsigned long index);
+};
+
+// TODO(simon): This is a By from the wire protocol.
+interface Locator {
+  // Locating mechanism, eg. "xpath", "id", "css"
+  readonly attribute DOMString mechanism;
+  // The value to pass to the appropriate finding mechanism
+  readonly attribute DOMString value;
+};
+
+interface SearchContext {
+  caller getter WebElementList findElements(in Locator locator);
+  caller getter WebElement findElement(in Locator locator);
+};
+
+interface WebElement : SearchContext {
+  void clear();
+  void click();
+  DOMString getAttribute(DOMString attributeName);
+  void sendKeys(DOMString value);
+  void submit();
+  void toggle();
+
+  readonly attribute boolean enabled;
+  attribute boolean selected;
+  readonly attribute DOMString tagName;
+  readonly attribute DOMString text;
+  readonly attribute DOMString value;
+};	
+
+// Has no properties.
+interface WindowHandle {
+};
+
+interface WindowHandleSet {
+  readonly attribute unsigned long length;
+  caller getter WindowHandle item(in unsigned long index);
+};
+
+// TODO(simonstewart): Needs httponly as a boolean attribute
+interface Cookie {
+  readonly attribute DOMString name;
+  readonly attribute DOMString value;
+  // TODO(simonstewart): Use the HTML5 date type
+  readonly attribute DOMString date;
+  readonly attribute DOMString domain;
+  readonly attribute DOMString path;
+  readonly attribute boolean secure;
+};
+
+interface TimeUnit {
+  readonly attribute long time;
+  readonly attribute DOMString measuredIn;
+};
+
+interface Timeouts {
+  attribute TimeUnit implicitWait;
+  attribute TimeUnit scriptTimeout;
+};
+
+// TODO(simonstewart): Called "Options" in the Java world. A better name?
+interface Manage {
+  void addCookie(Cookie cookie);
+  void deleteCookie(Cookie cookie);
+  void deleteCookieNamed(DOMString name);
+  void deleteAllCookies();
+
+  readonly attribute Timeouts timeouts;
+};
+
+interface Navigate {
+  void back();
+  void forward();
+  void refresh();
+  void to(DOMString url);
+};
+
+interface Alert {
+  void accept();
+  void dismiss();
+  void sendKeys(DOMString keys);
+
+  readonly attribute DOMString text;
+};
+
+interface TargetLocator {
+  WebDriver frame(int index);
+  WebDriver frame(String nameOrId);
+  WebDriver frame(WebElement frameElement);
+
+  readonly attribute WebElement activeElement;
+  readonly attribute Alert alert;
+  readonly attribute WebDriver defaultContent;
+};
+
+interface WebDriver : SearchContext {
+  void close();
+  void quit();
+  
+  readonly attribute WindowHandle currentWindow;
+  readonly attribute Manage manage;
+  readonly attribute Navigate navigateTo;
+  readonly attribute DOMString pageSource;
+  readonly attribute TargetLocator switchTo;
+  readonly attribute DOMString title;
+  attribute DOMString url;
+  readonly attribute WindowHandleSet windows;
+};
