@@ -1,8 +1,8 @@
 #summary A description of the protocol used by WebDriver to communicate with remote instances
 #labels WebDriver
 <wiki:comment>
-==============================================================================
-==============================================================================
+========================================================
+========================================================
 
 DO NOT EDIT THIS WIKI PAGE THROUGH THE UI.
 
@@ -16,8 +16,8 @@ $ svn update --depth=files ./trunk
 $ python ./trunk/wire.py > ./wiki/JsonWireProtocol.wiki
 $ svn commit ./trunk/wire.py ./wiki/JsonWireProtocol.wiki
 
-==============================================================================
-==============================================================================
+========================================================
+========================================================
 </wiki:comment>
 
 <font size=6>*The !WebDriver Wire Protocol*</font>
@@ -1080,7 +1080,19 @@ such cookie visible to the current page.</dd>
 <dd>*POST /session/:sessionId/element*</dd>
 <dd>
 <dl>
-<dd>Search for an element on the page, starting from the document root. The located element will be returned as a WebElement JSON object.</dd>
+<dd>Search for an element on the page, starting from the document root. The located element will be returned as a WebElement JSON object. The table below lists the locator strategies that each server should support. Each locator must return the first matching element located in the DOM.
+
+|| *Strategy* || *Description* ||
+|| class name || Returns an element whose class name contains the search value; compound class names are not permitted. ||
+|| css || Returns an element matching a CSS selector. ||
+|| id || Returns an element whose ID attribute matches the search value. ||
+|| name || Returns an element whose NAME attribute matches the search value. ||
+|| link text || Returns an anchor element whose visible text matches the search value. ||
+|| partial link text || Returns an anchor element whose visible text partially matches the search value. ||
+|| tag name || Returns an element whose tag name matches the search value. ||
+|| xpath || Returns an element matching an XPath expression. ||
+
+</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -1125,7 +1137,19 @@ such cookie visible to the current page.</dd>
 <dd>*POST /session/:sessionId/elements*</dd>
 <dd>
 <dl>
-<dd>Search for multiple elements on the page, starting from the document root. The located elements will be returned as a WebElement JSON objects.</dd>
+<dd>Search for multiple elements on the page, starting from the document root. The located elements will be returned as a WebElement JSON objects. The table below lists the locator strategies that each server should support. Elements should be returned in the order located in the DOM.
+
+|| *Strategy* || *Description* ||
+|| class name || Returns all elements whose class name contains the search value; compound class names are not permitted. ||
+|| css || Returns all elements matching a CSS selector. ||
+|| id || Returns all elements whose ID attribute matches the search value. ||
+|| name || Returns all elements whose NAME attribute matches the search value. ||
+|| link text || Returns all anchor elements whose visible text matches the search value. ||
+|| partial link text || Returns all anchor elements whose visible text partially matches the search value. ||
+|| tag name || Returns all elements whose tag name matches the search value. ||
+|| xpath || Returns all elements matching an XPath expression. ||
+
+</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -1228,7 +1252,19 @@ such cookie visible to the current page.</dd>
 <dd>*POST /session/:sessionId/element/:id/element*</dd>
 <dd>
 <dl>
-<dd>Search for an element on the page, starting from the identified element. The located element will be returned as a WebElement JSON object.</dd>
+<dd>Search for an element on the page, starting from the identified element. The located element will be returned as a WebElement JSON object. The table below lists the locator strategies that each server should support. Each locator must return the first matching element located in the DOM.
+
+|| *Strategy* || *Description* ||
+|| class name || Returns an element whose class name contains the search value; compound class names are not permitted. ||
+|| css || Returns an element matching a CSS selector. ||
+|| id || Returns an element whose ID attribute matches the search value. ||
+|| name || Returns an element whose NAME attribute matches the search value. ||
+|| link text || Returns an anchor element whose visible text matches the search value. ||
+|| partial link text || Returns an anchor element whose visible text partially matches the search value. ||
+|| tag name || Returns an element whose tag name matches the search value. ||
+|| xpath || Returns an element matching an XPath expression. The provided XPath expression must be applied to the server "as is"; if the expression is not relative to the element root, the server should not modify it. Consequently, an XPath query may return elements not contained in the root element's subtree. ||
+
+</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -1275,7 +1311,19 @@ such cookie visible to the current page.</dd>
 <dd>*POST /session/:sessionId/element/:id/elements*</dd>
 <dd>
 <dl>
-<dd>Search for multiple elements on the page, starting from the identified element. The located elements will be returned as a WebElement JSON objects.</dd>
+<dd>Search for multiple elements on the page, starting from the identified element. The located elements will be returned as a WebElement JSON objects. The table below lists the locator strategies that each server should support. Elements should be returned in the order located in the DOM.
+
+|| *Strategy* || *Description* ||
+|| class name || Returns all elements whose class name contains the search value; compound class names are not permitted. ||
+|| css || Returns all elements matching a CSS selector. ||
+|| id || Returns all elements whose ID attribute matches the search value. ||
+|| name || Returns all elements whose NAME attribute matches the search value. ||
+|| link text || Returns all anchor elements whose visible text matches the search value. ||
+|| partial link text || Returns all anchor elements whose visible text partially matches the search value. ||
+|| tag name || Returns all elements whose tag name matches the search value. ||
+|| xpath || Returns all elements matching an XPath expression. The provided XPath expression must be applied to the server "as is"; if the expression is not relative to the element root, the server should not modify it. Consequently, an XPath query may return elements not contained in the root element's subtree. ||
+
+</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
