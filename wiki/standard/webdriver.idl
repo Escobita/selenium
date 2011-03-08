@@ -90,7 +90,7 @@ interface CookieJar {
 };
 
 // TODO(simonstewart): Called "Options" in the Java world. A better name?
-interface Manage {
+interface Options {
   readonly attribute CookieJar cookies;
   readonly attribute Timeouts timeouts;
 };
@@ -125,7 +125,7 @@ interface WebDriver : SearchContext {
   void quit();
   
   readonly attribute WindowHandle currentWindow;
-  readonly attribute Manage manage;
+  readonly attribute Options manage;
   readonly attribute Navigate navigateTo;
   readonly attribute DOMString pageSource;
   readonly attribute TargetLocator switchTo;
