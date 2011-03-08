@@ -50,7 +50,6 @@ interface WebElement : SearchContext {
   attribute boolean selected;
   readonly attribute DOMString tagName;
   readonly attribute DOMString text;
-  readonly attribute DOMString value;
 };	
 
 // Has no properties.
@@ -83,13 +82,16 @@ interface Timeouts {
   attribute TimeUnit scriptTimeout;
 };
 
-// TODO(simonstewart): Called "Options" in the Java world. A better name?
-interface Manage {
+interface CookieJar {
   void addCookie(Cookie cookie);
   void deleteCookie(Cookie cookie);
   void deleteCookieNamed(DOMString name);
   void deleteAllCookies();
+};
 
+// TODO(simonstewart): Called "Options" in the Java world. A better name?
+interface Manage {
+  readonly attribute CookieJar cookies;
   readonly attribute Timeouts timeouts;
 };
 
