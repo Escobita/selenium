@@ -192,6 +192,11 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/execute || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
 || POST || /session/:sessionId/execute_async || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || _N/A_ ||
 || GET || /session/:sessionId/screenshot || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
+|| GET || /session/:sessionId/ime/available_engines || List all available engines on the machine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getAvailableEngines() WebDriver.ImeHandler#getAvailableEngines()] ||
+|| GET || /session/:sessionId/ime/active_engine || Get the name of the active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getActiveEngine() WebDriver.ImeHandler#getActiveEngine()] ||
+|| GET || /session/:sessionId/ime/activated || Indicates whether IME input is active at the moment (not if it's available. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#isActivated() WebDriver.ImeHandler#isActivated()] ||
+|| POST || /session/:sessionId/ime/deactivate || De-activates the currently-active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#deactivate() WebDriver.ImeHandler#deactivate()] ||
+|| POST || /session/:sessionId/ime/activate || Make an engines that is available (appears on the listreturned by getAvailableEngines) active. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#activateEngine(java.lang.String) WebDriver.ImeHandler#activateEngine(java.lang.String)] ||
 || POST || /session/:sessionId/frame || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
 || POST || /session/:sessionId/window || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
 || DELETE || /session/:sessionId/window || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
@@ -709,6 +714,191 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/ime/available_engines ===
+
+<dl>
+<dd>*GET /session/:sessionId/ime/available_engines*</dd>
+<dd>
+<dl>
+<dd>List all available engines on the machine. To use an engine, it has to be present in this list.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<string>}` A list of available engines</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`ImeNotAvailableException` - If the host does not support IME</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getAvailableEngines() WebDriver.ImeHandler#getAvailableEngines()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/ime/active_engine ===
+
+<dl>
+<dd>*GET /session/:sessionId/ime/active_engine*</dd>
+<dd>
+<dl>
+<dd>Get the name of the active IME engine. The name string is platform specific.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The name of the active IME engine.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`ImeNotAvailableException` - If the host does not support IME</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getActiveEngine() WebDriver.ImeHandler#getActiveEngine()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/ime/activated ===
+
+<dl>
+<dd>*GET /session/:sessionId/ime/activated*</dd>
+<dd>
+<dl>
+<dd>Indicates whether IME input is active at the moment (not if it's available.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{boolean}` true if IME input is available and currently active, false otherwise</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`ImeNotAvailableException` - If the host does not support IME</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#isActivated() WebDriver.ImeHandler#isActivated()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/ime/deactivate ===
+
+<dl>
+<dd>*POST /session/:sessionId/ime/deactivate*</dd>
+<dd>
+<dl>
+<dd>De-activates the currently-active IME engine.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`ImeNotAvailableException` - If the host does not support IME</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#deactivate() WebDriver.ImeHandler#deactivate()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/ime/activate ===
+
+<dl>
+<dd>*POST /session/:sessionId/ime/activate*</dd>
+<dd>
+<dl>
+<dd>Make an engines that is available (appears on the list
+returned by getAvailableEngines) active. After this call, the engine will
+be added to the list of engines loaded in the IME daemon and the input sent
+using sendKeys will be converted by the active engine.
+Note that this is a platform-independent method of activating IME
+(the platform-specific way being using keyboard shortcuts</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`engine` - `{string}` Name of the engine to activate.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`ImeActivationFailedException` - If the engine is not available or if the activation fails for other reasons.</dd>
+<dd>`ImeNotAvailableException` - If the host does not support IME</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#activateEngine(java.lang.String) WebDriver.ImeHandler#activateEngine(java.lang.String)]</dd>
 </dl>
 </dd>
 </dl>
