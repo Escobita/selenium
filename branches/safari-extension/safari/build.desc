@@ -6,7 +6,6 @@
 js_binary(name = "injected",
   srcs = [
     "src/js/injected.js",
-    "src/js/pagedriver.js",
   ],
   deps = [
     "//common:atoms",

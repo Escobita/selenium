@@ -12,6 +12,9 @@ public class Experimenter {
   public static void main(String[] args) throws Exception {
     SafariDriver driver = new SafariDriver();
 
+    driver.get("http://www/~kurniady/script_test.html");
+
+    /*
     for (int i=0;i<10;i++) {
       driver.get("http://www.google.com");
       Thread.sleep(1000);
@@ -24,6 +27,12 @@ public class Experimenter {
       System.err.println("Current title is : " + driver.getTitle());
       Thread.sleep(1000);
     }
+*/
+
+    // TODO(kurniady): fix this
+    Thread.sleep(3000);
+
+    driver.executeScript("window.console.log('hello!');");
 
     System.err.println("Done, idle sleep...");
 
