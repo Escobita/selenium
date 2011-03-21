@@ -39,6 +39,22 @@ js.executeScript("return document.title");
 
 Other language bindings will follow a similar approach. Take a look at the UsingJavascript page for more information.
 
+=== Q: Why is my Javascript execution always returning null? ===
+
+A: You need to return from your javascript snippet to return a value, so:
+
+{{{
+js.executeScript("document.title");
+}}}
+
+will return null, but:
+
+{{{
+js.executeScript("return document.title");
+}}}
+
+will return the title of the document.
+
 === Q: Which browsers does WebDriver support? ===
 
 A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
