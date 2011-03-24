@@ -15,7 +15,7 @@ Google will pay successful student contributors a $5000 USD stipend, enabling th
 
 When participating in the Selenium - Google Summer of Code program, students will learn that testing, and building automated testing tools, can be both fun and an integral part of delivering high quality software.  The collaborative effort with Selenium contributors can provide you with a new toolset to develop and document a set of components used by thousands of people.   You will gain valuable professional experience towards your career development and ultimately help drive higher quality web applications everywhere.
 
-Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
+Please [mailto:adam@element34.ca Email] questions to GSoC coordinator Adam Goucher
 
 =Student Eligibility=
 
@@ -38,11 +38,11 @@ If you meet the above requirements, we’d love to have you apply to Selenium fo
    # Selenium GSoC team will finish reviewing applications and match students with mentors by April 21, 2010.
    # Google announces accepted students on April 26, 2010.
 
-Please [mailto:grace@saucelabs.com Email] questions to GSoC coordinator Grace Law
+Please [mailto:adam@element34.ca Email] questions to GSoC coordinator Adam Goucher
 
 =Project Ideas=
 
-These are project ideas proposed by mentors.  Please send a post to the  [http://groups.google.com/group/selenium-developers/ developer mailing list] if you are interested in it or [mailto:grace@saucelabs.com email] GSoC coordinator Grace Law.
+These are project ideas proposed by mentors.  Please send a post to the  [http://groups.google.com/group/selenium-developers/ developer mailing list] if you are interested in it or [mailto:adam@element34.ca email] GSoC coordinator Adam Goucher.
 
 ==A Scriptable Proxy==
 
@@ -85,7 +85,7 @@ It is possible to run Selenese scripts outside of Se-IDE with the -htmlSuite opt
 
 =Perspective mentors=
 
-It's not too late to apply to be a mentor, if you are interested, please add your project idea here and discuss logistics with [mailto:grace@saucelabs.com Grace Law]
+It's not too late to apply to be a mentor, if you are interested, please add your project idea here and discuss logistics with [mailto:adam@element34.ca Adam Goucher]
 
 =Expectations=
  
