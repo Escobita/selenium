@@ -11,7 +11,7 @@ Since 2005, Google has administered [http://code.google.com/soc/ Google Summer o
     * Get more open source code created and released for the benefit of all
     * Help open source projects identify and bring in new developers and committers
 
-Google will pay successful student contributors a $5000 USD stipend, enabling them to focus on their coding projects for three months.  The deadline for application is *April 9, 2010*. 
+Google will pay successful student contributors a $5000 USD stipend, enabling them to focus on their coding projects for three months.  The deadline for application is *April 8, 2011*. 
 
 When participating in the Selenium - Google Summer of Code program, students will learn that testing, and building automated testing tools, can be both fun and an integral part of delivering high quality software.  The collaborative effort with Selenium contributors can provide you with a new toolset to develop and document a set of components used by thousands of people.   You will gain valuable professional experience towards your career development and ultimately help drive higher quality web applications everywhere.
 
@@ -34,9 +34,9 @@ If you meet the above requirements, we’d love to have you apply to Selenium fo
    # Read [GoogleSummerOfCode#Expectations Expectations] to understand what is expected of you.
    # Read [GoogleSummerOfCode#Application Applications] to find out what to put on your application.
    # Take a look at the [GoogleSummerOfCode#Project_Ideas Project Ideas].  If any interest you, feel free to contact the proposer for details.  You can also discuss your own project ideas with the people mentioned or talk about them on our [http://groups.google.com/group/selenium-developers/ developer mailing list] or on IRC #selenium on freenode
-   # [http://www.google-melange.com/gsoc/profile/student/google/gsoc2011 Submit your application directly to Google] before April 8, 2011.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
+   # [http://www.google-melange.com/gsoc/profile/student/google/gsoc2011 Submit your application directly to Google] before April 8, 2011.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 23, 2011.
    # Selenium GSoC team will finish reviewing applications and match students with mentors by April 23, 2011.
-   # Google announces accepted students on April 26, 2010.
+   # Google announces accepted students on April 26, 2011.
 
 Please [mailto:adam@element34.ca Email] questions to GSoC coordinator Adam Goucher
 
