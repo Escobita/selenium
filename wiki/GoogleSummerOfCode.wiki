@@ -34,8 +34,8 @@ If you meet the above requirements, we’d love to have you apply to Selenium fo
    # Read [GoogleSummerOfCode#Expectations Expectations] to understand what is expected of you.
    # Read [GoogleSummerOfCode#Application Applications] to find out what to put on your application.
    # Take a look at the [GoogleSummerOfCode#Project_Ideas Project Ideas].  If any interest you, feel free to contact the proposer for details.  You can also discuss your own project ideas with the people mentioned or talk about them on our [http://groups.google.com/group/selenium-developers/ developer mailing list] or on IRC #selenium on freenode
-   # [http://socghop.appspot.com/gsoc/student/apply/google/gsoc2010 Submit your application directly to Google] before April 9, 2010.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
-   # Selenium GSoC team will finish reviewing applications and match students with mentors by April 21, 2010.
+   # [http://www.google-melange.com/gsoc/profile/student/google/gsoc2011 Submit your application directly to Google] before April 8, 2011.  You can modify your application with your mentors' feedback after your initial submission, the final version of your application is due April 18, 2010.
+   # Selenium GSoC team will finish reviewing applications and match students with mentors by April 23, 2011.
    # Google announces accepted students on April 26, 2010.
 
 Please [mailto:adam@element34.ca Email] questions to GSoC coordinator Adam Goucher
