@@ -3,71 +3,113 @@
 
 = Chrome Driver =
 
-See below for instructions on how to install the ChromeDriver. 
+Developed in collaboration with the Chromium team, the !ChromeDriver is a standalone server which implements !WebDriver's  [JsonWireProtocol wire protocol].
 
-Note that ChromeDriver is one of the newest drivers. Please report any problems through the mailing list/issue tracker.
+== Requirements ==
 
-== Before Going Any Further ==
+The !ChromeDriver controls the browser using Chrome's automation proxy framework.  Consequently, the !ChromeDriver is only compatible with Chrome version 12.0.712.0 or newer, which is currently available on the [http://www.chromium.org/getting-involved/dev-channel dev channel].
 
-The ChromeDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-chrome.jar}}} or {{{webdriver-all.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
-
-The ChromeDriver works with any version of Google Chrome >= 4.0.
-
-== Pros ==
-
- * Runs in a real browser and supports Javascript
- * Because Chrome is a Webkit-based browser, the ChromeDriver may allow you to verify that your site works in Safari. Note that since Chrome uses its own V8 javascript engine rather than Safari's Nitro engine, javascript execution may differ.
-
-== Cons ==
- 
- * Slower than the HtmlUnitDriver
-
-== Known issues ==
-
-Iframes which have no src attribute, i.e. <iframe src=""> or <iframe> are unsupported.  This will be fixed by [http://code.google.com/p/chromium/issues/detail?id=20773 Chrome bug 20773], but is not likely to happen until at least October 2009.
-
-Only one instance at a time will run.  This is due to a bug in Chrome on Linux and Mac [http://code.google.com/p/chromium/issues/detail?id=11547 Chrome bug 11547].  On Windows, you can apply [http://selenium.googlecode.com/files/ChromeDriverMultipleInstancePatch.diff this patch] to the WebDriver source which will enable multiple instances to run concurrently, but this version of the WebDriver source will then not work on Linux or Mac.
-
-File uploading using <input type="file"> elements is currently unsupported. We aim to support this on Windows in the near future.
-
-Hovering and dragging and dropping are currently unsupported.
-
-ChromeDriver.get(url) will clear the navigating history of your session (ChromeDriver.navigate().back() and ChromeDriver.navigate().forward will stop working).
-
-=== Additionally, on Mac and Linux: ===
-
-Native events are unsupported.  Clicking will work, but only fires limited events.  Typing will only fire a limited range of events, and only works on TEXTAREA and INPUT elements. We aim to have this problem solved by late November (2009: there's a promise for posterity)
-
-== Important System Properties ==
-
-The following system properties (read using {{{System.getProperty()}}} and set using {{{System.setProperty()}}} in Java code or the "{{{-DpropertyName=value}}}" command line flag) are used by the ChromeDriver:
-
-|| *Property* || *What it means* ||
-|| webdriver.chrome.bin || The location of the binary used to control chrome. ||
-|| webdriver.reap_profile || Should be "true" if temporary files and profiles should not be deleted ||
-
-Normally the Chrome binary is assumed to be in the default location for your particular operating system:
-
+The server expects you to have Chrome installed in the default location for each system:
 || *OS* || *Expected Location of Chrome* ||
 || Linux || /usr/bin/google-chrome ||
-|| Mac || /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome *or* /User/:username/:as_to_the_left ||
+|| Mac || /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome ||
 || Windows XP || %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe ||
 || Windows Vista || C:\Users\%USERNAME%\AppData\Local\Google\Chrome\Application\chrome.exe ||
 
-== Installing a Downloaded Binary ==
+== Getting Started ==
 
-The "wedriver-all.zip" which may be [http://code.google.com/p/selenium/downloads/list downloaded from the website], contains all the dependencies required to run the ChromeDriver. In order to use it, copy all the "jar" files on to your CLASSPATH.
+Since the !ChromeDriver implements the wire protocol, it is fully compatible with any RemoteWebDriver client. To get set up, first [http://code.google.com/p/selenium/downloads/list download] the appropriate prebuilt server.  Next, create a new client and away you go:
+{{{
+WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.chrome());
+driver.get("http://www.google.com");
+}}}
 
-== Installing the Quick Way From Source ==
+=== Running the server in a child process ===
 
-If you're doing development work on the ChromeDriver itself, the test suites are arranged in such a way as to use the version of webdriver found in {{{chrome/src/extension}}}.  It will automatically (automagically?) copy over {{{build/Win32/Debug/npchromedriver.dll}}} into the extension if you're on Windows.  Make sure that this DLL has been compiled using Visual Studio/msbuild (it's part of WebDriver.sln).  Note that {{{rake clean}}} will delete this file, so you will need to recompile after {{{rake clean}}}ing.
+You may elect to start and stop the !ChromeDriver server as a child of your test process.  First, make sure the downloaded server can be located on your `PATH` or specify its location via the `webdriver.chrome.driver` system property. Finally, all you need to do is create a new `!ChromeDriver` instance:
+{{{
+WebDriver driver = new ChromeDriver();
+driver.get("http://www.google.com");
+}}}
 
-The underlying assumption is that your installation of chrome is pretty standard (i.e. where the installer puts it).  If your chrome is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the ChromeDriver where your Chrome binary is:
+You may notice that the `ChromeDriver` class is merely a convenience class that starts the server upon creation and shuts it down when you call [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() quit].  While the server is light weight, starting and stopping it multiple times will add a noticeable delay to a larger test suite.  To compensate for this, you can directly control the life and death of the server using the `ChromeDriverService`:
+{{{
+import static org.junit.Assert.assertEquals;
 
-{{{System.setProperty("webdriver.chrome.bin", "d:\\apps\\google\\chrome.exe");}}}
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
-= The New ChromeDriver = 
+@RunWith(BlockJUnit4ClassRunner.class)}
+public class ChromeTest extends TestCase {
 
-There is a new chrome driver being implemented as part of the Chromium project. This is expected to become the standard version once it's complete. To build it, check out the chromium tree, then run `make chromedriver`. This will generate a new `chromedriver` executable in the same directory as `chrome` which can be run to start a server that understands the JsonWireProtocol and can be used with the RemoteWebDriver.
+  private static ChromeDriverService service;
+  private WebDriver driver;
 
-As it stands, the new ChromeDriver lacks functionality. You can apply the patches [http://codereview.chromium.org/user/Joe here] to add this missing functionality.
+  @BeforeClass
+  public static void createAndStartService() {
+    service = new ChromeDriverService.Builder()
+        .usingChromeDriverExecutable(new File("path/to/my/chromedriver"))
+        .usingAnyFreePort()
+        .build();
+    service.start();
+  }
+
+  @AfterClass
+  public static void createAndStopService() {
+    service.stop();
+  }
+
+  @Before
+  public void createDriver() {
+    driver = new RemoteWebDriver(service.getUrl(),
+        DesiredCapabilities.chrome());
+  }
+
+  @After
+  public void quitDriver() {
+    driver.quit();
+  }
+
+  @Test
+  public void testGoogleSearch() {
+    driver.get("http://www.google.com");
+    WebElement searchBox = driver.findElement(By.name("q"));
+    searchBox.sendKeys("webdriver");
+    searchBox.quit();
+    assertEquals("webdriver - Google Search", driver.getTitle());
+  }
+}
+}}}
+
+== Known Issues ==
+
+There are a handful of known issues with !ChromeDriver, listed below:
+
+  # Can only retrieve the name and value of set cookies (no domain, path, etc.)
+  # Typing does not work with rich-text enabled documents
+  # Cannot specify a custom profile
+  # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeAsyncScript(java.lang.String,%20java.lang.Object...) Asynchronous script execution] not implemented
+  # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/html5/package-summary.html HTML 5 API] not implemented
+  # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/package-summary.html Advanced user interactions API] not implemented
+
+== Testing earlier versions of Chrome ==
+
+As previously mentioned, the !ChromeDriver is only compatible with Chrome version 12.0.712.0 or newer.  If you need to test an older version of Chrome, use Selenium RC  and a Selenium-backed WebDriver instance:
+{{{
+URL seleniumServerUrl = new URL("http://localhost:4444");
+URL serverUnderTest = new URL("http://www.google.com");
+CommandExecutor executor = new SeleneseCommandExecutor(
+    seleniumServerUrl, serverUnderTest, DesiredCapabilities.chrome());
+WebDriver driver = new RemoteWebDriver(executor);
+}}}
+
+== Building From Source ==
+
+The !ChromeDriver is available as part of the [http://www.chromium.org Chromium] project.  See this [http://dev.chromium.org/developers/testing/webdriver-for-chrome page] if you'd like to build the server yourself.
