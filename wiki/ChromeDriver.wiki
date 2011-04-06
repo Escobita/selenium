@@ -18,19 +18,13 @@ The server expects you to have Chrome installed in the default location for each
 
 == Getting Started ==
 
-Since the !ChromeDriver implements the wire protocol, it is fully compatible with any RemoteWebDriver client. To get set up, first [http://code.google.com/p/selenium/downloads/list download] the appropriate prebuilt server.  Next, create a new client and away you go:
-{{{
-WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.chrome());
-driver.get("http://www.google.com");
-}}}
-
-=== Running the server in a child process ===
-
-You may elect to start and stop the !ChromeDriver server as a child of your test process.  First, make sure the downloaded server can be located on your `PATH` or specify its location via the `webdriver.chrome.driver` system property. Finally, all you need to do is create a new `!ChromeDriver` instance:
+To get set up, first [http://code.google.com/p/selenium/downloads/list download] the appropriate prebuilt server.  Make sure the downloaded server can be located on your `PATH` or specify its location via the `webdriver.chrome.driver` system property. Finally, all you need to do is create a new `ChromeDriver` instance:
 {{{
 WebDriver driver = new ChromeDriver();
 driver.get("http://www.google.com");
 }}}
+
+=== Running the server in a child process ===
 
 You may notice that the `ChromeDriver` class is merely a convenience class that starts the server upon creation and shuts it down when you call [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() quit].  While the server is light weight, starting and stopping it multiple times will add a noticeable delay to a larger test suite.  To compensate for this, you can directly control the life and death of the server using the `ChromeDriverService`:
 {{{
@@ -86,6 +80,14 @@ public class ChromeTest extends TestCase {
     assertEquals("webdriver - Google Search", driver.getTitle());
   }
 }
+}}}
+
+=== Running the server as a standalone process ===
+
+Since the !ChromeDriver implements the wire protocol, it is fully compatible with any RemoteWebDriver client. Simply start up your server, create a client, and away you go:
+{{{
+WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.chrome());
+driver.get("http://www.google.com");
 }}}
 
 == Known Issues ==
