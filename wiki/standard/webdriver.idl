@@ -1,4 +1,32 @@
 
+// SPI
+
+interface Command {
+  // Opaque key
+  attribute string sessionId;
+  
+  attribute string name;
+  
+  // TODO(simon): This is really a dictionary of key/value pairs
+  attribute object parameters;
+};
+
+
+interface Response {
+  readonly attribute string sessionId;
+  
+  // TODO(simon): Is there an "int" type?
+  // A non-zero error code indicates an error
+  readonly attribute unsigned long status;
+  
+  readonly attribute object value;
+};
+
+
+
+// API
+
+
 // TODO: Add exceptions to methods
 
 exception WebDriverException {
