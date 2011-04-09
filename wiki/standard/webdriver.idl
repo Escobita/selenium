@@ -28,23 +28,24 @@ interface Response {
 
 
 // TODO: Add exceptions to methods
+// Using interfaces since WebIDL's exception type doesn't support inhertiance (http://www.w3.org/Bugs/Public/show_bug.cgi?id=12464)
 
-exception WebDriverException {
+interface WebDriverException {
 };
 
-exception NotFoundException : WebDriverException {
+interface NotFoundException : WebDriverException {
 };
 
-exception NoSuchElementException : NotFoundException {
+interface NoSuchElementException : NotFoundException {
 };
 
-exception NoSuchWindowException : NotFoundException {
+interface NoSuchWindowException : NotFoundException {
 };
 
-exception NoSuchFrameException : NotFoundException {
+interface NoSuchFrameException : NotFoundException {
 };
 
-exception NoSuchAlertException : NotFoundException {
+interface NoSuchAlertException : NotFoundException {
 };
 
 
