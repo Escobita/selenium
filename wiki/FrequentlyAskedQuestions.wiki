@@ -199,3 +199,10 @@ A: If there's something that you'd like WebDriver to do, or you've found a bug, 
 === Q: Why Is The InternetExplorerDriver Called Jobbie? ===
 
 A: It started out as a play on "[http://jacobie.sourceforge.net jacobie]". It's not terribly funny, I know, but it made sense at the time and the name has stayed.
+
+=== Q: Selenium server sometimes takes a long time to start a new session ? ===
+
+A: If you're running on linux, you will need to increase the amount of entropy available for secure random number generation. Most linux distros can install a package called "randomsound" to do this.
+
+On Windows (XP), you may be running into http://bugs.sun.com/view_bug.do?bug_id=6705872, which usually means clearing out a lot of files from your temp directory.
+temp directory.
