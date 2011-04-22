@@ -3,7 +3,7 @@
 
 = Internet Explorer Driver =
 
-This driver has been tested with IE 6, 7 and 8 on XP, but should also work with IE 5.5. It has also been successfully tested on Vista
+This driver has been tested with IE 6, 7, 8 and 9 on appropriate combinations of XP, Vista and Windows 7.
 
 == Installing ==
 
@@ -20,4 +20,4 @@ Simply add the {{{webdriver-all.jar}}} or {{{webdriver-ie.jar}}} to your CLASSPA
 
 == Required Configuration ==
 
- * Add every site you intend to visit to your "Trusted Sites" If you do not do this, then you will not be able to interact with the page.
+ * On IE 7 or higher on Windows Vista or Windows 7, you must set the Protected Mode settings for each zone to be the same value. The value can be on or off, as long as it is the same for every zone. To set the Protected Mode settings, choose "Internet Options..." from the Tools menu, and click on the Security tab. For each zone, there will be a check box at the bottom of the tab labeled "Enable Protected Mode".
