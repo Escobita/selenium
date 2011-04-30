@@ -3,7 +3,9 @@
 
 = Internet Explorer Driver =
 
-This driver has been tested with IE 6, 7, 8 and 9 on appropriate combinations of XP, Vista and Windows 7.
+This driver has been tested with IE 6, 7, 8 and 9 on appropriate combinations of XP, Vista and Windows 7. 
+
+The driver supports running 32-bit and 64-bit versions of the browser, but the choice of how to determine which "bit-ness" to use in launching the browser is left to the language bindings. However, the general rule of thumb is that if the code that instantiates the driver is running in a 32-bit process, the 32-bit version of IE will be launched. Similarly, if the code intantiating the driver is in a 64-bit process, the 64-bit version of IE will be launched.
 
 == Installing ==
 
