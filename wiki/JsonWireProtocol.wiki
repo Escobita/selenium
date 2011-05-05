@@ -237,6 +237,10 @@ Given these mappings, the server should always route requests whose final path s
 || POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
 || GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
 || POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
+|| GET || /session/:sessionId/alert_text || Gets the text of the currently displayed JavaScript `alert()`, `confirm()`, or `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#getText() Alert#getText()] ||
+|| POST || /session/:sessionId/alert_text || Sends keystrokes to a JavaScript `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#sendKeys() Alert#sendKeys()] ||
+|| POST || /session/:sessionId/accept_alert || Accepts the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#accept() Alert#accept()] ||
+|| POST || /session/:sessionId/dismiss_alert || Dismisses the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#dismiss() Alert#dismiss()] ||
 || POST || /session/:sessionId/moveto || Move the mouse by an offset of the specificed element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
 || POST || /session/:sessionId/click || Click any mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAction.html#perform() ClickAction#perform()] ||
 || POST || /session/:sessionId/buttondown || Click and hold the left mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
@@ -2443,6 +2447,132 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/alert_text ===
+
+<dl>
+<dd>*GET /session/:sessionId/alert_text*</dd>
+<dd>
+<dl>
+<dd>Gets the text of the currently displayed JavaScript `alert()`, `confirm()`, or `prompt()` dialog.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{string}` The text of the currently displayed alert.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoAlertPresent` - If there is no alert displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#getText() Alert#getText()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>*POST /session/:sessionId/alert_text*</dd>
+<dd>
+<dl>
+<dd>Sends keystrokes to a JavaScript `prompt()` dialog.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoAlertPresent` - If there is no alert displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#sendKeys() Alert#sendKeys()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/accept_alert ===
+
+<dl>
+<dd>*POST /session/:sessionId/accept_alert*</dd>
+<dd>
+<dl>
+<dd>Accepts the currently displayed alert dialog. Usually, this is equivalent to clicking on the 'OK' button in the dialog.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoAlertPresent` - If there is no alert displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#accept() Alert#accept()]</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/dismiss_alert ===
+
+<dl>
+<dd>*POST /session/:sessionId/dismiss_alert*</dd>
+<dd>
+<dl>
+<dd>Dismisses the currently displayed alert dialog. For `confirm()` and `prompt()` dialogs, this is equivalent to clicking the 'Cancel' button. For `alert()` dialogs, this is equivalent to clicking the 'OK' button.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoAlertPresent` - If there is no alert displayed.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*See Also:*</dt>
+<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#dismiss() Alert#dismiss()]</dd>
 </dl>
 </dd>
 </dl>
