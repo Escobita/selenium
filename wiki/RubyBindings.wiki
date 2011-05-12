@@ -116,6 +116,17 @@ You can use an existing profile as a template for the WebDriver profile by passi
 driver = Selenium::WebDriver.for(:firefox, :profile => "my-existing-profile")
 }}}
 
+If you want to use your default profile, pass {{{:profile => "default"}}}
+
+You can also get a Profile instance for an existing profile and tweak its preferences. This does not modify the existing profile, only the one used by WebDriver.
+
+{{{
+default_profile = Selenium::WebDriver::Firefox::Profile.from_name "default"
+default_profile.native_events = true
+
+driver = Selenium::WebDriver.for(:firefox, :profile => default_profile)
+}}}
+
 === Tweaking Firefox preferences ===
 
 Use a proxy:
