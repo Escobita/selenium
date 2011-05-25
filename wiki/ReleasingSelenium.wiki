@@ -19,8 +19,8 @@
     # `./go javadocs`
     # `find docs/api/java -name "*.html" | grep -v svn | xargs rm`
     # `cp -r build/javadoc/* docs/api/java`
-    # `svn st docs/api/java | grep -v \! | awk '{print $2}' | xargs svn rm`
-    # `svn st docs/api/java | grep -v \? | awk '{print $2}' | xargs svn add`
+    # `svn st docs/api/java | grep \! | awk '{print $2}' | xargs svn rm`
+    # `svn st docs/api/java | grep \? | awk '{print $2}' | xargs svn add`
     # `find docs/api/java -name "*.html" | xargs svn ps "svn:mime-type" "text/html"`
     # Commit new docs
 
