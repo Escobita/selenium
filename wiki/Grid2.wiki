@@ -1,0 +1,134 @@
+#labels grid,selenium,webdriver
+#Selenium grid for selenium1 and webdriver
+
+= Introduction =
+
+
+Grid allows you to :
+
+ * scale by distributing tests on several machines
+ * manage multiple environments from a central point, making it easy to run the tests against a vast combination of browsers / OS.
+ * minimize the maintenance time for the grid by allowing you to implement custom hooks to leverage virtual  infrastructure for instance.
+
+= Quick Start =
+
+ This example will show you how to start the Selenium 2 Hub, and register both a WebDriver node and a Selenium 1 RC legacy node.  We’ll also show you how to call the grid from Java. The hub and nodes are shown here running on the same machine, but of course you can copy the selenium-server-standalone to multiple machines.
+Note: The selenium-server-standalone package includes the Hub, WebDriver, and legacy RC needed to run the grid. Ant is not required anymore.
+This walk-through assumes you already have Java installed.
+
+* Step 1: Start the hub
+
+The Hub is the central point that will receive all the test request and distribute them the the right nodes.
+
+Open a command prompt and navigate to the directory where you copied the selenium-server-standalone file. Type the following command:
+{{{
+java -jar selenium-server-standalone-2.0rc1.jar -role hub
+}}}
+The hub will automatically start-up using port 4444 by default. To change the default port, you can add the optional parameter –port when you run the command.
+You can view the status of the hub by opening a browser window and navigating to:
+http://localhost:4444/grid/console
+
+* Step 2: Start the nodes
+
+Regardless on whether you want to run a grid with new WebDriver functionality, or a grid with Selenium 1 RC functionality, or both at the same time, you use the same selenium-server-standalone jar file to start the nodes. For demonstration purposes, we’ll register one of each to the same hub.
+
+*Selenium 1 RC Nodes*:
+
+Selenium 1 nodes are fully compatible Selenium 1 RCs. But rather than using ANT to start each RC individually, you now only need to run a single java command to launch and configure the nodes. Open a new command prompt and type:
+{{{
+Java –jar selenium-server-2.0rc1.jar –role rc  -hub http://localhost:4444/grid/register -port 5555
+}}}
+
+*Selenium WebDriver Nodes*:
+
+WebDriver nodes are compatible with both Selenium 1 and Selenium 2. The difference here is that you can use both Selenium 1 and WebDriver commands in the same session. WebDriver supports backward compatibility to Seleniuim 1 using a WebDriverBackedSelenium object. To launch the WebDriver nodes, open a new console window and type:
+{{{
+Java –jar selenium-server-2.0rc1.jar –role webdriver  -hub http://localhost:4444/grid/register -port 5556
+}}}
+
+Note: The port defaults to 4444 if not specified. If you’re running hub and RC on the same machine, you will get a port conflict when starting the node if you don’t set it.
+
+== Using grid to run tests ==
+( using java as an example )
+Now that the grid is in-place, we need to access the grid from our test cases. For the Selenium 1 RC nodes, you can continue to use the DefaultSelenium object and pass in the hub information:
+{{{
+Selenium selenium = new DefaultSelenium(“localhost”, 4444, “*firefox”, “http://www.google.com”);
+}}}
+
+For WebDriver nodes, you will need to use the *RemoteWebDriver* and the *DesiredCapabilities* object to define which browser, version and platform you wish to use.
+Create the target browser capabilities you want to run the tests against:
+{{{
+DesiredCapabilities capability = DesiredCapabilities.firefox();
+}}}
+Pass that into the RemoteWebDriver object:
+
+{{{
+WebDriver driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capability);
+}}}
+
+
+The hub will then assign the test to a matching node.
+
+A node matches if all the requested capabilities are met. To request specific capabilities on the grid, specify them before passing it into the WebDriver object.
+
+{{{
+capability.setBrowserName();
+capability.setPlatform();
+capability.setVersion()
+capability.setCapability(,);
+}}}
+
+Example: A node registered with the setting:
+{{{ 	
+ –browser  browserName=firefox,version=3.6,platform=linux
+}}}
+ will be a match for:
+{{{
+capability.setBrowserName(“firefox” ); 
+capability.setPlatform(“linux”);  
+capability.setVersion(“3.6”);
+}}}
+and would also be a match for 
+
+{{{
+capability.setBrowserName(“firefox” ); 
+capability.setVersion(“3.6”);
+}}}
+
+The capabilities that are not specified will be ignored. 
+If you specify capabilities that do not exist on your grid (for example, your test specifies Firefox version 4.0, but have no Firefox 4 instance) then there will be no match and the test will fail to run.
+
+== Configuring the nodes ==
+
+By default, this starts 7 browsers : 5 Firefox, 1 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each –browser switch (each switch represents a node based on your parameters).
+{{{
+-browser browserName=firefox,version=3.6,maxInstances=5,platform=linux
+}}}
+This setting starts 5 Firefox 3.6 nodes on a linux machine.
+
+If your remote machine has multiple versions of Firefox you’d like to use, you can map the location of each binary to a particular version on the same machine:
+{{{
+-browser browserName=firefox,version=3.6,firefox_binary=/home/myhomedir/firefox36/firefox,maxInstances=3,platform=linux  -browser browserName=firefox,version=4,firefox_binary=/home/myhomedir/firefox4/firefox,maxInstances=4,platform=linux
+}}} 
+Tip: If you need to provide a space somewhere in your browser parameters, then surround the parameters with quotation marks:
+
+{{{
+-browser “browserName=firefox,version=3.6,firefox_binary=c:\Program Files\firefox ,maxInstances=3, platform=windows”
+}}}
+
+== Optional parameters ==
+
+ * -port 4444 	(4444 is default) 
+ * -nodeTimeout 30 	(30 is default) The timeout in seconds before the hub automatically releases a node that hasn't received any requests for more than the specified number of seconds. After this time, the node will be released for another test in the queue. This helps to clear client crashes without manual intervention. To remove the timeout completely, specify –nodeTimeout 0 and the hub will never release the node.
+
+ Note: This is NOT the WebDriver timeout for all ”wait for WebElement” type of commands. 
+
+ * -maxConcurrent 5	(5 is default) The maximum number of browsers that can run in parallel on the node. This is different from the maxInstance of supported browsers (Example: For a node that supports Firefox 3.6, Firefox 4.0  and Internet Explorer 8, maxConccurent=1 will ensure that you never have more than 1 browser running. With maxConcurrent=2 you can have 2 Firefox tests at the same time, or 1 Internet Explorer and 1 Firefox test).
+
+ * -browser < params >	If –browser is not set, a node will start with 5 firefox, 1 chrome, and 1 internet explorer instance (assuming it’s on a windows box). This parameter can be set multiple times on the same line to define multiple types of browsers.
+Parameters allowed for -browser:
+browserName={firefox, internet explorer, safari, chrome} 
+version={browser version}
+firefox_binary={path to executable binary}
+maxInstances={maximum number of browsers of this type}
+platform={windows, linux, mac}
