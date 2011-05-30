@@ -1,6 +1,62 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.11==
+
+It has been half a year since our last release of 1.0.10 and we have put a lot of effort to bring you this release. The summary of the contributions to this release is as follows:-
+
+|| 73% (22) || Samit Badle ||
+|| 16%( 5) || Adam Goucher ||
+|| 6% (2) || Dave Hunt ||
+|| 3% (1) || Santiago Suarez Ordoñez ||
+|| 3% (1) || Simon Stewart ||
+
+Here is the list of changes excluding some minor fixes and code refactoring.
+
+===Main Features:===
+  * Firefox 4 support (Issue 1470, Simon Stewart and Samit Badle)
+  * New CSS locator builder! Selenium IDE will now create locators using CSS when recording (Santiago Suarez Ordoñez)
+  * Added more power to the plugin developers through the new Util command builders support (Issue 442, Samit Badle)
+  * New command getCssCount (Adam Goucher)
+
+===Usability Improvements:===
+  * Selenium IDE is now available from the Web developer menu in Firefox 4 (Issue 1467, Samit Badle)
+  * Camel Case search in command text box has been improved allowing you to type vTP for verifyTextPresent command (Samit Badle with Dave Hunt)
+  * Most actions in Selenium IDE are now accessible through the new Actions menu (Issue 1266, Samit Badle and Dave Hunt)
+  * Removed help menu items related to Firefox from Selenium IDE help menu (Issue 1704, Samit Badle)
+  * Less prompting when saving test suite (Issue 967, Samit Badle)
+  * A method to Reset IDE Window is now available through the Options menu for people having trouble when switching from multiple monitors (Issue 1249, Samit Badle)
+  * Show the name of the test case in save dialog (Issue 984, Samit Badle)
+  * The preferences for the current format will be automatically shown in options dialog (Samit Badle)
+  * The plugins pane in the Options dialog now has a splitter (Samit Badle)
+  * Default Timeout Value field in the Options dialog now mentions a unit (Issue 896, Adam Goucher)
+  * Introduced experimental features option to hide some unstable features (Samit Badle)
+
+===Bug Fixes:===
+  * Format changing is now marked as experimental due to possible issues, you can turn it on from the options dialog (Samit Badle)
+  * Fixed the header issue on saving test case in another format (Issue 1164, Samit Badle)
+  * Improved alert on changing the format (Issue 1244, Samit Badle)
+  * Find button is back on Macs and uses a new way to highlight (Issue 1052, Samit Badle)
+  * Recording is possible in the middle of a script again (Issue 968, Samit Badle)
+  * Fixed the annoying skip over one command when recording in the middle of the script (Issue 745, Samit Badle)
+  * While recording, "clickAndWait" command becomes "click" is now fixed (Issue 419, Samit Badle)
+  * Selenium IDE bottom pane folding now works correctly (Issue 614, Samit Badle)
+  * Changed the ID of Selenium IDE menu from generic name to avoid clashes with other addons. (Issue 969, Samit Badle)
+
+===Improvements/Fixes Related to Formatters:===
+  * Fixed support for stored variables in PHP formatter (Issue 970, Samit Badle)
+  * Allow formatters to customise how set`*` is handled (Adam Goucher)
+  * Some bug fixes in PHP formatter (Issue 1281, Adam Goucher)
+  * Number type fix (Jeremy Herault)
+  * New Java formatter: Webdriver backed Junit 4 formatter
+  * New PHP formatter: Testing selenium formatter (Adam Goucher)
+
+===Known Issues:===
+  * Issue 1728 - Firefox 4 eliminated support for the highlight. So the Find button has stopped working under Firefox 4 on Windows.
+  * Issue 1729 - The Plugin pane in the Options dialog is not shownig any text in Firefox 4 on Windows 7.
+  * Issues have been reported in Selenium IDE on Ubuntu 11, which are not related to Selenium IDE. See comments on issue 1642.
+
+
 ==1.0.10==
 
 Another packaging problem broke the various things that used getText(). Which of course is one of the most commonly used bits of the API.
