@@ -1,0 +1,22 @@
+// This file is used by Code Analysis to maintain SuppressMessage 
+// attributes that are applied to this project. 
+// Project-level suppressions either have no target or are given 
+// a specific target and scoped to a namespace, type, member, etc. 
+//
+// To add a suppression to this file, right-click the message in the 
+// Error List, point to "Suppress Message(s)", and click 
+// "In Project Suppression File". 
+// You do not need to add suppressions to this file manually. 
+
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Scope = "type", Target = "Selenium.WebDriverCommandProcessor", Justification = "WebDriverCommandProcessor is a factory, and requires high class coupling")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Scope = "member", Target = "Selenium.WebDriverCommandProcessor.#PopulateSeleneseMethods()", Justification = "WebDriverCommandProcessor is a factory, and requires high class coupling")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Selenese", Scope = "type", Target = "Selenium.Internal.SeleniumEmulation.SeleneseCommand", Justification = "Selenese is spelled correctly")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Selenese", Scope = "member", Target = "Selenium.Internal.SeleniumEmulation.SeleneseCommand.#HandleSeleneseCommand(OpenQA.Selenium.IWebDriver,System.String,System.String)", Justification = "Selenese is spelled correctly")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Scope = "member", Target = "Selenium.Internal.SeleniumEmulation.WaitForPageToLoad+PageLoadWaiter.#Until()", Justification = "We really do want to catch all exceptions in waiting.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Scope = "member", Target = "Selenium.Internal.SeleniumEmulation.WaitForPageToLoad+ReadyStateWaiter.#Until()", Justification = "We really do want to catch all exceptions in waiting.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Selenium", Justification = "The namespace is appropriately scoped.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Selenium.Internal.SeleniumEmulation", Justification = "The namespace is appropriately scoped.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "Selenium.Internal.SeleniumEmulation.SeleniumSelect.#.ctor(Selenium.Internal.SeleniumEmulation.ElementFinder,OpenQA.Selenium.IWebDriver,System.String)", Justification = "Strings are properly normalized to lowercase.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "Selenium.Internal.SeleniumEmulation.Type.#HandleSeleneseCommand(OpenQA.Selenium.IWebDriver,System.String,System.String)", Justification = "Strings are properly normalized to lowercase.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "Selenium.Internal.CommandTimer.#Timeout")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Scope = "type", Target = "Selenium.Internal.SeleniumEmulation.GetExpression")]
