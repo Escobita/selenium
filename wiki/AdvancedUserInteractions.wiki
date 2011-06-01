@@ -9,7 +9,7 @@ The Advanced User Interactions API is a new, more comprehensive API for describi
 == Getting started (short how-to) ==
 In order to generate a sequence of actions, use the [http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/interactions/ActionChainsGenerator.java ActionChainsGenerator] to build it. First, configure it:
 {{{
-   ActionChainsGenerator builder = ((HasInputDevices) driver).actionsBuilder();
+   Actions builder = new Actions(driver);
 
    builder.keyDown(Keys.CONTROL)
        .click(someElement)
@@ -41,7 +41,7 @@ The new interactions API will (first) support keyboard actions without a provide
 Mouse actions have a context - the current location of the mouse. So when setting a context for several mouse actions (using `onElement`), the first action will be relative to the location of the element used as context, the next action will be relative to the location of the mouse at the end of the last action, etc.
 
 = Current status =
-The API is (mostly) finalized for the actions and actions generator. It is fully implemented for HtmlUnit and in the process of being implemented for IE.
+The API is (mostly) finalized for the actions and actions generator. It is fully implemented for HtmlUnit, and Firefox and in the process of being implemented for IE.
 
 = Outline =
 == A single action ==
@@ -64,7 +64,7 @@ The CompositeAction contains other actions and when its perform method is invoke
 == Generating Action chains ==
 The ActionChainsGenerator implements the [http://en.wikipedia.org/wiki/Builder_pattern Builder] pattern to create a CompositeAction containing a group of other actions. This should ease building actions by configuring an ActionChainsGenerator instance and invoking it's `build()` method to get the complex action:
 {{{
-   ActionChainsGenerator builder = ((HasInputDevices) driver).actionsBuilder();
+   Actions builder = new Actions(driver);
 
    Action dragAndDrop = builder.clickAndHold(someElement)
        .moveToElement(otherElement)
@@ -74,7 +74,7 @@ The ActionChainsGenerator implements the [http://en.wikipedia.org/wiki/Builder_p
    dragAndDrop.perform();
 }}}
 
-A planned extension to the ActionChainsGenerator is adding a method that will append any Action to the current list of actions it holds. This will allow adding extended actions without manually creating the CompositeAction. On extending actions, see below.
+A planned extension to the Actions class is adding a method that will append any Action to the current list of actions it holds. This will allow adding extended actions without manually creating the CompositeAction. On extending actions, see below.
  
 == Guidelines for extending the Action interface ==
 Thie `Action` interface only has one action - `perform()`. In addition to the actual interaction itself, any evaluation of conditions should be performed in this method. It's possible that the page state has changed between creation of the action and when it was actually performed - so things like element's visibility and coordinates shouldn't be found out in the Action constructor.
