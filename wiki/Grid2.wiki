@@ -100,7 +100,7 @@ If you specify capabilities that do not exist on your grid (for example, your te
 
 == Configuring the nodes ==
 
-By default, this starts 7 browsers : 5 Firefox, 1 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each –browser switch (each switch represents a node based on your parameters).
+By default, this starts 7 browsers : 5 Firefox, 1 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each –browser switch (each switch represents a node based on your parameters). If you use the -browser parameter, the default browsers will be ignored and only what you specify command line will be used.
 {{{
 -browser browserName=firefox,version=3.6,maxInstances=5,platform=linux
 }}}
