@@ -32,7 +32,7 @@ All implementations of WebDriver that communicate with the browser, or a RemoteW
 
 The protocol will assume that the WebDriver API has been "flattened", but there is an expectation that client implementations will take a more Object-Oriented approach, as demonstrated in the existing Java API. The wire protocol is implemented in request/response pairs of "commands" and "responses".
 
-== Basic Concepts And Terms ==
+== Basic Terms and Concepts ==
 
 <dl>
 <dt>*Client*</dt>
@@ -58,6 +58,25 @@ The protocol will assume that the WebDriver API has been "flattened", but there 
 || ELEMENT || string || The opaque ID assigned to the element by the server. This ID should be used in all subsequent commands issued against the element. ||
 
 </dd>
+
+<dt>*Capabilities JSON Object*</dt>
+<dd>Not all server implementations will support every !WebDriver feature. Therefore, the client and server should use JSON objects with the properties listed below when describing which features a session supports.
+
+|| *Key* || *Type* || *Description* ||
+|| browserName || string || The name of the browser being used; should be one of `{chrome|firefox|htmlunit|internet explorer|iphone}`. ||
+|| version || string || The browser version, or the empty string if unknown. ||
+|| platform || string || A key specifying which platform the browser is running on. This value should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX}`. When requesting a new session, the client may specify `ANY` to indicate any available platform may be used. ||
+|| javascriptEnabled || boolean || Whether the session supports executing user supplied JavaScript in the context of the current page. ||
+|| takesScreenshot || boolean || Whether the session supports taking screenshots of the current page. ||
+
+</dd>
+
+<dt>*Desired Capabilities*</dt>
+<dd>A Capabilities JSON Object sent by the client describing the capabilities a new session created by the server should possess. Any omitted keys implicitly indicate the corresponding capability is irrelevant.</dd>
+
+<dt>*Actual Capabilities*</dt>
+<dd>A Capabilities JSON Object returned by the server describing what features a session actually supports. Any omitted keys implicitly indicate the corresponding capability is not supported.</dd>
+
 </dl>
 
 = Messages =
@@ -257,20 +276,11 @@ Given these mappings, the server should always route requests whose final path s
 <dd>
 <dl>
 <dd>
-Create a new session. The desired capabilities should be specified in a JSON
-object with the following properties:
-
-|| *Key* || *Type* || *Description* ||
-|| browserName || string || The name of the browser to use; should be one of `{iphone|firefox|internet explorer|htmlunit|iphone|chrome}`||
-|| version || string || The desired browser version. ||
-|| javascriptEnabled || boolean || Whether the session should support !JavaScript. ||
-|| platform || string || A key specifying the desired platform to launch the browser on. Should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}` ||
-
-The server should attempt to create a session that most closely matches the desired capabilities.</dd>
+Create a new session. The server should attempt to create a session that most closely matches the desired capabilities.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`desiredCapabilities` - `{object}` A JSON object describing the desired capabilities for the new session.</dd>
+<dd>`desiredCapabilities` - `{object}` A [JsonWireProtocol#Basic_Terms_and_Concepts desired capabilities] object.</dd>
 </dl>
 </dd>
 <dd>
@@ -291,17 +301,7 @@ The server should attempt to create a session that most closely matches the desi
 <dd>*GET /session/:sessionId*</dd>
 <dd>
 <dl>
-<dd>Retrieve the capabilities of the specified session. The session's capabilities
-will be returned in a JSON object with the following properties:
-
-|| *Key* || *Type* || *Description* ||
-|| browserName || string || The name of the browser to use; should be one of `{iphone|firefox|internet explorer|htmlunit|iphone|chrome}`||
-|| version || string || The desired browser version. ||
-|| javascriptEnabled || boolean || Whether the session should support !JavaScript. ||
-|| platform || string || A key specifying the desired platform to launch the browser on. Should be one of `{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}` ||
-|| nativeEvents || boolean || Whether the browser has native events enabled. ||
-
-</dd>
+<dd>Retrieve the capabilities of the specified session.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -311,7 +311,7 @@ will be returned in a JSON object with the following properties:
 <dd>
 <dl>
 <dt>*Returns:*</dt>
-<dd>`{object}` A JSON object with the session capabilities.</dd>
+<dd>`{object}` A [JsonWireProtocol#Basic_Terms_and_Concepts capabilities] object describing the sessions actual capabilities.</dd>
 </dl>
 </dd>
 </dl>
