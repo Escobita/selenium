@@ -235,8 +235,6 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_/session/:sessionId/frame /session/:sessionId/frame] || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
 || POST || [#POST_/session/:sessionId/window /session/:sessionId/window] || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
 || DELETE || [#DELETE_/session/:sessionId/window /session/:sessionId/window] || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
-|| GET || [#GET_/session/:sessionId/speed /session/:sessionId/speed] || Get the current user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()] ||
-|| POST || [#POST_/session/:sessionId/speed /session/:sessionId/speed] || Set the user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)] ||
 || GET || [#GET_/session/:sessionId/cookie /session/:sessionId/cookie] || Retrieve all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()] ||
 || POST || [#POST_/session/:sessionId/cookie /session/:sessionId/cookie] || Set a cookie. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options#addCookie(Cookie)] ||
 || DELETE || [#DELETE_/session/:sessionId/cookie /session/:sessionId/cookie] || Delete all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()] ||
@@ -1062,72 +1060,6 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*See Also:*</dt>
 <dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-----
-
-=== /session/:sessionId/speed ===
-
-<dl>
-<dd>
-==== GET /session/:sessionId/speed ====
-</dd>
-<dd>
-<dl>
-<dd>Get the current user input speed. The server should return one of
-`{SLOW|MEDIUM|FAST}`. How these constants map to actual input speed is still browser specific and
-not covered by the wire protocol.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*Returns:*</dt>
-<dd>`{string}` The current input speed mapped to one of `{SLOW|MEDIUM|FAST}`.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()]</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-
-<dl>
-<dd>
-==== POST /session/:sessionId/speed ====
-</dd>
-<dd>
-<dl>
-<dd>Set the user input speed. The speed should be specified as one of
-`{SLOW|MEDIUM|FAST}`. How these constants map to actual input speed is still browser specific and
-not covered by the wire protocol.</dd>
-<dd>
-<dl>
-<dt>*URL Parameters:*</dt>
-<dd>`:sessionId` - ID of the session to route the command to.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*JSON Parameters:*</dt>
-<dd>`speed` - `{string}` The new user input speed mapped to one of `{SLOW|MEDIUM|FAST}`.</dd>
-</dl>
-</dd>
-<dd>
-<dl>
-<dt>*See Also:*</dt>
-<dd>[http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)]</dd>
 </dl>
 </dd>
 </dl>
