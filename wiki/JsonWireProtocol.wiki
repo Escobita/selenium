@@ -196,75 +196,75 @@ Given these mappings, the server should always route requests whose final path s
 == Command Summary ==
 
 || *HTTP Method* || *Path* || *Summary* || *Java Equivalent* ||
-|| POST || /session || Create a new session. || _N/A_ ||
-|| GET || /session/:sessionId || Retrieve the capabilities of the specified session. || _N/A_ ||
-|| DELETE || /session/:sessionId || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
-|| POST || /session/:sessionId/timeouts/async_script || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. || _N/A_ ||
-|| POST || /session/:sessionId/timeouts/implicit_wait || Set the amount of time the driver should wait when searching for elements. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)] ||
-|| GET || /session/:sessionId/window_handle || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
-|| GET || /session/:sessionId/window_handles || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
-|| GET || /session/:sessionId/url || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
-|| POST || /session/:sessionId/url || Navigate to a new URL. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)] ||
-|| POST || /session/:sessionId/forward || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
-|| POST || /session/:sessionId/back || Navigate backwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#back() WebDriver.Navigation#back()] ||
-|| POST || /session/:sessionId/refresh || Refresh the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#refresh() WebDriver.Navigation#refresh()] ||
-|| POST || /session/:sessionId/execute || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
-|| POST || /session/:sessionId/execute_async || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || _N/A_ ||
-|| GET || /session/:sessionId/screenshot || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
-|| GET || /session/:sessionId/ime/available_engines || List all available engines on the machine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getAvailableEngines() WebDriver.ImeHandler#getAvailableEngines()] ||
-|| GET || /session/:sessionId/ime/active_engine || Get the name of the active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getActiveEngine() WebDriver.ImeHandler#getActiveEngine()] ||
-|| GET || /session/:sessionId/ime/activated || Indicates whether IME input is active at the moment (not if it's available. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#isActivated() WebDriver.ImeHandler#isActivated()] ||
-|| POST || /session/:sessionId/ime/deactivate || De-activates the currently-active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#deactivate() WebDriver.ImeHandler#deactivate()] ||
-|| POST || /session/:sessionId/ime/activate || Make an engines that is available (appears on the listreturned by getAvailableEngines) active. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#activateEngine(java.lang.String) WebDriver.ImeHandler#activateEngine(java.lang.String)] ||
-|| POST || /session/:sessionId/frame || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
-|| POST || /session/:sessionId/window || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
-|| DELETE || /session/:sessionId/window || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
-|| GET || /session/:sessionId/speed || Get the current user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()] ||
-|| POST || /session/:sessionId/speed || Set the user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)] ||
-|| GET || /session/:sessionId/cookie || Retrieve all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()] ||
-|| POST || /session/:sessionId/cookie || Set a cookie. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options#addCookie(Cookie)] ||
-|| DELETE || /session/:sessionId/cookie || Delete all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()] ||
-|| DELETE || /session/:sessionId/cookie/:name || Delete the cookie with the given name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookieNamed(java.lang.String) WebDriver.Options#deleteCookieNamed(String)] ||
-|| GET || /session/:sessionId/source || Get the current page source. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getPageSource() WebDriver#getPageSource()] ||
-|| GET || /session/:sessionId/title || Get the current page title. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getTitle() WebDriver#getTitle()] ||
-|| POST || /session/:sessionId/element || Search for an element on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.#findElement(By)] ||
-|| POST || /session/:sessionId/elements || Search for multiple elements on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.#findElements(By)] ||
-|| POST || /session/:sessionId/element/active || Get the element on the page that currently has focus. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#activeElement() WebDriver.TargetLocator#activeElement()] ||
-|| GET || /session/:sessionId/element/:id || Describe the identified element. || _N/A_ ||
-|| POST || /session/:sessionId/element/:id/element || Search for an element on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)] ||
-|| POST || /session/:sessionId/element/:id/elements || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
-|| POST || /session/:sessionId/element/:id/click || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
-|| POST || /session/:sessionId/element/:id/submit || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
-|| GET || /session/:sessionId/element/:id/text || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
-|| GET || /session/:sessionId/element/:id/value || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
-|| POST || /session/:sessionId/element/:id/value || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
-|| POST || /session/:sessionId/modifier || Send an event to the active element to depress or release a modifier key. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keyboard.html#pressKey(org.openqa.selenium.Keys) pressKey(org.openqa.selenium.Keys)] ||
-|| GET || /session/:sessionId/element/:id/name || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
-|| POST || /session/:sessionId/element/:id/clear || Clear a `TEXTAREA` or `text INPUT` element's value. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear() WebElement#clear()] ||
-|| GET || /session/:sessionId/element/:id/selected || Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isSelected() WebElement#isSelected()] ||
-|| POST || /session/:sessionId/element/:id/selected || Select an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton`. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#setSelected() WebElement#setSelected()] ||
-|| POST || /session/:sessionId/element/:id/toggle || Toggle whether an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#toggle() WebElement#toggle()] ||
-|| GET || /session/:sessionId/element/:id/enabled || Determine if an element is currently enabled. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isEnabled() WebElement#isEnabled()] ||
-|| GET || /session/:sessionId/element/:id/attribute/:name || Get the value of an element's attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement#getAttribute(String)] ||
-|| GET || /session/:sessionId/element/:id/equals/:other || Test if two element IDs refer to the same DOM element. || _N/A_ ||
-|| GET || /session/:sessionId/element/:id/displayed || Determine if an element is currently displayed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#isDisplayed() RenderedWebElement#isDisplayed()] ||
-|| GET || /session/:sessionId/element/:id/location || Determine an element's location on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getLocation() RenderedWebElement#getLocation()] ||
-|| GET || /session/:sessionId/element/:id/location_in_view || Determine an element's location on the screen once it has been scrolled into view. || _N/A_ ||
-|| GET || /session/:sessionId/element/:id/size || Determine an element's size in pixels. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()] ||
-|| GET || /session/:sessionId/element/:id/css/:propertyName || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
-|| POST || /session/:sessionId/element/:id/hover || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
-|| POST || /session/:sessionId/element/:id/drag || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
-|| GET || /session/:sessionId/orientation || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
-|| POST || /session/:sessionId/orientation || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
-|| GET || /session/:sessionId/alert_text || Gets the text of the currently displayed JavaScript `alert()`, `confirm()`, or `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#getText() Alert#getText()] ||
-|| POST || /session/:sessionId/alert_text || Sends keystrokes to a JavaScript `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#sendKeys(java.lang.String) Alert#sendKeys(String)] ||
-|| POST || /session/:sessionId/accept_alert || Accepts the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#accept() Alert#accept()] ||
-|| POST || /session/:sessionId/dismiss_alert || Dismisses the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#dismiss() Alert#dismiss()] ||
-|| POST || /session/:sessionId/moveto || Move the mouse by an offset of the specificed element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
-|| POST || /session/:sessionId/click || Click any mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAction.html#perform() ClickAction#perform()] ||
-|| POST || /session/:sessionId/buttondown || Click and hold the left mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
-|| POST || /session/:sessionId/buttonup || Releases the mouse button previously held (where the mouse is currently at). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()] ||
-|| POST || /session/:sessionId/doubleclick || Double-clicks at the current mouse coordinates (set by moveto). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()] ||
+|| POST || [#POST_/session /session] || Create a new session. || _N/A_ ||
+|| GET || [#GET_/session/:sessionId /session/:sessionId] || Retrieve the capabilities of the specified session. || _N/A_ ||
+|| DELETE || [#DELETE_/session/:sessionId /session/:sessionId] || Delete the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#quit() WebDriver#quit()] ||
+|| POST || [#POST_/session/:sessionId/timeouts/async_script /session/:sessionId/timeouts/async_script] || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. || _N/A_ ||
+|| POST || [#POST_/session/:sessionId/timeouts/implicit_wait /session/:sessionId/timeouts/implicit_wait] || Set the amount of time the driver should wait when searching for elements. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html#implicitlyWait(long,%20java.util.concurrent.TimeUnit) WebDriver.Timeouts#implicitlyWait(long, TimeUnit)] ||
+|| GET || [#GET_/session/:sessionId/window_handle /session/:sessionId/window_handle] || Retrieve the current window handle. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandle() WebDriver#getWindowHandle()] ||
+|| GET || [#GET_/session/:sessionId/window_handles /session/:sessionId/window_handles] || Retrieve the list of all window handles available to the session. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getWindowHandles() WebDriver#getWindowHandles()] ||
+|| GET || [#GET_/session/:sessionId/url /session/:sessionId/url] || Retrieve the URL of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getCurrentUrl() WebDriver#getCurrentUrl()] ||
+|| POST || [#POST_/session/:sessionId/url /session/:sessionId/url] || Navigate to a new URL. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String) WebDriver#get(String)] ||
+|| POST || [#POST_/session/:sessionId/forward /session/:sessionId/forward] || Navigate forwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#forward() WebDriver.Navigation#forward()] ||
+|| POST || [#POST_/session/:sessionId/back /session/:sessionId/back] || Navigate backwards in the browser history, if possible. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#back() WebDriver.Navigation#back()] ||
+|| POST || [#POST_/session/:sessionId/refresh /session/:sessionId/refresh] || Refresh the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Navigation.html#refresh() WebDriver.Navigation#refresh()] ||
+|| POST || [#POST_/session/:sessionId/execute /session/:sessionId/execute] || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeScript(java.lang.String,%20java.lang.Object...) JavascriptExecutor#executeScript(String, Object...)] ||
+|| POST || [#POST_/session/:sessionId/execute_async /session/:sessionId/execute_async] || Inject a snippet of !JavaScript into the page for execution in the context of the currently selected frame. || _N/A_ ||
+|| GET || [#GET_/session/:sessionId/screenshot /session/:sessionId/screenshot] || Take a screenshot of the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType) TakesScreenshot#getScreenshotAs(OutputType)] ||
+|| GET || [#GET_/session/:sessionId/ime/available_engines /session/:sessionId/ime/available_engines] || List all available engines on the machine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getAvailableEngines() WebDriver.ImeHandler#getAvailableEngines()] ||
+|| GET || [#GET_/session/:sessionId/ime/active_engine /session/:sessionId/ime/active_engine] || Get the name of the active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#getActiveEngine() WebDriver.ImeHandler#getActiveEngine()] ||
+|| GET || [#GET_/session/:sessionId/ime/activated /session/:sessionId/ime/activated] || Indicates whether IME input is active at the moment (not if it's available. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#isActivated() WebDriver.ImeHandler#isActivated()] ||
+|| POST || [#POST_/session/:sessionId/ime/deactivate /session/:sessionId/ime/deactivate] || De-activates the currently-active IME engine. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#deactivate() WebDriver.ImeHandler#deactivate()] ||
+|| POST || [#POST_/session/:sessionId/ime/activate /session/:sessionId/ime/activate] || Make an engines that is available (appears on the listreturned by getAvailableEngines) active. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.ImeHandler.html#activateEngine(java.lang.String) WebDriver.ImeHandler#activateEngine(java.lang.String)] ||
+|| POST || [#POST_/session/:sessionId/frame /session/:sessionId/frame] || Change focus to another frame on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame(java.lang.String) WebDriver.TargetLocator#frame(String)] ||
+|| POST || [#POST_/session/:sessionId/window /session/:sessionId/window] || Change focus to another window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) WebDriver.TargetLocator#window(String)] ||
+|| DELETE || [#DELETE_/session/:sessionId/window /session/:sessionId/window] || Close the current window. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#close() WebDriver#close()] ||
+|| GET || [#GET_/session/:sessionId/speed /session/:sessionId/speed] || Get the current user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getSpeed() WebDriver.Options#getSpeed()] ||
+|| POST || [#POST_/session/:sessionId/speed /session/:sessionId/speed] || Set the user input speed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#setSpeed(org.openqa.selenium.Speed) WebDriver.Options#setSpeed(Speed)] ||
+|| GET || [#GET_/session/:sessionId/cookie /session/:sessionId/cookie] || Retrieve all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookies() WebDriver.Options#getCookies()] ||
+|| POST || [#POST_/session/:sessionId/cookie /session/:sessionId/cookie] || Set a cookie. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#addCookie(org.openqa.selenium.Cookie) WebDriver.Options#addCookie(Cookie)] ||
+|| DELETE || [#DELETE_/session/:sessionId/cookie /session/:sessionId/cookie] || Delete all cookies visible to the current page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#deleteAllCookies() WebDriver.Options#deleteAllCookies()] ||
+|| DELETE || [#DELETE_/session/:sessionId/cookie/:name /session/:sessionId/cookie/:name] || Delete the cookie with the given name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Options.html#getCookieNamed(java.lang.String) WebDriver.Options#deleteCookieNamed(String)] ||
+|| GET || [#GET_/session/:sessionId/source /session/:sessionId/source] || Get the current page source. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getPageSource() WebDriver#getPageSource()] ||
+|| GET || [#GET_/session/:sessionId/title /session/:sessionId/title] || Get the current page title. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#getTitle() WebDriver#getTitle()] ||
+|| POST || [#POST_/session/:sessionId/element /session/:sessionId/element] || Search for an element on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElement(org.openqa.selenium.By) WebDriver.#findElement(By)] ||
+|| POST || [#POST_/session/:sessionId/elements /session/:sessionId/elements] || Search for multiple elements on the page, starting from the document root. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html#findElements(org.openqa.selenium.By) WebDriver.#findElements(By)] ||
+|| POST || [#POST_/session/:sessionId/element/active /session/:sessionId/element/active] || Get the element on the page that currently has focus. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#activeElement() WebDriver.TargetLocator#activeElement()] ||
+|| GET || [#GET_/session/:sessionId/element/:id /session/:sessionId/element/:id] || Describe the identified element. || _N/A_ ||
+|| POST || [#POST_/session/:sessionId/element/:id/element /session/:sessionId/element/:id/element] || Search for an element on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElement(org.openqa.selenium.By) WebElement#findElement(By)] ||
+|| POST || [#POST_/session/:sessionId/element/:id/elements /session/:sessionId/element/:id/elements] || Search for multiple elements on the page, starting from the identified element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#findElements(org.openqa.selenium.By) WebElement#findElements(By)] ||
+|| POST || [#POST_/session/:sessionId/element/:id/click /session/:sessionId/element/:id/click] || Click on an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click() WebElement#click()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/submit /session/:sessionId/element/:id/submit] || Submit a `FORM` element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#submit() WebElement#submit()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/text /session/:sessionId/element/:id/text] || Returns the visible text for the element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getText() WebElement#getText()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/value /session/:sessionId/element/:id/value] || Query for the value of an element, as determined by its `value` attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getValue() WebElement#getValue()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/value /session/:sessionId/element/:id/value] || Send a sequence of key strokes to an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...) WebElement#sendKeys(CharSequence...)] ||
+|| POST || [#POST_/session/:sessionId/modifier /session/:sessionId/modifier] || Send an event to the active element to depress or release a modifier key. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keyboard.html#pressKey(org.openqa.selenium.Keys) pressKey(org.openqa.selenium.Keys)] ||
+|| GET || [#GET_/session/:sessionId/element/:id/name /session/:sessionId/element/:id/name] || Query for an element's tag name. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getTagName() WebElement#getTagName()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/clear /session/:sessionId/element/:id/clear] || Clear a `TEXTAREA` or `text INPUT` element's value. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear() WebElement#clear()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/selected /session/:sessionId/element/:id/selected] || Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isSelected() WebElement#isSelected()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/selected /session/:sessionId/element/:id/selected] || Select an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton`. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#setSelected() WebElement#setSelected()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/toggle /session/:sessionId/element/:id/toggle] || Toggle whether an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#toggle() WebElement#toggle()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/enabled /session/:sessionId/element/:id/enabled] || Determine if an element is currently enabled. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#isEnabled() WebElement#isEnabled()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/attribute/:name /session/:sessionId/element/:id/attribute/:name] || Get the value of an element's attribute. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String) WebElement#getAttribute(String)] ||
+|| GET || [#GET_/session/:sessionId/element/:id/equals/:other /session/:sessionId/element/:id/equals/:other] || Test if two element IDs refer to the same DOM element. || _N/A_ ||
+|| GET || [#GET_/session/:sessionId/element/:id/displayed /session/:sessionId/element/:id/displayed] || Determine if an element is currently displayed. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#isDisplayed() RenderedWebElement#isDisplayed()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/location /session/:sessionId/element/:id/location] || Determine an element's location on the page. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getLocation() RenderedWebElement#getLocation()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/location_in_view /session/:sessionId/element/:id/location_in_view] || Determine an element's location on the screen once it has been scrolled into view. || _N/A_ ||
+|| GET || [#GET_/session/:sessionId/element/:id/size /session/:sessionId/element/:id/size] || Determine an element's size in pixels. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getSize() RenderedWebElement#getSize()] ||
+|| GET || [#GET_/session/:sessionId/element/:id/css/:propertyName /session/:sessionId/element/:id/css/:propertyName] || Query the value of an element's computed CSS property. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#getValueOfCssProperty(java.lang.String) RenderedWebElement#getValueOfCssProperty(String)] ||
+|| POST || [#POST_/session/:sessionId/element/:id/hover /session/:sessionId/element/:id/hover] || Move the mouse over an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#hover() RenderedWebElement#hover()] ||
+|| POST || [#POST_/session/:sessionId/element/:id/drag /session/:sessionId/element/:id/drag] || Drag and drop an element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html#dragAndDropBy(int,%20int) RenderedWebElement#dragAndDropBy(int, int)] ||
+|| GET || [#GET_/session/:sessionId/orientation /session/:sessionId/orientation] || Get the current browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#getOrientation() Rotatable#getOrientation()] ||
+|| POST || [#POST_/session/:sessionId/orientation /session/:sessionId/orientation] || Set the browser orientation. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Rotatable.html#rotate(org.openqa.selenium.ScreenOrientation) Rotatable#rotate(ScreenOrientation)] ||
+|| GET || [#GET_/session/:sessionId/alert_text /session/:sessionId/alert_text] || Gets the text of the currently displayed JavaScript `alert()`, `confirm()`, or `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#getText() Alert#getText()] ||
+|| POST || [#POST_/session/:sessionId/alert_text /session/:sessionId/alert_text] || Sends keystrokes to a JavaScript `prompt()` dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#sendKeys(java.lang.String) Alert#sendKeys(String)] ||
+|| POST || [#POST_/session/:sessionId/accept_alert /session/:sessionId/accept_alert] || Accepts the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#accept() Alert#accept()] ||
+|| POST || [#POST_/session/:sessionId/dismiss_alert /session/:sessionId/dismiss_alert] || Dismisses the currently displayed alert dialog. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html#dismiss() Alert#dismiss()] ||
+|| POST || [#POST_/session/:sessionId/moveto /session/:sessionId/moveto] || Move the mouse by an offset of the specificed element. || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/MoveMouseAction.html#perform() MoveMouseAction#perform()] ||
+|| POST || [#POST_/session/:sessionId/click /session/:sessionId/click] || Click any mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAction.html#perform() ClickAction#perform()] ||
+|| POST || [#POST_/session/:sessionId/buttondown /session/:sessionId/buttondown] || Click and hold the left mouse button (at the coordinates set by the last moveto command). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ClickAndHoldAction.html#perform() ClickAndHoldAction#perform()] ||
+|| POST || [#POST_/session/:sessionId/buttonup /session/:sessionId/buttonup] || Releases the mouse button previously held (where the mouse is currently at). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/ButtonReleaseAction.html#perform() ButtonReleaseAction#perform()] ||
+|| POST || [#POST_/session/:sessionId/doubleclick /session/:sessionId/doubleclick] || Double-clicks at the current mouse coordinates (set by moveto). || [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/DoubleClickAction.html#perform() DoubleClickAction#perform()] ||
 
 
 == Command Detail ==
@@ -272,7 +272,9 @@ Given these mappings, the server should always route requests whose final path s
 === /session ===
 
 <dl>
-<dd>*POST /session*</dd>
+<dd>
+==== POST /session ====
+</dd>
 <dd>
 <dl>
 <dd>
@@ -298,7 +300,9 @@ Create a new session. The server should attempt to create a session that most cl
 === /session/:sessionId ===
 
 <dl>
-<dd>*GET /session/:sessionId*</dd>
+<dd>
+==== GET /session/:sessionId ====
+</dd>
 <dd>
 <dl>
 <dd>Retrieve the capabilities of the specified session.</dd>
@@ -319,7 +323,9 @@ Create a new session. The server should attempt to create a session that most cl
 </dl>
 
 <dl>
-<dd>*DELETE /session/:sessionId*</dd>
+<dd>
+==== DELETE /session/:sessionId ====
+</dd>
 <dd>
 <dl>
 <dd>Delete the session.</dd>
@@ -344,7 +350,9 @@ Create a new session. The server should attempt to create a session that most cl
 === /session/:sessionId/timeouts/async_script ===
 
 <dl>
-<dd>*POST /session/:sessionId/timeouts/async_script*</dd>
+<dd>
+==== POST /session/:sessionId/timeouts/async_script ====
+</dd>
 <dd>
 <dl>
 <dd>Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client.</dd>
@@ -369,7 +377,9 @@ Create a new session. The server should attempt to create a session that most cl
 === /session/:sessionId/timeouts/implicit_wait ===
 
 <dl>
-<dd>*POST /session/:sessionId/timeouts/implicit_wait*</dd>
+<dd>
+==== POST /session/:sessionId/timeouts/implicit_wait ====
+</dd>
 <dd>
 <dl>
 <dd>Set the amount of time the driver should wait when searching for elements. When
@@ -406,7 +416,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/window_handle ===
 
 <dl>
-<dd>*GET /session/:sessionId/window_handle*</dd>
+<dd>
+==== GET /session/:sessionId/window_handle ====
+</dd>
 <dd>
 <dl>
 <dd>Retrieve the current window handle.</dd>
@@ -437,7 +449,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/window_handles ===
 
 <dl>
-<dd>*GET /session/:sessionId/window_handles*</dd>
+<dd>
+==== GET /session/:sessionId/window_handles ====
+</dd>
 <dd>
 <dl>
 <dd>Retrieve the list of all window handles available to the session.</dd>
@@ -468,7 +482,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/url ===
 
 <dl>
-<dd>*GET /session/:sessionId/url*</dd>
+<dd>
+==== GET /session/:sessionId/url ====
+</dd>
 <dd>
 <dl>
 <dd>Retrieve the URL of the current page.</dd>
@@ -495,7 +511,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/url*</dd>
+<dd>
+==== POST /session/:sessionId/url ====
+</dd>
 <dd>
 <dl>
 <dd>Navigate to a new URL.</dd>
@@ -526,7 +544,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/forward ===
 
 <dl>
-<dd>*POST /session/:sessionId/forward*</dd>
+<dd>
+==== POST /session/:sessionId/forward ====
+</dd>
 <dd>
 <dl>
 <dd>Navigate forwards in the browser history, if possible.</dd>
@@ -551,7 +571,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/back ===
 
 <dl>
-<dd>*POST /session/:sessionId/back*</dd>
+<dd>
+==== POST /session/:sessionId/back ====
+</dd>
 <dd>
 <dl>
 <dd>Navigate backwards in the browser history, if possible.</dd>
@@ -576,7 +598,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/refresh ===
 
 <dl>
-<dd>*POST /session/:sessionId/refresh*</dd>
+<dd>
+==== POST /session/:sessionId/refresh ====
+</dd>
 <dd>
 <dl>
 <dd>Refresh the current page.</dd>
@@ -601,7 +625,9 @@ If this command is never sent, the driver should default to an implicit wait of 
 === /session/:sessionId/execute ===
 
 <dl>
-<dd>*POST /session/:sessionId/execute*</dd>
+<dd>
+==== POST /session/:sessionId/execute ====
+</dd>
 <dd>
 <dl>
 <dd>
@@ -651,7 +677,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/execute_async ===
 
 <dl>
-<dd>*POST /session/:sessionId/execute_async*</dd>
+<dd>
+==== POST /session/:sessionId/execute_async ====
+</dd>
 <dd>
 <dl>
 <dd>
@@ -698,7 +726,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/screenshot ===
 
 <dl>
-<dd>*GET /session/:sessionId/screenshot*</dd>
+<dd>
+==== GET /session/:sessionId/screenshot ====
+</dd>
 <dd>
 <dl>
 <dd>Take a screenshot of the current page.</dd>
@@ -729,7 +759,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/ime/available_engines ===
 
 <dl>
-<dd>*GET /session/:sessionId/ime/available_engines*</dd>
+<dd>
+==== GET /session/:sessionId/ime/available_engines ====
+</dd>
 <dd>
 <dl>
 <dd>List all available engines on the machine. To use an engine, it has to be present in this list.</dd>
@@ -766,7 +798,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/ime/active_engine ===
 
 <dl>
-<dd>*GET /session/:sessionId/ime/active_engine*</dd>
+<dd>
+==== GET /session/:sessionId/ime/active_engine ====
+</dd>
 <dd>
 <dl>
 <dd>Get the name of the active IME engine. The name string is platform specific.</dd>
@@ -803,7 +837,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/ime/activated ===
 
 <dl>
-<dd>*GET /session/:sessionId/ime/activated*</dd>
+<dd>
+==== GET /session/:sessionId/ime/activated ====
+</dd>
 <dd>
 <dl>
 <dd>Indicates whether IME input is active at the moment (not if it's available.</dd>
@@ -840,7 +876,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/ime/deactivate ===
 
 <dl>
-<dd>*POST /session/:sessionId/ime/deactivate*</dd>
+<dd>
+==== POST /session/:sessionId/ime/deactivate ====
+</dd>
 <dd>
 <dl>
 <dd>De-activates the currently-active IME engine.</dd>
@@ -871,7 +909,9 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 === /session/:sessionId/ime/activate ===
 
 <dl>
-<dd>*POST /session/:sessionId/ime/activate*</dd>
+<dd>
+==== POST /session/:sessionId/ime/activate ====
+</dd>
 <dd>
 <dl>
 <dd>Make an engines that is available (appears on the list
@@ -914,7 +954,9 @@ Note that this is a platform-independent method of activating IME
 === /session/:sessionId/frame ===
 
 <dl>
-<dd>*POST /session/:sessionId/frame*</dd>
+<dd>
+==== POST /session/:sessionId/frame ====
+</dd>
 <dd>
 <dl>
 <dd>Change focus to another frame on the page. If the frame ID is `null`, the server
@@ -952,7 +994,9 @@ should switch to the page's default content.</dd>
 === /session/:sessionId/window ===
 
 <dl>
-<dd>*POST /session/:sessionId/window*</dd>
+<dd>
+==== POST /session/:sessionId/window ====
+</dd>
 <dd>
 <dl>
 <dd>Change focus to another window. The window to change focus to may be specified by its
@@ -980,7 +1024,9 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 </dl>
 
 <dl>
-<dd>*DELETE /session/:sessionId/window*</dd>
+<dd>
+==== DELETE /session/:sessionId/window ====
+</dd>
 <dd>
 <dl>
 <dd>Close the current window.</dd>
@@ -1011,7 +1057,9 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 === /session/:sessionId/speed ===
 
 <dl>
-<dd>*GET /session/:sessionId/speed*</dd>
+<dd>
+==== GET /session/:sessionId/speed ====
+</dd>
 <dd>
 <dl>
 <dd>Get the current user input speed. The server should return one of
@@ -1040,7 +1088,9 @@ not covered by the wire protocol.</dd>
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/speed*</dd>
+<dd>
+==== POST /session/:sessionId/speed ====
+</dd>
 <dd>
 <dl>
 <dd>Set the user input speed. The speed should be specified as one of
@@ -1073,7 +1123,9 @@ not covered by the wire protocol.</dd>
 === /session/:sessionId/cookie ===
 
 <dl>
-<dd>*GET /session/:sessionId/cookie*</dd>
+<dd>
+==== GET /session/:sessionId/cookie ====
+</dd>
 <dd>
 <dl>
 <dd>Retrieve all cookies visible to the current page. Each cookie will be returned as a
@@ -1112,7 +1164,9 @@ JSON object with the following properties:
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/cookie*</dd>
+<dd>
+==== POST /session/:sessionId/cookie ====
+</dd>
 <dd>
 <dl>
 <dd>Set a cookie.  The cookie should be specified as a JSON object with the following
@@ -1150,7 +1204,9 @@ properties:
 </dl>
 
 <dl>
-<dd>*DELETE /session/:sessionId/cookie*</dd>
+<dd>
+==== DELETE /session/:sessionId/cookie ====
+</dd>
 <dd>
 <dl>
 <dd>Delete all cookies visible to the current page.</dd>
@@ -1182,7 +1238,9 @@ properties:
 === /session/:sessionId/cookie/:name ===
 
 <dl>
-<dd>*DELETE /session/:sessionId/cookie/:name*</dd>
+<dd>
+==== DELETE /session/:sessionId/cookie/:name ====
+</dd>
 <dd>
 <dl>
 <dd>Delete the cookie with the given name. This command should be a no-op if there is no
@@ -1209,7 +1267,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/source ===
 
 <dl>
-<dd>*GET /session/:sessionId/source*</dd>
+<dd>
+==== GET /session/:sessionId/source ====
+</dd>
 <dd>
 <dl>
 <dd>Get the current page source.</dd>
@@ -1240,7 +1300,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/title ===
 
 <dl>
-<dd>*GET /session/:sessionId/title*</dd>
+<dd>
+==== GET /session/:sessionId/title ====
+</dd>
 <dd>
 <dl>
 <dd>Get the current page title.</dd>
@@ -1271,7 +1333,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element ===
 
 <dl>
-<dd>*POST /session/:sessionId/element*</dd>
+<dd>
+==== POST /session/:sessionId/element ====
+</dd>
 <dd>
 <dl>
 <dd>Search for an element on the page, starting from the document root. The located element will be returned as a WebElement JSON object. The table below lists the locator strategies that each server should support. Each locator must return the first matching element located in the DOM.
@@ -1328,7 +1392,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/elements ===
 
 <dl>
-<dd>*POST /session/:sessionId/elements*</dd>
+<dd>
+==== POST /session/:sessionId/elements ====
+</dd>
 <dd>
 <dl>
 <dd>Search for multiple elements on the page, starting from the document root. The located elements will be returned as a WebElement JSON objects. The table below lists the locator strategies that each server should support. Elements should be returned in the order located in the DOM.
@@ -1384,7 +1450,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/active ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/active*</dd>
+<dd>
+==== POST /session/:sessionId/element/active ====
+</dd>
 <dd>
 <dl>
 <dd>Get the element on the page that currently has focus. The element will be returned as a WebElement JSON object.</dd>
@@ -1415,7 +1483,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id ====
+</dd>
 <dd>
 <dl>
 <dd>Describe the identified element.
@@ -1443,7 +1513,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/element ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/element*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/element ====
+</dd>
 <dd>
 <dl>
 <dd>Search for an element on the page, starting from the identified element. The located element will be returned as a WebElement JSON object. The table below lists the locator strategies that each server should support. Each locator must return the first matching element located in the DOM.
@@ -1502,7 +1574,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/elements ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/elements*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/elements ====
+</dd>
 <dd>
 <dl>
 <dd>Search for multiple elements on the page, starting from the identified element. The located elements will be returned as a WebElement JSON objects. The table below lists the locator strategies that each server should support. Elements should be returned in the order located in the DOM.
@@ -1560,7 +1634,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/click ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/click*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/click ====
+</dd>
 <dd>
 <dl>
 <dd>Click on an element.</dd>
@@ -1593,7 +1669,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/submit ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/submit*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/submit ====
+</dd>
 <dd>
 <dl>
 <dd>Submit a `FORM` element. The submit command may also be applied to any element that is a descendant of a `FORM` element.</dd>
@@ -1625,7 +1703,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/text ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/text*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/text ====
+</dd>
 <dd>
 <dl>
 <dd>Returns the visible text for the element.</dd>
@@ -1657,7 +1737,9 @@ such cookie visible to the current page.</dd>
 === /session/:sessionId/element/:id/value ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/value*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/value ====
+</dd>
 <dd>
 <dl>
 <dd>Query for the value of an element, as determined by its `value` attribute.</dd>
@@ -1691,7 +1773,9 @@ such cookie visible to the current page.</dd>
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/value*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/value ====
+</dd>
 <dd>
 <dl>
 <dd>Send a sequence of key strokes to an element.
@@ -1815,7 +1899,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/modifier ===
 
 <dl>
-<dd>*POST /session/:sessionId/modifier*</dd>
+<dd>
+==== POST /session/:sessionId/modifier ====
+</dd>
 <dd>
 <dl>
 <dd>Send an event to the active element to depress or release a modifier key.</dd>
@@ -1847,7 +1933,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/name ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/name*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/name ====
+</dd>
 <dd>
 <dl>
 <dd>Query for an element's tag name.</dd>
@@ -1885,7 +1973,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/clear ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/clear*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/clear ====
+</dd>
 <dd>
 <dl>
 <dd>Clear a `TEXTAREA` or `text INPUT` element's value.</dd>
@@ -1919,7 +2009,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/selected ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/selected*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/selected ====
+</dd>
 <dd>
 <dl>
 <dd>Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected.</dd>
@@ -1953,7 +2045,9 @@ The server must process the key sequence as follows:
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/selected*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/selected ====
+</dd>
 <dd>
 <dl>
 <dd>Select an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton`.</dd>
@@ -1988,7 +2082,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/toggle ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/toggle*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/toggle ====
+</dd>
 <dd>
 <dl>
 <dd>Toggle whether an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected.</dd>
@@ -2029,7 +2125,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/enabled ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/enabled*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/enabled ====
+</dd>
 <dd>
 <dl>
 <dd>Determine if an element is currently enabled.</dd>
@@ -2067,7 +2165,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/attribute/:name ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/attribute/:name*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/attribute/:name ====
+</dd>
 <dd>
 <dl>
 <dd>Get the value of an element's attribute.</dd>
@@ -2105,7 +2205,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/equals/:other ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/equals/:other*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/equals/:other ====
+</dd>
 <dd>
 <dl>
 <dd>Test if two element IDs refer to the same DOM element.</dd>
@@ -2138,7 +2240,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/displayed ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/displayed*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/displayed ====
+</dd>
 <dd>
 <dl>
 <dd>Determine if an element is currently displayed.</dd>
@@ -2176,7 +2280,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/location ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/location*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/location ====
+</dd>
 <dd>
 <dl>
 <dd>Determine an element's location on the page. The point `(0, 0)` refers to the upper-left corner of the page. The element's coordinates are returned as a JSON object with `x` and `y` properties.</dd>
@@ -2214,7 +2320,9 @@ The server must process the key sequence as follows:
 === /session/:sessionId/element/:id/location_in_view ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/location_in_view*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/location_in_view ====
+</dd>
 <dd>
 <dl>
 <dd>Determine an element's location on the screen once it has been scrolled into view.
@@ -2249,7 +2357,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/element/:id/size ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/size*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/size ====
+</dd>
 <dd>
 <dl>
 <dd>Determine an element's size in pixels. The size will be returned as a JSON object  with `width` and `height` properties.</dd>
@@ -2287,7 +2397,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/element/:id/css/:propertyName ===
 
 <dl>
-<dd>*GET /session/:sessionId/element/:id/css/:propertyName*</dd>
+<dd>
+==== GET /session/:sessionId/element/:id/css/:propertyName ====
+</dd>
 <dd>
 <dl>
 <dd>Query the value of an element's computed CSS property. The CSS property to query should be specified using the CSS property name, *not* the !JavaScript property name (e.g. `background-color` instead of `backgroundColor`).</dd>
@@ -2325,7 +2437,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/element/:id/hover ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/hover*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/hover ====
+</dd>
 <dd>
 <dl>
 <dd>Move the mouse over an element.</dd>
@@ -2359,7 +2473,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/element/:id/drag ===
 
 <dl>
-<dd>*POST /session/:sessionId/element/:id/drag*</dd>
+<dd>
+==== POST /session/:sessionId/element/:id/drag ====
+</dd>
 <dd>
 <dl>
 <dd>Drag and drop an element. The distance to drag an element should be specified relative to the upper-left corner of the page.</dd>
@@ -2400,7 +2516,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/orientation ===
 
 <dl>
-<dd>*GET /session/:sessionId/orientation*</dd>
+<dd>
+==== GET /session/:sessionId/orientation ====
+</dd>
 <dd>
 <dl>
 <dd>Get the current browser orientation. The server should return a valid orientation value as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
@@ -2427,7 +2545,9 @@ location for correctly generating native events.</dd>
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/orientation*</dd>
+<dd>
+==== POST /session/:sessionId/orientation ====
+</dd>
 <dd>
 <dl>
 <dd>Set the browser orientation. The orientation should be specified as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
@@ -2458,7 +2578,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/alert_text ===
 
 <dl>
-<dd>*GET /session/:sessionId/alert_text*</dd>
+<dd>
+==== GET /session/:sessionId/alert_text ====
+</dd>
 <dd>
 <dl>
 <dd>Gets the text of the currently displayed JavaScript `alert()`, `confirm()`, or `prompt()` dialog.</dd>
@@ -2491,7 +2613,9 @@ location for correctly generating native events.</dd>
 </dl>
 
 <dl>
-<dd>*POST /session/:sessionId/alert_text*</dd>
+<dd>
+==== POST /session/:sessionId/alert_text ====
+</dd>
 <dd>
 <dl>
 <dd>Sends keystrokes to a JavaScript `prompt()` dialog.</dd>
@@ -2528,7 +2652,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/accept_alert ===
 
 <dl>
-<dd>*POST /session/:sessionId/accept_alert*</dd>
+<dd>
+==== POST /session/:sessionId/accept_alert ====
+</dd>
 <dd>
 <dl>
 <dd>Accepts the currently displayed alert dialog. Usually, this is equivalent to clicking on the 'OK' button in the dialog.</dd>
@@ -2559,7 +2685,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/dismiss_alert ===
 
 <dl>
-<dd>*POST /session/:sessionId/dismiss_alert*</dd>
+<dd>
+==== POST /session/:sessionId/dismiss_alert ====
+</dd>
 <dd>
 <dl>
 <dd>Dismisses the currently displayed alert dialog. For `confirm()` and `prompt()` dialogs, this is equivalent to clicking the 'Cancel' button. For `alert()` dialogs, this is equivalent to clicking the 'OK' button.</dd>
@@ -2590,7 +2718,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/moveto ===
 
 <dl>
-<dd>*POST /session/:sessionId/moveto*</dd>
+<dd>
+==== POST /session/:sessionId/moveto ====
+</dd>
 <dd>
 <dl>
 <dd>Move the mouse by an offset of the specificed element. If no element is specified, the move is relative to the current mouse cursor. If an element is provided but no offset, the mouse will be moved to the center of the element. If the element is not visible, it will be scrolled into view.</dd>
@@ -2623,7 +2753,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/click ===
 
 <dl>
-<dd>*POST /session/:sessionId/click*</dd>
+<dd>
+==== POST /session/:sessionId/click ====
+</dd>
 <dd>
 <dl>
 <dd>Click any mouse button (at the coordinates set by the last moveto command). Note that calling this command after calling buttondown and before calling button up (or any out-of-order interactions sequence) will yield undefined behaviour).</dd>
@@ -2654,7 +2786,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/buttondown ===
 
 <dl>
-<dd>*POST /session/:sessionId/buttondown*</dd>
+<dd>
+==== POST /session/:sessionId/buttondown ====
+</dd>
 <dd>
 <dl>
 <dd>Click and hold the left mouse button (at the coordinates set by the last moveto command). Note that the next mouse-related command that should follow is buttondown . Any other mouse command (such as click or another call to buttondown) will yield undefined behaviour.</dd>
@@ -2679,7 +2813,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/buttonup ===
 
 <dl>
-<dd>*POST /session/:sessionId/buttonup*</dd>
+<dd>
+==== POST /session/:sessionId/buttonup ====
+</dd>
 <dd>
 <dl>
 <dd>Releases the mouse button previously held (where the mouse is currently at). Must be called once for every buttondown command issued. See the note in click and buttondown about implications of out-of-order commands.</dd>
@@ -2704,7 +2840,9 @@ location for correctly generating native events.</dd>
 === /session/:sessionId/doubleclick ===
 
 <dl>
-<dd>*POST /session/:sessionId/doubleclick*</dd>
+<dd>
+==== POST /session/:sessionId/doubleclick ====
+</dd>
 <dd>
 <dl>
 <dd>Double-clicks at the current mouse coordinates (set by moveto).</dd>
