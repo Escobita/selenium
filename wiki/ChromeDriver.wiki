@@ -7,7 +7,7 @@ Developed in collaboration with the Chromium team, the !ChromeDriver is a standa
 
 == Requirements ==
 
-The !ChromeDriver controls the browser using Chrome's automation proxy framework.  Consequently, the !ChromeDriver is only compatible with Chrome version 12.0.712.0 or newer, which is currently available on the [http://www.chromium.org/getting-involved/dev-channel dev channel].
+The !ChromeDriver controls the browser using Chrome's automation proxy framework.  Consequently, the !ChromeDriver is only compatible with Chrome version 12.0.712.0 or newer.
 
 The server expects you to have Chrome installed in the default location for each system:
 || *OS* || *Expected Location of Chrome* ||
