@@ -239,6 +239,7 @@ Given these mappings, the server should always route requests whose final path s
 == Command Summary ==
 
 || *HTTP Method* || *Path* || *Summary* ||
+|| GET || [#GET_/status /status] ||  ||
 || POST || [#POST_/session /session] || Create a new session. ||
 || GET || [#GET_/session/:sessionId /session/:sessionId] || Retrieve the capabilities of the specified session. ||
 || DELETE || [#DELETE_/session/:sessionId /session/:sessionId] || Delete the session. ||
@@ -309,6 +310,27 @@ Given these mappings, the server should always route requests whose final path s
 
 
 == Command Detail ==
+
+=== /status ===
+
+<dl>
+<dd>
+==== GET /status ====
+</dd>
+<dd>
+<dl>
+<dd>Gets the server's status</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>A status of 0 is returned if the server is ready (HTTP 200 OK response)</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
 
 === /session ===
 
