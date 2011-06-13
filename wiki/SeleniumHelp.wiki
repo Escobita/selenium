@@ -16,10 +16,10 @@ If you're experiencing problems running a selenium test, and think that it may b
     * Does it happen every time you run the test?  If not, how frequently?
     * Are others on your team experiencing the problem?
     * A link to a [http://gist.github.com/ gist] of any interesting stack traces
-    * What you've tried so far
+  * What you've tried so far
     * Are you able to reproduce the failure on other browsers?
     * Do you have other changes in your code that might be affecting this test?
-    * Steps to reproduce
+  * Steps to reproduce
     * Ideally, a minimal test case against a public site we can run.
     * How to run the test (if there's any special set up needed)
   * Anything else we should know?
