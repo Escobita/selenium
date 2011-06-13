@@ -1,0 +1,29 @@
+#summary Help us help you.
+#labels Featured
+
+= Getting Help with Failing Tests =
+
+== Before We Begin ==
+
+Is this a FrequentlyAskedQuestion? If it's not, be aware that you won't get help in the comments section of this page. So what should you do?
+
+== It's Not a FAQ ==
+
+If you're experiencing problems running a selenium test, and think that it may be selenium's fault, please email the "webdriver" or "selenium-users" group with the following information:
+
+  * Symptoms
+    * What the problem?
+    * Does it happen every time you run the test?  If not, how frequently?
+    * Are others on your team experiencing the problem?
+    * A link to a gist of any interesting stack traces
+  * What you've tried so far
+    * Are you able to reproduce the failure on other browsers?
+    * Do you have other changes in your code that might be affecting this test?
+  * Steps to reproduce
+    * Ideally, a minimal test case against a public site we can run.
+    * How to run the test (if there's any special set up needed)
+  * Anything else we should know?
+
+= Why We Need This Information =
+
+We want to help you fix the problem. The best way to do this is if we can replicate the issue on our local machines. You're the person who knows best about how to build and test your application. 
