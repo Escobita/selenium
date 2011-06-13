@@ -27,3 +27,5 @@ If you're experiencing problems running a selenium test, and think that it may b
 = Why We Need This Information =
 
 We want to help you fix the problem. The best way to do this is if we can replicate the issue on our local machines. You're the person who knows best about how to build and test your application. 
+
+Patches are extremely welcome if you solve a Selenium bug!
