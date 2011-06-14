@@ -13,7 +13,7 @@ For all versions of WebDriver:
 In addition, the InternetExplorerDriver needs some additional components and can only be fully built on Windows
 
   * Visual Studio 2010 Professional or higher.
-  * "msbuild" should be on the PATH. This is most easily done by starting the "Visual Studio 2008 Command Prompt" from the Start menu.
+  * "msbuild" should be on the PATH. This is most easily done by starting the "Visual Studio 2010 Command Prompt" from the Start menu.
 
 The build is based on rake, a well-known Ruby build tool. Provided you have all the gems required you can use that for building the project, though this isn't the recommended way to build. The bundled JRuby jar, invoked through the "go" wrapper, includes all dependencies without requiring any extra setup.
 
