@@ -59,6 +59,13 @@ You can replace that second target with:
 
 The "uber" implicit targets build a single "uber jar" containing all the compiled java from the project, as well as all third party dependencies. The "project" implicit target is similar, but excludes third party dependencies.
 
+== Building the Android driver ==
+For the Android driver to be built, the Android SDK must be present. The Android SDK should reside in {{{$WEBDRIVER_HOME/../android_sdk}}}.  After downloading and unpacking the Android SDK, a symbolic link could be created like so:
+{{{
+cd $WEBDRIVER_HOME
+ln -s PATH_OF_ANDROID_SDK ../android_sdk
+}}}
+
 = Useful Targets =
 
 All of these should be run using the "go" executable.
