@@ -1,6 +1,20 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.0.12==
+
+This is a minor release with nothing too huge included. But because the last one didn't get pushed to the world, it is important to make a note of a big change introduced in 1.0.11.
+
+We have marked the changing of formats as _Experimental_ due to a couple lose-all-your-data bugs. As a result it is disabled in the toolbar by default. To enable it, click the checkbox in the Options menu. And because we *really* don't want you to lose your data, when you switch formats you will get a big warning box. This too can be disabled in the Options menu. But if you do both of these things and your script gets sent to the abyss, you have been warned. :)
+
+Changes in this release include the following:
+
+   * New - Firefox 5 support
+   * New - When upgrading Se-IDE, the release notes (these) are shown on first start
+   * Bug - some Java format changes
+   * Bug - some PHP format changes
+   * Bug - the 'Find' button works again
+
 ==1.0.11==
 
 It has been half a year since our last release of 1.0.10 and we have put a lot of effort to bring you this release. The summary of the contributions to this release is as follows:-
