@@ -176,6 +176,15 @@ Jetty is started by the application installed. So it should start when you first
 == I get "Page not Available" ==
 Sometimes the Android emulator does not detect the connection of the host machine it runs on. The solution in this case is to restart the emulator.
 
+== Android WebDriver fails to load HTTPS pages ==
+You can enable accepting all HTTPS certs by setting a capability as follow:
+{{{
+DesiredCapabilities caps = DesiredCapabilities.android();
+caps.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+
+AndroidDriver driver = new AndroidDriver(caps);
+}}}
+
 == The emulator is too slow, what can I do ==
 Couple things, you can start the emulator with the following options:
 -no-window
