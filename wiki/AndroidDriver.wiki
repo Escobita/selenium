@@ -74,6 +74,8 @@ In a terminal type:
 $~/android_sdk/adb forward tcp:8080 tcp:8080
 }}}
 
+This will make the android server available at http://localhost:8080/wd/hub
+
 === Install Android WebDriver on Real Device ===
 
 Connect your device through USB to your machine.
