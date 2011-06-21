@@ -14,6 +14,8 @@ Changes in this release include the following:
    * Bug - some Java format changes
    * Bug - some PHP format changes
    * Bug - the 'Find' button works again
+   * Bug - generated CSS is standards compliant
+   * New - dropped support for FF 3.5 or older
 
 ==1.0.11==
 
