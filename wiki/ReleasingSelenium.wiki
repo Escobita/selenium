@@ -46,7 +46,7 @@
  # Update the version number in all pom.xml files under the maven directory (but do not check in those changes)
  # Execute:
    # `./go //java/client/src/org/openqa/selenium:client-combined:project`
-   # `./go //java/server/src/org/openqa/selenium/server:server:project`
+   # `./go //java/server/src/org/openqa/grid/selenium:selenium:project`
    # `cd maven`
    # `mvn -Dtest=skip -DfailIfNoTests=false install`
  # Now all maven artifacts are installed in your local repository -- test them -- this is important, we should not deploy broken Maven artifacts!
