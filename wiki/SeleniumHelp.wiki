@@ -5,7 +5,7 @@
 
 == Before We Begin ==
 
-Is this a FrequentlyAskedQuestion? If it's not, be aware that you won't get help in the comments section of this page. So what should you do?
+Is this a [FrequentlyAskedQuestions frequently asked question]? If it's not, be aware that you won't get help in the comments section of this page. So what should you do?
 
 == It's Not a FAQ ==
 
