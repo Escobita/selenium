@@ -80,8 +80,7 @@ public class GoogleSuggest {
         // Sleep until the div we want is visible or 5 seconds is over
         long end = System.currentTimeMillis() + 5000;
         while (System.currentTimeMillis() < end) {
-            // Browsers which render content (such as Firefox and IE) return "RenderedWebElements"
-            RenderedWebElement resultsDiv = (RenderedWebElement) driver.findElement(By.className("gac_m"));
+            WebElement resultsDiv = driver.findElement(By.className("gac_m"));
 
             // If results have been returned, the results are displayed in a drop down.
             if (resultsDiv.isDisplayed()) {
