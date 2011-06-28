@@ -11,10 +11,12 @@ The !ChromeDriver controls the browser using Chrome's automation proxy framework
 
 The server expects you to have Chrome installed in the default location for each system:
 || *OS* || *Expected Location of Chrome* ||
-|| Linux || /usr/bin/google-chrome ||
+|| Linux || /usr/bin/google-chrome^1^ ||
 || Mac || /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome ||
 || Windows XP || %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe ||
 || Windows Vista || C:\Users\%USERNAME%\AppData\Local\Google\Chrome\Application\chrome.exe ||
+
+^1^ For Linux systems, the !ChromeDriver expects /usr/bin/google-chrome to be a symlink to the actual binary.
 
 == Getting Started ==
 
@@ -90,6 +92,26 @@ WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilit
 driver.get("http://www.google.com");
 }}}
 
+== Advanced Usage ==
+
+=== Starting Chromium with Specific Flags ===
+
+The !ChromeDriver can be made to start the browser with specific command line flags using the `chrome.switches` capability key; this key should define a list of command line flags that should be passed to the browser on start-up.  For example, to start !Chrome as a maximized window:
+{{{
+  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+  capabilities.setCapability("chrome.switches", Arrays.asList(
+      "--start-maximized"));
+  WebDriver driver = new ChromeDriver(capabilities);
+}}}
+
+Similarly, to load an extension when !Chrome starts:
+{{{
+  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+  capabilities.setCapability("chrome.switches", Arrays.asList(
+      "--load-extension=/path/to/extension/directory"));
+  WebDriver driver = new ChromeDriver(capabilities);
+}}}
+
 == Known Issues ==
 
 There are a handful of known issues with !ChromeDriver, listed below:
@@ -97,7 +119,6 @@ There are a handful of known issues with !ChromeDriver, listed below:
   # Can only retrieve the name and value of set cookies (no domain, path, etc.)
   # Typing does not work with rich-text enabled documents
   # Cannot specify a custom profile
-  # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeAsyncScript(java.lang.String,%20java.lang.Object...) Asynchronous script execution] not implemented
   # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/html5/package-summary.html HTML 5 API] not implemented
   # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/package-summary.html Advanced user interactions API] not implemented
 
