@@ -122,6 +122,18 @@ There are a handful of known issues with !ChromeDriver, listed below:
   # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/html5/package-summary.html HTML 5 API] not implemented
   # [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/interactions/package-summary.html Advanced user interactions API] not implemented
 
+=== Think you've found a bug? ===
+
+Check if the bug has been [http://code.google.com/p/selenium/issues/list reported] yet.  If it hasn't, please open a new issue and be sure to include the [SeleniumHelp following]:
+
+ * What platform are you running on?
+ * What version of the chromedriver are you using?
+ * What version of Chrome are you using?
+ * The failure stacktrace, if available.
+ * The contents of chromedriver's log file (chromedriver.log).
+
+Of course, if your bug has already been reported, you can update the issue with the information above.  Having more information to work on makes it easier for us to track down the cause of the bug.
+
 == Testing earlier versions of Chrome ==
 
 As previously mentioned, the !ChromeDriver is only compatible with Chrome version 12.0.712.0 or newer.  If you need to test an older version of Chrome, use Selenium RC  and a Selenium-backed WebDriver instance:
