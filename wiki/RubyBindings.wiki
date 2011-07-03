@@ -4,7 +4,7 @@
 
 The Ruby bindings for the WebDriver API are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. 
 
-The bindings support Ruby 1.8.7 through 1.9.1, JRuby and Rubinius.  
+The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.  
 
   * [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html API docs]
   * [http://selenium.googlecode.com/svn/trunk/rb/CHANGES Changelog]
@@ -67,7 +67,7 @@ caps = WebDriver::Remote::Capabilities.htmlunit(:javascript_enabled => true)
 driver = WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
 
-You may want to set the proxy settings of the remote browser (this currently only works for firefox)
+You may want to set the proxy settings of the remote browser (this currently only works for Firefox):
 
 {{{
 include Selenium
@@ -204,12 +204,12 @@ Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the Js
 }}}
 
 
-== Javascript Alert/Confirm ==
+== JavaScript dialogs  ==
 
-You can use webdriver to handle javascript alert and confirm dialogs.
-The implementation for both is the same.
+You can use webdriver to handle Javascript alert(), prompt() and confirm() dialogs.
+The API for all three is the same.
 
-Note: At this time the API is only available in Firefox (or in Firefox using the remote server), and only alert/confirms that are generated post load can be captured. 
+Note: At this time alert handling is only available in Firefox and IE (or in those browsers through the remote server), and only alerts that are generated post onload can be captured. 
 
 {{{
 require "selenium-webdriver"
