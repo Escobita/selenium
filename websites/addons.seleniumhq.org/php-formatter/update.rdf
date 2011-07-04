@@ -7,6 +7,20 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
+            <em:version>1.0.2</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
+                <em:minVersion>1.0.9</em:minVersion> 
+                <em:maxVersion>1.*</em:maxVersion>
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/php/php-format-1.0.2.xpi</em:updateLink>
+                <em:updateHash>sha1:25587a1b1ac54b2f7f88136a9a059f889e779713</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
             <em:version>1.0.0</em:version>
             <em:targetApplication>
               <RDF:Description>
