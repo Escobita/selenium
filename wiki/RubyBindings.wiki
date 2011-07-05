@@ -160,6 +160,8 @@ capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profil
 driver = Selenium::WebDriver.for :remote, :desired_capabilities => capabilities
 }}}
 
+For a list of possible preferences, see [http://preferential.mozdev.org/preferences.html this page].
+
 === Custom Firefox path ===
 
 If your Firefox executable is in a non-standard location:
