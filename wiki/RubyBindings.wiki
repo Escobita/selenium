@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The Ruby bindings for the WebDriver API are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. 
+The Ruby bindings for Selenium/WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem.
 
 The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.  
 
@@ -11,8 +11,12 @@ The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.
 
 The gem also includes the older selenium-client gem for use with Selenium RC. When reading the docs, keep in mind that these two namespaces refer to different APIs:
 
-  * Selenium::Client - Selenium RC API (previously released as the selenium-client gem)
   * Selenium::WebDriver - the WebDriver API
+  * Selenium::Client - Selenium RC API (previously released as the selenium-client gem)
+
+For people who are new to Selenium, we recommend starting directly with Selenium::WebDriver, and focusing on the two main classes, Selenium::WebDriver::Driver and Selenium::WebDriver::Element. This is the entry point to the whole WebDriver API. 
+
+The rest of this document deals with Selenium::WebDriver exclusively.
 
 = API Example =
 
@@ -33,7 +37,44 @@ puts driver.title
 driver.quit
 }}}
 
-The ruby bindings have drivers for Firefox, IE, Chrome and the remote server.
+Driver examples:
+
+{{{
+# execute arbitrary javascript
+puts driver.execute_script("return window.location.pathname")
+
+# wait for a specific element to show up
+wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+wait.until { driver.find_element(:id => "foo") }
+}}}
+
+Element examples:
+
+{{{
+  # get an attribute
+  class_name = element.attribute("class") 
+
+  # is the element visible on the page?
+  element.displayed?
+
+  # click the element
+  element.click
+
+  # get the element location
+  element.location
+
+  # scroll the element into view, then return its location
+  element.location_once_scrolled_into_view
+
+  # get the width and height of an element
+  element.size
+
+  # press space on an element - see Selenium::WebDriver::Keys for possible values
+  element.send_keys :space
+  
+  # get the text of an element
+  element.text
+}}}
 
 == IE ==
 
