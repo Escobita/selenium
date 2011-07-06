@@ -13,7 +13,7 @@ Be sure to understand chapter 1 "Fundamental Concepts" of the [http://svnbook.re
 For non-developers: The recommended way is to install a GUI client.
 Windows users should probably start with the free
 [http://tortoisesvn.tigris.org/ Tortoise SVN].  If you are using Mac
-OS X, you may wish to purchase [http://versionsapp.com/ Versions].
+OS X, you may wish to purchase [http://versionsapp.com/ Versions] or [http://www.syntevo.com/smartsvn/index.html SmartSVN]
 
 For developers: Mac OS X and many Linux distros, ship with a fine SVN
 command-line client.  Linux users who don't have an `svn` command, can
