@@ -87,7 +87,7 @@ Or if you have a proxy in front of the remote server:
 include Selenium
 
 client = WebDriver::Remote::Http::Default.new
-client.proxy = Proxy.new(:http => "http://proxy.org:8080")
+client.proxy = Proxy.new(:http => "proxy.org:8080")
 
 driver = WebDriver.for(:remote, :http_client => client)
 }}} 
