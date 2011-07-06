@@ -32,7 +32,7 @@ WebDriver driver = new FirefoxDriver(profile);
 Suppose that you wanted to modify the user agent string (as above), but you've got a tricked out Firefox profile that contains dozens of useful extensions. There are two ways to obtain this profile. Assuming that the profile has been created using Firefox's profile manager ("firefox -ProfileManager"):
 
 {{{
-ProfileIni allProfiles = new ProfilesIni();
+ProfilesIni allProfiles = new ProfilesIni();
 FirefoxProfile profile = allProfiles.getProfile("WebDriver");
 profile.setPreferences("foo.bar", 23);
 WebDriver driver = new FirefoxDriver(profile);
