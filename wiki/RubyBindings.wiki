@@ -51,29 +51,29 @@ wait.until { driver.find_element(:id => "foo") }
 Element examples:
 
 {{{
-  # get an attribute
-  class_name = element.attribute("class") 
+# get an attribute
+class_name = element.attribute("class") 
 
-  # is the element visible on the page?
-  element.displayed?
+# is the element visible on the page?
+element.displayed?
 
-  # click the element
-  element.click
+# click the element
+element.click
 
-  # get the element location
-  element.location
+# get the element location
+element.location
 
-  # scroll the element into view, then return its location
-  element.location_once_scrolled_into_view
+# scroll the element into view, then return its location
+element.location_once_scrolled_into_view
 
-  # get the width and height of an element
-  element.size
+# get the width and height of an element
+element.size
 
-  # press space on an element - see Selenium::WebDriver::Keys for possible values
-  element.send_keys :space
-  
-  # get the text of an element
-  element.text
+# press space on an element - see Selenium::WebDriver::Keys for possible values
+element.send_keys :space
+
+# get the text of an element
+element.text
 }}}
 
 == IE ==
