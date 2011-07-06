@@ -24,3 +24,7 @@ Simply add the {{{webdriver-all.jar}}} or {{{webdriver-ie.jar}}} to your CLASSPA
 
  * On IE 7 or higher on Windows Vista or Windows 7, you must set the Protected Mode settings for each zone to be the same value. The value can be on or off, as long as it is the same for every zone. To set the Protected Mode settings, choose "Internet Options..." from the Tools menu, and click on the Security tab. For each zone, there will be a check box at the bottom of the tab labeled "Enable Protected Mode".
  * The browser zoom level must be set to 100% so that the native mouse events can be set to the correct coordinates.
+
+== How InternetExplorerDriver Selects the IE Binary ==
+
+This is done by the client side code. The client side checks to see if the OS is x64. If this succeeds then it checks that the process running the client side code is running in x64. If that succeeds then the client code will try load x64 Internet Explorer. If any of the checks for x64 fail the code will try use x86 Internet Explorer
