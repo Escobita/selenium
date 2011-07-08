@@ -1,6 +1,21 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.1.0==
+
+Hey! Look at that! A slightly more significant version bump! Any why is that? Well...
+
+   * New - WebDriver exports for Ruby, Python, C# and Java
+
+Which are the four supported languages of the Selenium project. This also means that Se-IDE is officially deprecating inclusion of the Groovy, Perl and PHP format plugins in the main release bundle. It would be outstanding if the community around those languages picks up their development and maintenance.
+
+Also included in this release are
+
+   * New - setIndent(n) is now available to formats for greater control over formatting of export formats
+   * Bug - There was a performance regression in deep in some shared code that has been addressed.
+   * New - Rather than recording 'foo' for an element which and an id of 'foo' it is captured as 'id=foo' to be very specific as to which element would be interacted with
+   * New - Same with 'name'
+
 ==1.0.12==
 
 This is a minor release with nothing too huge included. But because the last one didn't get pushed to the world, it is important to make a note of a big change introduced in 1.0.11.
