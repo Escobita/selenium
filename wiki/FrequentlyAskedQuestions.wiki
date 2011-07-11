@@ -15,11 +15,15 @@ A: The aim is the same (to allow you to test your webapp), but the implementatio
 
 === Q: What is Selenium 2.0? ===
 
-A: WebDriver will soon become part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver will make is its API and the native drivers. The process of rolling WebDriver into Selenium will probably take some time, so until it's complete if you'd like to use the WebDriver API then the best bet will be to use WebDriver directly. There's an introduction to this at the [http://google-opensource.blogspot.com/2009/05/introducing-webdriver.html Google Open Source blog].
+A: WebDriver is part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver makes is its API and the native drivers.
 
-=== Q: What's the plan for migrating WebDriver into Selenium? ===
+=== Q: How do I migrate from using the original Selenium APIs to the new WebDriver APIs?
 
-A: The process is being discussed on the [http://clearspace.openqa.org/message/48227#48227 OpenQA forum], but the current plan is that parts of WebDriver will be rolled into Selenium 1.5. For the user, the key change will be that the WebDriver interfaces will become available within the Selenium (RC) libraries. There will also be a series of changes internally, for example picking the WebDriver implementation of the Selenium interfaces where this is appropriate, and these changes will be discussed and tracked on the OpenQA site and/or the [http://groups.google.com/group/webdriver?pli=1 WebDriver mailing list].
+A: The process is described in the Selenium documentation at http://seleniumhq.org/docs/appendix_migrating_from_rc_to_webdriver.html
+
+=== Q: Which browsers does WebDriver support? ===
+
+A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver, OperaDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages. There is also support for mobile testing via the AndroidDriver and IPhoneDriver.
 
 === Q: What does it mean to be "developer focused"? ===
 
@@ -55,25 +59,25 @@ js.executeScript("return document.title");
 
 will return the title of the document.
 
-=== Q: Which browsers does WebDriver support? ===
-
-A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages.
-
 === Q: My XPath finds elements in one browser, but not in others. Why is this? ===
 
 A: The short answer is that each supported browser handles XPath slightly differently, and you're probably running into one of these differences. The long answer is on the XpathInWebDriver page.
 
 === Q: The InternetExplorerDriver does not work well on Vista. How do I get it to work as expected? ===
 
-A: There are a number of solutions:
-   * Add any domains the browser visits to IE's "trustworthy sites". If you use a large number of sites, this might be problematic, so think about using a wild card (though only if you don't use IE as your main browser!)
-   * Run Java with Administrator rights. Note, that this is potentially a large security hole: only visit sites you trust when running in this mode.
+A: The InternetExplorerDriver requires that all security domains are set to the same value (either trusted or untrusted) If you're not in a position to modify the security domains, then you can override the check like this:
 
-The second approach is required when using IE8 and Vista or above.
+{{{
+DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+capabilities.set(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+WebDriver driver = new InternetExplorerDriver(capabilities);
+}}}
+
+As can be told by the name of the constant, this may introduce flakiness in your tests. If all sites are in the same protection domain, you _should_ be okay.
 
 === Q: What about support for languages other than Java? ===
 
-A: Python and Ruby support are already available. Support for C# is planned, and we will be announcing this on the mailing list as they are checked in. There is also a Javascript API (JS API) which is available on Firefox. 
+A: Python, Ruby, C# and Java are all supported directly by the development team. There are also webdriver implementations for PHP and Perl. Support for a pure JS API is also planned.
 
 === Q: How do I handle pop up windows? ===
 
@@ -81,7 +85,7 @@ A: WebDriver offers the ability to cope with multiple windows. This is done by u
 
 === Q: Does WebDriver support Javascript alerts and prompts? ===
 
-A: Not yet, but we plan on adding an API for this, that will look something like:
+A: Yes, using the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html Alerts API]:
 
 {{{
 // Get a handle to the open alert, prompt or confirmation
@@ -98,7 +102,23 @@ A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onch
 
 === Q: Can I run multiple instances of the WebDriver sub-classes? ===
 
-A: Each instance of HtmlUnit and FirefoxDriver is completely independent of every other instance (in the case of firefox, each instance has its own anonymous profile it uses).  See the ChromeDriver page for details of its concurrency (short answer: it's possible on Windows at the moment, but you need to apply a patch). Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
+A: Each instance of an HtmlUnitDriver, ChromeDriver and FirefoxDriver is completely independent of every other instance (in the case of firefox and chrome, each instance has its own anonymous profile it uses).  Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
+
+=== Q: I need to use a proxy. How do I configure that?
+
+A: Proxy configuration is done via the `org.openqa.selenium.Proxy` class like so:
+
+{{{
+Proxy proxy = new Proxy();
+proxy.setProxyAutoconfigUrl("http://youdomain/config");
+
+// We use firefox as an example here.
+DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+capabilities.setCapability(CapabilityType.PROXY, proxy);
+
+// You could use any webdriver implementation here
+WebDriver driver = new FirefoxDriver(capabilities);
+}}}
 
 === Q: How do I handle authentication with the HtmlUnitDriver? ===
 
@@ -144,7 +164,8 @@ Sometimes this doesn't work, and this is because the iframe doesn't have any con
 This is needed because the iframe has no content by default: there's nothing to send keyboard input to. This method call inserts an empty tag, which sets everything up nicely.
 
 === Q: WebDriver fails to start Firefox on Linux due to java.net.SocketException ===
-If, when running WebDriver on Linux, Firefox fails to start and the error looks like:
+
+A: If, when running WebDriver on Linux, Firefox fails to start and the error looks like:
 {{{
 Caused by: java.net.SocketException: Invalid argument
         at java.net.PlainSocketImpl.socketBind(Native Method)
@@ -161,7 +182,8 @@ To get the socket to bind both to IPv6 and IPv4 addresses of the host with the s
 More permanent solution is disabling this behaviour by editing /etc/sysctl.d/bindv6only.conf
 
 === Q: WebDriver fails to find elements / Does not block on page loads ===
-This problem can manifest itself in various ways:
+
+A: This problem can manifest itself in various ways:
  * Using WebDriver.findElement(...) throws ElementNotFoundException, but the element is clearly there - inspecting the DOM (using Firebug, etc) clearly shows it. 
  * Calling Driver.get returns once the HTML has been loaded - but Javascript code triggered by the onload event was not done, so the page is incomplete and some elements cannot be found.
  * Clicking on an element / link triggers an operation that creates new element. However, calling findElement(s) after click returns does not find it. Isn't click supposed to be blocking?
@@ -174,17 +196,21 @@ Solution:
 Use the Wait class to wait for a specific element to appear. This class simply calls findElement over and over, discarding the NoSuchElementException each time, until the element is found (or a timeout has expired). Since this is the behaviour desired by default for many users, a mechanism for  implicitly-waiting for elements to appear has been implemented. This is accessible through the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html WebDriver.manage().timeouts()] call. (This was previously tracked on issue [http://code.google.com/p/selenium/issues/detail?id=26 26]).
 
 === Q: How can I trigger arbitrary events on the page? ===
-WebDriver aims to emulate user interaction - so the API reflects the ways a user can interact with various elements. 
+
+A: WebDriver aims to emulate user interaction - so the API reflects the ways a user can interact with various elements. 
 
 Triggering a specific event cannot be achieved directly using the API, but one can use the Javascript execution abilities to call methods on an element.
 
 === Q: Why is it not possible to interact with hidden elements? ===
-Since a user cannot read text in a hidden element, WebDriver will not allow access to it as well.
+
+A: Since a user cannot read text in a hidden element, WebDriver will not allow access to it as well.
 
 However, it is possible to use Javascript execution abilities to call getText directly from the element:
 ((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", ...)
 
 === Q: How do I start Firefox with an extension installed? ===
+A: 
+
 {{{
 FirefoxProfile profile = new FirefoxProfile()
 profile.addExtension(....);
@@ -195,10 +221,6 @@ WebDriver driver = new FirefoxDriver(profile);
 === Q: I'd like it if WebDriver did.... ===
 
 A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
-
-=== Q: Why Is The InternetExplorerDriver Called Jobbie? ===
-
-A: It started out as a play on "[http://jacobie.sourceforge.net jacobie]". It's not terribly funny, I know, but it made sense at the time and the name has stayed.
 
 === Q: Selenium server sometimes takes a long time to start a new session ? ===
 
