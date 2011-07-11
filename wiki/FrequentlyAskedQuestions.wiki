@@ -104,7 +104,7 @@ A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onch
 
 A: Each instance of an HtmlUnitDriver, ChromeDriver and FirefoxDriver is completely independent of every other instance (in the case of firefox and chrome, each instance has its own anonymous profile it uses).  Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
 
-=== Q: I need to use a proxy. How do I configure that?
+=== Q: I need to use a proxy. How do I configure that? ===
 
 A: Proxy configuration is done via the `org.openqa.selenium.Proxy` class like so:
 
