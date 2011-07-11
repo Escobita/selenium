@@ -96,7 +96,7 @@ driver.get("http://www.google.com");
 
 === Starting Chromium with Specific Flags ===
 
-The !ChromeDriver can be made to start the browser with specific command line flags using the `chrome.switches` capability key; this key should define a list of command line flags that should be passed to the browser on start-up.  For example, to start !Chrome as a maximized window:
+The !ChromeDriver can be made to start the browser with specific command line flags using the `chrome.switches` capability key; this key should define a list of command line flags that should be passed to the browser on start-up.  For example, to start Chrome as a maximized window:
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
   capabilities.setCapability("chrome.switches", Arrays.asList(
@@ -104,7 +104,7 @@ The !ChromeDriver can be made to start the browser with specific command line fl
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
-Similarly, to load an extension when !Chrome starts:
+Similarly, to load an extension when Chrome starts:
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
   capabilities.setCapability("chrome.switches", Arrays.asList(
