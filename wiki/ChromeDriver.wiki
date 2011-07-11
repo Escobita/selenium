@@ -99,24 +99,21 @@ driver.get("http://www.google.com");
 The !ChromeDriver can be made to start the browser with specific command line flags using the `chrome.switches` capability key; this key should define a list of command line flags that should be passed to the browser on start-up.  For example, to start Chrome as a maximized window:
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-  capabilities.setCapability("chrome.switches", Arrays.asList(
-      "--start-maximized"));
+  capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized"));
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
 Similarly, to load an extension when Chrome starts:
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-  capabilities.setCapability("chrome.switches", Arrays.asList(
-      "--load-extension=/path/to/extension/directory"));
+  capabilities.setCapability("chrome.switches", Arrays.asList("--load-extension=/path/to/extension/directory"));
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
 Or to load with a specific profile (note that the default profile directories can be found [http://www.chromium.org/user-experience/user-data-directory here]):
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-  capabilities.setCapability("chrome.switches", Arrays.asList(
-      "--user-data-dir=/path/to/profile/directory"));
+  capabilities.setCapability("chrome.switches", Arrays.asList("--user-data-dir=/path/to/profile/directory"));
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
@@ -150,8 +147,7 @@ As previously mentioned, the !ChromeDriver is only compatible with Chrome versio
 {{{
 URL seleniumServerUrl = new URL("http://localhost:4444");
 URL serverUnderTest = new URL("http://www.google.com");
-CommandExecutor executor = new SeleneseCommandExecutor(
-    seleniumServerUrl, serverUnderTest, DesiredCapabilities.chrome());
+CommandExecutor executor = new SeleneseCommandExecutor(seleniumServerUrl, serverUnderTest, DesiredCapabilities.chrome());
 WebDriver driver = new RemoteWebDriver(executor);
 }}}
 
