@@ -112,6 +112,16 @@ Similarly, to load an extension when Chrome starts:
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
+Or to load with a specific profile (note that the default profile directories can be found [http://www.chromium.org/user-experience/user-data-directory here]):
+{{{
+  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+  capabilities.setCapability("chrome.switches", Arrays.asList(
+      "--user-data-dir=/path/to/profile/directory"));
+  WebDriver driver = new ChromeDriver(capabilities);
+}}}
+
+The full list of flags can be found [http://peter.sh/experiments/chromium-command-line-switches/ here].
+
 == Known Issues ==
 
 There are a handful of known issues with !ChromeDriver, listed below:
