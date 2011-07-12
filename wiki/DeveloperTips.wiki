@@ -32,3 +32,32 @@ The default target that's used will compile the code and run all the tests. More
 || ie || Compile the InternetExplorerDriver. This won't compile the C++ on a non-Windows system, but will always compile the Java, no matter which OS you happen to be using ||
 || support || Guess what this does :) ||
 || test_htmlunit || Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. ||
+
+== Debugging the Firefox Driver ==
+=== Getting output from the Firefox process itself ===
+This is usually useful to debug issues with Firefox starting up. The Java system property `webdriver.firefox.logfile` will instruct the FirefoxDriver to redirect the output to a file:
+{{{
+java -Dwebdriver.firefox.logfile=/dev/stdout -cp selenium-2.jar <sometest>
+}}}
+
+=== Outputting to the Error Console ===
+A common technique used for debugging of the Firefox driver extension is debug statements. The two following methods can be used from almost any Javascript code inside the extension:
+ * `Logger.dumpn()` - Logs a string into console (and converts arguments to strings). For example: `Logger.dumpn("Found element: " + node)`.
+ * `Logger.dump()` - Gets a single argument, an object, and dumps its entire contents: implemented interfaces, data fields, methods, etc. 
+
+=== Getting output from the error console to a file ===
+To see output generated using the `Logger` utility, one has to open up Firefox's error console - difficult or simply impossible on remote machines. Fortunately, there's a way to get the contents of the output dumped to a file:
+{{{
+FirefoxProfile p = new FirefoxProfile();
+p.setPreference("webdriver.log.file", "/tmp/firefox_console");
+WebDriver driver = new FirefoxDriver(p);
+...
+}}}
+The `webdriver.log.file` preference will instruct the `Logger` to dump all contents of the console to the specified file.
+webdriver.log.file
+=== Getting even more output to the command line ===
+When suspecting additional logging from Firefox could be beneficial, one can crank debugging level all the way up:
+{{{
+export NSPR_LOG_MODULES=all:3
+}}}
+Setting this environment variable will cause Firefox to log additional messages to the console. Use this environment variable together with `webdriver.firefox.logfile` to get a hold of Firefox's output to the console.
