@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The Ruby bindings for Selenium/WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem.
+The Ruby bindings for Selenium/!WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem.
 
 The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.  
 
@@ -11,16 +11,16 @@ The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.
 
 The gem also includes the older selenium-client gem for use with Selenium RC. When reading the docs, keep in mind that these two namespaces refer to different APIs:
 
-  * Selenium::WebDriver - the WebDriver API
-  * Selenium::Client - Selenium RC API (previously released as the selenium-client gem)
+  * `Selenium::WebDriver` - the !WebDriver API
+  * `Selenium::Client` - Selenium RC API (previously released as the selenium-client gem)
 
-For people who are new to Selenium, we recommend starting directly with Selenium::WebDriver, and focusing on the two main classes, Selenium::WebDriver::Driver and Selenium::WebDriver::Element. This is the entry point to the whole WebDriver API. 
+For people who are new to Selenium, we recommend starting directly with Selenium::WebDriver, and focusing on the two main classes, `Selenium::WebDriver::Driver` and `Selenium::WebDriver::Element`. This is the entry point to the whole !WebDriver API. 
 
-The rest of this document deals with Selenium::WebDriver exclusively.
+The rest of this document deals with `Selenium::WebDriver` exclusively.
 
 = API Example =
 
-The bindings provide a slightly rubified version of the WebDriver API:
+The bindings provide a slightly rubified version of the !WebDriver API:
 
 {{{
 require "selenium-webdriver"
@@ -78,7 +78,7 @@ element.text
 
 == IE ==
 
-Make sure that Internet Options -> Security has the same Protected Mode setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
+Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
 
 == Remote ==
 
@@ -143,7 +143,7 @@ The FirefoxDriver lets you configure the profile used.
 
 === Adding an extension ===
 
-It's often useful to have Firebug available in the Firefox instance launched by WebDriver:
+It's often useful to have Firebug available in the Firefox instance launched by !WebDriver:
 
 {{{
 include Selenium
@@ -164,7 +164,7 @@ driver = Selenium::WebDriver.for(:firefox, :profile => "my-existing-profile")
 
 If you want to use your default profile, pass {{{:profile => "default"}}}
 
-You can also get a Profile instance for an existing profile and tweak its preferences. This does not modify the existing profile, only the one used by WebDriver.
+You can also get a Profile instance for an existing profile and tweak its preferences. This does not modify the existing profile, only the one used by !WebDriver.
 
 {{{
 default_profile = Selenium::WebDriver::Firefox::Profile.from_name "default"
@@ -234,7 +234,7 @@ Experimental support for native events is available on Linux. Set {{{profile.nat
 
 === Implicit waits ===
 
-WebDriver lets you configure implicit waits, so that a call to #find_element will wait for a specified amount of time before raising a NoSuchElementError:
+!WebDriver lets you configure implicit waits, so that a call to #find_element will wait for a specified amount of time before raising a NoSuchElementError:
 
 {{{
   driver = Selenium::WebDriver.for :firefox
@@ -243,7 +243,7 @@ WebDriver lets you configure implicit waits, so that a call to #find_element wil
 
 === Internal timeouts ===
 
-Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, Net::HTTP from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
+Internally, !WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, `Net::HTTP` from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call Driver#get on a page that takes more than 60 seconds to load, you'll see a TimeoutError raised from Net::HTTP. You can configure this timeout (before launching a browser) by doing:
 
 {{{
   client = Selenium::WebDriver::Remote::Http::Default.new
@@ -252,7 +252,7 @@ Internally, WebDriver uses HTTP to communicate with a lot of the drivers (the Js
 }}}
 
 
-== JavaScript dialogs  ==
+== !JavaScript dialogs  ==
 
 You can use webdriver to handle Javascript alert(), prompt() and confirm() dialogs.
 The API for all three is the same.
@@ -287,4 +287,4 @@ client = WebDriver::Remote::Http::Curb.new
 driver = WebDriver.for(:firefox, :http_client => client)
 }}}
 
-If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of WebDriver, which is useful in [ScalingWebdriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive). 
+If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of !WebDriver, which is useful in [ScalingWebdriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive). 
