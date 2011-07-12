@@ -169,6 +169,19 @@ $./go android_server
 $./go test_android
 }}}
 
+== Debug on Android ==
+   * To access the android logs:
+{{{
+$./adb logcat
+}}}
+You can also filter the logs by adding "ActivityMAnager:W" for example to the logcat command.
+
+   * To access the JS console:
+- Open the android browser
+- Type "abou:debug" in the address bar, this is a toggle setting that will enable the JS console
+- Execute Js in the browser by typing javascript:<your JS>, you will see the JS console opening
+
+
 = FAQ =
 == How to start jetty ==
 Jetty is started by the application installed. So it should start when you first start the application.
