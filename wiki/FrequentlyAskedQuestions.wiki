@@ -5,35 +5,35 @@
 
 <wiki:toc max_depth="3" />
 
-=== Q: What is WebDriver? ===
+=== Q: What is !WebDriver? ===
 
-A: WebDriver is a tool for writing automated tests of websites. It aims to mimic the behaviour of a real user, and as such interacts with the HTML of the application.
+A: !WebDriver is a tool for writing automated tests of websites. It aims to mimic the behaviour of a real user, and as such interacts with the HTML of the application.
 
 === Q: So, is it like [http://www.openqa.org/selenium-core/ Selenium]? Or [http://sahi.co.in/ Sahi]? ===
 
-A: The aim is the same (to allow you to test your webapp), but the implementation is different. Rather than running as a Javascript application within the browser (with the limitations this brings, such as the "[http://www.openqa.org/selenium-rc/tutorial.html same origin]" problem), WebDriver controls the browser itself. This means that it can take advantage of any facilities offered by the native platform.
+A: The aim is the same (to allow you to test your webapp), but the implementation is different. Rather than running as a Javascript application within the browser (with the limitations this brings, such as the "[http://www.openqa.org/selenium-rc/tutorial.html same origin]" problem), !WebDriver controls the browser itself. This means that it can take advantage of any facilities offered by the native platform.
 
 === Q: What is Selenium 2.0? ===
 
-A: WebDriver is part of [http://www.openqa.org/selenium Selenium]. The main contribution that WebDriver makes is its API and the native drivers.
+A: !WebDriver is part of [http://www.openqa.org/selenium Selenium]. The main contribution that !WebDriver makes is its API and the native drivers.
 
-=== Q: How do I migrate from using the original Selenium APIs to the new WebDriver APIs?
+=== Q: How do I migrate from using the original Selenium APIs to the new !WebDriver APIs?
 
 A: The process is described in the Selenium documentation at http://seleniumhq.org/docs/appendix_migrating_from_rc_to_webdriver.html
 
-=== Q: Which browsers does WebDriver support? ===
+=== Q: Which browsers does !WebDriver support? ===
 
 A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver, OperaDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages. There is also support for mobile testing via the AndroidDriver and IPhoneDriver.
 
 === Q: What does it mean to be "developer focused"? ===
 
-A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
+A: We believe that within a software application's development team, the people who are best placed to build the tools that everyone else can use are the developers. Although it should be easy to use !WebDriver directly, it should also be easy to use it as a building block for more sophisticated tools. Because of this, !WebDriver has a small API that's easy to explore by hitting the "autocomplete" button in your favourite IDE, and aims to work consistently no matter which browser implementation you use.
 
 === Q: How do I execute Javascript directly? ===
 
-A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
+A: We believe that most of the time there is a requirement to execute Javascript there is a failing in the tool being used: it hasn't emitted the correct events, has not interacted with a page correctly, or has failed to react when an XmlHttpRequest returns. We would rather fix !WebDriver to work consistently and correctly than rely on testers working out which Javascript method to call.
 
-We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the WebDriver instance to a [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
+We also realise that there will be times when this is a limitation. As a result, for those browsers that support it, you can execute Javascript by casting the !WebDriver instance to a [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html JavascriptExecutor]. In Java, this looks like:
 
 {{{
 WebDriver driver; // Assigned elsewhere
@@ -81,9 +81,9 @@ A: Python, Ruby, C# and Java are all supported directly by the development team.
 
 === Q: How do I handle pop up windows? ===
 
-A: WebDriver offers the ability to cope with multiple windows. This is done by using the "WebDriver.switchTo().window()" method to switch to a window with a known name. If the name is not known, you can use "WebDriver.getWindowHandles()" to obtain a list of known windows. You may pass the handle to "switchTo().window()".
+A: !WebDriver offers the ability to cope with multiple windows. This is done by using the "WebDriver.switchTo().window()" method to switch to a window with a known name. If the name is not known, you can use "WebDriver.getWindowHandles()" to obtain a list of known windows. You may pass the handle to "switchTo().window()".
 
-=== Q: Does WebDriver support Javascript alerts and prompts? ===
+=== Q: Does !WebDriver support Javascript alerts and prompts? ===
 
 A: Yes, using the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Alert.html Alerts API]:
 
@@ -98,11 +98,11 @@ alert.accept();
 
 === Q: The "onchange" event doesn't fire after a call "sendKeys" ===
 
-A: WebDriver leaves the focus in the element you called "sendKeys" on. The "onchange" event will only fire when focus leaves that element. As such, you need to move the focus, perhaps using a "click" on another element.
+A: !WebDriver leaves the focus in the element you called "sendKeys" on. The "onchange" event will only fire when focus leaves that element. As such, you need to move the focus, perhaps using a "click" on another element.
 
-=== Q: Can I run multiple instances of the WebDriver sub-classes? ===
+=== Q: Can I run multiple instances of the !WebDriver sub-classes? ===
 
-A: Each instance of an HtmlUnitDriver, ChromeDriver and FirefoxDriver is completely independent of every other instance (in the case of firefox and chrome, each instance has its own anonymous profile it uses).  Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the RemoteWebDriver and virtual machines.
+A: Each instance of an HtmlUnitDriver, ChromeDriver and FirefoxDriver is completely independent of every other instance (in the case of firefox and chrome, each instance has its own anonymous profile it uses).  Because of the way that Windows works, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the Remote!WebDriver and virtual machines.
 
 === Q: I need to use a proxy. How do I configure that? ===
 
@@ -141,9 +141,9 @@ WebDriver driver = new HtmlUnitDriver() {
 };
 }}}
 
-=== Q: Is WebDriver thread-safe? ===
+=== Q: Is !WebDriver thread-safe? ===
 
-A: WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable.
+A: !WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable.
 
 === Q: How do I type into a contentEditable iframe? ===
 
@@ -163,9 +163,9 @@ Sometimes this doesn't work, and this is because the iframe doesn't have any con
 
 This is needed because the iframe has no content by default: there's nothing to send keyboard input to. This method call inserts an empty tag, which sets everything up nicely.
 
-=== Q: WebDriver fails to start Firefox on Linux due to java.net.SocketException ===
+=== Q: !WebDriver fails to start Firefox on Linux due to java.net.SocketException ===
 
-A: If, when running WebDriver on Linux, Firefox fails to start and the error looks like:
+A: If, when running !WebDriver on Linux, Firefox fails to start and the error looks like:
 {{{
 Caused by: java.net.SocketException: Invalid argument
         at java.net.PlainSocketImpl.socketBind(Native Method)
@@ -181,7 +181,7 @@ sudo sysctl net.ipv6.bindv6only=0
 To get the socket to bind both to IPv6 and IPv4 addresses of the host with the same calls.
 More permanent solution is disabling this behaviour by editing /etc/sysctl.d/bindv6only.conf
 
-=== Q: WebDriver fails to find elements / Does not block on page loads ===
+=== Q: !WebDriver fails to find elements / Does not block on page loads ===
 
 A: This problem can manifest itself in various ways:
  * Using WebDriver.findElement(...) throws ElementNotFoundException, but the element is clearly there - inspecting the DOM (using Firebug, etc) clearly shows it. 
@@ -190,20 +190,20 @@ A: This problem can manifest itself in various ways:
  * How do I know when a page has finished loading?
 
 Explanation:
-WebDriver has a blocking API, generally. However, under some conditions it is possible for a get call to return before the page has finished loading. The classic example is Javascript starting to run after the page has loaded (triggered by onload). Browsers (e.g. Firefox) will notify WebDriver when the basic HTML content has been loaded, which is when WebDriver returns. It's difficult (if not impossible) to know when Javascript has finished executing, since JS code may schedule functions to be called in the future, depend on server response, etc. This is also true for clicking - when the platform supports native events (Windows, Linux) clicking is done by sending a mouse click event with the element's coordinates at the OS level - WebDriver cannot track the exact sequence of operations this click creates. For this reason, the blocking API is imperfect - WebDriver cannot wait for all conditions to be met before the test proceeds because it does not know them. Usually, the important matter is whether the element involved in the next interaction is present and ready.
+!WebDriver has a blocking API, generally. However, under some conditions it is possible for a get call to return before the page has finished loading. The classic example is Javascript starting to run after the page has loaded (triggered by onload). Browsers (e.g. Firefox) will notify !WebDriver when the basic HTML content has been loaded, which is when !WebDriver returns. It's difficult (if not impossible) to know when Javascript has finished executing, since JS code may schedule functions to be called in the future, depend on server response, etc. This is also true for clicking - when the platform supports native events (Windows, Linux) clicking is done by sending a mouse click event with the element's coordinates at the OS level - !WebDriver cannot track the exact sequence of operations this click creates. For this reason, the blocking API is imperfect - !WebDriver cannot wait for all conditions to be met before the test proceeds because it does not know them. Usually, the important matter is whether the element involved in the next interaction is present and ready.
 
 Solution:
 Use the Wait class to wait for a specific element to appear. This class simply calls findElement over and over, discarding the NoSuchElementException each time, until the element is found (or a timeout has expired). Since this is the behaviour desired by default for many users, a mechanism for  implicitly-waiting for elements to appear has been implemented. This is accessible through the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.Timeouts.html WebDriver.manage().timeouts()] call. (This was previously tracked on issue [http://code.google.com/p/selenium/issues/detail?id=26 26]).
 
 === Q: How can I trigger arbitrary events on the page? ===
 
-A: WebDriver aims to emulate user interaction - so the API reflects the ways a user can interact with various elements. 
+A: !WebDriver aims to emulate user interaction - so the API reflects the ways a user can interact with various elements. 
 
 Triggering a specific event cannot be achieved directly using the API, but one can use the Javascript execution abilities to call methods on an element.
 
 === Q: Why is it not possible to interact with hidden elements? ===
 
-A: Since a user cannot read text in a hidden element, WebDriver will not allow access to it as well.
+A: Since a user cannot read text in a hidden element, !WebDriver will not allow access to it as well.
 
 However, it is possible to use Javascript execution abilities to call getText directly from the element:
 ((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", ...)
@@ -218,9 +218,9 @@ profile.addExtension(....);
 WebDriver driver = new FirefoxDriver(profile);
 }}}
 
-=== Q: I'd like it if WebDriver did.... ===
+=== Q: I'd like it if !WebDriver did.... ===
 
-A: If there's something that you'd like WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the WebDriver project page.
+A: If there's something that you'd like !WebDriver to do, or you've found a bug, then please add an [http://code.google.com/p/webdriver/issues/list add an issue] to the !WebDriver project page.
 
 === Q: Selenium server sometimes takes a long time to start a new session ? ===
 
