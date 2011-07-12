@@ -92,7 +92,7 @@ Then connect to it from Ruby
 driver = Selenium::WebDriver.for(:remote)
 }}}
 
-By default, this connects to the server running on localhost:4444 and opens Firefox. To connect to another machine, use the :url option:
+By default, this connects to the server running on localhost:4444 and opens Firefox. To connect to another machine, use the `:url` option:
 
 {{{
 driver = Selenium::WebDriver.for(:remote, :url => "http://myserver:4444/wd/hub")
@@ -104,7 +104,7 @@ To launch another browser, use the :desired_capabilities option:
 driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
 }}}
 
-You can also pass an instance of Selenium::WebDriver::Remote::Capabilities, e.g.:
+You can also pass an instance of `Selenium::WebDriver::Remote::Capabilities`, e.g.:
 
 {{{
 include Selenium
@@ -133,7 +133,7 @@ client.proxy = Proxy.new(:http => "proxy.org:8080")
 driver = WebDriver.for(:remote, :http_client => client)
 }}} 
 
-see `[http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb Selenium::WebDriver::Proxy]` for more options
+See [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb `Selenium::WebDriver::Proxy`] for more options.
 
 For the remote Firefox driver you can configure the profile, see the section [#Tweaking_Firefox_preferences Tweaking Firefox preferences].
 
@@ -229,6 +229,21 @@ driver = Selenium::WebDriver.for(:firefox, :profile => profile)
 }}}
 
 Experimental support for native events is available on Linux. Set {{{profile.native_events = true}}} to turn this on.
+
+== Opera ==
+
+The OperaDriver is always run as a RemoteWebDriver server which the Ruby bindings connect to.
+
+To get started, first [http://code.google.com/p/selenium/downloads/list download] the _selenium-server-standalone_ jar and set the `SELENIUM_SERVER_JAR` environmental variable to point to its location:
+
+`export SELENIUM_SERVER_JAR=/path/to/server-standalone.jar`
+
+Then you can simply create a new instance of `Selenium::WebDriver` with the `:opera` option:
+
+{{{
+driver = Selenium::WebDriver.for :opera
+driver.navigate.to 'http://opera.com/'
+}}}
 
 == Timeouts ==
 
