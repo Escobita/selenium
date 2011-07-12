@@ -1,7 +1,7 @@
 #summary Using WebDriver in your project and finding the jars and required libraries
 #labels WebDriver,Maven
 
-= Using WebDriver =
+= Using !WebDriver =
 
 == From a New Download ==
 
@@ -13,7 +13,7 @@ There are two [http://code.google.com/p/selenium/downloads/list downloads] that 
 
 == With Maven ==
 
-To use the client libraries (the remote webdriver client, HtmlUnitDriver, ChromeDriver, InternetExplorerDriver, FirefoxDriver and support libraries) Add the following dependencies to your project:
+To use the client libraries (the remote webdriver client, ChromeDriver, FirefoxDriver, HtmlUnitDriver, InternetExplorerDriver, OperaDriver, and support libraries) Add the following dependencies to your project:
 
 {{{
   <dependency>
@@ -37,7 +37,7 @@ That's it.
 
 == From a Fresh CheckOut ==
 
- * Follow the instructions in CheckOut in order to get the latest version of WebDriver.
+ * Follow the instructions in CheckOut in order to get the latest version of !WebDriver.
  * Run {{{rake}}} without any targets (that is, just run {{{rake}}}) This will run the unit tests too, and if that's not what you want to do, just run: {{{rake all}}}
- * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver) The JARs for the classes in "org.openqa.selenium" are located in subdirectories of the "build" directory. It should be obvious what is where.
+ * Figure out which drivers you will need on your project. You'll need at least *common*, but depending on your needs you may or may not want the drivers for *Firefox* (FirefoxDriver), *Internet Explorer* (InternetExplorerDriver), and/or *HtmlUnit* (HtmlUnitDriver) The JARs for the classes in "org.openqa.selenium" are located in subdirectories of the "build" directory. It should be obvious what is where. The OperaDriver is located in _/third_party/java/opera-driver/_.
  * Now, just copy the required runtime libraries and the newly built jars on to your CLASSPATH. Read the {{{build.desc}}} files to figure out what these are.
