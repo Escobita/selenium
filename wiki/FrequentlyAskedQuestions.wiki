@@ -228,3 +228,11 @@ A: If you're running on linux, you will need to increase the amount of entropy a
 
 On Windows (XP), you may be running into http://bugs.sun.com/view_bug.do?bug_id=6705872, which usually means clearing out a lot of files from your temp directory.
 temp directory.
+
+=== Q: What's the Selenium WebDriver API equivalent to *TextPresent ? ===
+
+A:
+{{{
+driver.findElement(By.tagName("body")).getText()
+}}}
+will get you the text of the page. To verifyTextPresent/assertTextPresent, from that you can use your favourite test framework to assert on the text.  To waitForTextPresent, you may want to investigate the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/support/ui/WebDriverWait.html WebDriverWait] class.
