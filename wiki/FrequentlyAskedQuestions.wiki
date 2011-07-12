@@ -17,7 +17,7 @@ A: The aim is the same (to allow you to test your webapp), but the implementatio
 
 A: !WebDriver is part of [http://www.openqa.org/selenium Selenium]. The main contribution that !WebDriver makes is its API and the native drivers.
 
-=== Q: How do I migrate from using the original Selenium APIs to the new !WebDriver APIs?
+=== Q: How do I migrate from using the original Selenium APIs to the new !WebDriver APIs? ===
 
 A: The process is described in the Selenium documentation at http://seleniumhq.org/docs/appendix_migrating_from_rc_to_webdriver.html
 
