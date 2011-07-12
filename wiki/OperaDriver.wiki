@@ -3,36 +3,24 @@
 
 = OperaDriver =
 
-OperaDriver is a vendor-supported WebDriver implementation developed by
-[http://opera.com/ Opera Software] and volunteers and implements
-!WebDriver's [JsonWireProtocol wire protocol].
+!OperaDriver is a vendor-supported !WebDriver implementation developed by [http://opera.com/ Opera Software] and volunteers and implements !WebDriver's [JsonWireProtocol wire protocol].
 
 == Requirements ==
 
-The OperaDriver uses the
-[http://dragonfly.opera.com/app/scope-interface/ Scope interface] (same
-as for [http://www.opera.com/dragonfly/ Dragonfly]) to communicate
-directly with Opera from Java.  Consequently, the !OperaDriver is only
-compatible with Opera version 11.5 or newer.
+The !OperaDriver uses the [http://dragonfly.opera.com/app/scope-interface/ Scope interface] (same as for [http://www.opera.com/dragonfly/ Dragonfly]) to communicate directly with Opera from Java.  Consequently, the !OperaDriver is only compatible with Opera version 11.5 or newer.
 
-The server expects you to have Opera installed in the default location
-for each system:
+The server expects you to have Opera installed in the default location for each system:
 
 || *OS* || *Expected Location of Opera* ||
 || Linux || /usr/bin/opera ||
 || Mac || /Applications/Opera.app/Contents/MacOS/Opera ||
 || Windows || \%PROGRAMFILES%\Opera\opera.exe ||
 
-However, you can override this and specify a custom location of Opera
-by setting the `OPERA_PATH` environmental variable which you can read
-more about under [#Settings].
+However, you can override this and specify a custom location of Opera by setting the `OPERA_PATH` environmental variable which you can read more about under [#Settings].
 
 == Getting Started ==
 
-To get set up please [http://code.google.com/p/selenium/downloads/list
-download either selenium-server or selenium-server-standalone] and make
-sure you have a fairly recent version of Opera.  All you need to do is
-to create a new `OperaDriver` instance:
+To get set up please [http://code.google.com/p/selenium/downloads/list download either selenium-server or selenium-server-standalone] and make sure you have a fairly recent version of Opera.  All you need to do is to create a new `OperaDriver` instance:
 
 {{{
 WebDriver driver = new OperaDriver();
@@ -41,9 +29,7 @@ driver.navigate().to("http://www.opera.com/");
 
 === Running the server as a standalone process ===
 
-Since the !OperaDriver implements the wire protocol, it is fully
-compatible with any RemoteWebDriver client.  Simply start up your
-server, create a client, and away you go:
+Since the !OperaDriver implements the wire protocol, it is fully compatible with any RemoteWebDriver client.  Simply start up your server, create a client, and away you go:
 
 {{{
 WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.opera());
@@ -52,24 +38,19 @@ driver.navigate().to("http://www.opera.com/");
 
 === Using the Ruby bindings ===
 
-[RubyBindings selenium-webdriver], the Ruby bindings for Selenium
-2/WebDriver also support Opera out of the box.  First, install the
-[http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem:
+[RubyBindings selenium-webdriver], the Ruby bindings for Selenium 2/WebDriver also support Opera out of the box.  First, install the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem:
 
 {{{
 gem install selenium-webdriver
 }}}
 
-Next, [http://code.google.com/p/selenium/downloads/list download the
-selenium-server-standalone] jar and set environmental variable
-`SELENIUM_SERVER_JAR` to point to its location:
+Next, [http://code.google.com/p/selenium/downloads/list download the selenium-server-standalone] jar and set environmental variable `SELENIUM_SERVER_JAR` to point to its location:
 
 {{{
 export SELENIUM_SERVER_JAR=~/server-standalone.jar
 }}}
 
-Then all you have to do is to create a new instance of
-`Selenium::WebDriver`:
+Then all you have to do is to create a new instance of `Selenium::WebDriver`:
 
 {{{
 require 'rubygems'
@@ -79,26 +60,19 @@ driver = Selenium::WebDriver.for :opera
 driver.navigate.to 'http://opera.com/'
 }}}
 
-If you prefer using the Watir API, you can have a look at the
-[http://rubygems.org/gems/watir-webdriver watir-webdriver] gem.
+If you prefer using the Watir API, you can have a look at the [http://rubygems.org/gems/watir-webdriver watir-webdriver] gem.
 
 == Advanced Usage ==
 
 === Settings ===
 
-To specify such things as a custom location of the Opera binary and
-command-line arguments you may use environmental variables or the
-OperaDriverSettings object.  This is a list of the environmental
-variables which can be set on any OS:
+To specify such things as a custom location of the Opera binary and command-line arguments you may use environmental variables or the !OperaDriverSettings object.  This is a list of the environmental variables which can be set on any OS:
 
 * `OPERA_PATH`: The full path to the Opera binary.
-* `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera,
-e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
-* `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a
-built-in browser-side checker for when a page is finished loading.
+* `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
+* `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a built-in browser-side checker for when a page is finished loading.
 
-You may also pass in the OperaDriverSettings object to the constructor
-in OperaDriver:
+You may also pass in the OperaDriverSettings object to the constructor in OperaDriver:
 
 {{{
 OperaDriverSettings settings = new OperaDriverSettings();
@@ -120,21 +94,15 @@ WebDriver driver = new OperaDriver(settings);
 
 === Think you've found a bug? ===
 
-Check if the bug has been
-[https://github.com/operasoftware/operadriver/issues reported] yet.  If
-it hasn't, please open a new issue and be sure to include the
-[SeleniumHelp following]:
+Check if the bug has been [https://github.com/operasoftware/operadriver/issues reported] yet.  If it hasn't, please open a new issue and be sure to include the [SeleniumHelp following]:
 
  * What platform are you running on?
  * What version of Selenium/OperaDriver are you using?
  * What version of Opera are you using?
  * The failure stacktrace, if available.
 
-Of course, if your bug has already been reported, you can update the
-issue with the information above.  Having more information to work on
-makes it easier for us to track down the cause of the bug.
+Of course, if your bug has already been reported, you can update the issue with the information above.  Having more information to work on makes it easier for us to track down the cause of the bug.
 
 == Source Code ==
 
-!OperaDriver is [https://github.com/operasoftware/operadriver/ available
-on Github].  It's distributed under the Apache License version 2.
+!OperaDriver is [https://github.com/operasoftware/operadriver/ available on Github].  It's distributed under the Apache License version 2.
