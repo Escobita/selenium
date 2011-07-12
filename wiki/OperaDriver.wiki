@@ -3,7 +3,7 @@
 
 = OperaDriver =
 
-!OperaDriver is a vendor-supported !WebDriver implementation developed by [http://opera.com/ Opera Software] and volunteers and implements !WebDriver's [JsonWireProtocol wire protocol].
+!OperaDriver is a vendor-supported !WebDriver implementation developed by [http://opera.com/ Opera Software] and volunteers that implements !WebDriver's [JsonWireProtocol wire protocol].
 
 == Requirements ==
 
@@ -16,11 +16,11 @@ The server expects you to have Opera installed in the default location for each 
 || Mac || /Applications/Opera.app/Contents/MacOS/Opera ||
 || Windows || \%PROGRAMFILES%\Opera\opera.exe ||
 
-However, you can override this and specify a custom location of Opera by setting the `OPERA_PATH` environmental variable which you can read more about under [#Settings].
+However, you can override this and specify a custom location to Opera by setting the `OPERA_PATH` environmental variable which you can read more about under [#Settings].
 
 == Getting Started ==
 
-To get set up please [http://code.google.com/p/selenium/downloads/list download either selenium-server or selenium-server-standalone] and make sure you have a fairly recent version of Opera.  All you need to do is to create a new `OperaDriver` instance:
+To get set up [http://code.google.com/p/selenium/downloads/list please download] either _selenium-server_ or _selenium-server-standalone_ and make sure you have a fairly recent version of Opera.  All you need to do is to create a new `OperaDriver` instance:
 
 {{{
 WebDriver driver = new OperaDriver();
@@ -38,7 +38,7 @@ driver.navigate().to("http://www.opera.com/");
 
 === Using the Ruby bindings ===
 
-[RubyBindings selenium-webdriver], the Ruby bindings for Selenium 2/WebDriver also support Opera out of the box.  First, install the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem:
+_[RubyBindings selenium-webdriver]_, the Ruby bindings for Selenium 2/!WebDriver also support Opera out of the box.  First, install the gem:
 
 {{{
 gem install selenium-webdriver
@@ -68,11 +68,11 @@ If you prefer using the Watir API, you can have a look at the [http://rubygems.o
 
 To specify such things as a custom location of the Opera binary and command-line arguments you may use environmental variables or the !OperaDriverSettings object.  This is a list of the environmental variables which can be set on any OS:
 
-* `OPERA_PATH`: The full path to the Opera binary.
-* `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
-* `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a built-in browser-side checker for when a page is finished loading.
+ * `OPERA_PATH`: The full path to the Opera binary.
+ * `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
+ * `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a built-in browser-side checker for when a page is finished loading.
 
-You may also pass in the OperaDriverSettings object to the constructor in OperaDriver:
+You may also pass in the !OperaDriverSettings object to the constructor in OperaDriver:
 
 {{{
 OperaDriverSettings settings = new OperaDriverSettings();
@@ -85,12 +85,12 @@ WebDriver driver = new OperaDriver(settings);
 
 == Known Issues ==
 
-* [AdvancedUserInteractions] only partially implemented
-* Currently limited to one instance of Opera per machine
-* Problems with Operas with IME feature enabled (Opera Mobile, Android, bream)
-* Not using WebDriver atoms yet
-* JavaScript JIT is disabled for injected scripts
-* Window management
+ * [AdvancedUserInteractions] only partially implemented
+ * Currently limited to one instance of Opera per machine
+ * Problems with Operas with IME feature enabled (Opera Mobile, Android, bream)
+ * Not using WebDriver atoms yet
+ * JavaScript JIT is disabled for injected scripts
+ * Window management
 
 === Think you've found a bug? ===
 
