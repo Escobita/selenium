@@ -15,6 +15,7 @@ Also included in this release are
    * Bug - There was a performance regression in deep in some shared code that has been addressed.
    * New - Rather than recording 'foo' for an element which and an id of 'foo' it is captured as 'id=foo' to be very specific as to which element would be interacted with
    * New - Same with 'name'
+   * New - Popups (alerts, confirms, prompts) and new windows work again
 
 ==1.0.12==
 
