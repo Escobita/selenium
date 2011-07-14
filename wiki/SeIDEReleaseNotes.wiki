@@ -9,6 +9,8 @@ Hey! Look at that! A slightly more significant version bump! Any why is that? We
 
 Which are the four supported languages of the Selenium project. This also means that Se-IDE is officially deprecating inclusion of the Groovy, Perl and PHP format plugins in the main release bundle. It would be outstanding if the community around those languages picks up their development and maintenance.
 
+Of course, format switching is still in Experimental purgatory for at least this release. Losing people's scripts because of bugs is not acceptable and we're working on it. To 'goal' is to have them back for the next release.
+
 Also included in this release are
 
    * New - setIndent(n) is now available to formats for greater control over formatting of export formats
