@@ -9,7 +9,7 @@ We'd still welcome your patch! If you're fixing an issue, please attach your pat
 
 The easiest way to create a patch is to either use TortoiseSvn's "Create patch" function, or to capture the output of "{{{svn diff}}}".
 
-Before we can accept a patch, we first ask people to sign a Contributor License Agreement (or CLA). We ask this so that we know that contributors have the right to donate the code.
+Before we can accept a patch, we first ask people to sign a [https://spreadsheets.google.com/spreadsheet/viewform?hl=en_US&formkey=dFFjXzBzM1VwekFlOWFWMjFFRjJMRFE6MQ#gid=0 Contributor License Agreement (or CLA)]. We ask this so that we know that contributors have the right to donate the code.
 
 == If You Have Commit Rights ==
 
@@ -27,4 +27,3 @@ If you have commit rights and want to check code in, please follow the following
 A good commit message is something like: "JoeBloggs: Fixing issue #123 (greedy cheese munching). Adding locking to the CheeseAdapter so that only one cheese is consumed at a time." A bad commit message looks like: "Edited CheeseAdapter.java".
 
 The reason we include the name in wiki format is two-fold. Firstly, this allows a developer to pair or checkin code for someone else. In this case, we use a checkin name such as "JoeBloggs on behalf of PuffTheMagicDragon" or "JoeBloggs and MightyPete". Secondly, Google Code is slowly allowing wiki content in more and more places. At some point, I hope that any WikiWord in the commit message will link to the wiki.
-
