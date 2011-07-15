@@ -23,15 +23,14 @@ developers have a few choices, but may wish to try
 Windows users should also be aware that the Cygwin SVN client
 is _not_ recommended at this time.
 
+
 == Repository ==
-According to your interest/profile choose one the following two URLs to be used for checkout in the Subversion client of your choice
+Check out the website: 
+svn co http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/
 
-Only working on the RST files: http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/src/main/rst/
-
-Also working on the website: http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/
 
 == Access ==
-In order to be able to commit you need an Google account with the appropriate privileges - if you don't have one already and you're part of the team contact Patrick Lightbody.
+In order to be able to commit you need an Google account with the appropriate privileges - if you don't have one already contact the dev list (selenium-developers@googlegroups.com)
 
 == Working process ==
  * Communicate to the others what your plans are and what you're currently working on to be synchronized with other team members
@@ -68,43 +67,46 @@ Run the following on a terminal (you may need to `sudo`):
     easy_install Sphinx
 }}}
 
+=== Install Make ===
+Depending on your OS, instructions to install will vary.
+
+linux variants with apt-get: sudo apt-get install build-esentials
+
+OS X - download and install the developer tools
+
+windows: http://gnuwin32.sourceforge.net/packages/make.htm
+
 === Generate the docs ===
 Finally, to generate the docs. All you have to do is run this on a terminal:
 
 {{{
-   sphinx-build -b html <rest_files_location> <html_destination>
+   mvn clean jetty:run
 }}}
 
-That's it, you should find the files on the html_destination you've chosen (open index.html to see the docs).
+That's it, you should find the site running at http://localhost:8080/
 
-Note that the HTML will be generated without any CSS.
-
-==== Using Make (optional) ====
-
-If you have Make installed on your system, go to
-`websites/www.seleniumhq.org/src/main/rst` and type `make` You will
-then see a list of available build targets for the Selenium docs.  For
-details, say `cat Makefile`
-
-Assuming you're in the `rst` directory, you can build the HTML
-documentation with `make html` The output will be placed in
-`rst/.build/html`
-
-If you'd like to generate the PDF version of the Selenium
-documentation, use the following incantation:
+If you want to work in eclipse, prepare the project to be imported with:
 
 {{{
-    make latex
-    cd .build/latex
-    make all-pdf
-    cd -
+  mvn eclipse:eclipse
 }}}
 
-The final PDF output will be a file named `rst/.build/latex/Selenium_Documentation.pdf`
+After making changes you can see them reflected in your local server by opening a new terminal and executing:
+{{{
+  mvn clean compile
+}}}
+
+==== Optional Docs as PDF ====
+
+Install pdf-LaTeX and run:
+
+{{{
+  mvn compile
+}}}
 
 ===== Checking for broken links =====
 
-One of the available Make targets is `linkcheck` If you run `make linkcheck` 
+One of the available Make targets is `linkcheck` If you run `make linkcheck` from www.seleniumhq.org/src/main/rst
 then Sphinx will validate all of the links in the document,
 and let you know if any links are malformed, or point to dead URLs.
 Note that checking all the links does take a while.
@@ -113,7 +115,7 @@ Note that checking all the links does take a while.
 
 Here you'll find some rules we must follow to keep the documentation source files as clean as possible.
 
- # Try to keep lines of no more that 80 columns, this way most text editors will be able to render the rst file in the same way, and will save us the annoyance of unending lines. The final html will be rendered as espected as the parser joins all consecutive lines to a single paragraph until the next blank line.
+ # Try to keep lines of no more that 80 columns, this way most text editors will be able to render the rst file in the same way, and will save us the annoyance of unending lines. The final html will be rendered as expected as the parser joins all consecutive lines to a single paragraph until the next blank line.
  # Don't add extra spaces. The parser removes duplicated spaces anyway, but it's better to keep the source rst files as clean as possible.
  # Don't use unicode characters, like ¶ ñ á or even  and  (double dashes). They sometimes are parsed correctly, but in some environment they don't, which brings more problems than advantages...
 
