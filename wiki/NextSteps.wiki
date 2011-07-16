@@ -52,7 +52,7 @@ element = driver.findElement(By.name("passwd"));
 element = driver.findElement(By.xpath("//input[@id='passwd-id']"));
 }}}
 
-You can also look for an link by its text, but be careful! The text must be an _exact_ match! You should also be careful when using XpathInWebDriver. If there's more than one element that matches the query, then only the first will be returned. If nothing can be found, a {{{NoSuchElementException}}} will be thrown.
+You can also look for a link by its text, but be careful! The text must be an _exact_ match! You should also be careful when using XpathInWebDriver. If there's more than one element that matches the query, then only the first will be returned. If nothing can be found, a {{{NoSuchElementException}}} will be thrown.
 
 WebDriver has an "Object-based" API; we represent all types of elements using the same interface: WebElement. This means that although you may see a lot of possible methods you could invoke when you hit your IDE's auto-complete key combination, not all of them will make sense or be valid. Don't worry! WebDriver will attempt to do the Right Thing, so if you call a method that makes no sense ("setSelected()" on a "meta" tag, for example) an exception will be thrown.
 
