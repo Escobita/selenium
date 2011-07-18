@@ -7,7 +7,7 @@ Hey! Look at that! A slightly more significant version bump! Any why is that? We
 
    * New - WebDriver exports for Ruby, Python, C# and Java
 
-Which are the four supported languages of the Selenium project. This also means that Se-IDE is officially deprecating inclusion of the Groovy, Perl and PHP format plugins in the main release bundle. It would be outstanding if the community around those languages picks up their development and maintenance.
+Which are the four supported languages of the Selenium project. This also means that Se-IDE is officially deprecating inclusion of the Groovy, Perl and PHP format plugins in the main release bundle. It would be outstanding if the community around those languages picks up their development and maintenance. Read more about the WebDriver on [http://blog.reallysimplethoughts.com/2011/07/08/selenium-ide-and-selenium-2-webdriver/ Samit's blog].
 
 Of course, format switching is still in Experimental purgatory for at least this release. Losing people's scripts because of bugs is not acceptable and we're working on it. To 'goal' is to have them back for the next release.
 
