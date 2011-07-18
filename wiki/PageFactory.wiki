@@ -72,7 +72,7 @@ is equivalent to:
 The driver instance that's used is the one that's passed to the PageFactory's initElements method.
 
 In the example given, we rely on the PageFactory to instantiate the instance of the 
-PageObject. It does this by first looking for a constructor that takes "WebDriver" as its sole argument ({{{public SomePage(WebDriver driver) {}}}}) If this is not present, then the default constructor is called. Sometimes, however, the PageObject depends on more than just an instance of the WebDriver interface. Should this be the case, it is possible to get the PageFactory to initialise the element's of an already constructed object:
+PageObject. It does this by first looking for a constructor that takes "WebDriver" as its sole argument ({{{public SomePage(WebDriver driver) {}}}). If this is not present, then the default constructor is called. Sometimes, however, the PageObject depends on more than just an instance of the WebDriver interface. Should this be the case, it is possible to get the PageFactory to initialise the elements of an already constructed object:
 
 {{{
 ComplexPageObject page = new ComplexPageObject("expected title", driver);
@@ -92,8 +92,8 @@ Although the code works, someone who's not familiar with the source of the Googl
 package org.openqa.selenium.example;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.How;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
 import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
@@ -115,9 +115,9 @@ One wrinkle that remains is that every time we call a method on the WebElement, 
 package org.openqa.selenium.example;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.How;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
 import org.openqa.selenium.WebElement;
 
 public class GoogleSearchPage {
