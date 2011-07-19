@@ -256,6 +256,15 @@ driver.navigate.to 'http://opera.com/'
   driver.manage.timeouts.implicit_wait = 3 # seconds
 }}}
 
+=== Explicit waits ===
+
+Use the Wait class to explicitly wait for some condition:
+
+{{{
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  wait.until { driver.find_element(:id => "cheese").displayed? }
+}}}
+
 === Internal timeouts ===
 
 Internally, !WebDriver uses HTTP to communicate with a lot of the drivers (the JsonWireProtocol). By default, `Net::HTTP` from Ruby's standard library is used, which has a default timeout of 60 seconds. If you call `Driver#get` on a page that takes more than 60 seconds to load, you'll see a `TimeoutError` raised from `Net::HTTP`. You can configure this timeout (before launching a browser) by doing:
