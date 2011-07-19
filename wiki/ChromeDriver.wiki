@@ -16,16 +16,7 @@ The server expects you to have Chrome installed in the default location for each
 || Windows XP || %HOMEPATH%\Local Settings\Application Data\Google\Chrome\Application\chrome.exe ||
 || Windows Vista || C:\Users\%USERNAME%\AppData\Local\Google\Chrome\Application\chrome.exe ||
 
-^1^ For Linux systems, the !ChromeDriver expects /usr/bin/google-chrome to be a symlink to the actual binary.
-
-You can override the default location by passing the "chrome.binary" capability, e.g. with Chromium on Debian:
-
-{{{
-  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-  capabilities.setCapability("chrome.binary", "/usr/lib/chromium-browser/chromium-browser"));
-  WebDriver driver = new ChromeDriver(capabilities);
-}}}
-
+^1^ For Linux systems, the !ChromeDriver expects /usr/bin/google-chrome to be a symlink to the actual binary. See also [Overriding_the_Chrome_binary_location].
 
 == Getting Started ==
 
@@ -127,6 +118,17 @@ Or to load with a specific profile (note that the default profile directories ca
 }}}
 
 The full list of flags can be found [http://peter.sh/experiments/chromium-command-line-switches/ here].
+
+=== Overriding the Chrome binary location ===
+
+You can specify the location of the Chrome binary by passing the "chrome.binary" capability, e.g. with a typical Chromium install on Debian:
+
+{{{
+  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+  capabilities.setCapability("chrome.binary", "/usr/lib/chromium-browser/chromium-browser"));
+  WebDriver driver = new ChromeDriver(capabilities);
+}}}
+
 
 == Known Issues ==
 
