@@ -206,7 +206,10 @@ Triggering a specific event cannot be achieved directly using the API, but one c
 A: Since a user cannot read text in a hidden element, !WebDriver will not allow access to it as well.
 
 However, it is possible to use Javascript execution abilities to call getText directly from the element:
-((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", ...)
+{{{
+WebElement element = ...;
+((JavascriptExecutor) driver).executeScript("return arguments[0].getText();", element);
+}}}
 
 === Q: How do I start Firefox with an extension installed? ===
 A: 
