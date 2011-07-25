@@ -71,6 +71,7 @@ To specify such things as a custom location of the Opera binary and command-line
  * `OPERA_PATH`: The full path to the Opera binary.
  * `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
  * `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a built-in browser-side checker for when a page is finished loading.
+ * `OPERA_LAUNCHER`: Full path to the Opera binary launcher, typically located in `~/.launcher/launcher-*` on GNU/Linux and Mac.
 
 You may also pass in the !OperaDriverSettings object to the constructor in OperaDriver:
 
@@ -82,6 +83,12 @@ settings.setUseOperaIdle(true);
 settings.setOperaLauncherXvfbDisplay(8);
 WebDriver driver = new OperaDriver(settings);
 }}}
+
+== opera-launcher ==
+
+!OperaDriver extracts a program called opera-launcher to a sub-directory in your home directory called _.launcher_.  This is a server spawned by OperaDriver which handles the management of the Opera browser binary, as well as taking screenshots.  OperaDriver communicates with the launcher over the !OperaLauncherProtocol, which is not related to the !Scope protocol in any way.
+
+The opera-launcher is a way to circumvent various problems related to process management on Windows and taking reliable, external screenshots for testing.
 
 == Known Issues ==
 
