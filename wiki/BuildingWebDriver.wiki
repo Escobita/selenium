@@ -48,14 +48,14 @@ The test logs are kept in the "build/test_logs" folder.
 
 You'll get a long way with just: 
 
-{{{go //java/server/src/org/openqa/selenium/remote/server:server:uber //java/client/src/org/openqa/selenium/remote:client-combined:project}}}
+{{{go //java/server/src/org/openqa/selenium/remote/server:server:uber //java/client/src/org/openqa/selenium:client-combined:project}}}
 
 That'll build the standalone "selenium server" jar and the client library too. The build output will tell you where the output files are being placed.
 
 You can replace that second target with: 
 
 
-{{{//java/client/src/org/openqa/selenium/remote:client-combined:uber}}}
+{{{//java/client/src/org/openqa/selenium:client-combined:uber}}}
 
 The "uber" implicit targets build a single "uber jar" containing all the compiled java from the project, as well as all third party dependencies. The "project" implicit target is similar, but excludes third party dependencies.
 
