@@ -80,6 +80,14 @@ element.text
 
 Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
 
+== Chrome ==
+
+Passing [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/chrome_switches.cc&exact_package=chromium Chrome command line switches]: 
+
+{{{driver = Selenium::WebDriver.for :chrome, :switches => %w[--ignore-certificate-errors --disable-popup-blocking --disable-translate]}}}
+
+See also ChromeDriver.
+
 == Remote ==
 
 The RemoteWebDriver makes it easy to control a browser running on another machine. Download the jar (from [http://code.google.com/p/selenium/downloads/list Downloads]) and launch the server:
