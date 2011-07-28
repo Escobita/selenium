@@ -47,9 +47,9 @@ profile.addAdditionalPreferences(extraPrefs);
 WebDriver driver = new FirefoxDriver(profile);
 }}}
 
-== Enabling features that might not be wise to use in Firefox ==
+== Enabling features that are disabled by default in Firefox ==
 
-As we develop features in the FirefoxDriver, we expose the ability to use them. For example, until we feel native events are stable on Firefox for Linux, they are disabled by default. To enable them:
+Native events is such a feature: It is disabled by default for Firefox on Linux as it may cause tests which open many windows in parallel to be unreliable. However, native events work quite well otherwise and are essential for some of the new actions of the Advanced User Interaction. To enable them:
 
 {{{
 FirefoxProfile profile = new FirefoxProfile();
