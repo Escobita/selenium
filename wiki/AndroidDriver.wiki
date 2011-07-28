@@ -71,7 +71,7 @@ If you face an issue, make sure you are allowing installation of application not
 === Setup Port Forwarding ===
 In a terminal type: 
 {{{
-$~/android_sdk/adb forward tcp:8080 tcp:8080
+$~/android_sdk/platform-tools/adb forward tcp:8080 tcp:8080
 }}}
 
 This will make the android server available at http://localhost:8080/wd/hub
@@ -80,7 +80,7 @@ This will make the android server available at http://localhost:8080/wd/hub
 
 Connect your device through USB to your machine.
 {{{
-$~/android_sdk/tools/adb devices
+$~/android_sdk/platform-tools/adb devices
 }}}
 
 This will give you the serial Id of your connected device. Now install the apk on the device:
