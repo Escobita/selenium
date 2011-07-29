@@ -76,6 +76,18 @@ element.send_keys :space
 element.text
 }}}
 
+Advanced user interactions (see [http://selenium.googlecode.com/svn/trunk/docs/api/rb/Selenium/WebDriver/ActionBuilder.html ActionBuilder]):
+
+{{{
+driver.action.key_down(:shift).
+              click(element).
+              double_click(second_element).
+              key_up(:shift).
+              drag_and_drop(element, third_element).
+              perform
+}}}
+
+
 == IE ==
 
 Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
