@@ -163,6 +163,11 @@ Sometimes this doesn't work, and this is because the iframe doesn't have any con
 
 This is needed because the iframe has no content by default: there's nothing to send keyboard input to. This method call inserts an empty tag, which sets everything up nicely.
 
+Remember to switch out of the frame once you're done (as all further interactions will be with this specific frame):
+{{{
+driver.switchTo().defaultContent();
+}}}
+
 === Q: !WebDriver fails to start Firefox on Linux due to java.net.SocketException ===
 
 A: If, when running !WebDriver on Linux, Firefox fails to start and the error looks like:
