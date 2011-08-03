@@ -201,7 +201,7 @@ Use a proxy:
 
 {{{
 profile = Selenium::WebDriver::Firefox::Profile.new
-proxy = Selenium::WebDriver::Proxy.new(:http => "http://proxy.org:8080")
+proxy = Selenium::WebDriver::Proxy.new(:http => "proxy.org:8080")
 profile.proxy = proxy
 
 driver = Selenium::WebDriver.for :firefox, :profile => profile
