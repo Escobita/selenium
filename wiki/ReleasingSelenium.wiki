@@ -51,7 +51,9 @@
  # Now all maven artifacts are installed in your local repository -- test them -- this is important, we should not deploy broken Maven artifacts!
  # When everything is fine, execute:
    `mvn source:jar javadoc:jar -Dtest=skip -DfailIfNoTests=false -Dgpg.passphrase=_your-GnuPG-key-passphrase_ -Psign deploy`                
- # Finally goto http://oss.sonatype.org, log in, close the staging repository, and promote it to the releases repository.
+ # Goto http://oss.sonatype.org, log in, close the staging repository.
+ # Ideally you should test the artifacts here (you can actually skip the test right after "install" if you do this), because these are the _real_ files you will be irreversibly promoting to central. Once the staging repository has been closed you get the url to the repository by clicking on the repository. This url can be added to your project pom to test. (Remember that you may need to delete the artifacts in your local repository to make sure you re-download the staged artifacts).  
+ # Promote that staged release in nexeus (or drop it).
 
 = For .NET =
 
