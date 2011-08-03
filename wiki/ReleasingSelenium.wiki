@@ -42,7 +42,7 @@
 }}}
  # Prerequisite 3: Make sure your GnuPG public key is distributed to `hkp://pgp.mit.edu`
  # Make sure the dependencies in all pom.xml files under the maven directory are correct -- if not, update them (Hint: check for changes in the third_party directory)
- # Update the version number in all pom.xml files under the maven directory (but do not check in those changes)
+ # Update the version number in all pom.xml files under the maven directory (but do not check in those changes) (`mvn versions:set -DnewVersion=2.3.0` inside the "maven" folder)
  # Execute:
    # `./go //java/client/src/org/openqa/selenium:client-combined:project`
    # `./go //java/server/src/org/openqa/grid/selenium:selenium:project`
