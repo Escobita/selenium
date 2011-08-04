@@ -51,6 +51,15 @@
 +                <version>3.2.3</version>
              </dependency>
 }}}
+To provide the correct version info in a WebDriverException you should also replace "unknown" in the maven/api/pom.xml with the Subversion commit number wich forked the version branch:
+{{{
+             <manifestEntries>
+                 <Selenium-Version>${version}</Selenium-Version>
+-                <Selenium-Revision>unknown</Selenium-Revision>
++                <Selenium-Revision>...</Selenium-Revision>
+                 <Selenium-Build-Time>${maven.build.timestamp}</Selenium-Build-Time>
+             </manifestEntries>
+}}} 
  # Update the version number in all pom.xml files under the maven directory (but do not check in those changes) (`mvn versions:set -DnewVersion=2.3.0` inside the "maven" folder)
  # Execute:
    # `./go //java/client/src/org/openqa/selenium:client-combined:project`
