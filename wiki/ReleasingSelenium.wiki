@@ -54,6 +54,7 @@
  # Goto http://oss.sonatype.org, log in, close the staging repository.
  # Ideally you should test the artifacts here (you can actually skip the test right after "install" if you do this), because these are the _real_ files you will be irreversibly promoting to central. Once the staging repository has been closed you get the url to the repository by clicking on the repository. This url can be added to your project pom to test. (Remember that you may need to delete the artifacts in your local repository to make sure you re-download the staged artifacts).  
  # Promote that staged release in nexeus (or drop it).
+ # Make sure any other manual hacks you did to files are committed back on trunk.
 
 = For .NET =
 
