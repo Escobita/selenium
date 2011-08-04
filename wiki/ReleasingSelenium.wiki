@@ -42,6 +42,15 @@
 }}}
  # Prerequisite 3: Make sure your GnuPG public key is distributed to `hkp://pgp.mit.edu`
  # Make sure the dependencies in all pom.xml files under the maven directory are correct -- if not, update them (Hint: check for changes in the third_party directory)
+ # Perform any manual steps/release hacks documented here: Until version 3.3.0 appears at http://repo1.maven.org/maven2/net/java/dev/jna/jna/ we need to do this in maven/pom.xml:
+{{{
+             <dependency>
+                 <groupId>net.java.dev.jna</groupId>
+                 <artifactId>jna</artifactId>
+-                <version>3.3.0</version>
++                <version>3.2.3</version>
+             </dependency>
+}}}
  # Update the version number in all pom.xml files under the maven directory (but do not check in those changes) (`mvn versions:set -DnewVersion=2.3.0` inside the "maven" folder)
  # Execute:
    # `./go //java/client/src/org/openqa/selenium:client-combined:project`
@@ -54,7 +63,7 @@
  # Goto http://oss.sonatype.org, log in, close the staging repository.
  # Ideally you should test the artifacts here (you can actually skip the test right after "install" if you do this), because these are the _real_ files you will be irreversibly promoting to central. Once the staging repository has been closed you get the url to the repository by clicking on the repository. This url can be added to your project pom to test. (Remember that you may need to delete the artifacts in your local repository to make sure you re-download the staged artifacts).  
  # Promote that staged release in nexeus (or drop it).
- # Make sure any other manual hacks you did to files are committed back on trunk.
+ # Make sure any other manual hacks you did are documented in step 5 or committed back on trunk.
 
 = For .NET =
 
