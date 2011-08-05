@@ -159,10 +159,16 @@ The wire protocol will inherit its status codes from those used by the InternetE
 || 15 || `ElementIsNotSelectable` || An attempt was made to select an element that cannot be selected. ||
 || 17 || `JavaScriptError` || An error occurred while executing user supplied !JavaScript. ||
 || 19 || `XPathLookupError` || An error occurred while searching for an element by XPath. ||
+|| 21 || `Timeout` || An operation did not complete before its timeout expired. ||
 || 23 || `NoSuchWindow` || A request to switch to a different window could not be satisfied because the window could not be found. ||
 || 24 || `InvalidCookieDomain` || An illegal attempt was made to set a cookie under a different domain than the current page. ||
 || 25 || `UnableToSetCookie` || A request to set a cookie's value could not be satisfied. ||
-|| 28 || `Timeout` || A command did not complete before its timeout expired. ||
+|| 27 || `NoModalDialogOpenError` || An attempt was made to operate on a modal dialog when one was not open. ||
+|| 28 || `ScriptTimeout` || A script did not complete before its timeout expired. ||
+|| 29 || `InvalidElementCoordinates` || The coordinates provided to an interactions operation are invalid. ||
+|| 30 || `IMENotAvailable` || IME was not available. ||
+|| 31 || `IMEEngineActivationFailed` || An IME engine could not be started. ||
+|| 32 || `InvalidSelector` || Argument was an invalid selector (e.g. XPath/CSS). ||
 
 The client should interpret a 404 Not Found response from the server as an "Unknown command" response. All other 4xx and 5xx responses from the server that do not define a status field should be interpreted as "Unknown error" responses.
 
