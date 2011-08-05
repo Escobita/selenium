@@ -163,6 +163,7 @@ The wire protocol will inherit its status codes from those used by the InternetE
 || 23 || `NoSuchWindow` || A request to switch to a different window could not be satisfied because the window could not be found. ||
 || 24 || `InvalidCookieDomain` || An illegal attempt was made to set a cookie under a different domain than the current page. ||
 || 25 || `UnableToSetCookie` || A request to set a cookie's value could not be satisfied. ||
+|| 26 || `UnexpectedAlertOpen` || An alert was open, blocking this operation ||
 || 27 || `NoModalDialogOpenError` || An attempt was made to operate on a modal dialog when one was not open. ||
 || 28 || `ScriptTimeout` || A script did not complete before its timeout expired. ||
 || 29 || `InvalidElementCoordinates` || The coordinates provided to an interactions operation are invalid. ||
