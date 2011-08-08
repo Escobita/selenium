@@ -3,7 +3,7 @@
 
 = Firefox Driver =
 
-See below for instructions on how to install the FirefoxDriver.
+Firefox driver is included in the selenium-server-stanalone.jar available in the downloads. The driver comes in the form of an xpi (firefox extension) which is added to the firefox profile when you start a new instance of FirefoxDriver.
 
 == Pros ==
 
@@ -14,11 +14,6 @@ See below for instructions on how to install the FirefoxDriver.
  
  * Slower than the HtmlUnitDriver
 
-== Before Going Any Further ==
-
-The FirefoxDriver contains everything it needs in the JAR file. If you're just interested in using this driver, then all you need to do is put the {{{webdriver-firefox.jar}}} or {{{webdriver-all.jar}}} on your CLASSPATH, and WebDriver will do everything else for you.
-
-If you want to dig deeper, though, carry on reading!
 
 == Important System Properties ==
 
@@ -49,16 +44,3 @@ Download the firebug xpi file from mozilla and start the profile as follows:
    firefoxProfile.addExtension(file);
    WebDriver driver = new FirefoxDriver(firefoxProfile);
 }}}
-== Installing a Downloaded Binary ==
-
-The "wedriver-all.zip" which may be downloaded from the website, contains all the dependencies (including the common library) required to run the FirefoxDriver. In order to use it:
-
- # Copy all the "jar" files on to your CLASSPATH.
-
-== Installing the Quick Way From Source (with Ruby) ==
-
-If you're doing development work, the test suites are arranged in such a way as to use the version of webdriver found in {{{firefox/src/extension}}}
-
-This assumes that your installation of Firefox 2 or 3.x is pretty standard. On Windows, this means that it should be installed in the default location ("C:\Program Files\Mozilla Firefox") and on the Mac under "/Applications/Firefox". On Linux, it is assumed that firefox is available on the default PATH. If your firefox is installed in a custom location, then open up the {{{SingleTestSuite}}} and add a system property to tell the firefox driver where your Firefox binary is:
-
-{{{System.setProperty("webdriver.firefox.bin", "d:\\apps\\mozilla firefox\\firefox");}}}
