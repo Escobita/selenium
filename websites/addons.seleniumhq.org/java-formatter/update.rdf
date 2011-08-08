@@ -7,7 +7,7 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
-            <em:version>1.0.3/em:version>
+            <em:version>1.0.3</em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
