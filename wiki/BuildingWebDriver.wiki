@@ -85,6 +85,14 @@ For Java:
 || selenium-server-standalone || Build the standalone server ||
 || //java/client/test/org/openqa/selenium:single:run || Run the SingleTestSuite ||
 
+Useful parameters:
+
+|| *Parameter* || *Purpose* || *Example ||
+|| haltonerror || This flag indicates if "go" should halt at an error. Default is true. || ./go test_firefox haltonerror=false ||
+|| haltonfailure || This flag indicates if "go" should halt at a failure. Default is true. || ./go test_firefox haltonfailure=false ||
+|| method || If set only the specified test will be executed. || ./go test_firefox method=testDoubleClick ||
+|| onlyrun || If set only tests in the specified class will be executed. || ./go test_firefox onlyrun=XPathElementFindingTest ||
+
 For Javascript:
 
 || *Target* || *Purpose* ||
