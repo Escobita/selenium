@@ -1,8 +1,0 @@
-java_library(name = "opera-driver",
-  deps = [
-    "operadriver-v0.6.jar",
-    "//third_party/java/commons-io",
-    "//third_party/java/commons-jxpath",
-    "//third_party/java/google-protobuffers",
-  ])
-
