@@ -150,7 +150,9 @@ driver.switchTo().frame("frameName");
 It's possible to access subframes by chaining switchTo() calls, and you can specify the frame by its index too. That is:
 
 {{{
-driver.switchTo().frame("frameName").switchTo().frame(0).switchTo().frame("child");
+driver.switchTo().frame("frameName")
+      .switchTo().frame(0)
+      .switchTo().frame("child");
 }}}
 
 would go to the frame named "child" of the first subframe of the frame called "frameName". *All frames are evaluated as if from currently switched to frame*.  To get back to the top level, call:
