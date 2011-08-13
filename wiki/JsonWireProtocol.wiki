@@ -2144,7 +2144,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`keysToSend` - `{string}` Keystrokes to send to the `prompt()` dialog.</dd>
+<dd>`text` - `{string}` Keystrokes to send to the `prompt()` dialog.</dd>
 </dl>
 </dd>
 <dd>
