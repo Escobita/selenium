@@ -178,7 +178,7 @@ You can also filter the logs by adding "ActivityMAnager:W" for example to the lo
 
    * To access the JS console:
 - Open the android browser
-- Type "abou:debug" in the address bar, this is a toggle setting that will enable the JS console
+- Type "about:debug" in the address bar, this is a toggle setting that will enable the JS console
 - Execute Js in the browser by typing javascript:<your JS>, you will see the JS console opening
 
 
