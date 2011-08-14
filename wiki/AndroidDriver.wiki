@@ -51,7 +51,7 @@ $./android create avd -n my_android -t 12 -c 100M
 
 -c option is for the SD card storage space.
 
-When prompted "Do you wish to create a custom hardware profile [no]" enter "no".
+When prompted "Do you wish to create a custom hardware profile `[`no`]`" enter "no".
 
 *Note: an issue has been discovered with the Java-to-JavaScript bridge in version 2.3 of the emulator which causes problems for the Android Driver. Currently we recommend using version of the Android platform 2.2 for AVDs.*
 ===Start the Emulator ===
