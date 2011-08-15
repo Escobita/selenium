@@ -94,10 +94,24 @@ Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ s
 
 == Chrome ==
 
-Passing [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/chrome_switches.cc&exact_package=chromium Chrome command line switches]: 
+=== Command line switches ===
+ 
+For a list of switches, see [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/chrome_switches.cc&exact_package=chromium chrome_switches.cc]: 
 
 {{{
 driver = Selenium::WebDriver.for :chrome, :switches => %w[--ignore-certificate-errors --disable-popup-blocking --disable-translate]
+}}}
+
+=== Tweaking profile preferences ===
+
+For a list of prefs, see [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/pref_names.cc&exact_package=chromium pref_names.cc].
+
+{{{
+profile = Selenium::WebDriver::Chrome::Profile.new
+profile['download.prompt_for_download'] = false
+profile['download.default_directory'] = "/path/to/dir"
+
+driver = Selenium::WebDriver.for :chrome, :profile => profile
 }}}
 
 See also ChromeDriver.
