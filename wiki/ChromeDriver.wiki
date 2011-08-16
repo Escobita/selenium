@@ -125,7 +125,7 @@ You can specify the location of the Chrome binary by passing the "chrome.binary"
 
 {{{
   DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-  capabilities.setCapability("chrome.binary", "/usr/lib/chromium-browser/chromium-browser"));
+  capabilities.setCapability("chrome.binary", "/usr/lib/chromium-browser/chromium-browser");
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
