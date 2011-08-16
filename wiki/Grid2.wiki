@@ -113,7 +113,7 @@ If your remote machine has multiple versions of Firefox you’d like to use, you
 Tip: If you need to provide a space somewhere in your browser parameters, then surround the parameters with quotation marks:
 
 {{{
--browser “browserName=firefox,version=3.6,firefox_binary=c:\Program Files\firefox ,maxInstances=3, platform=windows”
+-browser “browserName=firefox,version=3.6,firefox_binary=c:\Program Files\firefox ,maxInstances=3, platform=WINDOWS”
 }}}
 
 == Optional parameters ==
