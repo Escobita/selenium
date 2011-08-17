@@ -43,15 +43,6 @@
  # Prerequisite 3: Make sure your GnuPG public key is distributed to `hkp://pgp.mit.edu`
  # Make sure the dependencies in all pom.xml files under the maven directory are correct -- if not, update them (Hint: check for changes in the third_party directory)
  # Perform any manual steps/release hacks documented here:
-   # Until version 3.3.0 appears at http://repo1.maven.org/maven2/net/java/dev/jna/jna/ we need to do this in maven/pom.xml:
-{{{
-             <dependency>
-                 <groupId>net.java.dev.jna</groupId>
-                 <artifactId>jna</artifactId>
--                <version>3.3.0</version>
-+                <version>3.2.3</version>
-             </dependency>
-}}}
    # To provide the correct version info in a WebDriverException you should also replace "unknown" in the maven/api/pom.xml with the Subversion commit number wich forked the version branch:
 {{{
              <manifestEntries>
