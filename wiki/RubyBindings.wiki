@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The Ruby bindings for Selenium/!WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem.
+The Ruby bindings for Selenium/!WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem. If you're looking for a slightly higher level API built on the same technology, you may want to check out [http://watirwebdriver.com/ watir-webdriver].
 
 The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.  
 
