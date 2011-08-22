@@ -309,6 +309,16 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_/session/:sessionId/buttondown /session/:sessionId/buttondown] || Click and hold the left mouse button (at the coordinates set by the last moveto command). ||
 || POST || [#POST_/session/:sessionId/buttonup /session/:sessionId/buttonup] || Releases the mouse button previously held (where the mouse is currently at). ||
 || POST || [#POST_/session/:sessionId/doubleclick /session/:sessionId/doubleclick] || Double-clicks at the current mouse coordinates (set by moveto). ||
+|| POST || [#POST_/session/:sessionId/touch/click /session/:sessionId/touch/click] || Single tap on the touch enabled device. ||
+|| POST || [#POST_/session/:sessionId/touch/down /session/:sessionId/touch/down] || Finger down on the screen. ||
+|| POST || [#POST_/session/:sessionId/touch/up /session/:sessionId/touch/up] || Finger up on the screen. ||
+|| POST || [#POST_session/:sessionId/touch/move session/:sessionId/touch/move] || Finger move on the screen. ||
+|| POST || [#POST_session/:sessionId/touch/scroll session/:sessionId/touch/scroll] || Scroll on the touch screen using finger based motion events. ||
+|| POST || [#POST_session/:sessionId/touch/scroll session/:sessionId/touch/scroll] || Scroll on the touch screen using finger based motion events. ||
+|| POST || [#POST_session/:sessionId/touch/doubleclick session/:sessionId/touch/doubleclick] || Double tap on the touch screen using finger motion events. ||
+|| POST || [#POST_session/:sessionId/touch/longclick session/:sessionId/touch/longclick] || Long press on the touch screen using finger motion events. ||
+|| POST || [#POST_session/:sessionId/touch/flick session/:sessionId/touch/flick] || Flick on the touch screen using finger motion events. ||
+|| POST || [#POST_session/:sessionId/touch/flick session/:sessionId/touch/flick] || Flick on the touch screen using finger motion events. ||
 
 
 == Command Detail ==
@@ -2324,6 +2334,286 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/touch/click ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/touch/click ====
+</dd>
+<dd>
+<dl>
+<dd>Single tap on the touch enabled device.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element to single tapon.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/touch/down ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/touch/down ====
+</dd>
+<dd>
+<dl>
+<dd>Finger down on the screen.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`x` - `{number}` X coordinate on the screen.</dd>
+<dd>`y` - `{number}` Y coordinate on the screen.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/touch/up ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/touch/up ====
+</dd>
+<dd>
+<dl>
+<dd>Finger up on the screen.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`x` - `{number}` X coordinate on the screen.</dd>
+<dd>`y` - `{number}` Y coordinate on the screen.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/move ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/move ====
+</dd>
+<dd>
+<dl>
+<dd>Finger move on the screen.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`x` - `{number}` X coordinate on the screen.</dd>
+<dd>`y` - `{number}` Y coordinate on the screen.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/scroll ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/scroll ====
+</dd>
+<dd>
+<dl>
+<dd>Scroll on the touch screen using finger based motion events. Usethis command to start scrolling at a particular screen location.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element where thescroll starts.</dd>
+<dd>`xOffset` - `{number}` The x offset in pixels to scrollby.</dd>
+<dd>`yOffset` - `{number}` The y offset in pixels to scrollby.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/scroll ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/scroll ====
+</dd>
+<dd>
+<dl>
+<dd>Scroll on the touch screen using finger based motion events. Usethis command if you don't care where the scroll starts on thescreen.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`xOffset` - `{number}` The x offset in pixels to scrollby.</dd>
+<dd>`yOffset` - `{number}` The y offset in pixels to scrollby.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/doubleclick ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/doubleclick ====
+</dd>
+<dd>
+<dl>
+<dd>Double tap on the touch screen using finger motion events.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element to double tapon.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/longclick ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/longclick ====
+</dd>
+<dd>
+<dl>
+<dd>Long press on the touch screen using finger motion events.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element to long presson.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/flick ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/flick ====
+</dd>
+<dd>
+<dl>
+<dd>Flick on the touch screen using finger motion events. This flickcommand starts at a particulat screen location.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`element` - `{string}` ID of the element where theflick starts.</dd>
+<dd>`xOffset` - `{number}` The x offset in pixels to flickby.</dd>
+<dd>`yOffset` - `{number}` The y offset in pixels to flickby.</dd>
+<dd>`speed` - `{number}` The speed in pixels per seconds.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== session/:sessionId/touch/flick ===
+
+<dl>
+<dd>
+==== POST session/:sessionId/touch/flick ====
+</dd>
+<dd>
+<dl>
+<dd>Flick on the touch screen using finger motion events. Use thisflick command if you don't care where the flick starts on the screen.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`xSpeed` - `{number}` The x speed in pixels perseconds.</dd>
+<dd>`ySpeed` - `{number}` The y speed in pixels perseconds</dd>
 </dl>
 </dd>
 </dl>
