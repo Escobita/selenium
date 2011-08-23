@@ -2360,7 +2360,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element to single tapon.</dd>
+<dd>`element` - `{string}` ID of the element to single tap on.</dd>
 </dl>
 </dd>
 </dl>
@@ -2461,7 +2461,7 @@ location for correctly generating native events.</dd>
 </dd>
 <dd>
 <dl>
-<dd>Scroll on the touch screen using finger based motion events. Usethis command to start scrolling at a particular screen location.</dd>
+<dd>Scroll on the touch screen using finger based motion events. Use this command to start scrolling at a particular screen location.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -2471,9 +2471,9 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element where thescroll starts.</dd>
-<dd>`xOffset` - `{number}` The x offset in pixels to scrollby.</dd>
-<dd>`yOffset` - `{number}` The y offset in pixels to scrollby.</dd>
+<dd>`element` - `{string}` ID of the element where the scroll starts.</dd>
+<dd>`xOffset` - `{number}` The x offset in pixels to scroll by.</dd>
+<dd>`yOffset` - `{number}` The y offset in pixels to scroll by.</dd>
 </dl>
 </dd>
 </dl>
@@ -2490,7 +2490,7 @@ location for correctly generating native events.</dd>
 </dd>
 <dd>
 <dl>
-<dd>Scroll on the touch screen using finger based motion events. Usethis command if you don't care where the scroll starts on thescreen.</dd>
+<dd>Scroll on the touch screen using finger based motion events. Use this command if you don't care where the scroll starts on the screen.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -2528,7 +2528,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element to double tapon.</dd>
+<dd>`element` - `{string}` ID of the element to double tap on.</dd>
 </dl>
 </dd>
 </dl>
@@ -2555,7 +2555,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element to long presson.</dd>
+<dd>`element` - `{string}` ID of the element to long press on.</dd>
 </dl>
 </dd>
 </dl>
@@ -2582,9 +2582,9 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element where theflick starts.</dd>
-<dd>`xOffset` - `{number}` The x offset in pixels to flickby.</dd>
-<dd>`yOffset` - `{number}` The y offset in pixels to flickby.</dd>
+<dd>`element` - `{string}` ID of the element where the flick starts.</dd>
+<dd>`xOffset` - `{number}` The x offset in pixels to flick by.</dd>
+<dd>`yOffset` - `{number}` The y offset in pixels to flick by.</dd>
 <dd>`speed` - `{number}` The speed in pixels per seconds.</dd>
 </dl>
 </dd>
@@ -2602,7 +2602,7 @@ location for correctly generating native events.</dd>
 </dd>
 <dd>
 <dl>
-<dd>Flick on the touch screen using finger motion events. Use thisflick command if you don't care where the flick starts on the screen.</dd>
+<dd>Flick on the touch screen using finger motion events. Use this flick command if you don't care where the flick starts on the screen.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -2612,8 +2612,8 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`xSpeed` - `{number}` The x speed in pixels perseconds.</dd>
-<dd>`ySpeed` - `{number}` The y speed in pixels perseconds</dd>
+<dd>`xSpeed` - `{number}` The x speed in pixels per second.</dd>
+<dd>`ySpeed` - `{number}` The y speed in pixels per second.</dd>
 </dl>
 </dd>
 </dl>
