@@ -7,6 +7,20 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
+            <em:version>1.2.0</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
+                <em:minVersion>1.0.9</em:minVersion> 
+                <em:maxVersion>1.*</em:maxVersion> 
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/csharp/1.2.0/csharp-format-1.2.0.xpi</em:updateLink>
+                <em:updateHash>sha1:ed08d16f1ce5a7a84be5ba07889295160595f587</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
             <em:version>1.0.0</em:version>
             <em:targetApplication>
               <RDF:Description>
