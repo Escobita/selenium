@@ -1,6 +1,20 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.2.0==
+
+Just a quick release primarily for
+
+   * New - Firefox 6 support (which really was just changing the max version number)
+
+But we also snuck in
+
+   * Bug - Recorded CSS locator was not W3C clean wrt attributes
+   * Bug - Deleting of cookies works properly if the cookie name is escaped (such as will ASP sites)
+   * Bug - If the cookie value has an = in it, the whole cookie is now returned instead of just up to the =
+
+You will also notice that the bundle now only has formatters for the officially supported languages of the project (Java, C#, Python, Ruby). If anyone from the Perl, Groovy or PHP camps wants to take on ownership of those formats we'll happily help you out.
+
 ==1.1.0==
 
 Hey! Look at that! A slightly more significant version bump! Any why is that? Well...
