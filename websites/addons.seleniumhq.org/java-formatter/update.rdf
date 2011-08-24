@@ -10,9 +10,9 @@
             <em:version>1.2.0</em:version>
             <em:targetApplication>
               <RDF:Description>
-                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
-                <em:minVersion>1.0.9</em:minVersion> 
-                <em:maxVersion>1.*</em:maxVersion>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/1.2.0/java-format-1.2.0.xpi</em:updateLink>
                 <em:updateHash>sha1:33af70dbb417e849a162a569ea3277fbfa8b05fb</em:updateHash>
               </RDF:Description>
@@ -24,9 +24,9 @@
             <em:version>1.0.3</em:version>
             <em:targetApplication>
               <RDF:Description>
-                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
-                <em:minVersion>1.0.9</em:minVersion> 
-                <em:maxVersion>1.*</em:maxVersion>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/java-format-1.0.3.xpi</em:updateLink>
                 <em:updateHash>sha1:2c2932030d609f3a8bd07b014394b42f9691cc72</em:updateHash>
               </RDF:Description>
@@ -38,9 +38,9 @@
             <em:version>1.0.0</em:version>
             <em:targetApplication>
               <RDF:Description>
-                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
-                <em:minVersion>1.0.9</em:minVersion> 
-                <em:maxVersion>1.*</em:maxVersion>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/java-format-1.0.0.xpi</em:updateLink>
                 <em:updateHash>sha1:dbb88c8f3855113da06380fca55b7ee76982a8ec</em:updateHash>
               </RDF:Description>

@@ -10,9 +10,9 @@
             <em:version>1.2.0</em:version>
             <em:targetApplication>
               <RDF:Description>
-                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
-                <em:minVersion>1.0.9</em:minVersion> 
-                <em:maxVersion>1.*</em:maxVersion> 
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/ruby/1.2.0/ruby-format-1.2.0.xpi</em:updateLink>
                 <em:updateHash>sha1:034723ba00c2ecbc397f4bed86d4cdae157d78b1</em:updateHash>
               </RDF:Description>
@@ -24,9 +24,9 @@
             <em:version>1.0.0</em:version>
             <em:targetApplication>
               <RDF:Description>
-                <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
-                <em:minVersion>1.0.9</em:minVersion> 
-                <em:maxVersion>1.*</em:maxVersion> 
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/ruby/ruby-format-1.0.0.xpi</em:updateLink>
                 <em:updateHash>sha1:d7d8d68db4249b6869905ab341ad42033d02c76d</em:updateHash>
               </RDF:Description>
