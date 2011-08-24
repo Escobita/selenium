@@ -90,12 +90,13 @@ Useful parameters:
 || *Parameter* || *Purpose* || *Example ||
 || haltonerror || This flag indicates if "go" should halt at an error. Default is true. || ./go test_firefox haltonerror=false ||
 || haltonfailure || This flag indicates if "go" should halt at a failure. Default is true. || ./go test_firefox haltonfailure=false ||
-|| method || If set only the specified test will be executed. || ./go test_firefox method=testDoubleClick ||
-|| onlyrun || If set only tests in the specified class will be executed. || ./go test_firefox onlyrun=XPathElementFindingTest ||
+|| method || If set, only the specified test will be executed. || ./go test_firefox method=testDoubleClick ||
+|| onlyrun || If set, only tests in the specified class will be executed. || ./go test_firefox onlyrun=XPathElementFindingTest ||
 || log || This flag indicates logging (e.g. test result streaming) should be dumped to the console, not just files. Default is false. || go test_firefox log=true ||
 || suspend || If set, suspends the JVM until a debugger connects before running tests.  Useful in conjunction with debug. Default is false. || ./go test_firefox suspend=true debug=true ||
 || debug || Enable the java remote debugger when starting JVMs for tests.  Useful in conjunction with suspend. Default is false. Default debugger port is 5005. || ./go test_firefox suspend=true debug=true ||
 || offline || If set, don't try to download any components from the internet (e.g. the gecko sdk). Default is false. || ./go test_firefox offline=true ||
+|| leaverunning || If set the browser window will not be closed after the last test. || ./go test_firefox leaverunning=true ||
 
 For Javascript:
 
