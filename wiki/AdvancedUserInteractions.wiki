@@ -98,7 +98,39 @@ The `Mouse` interface includes the following methods (This interface will change
  * `void click(WebElement onElement)` - Similar to the existing `click()` method.
  * `void doubleClick(WebElement onElement)` - Double-clicks an element.
  * `void mouseDown(WebElement onElement)` - Holds down the left mouse button on an element.
+   Action selectMultiple = builder.build();
  * `void mouseUp(WebElement onElement)` - Releases the mouse button on an element.
  * `void mouseMove(WebElement toElement)` - Move (from the current location) to another element.
  * `void mouseMove(WebElement toElement, long xOffset, long yOffset)` - Move (from the current location) to new coordinates: (X coordinates of toElement + xOffset, Y coordinates of toElement + yOffset).
  * `void contextClick(WebElement onElement)` - Performs a context-click (right click) on an element.
+
+== Native events versus synthetic events ==
+
+In !WebDriver advanced user interactions are provided by either simulating the Javascript events directly (i.e. synthetic events) or by letting the browser generate the Javascript events (i.e. native events). Native events simulate the user interactions better whereas synthetic events are platform independent, which can be important in Linux when alternative window managers are used, see [NativeEventsOnLinux native events on Linux]. Native events should be used whenever it is possible.
+
+The following table shows which browsers support which kind of events:
+
+|| *Browser* || *Operating system* || *Native events* || *Synthetic events* ||
+|| Firefox || Linux || supported || supported (default) ||
+|| Firefox || Windows || supported (default) || supported ||
+|| Internet Explorer || Windows || supported (default) || not supported ||
+|| Chrome || Linux/Windows || supported`*` || not supported ||
+|| Opera || Linux/Windows || supported (default) || not supported ||
+|| HtmlUnit || Linux/Windows || supported (default) || not supported||
+
+`*`) ChromeDriver provides two modes of supporting native events called !WebKit events and raw events. In the !WebKit events the ChromeDriver calls the !WebKit functions which trigger Javascript events, in the raw events mode operating systems events are used.
+
+In the FirefoxDriver, native events can be turned on and off in the !FirefoxProfile.
+
+{{{
+FirefoxProfile profile = new FirefoxProfile();
+profile.setEnableNativeEvents(true);
+FirefoxDriver driver = new FirefoxDriver(profile);
+}}}
+
+=== Examples ===
+
+These are some examples where native events behave different to synthetic events:
+
+ * With synthetic events it is possible to click on elements which are hidden behind other elements. With native events the browser sends the click event to the top most element at the given location, as it would happen when the user clicks on the specific location.
+ * When a user presses the 'tab' key the focus jumps from the current element to the next element. This is done by the browser. With synthetic events the browser does not know that the 'tab' key is pressed and therefore won't change the focus. With native events the browser will behave as expected.
