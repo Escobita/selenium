@@ -7,10 +7,10 @@ The RemoteWebDriver is composed of two pieces: a client and a server. The client
 
 == Starting the Server from The Command Line ==
 
-Once you have downloaded selenium-server-standalone-2.0.jar place it on the computer with the browser you want to test. Then from the directory with the jar run the following
+Once you have downloaded selenium-server-standalone-{VERSION}.jar place it on the computer with the browser you want to test. Then from the directory with the jar run the following
 
 {{{
-java -jar selenium-server-standalone-2.0b1.jar
+java -jar selenium-server-standalone-{VERSION}.jar
 }}}
 
 ==Configuring the Server in Code ==
@@ -19,7 +19,7 @@ In theory, the process is as simple as mapping the "DriverServlet" to a URL, but
 
 === Details ===
 
-  # Download the "webdriver-remote-server.zip" and unpack. Put the JARs on the CLASSPATH
+  # Download the "selenium-server.zip" and unpack. Put the JARs on the CLASSPATH
   # Create a new class called "AppServer". Here, I'm using Jetty, so you'll need to download that as well:
 {{{
 import org.mortbay.jetty.Connector;
