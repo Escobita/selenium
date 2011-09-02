@@ -6,7 +6,7 @@ The official documentation for Selenium can be found at http://seleniumhq.org/do
 = Getting Involved =
 
 == Basic knowledge ==
-Be sure to understand chapter 1 "Fundamental Concepts" of the [http://svnbook.red-bean.com/en/1.5/svn-book.pdf SVN book].
+Be sure to understand chapter 1 "Fundamental Concepts" of the [http://svnbook.red-bean.com/en/1.6/svn-book.pdf SVN book].
 
 == Subversion client ==
 

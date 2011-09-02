@@ -5,14 +5,18 @@
 
 == Using Drag and Drop ==
 
-It may not be immediately obvious, but if you're using a browser that supports it you can cast a {{{WebElement}}} to {{{RenderedWebElement}}} and then it's easy to do drag and drop:
+It may not be immediately obvious, but if you're using a browser that supports it , you can use Action classes and then it's easy to do drag and drop:
 
 {{{
-// Note the casts
-RenderedWebElement from = (RenderedWebElement) driver.findElement(By.id("one"));
-RenderedWebElement to = (RenderedWebElement) driver.findElement(By.id("two"));
+ Actions builder = new Actions(driver);
 
-from.dragAndDropOn(to);
+   Action dragAndDrop = builder.clickAndHold(someElement)
+       .moveToElement(otherElement)
+       .release(otherElement)
+       .build();
+
+   dragAndDrop.perform();
+   
 }}}
 
 Currently, only the FirefoxDriver supports this, but you should also expect support for the InternetExplorerDriver too.
