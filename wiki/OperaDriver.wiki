@@ -64,6 +64,88 @@ If you prefer using the Watir API, you can have a look at the [http://rubygems.o
 
 == Advanced Usage ==
 
+=== Desired capabilities ===
+
+You can use the DesiredCapabilites class to set some settings inside OperaDriver. The capabilities we support are:
+
+==== opera.logging.level ====
+
+(String) How verbose the logging should be.  Available levels are: SEVERE (highest value),
+WARNING, INFO, CONFIG, FINE, FINER, FINEST (lowest value), ALL.  Default is INFO.
+
+==== opera.logging.file ====
+
+(String) Where to send the output of the logging.  Default is to not write to file.
+
+==== opera.binary ====
+
+(String) Path to the Opera binary to use.  If not specified, OperaDriver will guess the path to
+your Opera installation (typically <code>/usr/bin/opera</code> or <code>C:\Program
+Files\Opera\opera.exe</code>).
+
+==== opera.host ====
+
+(String) The host Opera should connect to.  Unless you're starting Opera manually you won't
+need this.
+
+==== opera.port ====
+
+(Integer) The port to Opera should connect to.  0 = Random, -1 = Opera default (for use with
+Opera < 12).
+
+==== opera.launcher ====
+
+(String) Path to the launcher binary to use.  The launcher is a gateway between OperaDriver and
+the Opera browser, and is being used for controlling the binary and taking external
+screenshots.  If left blank, OperaDriver will use the launcher supplied with the package.
+
+==== opera.arguments ====
+
+(String) Arguments to pass to Opera, separated by spaces.  See <code>opera -help</code> for
+available command-line switches.
+
+
+==== opera.profile ====
+
+(String) Directory to use for the Opera profile. If null a random temporary directory is used.
+If "", an empty string, then the default autotest profile directory is used.
+
+
+==== opera.idle ====
+
+(Boolean) Whether to use Opera's alternative implicit wait implementation.  It will use an
+in-browser heuristic to guess when a page has finished loading, allowing us with great accuracy
+tell whether there are any planned events in the document.  This functionality is useful for
+very simple test cases, but not designed for real-world testing.  It is disabled by default.
+
+==== opera.display ====
+
+(Integer) The X display to use.  (Only works on *nix OSes.)
+
+==== opera.autostart ====
+
+(Boolean) Whether to auto-start the Opera binary.  If false, OperaDriver will wait for a
+connection from the browser.  Go to "opera:debug", enter the correct port number, and hit
+"Connect" to connect manually.
+
+==== opera.no_restart ====
+
+(Boolean) Whether to restart.
+
+==== opera.no_quit ====
+
+(Boolean) Whether to quit Opera when OperaDriver is shut down.  If enabled, it will keep the
+browser running after the driver is shut down.
+
+==== opera.guess_binary_path ====
+
+(Boolean) Whether to guess the path to Opera if it isn't set in <code>opera.binary</code>.
+
+
+==== opera.binary_profile ====
+
+(String) The profile configuration we are using, for example "desktop" or "core-gogi".
+
 === Settings ===
 
 To specify such things as a custom location of the Opera binary and command-line arguments you may use environmental variables or the !OperaDriverSettings object.  This is a list of the environmental variables which can be set on any OS:
@@ -92,12 +174,10 @@ The opera-launcher is a way to circumvent various problems related to process ma
 
 == Known Issues ==
 
- * [AdvancedUserInteractions] only partially implemented
  * Currently limited to one instance of Opera per machine
  * Problems with Operas with IME feature enabled (Opera Mobile, Android, bream)
  * Not using WebDriver atoms yet
  * JavaScript JIT is disabled for injected scripts
- * Window management
 
 === Think you've found a bug? ===
 
