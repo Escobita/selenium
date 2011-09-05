@@ -5,7 +5,7 @@
 
 WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that's easy to explore and understand, which will help make your tests easier to read and maintain. It's not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old "main" method. This "Getting Started" guide introduces you to WebDriver's Java API and helps get you started becoming familiar with it.
 
-Start by [http://code.google.com/p/selenium/downloads/list downloading] the latest binaries and unpack them into a directory. A safe choice is the latest version of {{{selenium-server-standalone-}}}_x.y.z_{{{.jar}}}  _x_, _y_ and _z_ will be digits e.g. 2.4.0 at the time of writing. From now on, we'll refer to that as {{{$WEBDRIVER_HOME}}}. Now, open your favourite IDE and:
+Start by [http://code.google.com/p/selenium/downloads/list downloading] the latest binaries and unpack them into a directory. A safe choice is the latest version of {{{selenium-server-standalone-}}}_x.y.z_{{{.jar}}}  _x_, _y_ and _z_ will be digits e.g. 2.4.0 at the time of writing. From now on, we'll refer to this directory as {{{$WEBDRIVER_HOME}}}. Now, open your favourite IDE and:
 
  * Start a new Java project in your favourite IDE
  * Add all the JAR files under {{{$WEBDRIVER_HOME}}} to the {{{CLASSPATH}}}
