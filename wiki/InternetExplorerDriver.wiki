@@ -9,7 +9,7 @@ The driver supports running 32-bit and 64-bit versions of the browser, but the c
 
 == Installing ==
 
-Simply add the {{{webdriver-all.jar}}} or {{{webdriver-ie.jar}}} to your CLASSPATH. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
+Simply add the {{{selenium-server-standalone.jar}}} to your CLASSPATH. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
 
 == Pros ==
 
