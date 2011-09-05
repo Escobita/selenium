@@ -15,7 +15,14 @@ When developing WebDriver, it is common to want to run a single test rather than
 || method || The name of a particular method within the TestCase given by "onlyRun" ||
 
 You can also run a single test directly from the command line by typing:
+{{{
 ./go test_firefox method=foo
+}}}
+
+You can run all the tests in a given test class this way:
+{{{
+go //java/server/test/org/openqa/selenium/remote/server:test:run onlyRun=CombinedInputActionsTest
+}}}
 
 == Using Rake ==
 
