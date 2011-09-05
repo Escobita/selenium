@@ -14,6 +14,13 @@ When developing WebDriver, it is common to want to run a single test rather than
 || onlyRun || The class name (not fully qualified) of the TestCase to run ||
 || method || The name of a particular method within the TestCase given by "onlyRun" ||
 
+*Tip:* set the appropriate driver in `SingleTestSuite.java` e.g. `String driver = IE;` to use the Internet Explorer driver.
+
+The build target to call `SingleTestSuite` is:
+{{{
+./go test_single
+}}}
+
 You can also run a single test directly from the command line by typing:
 {{{
 ./go test_firefox method=foo
@@ -23,6 +30,10 @@ You can run all the tests in a given test class this way:
 {{{
 go //java/server/test/org/openqa/selenium/remote/server:test:run onlyRun=CombinedInputActionsTest
 }}}
+
+== Reviewing the logs for the tests ==
+
+When you run the tests, the test results don't appear on the screen. They are written to the `./build/test_logs' folder. A pair of files are written. Their names are relatively consistent and include the details of the tests which were run. The pair comprise a txt file and an xml file. The xml file contains more information about the runtime environment such as the path, Ant version, etc. These files are overwritten the next time the same test target is executed so you may want to archive results if they're important to you.
 
 == Using Rake ==
 
