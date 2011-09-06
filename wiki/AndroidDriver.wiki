@@ -170,10 +170,27 @@ $./go test_android
 }}}
 
 == Debug on Android ==
-   * To access the android logs:
+   * Run the tests
+It's advised to start your own emulator instance (instructions above), leave the emulator running and run the tests. This will prevent you from paying the cost of starting a new emulator for every test run. To run the tests on an already running emulator:
+{{{
+$./go //java/client/test/org/openqa/selenium/android:java-test:run  haltonerror=false haltonfailure=false
+}}}
+
+   * To run one test class only:
+{{{
+./go //java/client/test/org/openqa/selenium/android:java-test:run onlyrun=LocalStorageTest haltonerror=false haltonfailure=false
+}}}
+
+   * To run one test method only:
+{{{
+./go //java/client/test/org/openqa/selenium/android:java-test:run method=testShouldTreatReadonlyAsAValue
+}}}
+
+   * To access the Android logs (server side logs):
 {{{
 $./adb logcat
 }}}
+The Android logcat logs are the most useful piece of information for debugging and fixing an issue.
 You can also filter the logs by adding "ActivityMAnager:W" for example to the logcat command.
 
    * To access the JS console:
@@ -181,6 +198,10 @@ You can also filter the logs by adding "ActivityMAnager:W" for example to the lo
 - Type "about:debug" in the address bar, this is a toggle setting that will enable the JS console
 - Execute Js in the browser by typing javascript:<your JS>, you will see the JS console opening
 
+   * View the client side logs:
+{{{
+$ls build/test_logs
+}}}
 
 = FAQ =
 == How to start jetty ==
