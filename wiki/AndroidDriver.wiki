@@ -169,6 +169,8 @@ $./go android_server
 $./go test_android
 }}}
 
+Note that "./go test_android" will fail if there is already an emulator running.
+
 == Debug on Android ==
    * Run the tests
 It's advised to start your own emulator instance (instructions above), leave the emulator running and run the tests. This will prevent you from paying the cost of starting a new emulator for every test run. To run the tests on an already running emulator:
