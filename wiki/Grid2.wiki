@@ -127,7 +127,7 @@ Tip: If you need to provide a space somewhere in your browser parameters, then s
 
  * -browser < params >	If –browser is not set, a node will start with 5 firefox, 1 chrome, and 1 internet explorer instance (assuming it’s on a windows box). This parameter can be set multiple times on the same line to define multiple types of browsers.
 Parameters allowed for -browser:
-browserName={firefox, internet explorer, safari, chrome} 
+browserName={android, chrome, firefox, htmlunit, iphone, opera} 
 version={browser version}
 firefox_binary={path to executable binary}
 maxInstances={maximum number of browsers of this type}
