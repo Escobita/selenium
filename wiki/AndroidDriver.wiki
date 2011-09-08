@@ -168,6 +168,7 @@ $./go android_server
 {{{
 $./go test_android
 }}}
+You may see the tests executing in the emulator if the emulator screen is locked, but they are running in the background. If you want to see them simply unlock the screen.
 
 Note that "./go test_android" will fail if there is already an emulator running.
 
