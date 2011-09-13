@@ -13,7 +13,7 @@ Grid allows you to :
 = Quick Start =
 
  This example will show you how to start the Selenium 2 Hub, and register both a WebDriver node and a Selenium 1 RC legacy node.  We’ll also show you how to call the grid from Java. The hub and nodes are shown here running on the same machine, but of course you can copy the selenium-server-standalone to multiple machines.
-Note: The selenium-server-standalone package includes the Hub, WebDriver, and legacy RC needed to run the grid. Ant is not required anymore.
+Note: The selenium-server-standalone package includes the Hub, WebDriver, and legacy RC needed to run the grid. Ant is not required anymore. You can download the selenium-server-standalone-`*`.jar from http://code.google.com/p/selenium/downloads/list.
 This walk-through assumes you already have Java installed.
 
 * Step 1: Start the hub
