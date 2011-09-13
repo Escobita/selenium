@@ -83,8 +83,8 @@ We've already seen how to enter text into a textarea or text field, but what abo
 WebElement select = driver.findElement(By.xpath("//select"));
 List<WebElement> allOptions = select.findElements(By.tagName("option"));
 for (WebElement option : allOptions) {
-    System.out.println(String.format("Value is: %s", option.getValue()));
-    option.setSelected();
+    System.out.println(String.format("Value is: %s", option.getAttribute("value")));
+    option.click();
 }
 }}}
 
@@ -102,22 +102,15 @@ Alternatively, WebDriver has the convenience method "submit" on every element. I
 element.submit();
 }}}
 
-== Getting Visual Information And Drag And Drop ==
+== Drag And Drop ==
 
-Sometimes you want to extract some visual information out of an element, perhaps to see if it's visible or where it is on screen. You can find out this information by casting the element to a {{{RenderedWebElement}}}:
-
-{{{
-WebElement plain = driver.findElement(By.name("q"));
-RenderedWebElement element = (RenderedWebElement) plain;
-}}}
-
-Not all drivers render their content to the screen (such as the HtmlUnitDriver), so it's not safe to assume that the cast will work, but if it does you can gather additional information such as the size and location of the element. In addition, you can use drag and drop, either moving an element by a certain amount, or on to another element:
+You can use drag and drop, either moving an element by a certain amount, or on to another element:
 
 {{{
-RenderedWebElement element = (RenderedWebElement) driver.findElement(By.name("source"));
-RenderedWebElement target = (RenderedWebElement) driver.findElement(By.name("target"));
+WebElement element = driver.findElement(By.name("source"));
+WebElement target = driver.findElement(By.name("target"));
 
-element.dragAndDropOn(target);
+(new Actions(driver)).dragAndDrop(element, target).perform();
 }}}
 
 == Moving Between Windows and Frames ==
