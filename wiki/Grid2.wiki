@@ -1,4 +1,4 @@
-#labels grid,selenium,webdriver
+#labels grid,selenium,webdriver,Restrict-AddWikiComment-Commit
 #Selenium grid for selenium1 and webdriver
 
 = Introduction =
