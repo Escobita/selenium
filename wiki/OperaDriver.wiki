@@ -118,7 +118,7 @@ very simple test cases, but not designed for real-world testing.  It is disabled
 
 ==== opera.display ====
 
-(Integer) The X display to use.  (Only works on *nix OSes.)
+(Integer) The X display to use.  (Only works on UNIX-like OSes.)
 
 ==== opera.autostart ====
 
