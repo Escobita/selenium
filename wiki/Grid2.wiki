@@ -131,6 +131,6 @@ browserName={android, chrome, firefox, htmlunit, internet explorer, iphone, oper
 version={browser version}
 firefox_binary={path to executable binary}
 maxInstances={maximum number of browsers of this type}
-platform={windows, linux, mac}
+platform={WINDOWS, LINUX, MAC}
 
  * -registerCycle = how often in ms the node will try to register itself again.Allow to restart the hub without having to restart the nodes.
