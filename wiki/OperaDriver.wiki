@@ -172,16 +172,27 @@ The opera-launcher is a way to circumvent various problems related to process ma
 
 == Supported Opera versions ==
 
+=== Desktop ===
+
+This is a list of the official Opera Desktop versions we support:
+
 || *Version* || *Workaround/tweaks needed* ||
-|| 12.00 ||  ||
+|| 12.00 || _(Not released yet.)_ ||
 || 11.51 || Set `opera.port` to 0 and `opera.profile` to null to enable parallelization on GNU/Linux ||
 || 11.50 ||  ||
 || 11.11 ||  ||
 || 11.10 ||  ||
 || 11.01 || `-autotestmode` command-line argument is not supported, use a [#Wrapper_script wrapper script] ||
-|| 11.00 ||  ||
+|| 11.00 || `-autotestmode` command-line argument is not supported, use a [#Wrapper_script wrapper script] ||
 
-=== Wrapper script ===
+The ability to run multiple instances of Opera in parallell is currently only
+supported in the latest Opera version 11.51 on GNU/Linux (see comment above),
+but support for Windows and Mac is planned in Opera 12.
+
+We don't officially support Opera versions prior to 11.00, although it should
+be possible to get OperaDriver working on Opera 10.6 with some minor tweaks.
+
+==== Wrapper script ====
 
 Some Opera versions don't accept the `-autotestmode` or `-debugproxy arguments`.  Since
 
