@@ -178,7 +178,7 @@ The opera-launcher is a way to circumvent various problems related to process ma
 || 11.50 ||  ||
 || 11.11 ||  ||
 || 11.10 ||  ||
-|| 11.01 || `-autotestmode` command-line argument is not supported, use a [#WrapperScript wrapper script] ||
+|| 11.01 || `-autotestmode` command-line argument is not supported, use a [#Wrapper_script wrapper script] ||
 || 11.00 ||  ||
 
 === Wrapper script ===
