@@ -79,9 +79,9 @@ WARNING, INFO, CONFIG, FINE, FINER, FINEST (lowest value), ALL.  Default is INFO
 
 ==== opera.binary ====
 
-(String) Path to the Opera binary to use.  If not specified, OperaDriver will guess the path to
-your Opera installation (typically <code>/usr/bin/opera</code> or <code>C:\Program
-Files\Opera\opera.exe</code>).
+(String) Path to the Opera binary to use.  If not specified, OperaDriver will
+guess the path to your Opera installation (typically `/usr/bin/opera`> or
+`C:\Program Files\Opera\opera.exe`).
 
 ==== opera.host ====
 
@@ -101,15 +101,13 @@ screenshots.  If left blank, OperaDriver will use the launcher supplied with the
 
 ==== opera.arguments ====
 
-(String) Arguments to pass to Opera, separated by spaces.  See <code>opera -help</code> for
-available command-line switches.
-
+(String) Arguments to pass to Opera, separated by spaces.  See `opera -help`
+for available command-line switches.
 
 ==== opera.profile ====
 
 (String) Directory to use for the Opera profile. If null a random temporary directory is used.
 If "", an empty string, then the default autotest profile directory is used.
-
 
 ==== opera.idle ====
 
@@ -139,7 +137,7 @@ browser running after the driver is shut down.
 
 ==== opera.guess_binary_path ====
 
-(Boolean) Whether to guess the path to Opera if it isn't set in <code>opera.binary</code>.
+(Boolean) Whether to guess the path to Opera if it isn't set in `opera.binary`.
 
 
 ==== opera.binary_profile ====
