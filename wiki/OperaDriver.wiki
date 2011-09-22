@@ -170,6 +170,20 @@ WebDriver driver = new OperaDriver(settings);
 
 The opera-launcher is a way to circumvent various problems related to process management on Windows and taking reliable, external screenshots for testing.
 
+== Supported Opera versions ==
+
+|| *Version* || *Workaround/tweaks needed* ||
+|| 12.00 ||  ||
+|| 11.51 || Set `opera.port` to 0 and `opera.profile` to null to enable parallelization on GNU/Linux ||
+|| 11.50 ||  ||
+|| 11.11 ||  ||
+|| 11.10 ||  ||
+|| 11.01
+11.00 || `-autotestmode` command-line argument is not supported, use a wrapper script to work around this:
+<code>#!/bin/sh
+`dirname $0`/opera</code>
+||
+
 == Known Issues ==
 
  * Currently limited to one instance of Opera per machine
