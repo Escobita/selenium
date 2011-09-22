@@ -66,7 +66,7 @@ If you prefer using the Watir API, you can have a look at the [http://rubygems.o
 
 === Desired capabilities ===
 
-You can use the DesiredCapabilites class to set some settings inside OperaDriver. The capabilities we support are:
+You can use the !DesiredCapabilites class to set some settings inside OperaDriver. The capabilities we support are:
 
 ==== opera.logging.level ====
 
@@ -178,20 +178,26 @@ The opera-launcher is a way to circumvent various problems related to process ma
 || 11.50 ||  ||
 || 11.11 ||  ||
 || 11.10 ||  ||
-||
-11.01
-11.00
-|| `-autotestmode` command-line argument is not supported, use a wrapper script to work around this:
-<code>#!/bin/sh
-`dirname $0`/opera</code>
-||
+|| 11.01 || `-autotestmode` command-line argument is not supported, use a [#WrapperScript wrapper script] ||
+|| 11.00 ||  ||
+
+=== Wrapper script ===
+
+Some Opera versions don't accept the `-autotestmode` or `-debugproxy arguments`.  Since
+
+{{{
+#!/bin/sh
+# Wrapper to prevent the -autotestmode argument reaching this version of Opera
+# which doesn't support it.
+`dirname $0`/opera
+}}}
 
 == Known Issues ==
 
  * Currently limited to one instance of Opera per machine
  * Problems with Operas with IME feature enabled (Opera Mobile, Android, bream)
- * Not using WebDriver atoms yet
- * JavaScript JIT is disabled for injected scripts
+ * Not using !WebDriver atoms yet
+ * !JavaScript JIT is disabled for injected scripts
 
 === Think you've found a bug? ===
 
