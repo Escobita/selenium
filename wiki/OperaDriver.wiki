@@ -178,8 +178,10 @@ The opera-launcher is a way to circumvent various problems related to process ma
 || 11.50 ||  ||
 || 11.11 ||  ||
 || 11.10 ||  ||
-|| 11.01
-11.00 || `-autotestmode` command-line argument is not supported, use a wrapper script to work around this:
+||
+11.01
+11.00
+|| `-autotestmode` command-line argument is not supported, use a wrapper script to work around this:
 <code>#!/bin/sh
 `dirname $0`/opera</code>
 ||
