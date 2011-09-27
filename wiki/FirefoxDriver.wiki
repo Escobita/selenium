@@ -39,8 +39,10 @@ By default, the Firefox driver creates an anonymous profile
 
 Download the firebug xpi file from mozilla and start the profile as follows:
 {{{
-   File file = new File("firebug-1.5.4.xpi");
+   File file = new File("firebug-1.8.1.xpi");
    FirefoxProfile firefoxProfile = new FirefoxProfile();
    firefoxProfile.addExtension(file);
+   firefoxProfile.setPreference("extensions.firebug.currentVersion", "1.8.1"); // Avoid startup screen
+
    WebDriver driver = new FirefoxDriver(firefoxProfile);
 }}}
