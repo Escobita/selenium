@@ -1,0 +1,25 @@
+java_library(name = "tests_common",
+  srcs = [
+    "*.java",
+    "internal/*.java",
+  ],
+  resources = [
+    {"//third_party/firebug" : "resource/firebug-1.5.0-fx.xpi"}
+  ],
+  deps = [
+    "//java/client/src/org/openqa/selenium/firefox",
+    "//java/client/test/org/openqa/selenium:tests",
+    "//third_party/java/junit",
+  ])
+
+java_test(name = "test",
+  srcs = [ "FirefoxDriverTestSuite.java" ],
+  deps = [
+    ":tests_common"
+  ])
+
+java_test(name = "test_native",
+  srcs = [ "NativeEventsFirefoxDriverTestSuite.java" ],
+  deps = [
+    ":tests_common"
+  ])
