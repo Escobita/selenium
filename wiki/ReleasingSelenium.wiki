@@ -22,6 +22,7 @@
     # `svn st docs/api/java | grep \? | awk '{print $2}' | xargs svn add`
     # `find docs/api/java -name "*.html" | xargs svn ps "svn:mime-type" "text/html"`
     # Commit new docs
+  # Update the SeHQ downloads page with updated links, release numbers and dates
 
 
 == Updating the Maven Repos ==
@@ -64,12 +65,14 @@
  # Test the artifacts, these are the _real_ files you will be irreversibly promoting to central. You can do this easily by cloning the repo at [https://github.com/krosenvold/selenium-release-test] and following the instructions there. (Once the staging repository has been closed you get the url to the repository by clicking on the repository. This url can be added to your project pom to test if you want to test using a different project. Remember that you may need to delete the artifacts in your local repository to make sure you re-download the staged artifacts).  
  # Promote that staged release in nexeus (or drop it).
  # Make sure any other manual hacks you did are documented in step 5 or committed back on trunk.
+ # Once the artifacts finally hit central (please wait till they are actually there), update the maven downloads page on SeHQ. If you can't wait don't update the page, someone will notice and update it.
 
 = For .NET =
 
   # Verify the build number is correct in dotnet/build.desc
   # Run `go clean //dotnet:release`. Note that this will require you to have the [http://shfb.codeplex.com .NET documentation generation tools] installed.
   # Upload the selenium-dotnet-xx.zip file from build/dotnet to the downloads page.
+  # Update the SeHQ downloads page with updated links, release numbers and dates
 
 = For Ruby =
 
@@ -86,12 +89,14 @@
   # Commit the changes.
   # `./go //rb:gem:release`
   # Bump version number in rb/build.desc to "X.X.X.dev" and commit the change.
+  # Update the SeHQ downloads page with updated links, release numbers and dates
 
 = For Python =
 # To release a new version you need to be registered as a Owner/Maintener on pypi.python.org
  # Bump the version number in setup.py 
  # `./go //py_release`
  # Bump the version number to the next version with dev e.g. 2.0b3dev and commit changes
+ # Update the SeHQ downloads page with updated links, release numbers and dates
 
 
 = Areas to Improve =
