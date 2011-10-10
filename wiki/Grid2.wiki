@@ -108,7 +108,7 @@ This setting starts 5 Firefox 3.6 nodes on a linux machine.
 
 If your remote machine has multiple versions of Firefox you’d like to use, you can map the location of each binary to a particular version on the same machine:
 {{{
--browser browserName=firefox,version=3.6,firefox_binary=/home/myhomedir/firefox36/firefox,maxInstances=3,platform=LINUX-browser browserName=firefox,version=4,firefox_binary=/home/myhomedir/firefox4/firefox,maxInstances=4,platform=LINUX
+-browser browserName=firefox,version=3.6,firefox_binary=/home/myhomedir/firefox36/firefox,maxInstances=3,platform=LINUX -browser browserName=firefox,version=4,firefox_binary=/home/myhomedir/firefox4/firefox,maxInstances=4,platform=LINUX
 }}} 
 Tip: If you need to provide a space somewhere in your browser parameters, then surround the parameters with quotation marks:
 
