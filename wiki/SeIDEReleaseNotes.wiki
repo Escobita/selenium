@@ -2,7 +2,7 @@
 =Selenium IDE - Release Notes=
 
 ==1.4.0==
-   * New - Firefox 7 support (again, just a version max version bump
+   * New - Firefox 8 support (again, just a version max version bump)
 
 
 ==1.3.0==
