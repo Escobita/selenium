@@ -205,6 +205,20 @@ You can also filter the logs by adding "ActivityMAnager:W" for example to the lo
 $ls build/test_logs
 }}}
 
+== Make a Release == 
+To release an apk, build the new apk:
+{{{
+$ ./go //android/app:android-server
+}}}
+
+Check-in the new prebuilt apk:
+{{{
+$ svn ci android/app/prebuilt/app/android-server.apk
+}}}
+
+Updalod the new APK on the Downloads page with release notes.
+
+
 = FAQ =
 == How to start jetty ==
 Jetty is started by the application installed. So it should start when you first start the application.
@@ -226,5 +240,15 @@ Couple things, you can start the emulator with the following options:
 -no-window
 -no-audio
 -no-boot-anim
+
+If you start the emulator with -no-window, you can launch the WebDriver app with this command:
+{{{
+$adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity
+}}}
+
+Or in debug mode:
+{{{
+ $adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity -e debug true
+}}}
 
 Alternatively, newer devices using 2.3 (Gingerbread) and higher are much faster than emulators.
