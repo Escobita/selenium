@@ -1,6 +1,8 @@
 #summary Getting Started With Android Driver
 #labels Phase-Deploy,Phase-Design,Phase-Implementation,Mobile,WebDriver
 
+<wiki:toc max_depth="3" />
+
 = Introduction =
 
 The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriver RemoteWebDriver]. The client side is your test code. The server side is an application that gets installed on the android emulator or device. It uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriverServer RemoteWebDriver Server] component and embeds a light-weight HTTP server (Jetty). The client and the server communicate using the [http://code.google.com/p/selenium/wiki/JsonWireProtocol Wire Protocol] which consists of REST requests using JSON over HTTP. The application executes the tests in the context of an Android  WebView.
