@@ -12,7 +12,6 @@ The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDri
    * Runs on emulator and device
 
 == Cons ==
-   * Slower than Headless WebKit Driver
    * Support for SDK versions 2.0 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
    * Does not work on emulators running 2.3 because of an emulator bug that should be fixed soon by Android. However it works on Devices running 2.3 and higher (and runs much faster on those).
 
