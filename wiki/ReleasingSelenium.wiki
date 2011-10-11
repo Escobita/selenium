@@ -63,7 +63,7 @@
    `mvn source:jar javadoc:jar -Dtest=skip -DfailIfNoTests=false -Dgpg.passphrase=_your-GnuPG-key-passphrase_ -Psign deploy`                
  # Goto http://oss.sonatype.org, log in, close the staging repository.
  # Test the artifacts, these are the _real_ files you will be irreversibly promoting to central. You can do this easily by cloning the repo at [https://github.com/krosenvold/selenium-release-test] and following the instructions there. (Once the staging repository has been closed you get the url to the repository by clicking on the repository. This url can be added to your project pom to test if you want to test using a different project. Remember that you may need to delete the artifacts in your local repository to make sure you re-download the staged artifacts).  
- # Promote that staged release in nexeus (or drop it).
+ # Promote that staged release in nexus (or drop it).
  # Make sure any other manual hacks you did are documented in step 5 or committed back on trunk.
  # Once the artifacts finally hit central (please wait till they are actually there), update the maven downloads page on SeHQ. If you can't wait don't update the page, someone will notice and update it.
 
