@@ -36,14 +36,14 @@ Regardless on whether you want to run a grid with new WebDriver functionality, o
 
 Selenium 1 nodes are fully compatible Selenium 1 RCs. But rather than using ANT to start each RC individually, you now only need to run a single java command to launch and configure the nodes. Open a new command prompt and type:
 {{{
-Java –jar selenium-server-2.0rc1.jar –role rc  -hub http://localhost:4444/grid/register -port 5555
+java –jar selenium-server-2.0rc1.jar –role rc  -hub http://localhost:4444/grid/register -port 5555
 }}}
 
 *Selenium WebDriver Nodes*:
 
 WebDriver nodes are compatible with both Selenium 1 and Selenium 2. The difference here is that you can use both Selenium 1 and WebDriver commands in the same session. WebDriver supports backward compatibility to Seleniuim 1 using a WebDriverBackedSelenium object. To launch the WebDriver nodes, open a new console window and type:
 {{{
-Java –jar selenium-server-2.0rc1.jar –role webdriver  -hub http://localhost:4444/grid/register -port 5556
+java –jar selenium-server-2.0rc1.jar –role webdriver  -hub http://localhost:4444/grid/register -port 5556
 }}}
 
 Note: The port defaults to 4444 if not specified. If you’re running hub and RC on the same machine, you will get a port conflict when starting the node if you don’t set it.
@@ -80,7 +80,7 @@ capability.setCapability(,);
 
 Example: A node registered with the setting:
 {{{ 	
- –browser  browserName=firefox,version=3.6,platform=LINUX
+ -browser  browserName=firefox,version=3.6,platform=LINUX
 }}}
  will be a match for:
 {{{
@@ -100,7 +100,7 @@ If you specify capabilities that do not exist on your grid (for example, your te
 
 == Configuring the nodes ==
 
-By default, this starts 7 browsers : 5 Firefox, 1 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each –browser switch (each switch represents a node based on your parameters). If you use the -browser parameter, the default browsers will be ignored and only what you specify command line will be used.
+By default, this starts 7 browsers : 5 Firefox, 1 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each -browser switch (each switch represents a node based on your parameters). If you use the -browser parameter, the default browsers will be ignored and only what you specify command line will be used.
 {{{
 -browser browserName=firefox,version=3.6,maxInstances=5,platform=LINUX
 }}}
