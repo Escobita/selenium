@@ -286,7 +286,7 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_/session/:sessionId/element/:id/submit /session/:sessionId/element/:id/submit] || Submit a `FORM` element. ||
 || GET || [#GET_/session/:sessionId/element/:id/text /session/:sessionId/element/:id/text] || Returns the visible text for the element. ||
 || POST || [#POST_/session/:sessionId/element/:id/value /session/:sessionId/element/:id/value] || Send a sequence of key strokes to an element. ||
-|| POST || [#POST_/session/:sessionId/modifier /session/:sessionId/modifier] || Send an event to the active element to depress or release a modifier key. ||
+|| POST || [#POST_/session/:sessionId/keys /session/:sessionId/keys] || Send a sequence of key strokes to the active element. ||
 || GET || [#GET_/session/:sessionId/element/:id/name /session/:sessionId/element/:id/name] || Query for an element's tag name. ||
 || POST || [#POST_/session/:sessionId/element/:id/clear /session/:sessionId/element/:id/clear] || Clear a `TEXTAREA` or `text INPUT` element's value. ||
 || GET || [#GET_/session/:sessionId/element/:id/selected /session/:sessionId/element/:id/selected] || Determine if an `OPTION` element, or an `INPUT` element of type `checkbox` or `radiobutton` is currently selected. ||
@@ -1655,15 +1655,15 @@ The server must process the key sequence as follows:
 
 ----
 
-=== /session/:sessionId/modifier ===
+=== /session/:sessionId/keys ===
 
 <dl>
 <dd>
-==== POST /session/:sessionId/modifier ====
+==== POST /session/:sessionId/keys ====
 </dd>
 <dd>
 <dl>
-<dd>Send an event to the active element to depress or release a modifier key.</dd>
+<dd>Send a sequence of key strokes to the active element. This command is similar to the [JsonWireProtocol#/session/:sessionId/element/:id/value send keys] command in every aspect except the implicit termination: The modifiers are *not* released at the end of the call. Rather, the state of the modifier keys is kept between calls, so mouse interactions can be performed while modifier keys are depressed.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
@@ -1673,8 +1673,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`value` - `{string}` The modifier key event to be sent. This key must be one Ctrl, Shift, Alt, or Command/Meta, as defined by the [JsonWireProtocol#/session/:sessionId/element/:id/value send keys] command.</dd>
-<dd>`isdown` - `{boolean}` Whether to generate a key down or key up.</dd>
+<dd>`value` - `{Array.<string>}` The keys sequence to be sent. The sequence is defined in the[JsonWireProtocol#/session/:sessionId/element/:id/value send keys] command.</dd>
 </dl>
 </dd>
 </dl>
