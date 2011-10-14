@@ -13,6 +13,7 @@
 
   # Run `./go clean release`
   # Upload the new versions of the ZIP files from "build/dist" to the downloads page.
+  # Upload the new Android APK from build/android/app/android-server.apk to the downloads page.
   # Add a subversion tag!
   # Update the docs. I do this on a UNIX variant:
     # `./go javadocs`
