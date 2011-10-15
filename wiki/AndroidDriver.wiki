@@ -5,101 +5,91 @@
 
 = Introduction =
 
-The Android Driver uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriver RemoteWebDriver]. The client side is your test code. The server side is an application that gets installed on the android emulator or device. It uses the [http://code.google.com/p/selenium/wiki/RemoteWebDriverServer RemoteWebDriver Server] component and embeds a light-weight HTTP server (Jetty). The client and the server communicate using the [http://code.google.com/p/selenium/wiki/JsonWireProtocol Wire Protocol] which consists of REST requests using JSON over HTTP. The application executes the tests in the context of an Android  WebView.
+Android WebDriver allows to run automated end-to-end tests that ensure your site works correctly when viewed from the Android browser. Android WebDriver supports all core WebDriver APIs, and in addition to that it supports mobile spacific and HTML5 APIs. Android WebDriver models many user interactions such as finger taps, flicks, finger scrolls and long presses. It can rotate the display and interact with HTML5 features such as local storage, session storage and application cache.
 
-= Pros & Cons =
-== Pros ==
-   * Runs in Android browser
-   * Uses native touch events to emulate user interaction
-   * Runs on emulator and device
+We try to stay as close as possible to what the user interaction with the browser is. To do so, Android WebDriver runs the tests against a WebView (rendering component used by the Android browser) configured like the Android browser. To interact with the page Android WebDriver uses native touch and key events. To query the DOM, it uses the JavaScript Atoms libraries. 
 
-== Cons ==
+== Known Issues ==
    * Support for SDK versions 2.0 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
-   * Does not work on emulators running 2.3 because of an emulator bug that should be fixed soon by Android. However it works on Devices running 2.3 and higher (and runs much faster on those).
-
-= Important System Properties =
-== Native events and Javascript ==
-We try to stay as close as possible to what the user interaction with the browser is. To do so we send native Android touch and key events for interacting with the page (WebElement.click(), WebElement.sendKeys(...), etc.).
-When questionning the page (WebElement.getValue(), WebElement.getText(), etc.) we use Javascript injection to poll the DOM.
-
-== HTML5 Features ==
-_Documentation coming soon..._
-   * Application Cache
-   * WebStorage
-   * Web SQL Database
-   * Offline / Online Browser Mode
-   * Geolocation
+   * Does not work on emulators running 2.3 because of an emulator bug. However it works on Devices running 2.3 (and runs much faster on those).
 
 = Get Started =
-== Install the SDK ==
+== Install the Android SDK ==
 Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it in a directory, say ~/android_sdk/ .
 
-Note 1: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
+== Setup the Environment  ==
+Android WebDriver test can run on emulators or real devices for phone and tablets.
 
-Note2: On Linux, android SDK is distributed for 32-bits machine. If you have a 64-bit machine you will need to install ia32-libs http://developer.android.com/sdk/installing.html#troubleshooting
+=== Setup the Emulator ===
 
-== Setup the Emulator  ==
-=== Create An AVD ===
-Execute the following command to create a new Android Virtual Device (avd):
+To create an emulator, you can use the [http://developer.android.com/guide/developing/devices/managing-avds.html graphical interface] provided by the Android SDK, or the [http://developer.android.com/guide/developing/devices/emulator.html command line]. Below are instructions for using the command line.
+
+First, let's create an Android Virtual Device (AVD):
 {{{
 $cd ~/android_sdk/tools/
 $./android create avd -n my_android -t 12 -c 100M
 }}}
 
--n or naming your android virtual device.
+-n: specifies the name of the AVD.
 
--t for specifying the target. ("./android list targets" will give you a list of all available targets). Make sure the target level you selected corresponds to the latest API level.
+-t: specifies the platform target. For an exhaustive list of targets, run:
+{{{
+./android list targets
+}}}
+Make sure the target level you selected corresponds to a supported SDK platform.
 
--c option is for the SD card storage space.
+-c: specifies the SD card storage space.
 
 When prompted "Do you wish to create a custom hardware profile `[`no`]`" enter "no".
 
-*Note: an issue has been discovered with the Java-to-JavaScript bridge in version 2.3 of the emulator which causes problems for the Android Driver. Currently we recommend using version of the Android platform 2.2 for AVDs.*
-===Start the Emulator ===
-Start the emulator (this can take a while):
+*Note: An Android emulator bug prevents WebDriver from running on emulators on platforms 2.3 (Gingerbread).*
+
+Now, start the emulator. This can take a while, but take a look at the FAQ below for tips on how to improve performance of the emulator.
 {{{
 $./emulator -avd my_android &
 }}}
 
-=== Install the Application ===
-Install Android WebDriver Application. Wait until the emulator has started and the home screen is ready. Install android-server.apk:
-{{{
-$./adb -e install -r  android-server.apk
-}}}
+=== Setup the Device  ===
+Simply connect your Android device through USB to your machine!
 
-If you face an issue, make sure you are allowing installation of application not coming from Android Market (Android Emulator -> Settings -> Applications -> Unknown sources is checked)
-
-=== Setup Port Forwarding ===
-In a terminal type: 
-{{{
-$~/android_sdk/platform-tools/adb forward tcp:8080 tcp:8080
-}}}
-
-This will make the android server available at http://localhost:8080/wd/hub
-
-=== Install Android WebDriver on Real Device ===
-
-Connect your device through USB to your machine.
+== Android WebDriver Using the Remote Server == 
+=== Install the WebDriver ===
+Every device or emulator has a serial ID. Run this command to get the serial ID of the device or emulator you want to use:
 {{{
 $~/android_sdk/platform-tools/adb devices
 }}}
 
-This will give you the serial Id of your connected device. Now install the apk on the device:
- {{{
-$./adb -s <serialId> -e install -r android-server.apk
-}}}
-
-Setup port forwarding:
+Download the Android server from our [http://code.google.com/p/selenium/downloads/list downloads page]. To install the application do:
 {{{
-$~/android_sdk/adb -s <serialId> forward tcp:8080 tcp:8080
+$./adb -s <serialId> -e install -r  android-server.apk
 }}}
 
-=== Start the WebDriver Server on the device or emulator ===
-Start the WebDriver application just installed in the device or emulator.
+Make sure you are allowing installation of application not coming from Android Market. Go to Settings -> Applications, and check "Unknown Sources".
+
+Start the Android WebDriver application through the UI of the device or by running this command:
+{{{
+$./adb -s <serialId> shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity
+}}}
+
+You can start the application in debug mode, which has more verbose logs by doing:
+{{{
+$./adb -s <serialId> shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity -e debug true
+}}}
+
+Now we need to setup the port forwarding in order to forward traffic from the host machine to the emulator.
+In a terminal type: 
+{{{
+$./adb -s <serialId> forward tcp:8080 tcp:8080
+}}}
+
+This will make the android server available at http://localhost:8080/wd/hub
 
 === Tips ===
    * Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations".
    * Restart adb if you have networking errors reported when your tests run. Sometimes there are issues connecting to the device / emulator after switching devices. run {{{adb kill-server}}} followed by {{{adb start-server}}} then setup port forwarding again for the device you want to use. 
+
+== Android WebDriver Using the Android Test Framework ==
+
 == Run Your Tests ==
 {{{
 import junit.framework.TestCase;
@@ -143,6 +133,12 @@ Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/dow
   * *Prefer window handles to window names*:  (e.g. String current = driver.getWindowHandle(); driver.switchTo().window(current);).  Switching to a window by it's name property is more expensive because it requires injecting Javascript in every open window. While handles are saved in map which provides faster lookup times. 
 
 = Get Involved =
+
+
+Note 1: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
+
+Note2: On Linux, android SDK is distributed for 32-bits machine. If you have a 64-bit machine you will need to install ia32-libs http://developer.android.com/sdk/installing.html#troubleshooting
+
    * Check out the code:
 {{{
 $svn checkout https://selenium.googlecode.com/svn/trunk/ webdriver
