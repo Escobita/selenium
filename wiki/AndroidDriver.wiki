@@ -63,12 +63,12 @@ Here is a comparaison of both approach to help you choose which one suits you be
 || Runs slower because every command makes extra RPCs (HTTP requests/responses) || Runs fasters because the tests are on the device ||
 || Ideal if you use the same WebDriver tests on other browsers || Ideal if you don't use the same tests on other browsers and if you already use the Android test framework ||
 
-== Android WebDriver Using the Remote Server == 
+== Using the Remote Server == 
 
 This approach has a client and a server component. The client consists of your typical Junit tests that you can run from your favorite IDE or through the command line. The server is an Android application that contains an HTTP server. When you run the tests, each WebDriver command will make a RESTful  HTTP request to the server using JSON according to a [http://code.google.com/p/selenium/wiki/JsonWireProtocol well defined protocol]. The remote server will delegate the request to Android WebDriver, and will then return a response.
 
 
-=== Install the Android WebDriver Application ===
+=== Install the WebDriver Application ===
 Every device or emulator has a serial ID. Run this command to get the serial ID of the device or emulator you want to use:
 {{{
 $~/android_sdk/platform-tools/adb devices
@@ -134,7 +134,7 @@ To compile and run this example you will need the selenium-java-X.zip (client si
 Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/downloads/list download page], unzip and include all jars in your IDE project. For Eclipse, right click on project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars.
 
 
-== Android WebDriver Using the Android Test Framework ==
+== Using the Android Test Framework ==
 
 This approach runs the tests directly on the device using the [http://developer.android.com/guide/topics/testing/testing_android.html Android test framework].
 
