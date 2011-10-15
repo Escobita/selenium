@@ -50,9 +50,24 @@ $./emulator -avd my_android &
 }}}
 
 === Setup the Device  ===
-Simply connect your Android device through USB to your machine!
+Simply connect your Android device through USB to your machine.
+
+
+Now that we're done with the test environment setup, let's take a look at how to write tests. There are two options available to you to run Android WebDriver tests:
+   * Using the [http://code.google.com/p/selenium/wiki/RemoteWebDriver remote WebDriver server]
+   * Using the [http://developer.android.com/guide/topics/testing/testing_android.html Android test framework]
+Here is a comparaison of both approach to help you choose which one suits you best.
+
+||  * Android WebDriver using the remote server* || * Android WebDriver using the Android test framework * ||
+|| Tests can be written in any supported language binding (Java, Python, Ruby, etc.) || Tests can only br written in Java ||
+|| Runs slower because every command makes extra RPCs (HTTP requests/responses) || Runs fasters because the tests are on the device ||
+|| Ideal if you use the same WebDriver tests on other browsers || Ideal if you don't use the same tests on other browsers and if you already use the Android test framework ||
 
 == Android WebDriver Using the Remote Server == 
+
+This approach has a client and a server component. The client consists of your typical Junit tests that you can run from your favorite IDE or through the command line. The server is an Android application that contains an HTTP server. When you run the tests, each WebDriver command will make a RESTful  HTTP request to the server using JSON according to a [http://code.google.com/p/selenium/wiki/JsonWireProtocol well defined protocol]. The remote server will delegate the request to Android WebDriver, and will then return a response.
+
+
 === Install the WebDriver ===
 Every device or emulator has a serial ID. Run this command to get the serial ID of the device or emulator you want to use:
 {{{
@@ -82,15 +97,8 @@ In a terminal type:
 $./adb -s <serialId> forward tcp:8080 tcp:8080
 }}}
 
-This will make the android server available at http://localhost:8080/wd/hub
+This will make the android server available at http://localhost:8080/wd/hub from the host machine. You're now ready to run the tests. Let's take a look at some code.
 
-=== Tips ===
-   * Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations".
-   * Restart adb if you have networking errors reported when your tests run. Sometimes there are issues connecting to the device / emulator after switching devices. run {{{adb kill-server}}} followed by {{{adb start-server}}} then setup port forwarding again for the device you want to use. 
-
-== Android WebDriver Using the Android Test Framework ==
-
-== Run Your Tests ==
 {{{
 import junit.framework.TestCase;
 
@@ -101,7 +109,7 @@ import org.openqa.selenium.android.AndroidDriver;
 public class OneTest extends TestCase {
 
   public void testGoogle() throws Exception {
-    AndroidDriver driver = new AndroidDriver();
+    WebDriver driver = new AndroidDriver();
     
     // And now use this to visit Google
     driver.get("http://www.google.com");
@@ -118,38 +126,139 @@ public class OneTest extends TestCase {
     // Check the title of the page
     System.out.println("Page title is: " + driver.getTitle());
     driver.quit();
-
   }
 }
 }}}
 
 To compile and run this example you will need the selenium-java-X.zip (client side piece of selenium).
-Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/downloads/list download page], unzip and included all jars in your eclipse project (Right click on project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars)
+Download the selenium-java-X.zip from our [http://code.google.com/p/selenium/downloads/list download page], unzip and include all jars in your IDE project. For Eclipse, right click on project -> Build Path -> Configure Build Path -> Libraries -> Add External Jars.
 
-== Tips ==
-  * *Avoid using XPath*: XPath is not yet natively supported in Android WebView, so we inject our own XPath library in the browser which makes looking up element by XPath an expensive operation. Rather prefer looking up elements by ID, name, tag name, etc.
-  * *Keep the same emulator instance*: Starting an Android emulator is an expensive operation which can take up to 2 minute depending on your machine specifications. Do this once for your entire test suite. If you need a fresh instance of the driver call WebDriver#quit() which flushes the WebView cache, cookies, user data, etc.
-  * *Avoid requesting the entire page source*, if all you need is to verify that it contains a string or an element. Rather lookup elements by their IDs, name, etc.
-  * *Prefer window handles to window names*:  (e.g. String current = driver.getWindowHandle(); driver.switchTo().window(current);).  Switching to a window by it's name property is more expensive because it requires injecting Javascript in every open window. While handles are saved in map which provides faster lookup times. 
+
+== Android WebDriver Using the Android Test Framework ==
+
+This approach runs the tests directly on the device using the [http://developer.android.com/guide/topics/testing/testing_android.html Android test framework].
+
+You first need to download Android WebDriver, which is an SDK extra. Open the Android SDK manager and select: Available packages → Extras →  Google →  WebDriver.
+Once the SDK manager has downloaded WebDriver, the jars will be under the directory android_sdk/extras/google/webdriver/ . In the same directory you will also find sample code containing and Android project named "SimpleApp" and an Android test project called "TestAnAndroidWebApp".
+
+The SimpleApp project, contains an activity with no layout:
+{{{
+public class SimpleAppActivity extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+}
+}}}
+
+The reason the activity does not have any layout is because Android WebDriver will create the WebView and automatically set the layout in that activity.
+
+The TestAnAndroidWebApp is an Android test project which contains a simple test that open www.google.com, makes a search and validates that the result page's title contains the word "Google". Let's take a look at the code.
+
+We instantiate the driver by passing the activity in which the WebView will run.
+{{{
+WebDriver driver = new AndroidWebDriver(getActivity());
+}}}
+
+Then we use the driver in a test to drive the web application.
+{{{
+    public void testGoogleWorks() {
+        // Loads www.google.com
+        driver.get("http://www.google.com");
+        // Lookup the search box on the page by it's HTML name property
+        WebElement searchBox = driver.findElement(By.name("q"));
+        // Enter keys in the search box
+        searchBox.sendKeys("Android Rocks!");
+        // Hit enter
+        searchBox.submit();
+        // Ensure the title contains "Google"
+        assertTrue(driver.getTitle().contains("Google"));
+        // Ensure that there is at least one link with the keyword "Android"
+        assertTrue(driver.findElements(By.partialLinkText("Android")).size() > 1);
+    }
+}}}
+
+Here a are some instructions to help you setup you project.
+ 
+=== Configuring from an Eclipse Project ===
+If you are using Eclipse, first make sure that the [http://developer.android.com/sdk/eclipse-adt.html Eclipse ADT plugin] is installed .
+   # Open Eclipse
+   # Right click on the Android Test project → Build Path → Configure Build Path... → Libraries → Add External Jars
+   # Select the android_webdriver_library.jar
+
+If you would like to step in the code for debugging or see the javadoc from Eclipse, it’s recommended you link the sources as well. 
+   # Open the Referenced Libraries
+   # Right click on android_webdriver_library.jar → Properties → Java Source Attachment
+   # Select android_webdriver_library-srcs.jar
+
+Let's import the examples and run the sample code:
+   # Open Eclipse
+   # File → Import... → General → Existing Projects into Workspace
+   # Select the directory your_android_sdk/extras/google/webdriver which contains SimpleApp and TestAnAndroidWebApp projects.
+   # Right click on TestAnAndroidWebApp → Run As → Android JUnit Test
+
+You will see the tests executing on your device or emulator.
+
+=== Configuring command line managed projects ===
+
+If you are managing you project from the [http://developer.android.com/guide/developing/projects/projects-cmdline.html command line], copy android_webdriver_library.jar under the /libs directory of your Android test project. 
+First we need to build and install the SimpleApp application.
+{{{
+$ cd SimpleApp
+$ adb update project
+$ ant debug
+$ adb install bin/SimpleAppActivity-debug.apk
+}}}
+
+Then let's build and install the test application:
+{{{
+$ cd TestAnAndroidWebApp
+$ adb update test project
+$ ant debug
+$ adb install bin/TestAnAndroidWebApp-debug.apk
+}}}
+
+Now we can run the tests! Execute the following command to see your tests running:
+{{{
+$ adb shell am instrument -w simple.app.test/android.test.InstrumentationTestRunner
+}}}
+
+Android WebDriver requires the following permissions in the application's manifest file to work properly:
+   * android.permission.INTERNET
+   * android.permission.ACCESS_NETWORK_STATE
+   * android.permission.WRITE_SETTINGS
+   * android.permission.WAKE_LOCK
+   * android.permission.CLEAR_APP_CACHE
+   * android.permission.ACCESS_COARSE_LOCATION
+   * android.permission.ACCESS_MOCK_LOCATION
+   * android.permission.ACCESS_FINE_LOCATION
+   * android.permission.ACCESS_LOCATION_EXTRA_COMMANDS
+   * android.permission.CHANGE_CONFIGURATION
+   * android.permission.SET_DEBUG_APP
+   * android.permission.WRITE_EXTERNAL_STORAGE
+   * android.permission.WRITE_APN_SETTINGS
 
 = Get Involved =
 
-
-Note 1: if your sdk is installed in a different folder, edit {{{./properties.yml}}} to reflect that location. {{{./properties.yml}}} also specifies the Android platform version to use - again update the value to the version of the sdk you want to use e.g. version 8 for Android 2.2
-
-Note2: On Linux, android SDK is distributed for 32-bits machine. If you have a 64-bit machine you will need to install ia32-libs http://developer.android.com/sdk/installing.html#troubleshooting
+Want to fix a bug? Add a feature? Or simply play with the code? Here is a quick tutorial to help you get started with Android WebDriver. 
 
    * Check out the code:
 {{{
-$svn checkout https://selenium.googlecode.com/svn/trunk/ webdriver
+$ svn checkout https://selenium.googlecode.com/svn/trunk/ webdriver
+$ cd webdriver
 }}}
 
-== Build the Android Driver Code ==
+Edit the {{{properties.yml}}} file to reflect the location of your Android SDK, and set the platform target you want to use. If you want a list of all available target, execute the following command:
 {{{
-$cd webdriver
+./android list targets
 }}}
 
-   * To build the client and the server
+On Linux, android SDK is distributed for 32-bits machine. If you have a 64-bit machine you will need to install ia32-libs http://developer.android.com/sdk/installing.html#troubleshooting
+
+== Build the Android WebDriver Code ==
+Android WebDriver consists of 3 parts. The client and the server used to run Android WebDriver tests remotely, and a library. The library does most of the real work and is used by Android WebDriver to control the WebView. The server piece simply wraps the library in an  Android application together with the HTTP server.
+
+   * To build the library, the client and the server
 {{{
 $./go android
 }}}
@@ -161,11 +270,16 @@ $./go android_client
 {{{
 $./go android_server
 }}}
+   * To build the library
+{{{
+$./go //android/library/src/java/org/openqa/selenium/android:android-library
+}}}
    * To run the tests
 {{{
 $./go test_android
 }}}
-You may see the tests executing in the emulator if the emulator screen is locked, but they are running in the background. If you want to see them simply unlock the screen.
+This command will start the emulator install the Android WebDriver application and start the tests. 
+ If the emulator/device screen is locked, simply unlock it to see the tests running. 
 
 Note that "./go test_android" will fail if there is already an emulator running.
 
@@ -190,6 +304,7 @@ $./go //java/client/test/org/openqa/selenium/android:java-test:run  haltonerror=
 {{{
 $./adb logcat
 }}}
+
 The Android logcat logs are the most useful piece of information for debugging and fixing an issue.
 You can also filter the logs by adding "ActivityMAnager:W" for example to the logcat command.
 
@@ -200,7 +315,7 @@ You can also filter the logs by adding "ActivityMAnager:W" for example to the lo
 
    * View the client side logs:
 {{{
-$ls build/test_logs
+$ls build/test_logs/
 }}}
 
 == Make a Release == 
@@ -214,12 +329,42 @@ Check-in the new prebuilt apk:
 $ svn ci android/app/prebuilt/app/android-server.apk
 }}}
 
-Updalod the new APK on the Downloads page with release notes.
-
+Upload the new APK on the downloads page with the corresponding release notes.
 
 = FAQ =
-== How to start jetty ==
-Jetty is started by the application installed. So it should start when you first start the application.
+
+== My tests are slow, what can I do? == 
+  * Avoid looking up elements by XPath, it is by far more expensive than using IDs or name.
+  * Keep the same emulator instance for all tests. Starting an Android emulator is an expensive operation which can take up to 2 minute depending on your machine specifications. Do this once for your entire test suite. If you need a fresh instance of the driver call WebDriver.quit() which flushes the WebView cache, cookies, user data, etc.
+  * Prefer window handles to window names (e.g. String current = driver.getWindowHandle(); driver.switchTo().window(current);).  Switching to a window by it's name property is more expensive because it requires injecting Javascript in every open window to fetch the window's name. While handles are saved in map which provides really fast lookup times. 
+
+== The emulator is too slow to start == 
+The Android emulator can take up to 2 or 3 minutes to start.  Consider using the [http://tools.android.com/recent/emulatorsnapshots Android snapshot] feature, which allows you to start an emulator in less than 2 seconds!
+
+You can speed up the tests by disabling animations, audio, skins, and even by running in headless mode. To do so start  the emulator with the options --no-boot-anim, --no-audio, --noskin, and --no-window.
+
+If you start the emulator with -no-window, you can launch the WebDriver app with this command:
+{{{
+$adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity
+}}}
+
+Or in debug mode:
+{{{
+ $adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity -e debug true
+}}}
+
+== Geo location does not work == 
+   * Remember to set the following settings on your device: Settings -> Applications -> Development -> Check "USB debugging", "Stay Awake" and "Allow mock locations"
+
+== ADB does not find the emulator or device == 
+   * Sometimes there are issues connecting to the device / emulator in which case you can restart adb by doing:
+{{{
+$ adb kill-server
+$ adb start-server
+}}}
+
+== How to start the HTTP server Jetty ==
+Jetty is started by the Android WebDriver application when launched.
 
 == I get "Page not Available" ==
 Sometimes the Android emulator does not detect the connection of the host machine it runs on. The solution in this case is to restart the emulator.
@@ -232,21 +377,3 @@ caps.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 
 AndroidDriver driver = new AndroidDriver(caps);
 }}}
-
-== The emulator is too slow, what can I do ==
-Couple things, you can start the emulator with the following options:
--no-window
--no-audio
--no-boot-anim
-
-If you start the emulator with -no-window, you can launch the WebDriver app with this command:
-{{{
-$adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity
-}}}
-
-Or in debug mode:
-{{{
- $adb shell am start -a android.intent.action.MAIN -n org.openqa.selenium.android.app/.MainActivity -e debug true
-}}}
-
-Alternatively, newer devices using 2.3 (Gingerbread) and higher are much faster than emulators.
