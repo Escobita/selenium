@@ -68,7 +68,7 @@ Here is a comparaison of both approach to help you choose which one suits you be
 This approach has a client and a server component. The client consists of your typical Junit tests that you can run from your favorite IDE or through the command line. The server is an Android application that contains an HTTP server. When you run the tests, each WebDriver command will make a RESTful  HTTP request to the server using JSON according to a [http://code.google.com/p/selenium/wiki/JsonWireProtocol well defined protocol]. The remote server will delegate the request to Android WebDriver, and will then return a response.
 
 
-=== Install the WebDriver Application ===
+=== Install the WebDriver APK ===
 Every device or emulator has a serial ID. Run this command to get the serial ID of the device or emulator you want to use:
 {{{
 $~/android_sdk/platform-tools/adb devices
@@ -99,6 +99,7 @@ $./adb -s <serialId> forward tcp:8080 tcp:8080
 
 This will make the android server available at http://localhost:8080/wd/hub from the host machine. You're now ready to run the tests. Let's take a look at some code.
 
+=== Run the Tests === 
 {{{
 import junit.framework.TestCase;
 
