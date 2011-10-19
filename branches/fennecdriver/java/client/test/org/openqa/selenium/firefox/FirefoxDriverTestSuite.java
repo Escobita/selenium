@@ -39,8 +39,8 @@ public class FirefoxDriverTestSuite extends TestCase {
     // System.setProperty("webdriver.development", "true");
     // System.setProperty("webdriver.firefox.useExisting", "true");
 
-    // System.setProperty("webdriver.firefox.bin",
-    // "/Applications/Firefox3.app/Contents/MacOS/firefox-bin");
+    System.setProperty("webdriver.firefox.bin",
+    	"/home/mozilla/firefox/firefox-bin");
     // System.setProperty("webdriver.firefox.bin",
     // "/Applications/Firefox3_6.app/Contents/MacOS/firefox-bin");
     // System.setProperty("webdriver.firefox.bin",
@@ -51,7 +51,7 @@ public class FirefoxDriverTestSuite extends TestCase {
     return new TestSuiteBuilder()
         .addSourceDir("java/client/test")
 //        .addSourceDir("java/client/test/org/openqa/selenium/firefox") Haven't been running for a while, apparently, and some of them don't pass now...
-        .usingDriver(FirefoxDriver.class)
+        .usingDriver(TestFirefoxDriver.class)
         .exclude(FIREFOX)
         .keepDriverInstance()
         .includeJavascriptTests()
@@ -59,8 +59,8 @@ public class FirefoxDriverTestSuite extends TestCase {
   }
 
   public static class TestFirefoxDriver extends FirefoxDriver {
-    public TestFirefoxDriver() {
-      super(createTemporaryProfile());
+    public TestFirefoxDriver() throws Exception {
+      this(createTemporaryProfile());
     }
 
     public TestFirefoxDriver(FirefoxProfile profile) throws Exception {
@@ -91,6 +91,8 @@ public class FirefoxDriverTestSuite extends TestCase {
     private static FirefoxProfile createTemporaryProfile() {
       try {
         FirefoxProfile profile = new FirefoxProfile();
+
+        profile.setPreference("webdriver.client.address", "http://localhost:7052/xhr");
 
         if (Boolean.getBoolean("webdriver.debug")) {
           File firebug = InProject.locate("third_party/firebug/firebug-1.5.0-fx.xpi");

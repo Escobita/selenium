@@ -33,6 +33,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
@@ -50,8 +51,8 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   private final ErrorHandler errorHandler = new ErrorHandler();
 
   private CommandExecutor executor;
-  private Capabilities capabilities;
-  private SessionId sessionId;
+  protected Capabilities capabilities;
+  protected SessionId sessionId;
   private FileDetector fileDetector = new UselessFileDetector();
   private ExecuteMethod executeMethod;
 

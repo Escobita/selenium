@@ -10,6 +10,7 @@ java_library(name = "tests_common",
     "//java/client/src/org/openqa/selenium/firefox",
     "//java/client/test/org/openqa/selenium:tests",
     "//third_party/java/junit",
+    "//third_party/java/webbit",
   ])
 
 java_test(name = "test",

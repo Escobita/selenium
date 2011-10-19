@@ -13,6 +13,9 @@ mozilla_xpt(name = "status_xpt",
 mozilla_xpt(name = "coordinates_xpt",
   srcs = [ "extension/idl/wdICoordinate.idl" ])
 
+mozilla_xpt(name = "client_dispatcher_xpt",
+  srcs = [ "extension/idl/wdIClientDispatcher.idl" ])
+
 mozilla_xpt(name = "mouse_xpt",
   srcs = [ "extension/idl/wdIMouse.idl" ])
 
@@ -42,6 +45,8 @@ mozilla_extension(name = "webdriver",
     "extension/components/webdriverserver.js",
     "extension/components/wrappedElement.js",
     ":synthetic_mouse",
+    ":xhrendpoint",
+    ":client_dispatcher_xpt",
     ":command_processor_xpt",
     ":coordinates_xpt",
     ":httpd_xpt",
@@ -88,6 +93,20 @@ js_binary(name = "synthetic_mouse",
   ],
   deps = [ "//javascript/webdriver-atoms:deps" ])
 
+js_binary(name = "xhrendpoint",
+  srcs = [
+    "js/xhrendpoint.js",
+    "js/moz.js",
+    "js/logging.js",
+  ],
+  defines = [
+    "goog.userAgent.ASSUME_GECKO=true",
+  ],
+  externs = [
+    "js/externs.js",
+  ],
+  deps = [ "//javascript/webdriver-atoms:deps" ])
+
 # Needed because the closure library doesn't have the EXPORTED_SYMBOLS variable
 # required by the loader in firefox
 js_binary(name = "atoms",
@@ -115,6 +134,7 @@ js_binary(name = "utils",
     "js/logging.js",
     "js/modals.js",
     "js/moz.js",
+    "js/prefs.js",
     "js/timer.js",
     "js/utils.js",
     "js/utils_exports.js"

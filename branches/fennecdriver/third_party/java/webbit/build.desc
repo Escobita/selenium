@@ -1,0 +1,2 @@
+java_library(name = "webbit",
+  deps = [ "webbit-all-in-one.jar" ])

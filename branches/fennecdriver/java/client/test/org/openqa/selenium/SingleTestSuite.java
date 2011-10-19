@@ -30,6 +30,7 @@ import java.util.Map;
 public class SingleTestSuite extends TestCase {
   private static final String CHROME = "org.openqa.selenium.chrome.ChromeDriver";
 
+  private static final String BACKWARDS = "org.openqa.selenium.firefox.BackwardsFirefoxDriver";
   private static final String FIREFOX = "org.openqa.selenium.firefox.FirefoxDriver";
   private static final String FIREFOX_TEST =
       "org.openqa.selenium.firefox.FirefoxDriverTestSuite$TestFirefoxDriver";
@@ -54,6 +55,7 @@ public class SingleTestSuite extends TestCase {
           put(CHROME, Ignore.Driver.CHROME);
           put(FIREFOX, Ignore.Driver.FIREFOX);
           put(FIREFOX_TEST, Ignore.Driver.FIREFOX);
+          put(BACKWARDS, Ignore.Driver.FIREFOX);
           put(HTML_UNIT, Ignore.Driver.HTMLUNIT);
           put(HTML_UNIT_JS, Ignore.Driver.HTMLUNIT);
           put(IE, Ignore.Driver.IE);
@@ -66,7 +68,7 @@ public class SingleTestSuite extends TestCase {
       };
 
   public static Test suite() throws Exception {
-    String driver = REMOTE;
+    String driver = BACKWARDS;
 
     System.setProperty("jna.library.path", "..\\build;build");
     System.setProperty("webdriver.selenium.server.port", String.valueOf(findFreePort()));
@@ -79,8 +81,8 @@ public class SingleTestSuite extends TestCase {
         .usingDriver(driver)
         .keepDriverInstance()
         .includeJavascriptTests()
-        .onlyRun("UploadTest")
-//        .method("testGenerateKeyPressEventEvenWhenElementPreventsDefault")
+        .onlyRun("ElementFindingTest")
+//        .method("testShouldWaitForDocumentToBeLoaded")
 //        .method("testTypingIntoAnIFrameWithContentEditableOrDesignModeSet")
         .exclude(ALL)
         .exclude(EXCLUSIONS_BY_DRIVER.get(driver))

@@ -48,7 +48,7 @@ public class JsonToBeanConverter {
 
   @SuppressWarnings("unchecked")
   private <T> T convert(Class<T> clazz, Object text, int depth) throws JSONException {
-    if (text == null) {
+    if (text == null || JSONObject.NULL.equals(text)) {
       return null;
     }
 

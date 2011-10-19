@@ -10,6 +10,7 @@ interfaces components/nsIHttpServer.xpt
 interfaces components/nsINativeEvents.xpt
 interfaces components/nsIResponseHandler.xpt
 interfaces components/wdICoordinate.xpt
+interfaces components/wdIClientDispatcher.xpt
 interfaces components/wdIMouse.xpt
 interfaces components/wdIStatus.xpt
 
@@ -24,6 +25,9 @@ contract @mozilla.org/server/jshttp;1 {54ef6f81-30af-4b1d-ac55-8ba811293e41}
 
 component {692e5117-a4a2-4b00-99f7-0685285b4db5} components/nsCommandProcessor.js
 contract @googlecode.com/webdriver/command-processor;1 {692e5117-a4a2-4b00-99f7-0685285b4db5}
+
+component {c9e3a64a-4804-4b7e-8cb2-69d4c03b4a5e} components/xhrendpoint.js
+contract @googlecode.com/webdriver/xhr-dispatcher;1 {c9e3a64a-4804-4b7e-8cb2-69d4c03b4a5e}
 
 component {e26dbdcd-d3ba-4ded-88c3-6cb07ee3e9e0} components/promptService.js
 contract @mozilla.org/prompter;1 {e26dbdcd-d3ba-4ded-88c3-6cb07ee3e9e0}

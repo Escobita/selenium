@@ -23,8 +23,7 @@ function WebDriverServer() {
   Components.utils.import('resource://fxdriver/modules/utils.js');
 
   this.wrappedJSObject = this;
-  this.serverSocket =
-  Components.classes["@mozilla.org/network/server-socket;1"].
+  this.serverSocket = Components.classes["@mozilla.org/network/server-socket;1"].
       createInstance(Components.interfaces.nsIServerSocket);
   this.generator = fxdriver.moz.getService("@mozilla.org/uuid-generator;1", "nsIUUIDGenerator");
   this.enableNativeEvents = null;
@@ -36,29 +35,33 @@ function WebDriverServer() {
 
   var dispatcher_ = new Dispatcher();
 
-  try {
-    this.server_ = Utils.newInstance("@mozilla.org/server/jshttp;1", "nsIHttpServer");
-  } catch (e) {
+  var xhrEndPoint = fxdriver.prefs.read('webdriver.client.address');
+  if (xhrEndPoint) {
+    fxdriver.Logger.dumpn('Using XHR approach');
+    var xhrThing = Utils.newInstance('@googlecode.com/webdriver/xhr-dispatcher;1', 'wdIClientDispatcher').wrappedJSObject;
+    xhrThing.start = function() {
+      xhrThing.connectTo(xhrEndPoint);
+    };
+    this.server_ = xhrThing;
+  } else {
+    fxdriver.Logger.dumpn('Using HTTPD approach');
+    try {
+      this.server_ = Utils.newInstance("@mozilla.org/server/jshttp;1", "nsIHttpServer");
+    } catch (e) {
       fxdriver.Logger.dumpn(e);
-  }
+    }
 
-  this.server_.registerGlobHandler(".*/hub/.*", { handle: function(request, response) {
-    response.processAsync();
-    dispatcher_.dispatch(new Request(request), new Response(response));
-  }});
+    this.server_.registerGlobHandler(".*/hub/.*", { handle: function(request, response) {
+      response.processAsync();
+      dispatcher_.dispatch(new Request(request), new Response(response));
+    }});
+  }
 }
 
 
 WebDriverServer.prototype.newDriver = function(window) {
   if (null == this.useNativeEvents) {
-    var prefs =
-        fxdriver.moz.getService("@mozilla.org/preferences-service;1", "nsIPrefBranch");
-    if (!prefs.prefHasUserValue("webdriver_enable_native_events")) {
-      fxdriver.Logger.dumpn('webdriver_enable_native_events not set; defaulting to false');
-    }
-    this.enableNativeEvents =
-    prefs.prefHasUserValue("webdriver_enable_native_events") ?
-      prefs.getBoolPref("webdriver_enable_native_events") : false;
+    this.enableNativeEvents = fxdriver.prefs.read('webdriver_enable_native_events', false);
     fxdriver.Logger.dumpn('Using native events: ' + this.enableNativeEvents);
   }
   window.fxdriver = new FirefoxDriver(this, this.enableNativeEvents, window);

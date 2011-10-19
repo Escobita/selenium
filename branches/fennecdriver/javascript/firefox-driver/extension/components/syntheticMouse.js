@@ -41,7 +41,7 @@ SyntheticMouse = function() {
   // Declare the state we'll be using
   this.buttonDown = null;
   this.lastElement = null;
-}
+};
 
 
 SyntheticMouse.newResponse = function(status, message) {

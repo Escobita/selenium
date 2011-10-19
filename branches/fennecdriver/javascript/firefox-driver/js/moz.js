@@ -38,12 +38,31 @@ fxdriver.moz.load = function(module) {
  */
 fxdriver.moz.getService = function(className, serviceName) {
   var clazz = Components.classes[className];
-  if (clazz == undefined) {
+  if (!clazz) {
     // TODO(simon): Replace this with a proper error
     throw new Exception();
   }
 
   return clazz.getService(Components.interfaces[serviceName]);
+};
+
+
+fxdriver.moz.newInstance = function(className, interfaceName) {
+  var clazz = Components.classes[className];
+
+  if (!clazz) {
+    fxdriver.Logger.dumpn("Unable to find class: " + className);
+    return undefined;
+  }
+  var iface = Components.interfaces[interfaceName];
+
+  try {
+    return clazz.createInstance(iface);
+  } catch (e) {
+    fxdriver.Logger.dumpn("Cannot create: " + className + " from " + interfaceName);
+    fxdriver.Logger.dumpn(e);
+    throw e;
+  }
 };
 
 

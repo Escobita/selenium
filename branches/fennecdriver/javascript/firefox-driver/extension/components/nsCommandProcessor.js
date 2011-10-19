@@ -632,7 +632,8 @@ nsCommandProcessor.prototype.getSessionCapabilities = function(response) {
     'javascriptEnabled': true,
     'nativeEvents': Utils.useNativeEvents(),
     // See https://developer.mozilla.org/en/OS_TARGET
-    'platform': xulRuntime.OS,
+    //'platform': xulRuntime.OS,
+//    'platform': 'MAC',
     'takesScreenshot': true,
     'version': appInfo.version
   };
