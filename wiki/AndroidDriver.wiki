@@ -1,5 +1,5 @@
 #summary Getting Started With Android Driver
-#labels Phase-Deploy,Phase-Design,Phase-Implementation,Mobile,WebDriver
+#labels Phase-Deploy,Phase-Design,Phase-Implementation,Mobile,WebDriver,Android,automation
 
 <wiki:toc max_depth="3" />
 
