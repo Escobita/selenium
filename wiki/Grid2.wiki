@@ -24,7 +24,7 @@ Open a command prompt and navigate to the directory where you copied the seleniu
 {{{
 java -jar selenium-server-standalone-2.0rc1.jar -role hub
 }}}
-The hub will automatically start-up using port 4444 by default. To change the default port, you can add the optional parameter –port when you run the command.
+The hub will automatically start-up using port 4444 by default. To change the default port, you can add the optional parameter -port when you run the command.
 You can view the status of the hub by opening a browser window and navigating to:
 http://localhost:4444/grid/console
 
@@ -36,14 +36,14 @@ Regardless on whether you want to run a grid with new WebDriver functionality, o
 
 Selenium 1 nodes are fully compatible Selenium 1 RCs. But rather than using ANT to start each RC individually, you now only need to run a single java command to launch and configure the nodes. Open a new command prompt and type:
 {{{
-java –jar selenium-server-2.0rc1.jar –role rc  -hub http://localhost:4444/grid/register -port 5555
+java -jar selenium-server-2.0rc1.jar -role rc  -hub http://localhost:4444/grid/register -port 5555
 }}}
 
 *Selenium WebDriver Nodes*:
 
 WebDriver nodes are compatible with both Selenium 1 and Selenium 2. The difference here is that you can use both Selenium 1 and WebDriver commands in the same session. WebDriver supports backward compatibility to Seleniuim 1 using a WebDriverBackedSelenium object. To launch the WebDriver nodes, open a new console window and type:
 {{{
-java –jar selenium-server-2.0rc1.jar –role webdriver  -hub http://localhost:4444/grid/register -port 5556
+java -jar selenium-server-2.0rc1.jar -role webdriver  -hub http://localhost:4444/grid/register -port 5556
 }}}
 
 Note: The port defaults to 4444 if not specified. If you’re running hub and RC on the same machine, you will get a port conflict when starting the node if you don’t set it.
@@ -119,13 +119,13 @@ Tip: If you need to provide a space somewhere in your browser parameters, then s
 == Optional parameters ==
 
  * -port 4444 	(4444 is default) 
- * -nodeTimeout 30 	(30 is default) The timeout in seconds before the hub automatically releases a node that hasn't received any requests for more than the specified number of seconds. After this time, the node will be released for another test in the queue. This helps to clear client crashes without manual intervention. To remove the timeout completely, specify –nodeTimeout 0 and the hub will never release the node.
+ * -nodeTimeout 30 	(30 is default) The timeout in seconds before the hub automatically releases a node that hasn't received any requests for more than the specified number of seconds. After this time, the node will be released for another test in the queue. This helps to clear client crashes without manual intervention. To remove the timeout completely, specify -nodeTimeout 0 and the hub will never release the node.
 
  Note: This is NOT the WebDriver timeout for all ”wait for WebElement” type of commands. 
 
  * -maxSession 5	(5 is default) The maximum number of browsers that can run in parallel on the node. This is different from the maxInstance of supported browsers (Example: For a node that supports Firefox 3.6, Firefox 4.0  and Internet Explorer 8, maxSession=1 will ensure that you never have more than 1 browser running. With maxSession=2 you can have 2 Firefox tests at the same time, or 1 Internet Explorer and 1 Firefox test).
 
- * -browser < params >	If –browser is not set, a node will start with 5 firefox, 1 chrome, and 1 internet explorer instance (assuming it’s on a windows box). This parameter can be set multiple times on the same line to define multiple types of browsers.
+ * -browser < params >	If -browser is not set, a node will start with 5 firefox, 1 chrome, and 1 internet explorer instance (assuming it’s on a windows box). This parameter can be set multiple times on the same line to define multiple types of browsers.
 Parameters allowed for -browser:
 browserName={android, chrome, firefox, htmlunit, internet explorer, iphone, opera} 
 version={browser version}
