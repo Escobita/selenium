@@ -49,6 +49,13 @@ driver.execute_script("return arguments[0].tagName", element) #=> "BODY"
 # wait for a specific element to show up
 wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
 wait.until { driver.find_element(:id => "foo") }
+
+# switch to a frame
+driver.switch_to.frame "some-frame" # name or id
+driver.switch_to.frame driver.find_element(:id, 'some-frame') # frame element 
+
+# switch back to the main document 
+driver.switch_to.default_content
 }}}
 
 Element examples:
