@@ -143,7 +143,7 @@ WebDriver driver = new HtmlUnitDriver() {
 
 === Q: Is !WebDriver thread-safe? ===
 
-A: !WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable.
+A: !WebDriver is not thread-safe. Having said that, if you can serialise access to the underlying driver instance, you can share a reference in more than one thread. This is not advisable. You /can/ on the other hand instantiate one WebDriver instance for each thread.
 
 === Q: How do I type into a contentEditable iframe? ===
 
@@ -244,3 +244,14 @@ A:
 driver.findElement(By.tagName("body")).getText()
 }}}
 will get you the text of the page. To verifyTextPresent/assertTextPresent, from that you can use your favourite test framework to assert on the text.  To waitForTextPresent, you may want to investigate the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/support/ui/WebDriverWait.html WebDriverWait] class.
+
+
+
+=== Q: The socket lock seems like a bad design. I can make it better ===
+
+A: the socket lock that guards the starting of firefox is constructed with the following design constraints:
+  * It is shared among all the language bindings; ruby, java and any of the other bindings can coexist at the same time on the same machine.
+  * Certain critical parts of starting firefox must be exclusive-locked on the machine in question.
+  * The socket lock itself is not the primary bottleneck, starting firefox is.
+
+People have been known to override specific methods in their local implementations to replace the socket-lock with fair single-language locking mechanisms.
