@@ -13,6 +13,11 @@ Once you have downloaded selenium-server-standalone-{VERSION}.jar place it on th
 java -jar selenium-server-standalone-{VERSION}.jar
 }}}
 
+==Considerations when running server ==
+The caller is expected to terminate each session properly, calling either Selenium#stop() or WebDriver#quit. 
+
+The selenium-server keeps in-memory logs for each ongoing session, which are cleared when Selenium#stop() or WebDriver#quit is called. If you forget to terminate these sessions your server may leak memory. If you keep extremely long-running sessions you will probably need to stop/quit every now and then (or increase memory with -Xmx jvm option)
+
 ==Configuring the Server in Code ==
 
 In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
