@@ -11,39 +11,21 @@ The diagram above illustrates the design of the InternetExplorerDriver at a high
 
 == Client Code Into the Driver ==
 
-Key files: [http://code.google.com/p/selenium/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h webdriver.h]
-
-Language bindings are (or should be) thin shims around the underlying driver. In the case of the InternetExplorerDriver, we communicate from the "Object Based" language bindings to a flattened API presented in [http://code.google.com/p/selenium/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h webdriver.h]. These are presented as a series of exported C functions, and so can be called without difficulty using libraries such as [https://jna.dev.java.net/ JNA], [http://docs.python.org/library/ctypes.html ctypes], [http://msdn.microsoft.com/en-us/library/aa446536.aspx pinvoke] or [http://www.ruby-doc.org/stdlib/libdoc/dl/rdoc/index.html DL]. This increases the complexity of implementing the driver itself, but makes writing new clients a lot easier. It also means that clients are responsible for memory management.
+Language bindings are (or should be) subclasses of RemoteWebDriver. We use the WebDriver JsonWireProtocol to communicate with a local instance of an HTTP server. This greatly simplifies the implementation of the language-specific code, and minimzes the number of entry points into the C++ DLL that must be called using a native-code interop technology such as [https://jna.dev.java.net/ JNA], [http://docs.python.org/library/ctypes.html ctypes], [http://msdn.microsoft.com/en-us/library/aa446536.aspx pinvoke] or [http://www.ruby-doc.org/stdlib/libdoc/dl/rdoc/index.html DL].
 
 === Memory Management ===
 
-The rule of thumb: if you ask the driver for it, you're responsible for ensuring that the memory is cleared. The basic pattern is that followed by the [http://code.google.com/p/webdriver/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/webdriver.h#43 StringWrapper], who's usage is demonstrated below (in C, and omitting any checking of error codes):
+The IE driver utilizes the Active Template Library (ATL) to take advantage of its implementation of smart pointers to COM objects. This makes reference counting and cleanup of COM objects much easier.
 
-{{{
-StringWrapper* wrapper;
-wdGetCurrentUrl(driver, &wrapper);
+== Why Do We Require Protected Mode Settings Changes? ==
 
-/* Use the wrapper */
+IE 7 on Windows Vista introduced the concept of Protected Mode, which allows for some measure of protection to the underlying Windows OS when browsing. The problem is that when you manipulate an instance of IE via COM, and you navigate to a page that would cause a transition into or out of Protected Mode, IE requires that another browser session be created. This will orphan the COM object of the previous session, not allowing you to control it any longer.
 
-// Now free it
-errorCode = wdFreeString(wrapper);
-}}}
+In IE 7, this will usually manifest itself as a new top-level browser window; in IE 8, a new IExplore.exe process will be created, but it will usually (not always!) seamlessly attach it to the existing IE top-level frame window. Any browser automation framework that drives IE externally (as opposed to using a WebBrowser control) will run into these problems.
 
-In languages that support object lifecycles, you may find it easiest to ensure that the handle is freed in an object's finalizer or destructor.
+In order to work around that problem, we dictate that to work with IE, all zones must have the same Protected Mode setting. As long as it's on for all zones, or off for all zones, we can prevent the transistions to different Protected Mode zones that would invalidate our browser object. It also allows users to continue to run with UAC turned on, and to run securely in the browser if they set Protected Mode "on" for all zones.
 
-=== Error Codes ===
-
-Key files: [http://code.google.com/p/selenium/source/browse/trunk/common/src/cpp/webdriver-interactions/errorcodes.h errorcodes.h]
-
-Each function exposed from `webdriver.h` returns an `int` as a result. When the function succeeds, this result will be 0. In all other cases, an error code is returned, as indicated in errorcodes.h. Client implementations are free to interpret these response codes as they wish to, but the Java code attempts to give meaningful exceptions.
-
-== The Driver to IE ==
-
-Key files: [http://code.google.com/p/selenium/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/IEThread.h IEThread.h], [http://code.google.com/p/selenium/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/InternetExplorerDriver.cpp InternetExplorerDriver.cpp], [http://code.google.com/p/selenium/source/browse/trunk/jobbie/src/cpp/InternetExplorerDriver/IEThreadExplorer.cpp IEThreadExplorer.cpp]
-
-The C code in `webdriver.h` is ultimately a thin wrapper around C++ classes that model the the Object-based design of the Java code (the `InternetExplorerDriver (C++)` and `IEThreadExplorer (C++)` in the diagram) The underlying IE COM interfaces are designed for use in a Single Thread Apartment (STA) model. That is, the COM object must only ever be accessed from a single thread. Unfortunately, we cannot control how many threads call into our implementing library, and there are perfectly reasonable occasions where more than one thread may attempt to call the underlying library, even if in serial fashion (for example, the RemoteWebDriver is hosted in a servlet container, where many threads may be in use) In order to isolate the COM interfaces, we pass messages across a thread boundary using the Win32 PostMessage API.
-
-This design causes a certain amount of complexity to enter the InternetExplorerDriver, but does mean that client code can afford to be ignorant of the constraints offered by the underlying implementation: this is seen as being a Good Thing by the webdriver team.
+In earlier releases of the IE driver, if the user's Protected Mode settings were not correctly set, we would launch IE, and the process would simply hang until the HTTP request timed out. This was suboptimal, as it gave no indication what needed to be set. Erring on the side of caution, we do not modify the user's Protected Mode settings. Current versions, however check that the Protected Mode settings are properly set, and will return an error response if they are not.
 
 == Keyboard and Mouse Input ==
 
@@ -55,7 +37,7 @@ The code for doing this is in [http://code.google.com/p/selenium/source/browse/t
 
 = Working On the InternetExplorerDriver = 
 
-Currently, all the tests for the InternetExplorerDriver are written in Java, and so you'll need both Visual Studio 2005 and a Java IDE installed on your machine. If you're using Eclipse, the process for making and testing modifications is:
+Currently, there are tests that will run for the InternetExplorerDriver in all languages (Java, C#, Python, and Ruby), so you should be able to test your changes to the native code no matter what language you're comfortable working in from the client side. For working on the C++ code, you'll need Visual Studio 2010 Professional or higher. Unfortunately, the C++ code of the driver uses ATL to ease the pain of working with COM objects, and ATL is not supplied with Visual C++ 2010 Express Edition.  If you're using Eclipse, the process for making and testing modifications is:
 
   # Edit the C++ code in VS.
   # Build the code to ensure that it compiles
@@ -64,6 +46,4 @@ Currently, all the tests for the InternetExplorerDriver are written in Java, and
   # Edit the {{{SingleTestSuite}}} so that it is {{{usingDriver(IE)}}}
   # Create a JUnit run configuration that uses the "webdriver-internet-explorer" project. If you don't do this, the test won't work at all, and there will be a somewhat cryptic error message on the console.
 
-Once the basic setup is done, you can start working on the code pretty quickly. As an alternative, there will soon be .Net bindings added (using C#) Once these have been added, it should be possible to make changes to the IE driver entirely in Visual Studio.
-
-When working with Java, any unhandled exception in the C++ code may cause the JVM to die. If this happens, take a look at the log files that Java generates. This will give you a hint at where to start when tracking down the problem. When the IE driver is compiled in "Release" mode, we turn on Structured Exception Handling, which means that rather than taking out the JVM an `IllegalStateException` is thrown. 
+Once the basic setup is done, you can start working on the code pretty quickly. You can attach to the process you execute your code from using Visual Studio (from the Debug menu, select Attach to Process...).
