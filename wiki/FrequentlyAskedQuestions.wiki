@@ -254,4 +254,8 @@ A: the socket lock that guards the starting of firefox is constructed with the f
   * Certain critical parts of starting firefox must be exclusive-locked on the machine in question.
   * The socket lock itself is not the primary bottleneck, starting firefox is.
 
-People have been known to override specific methods in their local implementations to replace the socket-lock with fair single-language locking mechanisms.
+
+The SocketLock is an implementation of the Lock interface. This allows
+for a pluggable strategy for your own implementation of it. To switch
+to a different implementation, subclass the FirefoxDriver and override
+the "obtainLock" method.
