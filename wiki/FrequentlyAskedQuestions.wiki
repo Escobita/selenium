@@ -128,7 +128,7 @@ A: When creating your instance of the HtmlUnitDriver, override the "modifyWebCli
 WebDriver driver = new HtmlUnitDriver() {
   protected WebClient modifyWebClient(WebClient client) {
     // This class ships with HtmlUnit itself
-    DefaultCredentialsProvider creds = DefaultCredentialsProvider();
+    DefaultCredentialsProvider creds = new DefaultCredentialsProvider();
 
     // Set some example credentials
     creds.addCredentials("username", "password");
