@@ -129,7 +129,11 @@ You can specify the location of the Chrome binary by passing the "chrome.binary"
   WebDriver driver = new ChromeDriver(capabilities);
 }}}
 
-
+Or in Ruby:
+{{{
+  Selenium::WebDriver::Chrome.path = "/usr/lib/chromium-browser/chromium-browser"
+  driver = Selenium::WebDriver.for :chrome
+}}}
 == Known Issues ==
 
 There are a handful of known issues with !ChromeDriver, listed below:
