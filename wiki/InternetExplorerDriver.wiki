@@ -32,3 +32,7 @@ As the InternetExplorerDriver is Windows-only, it attempts to use so-called "nat
 == How InternetExplorerDriver Selects the IE Binary ==
 
 This is done by the client side code. The client side checks to see if the OS is x64. If this succeeds then it checks that the process running the client side code is a 64-bit process. If that succeeds then the client code will try load the 64-bit version of Internet Explorer. If any of the checks for x64 fail the code will try use 32-bit version of Internet Explorer.
+
+== Multiple instances of InternetExplorerDriver ==
+
+Unlike other WebDriver classes, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the Remote!WebDriver? and virtual machines.
