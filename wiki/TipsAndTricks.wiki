@@ -60,3 +60,14 @@ FirefoxProfile profile = new FirefoxProfile();
 profile.setEnableNativeEvents(true);
 WebDriver driver = new FirefoxDriver(profile);
 }}}
+
+== How to set language in profile ==
+{{{
+profile.setPreference( "intl.accept_languages", "no,en-us,en" ); 
+}}}
+
+== How to find profile keys ==
+Look in _prefs.js_ of your Firefox profile.
+
+==How to find Firefox profile ==
+Goto (url) about:support or FireFox Help menu / Troubleshooting information
