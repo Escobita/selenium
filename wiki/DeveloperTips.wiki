@@ -82,3 +82,7 @@ When suspecting additional logging from Firefox could be beneficial, one can cra
 export NSPR_LOG_MODULES=all:3
 }}}
 Setting this environment variable will cause Firefox to log additional messages to the console. Use this environment variable together with `webdriver.firefox.logfile` to get a hold of Firefox's output to the console.
+
+== Adding a test ==
+Most of WEbDriver's test cases live under java/client/test/org/openqa/selenium. For example, to demonstrate an issue with clicking on elements, a test case should be added to  ClickTest. The test cases already have a driver instance - no need to create one.
+The test use pages that are served by an in-process server, served from common/src/web. Their URLs are provided by the Pages class, so when adding a page and add it to the Pages class as well.
