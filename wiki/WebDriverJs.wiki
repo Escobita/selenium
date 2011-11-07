@@ -1,4 +1,5 @@
 #summary WebDriver's JavaScript language bindings.
+#labels WebDriver,JavaScript
 
 = WebDriverJS =
 <wiki:toc/>
