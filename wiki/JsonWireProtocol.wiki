@@ -13,7 +13,7 @@ $ cd wire_protocol
 $ svn update --depth=infinity ./wiki
 $ svn update --depth=files ./trunk
 # modify ./trunk/wire.py
-$ python ./trunk/wire.py > ./wiki/JsonWireProtocol.wiki
+$ python ./trunk/wire.py
 $ svn commit ./trunk/wire.py ./wiki/JsonWireProtocol.wiki
 
 ========================================================
@@ -2736,4 +2736,3 @@ location for correctly generating native events.</dd>
 </dl>
 </dd>
 </dl>
-
