@@ -270,6 +270,10 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_/session/:sessionId/frame /session/:sessionId/frame] || Change focus to another frame on the page. ||
 || POST || [#POST_/session/:sessionId/window /session/:sessionId/window] || Change focus to another window. ||
 || DELETE || [#DELETE_/session/:sessionId/window /session/:sessionId/window] || Close the current window. ||
+|| POST || [#POST_/session/:sessionId/window/:windowHandle/size /session/:sessionId/window/:windowHandle/size] || Change the size of the specified window. ||
+|| GET || [#GET_/session/:sessionId/window/:windowHandle/size /session/:sessionId/window/:windowHandle/size] || Get the size of the specified window. ||
+|| POST || [#POST_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Change the position of the specified window. ||
+|| GET || [#GET_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Get the position of the specified window. ||
 || GET || [#GET_/session/:sessionId/cookie /session/:sessionId/cookie] || Retrieve all cookies visible to the current page. ||
 || POST || [#POST_/session/:sessionId/cookie /session/:sessionId/cookie] || Set a cookie. ||
 || DELETE || [#DELETE_/session/:sessionId/cookie /session/:sessionId/cookie] || Delete all cookies visible to the current page. ||
@@ -1020,6 +1024,120 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*Potential Errors:*</dt>
 <dd>`NoSuchWindow` - If the window specified by `name` cannot be found.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window/:windowHandle/size ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/window/:windowHandle/size ====
+</dd>
+<dd>
+<dl>
+<dd>Change the size of the specified window. If the :windowHandle URL parameter is "current", the currently active window will be resized.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`width` - `{number}` The new window width.</dd>
+<dd>`height` - `{number}` The new window height.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== GET /session/:sessionId/window/:windowHandle/size ====
+</dd>
+<dd>
+<dl>
+<dd>Get the size of the specified window. If the :windowHandle URL parameter is "current", the size of the currently active window will be returned.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{width: number, height: number}` The size of the window.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the specified window cannot be found.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window/:windowHandle/position ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/window/:windowHandle/position ====
+</dd>
+<dd>
+<dl>
+<dd>Change the position of the specified window. If the :windowHandle URL parameter is "current", the currently active window will be moved.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`x` - `{number}` The X coordinate to position the window at, relative to the upper left corner of the screen.</dd>
+<dd>`y` - `{number}` The Y coordinate to position the window at, relative to the upper left corner of the screen.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== GET /session/:sessionId/window/:windowHandle/position ====
+</dd>
+<dd>
+<dl>
+<dd>Get the position of the specified window. If the :windowHandle URL       parameter is "current", the position of the currently active window will be returned.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{x: number, y: number}` The X and Y coordinates for the window, relative to the upper left corner of the screen.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the specified window cannot be found.</dd>
 </dl>
 </dd>
 </dl>
