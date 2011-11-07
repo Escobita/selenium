@@ -1,4 +1,4 @@
-#summary Design document for WebDriver's JavaScript language bindings.
+#summary WebDriver's JavaScript language bindings.
 
 = WebDriverJS =
 <wiki:toc/>
