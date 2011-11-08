@@ -135,6 +135,6 @@ Other things to check:
 
 = When do the prebuilds need re-building? =
 
-* Most changes to the atoms will lead to a new cpp/IEDriver/Generated/atoms.h file.  If this is the case, the IEDriver prebuilds needs recompiling, in a Visual Studio command prompt on Windows.
-* The iPhone driver, and ChromeDriver will also be affected by these changes, but let's be honest here, you probably aren't going to do anything about those.
-* Any change to the C++ under cpp will either need the IEDriver, firefox-driver, or both to be rebuilt.
+ * Most changes to the atoms will lead to a new cpp/IEDriver/Generated/atoms.h file.  If this is the case, the IEDriver prebuilds needs recompiling, in a Visual Studio command prompt on Windows.
+ * The iPhone driver, and ChromeDriver will also be affected by these changes, but let's be honest here, you probably aren't going to do anything about those.
+ * Any change to the C++ under cpp will either need the IEDriver, firefox-driver, or both to be rebuilt.
