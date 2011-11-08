@@ -5,7 +5,7 @@
 = For Everything =
 
   # Bump the revision numbers at the top of the Rakefile.
-  # Bump the revision number in firefox's install.rdf.
+  # Bump the revision number in javascript/firefox-driver/extension/install.rdf
   # Bump the revision number in "java/server/src/org/openqa/selenium/server/VERSION.txt" and "javascript/selenium-core/scripts/selenium-version.js"
   # Commit version number bump.
 
