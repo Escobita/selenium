@@ -108,7 +108,7 @@ For Javascript:
 
 == Nothing Compiles ==
 
-Make sure that you've got the JAVA_HOME environment setting properly set up. In addition, make sure that you can execute "rake" "java", "jar" and "javac" from the command line. If you're on Windows, you'll also need to be able to execute "devenv". You may need to install a JDK. If a C++ component doesn't build properly on Windows, make sure that you are actually using the VS2008 version of msbuild (this might not be the case, even if you're in a VS2008 Command Prompt)
+Make sure that you've got the JAVA_HOME environment setting properly set up. In addition, make sure that you can execute "rake" "java", "jar" and "javac" from the command line. If you're on Windows, you'll also need to be able to execute "devenv". You may need to install a JDK. If a C++ component doesn't build properly on Windows, make sure that you are actually using the VS2010 version of msbuild (this might not be the case, even if you're in a VS2010 Command Prompt)
 
 == All Firefox Tests Fail ==
 
