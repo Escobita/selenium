@@ -51,7 +51,7 @@ $ node
 
 === In the Browser ===
 
-In addition to node, WebDriverJS may also be used directly in the browser. When running in a browser, WebDriverJS communicates with the !WebDriver server using the same [JsonWireProtocol protocol] as the other language bindings. While the !WebDriver client is not bound by a security sandbox when running in node, it will be bound by the [http://www.google.com/url?q=http://www.w3.org/Security/wiki/Same_Origin_Policy same origin policy] in a browser. In order to communicate with a !WebDriver server which may be on a different domain, the client will select the most appropriate mechanism based on the capabilities of the current browser: [#Cross-Origin_Resource_Sharing cross-origin resource sharing] or [#JSONP]. This selection is handled by the `Builder`:
+In addition to node, WebDriverJS may also be used directly in the browser. When running in a browser, WebDriverJS communicates with the !WebDriver server using the same [JsonWireProtocol protocol] as the other language bindings. While the !WebDriver client is not bound by a security sandbox when running in node, it will be bound by the [http://www.google.com/url?q=http://www.w3.org/Security/wiki/Same_Origin_Policy same origin policy] in a browser. In order to communicate with a !WebDriver server which may be on a different domain, the client will select the most appropriate mechanism based on the capabilities of the current browser: [#Cross-Origin_Resource_Sharing cross-origin resource sharing] or [#JSONP JSONP]. This selection is handled by the `Builder`:
 
 {{{
 <!DOCTYPE html>
@@ -172,12 +172,49 @@ driver.getTitle().then(function(title) {
 
 ==== On Frames and Callbacks ====
 
-_*TODO*_
+Internally, the promise manager maintains a call stack. Upon each turn of the manager's execution loop, it will pull a task to execute from the queue of the top-most frame. Any commands scheduled within the callback of a previous command will be scheduled in a new frame, ensuring they run before any tasks previously scheduled. The end result is that if your test is written-in line, with all callbacks defined by function literals, commands should execute in the order they are read vertically on the screen. For example, consider the following WebDriverJS test case:
+
+{{{
+driver.get(MY_APP_URL);
+driver.getTitle().then(function(title) {
+  if (title === 'Login page') {
+    driver.findElement(By.id('user')).sendKeys('bugs');
+    driver.findElement(By.id('pw')).sendKeys('bunny');
+    driver.findElement(By.id('login')).click();
+  }
+});
+driver.findElement(By.id('userPreferences')).click();
+}}}
+
+This test case could be rewritten using !WebDriver's Java API as follows:
+
+{{{
+driver.get(MY_APP_URL);
+if (driver.getTitle().equals("Login Page")) {
+  driver.findElement(By.id("user")).sendKeys("bugs");
+  driver.findElement(By.id("pw")).sendKeys("bunny");
+  driver.findElement(By.id("login")).click();
+}
+driver.findElement(By.id("userPreferences")).click();
+}}}
 
 
-=== Error Handling ===
+==== Error Handling ====
 
-_*TODO*_
+Since every WebDriverJS action executes asynchronously, you cannot use try-catch blcoks. Instead, you must register _errbacks_ on the promised result of teh command in question. Each errback may either throw another Error, in which case it will be passed to the next errback in the chain or it may return a different value to suppress the error and switch back to the callback processing chain.
+
+If a rejected promise (not just those from !WebDriver commands) is not handled by an errback handler, that error will propagate to the parent frame's errback chain. If an error makes its way to the top frame without being suppressed, the promise manager will dispatch an `uncaughtException` event, discarding all other commands that have been queued:
+
+{{{
+driver.switchTo().window('foo').then(null, function(e) {
+  // Ignore NoSuchWindow errors. Let any others bubble up.
+  if (e.code !== bot.ErrorCode.NO_SUCH_WINDOW) {
+    throw e;
+  }
+});
+// This will never execute if the error above is not suppressed.
+driver.getTitle();
+}}}
 
 === Communicating with the Server ===
 
