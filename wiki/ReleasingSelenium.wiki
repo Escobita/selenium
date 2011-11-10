@@ -94,7 +94,12 @@
 
 = For Python =
 # To release a new version you need to be registered as a Owner/Maintener on pypi.python.org
- # Bump the version number in setup.py 
+ # Bump the version numbers
+   # in setup.py 
+   # in py/README
+   # in py/selenium/__init__.py
+   # in py/selenium/webdriver/__init__.py
+
  # `./go py_release` ~ just don't have your credentials stored in ~/.pypirc
  # manually edit setup.py that is inside dist/selenium-2-XX-X.tar.gz and remove all lines with "test" in them
  # repackage artifact and upload to pypi
