@@ -248,6 +248,7 @@ Given these mappings, the server should always route requests whose final path s
 || *HTTP Method* || *Path* || *Summary* ||
 || GET || [#GET_/status /status] || Query the server's current status. ||
 || POST || [#POST_/session /session] || Create a new session. ||
+|| GET || [#GET_/sessions /sessions] || Returns a list of the currently active sessions. ||
 || GET || [#GET_/session/:sessionId /session/:sessionId] || Retrieve the capabilities of the specified session. ||
 || DELETE || [#DELETE_/session/:sessionId /session/:sessionId] || Delete the session. ||
 || POST || [#POST_/session/:sessionId/timeouts/async_script /session/:sessionId/timeouts/async_script] || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. ||
@@ -381,6 +382,34 @@ Create a new session. The server should attempt to create a session that most cl
 <dl>
 <dt>*Returns:*</dt>
 <dd>A `303 See Other` redirect to `/session/:sessionId`, where `:sessionId` is the ID of the newly created session.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /sessions ===
+
+<dl>
+<dd>
+==== GET /sessions ====
+</dd>
+<dd>
+<dl>
+<dd>
+Returns a list of the currently active sessions. Each session will be returned as a list of JSON objects with the following keys:
+
+|| *Key* || *Type* || *Description ||
+|| id || string || The session ID. ||
+|| capabilities || object || An object describing the session's [#Actual_Capabilities capabilities]. ||
+
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<Object>}` A list of the currently active sessions.</dd>
 </dl>
 </dd>
 </dl>
