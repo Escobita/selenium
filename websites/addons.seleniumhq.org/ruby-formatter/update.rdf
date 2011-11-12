@@ -7,6 +7,20 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
+            <em:version>1.4.0</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>8.*</em:maxVersion>
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/ruby/1.4.0/ruby-format-1.4.0.xpi</em:updateLink>
+                <em:updateHash>sha1:6fd2422c449d0cc57fbdacbc15b7a06a882dd862</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
             <em:version>1.2.0</em:version>
             <em:targetApplication>
               <RDF:Description>

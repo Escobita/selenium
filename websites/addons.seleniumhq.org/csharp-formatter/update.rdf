@@ -12,6 +12,20 @@
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>8.*</em:maxVersion>
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/csharp/1.4.0/csharp-format-1.4.0.xpi</em:updateLink>
+                <em:updateHash>sha1:31b55d779ffefd55f930af498975cdf2939a7e02</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
+            <em:version>1.2.0</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/csharp/1.2.0/csharp-format-1.2.0.xpi</em:updateLink>
                 <em:updateHash>sha1:ed08d16f1ce5a7a84be5ba07889295160595f587</em:updateHash>

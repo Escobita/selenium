@@ -12,6 +12,20 @@
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>8.*</em:maxVersion> 
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.4.0/selenium-ide-1.4.0.xpi</em:updateLink>
+                <em:updateHash>sha1:b1dae17c8aad2ae271a950ff1c34a5d7f8887928</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
+            <em:version>1.3.0</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>7.*</em:maxVersion> 
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.3.0/selenium-ide-1.3.0.xpi</em:updateLink>
                 <em:updateHash>sha1:72ed3edb2061bdd519a5773c7c70a9c845e9a404</em:updateHash>

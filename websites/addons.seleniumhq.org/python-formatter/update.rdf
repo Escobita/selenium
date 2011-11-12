@@ -7,6 +7,20 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
+            <em:version>1.4.0</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>8.*</em:maxVersion>            
+                  <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/python/1.4.0/python-format-1.4.0.xpi</em:updateLink>
+                <em:updateHash>sha1:ef3c1d8c642eeede0f8494fd81b23c00b144362f</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
             <em:version>1.2.0</em:version>
             <em:targetApplication>
               <RDF:Description>
