@@ -20,7 +20,7 @@ The server expects you to have Chrome installed in the default location for each
 
 == Getting Started ==
 
-To get set up, first [http://code.google.com/p/selenium/downloads/list download] the appropriate prebuilt server.  Make sure the downloaded server can be located on your `PATH` or specify its location via the `webdriver.chrome.driver` system property. Finally, all you need to do is create a new `ChromeDriver` instance:
+To get set up, first [http://code.google.com/p/chromium/downloads/list download] the appropriate prebuilt server.  Make sure the downloaded server can be located on your `PATH` or specify its location via the `webdriver.chrome.driver` system property. Finally, all you need to do is create a new `ChromeDriver` instance:
 {{{
 WebDriver driver = new ChromeDriver();
 driver.get("http://www.google.com");
