@@ -10,8 +10,8 @@ Android WebDriver allows to run automated end-to-end tests that ensure your site
 We try to stay as close as possible to what the user interaction with the browser is. To do so, Android WebDriver runs the tests against a WebView (rendering component used by the Android browser) configured like the Android browser. To interact with the page Android WebDriver uses native touch and key events. To query the DOM, it uses the JavaScript Atoms libraries. 
 
 == Supported Platforms ==
+   * [http://code.google.com/p/selenium/downloads/list The current apk works with Honeycomb SDK 3.1 and onwards including ICS]
    * [http://code.google.com/p/selenium/downloads/detail?name=android-server-2.6.0.apk&can=1&q=android#makechanges For Android Froyo (2.2), download the apk 2.6.0].
-   * [http://code.google.com/p/selenium/downloads/list The current apk download supports Gingerbread  (2.3) and onwards including ICS]
 
 == Known Issues ==
    * Support for SDK versions 2.0 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
