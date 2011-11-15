@@ -1,6 +1,10 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.4.1==
+
+   * Bug - Apparently I shipped without switching all the version numbers correctly. (Adam)
+
 ==1.4.0==
    * New - Firefox 8 support (again, just a version max version bump)
 
