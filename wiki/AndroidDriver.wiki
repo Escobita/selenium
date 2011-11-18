@@ -388,3 +388,25 @@ caps.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 
 AndroidDriver driver = new AndroidDriver(caps);
 }}}
+
+== Can't talk to the emulator or device ==
+Sometimes executing adb commands will fail because the adb server fails to talk to the device or emulator. To fix this kill the adb server and restart it:
+{{{
+$adb kill-server
+
+$adb start-server
+}}}
+
+== Inconsistent certificates when installing the apk ==
+You may see the following error when trying to install an apk:
+{{{
+Failure [INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES]
+}}}
+
+This means that the certificates used to sign the apk are different from the certificate used with the already installed apk. To fix this, unistall the current apk:
+
+{{{
+$adb uninstall org.openqa.selenium.android.app/.MainActivity
+}}}
+
+You can also uninstall an app manually, by opening the Settings -> Applications -> select WebDriver -> Uninstall.
