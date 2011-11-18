@@ -19,7 +19,7 @@ To use the client libraries (the remote webdriver client, ChromeDriver, FirefoxD
   <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-java</artifactId>
-    <version>2.5.0</version>
+    <version>2.13.0</version>
   </dependency>
 }}}
 
@@ -29,7 +29,7 @@ If you want to start a selenium server, you will need the following dependency:
   <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-server</artifactId>
-    <version>2.5.0</version>
+    <version>2.13.0</version>
   </dependency>
 }}}
 
