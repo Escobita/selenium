@@ -12,19 +12,20 @@ There is a general problem of TCP/IP v4, where the TCP/IP stack uses ephemeral p
 
 [http://en.wikipedia.org/wiki/Ephemeral_port Wikipedia on Ephemeral ports] or a quick google of "ephemeral sockets <your os name>" will tell you what your current OS delivers and how to set it.
 
-Currently (2.0b1) it seems like a firefox running at full blast consumes something in the range of 2000 ephemeral ports per firefox; your mileage will vary here. This means you can 
+Currently (2.13.0) it seems like a firefox running at full blast consumes something in the range of 2000 ephemeral ports per firefox; your mileage will vary here. This means you can 
 run out of ephemeral port on Windows XP with as litttle as 2 browsers, maybe even 1 if you for instance iterate extermly quickly .
 
 
 ===Will it be fixed ?===
-The solution to the ephemeral socket problem is HTTP1.1 keep alive on the connections. WebDriver spans across a *large* amount of technology platforms (multiple clients, multiple browsers). Some of the current browser support (firefox) will probably 
-need new technology stacks to support keep-alive, which means you probably won't see it for 2.0. Some other combinations will probably be fixed.
+The solution to the ephemeral socket problem is HTTP1.1 keep alive on the connections. Firefox does not support keep-alive as of version 2.13.0. 
 
 ===Things that are fixed===
  * The java client.
  * Selenium server ("rc").
- *    The ruby bindings (see notes in [RubyBindings]).
+ * Selenium grid hub & nodes
+ * The ruby bindings (see notes in [RubyBindings]).
  * The IE driver.
+ * ChromeDriver
 
 The means you can use the java client to scale out to remote boxes running selenium server and never have any problems on the central build server. You may need to solve socket problems on the remote boxes though.
 
