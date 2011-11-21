@@ -5,7 +5,7 @@
 
    * Bug - Fixed 'break' command (#725)
    * Bug - Source view is monospace now (#522)
-   * New - Implemented 'select' foramming for WebDriver bindings (Java, C#, Python)
+   * New - Implemented 'select' formatting for WebDriver bindings (Java, C#, Python)
    * Bug - Fixed compile-time and run-time errors in the code formatted for WebDriverBackedSelenium
    * Bug - Fixed 'baseUrl' and 'get' formatting errors in various formatters to handle relative and absolute URLs
 
