@@ -1,7 +1,7 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
-==[upcoming release]==
+==upcoming release==
 
    * Bug - Fixed 'break' command (#725)
    * Bug - Source view is monospace now (#522)
