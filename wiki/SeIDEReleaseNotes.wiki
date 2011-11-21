@@ -1,6 +1,14 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==[upcoming release]==
+
+   * Bug - Fixed 'break' command (#725)
+   * Bug - Source view is monospace now (#522)
+   * New - Implemented 'select' foramming for WebDriver bindings (Java, C#, Python)
+   * Bug - Fixed compile-time and run-time errors in the code formatted for WebDriverBackedSelenium
+   * Bug - Fixed 'baseUrl' and 'get' formatting errors in various formatters to handle relative and absolute URLs
+
 ==1.4.1==
 
    * Bug - Apparently I shipped without switching all the version numbers correctly. (Adam)
