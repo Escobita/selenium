@@ -13,10 +13,6 @@ We try to stay as close as possible to what the user interaction with the browse
    * [http://code.google.com/p/selenium/downloads/list The current apk works with Honeycomb SDK 3.1 and onwards including ICS]
    * [http://code.google.com/p/selenium/downloads/detail?name=android-server-2.6.0.apk&can=1&q=android#makechanges For Android Froyo (2.2), download the apk 2.6.0].
 
-== Known Issues ==
-   * Support for SDK versions 2.0 and prior, has been deprecated. The driver is unlikely to work reliably on these versions. There were several limitations, for instance XPath wasn't supported natively and the Android Driver used to inject an Xpath library in WebView. We recommend using devices with version 2.2 or later.
-   * Does not work on emulators running 2.3 because of an emulator bug. However it works on Devices running 2.3 (and runs much faster on those).
-
 == Useful Related Links ==
    * [http://android-developers.blogspot.com/2011/10/introducing-android-webdriver.html Android WebDriver on Android Blog]
    * [http://google-opensource.blogspot.com/2011/10/test-your-mobile-web-apps-with.html Android WebDriver on Google Open Source Blog]
