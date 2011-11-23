@@ -13,12 +13,12 @@ Copy "webdriver-all.jar" and all the associated JARs to your CLASSAPATH. This wi
  
   * Separates where the tests are running from where the browser is.
   * Allows tests to be run with browsers not available on the current OS (because the browser can be elsewhere)
-  * Introduces extra latency to tests, particularly when exceptions are thrown.
 
 == Cons ==
   
   * Requires an external servlet container to be running
   * You may find problems with line endings when getting text from the remote server
+  * Introduces extra latency to tests, particularly when exceptions are thrown.
 
 == Using == 
 
