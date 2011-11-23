@@ -1,7 +1,7 @@
 #summary Information about the RemoteWebDriver
 #labels WebDriver
 
-= Remote WebDriver =
+= Remote !WebDriver =
 
 This is information about using the client implementation of the RemoteWebDriver. This is the code that is used within your tests. For information on how to set up the server-side, please take a look at the RemoteWebDriverServer page.
 
