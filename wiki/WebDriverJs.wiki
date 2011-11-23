@@ -96,17 +96,14 @@ One of the advantages to running WebDriverJS in the browser is that WebDriverJS 
 </script>
 }}}
 
-_Note:_ Using WebDriverJS in the browser is a work-in-progress. A full debugging story will be coming soon. In the meantime, to acquire a browser for experimenting, use the `//javascript/webdriver-jsapi/node/demo.js` script:
+You can debug a WebDriverJS test in the browser using !WebDriver's stand alone server:
 
 {{{
-$ ./go webdriverjs selenium-server-standalone
-$ java -jar build/java/server/src/org/openqa/selenium/server/server-standalone.jar &
-$ ./go debug-server &
-$ node javascript/webdriver-jsapi/node/demo.js \
-    --browser=chrome \
-    --wdUrl=http://localhost:4444/wd/hub \
-    --url=http://localhost:2310/javascript/webdriver-jsapi/test/e2e/example_test.html
+$ ./go selenium-server-standalone
+$ java -jar build/java/server/src/org/openqa/grid/selenium/selenium-standalone.jar &
 }}}
+
+After starting the server, open a browser to the !WebDriver control panel: `http://localhost:4444/wd/hub`.  You can use this control panel to view, create, or delete sessions on the server.  After selecting a session to use for debugging, click the `Load Script` button. In the pop-up dialog, enter the URL for your WebDriverJS test: the server will open that page in your browser with the additional parameters necessary for a WebDriverJS client to communicate with the server.
 
 == Design Details ==
 
