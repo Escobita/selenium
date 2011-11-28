@@ -27,7 +27,7 @@ Simply add the {{{selenium-server-standalone.jar}}} to your CLASSPATH. You do no
 
 == Native Events and Internet Explorer ==
 
-As the InternetExplorerDriver is Windows-only, it attempts to use so-called "native", or OS-level events to perform mouse and keyboard operations in the browser. This is in contrast to using simulated JavaScript events for the same operations. The advantage of using native events is that it does not rely on the JavaScript sandbox, and it ensures proper JavaScript event propagation within the browser. However, because of the mechanisms used to construct the native events in IE, the IE driver can sometimes be affected by the browser window not having focus, particularly for mouse events. This is not an ideal solution, and remedies for it are under investigation.
+As the InternetExplorerDriver is Windows-only, it attempts to use so-called "native", or OS-level events to perform mouse and keyboard operations in the browser. This is in contrast to using simulated JavaScript events for the same operations. The advantage of using native events is that it does not rely on the JavaScript sandbox, and it ensures proper JavaScript event propagation within the browser. However, because of the mechanisms used to construct the native events in IE, the IE driver can sometimes be affected by the browser window not having focus, particularly for mouse events. Additionally, attempting to hover over an element using native events can be problematic if the physical mouse cursor is within the window boundaries. This is not an ideal solution, and remedies for it are under investigation.
 
 == How InternetExplorerDriver Selects the IE Binary ==
 
