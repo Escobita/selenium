@@ -16,17 +16,17 @@ Which will build the iPhone driver and the application to be installed. It's eas
 
 = Installing =
 
-The iphone driver application is not currently on the Apple store. To run it, you will need the iphone development tools on your local machine. These tools must be downloaded from [http://developer.apple.com/iphone apple]. To run it on your device, you will also need a provisioning profile.
+The iphone driver application is not currently on the Apple store. To run it, you will need the iphone development tools on your local machine. These tools must be downloaded from [http://developer.apple.com/xcode/index.php apple] at least version 4.2 at the time of this writing. To run it on your device, you will also need a provisioning profile (which requires a developer license).
 
 The iphone driver connects through HTTP to the iphone, ipod or iphone simulator. You can run the simulator on another machine on your network and configure webdriver to connect to it remotely.
 
 == In the simulator ==
 
-First, install the iphone SDK from here: http://developer.apple.com/iphone
+First, install the Xcode (at least version 4.2) from here: https://developer.apple.com/xcode/index.php 
 
-Download the source from [http://code.google.com/p/webdriver/source/checkout here] and open webdriver/iphone/iWebDriver.xcodeproj in xcode.
+Download the source from [http://code.google.com/p/selenium/source/checkout here] and open selenium/iphone/iWebDriver.xcodeproj in xcode.
 
-Set your build configuration to Simulator / iPhone OS 3.2 / iWebDriver. This is done in a drop-down box in the top left of the project window.
+Set your build configuration to Simulator / iPhone OS 5.0 / iWebDriver. This is done in a drop-down box in the top left of the project window.
 
 Click Build & Go. After compiling, the iphone simulator should appear and the iWebDriver app will be installed in it.
 
@@ -40,10 +40,5 @@ Download and open the iWebdriver project as above. Open Info.plist and edit the 
 
 Make sure your device is connected to your computer. Your device must also be routable from your computer. The easiest way to do this is to configure a wifi network and connect your device to it.
 
-Set your build configuration to Device / iPhone OS 2.2 / iWebDriver and click Build & Go.
+Set your build configuration to Device / iPhone OS 5.0 / iWebDriver and click Build & Go.
 
-= FAQ =
-
-*Q:* My build fails. It says it can't find JSON.h.
-
-*A:* This is a known issue and was fixed recently. Update the code, clean and rebuild.
