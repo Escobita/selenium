@@ -22,7 +22,7 @@ The Hub is the central point that will receive all the test request and distribu
 
 Open a command prompt and navigate to the directory where you copied the selenium-server-standalone file. Type the following command:
 {{{
-java -jar selenium-server-standalone-2.12.0.jar -role hub
+java -jar selenium-server-standalone-2.14.0.jar -role hub
 }}}
 The hub will automatically start-up using port 4444 by default. To change the default port, you can add the optional parameter -port when you run the command.
 You can view the status of the hub by opening a browser window and navigating to:
@@ -33,7 +33,7 @@ http://localhost:4444/grid/console
 Regardless on whether you want to run a grid with new WebDriver functionality, or a grid with Selenium 1 RC functionality, or both at the same time, you use the same selenium-server-standalone jar file to start the nodes.
 
 {{{
-java -jar selenium-server-2.12.0.jar -role node  -hub http://localhost:4444/grid/register
+java -jar selenium-server-standalone-2.14.0.jar -role node  -hub http://localhost:4444/grid/register
 }}}
 
 Note: The port defaults to 5555 if not specified whenever the "-role" option is provided and is not hub.
