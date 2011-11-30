@@ -23,6 +23,7 @@ If you're experiencing problems running a selenium test, and think that it may b
     * Which OS, browser and version of the browser are you using? This is vital.
     * Ideally, a minimal test case against a public site we can run. Here are some templates you can use to create a test case: [https://gist.github.com/1024843 Ruby]
     * How to run the test (if there's any special set up needed)
+    * It is also very helpful if you can create a [http://www.webkit.org/quality/reduction.html reduced test case]
   * Anything else we should know?
     * Such as which OS, browser and version of the browser are you using. It's such an important bit of information that we thought we'd mention it again :)
 = Why We Need This Information =
